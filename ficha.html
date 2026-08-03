@@ -948,6 +948,7 @@ a{color:var(--brass)}
           <option value="consumibles">Consumibles</option>
           <option value="otros">Otros</option>
         </select>
+        <input type="text" id="catalogo-buscar" placeholder="Buscar ítem…" style="flex:1;min-width:0">
       </div>
       <div class="carrito-lista" id="carrito-lista"></div>
       <div class="carrito-footer">
@@ -2149,6 +2150,7 @@ document.addEventListener('click', e => {
   }
   if(b.id === 'chooser-fabricante'){
     $('#scrim-chooser').classList.remove('open');
+    $('#catalogo-buscar').value = '';
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');
     return;
@@ -2757,10 +2759,14 @@ function catalogoRowHtml(item){
 
 let carritoCatalogo = [];
 
+const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+
 function renderCatalogoModal(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
-  const visibles = filtro ? S.catalogo.filter(item => grupoCompraDe(item.tipoItem) === filtro) : S.catalogo;
+  const busqueda = normalizarBusqueda($('#catalogo-buscar') ? $('#catalogo-buscar').value : '');
+  let visibles = filtro ? S.catalogo.filter(item => grupoCompraDe(item.tipoItem) === filtro) : S.catalogo;
+  if(busqueda) visibles = visibles.filter(item => normalizarBusqueda(item.nombre).includes(busqueda));
 
   const grupos = {};
   visibles.forEach(item => {
@@ -2772,7 +2778,9 @@ function renderCatalogoModal(){
     <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
     ${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}
   `).join('');
-  $('#catalogo-body').innerHTML = html || `<div class="hint">${S.catalogo.length ? 'No hay ítems en esta categoría.' : 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.'}</div>`;
+  let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
+  if(S.catalogo.length) vacioMsg = busqueda ? `No hay ítems que coincidan con "${esc($('#catalogo-buscar').value)}".` : 'No hay ítems en esta categoría.';
+  $('#catalogo-body').innerHTML = html || `<div class="hint">${vacioMsg}</div>`;
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
   renderCarritoCatalogo();
 }
@@ -3096,7 +3104,7 @@ $('#modal-save').onclick = () => {
   else S[key].push(draft);
   closeModal();
   if(key === 'inventario') renderInventario();
-  else if(key === 'catalogo'){ renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+  else if(key === 'catalogo'){ $('#catalogo-buscar').value = ''; renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
   else renderList(key);
   refresh();
 };
@@ -3105,7 +3113,7 @@ $('#modal-del').onclick = () => {
   S[key] = S[key].filter(x=>x.id!==id);
   closeModal();
   if(key === 'inventario') renderInventario();
-  else if(key === 'catalogo'){ renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+  else if(key === 'catalogo'){ $('#catalogo-buscar').value = ''; renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
   else renderList(key);
   refresh();
 };
@@ -3330,6 +3338,7 @@ $('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);
+$('#catalogo-buscar').addEventListener('input', renderCatalogoModal);
 $('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
 $('#view-edit-btn').onclick = () => {
   if(!viewing) return;

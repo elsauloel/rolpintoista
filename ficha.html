@@ -900,6 +900,7 @@ a{color:var(--brass)}
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Actualizar</button>
   <button class="btn" id="btn-sync">Sincronizar</button>
   <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
+  <button class="btn ghost" id="btn-actualizar-app" title="Traer la última versión de la herramienta desde GitHub">Actualizar app</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
   <input type="file" id="file-input" accept=".json" hidden>
 </div>
@@ -2557,6 +2558,46 @@ async function cargarDesdeGitHub(ruta, nombre){
     toast(err && err.noExiste ? 'Ese personaje todavía no está sincronizado en GitHub' : 'No se pudo traer la ficha desde GitHub');
   }
 }
+
+// Actualiza la herramienta misma: trae ficha.html desde GitHub y lo escribe
+// sobre el archivo local (con permiso del usuario vía el diálogo de guardado).
+$('#btn-actualizar-app').onclick = async () => {
+  const aviso = 'Esto trae la última versión de la herramienta (ficha.html) desde GitHub para reemplazar tu archivo local.\n\n' +
+                'En el diálogo que se abre, elegí el MISMO ficha.html que estás usando ahora, y aceptá reemplazarlo.\n\n' +
+                'Ojo: al recargar se pierde lo que no hayas guardado o sincronizado.\n\n¿Seguís?';
+  if(!confirm(aviso)) return;
+  toast('Trayendo la última versión…');
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/ficha.html?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const html = await resp.text();
+    if(window.showSaveFilePicker){
+      let handle;
+      try{
+        handle = await showSaveFilePicker({
+          suggestedName: 'ficha.html',
+          types: [{description: 'Página HTML', accept: {'text/html': ['.html']}}],
+        });
+      }catch(e){ toast('Actualización cancelada'); return; }
+      const w = await handle.createWritable();
+      await w.write(html);
+      await w.close();
+      if(confirm('App actualizada. ¿Recargar ahora para usar la versión nueva?')) location.reload();
+    }else{
+      const blob = new Blob([html], {type: 'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ficha.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast('Se descargó ficha.html — reemplazá con este tu archivo viejo');
+    }
+  }catch(err){
+    console.error('Error actualizando la app:', err);
+    toast('No se pudo traer la última versión desde GitHub');
+  }
+};
 
 $('#btn-actualizar').onclick = () => {
   const nombreActual = (S.meta.nombre || '').trim();

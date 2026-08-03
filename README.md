@@ -23,6 +23,10 @@ internet: se abre en el navegador y listo.
    *Settings → Developer settings → Fine-grained tokens*, con acceso solo a este
    repo y permiso **Contents: Read and write**. Queda guardado en tu navegador.
 
+7. Con el botón **Actualizar app** traés la última versión de la herramienta
+   misma desde GitHub: en el diálogo que se abre elegí tu propio `ficha.html`
+   para reemplazarlo, y recargá la página.
+
 Todo se guarda localmente en tu computadora (no hay backend ni base de datos):
 el archivo `.json` que exportás **es** tu personaje.
 

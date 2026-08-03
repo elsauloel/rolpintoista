@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de personaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E;
+  --panel:#1A1418;
+  --panel2:#221A1E;
+  --line:#3B2E34;
+  --line-soft:#2A2126;
+  --copper:#C98545;
+  --brass:#E0A458;
+  --wine:#8C2F3E;
+  --bottle:#2E6B57;
+  --absenta:#A8C256;
+  --paper:#EDE3D2;
+  --muted:#9A867E;
+  --danger:#D4574E;
+  --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper);
+  font-family:"Space Grotesk", system-ui, sans-serif;
+  font-size:14px;
+  line-height:1.45;
+  min-height:100vh;
+}
+input,select,textarea,button{font-family:inherit;color:inherit}
+input,textarea,select{
+  min-width:0;
+  background:rgba(0,0,0,.28);
+  border:1px solid var(--line-soft);
+  border-radius:var(--r);
+  color:var(--paper);
+  padding:5px 7px;
+  width:100%;
+}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+select option{background:#1A1418}
+button{cursor:pointer;background:none;border:none;padding:0}
+a{color:var(--brass)}
+
+.wrap{max-width:1440px;margin:0 auto;padding:28px 20px 90px}
+
+/* ---------- Encabezado ---------- */
+.hero{
+  border:1px solid var(--line);
+  border-top:3px solid var(--copper);
+  background:linear-gradient(180deg, rgba(201,133,69,.10), rgba(0,0,0,0) 60%), var(--panel);
+  padding:20px 22px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1.4fr) minmax(0,1fr);
+  gap:18px 22px;
+  align-items:end;
+}
+.hero > *{min-width:0}
+@media(max-width:900px){.hero{grid-template-columns:auto minmax(0,1fr)}}
+@media(max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}}
+
+.portrait-wrap{position:relative;align-self:start}
+.portrait{
+  width:96px;height:118px;flex:none;border:1px solid var(--line-soft);border-radius:var(--r);
+  background:var(--panel2);overflow:hidden;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+.portrait:hover{border-color:var(--copper)}
+.portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.portrait-empty{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:"Fraunces",serif;font-size:22px;color:var(--muted);
+}
+.portrait-empty small{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.portrait:hover .portrait-empty{color:var(--brass)}
+.portrait-rm{
+  position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;
+  background:var(--wine);color:#F3E4E4;font-size:13px;line-height:1;border:1px solid rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center
+}
+.portrait-rm:hover{background:var(--danger)}
+
+.eyebrow{
+  font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--copper);margin-bottom:6px;
+}
+.hero h1{margin:0 0 12px}
+.hero h1 input{
+  font-family:"Fraunces",serif;font-weight:900;font-size:clamp(26px,3.4vw,44px);
+  line-height:1.05;letter-spacing:-.02em;width:100%;
+  background:transparent;border:none;border-bottom:1px dashed var(--line-soft);padding:0 0 4px;
+}
+.hero h1 input:hover{border-bottom-color:var(--copper)}
+.idgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.idfield{min-width:0}
+.idfield label{display:block;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.counters{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.counter{border:1px solid var(--line);background:var(--panel2);padding:7px 10px;border-radius:var(--r);min-width:0}
+.counter label{display:block;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.counter input{font-family:"Space Mono",monospace;font-size:17px;font-weight:700;background:none;border:none;padding:2px 0;color:var(--brass);width:100%;min-width:0}
+.counter .val{font-family:"Space Mono",monospace;font-size:17px;font-weight:700;padding:2px 0;color:var(--brass)}
+.counter.calc{border-color:rgba(201,133,69,.45);cursor:help}
+.bonos-nums{display:flex;align-items:baseline;gap:5px}
+.bonos-input{
+  font-family:"Space Mono",monospace;font-size:17px;font-weight:700;color:var(--brass);
+  background:none;border:none;padding:0;width:38px;min-width:0
+}
+.bonos-max{
+  font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);background:none;border:none;
+  padding:0;cursor:pointer;text-decoration:underline;text-decoration-style:dotted
+}
+.bonos-max:hover{color:var(--brass)}
+.counter.calc.penal .bonos-input{color:var(--danger)}
+.counter.calc.penal .val{color:var(--danger)}
+.counter .sub{font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted);margin-top:1px}
+.counter .sub.over{color:var(--danger)}
+.counter-exp{grid-column:span 2}
+.counter-exp .expnums{display:flex;align-items:baseline;gap:5px;min-width:0}
+.counter-exp input{flex:1 1 auto;width:auto;min-width:0;font-size:19px}
+.expmax{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap;flex:none}
+@media(max-width:420px){.counter-exp{grid-column:span 1}}
+.counter.penal{border-color:rgba(212,87,78,.5)}
+.counter.penal input{color:var(--danger)}
+.counter.penal .sub{color:var(--danger)}
+.counter.loot{padding:7px 10px 8px;min-width:180px}
+.loot-rows{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.loot-row{display:grid;grid-template-columns:8px 1fr 72px;align-items:center;gap:7px}
+.loot-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.loot-dot.n{background:var(--muted)}
+.loot-dot.m{background:#6FA8D8}
+.loot-dot.e{background:var(--brass)}
+.loot-l{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loot-row input{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-align:right;padding:1px 4px;background:rgba(0,0,0,.25);color:var(--brass);width:100%;min-width:0}
+.loot-especial{margin-top:7px;padding-top:7px;border-top:1px solid var(--line-soft)}
+.loot-esp-head{display:grid;grid-template-columns:8px 1fr 20px;align-items:center;gap:7px}
+.loot-add{
+  width:20px;height:20px;border:1px solid var(--copper);border-radius:99px;color:var(--brass);
+  font-family:"Space Mono",monospace;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center
+}
+.loot-add:hover{background:var(--copper);color:#180F08}
+.loot-esp-row{display:grid;grid-template-columns:1fr 72px 16px;align-items:center;gap:6px;margin-top:5px}
+.loot-esp-row input.nom{font-family:"Space Grotesk",sans-serif;font-size:11px;padding:2px 5px;background:rgba(0,0,0,.25)}
+.loot-esp-row input.cant{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;text-align:right;padding:2px 4px;background:rgba(0,0,0,.25);color:var(--brass);width:100%;min-width:0}
+.loot-esp-row .rm{color:var(--muted);font-size:13px;line-height:1}
+.loot-esp-row .rm:hover{color:var(--danger)}
+.loot-esp-empty{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:5px}
+
+/* ---------- Barra de vida ---------- */
+.vitals{display:grid;grid-template-columns:1.6fr auto 1.6fr;gap:14px;margin-top:14px;align-items:start}
+@media(max-width:900px){.vitals{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.vitals{grid-template-columns:1fr}}
+.vital{border:1px solid var(--line);background:var(--panel);padding:12px 14px}
+.vital .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.vital .name{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.vital .nums{font-family:"Space Mono",monospace;font-size:15px;font-weight:700;display:flex;align-items:center;gap:4px}
+.vital .nums input{width:62px;text-align:right;background:none;border:none;border-bottom:1px solid var(--line);padding:0 2px;font-size:20px;font-weight:700;color:var(--paper)}
+.vital .max{color:var(--muted)}
+.vital-card{margin:0}
+.vital-card .body{padding:12px 14px}
+.bar{height:9px;background:rgba(0,0,0,.45);border:1px solid var(--line-soft);margin-top:10px;position:relative;overflow:hidden}
+.bar span{position:absolute;inset:0;width:0;transition:width .35s cubic-bezier(.2,.8,.2,1)}
+.bar.hp span{background:linear-gradient(90deg,var(--wine),#C4485A)}
+.bar.bp span{background:linear-gradient(90deg,#2E6B57,var(--absenta))}
+.steppers{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+.step{
+  font-family:"Space Mono",monospace;font-size:11px;padding:3px 9px;
+  border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:var(--r);color:var(--muted)
+}
+.step:hover{border-color:var(--copper);color:var(--paper)}
+
+/* ---------- Grilla principal ---------- */
+.cols{display:grid;grid-template-columns:1.05fr .95fr 1fr;gap:16px;margin-top:16px;align-items:start}
+@media(max-width:1080px){.cols{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+.card{border:1px solid var(--line);background:var(--panel);}
+.card > header{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 13px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent);
+}
+.card > header h2{
+  margin:0;font-family:"Fraunces",serif;font-weight:600;font-size:16px;letter-spacing:.01em;
+}
+.card .body{padding:13px}
+.hint{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:.04em}
+.iconbtn{
+  font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--line);padding:3px 8px;color:var(--muted);border-radius:var(--r);white-space:nowrap
+}
+.iconbtn:hover{border-color:var(--copper);color:var(--brass)}
+.iconbtn-add{
+  border-color:var(--copper);color:var(--brass);background:rgba(201,133,69,.14);font-weight:700
+}
+.iconbtn-add:hover{background:var(--copper);color:#180F08}
+
+/* ---------- Atributos ---------- */
+.ptbar{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  border:1px solid var(--line-soft);background:var(--panel2);padding:8px 11px;margin-bottom:11px;
+}
+.pt-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pt-nums{font-family:"Space Mono",monospace;font-size:15px;font-weight:700;color:var(--paper);margin-left:auto}
+.pt-pend{font-family:"Space Mono",monospace;font-size:10.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--absenta);color:var(--absenta)}
+.pt-pend.over{border-color:var(--danger);color:var(--danger)}
+.pt-ok{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted)}
+
+.attr{border:1px solid var(--line-soft);margin-bottom:9px;background:var(--panel2)}
+.attr:last-child{margin-bottom:0}
+.attr .head{display:flex;align-items:stretch;gap:0;border-bottom:1px solid var(--line-soft)}
+.attr .glyph{
+  width:100px;flex:none;padding:7px 9px;border-right:1px solid var(--line-soft);
+  background:linear-gradient(180deg,rgba(0,0,0,.25),transparent);
+}
+.attr .glyph .ab{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent,var(--copper))}
+.glyph-val{
+  display:block;width:100%;font-family:"Space Mono",monospace;font-size:24px;font-weight:700;text-align:left;
+  background:none;border:none;border-bottom:1px dashed transparent;padding:0;color:var(--paper);line-height:1.1
+}
+.glyph-val:hover,.glyph-val:focus{border-bottom-color:var(--line-soft)}
+.glyph-val.mod-plus{color:var(--absenta)}
+.glyph-val.mod-minus{color:var(--danger)}
+.glyph-desc{
+  display:block;font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:0;
+  line-height:1.35;white-space:normal;word-break:break-word;text-align:left;background:none;border:none;
+  padding:0;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;max-width:100%
+}
+.glyph-desc:hover{color:var(--brass)}
+.attr .full{padding:9px 11px;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;justify-content:center;gap:5px}
+.full-name{line-height:1.2}
+.attrchip{
+  font-family:"Space Mono",monospace;font-size:10.5px;padding:2px 7px;border-radius:99px;
+  border:1px solid currentColor;background:rgba(0,0,0,.25)
+}
+.attrchip.plus{color:var(--absenta)}
+.attrchip.minus{color:var(--danger)}
+.attrchip:hover{background:rgba(255,255,255,.06)}
+.derived{display:grid;grid-template-columns:repeat(var(--dcols,3),1fr)}
+.d{padding:8px 9px;border-right:1px solid var(--line-soft);cursor:pointer;position:relative}
+.d:last-child{border-right:none}
+.d:hover{background:rgba(201,133,69,.07)}
+.d .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d .dv{font-family:"Space Mono",monospace;font-size:19px;font-weight:700;line-height:1.2}
+.d .dv.mod-plus{color:var(--absenta)}
+.d .dv.mod-minus{color:var(--danger)}
+.d .dv-desc{display:block;font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);margin-top:2px;line-height:1.3;white-space:normal;word-break:break-word}
+.d .dm{font-family:"Space Mono",monospace;font-size:10.5px;margin-left:4px}
+.dm.plus{color:var(--absenta)}
+.dm.minus{color:var(--danger)}
+.dm.zero{color:#4A3B41}
+.d.boosted{background:rgba(168,194,86,.07)}
+.d.nerfed{background:rgba(212,87,78,.07)}
+
+.breakdown{
+  grid-column:1/-1;border-top:1px dashed var(--line);background:rgba(0,0,0,.32);padding:10px 11px;
+  font-family:"Space Mono",monospace;font-size:11px;
+}
+.breakdown .row{display:flex;justify-content:space-between;gap:12px;padding:2px 0;color:var(--muted)}
+#bonos-breakdown:not(:empty){margin-top:10px}
+.breakdown .row b{color:var(--paper);font-weight:700}
+.breakdown .fx{display:flex;gap:6px;align-items:center;margin-top:7px}
+.breakdown .fx input{font-family:"Space Mono",monospace;font-size:11px}
+.breakdown .tot{border-top:1px solid var(--line);margin-top:7px;padding-top:6px;color:var(--brass)}
+
+/* ---------- Listas ---------- */
+.item{border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;position:relative}
+.item:last-child{margin-bottom:0}
+.item .ihead{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
+.item .iname{font-weight:700;font-size:13.5px;line-height:1.3}
+.item .idesc{font-size:12px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
+.item .istat{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);margin-top:4px}
+.item .imeta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{
+  font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line);padding:2px 6px;border-radius:99px;color:var(--muted)
+}
+.tag.mod{border-color:rgba(168,194,86,.45);color:var(--absenta)}
+.tag.mod.neg{border-color:rgba(212,87,78,.45);color:var(--danger)}
+.tag.cost{border-color:var(--copper);color:var(--brass)}
+.tag.on{background:rgba(168,194,86,.14);border-color:var(--absenta);color:var(--absenta)}
+.tag.off{opacity:.55}
+.tag.urgente{border-color:var(--danger);color:var(--danger)}
+.tag.pop{border-color:var(--copper);color:var(--brass)}
+.tag.job{border-color:var(--bottle);color:var(--absenta)}
+.tag.cat{border-color:#6FA8D8;color:#8FC0E8}
+.tag.price.buy{border-color:var(--danger);color:#E8938C}
+.tag.price.sell{border-color:var(--absenta);color:var(--absenta)}
+.acciones-box{
+  border:1px solid var(--copper);background:var(--panel);padding:12px 14px;
+  display:flex;flex-direction:column;justify-content:center;align-self:stretch;min-width:120px
+}
+.acciones-label{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.acciones-nums{font-family:"Space Mono",monospace;font-size:26px;font-weight:700;color:var(--brass);margin-top:4px;display:flex;align-items:baseline;gap:6px}
+.acciones-max{font-size:14px;color:var(--muted)}
+.acciones-input{
+  font-family:"Space Mono",monospace;font-size:26px;font-weight:700;color:var(--brass);
+  background:none;border:none;padding:0;width:52px;min-width:0
+}
+.acciones-box.agotadas .acciones-input{color:var(--danger)}
+.acciones-box.agotadas{border-color:var(--danger)}
+.acciones-box.agotadas .acciones-nums{color:var(--danger)}
+
+.unit-stepper{
+  display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line-soft)
+}
+.unit-label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:auto}
+.unit-btn{
+  width:22px;height:22px;border:1px solid var(--line);border-radius:99px;color:var(--brass);
+  font-family:"Space Mono",monospace;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center
+}
+.unit-btn:hover{background:var(--copper);color:#180F08;border-color:var(--copper)}
+.unit-n{font-family:"Space Mono",monospace;font-size:14px;font-weight:700;min-width:20px;text-align:center;color:var(--paper)}
+
+.consume-btn{
+  width:100%;margin-top:8px;padding:7px 10px;border:1px solid var(--bottle);border-radius:var(--r);
+  background:rgba(46,107,87,.18);color:#CFE6D8;font-family:"Space Mono",monospace;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase
+}
+.consume-btn:hover:not(:disabled){background:var(--bottle);color:#EAF3E6}
+.consume-btn:disabled{opacity:.4;cursor:not-allowed}
+.consume-fx{color:var(--absenta);text-transform:none;letter-spacing:0;margin-left:4px}
+
+.view-modal{max-width:520px}
+
+.catalogo-modal{max-width:640px;max-height:82vh;display:flex;flex-direction:column}
+.catalogo-dde-badge{
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);border:1px solid var(--copper);
+  padding:5px 10px;border-radius:99px;white-space:nowrap
+}
+.catalogo-dde-badge b{color:var(--brass);font-size:13px}
+
+.carrito-bar{border-bottom:1px solid var(--line);background:rgba(201,133,69,.06);padding:9px 16px}
+.catalogo-filtro-fila{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
+.catalogo-filtro-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
+#catalogo-filtro{width:auto;min-width:160px;font-family:"Space Mono",monospace;font-size:12px}
+.carrito-lista{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto}
+.carrito-vacio{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.carrito-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.carrito-nombre{flex:1;color:var(--paper)}
+.carrito-subtotal{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--brass);flex:none}
+.carrito-rm{color:var(--muted);font-size:13px;flex:none}
+.carrito-rm:hover{color:var(--danger)}
+.carrito-footer{display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line-soft)}
+.carrito-footer span{font-family:"Space Mono",monospace;font-size:12.5px;color:var(--muted);margin-right:auto}
+.carrito-footer span b{color:var(--brass);font-size:15px}
+#carrito-comprar:disabled{opacity:.4;cursor:not-allowed}
+.catalogo-modal .body{overflow-y:auto;padding:12px 16px}
+.cat-grouphead{
+  font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);
+  margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--line-soft)
+}
+.cat-grouphead:first-child{margin-top:0}
+.cat-row{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:9px
+}
+.cat-row .cat-info{flex:1;min-width:160px}
+.cat-row .cat-nombre{font-weight:700;font-size:13.5px}
+.cat-row .cat-meta{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:2px}
+.cat-row .cat-meta b{color:var(--brass)}
+.cat-row .cat-detalle{font-size:11.5px;color:#C9B8AD;margin-top:3px}
+.cat-row .cat-actions{display:flex;align-items:center;gap:6px;flex:none}
+.cat-qty{width:44px;font-family:"Space Mono",monospace;font-size:13px;text-align:center;padding:5px 2px}
+.cat-btn{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 10px;border-radius:var(--r);white-space:nowrap
+}
+.cat-btn.add{border:1px solid var(--line);color:var(--paper)}
+.cat-btn.add:hover{border-color:var(--copper)}
+.cat-btn.buy{border:1px solid var(--copper);background:rgba(201,133,69,.14);color:var(--brass);font-weight:700}
+.cat-btn.buy:hover{background:var(--copper);color:#180F08}
+.cat-row .cat-manage{display:flex;gap:4px;flex:none}
+.cat-manage button{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:4px 7px;border-radius:var(--r)}
+.cat-manage button:hover{border-color:var(--copper);color:var(--brass)}
+.view-modal .body{padding:0}
+.view-wrap{display:flex;gap:0}
+.view-image-wrap{
+  width:180px;flex:none;aspect-ratio:1/1;background:#0B0708;display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--line);overflow:hidden
+}
+.view-image{width:100%;height:100%;object-fit:contain}
+.view-image-empty{font-family:"Fraunces",serif;font-size:13px;color:var(--muted);text-align:center;padding:0 10px}
+.view-info{flex:1;min-width:0;padding:14px 16px}
+.view-title{font-family:"Fraunces",serif;font-weight:700;font-size:19px;margin-bottom:9px}
+.view-lines{display:flex;flex-direction:column;gap:5px}
+.view-line{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
+.view-label{color:var(--muted);flex:none}
+.view-value{color:var(--paper);text-align:right}
+.view-detalle{
+  padding:13px 16px;border-top:1px dashed var(--line);font-size:13px;line-height:1.55;
+  color:#DCCFC5;white-space:pre-wrap
+}
+.view-detalle .view-label{display:block;color:var(--copper);font-family:"Space Mono",monospace;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
+@media(max-width:480px){
+  .view-wrap{flex-direction:column}
+  .view-image-wrap{width:100%;border-right:none;border-bottom:1px solid var(--line)}
+}
+
+.ejecutar-btn{
+  width:100%;margin-top:9px;padding:7px 10px;border:1px solid var(--copper);border-radius:var(--r);
+  background:rgba(201,133,69,.14);color:var(--brass);font-family:"Space Mono",monospace;font-size:11px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase
+}
+.ejecutar-btn:hover{background:var(--copper);color:#180F08}
+.ejecutar-btn:disabled{opacity:.4;cursor:not-allowed;background:rgba(0,0,0,.2);color:var(--muted)}
+.ejecutar-btn:disabled:hover{background:rgba(0,0,0,.2)}
+
+/* ---------- Invocaciones ---------- */
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:10px}
+.inv-card{border:1px solid var(--line);background:var(--panel2);display:flex;flex-direction:column;border-top:3px solid var(--accent,var(--copper))}
+.inv-card.inv-dormida{border-top-color:var(--line);opacity:.72}
+.inv-card.inv-dormida .inv-cbody{opacity:.55;pointer-events:none;filter:grayscale(.4)}
+.inv-dormida-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;background:rgba(0,0,0,.35);
+  border-bottom:1px solid var(--line-soft);font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)
+}
+.inv-reinvocar{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 12px;border:1px solid var(--absenta);border-radius:var(--r);background:rgba(168,194,86,.14);
+  color:var(--absenta);font-weight:700;margin-left:auto
+}
+.inv-reinvocar:hover{background:var(--absenta);color:#12210a}
+.inv-chead{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--line-soft);background:rgba(255,255,255,.02)}
+.inv-chead input.inv-name{font-family:"Fraunces",serif;font-weight:700;font-size:15px;background:none;border:none;padding:2px 0;border-bottom:1px dashed transparent;flex:1;min-width:0;color:var(--paper)}
+.inv-chead input.inv-name:hover,.inv-chead input.inv-name:focus{border-bottom-color:var(--line-soft)}
+.inv-xbtn{width:20px;height:20px;border-radius:50%;color:var(--muted);font-size:13px;line-height:1;flex:none;display:flex;align-items:center;justify-content:center}
+.inv-xbtn:hover{background:var(--danger);color:#fff}
+.inv-cbody{padding:10px 11px;display:flex;flex-direction:column;gap:9px}
+
+.inv-imgwrap{padding:9px 10px 0}
+.inv-imgpick{
+  width:100%;height:110px;border:1px solid var(--line-soft);border-radius:var(--r);background:rgba(0,0,0,.2);
+  overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0
+}
+.inv-imgpick:hover{border-color:var(--copper)}
+.inv-imgpick img{width:100%;height:100%;object-fit:cover;display:block}
+.inv-imgempty{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:"Fraunces",serif;font-size:18px;color:var(--muted)}
+.inv-imgempty small{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.inv-imgpick:hover .inv-imgempty{color:var(--brass)}
+
+.inv-cooldownbox{border:1px solid var(--copper);background:rgba(201,133,69,.1);padding:6px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.inv-cooldownbox .cdl{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper)}
+.inv-cooldownbox .cdn{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted)}
+.inv-cooldownbox input{width:44px;font-family:"Space Mono",monospace;font-size:15px;font-weight:700;text-align:center;padding:3px 2px;color:var(--brass);flex:none}
+
+.inv-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.inv-row5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.inv-minif label{display:block;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.inv-minif input,.inv-minif select{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;text-align:center;padding:4px 2px;color:var(--brass)}
+
+.inv-vitalbar{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.inv-vitalmini{border:1px solid var(--line-soft);background:var(--panel);padding:5px 7px}
+.inv-vitalmini .vl{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.inv-vitalmini .vn{display:flex;align-items:baseline;gap:3px;margin-top:1px}
+.inv-vitalmini input{font-family:"Space Mono",monospace;font-size:16px;font-weight:700;text-align:left;padding:0;background:none;border:none;width:34px;color:var(--brass)}
+.inv-vitalmini .vmax{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.inv-vitalmini.hp{border-color:rgba(140,47,62,.5)}
+.inv-vitalmini.acc{border-color:rgba(201,133,69,.5)}
+
+.inv-sectlabel{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);margin-top:2px}
+
+.inv-armaline{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.inv-danopreview{grid-column:1/-1;font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);border-top:1px dashed var(--line-soft);padding-top:5px;margin-top:2px}
+.inv-danopreview b{color:var(--brass)}
+
+.inv-critgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.inv-critcell label{display:block;font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);text-align:center;margin-bottom:2px}
+.inv-critcell input{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-align:center;padding:3px 2px}
+
+.inv-hablist{display:flex;flex-direction:column;gap:6px}
+.inv-hab{border:1px solid var(--line-soft);background:var(--panel);padding:6px 7px}
+.inv-habtop{display:flex;gap:5px;align-items:center}
+.inv-habtop input.inv-hn{font-weight:700;font-size:12px;background:none;border:none;padding:2px 0;flex:1;min-width:0;color:var(--paper)}
+.inv-habtop .inv-dur{width:44px;flex:none}
+.inv-habtop .inv-dur input{font-family:"Space Mono",monospace;font-size:11px;text-align:center;padding:3px 2px}
+.inv-habtop .inv-durlabel{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted);text-align:center;display:block}
+.inv-habtop .inv-rm{color:var(--muted);font-size:13px;flex:none}
+.inv-habtop .inv-rm:hover{color:var(--danger)}
+.inv-hab textarea{margin-top:4px;font-size:11.5px;min-height:32px;background:rgba(0,0,0,.2)}
+.inv-habbottom{display:flex;align-items:center;gap:6px;margin-top:6px}
+.inv-habestado{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.05em;color:var(--muted);flex:1}
+.inv-habestado.ok{color:var(--absenta)}
+.inv-habestado.cd{color:var(--danger)}
+.inv-ejecutar{
+  font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 10px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.14);color:var(--brass);flex:none
+}
+.inv-ejecutar:hover:not(:disabled){background:var(--copper);color:#180F08}
+.inv-ejecutar:disabled{opacity:.35;cursor:not-allowed;border-color:var(--line)}
+
+.inv-addhab{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px dashed var(--line);border-radius:var(--r);padding:5px;text-align:center;color:var(--muted)
+}
+.inv-addhab:hover{border-color:var(--copper);color:var(--brass)}
+.inv-notas{font-size:11.5px;min-height:38px}
+
+.defres-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.defres-cell{border:1px solid var(--line-soft);background:rgba(0,0,0,.2);border-radius:var(--r);padding:6px 5px;text-align:center}
+.defres-cell label{display:block;font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);margin-bottom:4px}
+.defres-cell input{font-family:"Space Mono",monospace;font-size:14px;font-weight:700;text-align:center;padding:3px 2px;background:rgba(0,0,0,.25)}
+@media(max-width:420px){.defres-grid{grid-template-columns:repeat(3,1fr)}}
+
+.bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.bit-tab{
+  display:flex;align-items:center;gap:4px;border:1px solid var(--line-soft);background:var(--panel2);
+  border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer
+}
+.bit-tab.active{border-color:var(--copper);background:rgba(201,133,69,.12)}
+.bit-tab-name{
+  background:none;border:none;padding:2px 2px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;
+  color:var(--paper);width:auto;min-width:0;max-width:110px
+}
+.bit-tab.active .bit-tab-name{color:var(--brass);font-weight:700}
+.bit-tab-x{
+  width:16px;height:16px;border-radius:50%;color:var(--muted);font-size:11px;line-height:1;
+  display:flex;align-items:center;justify-content:center;flex:none
+}
+.bit-tab-x:hover{background:var(--danger);color:#fff}
+.tag.origen{border-color:var(--line);color:var(--muted);font-style:italic;text-transform:none;letter-spacing:0}
+.rowbtns{display:flex;flex-direction:column;gap:5px;flex:none}
+.mini{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:var(--r)}
+.mini:hover{border-color:var(--copper);color:var(--brass)}
+.mini.on{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6}
+.empty{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding:8px 2px}
+
+/* ---------- Capacidad ---------- */
+.cap{display:flex;justify-content:space-between;align-items:baseline;font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-bottom:6px}
+.cap b{color:var(--paper);font-size:14px}
+.capbar{height:6px;background:rgba(0,0,0,.45);border:1px solid var(--line-soft);margin-bottom:11px;position:relative;overflow:hidden}
+.capbar span{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--copper),var(--brass));transition:width .3s}
+.capbar.over span{background:linear-gradient(90deg,var(--danger),#F08070)}
+.overload{color:var(--danger);font-family:"Space Mono",monospace;font-size:10.5px;margin-bottom:8px}
+
+/* ---------- Armadura ---------- */
+.armgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
+.armbox .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.armbox .dv{font-family:"Space Mono",monospace;font-size:24px;font-weight:700;color:var(--brass)}
+.armbox-def{width:100%;cursor:pointer}
+.armbox-def:hover{border-color:var(--copper)}
+.armbox-def.boosted{background:rgba(168,194,86,.07)}
+.armbox-def.nerfed{background:rgba(212,87,78,.07)}
+.armbox-def .dm{font-family:"Space Mono",monospace;font-size:13px;margin-left:6px}
+.armbox-def .dm.plus{color:var(--absenta)}
+.armbox-def .dm.minus{color:var(--danger)}
+.tipos-derived{border:1px solid var(--line-soft);background:var(--panel2)}
+
+.manos-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mano-box{border:1px solid var(--line-soft);background:var(--panel2);padding:9px 10px;min-height:64px}
+.mano-label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper)}
+.mano-nombre{font-weight:700;font-size:13px;margin-top:2px}
+.mano-tipo{font-family:"Space Mono",monospace;font-size:11px;color:var(--copper);margin-top:3px;letter-spacing:.06em;text-transform:uppercase}
+.mano-dano{font-family:"Space Mono",monospace;font-size:15px;font-weight:700;color:var(--brass);margin-top:3px}
+.manos-grid-single{grid-template-columns:1fr}
+.mano-fx{font-size:11px;color:#C9B8AD;margin-top:4px}
+.mano-vacio{color:var(--muted);font-size:12px;margin-top:6px}
+
+.efecto-otro{font-size:12px;color:#C9B8AD;padding:5px 0;border-bottom:1px dashed var(--line-soft)}
+.efecto-otro:last-child{border-bottom:none}
+.efecto-otro b{color:var(--paper)}
+
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.slot-box{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 8px;text-align:center}
+.slot-box.over{border-color:var(--danger);background:rgba(212,87,78,.12)}
+.slot-l{font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot-n{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);margin-top:2px}
+.slot-box.over .slot-n{color:var(--danger)}
+.tipos{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.tipo{border:1px solid var(--line-soft);background:var(--panel2);text-align:center;padding:5px 2px}
+.tipo .n{font-family:"Space Mono",monospace;font-size:9.5px;color:var(--copper)}
+.tipo input{text-align:center;background:none;border:none;padding:2px 0;font-family:"Space Mono",monospace;font-weight:700}
+
+.btn.maint{
+  width:100%;background:rgba(46,107,87,.22);border-color:var(--bottle);color:#CFE6D8;
+  margin-bottom:10px;letter-spacing:.14em
+}
+.btn.maint:hover{background:var(--bottle);color:#EAF3E6}
+.log{
+  font-family:"Space Mono",monospace;font-size:10.5px;line-height:1.7;color:var(--muted);
+  border-left:2px solid var(--bottle);padding:2px 0 2px 9px;margin-bottom:11px
+}
+.log:empty{display:none}
+.log b{color:var(--paper)}
+.log .dmg{color:var(--danger)}
+.log .heal{color:var(--absenta)}
+.log .gone{color:var(--copper)}
+
+/* ---------- Modal ---------- */
+.scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);backdrop-filter:blur(3px);display:none;z-index:50;padding:24px;overflow:auto}
+.scrim.open{display:block}
+.modal{max-width:520px;margin:4vh auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel);}
+.modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}
+.modal header h3{margin:0;font-family:"Fraunces",serif;font-size:17px;font-weight:600}
+.modal .body{padding:15px;display:flex;flex-direction:column;gap:11px}
+.f label{display:block;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.modrow{display:grid;grid-template-columns:1fr 74px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.itempick{
+  width:100%;height:96px;border:1px solid var(--line-soft);border-radius:var(--r);background:var(--panel2);
+  overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0
+}
+.itempick:hover{border-color:var(--copper)}
+.itempick img{width:100%;height:100%;object-fit:cover;display:block}
+.itempick-empty{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:"Fraunces",serif;font-size:20px;color:var(--muted)}
+.itempick-empty small{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.itempick:hover .itempick-empty{color:var(--brass)}
+.item-thumb{width:40px;height:40px;object-fit:cover;border-radius:var(--r);border:1px solid var(--line-soft);flex:none}
+.modal footer{display:flex;justify-content:space-between;gap:9px;padding:12px 15px;border-top:1px solid var(--line)}
+.btn{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:8px 14px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper)
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.ghost{color:var(--muted)}
+.btn.del{color:var(--danger);border-color:rgba(212,87,78,.4)}
+
+.modal.reminder{border-top-color:var(--copper);max-width:440px}
+.reminder-item{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 12px;margin-bottom:9px}
+.reminder-item:last-child{margin-bottom:0}
+.reminder-item .rname{font-weight:700;font-size:14px;color:var(--brass);display:flex;align-items:center;gap:6px}
+.reminder-item .rname::before{content:"◆";font-size:11px}
+.reminder-item .rdetail{font-size:12.5px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
+
+/* ---------- Barra inferior ---------- */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:rgba(15,12,14,.93);backdrop-filter:blur(8px);border-top:1px solid var(--line);
+  padding:9px 20px;display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap
+}
+.dock .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto}
+@media(max-width:700px){.dock .note{display:none}}
+
+.toast{
+  position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
+  font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:60
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000}
+  .dock,.iconbtn,.mini,.steppers{display:none}
+  .card,.attr,.item{border-color:#999}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ENCABEZADO -->
+  <div class="hero">
+    <div class="portrait-wrap">
+      <button type="button" class="portrait" id="portrait-box" title="Subir foto del personaje">
+        <img id="portrait-img" style="display:none" alt="">
+        <span class="portrait-empty" id="portrait-empty">+<small>Foto</small></span>
+      </button>
+      <button type="button" class="portrait-rm" id="portrait-rm" title="Quitar foto" style="display:none">×</button>
+      <input type="file" id="portrait-input" accept="image/*" hidden>
+    </div>
+    <div>
+      <div class="eyebrow" id="eyebrow">Ficha de personaje</div>
+      <h1><input id="f-nombre" placeholder="Nombre del personaje"></h1>
+      <div class="idgrid">
+        <div class="idfield"><label>Raza</label><input id="f-raza"></div>
+        <div class="idfield"><label>Clase</label><input id="f-clase"></div>
+        <div class="idfield"><label>Subclase</label><input id="f-subclase"></div>
+        <div class="idfield"><label>Nivel</label><input id="f-nivel" type="number"></div>
+      </div>
+    </div>
+    <div class="counters">
+      <div class="counter counter-exp" id="c-exp" title="Al llegar al umbral, sube de nivel y el marcador reinicia">
+        <label>Experiencia</label>
+        <div class="expnums"><input id="f-exp" type="number"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
+      </div>
+      <div class="counter"><label>DDE($)</label><input id="f-dde" type="number"></div>
+      <div class="counter calc" id="c-job" title="3 puntos base + 2 por nivel, menos las habilidades/pasivas adquiridas con Job">
+        <label>Job</label>
+        <div class="val" id="v-job">0</div>
+        <div class="sub" id="v-job-sub"></div>
+      </div>
+      <div class="counter calc" id="c-bonos">
+        <label>Bonos</label>
+        <div class="bonos-nums">
+          <input type="number" id="f-bonos" class="bonos-input" value="0">
+          <button type="button" class="bonos-max" id="v-bonos-natural-btn" data-stat="bonos" title="Ver detalle">/ 0</button>
+        </div>
+      </div>
+      <div class="counter"><label>WildCards</label><input id="f-wld"></div>
+      <div class="counter loot">
+        <label>Loot</label>
+        <div class="loot-rows">
+          <div class="loot-row"><span class="loot-dot n"></span><span class="loot-l">Normal</span><input id="f-loot-normal" type="number"></div>
+          <div class="loot-row"><span class="loot-dot m"></span><span class="loot-l">Mágico</span><input id="f-loot-magico" type="number"></div>
+        </div>
+        <div class="loot-especial">
+          <div class="loot-esp-head">
+            <span class="loot-dot e"></span><span class="loot-l">Especial</span>
+            <button class="loot-add" id="btn-loot-add" title="Agregar tipo de loot especial">+</button>
+          </div>
+          <div id="loot-esp-list"></div>
+        </div>
+      </div>
+    </div>
+    <div id="bonos-breakdown"></div>
+  </div>
+
+  <!-- VITALES -->
+  <div class="vitals">
+    <div class="vital">
+      <div class="top">
+        <span class="name">Puntos de vida</span>
+        <span class="nums"><input id="f-hp" type="number"><span class="max">/ <span id="v-hpmax">0</span></span></span>
+      </div>
+      <div class="bar hp"><span id="bar-hp"></span></div>
+      <div class="steppers">
+        <button class="step" data-hp="-10">−10</button>
+        <button class="step" data-hp="-5">−5</button>
+        <button class="step" data-hp="-1">−1</button>
+        <button class="step" data-hp="1">+1</button>
+        <button class="step" data-hp="5">+5</button>
+        <button class="step" data-hp="full">Al máximo</button>
+      </div>
+    </div>
+    <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
+      <span class="acciones-label">Acciones</span>
+      <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ 3</span></div>
+    </div>
+    <section class="card vital-card">
+      <header>
+        <h2>Estados alterados</h2>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="tag" id="turno-tag">Turno 1</span>
+          <button class="iconbtn" id="btn-turno-reset" title="Reiniciar el contador de turno a 1">↺ Turno</button>
+          <button class="iconbtn iconbtn-add" data-add="efectos">+ Estado</button>
+        </div>
+      </header>
+      <div class="body">
+        <button class="btn maint" id="btn-mantenimiento">Mantenimiento · pasar turno</button>
+        <div class="log" id="maint-log"></div>
+        <div id="list-efectos"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="cols">
+    <!-- COLUMNA 1 -->
+    <div class="col">
+      <section class="card">
+        <header>
+          <h2>Atributos</h2>
+          <span class="hint">tocá un stat para ver de dónde sale</span>
+        </header>
+        <div class="body">
+          <div class="ptbar" id="attr-points"></div>
+          <div id="attrs"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Bitácora</h2>
+          <button class="iconbtn iconbtn-add" id="btn-bitacora-add">+ Jornada</button>
+        </header>
+        <div class="body">
+          <div class="bitacora-tabs" id="bitacora-tabs"></div>
+          <textarea id="f-notas" style="min-height:170px" placeholder="Lo que pasó en esta jornada, deudas, pactos, gente a la que le debés una."></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Mochila</h2>
+          <button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button>
+        </header>
+        <div class="body">
+          <div class="cap"><span>Ranuras usadas</span><span><b id="cap-mochila-n">0</b> / <input id="f-capmochila" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"></span></div>
+          <div class="capbar" id="cap-mochila-bar"><span></span></div>
+          <div id="list-mochila"></div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- COLUMNA 2 -->
+    <div class="col">
+      <section class="card">
+        <header><h2>Efectos de equipo</h2></header>
+        <div class="body">
+          <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
+          <div id="efectos-armas"></div>
+
+          <button type="button" class="armbox armbox-def" id="def-tile" data-stat="def" style="margin-top:12px">
+            <div class="dl">Defensa</div>
+            <div class="dv"><span id="v-def">0</span></div>
+          </button>
+          <div id="def-breakdown"></div>
+          <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
+          <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
+          <div id="tipos-breakdown"></div>
+
+          <div class="hint" style="margin:11px 0 6px">Otros efectos de equipo</div>
+          <div id="efectos-otros"></div>
+
+          <div style="margin-top:11px">
+            <div class="f"><label>Nota</label><input id="f-armanota"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Cinturón</h2>
+          <button class="iconbtn iconbtn-add" data-add-chooser="cinturon">+ Ítem</button>
+        </header>
+        <div class="body">
+          <div class="cap"><span>Ranuras usadas</span><span><b id="cap-cinturon-n">0</b> / <input id="f-capcinturon" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"></span></div>
+          <div class="capbar" id="cap-cinturon-bar"><span></span></div>
+          <div id="list-cinturon"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Equipo</h2>
+          <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
+        </header>
+        <div class="body">
+          <div class="cap"><span>Peso equipado</span><span><b id="cap-equipo-n">0</b> / <span id="cap-equipo-t">0</span></span></div>
+          <div class="capbar" id="cap-equipo-bar"><span></span></div>
+          <div class="overload" id="equipo-over"></div>
+          <div id="list-equipo"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- COLUMNA 3 -->
+    <div class="col">
+      <section class="card">
+        <header>
+          <h2>Habilidades</h2>
+          <button class="iconbtn iconbtn-add" data-add="habilidades">+ Habilidad</button>
+        </header>
+        <div class="body" id="list-habilidades"></div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Pasivas</h2>
+          <button class="iconbtn iconbtn-add" data-add="pasivas">+ Pasiva</button>
+        </header>
+        <div class="body" id="list-pasivas"></div>
+      </section>
+
+      <section class="card">
+        <header>
+          <h2>Sociales</h2>
+          <button class="iconbtn iconbtn-add" data-add="sociales">+ Social</button>
+        </header>
+        <div class="body" id="list-sociales"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- INVOCACIONES -->
+  <section class="card" style="margin-top:16px">
+    <header>
+      <h2>Invocaciones</h2>
+      <button class="iconbtn iconbtn-add" id="btn-invocar">+ Invocación</button>
+    </header>
+    <div class="body">
+      <div class="hint" id="inv-empty" style="display:none">Sin invocaciones activas.</div>
+      <div class="inv-grid" id="inv-grid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- DOCK -->
+<div class="dock">
+  <span class="note">Los cambios viven en esta pestaña. Guardá la ficha antes de cerrarla.</span>
+  <button class="btn del" id="btn-reset">Ficha nueva</button>
+  <button class="btn" id="btn-formulas">Fórmulas</button>
+  <button class="btn" id="btn-cargar">Cargar</button>
+  <button class="btn primary" id="btn-guardar">Guardar ficha</button>
+  <input type="file" id="file-input" accept=".json" hidden>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="scrim" id="scrim-chooser">
+  <div class="modal" style="max-width:340px">
+    <header><h3>Agregar ítem</h3><button class="iconbtn" id="chooser-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:9px">
+      <button class="btn primary" id="chooser-nuevo" style="width:100%">Crear ítem nuevo</button>
+      <button class="btn" id="chooser-fabricante" style="width:100%">Ítem del fabricante</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-catalogo">
+  <div class="modal catalogo-modal">
+    <header>
+      <h3>Catálogo del fabricante</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="catalogo-dde-badge">DDE disponibles: <b id="catalogo-dde">0</b></span>
+        <button class="iconbtn iconbtn-add" id="btn-catalogo-nuevo">+ Ítem al catálogo</button>
+        <button class="iconbtn" id="catalogo-x">Cerrar</button>
+      </div>
+    </header>
+    <div class="carrito-bar">
+      <div class="catalogo-filtro-fila">
+        <label class="catalogo-filtro-label">Categoría</label>
+        <select id="catalogo-filtro">
+          <option value="">Todas</option>
+          <option value="armas">Armas</option>
+          <option value="escudos">Escudos</option>
+          <option value="defensa">Defensa</option>
+          <option value="consumibles">Consumibles</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+      <div class="carrito-lista" id="carrito-lista"></div>
+      <div class="carrito-footer">
+        <span>Total: <b id="carrito-total">0</b> DDE</span>
+        <button class="btn ghost" id="carrito-vaciar">Vaciar</button>
+        <button class="btn primary" id="carrito-comprar" disabled>Comprar</button>
+      </div>
+    </div>
+    <div class="body" id="catalogo-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-costox">
+  <div class="modal" style="max-width:380px">
+    <header><h3>Costo variable</h3><button class="iconbtn" id="costox-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="hint" id="costox-nombre" style="font-size:14px;color:var(--paper);font-family:'Fraunces',serif;font-weight:700"></div>
+      <div class="f2">
+        <div class="f"><label>Bonos a gastar</label><input type="number" id="f-costox-bonos" value="0" min="0"></div>
+        <div class="f"><label>Acciones a gastar</label><input type="number" id="f-costox-acciones" value="1" min="0"></div>
+      </div>
+      <div class="hint">Tenés <span id="costox-disponibles"></span> disponibles ahora mismo.</div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="costox-cancel">Cancelar</button>
+      <button class="btn primary" id="costox-confirm">Ejecutar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-view">
+  <div class="modal view-modal">
+    <header><h3 id="view-title-header">Ítem</h3><button class="iconbtn" id="view-x">Cerrar</button></header>
+    <div class="body" id="view-body"></div>
+    <footer style="justify-content:flex-end">
+      <button class="btn primary" id="view-edit-btn">Editar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-reminder">
+  <div class="modal reminder">
+    <header><h3>Recordatorio de mantenimiento</h3><button class="iconbtn" id="reminder-x">Cerrar</button></header>
+    <div class="body" id="reminder-body"></div>
+    <footer style="justify-content:flex-end">
+      <button class="btn primary" id="reminder-ok">Entendido</button>
+    </footer>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <header><h3 id="modal-title">Editar</h3><button class="iconbtn" id="modal-x">Cerrar</button></header>
+    <div class="body" id="modal-body"></div>
+    <footer>
+      <button class="btn del" id="modal-del">Eliminar</button>
+      <div style="display:flex;gap:9px">
+        <button class="btn ghost" id="modal-cancel">Cancelar</button>
+        <button class="btn primary" id="modal-save">Guardar</button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   MODELO
+   ========================================================= */
+
+const GRUPOS = [
+  {id:'con', label:'Con', full:'Constitución', color:'#C4485A', derived:[
+    {id:'resmg', label:'Res.Mg', full:'Resistencia mágica'},
+    {id:'rescc', label:'Res.CC', full:'Resistencia al crowd control'},
+    {id:'hpmax', label:'Hp.Max', full:'Health points máximos'}]},
+  {id:'fue', label:'Fue', full:'Fuerza', color:'#D07B3A', derived:[
+    {id:'dmg', label:'Dmg', full:'Damage'},
+    {id:'potencia', label:'Potencia', full:'Potencia'},
+    {id:'crgmax', label:'Crg.Max', full:'Carga máxima'}]},
+  {id:'agl', label:'Agi', full:'Agilidad', color:'#8FB84F', derived:[
+    {id:'eva', label:'Eva', full:'Evasión'},
+    {id:'ini', label:'Iniciativa', full:'Iniciativa'},
+    {id:'mov', label:'Mov', full:'Movimiento'}]},
+  {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
+    {id:'rng', label:'Rng', full:'Rango'},
+    {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
+    {id:'crit', label:'Crit', full:'Crítico'}]},
+  {id:'int', label:'Int', full:'Inteligencia', color:'#9B7BD4', derived:[
+    {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
+    {id:'resm', label:'Res.M', full:'Resistencia mágica (Int)'},
+    {id:'bonos', label:'Bonos', full:'Bonos'},
+    {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
+];
+const EXTRA = [
+  {id:'def', label:'Defensa', full:'Defensa'},
+  {id:'tipo1', label:'Tipo 2', full:'Resistencia a crítico — armas Tipo 2 (d2)'},
+  {id:'tipo2', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
+  {id:'tipo3', label:'Tipo 6', full:'Resistencia a crítico — armas Tipo 6 (d6)'},
+  {id:'tipo4', label:'Tipo 8', full:'Resistencia a crítico — armas Tipo 8 (d8)'},
+  {id:'tipo5', label:'Tipo 10', full:'Resistencia a crítico — armas Tipo 10 (d10, explosivos/modernas)'},
+];
+const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
+
+const DADOS_ARMA = [2, 4, 6, 8, 10];
+
+const CATEGORIAS = [
+  {id:'', label:'— elegir categoría —'},
+  {id:'arma_1m', label:'Arma de una mano', arma:true},
+  {id:'arma_2m', label:'Arma de dos manos', arma:true},
+  {id:'escudo_1m', label:'Escudo de una mano', defensivo:true},
+  {id:'escudo_2m', label:'Escudo de dos manos', defensivo:true},
+  {id:'armadura_blanda', label:'Armadura blanda', defensivo:true},
+  {id:'armadura_rigida', label:'Armadura rígida', defensivo:true},
+  {id:'guantes_blandos', label:'Guantes blandos', defensivo:true},
+  {id:'guantes_rigidos', label:'Guantes rígidos', defensivo:true},
+  {id:'piernas_blandas', label:'Piernas blandas', defensivo:true},
+  {id:'piernas_rigidas', label:'Piernas rígidas', defensivo:true},
+  {id:'casco_blando', label:'Casco blando', defensivo:true},
+  {id:'casco_rigido', label:'Casco rígido', defensivo:true},
+  {id:'botas_blandas', label:'Botas blandas', defensivo:true},
+  {id:'botas_rigidas', label:'Botas rígidas', defensivo:true},
+  {id:'anillos', label:'Anillos'},
+  {id:'otros', label:'Otros'},
+  {id:'consumibles', label:'Consumibles'},
+];
+const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
+
+const GRUPO_COMPRA_MAP = {
+  arma_1m:'armas', arma_2m:'armas',
+  escudo_1m:'escudos', escudo_2m:'escudos',
+  armadura_blanda:'defensa', armadura_rigida:'defensa',
+  guantes_blandos:'defensa', guantes_rigidos:'defensa',
+  casco_blando:'defensa', casco_rigido:'defensa',
+  botas_blandas:'defensa', botas_rigidas:'defensa',
+  piernas_blandas:'defensa', piernas_rigidas:'defensa',
+  consumibles:'consumibles',
+  anillos:'otros', otros:'otros', '':'otros'
+};
+const GRUPO_COMPRA_LABEL = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', consumibles:'Consumibles', otros:'Otros'};
+const GRUPO_COMPRA_ORDEN = ['armas','escudos','defensa','consumibles','otros'];
+function grupoCompraDe(tipoItem){ return GRUPO_COMPRA_MAP[tipoItem] || 'otros'; }
+const ORDEN_EQUIPO = {
+  arma_1m:1, arma_2m:1,
+  escudo_1m:2, escudo_2m:2,
+  armadura_blanda:3, armadura_rigida:3,
+  guantes_blandos:4, guantes_rigidos:4, piernas_blandas:4, piernas_rigidas:4,
+  casco_blando:4, casco_rigido:4, botas_blandas:4, botas_rigidas:4,
+  anillos:5, otros:5, consumibles:5, '':5,
+};
+function ordenEquipoDe(i){
+  return ORDEN_EQUIPO[i.tipoItem] ?? 5;
+}
+const ES_ARMA = catId => CATEGORIAS.find(c=>c.id===catId)?.arma === true;
+const ES_MANO = catId => ['arma_1m','arma_2m','escudo_1m','escudo_2m'].includes(catId);
+
+const SLOT_DEFS = [
+  {id:'cabeza_blando', label:'Casco blando', cats:['casco_blando'], max:1},
+  {id:'cabeza_rigido', label:'Casco rígido', cats:['casco_rigido'], max:1},
+  {id:'torso_blanda', label:'Armadura blanda', cats:['armadura_blanda'], max:2},
+  {id:'torso_rigida', label:'Armadura rígida', cats:['armadura_rigida'], max:1},
+  {id:'guantes_blandos', label:'Guantes blandos', cats:['guantes_blandos'], max:1},
+  {id:'guantes_rigidos', label:'Guantes rígidos', cats:['guantes_rigidos'], max:1},
+  {id:'manos_arma', label:'Manos (armas y escudos)', cats:['arma_1m','arma_2m','escudo_1m','escudo_2m'], max:2, peso:{arma_1m:1, arma_2m:2, escudo_1m:1, escudo_2m:2}},
+  {id:'anillos', label:'Anillos', cats:['anillos'], max:10},
+  {id:'pies_blandas', label:'Botas blandas', cats:['botas_blandas'], max:1},
+  {id:'pies_rigidas', label:'Botas rígidas', cats:['botas_rigidas'], max:1},
+  {id:'piernas_blandas', label:'Piernas blandas', cats:['piernas_blandas'], max:1},
+  {id:'piernas_rigidas', label:'Piernas rígidas', cats:['piernas_rigidas'], max:1},
+];
+const ATTR_LIST = GRUPOS.map(g => ({id:g.id, label:g.label, full:g.full}));
+const MOD_TARGETS = [...ATTR_LIST, ...STAT_LIST];
+const STAT_LABEL = Object.fromEntries(MOD_TARGETS.map(s=>[s.id,s.label]));
+const STAT_FULL = Object.fromEntries(MOD_TARGETS.map(s=>[s.id,s.full]));
+const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
+
+const DEFAULT = {
+  meta:{nombre:'', raza:'', clase:'', subclase:'',
+        nivel:1, exp:0, dde:0, wld:'', imagen:''},
+  bitacora:[{id:'j1', nombre:'Jornada 1', texto:''}],
+  bitacoraActiva:'j1',
+  loot:{normal:0, magico:0, especial:[]},
+  attrs:{con:0, fue:0, agl:0, des:0, int:0},
+  hp:0, turno:1, log:[], bonosGastados:0, acciones:3,
+  caps:{mochila:20, cinturon:5},
+  armadura:{nota:''},
+  formulas:{
+    resmg:'con', rescc:'con', hpmax:'con*5',
+    dmg:'fue', potencia:'fue', crgmax:'fue',
+    eva:'agl', ini:'agl', mov:'agl',
+    rng:'des', pdg:'des', crit:'des',
+    pdgmg:'int', resm:'int', bonos:'ceil(int/2) - sobrecarga', rangocasteo:'int',
+    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0'
+  },
+  inventario:[],
+  cinturon:[],
+  habilidades:[
+    {id:'movimiento', nombre:'Movimiento', costo:'', categoria:'', job:false, origen:'Acción base', imagen:'', detalle:'Desplazarse por el mapa.'}
+  ],
+  pasivas:[],
+  sociales:[],
+  efectos:[],
+  invocaciones:[],
+  catalogo:[
+    {id:'cat-pocion-hp', nombre:'Poción de HP', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:5, unidades:1, consumible:true, curahp:25, mods:[], detalle:'Recupera 25 HP.'},
+    {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:3, consumible:true, curahp:25, mods:[], detalle:'3 Cargas. Recupera 25 HP por carga.'},
+    {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:100, mods:[], detalle:'Recupera 100 HP.'},
+    {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:3, consumible:true, curahp:100, mods:[], detalle:'3 Cargas. Recupera 100 HP por carga.'},
+    {id:'cat-pocion-sp', nombre:'Poción de SP', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'+1 SP. +3 Bonos. (El sistema no aplica SP ni Bonos solo — anotalo a mano al usarla.)'},
+    {id:'cat-pocion-sp-grande', nombre:'Poción de SP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:120, unidades:2, consumible:true, curahp:0, mods:[], detalle:'3 Cargas. +1 SP y +10 Bonos por carga. (Aplicar a mano al usarla.)'},
+    {id:'cat-cura-plus', nombre:'Cura Plus', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Remueve estados alterados.'},
+    {id:'cat-antidoto', nombre:'Antídoto', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Cura el estado Veneno.'},
+    {id:'cat-raciones', nombre:'Raciones', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:3, unidades:2, consumible:true, curahp:0, mods:[], detalle:'(2/2) +1 Wellness. (Aplicar a mano al usarla.)'},
+    {id:'cat-raciones-fancy', nombre:'Raciones Fancy', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:5, consumible:true, curahp:0, mods:[], detalle:'(5/5) +2 Wellness. (Aplicar a mano al usarla.)'},
+    {id:'cat-ankh', nombre:'Ankh de Reencarnación', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Se consume al morir el portador. Revive en un 25% del HP máximo. Queda titilando hasta el comienzo de su turno.'},
+    {id:'cat-revive', nombre:'Revive', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:150, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.'},
+    {id:'cat-polilla', nombre:'Polilla +2', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Consumible instantáneo. +2 a cualquier tirada.'},
+    {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Permite repetir una tirada. Se conserva si gana tirando una moneda.'},
+    {id:'cat-pergamino-luz', nombre:'Pergamino de luz cegadora', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-pergamino-tentaculo', nombre:'Pergamino de tentáculo sombrío', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-pergamino-sombras', nombre:'Pergamino de sombras chinescas', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-pergamino-red', nombre:'Pergamino de red Nerubian', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-pergamino-ojo', nombre:'Pergamino de ojo de Kicillof', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-pergamino-ventriloquia', nombre:'Pergamino de ventriloquía', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+    {id:'cat-daga', nombre:'Daga', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 de resistencia crítica.'},
+    {id:'cat-rompemalla', nombre:'Rompemalla', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+    {id:'cat-espada-ancha', nombre:'Espada ancha', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'Daño amplificado.'},
+    {id:'cat-hacha-de-mano', nombre:'Hacha de mano', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+    {id:'cat-bast-n-flexible', nombre:'Bastón flexible', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 de resistencia crítica.'},
+    {id:'cat-estoque', nombre:'Estoque', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Modificador: \'+1 a iniciativa'},
+    {id:'cat-espada-corta', nombre:'Espada corta', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[], detalle:''},
+    {id:'cat-machete', nombre:'Machete', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:25, consumible:false, curahp:0, mods:[], detalle:'+10% de daño crítico'},
+    {id:'cat-hacha', nombre:'Hacha', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+    {id:'cat-maza', nombre:'Maza', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'Daño amplificado.'},
+    {id:'cat-escudo-romano', nombre:'Escudo romano', imagen:'', tipoItem:'escudo_2m', peso:5, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:250}], detalle:'+4 al bloqueo. Movimiento y ataque lento'},
+    {id:'cat-espada-larga', nombre:'Espada larga', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'modificador: \'+1 al pdg. +1 al parry'},
+    {id:'cat-escudo-grande', nombre:'Escudo grande', imagen:'', tipoItem:'escudo_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:200}], detalle:'+2 al bloqueo'},
+    {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+    {id:'cat-mangual', nombre:'Mangual', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'Alcance +1.'},
+    {id:'cat-broquel', nombre:'Broquel', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[{stat:'def', val:50}], detalle:'+2 a estabilidad'},
+    {id:'cat-martillo', nombre:'Martillo', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'Daño +50%. Lento.'},
+    {id:'cat-escudo-pav-s', nombre:'Escudo pavés', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:150}], detalle:'+1 a estabilidad, +1 al bloqueo'},
+    {id:'cat-escudo-triangular', nombre:'Escudo triangular', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:150}], detalle:'+2 al bloqueo'},
+    {id:'cat-escudo-peque-o', nombre:'Escudo pequeño', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'def', val:100}], detalle:'+1 al bloqueo, +1 a la estabilidad'},
+  ]
+};
+
+let S = structuredClone(DEFAULT);
+let openStat = null;
+
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2,9);
+const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+
+function fileToDataURL(file, maxDim=480, quality=0.85){
+  return new Promise((resolve, reject) => {
+    if(!file.type || !file.type.startsWith('image/')){ reject(new Error('no-image')); return; }
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('bad-image'));
+      img.onload = () => {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1A1418';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* =========================================================
+   CÁLCULO
+   ========================================================= */
+
+function collectMods(){
+  const out = {};
+  const push = (m, origen) => {
+    if(!m || !m.stat) return;
+    (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen});
+  };
+  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre)));
+  S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
+    const stacks = Math.max(1, num(e.stacks) || 1);
+    push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''));
+  }));
+  return out;
+}
+
+function evalFormula(expr, ctx){
+  try{
+    const keys = Object.keys(ctx);
+    const fn = new Function(...keys, 'return ('+(expr||'0')+');');
+    const v = fn(...keys.map(k=>ctx[k]));
+    return Number.isFinite(v) ? v : NaN;
+  }catch(e){ return NaN; }
+}
+
+function compute(){
+  const mods = collectMods();
+  const modTotal = {};
+  MOD_TARGETS.forEach(s => modTotal[s.id] = (mods[s.id]||[]).reduce((a,b)=>a+b.val,0));
+
+  const attrFinal = {};
+  ATTR_LIST.forEach(a => attrFinal[a.id] = num(S.attrs[a.id]) + modTotal[a.id]);
+
+  const ctx = {
+    ...attrFinal,
+    nivel:num(S.meta.nivel), job:jobBudget().total,
+    sobrecarga:0, bon:0,
+    floor:Math.floor, ceil:Math.ceil, round:Math.round,
+    min:Math.min, max:Math.max, abs:Math.abs
+  };
+  STAT_LIST.forEach(s => ctx[s.id] = 0);
+
+  const pesoEquipado = S.inventario.filter(i=>i.equipado).reduce((a,i)=>a+num(i.peso),0);
+
+  const base = {};
+  for(let pass=0; pass<4; pass++){
+    ctx.sobrecarga = Math.max(0, pesoEquipado - (ctx.crgmax||0));
+    ctx.bon = ctx.bonos || 0;
+    STAT_LIST.forEach(s => {
+      const v = evalFormula(S.formulas[s.id], ctx);
+      base[s.id] = Number.isNaN(v) ? NaN : v;
+      ctx[s.id] = (Number.isNaN(v) ? 0 : v) + modTotal[s.id];
+    });
+  }
+
+  const final = {};
+  STAT_LIST.forEach(s => final[s.id] = Number.isNaN(base[s.id]) ? NaN : base[s.id] + modTotal[s.id]);
+  ATTR_LIST.forEach(a => { base[a.id] = num(S.attrs[a.id]); final[a.id] = attrFinal[a.id]; });
+  return {base, mods, modTotal, final, pesoEquipado, sobrecarga:ctx.sobrecarga};
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function expThreshold(nivel){
+  return Math.max(1, num(nivel) || 1) * 100;
+}
+
+function renderExp(){
+  $('#v-exp-max').textContent = fmt(expThreshold(S.meta.nivel));
+}
+
+function applyExp(rawValue){
+  let nivel = Math.max(1, num(S.meta.nivel) || 1);
+  let exp = Math.max(0, num(rawValue));
+  let subio = false;
+  let thr = expThreshold(nivel);
+  while(exp >= thr){
+    exp -= thr;
+    nivel += 1;
+    subio = true;
+    thr = expThreshold(nivel);
+  }
+  S.meta.exp = exp;
+  S.meta.nivel = nivel;
+  if(subio){
+    $('#f-exp').value = S.meta.exp;
+    $('#f-nivel').value = S.meta.nivel;
+    toast(`¡Subiste a nivel ${nivel}!`);
+  }
+  renderExp();
+}
+
+function attrBudget(){
+  const nivel = Math.max(1, num(S.meta.nivel) || 1);
+  const total = 33 + 3 * (nivel - 1);
+  const usado = ATTR_LIST.reduce((a,at) => a + num(S.attrs[at.id]), 0);
+  return {total, usado, pend: total - usado};
+}
+
+function renderAttrs(){
+  const c = compute();
+  const pb = attrBudget();
+  $('#attr-points').innerHTML = `
+    <span class="pt-label">Puntos de atributo</span>
+    <span class="pt-nums">${pb.usado} / ${pb.total}</span>
+    ${pb.pend !== 0 ? `<span class="pt-pend ${pb.pend<0?'over':''}">${pb.pend>0?`+${pb.pend} por asignar`:`${Math.abs(pb.pend)} de más`}</span>` : `<span class="pt-ok">al día</span>`}
+  `;
+  $('#attrs').innerHTML = GRUPOS.map(g => {
+    const m = c.modTotal[g.id];
+    const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
+    let descHtml = '';
+    if(m){
+      const origins = c.mods[g.id] || [];
+      const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
+      descHtml = `<button type="button" class="glyph-desc" data-stat="${g.id}" title="Ver detalle">${m>0?'+':''}${fmt(m)} → ${fmt(c.final[g.id])}${origenTxt?` · ${esc(origenTxt)}`:''}</button>`;
+    }
+    return `
+    <div class="attr" style="--accent:${g.color}">
+      <div class="head">
+        <div class="glyph">
+          <div class="ab">${g.label}</div>
+          <input type="number" class="glyph-val ${valCls}" data-attr="${g.id}" data-mod="${m}" value="${fmt(c.final[g.id])}" title="${esc(g.full)}">
+        </div>
+        <div class="full">
+          <span class="full-name">${g.full}</span>
+          ${descHtml}
+        </div>
+      </div>
+      <div class="derived" style="--dcols:${g.derived.length}">
+        ${g.derived.map(d => statTile(d, c)).join('')}
+        ${(openStat === g.id || g.derived.some(d=>d.id===openStat)) ? breakdown(openStat, c) : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function statTile(d, c, showMod=true){
+  const m = c.modTotal[d.id];
+  const val = Number.isNaN(c.final[d.id]) ? '?' : fmt(c.final[d.id]);
+  const cls = m>0 ? 'boosted' : m<0 ? 'nerfed' : '';
+  const valCls = showMod ? (m>0?'mod-plus':m<0?'mod-minus':'') : '';
+  let descHtml = '';
+  if(showMod && m){
+    const origins = c.mods[d.id] || [];
+    const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
+    descHtml = `<span class="dv-desc">${m>0?'+':''}${fmt(m)}${origenTxt?` · ${esc(origenTxt)}`:''}</span>`;
+  }
+  return `<div class="d ${cls}" data-stat="${d.id}" title="${esc(d.full)}">
+    <span class="dl">${d.label}</span>
+    <span class="dv ${valCls}">${val}</span>
+    ${descHtml}
+  </div>`;
+}
+
+function breakdown(id, c){
+  const rows = (c.mods[id]||[]).map(m =>
+    `<div class="row"><span>${esc(m.origen)}</span><b>${m.val>0?'+':''}${fmt(m.val)}</b></div>`).join('');
+  const attr = ES_ATTR(id);
+  const baseTxt = Number.isNaN(c.base[id]) ? 'fórmula inválida' : fmt(c.base[id]);
+  return `<div class="breakdown">
+    <div class="row"><span>${attr ? 'Valor propio' : 'Base'}</span><b>${baseTxt}</b></div>
+    ${rows || '<div class="row" style="opacity:.6"><span>Sin modificadores activos</span><b>–</b></div>'}
+    <div class="row tot"><span>${STAT_LABEL[id]} · ${STAT_FULL[id]}</span><b>${Number.isNaN(c.final[id])?'?':fmt(c.final[id])}</b></div>
+    ${attr
+      ? `<div class="hint" style="margin-top:7px">Los derivados de ${STAT_FULL[id]} usan ${fmt(c.final[id])}, no ${fmt(c.base[id])}. Editá el valor propio desde el número grande de arriba.</div>`
+      : `<div class="fx"><span style="color:var(--copper)">fx</span><input data-formula="${id}" value="${esc(S.formulas[id]||'')}"></div>`}
+  </div>`;
+}
+
+const TIPOS_IDS = ['tipo1','tipo2','tipo3','tipo4','tipo5'];
+
+function renderArmadura(){
+  const c = compute();
+  const m = c.modTotal.def;
+  const tile = $('#def-tile');
+  tile.classList.toggle('boosted', m > 0);
+  tile.classList.toggle('nerfed', m < 0);
+  $('#v-def').textContent = Number.isNaN(c.final.def) ? '?' : fmt(c.final.def);
+  $('#def-breakdown').innerHTML = openStat === 'def' ? breakdown('def', c) : '';
+
+  $('#tipos').innerHTML = TIPOS_IDS.map(id => {
+    const d = EXTRA.find(e => e.id === id);
+    return statTile(d, c, false);
+  }).join('');
+  $('#tipos-breakdown').innerHTML = TIPOS_IDS.includes(openStat) ? breakdown(openStat, c) : '';
+
+  renderEfectosArmas();
+  renderEfectosOtros();
+}
+
+function asignarManos(){
+  const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
+  const dosManos = enManos.find(a => a.tipoItem === 'arma_2m' || a.tipoItem === 'escudo_2m');
+  const unaMano = enManos.filter(a => a.tipoItem === 'arma_1m' || a.tipoItem === 'escudo_1m');
+  const mapa = new Map();
+  if(dosManos){
+    mapa.set(dosManos.id, 1);
+    const otro = unaMano[0];
+    if(otro) mapa.set(otro.id, 2);
+  }else{
+    const pref1 = unaMano.find(a => String(a.manoPreferida) === '1');
+    const pref2 = unaMano.find(a => String(a.manoPreferida) === '2' && a !== pref1);
+    const resto = unaMano.filter(a => a !== pref1 && a !== pref2);
+    const m1 = pref1 || resto.shift() || null;
+    const m2 = pref2 || resto.shift() || null;
+    if(m1) mapa.set(m1.id, 1);
+    if(m2) mapa.set(m2.id, 2);
+  }
+  return mapa;
+}
+
+function renderEfectosArmas(){
+  const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
+  if(!enManos.length){
+    $('#efectos-armas').innerHTML = `<div class="empty">No tenés nada equipado en las manos.</div>`;
+    return;
+  }
+  const dosManos = enManos.find(a => a.tipoItem === 'arma_2m' || a.tipoItem === 'escudo_2m');
+  const manos = asignarManos();
+  const m1 = enManos.find(a => manos.get(a.id) === 1) || null;
+  const m2 = enManos.find(a => manos.get(a.id) === 2) || null;
+  const esDosManos = !!(dosManos && m1 && m1.id === dosManos.id);
+
+  const manoHtml = (item, label) => {
+    if(!item) return `<div class="mano-box"><div class="mano-label">${label}</div><div class="mano-vacio">—</div></div>`;
+    const esElDosManos = esDosManos && item.id === dosManos.id;
+    const dano = armaDanoTxt(item);
+    const esArma = ES_ARMA(item.tipoItem);
+    return `<div class="mano-box">
+      <div class="mano-label">${label}${esElDosManos ? ' (dos manos)' : ''}</div>
+      <div class="mano-nombre">${esc(item.nombre)}</div>
+      ${esArma ? `<div class="mano-tipo">Tipo ${num(item.tipoDado)||6}</div>` : ''}
+      ${dano ? `<div class="mano-dano">${dano}</div>` : ''}
+      ${item.detalle ? `<div class="mano-fx">${esc(item.detalle)}</div>` : ''}
+    </div>`;
+  };
+
+  $('#efectos-armas').innerHTML = esDosManos
+    ? `<div class="manos-grid manos-grid-single">${manoHtml(m1, 'Mano 1')}</div>`
+    : `<div class="manos-grid">${manoHtml(m1, 'Mano 1')}${manoHtml(m2, 'Mano 2')}</div>`;
+}
+
+function renderEfectosOtros(){
+  const equipados = S.inventario.filter(i => i.equipado);
+  const lineas = [];
+  equipados.forEach(i => {
+    const otrosMods = (i.mods||[]).filter(m => m.stat && m.stat !== 'def' && !TIPOS_IDS.includes(m.stat));
+    if(otrosMods.length){
+      const partes = otrosMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ');
+      lineas.push(`<div class="efecto-otro"><b>${esc(i.nombre)}</b> — ${esc(partes)}</div>`);
+    }
+    if(!ES_MANO(i.tipoItem) && i.detalle && i.detalle.trim()){
+      lineas.push(`<div class="efecto-otro"><b>${esc(i.nombre)}</b> — ${esc(i.detalle)}</div>`);
+    }
+  });
+  $('#efectos-otros').innerHTML = lineas.length ? lineas.join('') : `<div class="empty">Sin efectos adicionales equipados.</div>`;
+}
+
+function computeSlots(){
+  const equipados = S.inventario.filter(i => i.equipado);
+  return SLOT_DEFS.map(sd => {
+    let usado = 0;
+    equipados.forEach(i => {
+      if(!sd.cats.includes(i.tipoItem)) return;
+      usado += sd.peso ? (sd.peso[i.tipoItem] || 1) : 1;
+    });
+    return {...sd, usado};
+  });
+}
+
+function renderVitals(){
+  const c = compute();
+  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+  $('#v-hpmax').textContent = fmt(hpmax);
+  $('#bar-hp').style.width = pct(S.hp, hpmax);
+
+  // capacidad
+  const crg = Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax;
+  setCap('equipo', c.pesoEquipado, crg);
+  setCap('mochila', S.inventario.filter(i=>!i.equipado).reduce((a,i)=>a+ranurasDe(i),0), num(S.caps.mochila));
+  setCap('cinturon', S.cinturon.length, num(S.caps.cinturon));
+  $('#cap-equipo-t').textContent = fmt(crg);
+
+  const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
+  const gastado = num(S.bonosGastados);
+  const bonos = bonosBase - gastado;
+  const fBonos = $('#f-bonos');
+  if(document.activeElement !== fBonos) fBonos.value = fmt(bonos);
+  $('#v-bonos-natural-btn').textContent = `/ ${fmt(bonosBase)}`;
+  $('#c-bonos').classList.toggle('penal', c.sobrecarga > 0 || bonos < 0);
+  $('#c-bonos').title = c.sobrecarga > 0
+    ? `Inteligencia ${fmt(c.final.int)} / 2 = ${fmt(Math.ceil(c.final.int/2))}, menos ${fmt(c.sobrecarga)} de peso excedido, menos ${fmt(gastado)} gastados este turno`
+    : `Inteligencia / 2 redondeado hacia arriba${gastado ? `, menos ${fmt(gastado)} gastados este turno` : ''}`;
+  $('#bonos-breakdown').innerHTML = openStat === 'bonos'
+    ? breakdown('bonos', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
+        <div class="row"><span>Gastado este turno (Ejecutar)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
+        <div class="row tot"><span>Disponibles</span><b>${fmt(bonos)}</b></div>
+      </div>` : '')
+    : '';
+  $('#equipo-over').textContent = c.sobrecarga > 0
+    ? `Te pasás por ${fmt(c.sobrecarga)}. Bonos −${fmt(c.sobrecarga)}.` : '';
+}
+
+function setCap(key, used, total){
+  $('#cap-'+key+'-n').textContent = fmt(used);
+  const bar = $('#cap-'+key+'-bar');
+  bar.classList.toggle('over', total>0 && used>total);
+  bar.firstElementChild.style.width = pct(used, total);
+}
+
+function pct(v, max){ return max>0 ? Math.min(100, Math.max(0, v/max*100))+'%' : '0%'; }
+function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+function esc(s){ return String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+
+function statOptions(sel){
+  const opt = s => `<option value="${s.id}" ${sel===s.id?'selected':''}>${s.label} — ${s.full}</option>`;
+  return `<optgroup label="Atributos">${ATTR_LIST.map(opt).join('')}</optgroup>`
+       + GRUPOS.map(g => `<optgroup label="${g.label} · ${g.full}">${g.derived.map(opt).join('')}</optgroup>`).join('')
+       + `<optgroup label="Otros">${EXTRA.map(opt).join('')}</optgroup>`;
+}
+
+function jobTag(i){
+  if(i.job === false){
+    return i.origen
+      ? `<span class="tag origen">${esc(i.origen)}</span>`
+      : `<span class="tag origen">fuera de Job</span>`;
+  }
+  return `<span class="tag job">Job</span>`;
+}
+
+function modTags(mods){
+  return (mods||[]).filter(m=>m.stat).map(m =>
+    `<span class="tag mod ${num(m.val)<0?'neg':''}" title="${esc(STAT_FULL[m.stat]||'')}">${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}</span>`).join('');
+}
+
+function thumb(i){
+  return i.imagen ? `<img class="item-thumb" src="${i.imagen}" alt="">` : '';
+}
+
+function ranurasDe(i){
+  return (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);
+}
+
+function unitStepper(i, key){
+  return `<div class="unit-stepper">
+    <span class="unit-label">Unidades</span>
+    <button class="unit-btn" data-unit="${key}:${i.id}:-1">−</button>
+    <span class="unit-n">${fmt(num(i.unidades))}</span>
+    <button class="unit-btn" data-unit="${key}:${i.id}:1">+</button>
+  </div>`;
+}
+
+function consumeButton(i){
+  if(!i.consumible) return '';
+  return `<button class="consume-btn" data-consume="${i.id}" ${num(i.unidades)<=0?'disabled':''}>
+    Consumir ${i.curahp ? `<span class="consume-fx">(${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP)</span>` : ''}
+  </button>`;
+}
+
+function priceTags(i){
+  const c = num(i.precioCompra), v = precioVentaDe(i);
+  let out = '';
+  if(c) out += `<span class="tag price buy">compra ${fmt(c)}</span>`;
+  if(v) out += `<span class="tag price sell">venta ${fmt(v)}</span>`;
+  return out;
+}
+
+function precioVentaDe(i){
+  return Math.round((num(i.precioCompra) / 2) * 100) / 100;
+}
+
+function armaDanoTxt(i){
+  if(!ES_ARMA(i.tipoItem)) return '';
+  const dados = Math.max(1, num(i.peso) || 1);
+  const tipo = num(i.tipoDado) || 6;
+  const fijo = num(i.danoFijo);
+  return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
+}
+
+/* =========================================================
+   INVOCACIONES
+   ========================================================= */
+
+const INV_COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
+
+function nuevaInvocacion(){
+  return {
+    id: uid(), nombre:'Invocación nueva', imagen:'', color: INV_COLORES[Math.floor(Math.random()*INV_COLORES.length)],
+    activa:true, cooldown:3, cooldownActual:3,
+    hp:10, hpMax:10, acc:3, accMax:3, spd:5,
+    con:0, fue:0, agl:0, des:0, int:0,
+    armaTipo:6, armaPeso:1, armaFijo:0,
+    defensa:0,
+    crit:[0,0,0,0,0],
+    habilidades:[]
+  };
+}
+
+function invDanoTxt(inv){
+  const dados = Math.max(1, num(inv.armaPeso)||1);
+  const tipo = num(inv.armaTipo)||6;
+  const fijo = num(inv.armaFijo);
+  return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
+}
+
+function renderInvocaciones(){
+  const grid = $('#inv-grid');
+  if(!grid) return;
+  $('#inv-empty').style.display = S.invocaciones.length ? 'none' : 'block';
+  grid.innerHTML = S.invocaciones.map(inv => invCardHtml(inv)).join('');
+}
+
+function invCardHtml(inv){
+  const sinAcc = num(inv.acc) <= 0;
+  const dormida = inv.activa === false;
+  return `
+  <div class="inv-card ${dormida?'inv-dormida':''}" style="--accent:${inv.color}" data-invid="${inv.id}">
+    <div class="inv-chead">
+      <input class="inv-name" data-invf="nombre" data-invid="${inv.id}" value="${esc(inv.nombre)}">
+      <button class="mini" data-verinv="${inv.id}">Ver</button>
+      <button class="inv-xbtn" data-rminv="${inv.id}" title="Eliminar del todo">×</button>
+    </div>
+    ${dormida ? `<div class="inv-dormida-bar">
+      <span>No invocada — la ficha se guardó, lista para volver a invocar</span>
+      <button class="inv-reinvocar" data-reinvocar="${inv.id}">Invocar</button>
+    </div>` : ''}
+    <div class="inv-imgwrap">
+      <button type="button" class="inv-imgpick" data-invimg="${inv.id}">
+        ${inv.imagen ? `<img src="${inv.imagen}" alt="">` : `<span class="inv-imgempty">+<small>Imagen</small></span>`}
+      </button>
+      ${inv.imagen ? `<button class="mini" data-invimgrm="${inv.id}" style="margin-top:5px">Quitar imagen</button>` : ''}
+      <input type="file" class="inv-imginput" data-invimginput="${inv.id}" accept="image/*" hidden>
+    </div>
+    <div class="inv-cbody">
+
+      <div class="inv-cooldownbox">
+        <span class="cdl">Cooldown</span>
+        <span class="cdn">Dura <input type="number" data-invf="cooldown" data-invid="${inv.id}" value="${inv.cooldown}" min="0" title="Cuántos turnos dura la invocación"> turnos ·</span>
+        <span class="cdn">${dormida ? 'Dormida' : `Quedan <b style="color:var(--brass)">${fmt(num(inv.cooldownActual))}</b>`}</span>
+      </div>
+
+      <div class="inv-vitalbar">
+        <div class="inv-vitalmini hp">
+          <div class="vl">HP</div>
+          <div class="vn"><input type="number" data-invf="hp" data-invid="${inv.id}" value="${inv.hp}"><span class="vmax">/ </span><input type="number" data-invf="hpMax" data-invid="${inv.id}" value="${inv.hpMax}" style="width:30px"></div>
+        </div>
+        <div class="inv-vitalmini acc">
+          <div class="vl">Acciones</div>
+          <div class="vn"><input type="number" data-invf="acc" data-invid="${inv.id}" value="${inv.acc}"><span class="vmax">/ </span><input type="number" data-invf="accMax" data-invid="${inv.id}" value="${inv.accMax}" style="width:30px"></div>
+        </div>
+      </div>
+
+      <div class="inv-row3">
+        <div class="inv-minif"><label>Vel.</label><input type="number" data-invf="spd" data-invid="${inv.id}" value="${inv.spd}"></div>
+        <div class="inv-minif"><label>Defensa</label><input type="number" data-invf="defensa" data-invid="${inv.id}" value="${inv.defensa}"></div>
+        <div></div>
+      </div>
+
+      <div>
+        <div class="inv-sectlabel">Atributos</div>
+        <div class="inv-row5" style="margin-top:4px">
+          <div class="inv-minif"><label>Con</label><input type="number" data-invf="con" data-invid="${inv.id}" value="${inv.con}"></div>
+          <div class="inv-minif"><label>Fue</label><input type="number" data-invf="fue" data-invid="${inv.id}" value="${inv.fue}"></div>
+          <div class="inv-minif"><label>Agi</label><input type="number" data-invf="agl" data-invid="${inv.id}" value="${inv.agl}"></div>
+          <div class="inv-minif"><label>Des</label><input type="number" data-invf="des" data-invid="${inv.id}" value="${inv.des}"></div>
+          <div class="inv-minif"><label>Int</label><input type="number" data-invf="int" data-invid="${inv.id}" value="${inv.int}"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="inv-sectlabel">Arma</div>
+        <div class="inv-armaline" style="margin-top:4px">
+          <div class="inv-minif"><label>Tipo (dado)</label>
+            <select data-invf="armaTipo" data-invid="${inv.id}">
+              ${DADOS_ARMA.map(d=>`<option value="${d}" ${num(inv.armaTipo)===d?'selected':''}>d${d}</option>`).join('')}
+            </select>
+          </div>
+          <div class="inv-minif"><label>Peso (cant.)</label><input type="number" data-invf="armaPeso" data-invid="${inv.id}" value="${inv.armaPeso}"></div>
+          <div class="inv-minif"><label>Daño fijo</label><input type="number" data-invf="armaFijo" data-invid="${inv.id}" value="${inv.armaFijo}"></div>
+          <div class="inv-danopreview">Daño: <b>${invDanoTxt(inv)}</b></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="inv-sectlabel">Res. a críticos</div>
+        <div class="inv-critgrid" style="margin-top:4px">
+          <div class="inv-critcell"><label>Tipo 2</label><input type="number" data-invcrit="0" data-invid="${inv.id}" value="${inv.crit[0]}"></div>
+          <div class="inv-critcell"><label>Tipo 4</label><input type="number" data-invcrit="1" data-invid="${inv.id}" value="${inv.crit[1]}"></div>
+          <div class="inv-critcell"><label>Tipo 6</label><input type="number" data-invcrit="2" data-invid="${inv.id}" value="${inv.crit[2]}"></div>
+          <div class="inv-critcell"><label>Tipo 8</label><input type="number" data-invcrit="3" data-invid="${inv.id}" value="${inv.crit[3]}"></div>
+          <div class="inv-critcell"><label>Tipo 10</label><input type="number" data-invcrit="4" data-invid="${inv.id}" value="${inv.crit[4]}"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="inv-sectlabel">Habilidades</div>
+        <div class="inv-hablist" style="margin-top:4px">
+          ${inv.habilidades.map(h => invHabHtml(inv.id, h, sinAcc || dormida, dormida)).join('')}
+        </div>
+        <button class="inv-addhab" data-addinvhab="${inv.id}" style="margin-top:6px">+ Habilidad</button>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+function invHabHtml(invId, h, sinAcc, dormida){
+  const enCooldown = num(h.cdActual) > 0;
+  const bloqueada = enCooldown || sinAcc;
+  return `<div class="inv-hab">
+    <div class="inv-habtop">
+      <input class="inv-hn" data-invhabf="nombre" data-invid="${invId}" data-habid="${h.id}" value="${esc(h.nombre)}" placeholder="Nombre">
+      <div class="inv-dur">
+        <span class="inv-durlabel">CD</span>
+        <input type="number" data-invhabf="cd" data-invid="${invId}" data-habid="${h.id}" value="${h.cd||0}" min="0" title="Turnos de reutilización. 0 = sin cooldown">
+      </div>
+      <button class="inv-rm" data-rminvhab="${invId}:${h.id}">×</button>
+    </div>
+    <textarea data-invhabf="detalle" data-invid="${invId}" data-habid="${h.id}" placeholder="Efecto...">${esc(h.detalle)}</textarea>
+    <div class="inv-habbottom">
+      <span class="inv-habestado ${bloqueada?'cd':'ok'}">${enCooldown ? `En cooldown · ${fmt(num(h.cdActual))} turno(s)` : (dormida ? 'No invocada' : (sinAcc?'Sin acciones':'Disponible'))}</span>
+      <button class="inv-ejecutar" data-ejecutarinvhab="${invId}:${h.id}" ${bloqueada?'disabled':''}>Ejecutar</button>
+    </div>
+  </div>`;
+}
+
+function defValorDe(i){
+  return (i.mods||[]).filter(m => m.stat === 'def').reduce((a,m) => a + num(m.val), 0);
+}
+
+function invRow(i, contexto){
+  const dano = armaDanoTxt(i);
+  const defVal = defValorDe(i);
+  const statTxt = dano
+    ? `Daño ${dano}`
+    : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
+  const pesoTag = `<span class="tag">peso ${fmt(num(i.peso))}</span>`;
+  return `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)} ${pesoTag}</div>
+          ${statTxt ? `<div class="istat">${statTxt}</div>` : ''}
+          ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
+        </div>
+        <div class="rowbtns">
+          <button class="mini ${i.equipado?'on':''}" data-toggle="${i.id}" title="${i.equipado?'Pasar a mochila':'Equipar'}">${i.equipado?'✓':'○'}</button>
+          <button class="mini" data-view="inventario:${i.id}">Ver</button><button class="mini" data-edit="inventario:${i.id}">Editar</button>
+        </div>
+      </div>
+      ${i.consumible ? unitStepper(i, 'inventario') : ''}
+      ${consumeButton(i)}
+      </div>`;
+}
+
+const LISTS = {
+  equipo:{
+    empty:'Nada equipado todavía.',
+    row:i => invRow(i, 'equipo')
+  },
+  mochila:{
+    empty:'Mochila vacía.',
+    row:i => invRow(i, 'mochila')
+  },
+  cinturon:{
+    empty:'Cinturón vacío.',
+    row:i => `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)}</div>
+          ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
+        </div>
+        <div class="rowbtns"><button class="mini" data-view="cinturon:${i.id}">Ver</button><button class="mini" data-edit="cinturon:${i.id}">Editar</button></div>
+      </div>
+      ${unitStepper(i, 'cinturon')}
+      ${consumeButton(i)}
+      </div>`
+  },
+  habilidades:{
+    empty:'Sin habilidades cargadas.',
+    row:i => {
+      const noEspameable = i.categoria === 'No espameable';
+      const yaUsada = noEspameable && i.usadaEsteTurno === true;
+      const esVariable = esCostoVariable(i.costo);
+      const sinAcciones = !esVariable && num(S.acciones) <= 0;
+      const bloqueada = yaUsada || sinAcciones;
+      return `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''} ${i.categoria?`<span class="tag cat">${esc(i.categoria)}</span>`:''}</div>
+          <div class="idesc">${esc(i.detalle)}</div>
+        </div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
+      </div>
+      <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar${yaUsada?' · ya usada este turno':(sinAcciones?' · sin acciones':'')}</button>
+      </div>`;
+    }
+  },
+  pasivas:{
+    empty:'Sin pasivas.',
+    row:i => `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)}</div><div class="idesc">${esc(i.detalle)}</div>
+        <div class="imeta">${modTags(i.mods)}</div></div>
+        <div class="rowbtns"><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
+      </div></div>`
+  },
+  sociales:{
+    empty:'Sin habilidades sociales.',
+    row:i => `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)} ${i.dado?`<span class="tag cost">${esc(i.dado)}</span>`:''}</div>
+          <div class="idesc">${esc(i.detalle)}</div></div>
+        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button></div>
+      </div></div>`
+  },
+  efectos:{
+    empty:'Sin estados alterados. Buen momento.',
+    row:i => {
+      const st = Math.max(1, num(i.stacks)||1);
+      const hp = num(i.hpturno)*st;
+      const dur = i.permanente ? '∞' : (num(i.turnos)>0 ? num(i.turnos)+(num(i.turnos)===1?' turno':' turnos') : 'sin duración');
+      return `<div class="item">
+      <div class="ihead">
+        ${thumb(i)}
+        <div><div class="iname">${esc(i.nombre)} ${st>1?`<span class="tag cost">×${fmt(st)}</span>`:''}</div>
+          <div class="idesc">${esc(i.detalle)}</div>
+          <div class="imeta">
+            <span class="tag ${i.activo!==false?'on':'off'}">${i.activo!==false?'activo':'pausado'}</span>
+            <span class="tag ${!i.permanente && num(i.turnos)===1?'urgente':''}">${dur}</span>
+            ${i.popup ? `<span class="tag pop">◆ pop-up</span>` : ''}
+            ${hp ? `<span class="tag mod ${hp<0?'neg':''}">${hp>0?'+':''}${fmt(hp)} HP / turno</span>` : ''}
+            ${num(i.stacksturno) ? `<span class="tag">${num(i.stacksturno)>0?'+':''}${fmt(num(i.stacksturno))} stack / turno</span>` : ''}
+            ${modTags(i.mods)}
+          </div>
+        </div>
+        <div class="rowbtns">
+          <button class="mini ${i.activo!==false?'on':''}" data-toggle="${i.id}">${i.activo!==false?'✓':'○'}</button>
+          <button class="mini" data-view="efectos:${i.id}">Ver</button><button class="mini" data-edit="efectos:${i.id}">Editar</button>
+        </div>
+      </div></div>`;
+    }
+  }
+};
+
+function renderList(key){
+  const el = $('#list-'+key);
+  if(!el) return;
+  let arr;
+  if(key === 'equipo'){
+    const manos = asignarManos();
+    arr = S.inventario.filter(i=>i.equipado).slice().sort((a,b) => {
+      const oa = ordenEquipoDe(a), ob = ordenEquipoDe(b);
+      if(oa !== ob) return oa - ob;
+      return (manos.get(a.id) || 99) - (manos.get(b.id) || 99);
+    });
+  }else if(key === 'mochila'){
+    arr = S.inventario.filter(i=>!i.equipado).slice().sort((a,b) => ordenEquipoDe(a) - ordenEquipoDe(b));
+  }else{
+    arr = S[key];
+  }
+  el.innerHTML = arr.length ? arr.map(LISTS[key].row).join('') : `<div class="empty">${LISTS[key].empty}</div>`;
+}
+
+function renderInventario(){
+  renderList('equipo');
+  renderList('mochila');
+  renderArmadura();
+}
+
+function renderLootEspecial(){
+  const list = S.loot.especial || [];
+  $('#loot-esp-list').innerHTML = list.length ? list.map(l => `
+    <div class="loot-esp-row">
+      <input class="nom" data-loot-esp="${l.id}" data-lk="nombre" value="${esc(l.nombre)}" placeholder="Tipo de loot">
+      <input class="cant" type="number" data-loot-esp="${l.id}" data-lk="cantidad" value="${l.cantidad}">
+      <button class="rm" data-loot-esp-rm="${l.id}" title="Quitar">×</button>
+    </div>`).join('') : `<div class="loot-esp-empty">Sin tipos agregados.</div>`;
+}
+
+function jobBudget(){
+  const nivel = Math.max(1, num(S.meta.nivel) || 1);
+  const total = 3 + 2 * (nivel - 1);
+  const gastado = [...S.habilidades, ...S.pasivas].filter(x => x.job !== false).length;
+  return {total, gastado, resto: total - gastado};
+}
+
+function renderJob(){
+  const jb = jobBudget();
+  const box = $('#c-job');
+  box.classList.toggle('penal', jb.resto < 0);
+  $('#v-job').textContent = fmt(jb.resto);
+  $('#v-job-sub').textContent = `${jb.gastado} usados de ${jb.total}`;
+  box.title = jb.resto < 0
+    ? `Te pasaste por ${Math.abs(jb.resto)}: ${jb.gastado} habilidades/pasivas con Job contra ${jb.total} disponibles.`
+    : `${jb.total} puntos (3 base + 2 por nivel) − ${jb.gastado} usados = ${jb.resto} disponibles.`;
+}
+
+function renderBitacora(){
+  if(!S.bitacora.some(p => p.id === S.bitacoraActiva)) S.bitacoraActiva = S.bitacora[0].id;
+  $('#bitacora-tabs').innerHTML = S.bitacora.map(p => `
+    <div class="bit-tab ${p.id===S.bitacoraActiva?'active':''}" data-bitacora-id="${p.id}">
+      <input class="bit-tab-name" data-bitacora-name="${p.id}" value="${esc(p.nombre)}">
+      ${S.bitacora.length>1 ? `<button class="bit-tab-x" data-bitacora-del="${p.id}" title="Borrar jornada">×</button>` : ''}
+    </div>`).join('');
+  const activa = S.bitacora.find(p => p.id === S.bitacoraActiva);
+  $('#f-notas').value = activa ? activa.texto : '';
+}
+
+function renderPortrait(){
+  const img = $('#portrait-img'), empty = $('#portrait-empty'), rm = $('#portrait-rm');
+  if(S.meta.imagen){
+    img.src = S.meta.imagen; img.style.display = 'block'; empty.style.display = 'none'; rm.style.display = 'flex';
+  }else{
+    img.removeAttribute('src'); img.style.display = 'none'; empty.style.display = 'flex'; rm.style.display = 'none';
+  }
+}
+
+function renderAll(){
+  $('#f-nombre').value = S.meta.nombre;
+  ['raza','clase','subclase','nivel','exp','dde','wld'].forEach(k => $('#f-'+k).value = S.meta[k]);
+  renderPortrait();
+  $('#f-loot-normal').value = S.loot.normal;
+  $('#f-loot-magico').value = S.loot.magico;
+  renderLootEspecial();
+  renderBitacora();
+  $('#f-hp').value = S.hp;
+  $('#f-capmochila').value = S.caps.mochila;
+  $('#f-capcinturon').value = S.caps.cinturon;
+  $('#f-armanota').value = S.armadura.nota;
+  $('#eyebrow').textContent = [S.meta.raza, S.meta.clase, S.meta.subclase].filter(Boolean).join(' · ') || 'Ficha de personaje';
+  renderAttrs();
+  renderArmadura();
+  Object.keys(LISTS).forEach(renderList);
+  renderTurno();
+  renderAcciones();
+  renderVitals();
+  renderJob();
+  renderExp();
+  renderInvocaciones();
+}
+
+function refresh(){ renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); }
+
+/* =========================================================
+   EVENTOS
+   ========================================================= */
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.id === 'f-nombre'){ S.meta.nombre = t.value; return; }
+  if(t.id === 'f-notas'){
+    const pag = S.bitacora.find(p => p.id === S.bitacoraActiva);
+    if(pag) pag.texto = t.value;
+    return;
+  }
+  if(t.dataset.bitacoraName !== undefined){
+    const pag = S.bitacora.find(p => p.id === t.dataset.bitacoraName);
+    if(pag) pag.nombre = t.value;
+    return;
+  }
+  if(['f-raza','f-clase','f-subclase','f-wld'].includes(t.id)){
+    S.meta[t.id.slice(2)] = t.value;
+    $('#eyebrow').textContent = [S.meta.raza,S.meta.clase,S.meta.subclase].filter(Boolean).join(' · ');
+    return;
+  }
+  if(['f-nivel','f-dde'].includes(t.id)){ S.meta[t.id.slice(2)] = num(t.value); renderExp(); refresh(); return; }
+  if(t.id === 'f-exp'){ applyExp(t.value); refresh(); return; }
+  if(['f-loot-normal','f-loot-magico'].includes(t.id)){
+    S.loot[t.id.replace('f-loot-','')] = num(t.value); return;
+  }
+  if(t.dataset.lootEsp !== undefined){
+    const row = (S.loot.especial||[]).find(l => l.id === t.dataset.lootEsp);
+    if(row){ row[t.dataset.lk] = t.dataset.lk === 'cantidad' ? num(t.value) : t.value; }
+    return;
+  }
+  if(t.id === 'f-hp'){ S.hp = num(t.value); renderVitals(); return; }
+  if(t.id === 'f-bonos'){
+    const c = compute();
+    const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
+    S.bonosGastados = bonosBase - num(t.value);
+    renderVitals();
+    return;
+  }
+  if(t.id === 'f-acciones'){
+    S.acciones = num(t.value);
+    renderAcciones();
+    renderList('habilidades');
+    return;
+  }
+  if(t.id === 'f-capmochila'){ S.caps.mochila = num(t.value); renderVitals(); return; }
+  if(t.dataset.invf !== undefined && t.dataset.invid){
+    const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
+    if(!inv) return;
+    const campo = t.dataset.invf;
+    const noNumericos = ['nombre'];
+    inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
+    if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));
+    if(['armaTipo','armaPeso','armaFijo'].includes(campo)){
+      const preview = t.closest('.inv-armaline')?.querySelector('.inv-danopreview b');
+      if(preview) preview.textContent = invDanoTxt(inv);
+    }
+    return;
+  }
+  if(t.dataset.invcrit !== undefined && t.dataset.invid){
+    const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
+    if(inv) inv.crit[+t.dataset.invcrit] = num(t.value);
+    return;
+  }
+  if(t.dataset.invhabf !== undefined){
+    const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
+    const h = inv && inv.habilidades.find(x=>x.id===t.dataset.habid);
+    if(!h) return;
+    h[t.dataset.invhabf] = t.dataset.invhabf === 'cd' ? num(t.value) : t.value;
+    return;
+  }
+  if(t.id === 'f-capcinturon'){ S.caps.cinturon = num(t.value); renderVitals(); return; }
+  if(t.id === 'f-armanota'){ S.armadura.nota = t.value; return; }
+  if(t.dataset.attr){
+    const mod = num(t.dataset.mod);
+    S.attrs[t.dataset.attr] = num(t.value) - mod;
+    const keep = t.dataset.attr, pos = t.selectionStart;
+    refresh();
+    const again = document.querySelector(`[data-attr="${keep}"]`);
+    if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(_){} }
+    return;
+  }
+  if(t.dataset.formula){
+    S.formulas[t.dataset.formula] = t.value;
+    const id = t.dataset.formula, pos = t.selectionStart;
+    refresh();
+    const again = document.querySelector(`[data-formula="${id}"]`);
+    if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(_){} }
+    return;
+  }
+});
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+
+  const tile = e.target.closest('.d');
+  if(tile && !b){
+    openStat = openStat === tile.dataset.stat ? null : tile.dataset.stat;
+    renderAttrs(); renderArmadura();
+    return;
+  }
+
+  const bitTab = e.target.closest('.bit-tab');
+  if(bitTab && !b){
+    const id = bitTab.dataset.bitacoraId;
+    const yaActiva = id === S.bitacoraActiva;
+    const esInput = e.target.matches('[data-bitacora-name]');
+    if(!(yaActiva && esInput)){
+      S.bitacoraActiva = id;
+      renderBitacora();
+    }
+    return;
+  }
+
+  if(!b) return;
+
+  if(b.id === 'btn-bitacora-add'){
+    const n = uid();
+    S.bitacora.push({id:n, nombre:`Jornada ${S.bitacora.length+1}`, texto:''});
+    S.bitacoraActiva = n;
+    renderBitacora();
+    document.querySelector(`[data-bitacora-name="${n}"]`)?.focus();
+    return;
+  }
+  if(b.dataset.bitacoraDel){
+    if(S.bitacora.length > 1){
+      S.bitacora = S.bitacora.filter(p => p.id !== b.dataset.bitacoraDel);
+      renderBitacora();
+    }
+    return;
+  }
+
+  if(b.id === 'portrait-box'){ $('#portrait-input').click(); return; }
+  if(b.id === 'portrait-rm'){ S.meta.imagen = ''; renderPortrait(); return; }
+
+  if(b.dataset.stat){
+    openStat = openStat === b.dataset.stat ? null : b.dataset.stat;
+    renderAttrs(); renderArmadura(); renderVitals();
+    return;
+  }
+
+  if(b.dataset.hp !== undefined){
+    const c = compute();
+    const mx = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+    S.hp = b.dataset.hp === 'full' ? mx : Math.min(mx, S.hp + num(b.dataset.hp));
+    $('#f-hp').value = S.hp; renderVitals(); return;
+  }
+  if(b.id === 'btn-loot-add'){
+    S.loot.especial = S.loot.especial || [];
+    S.loot.especial.push({id:uid(), nombre:'', cantidad:1});
+    renderLootEspecial();
+    document.querySelector('#loot-esp-list .nom:last-of-type')?.focus();
+    return;
+  }
+  if(b.dataset.lootEspRm !== undefined){
+    S.loot.especial = (S.loot.especial||[]).filter(l => l.id !== b.dataset.lootEspRm);
+    renderLootEspecial();
+    return;
+  }
+  if(b.dataset.add){ openEditor(b.dataset.add, null); return; }
+  if(b.dataset.addInv !== undefined){ abrirChooser('inventario', b.dataset.addInv === '1'); return; }
+  if(b.dataset.addChooser){ abrirChooser(b.dataset.addChooser, true); return; }
+  if(b.id === 'chooser-nuevo'){
+    $('#scrim-chooser').classList.remove('open');
+    if(chooserTarget === 'cinturon') openEditor('cinturon', null);
+    else openEditor('inventario', null, chooserPreset);
+    return;
+  }
+  if(b.id === 'chooser-fabricante'){
+    $('#scrim-chooser').classList.remove('open');
+    renderCatalogoModal();
+    $('#scrim-catalogo').classList.add('open');
+    return;
+  }
+  if(b.id === 'chooser-x'){ $('#scrim-chooser').classList.remove('open'); return; }
+  if(b.id === 'catalogo-x'){ $('#scrim-catalogo').classList.remove('open'); return; }
+  if(b.id === 'btn-catalogo-nuevo'){
+    $('#scrim-catalogo').classList.remove('open');
+    openEditor('catalogo', null);
+    return;
+  }
+  if(b.dataset.catalogoadd){ agregarDesdeCatalogo(b.dataset.catalogoadd); return; }
+  if(b.dataset.catalogocarrito){ agregarAlCarrito(b.dataset.catalogocarrito); return; }
+  if(b.dataset.carritorm){ quitarDelCarrito(b.dataset.carritorm); return; }
+  if(b.id === 'carrito-comprar'){ comprarCarrito(); return; }
+  if(b.id === 'carrito-vaciar'){ carritoCatalogo = []; renderCarritoCatalogo(); return; }
+  if(b.dataset.catalogoedit){
+    $('#scrim-catalogo').classList.remove('open');
+    openEditor('catalogo', b.dataset.catalogoedit);
+    return;
+  }
+  if(b.dataset.catalogodel){
+    if(!confirm('¿Eliminar este ítem del catálogo? No afecta a lo que ya tengas en tu mochila.')) return;
+    S.catalogo = S.catalogo.filter(x=>x.id!==b.dataset.catalogodel);
+    renderCatalogoModal();
+    return;
+  }
+  if(b.dataset.view){ const [k,id] = b.dataset.view.split(':'); openViewer(k, id); return; }
+  if(b.dataset.edit){ const [k,id] = b.dataset.edit.split(':'); openEditor(k, id); return; }
+  if(b.dataset.toggle){
+    const id = b.dataset.toggle;
+    let it = S.inventario.find(x=>x.id===id);
+    if(it){
+      if(!it.equipado && it.tipoItem === 'consumibles'){
+        S.inventario = S.inventario.filter(x => x.id !== id);
+        it.equipado = false;
+        S.cinturon.push(it);
+        renderInventario(); renderList('cinturon'); refresh();
+        toast(`${it.nombre} pasó al cinturón`);
+        return;
+      }
+      if(!it.equipado && it.tipoItem){
+        const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(it.tipoItem));
+        if(slotDef){
+          const usadoSinEste = computeSlots().find(s => s.id === slotDef.id)?.usado || 0;
+          const propio = slotDef.peso ? (slotDef.peso[it.tipoItem] || 1) : 1;
+          if(usadoSinEste + propio > slotDef.max){
+            toast(`No entra: ${slotDef.label} quedaría en ${fmt(usadoSinEste + propio)} / ${fmt(slotDef.max)}`);
+            return;
+          }
+        }
+      }
+      it.equipado = !it.equipado; renderInventario(); refresh(); return;
+    }
+    it = S.efectos.find(x=>x.id===id);
+    if(it){ it.activo = it.activo === false; renderList('efectos'); refresh(); return; }
+  }
+  if(b.dataset.unit){
+    const [key, id, delta] = b.dataset.unit.split(':');
+    const it = S[key].find(x=>x.id===id);
+    if(it){
+      it.unidades = Math.max(0, num(it.unidades) + num(delta));
+      if(key === 'inventario') renderInventario(); else renderList(key);
+    }
+    return;
+  }
+  if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
+  if(b.id === 'btn-invocar'){
+    S.invocaciones.push(nuevaInvocacion());
+    renderInvocaciones();
+    return;
+  }
+  if(b.dataset.rminv){
+    if(!confirm('¿Eliminar esta invocación del todo? No se puede deshacer.')) return;
+    S.invocaciones = S.invocaciones.filter(x=>x.id!==b.dataset.rminv);
+    renderInvocaciones();
+    return;
+  }
+  if(b.dataset.reinvocar){
+    const inv = S.invocaciones.find(x=>x.id===b.dataset.reinvocar);
+    if(inv){
+      inv.activa = true;
+      inv.cooldownActual = num(inv.cooldown);
+      inv.acc = inv.accMax;
+      renderInvocaciones();
+      toast(`${inv.nombre} invocada de nuevo`);
+    }
+    return;
+  }
+  if(b.dataset.invimg){
+    document.querySelector(`[data-invimginput="${b.dataset.invimg}"]`)?.click();
+    return;
+  }
+  if(b.dataset.invimgrm){
+    const inv = S.invocaciones.find(x=>x.id===b.dataset.invimgrm);
+    if(inv){ inv.imagen = ''; renderInvocaciones(); }
+    return;
+  }
+  if(b.dataset.verinv){
+    verInvocacion(b.dataset.verinv);
+    return;
+  }
+  if(b.dataset.addinvhab){
+    const inv = S.invocaciones.find(x=>x.id===b.dataset.addinvhab);
+    if(inv){ inv.habilidades.push({id:uid(), nombre:'', detalle:'', cd:0, cdActual:0}); renderInvocaciones(); }
+    return;
+  }
+  if(b.dataset.rminvhab){
+    const [invId, habId] = b.dataset.rminvhab.split(':');
+    const inv = S.invocaciones.find(x=>x.id===invId);
+    if(inv){ inv.habilidades = inv.habilidades.filter(h=>h.id!==habId); renderInvocaciones(); }
+    return;
+  }
+  if(b.dataset.ejecutarinvhab){
+    const [invId, habId] = b.dataset.ejecutarinvhab.split(':');
+    const inv = S.invocaciones.find(x=>x.id===invId);
+    const h = inv && inv.habilidades.find(x=>x.id===habId);
+    if(!inv || !h) return;
+    if(num(inv.acc) <= 0){ toast(`${inv.nombre}: no le quedan acciones este turno`); return; }
+    if(num(h.cdActual) > 0) return;
+    inv.acc = Math.max(0, num(inv.acc) - 1);
+    h.cdActual = num(h.cd);
+    renderInvocaciones();
+    toast(`${h.nombre||'Habilidad'} ejecutada · -1 Acción${h.cd>0?` · cooldown ${fmt(num(h.cd))} turno(s)`:''}`);
+    return;
+  }
+  if(b.dataset.consume){
+    const id = b.dataset.consume;
+    let it = S.inventario.find(x=>x.id===id);
+    let key = 'inventario';
+    if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
+    if(it && num(it.unidades) > 0){
+      it.unidades = num(it.unidades) - 1;
+      const c = compute();
+      const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+      S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
+      $('#f-hp').value = S.hp;
+      if(key === 'inventario') renderInventario(); else renderList('cinturon');
+      renderVitals();
+      toast(`${it.nombre}: ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
+    }
+    return;
+  }
+});
+
+$('#btn-guardar').onclick = () => {
+  const nombre = (S.meta.nombre || 'ficha').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
+  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nombre + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Ficha guardada');
+};
+$('#btn-cargar').onclick = () => {
+  const aviso = 'Cargar una ficha reemplaza todo lo que tengas puesto ahora: nombre, atributos, items, habilidades, estados.\n\nSi no guardaste los cambios actuales, se pierden.\n\n¿Seguís?';
+  if(!confirm(aviso)) return;
+  $('#file-input').click();
+};
+$('#portrait-input').onchange = async ev => {
+  const file = ev.target.files[0];
+  ev.target.value = '';
+  if(!file) return;
+  try{
+    S.meta.imagen = await fileToDataURL(file, 480, 0.85);
+    renderPortrait();
+  }catch(err){
+    toast('No se pudo cargar esa imagen');
+  }
+};
+
+document.addEventListener('change', async e => {
+  if(e.target.dataset.invimginput === undefined) return;
+  const invId = e.target.dataset.invimginput;
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const inv = S.invocaciones.find(x=>x.id===invId);
+  if(!inv) return;
+  try{
+    inv.imagen = await fileToDataURL(file, 480, 0.85);
+    renderInvocaciones();
+  }catch(err){
+    toast('No se pudo cargar esa imagen');
+  }
+});
+
+function mergeDeep(base, incoming){
+  if(!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) return structuredClone(base);
+  const out = structuredClone(base);
+  Object.keys(incoming).forEach(k => {
+    const bv = out[k], iv = incoming[k];
+    if(iv && typeof iv === 'object' && !Array.isArray(iv) && bv && typeof bv === 'object' && !Array.isArray(bv)){
+      out[k] = mergeDeep(bv, iv);
+    } else if(iv !== undefined){
+      out[k] = iv;
+    }
+  });
+  return out;
+}
+
+$('#file-input').onchange = ev => {
+  const f = ev.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let data;
+    try{
+      data = JSON.parse(r.result);
+    }catch(err){
+      toast('Ese archivo no es un JSON válido');
+      ev.target.value = '';
+      return;
+    }
+    try{
+      const fresh = structuredClone(DEFAULT);
+      const next = {...fresh, ...data};
+      ['meta','loot','armadura','caps','formulas'].forEach(k => { next[k] = mergeDeep(fresh[k], data[k]); });
+      ['inventario','cinturon','habilidades','pasivas','sociales','efectos','bitacora','invocaciones'].forEach(k => {
+        next[k] = Array.isArray(data[k]) && data[k].length ? data[k] : fresh[k];
+      });
+      // El catálogo se combina por id: se respetan tus ítems propios y ediciones,
+      // y se suman los ítems nuevos que trae esta versión de la ficha y vos todavía no tenías.
+      {
+        const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
+        const idsPropios = new Set(propio.map(i => i.id));
+        const nuevosDeFabrica = fresh.catalogo.filter(i => !idsPropios.has(i.id));
+        next.catalogo = [...propio, ...nuevosDeFabrica];
+      }
+      // Migración: fichas viejas guardaban equipo y mochila como listas separadas.
+      if(!(Array.isArray(data.inventario) && data.inventario.length) && (Array.isArray(data.equipo) || Array.isArray(data.mochila))){
+        next.inventario = [
+          ...(data.equipo || []).map(i => ({...i, equipado:true})),
+          ...(data.mochila || []).map(i => ({...i, equipado:false, ranuras: i.ranuras ?? 1})),
+        ];
+      }
+      if(!next.bitacora.some(p => p.id === next.bitacoraActiva)) next.bitacoraActiva = next.bitacora[0].id;
+      if(!next.habilidades.some(h => h.id === 'movimiento')){
+        next.habilidades = [structuredClone(fresh.habilidades[0]), ...next.habilidades];
+      }
+      if(next.bonosGastados === undefined) next.bonosGastados = 0;
+      if(next.acciones === undefined) next.acciones = 3;
+      S = next;
+      openStat = null;
+      renderAll();
+      toast('Ficha cargada');
+    }catch(err){
+      console.error('Error cargando la ficha:', err);
+      toast('El archivo cargó pero algo no se pudo mostrar bien — revisá la consola');
+    }
+  };
+  r.readAsText(f);
+  ev.target.value = '';
+};
+$('#btn-formulas').onclick = () => openFormulas();
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+   EDITOR (modal)
+   ========================================================= */
+
+const SCHEMA = {
+  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','curahp','detalle'], mods:true},
+  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','curahp','detalle'], mods:true},
+  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','curahp','detalle'], mods:true},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','categoria','job','origen','detalle'], mods:false},
+  pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
+  sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
+  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','permanente','activo','popup','detalle'], mods:true},
+};
+const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
+  equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
+  stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
+  job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
+  categoria:'Categoría', unidades:'Unidades', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
+  precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
+  manoPreferida:'Mano'};
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado'];
+const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
+
+let editing = null;
+
+let viewing = null;
+
+function openViewer(key, id){
+  const it = S[key].find(x => x.id === id);
+  if(!it) return;
+  viewing = {key, id};
+
+  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  const L = [];
+
+  if(key === 'inventario' || key === 'cinturon' || key === 'catalogo'){
+    if(it.tipoItem) L.push(linea('Categoría', CATEGORIA_LABEL[it.tipoItem] || it.tipoItem));
+    if(ES_ARMA(it.tipoItem)) L.push(linea('Tipo', fmt(num(it.tipoDado) || 6)));
+    L.push(linea('Peso', fmt(num(it.peso))));
+    if(ES_ARMA(it.tipoItem)) L.push(linea('Daño', armaDanoTxt(it)));
+    const defVal = defValorDe(it);
+    if(defVal) L.push(linea('Defensa', `${defVal>0?'+':''}${fmt(defVal)}`));
+    TIPOS_IDS.forEach(tid => {
+      const v = getModVal(it, tid);
+      if(v) L.push(linea(`Res. crítico ${STAT_LABEL[tid]}`, `${v>0?'+':''}${fmt(v)}`));
+    });
+    if(key === 'inventario') L.push(linea('Estado', it.equipado ? 'Equipado' : 'En mochila'));
+    if(key === 'inventario' && !it.equipado) L.push(linea('Ranuras', fmt(ranurasDe(it))));
+    if(num(it.precioCompra)) L.push(linea('Precio de compra', fmt(num(it.precioCompra))));
+    if(precioVentaDe(it)) L.push(linea('Precio de venta', fmt(precioVentaDe(it))));
+    if(it.consumible) L.push(linea('Consumible', `${fmt(num(it.unidades))} unidades · ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP al consumir`));
+    const otrosMods = (it.mods||[]).filter(m => m.stat && m.stat !== 'def' && !TIPOS_IDS.includes(m.stat));
+    if(otrosMods.length) L.push(linea('Otros modificadores', otrosMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+  }
+
+  if(key === 'habilidades'){
+    if(it.costo) L.push(linea('Costo', it.costo));
+    if(it.categoria) L.push(linea('Categoría', it.categoria));
+    L.push(linea('Adquirida con Job', it.job !== false ? 'Sí' : 'No'));
+    if(it.job === false && it.origen) L.push(linea('Origen', it.origen));
+  }
+
+  if(key === 'pasivas'){
+    L.push(linea('Adquirida con Job', it.job !== false ? 'Sí' : 'No'));
+    if(it.job === false && it.origen) L.push(linea('Origen', it.origen));
+    const pMods = (it.mods||[]);
+    if(pMods.length) L.push(linea('Modificadores', pMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+  }
+
+  if(key === 'sociales'){
+    if(it.dado) L.push(linea('Dado', it.dado));
+  }
+
+  if(key === 'efectos'){
+    L.push(linea('Duración', it.permanente ? 'Permanente' : (num(it.turnos)>0 ? `${fmt(num(it.turnos))} turno(s) restante(s)` : 'Sin duración fija')));
+    if(num(it.stacks) > 1) L.push(linea('Stacks', fmt(num(it.stacks))));
+    if(num(it.hpturno)) L.push(linea('HP por turno (por stack)', `${num(it.hpturno)>0?'+':''}${fmt(num(it.hpturno))}`));
+    L.push(linea('Estado', it.activo !== false ? 'Activo' : 'Pausado'));
+    if(it.popup) L.push(linea('Aviso', 'Avisa en el mantenimiento'));
+    const eMods = (it.mods||[]);
+    if(eMods.length) L.push(linea('Modificadores', eMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+  }
+
+  $('#view-title-header').textContent = it.nombre || 'Ítem';
+  $('#view-body').innerHTML = `
+    <div class="view-wrap">
+      <div class="view-image-wrap">${it.imagen ? `<img src="${esc(it.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
+      <div class="view-info">
+        <div class="view-title">${esc(it.nombre)}</div>
+        <div class="view-lines">${L.filter(Boolean).join('') || '<div class="view-line"><span class="view-value">Sin datos adicionales.</span></div>'}</div>
+      </div>
+    </div>
+    ${it.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(it.detalle)}</div>` : ''}
+  `;
+  $('#view-edit-btn').style.display = '';
+  $('#scrim-view').classList.add('open');
+}
+
+function verInvocacion(id){
+  const inv = S.invocaciones.find(x => x.id === id);
+  if(!inv) return;
+  viewing = null;
+
+  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  const L = [];
+  L.push(linea('Estado', inv.activa === false ? 'No invocada' : 'Invocada'));
+  L.push(linea('Cooldown', `${fmt(num(inv.cooldownActual))} / ${fmt(num(inv.cooldown))} turnos`));
+  L.push(linea('HP', `${fmt(num(inv.hp))} / ${fmt(num(inv.hpMax))}`));
+  L.push(linea('Acciones', `${fmt(num(inv.acc))} / ${fmt(num(inv.accMax))}`));
+  L.push(linea('Velocidad', fmt(num(inv.spd))));
+  L.push(linea('Defensa', fmt(num(inv.defensa))));
+  L.push(linea('Atributos', `Con ${fmt(num(inv.con))} · Fue ${fmt(num(inv.fue))} · Agi ${fmt(num(inv.agl))} · Des ${fmt(num(inv.des))} · Int ${fmt(num(inv.int))}`));
+  L.push(linea('Daño de arma', invDanoTxt(inv)));
+  const critLabels = ['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'];
+  const critTxt = inv.crit.map((v,i) => v ? `${critLabels[i]} ${v>0?'+':''}${fmt(v)}` : '').filter(Boolean).join(', ');
+  if(critTxt) L.push(linea('Resistencia a críticos', critTxt));
+  if(inv.habilidades.length) L.push(linea('Habilidades', inv.habilidades.map(h=>h.nombre||'(sin nombre)').join(', ')));
+
+  $('#view-title-header').textContent = inv.nombre || 'Invocación';
+  $('#view-body').innerHTML = `
+    <div class="view-wrap">
+      <div class="view-image-wrap">${inv.imagen ? `<img src="${esc(inv.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
+      <div class="view-info">
+        <div class="view-title">${esc(inv.nombre)}</div>
+        <div class="view-lines">${L.filter(Boolean).join('')}</div>
+      </div>
+    </div>
+  `;
+  $('#view-edit-btn').style.display = 'none';
+  $('#scrim-view').classList.add('open');
+}
+
+/* =========================================================
+   CATÁLOGO DEL FABRICANTE
+   ========================================================= */
+
+let chooserPreset = true;
+
+let chooserTarget = 'inventario';
+
+function abrirChooser(target, equipadoPreset){
+  chooserTarget = target;
+  chooserPreset = equipadoPreset;
+  $('#scrim-chooser').classList.add('open');
+}
+
+function catalogoRowHtml(item){
+  const dano = armaDanoTxt(item);
+  const defVal = defValorDe(item);
+  const statTxt = dano ? `Daño ${dano}` : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
+  return `<div class="cat-row" data-catid="${item.id}">
+    ${thumb(item)}
+    <div class="cat-info">
+      <div class="cat-nombre">${esc(item.nombre)}</div>
+      <div class="cat-meta"><b>${fmt(num(item.precioCompra))} DDE</b>${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
+      ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+    </div>
+    <div class="cat-actions">
+      <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1">
+      <button class="cat-btn add" data-catalogoadd="${item.id}">Agregar a mochila</button>
+      <button class="cat-btn buy" data-catalogocarrito="${item.id}">+ Carrito</button>
+    </div>
+    <div class="cat-manage">
+      <button data-view="catalogo:${item.id}">Ver</button>
+      <button data-catalogoedit="${item.id}">Editar</button>
+      <button data-catalogodel="${item.id}">Eliminar</button>
+    </div>
+  </div>`;
+}
+
+let carritoCatalogo = [];
+
+function renderCatalogoModal(){
+  if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
+  const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
+  const visibles = filtro ? S.catalogo.filter(item => grupoCompraDe(item.tipoItem) === filtro) : S.catalogo;
+
+  const grupos = {};
+  visibles.forEach(item => {
+    const g = grupoCompraDe(item.tipoItem);
+    (grupos[g] = grupos[g] || []).push(item);
+  });
+  const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
+  const html = claves.map(g => `
+    <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
+    ${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}
+  `).join('');
+  $('#catalogo-body').innerHTML = html || `<div class="hint">${S.catalogo.length ? 'No hay ítems en esta categoría.' : 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.'}</div>`;
+  $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
+  renderCarritoCatalogo();
+}
+
+function renderCarritoCatalogo(){
+  const cont = $('#carrito-lista');
+  if(!cont) return;
+  if(!carritoCatalogo.length){
+    cont.innerHTML = `<div class="carrito-vacio">Carrito vacío — usá "+ Carrito" en los ítems que quieras comprar.</div>`;
+    $('#carrito-total').textContent = '0';
+    $('#carrito-comprar').disabled = true;
+    return;
+  }
+  let total = 0;
+  cont.innerHTML = carritoCatalogo.map(ent => {
+    const item = S.catalogo.find(x=>x.id===ent.catId);
+    if(!item) return '';
+    const subtotal = num(item.precioCompra) * ent.cantidad;
+    total += subtotal;
+    return `<div class="carrito-item">
+      <span class="carrito-nombre">${esc(item.nombre)} ×${fmt(ent.cantidad)}</span>
+      <span class="carrito-subtotal">${fmt(subtotal)} DDE</span>
+      <button class="carrito-rm" data-carritorm="${ent.catId}">×</button>
+    </div>`;
+  }).join('');
+  $('#carrito-total').textContent = fmt(total);
+  $('#carrito-comprar').disabled = total > num(S.meta.dde);
+  $('#carrito-comprar').title = total > num(S.meta.dde) ? `Te faltan ${fmt(total - num(S.meta.dde))} DDE` : '';
+}
+
+function crearItemsDesdeCatalogo(item, cantidad){
+  if(item.consumible){
+    const nuevo = structuredClone(item);
+    nuevo.id = uid();
+    nuevo.equipado = false;
+    nuevo.unidades = cantidad;
+    nuevo.ranuras = item.ranuras ?? 1;
+    S.inventario.push(nuevo);
+  }else{
+    for(let i=0; i<cantidad; i++){
+      const nuevo = structuredClone(item);
+      nuevo.id = uid();
+      nuevo.equipado = false;
+      nuevo.unidades = 1;
+      nuevo.ranuras = item.ranuras ?? 1;
+      S.inventario.push(nuevo);
+    }
+  }
+}
+
+function agregarDesdeCatalogo(id){
+  const item = S.catalogo.find(x=>x.id===id);
+  if(!item) return;
+  const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
+  const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
+  crearItemsDesdeCatalogo(item, cantidad);
+  renderInventario();
+  refresh();
+  toast(`${item.nombre} ×${cantidad} agregado a la mochila (gratis)`);
+}
+
+function agregarAlCarrito(id){
+  const item = S.catalogo.find(x=>x.id===id);
+  if(!item) return;
+  const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
+  const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
+  const existente = carritoCatalogo.find(e=>e.catId===id);
+  if(existente) existente.cantidad += cantidad;
+  else carritoCatalogo.push({catId:id, cantidad});
+  renderCarritoCatalogo();
+  toast(`${item.nombre} ×${cantidad} agregado al carrito`);
+}
+
+function quitarDelCarrito(catId){
+  carritoCatalogo = carritoCatalogo.filter(e=>e.catId!==catId);
+  renderCarritoCatalogo();
+}
+
+function comprarCarrito(){
+  if(!carritoCatalogo.length) return;
+  let total = 0;
+  carritoCatalogo.forEach(ent => {
+    const item = S.catalogo.find(x=>x.id===ent.catId);
+    if(item) total += num(item.precioCompra) * ent.cantidad;
+  });
+  if(total > num(S.meta.dde)){
+    toast(`No te alcanzan los DDE — necesitás ${fmt(total)} y tenés ${fmt(num(S.meta.dde))}`);
+    return;
+  }
+  S.meta.dde = num(S.meta.dde) - total;
+  $('#f-dde').value = fmt(S.meta.dde);
+  carritoCatalogo.forEach(ent => {
+    const item = S.catalogo.find(x=>x.id===ent.catId);
+    if(item) crearItemsDesdeCatalogo(item, ent.cantidad);
+  });
+  const cantidadItems = carritoCatalogo.length;
+  carritoCatalogo = [];
+  renderInventario();
+  refresh();
+  renderCarritoCatalogo();
+  $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
+  toast(`Compra realizada · ${cantidadItems} tipo(s) de ítem · -${fmt(total)} DDE`);
+}
+
+
+function openEditor(key, id, equipadoPreset){
+  const sc = SCHEMA[key];
+  const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
+    equipado: equipadoPreset !== undefined ? equipadoPreset : true,
+    activo:true, stacks:1, costo:'', dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
+    job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
+    unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false};
+  const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
+  editing = {key, id, draft: structuredClone(item)};
+  $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
+  $('#modal-del').style.display = id ? 'block' : 'none';
+  drawEditor();
+  $('#scrim').classList.add('open');
+  setTimeout(()=>$('#modal-body').querySelector('input')?.focus(), 40);
+}
+
+function drawEditor(){
+  const {key, draft} = editing;
+  const sc = SCHEMA[key];
+  const FLAGS = ['equipado','activo','permanente','popup','job','consumible'];
+  const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
+  const cortos = sc.campos.filter(c => c!=='detalle' && !ESPECIALES.includes(c) && !FLAGS.includes(c));
+  const flags = sc.campos.filter(c => FLAGS.includes(c));
+  const esArma = ES_ARMA(draft.tipoItem);
+
+  let html = `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
+  if(sc.campos.includes('categoria')){
+    html += `<div class="f"><label>${CAMPO_LABEL.categoria}</label>
+      <select data-c="categoria">
+        ${CATEGORIAS_HABILIDAD.map(c => `<option value="${esc(c)}" ${draft.categoria===c?'selected':''}>${c || '— sin categoría —'}</option>`).join('')}
+      </select></div>`;
+  }
+  if(sc.campos.includes('tipoItem')){
+    html += `<div class="f"><label>${CAMPO_LABEL.tipoItem}</label>
+      <select data-c="tipoItem">
+        ${CATEGORIAS.map(c => `<option value="${esc(c.id)}" ${draft.tipoItem===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}
+      </select></div>`;
+    const slotDef = key !== 'catalogo' ? SLOT_DEFS.find(sd => sd.cats.includes(draft.tipoItem)) : null;
+    if(slotDef){
+      const slots = computeSlots();
+      const usado = slots.find(s => s.id === slotDef.id)?.usado || 0;
+      const sobre = usado > slotDef.max;
+      html += `<div class="hint" style="margin:-4px 0 8px${sobre?';color:var(--danger)':''}">${esc(slotDef.label)}: ${fmt(usado)} / ${fmt(slotDef.max)} ocupados${sobre?' — te pasaste':''}</div>`;
+    }
+  }
+  if(draft.tipoItem === 'arma_1m' || draft.tipoItem === 'escudo_1m'){
+    html += `<div class="f"><label>${CAMPO_LABEL.manoPreferida}</label>
+      <select data-c="manoPreferida">
+        <option value="" ${!draft.manoPreferida?'selected':''}>Automática</option>
+        <option value="1" ${String(draft.manoPreferida)==='1'?'selected':''}>Mano 1</option>
+        <option value="2" ${String(draft.manoPreferida)==='2'?'selected':''}>Mano 2</option>
+      </select>
+      <div class="hint" style="margin-top:5px">Define en qué mano aparece dentro de "Efectos de equipo" cuando tenés dos cosas equipadas.</div>
+    </div>`;
+  }
+  if(sc.campos.includes('imagen')){
+    html += `<div class="f">
+      <label>${CAMPO_LABEL.imagen}</label>
+      <button type="button" class="itempick" id="itempick">
+        ${draft.imagen ? `<img src="${draft.imagen}" alt="">` : `<span class="itempick-empty">+<small>Imagen</small></span>`}
+      </button>
+      ${draft.imagen ? `<button type="button" class="mini" id="itempick-remove" style="margin-top:6px">Quitar imagen</button>` : ''}
+      <input type="file" id="itempick-input" accept="image/*" hidden>
+    </div>`;
+  }
+  const resto = cortos.filter(c => {
+    if(c==='nombre') return false;
+    if(c==='curahp') return false;
+    if(c==='ranuras' && draft.equipado) return false;
+    if(c==='unidades' && !draft.consumible) return false;
+    return true;
+  });
+  const esDefensivo = CATEGORIAS.find(c => c.id === draft.tipoItem)?.defensivo === true;
+  if(resto.length || esDefensivo){
+    html += `<div class="f2">`
+      + resto.map(c => `<div class="f"><label>${CAMPO_LABEL[c]}</label>
+      <input data-c="${c}" ${CAMPO_NUM.includes(c)?'type="number" step="any"':''} value="${esc(draft[c]??'')}"></div>`).join('')
+      + (esDefensivo ? `<div class="f"><label>Defensa</label><input data-defmod="def" type="number" step="any" value="${getModVal(draft,'def')}"></div>` : '')
+      + `</div>`;
+  }
+  if(esDefensivo){
+    html += `<div class="f">
+      <label>Resistencia a críticos</label>
+      <div class="defres-grid">
+        ${TIPOS_IDS.map(id => {
+          const d = EXTRA.find(e => e.id === id);
+          return `<div class="defres-cell">
+            <label>${esc(d.label)}</label>
+            <input data-defmod="${id}" type="number" step="any" value="${getModVal(draft, id)}">
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  if(sc.campos.includes('curahp') && draft.consumible){
+    html += `<div class="f"><label>${CAMPO_LABEL.curahp}</label>
+      <input data-c="curahp" type="number" step="any" value="${esc(draft.curahp??0)}"></div>`;
+  }
+  if(esArma && (sc.campos.includes('tipoDado') || sc.campos.includes('danoFijo'))){
+    html += `<div class="f2">
+      <div class="f"><label>${CAMPO_LABEL.tipoDado}</label>
+        <select data-c="tipoDado">
+          ${DADOS_ARMA.map(d => `<option value="${d}" ${(num(draft.tipoDado)||6)===d?'selected':''}>d${d}${d===10?' (explosivos/modernas)':''}</option>`).join('')}
+        </select></div>
+      <div class="f"><label>${CAMPO_LABEL.danoFijo}</label><input data-c="danoFijo" type="number" step="any" value="${esc(draft.danoFijo??0)}"></div>
+    </div>
+    <div class="hint" id="dano-hint" style="margin:-4px 0 8px">Daño: ${armaDanoTxt(draft)} (peso × d${num(draft.tipoDado)||6}, más el fijo)</div>`;
+  }
+  if(sc.campos.includes('precioVentaAuto')){
+    html += `<div class="f"><label>Precio de venta (mitad de compra)</label>
+      <div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--brass);padding:5px 7px">${fmt(precioVentaDe(draft))}</div>
+    </div>`;
+  }
+  flags.forEach(c => {
+    const on = (c==='activo' || c==='job') ? draft[c] !== false : !!draft[c];
+    html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" data-c="${c}" ${on?'checked':''} style="width:auto">
+      <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL[c]}</span></label>`;
+  });
+  if(sc.campos.includes('detalle'))
+    html += `<div class="f"><label>Detalle</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
+
+  if(sc.mods){
+    html += `<div class="f"><label>Modificadores</label>
+      <div id="mods">${(draft.mods||[]).map((m,i)=>{
+        if(esDefensivo && (m.stat === 'def' || TIPOS_IDS.includes(m.stat))) return '';
+        return `
+        <div class="modrow">
+          <select data-m="${i}" data-mk="stat">
+            <option value="">— elegir stat —</option>
+            ${statOptions(m.stat)}
+          </select>
+          <input data-m="${i}" data-mk="val" type="number" step="any" value="${esc(m.val)}">
+          <button class="mini" data-rmmod="${i}">×</button>
+        </div>`;
+      }).join('')}</div>
+      <button class="iconbtn iconbtn-add" id="addmod">+ Modificador</button>
+      <div class="hint" style="margin-top:6px">Se suman al stat mientras el ítem esté equipado o el efecto activo.</div>
+    </div>`;
+  }
+  $('#modal-body').innerHTML = html;
+}
+
+function getModVal(draft, statId){
+  const m = (draft.mods||[]).find(mm => mm.stat === statId);
+  return m ? m.val : 0;
+}
+function setModVal(draft, statId, val){
+  draft.mods = draft.mods || [];
+  const idx = draft.mods.findIndex(mm => mm.stat === statId);
+  if(val === 0){
+    if(idx >= 0) draft.mods.splice(idx, 1);
+  }else if(idx >= 0){
+    draft.mods[idx].val = val;
+  }else{
+    draft.mods.push({stat: statId, val});
+  }
+}
+
+function handleModalFieldChange(e){
+  const t = e.target;
+  if(t.dataset.c){
+    const c = t.dataset.c;
+    editing.draft[c] = t.type === 'checkbox' ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===''?'':num(t.value)) : t.value);
+    if(['tipoItem','equipado','consumible'].includes(c)){ drawEditor(); return; }
+    if(['peso','tipoDado','danoFijo'].includes(c)){
+      const hint = document.getElementById('dano-hint');
+      if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||6}, más el fijo)`;
+    }
+  }
+  if(t.dataset.defmod){
+    setModVal(editing.draft, t.dataset.defmod, num(t.value));
+    return;
+  }
+  if(t.dataset.m !== undefined){
+    const i = +t.dataset.m, k = t.dataset.mk;
+    editing.draft.mods[i][k] = k==='val' ? num(t.value) : t.value;
+  }
+}
+$('#modal-body').addEventListener('input', handleModalFieldChange);
+$('#modal-body').addEventListener('change', handleModalFieldChange);
+$('#modal-body').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.id === 'addmod'){ editing.draft.mods = editing.draft.mods||[]; editing.draft.mods.push({stat:'', val:0}); drawEditor(); }
+  if(b.dataset.rmmod !== undefined){ editing.draft.mods.splice(+b.dataset.rmmod,1); drawEditor(); }
+  if(b.id === 'itempick'){ document.getElementById('itempick-input').click(); }
+  if(b.id === 'itempick-remove'){ editing.draft.imagen = ''; drawEditor(); }
+});
+$('#modal-body').addEventListener('change', async e => {
+  if(e.target.id === 'itempick-input'){
+    const file = e.target.files[0]; if(!file) return;
+    try{
+      editing.draft.imagen = await fileToDataURL(file, 480, 0.85);
+      drawEditor();
+    }catch(err){
+      toast('No se pudo cargar esa imagen');
+    }
+  }
+});
+$('#modal-save').onclick = () => {
+  const {key, id, draft} = editing;
+  if(!draft.nombre.trim()) draft.nombre = 'Sin nombre';
+  if(key === 'inventario' && draft.tipoItem === 'consumibles' && draft.equipado){
+    // Los consumibles no van a "Equipo": si se marcan como equipados, pasan al cinturón.
+    if(id) S.inventario = S.inventario.filter(x => x.id !== id);
+    draft.equipado = false;
+    const ya = S.cinturon.findIndex(x => x.id === draft.id);
+    if(ya >= 0) S.cinturon[ya] = draft; else S.cinturon.push(draft);
+    closeModal();
+    renderInventario(); renderList('cinturon');
+    refresh();
+    toast(`${draft.nombre} pasó al cinturón`);
+    return;
+  }
+  if(id){ const i = S[key].findIndex(x=>x.id===id); S[key][i] = draft; }
+  else S[key].push(draft);
+  closeModal();
+  if(key === 'inventario') renderInventario();
+  else if(key === 'catalogo'){ renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+  else renderList(key);
+  refresh();
+};
+$('#modal-del').onclick = () => {
+  const {key, id} = editing;
+  S[key] = S[key].filter(x=>x.id!==id);
+  closeModal();
+  if(key === 'inventario') renderInventario();
+  else if(key === 'catalogo'){ renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+  else renderList(key);
+  refresh();
+};
+$('#modal-cancel').onclick = closeModal;
+$('#modal-x').onclick = closeModal;
+$('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); } });
+function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
+
+/* ---- Panel de fórmulas ---- */
+function openFormulas(){
+  editing = null;
+  $('#modal-title').textContent = 'Fórmulas';
+  $('#modal-del').style.display = 'none';
+  const c = compute();
+  const fila = s => `<div class="modrow" style="grid-template-columns:150px 1fr 52px">
+      <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)" title="${esc(s.full)}">${s.label}<span style="display:block;font-size:9px;opacity:.7;font-family:'Space Grotesk',sans-serif;letter-spacing:0">${esc(s.full)}</span></span>
+      <input data-formula="${s.id}" value="${esc(S.formulas[s.id]||'')}" style="font-family:'Space Mono',monospace;font-size:12px">
+      <span style="font-family:'Space Mono',monospace;font-size:12px;text-align:right;color:${Number.isNaN(c.base[s.id])?'var(--danger)':'var(--brass)'}">${Number.isNaN(c.base[s.id])?'error':fmt(c.base[s.id])}</span>
+    </div>`;
+  $('#modal-body').innerHTML = `
+    <div class="hint">Escribí cómo se calcula cada stat. Variables: <b style="color:var(--brass)">con fue agl des int nivel job bon sobrecarga</b>, y el id de cualquier otro stat. <b style="color:var(--brass)">sobrecarga</b> es cuánto peso equipado te pasás de Crg.Max (0 si estás en regla). Funciones: floor() ceil() round() min() max().<br>Ejemplos: <b>con*5</b> · <b>ceil(int/2) - sobrecarga</b> · <b>ini+des</b></div>
+    ${GRUPOS.map(g => `<div><div class="hint" style="color:${g.color};margin:8px 0 4px">${g.full}</div>${g.derived.map(fila).join('')}</div>`).join('')}
+    <div><div class="hint" style="margin:8px 0 4px">Otros</div>${EXTRA.map(fila).join('')}</div>`;
+  $('#modal-save').style.display = 'none';
+  $('#scrim').classList.add('open');
+}
+const _close = closeModal;
+closeModal = function(){ _close(); $('#modal-save').style.display = ''; };
+
+$('#modal-body').addEventListener('input', e => {
+  if(e.target.dataset.formula){
+    S.formulas[e.target.dataset.formula] = e.target.value;
+    const c = compute();
+    const cell = e.target.parentElement.lastElementChild;
+    const b = c.base[e.target.dataset.formula];
+    cell.textContent = Number.isNaN(b) ? 'error' : fmt(b);
+    cell.style.color = Number.isNaN(b) ? 'var(--danger)' : 'var(--brass)';
+    refresh();
+  }
+});
+
+/* =========================================================
+   MANTENIMIENTO Y REINICIO
+   ========================================================= */
+
+function renderTurno(){
+  $('#turno-tag').textContent = 'Turno ' + (S.turno || 1);
+  $('#maint-log').innerHTML = (S.log || []).join('<br>');
+}
+
+function renderAcciones(){
+  const box = $('#acciones-box');
+  if(!box) return;
+  const fAcciones = $('#f-acciones');
+  if(document.activeElement !== fAcciones) fAcciones.value = fmt(num(S.acciones));
+  box.classList.toggle('agotadas', num(S.acciones) <= 0);
+}
+
+function parseCostoBonos(costo){
+  if(!costo) return 0;
+  const m = String(costo).match(/(\d+(\.\d+)?)/);
+  return m ? num(m[1]) : 0;
+}
+
+let pendingEjecucion = null;
+
+function esCostoVariable(costo){
+  return /x/i.test(String(costo||''));
+}
+
+function ejecutarHabilidad(id){
+  const it = S.habilidades.find(h => h.id === id);
+  if(!it) return;
+  if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
+    toast(`${it.nombre} ya se usó este turno`);
+    return;
+  }
+  if(esCostoVariable(it.costo)){
+    pendingEjecucion = id;
+    $('#costox-nombre').textContent = it.nombre;
+    $('#f-costox-bonos').value = 0;
+    $('#f-costox-acciones').value = num(S.acciones) > 0 ? 1 : 0;
+    $('#costox-disponibles').textContent = `${fmt(num(S.acciones))} Acciones`;
+    $('#scrim-costox').classList.add('open');
+    return;
+  }
+  if(num(S.acciones) <= 0){
+    toast('No te quedan acciones este turno');
+    return;
+  }
+  const costoBonos = parseCostoBonos(it.costo);
+  S.acciones = num(S.acciones) - 1;
+  S.bonosGastados = num(S.bonosGastados) + costoBonos;
+  if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
+  renderList('habilidades');
+  renderAcciones();
+  renderVitals();
+  toast(`${it.nombre} ejecutada${costoBonos ? ` · -${fmt(costoBonos)} Bonos` : ''} · -1 Acción`);
+}
+
+function confirmarCostoVariable(){
+  const it = S.habilidades.find(h => h.id === pendingEjecucion);
+  if(!it) return;
+  const bonos = num($('#f-costox-bonos').value);
+  const acciones = num($('#f-costox-acciones').value);
+  if(acciones > num(S.acciones)){
+    toast(`No hay suficientes Acciones — tenés ${fmt(num(S.acciones))}`);
+    return;
+  }
+  if(bonos < 0 || acciones < 0){
+    toast('Los valores no pueden ser negativos');
+    return;
+  }
+  S.acciones = Math.max(0, num(S.acciones) - acciones);
+  S.bonosGastados = num(S.bonosGastados) + bonos;
+  if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
+  $('#scrim-costox').classList.remove('open');
+  pendingEjecucion = null;
+  renderList('habilidades');
+  renderAcciones();
+  renderVitals();
+  toast(`${it.nombre} ejecutada · -${fmt(bonos)} Bonos · -${fmt(acciones)} Acciones`);
+}
+
+function mantenimiento(){
+  const c = compute();
+  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+  const log = [];
+  let hpDelta = 0;
+  const vencidos = [];
+
+  S.efectos.forEach(e => {
+    if(e.activo === false) return;
+    const stacks = Math.max(1, num(e.stacks) || 1);
+
+    const hp = num(e.hpturno) * stacks;
+    if(hp){
+      hpDelta += hp;
+      log.push(`<b>${esc(e.nombre)}</b> <span class="${hp<0?'dmg':'heal'}">${hp>0?'+':''}${fmt(hp)} HP</span>`);
+    }
+
+    const ds = num(e.stacksturno);
+    if(ds){
+      e.stacks = Math.max(0, stacks + ds);
+      log.push(`<b>${esc(e.nombre)}</b> stacks ${fmt(stacks)} &rarr; ${fmt(e.stacks)}`);
+      if(e.stacks === 0) vencidos.push(e.id);
+    }
+
+    if(!e.permanente && num(e.turnos) > 0){
+      e.turnos = num(e.turnos) - 1;
+      if(e.turnos === 0) vencidos.push(e.id);
+      else log.push(`<b>${esc(e.nombre)}</b> quedan ${fmt(e.turnos)}`);
+    }
+  });
+
+  if(hpDelta){
+    S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + hpDelta));
+    $('#f-hp').value = S.hp;
+  }
+
+  if(vencidos.length){
+    S.efectos.filter(e => vencidos.includes(e.id))
+      .forEach(e => log.push(`<span class="gone">${esc(e.nombre)} se termin&oacute;</span>`));
+    S.efectos = S.efectos.filter(e => !vencidos.includes(e.id));
+  }
+
+  S.turno = (S.turno || 1) + 1;
+  S.bonosGastados = 0;
+  S.acciones = 3;
+  S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
+
+  let invocacionesVencidas = 0;
+  S.invocaciones.forEach(inv => {
+    if(inv.activa === false) return; // ya dormida, no se sigue procesando
+    inv.acc = inv.accMax;
+    inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
+    if(num(inv.cooldown) > 0){
+      inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
+      if(inv.cooldownActual === 0){
+        inv.activa = false;
+        invocacionesVencidas++;
+      }
+    }
+  });
+  if(invocacionesVencidas){
+    log.push(`${invocacionesVencidas} invocación(es) quedaron dormidas al llegar el cooldown a 0.`);
+  }
+
+  log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
+  log.push('Bonos y Acciones se reiniciaron.');
+  S.log = log;
+
+  renderTurno();
+  renderList('efectos');
+  renderList('habilidades');
+  renderAcciones();
+  renderInvocaciones();
+  refresh();
+  if(S.hp === 0) toast('Te quedaste en 0 de HP');
+
+  const avisos = S.efectos.filter(e => e.popup && e.activo !== false);
+  if(avisos.length) showReminder(avisos);
+}
+
+function showReminder(avisos){
+  $('#reminder-body').innerHTML = avisos.map(e => `
+    <div class="reminder-item">
+      <div class="rname">${esc(e.nombre)}</div>
+      ${e.detalle ? `<div class="rdetail">${esc(e.detalle)}</div>` : ''}
+    </div>`).join('');
+  $('#scrim-reminder').classList.add('open');
+}
+$('#reminder-ok').onclick = () => $('#scrim-reminder').classList.remove('open');
+$('#reminder-x').onclick = () => $('#scrim-reminder').classList.remove('open');
+$('#scrim-reminder').addEventListener('mousedown', e => { if(e.target.id==='scrim-reminder') $('#scrim-reminder').classList.remove('open'); });
+$('#view-x').onclick = () => $('#scrim-view').classList.remove('open');
+$('#costox-x').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };
+$('#costox-cancel').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };
+$('#costox-confirm').onclick = confirmarCostoVariable;
+$('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-costox'){ $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; } });
+$('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
+$('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
+$('#catalogo-filtro').addEventListener('change', renderCatalogoModal);
+$('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
+$('#view-edit-btn').onclick = () => {
+  if(!viewing) return;
+  $('#scrim-view').classList.remove('open');
+  openEditor(viewing.key, viewing.id);
+};
+
+function fichaNueva(){
+  const aviso = 'Se borra todo el contenido de la ficha: nombre, atributos, items, habilidades, estados.\n\n' +
+                'Las formulas y las capacidades se mantienen, porque son las reglas del juego.\n\n\u00bfSeguis?';
+  if(!confirm(aviso)) return;
+  const formulas = structuredClone(S.formulas);
+  const caps = structuredClone(S.caps);
+  S = structuredClone(DEFAULT);
+  S.formulas = formulas;
+  S.caps = caps;
+  S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, wld:'', imagen:''};
+  S.bitacora = [{id:'j1', nombre:'Jornada 1', texto:''}];
+  S.bitacoraActiva = 'j1';
+  S.attrs = {con:0, fue:0, agl:0, des:0, int:0};
+  S.hp = 0; S.turno = 1; S.log = []; S.bonosGastados = 0; S.acciones = 3;
+  S.armadura = {nota:''};
+  ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
+  S.habilidades = [structuredClone(DEFAULT.habilidades[0])];
+  openStat = null;
+  renderAll();
+  toast('Ficha en blanco');
+  $('#f-nombre').focus();
+}
+
+$('#btn-mantenimiento').onclick = mantenimiento;
+$('#btn-reset').onclick = fichaNueva;
+$('#btn-turno-reset').onclick = () => {
+  if(!confirm('Esto vuelve el contador de turno a 1. No toca Bonos, Acciones ni los estados alterados. ¿Seguís?')) return;
+  S.turno = 1;
+  S.log = ['<b style="color:var(--brass)">Turno 1</b>', 'El contador de turno se reinició manualmente.'];
+  renderTurno();
+  toast('Turno reiniciado a 1');
+};
+
+renderAll();
+</script>
+</body>
+</html>

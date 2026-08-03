@@ -1,0 +1,39 @@
+# Ficha de personaje — Piratas en el espacio
+
+Ficha de personaje interactiva para nuestra campaña de rol casera, hecha como una
+única página HTML autocontenida. No necesita instalación, servidor ni conexión a
+internet: se abre en el navegador y listo.
+
+## Cómo usarla
+
+1. Descargá o cloná este repositorio.
+2. Abrí [`ficha.html`](ficha.html) haciendo doble clic (o arrastrándolo a una
+   pestaña del navegador).
+3. Con el botón **Cargar** podés importar la ficha de un personaje ya creado
+   (por ejemplo, alguno de los `.json` de la carpeta [`personajes/`](personajes/)).
+4. Con el botón **Guardar ficha** exportás tu personaje actual a un archivo
+   `.json` para no perder el progreso y poder seguir jugando otro día.
+
+Todo se guarda localmente en tu computadora (no hay backend ni base de datos):
+el archivo `.json` que exportás **es** tu personaje.
+
+## Estructura del repo
+
+```
+ficha.html              La herramienta: ficha de personaje interactiva
+personajes/              Personajes jugables, listos para cargar en la ficha
+  aurelio-tinto.json
+  felipe-gilardosky.json
+  retratos/               Retratos originales de cada personaje
+  backups/                Copias de seguridad más viejas de aurelio-tinto
+assets/
+  items/                  Arte de referencia para objetos e ítems
+  skills/                 Arte de referencia para habilidades
+  armas/                  Planilla de armas/escudos y arte de referencia
+```
+
+## Compartir con amigos
+
+Basta con que clonen o descarguen el repo y abran `ficha.html`. Si crean un
+personaje nuevo y quieren sumarlo al repo, pueden agregar su `.json` (y
+retrato, si tienen) dentro de `personajes/`.

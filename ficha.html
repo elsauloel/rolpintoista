@@ -898,6 +898,7 @@ a{color:var(--brass)}
   <button class="btn" id="btn-formulas">Fórmulas</button>
   <button class="btn" id="btn-cargar">Cargar</button>
   <button class="btn" id="btn-sync">Sincronizar</button>
+  <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
   <input type="file" id="file-input" accept=".json" hidden>
 </div>
@@ -2425,14 +2426,14 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
   const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
   const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
   const prev = await fetch(`${url}?ref=${GH_BRANCH}`, {headers: cab});
-  if(prev.status === 401) throw {auth:true};
+  if(prev.status === 401 || prev.status === 403) throw {auth:true};
   const sha = prev.ok ? (await prev.json()).sha : undefined;
   const resp = await fetch(url, {
     method: 'PUT',
     headers: cab,
     body: JSON.stringify({message: mensaje, content: contenidoB64, branch: GH_BRANCH, ...(sha ? {sha} : {})}),
   });
-  if(resp.status === 401) throw {auth:true};
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }
 
@@ -2462,6 +2463,14 @@ $('#btn-sync').onclick = async () => {
     }
   }finally{
     btn.disabled = false;
+  }
+};
+
+$('#btn-sync-reset').onclick = () => {
+  if(!localStorage.getItem('gh-token')){ toast('No hay ningún token guardado'); return; }
+  if(confirm('¿Borrar el token de GitHub guardado en este navegador?\n\nLa próxima vez que toques Sincronizar te va a pedir uno nuevo.')){
+    localStorage.removeItem('gh-token');
+    toast('Token borrado ✓');
   }
 };
 

@@ -9,8 +9,10 @@ internet: se abre en el navegador y listo.
 1. Descargá o cloná este repositorio.
 2. Abrí [`ficha.html`](ficha.html) haciendo doble clic (o arrastrándolo a una
    pestaña del navegador).
-3. Con el botón **Cargar** podés importar la ficha de un personaje ya creado
-   (por ejemplo, alguno de los `.json` de la carpeta [`personajes/`](personajes/)).
+3. Con el botón **Personajes** elegís un personaje de la lista (se trae la
+   última versión directo desde GitHub), creás una ficha en blanco o, si
+   preferís, cargás un archivo `.json` local de la carpeta
+   [`personajes/`](personajes/).
 4. Con el botón **Guardar ficha** exportás tu personaje actual a un archivo
    `.json` para no perder el progreso y poder seguir jugando otro día.
 5. Con el botón **Sincronizar** subís tu personaje directo a la carpeta

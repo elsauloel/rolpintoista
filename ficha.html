@@ -896,7 +896,7 @@ a{color:var(--brass)}
   <span class="note">Los cambios viven en esta pestaña. Guardá la ficha antes de cerrarla.</span>
   <button class="btn del" id="btn-reset">Ficha nueva</button>
   <button class="btn" id="btn-formulas">Fórmulas</button>
-  <button class="btn" id="btn-cargar">Cargar</button>
+  <button class="btn" id="btn-personajes">Personajes</button>
   <button class="btn" id="btn-sync">Sincronizar</button>
   <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
@@ -911,6 +911,17 @@ a{color:var(--brass)}
     <div class="body" style="display:flex;flex-direction:column;gap:9px">
       <button class="btn primary" id="chooser-nuevo" style="width:100%">Crear ítem nuevo</button>
       <button class="btn" id="chooser-fabricante" style="width:100%">Ítem del fabricante</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-personajes">
+  <div class="modal" style="max-width:360px">
+    <header><h3>Personajes</h3><button class="iconbtn" id="personajes-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:9px">
+      <div id="personajes-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+      <button class="btn primary" id="personajes-nuevo" style="width:100%">Ficha nueva</button>
+      <button class="btn ghost" id="personajes-archivo" style="width:100%">Cargar un archivo .json</button>
     </div>
   </div>
 </div>
@@ -2292,11 +2303,11 @@ $('#btn-guardar').onclick = () => {
   URL.revokeObjectURL(a.href);
   toast('Ficha guardada');
 };
-$('#btn-cargar').onclick = () => {
+function cargarArchivoLocal(){
   const aviso = 'Cargar una ficha reemplaza todo lo que tengas puesto ahora: nombre, atributos, items, habilidades, estados.\n\nSi no guardaste los cambios actuales, se pierden.\n\n¿Seguís?';
   if(!confirm(aviso)) return;
   $('#file-input').click();
-};
+}
 $('#portrait-input').onchange = async ev => {
   const file = ev.target.files[0];
   ev.target.value = '';
@@ -2351,6 +2362,15 @@ $('#file-input').onchange = ev => {
       ev.target.value = '';
       return;
     }
+    aplicarFicha(data);
+  };
+  r.readAsText(f);
+  ev.target.value = '';
+};
+
+// Vuelca una ficha (objeto ya parseado) sobre el estado, con las mismas
+// migraciones y merges tanto si viene de un archivo local como de GitHub.
+function aplicarFicha(data){
     try{
       const fresh = structuredClone(DEFAULT);
       const next = {...fresh, ...data};
@@ -2385,12 +2405,9 @@ $('#file-input').onchange = ev => {
       toast('Ficha cargada');
     }catch(err){
       console.error('Error cargando la ficha:', err);
-      toast('El archivo cargó pero algo no se pudo mostrar bien — revisá la consola');
+      toast('La ficha cargó pero algo no se pudo mostrar bien — revisá la consola');
     }
-  };
-  r.readAsText(f);
-  ev.target.value = '';
-};
+}
 $('#btn-formulas').onclick = () => openFormulas();
 
 /* =========================================================
@@ -2473,6 +2490,77 @@ $('#btn-sync-reset').onclick = () => {
     toast('Token borrado ✓');
   }
 };
+
+/* =========================================================
+   PERSONAJES (modal)
+   Lista los personajes que hay en el repo y trae la última
+   versión de cada uno directo desde GitHub.
+   ========================================================= */
+
+function ghCabeceras(accept){
+  const cab = {Accept: accept};
+  const token = localStorage.getItem('gh-token');
+  if(token) cab.Authorization = 'Bearer ' + token.trim();
+  return cab;
+}
+
+$('#btn-personajes').onclick = async () => {
+  const lista = $('#personajes-lista');
+  lista.innerHTML = '<div class="hint">Buscando personajes en GitHub…</div>';
+  $('#scrim-personajes').classList.add('open');
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/personajes?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github+json')});
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const archivos = (await resp.json()).filter(x => x.type === 'file' && x.name.endsWith('.json'));
+    if(!archivos.length){
+      lista.innerHTML = '<div class="hint">Todavía no hay personajes en el repo.</div>';
+      return;
+    }
+    lista.innerHTML = '';
+    archivos.forEach(arch => {
+      const nombre = arch.name.replace(/\.json$/,'').split('-')
+        .map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      const b = document.createElement('button');
+      b.className = 'btn';
+      b.style.width = '100%';
+      b.textContent = nombre;
+      b.onclick = () => cargarDesdeGitHub(arch.path, nombre);
+      lista.appendChild(b);
+    });
+  }catch(err){
+    console.error('Error listando personajes:', err);
+    lista.innerHTML = '<div class="hint">No se pudo traer la lista desde GitHub. ¿Tenés internet?</div>';
+  }
+};
+
+async function cargarDesdeGitHub(ruta, nombre){
+  const aviso = `Cargar a ${nombre} reemplaza todo lo que tengas puesto ahora: nombre, atributos, items, habilidades, estados.\n\nSi no guardaste los cambios actuales, se pierden.\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  toast(`Trayendo a ${nombre}…`);
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json')});
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const data = await resp.json();
+    aplicarFicha(data);
+    $('#scrim-personajes').classList.remove('open');
+  }catch(err){
+    console.error('Error trayendo la ficha:', err);
+    toast('No se pudo traer la ficha desde GitHub');
+  }
+}
+
+$('#personajes-nuevo').onclick = () => {
+  $('#scrim-personajes').classList.remove('open');
+  fichaNueva();
+};
+$('#personajes-archivo').onclick = () => {
+  $('#scrim-personajes').classList.remove('open');
+  cargarArchivoLocal();
+};
+$('#personajes-x').onclick = () => $('#scrim-personajes').classList.remove('open');
+$('#scrim-personajes').addEventListener('mousedown', e => { if(e.target.id==='scrim-personajes') $('#scrim-personajes').classList.remove('open'); });
 
 let toastT;
 function toast(msg){

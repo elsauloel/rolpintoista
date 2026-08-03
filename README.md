@@ -23,9 +23,10 @@ internet: se abre en el navegador y listo.
    *Settings → Developer settings → Fine-grained tokens*, con acceso solo a este
    repo y permiso **Contents: Read and write**. Queda guardado en tu navegador.
 
-7. Con el botón **Actualizar app** traés la última versión de la herramienta
-   misma desde GitHub: en el diálogo que se abre elegí tu propio `ficha.html`
-   para reemplazarlo, y recargá la página.
+7. Para mantener la herramienta misma al día, abrí [`gestor.html`](gestor.html):
+   la primera vez elegís la carpeta del repo (una sola vez) y de ahí en más
+   **Traer última versión** actualiza `ficha.html` con un clic. Si editaste la
+   herramienta localmente, **Subir al repo** publica tu versión para todos.
 
 Todo se guarda localmente en tu computadora (no hay backend ni base de datos):
 el archivo `.json` que exportás **es** tu personaje.
@@ -34,6 +35,7 @@ el archivo `.json` que exportás **es** tu personaje.
 
 ```
 ficha.html              La herramienta: ficha de personaje interactiva
+gestor.html             Gestor de la app: actualizarla o publicar tu versión
 personajes/              Personajes jugables, listos para cargar en la ficha
   aurelio-tinto.json
   felipe-gilardosky.json

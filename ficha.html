@@ -2442,7 +2442,7 @@ function aBase64(texto){
 async function ghSubir(ruta, contenidoB64, token, mensaje){
   const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
   const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
-  const prev = await fetch(`${url}?ref=${GH_BRANCH}`, {headers: cab});
+  const prev = await fetch(`${url}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
   if(prev.status === 401 || prev.status === 403) throw {auth:true};
   const sha = prev.ok ? (await prev.json()).sha : undefined;
   const resp = await fetch(url, {
@@ -2456,9 +2456,14 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
 
 $('#btn-sync').onclick = async () => {
   const btn = $('#btn-sync');
+  if(!(S.meta.nombre || '').trim()){
+    toast('Ponéle nombre al personaje antes de sincronizar');
+    $('#f-nombre').focus();
+    return;
+  }
   const token = ghToken(false);
   if(!token){ toast('Sin token no se puede sincronizar'); return; }
-  const nombre = (S.meta.nombre || 'ficha').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
+  const nombre = S.meta.nombre.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
   const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   const hoy = new Date();
   const fecha = hoy.getDate() + meses[hoy.getMonth()];
@@ -2510,7 +2515,7 @@ $('#btn-personajes').onclick = async () => {
   $('#scrim-personajes').classList.add('open');
   try{
     const url = `https://api.github.com/repos/${GH_REPO}/contents/personajes?ref=${GH_BRANCH}`;
-    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github+json')});
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github+json'), cache: 'no-store'});
     if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
     const archivos = (await resp.json()).filter(x => x.type === 'file' && x.name.endsWith('.json'));
     if(!archivos.length){
@@ -2540,7 +2545,7 @@ async function cargarDesdeGitHub(ruta, nombre){
   toast(`Trayendo a ${nombre}…`);
   try{
     const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
-    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json')});
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
     if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
     const data = await resp.json();
     aplicarFicha(data);

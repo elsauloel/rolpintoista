@@ -897,6 +897,7 @@ a{color:var(--brass)}
   <button class="btn del" id="btn-reset">Ficha nueva</button>
   <button class="btn" id="btn-formulas">Fórmulas</button>
   <button class="btn" id="btn-personajes">Personajes</button>
+  <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Actualizar</button>
   <button class="btn" id="btn-sync">Sincronizar</button>
   <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
@@ -2546,15 +2547,26 @@ async function cargarDesdeGitHub(ruta, nombre){
   try{
     const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
     const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(resp.status === 404) throw {noExiste: true};
     if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
     const data = await resp.json();
     aplicarFicha(data);
     $('#scrim-personajes').classList.remove('open');
   }catch(err){
     console.error('Error trayendo la ficha:', err);
-    toast('No se pudo traer la ficha desde GitHub');
+    toast(err && err.noExiste ? 'Ese personaje todavía no está sincronizado en GitHub' : 'No se pudo traer la ficha desde GitHub');
   }
 }
+
+$('#btn-actualizar').onclick = () => {
+  const nombreActual = (S.meta.nombre || '').trim();
+  if(!nombreActual){
+    toast('La ficha no tiene nombre — elegí un personaje desde Personajes');
+    return;
+  }
+  const slug = nombreActual.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
+  cargarDesdeGitHub(`personajes/${slug}.json`, nombreActual);
+};
 
 $('#personajes-nuevo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');

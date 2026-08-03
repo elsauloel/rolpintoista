@@ -15,7 +15,9 @@ internet: se abre en el navegador y listo.
    [`personajes/`](personajes/).
 4. Con el botón **Guardar ficha** exportás tu personaje actual a un archivo
    `.json` para no perder el progreso y poder seguir jugando otro día.
-5. Con el botón **Sincronizar** subís tu personaje directo a la carpeta
+5. Con el botón **Actualizar** traés de un toque la última versión sincronizada
+   del personaje que tenés abierto, sin pasar por la lista.
+6. Con el botón **Sincronizar** subís tu personaje directo a la carpeta
    `personajes/` de este repo (más un backup con fecha en `personajes/backups/`),
    sin salir de la ficha. La primera vez te pide un token de GitHub: crealo en
    *Settings → Developer settings → Fine-grained tokens*, con acceso solo a este

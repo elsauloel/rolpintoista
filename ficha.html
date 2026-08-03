@@ -2577,7 +2577,9 @@ function ghCabeceras(accept){
   return cab;
 }
 
-$('#btn-personajes').onclick = async () => {
+$('#btn-personajes').onclick = () => abrirPersonajes();
+
+async function abrirPersonajes(){
   const lista = $('#personajes-lista');
   lista.innerHTML = '<div class="hint">Buscando personajes en GitHub…</div>';
   $('#scrim-personajes').classList.add('open');
@@ -2594,18 +2596,66 @@ $('#btn-personajes').onclick = async () => {
     archivos.forEach(arch => {
       const nombre = arch.name.replace(/\.json$/,'').split('-')
         .map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      const fila = document.createElement('div');
+      fila.style.cssText = 'display:flex;gap:7px;align-items:stretch';
       const b = document.createElement('button');
       b.className = 'btn';
-      b.style.width = '100%';
+      b.style.flex = '1';
       b.textContent = nombre;
       b.onclick = () => cargarDesdeGitHub(arch.path, nombre);
-      lista.appendChild(b);
+      const x = document.createElement('button');
+      x.className = 'iconbtn';
+      x.textContent = '✕';
+      x.title = `Borrar a ${nombre} del repo`;
+      x.onclick = () => borrarDeGitHub(arch.path, nombre);
+      fila.append(b, x);
+      lista.appendChild(fila);
     });
   }catch(err){
     console.error('Error listando personajes:', err);
     lista.innerHTML = '<div class="hint">No se pudo traer la lista desde GitHub. ¿Tenés internet?</div>';
   }
-};
+}
+
+async function borrarDeGitHub(ruta, nombre){
+  const aviso = `Esto borra a ${nombre} del repo de GitHub, para todos.\n\n` +
+                `Los backups de personajes/backups/ no se tocan, así que un personaje borrado por error se puede recuperar desde ahí.\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.toLowerCase()){
+    toast('El nombre no coincide — no se borró nada');
+    return;
+  }
+  const token = ghToken(false);
+  if(!token){ toast('Sin token no se puede borrar'); return; }
+  toast(`Borrando a ${nombre}…`);
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
+    const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
+    const prev = await fetch(`${url}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+    if(prev.status === 401 || prev.status === 403) throw {auth: true};
+    if(!prev.ok) throw new Error(`GitHub respondió ${prev.status} consultando ${ruta}`);
+    const sha = (await prev.json()).sha;
+    const resp = await fetch(url, {
+      method: 'DELETE',
+      headers: cab,
+      body: JSON.stringify({message: `Borrar personaje ${nombre}`, sha, branch: GH_BRANCH}),
+    });
+    if(resp.status === 401 || resp.status === 403) throw {auth: true};
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} borrando ${ruta}: ${await resp.text()}`);
+    toast(`${nombre} borrado del repo ✓`);
+    abrirPersonajes();
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — probá de nuevo');
+    }else{
+      console.error('Error borrando el personaje:', err);
+      toast('No se pudo borrar — revisá la consola');
+    }
+  }
+}
 
 async function cargarDesdeGitHub(ruta, nombre){
   const aviso = `Cargar a ${nombre} reemplaza todo lo que tengas puesto ahora: nombre, atributos, items, habilidades, estados.\n\nSi no guardaste los cambios actuales, se pierden.\n\n¿Seguís?`;

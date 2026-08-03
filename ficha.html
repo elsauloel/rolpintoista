@@ -900,6 +900,7 @@ a{color:var(--brass)}
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Actualizar</button>
   <button class="btn" id="btn-sync">Sincronizar</button>
   <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
+  <button class="btn ghost" id="btn-actualizar-gestor" title="Traer la última versión de gestor.html desde GitHub">Actualizar gestor</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
   <input type="file" id="file-input" accept=".json" hidden>
 </div>
@@ -2602,6 +2603,94 @@ async function cargarDesdeGitHub(ruta, nombre){
     toast(err && err.noExiste ? 'Ese personaje todavía no está sincronizado en GitHub' : 'No se pudo traer la ficha desde GitHub');
   }
 }
+
+/* =========================================================
+   ACTUALIZAR GESTOR
+   Escribe la última versión de gestor.html en la carpeta del
+   repo, reusando la carpeta que el gestor dejó recordada en
+   IndexedDB (mismo almacenamiento entre páginas file://).
+   ========================================================= */
+
+function idbGestor(){
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('gestor-rolpintoista', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbCarpeta(valor){
+  const db = await idbGestor();
+  return new Promise((res, rej) => {
+    const tx = valor === undefined
+      ? db.transaction('kv').objectStore('kv').get('carpeta')
+      : db.transaction('kv', 'readwrite').objectStore('kv').put(valor, 'carpeta');
+    tx.onsuccess = () => res(tx.result);
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+async function gitBlobSha(texto){
+  const cuerpo = new TextEncoder().encode(texto);
+  const cabecera = new TextEncoder().encode('blob ' + cuerpo.length + '\0');
+  const todo = new Uint8Array(cabecera.length + cuerpo.length);
+  todo.set(cabecera); todo.set(cuerpo, cabecera.length);
+  const hash = await crypto.subtle.digest('SHA-1', todo);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+$('#btn-actualizar-gestor').onclick = async () => {
+  if(!window.showDirectoryPicker){
+    toast('Este navegador no soporta escribir archivos — usá Chrome o Edge');
+    return;
+  }
+  try{
+    let carpeta = await idbCarpeta();
+    if(carpeta){
+      let permiso = await carpeta.queryPermission({mode: 'readwrite'});
+      if(permiso === 'prompt') permiso = await carpeta.requestPermission({mode: 'readwrite'});
+      if(permiso !== 'granted') carpeta = null;
+    }
+    if(!carpeta){
+      toast('Elegí la carpeta del repo (la que tiene ficha.html)');
+      try{
+        carpeta = await showDirectoryPicker({mode: 'readwrite'});
+      }catch(e){ return; } // canceló
+      try{
+        await carpeta.getFileHandle('ficha.html');
+      }catch(e){
+        toast('Esa carpeta no tiene ficha.html adentro — no parece el repo');
+        return;
+      }
+      await idbCarpeta(carpeta);
+    }
+    toast('Buscando la última versión del gestor…');
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/gestor.html?ref=${GH_BRANCH}`;
+    const meta = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
+    if(!meta.ok) throw new Error(`GitHub respondió ${meta.status}`);
+    const shaRemoto = (await meta.json()).sha;
+    let local = null;
+    try{
+      const fh = await carpeta.getFileHandle('gestor.html');
+      local = (await (await fh.getFile()).text()).replace(/\r\n/g, '\n');
+    }catch(e){ /* todavía no existe */ }
+    if(local !== null && await gitBlobSha(local) === shaRemoto){
+      toast('El gestor ya está al día ✓');
+      return;
+    }
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const contenido = await resp.text();
+    const fh = await carpeta.getFileHandle('gestor.html', {create: true});
+    const w = await fh.createWritable();
+    await w.write(contenido);
+    await w.close();
+    toast('Gestor actualizado ✓');
+  }catch(err){
+    console.error('Error actualizando el gestor:', err);
+    toast('No se pudo actualizar el gestor — revisá la consola');
+  }
+};
 
 $('#btn-actualizar').onclick = () => {
   const nombreActual = (S.meta.nombre || '').trim();

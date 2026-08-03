@@ -27,6 +27,8 @@ internet: se abre en el navegador y listo.
    la primera vez elegís la carpeta del repo (una sola vez) y de ahí en más
    **Traer última versión** actualiza `ficha.html` con un clic. Si editaste la
    herramienta localmente, **Subir al repo** publica tu versión para todos.
+   Y si el que quedó viejo es el gestor mismo, la ficha tiene un botón
+   **Actualizar gestor** que lo trae al día usando la misma carpeta recordada.
 
 Todo se guarda localmente en tu computadora (no hay backend ni base de datos):
 el archivo `.json` que exportás **es** tu personaje.

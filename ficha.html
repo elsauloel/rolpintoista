@@ -646,6 +646,14 @@ a{color:var(--brass)}
 .dock .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto}
 @media(max-width:700px){.dock .note{display:none}}
 
+.menu-ajustes{position:fixed;top:10px;right:10px;z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.menu-ajustes .desplegable{
+  display:none;flex-direction:column;gap:7px;
+  background:rgba(15,12,14,.95);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:var(--r);padding:9px
+}
+.menu-ajustes.open .desplegable{display:flex}
+
 .toast{
   position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(12px);
   background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
@@ -656,7 +664,7 @@ a{color:var(--brass)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
   body{background:#fff;color:#000}
-  .dock,.iconbtn,.mini,.steppers{display:none}
+  .dock,.iconbtn,.mini,.steppers,.menu-ajustes{display:none}
   .card,.attr,.item{border-color:#999}
 }
 </style>
@@ -891,16 +899,23 @@ a{color:var(--brass)}
   </section>
 </div>
 
+<!-- MENÚ DE AJUSTES -->
+<div class="menu-ajustes" id="menu-ajustes">
+  <button class="iconbtn" id="btn-ajustes" title="Ajustes de sincronización">⚙ Ajustes</button>
+  <div class="desplegable">
+    <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
+    <button class="btn" id="btn-actualizar-gestor" title="Traer la última versión de gestor.html desde GitHub">Actualizar gestor</button>
+  </div>
+</div>
+
 <!-- DOCK -->
 <div class="dock">
   <span class="note">Los cambios viven en esta pestaña. Guardá la ficha antes de cerrarla.</span>
   <button class="btn del" id="btn-reset">Ficha nueva</button>
   <button class="btn" id="btn-formulas">Fórmulas</button>
   <button class="btn" id="btn-personajes">Personajes</button>
-  <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Actualizar</button>
-  <button class="btn" id="btn-sync">Sincronizar</button>
-  <button class="btn" id="btn-sync-reset" title="Olvidar el token guardado y pedir uno nuevo">Cambiar token</button>
-  <button class="btn ghost" id="btn-actualizar-gestor" title="Traer la última versión de gestor.html desde GitHub">Actualizar gestor</button>
+  <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Bajar datos</button>
+  <button class="btn" id="btn-sync" title="Subir este personaje a GitHub">Subir datos</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
   <input type="file" id="file-input" accept=".json" hidden>
 </div>
@@ -2525,7 +2540,7 @@ $('#btn-sync').onclick = async () => {
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá Sincronizar de nuevo');
+      toast('El token no sirve o venció — tocá Subir datos de nuevo');
     }else{
       console.error('Error sincronizando:', err);
       toast('No se pudo sincronizar — revisá la consola');
@@ -2534,6 +2549,12 @@ $('#btn-sync').onclick = async () => {
     btn.disabled = false;
   }
 };
+
+$('#btn-ajustes').onclick = () => $('#menu-ajustes').classList.toggle('open');
+document.addEventListener('mousedown', e => {
+  if(!e.target.closest('#menu-ajustes')) $('#menu-ajustes').classList.remove('open');
+});
+$('#menu-ajustes .desplegable').addEventListener('click', () => $('#menu-ajustes').classList.remove('open'));
 
 $('#btn-sync-reset').onclick = () => {
   if(!localStorage.getItem('gh-token')){ toast('No hay ningún token guardado'); return; }

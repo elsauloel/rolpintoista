@@ -2419,11 +2419,18 @@ function aplicarFicha(data){
       });
       // El catálogo se combina por id: se respetan tus ítems propios y ediciones,
       // y se suman los ítems nuevos que trae esta versión de la ficha y vos todavía no tenías.
+      // Si a un ítem que ya tenías nunca le cargaste imagen y la versión de fábrica
+      // ahora sí tiene una, se la completamos (sin tocar nada que hayas editado vos).
       {
         const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
+        const frescoPorId = new Map(fresh.catalogo.map(i => [i.id, i]));
+        const propioActualizado = propio.map(item => {
+          const fresco = frescoPorId.get(item.id);
+          return (fresco && !item.imagen && fresco.imagen) ? {...item, imagen: fresco.imagen} : item;
+        });
         const idsPropios = new Set(propio.map(i => i.id));
         const nuevosDeFabrica = fresh.catalogo.filter(i => !idsPropios.has(i.id));
-        next.catalogo = [...propio, ...nuevosDeFabrica];
+        next.catalogo = [...propioActualizado, ...nuevosDeFabrica];
       }
       // Migración: fichas viejas guardaban equipo y mochila como listas separadas.
       if(!(Array.isArray(data.inventario) && data.inventario.length) && (Array.isArray(data.equipo) || Array.isArray(data.mochila))){

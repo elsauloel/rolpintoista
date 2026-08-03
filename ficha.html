@@ -687,9 +687,9 @@ a{color:var(--brass)}
     <div class="counters">
       <div class="counter counter-exp" id="c-exp" title="Al llegar al umbral, sube de nivel y el marcador reinicia">
         <label>Experiencia</label>
-        <div class="expnums"><input id="f-exp" type="number"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
+        <div class="expnums"><input id="f-exp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
       </div>
-      <div class="counter"><label>DDE($)</label><input id="f-dde" type="number"></div>
+      <div class="counter"><label>DDE($)</label><input id="f-dde" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"></div>
       <div class="counter calc" id="c-job" title="3 puntos base + 3 por nivel, menos las habilidades/pasivas adquiridas con Job">
         <label>Job</label>
         <div class="val" id="v-job">0</div>
@@ -726,7 +726,7 @@ a{color:var(--brass)}
     <div class="vital">
       <div class="top">
         <span class="name">Puntos de vida</span>
-        <span class="nums"><input id="f-hp" type="number"><span class="max">/ <span id="v-hpmax">0</span></span></span>
+        <span class="nums"><input id="f-hp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="max">/ <span id="v-hpmax">0</span></span></span>
       </div>
       <div class="bar hp"><span id="bar-hp"></span></div>
       <div class="steppers">
@@ -2001,8 +2001,8 @@ document.addEventListener('input', e => {
     $('#eyebrow').textContent = [S.meta.raza,S.meta.clase,S.meta.subclase].filter(Boolean).join(' · ');
     return;
   }
-  if(['f-nivel','f-dde'].includes(t.id)){ S.meta[t.id.slice(2)] = num(t.value); renderExp(); refresh(); return; }
-  if(t.id === 'f-exp'){ applyExp(t.value); refresh(); return; }
+  if(t.id === 'f-nivel'){ S.meta.nivel = num(t.value); renderExp(); refresh(); return; }
+  if(CAJAS_DELTA.includes(t.id)) return;
   if(['f-loot-normal','f-loot-magico'].includes(t.id)){
     S.loot[t.id.replace('f-loot-','')] = num(t.value); return;
   }
@@ -2011,7 +2011,6 @@ document.addEventListener('input', e => {
     if(row){ row[t.dataset.lk] = t.dataset.lk === 'cantidad' ? num(t.value) : t.value; }
     return;
   }
-  if(t.id === 'f-hp'){ S.hp = num(t.value); renderVitals(); return; }
   if(t.id === 'f-bonos'){
     const c = compute();
     const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
@@ -2070,6 +2069,43 @@ document.addEventListener('input', e => {
     if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(_){} }
     return;
   }
+});
+
+/* =========================================================
+   CAJAS CON DELTA (Vida, DDE, Experiencia)
+   Escribir un número fija el valor. Escribir +50 / -35 y
+   apretar Enter suma o resta eso al valor que había al
+   entrar a la caja.
+   ========================================================= */
+
+const CAJAS_DELTA = ['f-hp', 'f-dde', 'f-exp'];
+let cajaDeltaBase = {};
+
+function resolverCajaDelta(t){
+  const raw = (t.value || '').trim();
+  const m = raw.match(/^([+-])\s*(\d+(?:[.,]\d+)?)$/);
+  const base = cajaDeltaBase[t.id] ?? 0;
+  const val = m ? base + parseFloat(m[2].replace(',', '.')) * (m[1] === '-' ? -1 : 1) : num(raw);
+  let final = val;
+  if(t.id === 'f-hp'){ S.hp = val; renderVitals(); }
+  else if(t.id === 'f-dde'){ S.meta.dde = val; renderExp(); refresh(); }
+  else if(t.id === 'f-exp'){ applyExp(val); refresh(); final = S.meta.exp; }
+  t.value = fmt(final);
+  cajaDeltaBase[t.id] = final;
+}
+
+document.addEventListener('focusin', e => {
+  if(CAJAS_DELTA.includes(e.target.id)){ cajaDeltaBase[e.target.id] = num(e.target.value); e.target.select(); }
+});
+document.addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.keyCode === 13) && CAJAS_DELTA.includes(e.target.id)){
+    e.preventDefault();
+    resolverCajaDelta(e.target);
+    e.target.blur();
+  }
+});
+document.addEventListener('focusout', e => {
+  if(CAJAS_DELTA.includes(e.target.id)) resolverCajaDelta(e.target);
 });
 
 document.addEventListener('click', e => {

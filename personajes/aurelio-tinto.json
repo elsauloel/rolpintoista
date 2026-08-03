@@ -897,6 +897,346 @@
       "curahp": 0,
       "mods": [],
       "detalle": "Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+    },
+    {
+      "id": "cat-daga",
+      "nombre": "Daga",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 de resistencia crítica."
+    },
+    {
+      "id": "cat-rompemalla",
+      "nombre": "Rompemalla",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "cat-espada-ancha",
+      "nombre": "Espada ancha",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Daño amplificado."
+    },
+    {
+      "id": "cat-hacha-de-mano",
+      "nombre": "Hacha de mano",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "cat-bast-n-flexible",
+      "nombre": "Bastón flexible",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 de resistencia crítica."
+    },
+    {
+      "id": "cat-estoque",
+      "nombre": "Estoque",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": "Modificador: '+1 a iniciativa"
+    },
+    {
+      "id": "cat-espada-corta",
+      "nombre": "Espada corta",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "cat-machete",
+      "nombre": "Machete",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 25,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "+10% de daño crítico"
+    },
+    {
+      "id": "cat-hacha",
+      "nombre": "Hacha",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "cat-maza",
+      "nombre": "Maza",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Daño amplificado."
+    },
+    {
+      "id": "cat-escudo-romano",
+      "nombre": "Escudo romano",
+      "imagen": "",
+      "tipoItem": "escudo_2m",
+      "peso": 5,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 250
+        }
+      ],
+      "detalle": "+4 al bloqueo. Movimiento y ataque lento"
+    },
+    {
+      "id": "cat-espada-larga",
+      "nombre": "Espada larga",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "modificador: '+1 al pdg. +1 al parry"
+    },
+    {
+      "id": "cat-escudo-grande",
+      "nombre": "Escudo grande",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 200
+        }
+      ],
+      "detalle": "+2 al bloqueo"
+    },
+    {
+      "id": "cat-hacha-de-batalla",
+      "nombre": "Hacha de batalla",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "cat-mangual",
+      "nombre": "Mangual",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Alcance +1."
+    },
+    {
+      "id": "cat-broquel",
+      "nombre": "Broquel",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 50
+        }
+      ],
+      "detalle": "+2 a estabilidad"
+    },
+    {
+      "id": "cat-martillo",
+      "nombre": "Martillo",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Daño +50%. Lento."
+    },
+    {
+      "id": "cat-escudo-pav-s",
+      "nombre": "Escudo pavés",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 150
+        }
+      ],
+      "detalle": "+1 a estabilidad, +1 al bloqueo"
+    },
+    {
+      "id": "cat-escudo-triangular",
+      "nombre": "Escudo triangular",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 150
+        }
+      ],
+      "detalle": "+2 al bloqueo"
+    },
+    {
+      "id": "cat-escudo-peque-o",
+      "nombre": "Escudo pequeño",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 100
+        }
+      ],
+      "detalle": "+1 al bloqueo, +1 a la estabilidad"
     }
   ],
   "equipo": [

@@ -690,7 +690,7 @@ a{color:var(--brass)}
         <div class="expnums"><input id="f-exp" type="number"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
       </div>
       <div class="counter"><label>DDE($)</label><input id="f-dde" type="number"></div>
-      <div class="counter calc" id="c-job" title="3 puntos base + 2 por nivel, menos las habilidades/pasivas adquiridas con Job">
+      <div class="counter calc" id="c-job" title="3 puntos base + 3 por nivel, menos las habilidades/pasivas adquiridas con Job">
         <label>Job</label>
         <div class="val" id="v-job">0</div>
         <div class="sub" id="v-job-sub"></div>
@@ -1917,7 +1917,7 @@ function renderLootEspecial(){
 
 function jobBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
-  const total = 3 + 2 * (nivel - 1);
+  const total = 3 + 3 * (nivel - 1);
   const gastado = [...S.habilidades, ...S.pasivas].filter(x => x.job !== false).length;
   return {total, gastado, resto: total - gastado};
 }

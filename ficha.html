@@ -417,6 +417,8 @@ a{color:var(--brass)}
 .ejecutar-btn:hover{background:var(--copper);color:#180F08}
 .ejecutar-btn:disabled{opacity:.4;cursor:not-allowed;background:rgba(0,0,0,.2);color:var(--muted)}
 .ejecutar-btn:disabled:hover{background:rgba(0,0,0,.2)}
+.ejecutar-btn.usada{opacity:.4;background:rgba(0,0,0,.2);color:var(--muted)}
+.ejecutar-btn.usada:hover{opacity:.7;background:rgba(0,0,0,.3);color:var(--muted)}
 
 /* ---------- Invocaciones ---------- */
 .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:10px}
@@ -1836,7 +1838,7 @@ const LISTS = {
       const yaUsada = noEspameable && i.usadaEsteTurno === true;
       const esVariable = esCostoVariable(i.costo);
       const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
-      const bloqueada = yaUsada || sinAcciones;
+      const bloqueada = sinAcciones;
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
@@ -1845,7 +1847,7 @@ const LISTS = {
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
       </div>
-      <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar${yaUsada?' · ya usada este turno':(sinAcciones?' · sin acciones':'')}</button>
+      <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar${yaUsada?' · ya usada este turno':(sinAcciones?' · sin acciones':'')}</button>
       </div>`;
     }
   },
@@ -3396,8 +3398,7 @@ function ejecutarHabilidad(id){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
   if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
-    toast(`${it.nombre} ya se usó este turno`);
-    return;
+    if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
   }
   if(esCostoVariable(it.costo)){
     pendingEjecucion = id;

@@ -748,7 +748,7 @@ a{color:var(--brass)}
     </div>
     <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
       <span class="acciones-label">Acciones</span>
-      <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ 3</span></div>
+      <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ <span id="v-acciones-max">3</span></span></div>
     </div>
     <section class="card vital-card">
       <header>
@@ -1060,6 +1060,7 @@ const GRUPOS = [
 ];
 const EXTRA = [
   {id:'def', label:'Defensa', full:'Defensa'},
+  {id:'accionesmax', label:'Acciones máx.', full:'Acciones máximas por turno'},
   {id:'tipo1', label:'Tipo 2', full:'Resistencia a crítico — armas Tipo 2 (d2)'},
   {id:'tipo2', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
   {id:'tipo3', label:'Tipo 6', full:'Resistencia a crítico — armas Tipo 6 (d6)'},
@@ -1156,7 +1157,7 @@ const DEFAULT = {
     eva:'agl', ini:'agl', mov:'agl',
     rng:'des', pdg:'des', crit:'des',
     pdgmg:'int', resm:'int', bonos:'ceil(int/2) - sobrecarga', rangocasteo:'int',
-    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0'
+    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', accionesmax:'3'
   },
   inventario:[],
   cinturon:[],
@@ -1994,7 +1995,7 @@ function renderAll(){
   renderInvocaciones();
 }
 
-function refresh(){ renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); }
+function refresh(){ renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); renderAcciones(); }
 
 /* =========================================================
    EVENTOS
@@ -3375,6 +3376,8 @@ function renderAcciones(){
   const fAcciones = $('#f-acciones');
   if(document.activeElement !== fAcciones) fAcciones.value = fmt(num(S.acciones));
   box.classList.toggle('agotadas', num(S.acciones) <= 0);
+  const max = compute().final.accionesmax;
+  $('#v-acciones-max').textContent = Number.isNaN(max) ? '?' : fmt(max);
 }
 
 function parseCostoBonos(costo){
@@ -3488,7 +3491,7 @@ function mantenimiento(){
 
   S.turno = (S.turno || 1) + 1;
   S.bonosGastados = 0;
-  S.acciones = 3;
+  S.acciones = compute().final.accionesmax;
   S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
 
   let invocacionesVencidas = 0;
@@ -3568,6 +3571,7 @@ function fichaNueva(){
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
   S.habilidades = [structuredClone(DEFAULT.habilidades[0])];
+  S.acciones = compute().final.accionesmax;
   openStat = null;
   renderAll();
   toast('Ficha en blanco');

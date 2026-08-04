@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "nombre": "Ithak Igrakhur",
+    "raza": "Alien Verde",
+    "clase": "Tanque",
+    "subclase": "Staff",
+    "nivel": 2,
+    "exp": 0,
+    "dde": 58,
+    "wld": "+1",
+    "imagen": ""
+  },
+  "bitacora": [
+    { "id": "j1", "nombre": "Jornada 1", "texto": "" }
+  ],
+  "bitacoraActiva": "j1",
+  "loot": { "normal": 0, "magico": 0, "especial": [] },
+  "attrs": { "con": 10, "fue": 7, "agl": 5, "des": 9, "int": 5 },
+  "hp": 50,
+  "turno": 1,
+  "log": [],
+  "bonosGastados": -1,
+  "acciones": 3,
+  "caps": { "mochila": 30, "cinturon": 5 },
+  "armadura": {
+    "nota": "Defensa total 14 (Coraza +12, Mercury threads +2) — se calcula sola al tener ambas equipadas. La hoja original también marcaba \"x\" en Resistencia a crítico para los tipos 2/4/6/8/10 (probablemente por la Coraza, que \"reduce críticos de cualquier tipo\"), pero sin un número — no quedó cargado en las fórmulas de armadura, revisalo si hace falta. Tampoco pude interpretar \"Blind.+5\" que aparecía al lado de la Defensa."
+  },
+  "formulas": {
+    "resmg": "con", "rescc": "con", "hpmax": "con*5",
+    "dmg": "fue", "potencia": "fue", "crgmax": "fue",
+    "eva": "agl", "ini": "agl", "mov": "agl",
+    "rng": "des", "pdg": "des", "crit": "des",
+    "pdgmg": "int", "resm": "int", "bonos": "ceil(int/2) - sobrecarga", "rangocasteo": "int",
+    "def": "0", "tipo1": "0", "tipo2": "0", "tipo3": "0", "tipo4": "0", "tipo5": "0"
+  },
+  "inventario": [
+    {
+      "id": "ithak-coraza", "nombre": "Coraza", "imagen": "", "tipoItem": "armadura_rigida",
+      "peso": 5, "ranuras": 1, "precioCompra": 100, "equipado": true, "unidades": 1,
+      "consumible": false, "curahp": 0, "mods": [{ "stat": "def", "val": 12 }],
+      "detalle": "Reduce críticos de cualquier tipo."
+    },
+    {
+      "id": "ithak-mercury-threads", "nombre": "Mercury threads", "imagen": "", "tipoItem": "botas_blandas",
+      "peso": 0, "ranuras": 1, "precioCompra": 150, "equipado": true, "unidades": 1,
+      "consumible": false, "curahp": 0,
+      "mods": [{ "stat": "def", "val": 2 }, { "stat": "resm", "val": 1 }, { "stat": "rescc", "val": 1 }],
+      "detalle": "+1 Res.M, +1 Res.CC. La hoja original también listaba \"+1 No2\", que no supe interpretar — quedó sin cargar."
+    },
+    {
+      "id": "ithak-maza", "nombre": "Maza", "imagen": "", "tipoItem": "arma_1m",
+      "peso": 2, "ranuras": 1, "tipoDado": 8, "danoFijo": 0, "precioCompra": 50,
+      "equipado": true, "unidades": 1, "consumible": false, "curahp": 0, "mods": [],
+      "detalle": "Daño amplificado. Fórmulas de la hoja original (la ficha no tiene un campo de macro de dado, quedan acá como referencia): Pdg 1d10+1 · Atq 3d8+9."
+    },
+    {
+      "id": "ithak-revive", "nombre": "Revive", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 150, "equipado": false, "unidades": 1,
+      "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas."
+    },
+    {
+      "id": "ithak-kit-staff", "nombre": "Kit del Hombre del Staff", "imagen": "", "tipoItem": "otros",
+      "peso": 0, "ranuras": 1, "precioCompra": 0, "equipado": false, "unidades": 1,
+      "consumible": false, "curahp": 0, "mods": [],
+      "detalle": "Estaba en la mochila sin descripción de efecto — no supe qué hace, revisalo."
+    },
+    {
+      "id": "ithak-raciones", "nombre": "Raciones", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 3, "equipado": false, "unidades": 7,
+      "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "(2/2) +1 Wellness."
+    }
+  ],
+  "cinturon": [
+    {
+      "id": "ithak-cint-curaplus", "nombre": "Cura Plus", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 15, "unidades": 1, "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "Remueve estados alterados. (2) Hierba de sanación."
+    },
+    {
+      "id": "ithak-cint-pocionhpmenor", "nombre": "Poción de HP menor", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 9, "unidades": 4, "consumible": true, "curahp": 10, "mods": [],
+      "detalle": "Recupera 10 HP. (2) Hierba de curación."
+    },
+    {
+      "id": "ithak-cint-pocionspmenor", "nombre": "Poción de SP menor", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 30, "unidades": 0, "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "Recupera SP (+1 Sobrecarga). (2) Hierba de spooky. La ficha web no tiene un recurso de SP propio, así que este ítem no hace nada mecánicamente acá — solo queda de referencia."
+    },
+    {
+      "id": "ithak-cint-honguitos", "nombre": "Honguitos del ermitaño", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 0, "unidades": 0, "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "+ Hp.Max / Sp.SbrCrg / Bns.Max. El precio en la hoja original decía \"10K\" — no supe si son 10.000 DDE u otra cosa, lo dejé en 0, revisalo."
+    },
+    {
+      "id": "ithak-cint-revive", "nombre": "Revive", "imagen": "", "tipoItem": "consumibles",
+      "peso": 0, "ranuras": 1, "precioCompra": 150, "unidades": 2, "consumible": true, "curahp": 0, "mods": [],
+      "detalle": "Revive con 50% Hp a 1 Obj. caído en 5 turnos o menos, dentro de un área de 5 casillas. (5) Loot mágico, (5) Hierba de curación, (5) Hierba de sanación."
+    }
+  ],
+  "habilidades": [
+    { "id": "movimiento", "nombre": "Movimiento", "costo": "", "categoria": "", "job": false, "origen": "Acción base", "imagen": "", "detalle": "Desplazarse por el mapa." },
+    { "id": "ithak-hab-blindaje", "nombre": "Blindaje", "costo": "Acciones: 0. SP: Normal. Bonos: 1.", "categoria": "", "job": true, "origen": "", "imagen": "", "detalle": "Flash. La próxima vez que reciba daño lo reduce en 5." },
+    { "id": "ithak-hab-shockwave", "nombre": "Shockwave", "costo": "Acciones: 1. SP: Pesado. Bonos: 1.", "categoria": "", "job": true, "origen": "", "imagen": "", "detalle": "Tira FUE vs Res.CC para causar \"pajaritos en flor\" (así decía la hoja original — parece un estado de aturdido, no supe a cuál estado de la ficha mapearlo) de 1 por 1 turno." },
+    { "id": "ithak-hab-curarse", "nombre": "Curarse", "costo": "Acciones: 1. SP: Normal. Bonos: 1.", "categoria": "", "job": true, "origen": "", "imagen": "", "detalle": "Tira CON. Se cura el doble del resultado." },
+    { "id": "ithak-hab-espinas", "nombre": "Espinas", "costo": "Acciones: 1. Bonos: 1.", "categoria": "", "job": true, "origen": "", "imagen": "", "detalle": "Por 2 turnos devuelve como true damage 1/4 del daño de ataque que reciba." }
+  ],
+  "pasivas": [
+    { "id": "ithak-pasv-prisa", "nombre": "Prisa", "job": true, "origen": "", "imagen": "", "mods": [], "detalle": "La hoja original solo tenía el título \"Prisa.\", sin descripción de efecto — no supe qué hace, revisalo." },
+    { "id": "ithak-pasv-eva", "nombre": "+1 Eva", "job": true, "origen": "", "imagen": "", "mods": [{ "stat": "eva", "val": 1 }], "detalle": "+1 a Evasión." },
+    { "id": "ithak-pasv-regcon", "nombre": "Reg. 1dCon", "job": true, "origen": "", "imagen": "", "mods": [], "detalle": "Interpretación: regenera 1 dado de Constitución de HP por turno — la hoja no aclaraba el detalle exacto, revisalo." }
+  ],
+  "sociales": [],
+  "efectos": [],
+  "invocaciones": []
+}

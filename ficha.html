@@ -1257,6 +1257,7 @@ function collectMods(){
     (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen});
   };
   S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre)));
+  S.pasivas.forEach(p => (p.mods||[]).forEach(m => push(m, p.nombre)));
   S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
     const stacks = Math.max(1, num(e.stacks) || 1);
     push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''));
@@ -1833,7 +1834,7 @@ const LISTS = {
       const noEspameable = i.categoria === 'No espameable';
       const yaUsada = noEspameable && i.usadaEsteTurno === true;
       const esVariable = esCostoVariable(i.costo);
-      const sinAcciones = !esVariable && num(S.acciones) <= 0;
+      const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
       const bloqueada = yaUsada || sinAcciones;
       return `<div class="item">
       <div class="ihead">
@@ -2798,19 +2799,19 @@ const SCHEMA = {
   inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','curahp','detalle'], mods:true},
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','curahp','detalle'], mods:true},
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','curahp','detalle'], mods:true},
-  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','categoria','job','origen','detalle'], mods:false},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','permanente','activo','popup','detalle'], mods:true},
 };
-const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
+const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', accionesCosto:'Acciones que consume al ejecutar', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
   stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
   job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
   categoria:'Categoría', unidades:'Unidades', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
   manoPreferida:'Mano'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado'];
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 let editing = null;
@@ -3093,7 +3094,7 @@ function openEditor(key, id, equipadoPreset){
   const sc = SCHEMA[key];
   const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
-    activo:true, stacks:1, costo:'', dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
+    activo:true, stacks:1, costo:'', accionesCosto:1, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
@@ -3399,23 +3400,24 @@ function ejecutarHabilidad(id){
     pendingEjecucion = id;
     $('#costox-nombre').textContent = it.nombre;
     $('#f-costox-bonos').value = 0;
-    $('#f-costox-acciones').value = num(S.acciones) > 0 ? 1 : 0;
+    $('#f-costox-acciones').value = Math.min(num(S.acciones), num(it.accionesCosto ?? 1));
     $('#costox-disponibles').textContent = `${fmt(num(S.acciones))} Acciones`;
     $('#scrim-costox').classList.add('open');
     return;
   }
-  if(num(S.acciones) <= 0){
+  const costoAcciones = num(it.accionesCosto ?? 1);
+  if(costoAcciones > num(S.acciones)){
     toast('No te quedan acciones este turno');
     return;
   }
   const costoBonos = parseCostoBonos(it.costo);
-  S.acciones = num(S.acciones) - 1;
+  S.acciones = num(S.acciones) - costoAcciones;
   S.bonosGastados = num(S.bonosGastados) + costoBonos;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   renderList('habilidades');
   renderAcciones();
   renderVitals();
-  toast(`${it.nombre} ejecutada${costoBonos ? ` · -${fmt(costoBonos)} Bonos` : ''} · -1 Acción`);
+  toast(`${it.nombre} ejecutada${costoBonos ? ` · -${fmt(costoBonos)} Bonos` : ''}${costoAcciones ? ` · -${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : ' · sin costo de Acciones'}`);
 }
 
 function confirmarCostoVariable(){

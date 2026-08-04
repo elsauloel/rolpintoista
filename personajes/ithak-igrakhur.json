@@ -302,6 +302,7 @@
     {
       "id": "ithak-hab-blindaje",
       "nombre": "Blindaje",
+      "accionesCosto": 0,
       "peso": 0,
       "ranuras": 1,
       "detalle": "Flash. La próxima vez que reciba daño lo reduce en 5.",

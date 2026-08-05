@@ -2326,6 +2326,7 @@ document.addEventListener('click', e => {
     clon.ranuras = 1;
     clon.equipado = false;
     S.cinturon.push(clon);
+    purgarSiAgotado('inventario', it.id);
     renderInventario();
     renderList('cinturon');
     refresh();

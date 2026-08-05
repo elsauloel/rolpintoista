@@ -1,17 +1,17 @@
 {
-  "actualizado": "2026-08-05T06:22:47.014Z",
+  "actualizado": "2026-08-05T06:29:42.014Z",
   "creeps": [
     {
-      "id": "jkadc7z",
+      "id": "7fhy8qc",
       "nombre": "Sabotea rifle",
       "imagen": "",
-      "hp": 40,
-      "hpMax": 40,
+      "hp": 10,
+      "hpMax": 10,
       "estados": []
     },
     {
-      "id": "22nvf46",
-      "nombre": "Perro Rabioso",
+      "id": "17pesxu",
+      "nombre": "Robot Mercenario Ninja",
       "imagen": "",
       "hp": 40,
       "hpMax": 40,

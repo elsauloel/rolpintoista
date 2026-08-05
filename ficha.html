@@ -941,6 +941,7 @@ a{color:var(--brass)}
       <div id="personajes-lista" style="display:flex;flex-direction:column;gap:9px"></div>
       <button class="btn primary" id="personajes-nuevo" style="width:100%">Ficha nueva</button>
       <button class="btn ghost" id="personajes-archivo" style="width:100%">Cargar un archivo .json</button>
+      <button class="btn ghost" id="personajes-creeps" style="width:100%">Ver estado de los Creeps</button>
     </div>
   </div>
 </div>
@@ -2485,10 +2486,13 @@ $('#btn-formulas').onclick = () => openFormulas();
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'main';
 
+const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
+
 function ghToken(pedirDeNuevo){
   let t = localStorage.getItem('gh-token');
   if(!t || pedirDeNuevo){
-    t = prompt('Pegá tu token de GitHub para sincronizar.\n\nCrealo en github.com → Settings → Developer settings → Fine-grained tokens, dándole acceso solo a este repo con permiso "Contents: Read and write".\n\nQueda guardado en este navegador para las próximas veces.');
+    window.open(GH_TOKEN_URL, '_blank');
+    t = prompt('Se abrió GitHub en otra pestaña, ya con los permisos correctos elegidos.\n\nAhí solo tocá "Generate token" al final de la página, copiá el token verde (ojo: sólo se muestra una vez) y pegalo acá.\n\nQueda guardado en este navegador para las próximas veces.');
     if(t) localStorage.setItem('gh-token', t.trim());
   }
   return t ? t.trim() : null;
@@ -2785,6 +2789,7 @@ $('#personajes-archivo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');
   cargarArchivoLocal();
 };
+$('#personajes-creeps').onclick = () => window.open('creeps-vista.html', '_blank');
 $('#personajes-x').onclick = () => $('#scrim-personajes').classList.remove('open');
 $('#scrim-personajes').addEventListener('mousedown', e => { if(e.target.id==='scrim-personajes') $('#scrim-personajes').classList.remove('open'); });
 

@@ -34,11 +34,35 @@ internet: se abre en el navegador y listo.
 Todo se guarda localmente en tu computadora (no hay backend ni base de datos):
 el archivo `.json` que exportás **es** tu personaje.
 
+## Herramientas del máster: creeps en combate
+
+Para que el máster comparta el estado de sus creeps (HP y estados alterados)
+con el resto del grupo sin pasar el archivo por WhatsApp, hay dos páginas más:
+
+- [`gm-tools.html`](gm-tools.html) — panel del máster para manejar sus creeps
+  en combate (HP, atributos, arma, habilidades, estados). El botón **Guardar**
+  baja dos archivos: `gm-creeps.json` (todos los datos, respaldo privado del
+  máster, **nunca** se sube al repo) y `creeps-publico.json` (una versión
+  recortada: id, nombre, imagen, HP y estados con nombre y turnos). El botón
+  **Subir datos** sube directamente `creeps-publico.json` al repo, con el
+  mismo token de GitHub que usa **Subir datos** de la ficha.
+- [`creeps-vista.html`](creeps-vista.html) — página de solo lectura para el
+  resto del grupo: con **Cargar datos** eligen el `creeps-publico.json` y ven
+  una tarjeta por creep (imagen, barra de HP, estados con turnos restantes).
+
+Si el máster actualiza `gm-tools.html` o `creeps-vista.html`, esos cambios se
+publican desde `gestor.html` (botón **Subir al repo**), igual que `ficha.html`
+— no desde el botón Subir datos de ninguna de las dos herramientas, que es
+solo para los datos de la partida.
+
 ## Estructura del repo
 
 ```
 ficha.html              La herramienta: ficha de personaje interactiva
 gestor.html             Gestor de la app: actualizarla o publicar tu versión
+gm-tools.html           Panel del máster: creeps en combate (HP, estados, etc.)
+creeps-vista.html       Vista de solo lectura del estado de los creeps
+creeps-publico.json     Estado público de los creeps (lo sube gm-tools.html)
 personajes/              Personajes jugables, listos para cargar en la ficha
   aurelio-tinto.json
   felipe-gilardosky.json

@@ -93,8 +93,8 @@ a{color:var(--copper)}
 <script>
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'main';
-// Archivos que componen la herramienta en sí (los personajes se sincronizan desde la ficha).
-const ARCHIVOS_APP = ['ficha.html', 'gestor.html', 'README.md'];
+// Archivos que componen la herramienta en sí (los personajes y los creeps se sincronizan desde sus propias páginas).
+const ARCHIVOS_APP = ['ficha.html', 'gestor.html', 'gm-tools.html', 'creeps-vista.html', 'README.md'];
 
 const $ = s => document.querySelector(s);
 function log(msg){
@@ -195,10 +195,13 @@ function ghCabeceras(accept){
   if(token) cab.Authorization = 'Bearer ' + token.trim();
   return cab;
 }
+const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
+
 function ghToken(pedirDeNuevo){
   let t = localStorage.getItem('gh-token');
   if(!t || pedirDeNuevo){
-    t = prompt('Pegá tu token de GitHub (fine-grained, solo este repo, permiso "Contents: Read and write").\n\nQueda guardado en este navegador.');
+    window.open(GH_TOKEN_URL, '_blank');
+    t = prompt('Se abrió GitHub en otra pestaña, ya con los permisos correctos elegidos.\n\nAhí solo tocá "Generate token" al final de la página, copiá el token verde (ojo: sólo se muestra una vez) y pegalo acá.\n\nQueda guardado en este navegador.');
     if(t) localStorage.setItem('gh-token', t.trim());
   }
   return t ? t.trim() : null;

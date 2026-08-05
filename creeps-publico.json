@@ -1,8 +1,8 @@
 {
-  "actualizado": "2026-08-05T14:46:41.595Z",
+  "actualizado": "2026-08-05T18:31:01.784Z",
   "creeps": [
     {
-      "id": "qzdii25",
+      "id": "dyl4nv4",
       "nombre": "Sabotea rifle",
       "imagen": "",
       "hp": 10,
@@ -10,8 +10,8 @@
       "estados": []
     },
     {
-      "id": "76ajf7k",
-      "nombre": "Saltamontes Venenoso",
+      "id": "46sgnsv",
+      "nombre": "Babosa Psíquica Biomecánica",
       "imagen": "",
       "hp": 40,
       "hpMax": 40,

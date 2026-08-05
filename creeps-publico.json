@@ -1,8 +1,8 @@
 {
-  "actualizado": "2026-08-05T06:29:42.014Z",
+  "actualizado": "2026-08-05T14:46:41.595Z",
   "creeps": [
     {
-      "id": "7fhy8qc",
+      "id": "qzdii25",
       "nombre": "Sabotea rifle",
       "imagen": "",
       "hp": 10,
@@ -10,8 +10,8 @@
       "estados": []
     },
     {
-      "id": "17pesxu",
-      "nombre": "Robot Mercenario Ninja",
+      "id": "76ajf7k",
+      "nombre": "Saltamontes Venenoso",
       "imagen": "",
       "hp": 40,
       "hpMax": 40,

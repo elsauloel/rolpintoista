@@ -1176,10 +1176,10 @@ const DEFAULT = {
     {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:3, consumible:true, curahp:25, mods:[], detalle:'3 Cargas. Recupera 25 HP por carga.'},
     {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:100, mods:[], detalle:'Recupera 100 HP.'},
     {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:3, consumible:true, curahp:100, mods:[], detalle:'3 Cargas. Recupera 100 HP por carga.'},
-    {id:'cat-pocion-regen', nombre:'Poción de Regeneración', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 50 HP a lo largo de 5 turnos. (El sistema no aplica la curación por turno sola — anotala a mano, 10 HP por turno durante 5 turnos.)'},
-    {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:40, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 100 HP a lo largo de 5 turnos. (Aplicar a mano, 20 HP por turno durante 5 turnos.)'},
-    {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 200 HP a lo largo de 5 turnos. (Aplicar a mano, 40 HP por turno durante 5 turnos.)'},
-    {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:250, unidades:3, consumible:true, curahp:0, mods:[], detalle:'3 Cargas. Cada carga recupera 200 HP a lo largo de 5 turnos. (Aplicar a mano, 40 HP por turno durante 5 turnos por carga.)'},
+    {id:'cat-pocion-regen', nombre:'Poción de Regeneración', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:10, detalle:'Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+    {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:40, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:20, detalle:'Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+    {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:40, detalle:'Recupera 200 HP a lo largo de 5 turnos (40 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+    {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:250, unidades:3, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:40, detalle:'3 Cargas. Cada carga recupera 200 HP a lo largo de 5 turnos (40 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
     {id:'cat-pocion-sp', nombre:'Poción de SP', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'+1 SP. +3 Bonos. (El sistema no aplica SP ni Bonos solo — anotalo a mano al usarla.)'},
     {id:'cat-pocion-sp-grande', nombre:'Poción de SP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:120, unidades:2, consumible:true, curahp:0, mods:[], detalle:'3 Cargas. +1 SP y +10 Bonos por carga. (Aplicar a mano al usarla.)'},
     {id:'cat-cura-plus', nombre:'Cura Plus', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Remueve estados alterados.'},
@@ -1609,6 +1609,24 @@ function unitStepper(i, key){
     <span class="unit-n">${fmt(num(i.unidades))}</span>
     <button class="unit-btn" data-unit="${key}:${i.id}:1">+</button>
   </div>`;
+}
+
+function aplicarEfectoDeConsumo(it){
+  const nombre = (it.efectoNombre || '').trim();
+  if(!nombre) return null;
+  const turnos = num(it.efectoTurnos);
+  const hpturno = num(it.efectoHpTurno);
+  let ef = S.efectos.find(e => e.nombre === nombre);
+  if(ef){
+    ef.turnos = turnos;
+    ef.hpturno = hpturno;
+    ef.activo = true;
+    ef.permanente = false;
+  }else{
+    ef = {id:uid(), nombre, imagen:'', turnos, stacks:1, hpturno, stacksturno:0, permanente:false, activo:true, popup:false, detalle:'', mods:[]};
+    S.efectos.push(ef);
+  }
+  return ef;
 }
 
 function consumeButton(i, key){
@@ -2396,10 +2414,12 @@ document.addEventListener('click', e => {
       const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
       S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
       $('#f-hp').value = S.hp;
+      const efecto = aplicarEfectoDeConsumo(it);
       if(key === 'inventario') renderInventario(); else renderList('cinturon');
+      if(efecto) renderList('efectos');
       renderVitals();
       renderAcciones();
-      toast(`${it.nombre}: ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP · -${costoAcciones} Acción${costoAcciones===1?'':'es'}`);
+      toast(`${it.nombre}: ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP · -${costoAcciones} Acción${costoAcciones===1?'':'es'}${efecto ? ` · ${efecto.nombre} (${fmt(efecto.turnos)} turnos)` : ''}`);
     }
     return;
   }
@@ -2856,9 +2876,9 @@ function toast(msg){
    ========================================================= */
 
 const SCHEMA = {
-  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','curahp','detalle'], mods:true},
-  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','curahp','detalle'], mods:true},
-  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','curahp','detalle'], mods:true},
+  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','curahp','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
+  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','curahp','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
+  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','curahp','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
@@ -2870,8 +2890,8 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
   categoria:'Categoría', unidades:'Unidades', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
-  manoPreferida:'Mano'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto'];
+  manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado'};
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 let editing = null;
@@ -3156,7 +3176,8 @@ function openEditor(key, id, equipadoPreset){
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
     activo:true, stacks:1, costo:'', accionesCosto:1, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
-    unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false};
+    unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
+    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
@@ -3218,6 +3239,7 @@ function drawEditor(){
   const resto = cortos.filter(c => {
     if(c==='nombre') return false;
     if(c==='curahp') return false;
+    if(['efectoNombre','efectoTurnos','efectoHpTurno'].includes(c)) return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(c==='unidades' && !draft.consumible) return false;
     return true;
@@ -3247,6 +3269,15 @@ function drawEditor(){
   if(sc.campos.includes('curahp') && draft.consumible){
     html += `<div class="f"><label>${CAMPO_LABEL.curahp}</label>
       <input data-c="curahp" type="number" step="any" value="${esc(draft.curahp??0)}"></div>`;
+  }
+  if(sc.campos.includes('efectoNombre') && draft.consumible){
+    html += `<div class="f"><label>Estado alterado al consumir (opcional)</label>
+      <input data-c="efectoNombre" placeholder="ej. Regeneración (poción)" value="${esc(draft.efectoNombre??'')}"></div>
+      <div class="f2">
+        <div class="f"><label>${CAMPO_LABEL.efectoTurnos}</label><input data-c="efectoTurnos" type="number" step="any" value="${esc(draft.efectoTurnos??0)}"></div>
+        <div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>
+      </div>
+      <div class="hint" style="margin:-4px 0 8px">Si le ponés nombre, al consumir este ítem se activa (o refresca) ese estado en Estados alterados con esos Turnos y HP por turno.</div>`;
   }
   if(esArma && (sc.campos.includes('tipoDado') || sc.campos.includes('danoFijo'))){
     html += `<div class="f2">

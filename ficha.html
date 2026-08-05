@@ -2332,7 +2332,8 @@ document.addEventListener('click', e => {
     const [key, id, delta] = b.dataset.unit.split(':');
     const it = S[key].find(x=>x.id===id);
     if(it){
-      it.unidades = Math.max(0, num(it.unidades) + num(delta));
+      const tope = key === 'inventario' ? STACK_MAX : Infinity;
+      it.unidades = Math.max(0, Math.min(tope, num(it.unidades) + num(delta)));
       if(key === 'inventario') renderInventario(); else renderList(key);
     }
     return;
@@ -3095,14 +3096,34 @@ function renderCarritoCatalogo(){
   $('#carrito-comprar').title = total > num(S.meta.dde) ? `Te faltan ${fmt(total - num(S.meta.dde))} DDE` : '';
 }
 
-function crearItemsDesdeCatalogo(item, cantidad){
-  if(item.consumible){
-    const nuevo = structuredClone(item);
+const STACK_MAX = 10;
+
+function agregarConsumibleAInventario(itemBase, cantidad){
+  let restante = num(cantidad);
+  const existentes = S.inventario.filter(i => !i.equipado && i.consumible && i.nombre === itemBase.nombre);
+  for(const stack of existentes){
+    if(restante <= 0) break;
+    const espacio = STACK_MAX - num(stack.unidades);
+    if(espacio <= 0) continue;
+    const mover = Math.min(espacio, restante);
+    stack.unidades = num(stack.unidades) + mover;
+    restante -= mover;
+  }
+  while(restante > 0){
+    const nuevo = structuredClone(itemBase);
     nuevo.id = uid();
     nuevo.equipado = false;
-    nuevo.unidades = cantidad;
-    nuevo.ranuras = item.ranuras ?? 1;
+    nuevo.ranuras = itemBase.ranuras ?? 1;
+    const enEsteStack = Math.min(STACK_MAX, restante);
+    nuevo.unidades = enEsteStack;
     S.inventario.push(nuevo);
+    restante -= enEsteStack;
+  }
+}
+
+function crearItemsDesdeCatalogo(item, cantidad){
+  if(item.consumible){
+    agregarConsumibleAInventario(item, cantidad);
   }else{
     for(let i=0; i<cantidad; i++){
       const nuevo = structuredClone(item);

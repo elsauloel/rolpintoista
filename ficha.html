@@ -823,6 +823,10 @@ a{color:var(--brass)}
         <div class="body">
           <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
           <div id="efectos-armas"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn" id="btn-atacar-pdg" style="flex:1">🎲 Atacar (PdG)</button>
+            <button type="button" class="btn" id="btn-danio-arma" style="flex:1">🎲 Daño Arma</button>
+          </div>
 
           <button type="button" class="armbox armbox-def" id="def-tile" data-stat="def" style="margin-top:12px">
             <div class="dl">Defensa</div>
@@ -940,6 +944,13 @@ a{color:var(--brass)}
       <button class="btn primary" id="chooser-nuevo" style="width:100%">Crear ítem nuevo</button>
       <button class="btn" id="chooser-fabricante" style="width:100%">Ítem del fabricante</button>
     </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-elegir-arma">
+  <div class="modal" style="max-width:320px">
+    <header><h3>¿Con qué arma?</h3><button class="iconbtn" id="elegir-arma-x">Cerrar</button></header>
+    <div class="body" id="elegir-arma-lista" style="display:flex;flex-direction:column;gap:9px"></div>
   </div>
 </div>
 
@@ -1567,6 +1578,31 @@ function renderEfectosArmas(){
   $('#efectos-armas').innerHTML = esDosManos
     ? `<div class="manos-grid manos-grid-single">${manoHtml(m1, 'Mano 1')}</div>`
     : `<div class="manos-grid">${manoHtml(m1, 'Mano 1')}${manoHtml(m2, 'Mano 2')}</div>`;
+}
+
+function armasEquipadasConDano(){
+  const manos = asignarManos();
+  return S.inventario
+    .filter(i => i.equipado && ES_MANO(i.tipoItem) && armaDanoTxt(i))
+    .map(i => ({item: i, mano: manos.get(i.id) || null}))
+    .sort((a, b) => (a.mano || 99) - (b.mano || 99));
+}
+
+function tirarDanoDeArma(it){
+  const r = tirarDados(armaDanoTxt(it));
+  if(!r) return;
+  mostrarResultadoDado(it.nombre, r);
+}
+
+function pedirArmaYTirar(){
+  const armas = armasEquipadasConDano();
+  if(!armas.length){ toast('No tenés ningún arma equipada con daño para tirar'); return; }
+  if(armas.length === 1){ tirarDanoDeArma(armas[0].item); return; }
+  $('#elegir-arma-lista').innerHTML = armas.map(a => `
+    <button class="btn" data-elegirarma="${a.item.id}" style="width:100%">
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${esc(armaDanoTxt(a.item))}
+    </button>`).join('');
+  $('#scrim-elegir-arma').classList.add('open');
 }
 
 function renderEfectosOtros(){
@@ -2534,9 +2570,13 @@ document.addEventListener('click', e => {
   if(b.dataset.tirararma){
     const it = S.inventario.find(x=>x.id===b.dataset.tirararma);
     if(!it) return;
-    const r = tirarDados(armaDanoTxt(it));
-    if(!r) return;
-    mostrarResultadoDado(it.nombre, r);
+    tirarDanoDeArma(it);
+    return;
+  }
+  if(b.dataset.elegirarma){
+    const it = S.inventario.find(x=>x.id===b.dataset.elegirarma);
+    $('#scrim-elegir-arma').classList.remove('open');
+    if(it) tirarDanoDeArma(it);
     return;
   }
   if(b.dataset.tocinturon){
@@ -3817,7 +3857,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -4058,6 +4098,10 @@ $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ 
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remove('open');
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
+$('#btn-atacar-pdg').onclick = () => tirarValorStat('PdG', compute().final.pdg);
+$('#btn-danio-arma').onclick = pedirArmaYTirar;
+$('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
+$('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);

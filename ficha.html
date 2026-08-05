@@ -917,6 +917,7 @@ a{color:var(--brass)}
   <span class="note">Los cambios viven en esta pestaña. Guardá la ficha antes de cerrarla.</span>
   <button class="btn del" id="btn-reset">Ficha nueva</button>
   <button class="btn" id="btn-formulas">Fórmulas</button>
+  <button class="btn" id="btn-dados">Dados</button>
   <button class="btn" id="btn-personajes">Personajes</button>
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Bajar datos</button>
   <button class="btn" id="btn-sync" title="Subir este personaje a GitHub">Subir datos</button>
@@ -1010,6 +1011,24 @@ a{color:var(--brass)}
       <button class="btn del" id="portrait-view-del">Eliminar</button>
       <button class="btn primary" id="portrait-view-change">Cambiar</button>
     </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-dados">
+  <div class="modal" style="max-width:400px">
+    <header><h3>Tirar dados</h3><button class="iconbtn" id="dados-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="f">
+        <label>Fórmula (ej. 3d8+9, 1d20, 2d6-1)</label>
+        <input type="text" id="f-dados-formula" placeholder="1d20">
+      </div>
+      <button class="btn primary" id="dados-tirar" style="width:100%">Tirar</button>
+      <div id="dados-resultado" class="hint" style="font-size:16px;color:var(--paper);min-height:24px"></div>
+      <div>
+        <div class="hint" style="margin-bottom:6px">Historial</div>
+        <div id="dados-historial" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1695,6 +1714,59 @@ function armaDanoTxt(i){
 }
 
 /* =========================================================
+   DADOS
+   ========================================================= */
+
+function parseDados(formula){
+  const m = String(formula || '').trim().toLowerCase().replace(/\s+/g, '').match(/^(\d*)d(\d+)([+-]\d+)?$/);
+  if(!m) return null;
+  const n = m[1] ? parseInt(m[1], 10) : 1;
+  const caras = parseInt(m[2], 10);
+  const mod = m[3] ? parseInt(m[3], 10) : 0;
+  if(n < 1 || n > 100 || caras < 2) return null;
+  return {n, caras, mod};
+}
+
+function tirarDados(formula){
+  const p = parseDados(formula);
+  if(!p) return null;
+  const rolls = [];
+  for(let i = 0; i < p.n; i++) rolls.push(1 + Math.floor(Math.random() * p.caras));
+  const suma = rolls.reduce((a, b) => a + b, 0);
+  return {
+    formula: `${p.n}d${p.caras}${p.mod ? (p.mod > 0 ? `+${p.mod}` : p.mod) : ''}`,
+    rolls, mod: p.mod, total: suma + p.mod,
+  };
+}
+
+let dadosHistorial = [];
+
+function registrarTirada(origen, r){
+  dadosHistorial.unshift({origen, ...r});
+  dadosHistorial = dadosHistorial.slice(0, 20);
+  renderDadosHistorial();
+}
+
+function renderDadosHistorial(){
+  const el = $('#dados-historial');
+  if(!el) return;
+  el.innerHTML = dadosHistorial.length
+    ? dadosHistorial.map(r => `<div><b style="color:var(--brass)">${fmt(r.total)}</b> — ${esc(r.origen)}: ${esc(r.formula)} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''}</div>`).join('')
+    : '<div style="opacity:.6">Sin tiradas todavía.</div>';
+}
+
+function ejecutarTiradaManual(){
+  const formula = $('#f-dados-formula').value.trim() || '1d20';
+  const r = tirarDados(formula);
+  if(!r){
+    $('#dados-resultado').textContent = 'Fórmula inválida — usá algo como 3d8+9, 1d20 o 2d6-1';
+    return;
+  }
+  $('#dados-resultado').innerHTML = `<b style="color:var(--brass);font-size:22px">${fmt(r.total)}</b> &nbsp; (${esc(r.formula)}: [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''})`;
+  registrarTirada('Manual', r);
+}
+
+/* =========================================================
    INVOCACIONES
    ========================================================= */
 
@@ -1856,7 +1928,7 @@ function invRow(i, contexto){
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${pesoTag}</div>
-          ${statTxt ? `<div class="istat">${statTxt}</div>` : ''}
+          ${statTxt ? `<div class="istat">${statTxt} ${dano ? `<button class="mini" data-tirararma="${i.id}" title="Tirar el daño de esta arma">🎲 Tirar</button>` : ''}</div>` : ''}
           ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
         </div>
         <div class="rowbtns">
@@ -2350,6 +2422,15 @@ document.addEventListener('click', e => {
     }
     it = S.efectos.find(x=>x.id===id);
     if(it){ it.activo = it.activo === false; renderList('efectos'); refresh(); return; }
+  }
+  if(b.dataset.tirararma){
+    const it = S.inventario.find(x=>x.id===b.dataset.tirararma);
+    if(!it) return;
+    const r = tirarDados(armaDanoTxt(it));
+    if(!r) return;
+    registrarTirada(it.nombre, r);
+    toast(`${it.nombre}: ${r.formula} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''} = ${fmt(r.total)}`);
+    return;
   }
   if(b.dataset.tocinturon){
     const it = S.inventario.find(x=>x.id===b.dataset.tocinturon);
@@ -3551,7 +3632,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -3769,6 +3850,17 @@ $('#costox-cancel').onclick = () => { $('#scrim-costox').classList.remove('open'
 $('#costox-confirm').onclick = confirmarCostoVariable;
 $('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-costox'){ $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; } });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
+$('#btn-dados').onclick = () => {
+  $('#f-dados-formula').value = '';
+  $('#dados-resultado').textContent = '';
+  renderDadosHistorial();
+  $('#scrim-dados').classList.add('open');
+  setTimeout(() => $('#f-dados-formula').focus(), 40);
+};
+$('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');
+$('#dados-tirar').onclick = ejecutarTiradaManual;
+$('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); ejecutarTiradaManual(); } });
+$('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);

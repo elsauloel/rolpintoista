@@ -542,6 +542,10 @@ a{color:var(--brass)}
 .empty{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding:8px 2px}
 .dado-btn{background:none;border:none;cursor:pointer;font-size:13px;line-height:1;opacity:.55;padding:0 2px;flex:none}
 .dado-btn:hover{opacity:1}
+.dado-cara{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;
+  border:1px solid var(--line);border-radius:var(--r);font-family:"Space Mono",monospace;font-weight:700;font-size:15px;
+  background:rgba(0,0,0,.25);color:var(--paper)}
+.dado-cara.mod{border-color:var(--copper);color:var(--brass)}
 
 /* ---------- Capacidad ---------- */
 .cap{display:flex;justify-content:space-between;align-items:baseline;font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-bottom:6px}
@@ -1030,6 +1034,18 @@ a{color:var(--brass)}
         <div class="hint" style="margin-bottom:6px">Historial</div>
         <div id="dados-historial" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-resultado-dado">
+  <div class="modal" style="max-width:340px">
+    <header><h3>Tirada</h3><button class="iconbtn" id="resultado-dado-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+      <div id="resultado-dado-origen" style="font-size:15px;color:var(--paper);font-family:'Fraunces',serif;font-weight:700"></div>
+      <div id="resultado-dado-total" style="font-size:46px;font-weight:900;color:var(--brass);font-family:'Fraunces',serif;line-height:1"></div>
+      <div id="resultado-dado-formula" class="hint" style="font-family:'Space Mono',monospace;font-size:12px"></div>
+      <div id="resultado-dado-dados" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px"></div>
     </div>
   </div>
 </div>
@@ -1765,6 +1781,18 @@ function registrarTirada(origen, r){
   renderDadosHistorial();
 }
 
+// Registra la tirada y abre el popup con el detalle (usar para tiradas que no
+// tengan ya un lugar visible donde mostrarse, como la del tirador manual).
+function mostrarResultadoDado(origen, r){
+  registrarTirada(origen, r);
+  $('#resultado-dado-origen').textContent = origen;
+  $('#resultado-dado-total').textContent = fmt(r.total);
+  $('#resultado-dado-formula').textContent = r.formula;
+  $('#resultado-dado-dados').innerHTML = r.rolls.map(v => `<span class="dado-cara">${v}</span>`).join('')
+    + (r.mod ? `<span class="dado-cara mod">${r.mod > 0 ? '+' : ''}${r.mod}</span>` : '');
+  $('#scrim-resultado-dado').classList.add('open');
+}
+
 function renderDadosHistorial(){
   const el = $('#dados-historial');
   if(!el) return;
@@ -1824,8 +1852,7 @@ function tirarValorStat(nombre, valor){
   const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
   const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
   const r = {formula: f.formula, rolls, mod: f.mod, total};
-  registrarTirada(nombre, r);
-  toast(`${nombre}: ${r.formula} [${r.rolls.join(', ')}]${r.mod ? ` +${r.mod}` : ''} = ${fmt(r.total)}`);
+  mostrarResultadoDado(nombre, r);
 }
 
 function ejecutarTiradaManual(){
@@ -2509,8 +2536,7 @@ document.addEventListener('click', e => {
     if(!it) return;
     const r = tirarDados(armaDanoTxt(it));
     if(!r) return;
-    registrarTirada(it.nombre, r);
-    toast(`${it.nombre}: ${r.formula} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''} = ${fmt(r.total)}`);
+    mostrarResultadoDado(it.nombre, r);
     return;
   }
   if(b.dataset.tocinturon){
@@ -3791,7 +3817,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -4030,6 +4056,8 @@ $('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');
 $('#dados-tirar').onclick = ejecutarTiradaManual;
 $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); ejecutarTiradaManual(); } });
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
+$('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remove('open');
+$('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);

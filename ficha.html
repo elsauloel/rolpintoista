@@ -3054,7 +3054,7 @@ const SCHEMA = {
   inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
-  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','detalle'], mods:false},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','permanente','activo','popup','detalle'], mods:true},
@@ -3481,9 +3481,9 @@ function drawEditor(){
     html += `<div class="f"><label>${CAMPO_LABEL.curabonosPct}</label>
       <input data-c="curabonosPct" type="number" step="any" min="0" max="100" value="${esc(draft.curabonosPct??0)}"></div>`;
   }
-  if(sc.campos.includes('efectoNombre') && draft.consumible){
-    html += `<div class="f"><label>Estado alterado al consumir (opcional)</label>
-      <input data-c="efectoNombre" placeholder="ej. Regeneración (poción)" value="${esc(draft.efectoNombre??'')}"></div>
+  if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')){
+    html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
+      <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}"></div>
       <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" data-c="efectoPermanente" ${draft.efectoPermanente?'checked':''} style="width:auto">
         <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence (queda hasta usarlo o borrarlo a mano)</span>
@@ -3723,10 +3723,16 @@ function ejecutarHabilidad(id){
   S.acciones = num(S.acciones) - costoAcciones;
   S.bonosGastados = num(S.bonosGastados) + costoBonos;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
+  const efecto = aplicarEfectoDeConsumo(it);
   renderList('habilidades');
+  if(efecto) renderList('efectos');
   renderAcciones();
   renderVitals();
-  toast(`${it.nombre} ejecutada${costoBonos ? ` · -${fmt(costoBonos)} Bonos` : ''}${costoAcciones ? ` · -${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : ' · sin costo de Acciones'}`);
+  const partes = [`ejecutada`];
+  if(costoBonos) partes.push(`-${fmt(costoBonos)} Bonos`);
+  partes.push(costoAcciones ? `-${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : 'sin costo de Acciones');
+  if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+  toast(`${it.nombre} ${partes.join(' · ')}`);
 }
 
 function confirmarCostoVariable(){
@@ -3745,12 +3751,16 @@ function confirmarCostoVariable(){
   S.acciones = Math.max(0, num(S.acciones) - acciones);
   S.bonosGastados = num(S.bonosGastados) + bonos;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
+  const efecto = aplicarEfectoDeConsumo(it);
   $('#scrim-costox').classList.remove('open');
   pendingEjecucion = null;
   renderList('habilidades');
+  if(efecto) renderList('efectos');
   renderAcciones();
   renderVitals();
-  toast(`${it.nombre} ejecutada · -${fmt(bonos)} Bonos · -${fmt(acciones)} Acciones`);
+  const partes = [`ejecutada`, `-${fmt(bonos)} Bonos`, `-${fmt(acciones)} Acciones`];
+  if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+  toast(`${it.nombre} ${partes.join(' · ')}`);
 }
 
 function mantenimiento(){

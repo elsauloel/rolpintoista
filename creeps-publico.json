@@ -1,0 +1,21 @@
+{
+  "actualizado": "2026-08-05T06:22:47.014Z",
+  "creeps": [
+    {
+      "id": "jkadc7z",
+      "nombre": "Sabotea rifle",
+      "imagen": "",
+      "hp": 40,
+      "hpMax": 40,
+      "estados": []
+    },
+    {
+      "id": "22nvf46",
+      "nombre": "Perro Rabioso",
+      "imagen": "",
+      "hp": 40,
+      "hpMax": 40,
+      "estados": []
+    }
+  ]
+}

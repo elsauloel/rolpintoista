@@ -540,6 +540,8 @@ a{color:var(--brass)}
 .mini.danger{color:var(--danger);border-color:rgba(212,87,78,.45)}
 .mini.danger:hover{background:var(--danger);border-color:var(--danger);color:#fff}
 .empty{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding:8px 2px}
+.dado-btn{background:none;border:none;cursor:pointer;font-size:13px;line-height:1;opacity:.55;padding:0 2px;flex:none}
+.dado-btn:hover{opacity:1}
 
 /* ---------- Capacidad ---------- */
 .cap{display:flex;justify-content:space-between;align-items:baseline;font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-bottom:6px}
@@ -1415,6 +1417,7 @@ function renderAttrs(){
         <div class="glyph">
           <div class="ab">${g.label}</div>
           <input type="number" class="glyph-val ${valCls}" data-attr="${g.id}" data-mod="${m}" value="${fmt(c.final[g.id])}" title="${esc(g.full)}">
+          <button type="button" class="dado-btn" data-tirarstat="${g.id}" title="Tirar dados para ${esc(g.full)}">🎲</button>
         </div>
         <div class="full">
           <span class="full-name">${g.full}</span>
@@ -1440,9 +1443,11 @@ function statTile(d, c, showMod=true){
     const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
     descHtml = `<span class="dv-desc">${m>0?'+':''}${fmt(m)}${origenTxt?` · ${esc(origenTxt)}`:''}</span>`;
   }
+  const puedeTirar = !STATS_SIN_TIRADA.includes(d.id);
   return `<div class="d ${cls}" data-stat="${d.id}" title="${esc(d.full)}">
     <span class="dl">${d.label}</span>
     <span class="dv ${valCls}">${val}</span>
+    ${puedeTirar ? `<button type="button" class="dado-btn" data-tirarstat="${d.id}" title="Tirar dados para ${esc(d.full)}">🎲</button>` : ''}
     ${descHtml}
   </div>`;
 }
@@ -1755,6 +1760,61 @@ function renderDadosHistorial(){
     : '<div style="opacity:.6">Sin tiradas todavía.</div>';
 }
 
+/* ---------- Tirar dados a partir del valor de un stat ---------- */
+
+const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
+const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos'];
+
+function combosDeSuma(n, k, minIdx){
+  if(k === 0) return n === 0 ? [[]] : [];
+  const out = [];
+  for(let i = minIdx; i < DADOS_REALES.length; i++){
+    const d = DADOS_REALES[i];
+    if(d > n) break;
+    combosDeSuma(n - d, k - 1, i).forEach(resto => out.push([d, ...resto]));
+  }
+  return out;
+}
+
+function mejorComboDados(n){
+  for(let k = 1; k <= 6; k++){
+    const combos = combosDeSuma(n, k, 0);
+    if(combos.length){
+      combos.sort((a, b) => (Math.max(...a) - Math.min(...a)) - (Math.max(...b) - Math.min(...b)));
+      return combos[0];
+    }
+  }
+  return null;
+}
+
+// Descompone un valor de stat en dados reales (4/6/8/10/12/20/100), con la
+// menor cantidad de dados posible y, entre empates, la combinación más pareja.
+// Impares: se resuelve el par inmediato inferior y se suma +1 fijo.
+function formulaParaValor(valor){
+  const n = Math.round(num(valor));
+  if(n <= 0) return null;
+  let base = n, mod = 0;
+  if(base % 2 !== 0){ base -= 1; mod = 1; }
+  if(base <= 0) return null;
+  const combo = mejorComboDados(base);
+  if(!combo) return null;
+  const counts = {};
+  combo.forEach(d => counts[d] = (counts[d] || 0) + 1);
+  const formula = Object.keys(counts).map(Number).sort((a, b) => a - b)
+    .map(d => `${counts[d]}d${d}`).join('+') + (mod ? `+${mod}` : '');
+  return {combo, mod, formula};
+}
+
+function tirarValorStat(nombre, valor){
+  const f = formulaParaValor(valor);
+  if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+  const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+  const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
+  const r = {formula: f.formula, rolls, mod: f.mod, total};
+  registrarTirada(nombre, r);
+  toast(`${nombre}: ${r.formula} [${r.rolls.join(', ')}]${r.mod ? ` +${r.mod}` : ''} = ${fmt(r.total)}`);
+}
+
 function ejecutarTiradaManual(){
   const formula = $('#f-dados-formula').value.trim() || '1d20';
   const r = tirarDados(formula);
@@ -1924,11 +1984,13 @@ function invRow(i, contexto){
     ? `Daño ${dano}`
     : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
   const pesoTag = `<span class="tag">peso ${fmt(num(i.peso))}</span>`;
+  const mano = (contexto === 'equipo' && dano) ? asignarManos().get(i.id) : null;
+  const atacarTxt = mano ? `Atacar (Mano ${mano})` : 'Atacar';
   return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${pesoTag}</div>
-          ${statTxt ? `<div class="istat">${statTxt} ${dano ? `<button class="mini" data-tirararma="${i.id}" title="Tirar el daño de esta arma">🎲 Tirar</button>` : ''}</div>` : ''}
+          ${statTxt ? `<div class="istat">${statTxt} ${dano ? `<button class="mini" data-tirararma="${i.id}" title="Tirar el daño de esta arma">🎲 ${atacarTxt}</button>` : ''}</div>` : ''}
           ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
         </div>
         <div class="rowbtns">
@@ -2330,6 +2392,12 @@ document.addEventListener('click', e => {
     return;
   }
 
+  if(b.dataset.tirarstat){
+    const c = compute();
+    const id = b.dataset.tirarstat;
+    tirarValorStat(STAT_LABEL[id] || id, c.final[id]);
+    return;
+  }
   if(b.dataset.stat){
     openStat = openStat === b.dataset.stat ? null : b.dataset.stat;
     renderAttrs(); renderArmadura(); renderVitals();

@@ -1189,6 +1189,10 @@ $('#file-input').onchange = ev => {
     try{
       const data = JSON.parse(r.result);
       if(!Array.isArray(data.creeps)) throw new Error('formato inválido');
+      if(data.turno === undefined && data.actualizado !== undefined){
+        toast('Ese archivo es creeps-publico.json (la vista recortada para jugadores) — cargá gm-creeps.json, que es el que tiene todos tus datos');
+        return;
+      }
       S = { turno: num(data.turno)||1, creeps: data.creeps.map(sc => {
         const merged = Object.assign(nuevoCreep(), sc);
         if(!merged.habilidades.some(h => h.nombre === 'Movimiento')){

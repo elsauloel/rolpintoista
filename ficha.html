@@ -1000,6 +1000,19 @@ a{color:var(--brass)}
   </div>
 </div>
 
+<div class="scrim" id="scrim-portrait">
+  <div class="modal" style="max-width:420px">
+    <header><h3>Foto del personaje</h3><button class="iconbtn" id="portrait-view-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <img id="portrait-view-img" alt="" style="width:100%;max-height:60vh;object-fit:contain;border-radius:var(--r);background:var(--panel2)">
+    </div>
+    <footer>
+      <button class="btn del" id="portrait-view-del">Eliminar</button>
+      <button class="btn primary" id="portrait-view-change">Cambiar</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-view">
   <div class="modal view-modal">
     <header><h3 id="view-title-header">Ítem</h3><button class="iconbtn" id="view-x">Cerrar</button></header>
@@ -2216,8 +2229,25 @@ document.addEventListener('click', e => {
     return;
   }
 
-  if(b.id === 'portrait-box'){ $('#portrait-input').click(); return; }
+  if(b.id === 'portrait-box'){
+    if(S.meta.imagen){
+      $('#portrait-view-img').src = S.meta.imagen;
+      $('#scrim-portrait').classList.add('open');
+    }else{
+      $('#portrait-input').click();
+    }
+    return;
+  }
   if(b.id === 'portrait-rm'){ S.meta.imagen = ''; renderPortrait(); return; }
+  if(b.id === 'portrait-view-x'){ $('#scrim-portrait').classList.remove('open'); return; }
+  if(b.id === 'portrait-view-change'){ $('#scrim-portrait').classList.remove('open'); $('#portrait-input').click(); return; }
+  if(b.id === 'portrait-view-del'){
+    if(!confirm('¿Eliminar la foto del personaje?')) return;
+    S.meta.imagen = '';
+    renderPortrait();
+    $('#scrim-portrait').classList.remove('open');
+    return;
+  }
 
   if(b.dataset.stat){
     openStat = openStat === b.dataset.stat ? null : b.dataset.stat;
@@ -3496,7 +3526,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -3713,6 +3743,7 @@ $('#costox-x').onclick = () => { $('#scrim-costox').classList.remove('open'); pe
 $('#costox-cancel').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };
 $('#costox-confirm').onclick = confirmarCostoVariable;
 $('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-costox'){ $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; } });
+$('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);

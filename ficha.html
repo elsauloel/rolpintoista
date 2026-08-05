@@ -1176,6 +1176,10 @@ const DEFAULT = {
     {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:3, consumible:true, curahp:25, mods:[], detalle:'3 Cargas. Recupera 25 HP por carga.'},
     {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:100, mods:[], detalle:'Recupera 100 HP.'},
     {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:3, consumible:true, curahp:100, mods:[], detalle:'3 Cargas. Recupera 100 HP por carga.'},
+    {id:'cat-pocion-regen', nombre:'Poción de Regeneración', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 50 HP a lo largo de 5 turnos. (El sistema no aplica la curación por turno sola — anotala a mano, 10 HP por turno durante 5 turnos.)'},
+    {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:40, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 100 HP a lo largo de 5 turnos. (Aplicar a mano, 20 HP por turno durante 5 turnos.)'},
+    {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Recupera 200 HP a lo largo de 5 turnos. (Aplicar a mano, 40 HP por turno durante 5 turnos.)'},
+    {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:250, unidades:3, consumible:true, curahp:0, mods:[], detalle:'3 Cargas. Cada carga recupera 200 HP a lo largo de 5 turnos. (Aplicar a mano, 40 HP por turno durante 5 turnos por carga.)'},
     {id:'cat-pocion-sp', nombre:'Poción de SP', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'+1 SP. +3 Bonos. (El sistema no aplica SP ni Bonos solo — anotalo a mano al usarla.)'},
     {id:'cat-pocion-sp-grande', nombre:'Poción de SP grande', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:120, unidades:2, consumible:true, curahp:0, mods:[], detalle:'3 Cargas. +1 SP y +10 Bonos por carga. (Aplicar a mano al usarla.)'},
     {id:'cat-cura-plus', nombre:'Cura Plus', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Remueve estados alterados.'},
@@ -1607,10 +1611,11 @@ function unitStepper(i, key){
   </div>`;
 }
 
-function consumeButton(i){
+function consumeButton(i, key){
   if(!i.consumible) return '';
+  const costoAcciones = key === 'cinturon' ? 1 : 2;
   return `<button class="consume-btn" data-consume="${i.id}" ${num(i.unidades)<=0?'disabled':''}>
-    Consumir ${i.curahp ? `<span class="consume-fx">(${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP)</span>` : ''}
+    Consumir <span class="consume-fx">${i.curahp ? `(${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP · ` : '('}-${costoAcciones} Acción${costoAcciones===1?'':'es'})</span>
   </button>`;
 }
 
@@ -1801,11 +1806,12 @@ function invRow(i, contexto){
         </div>
         <div class="rowbtns">
           <button class="mini ${i.equipado?'on':''}" data-toggle="${i.id}" title="${i.equipado?'Pasar a mochila':'Equipar'}">${i.equipado?'✓':'○'}</button>
+          ${(contexto === 'mochila' && i.consumible) ? `<button class="mini" data-tocinturon="${i.id}" ${num(i.unidades)<=0?'disabled':''} title="Mover 1 unidad de esta pila al cinturón">→ Cinturón</button>` : ''}
           <button class="mini" data-view="inventario:${i.id}">Ver</button><button class="mini" data-edit="inventario:${i.id}">Editar</button>
         </div>
       </div>
       ${i.consumible ? unitStepper(i, 'inventario') : ''}
-      ${consumeButton(i)}
+      ${consumeButton(i, 'inventario')}
       </div>`;
 }
 
@@ -1826,10 +1832,13 @@ const LISTS = {
         <div><div class="iname">${esc(i.nombre)}</div>
           ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
         </div>
-        <div class="rowbtns"><button class="mini" data-view="cinturon:${i.id}">Ver</button><button class="mini" data-edit="cinturon:${i.id}">Editar</button></div>
+        <div class="rowbtns">
+          <button class="mini" data-tomochila="${i.id}" title="Devolver esta unidad a la mochila">← Mochila</button>
+          <button class="mini" data-view="cinturon:${i.id}">Ver</button><button class="mini" data-edit="cinturon:${i.id}">Editar</button>
+        </div>
       </div>
       ${unitStepper(i, 'cinturon')}
-      ${consumeButton(i)}
+      ${consumeButton(i, 'cinturon')}
       </div>`
   },
   habilidades:{
@@ -2265,6 +2274,42 @@ document.addEventListener('click', e => {
     it = S.efectos.find(x=>x.id===id);
     if(it){ it.activo = it.activo === false; renderList('efectos'); refresh(); return; }
   }
+  if(b.dataset.tocinturon){
+    const it = S.inventario.find(x=>x.id===b.dataset.tocinturon);
+    if(!it || num(it.unidades) <= 0) return;
+    if(S.cinturon.length >= num(S.caps.cinturon)){
+      toast('No hay lugar en el cinturón');
+      return;
+    }
+    it.unidades = num(it.unidades) - 1;
+    const clon = structuredClone(it);
+    clon.id = uid();
+    clon.unidades = 1;
+    clon.ranuras = 1;
+    clon.equipado = false;
+    S.cinturon.push(clon);
+    renderInventario();
+    renderList('cinturon');
+    refresh();
+    toast(`${it.nombre} · 1 unidad movida al cinturón`);
+    return;
+  }
+  if(b.dataset.tomochila){
+    const idx = S.cinturon.findIndex(x=>x.id===b.dataset.tomochila);
+    if(idx < 0) return;
+    const it = S.cinturon[idx];
+    S.cinturon.splice(idx, 1);
+    const clon = structuredClone(it);
+    clon.id = uid();
+    clon.unidades = 1;
+    clon.equipado = false;
+    S.inventario.push(clon);
+    renderInventario();
+    renderList('cinturon');
+    refresh();
+    toast(`${it.nombre} devuelto a la mochila`);
+    return;
+  }
   if(b.dataset.unit){
     const [key, id, delta] = b.dataset.unit.split(':');
     const it = S[key].find(x=>x.id===id);
@@ -2340,6 +2385,12 @@ document.addEventListener('click', e => {
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
     if(it && num(it.unidades) > 0){
+      const costoAcciones = key === 'cinturon' ? 1 : 2;
+      if(costoAcciones > num(S.acciones)){
+        toast(`No te quedan Acciones suficientes — consumir ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'} cuesta ${costoAcciones}`);
+        return;
+      }
+      S.acciones = num(S.acciones) - costoAcciones;
       it.unidades = num(it.unidades) - 1;
       const c = compute();
       const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
@@ -2347,7 +2398,8 @@ document.addEventListener('click', e => {
       $('#f-hp').value = S.hp;
       if(key === 'inventario') renderInventario(); else renderList('cinturon');
       renderVitals();
-      toast(`${it.nombre}: ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
+      renderAcciones();
+      toast(`${it.nombre}: ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP · -${costoAcciones} Acción${costoAcciones===1?'':'es'}`);
     }
     return;
   }

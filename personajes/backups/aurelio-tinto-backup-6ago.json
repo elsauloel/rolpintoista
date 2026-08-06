@@ -31,13 +31,13 @@
     "int": 12
   },
   "hp": 40,
-  "turno": 1,
+  "turno": 2,
   "log": [
-    "<b style=\"color:var(--brass)\">Turno 1</b>",
-    "El contador de turno se reinició manualmente."
+    "<b style=\"color:var(--brass)\">Turno 2</b>",
+    "Bonos y Acciones se reiniciaron."
   ],
-  "bonosGastados": 1,
-  "acciones": 2,
+  "bonosGastados": 0,
+  "acciones": 3,
   "caps": {
     "mochila": 20,
     "cinturon": 5
@@ -403,7 +403,7 @@
       "consumible": false,
       "curahp": 0,
       "precioCompra": 0,
-      "usadaEsteTurno": true,
+      "usadaEsteTurno": false,
       "efectoNombre": "",
       "efectoTurnos": 0,
       "efectoHpTurno": 0,

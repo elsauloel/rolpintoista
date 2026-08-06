@@ -847,7 +847,7 @@ function cardCompactoHtml(sc){
     <div class="cbody-compacto">
       <div class="vital-mini hp">
         <div class="vl">HP</div>
-        <div class="vn">${fmt(num(sc.hp))}<span class="vmax"> / ${fmt(num(sc.hpMax))}</span></div>
+        <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}" style="width:30px"></div>
       </div>
       <div class="chips-estados">${chips}</div>
     </div>

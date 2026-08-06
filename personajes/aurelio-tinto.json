@@ -384,6 +384,7 @@
       "activo": true,
       "stacks": 1,
       "costo": "1B",
+      "accionesCosto": 1,
       "dado": "",
       "turnos": "",
       "hpturno": 0,
@@ -402,7 +403,19 @@
       "consumible": false,
       "curahp": 0,
       "precioCompra": 0,
-      "usadaEsteTurno": false
+      "usadaEsteTurno": false,
+      "efectoNombre": "",
+      "efectoTurnos": 0,
+      "efectoHpTurno": 0,
+      "efectoPermanente": false,
+      "curabonosPct": 0,
+      "cargaMax": 1,
+      "cargaActual": 1,
+      "forzarAccionesMax": "",
+      "mitadPdgEva": false,
+      "armaduraRota": false,
+      "armaduraArruinada": false,
+      "tiradaExtra": "4d6+4"
     },
     {
       "id": "jumya68",

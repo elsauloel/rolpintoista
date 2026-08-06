@@ -47,6 +47,11 @@ input[type=text]{
 }
 a{color:var(--copper)}
 .hint{font-size:13px; color:var(--muted)}
+.scrim{position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:16px; z-index:999}
+.scrim.open{display:flex}
+.scrim .caja{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-width:460px; width:100%; padding:20px; display:flex; flex-direction:column; gap:12px}
+.scrim .caja h3{font-size:18px; color:var(--copper)}
+.scrim .caja .fila{margin-top:4px}
 </style>
 </head>
 <body>
@@ -62,6 +67,7 @@ a{color:var(--copper)}
     <div class="fila">
       <button id="btn-carpeta">Elegir carpeta…</button>
       <a href="ficha.html" target="_blank">Abrir la ficha →</a>
+      <a href="gm-tools.html" target="_blank">Abrir GM tools →</a>
     </div>
   </div>
 
@@ -89,6 +95,17 @@ a{color:var(--copper)}
     <div class="log" id="log">Listo.</div>
   </div>
 </main>
+
+<div class="scrim" id="scrim-recordatorio">
+  <div class="caja">
+    <h3>Antes de arrancar…</h3>
+    <div>Para no pisar el trabajo de un compañero, traé la última versión antes de tocar nada.</div>
+    <div class="fila">
+      <button class="primary" id="recordatorio-traer">Traer última versión</button>
+      <button id="recordatorio-cerrar">Ya estoy al día</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const GH_REPO = 'elsauloel/rolpintoista';
@@ -340,7 +357,7 @@ async function revisar(){
 }
 $('#btn-revisar').onclick = revisar;
 
-$('#btn-traer').onclick = async () => {
+async function traerUltimaVersion(){
   const dir = await conseguirCarpeta(true);
   if(!dir) return;
   estado('Trayendo la última versión…');
@@ -365,7 +382,8 @@ $('#btn-traer').onclick = async () => {
     estado('Falló la actualización — mirá el registro.', 'err');
     log('Error: ' + (err.message || err));
   }
-};
+}
+$('#btn-traer').onclick = traerUltimaVersion;
 
 $('#btn-subir').onclick = async () => {
   const dir = await conseguirCarpeta(true);
@@ -400,6 +418,14 @@ $('#btn-subir').onclick = async () => {
 $('#btn-token').onclick = async () => {
   if(await ghToken(true)) log('Token actualizado.');
 };
+
+$('#recordatorio-traer').onclick = () => { $('#scrim-recordatorio').classList.remove('open'); traerUltimaVersion(); };
+$('#recordatorio-cerrar').onclick = () => $('#scrim-recordatorio').classList.remove('open');
+$('#scrim-recordatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-recordatorio') $('#scrim-recordatorio').classList.remove('open'); });
+if(!sessionStorage.getItem('gestor-recordatorio-visto')){
+  sessionStorage.setItem('gestor-recordatorio-visto', '1');
+  $('#scrim-recordatorio').classList.add('open');
+}
 
 /* Al abrir: si la carpeta ya está recordada y con permiso, revisar solo. */
 conseguirCarpeta(false).then(dir => {

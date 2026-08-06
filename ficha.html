@@ -1103,6 +1103,22 @@ a{color:var(--brass)}
   </div>
 </div>
 
+<div class="scrim" id="scrim-recordatorio">
+  <div class="modal" style="max-width:420px">
+    <header><h3>Antes de arrancar…</h3></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:12px">
+      <div>Para no pisar el trabajo de un compañero, conviene traer la última versión antes de tocar nada.</div>
+      <div id="recordatorio-actualizado" style="display:none;color:var(--bottle);font-weight:700">✓ Se actualizó — recargá la página para usar la versión nueva.</div>
+    </div>
+    <footer style="flex-wrap:wrap">
+      <a class="btn ghost" href="gestor.html" target="_blank" style="text-decoration:none;text-align:center">Abrir el gestor</a>
+      <button class="btn ghost" id="recordatorio-cerrar">Ya estoy al día</button>
+      <button class="btn primary" id="recordatorio-traer">Traer última versión</button>
+      <button class="btn primary" id="recordatorio-recargar" style="display:none">Recargar ahora</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-reminder">
   <div class="modal reminder">
     <header><h3>Recordatorio de mantenimiento</h3><button class="iconbtn" id="reminder-x">Cerrar</button></header>
@@ -3033,6 +3049,80 @@ $('#btn-formulas').onclick = () => openFormulas();
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'main';
 
+/* ---------- Recordatorio: traer la última versión antes de laburar ----------
+   Reutiliza la carpeta que ya recordó gestor.html (File System Access API,
+   guardada en la base IndexedDB "gestor-rolpintoista") para poder traer la
+   versión de este mismo archivo sin tener que abrir el gestor aparte. */
+const NOMBRE_ARCHIVO_PROPIO = 'ficha.html';
+
+function idbGestor(){
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('gestor-rolpintoista', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbGetGestor(clave){
+  const db = await idbGestor();
+  return new Promise((res, rej) => {
+    const req = db.transaction('kv').objectStore('kv').get(clave);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function gitBlobShaPropio(texto){
+  const cuerpo = new TextEncoder().encode(texto);
+  const cabecera = new TextEncoder().encode('blob ' + cuerpo.length + '\0');
+  const todo = new Uint8Array(cabecera.length + cuerpo.length);
+  todo.set(cabecera); todo.set(cuerpo, cabecera.length);
+  const hash = await crypto.subtle.digest('SHA-1', todo);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function traerUltimaVersionPropia(){
+  if(!window.showDirectoryPicker){
+    toast('Tu navegador no soporta esto — abrí el gestor para actualizar.');
+    return;
+  }
+  let carpeta;
+  try{ carpeta = await idbGetGestor('carpeta'); }catch(e){ carpeta = null; }
+  if(!carpeta){
+    toast('Todavía no elegiste la carpeta en el gestor — abrí el gestor primero.');
+    return;
+  }
+  let permiso = await carpeta.queryPermission({mode:'readwrite'});
+  if(permiso === 'prompt') permiso = await carpeta.requestPermission({mode:'readwrite'});
+  if(permiso !== 'granted'){
+    toast('Sin permiso a la carpeta — abrí el gestor para autorizarla.');
+    return;
+  }
+  toast('Revisando…');
+  try{
+    const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${NOMBRE_ARCHIVO_PROPIO}?ref=${GH_BRANCH}`, {headers:{Accept:'application/vnd.github.object+json'}, cache:'no-store'});
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const remotoSha = (await resp.json()).sha;
+    const fh = await carpeta.getFileHandle(NOMBRE_ARCHIVO_PROPIO);
+    const local = (await (await fh.getFile()).text()).replace(/\r\n/g, '\n');
+    if(await gitBlobShaPropio(local) === remotoSha){
+      toast('Ya estabas al día ✓');
+      return;
+    }
+    const contenidoResp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${NOMBRE_ARCHIVO_PROPIO}?ref=${GH_BRANCH}`, {headers:{Accept:'application/vnd.github.raw+json'}, cache:'no-store'});
+    const contenido = await contenidoResp.text();
+    const w = await (await carpeta.getFileHandle(NOMBRE_ARCHIVO_PROPIO, {create:true})).createWritable();
+    await w.write(contenido);
+    await w.close();
+    $('#recordatorio-actualizado').style.display = 'block';
+    $('#recordatorio-traer').style.display = 'none';
+    $('#recordatorio-recargar').style.display = '';
+    toast('Actualizado ✓ — recargá la página para usar la versión nueva');
+  }catch(err){
+    console.error(err);
+    toast('No se pudo actualizar — mirá la consola');
+  }
+}
+
 const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
 
 /* Pide el token en un cartel dentro de esta misma pestaña.
@@ -4358,6 +4448,14 @@ function showReminder(avisos){
 $('#reminder-ok').onclick = () => $('#scrim-reminder').classList.remove('open');
 $('#reminder-x').onclick = () => $('#scrim-reminder').classList.remove('open');
 $('#scrim-reminder').addEventListener('mousedown', e => { if(e.target.id==='scrim-reminder') $('#scrim-reminder').classList.remove('open'); });
+$('#recordatorio-traer').onclick = traerUltimaVersionPropia;
+$('#recordatorio-recargar').onclick = () => location.reload();
+$('#recordatorio-cerrar').onclick = () => $('#scrim-recordatorio').classList.remove('open');
+$('#scrim-recordatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-recordatorio') $('#scrim-recordatorio').classList.remove('open'); });
+if(!sessionStorage.getItem('recordatorio-visto-ficha')){
+  sessionStorage.setItem('recordatorio-visto-ficha', '1');
+  $('#scrim-recordatorio').classList.add('open');
+}
 $('#view-x').onclick = () => $('#scrim-view').classList.remove('open');
 $('#costox-x').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };
 $('#costox-cancel').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };

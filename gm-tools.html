@@ -593,7 +593,7 @@ function ejecutarTiradaManual(){
     return;
   }
   $('#dados-resultado').innerHTML = `<b style="color:var(--brass);font-size:22px">${fmt(r.total)}</b> &nbsp; (${esc(r.formula)}: [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''})`;
-  registrarTirada('Manual', r);
+  mostrarResultadoDado('Manual', r);
 }
 
 function tirarRapido(caras){

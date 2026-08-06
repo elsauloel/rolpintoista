@@ -420,6 +420,13 @@ a{color:var(--brass)}
 .ejecutar-btn.usada{opacity:.4;background:rgba(0,0,0,.2);color:var(--muted)}
 .ejecutar-btn.usada:hover{opacity:.7;background:rgba(0,0,0,.3);color:var(--muted)}
 
+.habs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.habs-grid-item{border:1px solid var(--line-soft);background:var(--panel2);padding:9px;display:flex;flex-direction:column;gap:7px}
+.habs-grid-nombre{font-weight:700;font-size:12.5px;line-height:1.3}
+.habs-grid-btns{display:flex;gap:6px;margin-top:auto}
+.habs-grid-btns .mini{flex:none}
+.habs-grid-btns .ejecutar-btn{width:auto;flex:1;margin-top:0;padding:5px 8px;font-size:10px}
+
 /* ---------- Invocaciones ---------- */
 .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:10px}
 .inv-card{border:1px solid var(--line);background:var(--panel2);display:flex;flex-direction:column;border-top:3px solid var(--accent,var(--copper))}
@@ -878,7 +885,10 @@ a{color:var(--brass)}
       <section class="card">
         <header>
           <h2>Habilidades</h2>
-          <button class="iconbtn iconbtn-add" data-add="habilidades">+ Habilidad</button>
+          <div style="display:flex;gap:8px">
+            <button class="iconbtn" id="btn-ver-todas-habilidades">Ver todas</button>
+            <button class="iconbtn iconbtn-add" data-add="habilidades">+ Habilidad</button>
+          </div>
         </header>
         <div class="body" id="list-habilidades"></div>
       </section>
@@ -1016,6 +1026,13 @@ a{color:var(--brass)}
       <button class="btn ghost" id="costox-cancel">Cancelar</button>
       <button class="btn primary" id="costox-confirm">Ejecutar</button>
     </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-todas-habilidades">
+  <div class="modal catalogo-modal">
+    <header><h3>Todas las habilidades</h3><button class="iconbtn" id="todas-habilidades-x">Cerrar</button></header>
+    <div class="body" id="todas-habilidades-grid"></div>
   </div>
 </div>
 
@@ -2249,7 +2266,7 @@ const LISTS = {
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${i.dado?`<span class="tag cost">${esc(i.dado)}</span>`:''}</div>
           <div class="idesc">${esc(i.detalle)}</div></div>
-        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button></div>
+        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button><button class="mini" data-tirarsocial="${i.id}">Dado</button></div>
       </div></div>`
   },
   efectos:{
@@ -2299,12 +2316,32 @@ function renderList(key){
     arr = S[key];
   }
   el.innerHTML = arr.length ? arr.map(LISTS[key].row).join('') : `<div class="empty">${LISTS[key].empty}</div>`;
+  if(key === 'habilidades' && $('#scrim-todas-habilidades').classList.contains('open')) renderTodasHabilidades();
 }
 
 function renderInventario(){
   renderList('equipo');
   renderList('mochila');
   renderArmadura();
+}
+
+function renderTodasHabilidades(){
+  const grid = $('#todas-habilidades-grid');
+  if(!S.habilidades.length){ grid.innerHTML = '<div class="hint">Sin habilidades cargadas.</div>'; return; }
+  grid.innerHTML = `<div class="habs-grid">${S.habilidades.map(i => {
+    const noEspameable = i.categoria === 'No espameable';
+    const yaUsada = noEspameable && i.usadaEsteTurno === true;
+    const esVariable = esCostoVariable(i.costo);
+    const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
+    const bloqueada = sinAcciones;
+    return `<div class="habs-grid-item">
+      <div class="habs-grid-nombre">${esc(i.nombre)}</div>
+      <div class="habs-grid-btns">
+        <button class="mini" data-view="habilidades:${i.id}">Ver</button>
+        <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function renderLootEspecial(){
@@ -2641,6 +2678,15 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.view){ const [k,id] = b.dataset.view.split(':'); openViewer(k, id); return; }
   if(b.dataset.edit){ const [k,id] = b.dataset.edit.split(':'); openEditor(k, id); return; }
+  if(b.dataset.tirarsocial){
+    const i = S.sociales.find(x=>x.id===b.dataset.tirarsocial);
+    if(!i) return;
+    if(!i.dado || !i.dado.trim()){ toast(`${i.nombre}: no tiene un dado configurado — editalo para ponerle uno (ej. 1d20+3)`); return; }
+    const r = tirarDados(i.dado);
+    if(!r){ toast(`${i.nombre}: "${i.dado}" no es una fórmula de dados válida`); return; }
+    mostrarResultadoDado(i.nombre, r);
+    return;
+  }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
     let it = S.inventario.find(x=>x.id===id);
@@ -4317,6 +4363,9 @@ $('#costox-x').onclick = () => { $('#scrim-costox').classList.remove('open'); pe
 $('#costox-cancel').onclick = () => { $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; };
 $('#costox-confirm').onclick = confirmarCostoVariable;
 $('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-costox'){ $('#scrim-costox').classList.remove('open'); pendingEjecucion = null; } });
+$('#btn-ver-todas-habilidades').onclick = () => { renderTodasHabilidades(); $('#scrim-todas-habilidades').classList.add('open'); };
+$('#todas-habilidades-x').onclick = () => $('#scrim-todas-habilidades').classList.remove('open');
+$('#scrim-todas-habilidades').addEventListener('mousedown', e => { if(e.target.id==='scrim-todas-habilidades') $('#scrim-todas-habilidades').classList.remove('open'); });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
 $('#btn-dados').onclick = () => {
   $('#f-dados-formula').value = '';

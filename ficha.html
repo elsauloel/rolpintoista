@@ -1944,9 +1944,12 @@ function formulaParaValor(valor){
   if(n <= 0) return null;
   let base = n, mod = 0;
   if(base % 2 !== 0){ base -= 1; mod = 1; }
-  if(base <= 0) return null;
-  const combo = mejorComboDados(base);
-  if(!combo) return null;
+  const combo = base > 0 ? mejorComboDados(base) : null;
+  if(!combo){
+    // No se arma con dados reales (valores chicos como 1, 2 o 3): se tira
+    // un dado "inexistente" del tamaño exacto del stat, ej. 1d3.
+    return {combo: [n], mod: 0, formula: `1d${n}`};
+  }
   const counts = {};
   combo.forEach(d => counts[d] = (counts[d] || 0) + 1);
   const formula = Object.keys(counts).map(Number).sort((a, b) => a - b)

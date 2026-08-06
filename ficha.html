@@ -2633,6 +2633,7 @@ function renderBotonera(){
           const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
           return `<div class="cat-row${i.nombre==='Movimiento'?' item-movimiento':''}">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+            <button class="mini" data-view="habilidades:${i.id}">Ver</button>
             <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}

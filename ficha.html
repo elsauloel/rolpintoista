@@ -1783,6 +1783,15 @@ function aplicarEfectoDeConsumo(it){
   return ef;
 }
 
+// Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y muestra
+// el popup de resultado, igual que un ataque o un chequeo manual.
+function tirarExtraDeItem(it){
+  const formula = (it.tiradaExtra || '').trim();
+  if(!formula) return;
+  const r = tirarDados(formula);
+  if(r) mostrarResultadoDado(it.nombre, r);
+}
+
 function restaurarBonosDeConsumo(it){
   const pct = num(it.curabonosPct);
   if(pct <= 0) return 0;
@@ -2803,6 +2812,7 @@ document.addEventListener('click', e => {
       S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
       $('#f-hp').value = S.hp;
       const efecto = aplicarEfectoDeConsumo(it);
+  tirarExtraDeItem(it);
       const bonosRestaurados = restaurarBonosDeConsumo(it);
       if(key === 'inventario') renderInventario(); else renderList('cinturon');
       if(efecto) renderList('efectos');
@@ -3271,10 +3281,10 @@ function toast(msg){
    ========================================================= */
 
 const SCHEMA = {
-  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
-  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
-  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:true},
-  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:false},
+  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','tiradaExtra','detalle'], mods:true},
+  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','tiradaExtra','detalle'], mods:true},
+  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','tiradaExtra','detalle'], mods:true},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
@@ -3289,7 +3299,8 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   curabonosPct:'% de Bonos al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarAccionesMax:'Forzar Acciones máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
-  armaduraRota:'Defensa y Res. a crítico de equipo a la mitad (redondeado abajo)', armaduraArruinada:'Anula Defensa y Res. a crítico de equipo'};
+  armaduraRota:'Defensa y Res. a crítico de equipo a la mitad (redondeado abajo)', armaduraArruinada:'Anula Defensa y Res. a crítico de equipo',
+  tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)'};
 const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
@@ -3630,7 +3641,7 @@ function openEditor(key, id, equipadoPreset){
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, curabonosPct:0, cargaMax:1, cargaActual:1,
-    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false};
+    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, tiradaExtra:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
@@ -4028,6 +4039,7 @@ function ejecutarHabilidad(id){
   S.bonosGastados = num(S.bonosGastados) + costoBonos;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
+  tirarExtraDeItem(it);
   renderList('habilidades');
   if(efecto) renderList('efectos');
   renderAcciones();
@@ -4056,6 +4068,7 @@ function confirmarCostoVariable(){
   S.bonosGastados = num(S.bonosGastados) + bonos;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
+  tirarExtraDeItem(it);
   $('#scrim-costox').classList.remove('open');
   pendingEjecucion = null;
   renderList('habilidades');

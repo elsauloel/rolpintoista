@@ -1854,23 +1854,34 @@ function computeSlots(){
   });
 }
 
-// Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se consume
-// solo y revive al portador con 25% del HP máximo (mínimo 1, para no reventar
-// todos los Ankh de un saque si el HP máximo es muy bajo).
+// Consume 1 unidad del Ankh (esté donde esté) y revive con 25% del HP
+// máximo (mínimo 1, para no reventar todos los Ankh de un saque si el HP
+// máximo es muy bajo). No toca S.muerto — eso lo resuelve revisarMuerte()
+// en el siguiente renderVitals().
+function aplicarRevivirConAnkh(key, id){
+  const it = S[key].find(x => x.id === id);
+  if(!it) return null;
+  it.unidades = num(it.unidades) - 1;
+  purgarSiAgotado(key, it.id);
+  const cc = compute();
+  const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
+  S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+  $('#f-hp').value = S.hp;
+  return it.nombre;
+}
+
+// Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se
+// activa solo (auto-consumo). Si está en la mochila en vez de equipado,
+// NO se activa solo — hay un botón de Consumir aparte para activarlo a
+// mano (pensado para el caso de un aliado a distancia cero).
 function revisarAnkh(){
   if(num(S.hp) > 0) return;
   if(S.muerto && S.muerto.definitivo) return; // muerte definitiva: ya no hay vuelta atrás
   const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
   if(idx < 0) return;
-  const it = S.cinturon[idx];
-  it.unidades = num(it.unidades) - 1;
-  purgarSiAgotado('cinturon', it.id);
-  const cc = compute();
-  const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
-  S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
-  $('#f-hp').value = S.hp;
+  const nombre = aplicarRevivirConAnkh('cinturon', S.cinturon[idx].id);
   renderList('cinturon');
-  toast(`¡${it.nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
+  toast(`¡${nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
 }
 
 function revisarMuerte(){
@@ -2034,7 +2045,11 @@ function restaurarBonosDeConsumo(it){
 function consumeButton(i, key){
   if(!i.consumible) return '';
   if(i.nombre === 'Ankh de Reencarnación'){
-    return `<span class="hint">${key==='cinturon' ? 'Se activa solo al llegar tu HP a 0' : 'En la mochila no se activa solo — no cuenta para revivirte'}</span>`;
+    if(key === 'cinturon') return `<span class="hint">Se activa solo al llegar tu HP a 0</span>`;
+    return `<button class="consume-btn" data-consumirankh="${key}:${i.id}" ${num(i.unidades)<=0?'disabled':''}>
+      Consumir <span class="consume-fx">(revive con 25% del HP máx.)</span>
+    </button>
+    <span class="hint">En la mochila no se activa solo — usalo a mano para el caso de un aliado a distancia cero.</span>`;
   }
   const costoAcciones = key === 'cinturon' ? 1 : 2;
   const partes = [];
@@ -3132,6 +3147,16 @@ document.addEventListener('click', e => {
     h.cdActual = num(h.cd);
     renderInvocaciones();
     toast(`${h.nombre||'Habilidad'} ejecutada · -1 Acción${h.cd>0?` · cooldown ${fmt(num(h.cd))} turno(s)`:''}`);
+    return;
+  }
+  if(b.dataset.consumirankh){
+    const [key, id] = b.dataset.consumirankh.split(':');
+    const it = S[key] && S[key].find(x => x.id === id);
+    if(!it || num(it.unidades) <= 0) return;
+    const nombre = aplicarRevivirConAnkh(key, id);
+    renderInventario(); renderList('cinturon');
+    refresh();
+    toast(`${nombre} activado a mano. Revivís con ${fmt(S.hp)} HP.`);
     return;
   }
   if(b.dataset.consume){

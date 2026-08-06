@@ -784,6 +784,8 @@ a{color:var(--brass)}
     </section>
   </div>
 
+  <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-bottom:14px">⚡ Botonera</button>
+
   <div class="cols">
     <!-- COLUMNA 1 -->
     <div class="col">
@@ -1033,6 +1035,13 @@ a{color:var(--brass)}
   <div class="modal catalogo-modal">
     <header><h3>Todas las habilidades</h3><button class="iconbtn" id="todas-habilidades-x">Cerrar</button></header>
     <div class="body" id="todas-habilidades-grid"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-botonera">
+  <div class="modal catalogo-modal">
+    <header><h3>Botonera</h3><button class="iconbtn" id="botonera-x">Cerrar</button></header>
+    <div class="body" id="botonera-body"></div>
   </div>
 </div>
 
@@ -1862,7 +1871,7 @@ function consumeButton(i, key){
   const partes = [];
   if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
   if(num(i.curabonosPct) > 0) partes.push(`${fmt(num(i.curabonosPct))}% Bonos`);
-  partes.push(`-${costoAcciones} Acción${costoAcciones===1?'':'es'}`);
+  partes.push(`-${costoAcciones} Acci${costoAcciones===1?'ón':'ones'}`);
   return `<button class="consume-btn" data-consume="${i.id}" ${num(i.unidades)<=0?'disabled':''}>
     Consumir <span class="consume-fx">(${partes.join(' · ')})</span>
   </button>`;
@@ -2333,6 +2342,7 @@ function renderList(key){
   }
   el.innerHTML = arr.length ? arr.map(LISTS[key].row).join('') : `<div class="empty">${LISTS[key].empty}</div>`;
   if(key === 'habilidades' && $('#scrim-todas-habilidades').classList.contains('open')) renderTodasHabilidades();
+  if(['habilidades','inventario','mochila','equipo','cinturon'].includes(key) && $('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
 function renderInventario(){
@@ -2358,6 +2368,60 @@ function renderTodasHabilidades(){
       </div>
     </div>`;
   }).join('')}</div>`;
+}
+
+function renderBotonera(){
+  const c = compute();
+  let html = '';
+
+  const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
+  html += `<div class="cat-grouphead">Tiradas de stats</div>`;
+  html += statsRollables.map(s => `
+    <div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">${esc(s.full || s.label)}</div></div>
+      <button type="button" class="mini" data-tirarstat="${s.id}">🎲 ${fmt(c.final[s.id])}</button>
+    </div>`).join('');
+
+  const sinAccPdg = num(S.acciones) < 1;
+  html += `<div class="cat-grouphead">Combate</div>`;
+  html += `
+    <div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">Atacar (PdG)</div></div>
+      <button type="button" class="mini" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''}>🎲 Atacar</button>
+    </div>
+    <div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">Daño Arma</div></div>
+      <button type="button" class="mini" data-botoneraaccion="danio">🎲 Daño</button>
+    </div>
+    <div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">Esquivar</div></div>
+      <button type="button" class="mini" data-botoneraaccion="esquivar">🎲 Esquivar</button>
+    </div>`;
+
+  html += `<div class="cat-grouphead">Habilidades</div>`;
+  html += S.habilidades.length ? S.habilidades.map(i => {
+    const noEspameable = i.categoria === 'No espameable';
+    const yaUsada = noEspameable && i.usadaEsteTurno === true;
+    const esVariable = esCostoVariable(i.costo);
+    const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
+    return `<div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+      <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
+    </div>`;
+  }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`;
+
+  const consumibles = [
+    ...S.inventario.filter(i => i.consumible).map(i => ({i, key:'inventario'})),
+    ...S.cinturon.filter(i => i.consumible).map(i => ({i, key:'cinturon'})),
+  ];
+  html += `<div class="cat-grouphead">Consumibles</div>`;
+  html += consumibles.length ? consumibles.map(({i, key}) => `
+    <div class="cat-row">
+      <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)} <span class="hint">(${key==='cinturon'?'cinturón':'mochila'})</span></div></div>
+      ${consumeButton(i, key)}
+    </div>`).join('') : `<div class="hint">Sin consumibles.</div>`;
+
+  $('#botonera-body').innerHTML = html;
 }
 
 function renderLootEspecial(){
@@ -2627,6 +2691,12 @@ document.addEventListener('click', e => {
     const c = compute();
     const id = b.dataset.tirarstat;
     tirarValorStat(STAT_LABEL[id] || id, c.final[id]);
+    return;
+  }
+  if(b.dataset.botoneraaccion){
+    if(b.dataset.botoneraaccion === 'atacar') $('#btn-atacar-pdg').click();
+    if(b.dataset.botoneraaccion === 'danio') $('#btn-danio-arma').click();
+    if(b.dataset.botoneraaccion === 'esquivar') $('#btn-esquivar').click();
     return;
   }
   if(b.dataset.stat){
@@ -2907,7 +2977,7 @@ document.addEventListener('click', e => {
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
       if(bonosRestaurados) partes.push(`+${fmt(bonosRestaurados)} Bonos`);
-      partes.push(`-${costoAcciones} Acción${costoAcciones===1?'':'es'}`);
+      partes.push(`-${costoAcciones} Acci${costoAcciones===1?'ón':'ones'}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       toast(`${it.nombre}: ${partes.join(' · ')}`);
@@ -4278,6 +4348,7 @@ function renderAcciones(){
   box.classList.toggle('agotadas', num(S.acciones) <= 0);
   const max = compute().final.accionesmax;
   $('#v-acciones-max').textContent = Number.isNaN(max) ? '?' : fmt(max);
+  if($('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
 function parseCostoBonos(costo){
@@ -4324,7 +4395,7 @@ function ejecutarHabilidad(id){
   renderVitals();
   const partes = [`ejecutada`];
   if(costoBonos) partes.push(`-${fmt(costoBonos)} Bonos`);
-  partes.push(costoAcciones ? `-${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : 'sin costo de Acciones');
+  partes.push(costoAcciones ? `-${fmt(costoAcciones)} Acci${costoAcciones===1?'ón':'ones'}` : 'sin costo de Acciones');
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
 }
@@ -4465,6 +4536,9 @@ $('#scrim-costox').addEventListener('mousedown', e => { if(e.target.id==='scrim-
 $('#btn-ver-todas-habilidades').onclick = () => { renderTodasHabilidades(); $('#scrim-todas-habilidades').classList.add('open'); };
 $('#todas-habilidades-x').onclick = () => $('#scrim-todas-habilidades').classList.remove('open');
 $('#scrim-todas-habilidades').addEventListener('mousedown', e => { if(e.target.id==='scrim-todas-habilidades') $('#scrim-todas-habilidades').classList.remove('open'); });
+$('#btn-botonera').onclick = () => { renderBotonera(); $('#scrim-botonera').classList.add('open'); };
+$('#botonera-x').onclick = () => $('#scrim-botonera').classList.remove('open');
+$('#scrim-botonera').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera') $('#scrim-botonera').classList.remove('open'); });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
 $('#btn-dados').onclick = () => {
   $('#f-dados-formula').value = '';

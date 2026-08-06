@@ -324,6 +324,13 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<div class="scrim" id="scrim-equipar-creep">
+  <div class="modal" style="max-width:420px">
+    <header><h3>Equipar del fabricante</h3><button class="iconbtn" id="equipar-creep-x">Cerrar</button></header>
+    <div class="body" id="equipar-creep-lista" style="display:flex;flex-direction:column;gap:7px;max-height:60vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-hab-creep">
   <div class="modal" style="max-width:420px">
     <header><h3>Habilidad</h3><button class="iconbtn" id="habcreep-x">Cerrar</button></header>
@@ -524,6 +531,32 @@ function tirarValorStat(nombre, valor){
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
+
+// Copia liviana (sin imágenes) del catálogo del fabricante de ficha.html,
+// solo armas y escudos — para equipar creeps rápido. Si el catálogo de
+// ficha.html cambia, esta lista hay que actualizarla a mano.
+const CATALOGO_EQUIPO = [
+  {nombre:'Daga', tipoItem:'arma_1m', tipoDado:2, danoFijo:0, peso:1, precioCompra:30, def:0, detalle:'Ignora 1 de resistencia crítica.'},
+  {nombre:'Rompemalla', tipoItem:'arma_1m', tipoDado:2, danoFijo:0, peso:2, precioCompra:60, def:0, detalle:'Rompe armadura.'},
+  {nombre:'Espada ancha', tipoItem:'arma_1m', tipoDado:4, danoFijo:0, peso:3, precioCompra:70, def:0, detalle:'Daño amplificado.'},
+  {nombre:'Hacha de mano', tipoItem:'arma_1m', tipoDado:6, danoFijo:0, peso:2, precioCompra:50, def:0, detalle:'Rompe armadura.'},
+  {nombre:'Bastón flexible', tipoItem:'arma_1m', tipoDado:8, danoFijo:0, peso:1, precioCompra:30, def:0, detalle:'Ignora 1 de resistencia crítica.'},
+  {nombre:'Estoque', tipoItem:'arma_1m', tipoDado:2, danoFijo:0, peso:2, precioCompra:50, def:0, detalle:"Modificador: '+1 a iniciativa"},
+  {nombre:'Espada corta', tipoItem:'arma_1m', tipoDado:4, danoFijo:0, peso:1, precioCompra:30, def:0, detalle:''},
+  {nombre:'Machete', tipoItem:'arma_1m', tipoDado:4, danoFijo:0, peso:1, precioCompra:25, def:0, detalle:'+10% de daño crítico'},
+  {nombre:'Hacha', tipoItem:'arma_1m', tipoDado:6, danoFijo:0, peso:3, precioCompra:70, def:0, detalle:'Rompe armadura.'},
+  {nombre:'Maza', tipoItem:'arma_1m', tipoDado:8, danoFijo:0, peso:2, precioCompra:50, def:0, detalle:'Daño amplificado.'},
+  {nombre:'Espada larga', tipoItem:'arma_1m', tipoDado:4, danoFijo:0, peso:2, precioCompra:50, def:0, detalle:"modificador: '+1 al pdg. +1 al parry"},
+  {nombre:'Hacha de batalla', tipoItem:'arma_1m', tipoDado:6, danoFijo:0, peso:4, precioCompra:90, def:0, detalle:'Rompe armadura.'},
+  {nombre:'Mangual', tipoItem:'arma_1m', tipoDado:8, danoFijo:0, peso:2, precioCompra:50, def:0, detalle:'Alcance +1.'},
+  {nombre:'Martillo', tipoItem:'arma_1m', tipoDado:8, danoFijo:0, peso:3, precioCompra:70, def:0, detalle:'Daño +50%. Lento.'},
+  {nombre:'Escudo romano', tipoItem:'escudo_2m', tipoDado:6, danoFijo:0, peso:5, precioCompra:110, def:250, detalle:'+4 al bloqueo. Movimiento y ataque lento'},
+  {nombre:'Escudo grande', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:4, precioCompra:90, def:200, detalle:'+2 al bloqueo'},
+  {nombre:'Broquel', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:1, precioCompra:30, def:50, detalle:'+2 a estabilidad'},
+  {nombre:'Escudo pavés', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:3, precioCompra:70, def:150, detalle:'+1 a estabilidad, +1 al bloqueo'},
+  {nombre:'Escudo triangular', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:3, precioCompra:70, def:150, detalle:'+2 al bloqueo'},
+  {nombre:'Escudo pequeño', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:2, precioCompra:50, def:100, detalle:'+1 al bloqueo, +1 a la estabilidad'},
+];
 const DADOS_ARMA = [2,4,6,8,10];
 
 function nuevoCreep(){
@@ -735,6 +768,7 @@ function cardHtml(sc){
           <div class="mini-f"><label>Daño fijo</label><input type="number" data-f="armaFijo" data-id="${sc.id}" value="${sc.armaFijo}"></div>
           <div class="dano-preview">Daño: <b>${danoTxt(sc)}</b></div>
         </div>
+        <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
 
       <div>
@@ -802,6 +836,44 @@ function aplicarEfectoDeConsumoCreep(sc, h){
 function tirarExtraDeHab(h){
   const r = tirarDados(h.tiradaExtra);
   if(r) mostrarResultadoDado(h.nombre || 'Habilidad', r);
+}
+
+let equipandoCreepId = null;
+
+function equipoItemHtml(item, idx){
+  const stat = item.tipoItem.startsWith('escudo') ? `Defensa +${item.def}` : `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`;
+  return `<button type="button" class="btn" data-equiparitem="${idx}" style="width:100%;text-align:left">
+    <b>${esc(item.nombre)}</b> — ${esc(stat)}${item.detalle ? ` · ${esc(item.detalle)}` : ''}
+  </button>`;
+}
+
+function abrirEquiparCreep(scId){
+  equipandoCreepId = scId;
+  const armas = CATALOGO_EQUIPO.filter(i => i.tipoItem.startsWith('arma'));
+  const escudos = CATALOGO_EQUIPO.filter(i => i.tipoItem.startsWith('escudo'));
+  const lista = $('#equipar-creep-lista');
+  lista.innerHTML =
+    `<div class="hint">Armas</div>` + armas.map((it) => equipoItemHtml(it, CATALOGO_EQUIPO.indexOf(it))).join('') +
+    `<div class="hint" style="margin-top:8px">Escudos (suman a Defensa)</div>` + escudos.map((it) => equipoItemHtml(it, CATALOGO_EQUIPO.indexOf(it))).join('');
+  $('#scrim-equipar-creep').classList.add('open');
+}
+
+function equiparItemEnCreep(idx){
+  const sc = S.creeps.find(s => s.id === equipandoCreepId);
+  const item = CATALOGO_EQUIPO[idx];
+  if(!sc || !item) return;
+  if(item.tipoItem.startsWith('escudo')){
+    sc.defensa = num(sc.defensa) + item.def;
+    sc.armaduraTipo = sc.armaduraTipo ? `${sc.armaduraTipo}, ${item.nombre}` : item.nombre;
+    toast(`${sc.nombre}: +${item.def} Defensa (${item.nombre})`);
+  }else{
+    sc.armaTipo = item.tipoDado;
+    sc.armaPeso = Math.max(1, item.peso);
+    sc.armaFijo = item.danoFijo;
+    toast(`${sc.nombre} equipado con ${item.nombre}`);
+  }
+  $('#scrim-equipar-creep').classList.remove('open');
+  renderAll();
 }
 
 let editingHabCreep = null;
@@ -1103,6 +1175,14 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const eva = num(sc.agl) + attrModTotal(sc, 'agl');
     tirarValorStat(`${sc.nombre} · Esquivar`, eva);
+    return;
+  }
+  if(b.dataset.equipardelfabricante){
+    abrirEquiparCreep(b.dataset.equipardelfabricante);
+    return;
+  }
+  if(b.dataset.equiparitem !== undefined){
+    equiparItemEnCreep(num(b.dataset.equiparitem));
     return;
   }
   if(b.dataset.addhab){
@@ -1530,6 +1610,8 @@ $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ 
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remove('open');
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
+$('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
+$('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };

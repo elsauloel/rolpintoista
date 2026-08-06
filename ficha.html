@@ -3844,8 +3844,18 @@ function drawEditor(){
       <input data-c="curabonosPct" type="number" step="any" min="0" max="100" value="${esc(draft.curabonosPct??0)}"></div>`;
   }
   if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')){
+    const personalizadosIt = S.efectosPersonalizados || [];
     html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
-      <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}"></div>
+      <select id="item-efecto-preset">
+        <option value="">— elegir preset o escribir a mano —</option>
+        <optgroup label="Estándar">
+          ${EFECTOS_PRESET.map((p,i) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}
+        </optgroup>
+        ${personalizadosIt.length ? `<optgroup label="Mis presets">
+          ${personalizadosIt.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}
+        </optgroup>` : ''}
+      </select>
+      <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}" style="margin-top:6px"></div>
       <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" data-c="efectoPermanente" ${draft.efectoPermanente?'checked':''} style="width:auto">
         <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence (queda hasta usarlo o borrarlo a mano)</span>
@@ -3936,6 +3946,18 @@ function handleModalFieldChange(e){
     const {nombre, ...resto} = preset;
     Object.assign(editing.draft, structuredClone(resto));
     editing.draft.nombre = nombre;
+    drawEditor();
+    return;
+  }
+  if(t.id === 'item-efecto-preset'){
+    if(!t.value) return;
+    const [tipo, idx] = t.value.split(':');
+    const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
+    if(!preset) return;
+    editing.draft.efectoNombre = preset.nombre;
+    editing.draft.efectoTurnos = preset.turnos ?? 0;
+    editing.draft.efectoHpTurno = preset.hpturno ?? 0;
+    editing.draft.efectoPermanente = !!preset.permanente;
     drawEditor();
     return;
   }

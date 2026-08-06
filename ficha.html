@@ -157,7 +157,12 @@ a{color:var(--brass)}
 .loot-esp-empty{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:5px}
 
 /* ---------- Barra de vida ---------- */
-.vitals{display:grid;grid-template-columns:1.6fr auto 1.6fr;gap:14px;margin-top:14px;align-items:start}
+.vitals-sticky{
+  position:sticky;top:0;z-index:60;background:var(--ink);
+  padding-top:14px;padding-bottom:14px;margin:0 -20px;padding-left:20px;padding-right:20px;
+  border-bottom:1px solid var(--line);box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
+}
+.vitals{display:grid;grid-template-columns:1.6fr auto 1.6fr;gap:14px;align-items:start}
 @media(max-width:900px){.vitals{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.vitals{grid-template-columns:1fr}}
 .vital{border:1px solid var(--line);background:var(--panel);padding:12px 14px}
@@ -707,6 +712,47 @@ a{color:var(--brass)}
 <body>
 <div class="wrap">
 
+  <!-- VITALES -->
+  <div class="vitals-sticky">
+    <div class="vitals">
+      <div class="vital">
+        <div class="top">
+          <span class="name">Puntos de vida</span>
+          <span class="nums"><input id="f-hp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="max">/ <span id="v-hpmax">0</span></span></span>
+        </div>
+        <div class="bar hp"><span id="bar-hp"></span></div>
+        <div class="steppers">
+          <button class="step" data-hp="-10">−10</button>
+          <button class="step" data-hp="-5">−5</button>
+          <button class="step" data-hp="-1">−1</button>
+          <button class="step" data-hp="1">+1</button>
+          <button class="step" data-hp="5">+5</button>
+          <button class="step" data-hp="full">Al máximo</button>
+        </div>
+        <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
+      </div>
+      <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
+        <span class="acciones-label">Acciones</span>
+        <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ <span id="v-acciones-max">3</span></span></div>
+      </div>
+      <section class="card vital-card">
+        <header>
+          <h2>Estados alterados</h2>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="tag" id="turno-tag">Turno 1</span>
+            <button class="iconbtn" id="btn-turno-reset" title="Reiniciar el contador de turno a 1">↺ Turno</button>
+            <button class="iconbtn iconbtn-add" data-add="efectos">+ Estado</button>
+          </div>
+        </header>
+        <div class="body">
+          <button class="btn maint" id="btn-mantenimiento">Mantenimiento · pasar turno</button>
+          <div class="log" id="maint-log"></div>
+          <div id="list-efectos"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
   <!-- ENCABEZADO -->
   <div class="hero">
     <div class="portrait-wrap">
@@ -763,46 +809,6 @@ a{color:var(--brass)}
     </div>
     <div id="bonos-breakdown"></div>
   </div>
-
-  <!-- VITALES -->
-  <div class="vitals">
-    <div class="vital">
-      <div class="top">
-        <span class="name">Puntos de vida</span>
-        <span class="nums"><input id="f-hp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="max">/ <span id="v-hpmax">0</span></span></span>
-      </div>
-      <div class="bar hp"><span id="bar-hp"></span></div>
-      <div class="steppers">
-        <button class="step" data-hp="-10">−10</button>
-        <button class="step" data-hp="-5">−5</button>
-        <button class="step" data-hp="-1">−1</button>
-        <button class="step" data-hp="1">+1</button>
-        <button class="step" data-hp="5">+5</button>
-        <button class="step" data-hp="full">Al máximo</button>
-      </div>
-    </div>
-    <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
-      <span class="acciones-label">Acciones</span>
-      <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ <span id="v-acciones-max">3</span></span></div>
-    </div>
-    <section class="card vital-card">
-      <header>
-        <h2>Estados alterados</h2>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="tag" id="turno-tag">Turno 1</span>
-          <button class="iconbtn" id="btn-turno-reset" title="Reiniciar el contador de turno a 1">↺ Turno</button>
-          <button class="iconbtn iconbtn-add" data-add="efectos">+ Estado</button>
-        </div>
-      </header>
-      <div class="body">
-        <button class="btn maint" id="btn-mantenimiento">Mantenimiento · pasar turno</button>
-        <div class="log" id="maint-log"></div>
-        <div id="list-efectos"></div>
-      </div>
-    </section>
-  </div>
-
-  <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-bottom:14px">⚡ Botonera</button>
 
   <div class="cols">
     <!-- COLUMNA 1 -->

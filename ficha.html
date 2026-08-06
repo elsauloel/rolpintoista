@@ -1392,6 +1392,14 @@ function compute(){
     if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
     if(!Number.isNaN(final.eva)) final.eva = Math.floor(final.eva / 2);
   }
+  const armaduraArruinada = efectosActivos.some(e => e.armaduraArruinada);
+  const armaduraRota = !armaduraArruinada && efectosActivos.some(e => e.armaduraRota);
+  if(armaduraArruinada || armaduraRota){
+    ['def', ...TIPOS_IDS].forEach(id => {
+      if(Number.isNaN(final[id])) return;
+      final[id] = armaduraArruinada ? 0 : Math.floor(final[id] / 2);
+    });
+  }
 
   return {base, mods, modTotal, final, pesoEquipado, sobrecarga:ctx.sobrecarga};
 }
@@ -1635,7 +1643,26 @@ function computeSlots(){
   });
 }
 
+// Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se consume
+// solo y revive al portador con 25% del HP máximo (mínimo 1, para no reventar
+// todos los Ankh de un saque si el HP máximo es muy bajo).
+function revisarAnkh(){
+  if(num(S.hp) > 0) return;
+  const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
+  if(idx < 0) return;
+  const it = S.cinturon[idx];
+  it.unidades = num(it.unidades) - 1;
+  purgarSiAgotado('cinturon', it.id);
+  const cc = compute();
+  const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
+  S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+  $('#f-hp').value = S.hp;
+  renderList('cinturon');
+  toast(`¡${it.nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
+}
+
 function renderVitals(){
+  revisarAnkh();
   const c = compute();
   const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
   $('#v-hpmax').textContent = fmt(hpmax);
@@ -3212,7 +3239,7 @@ const SCHEMA = {
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
-  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','mitadPdgEva','permanente','activo','popup','detalle'], mods:true},
+  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
 };
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', accionesCosto:'velocidad (acciones)', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
@@ -3223,7 +3250,8 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado',
   curabonosPct:'% de Bonos al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
-  forzarAccionesMax:'Forzar Acciones máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)'};
+  forzarAccionesMax:'Forzar Acciones máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
+  armaduraRota:'Defensa y Res. a crítico de equipo a la mitad (redondeado abajo)', armaduraArruinada:'Anula Defensa y Res. a crítico de equipo'};
 const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
@@ -3244,6 +3272,10 @@ const EFECTOS_PRESET = [
     detalle:'Sin Acciones este turno.'},
   {nombre:'Hypeado', turnos:2, mods:[{stat:'accionesmax', val:1}],
     detalle:'+1 a las Acciones máximas del turno.'},
+  {nombre:'Armadura rota', turnos:2, armaduraRota:true,
+    detalle:'Reduce a la mitad (redondeado hacia abajo) todos los valores defensivos otorgados por equipo (Defensa y Resistencia a crítico).'},
+  {nombre:'Armadura arruinada', turnos:2, armaduraArruinada:true,
+    detalle:'Anula todo efecto de armadura y resistencia al crítico otorgados por equipo.'},
 ];
 
 let editing = null;
@@ -3560,7 +3592,7 @@ function openEditor(key, id, equipadoPreset){
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, curabonosPct:0, cargaMax:1, cargaActual:1,
-    forzarAccionesMax:'', mitadPdgEva:false};
+    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
@@ -3573,7 +3605,7 @@ function openEditor(key, id, equipadoPreset){
 function drawEditor(){
   const {key, draft} = editing;
   const sc = SCHEMA[key];
-  const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva'];
+  const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada'];
   const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
   const cortos = sc.campos.filter(c => c!=='detalle' && !ESPECIALES.includes(c) && !FLAGS.includes(c));
   const flags = sc.campos.filter(c => FLAGS.includes(c));
@@ -3802,6 +3834,7 @@ $('#modal-body').addEventListener('click', e => {
       nombre: d.nombre, imagen: d.imagen || '', turnos: d.turnos, stacks: d.stacks,
       hpturno: d.hpturno, stacksturno: d.stacksturno, permanente: !!d.permanente,
       forzarAccionesMax: d.forzarAccionesMax, mitadPdgEva: !!d.mitadPdgEva,
+      armaduraRota: !!d.armaduraRota, armaduraArruinada: !!d.armaduraArruinada,
       mods: structuredClone(d.mods || []), detalle: d.detalle || '',
     };
     S.efectosPersonalizados = S.efectosPersonalizados || [];
@@ -4106,7 +4139,12 @@ $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ 
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remove('open');
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
-$('#btn-atacar-pdg').onclick = () => tirarValorStat('PdG', compute().final.pdg);
+$('#btn-atacar-pdg').onclick = () => {
+  if(num(S.acciones) < 1){ toast('No te quedan Acciones para atacar'); return; }
+  S.acciones = num(S.acciones) - 1;
+  renderAcciones();
+  tirarValorStat('PdG', compute().final.pdg);
+};
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva);
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');

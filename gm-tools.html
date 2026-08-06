@@ -161,8 +161,9 @@ input[type=file]{display:none}
 
 .accion-row{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 9px;
-  display:flex;align-items:center;gap:8px
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap
 }
+.accion-row .accion-nombre{min-width:100px}
 .accion-nombre{flex:1;font-weight:700;font-size:12.5px}
 .acciones-grupo-label{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);
@@ -281,9 +282,18 @@ input[type=file]{display:none}
 .chips-estados{display:flex;flex-wrap:wrap;gap:5px}
 .chip-estado{
   font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.03em;border:1px solid var(--line);
-  border-radius:99px;padding:3px 9px;color:var(--paper)
+  border-radius:99px;padding:3px 9px;color:var(--paper);background:var(--panel2);cursor:pointer
 }
-.chip-estado-vacio{color:var(--muted);border-style:dashed}
+.chip-estado:hover{border-color:var(--copper);color:var(--brass)}
+.chip-estado-vacio{color:var(--muted);border-style:dashed;cursor:default}
+.chip-estado-vacio:hover{border-color:var(--line);color:var(--muted)}
+.chip-add{border-style:dashed;color:var(--muted)}
+.chip-add:hover{border-color:var(--copper);color:var(--brass)}
+.modal-xbtn{
+  position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;color:var(--muted);
+  font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-soft)
+}
+.modal-xbtn:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
 
 /* Modal de vista */
 .scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);backdrop-filter:blur(3px);display:none;z-index:80;padding:24px;overflow:auto}
@@ -517,6 +527,17 @@ input[type=file]{display:none}
     <footer>
       <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
       <button class="btn primary" id="habcreep-guardar">Guardar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-ver-estado">
+  <div class="modal" style="max-width:380px;position:relative">
+    <button type="button" class="modal-xbtn" id="verestado-eliminar" title="Eliminar estado">×</button>
+    <header><h3 id="verestado-nombre">Estado</h3></header>
+    <div class="body" id="verestado-body"></div>
+    <footer>
+      <button class="btn primary" id="verestado-editar">Editar</button>
     </footer>
   </div>
 </div>
@@ -1209,9 +1230,8 @@ function cardHtml(sc){
 }
 
 function cardCompactoHtml(sc){
-  const chips = sc.estados.length
-    ? sc.estados.map(es => `<span class="chip-estado">${esc(es.nombre || '(sin nombre)')} · ${fmt(num(es.turnos))}t</span>`).join('')
-    : `<span class="chip-estado chip-estado-vacio">Sin estados</span>`;
+  const chips = sc.estados.map(es => `<button type="button" class="chip-estado" data-verestadocreep="${sc.id}:${es.id}">${esc(es.nombre || '(sin nombre)')} · ${fmt(num(es.turnos))}t</button>`).join('')
+    || `<span class="chip-estado chip-estado-vacio">Sin estados</span>`;
   return `
   <div class="card card-compacto" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
@@ -1232,7 +1252,7 @@ function cardCompactoHtml(sc){
           <div class="acc-mini-bar"><div class="acc-mini-fill" style="width:${num(sc.accMax)>0 ? Math.max(0,Math.min(100,num(sc.acc)/num(sc.accMax)*100)) : 0}%"></div></div>
         </div>
       </div>
-      <div class="chips-estados">${chips}</div>
+      <div class="chips-estados">${chips}<button type="button" class="chip-estado chip-add" data-addestado="${sc.id}">+ Estado</button></div>
       <button type="button" class="addhab" data-abriracciones="${sc.id}" style="margin-top:2px">⚡ Acciones</button>
     </div>
   </div>`;
@@ -1528,6 +1548,28 @@ function verCreep(id){
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;
   $('#scrim-view').classList.add('open');
+}
+
+let viendoEstadoCreep = null; // {scId, esId}
+
+function abrirVerEstadoCreep(scId, esId){
+  const sc = S.creeps.find(s => s.id === scId);
+  const es = sc && sc.estados.find(x => x.id === esId);
+  if(!es) return;
+  viendoEstadoCreep = {scId, esId};
+  const stacks = Math.max(1, num(es.stacks) || 1);
+  const hpTotal = num(es.hpTurno) * stacks;
+  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  $('#verestado-nombre').textContent = es.nombre || 'Sin nombre';
+  $('#verestado-body').innerHTML = [
+    linea('Turnos restantes', es.permanente ? 'No vence' : fmt(num(es.turnos))),
+    linea('Stacks', fmt(stacks)),
+    linea('HP por turno', hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)}` : ''),
+    linea('Activo', es.activo === false ? 'No' : 'Sí'),
+    (es.mods||[]).length ? linea('Modificadores', es.mods.map(m => `${ATTR_LABELS[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')) : '',
+    es.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(es.detalle)}</div>` : '',
+  ].filter(Boolean).join('');
+  $('#scrim-ver-estado').classList.add('open');
 }
 
 let editingEstadoCreep = null; // {scId, esId} — esId es null para un estado nuevo
@@ -1842,6 +1884,11 @@ document.addEventListener('click', e => {
   if(b.dataset.editarestado){
     const [scId, esId] = b.dataset.editarestado.split(':');
     abrirEditorEstadoCreep(scId, esId);
+    return;
+  }
+  if(b.dataset.verestadocreep){
+    const [scId, esId] = b.dataset.verestadocreep.split(':');
+    abrirVerEstadoCreep(scId, esId);
     return;
   }
   if(b.dataset.rmestado){
@@ -2457,6 +2504,27 @@ $('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-accio
 $('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
 $('#verhab-x').onclick = () => $('#scrim-ver-hab').classList.remove('open');
 $('#scrim-ver-hab').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-hab') $('#scrim-ver-hab').classList.remove('open'); });
+$('#verestado-eliminar').onclick = () => {
+  if(!viendoEstadoCreep) return;
+  const {scId, esId} = viendoEstadoCreep;
+  const sc = S.creeps.find(s => s.id === scId);
+  if(sc){
+    const es = sc.estados.find(x => x.id === esId);
+    const teniaCon = es && (es.mods||[]).some(m=>m.stat==='con');
+    sc.estados = sc.estados.filter(x => x.id !== esId);
+    if(teniaCon) actualizarHpMaxPorCon(sc);
+    renderAll();
+  }
+  viendoEstadoCreep = null;
+  $('#scrim-ver-estado').classList.remove('open');
+};
+$('#verestado-editar').onclick = () => {
+  if(!viendoEstadoCreep) return;
+  const {scId, esId} = viendoEstadoCreep;
+  $('#scrim-ver-estado').classList.remove('open');
+  abrirEditorEstadoCreep(scId, esId);
+};
+$('#scrim-ver-estado').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-estado'){ viendoEstadoCreep = null; $('#scrim-ver-estado').classList.remove('open'); } });
 $('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
 $('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };

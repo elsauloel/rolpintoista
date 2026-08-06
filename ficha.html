@@ -659,6 +659,10 @@ a{color:var(--brass)}
   display:none;align-items:center;justify-content:center
 }
 #overlay-muerte.open{display:flex}
+/* El botón de Mantenimiento tiene que seguir usándose para pasar turno
+   (y así bajar el contador de muerte), así que queda por encima del
+   filtro rojo, con su color original intacto. */
+#btn-mantenimiento{position:relative;z-index:36}
 #btn-revivir{
   position:fixed;top:16px;left:16px;z-index:36;pointer-events:auto;
   display:flex;align-items:center;gap:7px;background:#2E6B57;color:#fff;border:1px solid #4FA88C;
@@ -1848,6 +1852,7 @@ function revisarMuerte(){
 function renderOverlayMuerte(){
   if(!S.muerto || !S.muerto.activo){ $('#overlay-muerte').classList.remove('open'); return; }
   $('#overlay-muerte').classList.add('open');
+  $('#btn-revivir').style.display = S.muerto.definitivo ? 'none' : '';
   $('#overlay-muerte-centro').innerHTML = S.muerto.definitivo
     ? `<div class="muerte-final">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATRÁS</div>`
     : `<div class="muerte-label">turnos hasta muerte definitiva:</div><div class="muerte-numero">${fmt(S.muerto.turnos)}</div>`;
@@ -1859,6 +1864,9 @@ function renderVitals(){
   const c = compute();
   const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
   $('#v-hpmax').textContent = fmt(hpmax);
+  // El HP puede quedar en negativo internamente (overkill), pero en el
+  // contador de la cabecera nunca se muestra por debajo de 0.
+  if(document.activeElement !== $('#f-hp')) $('#f-hp').value = fmt(Math.max(0, num(S.hp)));
   $('#bar-hp').style.width = pct(S.hp, hpmax);
 
   // capacidad

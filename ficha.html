@@ -605,6 +605,9 @@ a{color:var(--brass)}
   line-height:1.2
 }
 .botonera-tile .bt-value{font-family:"Space Mono",monospace;font-size:18px;font-weight:700;color:var(--brass)}
+.botonera-tile .bt-value.mod-plus{color:var(--absenta)}
+.botonera-tile .bt-value.mod-minus{color:var(--danger)}
+.botonera-tile .bt-mod{font-family:"Space Mono",monospace;font-size:8.5px;color:var(--muted)}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
 .armbox .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .armbox .dv{font-family:"Space Mono",monospace;font-size:24px;font-weight:700;color:var(--brass)}
@@ -2635,11 +2638,19 @@ function renderBotonera(){
     <div class="botonera-caja">
       <div class="cat-grouphead" style="margin-top:0">Tiradas de stats</div>
       <div class="botonera-stats-grid">
-        ${statsRollables.map(s => `
-          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}">
+        ${statsRollables.map(s => {
+          const m = c.modTotal[s.id];
+          const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
+          const origins = c.mods[s.id] || [];
+          const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
+          const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
+          return `
+          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
             <span class="bt-label">${esc(s.label)}</span>
-            <span class="bt-value">${fmt(c.final[s.id])}</span>
-          </button>`).join('')}
+            <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
+            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
+          </button>`;
+        }).join('')}
       </div>
     </div>
     <div class="botonera-caja">

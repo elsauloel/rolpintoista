@@ -122,6 +122,13 @@ input[type=file]{display:none}
 .acc-mini-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:5px;overflow:hidden}
 .acc-mini-fill{height:100%;background:var(--copper)}
 .efectivo-badge{color:var(--wine);text-transform:none;letter-spacing:0}
+.mod-origen-btn{
+  background:none;border:none;padding:0;cursor:pointer;font:inherit;text-decoration:underline dotted;
+  text-underline-offset:2px;color:var(--muted)
+}
+.mod-origen-btn.mod-plus{color:var(--absenta)}
+.mod-origen-btn.mod-minus{color:var(--danger)}
+.mod-origen-btn.efectivo-badge{color:var(--wine)}
 
 .sect-label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);margin-top:2px}
 
@@ -954,13 +961,28 @@ function creepCritEfectivo(sc, i){
   if(rota) return Math.floor(num(sc.crit[i]) / 2);
   return num(sc.crit[i]);
 }
+function creepArmaduraOrigenTxt(sc){
+  const activos = (sc.estados||[]).filter(e => e.activo !== false && (e.armaduraRota || e.armaduraArruinada));
+  const nombres = activos.map(e => e.nombre || '(sin nombre)').join(', ');
+  return `Reducido por: ${nombres || 'estado activo'}`;
+}
+
+// Nombres de los estados activos que aportan un mod a ese stat, para
+// poder mostrar "de dónde sale" al tocar el indicador +/-.
+function origenesModCreep(sc, statId){
+  return (sc.estados||[])
+    .filter(es => es.activo !== false && (es.mods||[]).some(m => m.stat === statId))
+    .map(es => es.nombre || '(sin nombre)');
+}
 
 function attrCellHtml(sc, a){
   const mod = attrModTotal(sc, a);
   const cls = mod>0 ? 'mod-plus' : mod<0 ? 'mod-minus' : '';
+  const origenes = mod ? origenesModCreep(sc, a) : [];
+  const texto = `Base ${fmt(num(sc[a]))} ${mod>0?'+':''}${fmt(mod)}${origenes.length?` por ${esc(origenes.join(', '))}`:''}`;
   return `<div class="mini-f">
-    <label>${ATTR_LABELS[a]}</label>
-    <input type="number" class="${cls}" data-attr="${a}" data-id="${sc.id}" data-attrmod="${mod}" value="${fmt(num(sc[a])+mod)}" title="${mod?`Base ${fmt(num(sc[a]))} ${mod>0?'+':''}${fmt(mod)} por estados`:''}">
+    <label>${ATTR_LABELS[a]}${mod ? ` <button type="button" class="mod-origen-btn ${cls}" data-modorigen="${esc(texto)}">${mod>0?'+':''}${fmt(mod)}</button>` : ''}</label>
+    <input type="number" class="${cls}" data-attr="${a}" data-id="${sc.id}" data-attrmod="${mod}" value="${fmt(num(sc[a])+mod)}">
   </div>`;
 }
 
@@ -1195,7 +1217,7 @@ function cardHtml(sc){
 
       <div class="row3">
         <div class="mini-f"><label>Vel.</label><input type="number" data-f="spd" data-id="${sc.id}" value="${sc.spd}"></div>
-        <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <span class="efectivo-badge">efect. ${fmt(creepDefensaEfectiva(sc))}</span>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
+        <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
         <div class="mini-f"><label>Armadura</label><input data-f="armaduraTipo" data-id="${sc.id}" value="${esc(sc.armaduraTipo)}" placeholder="tipo/-"></div>
       </div>
 
@@ -1235,7 +1257,7 @@ function cardHtml(sc){
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
           ${['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0
-            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <span class="efectivo-badge">${fmt(creepCritEfectivo(sc,i))}</span>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
+            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">${fmt(creepCritEfectivo(sc,i))}</button>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
             : '').join('') || '<div class="hint">Sin resistencias a crítico — se suman al equipar armadura.</div>'}
         </div>
       </div>
@@ -1855,6 +1877,10 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.editararma){
     abrirEditorArmaCreep(b.dataset.editararma);
+    return;
+  }
+  if(b.dataset.modorigen){
+    toast(b.dataset.modorigen);
     return;
   }
   if(b.dataset.abriracciones){

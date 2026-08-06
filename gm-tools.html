@@ -843,7 +843,7 @@ document.addEventListener('click', e => {
   if(b.id === 'btn-save'){ guardar(); return; }
   if(b.id === 'btn-load'){ $('#file-input').click(); return; }
   if(b.id === 'btn-subir'){ subirDatos(); return; }
-  if(b.id === 'btn-token'){ if(ghToken(true)) toast('Token de GitHub actualizado'); return; }
+  if(b.id === 'btn-token'){ ghToken(true).then(t => { if(t) toast('Token de GitHub actualizado'); }); return; }
   if(b.id === 'btn-ia'){ $('#ia-prompt').value = ''; poblarSelectorModelos(); $('#scrim-ia').classList.add('open'); $('#ia-prompt').focus(); return; }
   if(b.id === 'ia-x'){ $('#scrim-ia').classList.remove('open'); return; }
   if(b.id === 'ia-token'){ if(orKey(true)) toast('Clave de OpenRouter actualizada'); return; }
@@ -862,11 +862,60 @@ const GH_BRANCH = 'main';
 
 const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
 
-function ghToken(pedirDeNuevo){
+/* Pide el token en un cartel dentro de esta misma pestaña.
+   Antes se abría GitHub con window.open() y enseguida se llamaba a
+   prompt(): como la pestaña de GitHub se lleva el foco, el navegador
+   no muestra el prompt de la pestaña de atrás y no quedaba a la vista
+   dónde pegar el token. Ahora el cartel se abre primero y el botón
+   "Abrir GitHub" es el que abre la otra pestaña. */
+function ghPedirToken(){
+  return new Promise(res => {
+    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
+    const fondo = document.createElement('div');
+    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+    const caja = document.createElement('div');
+    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:460px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
+    caja.innerHTML =
+      '<h3 style="margin:0 0 10px;font-size:16px">Token de GitHub</h3>' +
+      '<ol style="margin:0 0 14px;padding-left:20px">' +
+        '<li>Tocá <b>Abrir GitHub</b>: se abre en otra pestaña, ya con los permisos correctos elegidos.</li>' +
+        '<li>Bajá hasta el final y tocá <b>Generate token</b>.</li>' +
+        '<li>Copiá el token verde (ojo: solo se muestra una vez).</li>' +
+        '<li>Volvé <b>a esta pestaña</b> y pegalo en el casillero de abajo.</li>' +
+      '</ol>' +
+      '<button type="button" data-gh="abrir" style="' + btnCss + ';width:100%;margin-bottom:10px">Abrir GitHub ↗</button>' +
+      '<input type="text" data-gh="input" placeholder="Pegá el token acá (ghp_…)" ' +
+        'style="width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin-bottom:12px">' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" data-gh="cancelar" style="' + btnCss + '">Cancelar</button>' +
+        '<button type="button" data-gh="guardar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Guardar</button>' +
+      '</div>' +
+      '<div style="margin-top:10px;opacity:.65;font-size:12px">Queda guardado en este navegador para las próximas veces.</div>';
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    const campo = caja.querySelector('[data-gh="input"]');
+    campo.focus();
+    const cerrar = valor => {
+      document.removeEventListener('keydown', teclas);
+      fondo.remove();
+      res(valor);
+    };
+    const teclas = e => {
+      if(e.key === 'Escape') cerrar(null);
+      if(e.key === 'Enter' && document.activeElement === campo) cerrar(campo.value.trim() || null);
+    };
+    document.addEventListener('keydown', teclas);
+    caja.querySelector('[data-gh="abrir"]').onclick = () => window.open(GH_TOKEN_URL, '_blank');
+    caja.querySelector('[data-gh="cancelar"]').onclick = () => cerrar(null);
+    caja.querySelector('[data-gh="guardar"]').onclick = () => cerrar(campo.value.trim() || null);
+    fondo.onmousedown = e => { if(e.target === fondo) cerrar(null); };
+  });
+}
+
+async function ghToken(pedirDeNuevo){
   let t = localStorage.getItem('gh-token');
   if(!t || pedirDeNuevo){
-    window.open(GH_TOKEN_URL, '_blank');
-    t = prompt('Se abrió GitHub en otra pestaña, ya con los permisos correctos elegidos.\n\nAhí solo tocá "Generate token" al final de la página, copiá el token verde (ojo: sólo se muestra una vez) y pegalo acá.\n\nQueda guardado en este navegador para las próximas veces.');
+    t = await ghPedirToken();
     if(t) localStorage.setItem('gh-token', t.trim());
   }
   return t ? t.trim() : null;
@@ -898,7 +947,7 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
 
 async function subirDatos(){
   const btn = $('#btn-subir');
-  const token = ghToken(false);
+  const token = await ghToken(false);
   if(!token){ toast('Sin token no se puede subir'); return; }
   btn.disabled = true;
   toast('Subiendo a GitHub…');

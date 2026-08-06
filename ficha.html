@@ -866,11 +866,11 @@ a{color:var(--brass)}
       <section class="card">
         <header>
           <h2>Bitácora</h2>
-          <button class="iconbtn iconbtn-add" id="btn-bitacora-add">+ Jornada</button>
+          <button class="iconbtn iconbtn-add" id="btn-bitacora-add">+ Página</button>
         </header>
         <div class="body">
           <div class="bitacora-tabs" id="bitacora-tabs"></div>
-          <textarea id="f-notas" style="min-height:170px" placeholder="Lo que pasó en esta jornada, deudas, pactos, gente a la que le debés una."></textarea>
+          <textarea id="f-notas" style="min-height:170px" placeholder="Lo que pasó en esta página, deudas, pactos, gente a la que le debés una."></textarea>
         </div>
       </section>
 
@@ -1356,7 +1356,7 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
         nivel:1, exp:0, dde:0, wld:'', imagen:''},
-  bitacora:[{id:'j1', nombre:'Jornada 1', texto:''}],
+  bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
   attrs:{con:0, fue:0, agl:0, des:0, int:0},
@@ -2604,7 +2604,7 @@ function renderBitacora(){
   $('#bitacora-tabs').innerHTML = S.bitacora.map(p => `
     <div class="bit-tab ${p.id===S.bitacoraActiva?'active':''}" data-bitacora-id="${p.id}">
       <input class="bit-tab-name" data-bitacora-name="${p.id}" value="${esc(p.nombre)}">
-      ${S.bitacora.length>1 ? `<button class="bit-tab-x" data-bitacora-del="${p.id}" title="Borrar jornada">×</button>` : ''}
+      ${S.bitacora.length>1 ? `<button class="bit-tab-x" data-bitacora-del="${p.id}" title="Borrar página">×</button>` : ''}
     </div>`).join('');
   const activa = S.bitacora.find(p => p.id === S.bitacoraActiva);
   $('#f-notas').value = activa ? activa.texto : '';
@@ -2800,7 +2800,7 @@ document.addEventListener('click', e => {
 
   if(b.id === 'btn-bitacora-add'){
     const n = uid();
-    S.bitacora.push({id:n, nombre:`Jornada ${S.bitacora.length+1}`, texto:''});
+    S.bitacora.push({id:n, nombre:`Página ${S.bitacora.length+1}`, texto:''});
     S.bitacoraActiva = n;
     renderBitacora();
     document.querySelector(`[data-bitacora-name="${n}"]`)?.focus();
@@ -3784,7 +3784,7 @@ const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
 const EFECTOS_PRESET = [
-  {nombre:'Veneno', polaridad:'debuff', stacks:3, turnos:3, hpturno:-1, stacksturno:-1,
+  {nombre:'Veneno', polaridad:'debuff', stacks:4, turnos:4, hpturno:-1, stacksturno:-1,
     detalle:'Pierde 1 HP por stack cada turno. Se agota junto con los stacks (y con los turnos, que arrancan igualados).'},
   {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpturno:5, stacksturno:0,
     detalle:'Cura HP cada turno.'},
@@ -4764,7 +4764,7 @@ function fichaNueva(){
   S.formulas = formulas;
   S.caps = caps;
   S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, wld:'', imagen:''};
-  S.bitacora = [{id:'j1', nombre:'Jornada 1', texto:''}];
+  S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
   S.attrs = {con:0, fue:0, agl:0, des:0, int:0};
   S.hp = 0; S.turno = 1; S.log = []; S.bonosGastados = 0; S.acciones = 3;

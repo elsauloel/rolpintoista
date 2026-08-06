@@ -551,10 +551,11 @@ input[type=file]{display:none}
       <div class="f"><label>Preset</label><select id="ec-preset"></select></div>
       <div class="f"><label>Nombre</label><input type="text" id="ec-nombre" placeholder="ej. Veneno"></div>
       <div class="f"><label>Detalle (opcional)</label><input type="text" id="ec-detalle"></div>
-      <div class="row3">
-        <div class="mini-f"><label>Turnos</label><input type="number" id="ec-turnos" min="0" value="1"></div>
+      <div class="row3" style="grid-template-columns:1fr 1fr">
+        <div class="mini-f"><label>Turnos restantes</label><input type="number" id="ec-turnos" min="0" value="1"></div>
+        <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" id="ec-hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
-        <div class="mini-f"><label>HP por turno</label><input type="number" id="ec-hpturno" value="0"></div>
+        <div class="mini-f"><label>Stacks por turno</label><input type="number" id="ec-stacksturno" value="0"></div>
       </div>
       <div style="display:flex;gap:16px">
         <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
@@ -1262,7 +1263,7 @@ function cardCompactoHtml(sc){
 }
 
 const ESTADOS_PRESET_GM = [
-  {nombre:'Veneno', polaridad:'debuff', turnos:3, stacks:3, hpTurno:-1,
+  {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1,
     detalle:'Pierde 1 HP por stack cada turno.'},
   {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
     detalle:'Cura HP cada turno.'},
@@ -1595,6 +1596,7 @@ function abrirEditorEstadoCreep(scId, esId){
   $('#ec-turnos').value = es ? es.turnos : 1;
   $('#ec-stacks').value = es ? es.stacks : 1;
   $('#ec-hpturno').value = es ? es.hpTurno : 0;
+  $('#ec-stacksturno').value = es ? (es.stacksTurno ?? 0) : 0;
   $('#ec-activo').checked = es ? es.activo !== false : true;
   $('#ec-permanente').checked = es ? !!es.permanente : false;
   $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
@@ -1635,6 +1637,7 @@ function guardarEditorEstadoCreep(){
     turnos: Math.max(0, num($('#ec-turnos').value) || 0),
     stacks: Math.max(1, num($('#ec-stacks').value) || 1),
     hpTurno: num($('#ec-hpturno').value) || 0,
+    stacksTurno: num($('#ec-stacksturno').value) || 0,
     activo: $('#ec-activo').checked,
     permanente: $('#ec-permanente').checked,
     polaridad: $('#ec-preset').dataset.polaridad || 'otro',
@@ -2368,17 +2371,19 @@ function mantenimiento(){
       }
     });
     sc.estados.forEach(es => {
-      if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos
+      if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos ni stacks
       const stacks = Math.max(1, num(es.stacks) || 1);
       const cambio = num(es.hpTurno) * stacks;
       if(cambio){
         sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + cambio));
         hpAplicado++;
       }
-      if(!es.permanente) es.turnos = Math.max(0, num(es.turnos) - 1);
+      const ds = num(es.stacksTurno);
+      if(ds) es.stacks = Math.max(0, stacks + ds);
+      if(!es.permanente && num(es.turnos) > 0) es.turnos = Math.max(0, num(es.turnos) - 1);
     });
     const antes = sc.estados.length;
-    sc.estados = sc.estados.filter(es => es.permanente || es.activo === false || es.turnos > 0);
+    sc.estados = sc.estados.filter(es => es.activo === false || (es.permanente ? num(es.stacks) !== 0 : (es.turnos > 0 && num(es.stacks) !== 0)));
     vencidos += antes - sc.estados.length;
   });
   renderAll();
@@ -2543,6 +2548,7 @@ $('#ec-preset').addEventListener('change', e => {
   $('#ec-turnos').value = preset.turnos ?? 0;
   $('#ec-stacks').value = preset.stacks ?? 1;
   $('#ec-hpturno').value = preset.hpTurno ?? 0;
+  $('#ec-stacksturno').value = preset.stacksTurno ?? 0;
   $('#ec-activo').checked = true;
   $('#ec-permanente').checked = false;
   e.target.dataset.polaridad = preset.polaridad || 'otro';
@@ -2571,7 +2577,8 @@ $('#ec-guardarpreset').onclick = () => {
   const preset = {
     nombre, polaridad: $('#ec-preset').dataset.polaridad || 'otro',
     turnos: Math.max(0, num($('#ec-turnos').value) || 0), stacks: Math.max(1, num($('#ec-stacks').value) || 1),
-    hpTurno: num($('#ec-hpturno').value) || 0, detalle: $('#ec-detalle').value,
+    hpTurno: num($('#ec-hpturno').value) || 0, stacksTurno: num($('#ec-stacksturno').value) || 0,
+    detalle: $('#ec-detalle').value,
     armaduraRota: $('#ec-preset').dataset.armadurarota === '1',
     armaduraArruinada: $('#ec-preset').dataset.armaduraarruinada === '1',
     mods: structuredClone(ecMods),

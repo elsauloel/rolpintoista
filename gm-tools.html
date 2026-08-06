@@ -1804,15 +1804,10 @@ $('#file-input').onchange = ev => {
   ev.target.value = '';
 };
 
-// Al abrir la herramienta con la lista vacía, en vez de arrancar siempre
-// con el mismo creep de ejemplo, se genera uno al azar con IA (mismo
-// flujo que tocar "+ Creep con IA" y escribir "sorprendeme"). Si no hay
-// clave de OpenRouter configurada, el panel queda abierto para cargarla.
+// Al abrir la herramienta con la lista vacía, arranca con un creep nuevo
+// en blanco (nivel 1) en vez del mismo creep de ejemplo hardcodeado.
+S.creeps.push(nuevoCreep());
 renderAll();
-$('#ia-prompt').value = 'sorprendeme';
-poblarSelectorModelos();
-$('#scrim-ia').classList.add('open');
-generarCreepIA('sorprendeme');
 </script>
 </body>
 </html>

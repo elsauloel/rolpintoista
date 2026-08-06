@@ -41,6 +41,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   border:1px solid var(--line);border-top:3px solid var(--copper);
   background:linear-gradient(180deg, rgba(201,133,69,.10), rgba(0,0,0,0) 60%), var(--panel);
   padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:60;box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
 }
 .hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(22px,3vw,32px);margin:0;letter-spacing:-.01em}
 .hero .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px}
@@ -99,10 +100,15 @@ input[type=file]{display:none}
 .vital-mini{border:1px solid var(--line-soft);background:var(--panel2);padding:5px 7px}
 .vital-mini .vl{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 .vital-mini .vn{display:flex;align-items:baseline;gap:3px;margin-top:1px}
-.vital-mini input{font-family:"Space Mono",monospace;font-size:16px;font-weight:700;text-align:left;padding:0;background:none;border:none;width:34px;color:var(--brass)}
+.vital-mini input{font-family:"Space Mono",monospace;font-size:16px;font-weight:700;text-align:left;padding:0;background:none;border:none;width:40px;color:var(--brass);-moz-appearance:textfield}
+.vital-mini input::-webkit-outer-spin-button,.vital-mini input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .vital-mini .vmax{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .vital-mini.hp{border-color:rgba(140,47,62,.5)}
 .vital-mini.acc{border-color:rgba(201,133,69,.5)}
+.vital-mini .vn-static{font-family:"Space Mono",monospace;font-size:16px;font-weight:700;color:var(--brass);margin-top:1px}
+.acc-mini-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:5px;overflow:hidden}
+.acc-mini-fill{height:100%;background:var(--copper)}
+.efectivo-badge{color:var(--wine);text-transform:none;letter-spacing:0}
 
 .sect-label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);margin-top:2px}
 
@@ -153,6 +159,11 @@ input[type=file]{display:none}
   display:flex;align-items:center;gap:8px
 }
 .accion-nombre{flex:1;font-weight:700;font-size:12.5px}
+.acciones-grupo-label{
+  font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);
+  margin:10px 0 2px
+}
+.acciones-grupo-label:first-child{margin-top:0}
 .acciones-badge{
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);
   border:1px solid var(--copper);border-radius:var(--r);padding:3px 9px;background:rgba(201,133,69,.14);flex:none
@@ -491,6 +502,16 @@ input[type=file]{display:none}
         <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
         <div class="mini-f"><label>HP por turno</label><input type="number" id="ec-hpturno" value="0"></div>
       </div>
+      <div style="display:flex;gap:16px">
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
+          <input type="checkbox" id="ec-activo" checked style="width:auto">
+          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Activo</span>
+        </label>
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
+          <input type="checkbox" id="ec-permanente" style="width:auto">
+          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Permanente (no vence)</span>
+        </label>
+      </div>
       <div class="est-mods">
         <div class="est-mods-label">Modificadores de atributo</div>
         <div id="ec-mods-lista"></div>
@@ -684,9 +705,12 @@ function formulaParaValor(valor){
   if(n <= 0) return null;
   let base = n, mod = 0;
   if(base % 2 !== 0){ base -= 1; mod = 1; }
-  if(base <= 0) return null;
-  const combo = mejorComboDados(base);
-  if(!combo) return null;
+  const combo = base > 0 ? mejorComboDados(base) : null;
+  if(!combo){
+    // No se arma con dados reales (valores chicos como 1, 2 o 3): se tira
+    // un dado "inexistente" del tamaño exacto del stat, ej. 1d3.
+    return {combo: [n], mod: 0, formula: `1d${n}`};
+  }
   const counts = {};
   combo.forEach(d => counts[d] = (counts[d] || 0) + 1);
   const formula = Object.keys(counts).map(Number).sort((a, b) => a - b)
@@ -809,10 +833,32 @@ function danoTxt(sc){
 function attrModTotal(sc, statId){
   let total = 0;
   (sc.estados||[]).forEach(es => {
+    if(es.activo === false) return;
     const stacks = Math.max(1, num(es.stacks)||1);
     (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
   });
   return total;
+}
+
+// Estados con armaduraRota/armaduraArruinada activos reducen o anulan la
+// Defensa y la Resistencia a crítico que da el equipo — igual que en ficha.html.
+function creepEstadosArmadura(sc){
+  const activos = (sc.estados||[]).filter(e => e.activo !== false);
+  const arruinada = activos.some(e => e.armaduraArruinada);
+  const rota = !arruinada && activos.some(e => e.armaduraRota);
+  return {arruinada, rota};
+}
+function creepDefensaEfectiva(sc){
+  const {arruinada, rota} = creepEstadosArmadura(sc);
+  if(arruinada) return 0;
+  if(rota) return Math.floor(num(sc.defensa) / 2);
+  return num(sc.defensa);
+}
+function creepCritEfectivo(sc, i){
+  const {arruinada, rota} = creepEstadosArmadura(sc);
+  if(arruinada) return 0;
+  if(rota) return Math.floor(num(sc.crit[i]) / 2);
+  return num(sc.crit[i]);
 }
 
 function attrCellHtml(sc, a){
@@ -906,16 +952,42 @@ function renderAll(){
 
 let accionesCreepId = null;
 
+// Mismos stats secundarios derivados que un PJ (Res.Mg/Res.CC de Con, Dmg/
+// Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry de Des,
+// PdG.Mg/Res.M/Rango de casteo de Int), sin agregar una grilla a la ficha
+// del creep — se tiran desde acá, en Acciones.
+const CREEP_DERIVED_STATS = [
+  {id:'resmg', label:'Res.Mg', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
+  {id:'dmg', label:'Dmg', attr:'fue'}, {id:'potencia', label:'Potencia', attr:'fue'},
+  {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
+  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico', attr:'des'}, {id:'parry', label:'Parry', attr:'des'},
+  {id:'pdgmg', label:'PdG.Mg', attr:'int'}, {id:'resm', label:'Res.M', attr:'int'}, {id:'rangocasteo', label:'Rango de casteo', attr:'int'},
+];
+
+const CREEP_STAT_LOOKUP = Object.fromEntries(CREEP_DERIVED_STATS.map(d => [d.id, d]));
+function creepStatValor(sc, statId){
+  const d = CREEP_STAT_LOOKUP[statId];
+  if(!d) return 0;
+  return num(sc[d.attr]) + attrModTotal(sc, d.attr);
+}
+
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
   if(!sc) return;
   const sinAcc = num(sc.acc) < 1;
-  const filas = [
+
+  const filasStats = CREEP_DERIVED_STATS.map(d => ({
+    nombre: d.label, disabled:false, motivo:`Valor ${fmt(creepStatValor(sc, d.id))}`,
+    attr:`data-tirarstatcreep="${sc.id}:${d.id}"`,
+  }));
+
+  const filasCombate = [
     {nombre:'Atacar (PdG)', disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {nombre:'Esquivar', disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
   ];
-  sc.habilidades.forEach(h => {
+
+  const filasHab = sc.habilidades.map(h => {
     const enCooldown = num(h.cdActual) > 0;
     const costoAcciones = h.accionesCosto ?? 1;
     const sinAcciones = num(sc.acc) < costoAcciones;
@@ -924,16 +996,22 @@ function renderAccionesCreep(){
     if(enCooldown) motivo = `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
     else if(sinAcciones) motivo = 'Sin acciones';
     else motivo = costoAcciones ? `${fmt(costoAcciones)} acción(es)` : 'Sin costo';
-    filas.push({nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`});
+    return {nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
   });
+
   $('#acciones-creep-titulo').textContent = sc.nombre;
   $('#acciones-creep-badge').textContent = `${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}`;
-  $('#acciones-creep-lista').innerHTML = filas.map(f => `
+
+  const fila = f => `
     <div class="accion-row">
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
-    </div>`).join('');
+    </div>`;
+  const grupo = (titulo, filas) => filas.length ? `<div class="acciones-grupo-label">${esc(titulo)}</div>${filas.map(fila).join('')}` : '';
+
+  $('#acciones-creep-lista').innerHTML =
+    grupo('Tiradas de stats', filasStats) + grupo('Combate', filasCombate) + grupo('Habilidades', filasHab);
 }
 
 function abrirAccionesCreep(scId){
@@ -972,17 +1050,17 @@ function cardHtml(sc){
       <div class="vitalbar">
         <div class="vital-mini hp">
           <div class="vl">HP</div>
-          <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}" style="width:30px"></div>
+          <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
         </div>
         <div class="vital-mini acc">
           <div class="vl acc-label">${accLabelHtml(sc)}</div>
-          <div class="vn"><input type="number" data-f="acc" data-id="${sc.id}" value="${sc.acc}"><span class="vmax">/ </span><input type="number" data-f="accMax" data-id="${sc.id}" value="${sc.accMax}" style="width:30px"></div>
+          <div class="vn"><input type="number" data-f="acc" data-id="${sc.id}" value="${sc.acc}"><span class="vmax">/ </span><input type="number" data-f="accMax" data-id="${sc.id}" value="${sc.accMax}"></div>
         </div>
       </div>
 
       <div class="row3">
         <div class="mini-f"><label>Vel.</label><input type="number" data-f="spd" data-id="${sc.id}" value="${sc.spd}"></div>
-        <div class="mini-f"><label>Defensa</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
+        <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <span class="efectivo-badge">efect. ${fmt(creepDefensaEfectiva(sc))}</span>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
         <div class="mini-f"><label>Armadura</label><input data-f="armaduraTipo" data-id="${sc.id}" value="${esc(sc.armaduraTipo)}" placeholder="tipo/-"></div>
       </div>
 
@@ -1021,7 +1099,7 @@ function cardHtml(sc){
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
           ${['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0
-            ? `<div class="crit-cell"><label>${lbl}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
+            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <span class="efectivo-badge">${fmt(creepCritEfectivo(sc,i))}</span>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
             : '').join('') || '<div class="hint">Sin resistencias a crítico — se suman al equipar armadura.</div>'}
         </div>
       </div>
@@ -1078,9 +1156,16 @@ function cardCompactoHtml(sc){
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
     <div class="cbody-compacto">
-      <div class="vital-mini hp">
-        <div class="vl">HP</div>
-        <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}" style="width:30px"></div>
+      <div class="vitalbar">
+        <div class="vital-mini hp">
+          <div class="vl">HP</div>
+          <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+        </div>
+        <div class="vital-mini acc">
+          <div class="vl">Acciones</div>
+          <div class="vn-static">${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}</div>
+          <div class="acc-mini-bar"><div class="acc-mini-fill" style="width:${num(sc.accMax)>0 ? Math.max(0,Math.min(100,num(sc.acc)/num(sc.accMax)*100)) : 0}%"></div></div>
+        </div>
       </div>
       <div class="chips-estados">${chips}</div>
       <button type="button" class="addhab" data-abriracciones="${sc.id}" style="margin-top:2px">⚡ Acciones</button>
@@ -1103,9 +1188,9 @@ const ESTADOS_PRESET_GM = [
     detalle:'Sin Acciones este turno.'},
   {nombre:'Hypeado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0,
     detalle:'+1 a las Acciones máximas del turno.'},
-  {nombre:'Armadura rota', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+  {nombre:'Armadura rota', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, armaduraRota:true,
     detalle:'Defensa y Res. a crítico de equipo a la mitad (redondeado hacia abajo).'},
-  {nombre:'Armadura arruinada', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+  {nombre:'Armadura arruinada', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, armaduraArruinada:true,
     detalle:'Anula Defensa y Res. a crítico de equipo.'},
 ];
 
@@ -1355,7 +1440,8 @@ function verCreep(id){
   L.push(linea('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`));
   L.push(linea('Acciones', `${fmt(num(sc.acc))} / ${fmt(num(sc.accMax))}`));
   L.push(linea('Velocidad', fmt(num(sc.spd))));
-  L.push(linea('Defensa', fmt(num(sc.defensa))));
+  const defBase = num(sc.defensa), defEf = creepDefensaEfectiva(sc);
+  L.push(linea('Defensa', defEf !== defBase ? `${fmt(defEf)} (base ${fmt(defBase)}, reducida por estado)` : fmt(defBase)));
   if(sc.armaduraTipo) L.push(linea('Armadura', sc.armaduraTipo));
   L.push(linea('Atributos', `Con ${fmt(num(sc.con))} · Fue ${fmt(num(sc.fue))} · Agi ${fmt(num(sc.agl))} · Des ${fmt(num(sc.des))} · Int ${fmt(num(sc.int))}`));
   L.push(linea('Daño de arma', danoTxt(sc)));
@@ -1399,7 +1485,11 @@ function abrirEditorEstadoCreep(scId, esId){
   $('#ec-turnos').value = es ? es.turnos : 1;
   $('#ec-stacks').value = es ? es.stacks : 1;
   $('#ec-hpturno').value = es ? es.hpTurno : 0;
+  $('#ec-activo').checked = es ? es.activo !== false : true;
+  $('#ec-permanente').checked = es ? !!es.permanente : false;
   $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
+  $('#ec-preset').dataset.armadurarota = es ? (es.armaduraRota ? '1' : '') : '';
+  $('#ec-preset').dataset.armaduraarruinada = es ? (es.armaduraArruinada ? '1' : '') : '';
   renderEcMods();
   actualizarBotonesPresetEc();
   $('#scrim-estado-creep').classList.add('open');
@@ -1435,7 +1525,11 @@ function guardarEditorEstadoCreep(){
     turnos: Math.max(0, num($('#ec-turnos').value) || 0),
     stacks: Math.max(1, num($('#ec-stacks').value) || 1),
     hpTurno: num($('#ec-hpturno').value) || 0,
+    activo: $('#ec-activo').checked,
+    permanente: $('#ec-permanente').checked,
     polaridad: $('#ec-preset').dataset.polaridad || 'otro',
+    armaduraRota: $('#ec-preset').dataset.armadurarota === '1',
+    armaduraArruinada: $('#ec-preset').dataset.armaduraarruinada === '1',
     mods: structuredClone(ecMods),
   };
   let es;
@@ -1609,6 +1703,14 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
+    return;
+  }
+  if(b.dataset.tirarstatcreep){
+    const [scId, statId] = b.dataset.tirarstatcreep.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const d = CREEP_STAT_LOOKUP[statId];
+    if(!sc || !d) return;
+    tirarValorStat(`${sc.nombre} · ${d.label}`, creepStatValor(sc, statId));
     return;
   }
   if(b.dataset.atacarcreep){
@@ -2139,16 +2241,17 @@ function mantenimiento(){
       }
     });
     sc.estados.forEach(es => {
+      if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos
       const stacks = Math.max(1, num(es.stacks) || 1);
       const cambio = num(es.hpTurno) * stacks;
       if(cambio){
         sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + cambio));
         hpAplicado++;
       }
-      es.turnos = Math.max(0, num(es.turnos) - 1);
+      if(!es.permanente) es.turnos = Math.max(0, num(es.turnos) - 1);
     });
     const antes = sc.estados.length;
-    sc.estados = sc.estados.filter(es => es.turnos > 0);
+    sc.estados = sc.estados.filter(es => es.permanente || es.activo === false || es.turnos > 0);
     vencidos += antes - sc.estados.length;
   });
   renderAll();
@@ -2281,7 +2384,11 @@ $('#ec-preset').addEventListener('change', e => {
   $('#ec-turnos').value = preset.turnos ?? 0;
   $('#ec-stacks').value = preset.stacks ?? 1;
   $('#ec-hpturno').value = preset.hpTurno ?? 0;
+  $('#ec-activo').checked = true;
+  $('#ec-permanente').checked = false;
   e.target.dataset.polaridad = preset.polaridad || 'otro';
+  e.target.dataset.armadurarota = preset.armaduraRota ? '1' : '';
+  e.target.dataset.armaduraarruinada = preset.armaduraArruinada ? '1' : '';
   ecMods = structuredClone(preset.mods || []);
   renderEcMods();
   actualizarBotonesPresetEc();
@@ -2306,6 +2413,8 @@ $('#ec-guardarpreset').onclick = () => {
     nombre, polaridad: $('#ec-preset').dataset.polaridad || 'otro',
     turnos: Math.max(0, num($('#ec-turnos').value) || 0), stacks: Math.max(1, num($('#ec-stacks').value) || 1),
     hpTurno: num($('#ec-hpturno').value) || 0, detalle: $('#ec-detalle').value,
+    armaduraRota: $('#ec-preset').dataset.armadurarota === '1',
+    armaduraArruinada: $('#ec-preset').dataset.armaduraarruinada === '1',
     mods: structuredClone(ecMods),
   };
   S.estadosPersonalizados = S.estadosPersonalizados || [];

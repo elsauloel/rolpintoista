@@ -1028,6 +1028,7 @@ a{color:var(--brass)}
   <button class="btn del" id="btn-reset">Ficha nueva</button>
   <button class="btn" id="btn-formulas">Fórmulas</button>
   <button class="btn" id="btn-dados">Dados</button>
+  <button class="btn" id="btn-historial">Historial</button>
   <button class="btn" id="btn-personajes">Personajes</button>
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Bajar datos</button>
   <button class="btn" id="btn-sync" title="Subir este personaje a GitHub">Subir datos</button>
@@ -1181,6 +1182,16 @@ a{color:var(--brass)}
         <div class="hint" style="margin-bottom:6px">Historial</div>
         <div id="dados-historial" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-historial">
+  <div class="modal" style="max-width:460px">
+    <header><h3>Historial de la sesión</h3><button class="iconbtn" id="historial-x">Cerrar</button></header>
+    <div class="body">
+      <div class="hint" style="margin-bottom:8px">Tiradas y eventos recientes — vive solo en esta pestaña, no se guarda en la ficha.</div>
+      <div id="historial-body" style="display:flex;flex-direction:column;gap:4px;max-height:60vh;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
     </div>
   </div>
 </div>
@@ -2169,6 +2180,22 @@ function registrarTirada(origen, r){
   dadosHistorial.unshift({origen, ...r, hora: new Date()});
   dadosHistorial = dadosHistorial.slice(0, 20);
   renderDadosHistorial();
+  registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
+}
+
+/* ---------- Historial de sesión (tiradas + eventos, no se guarda) ---------- */
+let sesionHistorial = [];
+function registrarEvento(texto){
+  sesionHistorial.unshift({texto, hora: new Date()});
+  sesionHistorial = sesionHistorial.slice(0, 80);
+  renderHistorialSesion();
+}
+function renderHistorialSesion(){
+  const el = $('#historial-body');
+  if(!el) return;
+  el.innerHTML = sesionHistorial.length
+    ? sesionHistorial.map(h => `<div>${horaTxt(h.hora)} — ${esc(h.texto)}</div>`).join('')
+    : '<div style="opacity:.6">Sin eventos todavía.</div>';
 }
 
 // Registra la tirada y abre el popup con el detalle (usar para tiradas que no
@@ -3868,6 +3895,7 @@ let toastT;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+  registrarEvento(msg);
 }
 
 /* =========================================================
@@ -4570,7 +4598,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -4875,6 +4903,9 @@ $('#btn-dados').onclick = () => {
   setTimeout(() => $('#f-dados-formula').focus(), 40);
 };
 $('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');
+$('#btn-historial').onclick = () => { renderHistorialSesion(); $('#scrim-historial').classList.add('open'); };
+$('#historial-x').onclick = () => $('#scrim-historial').classList.remove('open');
+$('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id==='scrim-historial') $('#scrim-historial').classList.remove('open'); });
 $('#dados-tirar').onclick = ejecutarTiradaManual;
 $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); ejecutarTiradaManual(); } });
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });

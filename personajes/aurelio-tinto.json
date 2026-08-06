@@ -14,10 +14,15 @@
     {
       "id": "j1",
       "nombre": "Jornada 1",
-      "texto": "- faltó sumarnos la exp y el loot de la última pelea\n- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado.\n- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado\n"
+      "texto": "- faltó sumarnos la exp y el loot de la última pelea\n\n"
+    },
+    {
+      "id": "1m5vfp1",
+      "nombre": "IDEAS DE SKILLS",
+      "texto": "- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado.\n- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado"
     }
   ],
-  "bitacoraActiva": "j1",
+  "bitacoraActiva": "1m5vfp1",
   "loot": {
     "normal": 0,
     "magico": 0,

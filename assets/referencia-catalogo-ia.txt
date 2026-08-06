@@ -1,10 +1,14 @@
 ================================================================
 PARTE 1 — REGLAS Y VOCABULARIO IMPLÍCITO DEL SISTEMA
 ================================================================
-Este documento es material de referencia sobre el sistema de items del
-juego de rol de mesa "Piratas en el espacio" (ficha de personaje casera,
-sin publicar comercialmente). Sirve como contexto para diseñar objetos
-NUEVOS que respeten la lógica y el balance de los ya existentes.
+Este documento es material de referencia sobre el sistema de items de
+"Rol Pintoísta", un sistema de rol de mesa casero (ficha de personaje
+propia, sin publicar comercialmente). "Piratas en el espacio" fue el
+nombre de la campaña puntual que se estaba jugando cuando arrancó el
+desarrollo de estas herramientas — no es el nombre del sistema en sí,
+que es reutilizable para cualquier campaña. Sirve como contexto para
+diseñar objetos NUEVOS que respeten la lógica y el balance de los ya
+existentes.
 
 --- ATRIBUTOS PRINCIPALES Y STATS DERIVADOS ---
 Hay 5 atributos base que el jugador asigna con puntos: Constitución (con),

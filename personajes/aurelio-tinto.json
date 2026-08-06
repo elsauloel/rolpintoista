@@ -36,8 +36,8 @@
     "<b style=\"color:var(--brass)\">Turno 1</b>",
     "El contador de turno se reinició manualmente."
   ],
-  "bonosGastados": 0,
-  "acciones": 3,
+  "bonosGastados": 1,
+  "acciones": 2,
   "caps": {
     "mochila": 20,
     "cinturon": 5
@@ -403,7 +403,7 @@
       "consumible": false,
       "curahp": 0,
       "precioCompra": 0,
-      "usadaEsteTurno": false,
+      "usadaEsteTurno": true,
       "efectoNombre": "",
       "efectoTurnos": 0,
       "efectoHpTurno": 0,

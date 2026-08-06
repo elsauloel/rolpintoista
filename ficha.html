@@ -2558,17 +2558,57 @@ function aBase64(texto){
   });
 }
 
+/* Para pisar un archivo que ya está en el repo hay que mandarle a GitHub
+   el sha de la versión anterior; si no, contesta 422 ("sha wasn't
+   supplied"). Antes, si la consulta del sha fallaba por lo que fuera, se
+   seguía igual sin sha y la subida moría con ese 422 sin decir por qué.
+   Ahora, si la consulta directa no sirve, el sha se busca en el listado
+   de la carpeta (otra ruta de la API, respuesta chica) y cualquier
+   rareza queda anotada en la consola. */
+async function ghShaPorListado(ruta, cab){
+  const partes = ruta.split('/');
+  const archivo = partes.pop();
+  const carpeta = partes.join('/');
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${carpeta}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
+  if(!resp.ok) return undefined;
+  const cuerpo = await resp.json();
+  const lista = Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || []);
+  const item = lista.find(x => x.name === archivo);
+  return item ? item.sha : undefined;
+}
+
+async function ghSha(ruta, cab){
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
+  if(resp.status === 404) return undefined; // todavía no existe: se crea de cero
+  if(resp.ok){
+    const sha = (await resp.json()).sha;
+    if(sha) return sha;
+    console.warn(`GitHub contestó 200 para ${ruta} pero sin sha — lo busco en el listado de la carpeta`);
+  }else{
+    console.warn(`GitHub respondió ${resp.status} consultando ${ruta} — busco el sha en el listado de la carpeta`);
+  }
+  return await ghShaPorListado(ruta, cab);
+}
+
 async function ghSubir(ruta, contenidoB64, token, mensaje){
   const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
   const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
-  const prev = await fetch(`${url}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
-  if(prev.status === 401 || prev.status === 403) throw {auth:true};
-  const sha = prev.ok ? (await prev.json()).sha : undefined;
-  const resp = await fetch(url, {
+  const mandar = sha => fetch(url, {
     method: 'PUT',
     headers: cab,
     body: JSON.stringify({message: mensaje, content: contenidoB64, branch: GH_BRANCH, ...(sha ? {sha} : {})}),
   });
+  const sha = await ghSha(ruta, cab);
+  let resp = await mandar(sha);
+  // 422 = el archivo existe y el sha que mandamos no le sirve: o no lo
+  // encontramos, o alguien subió una versión nueva recién. Se vuelve a
+  // pedir el sha y se reintenta una sola vez.
+  if(resp.status === 422){
+    const nuevo = await ghShaPorListado(ruta, cab);
+    if(nuevo && nuevo !== sha) resp = await mandar(nuevo);
+  }
   if(resp.status === 401 || resp.status === 403) throw {auth:true};
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }

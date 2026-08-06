@@ -282,8 +282,11 @@ a{color:var(--brass)}
 /* ---------- Listas ---------- */
 .item{border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;position:relative}
 .item:last-child{margin-bottom:0}
-/* Movimiento: siempre con un fondo distinguible del resto de las habilidades */
-.item-movimiento{background:rgba(91,141,190,.14);border-color:rgba(91,141,190,.5)}
+/* Movimiento: siempre con un fondo distinguible del resto de las habilidades.
+   !important porque .cat-row/.habs-grid-item declaran su propio background
+   más abajo en la hoja de estilos y, a igual especificidad, ganarían por
+   orden de aparición. */
+.item-movimiento{background:rgba(91,141,190,.14)!important;border-color:rgba(91,141,190,.5)!important}
 .item .ihead{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
 .item .iname{font-weight:700;font-size:13.5px;line-height:1.3}
 .item .idesc{font-size:12px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
@@ -1749,6 +1752,7 @@ function renderEfectosArmas(){
   const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
   if(!enManos.length){
     $('#efectos-armas').innerHTML = `<div class="empty">No tenés nada equipado en las manos.</div>`;
+    actualizarTextosCombate(enManos);
     return;
   }
   const dosManos = enManos.find(a => a.tipoItem === 'arma_2m' || a.tipoItem === 'escudo_2m');
@@ -1774,6 +1778,27 @@ function renderEfectosArmas(){
   $('#efectos-armas').innerHTML = esDosManos
     ? `<div class="manos-grid manos-grid-single">${manoHtml(m1, 'Mano 1')}</div>`
     : `<div class="manos-grid">${manoHtml(m1, 'Mano 1')}${manoHtml(m2, 'Mano 2')}</div>`;
+
+  actualizarTextosCombate(enManos);
+}
+
+// Los botones de Combate muestran qué van a tirar, para no tener que
+// adivinar antes de apretar.
+function actualizarTextosCombate(enManos){
+  const c = compute();
+  const fPdg = formulaParaValor(c.final.pdg);
+  const fEva = formulaParaValor(c.final.eva);
+  const fParry = formulaParaValor(c.final.parry);
+  $('#btn-atacar-pdg').textContent = `🎲 Atacar (PdG)${fPdg ? ` · ${fPdg.formula}` : ''}`;
+  $('#btn-esquivar').textContent = `🎲 Esquivar${fEva ? ` · ${fEva.formula}` : ''}`;
+  $('#btn-parry').textContent = `🎲 Parry${fParry ? ` · ${fParry.formula}` : ''}`;
+
+  const armas = (enManos || []).filter(i => ES_ARMA(i.tipoItem));
+  let danoTxt;
+  if(armas.length === 1) danoTxt = ` · ${armaDanoTxt(armas[0])}`;
+  else if(armas.length > 1) danoTxt = ' · elegís arma';
+  else danoTxt = ' · sin arma equipada';
+  $('#btn-danio-arma').textContent = `🎲 Daño Arma${danoTxt}`;
 }
 
 function armasEquipadasConDano(){

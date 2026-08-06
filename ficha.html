@@ -841,7 +841,10 @@ a{color:var(--brass)}
             <div class="dl">Defensa</div>
             <div class="dv"><span id="v-def">0</span></div>
           </button>
-          <button type="button" class="btn" id="btn-esquivar" style="width:100%;margin-top:8px">🎲 Esquivar</button>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn" id="btn-esquivar" style="flex:1">🎲 Esquivar</button>
+            <button type="button" class="btn" id="btn-parry" style="flex:1">🎲 Parry</button>
+          </div>
           <div id="def-breakdown"></div>
           <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
           <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
@@ -1174,7 +1177,8 @@ const GRUPOS = [
   {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
     {id:'rng', label:'Rng', full:'Rango'},
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
-    {id:'crit', label:'Crit', full:'Crítico'}]},
+    {id:'crit', label:'Crit', full:'Crítico'},
+    {id:'parry', label:'Parry', full:'Parry'}]},
   {id:'int', label:'Int', full:'Inteligencia', color:'#9B7BD4', derived:[
     {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
     {id:'resm', label:'Res.M', full:'Resistencia mágica (Int)'},
@@ -1278,7 +1282,7 @@ const DEFAULT = {
     resmg:'con', rescc:'con', hpmax:'con*5',
     dmg:'fue', potencia:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', mov:'agl',
-    rng:'des', pdg:'des', crit:'des',
+    rng:'des', pdg:'des', crit:'des', parry:'des',
     pdgmg:'int', resm:'int', bonos:'ceil(int/2) - sobrecarga', rangocasteo:'int',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', accionesmax:'3'
   },
@@ -4561,6 +4565,7 @@ $('#btn-atacar-pdg').onclick = () => {
 };
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva);
+$('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry);
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
 $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });

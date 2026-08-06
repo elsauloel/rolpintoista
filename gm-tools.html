@@ -106,12 +106,11 @@ input[type=file]{display:none}
 
 .sect-label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);margin-top:2px}
 
-.armaline,.armorline{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.dano-preview{
-  grid-column:1/-1;font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);
-  border-top:1px dashed var(--line-soft);padding-top:5px;margin-top:2px
-}
-.dano-preview b{color:var(--brass)}
+.arma-compacta{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
+.arma-compacta-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.arma-dano{font-family:"Space Mono",monospace;font-size:13px;color:var(--brass);font-weight:700}
+.arma-detalle{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.sect-arma-nombre{color:var(--paper);text-transform:none;letter-spacing:0;font-weight:700}
 
 .crit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .crit-cell label{display:block;font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);text-align:center;margin-bottom:2px}
@@ -127,7 +126,8 @@ input[type=file]{display:none}
 .hab-top .dur input{font-family:"Space Mono",monospace;font-size:11px;text-align:center;padding:3px 2px}
 .hab-top .rm{color:var(--muted);font-size:13px;flex:none}
 .hab-top .rm:hover{color:var(--danger)}
-.hab textarea{margin-top:4px;font-size:11.5px;min-height:32px;background:rgba(0,0,0,.2)}
+.hab-detalle-text{margin-top:4px;font-size:11.5px;color:var(--paper);line-height:1.4;white-space:pre-wrap}
+.hab-detalle-text.vacio{color:var(--muted);font-style:italic}
 .hab-bottom{display:flex;align-items:center;gap:6px;margin-top:6px}
 .hab-estado{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.05em;color:var(--muted);flex:1}
 .hab-estado.ok{color:var(--absenta)}
@@ -141,8 +141,8 @@ input[type=file]{display:none}
 
 .est-list{display:flex;flex-direction:column;gap:6px}
 .estado{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
-.estado-veneno{border-color:rgba(168,194,86,.35)}
-.estado-regeneracion{border-color:rgba(79,168,140,.4)}
+.estado-buff{border-color:rgba(79,168,140,.4)}
+.estado-debuff{border-color:rgba(168,194,86,.35)}
 .est-tipo{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;flex:1;padding:4px 6px}
 .est-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}
 .est-preview{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:5px;border-top:1px dashed var(--line-soft);padding-top:4px}
@@ -254,6 +254,32 @@ input[type=file]{display:none}
 .hint{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .modal .body{padding:14px 16px}
 .modal footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)}
+
+.catalogo-modal{max-width:640px;max-height:82vh;display:flex;flex-direction:column}
+.catalogo-modal .body{overflow-y:auto;padding:12px 16px}
+.catalogo-filtro-fila{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--line);background:rgba(201,133,69,.06)}
+.catalogo-filtro-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
+#equipar-creep-filtro{width:auto;min-width:140px;font-family:"Space Mono",monospace;font-size:12px}
+.cat-grouphead{
+  font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);
+  margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--line-soft)
+}
+.cat-grouphead:first-child{margin-top:0}
+.cat-row{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:9px
+}
+.cat-row .cat-info{flex:1;min-width:160px}
+.cat-row .cat-nombre{font-weight:700;font-size:13.5px}
+.cat-row .cat-meta{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:2px}
+.cat-row .cat-meta b{color:var(--brass)}
+.cat-row .cat-detalle{font-size:11.5px;color:#C9B8AD;margin-top:3px}
+.cat-btn-equipar{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 10px;border-radius:var(--r);white-space:nowrap;flex:none;
+  border:1px solid var(--copper);background:rgba(201,133,69,.14);color:var(--brass);font-weight:700
+}
+.cat-btn-equipar:hover{background:var(--copper);color:#180F08}
 .dado-cara{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;
   border:1px solid var(--line);border-radius:var(--r);font-family:"Space Mono",monospace;font-weight:700;font-size:15px;
   background:rgba(0,0,0,.25);color:var(--paper)}
@@ -346,9 +372,18 @@ input[type=file]{display:none}
 </div>
 
 <div class="scrim" id="scrim-equipar-creep">
-  <div class="modal" style="max-width:420px">
+  <div class="modal catalogo-modal">
     <header><h3>Equipar del fabricante</h3><button class="iconbtn" id="equipar-creep-x">Cerrar</button></header>
-    <div class="body" id="equipar-creep-lista" style="display:flex;flex-direction:column;gap:7px;max-height:60vh;overflow-y:auto"></div>
+    <div class="catalogo-filtro-fila">
+      <label class="catalogo-filtro-label">Categoría</label>
+      <select id="equipar-creep-filtro">
+        <option value="">Todas</option>
+        <option value="armas">Armas</option>
+        <option value="escudos">Escudos</option>
+      </select>
+      <input type="text" id="equipar-creep-buscar" placeholder="Buscar ítem…" style="flex:1;min-width:0">
+    </div>
+    <div class="body" id="equipar-creep-lista"></div>
   </div>
 </div>
 
@@ -374,6 +409,27 @@ input[type=file]{display:none}
     <footer>
       <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
       <button class="btn primary" id="habcreep-guardar">Guardar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-arma-creep">
+  <div class="modal" style="max-width:380px">
+    <header><h3>Arma</h3><button class="iconbtn" id="armacreep-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <div class="f"><label>Nombre</label><input type="text" id="ac-nombre" placeholder="ej. Hacha de mano"></div>
+      <div class="row3">
+        <div class="mini-f"><label>Tipo (dado)</label>
+          <select id="ac-tipo"></select>
+        </div>
+        <div class="mini-f"><label>Peso (cant.)</label><input type="number" id="ac-peso" min="1" value="1"></div>
+        <div class="mini-f"><label>Daño fijo</label><input type="number" id="ac-fijo" value="0"></div>
+      </div>
+      <div class="f"><label>Detalle</label><textarea id="ac-detalle"></textarea></div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="armacreep-cancel">Cancelar</button>
+      <button class="btn primary" id="armacreep-guardar">Guardar</button>
     </footer>
   </div>
 </div>
@@ -585,14 +641,15 @@ function nuevoCreep(){
     id: uid(), nombre:'Creep nuevo', imagen:'', nivel:1, color: COLORES[Math.floor(Math.random()*COLORES.length)],
     hp:10, hpMax:10, acc:3, accMax:3, spd:5,
     con:0, fue:0, agl:0, des:0, int:0,
-    armaTipo:6, armaPeso:1, armaFijo:0,
+    armaTipo:6, armaPeso:1, armaFijo:0, armaNombre:'', armaDetalle:'',
     defensa:0, armaduraTipo:'',
     crit:[0,0,0,0],
     habilidades:[
       {id:uid(), nombre:'Movimiento', detalle:'', cd:0, cdActual:0}
     ],
     estados:[],
-    notas:''
+    notas:'',
+    compacto:true
   };
 }
 
@@ -783,16 +840,13 @@ function cardHtml(sc){
       </div>
 
       <div>
-        <div class="sect-label">Arma</div>
-        <div class="armaline" style="margin-top:4px">
-          <div class="mini-f"><label>Tipo (dado)</label>
-            <select data-f="armaTipo" data-id="${sc.id}">
-              ${DADOS_ARMA.map(d=>`<option value="${d}" ${num(sc.armaTipo)===d?'selected':''}>d${d}</option>`).join('')}
-            </select>
+        <div class="sect-label">Arma${sc.armaNombre ? ` · <span class="sect-arma-nombre">${esc(sc.armaNombre)}</span>` : ''}</div>
+        <div class="arma-compacta" style="margin-top:4px">
+          <div class="arma-compacta-top">
+            <span class="arma-dano">${danoTxt(sc)}</span>
+            <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
-          <div class="mini-f"><label>Peso (cant.)</label><input type="number" data-f="armaPeso" data-id="${sc.id}" value="${sc.armaPeso}"></div>
-          <div class="mini-f"><label>Daño fijo</label><input type="number" data-f="armaFijo" data-id="${sc.id}" value="${sc.armaFijo}"></div>
-          <div class="dano-preview">Daño: <b>${danoTxt(sc)}</b></div>
+          ${sc.armaDetalle ? `<div class="arma-detalle">${esc(sc.armaDetalle)}</div>` : ''}
         </div>
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
@@ -854,11 +908,40 @@ function cardCompactoHtml(sc){
   </div>`;
 }
 
-const ESTADO_PRESETS = {
-  veneno:{nombre:'Veneno', hpTurno:-2},
-  regeneracion:{nombre:'Regeneración', hpTurno:2},
-  otro:{nombre:'', hpTurno:0},
-};
+const ESTADOS_PRESET_GM = [
+  {nombre:'Veneno', polaridad:'debuff', turnos:3, stacks:3, hpTurno:-1,
+    detalle:'Pierde 1 HP por stack cada turno.'},
+  {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
+    detalle:'Cura HP cada turno.'},
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+    detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Agotado', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+    detalle:'-1 a las Acciones máximas del turno.'},
+  {nombre:'Exhausto', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+    detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
+  {nombre:'Stun', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+    detalle:'Sin Acciones este turno.'},
+  {nombre:'Hypeado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0,
+    detalle:'+1 a las Acciones máximas del turno.'},
+  {nombre:'Armadura rota', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+    detalle:'Defensa y Res. a crítico de equipo a la mitad (redondeado hacia abajo).'},
+  {nombre:'Armadura arruinada', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+    detalle:'Anula Defensa y Res. a crítico de equipo.'},
+];
+
+const POLARIDAD_ESTADO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
+function optgroupsEstadosPresetHtml(){
+  return ['buff','debuff','otro'].map(pol => {
+    const opts = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol);
+    if(!opts.length) return '';
+    return `<optgroup label="${POLARIDAD_ESTADO_LABEL[pol]}">${opts.map(({p,i}) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
+  }).join('');
+}
+function optgroupsEstadosPersonalizadosHtml(){
+  const personalizados = S.estadosPersonalizados || [];
+  if(!personalizados.length) return '';
+  return `<optgroup label="Mis presets">${personalizados.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
+}
 
 const ATTR_IDS = ['con','fue','agl','des','int'];
 const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int'};
@@ -888,21 +971,42 @@ function tirarExtraDeHab(h){
 
 let equipandoCreepId = null;
 
+const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+
 function equipoItemHtml(item, idx){
-  const stat = item.tipoItem.startsWith('escudo') ? `Defensa +${item.def}` : `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`;
-  return `<button type="button" class="btn" data-equiparitem="${idx}" style="width:100%;text-align:left">
-    <b>${esc(item.nombre)}</b> — ${esc(stat)}${item.detalle ? ` · ${esc(item.detalle)}` : ''}
-  </button>`;
+  const esEscudo = item.tipoItem.startsWith('escudo');
+  const stat = esEscudo ? `Defensa +${item.def}` : `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`;
+  return `<div class="cat-row">
+    <div class="cat-info">
+      <div class="cat-nombre">${esc(item.nombre)}</div>
+      <div class="cat-meta"><b>${esc(stat)}</b></div>
+      ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+    </div>
+    <button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>
+  </div>`;
+}
+
+function renderEquiparCreepLista(){
+  const filtro = $('#equipar-creep-filtro') ? $('#equipar-creep-filtro').value : '';
+  const busqueda = normalizarBusqueda($('#equipar-creep-buscar') ? $('#equipar-creep-buscar').value : '');
+  let visibles = CATALOGO_EQUIPO.map((it, idx) => ({it, idx}));
+  if(filtro === 'armas') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('arma'));
+  if(filtro === 'escudos') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
+  if(busqueda) visibles = visibles.filter(({it}) => normalizarBusqueda(it.nombre).includes(busqueda));
+
+  const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma'));
+  const escudos = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
+  let html = '';
+  if(armas.length) html += `<div class="cat-grouphead">Armas</div>` + armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
+  if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div>` + escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
+  $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems que coincidan con la búsqueda.</div>`;
 }
 
 function abrirEquiparCreep(scId){
   equipandoCreepId = scId;
-  const armas = CATALOGO_EQUIPO.filter(i => i.tipoItem.startsWith('arma'));
-  const escudos = CATALOGO_EQUIPO.filter(i => i.tipoItem.startsWith('escudo'));
-  const lista = $('#equipar-creep-lista');
-  lista.innerHTML =
-    `<div class="hint">Armas</div>` + armas.map((it) => equipoItemHtml(it, CATALOGO_EQUIPO.indexOf(it))).join('') +
-    `<div class="hint" style="margin-top:8px">Escudos (suman a Defensa)</div>` + escudos.map((it) => equipoItemHtml(it, CATALOGO_EQUIPO.indexOf(it))).join('');
+  $('#equipar-creep-filtro').value = '';
+  $('#equipar-creep-buscar').value = '';
+  renderEquiparCreepLista();
   $('#scrim-equipar-creep').classList.add('open');
 }
 
@@ -918,6 +1022,8 @@ function equiparItemEnCreep(idx){
     sc.armaTipo = item.tipoDado;
     sc.armaPeso = Math.max(1, item.peso);
     sc.armaFijo = item.danoFijo;
+    sc.armaNombre = item.nombre;
+    sc.armaDetalle = item.detalle || '';
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
   $('#scrim-equipar-creep').classList.remove('open');
@@ -963,6 +1069,35 @@ function guardarEditorHabCreep(){
   toast(`${h.nombre} guardada`);
 }
 
+let editingArmaCreep = null;
+
+function abrirEditorArmaCreep(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return;
+  editingArmaCreep = scId;
+  $('#ac-nombre').value = sc.armaNombre || '';
+  $('#ac-tipo').innerHTML = DADOS_ARMA.map(d=>`<option value="${d}" ${num(sc.armaTipo)===d?'selected':''}>d${d}</option>`).join('');
+  $('#ac-peso').value = sc.armaPeso;
+  $('#ac-fijo').value = sc.armaFijo;
+  $('#ac-detalle').value = sc.armaDetalle || '';
+  $('#scrim-arma-creep').classList.add('open');
+}
+
+function guardarEditorArmaCreep(){
+  if(!editingArmaCreep) return;
+  const sc = S.creeps.find(s => s.id === editingArmaCreep);
+  if(!sc){ editingArmaCreep = null; return; }
+  sc.armaNombre = $('#ac-nombre').value.trim();
+  sc.armaTipo = num($('#ac-tipo').value) || 6;
+  sc.armaPeso = Math.max(1, num($('#ac-peso').value) || 1);
+  sc.armaFijo = num($('#ac-fijo').value) || 0;
+  sc.armaDetalle = $('#ac-detalle').value;
+  editingArmaCreep = null;
+  $('#scrim-arma-creep').classList.remove('open');
+  renderAll();
+  toast('Arma actualizada');
+}
+
 function verCreep(id){
   const sc = S.creeps.find(x => x.id === id);
   if(!sc) return;
@@ -999,16 +1134,19 @@ function verCreep(id){
 
 function estadoHtml(scId, es){
   const mods = es.mods || [];
-  return `<div class="estado estado-${es.tipo}" data-estid="${es.id}">
+  const personalizados = S.estadosPersonalizados || [];
+  const yaGuardado = es.nombre && personalizados.some(p => p.nombre === es.nombre);
+  return `<div class="estado estado-${es.polaridad||'otro'}" data-estid="${es.id}">
     <div class="hab-top">
-      <select class="est-tipo" data-estf="tipo" data-scid="${scId}" data-estid="${es.id}">
-        <option value="veneno" ${es.tipo==='veneno'?'selected':''}>Veneno</option>
-        <option value="regeneracion" ${es.tipo==='regeneracion'?'selected':''}>Regeneración</option>
-        <option value="otro" ${es.tipo==='otro'?'selected':''}>Otro</option>
+      <select class="est-tipo" data-estpreset="${scId}:${es.id}">
+        <option value="">— elegir preset o completar a mano —</option>
+        ${optgroupsEstadosPresetHtml()}
+        ${optgroupsEstadosPersonalizadosHtml()}
       </select>
       <button class="rm" data-rmestado="${scId}:${es.id}">×</button>
     </div>
     <input class="hn" data-estf="nombre" data-scid="${scId}" data-estid="${es.id}" value="${esc(es.nombre)}" placeholder="Nombre del estado" style="margin-top:5px">
+    <input class="hn" data-estf="detalle" data-scid="${scId}" data-estid="${es.id}" value="${esc(es.detalle||'')}" placeholder="Detalle (opcional)" style="margin-top:4px;font-weight:400;font-size:11px;color:var(--muted)">
     <div class="est-row">
       <div class="mini-f"><label>HP / turno</label><input type="number" data-estf="hpTurno" data-scid="${scId}" data-estid="${es.id}" value="${es.hpTurno}"></div>
       <div class="mini-f"><label>Stacks</label><input type="number" data-estf="stacks" data-scid="${scId}" data-estid="${es.id}" value="${es.stacks}" min="1"></div>
@@ -1026,6 +1164,10 @@ function estadoHtml(scId, es){
           <button class="rm" data-rmestmod="${scId}:${es.id}:${i}">×</button>
         </div>`).join('')}
       <button class="addmod-mini" data-addestmod="${scId}:${es.id}">+ Modificador</button>
+    </div>
+    <div style="margin-top:6px;border-top:1px dashed var(--line-soft);padding-top:6px">
+      <button type="button" class="addmod-mini" data-guardarestadopreset="${scId}:${es.id}">${yaGuardado ? 'Actualizar' : '☆ Guardar'} como preset personalizado</button>
+      ${yaGuardado ? `<button type="button" class="addmod-mini" data-borrarestadopreset="${esc(es.nombre)}" style="margin-left:5px;color:var(--danger)">Borrar preset</button>` : ''}
     </div>
   </div>`;
 }
@@ -1059,7 +1201,7 @@ function habHtml(scId, h, sinAcciones){
       <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
       <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
     </div>
-    <textarea data-habf="detalle" data-scid="${scId}" data-habid="${h.id}" placeholder="Efecto...">${esc(h.detalle)}</textarea>
+    <div class="hab-detalle-text${h.detalle ? '' : ' vacio'}">${h.detalle ? esc(h.detalle) : 'Sin detalle — tocá ✎ para escribir uno.'}</div>
     <div class="hab-bottom">
       <span class="hab-estado ${bloqueado?'cd':'ok'}">${enCooldown ? `En cooldown · ${fmt(num(h.cdActual))} turno(s)` : (sinAcciones ? 'Sin acciones' : 'Disponible')}</span>
       <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
@@ -1088,12 +1230,8 @@ document.addEventListener('input', e => {
     const sc = S.creeps.find(s=>s.id===t.dataset.id);
     if(!sc) return;
     const campo = t.dataset.f;
-    const numericos = ['nivel','hp','hpMax','acc','accMax','spd','armaTipo','armaPeso','armaFijo','defensa'];
+    const numericos = ['nivel','hp','hpMax','acc','accMax','spd','defensa'];
     sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
-    if(['armaTipo','armaPeso','armaFijo'].includes(campo)){
-      const preview = t.closest('.armaline').querySelector('.dano-preview b');
-      if(preview) preview.textContent = danoTxt(sc);
-    }
     if(campo === 'nivel'){
       actualizarBadgePresupuesto(sc, t.closest('.card'));
     }
@@ -1133,17 +1271,7 @@ document.addEventListener('input', e => {
     const es = sc.estados.find(x=>x.id===t.dataset.estid);
     if(!es) return;
     const campo = t.dataset.estf;
-    if(campo === 'tipo'){
-      es.tipo = t.value;
-      const preset = ESTADO_PRESETS[t.value];
-      if(preset){
-        if(!es.nombre || Object.values(ESTADO_PRESETS).some(p=>p.nombre===es.nombre)) es.nombre = preset.nombre;
-        es.hpTurno = preset.hpTurno;
-      }
-      renderAll();
-      return;
-    }
-    es[campo] = (campo === 'nombre') ? t.value : num(t.value);
+    es[campo] = (campo === 'nombre' || campo === 'detalle') ? t.value : num(t.value);
     const card = t.closest('.estado');
     if(card){
       const stacks = Math.max(1, num(es.stacks)||1);
@@ -1202,6 +1330,10 @@ document.addEventListener('click', e => {
     abrirEditorHabCreep(scId, habId);
     return;
   }
+  if(b.dataset.editararma){
+    abrirEditorArmaCreep(b.dataset.editararma);
+    return;
+  }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
     return;
@@ -1249,7 +1381,7 @@ document.addEventListener('click', e => {
   if(b.dataset.addestado){
     const sc = S.creeps.find(s=>s.id===b.dataset.addestado);
     if(sc){
-      sc.estados.push({id:uid(), tipo:'veneno', nombre:'Veneno', hpTurno:-2, stacks:1, turnos:3, mods:[]});
+      sc.estados.push({id:uid(), nombre:'', polaridad:'otro', hpTurno:0, stacks:1, turnos:1, detalle:'', mods:[]});
       renderAll();
     }
     return;
@@ -1287,6 +1419,33 @@ document.addEventListener('click', e => {
       if(eraCon) actualizarHpMaxPorCon(sc);
       renderAll();
     }
+    return;
+  }
+  if(b.dataset.guardarestadopreset){
+    const [scId, estId] = b.dataset.guardarestadopreset.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const es = sc && sc.estados.find(x=>x.id===estId);
+    if(es){
+      if(!es.nombre.trim()){ toast('Poné un nombre antes de guardar el preset'); return; }
+      const preset = {
+        nombre: es.nombre, polaridad: es.polaridad||'otro', turnos: num(es.turnos),
+        stacks: num(es.stacks), hpTurno: num(es.hpTurno), detalle: es.detalle||'',
+        mods: structuredClone(es.mods||[]),
+      };
+      S.estadosPersonalizados = S.estadosPersonalizados || [];
+      const idx = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+      if(idx >= 0) S.estadosPersonalizados[idx] = preset; else S.estadosPersonalizados.push(preset);
+      toast(`Preset "${preset.nombre}" guardado`);
+      renderAll();
+    }
+    return;
+  }
+  if(b.dataset.borrarestadopreset){
+    const nombre = b.dataset.borrarestadopreset;
+    if(!confirm(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
+    S.estadosPersonalizados = (S.estadosPersonalizados || []).filter(p => p.nombre !== nombre);
+    toast('Preset borrado');
+    renderAll();
     return;
   }
   if(b.dataset.rmhab){
@@ -1739,6 +1898,20 @@ function guardar(){
 }
 
 document.addEventListener('change', async e => {
+  if(e.target.dataset.estpreset !== undefined){
+    const [scId, esId] = e.target.dataset.estpreset.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const es = sc && sc.estados.find(x=>x.id===esId);
+    if(!es || !e.target.value) return;
+    const [tipo, idx] = e.target.value.split(':');
+    const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
+    if(!preset) return;
+    const {nombre, ...resto} = preset;
+    Object.assign(es, structuredClone(resto));
+    es.nombre = nombre;
+    renderAll();
+    return;
+  }
   if(e.target.dataset.imginput === undefined) return;
   const scId = e.target.dataset.imginput;
   const file = e.target.files[0];
@@ -1765,10 +1938,16 @@ $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remo
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
+$('#equipar-creep-filtro').addEventListener('change', renderEquiparCreepLista);
+$('#equipar-creep-buscar').addEventListener('input', renderEquiparCreepLista);
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-creep'){ editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); } });
+$('#armacreep-guardar').onclick = guardarEditorArmaCreep;
+$('#armacreep-cancel').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
+$('#armacreep-x').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
+$('#scrim-arma-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-arma-creep'){ editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); } });
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;

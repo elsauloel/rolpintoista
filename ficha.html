@@ -564,6 +564,24 @@ a{color:var(--brass)}
 
 /* ---------- Armadura ---------- */
 .armgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.botonera-modal{max-width:900px}
+.botonera-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start}
+@media(max-width:720px){.botonera-grid{grid-template-columns:1fr}}
+.botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;margin-bottom:14px}
+.botonera-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.botonera-combate-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+@media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,1fr)}}
+.botonera-tile{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;gap:2px;font-family:inherit
+}
+.botonera-tile:hover:not(:disabled){border-color:var(--copper)}
+.botonera-tile:disabled{opacity:.4;cursor:not-allowed}
+.botonera-tile .bt-label{
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  line-height:1.2
+}
+.botonera-tile .bt-value{font-family:"Space Mono",monospace;font-size:18px;font-weight:700;color:var(--brass)}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
 .armbox .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .armbox .dv{font-family:"Space Mono",monospace;font-size:24px;font-weight:700;color:var(--brass)}
@@ -1042,7 +1060,7 @@ a{color:var(--brass)}
 </div>
 
 <div class="scrim" id="scrim-botonera">
-  <div class="modal catalogo-modal">
+  <div class="modal catalogo-modal botonera-modal">
     <header><h3>Botonera</h3><button class="iconbtn" id="botonera-x">Cerrar</button></header>
     <div class="body" id="botonera-body"></div>
   </div>
@@ -2379,30 +2397,39 @@ function renderBotonera(){
   let html = '';
 
   const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
-  html += `<div class="cat-grouphead">Tiradas de stats</div>`;
-  html += statsRollables.map(s => `
-    <div class="cat-row">
-      <div class="cat-info"><div class="cat-nombre">${esc(s.full || s.label)}</div></div>
-      <button type="button" class="mini" data-tirarstat="${s.id}">🎲 ${fmt(c.final[s.id])}</button>
-    </div>`).join('');
-
   const sinAccPdg = num(S.acciones) < 1;
-  html += `<div class="cat-grouphead">Combate</div>`;
-  html += `
-    <div class="cat-row">
-      <div class="cat-info"><div class="cat-nombre">Atacar (PdG)</div></div>
-      <button type="button" class="mini" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''}>🎲 Atacar</button>
-    </div>
-    <div class="cat-row">
-      <div class="cat-info"><div class="cat-nombre">Daño Arma</div></div>
-      <button type="button" class="mini" data-botoneraaccion="danio">🎲 Daño</button>
-    </div>
-    <div class="cat-row">
-      <div class="cat-info"><div class="cat-nombre">Esquivar</div></div>
-      <button type="button" class="mini" data-botoneraaccion="esquivar">🎲 Esquivar</button>
-    </div>`;
 
-  html += `<div class="cat-grouphead">Habilidades</div>`;
+  html += `<div class="botonera-grid">
+    <div class="botonera-caja">
+      <div class="cat-grouphead" style="margin-top:0">Tiradas de stats</div>
+      <div class="botonera-stats-grid">
+        ${statsRollables.map(s => `
+          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}">
+            <span class="bt-label">${esc(s.label)}</span>
+            <span class="bt-value">${fmt(c.final[s.id])}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+    <div class="botonera-caja">
+      <div class="cat-grouphead" style="margin-top:0">Combate</div>
+      <div class="botonera-combate-grid">
+        <button type="button" class="botonera-tile" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''} title="Atacar (PdG) · cuesta 1 acción">
+          <span class="bt-label">Atacar (PdG)</span><span class="bt-value">🎲</span>
+        </button>
+        <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
+          <span class="bt-label">Daño Arma</span><span class="bt-value">🎲</span>
+        </button>
+        <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
+          <span class="bt-label">Esquivar</span><span class="bt-value">🎲</span>
+        </button>
+        <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
+          <span class="bt-label">Parry</span><span class="bt-value">🎲</span>
+        </button>
+      </div>
+    </div>
+  </div>`;
+
+  html += `<div class="botonera-caja"><div class="cat-grouphead" style="margin-top:0">Habilidades</div>`;
   html += S.habilidades.length ? S.habilidades.map(i => {
     const noEspameable = i.categoria === 'No espameable';
     const yaUsada = noEspameable && i.usadaEsteTurno === true;
@@ -2413,17 +2440,19 @@ function renderBotonera(){
       <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
     </div>`;
   }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`;
+  html += `</div>`;
 
   const consumibles = [
     ...S.inventario.filter(i => i.consumible).map(i => ({i, key:'inventario'})),
     ...S.cinturon.filter(i => i.consumible).map(i => ({i, key:'cinturon'})),
   ];
-  html += `<div class="cat-grouphead">Consumibles</div>`;
+  html += `<div class="botonera-caja"><div class="cat-grouphead" style="margin-top:0">Consumibles</div>`;
   html += consumibles.length ? consumibles.map(({i, key}) => `
     <div class="cat-row">
       <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)} <span class="hint">(${key==='cinturon'?'cinturón':'mochila'})</span></div></div>
       ${consumeButton(i, key)}
     </div>`).join('') : `<div class="hint">Sin consumibles.</div>`;
+  html += `</div>`;
 
   $('#botonera-body').innerHTML = html;
 }
@@ -2701,6 +2730,7 @@ document.addEventListener('click', e => {
     if(b.dataset.botoneraaccion === 'atacar') $('#btn-atacar-pdg').click();
     if(b.dataset.botoneraaccion === 'danio') $('#btn-danio-arma').click();
     if(b.dataset.botoneraaccion === 'esquivar') $('#btn-esquivar').click();
+    if(b.dataset.botoneraaccion === 'parry') $('#btn-parry').click();
     return;
   }
   if(b.dataset.stat){

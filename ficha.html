@@ -3976,6 +3976,7 @@ function drawEditor(){
     if(c==='nombre') return false;
     if(c==='curahp') return false;
     if(['efectoNombre','efectoTurnos','efectoHpTurno','curabonosPct'].includes(c)) return false;
+    if(c==='forzarAccionesMax') return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
     return true;

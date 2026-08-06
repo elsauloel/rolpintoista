@@ -133,6 +133,8 @@ input[type=file]{display:none}
 
 .hab-list{display:flex;flex-direction:column;gap:6px}
 .hab{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
+/* Movimiento: siempre con un fondo distinguible del resto de las habilidades */
+.item-movimiento{background:rgba(91,141,190,.14)!important;border-color:rgba(91,141,190,.5)!important}
 .hab-compacta{padding:5px 7px}
 .hab-compacta .hab-bottom{margin-top:5px}
 .hab-top{display:flex;gap:5px;align-items:center}
@@ -164,6 +166,25 @@ input[type=file]{display:none}
   margin:10px 0 2px
 }
 .acciones-grupo-label:first-child{margin-top:0}
+.acciones-modal{max-width:1400px!important;width:calc(100% - 20px)}
+.acciones-modal .body{max-height:none!important;overflow:visible!important}
+.botonera-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start;min-width:0;margin-bottom:14px}
+@media(max-width:820px){.botonera-grid{grid-template-columns:1fr}}
+.botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;min-width:0}
+.botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.botonera-tile{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;gap:2px;font-family:inherit;min-width:0;color:var(--paper)
+}
+.botonera-tile:hover:not(:disabled){border-color:var(--copper)}
+.botonera-tile:disabled{opacity:.4;cursor:not-allowed}
+.botonera-tile .bt-label{
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.2
+}
+.botonera-tile .bt-value{font-family:"Space Mono",monospace;font-size:18px;font-weight:700;color:var(--brass)}
+.botonera-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px;align-content:start}
 .acciones-badge{
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);
   border:1px solid var(--copper);border-radius:var(--r);padding:3px 9px;background:rgba(201,133,69,.14);flex:none
@@ -362,7 +383,7 @@ input[type=file]{display:none}
 <div class="toast" id="toast"></div>
 
 <div class="scrim" id="scrim-acciones-creep">
-  <div class="modal" style="max-width:420px">
+  <div class="modal acciones-modal">
     <header>
       <div style="display:flex;align-items:center;gap:10px;min-width:0">
         <h3>Acciones</h3>
@@ -371,7 +392,7 @@ input[type=file]{display:none}
       </div>
       <button class="iconbtn" id="acciones-creep-x">Cerrar</button>
     </header>
-    <div class="body" id="acciones-creep-lista" style="display:flex;flex-direction:column;gap:6px;max-height:65vh;overflow-y:auto"></div>
+    <div class="body" id="acciones-creep-lista"></div>
   </div>
 </div>
 
@@ -976,16 +997,21 @@ function renderAccionesCreep(){
   if(!sc) return;
   const sinAcc = num(sc.acc) < 1;
 
-  const filasStats = CREEP_DERIVED_STATS.map(d => ({
-    nombre: d.label, disabled:false, motivo:`Valor ${fmt(creepStatValor(sc, d.id))}`,
-    attr:`data-tirarstatcreep="${sc.id}:${d.id}"`,
-  }));
+  const tilesStats = CREEP_DERIVED_STATS.map(d => `
+    <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
+      <span class="bt-label">${esc(d.label)}</span>
+      <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
+    </button>`).join('');
 
-  const filasCombate = [
+  const combate = [
     {nombre:'Atacar (PdG)', disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {nombre:'Esquivar', disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
   ];
+  const tilesCombate = combate.map(f => `
+    <button type="button" class="botonera-tile" ${f.attr} ${f.disabled?'disabled':''} title="${esc(f.motivo)}">
+      <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value">🎲</span>
+    </button>`).join('');
 
   const filasHab = sc.habilidades.map(h => {
     const enCooldown = num(h.cdActual) > 0;
@@ -1002,16 +1028,28 @@ function renderAccionesCreep(){
   $('#acciones-creep-titulo').textContent = sc.nombre;
   $('#acciones-creep-badge').textContent = `${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}`;
 
-  const fila = f => `
-    <div class="accion-row">
+  const filaHab = f => `
+    <div class="accion-row${f.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
     </div>`;
-  const grupo = (titulo, filas) => filas.length ? `<div class="acciones-grupo-label">${esc(titulo)}</div>${filas.map(fila).join('')}` : '';
 
-  $('#acciones-creep-lista').innerHTML =
-    grupo('Tiradas de stats', filasStats) + grupo('Combate', filasCombate) + grupo('Habilidades', filasHab);
+  $('#acciones-creep-lista').innerHTML = `
+    <div class="botonera-grid">
+      <div class="botonera-caja">
+        <div class="acciones-grupo-label" style="margin-top:0">Tiradas de stats</div>
+        <div class="botonera-stats-grid">${tilesStats}</div>
+      </div>
+      <div class="botonera-caja">
+        <div class="acciones-grupo-label" style="margin-top:0">Combate</div>
+        <div class="botonera-combate-grid">${tilesCombate}</div>
+      </div>
+    </div>
+    <div class="botonera-caja">
+      <div class="acciones-grupo-label" style="margin-top:0">Habilidades</div>
+      <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
+    </div>`;
 }
 
 function abrirAccionesCreep(scId){
@@ -1568,7 +1606,7 @@ function habHtml(scId, h, sinAcciones){
   const esMovimiento = h.nombre === 'Movimiento';
 
   if(esMovimiento){
-    return `<div class="hab hab-compacta" data-habid="${h.id}">
+    return `<div class="hab hab-compacta item-movimiento" data-habid="${h.id}">
       <div class="hab-top">
         <input class="hn" data-habf="nombre" data-scid="${scId}" data-habid="${h.id}" value="${esc(h.nombre)}" placeholder="Nombre">
         <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
@@ -2336,6 +2374,15 @@ if(!sessionStorage.getItem('recordatorio-visto-gmtools')){
   sessionStorage.setItem('recordatorio-visto-gmtools', '1');
   $('#scrim-recordatorio').classList.add('open');
 }
+
+// Cerrar cualquier popup con la tecla Escape.
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  document.querySelectorAll('.scrim.open').forEach(scrim => {
+    const closeBtn = scrim.querySelector('[id$="-x"]');
+    if(closeBtn) closeBtn.click(); else scrim.classList.remove('open');
+  });
+});
 $('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');
 $('#dados-tirar').onclick = ejecutarTiradaManual;
 $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); ejecutarTiradaManual(); } });

@@ -282,6 +282,8 @@ a{color:var(--brass)}
 /* ---------- Listas ---------- */
 .item{border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;position:relative}
 .item:last-child{margin-bottom:0}
+/* Movimiento: siempre con un fondo distinguible del resto de las habilidades */
+.item-movimiento{background:rgba(91,141,190,.14);border-color:rgba(91,141,190,.5)}
 .item .ihead{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
 .item .iname{font-weight:700;font-size:13.5px;line-height:1.3}
 .item .idesc{font-size:12px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
@@ -2299,7 +2301,7 @@ const LISTS = {
       const esVariable = esCostoVariable(i.costo);
       const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
       const bloqueada = sinAcciones;
-      return `<div class="item">
+      return `<div class="item${i.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''} ${i.categoria?`<span class="tag cat">${esc(i.categoria)}</span>`:''}</div>
@@ -2397,7 +2399,7 @@ function renderTodasHabilidades(){
     const esVariable = esCostoVariable(i.costo);
     const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
     const bloqueada = sinAcciones;
-    return `<div class="habs-grid-item">
+    return `<div class="habs-grid-item${i.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="habs-grid-nombre">${esc(i.nombre)}</div>
       <div class="habs-grid-btns">
         <button class="mini" data-view="habilidades:${i.id}">Ver</button>
@@ -2458,7 +2460,7 @@ function renderBotonera(){
           const yaUsada = noEspameable && i.usadaEsteTurno === true;
           const esVariable = esCostoVariable(i.costo);
           const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
-          return `<div class="cat-row">
+          return `<div class="cat-row${i.nombre==='Movimiento'?' item-movimiento':''}">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
           </div>`;
@@ -3423,6 +3425,16 @@ document.addEventListener('mousedown', e => {
   if(!e.target.closest('#menu-ajustes')) $('#menu-ajustes').classList.remove('open');
 });
 $('#menu-ajustes .desplegable').addEventListener('click', () => $('#menu-ajustes').classList.remove('open'));
+
+// Cerrar cualquier popup (modal o menú desplegable) con la tecla Escape.
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  document.querySelectorAll('.scrim.open').forEach(scrim => {
+    const closeBtn = scrim.querySelector('[id$="-x"]');
+    if(closeBtn) closeBtn.click(); else scrim.classList.remove('open');
+  });
+  $('#menu-ajustes').classList.remove('open');
+});
 
 $('#btn-sync-reset').onclick = () => {
   if(!localStorage.getItem('gh-token')){ toast('No hay ningún token guardado'); return; }

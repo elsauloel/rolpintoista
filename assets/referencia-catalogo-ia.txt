@@ -1,0 +1,844 @@
+================================================================
+PARTE 1 — REGLAS Y VOCABULARIO IMPLÍCITO DEL SISTEMA
+================================================================
+Este documento es material de referencia sobre el sistema de items del
+juego de rol de mesa "Piratas en el espacio" (ficha de personaje casera,
+sin publicar comercialmente). Sirve como contexto para diseñar objetos
+NUEVOS que respeten la lógica y el balance de los ya existentes.
+
+--- ATRIBUTOS PRINCIPALES Y STATS DERIVADOS ---
+Hay 5 atributos base que el jugador asigna con puntos: Constitución (con),
+Fuerza (fue), Agilidad (agl), Destreza (des) e Inteligencia (int).
+Cada atributo tiene stats derivados que, por default, son simplemente
+IGUALES al atributo del que derivan (fórmula base "= atributo"), pero esa
+fórmula es editable por cada jugador y puede llevar modificadores propios:
+
+  Constitución (con) → Resistencia mágica (resmg), Resistencia al crowd
+    control (rescc), HP máximo (hpmax, fórmula por default con*5)
+  Fuerza (fue) → Daño (dmg), Potencia (potencia), Carga máxima (crgmax)
+  Agilidad (agl) → Evasión (eva), Iniciativa (ini), Movimiento (mov)
+  Destreza (des) → Rango (rng), Probabilidad de golpe / PdG (pdg),
+    Crítico (crit), Parry (parry)
+  Inteligencia (int) → PdG mágico (pdgmg), Resistencia mágica por Int
+    (resm), Bonos (fórmula ceil(int/2) menos penalización por sobrecarga
+    de peso), Rango de casteo (rangocasteo)
+
+Además hay stats "sueltos" que no derivan de un atributo:
+  Defensa (def) — la da casi exclusivamente el equipo (escudos/armaduras).
+  Acciones máximas por turno (accionesmax) — normalmente 3, se puede
+    modificar con equipo, habilidades o estados alterados.
+  Resistencia a crítico por Tipo de arma (tipo1..tipo5) — hay 5
+    "tipos" de crítico, cada uno asociado a un tamaño de dado de arma:
+      Tipo 2 (d2), Tipo 4 (d4), Tipo 6 (d6), Tipo 8 (d8), Tipo 10 (d10,
+      pensado para armas explosivas / modernas / de alto impacto).
+    La armadura reduce específicamente el crítico de CIERTOS tipos de
+    arma, no todos por igual — es la forma en que el sistema modela que
+    una armadura "buena contra espadas" no necesariamente protege igual
+    contra un arma explosiva.
+
+--- CÓMO FUNCIONAN LOS MODIFICADORES DE EQUIPO ---
+Cualquier ítem equipable puede tener una lista de "mods": pares
+{stat, val} que se suman SOLO mientras el ítem está equipado. El campo
+"def" (Defensa) es el más común en escudos y armaduras. También se usan
+mods de resistencia a crítico (tipo1..tipo5), de atributos, o de
+cualquier stat derivado (ej. "+1 ini", "-1 mov" en un ítem pesado).
+No hay límite duro de cuántos mods puede tener un ítem, pero en la
+práctica el catálogo actual usa entre 0 y 4 mods por ítem.
+
+--- CATEGORÍAS DE ÍTEM ---
+Armas: arma de una mano (arma_1m), arma de dos manos (arma_2m).
+Escudos: de una mano (escudo_1m), de dos manos (escudo_2m).
+Defensa (armadura, por zona del cuerpo, cada una en versión "blanda"
+  -más liviana, menos protección- o "rígida" -más pesada, más
+  protección-): armadura de torso, guantes, piernas, casco, botas.
+Otros: anillos, otros accesorios.
+Consumibles: se gastan al usarse (pociones, ítems de un solo uso o con
+  cargas).
+
+--- ARMAS: DADO DE DAÑO ---
+Las armas no tienen un número de daño fijo por sí solas: usan un dado
+(tipoDado) — 2, 4, 6, 8 o 10 caras — que se multiplica por la cantidad de
+dados que el personaje puede tirar (eso lo determina "peso"/fuerza del
+personaje, no el arma). Un arma puede además sumar "danoFijo", un bonus
+plano de daño que no depende de tirada. El tamaño del dado es, en la
+práctica, el principal indicador de "qué tan fuerte pega" un arma —
+ver el análisis de precios más abajo para la correlación precio/dado.
+
+--- CONSUMIBLES: MECÁNICAS DISPONIBLES ---
+Un consumible puede combinar cualquiera de estas mecánicas:
+  • curahp: HP instantáneo al consumir (negativo = hace daño en vez de
+    curar, para venenos/trampas comestibles).
+  • curabonosPct: restaura un % del máximo de Bonos (redondeado arriba).
+  • cargaMax / cargaActual: la unidad trae varias "cargas" internas
+    (ej. una poción con 3 cargas se consume 3 veces antes de gastar la
+    unidad completa del inventario).
+  • efectoNombre / efectoTurnos / efectoHpTurno / efectoPermanente: al
+    consumirlo, activa (o refresca) automáticamente un Estado Alterado
+    con ese nombre en la ficha del personaje, con HP por turno y
+    duración configurados. Esto es cómo funcionan las pociones de
+    Regeneración, por ejemplo.
+  • unidades: cuántas unidades vienen por compra (para stackear en un
+    slot de inventario).
+
+--- ESTADOS ALTERADOS (relevantes para ítems con efecto) ---
+Hay un sistema de Estados Alterados con presets estándar, cada uno
+etiquetado como buff, debuff u otro:
+  BUFFS: Regeneración (+HP/turno), Hypeado (+1 Acción máxima/turno).
+  DEBUFFS: Veneno (-HP/turno y pierde stacks/turno), Pajaritos (PdG y
+    Evasión a la mitad), Agotado (-1 Acción máxima), Exhausto (fuerza a
+    1 sola Acción por turno), Stun (fuerza a 0 Acciones), Armadura rota
+    (Defensa y Resistencia a crítico de equipo a la mitad), Armadura
+    arruinada (anula Defensa y Resistencia a crítico de equipo).
+  Un estado tiene: turnos restantes, stacks, HP por turno (multiplicado
+  por stacks), stacks por turno (para venenos que se van agotando
+  solos), y opcionalmente modificadores de atributo.
+  Un ítem nuevo con efecto especial puede apuntar a cualquiera de estos
+  presets, a un preset personalizado, o a un estado inventado con
+  nombre propio.
+
+--- ECONOMÍA: LA MONEDA ES "DDE" ---
+Todos los precios están en DDE (la moneda del mundo del juego). No hay
+un tipo de cambio publicado a "valor real" — el equilibrio es puramente
+interno, relativo a lo que ya existe en el catálogo.
+
+--- ADVERTENCIA SOBRE EL CATÁLOGO ACTUAL ---
+Muchos ítems fueron diseñados "a ojo" en iteraciones anteriores del
+juego, antes de que existieran mecánicas más nuevas (cargas, efectos
+automáticos, resistencia a crítico por tipo, Parry, etc.). Es esperable
+encontrar inconsistencias de precio/poder entre ítems viejos y nuevos:
+no asumas que todo el catálogo actual ya está balanceado entre sí — usá
+el análisis de precios de la Parte 2 como punto de partida, no como
+verdad absoluta.
+
+================================================================
+PARTE 2 — ANÁLISIS DE PRECIOS OBSERVADOS EN EL CATÁLOGO ACTUAL
+================================================================
+Precio promedio de armas por tamaño de dado de daño (antes de daño fijo):
+  d2: promedio 47 DDE (n=3, rango 30-60)
+  d4: promedio 44 DDE (n=4, rango 25-70)
+  d6: promedio 70 DDE (n=3, rango 50-90)
+  d8: promedio 50 DDE (n=4, rango 30-70)
+
+Precio por punto de Defensa (ítems equipables con mod 'def'): promedio 21.9 DDE/punto (n=26, rango 0.4-180.0)
+
+Precio por punto de HP curado (consumibles de curación instantánea): promedio 0.88 DDE/HP (n=4, rango 0.20-2.00)
+
+================================================================
+PARTE 3 — CATÁLOGO COMPLETO (65 ítems), UNO POR UNO
+================================================================
+
+----------------- ARMAS (14 ítems) -----------------
+
+### Daga
+ID interno: cat-daga
+Categoría: Arma de una mano
+Precio de compra: 30 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d2
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Ignora 1 de resistencia crítica.
+
+### Rompemalla
+ID interno: cat-rompemalla
+Categoría: Arma de una mano
+Precio de compra: 60 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d2
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Rompe armadura.
+
+### Espada ancha
+ID interno: cat-espada-ancha
+Categoría: Arma de una mano
+Precio de compra: 70 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d4
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Daño amplificado.
+
+### Hacha de mano
+ID interno: cat-hacha-de-mano
+Categoría: Arma de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d6
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Rompe armadura.
+
+### Bastón flexible
+ID interno: cat-bast-n-flexible
+Categoría: Arma de una mano
+Precio de compra: 30 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d8
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Ignora 1 de resistencia crítica.
+
+### Estoque
+ID interno: cat-estoque
+Categoría: Arma de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d2
+Otros modificadores mientras está equipado: +1 Iniciativa
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Modificador: '+1 a iniciativa
+
+### Espada corta
+ID interno: cat-espada-corta
+Categoría: Arma de una mano
+Precio de compra: 30 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d4
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: (sin descripción cargada)
+
+### Machete
+ID interno: cat-machete
+Categoría: Arma de una mano
+Precio de compra: 25 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d4
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +10% de daño crítico
+
+### Hacha
+ID interno: cat-hacha
+Categoría: Arma de una mano
+Precio de compra: 70 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d6
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Rompe armadura.
+
+### Maza
+ID interno: cat-maza
+Categoría: Arma de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d8
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Daño amplificado.
+
+### Espada larga
+ID interno: cat-espada-larga
+Categoría: Arma de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d4
+Otros modificadores mientras está equipado: +1 Probabilidad de golpe
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: modificador: '+1 al pdg. +1 al parry
+
+### Hacha de batalla
+ID interno: cat-hacha-de-batalla
+Categoría: Arma de una mano
+Precio de compra: 90 DDE
+Peso: 4
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d6
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Rompe armadura.
+
+### Mangual
+ID interno: cat-mangual
+Categoría: Arma de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d8
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Alcance +1.
+
+### Martillo
+ID interno: cat-martillo
+Categoría: Arma de una mano
+Precio de compra: 70 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 1
+Dado de daño: d8
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Daño +50%. Lento.
+
+
+----------------- ESCUDOS (6 ítems) -----------------
+
+### Escudo romano
+ID interno: cat-escudo-romano
+Categoría: Escudo de dos manos
+Precio de compra: 110 DDE
+Peso: 5
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +250
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +4 al bloqueo. Movimiento y ataque lento
+
+### Escudo grande
+ID interno: cat-escudo-grande
+Categoría: Escudo de una mano
+Precio de compra: 90 DDE
+Peso: 4
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +200
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +2 al bloqueo
+
+### Broquel
+ID interno: cat-broquel
+Categoría: Escudo de una mano
+Precio de compra: 30 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +50
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +2 a estabilidad
+
+### Escudo pavés
+ID interno: cat-escudo-pav-s
+Categoría: Escudo de una mano
+Precio de compra: 70 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +150
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +1 a estabilidad, +1 al bloqueo
+
+### Escudo triangular
+ID interno: cat-escudo-triangular
+Categoría: Escudo de una mano
+Precio de compra: 70 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +150
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +2 al bloqueo
+
+### Escudo pequeño
+ID interno: cat-escudo-peque-o
+Categoría: Escudo de una mano
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 1
+Modificador de Defensa: +100
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +1 al bloqueo, +1 a la estabilidad
+
+
+----------------- DEFENSA (armaduras/accesorios) (21 ítems) -----------------
+
+### Armadura acolchada
+ID interno: cat-armadura-acolchada
+Categoría: Armadura blanda
+Precio de compra: 70 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +6
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2.
+
+### Armadura con tachas
+ID interno: cat-armadura-con-tachas
+Categoría: Armadura blanda
+Precio de compra: 70 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +5
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2 y 4.
+
+### Cota de malla
+ID interno: cat-cota-de-malla
+Categoría: Armadura blanda
+Precio de compra: 80 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +7
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 4 y 6.
+
+### Pechera
+ID interno: cat-pechera
+Categoría: Armadura blanda
+Precio de compra: 60 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +3
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2.
+
+### Cota de placas
+ID interno: cat-cota-de-placas
+Categoría: Armadura rígida
+Precio de compra: 90 DDE
+Peso: 4
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +9
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 4, 6 y 8.
+
+### Coraza
+ID interno: cat-coraza
+Categoría: Armadura rígida
+Precio de compra: 100 DDE
+Peso: 5
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +12
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8); +1 Resistencia a crítico Tipo 10 (d10, explosivos/modernas)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos de cualquier tipo.
+
+### Sombrero humectante
+ID interno: cat-sombrero-humectante
+Categoría: Casco blando
+Precio de compra: 80 DDE
+Peso: 0
+Ranuras ocupadas en mochila (si no está equipado): 0
+Otros modificadores mientras está equipado: +1 Bonos
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +1 a los Bonos máximos.
+
+### Casco
+ID interno: cat-casco
+Categoría: Casco rígido
+Precio de compra: 30 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +3
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 8.
+
+### Yelmo liviano
+ID interno: cat-yelmo-liviano
+Categoría: Casco rígido
+Precio de compra: 50 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +5
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 6 y 8.
+
+### Yelmo completo
+ID interno: cat-yelmo-completo
+Categoría: Casco rígido
+Precio de compra: 80 DDE
+Peso: 6
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +7
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 6 y 8.
+
+### Gran yelmo
+ID interno: cat-gran-yelmo
+Categoría: Casco rígido
+Precio de compra: 90 DDE
+Peso: 4
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +9
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 4, 6 y 8.
+
+### Zapatillas Nike
+ID interno: cat-zapatillas-nike
+Categoría: Botas rígidas
+Precio de compra: 180 DDE
+Peso: 0
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +1
+Otros modificadores mientras está equipado: +1 Acciones máximas por turno
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +1 a las Acciones máximas del turno.
+
+### Botas reforzadas
+ID interno: cat-botas-reforzadas
+Categoría: Botas blandas
+Precio de compra: 70 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +3
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 6 (d6)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 6.
+
+### Grebas
+ID interno: cat-grebas
+Categoría: Piernas rígidas
+Precio de compra: 80 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +5
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 6 y 8.
+
+### Sabatón
+ID interno: cat-sabaton
+Categoría: Botas rígidas
+Precio de compra: 90 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +7
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6); +1 Resistencia a crítico Tipo 8 (d8); -1 Movimiento
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.
+
+### Mercury threads
+ID interno: cat-mercury-threads
+Categoría: Botas blandas
+Precio de compra: 150 DDE
+Peso: 0
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +2
+Otros modificadores mientras está equipado: +1 Bonos; +1 Resistencia mágica (Int); +1 Resistencia al crowd control
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: +1 a los Bonos máximos, +1 Res.M y +1 Res.CC.
+
+### Guantes finos de señor
+ID interno: cat-guantes-finos-de-senor
+Categoría: Guantes blandos
+Precio de compra: 80 DDE
+Peso: 0
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +1
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar
+
+### Guantes de cuero reforzado
+ID interno: cat-guantes-de-cuero-reforzado
+Categoría: Guantes blandos
+Precio de compra: 70 DDE
+Peso: 1
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +3
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2.
+
+### Mitones de malla
+ID interno: cat-mitones-de-malla
+Categoría: Guantes rígidos
+Precio de compra: 80 DDE
+Peso: 2
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +5
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2 y 4.
+
+### Guanteletes
+ID interno: cat-guanteletes
+Categoría: Guantes rígidos
+Precio de compra: 90 DDE
+Peso: 3
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +7
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 6 (d6)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 4 y 6.
+
+### Armadura mediana
+ID interno: cat-armadura-mediana
+Categoría: Armadura rígida
+Precio de compra: 90 DDE
+Peso: 4
+Ranuras ocupadas en mochila (si no está equipado): 0
+Modificador de Defensa: +9
+Otros modificadores mientras está equipado: +1 Resistencia a crítico Tipo 2 (d2); +1 Resistencia a crítico Tipo 4 (d4); +1 Resistencia a crítico Tipo 8 (d8)
+Es consumible: no (se equipa)
+Descripción / texto de sabor original: Reduce críticos Tipo 2, 4 y 8.
+
+
+----------------- CONSUMIBLES (24 ítems) -----------------
+
+### Poción de HP
+ID interno: cat-pocion-hp
+Categoría: Consumibles
+Precio de compra: 5 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+HP instantáneo al consumir: +25
+Descripción / texto de sabor original: Recupera 25 HP.
+
+### Poción de HP grande
+ID interno: cat-pocion-hp-grande
+Categoría: Consumibles
+Precio de compra: 20 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Cargas por unidad: 3 (cada uso gasta 1 carga; al agotarse las cargas, se gasta 1 unidad)
+HP instantáneo al consumir: +25
+Descripción / texto de sabor original: 3 Cargas. Recupera 25 HP por carga.
+
+### Poción de HP mayor
+ID interno: cat-pocion-hp-mayor
+Categoría: Consumibles
+Precio de compra: 50 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+HP instantáneo al consumir: +100
+Descripción / texto de sabor original: Recupera 100 HP.
+
+### Poción de HP mayor grande
+ID interno: cat-pocion-hp-mayor-grande
+Categoría: Consumibles
+Precio de compra: 200 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Cargas por unidad: 3 (cada uso gasta 1 carga; al agotarse las cargas, se gasta 1 unidad)
+HP instantáneo al consumir: +100
+Descripción / texto de sabor original: 3 Cargas. Recupera 100 HP por carga.
+
+### Poción de Regeneración
+ID interno: cat-pocion-regen
+Categoría: Consumibles
+Precio de compra: 15 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Al consumir activa el estado alterado "Regeneración (poción)": +10 HP/turno, dura 5 turno(s)
+Descripción / texto de sabor original: Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración Grande
+ID interno: cat-pocion-regen-grande
+Categoría: Consumibles
+Precio de compra: 45 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Cargas por unidad: 3 (cada uso gasta 1 carga; al agotarse las cargas, se gasta 1 unidad)
+Al consumir activa el estado alterado "Regeneración (poción)": +10 HP/turno, dura 5 turno(s)
+Descripción / texto de sabor original: 3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración mayor
+ID interno: cat-pocion-regen-mayor
+Categoría: Consumibles
+Precio de compra: 35 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Al consumir activa el estado alterado "Regeneración (poción)": +20 HP/turno, dura 5 turno(s)
+Descripción / texto de sabor original: Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración mayor grande
+ID interno: cat-pocion-regen-mayor-grande
+Categoría: Consumibles
+Precio de compra: 100 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Cargas por unidad: 3 (cada uso gasta 1 carga; al agotarse las cargas, se gasta 1 unidad)
+Al consumir activa el estado alterado "Regeneración (poción)": +20 HP/turno, dura 5 turno(s)
+Descripción / texto de sabor original: 3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Bonos
+ID interno: cat-pocion-bonos
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Restaura Bonos al consumir: 50% del máximo (redondeado arriba)
+Descripción / texto de sabor original: Restaura la mitad de tu total de Bonos (redondeado hacia arriba).
+
+### Poción de Bonos grande
+ID interno: cat-pocion-bonos-grande
+Categoría: Consumibles
+Precio de compra: 120 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Restaura Bonos al consumir: 100% del máximo (redondeado arriba)
+Descripción / texto de sabor original: Restaura todos tus Bonos.
+
+### Cura Plus
+ID interno: cat-cura-plus
+Categoría: Consumibles
+Precio de compra: 15 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Remueve estados alterados.
+
+### Antídoto
+ID interno: cat-antidoto
+Categoría: Consumibles
+Precio de compra: 10 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Cura el estado Veneno.
+
+### Raciones
+ID interno: cat-raciones
+Categoría: Consumibles
+Precio de compra: 3 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 2
+Descripción / texto de sabor original: (2/2) +1 Wellness. (Aplicar a mano al usarla.)
+
+### Raciones Fancy
+ID interno: cat-raciones-fancy
+Categoría: Consumibles
+Precio de compra: 50 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 5
+Descripción / texto de sabor original: (5/5) +2 Wellness. (Aplicar a mano al usarla.)
+
+### Ankh de Reencarnación
+ID interno: cat-ankh
+Categoría: Consumibles
+Precio de compra: 200 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Se activa solo si está en tu CINTURÓN al llegar tu HP a 0: te revive con 25% del HP máximo, titilando hasta el comienzo de tu turno. Si está en la mochila no se activa solo — entrás en estado de Muerte igual, pero un aliado puede usarlo sobre tu cuerpo para revivirte.
+
+### Revive
+ID interno: cat-revive
+Categoría: Consumibles
+Precio de compra: 150 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.
+
+### Polilla mística
+ID interno: cat-polilla
+Categoría: Consumibles
+Precio de compra: 50 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Al consumir activa el estado alterado "Polilla revoloteando", dura no vence (hasta que se borre a mano)
+Descripción / texto de sabor original: Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. Mientras siga ahí, podés gastarla en cualquier momento para sumar +2 a una tirada de dado. Si todavía la tenés guardada sin consumir, no hay bono — el efecto arranca recién cuando la liberás, y dura hasta que la uses.
+
+### Moneda Re-Roll
+ID interno: cat-moneda-reroll
+Categoría: Consumibles
+Precio de compra: 100 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Permite repetir una tirada. Se conserva si gana tirando una moneda.
+
+### Pergamino de luz cegadora
+ID interno: cat-pergamino-luz
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de tentáculo sombrío
+ID interno: cat-pergamino-tentaculo
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de sombras chinescas
+ID interno: cat-pergamino-sombras
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de red Nerubian
+ID interno: cat-pergamino-red
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de ojo de Kicillof
+ID interno: cat-pergamino-ojo
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de ventriloquía
+ID interno: cat-pergamino-ventriloquia
+Categoría: Consumibles
+Precio de compra: 30 DDE
+Peso: 0
+Otros modificadores mientras está equipado: Ninguno.
+Es consumible: sí
+Unidades por compra: 1
+Descripción / texto de sabor original: Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).

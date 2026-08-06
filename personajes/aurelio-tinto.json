@@ -14,7 +14,7 @@
     {
       "id": "j1",
       "nombre": "Jornada 1",
-      "texto": "- faltó sumarnos la exp y el loot de la última pelea\n- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado."
+      "texto": "- faltó sumarnos la exp y el loot de la última pelea\n- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado.\n- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado\n"
     }
   ],
   "bitacoraActiva": "j1",
@@ -38,6 +38,11 @@
   ],
   "bonosGastados": 0,
   "acciones": 3,
+  "muerto": {
+    "activo": false,
+    "turnos": 5,
+    "definitivo": false
+  },
   "caps": {
     "mochila": 20,
     "cinturon": 5
@@ -58,6 +63,7 @@
     "rng": "des",
     "pdg": "des",
     "crit": "des",
+    "parry": "des",
     "pdgmg": "int",
     "resm": "int",
     "bonos": "ceil(int/2) - sobrecarga",
@@ -1319,6 +1325,610 @@
       "curabonosPct": 100,
       "mods": [],
       "detalle": "Restaura todos tus Bonos."
+    },
+    {
+      "id": "cat-armadura-acolchada",
+      "nombre": "Armadura acolchada",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "cat-armadura-con-tachas",
+      "nombre": "Armadura con tachas",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4."
+    },
+    {
+      "id": "cat-cota-de-malla",
+      "nombre": "Cota de malla",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+    },
+    {
+      "id": "cat-pechera",
+      "nombre": "Pechera",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "cat-cota-de-placas",
+      "nombre": "Cota de placas",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+    },
+    {
+      "id": "cat-coraza",
+      "nombre": "Coraza",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 5,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 12
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos de cualquier tipo."
+    },
+    {
+      "id": "cat-sombrero-humectante",
+      "nombre": "Sombrero humectante",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a los Bonos máximos."
+    },
+    {
+      "id": "cat-casco",
+      "nombre": "Casco",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 8."
+    },
+    {
+      "id": "cat-yelmo-liviano",
+      "nombre": "Yelmo liviano",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6 y 8."
+    },
+    {
+      "id": "cat-yelmo-completo",
+      "nombre": "Yelmo completo",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 6,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 6 y 8."
+    },
+    {
+      "id": "cat-gran-yelmo",
+      "nombre": "Gran yelmo",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+    },
+    {
+      "id": "cat-zapatillas-nike",
+      "nombre": "Zapatillas Nike",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 180,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "accionesmax",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a las Acciones máximas del turno."
+    },
+    {
+      "id": "cat-botas-reforzadas",
+      "nombre": "Botas reforzadas",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6."
+    },
+    {
+      "id": "cat-grebas",
+      "nombre": "Grebas",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6 y 8."
+    },
+    {
+      "id": "cat-sabaton",
+      "nombre": "Sabatón",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": -1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 4, 6 y 8. -1 Movimiento."
+    },
+    {
+      "id": "cat-mercury-threads",
+      "nombre": "Mercury threads",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 150,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        },
+        {
+          "stat": "resm",
+          "val": 1
+        },
+        {
+          "stat": "rescc",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC."
+    },
+    {
+      "id": "cat-guantes-finos-de-senor",
+      "nombre": "Guantes finos de señor",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        }
+      ],
+      "detalle": "Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar"
+    },
+    {
+      "id": "cat-guantes-de-cuero-reforzado",
+      "nombre": "Guantes de cuero reforzado",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "cat-mitones-de-malla",
+      "nombre": "Mitones de malla",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4."
+    },
+    {
+      "id": "cat-guanteletes",
+      "nombre": "Guanteletes",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+    },
+    {
+      "id": "cat-armadura-mediana",
+      "nombre": "Armadura mediana",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 8."
     }
   ],
   "equipo": [

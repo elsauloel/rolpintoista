@@ -30,7 +30,7 @@
     "des": 7,
     "int": 5
   },
-  "hp": 41,
+  "hp": 34,
   "turno": 3,
   "log": [
     "<b style=\"color:var(--brass)\">Turno 3</b>",

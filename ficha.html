@@ -158,7 +158,7 @@ a{color:var(--brass)}
 
 /* ---------- Barra de vida ---------- */
 .vitals-sticky{
-  position:sticky;top:0;z-index:60;background:var(--ink);
+  position:sticky;top:0;z-index:30;background:var(--ink);
   padding-top:14px;padding-bottom:14px;margin:0 -20px;padding-left:20px;padding-right:20px;
   border-bottom:1px solid var(--line);box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
 }
@@ -569,16 +569,17 @@ a{color:var(--brass)}
 
 /* ---------- Armadura ---------- */
 .armgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
-.botonera-modal{max-width:900px}
-.botonera-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start}
+.botonera-modal{max-width:900px;width:calc(100% - 20px);max-height:none}
+.botonera-modal .body{overflow:visible;max-height:none}
+.botonera-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start;min-width:0}
 @media(max-width:720px){.botonera-grid{grid-template-columns:1fr}}
-.botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;margin-bottom:14px}
-.botonera-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.botonera-combate-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-@media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,1fr)}}
+.botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;margin-bottom:14px;min-width:0}
+.botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .botonera-tile{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
-  display:flex;flex-direction:column;gap:2px;font-family:inherit
+  display:flex;flex-direction:column;gap:2px;font-family:inherit;min-width:0
 }
 .botonera-tile:hover:not(:disabled){border-color:var(--copper)}
 .botonera-tile:disabled{opacity:.4;cursor:not-allowed}

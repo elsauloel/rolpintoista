@@ -474,6 +474,55 @@ function tirarRapido(caras){
   ejecutarTiradaManual();
 }
 
+/* ---------- Descomponer un valor de stat en dados reales (portado de ficha.html) ---------- */
+
+const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
+
+function combosDeSuma(n, k, minIdx){
+  if(k === 0) return n === 0 ? [[]] : [];
+  const out = [];
+  for(let i = minIdx; i < DADOS_REALES.length; i++){
+    const d = DADOS_REALES[i];
+    if(d > n) break;
+    combosDeSuma(n - d, k - 1, i).forEach(resto => out.push([d, ...resto]));
+  }
+  return out;
+}
+
+function mejorComboDados(n){
+  for(let k = 1; k <= 6; k++){
+    const combos = combosDeSuma(n, k, 0);
+    if(combos.length){
+      combos.sort((a, b) => (Math.max(...a) - Math.min(...a)) - (Math.max(...b) - Math.min(...b)));
+      return combos[0];
+    }
+  }
+  return null;
+}
+
+function formulaParaValor(valor){
+  const n = Math.round(num(valor));
+  if(n <= 0) return null;
+  let base = n, mod = 0;
+  if(base % 2 !== 0){ base -= 1; mod = 1; }
+  if(base <= 0) return null;
+  const combo = mejorComboDados(base);
+  if(!combo) return null;
+  const counts = {};
+  combo.forEach(d => counts[d] = (counts[d] || 0) + 1);
+  const formula = Object.keys(counts).map(Number).sort((a, b) => a - b)
+    .map(d => `${counts[d]}d${d}`).join('+') + (mod ? `+${mod}` : '');
+  return {combo, mod, formula};
+}
+
+function tirarValorStat(nombre, valor){
+  const f = formulaParaValor(valor);
+  if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+  const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+  const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
+  mostrarResultadoDado(nombre, {formula: f.formula, rolls, mod: f.mod, total});
+}
+
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
 const DADOS_ARMA = [2,4,6,8,10];
 
@@ -653,6 +702,15 @@ function cardHtml(sc){
         <div class="mini-f"><label>Vel.</label><input type="number" data-f="spd" data-id="${sc.id}" value="${sc.spd}"></div>
         <div class="mini-f"><label>Defensa</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
         <div class="mini-f"><label>Armadura</label><input data-f="armaduraTipo" data-id="${sc.id}" value="${esc(sc.armaduraTipo)}" placeholder="tipo/-"></div>
+      </div>
+
+      <div>
+        <div class="sect-label">Combate</div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button type="button" class="addhab" data-atacarcreep="${sc.id}" style="flex:1">🎲 Atacar (PdG)</button>
+          <button type="button" class="addhab" data-daniocreep="${sc.id}" style="flex:1">🎲 Daño Arma</button>
+          <button type="button" class="addhab" data-esquivarcreep="${sc.id}" style="flex:1">🎲 Esquivar</button>
+        </div>
       </div>
 
       <div>
@@ -1021,6 +1079,30 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
+    return;
+  }
+  if(b.dataset.atacarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.atacarcreep);
+    if(!sc) return;
+    if(num(sc.acc) < 1){ toast(`${sc.nombre}: no le quedan acciones para atacar`); return; }
+    sc.acc = num(sc.acc) - 1;
+    renderAll();
+    const pdg = num(sc.des) + attrModTotal(sc, 'des');
+    tirarValorStat(`${sc.nombre} · PdG`, pdg);
+    return;
+  }
+  if(b.dataset.daniocreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.daniocreep);
+    if(!sc) return;
+    const r = tirarDados(danoTxt(sc));
+    if(r) mostrarResultadoDado(`${sc.nombre} · Daño`, r);
+    return;
+  }
+  if(b.dataset.esquivarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.esquivarcreep);
+    if(!sc) return;
+    const eva = num(sc.agl) + attrModTotal(sc, 'agl');
+    tirarValorStat(`${sc.nombre} · Esquivar`, eva);
     return;
   }
   if(b.dataset.addhab){

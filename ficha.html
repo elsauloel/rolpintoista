@@ -1037,11 +1037,24 @@ a{color:var(--brass)}
     <header><h3>Tirar dados</h3><button class="iconbtn" id="dados-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:12px">
       <div class="f">
-        <label>Fórmula (ej. 3d8+9, 1d20, 2d6-1)</label>
+        <label>Fórmula (ej. 3d8+9, 2d6+1d12, 1d20-2)</label>
         <input type="text" id="f-dados-formula" placeholder="1d20">
       </div>
       <button class="btn primary" id="dados-tirar" style="width:100%">Tirar</button>
       <div id="dados-resultado" class="hint" style="font-size:16px;color:var(--paper);min-height:24px"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--line-soft)">
+        <label class="hint" style="flex:none">Cantidad</label>
+        <input type="number" id="f-dados-cantidad" value="1" min="1" style="width:56px">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="btn" data-dadorapido="4" style="flex:1">1d4</button>
+        <button type="button" class="btn" data-dadorapido="6" style="flex:1">1d6</button>
+        <button type="button" class="btn" data-dadorapido="8" style="flex:1">1d8</button>
+        <button type="button" class="btn" data-dadorapido="10" style="flex:1">1d10</button>
+        <button type="button" class="btn" data-dadorapido="12" style="flex:1">1d12</button>
+        <button type="button" class="btn" data-dadorapido="20" style="flex:1">1d20</button>
+        <button type="button" class="btn" data-dadorapido="100" style="flex:1">1d100</button>
+      </div>
       <div>
         <div class="hint" style="margin-bottom:6px">Historial</div>
         <div id="dados-historial" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
@@ -1816,24 +1829,39 @@ function armaDanoTxt(i){
    DADOS
    ========================================================= */
 
+// Soporta combinaciones de distintos tipos de dado en una sola fórmula,
+// ej. "2d6+1d12+3", "1d20-2", "4d6". Los dados siempre suman (no hay "-1d4").
 function parseDados(formula){
-  const m = String(formula || '').trim().toLowerCase().replace(/\s+/g, '').match(/^(\d*)d(\d+)([+-]\d+)?$/);
-  if(!m) return null;
-  const n = m[1] ? parseInt(m[1], 10) : 1;
-  const caras = parseInt(m[2], 10);
-  const mod = m[3] ? parseInt(m[3], 10) : 0;
-  if(n < 1 || n > 100 || caras < 2) return null;
-  return {n, caras, mod};
+  const limpio = String(formula || '').trim().toLowerCase().replace(/\s+/g, '');
+  if(!limpio) return null;
+  const dadoRe = /(\d*)d(\d+)/g;
+  const dados = [];
+  let m;
+  while((m = dadoRe.exec(limpio))){
+    const n = m[1] ? parseInt(m[1], 10) : 1;
+    const caras = parseInt(m[2], 10);
+    if(n < 1 || n > 100 || caras < 2) return null;
+    dados.push({n, caras});
+  }
+  const sinDados = limpio.replace(/\d*d\d+/g, '');
+  let mod = 0;
+  const modRe = /([+-]\d+)/g;
+  let mm;
+  while((mm = modRe.exec(sinDados))) mod += parseInt(mm[1], 10);
+  if(!dados.length && !mod) return null;
+  if(/[^+\-0-9]/.test(sinDados.replace(/[+-]\d+/g, ''))) return null;
+  return {dados, mod};
 }
 
 function tirarDados(formula){
   const p = parseDados(formula);
   if(!p) return null;
   const rolls = [];
-  for(let i = 0; i < p.n; i++) rolls.push(1 + Math.floor(Math.random() * p.caras));
+  p.dados.forEach(d => { for(let i = 0; i < d.n; i++) rolls.push(1 + Math.floor(Math.random() * d.caras)); });
   const suma = rolls.reduce((a, b) => a + b, 0);
+  const formulaTxt = p.dados.map(d => `${d.n}d${d.caras}`).join('+') + (p.mod ? (p.mod > 0 ? `+${p.mod}` : `${p.mod}`) : '');
   return {
-    formula: `${p.n}d${p.caras}${p.mod ? (p.mod > 0 ? `+${p.mod}` : p.mod) : ''}`,
+    formula: formulaTxt || `${p.mod}`,
     rolls, mod: p.mod, total: suma + p.mod,
   };
 }
@@ -1875,7 +1903,7 @@ function renderDadosHistorial(){
 /* ---------- Tirar dados a partir del valor de un stat ---------- */
 
 const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
-const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos'];
+const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'];
 
 function combosDeSuma(n, k, minIdx){
   if(k === 0) return n === 0 ? [[]] : [];
@@ -1935,6 +1963,12 @@ function ejecutarTiradaManual(){
   }
   $('#dados-resultado').innerHTML = `<b style="color:var(--brass);font-size:22px">${fmt(r.total)}</b> &nbsp; (${esc(r.formula)}: [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''})`;
   registrarTirada('Manual', r);
+}
+
+function tirarRapido(caras){
+  const cant = Math.max(1, num($('#f-dados-cantidad').value) || 1);
+  $('#f-dados-formula').value = `${cant}d${caras}`;
+  ejecutarTiradaManual();
 }
 
 /* =========================================================
@@ -2612,6 +2646,10 @@ document.addEventListener('click', e => {
     const it = S.inventario.find(x=>x.id===b.dataset.elegirarma);
     $('#scrim-elegir-arma').classList.remove('open');
     if(it) tirarDanoDeArma(it);
+    return;
+  }
+  if(b.dataset.dadorapido){
+    tirarRapido(num(b.dataset.dadorapido));
     return;
   }
   if(b.dataset.tocinturon){

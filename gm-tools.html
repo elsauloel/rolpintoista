@@ -112,9 +112,18 @@ input[type=file]{display:none}
 .arma-detalle{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
 .sect-arma-nombre{color:var(--paper);text-transform:none;letter-spacing:0;font-weight:700}
 
-.crit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.crit-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .crit-cell label{display:block;font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);text-align:center;margin-bottom:2px}
 .crit-cell input{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-align:center;padding:3px 2px}
+
+.equipo-list{display:flex;flex-direction:column;gap:5px}
+.equipo-item{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:6px 8px;
+  display:flex;align-items:center;gap:8px
+}
+.equipo-item-info{flex:1;min-width:0}
+.equipo-item-nombre{font-weight:700;font-size:12px}
+.equipo-item-meta{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px}
 
 .hab-list{display:flex;flex-direction:column;gap:6px}
 .hab{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
@@ -138,6 +147,12 @@ input[type=file]{display:none}
 }
 .hab-ejecutar:hover:not(:disabled){background:var(--copper);color:#180F08}
 .hab-ejecutar:disabled{opacity:.35;cursor:not-allowed;border-color:var(--line)}
+
+.accion-row{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:7px 9px;
+  display:flex;align-items:center;gap:8px
+}
+.accion-nombre{flex:1;font-weight:700;font-size:12.5px}
 
 .est-list{display:flex;flex-direction:column;gap:6px}
 .estado{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
@@ -320,6 +335,13 @@ input[type=file]{display:none}
 
 <div class="toast" id="toast"></div>
 
+<div class="scrim" id="scrim-acciones-creep">
+  <div class="modal" style="max-width:420px">
+    <header><h3 id="acciones-creep-titulo">Acciones</h3><button class="iconbtn" id="acciones-creep-x">Cerrar</button></header>
+    <div class="body" id="acciones-creep-lista" style="display:flex;flex-direction:column;gap:6px;max-height:65vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-recordatorio">
   <div class="modal" style="max-width:420px">
     <header><h3>Antes de arrancar…</h3></header>
@@ -396,6 +418,7 @@ input[type=file]{display:none}
         <option value="">Todas</option>
         <option value="armas">Armas</option>
         <option value="escudos">Escudos</option>
+        <option value="defensa">Defensa</option>
       </select>
       <input type="text" id="equipar-creep-buscar" placeholder="Buscar ítem…" style="flex:1;min-width:0">
     </div>
@@ -416,11 +439,16 @@ input[type=file]{display:none}
       <div class="f"><label>Detalle</label><textarea id="hc-detalle"></textarea></div>
       <div class="f"><label>Tirada de dados automática (opcional, ej. 1d20+5)</label><input type="text" id="hc-tirada"></div>
       <div class="hint" style="margin-top:4px">Estado alterado automático al ejecutar (opcional)</div>
+      <div class="f"><label>Preset</label><select id="hc-efecto-preset"></select></div>
       <div class="f"><label>Nombre del estado</label><input type="text" id="hc-efecto-nombre" placeholder="ej. Espinas"></div>
       <div class="row3">
         <div class="mini-f"><label>Turnos</label><input type="number" id="hc-efecto-turnos" min="0" value="0"></div>
+        <div class="mini-f"><label>Stacks</label><input type="number" id="hc-efecto-stacks" min="1" value="1"></div>
         <div class="mini-f"><label>HP por turno</label><input type="number" id="hc-efecto-hpturno" value="0"></div>
       </div>
+      <div class="f"><label>Detalle del estado (opcional)</label><input type="text" id="hc-efecto-detalle"></div>
+      <input type="hidden" id="hc-efecto-polaridad" value="otro">
+      <input type="hidden" id="hc-efecto-mods" value="[]">
     </div>
     <footer>
       <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
@@ -649,6 +677,27 @@ const CATALOGO_EQUIPO = [
   {nombre:'Escudo pavés', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:3, precioCompra:70, def:150, detalle:'+1 a estabilidad, +1 al bloqueo'},
   {nombre:'Escudo triangular', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:3, precioCompra:70, def:150, detalle:'+2 al bloqueo'},
   {nombre:'Escudo pequeño', tipoItem:'escudo_1m', tipoDado:6, danoFijo:0, peso:2, precioCompra:50, def:100, detalle:'+1 al bloqueo, +1 a la estabilidad'},
+  {nombre:'Armadura acolchada', tipoItem:'armadura_blanda', peso:1, precioCompra:70, def:6, mods:[{stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {nombre:'Armadura con tachas', tipoItem:'armadura_blanda', peso:2, precioCompra:70, def:5, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 2 y 4.'},
+  {nombre:'Cota de malla', tipoItem:'armadura_blanda', peso:3, precioCompra:80, def:7, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 6.'},
+  {nombre:'Pechera', tipoItem:'armadura_blanda', peso:1, precioCompra:60, def:3, mods:[{stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {nombre:'Cota de placas', tipoItem:'armadura_rigida', peso:4, precioCompra:90, def:9, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4, 6 y 8.'},
+  {nombre:'Coraza', tipoItem:'armadura_rigida', peso:5, precioCompra:100, def:12, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}], detalle:'Reduce críticos de cualquier tipo.'},
+  {nombre:'Sombrero humectante', tipoItem:'casco_blando', peso:0, precioCompra:80, def:0, mods:[{stat:'bonos', val:1}], detalle:'+1 a los Bonos máximos.'},
+  {nombre:'Casco', tipoItem:'casco_rigido', peso:1, precioCompra:30, def:3, mods:[{stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 8.'},
+  {nombre:'Yelmo liviano', tipoItem:'casco_rigido', peso:2, precioCompra:50, def:5, mods:[{stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 6 y 8.'},
+  {nombre:'Yelmo completo', tipoItem:'casco_rigido', peso:6, precioCompra:80, def:7, mods:[{stat:'tipo1', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 6 y 8.'},
+  {nombre:'Gran yelmo', tipoItem:'casco_rigido', peso:4, precioCompra:90, def:9, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4, 6 y 8.'},
+  {nombre:'Zapatillas Nike', tipoItem:'botas_rigidas', peso:0, precioCompra:180, def:1, mods:[{stat:'accionesmax', val:1}], detalle:'+1 a las Acciones máximas del turno.'},
+  {nombre:'Botas reforzadas', tipoItem:'botas_blandas', peso:1, precioCompra:70, def:3, mods:[{stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 6.'},
+  {nombre:'Grebas', tipoItem:'piernas_rigidas', peso:2, precioCompra:80, def:5, mods:[{stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 6 y 8.'},
+  {nombre:'Sabatón', tipoItem:'botas_rigidas', peso:3, precioCompra:90, def:7, mods:[{stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'mov', val:-1}], detalle:'Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.'},
+  {nombre:'Mercury threads', tipoItem:'botas_blandas', peso:0, precioCompra:150, def:2, mods:[{stat:'bonos', val:1}, {stat:'resm', val:1}, {stat:'rescc', val:1}], detalle:'+1 a los Bonos máximos, +1 Res.M y +1 Res.CC.'},
+  {nombre:'Guantes finos de señor', tipoItem:'guantes_blandos', peso:0, precioCompra:80, def:1, mods:[], detalle:'Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar'},
+  {nombre:'Guantes de cuero reforzado', tipoItem:'guantes_blandos', peso:1, precioCompra:70, def:3, mods:[{stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {nombre:'Mitones de malla', tipoItem:'guantes_rigidos', peso:2, precioCompra:80, def:5, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 2 y 4.'},
+  {nombre:'Guanteletes', tipoItem:'guantes_rigidos', peso:3, precioCompra:90, def:7, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 6.'},
+  {nombre:'Armadura mediana', tipoItem:'armadura_rigida', peso:4, precioCompra:90, def:9, mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 8.'},
 ];
 const DADOS_ARMA = [2,4,6,8,10];
 
@@ -658,8 +707,8 @@ function nuevoCreep(){
     hp:10, hpMax:10, acc:3, accMax:3, spd:5,
     con:0, fue:0, agl:0, des:0, int:0,
     armaTipo:6, armaPeso:1, armaFijo:0, armaNombre:'', armaDetalle:'',
-    defensa:0, armaduraTipo:'',
-    crit:[0,0,0,0],
+    defensa:0, armaduraTipo:'', equipo:[],
+    crit:[0,0,0,0,0],
     habilidades:[
       {id:uid(), nombre:'Movimiento', detalle:'', cd:0, cdActual:0}
     ],
@@ -785,11 +834,60 @@ function actualizarAccLabelEnDOM(sc, card){
   if(label) label.innerHTML = accLabelHtml(sc);
 }
 
+// Rellena campos que creeps viejos (guardados antes de una función nueva)
+// pueden no tener, para que el resto del código no se tope con undefined.
+function normalizarCreep(sc){
+  const crit = Array.isArray(sc.crit) ? sc.crit.map(v=>num(v)) : [];
+  while(crit.length < 5) crit.push(0);
+  sc.crit = crit.slice(0, 5);
+  sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
+  return sc;
+}
+
 function renderAll(){
   $('#turno-badge').textContent = 'Turno ' + S.turno;
   const grid = $('#grid');
   $('#empty').style.display = S.creeps.length ? 'none' : 'block';
+  S.creeps.forEach(normalizarCreep);
   grid.innerHTML = S.creeps.map(sc => cardHtml(sc)).join('');
+  if($('#scrim-acciones-creep').classList.contains('open')) renderAccionesCreep();
+}
+
+let accionesCreepId = null;
+
+function renderAccionesCreep(){
+  const sc = S.creeps.find(s => s.id === accionesCreepId);
+  if(!sc) return;
+  const sinAcc = num(sc.acc) < 1;
+  const filas = [
+    {nombre:'Atacar (PdG)', disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
+    {nombre:'Daño Arma', disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
+    {nombre:'Esquivar', disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
+  ];
+  sc.habilidades.forEach(h => {
+    const enCooldown = num(h.cdActual) > 0;
+    const costoAcciones = h.accionesCosto ?? 1;
+    const sinAcciones = num(sc.acc) < costoAcciones;
+    const bloqueada = enCooldown || sinAcciones;
+    let motivo;
+    if(enCooldown) motivo = `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
+    else if(sinAcciones) motivo = 'Sin acciones';
+    else motivo = costoAcciones ? `${fmt(costoAcciones)} acción(es)` : 'Sin costo';
+    filas.push({nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`});
+  });
+  $('#acciones-creep-titulo').textContent = `Acciones · ${sc.nombre}`;
+  $('#acciones-creep-lista').innerHTML = filas.map(f => `
+    <div class="accion-row">
+      <div class="accion-nombre">${esc(f.nombre)}</div>
+      <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
+      <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
+    </div>`).join('');
+}
+
+function abrirAccionesCreep(scId){
+  accionesCreepId = scId;
+  renderAccionesCreep();
+  $('#scrim-acciones-creep').classList.add('open');
 }
 
 const SVG_OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -874,6 +972,21 @@ function cardHtml(sc){
           <div class="crit-cell"><label>Tipo 4</label><input type="number" data-crit="1" data-id="${sc.id}" value="${sc.crit[1]}"></div>
           <div class="crit-cell"><label>Tipo 6</label><input type="number" data-crit="2" data-id="${sc.id}" value="${sc.crit[2]}"></div>
           <div class="crit-cell"><label>Tipo 8</label><input type="number" data-crit="3" data-id="${sc.id}" value="${sc.crit[3]}"></div>
+          <div class="crit-cell"><label>Tipo 10</label><input type="number" data-crit="4" data-id="${sc.id}" value="${sc.crit[4]}"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sect-label">Equipo</div>
+        <div class="equipo-list" style="margin-top:4px">
+          ${sc.equipo.length ? sc.equipo.map(it => `
+            <div class="equipo-item">
+              <div class="equipo-item-info">
+                <div class="equipo-item-nombre">${esc(it.nombre)}</div>
+                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.def?` · Defensa +${fmt(it.def)}`:''}</div>
+              </div>
+              <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
+            </div>`).join('') : `<div class="hint">Sin equipo defensivo.</div>`}
         </div>
       </div>
 
@@ -920,6 +1033,7 @@ function cardCompactoHtml(sc){
         <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}" style="width:30px"></div>
       </div>
       <div class="chips-estados">${chips}</div>
+      <button type="button" class="addhab" data-abriracciones="${sc.id}" style="margin-top:2px">⚡ Acciones</button>
     </div>
   </div>`;
 }
@@ -962,19 +1076,24 @@ function optgroupsEstadosPersonalizadosHtml(){
 const ATTR_IDS = ['con','fue','agl','des','int'];
 const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int'};
 
-// Crea o refresca un estado del creep a partir de una habilidad con
-// efectoNombre/efectoTurnos/efectoHpTurno configurados (igual que en ficha.html).
+// Crea o refresca un estado del creep a partir de una habilidad con un
+// efecto configurado (preset o a mano) — igual variedad que en ficha.html:
+// nombre, turnos, stacks, HP por turno, detalle y modificadores de atributo.
 function aplicarEfectoDeConsumoCreep(sc, h){
   const nombre = (h.efectoNombre || '').trim();
   if(!nombre) return null;
   const turnos = num(h.efectoTurnos);
+  const stacks = Math.max(1, num(h.efectoStacks) || 1);
   const hpTurno = num(h.efectoHpTurno);
+  const polaridad = h.efectoPolaridad || 'otro';
+  const detalle = h.efectoDetalle || '';
+  const mods = structuredClone(h.efectoMods || []);
   let es = sc.estados.find(x => x.nombre === nombre);
   if(es){
-    es.turnos = turnos;
-    es.hpTurno = hpTurno;
+    es.turnos = turnos; es.stacks = stacks; es.hpTurno = hpTurno;
+    es.polaridad = polaridad; es.detalle = detalle; es.mods = mods;
   }else{
-    es = {id: uid(), tipo:'otro', nombre, hpTurno, stacks:1, turnos, mods:[]};
+    es = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods};
     sc.estados.push(es);
   }
   return es;
@@ -990,8 +1109,8 @@ let equipandoCreepId = null;
 const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
 
 function equipoItemHtml(item, idx){
-  const esEscudo = item.tipoItem.startsWith('escudo');
-  const stat = esEscudo ? `Defensa +${item.def}` : `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`;
+  const esArma = item.tipoItem.startsWith('arma_');
+  const stat = esArma ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}` : `Defensa +${item.def}`;
   return `<div class="cat-row">
     <div class="cat-info">
       <div class="cat-nombre">${esc(item.nombre)}</div>
@@ -1006,15 +1125,18 @@ function renderEquiparCreepLista(){
   const filtro = $('#equipar-creep-filtro') ? $('#equipar-creep-filtro').value : '';
   const busqueda = normalizarBusqueda($('#equipar-creep-buscar') ? $('#equipar-creep-buscar').value : '');
   let visibles = CATALOGO_EQUIPO.map((it, idx) => ({it, idx}));
-  if(filtro === 'armas') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('arma'));
+  if(filtro === 'armas') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
   if(filtro === 'escudos') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
+  if(filtro === 'defensa') visibles = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
   if(busqueda) visibles = visibles.filter(({it}) => normalizarBusqueda(it.nombre).includes(busqueda));
 
-  const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma'));
+  const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
   const escudos = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
+  const defensa = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
   let html = '';
   if(armas.length) html += `<div class="cat-grouphead">Armas</div>` + armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
   if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div>` + escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
+  if(defensa.length) html += `<div class="cat-grouphead">Defensa</div>` + defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
   $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems que coincidan con la búsqueda.</div>`;
 }
 
@@ -1026,14 +1148,55 @@ function abrirEquiparCreep(scId){
   $('#scrim-equipar-creep').classList.add('open');
 }
 
+const TIPOITEM_LABEL_GM = {
+  escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
+  armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
+  guantes_blandos:'Guantes blandos', guantes_rigidos:'Guantes rígidos',
+  casco_blando:'Casco blando', casco_rigido:'Casco rígido',
+  botas_blandas:'Botas blandas', botas_rigidas:'Botas rígidas',
+  piernas_blandas:'Piernas blandas', piernas_rigidas:'Piernas rígidas',
+};
+const TIPO_STAT_A_CRIT_IDX = {tipo1:0, tipo2:1, tipo3:2, tipo4:3, tipo5:4};
+
+// Aplica (signo 1) o revierte (signo -1) los modificadores de un ítem de
+// equipo sobre los campos del creep que tienen dónde guardarlos. Bonos/Res.M/
+// Res.CC no tienen campo propio en un creep, así que quedan solo en el
+// detalle del ítem — no se pierden, simplemente no suman a ningún número.
+function aplicarModsEquipo(sc, mods, signo){
+  (mods||[]).forEach(m => {
+    if(TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined){
+      const i = TIPO_STAT_A_CRIT_IDX[m.stat];
+      sc.crit[i] = num(sc.crit[i]) + signo * num(m.val);
+    }else if(m.stat === 'accionesmax'){
+      sc.accMax = num(sc.accMax) + signo * num(m.val);
+    }else if(m.stat === 'mov'){
+      sc.spd = num(sc.spd) + signo * num(m.val);
+    }
+  });
+}
+
+function quitarEquipoDeCreep(scId, equipoId){
+  const sc = S.creeps.find(s => s.id === scId);
+  const item = sc && (sc.equipo||[]).find(x => x.id === equipoId);
+  if(!sc || !item) return;
+  sc.defensa = Math.max(0, num(sc.defensa) - num(item.def));
+  aplicarModsEquipo(sc, item.mods, -1);
+  sc.equipo = sc.equipo.filter(x => x.id !== equipoId);
+  renderAll();
+  toast(`${item.nombre} quitado`);
+}
+
 function equiparItemEnCreep(idx){
   const sc = S.creeps.find(s => s.id === equipandoCreepId);
   const item = CATALOGO_EQUIPO[idx];
   if(!sc || !item) return;
-  if(item.tipoItem.startsWith('escudo')){
-    sc.defensa = num(sc.defensa) + item.def;
-    sc.armaduraTipo = sc.armaduraTipo ? `${sc.armaduraTipo}, ${item.nombre}` : item.nombre;
-    toast(`${sc.nombre}: +${item.def} Defensa (${item.nombre})`);
+  if(!item.tipoItem.startsWith('arma_')){
+    const mods = structuredClone(item.mods || []);
+    sc.defensa = num(sc.defensa) + num(item.def);
+    aplicarModsEquipo(sc, mods, 1);
+    sc.equipo = sc.equipo || [];
+    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || ''});
+    toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
     sc.armaTipo = item.tipoDado;
     sc.armaPeso = Math.max(1, item.peso);
@@ -1059,9 +1222,14 @@ function abrirEditorHabCreep(scId, habId){
   $('#hc-cd').value = h.cd || 0;
   $('#hc-detalle').value = h.detalle || '';
   $('#hc-tirada').value = h.tiradaExtra || '';
+  $('#hc-efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEstadosPresetHtml() + optgroupsEstadosPersonalizadosHtml();
   $('#hc-efecto-nombre').value = h.efectoNombre || '';
   $('#hc-efecto-turnos').value = h.efectoTurnos || 0;
+  $('#hc-efecto-stacks').value = h.efectoStacks || 1;
   $('#hc-efecto-hpturno').value = h.efectoHpTurno || 0;
+  $('#hc-efecto-detalle').value = h.efectoDetalle || '';
+  $('#hc-efecto-polaridad').value = h.efectoPolaridad || 'otro';
+  $('#hc-efecto-mods').value = JSON.stringify(h.efectoMods || []);
   $('#scrim-hab-creep').classList.add('open');
 }
 
@@ -1078,7 +1246,11 @@ function guardarEditorHabCreep(){
   h.tiradaExtra = $('#hc-tirada').value.trim();
   h.efectoNombre = $('#hc-efecto-nombre').value.trim();
   h.efectoTurnos = Math.max(0, num($('#hc-efecto-turnos').value) || 0);
+  h.efectoStacks = Math.max(1, num($('#hc-efecto-stacks').value) || 1);
   h.efectoHpTurno = num($('#hc-efecto-hpturno').value) || 0;
+  h.efectoDetalle = $('#hc-efecto-detalle').value;
+  h.efectoPolaridad = $('#hc-efecto-polaridad').value || 'otro';
+  try{ h.efectoMods = JSON.parse($('#hc-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }
   editingHabCreep = null;
   $('#scrim-hab-creep').classList.remove('open');
   renderAll();
@@ -1128,7 +1300,7 @@ function verCreep(id){
   if(sc.armaduraTipo) L.push(linea('Armadura', sc.armaduraTipo));
   L.push(linea('Atributos', `Con ${fmt(num(sc.con))} · Fue ${fmt(num(sc.fue))} · Agi ${fmt(num(sc.agl))} · Des ${fmt(num(sc.des))} · Int ${fmt(num(sc.int))}`));
   L.push(linea('Daño de arma', danoTxt(sc)));
-  const critLabels = ['Tipo 2','Tipo 4','Tipo 6','Tipo 8'];
+  const critLabels = ['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'];
   const critTxt = sc.crit.map((v,i) => v ? `${critLabels[i]} ${v>0?'+':''}${fmt(v)}` : '').filter(Boolean).join(', ');
   if(critTxt) L.push(linea('Resistencia a críticos', critTxt));
   if(sc.habilidades.length) L.push(linea('Habilidades', sc.habilidades.map(h=>h.nombre||'(sin nombre)').join(', ')));
@@ -1350,6 +1522,10 @@ document.addEventListener('click', e => {
     abrirEditorArmaCreep(b.dataset.editararma);
     return;
   }
+  if(b.dataset.abriracciones){
+    abrirAccionesCreep(b.dataset.abriracciones);
+    return;
+  }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
     return;
@@ -1384,6 +1560,11 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.equiparitem !== undefined){
     equiparItemEnCreep(num(b.dataset.equiparitem));
+    return;
+  }
+  if(b.dataset.quitarequipo){
+    const [scId, equipoId] = b.dataset.quitarequipo.split(':');
+    quitarEquipoDeCreep(scId, equipoId);
     return;
   }
   if(b.dataset.addhab){
@@ -1484,6 +1665,7 @@ document.addEventListener('click', e => {
     sc.acc = Math.max(0, num(sc.acc) - costoAcciones);
     h.cdActual = num(h.cd);
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
+    if(efecto && (efecto.mods||[]).some(m=>m.stat==='con')) actualizarHpMaxPorCon(sc);
     renderAll();
     if(h.tiradaExtra) tirarExtraDeHab(h);
     const partes = [`ejecutada`, costoAcciones ? `−${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : 'sin costo de Acciones'];
@@ -1839,9 +2021,9 @@ function creepDesdeIA(data){
     defensa: num(data.defensa),
     armaduraTipo: (data.armaduraTipo || '').toString(),
     // Resistencia a crítico: la da la armadura, no el bicho — 0 es lo normal, tope 3.
-    crit: Array.isArray(data.crit) && data.crit.length === 4
-      ? data.crit.map(v => Math.min(3, Math.max(0, Math.round(num(v)))))
-      : [0,0,0,0],
+    crit: Array.isArray(data.crit) && data.crit.length
+      ? [0,1,2,3,4].map(i => Math.min(3, Math.max(0, Math.round(num(data.crit[i])))))
+      : [0,0,0,0,0],
     notas: (data.notas || '').toString(),
   });
   const habilidades = Array.isArray(data.habilidades) ? data.habilidades : [];
@@ -2039,6 +2221,19 @@ $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id===
 $('#equipar-creep-filtro').addEventListener('change', renderEquiparCreepLista);
 $('#equipar-creep-buscar').addEventListener('input', renderEquiparCreepLista);
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
+$('#hc-efecto-preset').addEventListener('change', e => {
+  if(!e.target.value) return;
+  const [tipo, idx] = e.target.value.split(':');
+  const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
+  if(!preset) return;
+  $('#hc-efecto-nombre').value = preset.nombre;
+  $('#hc-efecto-turnos').value = preset.turnos ?? 0;
+  $('#hc-efecto-stacks').value = preset.stacks ?? 1;
+  $('#hc-efecto-hpturno').value = preset.hpTurno ?? 0;
+  $('#hc-efecto-detalle').value = preset.detalle || '';
+  $('#hc-efecto-polaridad').value = preset.polaridad || 'otro';
+  $('#hc-efecto-mods').value = JSON.stringify(preset.mods || []);
+});
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-creep'){ editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); } });
@@ -2046,6 +2241,8 @@ $('#armacreep-guardar').onclick = guardarEditorArmaCreep;
 $('#armacreep-cancel').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
 $('#armacreep-x').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
 $('#scrim-arma-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-arma-creep'){ editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); } });
+$('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); };
+$('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;

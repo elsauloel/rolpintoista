@@ -241,6 +241,7 @@ input[type=file]{display:none}
     </div>
     <div class="hero-right">
       <span class="turno-badge" id="turno-badge">Turno 1</span>
+      <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
       <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
       <button class="btn" id="btn-ia">+ Creep con IA</button>
       <button class="btn primary" id="btn-add">+ Creep</button>
@@ -840,6 +841,10 @@ document.addEventListener('click', e => {
     mantenimiento();
     return;
   }
+  if(b.id === 'btn-reset'){
+    reiniciarCombate();
+    return;
+  }
   if(b.id === 'btn-save'){ guardar(); return; }
   if(b.id === 'btn-load'){ $('#file-input').click(); return; }
   if(b.id === 'btn-subir'){ subirDatos(); return; }
@@ -1209,6 +1214,13 @@ function mantenimiento(){
     vencidos ? `${vencidos} estado(s) vencidos` : '',
   ].filter(Boolean).join(' · ');
   toast(`Turno ${S.turno} · Acciones reiniciadas${detalle ? ` · ${detalle}` : ''}`);
+}
+
+function reiniciarCombate(){
+  if(!confirm('¿Reiniciar el combate? El contador vuelve a cero.')) return;
+  S.turno = 0;
+  renderAll();
+  toast('Combate reiniciado · Turno 0');
 }
 
 let toastT;

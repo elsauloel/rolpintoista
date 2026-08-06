@@ -819,7 +819,7 @@ a{color:var(--brass)}
     <!-- COLUMNA 2 -->
     <div class="col">
       <section class="card">
-        <header><h2>Efectos de equipo</h2></header>
+        <header><h2>COMBATE</h2></header>
         <div class="body">
           <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
           <div id="efectos-armas"></div>
@@ -832,6 +832,7 @@ a{color:var(--brass)}
             <div class="dl">Defensa</div>
             <div class="dv"><span id="v-def">0</span></div>
           </button>
+          <button type="button" class="btn" id="btn-esquivar" style="width:100%;margin-top:8px">🎲 Esquivar</button>
           <div id="def-breakdown"></div>
           <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
           <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
@@ -4100,6 +4101,7 @@ $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remo
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
 $('#btn-atacar-pdg').onclick = () => tirarValorStat('PdG', compute().final.pdg);
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
+$('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva);
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
 $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });

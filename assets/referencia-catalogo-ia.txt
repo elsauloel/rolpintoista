@@ -32,9 +32,23 @@ Además hay stats "sueltos" que no derivan de un atributo:
   Acciones máximas por turno (accionesmax) — normalmente 3, se puede
     modificar con equipo, habilidades o estados alterados.
   Resistencia a crítico por Tipo de arma (tipo1..tipo5) — hay 5
-    "tipos" de crítico, cada uno asociado a un tamaño de dado de arma:
-      Tipo 2 (d2), Tipo 4 (d4), Tipo 6 (d6), Tipo 8 (d8), Tipo 10 (d10,
-      pensado para armas explosivas / modernas / de alto impacto).
+    "tipos" de crítico, cada uno asociado a un tamaño de dado de arma,
+    y cada tamaño de dado corresponde a una familia de arma temática:
+      Tipo 2 (d2): armas punzantes (dagas, estoques, cosas que perforan).
+      Tipo 4 (d4): cortantes chicas (espadas cortas, machetes, hachas de
+        mano — filo, pero de porte liviano).
+      Tipo 6 (d6): cortantes grandes o contundentes chicas (espadas
+        largas, hachas grandes, mazas livianas — el punto medio).
+      Tipo 8 (d8): contundentes grandes (martillos, mangos pesados,
+        golpe de fuerza bruta).
+      Tipo 10 (d10): explosivo (armas explosivas / modernas / de alto
+        impacto — la categoría más alejada del combate cuerpo a cuerpo
+        clásico).
+    Esta progresión (punzante → cortante chico → cortante grande /
+    contundente chico → contundente grande → explosivo) es también,
+    a grandes rasgos, un gradiente de "qué tan directo/brutal" es el
+    daño, y se puede usar como guía temática al elegir qué tipoDado le
+    corresponde a un arma nueva, más allá de solo mirar el número.
     La armadura reduce específicamente el crítico de CIERTOS tipos de
     arma, no todos por igual — es la forma en que el sistema modela que
     una armadura "buena contra espadas" no necesariamente protege igual

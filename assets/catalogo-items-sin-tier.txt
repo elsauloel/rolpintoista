@@ -1,0 +1,458 @@
+================================================================
+ÍTEMS DEL CATÁLOGO SIN TIER ASIGNADO (65 ítems)
+Rol Pintoísta — catálogo del fabricante, ficha.html
+================================================================
+
+Estos son los ítems que ya estaban en el catálogo ANTES de la
+tanda01 generada por IA (esa sí tiene tier documentado: Común,
+Buena Calidad o Raro, con "Absurdo" mapeado a Común).
+Ninguno de estos 65 tiene tier asignado todavía. Se listan con
+todos sus datos (precio, peso, dado/daño, mods, detalle) para
+poder clasificarlos según el sistema de tiers ya definido.
+
+----------------------------------------------------------------
+ARMAS (14 ítems)
+----------------------------------------------------------------
+
+### Bastón flexible
+ID interno: cat-bast-n-flexible | Categoría: Arma de una mano
+Precio: 30 DDE | Peso: 1 | Ranuras: 1
+Dado de daño: d8 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Ignora 1 de resistencia crítica.
+
+### Daga
+ID interno: cat-daga | Categoría: Arma de una mano
+Precio: 30 DDE | Peso: 1 | Ranuras: 1
+Dado de daño: d2 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Ignora 1 de resistencia crítica.
+
+### Espada ancha
+ID interno: cat-espada-ancha | Categoría: Arma de una mano
+Precio: 70 DDE | Peso: 3 | Ranuras: 1
+Dado de daño: d4 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Daño amplificado.
+
+### Espada corta
+ID interno: cat-espada-corta | Categoría: Arma de una mano
+Precio: 30 DDE | Peso: 1 | Ranuras: 1
+Dado de daño: d4 | Daño fijo: 0
+Mods: (sin mods)
+
+### Espada larga
+ID interno: cat-espada-larga | Categoría: Arma de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d4 | Daño fijo: 0
+Mods: Probabilidad de golpe +1
+Detalle: modificador: '+1 al pdg. +1 al parry
+
+### Estoque
+ID interno: cat-estoque | Categoría: Arma de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d2 | Daño fijo: 0
+Mods: Iniciativa +1
+Detalle: Modificador: '+1 a iniciativa
+
+### Hacha
+ID interno: cat-hacha | Categoría: Arma de una mano
+Precio: 70 DDE | Peso: 3 | Ranuras: 1
+Dado de daño: d6 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Rompe armadura.
+
+### Hacha de batalla
+ID interno: cat-hacha-de-batalla | Categoría: Arma de una mano
+Precio: 90 DDE | Peso: 4 | Ranuras: 1
+Dado de daño: d6 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Rompe armadura.
+
+### Hacha de mano
+ID interno: cat-hacha-de-mano | Categoría: Arma de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d6 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Rompe armadura.
+
+### Machete
+ID interno: cat-machete | Categoría: Arma de una mano
+Precio: 25 DDE | Peso: 1 | Ranuras: 1
+Dado de daño: d4 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: +10% de daño crítico
+
+### Mangual
+ID interno: cat-mangual | Categoría: Arma de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d8 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Alcance +1.
+
+### Martillo
+ID interno: cat-martillo | Categoría: Arma de una mano
+Precio: 70 DDE | Peso: 3 | Ranuras: 1
+Dado de daño: d8 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Daño +50%. Lento.
+
+### Maza
+ID interno: cat-maza | Categoría: Arma de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d8 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Daño amplificado.
+
+### Rompemalla
+ID interno: cat-rompemalla | Categoría: Arma de una mano
+Precio: 60 DDE | Peso: 2 | Ranuras: 1
+Dado de daño: d2 | Daño fijo: 0
+Mods: (sin mods)
+Detalle: Rompe armadura.
+
+----------------------------------------------------------------
+ESCUDOS (6 ítems)
+----------------------------------------------------------------
+
+### Broquel
+ID interno: cat-broquel | Categoría: Escudo de una mano
+Precio: 30 DDE | Peso: 1 | Ranuras: 1
+Mods: Defensa +50
+Detalle: +2 a estabilidad
+
+### Escudo grande
+ID interno: cat-escudo-grande | Categoría: Escudo de una mano
+Precio: 90 DDE | Peso: 4 | Ranuras: 1
+Mods: Defensa +200
+Detalle: +2 al bloqueo
+
+### Escudo pavés
+ID interno: cat-escudo-pav-s | Categoría: Escudo de una mano
+Precio: 70 DDE | Peso: 3 | Ranuras: 1
+Mods: Defensa +150
+Detalle: +1 a estabilidad, +1 al bloqueo
+
+### Escudo pequeño
+ID interno: cat-escudo-peque-o | Categoría: Escudo de una mano
+Precio: 50 DDE | Peso: 2 | Ranuras: 1
+Mods: Defensa +100
+Detalle: +1 al bloqueo, +1 a la estabilidad
+
+### Escudo romano
+ID interno: cat-escudo-romano | Categoría: Escudo de dos manos
+Precio: 110 DDE | Peso: 5 | Ranuras: 1
+Mods: Defensa +250
+Detalle: +4 al bloqueo. Movimiento y ataque lento
+
+### Escudo triangular
+ID interno: cat-escudo-triangular | Categoría: Escudo de una mano
+Precio: 70 DDE | Peso: 3 | Ranuras: 1
+Mods: Defensa +150
+Detalle: +2 al bloqueo
+
+----------------------------------------------------------------
+DEFENSA (armadura/casco/guantes/piernas/botas) (21 ítems)
+----------------------------------------------------------------
+
+### Armadura acolchada
+ID interno: cat-armadura-acolchada | Categoría: Armadura blanda (torso)
+Precio: 70 DDE | Peso: 1 | Ranuras: 0
+Mods: Defensa +6; Res. crítico Tipo 2 (Perforación) +1
+Detalle: Reduce críticos Tipo 2.
+
+### Armadura con tachas
+ID interno: cat-armadura-con-tachas | Categoría: Armadura blanda (torso)
+Precio: 70 DDE | Peso: 2 | Ranuras: 0
+Mods: Defensa +5; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1
+Detalle: Reduce críticos Tipo 2 y 4.
+
+### Armadura mediana
+ID interno: cat-armadura-mediana | Categoría: Armadura rígida (torso)
+Precio: 90 DDE | Peso: 4 | Ranuras: 0
+Mods: Defensa +9; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 2, 4 y 8.
+
+### Botas reforzadas
+ID interno: cat-botas-reforzadas | Categoría: Botas blandas
+Precio: 70 DDE | Peso: 1 | Ranuras: 0
+Mods: Defensa +3; Res. crítico Tipo 6 (Corte con impacto) +1
+Detalle: Reduce críticos Tipo 6.
+
+### Casco
+ID interno: cat-casco | Categoría: Casco rígido
+Precio: 30 DDE | Peso: 1 | Ranuras: 0
+Mods: Defensa +3; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 8.
+
+### Coraza
+ID interno: cat-coraza | Categoría: Armadura rígida (torso)
+Precio: 100 DDE | Peso: 5 | Ranuras: 0
+Mods: Defensa +12; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1; Res. crítico Tipo 10 +1
+Detalle: Reduce críticos de cualquier tipo.
+
+### Cota de malla
+ID interno: cat-cota-de-malla | Categoría: Armadura blanda (torso)
+Precio: 80 DDE | Peso: 3 | Ranuras: 0
+Mods: Defensa +7; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1
+Detalle: Reduce críticos Tipo 2, 4 y 6.
+
+### Cota de placas
+ID interno: cat-cota-de-placas | Categoría: Armadura rígida (torso)
+Precio: 90 DDE | Peso: 4 | Ranuras: 0
+Mods: Defensa +9; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 2, 4, 6 y 8.
+
+### Gran yelmo
+ID interno: cat-gran-yelmo | Categoría: Casco rígido
+Precio: 90 DDE | Peso: 4 | Ranuras: 0
+Mods: Defensa +9; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 2, 4, 6 y 8.
+
+### Grebas
+ID interno: cat-grebas | Categoría: Piernas rígidas
+Precio: 80 DDE | Peso: 2 | Ranuras: 0
+Mods: Defensa +5; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 6 y 8.
+
+### Guanteletes
+ID interno: cat-guanteletes | Categoría: Guantes rígidos
+Precio: 90 DDE | Peso: 3 | Ranuras: 0
+Mods: Defensa +7; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1
+Detalle: Reduce críticos Tipo 2, 4 y 6.
+
+### Guantes de cuero reforzado
+ID interno: cat-guantes-de-cuero-reforzado | Categoría: Guantes blandos
+Precio: 70 DDE | Peso: 1 | Ranuras: 0
+Mods: Defensa +3; Res. crítico Tipo 2 (Perforación) +1
+Detalle: Reduce críticos Tipo 2.
+
+### Guantes finos de señor
+ID interno: cat-guantes-finos-de-senor | Categoría: Guantes blandos
+Precio: 80 DDE | Peso: 0 | Ranuras: 0
+Mods: Defensa +1
+Detalle: Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar
+
+### Mercury threads
+ID interno: cat-mercury-threads | Categoría: Botas blandas
+Precio: 150 DDE | Peso: 0 | Ranuras: 0
+Mods: Defensa +2; Bonos +1; Res. Mágica (Int) +1; Res. a CC +1
+Detalle: +1 a los Bonos máximos, +1 Res.M y +1 Res.CC.
+
+### Mitones de malla
+ID interno: cat-mitones-de-malla | Categoría: Guantes rígidos
+Precio: 80 DDE | Peso: 2 | Ranuras: 0
+Mods: Defensa +5; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 4 (Corte normal) +1
+Detalle: Reduce críticos Tipo 2 y 4.
+
+### Pechera
+ID interno: cat-pechera | Categoría: Armadura blanda (torso)
+Precio: 60 DDE | Peso: 1 | Ranuras: 0
+Mods: Defensa +3; Res. crítico Tipo 2 (Perforación) +1
+Detalle: Reduce críticos Tipo 2.
+
+### Sabatón
+ID interno: cat-sabaton | Categoría: Botas rígidas
+Precio: 90 DDE | Peso: 3 | Ranuras: 0
+Mods: Defensa +7; Res. crítico Tipo 4 (Corte normal) +1; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1; Movimiento -1
+Detalle: Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.
+
+### Sombrero humectante
+ID interno: cat-sombrero-humectante | Categoría: Casco blando
+Precio: 80 DDE | Peso: 0 | Ranuras: 0
+Mods: Bonos +1
+Detalle: +1 a los Bonos máximos.
+
+### Yelmo completo
+ID interno: cat-yelmo-completo | Categoría: Casco rígido
+Precio: 80 DDE | Peso: 6 | Ranuras: 0
+Mods: Defensa +7; Res. crítico Tipo 2 (Perforación) +1; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 2, 6 y 8.
+
+### Yelmo liviano
+ID interno: cat-yelmo-liviano | Categoría: Casco rígido
+Precio: 50 DDE | Peso: 2 | Ranuras: 0
+Mods: Defensa +5; Res. crítico Tipo 6 (Corte con impacto) +1; Res. crítico Tipo 8 (Impacto/contundente) +1
+Detalle: Reduce críticos Tipo 6 y 8.
+
+### Zapatillas Nike
+ID interno: cat-zapatillas-nike | Categoría: Botas rígidas
+Precio: 180 DDE | Peso: 0 | Ranuras: 0
+Mods: Defensa +1; Acciones máx. +1
+Detalle: +1 a las Acciones máximas del turno.
+
+----------------------------------------------------------------
+CONSUMIBLES (24 ítems)
+----------------------------------------------------------------
+
+### Ankh de Reencarnación
+ID interno: cat-ankh | Categoría: Consumibles
+Precio: 200 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Se activa solo si está en tu CINTURÓN al llegar tu HP a 0: te revive con 25% del HP máximo, titilando hasta el comienzo de tu turno. Si está en la mochila no se activa solo — entrás en estado de Muerte igual, pero un aliado puede usarlo sobre tu cuerpo para revivirte.
+
+### Antídoto
+ID interno: cat-antidoto | Categoría: Consumibles
+Precio: 10 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Cura el estado Veneno.
+
+### Cura Plus
+ID interno: cat-cura-plus | Categoría: Consumibles
+Precio: 15 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Remueve estados alterados.
+
+### Moneda Re-Roll
+ID interno: cat-moneda-reroll | Categoría: Consumibles
+Precio: 100 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Permite repetir una tirada. Se conserva si gana tirando una moneda.
+
+### Pergamino de luz cegadora
+ID interno: cat-pergamino-luz | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de ojo de Kicillof
+ID interno: cat-pergamino-ojo | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de red Nerubian
+ID interno: cat-pergamino-red | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de sombras chinescas
+ID interno: cat-pergamino-sombras | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de tentáculo sombrío
+ID interno: cat-pergamino-tentaculo | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Pergamino de ventriloquía
+ID interno: cat-pergamino-ventriloquia | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).
+
+### Poción de Bonos
+ID interno: cat-pocion-bonos | Categoría: Consumibles
+Precio: 30 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | 50% de Bonos al consumir
+Mods: (sin mods)
+Detalle: Restaura la mitad de tu total de Bonos (redondeado hacia arriba).
+
+### Poción de Bonos grande
+ID interno: cat-pocion-bonos-grande | Categoría: Consumibles
+Precio: 120 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | 100% de Bonos al consumir
+Mods: (sin mods)
+Detalle: Restaura todos tus Bonos.
+
+### Poción de HP
+ID interno: cat-pocion-hp | Categoría: Consumibles
+Precio: 5 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | HP instantáneo: +25
+Mods: (sin mods)
+Detalle: Recupera 25 HP.
+
+### Poción de HP grande
+ID interno: cat-pocion-hp-grande | Categoría: Consumibles
+Precio: 20 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | HP instantáneo: +25 | 3 cargas por unidad
+Mods: (sin mods)
+Detalle: 3 Cargas. Recupera 25 HP por carga.
+
+### Poción de HP mayor
+ID interno: cat-pocion-hp-mayor | Categoría: Consumibles
+Precio: 50 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | HP instantáneo: +100
+Mods: (sin mods)
+Detalle: Recupera 100 HP.
+
+### Poción de HP mayor grande
+ID interno: cat-pocion-hp-mayor-grande | Categoría: Consumibles
+Precio: 200 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | HP instantáneo: +100 | 3 cargas por unidad
+Mods: (sin mods)
+Detalle: 3 Cargas. Recupera 100 HP por carga.
+
+### Poción de Regeneración
+ID interno: cat-pocion-regen | Categoría: Consumibles
+Precio: 15 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración Grande
+ID interno: cat-pocion-regen-grande | Categoría: Consumibles
+Precio: 45 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | 3 cargas por unidad
+Mods: (sin mods)
+Detalle: 3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración mayor
+ID interno: cat-pocion-regen-mayor | Categoría: Consumibles
+Precio: 35 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Poción de Regeneración mayor grande
+ID interno: cat-pocion-regen-mayor-grande | Categoría: Consumibles
+Precio: 100 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1 | 3 cargas por unidad
+Mods: (sin mods)
+Detalle: 3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".
+
+### Polilla mística
+ID interno: cat-polilla | Categoría: Consumibles
+Precio: 50 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. Mientras siga ahí, podés gastarla en cualquier momento para sumar +2 a una tirada de dado. Si todavía la tenés guardada sin consumir, no hay bono — el efecto arranca recién cuando la liberás, y dura hasta que la uses.
+
+### Raciones
+ID interno: cat-raciones | Categoría: Consumibles
+Precio: 3 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 2
+Mods: (sin mods)
+Detalle: (2/2) +1 Wellness. (Aplicar a mano al usarla.)
+
+### Raciones Fancy
+ID interno: cat-raciones-fancy | Categoría: Consumibles
+Precio: 50 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 5
+Mods: (sin mods)
+Detalle: (5/5) +2 Wellness. (Aplicar a mano al usarla.)
+
+### Revive
+ID interno: cat-revive | Categoría: Consumibles
+Precio: 150 DDE | Peso: 0 | Ranuras: 1
+Es consumible: sí | Unidades: 1
+Mods: (sin mods)
+Detalle: Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.
+
+================================================================
+TOTAL: 65 ítems sin tier
+================================================================

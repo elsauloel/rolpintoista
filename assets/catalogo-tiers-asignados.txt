@@ -1,0 +1,83 @@
+Bastón flexible | Común
+Daga | Común
+Espada ancha | Común
+Espada corta | Común
+Espada larga | Común
+Estoque | Común
+Hacha | Común
+Hacha de batalla | Común
+Hacha de mano | Común
+Machete | Común
+Mangual | Buena Calidad
+Martillo | Buena Calidad
+Maza | Común
+Rompemalla | Común
+Broquel | Común
+Escudo grande | Buena Calidad
+Escudo pavés | Buena Calidad
+Escudo pequeño | Común
+Escudo romano | Buena Calidad
+Escudo triangular | Buena Calidad
+Armadura acolchada | Común
+Armadura con tachas | Buena Calidad
+Armadura mediana | Buena Calidad
+Botas reforzadas | Común
+Casco | Común
+Coraza | Raro
+Cota de malla | Buena Calidad
+Cota de placas | Raro
+Gran yelmo | Raro
+Grebas | Buena Calidad
+Guanteletes | Buena Calidad
+Guantes de cuero reforzado | Común
+Guantes finos de señor | Común
+Mercury threads | Buena Calidad
+Mitones de malla | Buena Calidad
+Pechera | Común
+Sabatón | Buena Calidad
+Sombrero humectante | Común
+Yelmo completo | Buena Calidad
+Yelmo liviano | Buena Calidad
+Zapatillas Nike | Excepcional
+Ankh de Reencarnación | Buena Calidad
+Antídoto | Común
+Cura Plus | Común
+Moneda Re-Roll | Raro
+Pergamino de luz cegadora | Buena Calidad
+Pergamino de ojo de Kicillof | Buena Calidad
+Pergamino de red Nerubian | Buena Calidad
+Pergamino de sombras chinescas | Buena Calidad
+Pergamino de tentáculo sombrío | Buena Calidad
+Pergamino de ventriloquía | Buena Calidad
+Poción de Bonos | Buena Calidad
+Poción de Bonos grande | Excepcional
+Poción de HP | Común
+Poción de HP grande | Buena Calidad
+Poción de HP mayor | Raro
+Poción de HP mayor grande | Excepcional
+Poción de Regeneración | Común
+Poción de Regeneración Grande | Buena Calidad
+Poción de Regeneración mayor | Buena Calidad
+Poción de Regeneración mayor grande | Raro
+Polilla mística | Buena Calidad
+Raciones | Común
+Raciones Fancy | Buena Calidad
+Revive | Raro
+
+OBSERVACIONES (casos ambiguos):
+- Mangual y Martillo: quedan justo en el límite Común/Buena Calidad (~80 DDE
+  calculado con la fórmula del marco). Los clasifiqué Buena Calidad porque
+  cruzan ese umbral por muy poco, pero con otro criterio de redondeo
+  podrían quedar en Común.
+- Escudo romano: pese a ser el escudo más caro, pesado y con más Defensa
+  del set legacy (y el único "de dos manos"), el cálculo lo deja en Buena
+  Calidad, no Raro — porque no tiene ningún efecto adicional aparte de
+  Defensa (a diferencia de los escudos Raro que diseñamos en la tanda
+  nueva, que combinan Defensa con 2-3 efectos más). Es coherente con el
+  sistema, pero si narrativamente lo sienten como "el mejor escudo del
+  catálogo", podría justificarse subirlo a Raro igualmente.
+- Revive: dudé entre Raro y Excepcional. Se queda en Raro por sus
+  limitaciones (ventana de 5 turnos, área de 5 casillas, solo 50% HP),
+  pero el efecto en sí (revivir a un aliado) es de los más fuertes de
+  todo el catálogo — es defendible subirlo a Excepcional si en mesa
+  sienten que revivir gente nunca debería ser "solo Raro".

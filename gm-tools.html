@@ -153,11 +153,25 @@ input[type=file]{display:none}
   display:flex;align-items:center;gap:8px
 }
 .accion-nombre{flex:1;font-weight:700;font-size:12.5px}
+.acciones-badge{
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);
+  border:1px solid var(--copper);border-radius:var(--r);padding:3px 9px;background:rgba(201,133,69,.14);flex:none
+}
 
 .est-list{display:flex;flex-direction:column;gap:6px}
 .estado{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
 .estado-buff{border-color:rgba(79,168,140,.4)}
 .estado-debuff{border-color:rgba(168,194,86,.35)}
+.estado-compacto{
+  border:1px solid var(--line-soft);background:var(--panel2);padding:6px 8px;
+  display:flex;align-items:center;gap:8px
+}
+.estado-compacto-info{flex:1;min-width:0}
+.estado-compacto-nombre{font-weight:700;font-size:12px}
+.estado-compacto-meta{
+  font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
 .est-tipo{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;flex:1;padding:4px 6px}
 .est-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}
 .est-preview{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:5px;border-top:1px dashed var(--line-soft);padding-top:4px}
@@ -321,9 +335,10 @@ input[type=file]{display:none}
   </div>
 
   <div class="toolbar">
-    <span class="note">Guardá antes de cerrar la pestaña — esto no se guarda solo. "Guardar" baja tus datos completos y la vista para jugadores, los dos juntos. "Subir datos" sube solo la vista para jugadores al repo.</span>
+    <span class="note">Guardá antes de cerrar la pestaña — esto no se guarda solo. "Guardar todo" baja tu respaldo completo (gm-creeps.json). "Guardar vista pública" baja solo lo que ven los jugadores (creeps-publico.json). "Subir datos" sube esa vista pública al repo.</span>
     <button class="btn ghost" id="btn-load">Cargar</button>
-    <button class="btn" id="btn-save">Guardar (los dos archivos)</button>
+    <button class="btn" id="btn-save-todo">Guardar todo (para mí)</button>
+    <button class="btn" id="btn-save-publico">Guardar vista pública (para jugadores)</button>
     <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
     <button class="btn primary" id="btn-subir">Subir datos</button>
     <input type="file" id="file-input" accept=".json">
@@ -337,7 +352,14 @@ input[type=file]{display:none}
 
 <div class="scrim" id="scrim-acciones-creep">
   <div class="modal" style="max-width:420px">
-    <header><h3 id="acciones-creep-titulo">Acciones</h3><button class="iconbtn" id="acciones-creep-x">Cerrar</button></header>
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <h3>Acciones</h3>
+        <span class="acciones-badge" id="acciones-creep-badge">0/0</span>
+        <span id="acciones-creep-titulo" style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      </div>
+      <button class="iconbtn" id="acciones-creep-x">Cerrar</button>
+    </header>
     <div class="body" id="acciones-creep-lista" style="display:flex;flex-direction:column;gap:6px;max-height:65vh;overflow-y:auto"></div>
   </div>
 </div>
@@ -453,6 +475,35 @@ input[type=file]{display:none}
     <footer>
       <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
       <button class="btn primary" id="habcreep-guardar">Guardar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-estado-creep">
+  <div class="modal" style="max-width:420px">
+    <header><h3>Estado alterado</h3><button class="iconbtn" id="estadocreep-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <div class="f"><label>Preset</label><select id="ec-preset"></select></div>
+      <div class="f"><label>Nombre</label><input type="text" id="ec-nombre" placeholder="ej. Veneno"></div>
+      <div class="f"><label>Detalle (opcional)</label><input type="text" id="ec-detalle"></div>
+      <div class="row3">
+        <div class="mini-f"><label>Turnos</label><input type="number" id="ec-turnos" min="0" value="1"></div>
+        <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
+        <div class="mini-f"><label>HP por turno</label><input type="number" id="ec-hpturno" value="0"></div>
+      </div>
+      <div class="est-mods">
+        <div class="est-mods-label">Modificadores de atributo</div>
+        <div id="ec-mods-lista"></div>
+        <button type="button" class="addmod-mini" id="ec-addmod">+ Modificador</button>
+      </div>
+      <div style="border-top:1px dashed var(--line-soft);padding-top:8px">
+        <button type="button" class="addmod-mini" id="ec-guardarpreset">☆ Guardar como preset personalizado</button>
+        <button type="button" class="addmod-mini" id="ec-borrarpreset" style="margin-top:5px;color:var(--danger);display:none">Borrar preset personalizado</button>
+      </div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="estadocreep-cancel">Cancelar</button>
+      <button class="btn primary" id="estadocreep-guardar">Guardar</button>
     </footer>
   </div>
 </div>
@@ -875,7 +926,8 @@ function renderAccionesCreep(){
     else motivo = costoAcciones ? `${fmt(costoAcciones)} acción(es)` : 'Sin costo';
     filas.push({nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`});
   });
-  $('#acciones-creep-titulo').textContent = `Acciones · ${sc.nombre}`;
+  $('#acciones-creep-titulo').textContent = sc.nombre;
+  $('#acciones-creep-badge').textContent = `${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}`;
   $('#acciones-creep-lista').innerHTML = filas.map(f => `
     <div class="accion-row">
       <div class="accion-nombre">${esc(f.nombre)}</div>
@@ -968,11 +1020,9 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
-          <div class="crit-cell"><label>Tipo 2</label><input type="number" data-crit="0" data-id="${sc.id}" value="${sc.crit[0]}"></div>
-          <div class="crit-cell"><label>Tipo 4</label><input type="number" data-crit="1" data-id="${sc.id}" value="${sc.crit[1]}"></div>
-          <div class="crit-cell"><label>Tipo 6</label><input type="number" data-crit="2" data-id="${sc.id}" value="${sc.crit[2]}"></div>
-          <div class="crit-cell"><label>Tipo 8</label><input type="number" data-crit="3" data-id="${sc.id}" value="${sc.crit[3]}"></div>
-          <div class="crit-cell"><label>Tipo 10</label><input type="number" data-crit="4" data-id="${sc.id}" value="${sc.crit[4]}"></div>
+          ${['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0
+            ? `<div class="crit-cell"><label>${lbl}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
+            : '').join('') || '<div class="hint">Sin resistencias a crítico — se suman al equipar armadura.</div>'}
         </div>
       </div>
 
@@ -1001,7 +1051,7 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Estados</div>
         <div class="est-list" style="margin-top:4px">
-          ${sc.estados.map(es => estadoHtml(sc.id, es)).join('')}
+          ${sc.estados.length ? sc.estados.map(es => estadoHtml(sc.id, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
         </div>
         <button class="addhab" data-addestado="${sc.id}" style="margin-top:6px">+ Estado</button>
       </div>
@@ -1175,6 +1225,13 @@ function aplicarModsEquipo(sc, mods, signo){
   });
 }
 
+// El texto libre de "Armadura" refleja por default lo que hay en sc.equipo
+// (nombres separados por coma), tanto si se equipó del catálogo como si el
+// creep es un custom armado a mano con esos mismos ítems.
+function actualizarArmaduraTipo(sc){
+  sc.armaduraTipo = (sc.equipo||[]).map(it => it.nombre).join(', ');
+}
+
 function quitarEquipoDeCreep(scId, equipoId){
   const sc = S.creeps.find(s => s.id === scId);
   const item = sc && (sc.equipo||[]).find(x => x.id === equipoId);
@@ -1182,6 +1239,7 @@ function quitarEquipoDeCreep(scId, equipoId){
   sc.defensa = Math.max(0, num(sc.defensa) - num(item.def));
   aplicarModsEquipo(sc, item.mods, -1);
   sc.equipo = sc.equipo.filter(x => x.id !== equipoId);
+  actualizarArmaduraTipo(sc);
   renderAll();
   toast(`${item.nombre} quitado`);
 }
@@ -1196,6 +1254,7 @@ function equiparItemEnCreep(idx){
     aplicarModsEquipo(sc, mods, 1);
     sc.equipo = sc.equipo || [];
     sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || ''});
+    actualizarArmaduraTipo(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
     sc.armaTipo = item.tipoDado;
@@ -1320,43 +1379,92 @@ function verCreep(id){
   $('#scrim-view').classList.add('open');
 }
 
-function estadoHtml(scId, es){
-  const mods = es.mods || [];
+let editingEstadoCreep = null; // {scId, esId} — esId es null para un estado nuevo
+let ecMods = [];
+
+function abrirEditorEstadoCreep(scId, esId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return;
+  let es = null;
+  if(esId){
+    es = sc.estados.find(x => x.id === esId);
+    if(!es) return;
+  }
+  editingEstadoCreep = {scId, esId};
+  ecMods = structuredClone((es && es.mods) || []);
+  $('#ec-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEstadosPresetHtml() + optgroupsEstadosPersonalizadosHtml();
+  $('#ec-preset').value = '';
+  $('#ec-nombre').value = es ? es.nombre : '';
+  $('#ec-detalle').value = es ? (es.detalle||'') : '';
+  $('#ec-turnos').value = es ? es.turnos : 1;
+  $('#ec-stacks').value = es ? es.stacks : 1;
+  $('#ec-hpturno').value = es ? es.hpTurno : 0;
+  $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
+  renderEcMods();
+  actualizarBotonesPresetEc();
+  $('#scrim-estado-creep').classList.add('open');
+}
+
+function actualizarBotonesPresetEc(){
+  const nombre = $('#ec-nombre').value.trim();
   const personalizados = S.estadosPersonalizados || [];
-  const yaGuardado = es.nombre && personalizados.some(p => p.nombre === es.nombre);
-  return `<div class="estado estado-${es.polaridad||'otro'}" data-estid="${es.id}">
-    <div class="hab-top">
-      <select class="est-tipo" data-estpreset="${scId}:${es.id}">
-        <option value="">— elegir preset o completar a mano —</option>
-        ${optgroupsEstadosPresetHtml()}
-        ${optgroupsEstadosPersonalizadosHtml()}
+  const yaGuardado = nombre && personalizados.some(p => p.nombre === nombre);
+  $('#ec-guardarpreset').textContent = yaGuardado ? 'Actualizar preset personalizado' : '☆ Guardar como preset personalizado';
+  $('#ec-borrarpreset').style.display = yaGuardado ? '' : 'none';
+}
+
+function renderEcMods(){
+  $('#ec-mods-lista').innerHTML = ecMods.map((m,i) => `
+    <div class="est-modrow">
+      <select data-ecmodstat="${i}">
+        ${ATTR_IDS.map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${ATTR_LABELS[a]}</option>`).join('')}
       </select>
-      <button class="rm" data-rmestado="${scId}:${es.id}">×</button>
+      <input type="number" data-ecmodval="${i}" value="${m.val}">
+      <button class="rm" data-ecmodrm="${i}">×</button>
+    </div>`).join('');
+}
+
+function guardarEditorEstadoCreep(){
+  if(!editingEstadoCreep) return;
+  const sc = S.creeps.find(s => s.id === editingEstadoCreep.scId);
+  if(!sc) return;
+  const nombre = $('#ec-nombre').value.trim() || 'Sin nombre';
+  const datos = {
+    nombre,
+    detalle: $('#ec-detalle').value,
+    turnos: Math.max(0, num($('#ec-turnos').value) || 0),
+    stacks: Math.max(1, num($('#ec-stacks').value) || 1),
+    hpTurno: num($('#ec-hpturno').value) || 0,
+    polaridad: $('#ec-preset').dataset.polaridad || 'otro',
+    mods: structuredClone(ecMods),
+  };
+  let es;
+  if(editingEstadoCreep.esId){
+    es = sc.estados.find(x => x.id === editingEstadoCreep.esId);
+    if(es) Object.assign(es, datos);
+  }else{
+    es = {id: uid(), ...datos};
+    sc.estados.push(es);
+  }
+  const teniaCon = (datos.mods||[]).some(m=>m.stat==='con');
+  if(teniaCon) actualizarHpMaxPorCon(sc);
+  editingEstadoCreep = null;
+  $('#scrim-estado-creep').classList.remove('open');
+  renderAll();
+  toast(`${nombre} guardado`);
+}
+
+function estadoHtml(scId, es){
+  const stacks = Math.max(1, num(es.stacks) || 1);
+  const hpTotal = num(es.hpTurno) * stacks;
+  const efectoTxt = es.detalle ? es.detalle : (hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)} HP/turno` : 'Sin efecto numérico');
+  return `<div class="estado-compacto estado-${es.polaridad||'otro'}">
+    <div class="estado-compacto-info">
+      <div class="estado-compacto-nombre">${esc(es.nombre || '(sin nombre)')}</div>
+      <div class="estado-compacto-meta">${esc(efectoTxt)} · ${fmt(num(es.turnos))} turno(s)</div>
     </div>
-    <input class="hn" data-estf="nombre" data-scid="${scId}" data-estid="${es.id}" value="${esc(es.nombre)}" placeholder="Nombre del estado" style="margin-top:5px">
-    <input class="hn" data-estf="detalle" data-scid="${scId}" data-estid="${es.id}" value="${esc(es.detalle||'')}" placeholder="Detalle (opcional)" style="margin-top:4px;font-weight:400;font-size:11px;color:var(--muted)">
-    <div class="est-row">
-      <div class="mini-f"><label>HP / turno</label><input type="number" data-estf="hpTurno" data-scid="${scId}" data-estid="${es.id}" value="${es.hpTurno}"></div>
-      <div class="mini-f"><label>Stacks</label><input type="number" data-estf="stacks" data-scid="${scId}" data-estid="${es.id}" value="${es.stacks}" min="1"></div>
-      <div class="mini-f"><label>Turnos</label><input type="number" data-estf="turnos" data-scid="${scId}" data-estid="${es.id}" value="${es.turnos}" min="0"></div>
-    </div>
-    <div class="est-preview">${es.hpTurno*Math.max(1,num(es.stacks))>=0?'+':''}${fmt(es.hpTurno*Math.max(1,num(es.stacks)))} HP por turno · ${fmt(num(es.turnos))} turno(s) restante(s)</div>
-    <div class="est-mods">
-      <div class="est-mods-label">Modificadores de atributo</div>
-      ${mods.map((m,i) => `
-        <div class="est-modrow">
-          <select data-estmod="${i}" data-estmk="stat" data-scid="${scId}" data-estid="${es.id}">
-            ${ATTR_IDS.map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${ATTR_LABELS[a]}</option>`).join('')}
-          </select>
-          <input type="number" data-estmod="${i}" data-estmk="val" data-scid="${scId}" data-estid="${es.id}" value="${m.val}">
-          <button class="rm" data-rmestmod="${scId}:${es.id}:${i}">×</button>
-        </div>`).join('')}
-      <button class="addmod-mini" data-addestmod="${scId}:${es.id}">+ Modificador</button>
-    </div>
-    <div style="margin-top:6px;border-top:1px dashed var(--line-soft);padding-top:6px">
-      <button type="button" class="addmod-mini" data-guardarestadopreset="${scId}:${es.id}">${yaGuardado ? 'Actualizar' : '☆ Guardar'} como preset personalizado</button>
-      ${yaGuardado ? `<button type="button" class="addmod-mini" data-borrarestadopreset="${esc(es.nombre)}" style="margin-left:5px;color:var(--danger)">Borrar preset</button>` : ''}
-    </div>
+    <button class="rm" data-editarestado="${scId}:${es.id}" title="Editar">✎</button>
+    <button class="rm" data-rmestado="${scId}:${es.id}">×</button>
   </div>`;
 }
 
@@ -1428,18 +1536,6 @@ document.addEventListener('input', e => {
     }
     return;
   }
-  if(t.dataset.estmod !== undefined){
-    const sc = S.creeps.find(s=>s.id===t.dataset.scid);
-    const es = sc && sc.estados.find(x=>x.id===t.dataset.estid);
-    if(!es) return;
-    const i = +t.dataset.estmod, k = t.dataset.estmk;
-    es.mods[i][k] = k==='val' ? num(t.value) : t.value;
-    if(es.mods[i].stat === 'con'){
-      actualizarHpMaxPorCon(sc);
-      actualizarVitalesEnDOM(sc, t.closest('.card'));
-    }
-    return;
-  }
   if(t.dataset.crit !== undefined && t.dataset.id){
     const sc = S.creeps.find(s=>s.id===t.dataset.id);
     if(sc) sc.crit[+t.dataset.crit] = num(t.value);
@@ -1451,21 +1547,6 @@ document.addEventListener('input', e => {
     const h = sc.habilidades.find(x=>x.id===t.dataset.habid);
     if(!h) return;
     h[t.dataset.habf] = t.dataset.habf === 'cd' ? num(t.value) : t.value;
-    return;
-  }
-  if(t.dataset.estf !== undefined){
-    const sc = S.creeps.find(s=>s.id===t.dataset.scid);
-    if(!sc) return;
-    const es = sc.estados.find(x=>x.id===t.dataset.estid);
-    if(!es) return;
-    const campo = t.dataset.estf;
-    es[campo] = (campo === 'nombre' || campo === 'detalle') ? t.value : num(t.value);
-    const card = t.closest('.estado');
-    if(card){
-      const stacks = Math.max(1, num(es.stacks)||1);
-      card.querySelector('.est-preview').textContent =
-        `${es.hpTurno*stacks>=0?'+':''}${fmt(es.hpTurno*stacks)} HP por turno · ${fmt(num(es.turnos))} turno(s) restante(s)`;
-    }
     return;
   }
 });
@@ -1576,11 +1657,12 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.addestado){
-    const sc = S.creeps.find(s=>s.id===b.dataset.addestado);
-    if(sc){
-      sc.estados.push({id:uid(), nombre:'', polaridad:'otro', hpTurno:0, stacks:1, turnos:1, detalle:'', mods:[]});
-      renderAll();
-    }
+    abrirEditorEstadoCreep(b.dataset.addestado, null);
+    return;
+  }
+  if(b.dataset.editarestado){
+    const [scId, esId] = b.dataset.editarestado.split(':');
+    abrirEditorEstadoCreep(scId, esId);
     return;
   }
   if(b.dataset.rmestado){
@@ -1593,56 +1675,6 @@ document.addEventListener('click', e => {
       if(teniaCon) actualizarHpMaxPorCon(sc);
       renderAll();
     }
-    return;
-  }
-  if(b.dataset.addestmod){
-    const [scId, estId] = b.dataset.addestmod.split(':');
-    const sc = S.creeps.find(s=>s.id===scId);
-    const es = sc && sc.estados.find(x=>x.id===estId);
-    if(es){
-      es.mods = es.mods || [];
-      es.mods.push({stat:'con', val:0});
-      renderAll();
-    }
-    return;
-  }
-  if(b.dataset.rmestmod){
-    const [scId, estId, idx] = b.dataset.rmestmod.split(':');
-    const sc = S.creeps.find(s=>s.id===scId);
-    const es = sc && sc.estados.find(x=>x.id===estId);
-    if(es){
-      const eraCon = es.mods[+idx] && es.mods[+idx].stat === 'con';
-      es.mods.splice(+idx, 1);
-      if(eraCon) actualizarHpMaxPorCon(sc);
-      renderAll();
-    }
-    return;
-  }
-  if(b.dataset.guardarestadopreset){
-    const [scId, estId] = b.dataset.guardarestadopreset.split(':');
-    const sc = S.creeps.find(s=>s.id===scId);
-    const es = sc && sc.estados.find(x=>x.id===estId);
-    if(es){
-      if(!es.nombre.trim()){ toast('Poné un nombre antes de guardar el preset'); return; }
-      const preset = {
-        nombre: es.nombre, polaridad: es.polaridad||'otro', turnos: num(es.turnos),
-        stacks: num(es.stacks), hpTurno: num(es.hpTurno), detalle: es.detalle||'',
-        mods: structuredClone(es.mods||[]),
-      };
-      S.estadosPersonalizados = S.estadosPersonalizados || [];
-      const idx = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
-      if(idx >= 0) S.estadosPersonalizados[idx] = preset; else S.estadosPersonalizados.push(preset);
-      toast(`Preset "${preset.nombre}" guardado`);
-      renderAll();
-    }
-    return;
-  }
-  if(b.dataset.borrarestadopreset){
-    const nombre = b.dataset.borrarestadopreset;
-    if(!confirm(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
-    S.estadosPersonalizados = (S.estadosPersonalizados || []).filter(p => p.nombre !== nombre);
-    toast('Preset borrado');
-    renderAll();
     return;
   }
   if(b.dataset.rmhab){
@@ -1682,7 +1714,8 @@ document.addEventListener('click', e => {
     reiniciarCombate();
     return;
   }
-  if(b.id === 'btn-save'){ guardar(); return; }
+  if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
+  if(b.id === 'btn-save-publico'){ guardarVistaPublica(); return; }
   if(b.id === 'btn-load'){ $('#file-input').click(); return; }
   if(b.id === 'btn-subir'){ subirDatos(); return; }
   if(b.id === 'btn-token'){ ghToken(true).then(t => { if(t) toast('Token de GitHub actualizado'); }); return; }
@@ -2163,27 +2196,17 @@ function descargar(nombreArchivo, objeto){
   URL.revokeObjectURL(a.href);
 }
 
-function guardar(){
+function guardarTodo(){
   descargar('gm-creeps.json', S);
-  setTimeout(() => descargar('creeps-publico.json', armarVistaPublica()), 300);
-  toast('Guardado: tus datos completos + la vista para jugadores');
+  toast('Guardado: tu respaldo completo (gm-creeps.json)');
+}
+
+function guardarVistaPublica(){
+  descargar('creeps-publico.json', armarVistaPublica());
+  toast('Guardado: la vista para jugadores (creeps-publico.json)');
 }
 
 document.addEventListener('change', async e => {
-  if(e.target.dataset.estpreset !== undefined){
-    const [scId, esId] = e.target.dataset.estpreset.split(':');
-    const sc = S.creeps.find(s=>s.id===scId);
-    const es = sc && sc.estados.find(x=>x.id===esId);
-    if(!es || !e.target.value) return;
-    const [tipo, idx] = e.target.value.split(':');
-    const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
-    if(!preset) return;
-    const {nombre, ...resto} = preset;
-    Object.assign(es, structuredClone(resto));
-    es.nombre = nombre;
-    renderAll();
-    return;
-  }
   if(e.target.dataset.imginput === undefined) return;
   const scId = e.target.dataset.imginput;
   const file = e.target.files[0];
@@ -2243,6 +2266,61 @@ $('#armacreep-x').onclick = () => { editingArmaCreep = null; $('#scrim-arma-cree
 $('#scrim-arma-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-arma-creep'){ editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); } });
 $('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); };
 $('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
+$('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
+$('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
+$('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
+$('#scrim-estado-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-estado-creep'){ editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); } });
+$('#ec-nombre').addEventListener('input', actualizarBotonesPresetEc);
+$('#ec-preset').addEventListener('change', e => {
+  if(!e.target.value) return;
+  const [tipo, idx] = e.target.value.split(':');
+  const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
+  if(!preset) return;
+  $('#ec-nombre').value = preset.nombre;
+  $('#ec-detalle').value = preset.detalle || '';
+  $('#ec-turnos').value = preset.turnos ?? 0;
+  $('#ec-stacks').value = preset.stacks ?? 1;
+  $('#ec-hpturno').value = preset.hpTurno ?? 0;
+  e.target.dataset.polaridad = preset.polaridad || 'otro';
+  ecMods = structuredClone(preset.mods || []);
+  renderEcMods();
+  actualizarBotonesPresetEc();
+});
+$('#ec-addmod').onclick = () => { ecMods.push({stat:'con', val:0}); renderEcMods(); };
+$('#ec-mods-lista').addEventListener('change', e => {
+  if(e.target.dataset.ecmodstat !== undefined) ecMods[+e.target.dataset.ecmodstat].stat = e.target.value;
+});
+$('#ec-mods-lista').addEventListener('input', e => {
+  if(e.target.dataset.ecmodval !== undefined) ecMods[+e.target.dataset.ecmodval].val = num(e.target.value);
+});
+$('#ec-mods-lista').addEventListener('click', e => {
+  const b = e.target.closest('[data-ecmodrm]');
+  if(!b) return;
+  ecMods.splice(+b.dataset.ecmodrm, 1);
+  renderEcMods();
+});
+$('#ec-guardarpreset').onclick = () => {
+  const nombre = $('#ec-nombre').value.trim();
+  if(!nombre){ toast('Poné un nombre antes de guardar el preset'); return; }
+  const preset = {
+    nombre, polaridad: $('#ec-preset').dataset.polaridad || 'otro',
+    turnos: Math.max(0, num($('#ec-turnos').value) || 0), stacks: Math.max(1, num($('#ec-stacks').value) || 1),
+    hpTurno: num($('#ec-hpturno').value) || 0, detalle: $('#ec-detalle').value,
+    mods: structuredClone(ecMods),
+  };
+  S.estadosPersonalizados = S.estadosPersonalizados || [];
+  const idx = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+  if(idx >= 0) S.estadosPersonalizados[idx] = preset; else S.estadosPersonalizados.push(preset);
+  toast(`Preset "${preset.nombre}" guardado`);
+  actualizarBotonesPresetEc();
+};
+$('#ec-borrarpreset').onclick = () => {
+  const nombre = $('#ec-nombre').value.trim();
+  if(!confirm(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
+  S.estadosPersonalizados = (S.estadosPersonalizados || []).filter(p => p.nombre !== nombre);
+  toast('Preset borrado');
+  actualizarBotonesPresetEc();
+};
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;

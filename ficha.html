@@ -397,6 +397,15 @@ a{color:var(--brass)}
 .cat-btn.buy:hover{background:var(--copper);color:#180F08}
 .cat-row .cat-manage{display:flex;gap:4px;flex:none}
 .cat-manage button{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:4px 7px;border-radius:var(--r)}
+
+/* Catálogo del fabricante: grilla de tarjetas en vez de lista */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));gap:10px;align-content:start;margin-bottom:14px}
+.cat-row.cat-card{flex-direction:column;align-items:stretch;margin-bottom:0;height:100%}
+.cat-row.cat-card .item-thumb{width:100%;height:110px;object-fit:cover;border-radius:var(--r)}
+.cat-row.cat-card .cat-info{flex:1;min-width:0}
+.cat-row.cat-card .cat-actions{flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.cat-row.cat-card .cat-actions .cat-btn{flex:1 1 88px;min-width:0;white-space:normal;text-align:center}
+.cat-row.cat-card .cat-manage{justify-content:flex-end;padding-top:4px}
 .cat-manage button:hover{border-color:var(--copper);color:var(--brass)}
 .view-modal .body{padding:0}
 .view-wrap{display:flex;gap:0}
@@ -1071,7 +1080,7 @@ a{color:var(--brass)}
 </div>
 
 <div class="scrim" id="scrim-catalogo">
-  <div class="modal catalogo-modal">
+  <div class="modal catalogo-modal botonera-modal">
     <header>
       <h3>Catálogo del fabricante</h3>
       <div style="display:flex;gap:8px;align-items:center">
@@ -4160,7 +4169,7 @@ function catalogoRowHtml(item){
   const dano = armaDanoTxt(item);
   const defVal = defValorDe(item);
   const statTxt = dano ? `Daño ${dano}` : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
-  return `<div class="cat-row" data-catid="${item.id}">
+  return `<div class="cat-row cat-card" data-catid="${item.id}">
     ${thumb(item)}
     <div class="cat-info">
       <div class="cat-nombre">${esc(item.nombre)}</div>
@@ -4199,7 +4208,7 @@ function renderCatalogoModal(){
   const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
   const html = claves.map(g => `
     <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
-    ${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}
+    <div class="cat-grid">${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}</div>
   `).join('');
   let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
   if(S.catalogo.length) vacioMsg = busqueda ? `No hay ítems que coincidan con "${esc($('#catalogo-buscar').value)}".` : 'No hay ítems en esta categoría.';

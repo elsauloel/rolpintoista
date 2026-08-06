@@ -12,17 +12,17 @@
   },
   "bitacora": [
     {
-      "id": "j1",
-      "nombre": "Jornada 1",
-      "texto": "- faltó sumarnos la exp y el loot de la última pelea\n\n"
-    },
-    {
       "id": "1m5vfp1",
       "nombre": "IDEAS DE SKILLS",
       "texto": "- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado.\n- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado"
+    },
+    {
+      "id": "gan84kw",
+      "nombre": "Jornada 1",
+      "texto": "- faltó sumarnos la exp y el loot de la última pelea"
     }
   ],
-  "bitacoraActiva": "1m5vfp1",
+  "bitacoraActiva": "gan84kw",
   "loot": {
     "normal": 0,
     "magico": 0,
@@ -36,9 +36,9 @@
     "int": 12
   },
   "hp": 40,
-  "turno": 2,
+  "turno": 18,
   "log": [
-    "<b style=\"color:var(--brass)\">Turno 2</b>",
+    "<b style=\"color:var(--brass)\">Turno 18</b>",
     "Bonos y Acciones se reiniciaron."
   ],
   "bonosGastados": 0,

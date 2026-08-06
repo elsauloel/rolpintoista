@@ -3881,7 +3881,8 @@ function drawEditor(){
       <div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--brass);padding:5px 7px">${fmt(precioVentaDe(draft))}</div>
     </div>`;
   }
-  flags.forEach(c => {
+  const FLAGS_OCULTOS = ['mitadPdgEva','armaduraRota','armaduraArruinada'];
+  flags.filter(c => !FLAGS_OCULTOS.includes(c)).forEach(c => {
     const on = (c==='activo' || c==='job') ? draft[c] !== false : !!draft[c];
     html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
       <input type="checkbox" data-c="${c}" ${on?'checked':''} style="width:auto">

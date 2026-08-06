@@ -76,6 +76,19 @@ input[type=file]{display:none}
   border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;
   border-top:3px solid var(--accent,var(--copper))
 }
+.card-muerto{border-top-color:var(--danger)}
+.creep-muerto-badge{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(160,20,20,.28);border-bottom:1px solid var(--danger);padding:6px 10px;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;color:#fff
+}
+.revivir-creep-btn{
+  background:rgba(46,107,87,.9);color:#EAF3E6;border:1px solid var(--bottle);border-radius:var(--r);
+  padding:4px 10px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:700;cursor:pointer
+}
+.revivir-creep-btn:hover{background:var(--bottle)}
 .card .chead{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--line-soft);background:rgba(255,255,255,.02)}
 .card .chead input.name{
   font-family:"Fraunces",serif;font-weight:700;font-size:16px;background:none;border:none;padding:2px 0;
@@ -540,6 +553,31 @@ input[type=file]{display:none}
     <div class="body" id="verestado-body"></div>
     <footer>
       <button class="btn primary" id="verestado-editar">Editar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-revivir-creep">
+  <div class="modal" style="max-width:340px">
+    <header><h3>¿Con cuánto HP revivir?</h3><button class="iconbtn" id="revivircreep-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn" id="revivircreep-modo-pct" style="flex:1">Por %</button>
+        <button type="button" class="btn" id="revivircreep-modo-valor" style="flex:1">Valor neto</button>
+      </div>
+      <div class="f" id="revivircreep-campo-pct">
+        <label>Porcentaje del HP máximo</label>
+        <input type="number" id="f-revivircreep-pct" value="50" min="1" max="100">
+      </div>
+      <div class="f" id="revivircreep-campo-valor" style="display:none">
+        <label>HP exacto</label>
+        <input type="number" id="f-revivircreep-valor" value="1" min="1">
+      </div>
+      <div class="hint" id="revivircreep-preview"></div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="revivircreep-cancel">Cancelar</button>
+      <button class="btn primary" id="revivircreep-confirmar">Revivir</button>
     </footer>
   </div>
 </div>
@@ -1112,10 +1150,17 @@ function abrirVerHabAccion(scId, habId){
 const SVG_OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
 const SVG_OJO_CERRADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
 
+function muertoBadgeHtml(sc){
+  if(num(sc.hp) > 0) return '';
+  return `<div class="creep-muerto-badge">💀 MUERTO
+    <button type="button" class="revivir-creep-btn" data-revivircreep="${sc.id}">Revivir</button>
+  </div>`;
+}
+
 function cardHtml(sc){
   if(sc.compacto) return cardCompactoHtml(sc);
   return `
-  <div class="card" style="--accent:${sc.color}" data-id="${sc.id}">
+  <div class="card${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
       <button type="button" class="eyebtn" data-vermodo="${sc.id}" title="Vista rápida">${SVG_OJO_ABIERTO}</button>
       <input class="name" data-f="nombre" data-id="${sc.id}" value="${esc(sc.nombre)}">
@@ -1127,6 +1172,7 @@ function cardHtml(sc){
       <button class="verbtn" data-dup="${sc.id}" title="Duplicar este creep">Duplicar</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
+    ${muertoBadgeHtml(sc)}
     <div class="imgwrap">
       <button type="button" class="imgpick" data-img="${sc.id}">
         ${sc.imagen ? `<img src="${sc.imagen}" alt="">` : `<span class="imgempty">+<small>Imagen</small></span>`}
@@ -1237,13 +1283,14 @@ function cardCompactoHtml(sc){
   const chips = sc.estados.map(es => `<button type="button" class="chip-estado" data-verestadocreep="${sc.id}:${es.id}">${esc(es.nombre || '(sin nombre)')} · ${fmt(num(es.turnos))}t</button>`).join('')
     || `<span class="chip-estado chip-estado-vacio">Sin estados</span>`;
   return `
-  <div class="card card-compacto" style="--accent:${sc.color}" data-id="${sc.id}">
+  <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
       <button type="button" class="eyebtn" data-vermodo="${sc.id}" title="Ver ficha completa">${SVG_OJO_CERRADO}</button>
       <span class="name-compacto">${esc(sc.nombre)}</span>
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
+    ${muertoBadgeHtml(sc)}
     <div class="cbody-compacto">
       <div class="vitalbar">
         <div class="vital-mini hp">
@@ -1812,6 +1859,14 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.abriracciones){
     abrirAccionesCreep(b.dataset.abriracciones);
+    return;
+  }
+  if(b.dataset.revivircreep){
+    revivirCreepId = b.dataset.revivircreep;
+    revivirCreepModo = 'pct';
+    $('#f-revivircreep-pct').value = 50;
+    actualizarRevivirCreepUI();
+    $('#scrim-revivir-creep').classList.add('open');
     return;
   }
   if(b.dataset.verhabaccion){
@@ -2596,6 +2651,42 @@ $('#ec-borrarpreset').onclick = () => {
   toast('Preset borrado');
   actualizarBotonesPresetEc();
 };
+let revivirCreepId = null;
+let revivirCreepModo = 'pct';
+function calcularHpRevivirCreep(){
+  const sc = S.creeps.find(s => s.id === revivirCreepId);
+  const hpMax = sc ? num(sc.hpMax) : 0;
+  if(revivirCreepModo === 'pct'){
+    const pct = Math.max(0, Math.min(100, num($('#f-revivircreep-pct').value) || 0));
+    return {hpMax, val: Math.max(1, Math.floor(hpMax * pct / 100))};
+  }
+  return {hpMax, val: Math.max(1, Math.floor(num($('#f-revivircreep-valor').value) || 1))};
+}
+function actualizarRevivirCreepUI(){
+  $('#revivircreep-modo-pct').classList.toggle('primary', revivirCreepModo === 'pct');
+  $('#revivircreep-modo-valor').classList.toggle('primary', revivirCreepModo === 'valor');
+  $('#revivircreep-campo-pct').style.display = revivirCreepModo === 'pct' ? '' : 'none';
+  $('#revivircreep-campo-valor').style.display = revivirCreepModo === 'valor' ? '' : 'none';
+  const {hpMax, val} = calcularHpRevivirCreep();
+  $('#revivircreep-preview').textContent = `Revive con ${fmt(val)} / ${fmt(hpMax)} HP`;
+}
+$('#revivircreep-modo-pct').onclick = () => { revivirCreepModo = 'pct'; actualizarRevivirCreepUI(); };
+$('#revivircreep-modo-valor').onclick = () => { revivirCreepModo = 'valor'; actualizarRevivirCreepUI(); };
+$('#f-revivircreep-pct').addEventListener('input', actualizarRevivirCreepUI);
+$('#f-revivircreep-valor').addEventListener('input', actualizarRevivirCreepUI);
+$('#revivircreep-confirmar').onclick = () => {
+  const sc = S.creeps.find(s => s.id === revivirCreepId);
+  if(!sc) return;
+  const {val} = calcularHpRevivirCreep();
+  sc.hp = val;
+  revivirCreepId = null;
+  $('#scrim-revivir-creep').classList.remove('open');
+  renderAll();
+  toast(`${sc.nombre} revivido con ${fmt(val)} HP`);
+};
+$('#revivircreep-cancel').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };
+$('#revivircreep-x').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };
+$('#scrim-revivir-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-revivir-creep'){ revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); } });
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;

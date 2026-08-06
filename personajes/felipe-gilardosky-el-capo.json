@@ -2,7 +2,7 @@
   "meta": {
     "nombre": "Felipe Gilardosky el Capo",
     "raza": "Cocodrilo",
-    "clase": "Cocodrilo Loco",
+    "clase": "Warrior Tanque",
     "subclase": "Mercenario",
     "nivel": 2,
     "exp": 0,
@@ -30,7 +30,7 @@
     "des": 7,
     "int": 5
   },
-  "hp": 34,
+  "hp": 45,
   "turno": 3,
   "log": [
     "<b style=\"color:var(--brass)\">Turno 3</b>",

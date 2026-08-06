@@ -1137,6 +1137,8 @@ a{color:var(--brass)}
       <div style="display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--line-soft)">
         <label class="hint" style="flex:none">Cantidad</label>
         <input type="number" id="f-dados-cantidad" value="1" min="1" style="width:56px">
+        <label class="hint" style="flex:none">+ daño fijo</label>
+        <input type="number" id="f-dados-fijo" value="0" style="width:56px">
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button type="button" class="btn" data-dadorapido="4" style="flex:1">1d4</button>
@@ -2160,7 +2162,8 @@ function ejecutarTiradaManual(){
 
 function tirarRapido(caras){
   const cant = Math.max(1, num($('#f-dados-cantidad').value) || 1);
-  $('#f-dados-formula').value = `${cant}d${caras}`;
+  const fijo = num($('#f-dados-fijo').value) || 0;
+  $('#f-dados-formula').value = `${cant}d${caras}${fijo ? `${fijo>0?'+':''}${fijo}` : ''}`;
   ejecutarTiradaManual();
 }
 

@@ -1223,6 +1223,31 @@ a{color:var(--brass)}
   </div>
 </div>
 
+<div class="scrim" id="scrim-revivir">
+  <div class="modal" style="max-width:340px">
+    <header><h3>¿Con cuánto HP revivir?</h3><button class="iconbtn" id="revivir-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn" id="revivir-modo-pct" style="flex:1">Por %</button>
+        <button type="button" class="btn" id="revivir-modo-valor" style="flex:1">Valor neto</button>
+      </div>
+      <div class="f" id="revivir-campo-pct">
+        <label>Porcentaje del HP máximo</label>
+        <input type="number" id="f-revivir-pct" value="50" min="1" max="100">
+      </div>
+      <div class="f" id="revivir-campo-valor" style="display:none">
+        <label>HP exacto</label>
+        <input type="number" id="f-revivir-valor" value="1" min="1">
+      </div>
+      <div class="hint" id="revivir-preview" style="font-size:14px;color:var(--paper)"></div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="revivir-cancel">Cancelar</button>
+      <button class="btn primary" id="revivir-confirmar">Revivir</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-muerte">
   <div class="modal" style="max-width:380px;text-align:center;border-top-color:var(--danger)">
     <div class="body" style="padding:34px 20px;display:flex;flex-direction:column;align-items:center;gap:18px">
@@ -1233,7 +1258,7 @@ a{color:var(--brass)}
 </div>
 
 <div id="overlay-muerte">
-  <button type="button" id="btn-revivir" title="Revivir con 50% del HP máximo">
+  <button type="button" id="btn-revivir" title="Elegir con cuánto HP revivir">
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="5" r="3"/>
       <path d="M12 9c-4 1-7 5-7 10 3 0 6-2 7-6 1 4 4 6 7 6 0-5-3-9-7-10Z"/>
@@ -4527,7 +4552,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -4767,14 +4792,45 @@ $('#recordatorio-traer').onclick = traerUltimaVersionPropia;
 $('#recordatorio-recargar').onclick = () => location.reload();
 $('#recordatorio-cerrar').onclick = () => $('#scrim-recordatorio').classList.remove('open');
 $('#muerte-cerrar').onclick = () => $('#scrim-muerte').classList.remove('open');
-$('#btn-revivir').onclick = () => {
+let revivirModo = 'pct';
+function calcularHpRevivir(){
   const c = compute();
   const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-  S.hp = Math.max(1, Math.floor(hpmax * 0.5));
+  if(revivirModo === 'pct'){
+    const pct = Math.max(0, Math.min(100, num($('#f-revivir-pct').value) || 0));
+    return {hpmax, val: Math.max(1, Math.floor(hpmax * pct / 100))};
+  }
+  return {hpmax, val: Math.max(1, Math.floor(num($('#f-revivir-valor').value) || 1))};
+}
+function actualizarRevivirUI(){
+  $('#revivir-modo-pct').classList.toggle('primary', revivirModo === 'pct');
+  $('#revivir-modo-valor').classList.toggle('primary', revivirModo === 'valor');
+  $('#revivir-campo-pct').style.display = revivirModo === 'pct' ? '' : 'none';
+  $('#revivir-campo-valor').style.display = revivirModo === 'valor' ? '' : 'none';
+  const {hpmax, val} = calcularHpRevivir();
+  $('#revivir-preview').textContent = `Revive con ${fmt(val)} / ${fmt(hpmax)} HP`;
+}
+$('#btn-revivir').onclick = () => {
+  revivirModo = 'pct';
+  $('#f-revivir-pct').value = 50;
+  actualizarRevivirUI();
+  $('#scrim-revivir').classList.add('open');
+};
+$('#revivir-modo-pct').onclick = () => { revivirModo = 'pct'; actualizarRevivirUI(); };
+$('#revivir-modo-valor').onclick = () => { revivirModo = 'valor'; actualizarRevivirUI(); };
+$('#f-revivir-pct').addEventListener('input', actualizarRevivirUI);
+$('#f-revivir-valor').addEventListener('input', actualizarRevivirUI);
+$('#revivir-confirmar').onclick = () => {
+  const {val} = calcularHpRevivir();
+  S.hp = val;
   $('#f-hp').value = S.hp;
+  $('#scrim-revivir').classList.remove('open');
   refresh();
   toast(`Revivido con ${fmt(S.hp)} HP`);
 };
+$('#revivir-cancel').onclick = () => $('#scrim-revivir').classList.remove('open');
+$('#revivir-x').onclick = () => $('#scrim-revivir').classList.remove('open');
+$('#scrim-revivir').addEventListener('mousedown', e => { if(e.target.id==='scrim-revivir') $('#scrim-revivir').classList.remove('open'); });
 $('#scrim-muerte').addEventListener('mousedown', e => { if(e.target.id==='scrim-muerte') $('#scrim-muerte').classList.remove('open'); });
 $('#scrim-recordatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-recordatorio') $('#scrim-recordatorio').classList.remove('open'); });
 if(!sessionStorage.getItem('recordatorio-visto-ficha')){

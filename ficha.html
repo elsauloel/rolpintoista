@@ -298,6 +298,10 @@ a{color:var(--brass)}
 }
 .tag.mod{border-color:rgba(168,194,86,.45);color:var(--absenta)}
 .tag.mod.neg{border-color:rgba(212,87,78,.45);color:var(--danger)}
+.botonera-badge{
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;color:var(--brass);
+  border:1px solid var(--copper);border-radius:var(--r);padding:3px 9px;background:rgba(201,133,69,.14);flex:none
+}
 .tag.cost{border-color:var(--copper);color:var(--brass)}
 .tag.on{background:rgba(168,194,86,.14);border-color:var(--absenta);color:var(--absenta)}
 .tag.off{opacity:.55}
@@ -1123,7 +1127,14 @@ a{color:var(--brass)}
 
 <div class="scrim" id="scrim-botonera">
   <div class="modal catalogo-modal botonera-modal">
-    <header><h3>Botonera</h3><button class="iconbtn" id="botonera-x">Cerrar</button></header>
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
+        <h3>Botonera</h3>
+        <span class="botonera-badge" id="botonera-badge-acciones">Acciones 0/0</span>
+        <span class="botonera-badge" id="botonera-badge-bonos">Bonos 0/0</span>
+      </div>
+      <button class="iconbtn" id="botonera-x">Cerrar</button>
+    </header>
     <div class="body" id="botonera-body"></div>
   </div>
 </div>
@@ -2583,6 +2594,12 @@ function renderTodasHabilidades(){
 function renderBotonera(){
   const c = compute();
   let html = '';
+
+  const accionesmax = Number.isNaN(c.final.accionesmax) ? 0 : c.final.accionesmax;
+  $('#botonera-badge-acciones').textContent = `Acciones ${fmt(num(S.acciones))}/${fmt(accionesmax)}`;
+  const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
+  const bonosDisponibles = bonosBase - num(S.bonosGastados);
+  $('#botonera-badge-bonos').textContent = `Bonos ${fmt(bonosDisponibles)}/${fmt(bonosBase)}`;
 
   const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
   const sinAccPdg = num(S.acciones) < 1;

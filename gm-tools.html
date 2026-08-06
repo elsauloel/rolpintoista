@@ -396,6 +396,13 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<div class="scrim" id="scrim-ver-hab">
+  <div class="modal" style="max-width:420px">
+    <header><h3 id="verhab-nombre">Habilidad</h3><button class="iconbtn" id="verhab-x">Cerrar</button></header>
+    <div class="body" id="verhab-body"></div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-recordatorio">
   <div class="modal" style="max-width:420px">
     <header><h3>Antes de arrancar…</h3></header>
@@ -1007,6 +1014,7 @@ function renderAccionesCreep(){
     {nombre:'Atacar (PdG)', disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {nombre:'Esquivar', disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
+    {nombre:'Parry', disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
   ];
   const tilesCombate = combate.map(f => `
     <button type="button" class="botonera-tile" ${f.attr} ${f.disabled?'disabled':''} title="${esc(f.motivo)}">
@@ -1022,7 +1030,7 @@ function renderAccionesCreep(){
     if(enCooldown) motivo = `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
     else if(sinAcciones) motivo = 'Sin acciones';
     else motivo = costoAcciones ? `${fmt(costoAcciones)} acción(es)` : 'Sin costo';
-    return {nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
+    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
   });
 
   $('#acciones-creep-titulo').textContent = sc.nombre;
@@ -1032,6 +1040,7 @@ function renderAccionesCreep(){
     <div class="accion-row${f.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
+      <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
     </div>`;
 
@@ -1056,6 +1065,20 @@ function abrirAccionesCreep(scId){
   accionesCreepId = scId;
   renderAccionesCreep();
   $('#scrim-acciones-creep').classList.add('open');
+}
+
+function abrirVerHabAccion(scId, habId){
+  const sc = S.creeps.find(s => s.id === scId);
+  const h = sc && sc.habilidades.find(x => x.id === habId);
+  if(!h) return;
+  const costo = h.accionesCosto ?? 1;
+  const costoTxt = costo ? `${fmt(costo)} acción(es)` : 'Sin costo';
+  const cdTxt = num(h.cd) > 0 ? `${fmt(num(h.cd))} turno(s) de cooldown` : 'Sin cooldown';
+  $('#verhab-nombre').textContent = h.nombre || 'Sin nombre';
+  $('#verhab-body').innerHTML = `
+    <div class="hint" style="margin-bottom:10px">${esc(costoTxt)} · ${esc(cdTxt)}</div>
+    <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`;
+  $('#scrim-ver-hab').classList.add('open');
 }
 
 const SVG_OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -1104,10 +1127,11 @@ function cardHtml(sc){
 
       <div>
         <div class="sect-label">Combate</div>
-        <div style="display:flex;gap:6px;margin-top:4px">
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
           <button type="button" class="addhab" data-atacarcreep="${sc.id}" style="flex:1">🎲 Atacar (PdG)</button>
           <button type="button" class="addhab" data-daniocreep="${sc.id}" style="flex:1">🎲 Daño Arma</button>
           <button type="button" class="addhab" data-esquivarcreep="${sc.id}" style="flex:1">🎲 Esquivar</button>
+          <button type="button" class="addhab" data-parrycreep="${sc.id}" style="flex:1">🎲 Parry</button>
         </div>
       </div>
 
@@ -1739,6 +1763,11 @@ document.addEventListener('click', e => {
     abrirAccionesCreep(b.dataset.abriracciones);
     return;
   }
+  if(b.dataset.verhabaccion){
+    const [scId, habId] = b.dataset.verhabaccion.split(':');
+    abrirVerHabAccion(scId, habId);
+    return;
+  }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
     return;
@@ -1773,6 +1802,13 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const eva = num(sc.agl) + attrModTotal(sc, 'agl');
     tirarValorStat(`${sc.nombre} · Esquivar`, eva);
+    return;
+  }
+  if(b.dataset.parrycreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
+    if(!sc) return;
+    const parry = num(sc.des) + attrModTotal(sc, 'des');
+    tirarValorStat(`${sc.nombre} · Parry`, parry);
     return;
   }
   if(b.dataset.equipardelfabricante){
@@ -2416,6 +2452,8 @@ $('#armacreep-x').onclick = () => { editingArmaCreep = null; $('#scrim-arma-cree
 $('#scrim-arma-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-arma-creep'){ editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); } });
 $('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); };
 $('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
+$('#verhab-x').onclick = () => $('#scrim-ver-hab').classList.remove('open');
+$('#scrim-ver-hab').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-hab') $('#scrim-ver-hab').classList.remove('open'); });
 $('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
 $('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };

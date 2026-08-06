@@ -659,6 +659,14 @@ a{color:var(--brass)}
   display:none;align-items:center;justify-content:center
 }
 #overlay-muerte.open{display:flex}
+#btn-revivir{
+  position:fixed;top:16px;left:16px;z-index:36;pointer-events:auto;
+  display:flex;align-items:center;gap:7px;background:#2E6B57;color:#fff;border:1px solid #4FA88C;
+  border-radius:var(--r);padding:9px 14px;font-family:"Space Mono",monospace;font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.45)
+}
+#btn-revivir:hover{background:#3a8068;border-color:#6FCB9F}
 .muerte-centro{text-align:center;padding:0 24px}
 .muerte-label{
   font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;
@@ -1206,6 +1214,13 @@ a{color:var(--brass)}
 </div>
 
 <div id="overlay-muerte">
+  <button type="button" id="btn-revivir" title="Revivir con 50% del HP máximo">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="5" r="3"/>
+      <path d="M12 9c-4 1-7 5-7 10 3 0 6-2 7-6 1 4 4 6 7 6 0-5-3-9-7-10Z"/>
+    </svg>
+    Revivir
+  </button>
   <div id="overlay-muerte-centro" class="muerte-centro"></div>
 </div>
 
@@ -1343,7 +1358,7 @@ const DEFAULT = {
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
   attrs:{con:0, fue:0, agl:0, des:0, int:0},
-  hp:0, turno:1, log:[], bonosGastados:0, acciones:3,
+  hp:1, turno:1, log:[], bonosGastados:0, acciones:3,
   muerto:{activo:false, turnos:5, definitivo:false},
   caps:{mochila:20, cinturon:5},
   armadura:{nota:''},
@@ -4675,6 +4690,14 @@ $('#recordatorio-traer').onclick = traerUltimaVersionPropia;
 $('#recordatorio-recargar').onclick = () => location.reload();
 $('#recordatorio-cerrar').onclick = () => $('#scrim-recordatorio').classList.remove('open');
 $('#muerte-cerrar').onclick = () => $('#scrim-muerte').classList.remove('open');
+$('#btn-revivir').onclick = () => {
+  const c = compute();
+  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+  S.hp = Math.max(1, Math.floor(hpmax * 0.5));
+  $('#f-hp').value = S.hp;
+  refresh();
+  toast(`Revivido con ${fmt(S.hp)} HP`);
+};
 $('#scrim-muerte').addEventListener('mousedown', e => { if(e.target.id==='scrim-muerte') $('#scrim-muerte').classList.remove('open'); });
 $('#scrim-recordatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-recordatorio') $('#scrim-recordatorio').classList.remove('open'); });
 if(!sessionStorage.getItem('recordatorio-visto-ficha')){

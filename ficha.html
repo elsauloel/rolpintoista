@@ -1058,6 +1058,7 @@ a{color:var(--brass)}
       <div id="resultado-dado-total" style="font-size:46px;font-weight:900;color:var(--brass);font-family:'Fraunces',serif;line-height:1"></div>
       <div id="resultado-dado-formula" class="hint" style="font-family:'Space Mono',monospace;font-size:12px"></div>
       <div id="resultado-dado-dados" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px"></div>
+      <div id="resultado-dado-hora" class="hint" style="font-family:'Space Mono',monospace;font-size:11px;opacity:.7"></div>
     </div>
   </div>
 </div>
@@ -1812,8 +1813,13 @@ function tirarDados(formula){
 
 let dadosHistorial = [];
 
+function horaTxt(fecha){
+  const p = n => String(n).padStart(2, '0');
+  return `${p(fecha.getHours())}:${p(fecha.getMinutes())}:${p(fecha.getSeconds())}`;
+}
+
 function registrarTirada(origen, r){
-  dadosHistorial.unshift({origen, ...r});
+  dadosHistorial.unshift({origen, ...r, hora: new Date()});
   dadosHistorial = dadosHistorial.slice(0, 20);
   renderDadosHistorial();
 }
@@ -1825,6 +1831,7 @@ function mostrarResultadoDado(origen, r){
   $('#resultado-dado-origen').textContent = origen;
   $('#resultado-dado-total').textContent = fmt(r.total);
   $('#resultado-dado-formula').textContent = r.formula;
+  $('#resultado-dado-hora').textContent = horaTxt(dadosHistorial[0].hora);
   $('#resultado-dado-dados').innerHTML = r.rolls.map(v => `<span class="dado-cara">${v}</span>`).join('')
     + (r.mod ? `<span class="dado-cara mod">${r.mod > 0 ? '+' : ''}${r.mod}</span>` : '');
   $('#scrim-resultado-dado').classList.add('open');
@@ -1834,7 +1841,7 @@ function renderDadosHistorial(){
   const el = $('#dados-historial');
   if(!el) return;
   el.innerHTML = dadosHistorial.length
-    ? dadosHistorial.map(r => `<div><b style="color:var(--brass)">${fmt(r.total)}</b> — ${esc(r.origen)}: ${esc(r.formula)} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''}</div>`).join('')
+    ? dadosHistorial.map(r => `<div>${horaTxt(r.hora)} — <b style="color:var(--brass)">${fmt(r.total)}</b> — ${esc(r.origen)}: ${esc(r.formula)} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''}</div>`).join('')
     : '<div style="opacity:.6">Sin tiradas todavía.</div>';
 }
 

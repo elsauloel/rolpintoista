@@ -3420,25 +3420,34 @@ const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
 const EFECTOS_PRESET = [
-  {nombre:'Veneno', stacks:3, turnos:3, hpturno:-1, stacksturno:-1,
+  {nombre:'Veneno', polaridad:'debuff', stacks:3, turnos:3, hpturno:-1, stacksturno:-1,
     detalle:'Pierde 1 HP por stack cada turno. Se agota junto con los stacks (y con los turnos, que arrancan igualados).'},
-  {nombre:'Regeneración', stacks:1, turnos:3, hpturno:5, stacksturno:0,
+  {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpturno:5, stacksturno:0,
     detalle:'Cura HP cada turno.'},
-  {nombre:'Pajaritos', turnos:2, mitadPdgEva:true,
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:2, mitadPdgEva:true,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Agotado', turnos:1, mods:[{stat:'accionesmax', val:-1}],
+  {nombre:'Agotado', polaridad:'debuff', turnos:1, mods:[{stat:'accionesmax', val:-1}],
     detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', turnos:1, forzarAccionesMax:1,
+  {nombre:'Exhausto', polaridad:'debuff', turnos:1, forzarAccionesMax:1,
     detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', turnos:1, forzarAccionesMax:0,
+  {nombre:'Stun', polaridad:'debuff', turnos:1, forzarAccionesMax:0,
     detalle:'Sin Acciones este turno.'},
-  {nombre:'Hypeado', turnos:2, mods:[{stat:'accionesmax', val:1}],
+  {nombre:'Hypeado', polaridad:'buff', turnos:2, mods:[{stat:'accionesmax', val:1}],
     detalle:'+1 a las Acciones máximas del turno.'},
-  {nombre:'Armadura rota', turnos:2, armaduraRota:true,
+  {nombre:'Armadura rota', polaridad:'debuff', turnos:2, armaduraRota:true,
     detalle:'Reduce a la mitad (redondeado hacia abajo) todos los valores defensivos otorgados por equipo (Defensa y Resistencia a crítico).'},
-  {nombre:'Armadura arruinada', turnos:2, armaduraArruinada:true,
+  {nombre:'Armadura arruinada', polaridad:'debuff', turnos:2, armaduraArruinada:true,
     detalle:'Anula todo efecto de armadura y resistencia al crítico otorgados por equipo.'},
 ];
+
+const POLARIDAD_EFECTO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
+function optgroupsEfectosPresetHtml(){
+  return ['buff','debuff','otro'].map(pol => {
+    const opts = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol);
+    if(!opts.length) return '';
+    return `<optgroup label="${POLARIDAD_EFECTO_LABEL[pol]}">${opts.map(({p,i}) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
+  }).join('');
+}
 
 let editing = null;
 
@@ -3779,9 +3788,7 @@ function drawEditor(){
     html += `<div class="f"><label>Preset (opcional)</label>
       <select id="efecto-preset">
         <option value="">— en blanco —</option>
-        <optgroup label="Estándar">
-          ${EFECTOS_PRESET.map((p,i) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}
-        </optgroup>
+        ${optgroupsEfectosPresetHtml()}
         ${personalizados.length ? `<optgroup label="Mis presets">
           ${personalizados.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}
         </optgroup>` : ''}
@@ -3872,9 +3879,7 @@ function drawEditor(){
     html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
       <select id="item-efecto-preset">
         <option value="">— elegir preset o escribir a mano —</option>
-        <optgroup label="Estándar">
-          ${EFECTOS_PRESET.map((p,i) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}
-        </optgroup>
+        ${optgroupsEfectosPresetHtml()}
         ${personalizadosIt.length ? `<optgroup label="Mis presets">
           ${personalizadosIt.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}
         </optgroup>` : ''}

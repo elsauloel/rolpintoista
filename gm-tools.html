@@ -74,6 +74,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .reporte-estado.escapo{color:var(--muted);border:1px solid var(--line)}
 .reporte-xp{font-family:"Space Mono",monospace;font-weight:700;color:var(--brass);flex:none;min-width:70px;text-align:right}
 .reporte-total{margin-top:8px;text-align:right;font-size:14px;color:var(--paper)}
+.reporte-dividir{margin-top:10px;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.reporte-dividir input{width:56px;text-align:center;flex:none}
+.reporte-xp-por-jugador{color:var(--paper)}
+.reporte-xp-por-jugador b{color:var(--brass)}
 .reporte-loot-lista{display:flex;flex-direction:column;gap:8px}
 .reporte-loot-creep{border:1px solid var(--line-soft);background:var(--panel2);padding:7px 10px}
 .reporte-loot-nombre{font-weight:700;font-size:12.5px;margin-bottom:5px}
@@ -2745,6 +2749,8 @@ function generarReporteCombate(){
   return {filas, xpTotal};
 }
 
+let xpCantidadJugadores = 4;
+
 function renderReporteCombate(){
   const {filas, xpTotal} = generarReporteCombate();
   if(!filas.length){
@@ -2770,17 +2776,29 @@ function renderReporteCombate(){
       </div>`).join('')
     : `<div class="hint">Sin objetos equipados entre los creeps derrotados.</div>`;
 
+  const xpPorJugador = xpCantidadJugadores > 0 ? Math.round(xpTotal / xpCantidadJugadores) : 0;
+
   $('#finalizar-combate-body').innerHTML = `
     <div>
       <div class="reporte-seccion-titulo">Experiencia obtenida</div>
       <div class="reporte-lista">${filasHtml}</div>
       <div class="reporte-total">Total del grupo: <b>${fmt(xpTotal)} XP</b></div>
+      <div class="reporte-dividir">
+        Dividir entre <input type="number" id="finalizar-combate-jugadores" min="1" step="1" value="${xpCantidadJugadores}">
+        jugadores <span class="reporte-xp-por-jugador">→ <b id="finalizar-combate-xp-por-jugador">${fmt(xpPorJugador)}</b> XP c/u</span>
+      </div>
     </div>
     <div>
       <div class="reporte-seccion-titulo">Loot obtenido (creeps derrotados)</div>
       <div class="reporte-loot-lista">${lootHtml}</div>
     </div>
   `;
+
+  $('#finalizar-combate-jugadores').addEventListener('input', e => {
+    const n = Math.max(1, Math.round(num(e.target.value)) || 1);
+    xpCantidadJugadores = n;
+    $('#finalizar-combate-xp-por-jugador').textContent = fmt(Math.round(xpTotal / n));
+  });
 }
 
 let toastT;

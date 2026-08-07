@@ -2242,16 +2242,27 @@ function cargaIndicator(i){
   return `<div class="unit-stepper"><span class="unit-label">Cargas de la unidad actual</span><span class="unit-n">${carga}/${cargaMax}</span></div>`;
 }
 
+// Lo que está en la mochila es una copia del ítem del catálogo hecha en el
+// momento de comprarlo. Si el efecto se configuró después, esa copia no lo
+// tiene y el consumible no hace nada. Se busca el original por nombre, que
+// es la única referencia al catálogo que sobrevive a la copia.
+function configEfectoDe(it){
+  if((it.efectoNombre || '').trim()) return it;
+  const base = (S.catalogo || []).find(c => c.nombre === it.nombre);
+  return base && (base.efectoNombre || '').trim() ? base : it;
+}
+
 function aplicarEfectoDeConsumo(it){
-  const nombre = (it.efectoNombre || '').trim();
+  const src = configEfectoDe(it);
+  const nombre = (src.efectoNombre || '').trim();
   if(!nombre) return null;
-  const turnos = num(it.efectoTurnos);
-  const hpturno = num(it.efectoHpTurno);
-  const permanente = !!it.efectoPermanente;
+  const turnos = num(src.efectoTurnos);
+  const hpturno = num(src.efectoHpTurno);
+  const permanente = !!src.efectoPermanente;
   // El estado se queda solo en la lista: sin una descripción propia hay que
   // acordarse de qué ítem salió. Si el ítem no trae un texto pensado para el
   // estado, se usa el suyo, que es mejor que nada.
-  const detalle = (it.efectoDetalle || '').trim() || (it.detalle || '').trim();
+  const detalle = (src.efectoDetalle || '').trim() || (src.detalle || '').trim();
   let ef = S.efectos.find(e => e.nombre === nombre);
   if(ef){
     ef.turnos = turnos;
@@ -3468,10 +3479,15 @@ document.addEventListener('click', e => {
       it.cargaActual = carga;
       purgarSiAgotado(key, id);
 
-      const c = compute();
-      const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-      S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
-      $('#f-hp').value = S.hp;
+      // Solo se toca el HP si el ítem efectivamente cura o daña: si no,
+      // el clamp contra hpmax lo bajaría igual (con la ficha recién
+      // abierta hpmax es 0 y eso mataba al personaje de una).
+      if(num(it.curahp)){
+        const c = compute();
+        const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+        S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
+        $('#f-hp').value = S.hp;
+      }
       const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
       const bonosRestaurados = restaurarBonosDeConsumo(it);

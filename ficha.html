@@ -755,6 +755,8 @@ a{color:var(--brass)}
 .btn.primary:hover{background:var(--brass)}
 .btn.ghost{color:var(--muted)}
 .btn.del{color:var(--danger);border-color:rgba(212,87,78,.4)}
+.btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
+.btn.aleatorio:hover{background:#9B7BD4;color:#1B0F1F}
 
 .modal.reminder{border-top-color:var(--copper);max-width:440px}
 .reminder-item{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 12px;margin-bottom:9px}
@@ -1143,6 +1145,7 @@ a{color:var(--brass)}
         </div>
         <input type="text" id="catalogo-buscar" placeholder="Buscar por nombre, efecto, modificador…">
         <button type="button" class="btn ghost" id="catalogo-limpiar-filtros">Limpiar filtros</button>
+        <button type="button" class="btn aleatorio" id="catalogo-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
       </div>
       <div class="carrito-lista" id="carrito-lista"></div>
       <div class="carrito-footer">
@@ -1152,6 +1155,17 @@ a{color:var(--brass)}
       </div>
     </div>
     <div class="body" id="catalogo-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-item-aleatorio">
+  <div class="modal" style="max-width:420px">
+    <header><h3>🎲 Ítem aleatorio</h3><button class="iconbtn" id="item-aleatorio-x">Cerrar</button></header>
+    <div class="body" id="item-aleatorio-body"></div>
+    <footer>
+      <button class="btn ghost" id="item-aleatorio-tirar-de-nuevo">🎲 Tirar de nuevo</button>
+      <button class="btn primary" id="item-aleatorio-cerrar">Cerrar</button>
+    </footer>
   </div>
 </div>
 
@@ -4293,7 +4307,11 @@ let carritoCatalogo = [];
 
 const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
 
-function renderCatalogoModal(){
+// Devuelve los ítems del catálogo que pasan los filtros activos ahora
+// mismo (categoría, slot, tier, búsqueda) — la usan tanto el render de
+// la grilla como el botón de Ítem aleatorio, para que "aleatorio" sea
+// siempre "aleatorio dentro de lo que se está viendo".
+function catalogoVisibles(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
   const filtroSlot = $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '';
@@ -4303,7 +4321,23 @@ function renderCatalogoModal(){
   if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);
   if(filtroTier) visibles = visibles.filter(item => item.tier === filtroTier);
   if(busqueda) visibles = visibles.filter(item => textoBusquedaDe(item).includes(busqueda));
+  return visibles;
+}
 
+let itemAleatorioActual = null;
+
+// Elige un ítem al azar entre los que pasan los filtros activos en ese
+// momento (no de todo el catálogo) — para botín o recompensas rápidas.
+function elegirItemAleatorio(){
+  const visibles = catalogoVisibles();
+  if(!visibles.length){ toast('No hay ítems que coincidan con los filtros activos'); return; }
+  itemAleatorioActual = visibles[Math.floor(Math.random() * visibles.length)];
+  $('#item-aleatorio-body').innerHTML = `<div class="cat-grid">${catalogoRowHtml(itemAleatorioActual)}</div>`;
+  $('#scrim-item-aleatorio').classList.add('open');
+}
+
+function renderCatalogoModal(){
+  const visibles = catalogoVisibles();
   const grupos = {};
   visibles.forEach(item => {
     const g = grupoCompraDe(item.tipoItem);
@@ -4786,7 +4820,7 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */
@@ -5123,6 +5157,11 @@ $('#catalogo-limpiar-filtros').addEventListener('click', () => {
   $('#catalogo-buscar').value = '';
   renderCatalogoModal();
 });
+$('#catalogo-item-aleatorio').addEventListener('click', elegirItemAleatorio);
+$('#item-aleatorio-tirar-de-nuevo').addEventListener('click', elegirItemAleatorio);
+$('#item-aleatorio-x').onclick = () => $('#scrim-item-aleatorio').classList.remove('open');
+$('#item-aleatorio-cerrar').onclick = () => $('#scrim-item-aleatorio').classList.remove('open');
+$('#scrim-item-aleatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-aleatorio') $('#scrim-item-aleatorio').classList.remove('open'); });
 $('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
 $('#view-edit-btn').onclick = () => {
   if(!viewing) return;

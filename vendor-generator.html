@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor Generator — Tiendas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper); font-family:"Space Grotesk", system-ui, sans-serif; font-size:14px; line-height:1.4;
+  min-height:100vh;
+}
+input,select,textarea,button{font-family:inherit;color:inherit}
+input,textarea,select{
+  min-width:0;background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--paper);padding:5px 7px;width:100%;
+}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+button{cursor:pointer;background:none;border:none;padding:0}
+button:disabled{opacity:.5;cursor:not-allowed}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 18px 90px}
+
+.hero{
+  border:1px solid var(--line);border-top:3px solid var(--copper);
+  background:linear-gradient(180deg, rgba(201,133,69,.10), rgba(0,0,0,0) 60%), var(--panel);
+  padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:60;box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
+}
+.hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(22px,3vw,32px);margin:0;letter-spacing:-.01em}
+.hero .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px}
+.hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  padding:9px 16px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);white-space:nowrap
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.ghost{color:var(--muted)}
+.btn.publicar{background:#2E6B57;border-color:#2E6B57;color:#EAF3E6;font-weight:700}
+.btn.publicar:hover{background:#3A8770;border-color:#3A8770}
+
+.panel{border:1px solid var(--line);background:var(--panel);padding:16px 18px;margin-top:16px}
+.panel-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:12px}
+.controles{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.campo{display:flex;flex-direction:column;gap:5px;flex:0 1 260px}
+.campo label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.campo select{width:100%}
+.hint{color:var(--muted);font-size:12.5px}
+
+.resumen{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.resumen-chip{
+  font-family:"Space Mono",monospace;font-size:11px;border:1px solid var(--line);
+  border-radius:99px;padding:4px 12px;color:var(--paper)
+}
+.resumen-chip b{color:var(--brass)}
+
+.cat-grouphead{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--copper);margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line-soft)
+}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));gap:10px}
+.cat-card{
+  display:flex;flex-direction:column;gap:5px;border:1px solid var(--line-soft);
+  background:var(--panel2);padding:9px 11px
+}
+.cat-card-titulo{display:flex;align-items:flex-start;gap:7px;justify-content:space-between}
+.cat-nombre{font-weight:700;font-size:13px;min-width:0}
+.cat-tier-badge{
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;border:1px solid;font-weight:700;flex:none;white-space:nowrap;margin-top:1px
+}
+.cat-meta{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.cat-precio{color:var(--brass);font-weight:700}
+.cat-garantizado{
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--absenta);border:1px solid var(--absenta);border-radius:99px;padding:1px 7px;align-self:flex-start
+}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--panel);
+  border:1px solid var(--copper);padding:10px 16px;font-family:"Space Mono",monospace;font-size:11.5px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:95;max-width:90vw;text-align:center
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Rol Pintoísta</div>
+      <h1>Vendor Generator</h1>
+    </div>
+    <div class="hero-right">
+      <a class="btn ghost" href="ficha.html">Abrir ficha</a>
+      <a class="btn ghost" href="gm-tools.html">Abrir GM Tools</a>
+      <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-titulo">Generar tienda</div>
+    <div class="controles">
+      <div class="campo">
+        <label for="f-tamano">Tamaño del vendedor</label>
+        <select id="f-tamano">
+          <option value="ambulante">Vendedor ambulante</option>
+          <option value="pueblito">Pueblito</option>
+          <option value="aldea" selected>Aldea</option>
+          <option value="ciudad">Ciudad</option>
+          <option value="capital">Capital</option>
+        </select>
+      </div>
+      <button class="btn primary" id="btn-generar">Generar Shop</button>
+      <button class="btn" id="btn-regenerar" disabled>Regenerar</button>
+      <button class="btn publicar" id="btn-publicar" disabled>Publicar Shop</button>
+    </div>
+    <div class="hint" id="hint-tamano" style="margin-top:10px"></div>
+  </div>
+
+  <div class="panel" id="panel-preview" style="display:none">
+    <div class="panel-titulo">Vista previa del catálogo</div>
+    <div class="resumen" id="preview-resumen"></div>
+    <div id="preview-lista"></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => new Intl.NumberFormat('es-AR').format(n);
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------- Catálogo (espejo del de ficha.html, sin imágenes) ---------- */
+/* La tienda publicada guarda solo ids: la ficha resuelve nombre, imagen y
+   stats desde su propio catálogo, así este archivo no duplica esos datos. */
+const CATALOGO = [
+  {id:'cat-pocion-hp', nombre:'Poción de HP', tipoItem:'consumibles', tier:'Común', precioCompra:5, consumible:true},
+  {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:20, consumible:true},
+  {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', tipoItem:'consumibles', tier:'Raro', precioCompra:50, consumible:true},
+  {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', tipoItem:'consumibles', tier:'Excepcional', precioCompra:200, consumible:true},
+  {id:'cat-pocion-regen', nombre:'Poción de Regeneración', tipoItem:'consumibles', tier:'Común', precioCompra:15, consumible:true},
+  {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:45, consumible:true},
+  {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:35, consumible:true},
+  {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', tipoItem:'consumibles', tier:'Raro', precioCompra:100, consumible:true},
+  {id:'cat-pocion-bonos', nombre:'Poción de Bonos', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pocion-bonos-grande', nombre:'Poción de Bonos grande', tipoItem:'consumibles', tier:'Excepcional', precioCompra:120, consumible:true},
+  {id:'cat-cura-plus', nombre:'Cura Plus', tipoItem:'consumibles', tier:'Común', precioCompra:15, consumible:true},
+  {id:'cat-antidoto', nombre:'Antídoto', tipoItem:'consumibles', tier:'Común', precioCompra:10, consumible:true},
+  {id:'cat-raciones', nombre:'Raciones', tipoItem:'consumibles', tier:'Común', precioCompra:3, consumible:true},
+  {id:'cat-raciones-fancy', nombre:'Raciones Fancy', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:50, consumible:true},
+  {id:'cat-ankh', nombre:'Ankh de Reencarnación', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:200, consumible:true},
+  {id:'cat-revive', nombre:'Revive', tipoItem:'consumibles', tier:'Raro', precioCompra:150, consumible:true},
+  {id:'cat-polilla', nombre:'Polilla mística', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:50, consumible:true},
+  {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', tipoItem:'consumibles', tier:'Raro', precioCompra:100, consumible:true},
+  {id:'cat-pergamino-luz', nombre:'Pergamino de luz cegadora', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pergamino-tentaculo', nombre:'Pergamino de tentáculo sombrío', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pergamino-sombras', nombre:'Pergamino de sombras chinescas', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pergamino-red', nombre:'Pergamino de red Nerubian', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pergamino-ojo', nombre:'Pergamino de ojo de Kicillof', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-pergamino-ventriloquia', nombre:'Pergamino de ventriloquía', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
+  {id:'cat-daga', nombre:'Daga', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
+  {id:'cat-rompemalla', nombre:'Rompemalla', tipoItem:'arma_1m', tier:'Común', precioCompra:40, consumible:false},
+  {id:'cat-espada-ancha', nombre:'Espada ancha', tipoItem:'arma_1m', tier:'Común', precioCompra:31, consumible:false},
+  {id:'cat-hacha-de-mano', nombre:'Hacha de mano', tipoItem:'arma_1m', tier:'Común', precioCompra:65, consumible:false},
+  {id:'cat-bast-n-flexible', nombre:'Bastón flexible', tipoItem:'arma_1m', tier:'Común', precioCompra:85, consumible:false},
+  {id:'cat-estoque', nombre:'Estoque', tipoItem:'arma_1m', tier:'Común', precioCompra:40, consumible:false},
+  {id:'cat-espada-corta', nombre:'Espada corta', tipoItem:'arma_1m', tier:'Común', precioCompra:35, consumible:false},
+  {id:'cat-machete', nombre:'Machete', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
+  {id:'cat-hacha', nombre:'Hacha', tipoItem:'arma_1m', tier:'Común', precioCompra:60, consumible:false},
+  {id:'cat-maza', nombre:'Maza', tipoItem:'arma_1m', tier:'Común', precioCompra:66, consumible:false},
+  {id:'cat-escudo-romano', nombre:'Escudo romano', tipoItem:'escudo_2m', tier:'Buena Calidad', precioCompra:131, consumible:false},
+  {id:'cat-espada-larga', nombre:'Espada larga', tipoItem:'arma_1m', tier:'Común', precioCompra:50, consumible:false},
+  {id:'cat-escudo-grande', nombre:'Escudo grande', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:82, consumible:false},
+  {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
+  {id:'cat-mangual', nombre:'Mangual', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:105, consumible:false},
+  {id:'cat-broquel', nombre:'Broquel', tipoItem:'escudo_1m', tier:'Común', precioCompra:42, consumible:false},
+  {id:'cat-martillo', nombre:'Martillo', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:124, consumible:false},
+  {id:'cat-escudo-pav-s', nombre:'Escudo pavés', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:116, consumible:false},
+  {id:'cat-escudo-triangular', nombre:'Escudo triangular', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
+  {id:'cat-escudo-peque-o', nombre:'Escudo pequeño', tipoItem:'escudo_1m', tier:'Común', precioCompra:46, consumible:false},
+  {id:'cat-armadura-acolchada', nombre:'Armadura acolchada', tipoItem:'armadura_blanda', tier:'Común', precioCompra:51, consumible:false},
+  {id:'cat-armadura-con-tachas', nombre:'Armadura con tachas', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:98, consumible:false},
+  {id:'cat-cota-de-malla', nombre:'Cota de malla', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:127, consumible:false},
+  {id:'cat-pechera', nombre:'Pechera', tipoItem:'armadura_blanda', tier:'Común', precioCompra:42, consumible:false},
+  {id:'cat-cota-de-placas', nombre:'Cota de placas', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:221, consumible:false},
+  {id:'cat-coraza', nombre:'Coraza', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:234, consumible:false},
+  {id:'cat-sombrero-humectante', nombre:'Sombrero humectante', tipoItem:'casco_blando', tier:'Común', precioCompra:20, consumible:false},
+  {id:'cat-casco', nombre:'Casco', tipoItem:'casco_rigido', tier:'Común', precioCompra:42, consumible:false},
+  {id:'cat-yelmo-liviano', nombre:'Yelmo liviano', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:80, consumible:false},
+  {id:'cat-yelmo-completo', nombre:'Yelmo completo', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:122, consumible:false},
+  {id:'cat-gran-yelmo', nombre:'Gran yelmo', tipoItem:'casco_rigido', tier:'Raro', precioCompra:221, consumible:false},
+  {id:'cat-zapatillas-nike', nombre:'Zapatillas Nike', tipoItem:'botas_rigidas', tier:'Excepcional', precioCompra:500, consumible:false},
+  {id:'cat-botas-reforzadas', nombre:'Botas reforzadas', tipoItem:'botas_blandas', tier:'Común', precioCompra:42, consumible:false},
+  {id:'cat-grebas', nombre:'Grebas', tipoItem:'piernas_rigidas', tier:'Buena Calidad', precioCompra:98, consumible:false},
+  {id:'cat-sabaton', nombre:'Sabatón', tipoItem:'botas_rigidas', tier:'Buena Calidad', precioCompra:127, consumible:false},
+  {id:'cat-mercury-threads', nombre:'Mercury threads', tipoItem:'botas_blandas', tier:'Buena Calidad', precioCompra:133, consumible:false},
+  {id:'cat-guantes-finos-de-senor', nombre:'Guantes finos de señor', tipoItem:'guantes_blandos', tier:'Común', precioCompra:34, consumible:false},
+  {id:'cat-guantes-de-cuero-reforzado', nombre:'Guantes de cuero reforzado', tipoItem:'guantes_blandos', tier:'Común', precioCompra:42, consumible:false},
+  {id:'cat-mitones-de-malla', nombre:'Mitones de malla', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:80, consumible:false},
+  {id:'cat-guanteletes', nombre:'Guanteletes', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:127, consumible:false},
+  {id:'cat-armadura-mediana', nombre:'Armadura mediana', tipoItem:'armadura_rigida', tier:'Buena Calidad', precioCompra:140, consumible:false},
+  {id:'new-punal-de-asalto', nombre:'Puñal de asalto', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
+  {id:'new-espada-ropera', nombre:'Espada ropera', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:74, consumible:false},
+  {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tipoItem:'arma_1m', tier:'Raro', precioCompra:165, consumible:false},
+  {id:'new-aguja-de-tejer-gigante', nombre:'Aguja de tejer gigante', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
+  {id:'new-espada-corta-de-instruccion', nombre:'Espada corta de instrucción', tipoItem:'arma_1m', tier:'Común', precioCompra:50, consumible:false},
+  {id:'new-sable-de-caballeria', nombre:'Sable de caballería', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
+  {id:'new-espada-bastarda-encantada', nombre:'Espada bastarda encantada', tipoItem:'arma_1m', tier:'Raro', precioCompra:140, consumible:false},
+  {id:'new-machete-de-podar-rosales-de-vivero', nombre:'Machete de podar rosales de vivero', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
+  {id:'new-hachuela-de-lenador', nombre:'Hachuela de leñador', tipoItem:'arma_1m', tier:'Común', precioCompra:65, consumible:false},
+  {id:'new-hacha-de-guerra-ligera', nombre:'Hacha de guerra ligera', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:82, consumible:false},
+  {id:'new-hacha-bipenne', nombre:'Hacha bipenne', tipoItem:'arma_1m', tier:'Raro', precioCompra:155, consumible:false},
+  {id:'new-ventilador-de-techo-industrial-desmontado', nombre:'Ventilador de techo industrial desmontado', tipoItem:'arma_1m', tier:'Común', precioCompra:60, consumible:false},
+  {id:'new-maza-de-guardia', nombre:'Maza de guardia', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
+  {id:'new-martillo-de-sargento', nombre:'Martillo de sargento', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:112, consumible:false},
+  {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tipoItem:'arma_1m', tier:'Raro', precioCompra:281, consumible:false},
+  {id:'new-bate-de-aluminio-de-la-liga-interbarrial', nombre:'Bate de aluminio de la Liga Interbarrial', tipoItem:'arma_1m', tier:'Común', precioCompra:85, consumible:false},
+  {id:'new-rodela-de-cuero', nombre:'Rodela de cuero', tipoItem:'escudo_1m', tier:'Común', precioCompra:42, consumible:false},
+  {id:'new-escudo-de-acero-laminado', nombre:'Escudo de acero laminado', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
+  {id:'new-egida-menor', nombre:'Égida menor', tipoItem:'escudo_1m', tier:'Raro', precioCompra:326, consumible:false},
+  {id:'new-tapa-de-tacho-de-basura-reforzada', nombre:'Tapa de tacho de basura reforzada', tipoItem:'escudo_1m', tier:'Común', precioCompra:46, consumible:false},
+  {id:'new-peto-de-cuero-curtido', nombre:'Peto de cuero curtido', tipoItem:'armadura_blanda', tier:'Común', precioCompra:51, consumible:false},
+  {id:'new-gambeson-acolchado-de-doble-capa', nombre:'Gambesón acolchado de doble capa', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:98, consumible:false},
+  {id:'new-manto-de-cuero-de-basilisco', nombre:'Manto de cuero de basilisco', tipoItem:'armadura_blanda', tier:'Raro', precioCompra:188, consumible:false},
+  {id:'new-campera-de-cuero-de-motociclista-con-tachas', nombre:'Campera de cuero de motociclista con tachas', tipoItem:'armadura_blanda', tier:'Común', precioCompra:42, consumible:false},
+  {id:'new-peto-de-placas-de-aprendiz', nombre:'Peto de placas de aprendiz', tipoItem:'armadura_rigida', tier:'Común', precioCompra:51, consumible:false},
+  {id:'new-coraza-de-guardia-de-cuartel', nombre:'Coraza de guardia de cuartel', tipoItem:'armadura_rigida', tier:'Buena Calidad', precioCompra:106, consumible:false},
+  {id:'new-coraza-de-dragon-menor', nombre:'Coraza de dragón menor', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:277, consumible:false},
+  {id:'new-chapa-de-auto-abollada-ajustada-con-alambre', nombre:'Chapa de auto abollada ajustada con alambre', tipoItem:'armadura_rigida', tier:'Común', precioCompra:59, consumible:false},
+  {id:'new-capucha-de-cuero-acolchada', nombre:'Capucha de cuero acolchada', tipoItem:'casco_blando', tier:'Común', precioCompra:37, consumible:false},
+  {id:'new-turbante-de-tela-reforzada', nombre:'Turbante de tela reforzada', tipoItem:'casco_blando', tier:'Buena Calidad', precioCompra:92, consumible:false},
+  {id:'new-capucha-de-las-sombras-silentes', nombre:'Capucha de las sombras silentes', tipoItem:'casco_blando', tier:'Raro', precioCompra:161, consumible:false},
+  {id:'new-gorra-reglamentaria-de-la-policia-federal', nombre:'Gorra reglamentaria de la Policía Federal', tipoItem:'casco_blando', tier:'Común', precioCompra:42, consumible:false},
+  {id:'new-capacete-de-aprendiz-de-herrero', nombre:'Capacete de aprendiz de herrero', tipoItem:'casco_rigido', tier:'Común', precioCompra:37, consumible:false},
+  {id:'new-yelmo-de-visera', nombre:'Yelmo de visera', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:98, consumible:false},
+  {id:'new-yelmo-con-cresta-de-comandante', nombre:'Yelmo con cresta de comandante', tipoItem:'casco_rigido', tier:'Raro', precioCompra:205, consumible:false},
+  {id:'new-casco-de-moto-vintage-pintado-a-mano', nombre:'Casco de moto vintage pintado a mano', tipoItem:'casco_rigido', tier:'Común', precioCompra:56, consumible:false},
+  {id:'new-guantes-de-cuero-de-carretero', nombre:'Guantes de cuero de carretero', tipoItem:'guantes_blandos', tier:'Común', precioCompra:37, consumible:false},
+  {id:'new-guantes-de-escalador-encerados', nombre:'Guantes de escalador encerados', tipoItem:'guantes_blandos', tier:'Buena Calidad', precioCompra:81, consumible:false},
+  {id:'new-guantes-del-sanador-errante', nombre:'Guantes del sanador errante', tipoItem:'guantes_blandos', tier:'Raro', precioCompra:157, consumible:false},
+  {id:'new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo', nombre:'Mitones tejidos a mano por una abuela legendaria del pueblo', tipoItem:'guantes_blandos', tier:'Común', precioCompra:34, consumible:false},
+  {id:'new-manoplas-de-trabajo-de-fragua', nombre:'Manoplas de trabajo de fragua', tipoItem:'guantes_rigidos', tier:'Común', precioCompra:42, consumible:false},
+  {id:'new-guanteletes-de-combate', nombre:'Guanteletes de combate', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:121, consumible:false},
+  {id:'new-guanteletes-del-herrero-real', nombre:'Guanteletes del herrero real', tipoItem:'guantes_rigidos', tier:'Raro', precioCompra:246, consumible:false},
+  {id:'new-guantes-de-horno-de-cocina-industrial', nombre:'Guantes de horno de cocina industrial', tipoItem:'guantes_rigidos', tier:'Común', precioCompra:46, consumible:false},
+  {id:'new-calzas-de-cuero-flexible', nombre:'Calzas de cuero flexible', tipoItem:'piernas_blandas', tier:'Común', precioCompra:32, consumible:false},
+  {id:'new-pantalon-reforzado-de-cazador', nombre:'Pantalón reforzado de cazador', tipoItem:'piernas_blandas', tier:'Buena Calidad', precioCompra:87, consumible:false},
+  {id:'new-calzas-del-corredor-de-tormentas', nombre:'Calzas del corredor de tormentas', tipoItem:'piernas_blandas', tier:'Raro', precioCompra:157, consumible:false},
+  {id:'new-jogging-de-gimnasia-con-rayas-laterales', nombre:'Jogging de gimnasia con rayas laterales', tipoItem:'piernas_blandas', tier:'Común', precioCompra:34, consumible:false},
+  {id:'new-grebas-de-aprendiz-de-milicia', nombre:'Grebas de aprendiz de milicia', tipoItem:'piernas_rigidas', tier:'Común', precioCompra:46, consumible:false},
+  {id:'new-perneras-articuladas', nombre:'Perneras articuladas', tipoItem:'piernas_rigidas', tier:'Buena Calidad', precioCompra:111, consumible:false},
+  {id:'new-grebas-del-centinela-de-hierro', nombre:'Grebas del centinela de hierro', tipoItem:'piernas_rigidas', tier:'Raro', precioCompra:205, consumible:false},
+  {id:'new-canilleras-de-arquero-de-futbol-amateur', nombre:'Canilleras de arquero de fútbol amateur', tipoItem:'piernas_rigidas', tier:'Común', precioCompra:42, consumible:false},
+  {id:'new-botas-de-marcha', nombre:'Botas de marcha', tipoItem:'botas_blandas', tier:'Común', precioCompra:38, consumible:false},
+  {id:'new-botas-de-cuero-de-mercader-viajero', nombre:'Botas de cuero de mercader viajero', tipoItem:'botas_blandas', tier:'Buena Calidad', precioCompra:92, consumible:false},
+  {id:'new-botas-del-mensajero-veloz', nombre:'Botas del mensajero veloz', tipoItem:'botas_blandas', tier:'Raro', precioCompra:186, consumible:false},
+  {id:'new-ojotas-de-goma-con-flores-hawaianas', nombre:'Ojotas de goma con flores hawaianas', tipoItem:'botas_blandas', tier:'Común', precioCompra:34, consumible:false},
+  {id:'new-borceguies-reglamentarios-de-recluta', nombre:'Borceguíes reglamentarios de recluta', tipoItem:'botas_rigidas', tier:'Común', precioCompra:37, consumible:false},
+  {id:'new-botas-de-placas-del-guardia-de-avanzada', nombre:'Botas de placas del guardia de avanzada', tipoItem:'botas_rigidas', tier:'Buena Calidad', precioCompra:93, consumible:false},
+  {id:'new-botas-de-hierro-del-coloso-menor', nombre:'Botas de hierro del coloso menor', tipoItem:'botas_rigidas', tier:'Raro', precioCompra:338, consumible:false},
+  {id:'new-botas-de-esqui-de-aluminio-sin-los-esquis', nombre:'Botas de esquí de aluminio sin los esquís', tipoItem:'botas_rigidas', tier:'Común', precioCompra:41, consumible:false},
+  {id:'new-pocion-de-hp-comun', nombre:'Poción de HP (común)', tipoItem:'consumibles', tier:'Común', precioCompra:20, consumible:true},
+  {id:'new-pocion-de-hp-buena-calidad', nombre:'Poción de HP (Buena Calidad)', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:40, consumible:true},
+  {id:'new-pocion-de-hp-raro', nombre:'Poción de HP (Raro)', tipoItem:'consumibles', tier:'Raro', precioCompra:90, consumible:true},
+  {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda antiguo a presión', tipoItem:'consumibles', tier:'Común', precioCompra:10, consumible:true},
+];
+
+const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
+const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+
+/* Consumibles que todo vendedor ofrece siempre, sin importar el tamaño.
+   No entran en los porcentajes del resto del catálogo. */
+const GARANTIZADOS = ['cat-pocion-hp', 'cat-pocion-bonos', 'cat-revive'];
+
+/* Pesos de rareza por tamaño. Son probabilidades, no topes: hasta el
+   vendedor ambulante puede sacar algo Excepcional, solo que casi nunca. */
+const TAMANOS = {
+  ambulante: {label:'Vendedor ambulante', min:8,  max:12,  pesos:{'Común':78, 'Buena Calidad':18, 'Raro':3.5, 'Excepcional':0.4, 'Legendario':0.1}},
+  pueblito:  {label:'Pueblito',           min:15, max:20,  pesos:{'Común':68, 'Buena Calidad':25, 'Raro':6,   'Excepcional':0.8, 'Legendario':0.2}},
+  aldea:     {label:'Aldea',              min:25, max:35,  pesos:{'Común':55, 'Buena Calidad':32, 'Raro':11,  'Excepcional':1.7, 'Legendario':0.3}},
+  ciudad:    {label:'Ciudad',             min:40, max:60,  pesos:{'Común':42, 'Buena Calidad':35, 'Raro':18,  'Excepcional':4,   'Legendario':1}},
+  capital:   {label:'Capital',            min:70, max:100, pesos:{'Común':30, 'Buena Calidad':33, 'Raro':25,  'Excepcional':9,   'Legendario':3}},
+};
+
+const ES_ARMA = t => t.startsWith('arma_');
+const ES_DEFENSA = t => t.startsWith('escudo') || t.startsWith('armadura') || t.startsWith('casco')
+  || t.startsWith('guantes') || t.startsWith('piernas') || t.startsWith('botas');
+
+function rubroDe(item){
+  if(item.consumible || item.tipoItem === 'consumibles') return 'consumibles';
+  if(ES_ARMA(item.tipoItem)) return 'ofensivo';
+  if(ES_DEFENSA(item.tipoItem)) return 'defensivo';
+  return 'otros';
+}
+
+const RUBRO_LABEL = {ofensivo:'Armas', defensivo:'Defensa', consumibles:'Consumibles', otros:'Otros'};
+const RUBRO_ORDEN = ['ofensivo', 'defensivo', 'consumibles', 'otros'];
+
+function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
+
+/* Elige un tier al azar respetando los pesos del tamaño, pero solo entre
+   los tiers que todavía tienen stock disponible en ese rubro. */
+function sortearTier(pesos, disponiblesPorTier){
+  const posibles = TIERS.filter(t => (disponiblesPorTier[t] || []).length);
+  if(!posibles.length) return null;
+  const total = posibles.reduce((a, t) => a + (pesos[t] || 0), 0);
+  if(total <= 0) return posibles[entero(0, posibles.length - 1)];
+  let r = Math.random() * total;
+  for(const t of posibles){
+    r -= (pesos[t] || 0);
+    if(r <= 0) return t;
+  }
+  return posibles[posibles.length - 1];
+}
+
+function elegirDeRubro(candidatos, cantidad, pesos, usados){
+  const porTier = {};
+  candidatos.forEach(it => {
+    if(usados.has(it.id)) return;
+    (porTier[it.tier] = porTier[it.tier] || []).push(it);
+  });
+  const elegidos = [];
+  for(let i = 0; i < cantidad; i++){
+    const tier = sortearTier(pesos, porTier);
+    if(!tier) break;
+    const lista = porTier[tier];
+    const idx = entero(0, lista.length - 1);
+    const item = lista.splice(idx, 1)[0];
+    if(!lista.length) delete porTier[tier];
+    usados.add(item.id);
+    elegidos.push(item);
+  }
+  return elegidos;
+}
+
+function generarTienda(claveTamano){
+  const cfg = TAMANOS[claveTamano];
+  const usados = new Set();
+
+  // 1. Stock garantizado: va siempre y no cuenta para los porcentajes.
+  const garantizados = GARANTIZADOS
+    .map(id => CATALOGO.find(it => it.id === id))
+    .filter(Boolean);
+  garantizados.forEach(it => usados.add(it.id));
+
+  // 2. El resto se reparte: hasta 20% consumibles, la otra parte mitad y
+  //    mitad entre ofensivo y defensivo.
+  const total = entero(cfg.min, cfg.max);
+  const nConsumibles = Math.round(total * 0.20);
+  const resto = total - nConsumibles;
+  const nOfensivos = Math.ceil(resto / 2);
+  const nDefensivos = resto - nOfensivos;
+
+  const porRubro = {ofensivo: [], defensivo: [], consumibles: []};
+  CATALOGO.forEach(it => {
+    const r = rubroDe(it);
+    if(porRubro[r]) porRubro[r].push(it);
+  });
+
+  const elegidos = [
+    ...elegirDeRubro(porRubro.ofensivo, nOfensivos, cfg.pesos, usados),
+    ...elegirDeRubro(porRubro.defensivo, nDefensivos, cfg.pesos, usados),
+    ...elegirDeRubro(porRubro.consumibles, nConsumibles, cfg.pesos, usados),
+  ];
+
+  return {
+    tamano: claveTamano,
+    tamanoLabel: cfg.label,
+    generado: new Date().toISOString(),
+    garantizados: garantizados.map(it => it.id),
+    items: [...garantizados, ...elegidos].map(it => it.id),
+  };
+}
+
+/* ---------- Vista previa ---------- */
+
+let tiendaActual = null;
+
+function itemCardHtml(item, esGarantizado){
+  const color = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+  return `<div class="cat-card">
+    <div class="cat-card-titulo">
+      <div class="cat-nombre">${esc(item.nombre)}</div>
+      <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(item.tier)}</div>
+    </div>
+    <div class="cat-meta"><span class="cat-precio">${fmt(item.precioCompra)} DDE</span></div>
+    ${esGarantizado ? '<div class="cat-garantizado">Stock fijo</div>' : ''}
+  </div>`;
+}
+
+function renderPreview(){
+  if(!tiendaActual){ $('#panel-preview').style.display = 'none'; return; }
+  const garantizados = new Set(tiendaActual.garantizados);
+  const items = tiendaActual.items.map(id => CATALOGO.find(it => it.id === id)).filter(Boolean);
+
+  const porTier = {};
+  items.forEach(it => porTier[it.tier] = (porTier[it.tier] || 0) + 1);
+  $('#preview-resumen').innerHTML =
+    `<span class="resumen-chip">${esc(tiendaActual.tamanoLabel)}</span>` +
+    `<span class="resumen-chip">Ítems <b>${fmt(items.length)}</b></span>` +
+    TIERS.filter(t => porTier[t]).map(t =>
+      `<span class="resumen-chip" style="border-color:${TIER_COLOR[t]}">${esc(t)} <b>${fmt(porTier[t])}</b></span>`
+    ).join('');
+
+  let html = '';
+  RUBRO_ORDEN.forEach(rubro => {
+    const delRubro = items.filter(it => rubroDe(it) === rubro);
+    if(!delRubro.length) return;
+    delRubro.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es'));
+    html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
+    html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+  });
+  $('#preview-lista').innerHTML = html;
+  $('#panel-preview').style.display = '';
+}
+
+function generar(){
+  const clave = $('#f-tamano').value;
+  tiendaActual = generarTienda(clave);
+  renderPreview();
+  $('#btn-regenerar').disabled = false;
+  $('#btn-publicar').disabled = false;
+  toast(`Tienda generada · ${tiendaActual.items.length} ítems`);
+}
+
+function actualizarHint(){
+  const cfg = TAMANOS[$('#f-tamano').value];
+  $('#hint-tamano').textContent =
+    `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems, más los consumibles de stock fijo (Poción de HP, Poción de Bonos y Revive).`;
+}
+
+/* ---------- GitHub ---------- */
+
+const GH_REPO = 'elsauloel/rolpintoista';
+const GH_BRANCH = 'main';
+const ARCHIVO_TIENDA = 'tienda-publica.json';
+
+const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
+
+/* Pide el token en un cartel dentro de esta misma pestaña.
+   Antes se abría GitHub con window.open() y enseguida se llamaba a
+   prompt(): como la pestaña de GitHub se lleva el foco, el navegador
+   no muestra el prompt de la pestaña de atrás y no quedaba a la vista
+   dónde pegar el token. Ahora el cartel se abre primero y el botón
+   "Abrir GitHub" es el que abre la otra pestaña. */
+function ghPedirToken(){
+  return new Promise(res => {
+    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
+    const fondo = document.createElement('div');
+    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+    const caja = document.createElement('div');
+    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:460px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
+    caja.innerHTML =
+      '<h3 style="margin:0 0 10px;font-size:16px">Token de GitHub</h3>' +
+      '<ol style="margin:0 0 14px;padding-left:20px">' +
+        '<li>Tocá <b>Abrir GitHub</b>: se abre en otra pestaña, ya con los permisos correctos elegidos.</li>' +
+        '<li>Bajá hasta el final y tocá <b>Generate token</b>.</li>' +
+        '<li>Copiá el token verde (ojo: solo se muestra una vez).</li>' +
+        '<li>Volvé <b>a esta pestaña</b> y pegalo en el casillero de abajo.</li>' +
+      '</ol>' +
+      '<button type="button" data-gh="abrir" style="' + btnCss + ';width:100%;margin-bottom:10px">Abrir GitHub ↗</button>' +
+      '<input type="text" data-gh="input" placeholder="Pegá el token acá (ghp_…)" ' +
+        'style="width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin-bottom:12px">' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" data-gh="cancelar" style="' + btnCss + '">Cancelar</button>' +
+        '<button type="button" data-gh="guardar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Guardar</button>' +
+      '</div>' +
+      '<div style="margin-top:10px;opacity:.65;font-size:12px">Queda guardado en este navegador para las próximas veces.</div>';
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    const campo = caja.querySelector('[data-gh="input"]');
+    campo.focus();
+    const cerrar = valor => {
+      document.removeEventListener('keydown', teclas);
+      fondo.remove();
+      res(valor);
+    };
+    const teclas = e => {
+      if(e.key === 'Escape') cerrar(null);
+      if(e.key === 'Enter' && document.activeElement === campo) cerrar(campo.value.trim() || null);
+    };
+    document.addEventListener('keydown', teclas);
+    caja.querySelector('[data-gh="abrir"]').onclick = () => window.open(GH_TOKEN_URL, '_blank');
+    caja.querySelector('[data-gh="cancelar"]').onclick = () => cerrar(null);
+    caja.querySelector('[data-gh="guardar"]').onclick = () => cerrar(campo.value.trim() || null);
+    fondo.onmousedown = e => { if(e.target === fondo) cerrar(null); };
+  });
+}
+
+async function ghToken(pedirDeNuevo){
+  let t = localStorage.getItem('gh-token');
+  if(!t || pedirDeNuevo){
+    t = await ghPedirToken();
+    if(t) localStorage.setItem('gh-token', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+function aBase64(texto){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(new Blob([texto]));
+  });
+}
+
+/* Para pisar un archivo que ya está en el repo hay que mandarle a GitHub
+   el sha de la versión anterior; si no, contesta 422 ("sha wasn't
+   supplied"). Antes, si la consulta del sha fallaba por lo que fuera, se
+   seguía igual sin sha y la subida moría con ese 422 sin decir por qué.
+   Ahora, si la consulta directa no sirve, el sha se busca en el listado
+   de la carpeta (otra ruta de la API, respuesta chica) y cualquier
+   rareza queda anotada en la consola. */
+async function ghShaPorListado(ruta, cab){
+  const partes = ruta.split('/');
+  const archivo = partes.pop();
+  const carpeta = partes.join('/');
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${carpeta}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
+  if(!resp.ok) return undefined;
+  const cuerpo = await resp.json();
+  const lista = Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || []);
+  const item = lista.find(x => x.name === archivo);
+  return item ? item.sha : undefined;
+}
+
+async function ghSha(ruta, cab){
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
+  if(resp.status === 404) return undefined; // todavía no existe: se crea de cero
+  if(resp.ok){
+    const sha = (await resp.json()).sha;
+    if(sha) return sha;
+    console.warn(`GitHub contestó 200 para ${ruta} pero sin sha — lo busco en el listado de la carpeta`);
+  }else{
+    console.warn(`GitHub respondió ${resp.status} consultando ${ruta} — busco el sha en el listado de la carpeta`);
+  }
+  return await ghShaPorListado(ruta, cab);
+}
+
+async function ghSubir(ruta, contenidoB64, token, mensaje){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
+  const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
+  const mandar = sha => fetch(url, {
+    method: 'PUT',
+    headers: cab,
+    body: JSON.stringify({message: mensaje, content: contenidoB64, branch: GH_BRANCH, ...(sha ? {sha} : {})}),
+  });
+  const sha = await ghSha(ruta, cab);
+  let resp = await mandar(sha);
+  // 422 = el archivo existe y el sha que mandamos no le sirve: o no lo
+  // encontramos, o alguien subió una versión nueva recién. Se vuelve a
+  // pedir el sha y se reintenta una sola vez.
+  if(resp.status === 422){
+    const nuevo = await ghShaPorListado(ruta, cab);
+    if(nuevo && nuevo !== sha) resp = await mandar(nuevo);
+  }
+  if(resp.status === 401 || resp.status === 403) throw {auth:true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
+}
+
+async function publicarShop(){
+  if(!tiendaActual){ toast('Primero generá una tienda'); return; }
+  const btn = $('#btn-publicar');
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede publicar'); return; }
+  btn.disabled = true;
+  toast('Publicando en GitHub…');
+  try{
+    const b64 = await aBase64(JSON.stringify(tiendaActual, null, 2));
+    await ghSubir(ARCHIVO_TIENDA, b64, token, `Publicar tienda (${tiendaActual.tamanoLabel})`);
+    toast('Tienda publicada ✓ — los jugadores ya pueden cargarla');
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá Publicar Shop de nuevo');
+    }else{
+      console.error('Error publicando la tienda:', err);
+      toast('No se pudo publicar — revisá la consola');
+    }
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+/* ---------- Eventos ---------- */
+
+$('#f-tamano').addEventListener('change', actualizarHint);
+$('#btn-generar').addEventListener('click', generar);
+$('#btn-regenerar').addEventListener('click', generar);
+$('#btn-publicar').addEventListener('click', publicarShop);
+$('#btn-token').addEventListener('click', () => ghToken(true));
+
+actualizarHint();
+</script>
+</body>
+</html>

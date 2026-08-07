@@ -403,10 +403,12 @@ a{color:var(--brass)}
 
 /* Catálogo del fabricante: grilla de tarjetas en vez de lista */
 .cat-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));gap:10px;align-content:start;margin-bottom:14px}
-.cat-row.cat-card{flex-direction:column;align-items:stretch;margin-bottom:0;height:100%;position:relative}
+.cat-row.cat-card{flex-direction:column;align-items:stretch;margin-bottom:0;height:100%}
+.cat-card-titulo{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.cat-card-titulo .cat-nombre{min-width:0}
 .cat-tier-badge{
-  position:absolute;top:7px;right:7px;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 7px;border-radius:99px;border:1px solid;z-index:1;font-weight:700
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;border:1px solid;font-weight:700;flex:none;white-space:nowrap;margin-top:1px
 }
 .cat-row.cat-card .item-thumb{width:100%;height:110px;object-fit:cover;border-radius:var(--r)}
 .cat-row.cat-card .cat-info{flex:1;min-width:0}
@@ -4245,10 +4247,12 @@ function catalogoRowHtml(item){
   const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
   const modsHtml = modsResumenHtml(item);
   return `<div class="cat-row cat-card" data-catid="${item.id}">
-    ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
     ${thumb(item)}
     <div class="cat-info">
-      <div class="cat-nombre">${esc(item.nombre)}</div>
+      <div class="cat-card-titulo">
+        <div class="cat-nombre">${esc(item.nombre)}</div>
+        ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
+      </div>
       <div class="cat-meta"><b>${fmt(num(item.precioCompra))} DDE</b> · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
       ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}

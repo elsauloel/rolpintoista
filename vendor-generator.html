@@ -85,6 +85,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
   padding:2px 7px;border-radius:99px;border:1px solid;font-weight:700;flex:none;white-space:nowrap;margin-top:1px
 }
 .cat-meta{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.cat-mods{font-family:"Space Mono",monospace;font-size:10.5px;line-height:1.5}
+.cat-mods .mod-plus{color:var(--absenta)}
+.cat-mods .mod-minus{color:var(--danger)}
+.cat-detalle{font-size:11.5px;color:var(--muted);line-height:1.45}
+.cat-card-pie{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.view-title{font-family:"Fraunces",serif;font-size:19px;font-weight:600;margin-bottom:10px}
+.view-lines{display:flex;flex-direction:column;gap:4px}
+.view-line{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line-soft);padding-bottom:3px}
+.view-label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.view-value{font-size:13px;text-align:right}
+.view-detalle{margin-top:12px;font-size:12.5px;line-height:1.5;color:var(--paper)}
+.view-detalle .view-label{display:block;margin-bottom:4px}
 .cat-precio{color:var(--brass);font-weight:700}
 .cat-garantizado{
   font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
@@ -189,7 +201,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <button type="button" class="ajuste-preset activo" data-ajuste="0">Normal</button>
       <button type="button" class="ajuste-preset" data-ajuste="10">+10%</button>
       <button type="button" class="ajuste-preset" data-ajuste="25">+25%</button>
-      <button type="button" class="btn" id="btn-agregar-items" style="margin-left:auto">+ Agregar ítems</button>
+      <div class="ajuste-grupo" style="margin-left:auto">
+        <label for="f-orden">Ordenar por</label>
+        <select id="f-orden" style="width:auto"></select>
+      </div>
+      <button type="button" class="ajuste-preset" id="btn-orden-dir">↑ Menor a mayor</button>
+      <button type="button" class="btn" id="btn-agregar-items">+ Agregar ítems</button>
     </div>
     <div id="preview-lista"></div>
   </div>
@@ -223,6 +240,19 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </div>
 </div>
 
+<div class="scrim" id="scrim-ver">
+  <div class="modal" style="max-width:460px">
+    <header>
+      <h3 id="ver-titulo">Ítem</h3>
+      <button class="iconbtn" id="ver-x">Cerrar</button>
+    </header>
+    <div class="body" id="ver-body"></div>
+    <footer style="display:flex;justify-content:flex-end;gap:9px;padding:12px 15px;border-top:1px solid var(--line)">
+      <button class="btn primary" id="ver-toggle">Agregar a la tienda</button>
+    </footer>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -239,136 +269,203 @@ function toast(msg){
 /* ---------- Catálogo (espejo del de ficha.html, sin imágenes) ---------- */
 /* La tienda publicada guarda solo ids: la ficha resuelve nombre, imagen y
    stats desde su propio catálogo, así este archivo no duplica esos datos. */
+/* Espejo del catálogo de ficha.html, sin las imágenes: son 1022 de los
+   1060 KB del bloque original y acá no aportan nada. Todo lo demás
+   (peso, dado, daño fijo, mods, detalle) viene completo para poder
+   mostrar la misma tarjeta que ve el jugador. */
+const GRUPOS = [
+  {id:'con', label:'Con', full:'Constitución', color:'#C4485A', derived:[
+    {id:'resmg', label:'Res.Mg', full:'Resistencia mágica'},
+    {id:'rescc', label:'Res.CC', full:'Resistencia al crowd control'},
+    {id:'hpmax', label:'Hp.Max', full:'Health points máximos'}]},
+  {id:'fue', label:'Fue', full:'Fuerza', color:'#D07B3A', derived:[
+    {id:'dmg', label:'Dmg', full:'Damage'},
+    {id:'potencia', label:'Potencia', full:'Potencia'},
+    {id:'crgmax', label:'Crg.Max', full:'Carga máxima'}]},
+  {id:'agl', label:'Agi', full:'Agilidad', color:'#8FB84F', derived:[
+    {id:'eva', label:'Eva', full:'Evasión'},
+    {id:'ini', label:'Iniciativa', full:'Iniciativa'},
+    {id:'mov', label:'Mov', full:'Movimiento'}]},
+  {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
+    {id:'rng', label:'Rng', full:'Rango'},
+    {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
+    {id:'crit', label:'Crit', full:'Crítico'},
+    {id:'parry', label:'Parry', full:'Parry'}]},
+  {id:'int', label:'Int', full:'Inteligencia', color:'#9B7BD4', derived:[
+    {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
+    {id:'resm', label:'Res.M', full:'Resistencia mágica (Int)'},
+    {id:'bonos', label:'Bonos', full:'Bonos'},
+    {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
+];
+const EXTRA = [
+  {id:'def', label:'Defensa', full:'Defensa'},
+  {id:'accionesmax', label:'Acciones máx.', full:'Acciones máximas por turno'},
+  {id:'tipo1', label:'Tipo 2', full:'Resistencia a crítico — armas Tipo 2 (d2)'},
+  {id:'tipo2', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
+  {id:'tipo3', label:'Tipo 6', full:'Resistencia a crítico — armas Tipo 6 (d6)'},
+  {id:'tipo4', label:'Tipo 8', full:'Resistencia a crítico — armas Tipo 8 (d8)'},
+  {id:'tipo5', label:'Tipo 10', full:'Resistencia a crítico — armas Tipo 10 (d10, explosivos/modernas)'},
+];
+const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
+
+const DADOS_ARMA = [2, 4, 6, 8, 10];
+const MOD_TARGETS = [...GRUPOS.map(g => ({id:g.id, label:g.label, full:g.full})), ...STAT_LIST];
+const STAT_LABEL = Object.fromEntries(MOD_TARGETS.map(s=>[s.id,s.label]));
+const TIPOS_IDS = ['tipo1','tipo2','tipo3','tipo4','tipo5'];
+
+const CATEGORIAS = [
+  {id:'', label:'— elegir categoría —'},
+  {id:'arma_1m', label:'Arma de una mano', arma:true},
+  {id:'arma_2m', label:'Arma de dos manos', arma:true},
+  {id:'escudo_1m', label:'Escudo de una mano', defensivo:true},
+  {id:'escudo_2m', label:'Escudo de dos manos', defensivo:true},
+  {id:'armadura_blanda', label:'Armadura blanda', defensivo:true},
+  {id:'armadura_rigida', label:'Armadura rígida', defensivo:true},
+  {id:'guantes_blandos', label:'Guantes blandos', defensivo:true},
+  {id:'guantes_rigidos', label:'Guantes rígidos', defensivo:true},
+  {id:'piernas_blandas', label:'Piernas blandas', defensivo:true},
+  {id:'piernas_rigidas', label:'Piernas rígidas', defensivo:true},
+  {id:'casco_blando', label:'Casco blando', defensivo:true},
+  {id:'casco_rigido', label:'Casco rígido', defensivo:true},
+  {id:'botas_blandas', label:'Botas blandas', defensivo:true},
+  {id:'botas_rigidas', label:'Botas rígidas', defensivo:true},
+  {id:'anillos', label:'Anillos'},
+  {id:'otros', label:'Otros'},
+  {id:'consumibles', label:'Consumibles'},
+];
+const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
+const ES_ARMA = catId => CATEGORIAS.find(c=>c.id===catId)?.arma === true;
+
 const CATALOGO = [
-  {id:'cat-pocion-hp', nombre:'Poción de HP', tipoItem:'consumibles', tier:'Común', precioCompra:5, consumible:true},
-  {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:20, consumible:true},
-  {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', tipoItem:'consumibles', tier:'Raro', precioCompra:50, consumible:true},
-  {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', tipoItem:'consumibles', tier:'Excepcional', precioCompra:200, consumible:true},
-  {id:'cat-pocion-regen', nombre:'Poción de Regeneración', tipoItem:'consumibles', tier:'Común', precioCompra:15, consumible:true},
-  {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:45, consumible:true},
-  {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:35, consumible:true},
-  {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', tipoItem:'consumibles', tier:'Raro', precioCompra:100, consumible:true},
-  {id:'cat-pocion-bonos', nombre:'Poción de Bonos', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pocion-bonos-grande', nombre:'Poción de Bonos grande', tipoItem:'consumibles', tier:'Excepcional', precioCompra:120, consumible:true},
-  {id:'cat-cura-plus', nombre:'Cura Plus', tipoItem:'consumibles', tier:'Común', precioCompra:15, consumible:true},
-  {id:'cat-antidoto', nombre:'Antídoto', tipoItem:'consumibles', tier:'Común', precioCompra:10, consumible:true},
-  {id:'cat-raciones', nombre:'Raciones', tipoItem:'consumibles', tier:'Común', precioCompra:3, consumible:true},
-  {id:'cat-raciones-fancy', nombre:'Raciones Fancy', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:50, consumible:true},
-  {id:'cat-ankh', nombre:'Ankh de Reencarnación', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:200, consumible:true},
-  {id:'cat-revive', nombre:'Revive', tipoItem:'consumibles', tier:'Raro', precioCompra:150, consumible:true},
-  {id:'cat-polilla', nombre:'Polilla mística', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:50, consumible:true},
-  {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', tipoItem:'consumibles', tier:'Raro', precioCompra:100, consumible:true},
-  {id:'cat-pergamino-luz', nombre:'Pergamino de luz cegadora', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pergamino-tentaculo', nombre:'Pergamino de tentáculo sombrío', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pergamino-sombras', nombre:'Pergamino de sombras chinescas', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pergamino-red', nombre:'Pergamino de red Nerubian', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pergamino-ojo', nombre:'Pergamino de ojo de Kicillof', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-pergamino-ventriloquia', nombre:'Pergamino de ventriloquía', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:30, consumible:true},
-  {id:'cat-daga', nombre:'Daga', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
-  {id:'cat-rompemalla', nombre:'Rompemalla', tipoItem:'arma_1m', tier:'Común', precioCompra:40, consumible:false},
-  {id:'cat-espada-ancha', nombre:'Espada ancha', tipoItem:'arma_1m', tier:'Común', precioCompra:31, consumible:false},
-  {id:'cat-hacha-de-mano', nombre:'Hacha de mano', tipoItem:'arma_1m', tier:'Común', precioCompra:65, consumible:false},
-  {id:'cat-bast-n-flexible', nombre:'Bastón flexible', tipoItem:'arma_1m', tier:'Común', precioCompra:85, consumible:false},
-  {id:'cat-estoque', nombre:'Estoque', tipoItem:'arma_1m', tier:'Común', precioCompra:40, consumible:false},
-  {id:'cat-espada-corta', nombre:'Espada corta', tipoItem:'arma_1m', tier:'Común', precioCompra:35, consumible:false},
-  {id:'cat-machete', nombre:'Machete', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
-  {id:'cat-hacha', nombre:'Hacha', tipoItem:'arma_1m', tier:'Común', precioCompra:60, consumible:false},
-  {id:'cat-maza', nombre:'Maza', tipoItem:'arma_1m', tier:'Común', precioCompra:66, consumible:false},
-  {id:'cat-escudo-romano', nombre:'Escudo romano', tipoItem:'escudo_2m', tier:'Buena Calidad', precioCompra:131, consumible:false},
-  {id:'cat-espada-larga', nombre:'Espada larga', tipoItem:'arma_1m', tier:'Común', precioCompra:50, consumible:false},
-  {id:'cat-escudo-grande', nombre:'Escudo grande', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:82, consumible:false},
-  {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
-  {id:'cat-mangual', nombre:'Mangual', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:105, consumible:false},
-  {id:'cat-broquel', nombre:'Broquel', tipoItem:'escudo_1m', tier:'Común', precioCompra:42, consumible:false},
-  {id:'cat-martillo', nombre:'Martillo', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:124, consumible:false},
-  {id:'cat-escudo-pav-s', nombre:'Escudo pavés', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:116, consumible:false},
-  {id:'cat-escudo-triangular', nombre:'Escudo triangular', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
-  {id:'cat-escudo-peque-o', nombre:'Escudo pequeño', tipoItem:'escudo_1m', tier:'Común', precioCompra:46, consumible:false},
-  {id:'cat-armadura-acolchada', nombre:'Armadura acolchada', tipoItem:'armadura_blanda', tier:'Común', precioCompra:51, consumible:false},
-  {id:'cat-armadura-con-tachas', nombre:'Armadura con tachas', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:98, consumible:false},
-  {id:'cat-cota-de-malla', nombre:'Cota de malla', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:127, consumible:false},
-  {id:'cat-pechera', nombre:'Pechera', tipoItem:'armadura_blanda', tier:'Común', precioCompra:42, consumible:false},
-  {id:'cat-cota-de-placas', nombre:'Cota de placas', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:221, consumible:false},
-  {id:'cat-coraza', nombre:'Coraza', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:234, consumible:false},
-  {id:'cat-sombrero-humectante', nombre:'Sombrero humectante', tipoItem:'casco_blando', tier:'Común', precioCompra:20, consumible:false},
-  {id:'cat-casco', nombre:'Casco', tipoItem:'casco_rigido', tier:'Común', precioCompra:42, consumible:false},
-  {id:'cat-yelmo-liviano', nombre:'Yelmo liviano', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:80, consumible:false},
-  {id:'cat-yelmo-completo', nombre:'Yelmo completo', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:122, consumible:false},
-  {id:'cat-gran-yelmo', nombre:'Gran yelmo', tipoItem:'casco_rigido', tier:'Raro', precioCompra:221, consumible:false},
-  {id:'cat-zapatillas-nike', nombre:'Zapatillas Nike', tipoItem:'botas_rigidas', tier:'Excepcional', precioCompra:500, consumible:false},
-  {id:'cat-botas-reforzadas', nombre:'Botas reforzadas', tipoItem:'botas_blandas', tier:'Común', precioCompra:42, consumible:false},
-  {id:'cat-grebas', nombre:'Grebas', tipoItem:'piernas_rigidas', tier:'Buena Calidad', precioCompra:98, consumible:false},
-  {id:'cat-sabaton', nombre:'Sabatón', tipoItem:'botas_rigidas', tier:'Buena Calidad', precioCompra:127, consumible:false},
-  {id:'cat-mercury-threads', nombre:'Mercury threads', tipoItem:'botas_blandas', tier:'Buena Calidad', precioCompra:133, consumible:false},
-  {id:'cat-guantes-finos-de-senor', nombre:'Guantes finos de señor', tipoItem:'guantes_blandos', tier:'Común', precioCompra:34, consumible:false},
-  {id:'cat-guantes-de-cuero-reforzado', nombre:'Guantes de cuero reforzado', tipoItem:'guantes_blandos', tier:'Común', precioCompra:42, consumible:false},
-  {id:'cat-mitones-de-malla', nombre:'Mitones de malla', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:80, consumible:false},
-  {id:'cat-guanteletes', nombre:'Guanteletes', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:127, consumible:false},
-  {id:'cat-armadura-mediana', nombre:'Armadura mediana', tipoItem:'armadura_rigida', tier:'Buena Calidad', precioCompra:140, consumible:false},
-  {id:'new-punal-de-asalto', nombre:'Puñal de asalto', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
-  {id:'new-espada-ropera', nombre:'Espada ropera', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:74, consumible:false},
-  {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tipoItem:'arma_1m', tier:'Raro', precioCompra:165, consumible:false},
-  {id:'new-aguja-de-tejer-gigante', nombre:'Aguja de tejer gigante', tipoItem:'arma_1m', tier:'Común', precioCompra:45, consumible:false},
-  {id:'new-espada-corta-de-instruccion', nombre:'Espada corta de instrucción', tipoItem:'arma_1m', tier:'Común', precioCompra:50, consumible:false},
-  {id:'new-sable-de-caballeria', nombre:'Sable de caballería', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
-  {id:'new-espada-bastarda-encantada', nombre:'Espada bastarda encantada', tipoItem:'arma_1m', tier:'Raro', precioCompra:140, consumible:false},
-  {id:'new-machete-de-podar-rosales-de-vivero', nombre:'Machete de podar rosales de vivero', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
-  {id:'new-hachuela-de-lenador', nombre:'Hachuela de leñador', tipoItem:'arma_1m', tier:'Común', precioCompra:65, consumible:false},
-  {id:'new-hacha-de-guerra-ligera', nombre:'Hacha de guerra ligera', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:82, consumible:false},
-  {id:'new-hacha-bipenne', nombre:'Hacha bipenne', tipoItem:'arma_1m', tier:'Raro', precioCompra:155, consumible:false},
-  {id:'new-ventilador-de-techo-industrial-desmontado', nombre:'Ventilador de techo industrial desmontado', tipoItem:'arma_1m', tier:'Común', precioCompra:60, consumible:false},
-  {id:'new-maza-de-guardia', nombre:'Maza de guardia', tipoItem:'arma_1m', tier:'Común', precioCompra:55, consumible:false},
-  {id:'new-martillo-de-sargento', nombre:'Martillo de sargento', tipoItem:'arma_1m', tier:'Buena Calidad', precioCompra:112, consumible:false},
-  {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tipoItem:'arma_1m', tier:'Raro', precioCompra:281, consumible:false},
-  {id:'new-bate-de-aluminio-de-la-liga-interbarrial', nombre:'Bate de aluminio de la Liga Interbarrial', tipoItem:'arma_1m', tier:'Común', precioCompra:85, consumible:false},
-  {id:'new-rodela-de-cuero', nombre:'Rodela de cuero', tipoItem:'escudo_1m', tier:'Común', precioCompra:42, consumible:false},
-  {id:'new-escudo-de-acero-laminado', nombre:'Escudo de acero laminado', tipoItem:'escudo_1m', tier:'Buena Calidad', precioCompra:87, consumible:false},
-  {id:'new-egida-menor', nombre:'Égida menor', tipoItem:'escudo_1m', tier:'Raro', precioCompra:326, consumible:false},
-  {id:'new-tapa-de-tacho-de-basura-reforzada', nombre:'Tapa de tacho de basura reforzada', tipoItem:'escudo_1m', tier:'Común', precioCompra:46, consumible:false},
-  {id:'new-peto-de-cuero-curtido', nombre:'Peto de cuero curtido', tipoItem:'armadura_blanda', tier:'Común', precioCompra:51, consumible:false},
-  {id:'new-gambeson-acolchado-de-doble-capa', nombre:'Gambesón acolchado de doble capa', tipoItem:'armadura_blanda', tier:'Buena Calidad', precioCompra:98, consumible:false},
-  {id:'new-manto-de-cuero-de-basilisco', nombre:'Manto de cuero de basilisco', tipoItem:'armadura_blanda', tier:'Raro', precioCompra:188, consumible:false},
-  {id:'new-campera-de-cuero-de-motociclista-con-tachas', nombre:'Campera de cuero de motociclista con tachas', tipoItem:'armadura_blanda', tier:'Común', precioCompra:42, consumible:false},
-  {id:'new-peto-de-placas-de-aprendiz', nombre:'Peto de placas de aprendiz', tipoItem:'armadura_rigida', tier:'Común', precioCompra:51, consumible:false},
-  {id:'new-coraza-de-guardia-de-cuartel', nombre:'Coraza de guardia de cuartel', tipoItem:'armadura_rigida', tier:'Buena Calidad', precioCompra:106, consumible:false},
-  {id:'new-coraza-de-dragon-menor', nombre:'Coraza de dragón menor', tipoItem:'armadura_rigida', tier:'Raro', precioCompra:277, consumible:false},
-  {id:'new-chapa-de-auto-abollada-ajustada-con-alambre', nombre:'Chapa de auto abollada ajustada con alambre', tipoItem:'armadura_rigida', tier:'Común', precioCompra:59, consumible:false},
-  {id:'new-capucha-de-cuero-acolchada', nombre:'Capucha de cuero acolchada', tipoItem:'casco_blando', tier:'Común', precioCompra:37, consumible:false},
-  {id:'new-turbante-de-tela-reforzada', nombre:'Turbante de tela reforzada', tipoItem:'casco_blando', tier:'Buena Calidad', precioCompra:92, consumible:false},
-  {id:'new-capucha-de-las-sombras-silentes', nombre:'Capucha de las sombras silentes', tipoItem:'casco_blando', tier:'Raro', precioCompra:161, consumible:false},
-  {id:'new-gorra-reglamentaria-de-la-policia-federal', nombre:'Gorra reglamentaria de la Policía Federal', tipoItem:'casco_blando', tier:'Común', precioCompra:42, consumible:false},
-  {id:'new-capacete-de-aprendiz-de-herrero', nombre:'Capacete de aprendiz de herrero', tipoItem:'casco_rigido', tier:'Común', precioCompra:37, consumible:false},
-  {id:'new-yelmo-de-visera', nombre:'Yelmo de visera', tipoItem:'casco_rigido', tier:'Buena Calidad', precioCompra:98, consumible:false},
-  {id:'new-yelmo-con-cresta-de-comandante', nombre:'Yelmo con cresta de comandante', tipoItem:'casco_rigido', tier:'Raro', precioCompra:205, consumible:false},
-  {id:'new-casco-de-moto-vintage-pintado-a-mano', nombre:'Casco de moto vintage pintado a mano', tipoItem:'casco_rigido', tier:'Común', precioCompra:56, consumible:false},
-  {id:'new-guantes-de-cuero-de-carretero', nombre:'Guantes de cuero de carretero', tipoItem:'guantes_blandos', tier:'Común', precioCompra:37, consumible:false},
-  {id:'new-guantes-de-escalador-encerados', nombre:'Guantes de escalador encerados', tipoItem:'guantes_blandos', tier:'Buena Calidad', precioCompra:81, consumible:false},
-  {id:'new-guantes-del-sanador-errante', nombre:'Guantes del sanador errante', tipoItem:'guantes_blandos', tier:'Raro', precioCompra:157, consumible:false},
-  {id:'new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo', nombre:'Mitones tejidos a mano por una abuela legendaria del pueblo', tipoItem:'guantes_blandos', tier:'Común', precioCompra:34, consumible:false},
-  {id:'new-manoplas-de-trabajo-de-fragua', nombre:'Manoplas de trabajo de fragua', tipoItem:'guantes_rigidos', tier:'Común', precioCompra:42, consumible:false},
-  {id:'new-guanteletes-de-combate', nombre:'Guanteletes de combate', tipoItem:'guantes_rigidos', tier:'Buena Calidad', precioCompra:121, consumible:false},
-  {id:'new-guanteletes-del-herrero-real', nombre:'Guanteletes del herrero real', tipoItem:'guantes_rigidos', tier:'Raro', precioCompra:246, consumible:false},
-  {id:'new-guantes-de-horno-de-cocina-industrial', nombre:'Guantes de horno de cocina industrial', tipoItem:'guantes_rigidos', tier:'Común', precioCompra:46, consumible:false},
-  {id:'new-calzas-de-cuero-flexible', nombre:'Calzas de cuero flexible', tipoItem:'piernas_blandas', tier:'Común', precioCompra:32, consumible:false},
-  {id:'new-pantalon-reforzado-de-cazador', nombre:'Pantalón reforzado de cazador', tipoItem:'piernas_blandas', tier:'Buena Calidad', precioCompra:87, consumible:false},
-  {id:'new-calzas-del-corredor-de-tormentas', nombre:'Calzas del corredor de tormentas', tipoItem:'piernas_blandas', tier:'Raro', precioCompra:157, consumible:false},
-  {id:'new-jogging-de-gimnasia-con-rayas-laterales', nombre:'Jogging de gimnasia con rayas laterales', tipoItem:'piernas_blandas', tier:'Común', precioCompra:34, consumible:false},
-  {id:'new-grebas-de-aprendiz-de-milicia', nombre:'Grebas de aprendiz de milicia', tipoItem:'piernas_rigidas', tier:'Común', precioCompra:46, consumible:false},
-  {id:'new-perneras-articuladas', nombre:'Perneras articuladas', tipoItem:'piernas_rigidas', tier:'Buena Calidad', precioCompra:111, consumible:false},
-  {id:'new-grebas-del-centinela-de-hierro', nombre:'Grebas del centinela de hierro', tipoItem:'piernas_rigidas', tier:'Raro', precioCompra:205, consumible:false},
-  {id:'new-canilleras-de-arquero-de-futbol-amateur', nombre:'Canilleras de arquero de fútbol amateur', tipoItem:'piernas_rigidas', tier:'Común', precioCompra:42, consumible:false},
-  {id:'new-botas-de-marcha', nombre:'Botas de marcha', tipoItem:'botas_blandas', tier:'Común', precioCompra:38, consumible:false},
-  {id:'new-botas-de-cuero-de-mercader-viajero', nombre:'Botas de cuero de mercader viajero', tipoItem:'botas_blandas', tier:'Buena Calidad', precioCompra:92, consumible:false},
-  {id:'new-botas-del-mensajero-veloz', nombre:'Botas del mensajero veloz', tipoItem:'botas_blandas', tier:'Raro', precioCompra:186, consumible:false},
-  {id:'new-ojotas-de-goma-con-flores-hawaianas', nombre:'Ojotas de goma con flores hawaianas', tipoItem:'botas_blandas', tier:'Común', precioCompra:34, consumible:false},
-  {id:'new-borceguies-reglamentarios-de-recluta', nombre:'Borceguíes reglamentarios de recluta', tipoItem:'botas_rigidas', tier:'Común', precioCompra:37, consumible:false},
-  {id:'new-botas-de-placas-del-guardia-de-avanzada', nombre:'Botas de placas del guardia de avanzada', tipoItem:'botas_rigidas', tier:'Buena Calidad', precioCompra:93, consumible:false},
-  {id:'new-botas-de-hierro-del-coloso-menor', nombre:'Botas de hierro del coloso menor', tipoItem:'botas_rigidas', tier:'Raro', precioCompra:338, consumible:false},
-  {id:'new-botas-de-esqui-de-aluminio-sin-los-esquis', nombre:'Botas de esquí de aluminio sin los esquís', tipoItem:'botas_rigidas', tier:'Común', precioCompra:41, consumible:false},
-  {id:'new-pocion-de-hp-comun', nombre:'Poción de HP (común)', tipoItem:'consumibles', tier:'Común', precioCompra:20, consumible:true},
-  {id:'new-pocion-de-hp-buena-calidad', nombre:'Poción de HP (Buena Calidad)', tipoItem:'consumibles', tier:'Buena Calidad', precioCompra:40, consumible:true},
-  {id:'new-pocion-de-hp-raro', nombre:'Poción de HP (Raro)', tipoItem:'consumibles', tier:'Raro', precioCompra:90, consumible:true},
-  {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda antiguo a presión', tipoItem:'consumibles', tier:'Común', precioCompra:10, consumible:true},
+  {id:'cat-pocion-hp', nombre:'Poción de HP', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:5, unidades:1, consumible:true, curahp:25, mods:[], detalle:'Recupera 25 HP.'},
+  {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:1, cargaMax:3, consumible:true, curahp:25, mods:[], detalle:'3 Cargas. Recupera 25 HP por carga.'},
+  {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:100, mods:[], detalle:'Recupera 100 HP.'},
+  {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', tier:'Excepcional', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:1, cargaMax:3, consumible:true, curahp:100, mods:[], detalle:'3 Cargas. Recupera 100 HP por carga.'},
+  {id:'cat-pocion-regen', nombre:'Poción de Regeneración', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:10, detalle:'Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+  {id:'cat-pocion-regen-grande', nombre:'Poción de Regeneración Grande', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:45, unidades:1, cargaMax:3, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:10, detalle:'3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+  {id:'cat-pocion-regen-mayor', nombre:'Poción de Regeneración mayor', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:35, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:20, detalle:'Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+  {id:'cat-pocion-regen-mayor-grande', nombre:'Poción de Regeneración mayor grande', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, cargaMax:3, consumible:true, curahp:0, mods:[], efectoNombre:'Regeneración (poción)', efectoTurnos:5, efectoHpTurno:20, detalle:'3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado "Regeneración (poción)".'},
+  {id:'cat-pocion-bonos', nombre:'Poción de Bonos', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, curabonosPct:50, mods:[], detalle:'Restaura la mitad de tu total de Bonos (redondeado hacia arriba).'},
+  {id:'cat-pocion-bonos-grande', nombre:'Poción de Bonos grande', tier:'Excepcional', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:120, unidades:1, consumible:true, curahp:0, curabonosPct:100, mods:[], detalle:'Restaura todos tus Bonos.'},
+  {id:'cat-cura-plus', nombre:'Cura Plus', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:15, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Remueve estados alterados.'},
+  {id:'cat-antidoto', nombre:'Antídoto', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Cura el estado Veneno.'},
+  {id:'cat-raciones', nombre:'Raciones', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:3, unidades:2, consumible:true, curahp:0, mods:[], detalle:'(2/2) +1 Wellness. (Aplicar a mano al usarla.)'},
+  {id:'cat-raciones-fancy', nombre:'Raciones Fancy', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:5, consumible:true, curahp:0, mods:[], detalle:'(5/5) +2 Wellness. (Aplicar a mano al usarla.)'},
+  {id:'cat-ankh', nombre:'Ankh de Reencarnación', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Se activa solo si está en tu CINTURÓN al llegar tu HP a 0: te revive con 25% del HP máximo, titilando hasta el comienzo de tu turno. Si está en la mochila no se activa solo — entrás en estado de Muerte igual, pero un aliado puede usarlo sobre tu cuerpo para revivirte.'},
+  {id:'cat-revive', nombre:'Revive', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:150, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.'},
+  {id:'cat-polilla', nombre:'Polilla mística', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:0, mods:[], efectoNombre:'Polilla revoloteando', efectoPermanente:true, detalle:'Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. Mientras siga ahí, podés gastarla en cualquier momento para sumar +2 a una tirada de dado. Si todavía la tenés guardada sin consumir, no hay bono — el efecto arranca recién cuando la liberás, y dura hasta que la uses.'},
+  {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Permite repetir una tirada. Se conserva si gana tirando una moneda.'},
+  {id:'cat-pergamino-luz', nombre:'Pergamino de luz cegadora', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-pergamino-tentaculo', nombre:'Pergamino de tentáculo sombrío', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-pergamino-sombras', nombre:'Pergamino de sombras chinescas', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-pergamino-red', nombre:'Pergamino de red Nerubian', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-pergamino-ojo', nombre:'Pergamino de ojo de Kicillof', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-pergamino-ventriloquia', nombre:'Pergamino de ventriloquía', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, mods:[], detalle:'Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).'},
+  {id:'cat-daga', nombre:'Daga', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:45, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 de resistencia crítica.'},
+  {id:'cat-rompemalla', nombre:'Rompemalla', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+  {id:'cat-espada-ancha', nombre:'Espada ancha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:4, danoFijo:1, precioCompra:31, consumible:false, curahp:0, mods:[], detalle:'Daño amplificado.'},
+  {id:'cat-hacha-de-mano', nombre:'Hacha de mano', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:65, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+  {id:'cat-bast-n-flexible', nombre:'Bastón flexible', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:85, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 de resistencia crítica.'},
+  {id:'cat-estoque', nombre:'Estoque', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Modificador: \'+1 a iniciativa'},
+  {id:'cat-espada-corta', nombre:'Espada corta', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:35, consumible:false, curahp:0, mods:[], detalle:''},
+  {id:'cat-machete', nombre:'Machete', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:55, consumible:false, curahp:0, mods:[], detalle:'+10% de daño crítico'},
+  {id:'cat-hacha', nombre:'Hacha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+  {id:'cat-maza', nombre:'Maza', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:66, consumible:false, curahp:0, mods:[], detalle:'Daño amplificado.'},
+  {id:'cat-escudo-romano', nombre:'Escudo romano', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_2m', peso:5, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:131, consumible:false, curahp:0, mods:[{stat:'def', val:10}], detalle:'+4 al bloqueo. Movimiento y ataque lento'},
+  {id:'cat-espada-larga', nombre:'Espada larga', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'modificador: \'+1 al pdg. +1 al parry'},
+  {id:'cat-escudo-grande', nombre:'Escudo grande', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:82, consumible:false, curahp:0, mods:[{stat:'def', val:7}], detalle:'+2 al bloqueo'},
+  {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:55, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
+  {id:'cat-mangual', nombre:'Mangual', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:105, consumible:false, curahp:0, mods:[], detalle:'Alcance +1.'},
+  {id:'cat-broquel', nombre:'Broquel', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}], detalle:'+2 a estabilidad'},
+  {id:'cat-martillo', nombre:'Martillo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:3, precioCompra:124, consumible:false, curahp:0, mods:[], detalle:'Daño +50%. Lento.'},
+  {id:'cat-escudo-pav-s', nombre:'Escudo pavés', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:116, consumible:false, curahp:0, mods:[{stat:'def', val:6}], detalle:'+1 a estabilidad, +1 al bloqueo'},
+  {id:'cat-escudo-triangular', nombre:'Escudo triangular', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:87, consumible:false, curahp:0, mods:[{stat:'def', val:7}], detalle:'+2 al bloqueo'},
+  {id:'cat-escudo-peque-o', nombre:'Escudo pequeño', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:46, consumible:false, curahp:0, mods:[{stat:'def', val:4}], detalle:'+1 al bloqueo, +1 a la estabilidad'},
+  {id:'cat-armadura-acolchada', nombre:'Armadura acolchada', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:51, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {id:'cat-armadura-con-tachas', nombre:'Armadura con tachas', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_blanda', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:98, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 2 y 4.'},
+  {id:'cat-cota-de-malla', nombre:'Cota de malla', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_blanda', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:127, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 6.'},
+  {id:'cat-pechera', nombre:'Pechera', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {id:'cat-cota-de-placas', nombre:'Cota de placas', tier:'Raro', imagen:'', tipoItem:'armadura_rigida', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:221, consumible:false, curahp:0, mods:[{stat:'def', val:9}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4, 6 y 8.'},
+  {id:'cat-coraza', nombre:'Coraza', tier:'Raro', imagen:'', tipoItem:'armadura_rigida', peso:5, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:234, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}], detalle:'Reduce críticos de cualquier tipo.'},
+  {id:'cat-sombrero-humectante', nombre:'Sombrero humectante', tier:'Común', imagen:'', tipoItem:'casco_blando', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:20, consumible:false, curahp:0, mods:[{stat:'bonos', val:1}], detalle:'+1 a los Bonos máximos.'},
+  {id:'cat-casco', nombre:'Casco', tier:'Común', imagen:'', tipoItem:'casco_rigido', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 8.'},
+  {id:'cat-yelmo-liviano', nombre:'Yelmo liviano', tier:'Buena Calidad', imagen:'', tipoItem:'casco_rigido', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 6 y 8.'},
+  {id:'cat-yelmo-completo', nombre:'Yelmo completo', tier:'Buena Calidad', imagen:'', tipoItem:'casco_rigido', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:122, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 6 y 8.'},
+  {id:'cat-gran-yelmo', nombre:'Gran yelmo', tier:'Raro', imagen:'', tipoItem:'casco_rigido', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:221, consumible:false, curahp:0, mods:[{stat:'def', val:9}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4, 6 y 8.'},
+  {id:'cat-zapatillas-nike', nombre:'Zapatillas Nike', tier:'Excepcional', imagen:'', tipoItem:'botas_rigidas', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'accionesmax', val:1}], detalle:'+1 a las Acciones máximas del turno.'},
+  {id:'cat-botas-reforzadas', nombre:'Botas reforzadas', tier:'Común', imagen:'', tipoItem:'botas_blandas', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 6.'},
+  {id:'cat-grebas', nombre:'Grebas', tier:'Buena Calidad', imagen:'', tipoItem:'piernas_rigidas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:98, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 6 y 8.'},
+  {id:'cat-sabaton', nombre:'Sabatón', tier:'Buena Calidad', imagen:'', tipoItem:'botas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:127, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'mov', val:-1}], detalle:'Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.'},
+  {id:'cat-mercury-threads', nombre:'Mercury threads', tier:'Buena Calidad', imagen:'', tipoItem:'botas_blandas', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:133, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'bonos', val:1}, {stat:'resm', val:1}, {stat:'rescc', val:1}], detalle:'+1 a los Bonos máximos, +1 Res.M y +1 Res.CC.'},
+  {id:'cat-guantes-finos-de-senor', nombre:'Guantes finos de señor', tier:'Común', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:34, consumible:false, curahp:0, mods:[{stat:'def', val:1}], detalle:'Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar'},
+  {id:'cat-guantes-de-cuero-reforzado', nombre:'Guantes de cuero reforzado', tier:'Común', imagen:'', tipoItem:'guantes_blandos', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:1}], detalle:'Reduce críticos Tipo 2.'},
+  {id:'cat-mitones-de-malla', nombre:'Mitones de malla', tier:'Buena Calidad', imagen:'', tipoItem:'guantes_rigidos', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 2 y 4.'},
+  {id:'cat-guanteletes', nombre:'Guanteletes', tier:'Buena Calidad', imagen:'', tipoItem:'guantes_rigidos', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:127, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 6.'},
+  {id:'cat-armadura-mediana', nombre:'Armadura mediana', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_rigida', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2, 4 y 8.'},
+  {id:'new-punal-de-asalto', nombre:'Puñal de asalto', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:45, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 punto de resistencia a crítico del objetivo. Tipo de daño: Tipo 2 (Perforación).'},
+  {id:'new-espada-ropera', nombre:'Espada ropera', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:1, precioCompra:74, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'Tipo de daño: Tipo 2 (Perforación) — desacoplada del dado (d4 pero perfora, no corta).'},
+  {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:2, precioCompra:165, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Tipo de daño: Tipo 2 (Perforación). Durante el primer turno de cualquier combate, ignora 2 puntos de resistencia a crítico del objetivo.'},
+  {id:'new-aguja-de-tejer-gigante', nombre:'Aguja de tejer gigante', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:45, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 punto de resistencia a crítico del objetivo. Tipo de daño: Tipo 2 (Perforación).'},
+  {id:'new-espada-corta-de-instruccion', nombre:'Espada corta de instrucción', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:'Tipo de daño: Tipo 4 (Corte normal).'},
+  {id:'new-sable-de-caballeria', nombre:'Sable de caballería', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:1, precioCompra:87, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'Tipo de daño: Tipo 4 (Corte normal) — desacoplado del dado (d6 pero corta limpio, no de impacto).'},
+  {id:'new-espada-bastarda-encantada', nombre:'Espada bastarda encantada', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:2, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'crit', val:10}, {stat:'parry', val:1}], detalle:'Tipo de daño: Tipo 4 (Corte normal).'},
+  {id:'new-machete-de-podar-rosales-de-vivero', nombre:'Machete de podar rosales de vivero', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:55, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:'Tipo de daño: Tipo 4 (Corte normal). Corte limpio de jardinero profesional.'},
+  {id:'new-hachuela-de-lenador', nombre:'Hachuela de leñador', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:65, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto).'},
+  {id:'new-hacha-de-guerra-ligera', nombre:'Hacha de guerra ligera', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:1, precioCompra:82, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto).'},
+  {id:'new-hacha-bipenne', nombre:'Hacha bipenne', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:3, precioCompra:155, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto).'},
+  {id:'new-ventilador-de-techo-industrial-desmontado', nombre:'Ventilador de techo industrial desmontado', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto).'},
+  {id:'new-maza-de-guardia', nombre:'Maza de guardia', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:55, consumible:false, curahp:0, mods:[], detalle:'Tipo de daño: Tipo 8 (Impacto/contundente).'},
+  {id:'new-martillo-de-sargento', nombre:'Martillo de sargento', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:112, consumible:false, curahp:0, mods:[{stat:'parry', val:1}, {stat:'crit', val:10}], detalle:'Tipo de daño: Tipo 8 (Impacto/contundente).'},
+  {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:5, ranuras:1, tipoDado:8, danoFijo:3, precioCompra:281, consumible:false, curahp:0, mods:[{stat:'fue', val:1}], detalle:'Tipo de daño: Tipo 8 (Impacto/contundente). +50% de daño contra un objetivo con Stun/Aturdido activo.'},
+  {id:'new-bate-de-aluminio-de-la-liga-interbarrial', nombre:'Bate de aluminio de la Liga Interbarrial', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:85, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:'Tipo de daño: Tipo 8 (Impacto/contundente).'},
+  {id:'new-rodela-de-cuero', nombre:'Rodela de cuero', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:1, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:1}], detalle:''},
+  {id:'new-escudo-de-acero-laminado', nombre:'Escudo de acero laminado', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:0, danoFijo:0, precioCompra:87, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-egida-menor', nombre:'Égida menor', tier:'Raro', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, tipoDado:0, danoFijo:0, precioCompra:326, consumible:false, curahp:0, mods:[{stat:'def', val:9}, {stat:'tipo2', val:1}, {stat:'parry', val:1}], detalle:'Al bloquear un golpe crítico, cura 10 HP instantáneos al portador.'},
+  {id:'new-tapa-de-tacho-de-basura-reforzada', nombre:'Tapa de tacho de basura reforzada', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:1, tipoDado:0, danoFijo:0, precioCompra:46, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-peto-de-cuero-curtido', nombre:'Peto de cuero curtido', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:51, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}], detalle:''},
+  {id:'new-gambeson-acolchado-de-doble-capa', nombre:'Gambesón acolchado de doble capa', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_blanda', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:98, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:''},
+  {id:'new-manto-de-cuero-de-basilisco', nombre:'Manto de cuero de basilisco', tier:'Raro', imagen:'', tipoItem:'armadura_blanda', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:188, consumible:false, curahp:0, mods:[{stat:'def', val:8}, {stat:'tipo1', val:1}, {stat:'tipo4', val:1}, {stat:'eva', val:1}], detalle:''},
+  {id:'new-campera-de-cuero-de-motociclista-con-tachas', nombre:'Campera de cuero de motociclista con tachas', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo3', val:1}], detalle:''},
+  {id:'new-peto-de-placas-de-aprendiz', nombre:'Peto de placas de aprendiz', tier:'Común', imagen:'', tipoItem:'armadura_rigida', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:51, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-coraza-de-guardia-de-cuartel', nombre:'Coraza de guardia de cuartel', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_rigida', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:106, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo1', val:1}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-coraza-de-dragon-menor', nombre:'Coraza de dragón menor', tier:'Raro', imagen:'', tipoItem:'armadura_rigida', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:277, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Resiste 1 punto adicional de daño ígneo por turno.'},
+  {id:'new-chapa-de-auto-abollada-ajustada-con-alambre', nombre:'Chapa de auto abollada ajustada con alambre', tier:'Común', imagen:'', tipoItem:'armadura_rigida', peso:5, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:59, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-capucha-de-cuero-acolchada', nombre:'Capucha de cuero acolchada', tier:'Común', imagen:'', tipoItem:'casco_blando', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:37, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo1', val:1}], detalle:''},
+  {id:'new-turbante-de-tela-reforzada', nombre:'Turbante de tela reforzada', tier:'Buena Calidad', imagen:'', tipoItem:'casco_blando', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:92, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo2', val:1}, {stat:'rangocasteo', val:1}], detalle:''},
+  {id:'new-capucha-de-las-sombras-silentes', nombre:'Capucha de las sombras silentes', tier:'Raro', imagen:'', tipoItem:'casco_blando', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:161, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'eva', val:1}], detalle:'Ignora 1 punto de resistencia a crítico del objetivo al atacar sorprendiendo.'},
+  {id:'new-gorra-reglamentaria-de-la-policia-federal', nombre:'Gorra reglamentaria de la Policía Federal', tier:'Común', imagen:'', tipoItem:'casco_blando', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-capacete-de-aprendiz-de-herrero', nombre:'Capacete de aprendiz de herrero', tier:'Común', imagen:'', tipoItem:'casco_rigido', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:37, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-yelmo-de-visera', nombre:'Yelmo de visera', tier:'Buena Calidad', imagen:'', tipoItem:'casco_rigido', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:98, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-yelmo-con-cresta-de-comandante', nombre:'Yelmo con cresta de comandante', tier:'Raro', imagen:'', tipoItem:'casco_rigido', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:205, consumible:false, curahp:0, mods:[{stat:'def', val:9}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'ini', val:1}], detalle:''},
+  {id:'new-casco-de-moto-vintage-pintado-a-mano', nombre:'Casco de moto vintage pintado a mano', tier:'Común', imagen:'', tipoItem:'casco_rigido', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:56, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-guantes-de-cuero-de-carretero', nombre:'Guantes de cuero de carretero', tier:'Común', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:37, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo3', val:1}], detalle:''},
+  {id:'new-guantes-de-escalador-encerados', nombre:'Guantes de escalador encerados', tier:'Buena Calidad', imagen:'', tipoItem:'guantes_blandos', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:81, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:1}, {stat:'pdg', val:1}], detalle:''},
+  {id:'new-guantes-del-sanador-errante', nombre:'Guantes del sanador errante', tier:'Raro', imagen:'', tipoItem:'guantes_blandos', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:157, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'bonos', val:1}], detalle:'Al curar a un aliado, el portador también recibe 5 HP instantáneos.'},
+  {id:'new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo', nombre:'Mitones tejidos a mano por una abuela legendaria del pueblo', tier:'Común', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:34, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'bonos', val:1}], detalle:''},
+  {id:'new-manoplas-de-trabajo-de-fragua', nombre:'Manoplas de trabajo de fragua', tier:'Común', imagen:'', tipoItem:'guantes_rigidos', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-guanteletes-de-combate', nombre:'Guanteletes de combate', tier:'Buena Calidad', imagen:'', tipoItem:'guantes_rigidos', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:121, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'pdg', val:1}], detalle:''},
+  {id:'new-guanteletes-del-herrero-real', nombre:'Guanteletes del herrero real', tier:'Raro', imagen:'', tipoItem:'guantes_rigidos', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:246, consumible:false, curahp:0, mods:[{stat:'def', val:8}, {stat:'tipo1', val:1}, {stat:'tipo3', val:1}, {stat:'fue', val:1}], detalle:''},
+  {id:'new-guantes-de-horno-de-cocina-industrial', nombre:'Guantes de horno de cocina industrial', tier:'Común', imagen:'', tipoItem:'guantes_rigidos', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:46, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-calzas-de-cuero-flexible', nombre:'Calzas de cuero flexible', tier:'Común', imagen:'', tipoItem:'piernas_blandas', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:32, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo1', val:1}], detalle:''},
+  {id:'new-pantalon-reforzado-de-cazador', nombre:'Pantalón reforzado de cazador', tier:'Buena Calidad', imagen:'', tipoItem:'piernas_blandas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:87, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo3', val:1}, {stat:'mov', val:1}], detalle:''},
+  {id:'new-calzas-del-corredor-de-tormentas', nombre:'Calzas del corredor de tormentas', tier:'Raro', imagen:'', tipoItem:'piernas_blandas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:157, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'mov', val:2}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-jogging-de-gimnasia-con-rayas-laterales', nombre:'Jogging de gimnasia con rayas laterales', tier:'Común', imagen:'', tipoItem:'piernas_blandas', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:34, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'mov', val:1}], detalle:''},
+  {id:'new-grebas-de-aprendiz-de-milicia', nombre:'Grebas de aprendiz de milicia', tier:'Común', imagen:'', tipoItem:'piernas_rigidas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:46, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-perneras-articuladas', nombre:'Perneras articuladas', tier:'Buena Calidad', imagen:'', tipoItem:'piernas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:111, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-grebas-del-centinela-de-hierro', nombre:'Grebas del centinela de hierro', tier:'Raro', imagen:'', tipoItem:'piernas_rigidas', peso:4, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:205, consumible:false, curahp:0, mods:[{stat:'def', val:9}, {stat:'tipo1', val:1}, {stat:'tipo4', val:1}, {stat:'parry', val:1}], detalle:''},
+  {id:'new-canilleras-de-arquero-de-futbol-amateur', nombre:'Canilleras de arquero de fútbol amateur', tier:'Común', imagen:'', tipoItem:'piernas_rigidas', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:42, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-botas-de-marcha', nombre:'Botas de marcha', tier:'Común', imagen:'', tipoItem:'botas_blandas', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:38, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'mov', val:1}], detalle:''},
+  {id:'new-botas-de-cuero-de-mercader-viajero', nombre:'Botas de cuero de mercader viajero', tier:'Buena Calidad', imagen:'', tipoItem:'botas_blandas', peso:1, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:92, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'mov', val:1}, {stat:'tipo3', val:1}], detalle:''},
+  {id:'new-botas-del-mensajero-veloz', nombre:'Botas del mensajero veloz', tier:'Raro', imagen:'', tipoItem:'botas_blandas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:186, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'mov', val:2}, {stat:'ini', val:1}], detalle:''},
+  {id:'new-ojotas-de-goma-con-flores-hawaianas', nombre:'Ojotas de goma con flores hawaianas', tier:'Común', imagen:'', tipoItem:'botas_blandas', peso:0, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:34, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'mov', val:1}], detalle:''},
+  {id:'new-borceguies-reglamentarios-de-recluta', nombre:'Borceguíes reglamentarios de recluta', tier:'Común', imagen:'', tipoItem:'botas_rigidas', peso:2, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:37, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-botas-de-placas-del-guardia-de-avanzada', nombre:'Botas de placas del guardia de avanzada', tier:'Buena Calidad', imagen:'', tipoItem:'botas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:93, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo3', val:1}], detalle:''},
+  {id:'new-botas-de-hierro-del-coloso-menor', nombre:'Botas de hierro del coloso menor', tier:'Raro', imagen:'', tipoItem:'botas_rigidas', peso:5, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:338, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}, {stat:'con', val:1}], detalle:''},
+  {id:'new-botas-de-esqui-de-aluminio-sin-los-esquis', nombre:'Botas de esquí de aluminio sin los esquís', tier:'Común', imagen:'', tipoItem:'botas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:41, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:''},
+  {id:'new-pocion-de-hp-comun', nombre:'Poción de HP (común)', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:1, consumible:true, curahp:25, mods:[], detalle:''},
+  {id:'new-pocion-de-hp-buena-calidad', nombre:'Poción de HP (Buena Calidad)', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:40, unidades:1, consumible:true, curahp:50, mods:[], detalle:''},
+  {id:'new-pocion-de-hp-raro', nombre:'Poción de HP (Raro)', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:100, mods:[], detalle:''},
+  {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda antiguo a presión', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, curahp:10, mods:[], detalle:''},
 ];
 
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
@@ -388,7 +485,7 @@ const TAMANOS = {
   capital:   {label:'Capital',            min:70, max:100, pesos:{'Común':30, 'Buena Calidad':33, 'Raro':25,  'Excepcional':9,   'Legendario':3}},
 };
 
-const ES_ARMA = t => t.startsWith('arma_');
+// ES_ARMA sale de CATEGORIAS, arriba, junto con el catálogo.
 const ES_DEFENSA = t => t.startsWith('escudo') || t.startsWith('armadura') || t.startsWith('casco')
   || t.startsWith('guantes') || t.startsWith('piernas') || t.startsWith('botas');
 
@@ -401,6 +498,41 @@ function rubroDe(item){
 
 const RUBRO_LABEL = {ofensivo:'Armas', defensivo:'Defensa', consumibles:'Consumibles', otros:'Otros'};
 const RUBRO_ORDEN = ['ofensivo', 'defensivo', 'consumibles', 'otros'];
+
+function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+function armaDanoTxt(i){
+  if(!ES_ARMA(i.tipoItem)) return '';
+  const dados = Math.max(1, num(i.peso) || 1);
+  const tipo = num(i.tipoDado) || 6;
+  const fijo = num(i.danoFijo);
+  return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
+}
+
+function defValorDe(i){
+  return (i.mods||[]).filter(m => m.stat === 'def').reduce((a,m) => a + num(m.val), 0);
+}
+
+function modsResumenHtml(item){
+  const mods = (item.mods || []).filter(m => m.stat && m.stat !== 'def');
+  if(!mods.length) return '';
+  return mods.map(m => {
+    const label = TIPOS_IDS.includes(m.stat) ? `Res.Crít. ${STAT_LABEL[m.stat]}` : (STAT_LABEL[m.stat] || m.stat);
+    const val = num(m.val);
+    const suf = m.stat === 'crit' ? '%' : '';
+    const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
+    return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
+  }).join(' · ');
+}
+
+// Para ordenar "por daño o defensa" con un solo criterio: las armas valen
+// por su daño máximo posible, el resto por los puntos de Defensa que dan.
+function poderDe(item){
+  if(ES_ARMA(item.tipoItem)){
+    return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
+  }
+  return defValorDe(item);
+}
 
 function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
 
@@ -479,6 +611,43 @@ function generarTienda(claveTamano){
   };
 }
 
+/* ---------- Orden ---------- */
+
+const ORDENES = {
+  categoria: {label:'Categoría', cmp:(a,b) => RUBRO_ORDEN.indexOf(rubroDe(a)) - RUBRO_ORDEN.indexOf(rubroDe(b)) || TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es')},
+  nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
+  precio:    {label:'Precio',    cmp:(a,b) => num(a.precioCompra) - num(b.precioCompra)},
+  peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
+  rareza:    {label:'Rareza',    cmp:(a,b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)},
+  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDe(a) - poderDe(b)},
+};
+
+let ordenActual = 'categoria';
+let ordenDesc = false;
+
+// Ordenar por categoría mantiene los grupos (es la vista de siempre);
+// cualquier otro criterio pasa a lista plana, porque agrupado no se puede
+// ver "lo más caro de la tienda" de un vistazo.
+function ordenarItems(items){
+  const cmp = (ORDENES[ordenActual] || ORDENES.categoria).cmp;
+  const orden = items.slice().sort((a, b) => cmp(a, b) || a.nombre.localeCompare(b.nombre, 'es'));
+  return ordenDesc ? orden.reverse() : orden;
+}
+
+function renderOrdenControles(){
+  const sel = $('#f-orden');
+  if(sel && !sel.dataset.listo){
+    sel.innerHTML = Object.entries(ORDENES).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
+    sel.dataset.listo = '1';
+  }
+  if(sel) sel.value = ordenActual;
+  const b = $('#btn-orden-dir');
+  if(b){
+    b.textContent = ordenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
+    b.title = ordenDesc ? 'Cambiar a menor a mayor' : 'Cambiar a mayor a menor';
+  }
+}
+
 /* ---------- Vista previa ---------- */
 
 let tiendaActual = null;
@@ -496,22 +665,80 @@ function precioAjustado(item){
   return Math.max(1, Math.round((Number(item.precioCompra) || 0) * (1 + pct / 100)));
 }
 
-function itemCardHtml(item, esGarantizado){
-  const color = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+function precioHtmlDe(item){
   const pct = ajusteActual();
   const final = precioAjustado(item);
-  const precioHtml = pct
-    ? `<span class="cat-precio-viejo">${fmt(item.precioCompra)}</span><span class="cat-precio">${fmt(final)} DDE</span>`
-    : `<span class="cat-precio">${fmt(final)} DDE</span>`;
+  return pct
+    ? `<span class="cat-precio-viejo">${fmt(item.precioCompra)}</span><b class="cat-precio">${fmt(final)} DDE</b>`
+    : `<b class="cat-precio">${fmt(final)} DDE</b>`;
+}
+
+// Misma tarjeta que ve el jugador en el catálogo del fabricante, para que
+// el GM arme la tienda mirando exactamente lo mismo que va a ver la mesa.
+function itemCardHtml(item, esGarantizado){
+  const color = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+  const dano = armaDanoTxt(item);
+  const defVal = defValorDe(item);
+  const statTxt = dano ? `Daño ${dano}` : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
+  const modsHtml = modsResumenHtml(item);
   return `<div class="cat-card">
     <button type="button" class="cat-quitar" data-quitar="${esc(item.id)}" title="Quitar de la tienda">×</button>
     <div class="cat-card-titulo">
       <div class="cat-nombre">${esc(item.nombre)}</div>
       <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(item.tier)}</div>
     </div>
-    <div class="cat-meta">${precioHtml}</div>
-    ${esGarantizado ? '<div class="cat-garantizado">Stock fijo</div>' : ''}
+    <div class="cat-meta">${precioHtmlDe(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
+    ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
+    ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+    <div class="cat-card-pie">
+      ${esGarantizado ? '<span class="cat-garantizado">Stock fijo</span>' : '<span></span>'}
+      <button type="button" class="iconbtn" data-ver="${esc(item.id)}">Ver</button>
+    </div>
   </div>`;
+}
+
+/* ---------- Tarjeta completa (Ver) ---------- */
+
+function verItem(id){
+  const item = CATALOGO.find(it => it.id === id);
+  if(!item) return;
+  const linea = (label, val) => (val === '' || val === null || val === undefined)
+    ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  const L = [];
+  if(item.tipoItem) L.push(linea('Categoría', CATEGORIA_LABEL[item.tipoItem] || item.tipoItem));
+  L.push(linea('Rareza', item.tier));
+  if(ES_ARMA(item.tipoItem)){
+    L.push(linea('Tipo de dado', `d${num(item.tipoDado) || 6}`));
+    L.push(linea('Daño', armaDanoTxt(item)));
+  }
+  const defVal = defValorDe(item);
+  if(defVal) L.push(linea('Defensa', `${defVal>0?'+':''}${fmt(defVal)}`));
+  L.push(linea('Peso', fmt(num(item.peso))));
+  if(item.ranuras !== undefined) L.push(linea('Ranuras', fmt(num(item.ranuras))));
+  const pct = ajusteActual();
+  L.push(linea('Precio de lista', `${fmt(num(item.precioCompra))} DDE`));
+  if(pct) L.push(linea(pct < 0 ? `Precio con ${Math.abs(pct)}% de descuento` : `Precio con ${pct}% de recargo`, `${fmt(precioAjustado(item))} DDE`));
+  if(item.consumible) L.push(linea('Consumible', `${fmt(num(item.unidades) || 1)} unidad(es)${item.curahp ? ` · ${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP al consumir` : ''}`));
+  TIPOS_IDS.forEach(tid => {
+    const m = (item.mods || []).find(x => x.stat === tid);
+    if(m && num(m.val)) L.push(linea(`Res. crítico ${STAT_LABEL[tid]}`, `${num(m.val)>0?'+':''}${fmt(num(m.val))}`));
+  });
+  const otros = (item.mods || []).filter(m => m.stat && m.stat !== 'def' && !TIPOS_IDS.includes(m.stat));
+  if(otros.length) L.push(linea('Otros modificadores', otros.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+
+  const enTienda = tiendaActual && tiendaActual.items.includes(item.id);
+  $('#ver-titulo').textContent = item.nombre;
+  $('#ver-body').innerHTML = `
+    <div class="view-title">${esc(item.nombre)}</div>
+    <div class="view-lines">${L.filter(Boolean).join('')}</div>
+    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+  `;
+  const btn = $('#ver-toggle');
+  btn.textContent = enTienda ? 'Quitar de la tienda' : 'Agregar a la tienda';
+  btn.className = enTienda ? 'btn ghost' : 'btn primary';
+  btn.dataset.item = item.id;
+  btn.style.display = tiendaActual ? '' : 'none';
+  $('#scrim-ver').classList.add('open');
 }
 
 function renderPreview(){
@@ -531,13 +758,19 @@ function renderPreview(){
     ).join('');
 
   let html = '';
-  RUBRO_ORDEN.forEach(rubro => {
-    const delRubro = items.filter(it => rubroDe(it) === rubro);
-    if(!delRubro.length) return;
-    delRubro.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es'));
-    html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
-    html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
-  });
+  if(ordenActual === 'categoria'){
+    RUBRO_ORDEN.forEach(rubro => {
+      const delRubro = ordenarItems(items.filter(it => rubroDe(it) === rubro));
+      if(!delRubro.length) return;
+      html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
+      html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+    });
+  }else{
+    const orden = ordenarItems(items);
+    html += `<div class="cat-grouphead">${esc(ORDENES[ordenActual].label)} · ${fmt(orden.length)}</div>`;
+    html += `<div class="cat-grid">${orden.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+  }
+  renderOrdenControles();
   $('#preview-lista').innerHTML = html;
   $('#panel-preview').style.display = '';
 }
@@ -574,7 +807,7 @@ function renderAgregarLista(){
   if(rubro) candidatos = candidatos.filter(it => rubroDe(it) === rubro);
   if(tier) candidatos = candidatos.filter(it => it.tier === tier);
   if(texto) candidatos = candidatos.filter(it => it.nombre.toLowerCase().includes(texto));
-  candidatos.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es'));
+  candidatos = ordenarItems(candidatos);
 
   if(!candidatos.length){
     $('#agregar-lista').innerHTML = `<div class="hint">No quedan ítems del catálogo que coincidan${enTienda.size ? ' y no estén ya en la tienda' : ''}.</div>`;
@@ -582,10 +815,14 @@ function renderAgregarLista(){
   }
   $('#agregar-lista').innerHTML = candidatos.map(it => {
     const color = TIER_COLOR[it.tier] || TIER_COLOR['Común'];
+    const dano = armaDanoTxt(it);
+    const defVal = defValorDe(it);
+    const statTxt = dano ? `Daño ${dano}` : (defVal ? `Def ${defVal>0?'+':''}${fmt(defVal)}` : '');
     return `<div class="agregar-fila">
       <div class="cat-nombre">${esc(it.nombre)}</div>
       <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(it.tier)}</div>
-      <span class="cat-meta"><span class="cat-precio">${fmt(precioAjustado(it))} DDE</span></span>
+      <span class="cat-meta">${fmt(precioAjustado(it))} DDE · Peso ${fmt(num(it.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}</span>
+      <button type="button" class="iconbtn" data-ver="${esc(it.id)}">Ver</button>
       <button type="button" class="iconbtn" data-agregar="${esc(it.id)}">Agregar</button>
     </div>`;
   }).join('');
@@ -798,18 +1035,33 @@ $('#agregar-buscar').addEventListener('input', renderAgregarLista);
 $('#agregar-rubro').addEventListener('change', renderAgregarLista);
 $('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
+$('#f-orden').addEventListener('change', e => { ordenActual = e.target.value; renderPreview(); renderAgregarLista(); });
+$('#btn-orden-dir').addEventListener('click', () => { ordenDesc = !ordenDesc; renderOrdenControles(); renderPreview(); renderAgregarLista(); });
+$('#ver-x').addEventListener('click', () => $('#scrim-ver').classList.remove('open'));
+$('#scrim-ver').addEventListener('mousedown', e => { if(e.target.id === 'scrim-ver') $('#scrim-ver').classList.remove('open'); });
+$('#ver-toggle').addEventListener('click', e => {
+  const id = e.currentTarget.dataset.item;
+  if(!id || !tiendaActual) return;
+  if(tiendaActual.items.includes(id)) quitarItem(id); else agregarItem(id);
+  verItem(id);
+});
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') $('#scrim-agregar').classList.remove('open');
+  if(e.key === 'Escape'){
+    $('#scrim-agregar').classList.remove('open');
+    $('#scrim-ver').classList.remove('open');
+  }
 });
 document.addEventListener('click', e => {
-  const b = e.target.closest('[data-quitar],[data-agregar],[data-ajuste]');
+  const b = e.target.closest('[data-quitar],[data-agregar],[data-ajuste],[data-ver]');
   if(!b) return;
+  if(b.dataset.ver !== undefined) return verItem(b.dataset.ver);
   if(b.dataset.quitar !== undefined) return quitarItem(b.dataset.quitar);
   if(b.dataset.agregar !== undefined) return agregarItem(b.dataset.agregar);
   if(b.dataset.ajuste !== undefined) return aplicarAjuste(b.dataset.ajuste);
 });
 
 actualizarHint();
+renderOrdenControles();
 </script>
 </body>
 </html>

@@ -91,6 +91,47 @@ button:disabled{opacity:.5;cursor:not-allowed}
   color:var(--absenta);border:1px solid var(--absenta);border-radius:99px;padding:1px 7px;align-self:flex-start
 }
 
+.cat-card{position:relative}
+.cat-quitar{
+  position:absolute;top:6px;right:6px;width:20px;height:20px;line-height:1;
+  border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:13px;
+  display:none;align-items:center;justify-content:center
+}
+.cat-card:hover .cat-quitar{display:flex}
+.cat-quitar:hover{border-color:var(--danger);color:var(--danger);background:rgba(212,87,78,.14)}
+.cat-precio-viejo{text-decoration:line-through;color:var(--muted);margin-right:6px;font-weight:400}
+
+.barra-edicion{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line-soft)
+}
+.ajuste-grupo{display:flex;align-items:center;gap:6px}
+.ajuste-grupo label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ajuste-grupo input{width:74px;text-align:center;flex:none}
+.ajuste-preset{
+  font-family:"Space Mono",monospace;font-size:10px;border:1px solid var(--line);
+  border-radius:99px;padding:4px 9px;color:var(--muted)
+}
+.ajuste-preset:hover{border-color:var(--copper);color:var(--paper)}
+.ajuste-preset.activo{border-color:var(--copper);background:rgba(201,133,69,.18);color:var(--paper);font-weight:700}
+
+.agregar-fila{
+  display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);
+  background:var(--panel2);padding:7px 10px;margin-bottom:6px
+}
+.agregar-fila .cat-nombre{flex:1}
+.scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;z-index:50;padding:24px;overflow:auto}
+.scrim.open{display:block}
+.modal{max-width:820px;margin:4vh auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel)}
+.modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line);gap:10px}
+.modal header h3{margin:0;font-family:"Fraunces",serif;font-size:17px;font-weight:600}
+.modal .body{padding:15px;max-height:62vh;overflow:auto}
+.modal .filtros{display:flex;flex-wrap:wrap;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line-soft)}
+.modal .filtros input{flex:2 1 220px}
+.modal .filtros select{flex:1 1 150px;width:auto}
+.iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
+.iconbtn:hover{border-color:var(--copper);color:var(--paper)}
+
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--panel);
   border:1px solid var(--copper);padding:10px 16px;font-family:"Space Mono",monospace;font-size:11.5px;
@@ -137,10 +178,51 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="panel" id="panel-preview" style="display:none">
     <div class="panel-titulo">Vista previa del catálogo</div>
     <div class="resumen" id="preview-resumen"></div>
+    <div class="barra-edicion">
+      <div class="ajuste-grupo">
+        <label for="f-ajuste">Precios</label>
+        <input type="number" id="f-ajuste" step="5" value="0" title="Porcentaje sobre el precio de catálogo: negativo descuenta, positivo recarga">
+        <span class="hint">%</span>
+      </div>
+      <button type="button" class="ajuste-preset" data-ajuste="-25">-25%</button>
+      <button type="button" class="ajuste-preset" data-ajuste="-10">-10%</button>
+      <button type="button" class="ajuste-preset activo" data-ajuste="0">Normal</button>
+      <button type="button" class="ajuste-preset" data-ajuste="10">+10%</button>
+      <button type="button" class="ajuste-preset" data-ajuste="25">+25%</button>
+      <button type="button" class="btn" id="btn-agregar-items" style="margin-left:auto">+ Agregar ítems</button>
+    </div>
     <div id="preview-lista"></div>
   </div>
 
 </div>
+
+<div class="scrim" id="scrim-agregar">
+  <div class="modal">
+    <header>
+      <h3>Agregar ítems a la tienda</h3>
+      <button class="iconbtn" id="agregar-x">Cerrar</button>
+    </header>
+    <div class="filtros">
+      <input type="text" id="agregar-buscar" placeholder="Buscar por nombre…">
+      <select id="agregar-rubro">
+        <option value="">Todos los rubros</option>
+        <option value="ofensivo">Armas</option>
+        <option value="defensivo">Defensa</option>
+        <option value="consumibles">Consumibles</option>
+      </select>
+      <select id="agregar-tier">
+        <option value="">Todos los tiers</option>
+        <option value="Común">Común</option>
+        <option value="Buena Calidad">Buena calidad</option>
+        <option value="Raro">Raro</option>
+        <option value="Excepcional">Excepcional</option>
+        <option value="Legendario">Legendario</option>
+      </select>
+    </div>
+    <div class="body" id="agregar-lista"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -391,6 +473,7 @@ function generarTienda(claveTamano){
     tamano: claveTamano,
     tamanoLabel: cfg.label,
     generado: new Date().toISOString(),
+    ajustePrecio: 0,
     garantizados: garantizados.map(it => it.id),
     items: [...garantizados, ...elegidos].map(it => it.id),
   };
@@ -400,14 +483,33 @@ function generarTienda(claveTamano){
 
 let tiendaActual = null;
 
+// El ajuste es de la tienda entera, no de cada ítem: se guarda como
+// porcentaje y el precio final se calcula al vuelo, así el catálogo base
+// nunca se toca y cambiar el porcentaje no pierde el precio original.
+function ajusteActual(){
+  return tiendaActual ? (Number(tiendaActual.ajustePrecio) || 0) : 0;
+}
+
+function precioAjustado(item){
+  const pct = ajusteActual();
+  if(!pct) return Number(item.precioCompra) || 0;
+  return Math.max(1, Math.round((Number(item.precioCompra) || 0) * (1 + pct / 100)));
+}
+
 function itemCardHtml(item, esGarantizado){
   const color = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+  const pct = ajusteActual();
+  const final = precioAjustado(item);
+  const precioHtml = pct
+    ? `<span class="cat-precio-viejo">${fmt(item.precioCompra)}</span><span class="cat-precio">${fmt(final)} DDE</span>`
+    : `<span class="cat-precio">${fmt(final)} DDE</span>`;
   return `<div class="cat-card">
+    <button type="button" class="cat-quitar" data-quitar="${esc(item.id)}" title="Quitar de la tienda">×</button>
     <div class="cat-card-titulo">
       <div class="cat-nombre">${esc(item.nombre)}</div>
       <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(item.tier)}</div>
     </div>
-    <div class="cat-meta"><span class="cat-precio">${fmt(item.precioCompra)} DDE</span></div>
+    <div class="cat-meta">${precioHtml}</div>
     ${esGarantizado ? '<div class="cat-garantizado">Stock fijo</div>' : ''}
   </div>`;
 }
@@ -419,9 +521,11 @@ function renderPreview(){
 
   const porTier = {};
   items.forEach(it => porTier[it.tier] = (porTier[it.tier] || 0) + 1);
+  const pct = ajusteActual();
   $('#preview-resumen').innerHTML =
     `<span class="resumen-chip">${esc(tiendaActual.tamanoLabel)}</span>` +
     `<span class="resumen-chip">Ítems <b>${fmt(items.length)}</b></span>` +
+    (pct ? `<span class="resumen-chip" style="border-color:${pct < 0 ? 'var(--absenta)' : 'var(--brass)'}">${pct < 0 ? 'Descuento' : 'Recargo'} <b>${fmt(Math.abs(pct))}%</b></span>` : '') +
     TIERS.filter(t => porTier[t]).map(t =>
       `<span class="resumen-chip" style="border-color:${TIER_COLOR[t]}">${esc(t)} <b>${fmt(porTier[t])}</b></span>`
     ).join('');
@@ -438,9 +542,81 @@ function renderPreview(){
   $('#panel-preview').style.display = '';
 }
 
+function quitarItem(id){
+  if(!tiendaActual) return;
+  const item = CATALOGO.find(it => it.id === id);
+  tiendaActual.items = tiendaActual.items.filter(x => x !== id);
+  // Si sacan un consumible del stock fijo se respeta: es la tienda del GM.
+  tiendaActual.garantizados = (tiendaActual.garantizados || []).filter(x => x !== id);
+  renderPreview();
+  renderAgregarLista();
+  toast(`${item ? item.nombre : 'Ítem'} fuera de la tienda`);
+}
+
+function agregarItem(id){
+  if(!tiendaActual) return;
+  if(tiendaActual.items.includes(id)){ toast('Ese ítem ya está en la tienda'); return; }
+  const item = CATALOGO.find(it => it.id === id);
+  tiendaActual.items.push(id);
+  renderPreview();
+  renderAgregarLista();
+  toast(`${item ? item.nombre : 'Ítem'} agregado`);
+}
+
+function renderAgregarLista(){
+  if(!tiendaActual) return;
+  const enTienda = new Set(tiendaActual.items);
+  const texto = ($('#agregar-buscar').value || '').trim().toLowerCase();
+  const rubro = $('#agregar-rubro').value;
+  const tier = $('#agregar-tier').value;
+
+  let candidatos = CATALOGO.filter(it => !enTienda.has(it.id));
+  if(rubro) candidatos = candidatos.filter(it => rubroDe(it) === rubro);
+  if(tier) candidatos = candidatos.filter(it => it.tier === tier);
+  if(texto) candidatos = candidatos.filter(it => it.nombre.toLowerCase().includes(texto));
+  candidatos.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es'));
+
+  if(!candidatos.length){
+    $('#agregar-lista').innerHTML = `<div class="hint">No quedan ítems del catálogo que coincidan${enTienda.size ? ' y no estén ya en la tienda' : ''}.</div>`;
+    return;
+  }
+  $('#agregar-lista').innerHTML = candidatos.map(it => {
+    const color = TIER_COLOR[it.tier] || TIER_COLOR['Común'];
+    return `<div class="agregar-fila">
+      <div class="cat-nombre">${esc(it.nombre)}</div>
+      <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(it.tier)}</div>
+      <span class="cat-meta"><span class="cat-precio">${fmt(precioAjustado(it))} DDE</span></span>
+      <button type="button" class="iconbtn" data-agregar="${esc(it.id)}">Agregar</button>
+    </div>`;
+  }).join('');
+}
+
+function abrirAgregar(){
+  if(!tiendaActual){ toast('Primero generá una tienda'); return; }
+  $('#agregar-buscar').value = '';
+  $('#agregar-rubro').value = '';
+  $('#agregar-tier').value = '';
+  renderAgregarLista();
+  $('#scrim-agregar').classList.add('open');
+}
+
+function aplicarAjuste(pct){
+  if(!tiendaActual) return;
+  const n = Math.max(-90, Math.min(500, Math.round(Number(pct) || 0)));
+  tiendaActual.ajustePrecio = n;
+  $('#f-ajuste').value = n;
+  document.querySelectorAll('.ajuste-preset').forEach(b =>
+    b.classList.toggle('activo', Number(b.dataset.ajuste) === n));
+  renderPreview();
+  renderAgregarLista();
+}
+
 function generar(){
   const clave = $('#f-tamano').value;
+  const ajustePrevio = ajusteActual();
   tiendaActual = generarTienda(clave);
+  // Regenerar cambia el stock, no la política de precios del vendedor.
+  tiendaActual.ajustePrecio = ajustePrevio;
   renderPreview();
   $('#btn-regenerar').disabled = false;
   $('#btn-publicar').disabled = false;
@@ -615,6 +791,23 @@ $('#btn-generar').addEventListener('click', generar);
 $('#btn-regenerar').addEventListener('click', generar);
 $('#btn-publicar').addEventListener('click', publicarShop);
 $('#btn-token').addEventListener('click', () => ghToken(true));
+$('#btn-agregar-items').addEventListener('click', abrirAgregar);
+$('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));
+$('#scrim-agregar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-agregar') $('#scrim-agregar').classList.remove('open'); });
+$('#agregar-buscar').addEventListener('input', renderAgregarLista);
+$('#agregar-rubro').addEventListener('change', renderAgregarLista);
+$('#agregar-tier').addEventListener('change', renderAgregarLista);
+$('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') $('#scrim-agregar').classList.remove('open');
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-quitar],[data-agregar],[data-ajuste]');
+  if(!b) return;
+  if(b.dataset.quitar !== undefined) return quitarItem(b.dataset.quitar);
+  if(b.dataset.agregar !== undefined) return agregarItem(b.dataset.agregar);
+  if(b.dataset.ajuste !== undefined) return aplicarAjuste(b.dataset.ajuste);
+});
 
 actualizarHint();
 </script>

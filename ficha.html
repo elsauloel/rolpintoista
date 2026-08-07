@@ -354,6 +354,7 @@ a{color:var(--brass)}
   padding:5px 10px;border-radius:99px;white-space:nowrap
 }
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
+.cat-meta .precio-lista{text-decoration:line-through;color:var(--muted);margin-right:5px}
 .tienda-badge{
   font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
   border:1px solid var(--absenta);color:var(--absenta);border-radius:99px;padding:3px 10px;white-space:nowrap
@@ -4315,6 +4316,13 @@ function textoBusquedaDe(item){
   return normalizarBusqueda(partes.filter(Boolean).join(' '));
 }
 
+function precioTiendaHtml(item){
+  const base = num(item.precioCompra);
+  const final = precioDeCompra(item);
+  if(final === base) return `<b>${fmt(base)} DDE</b>`;
+  return `<span class="precio-lista">${fmt(base)}</span><b>${fmt(final)} DDE</b>`;
+}
+
 function catalogoRowHtml(item){
   const dano = armaDanoTxt(item);
   const defVal = defValorDe(item);
@@ -4328,7 +4336,7 @@ function catalogoRowHtml(item){
         <div class="cat-nombre">${esc(item.nombre)}</div>
         ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
       </div>
-      <div class="cat-meta"><b>${fmt(num(item.precioCompra))} DDE</b> · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
+      <div class="cat-meta">${precioTiendaHtml(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
       ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
     </div>
@@ -4383,8 +4391,9 @@ function renderCabeceraTienda(){
   const salir = $('#tienda-salir');
   const nuevo = $('#btn-catalogo-nuevo');
   if(tiendaCargada){
-    const cuantos = catalogoVisibles().length;
-    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}`;
+    const pct = Number(tiendaCargada.ajustePrecio) || 0;
+    const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
+    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}${extra}`;
     badge.style.display = '';
     salir.style.display = '';
     if(nuevo) nuevo.style.display = 'none';
@@ -4400,6 +4409,16 @@ function limpiarFiltrosCatalogo(){
   $('#catalogo-filtro-slot').value = '';
   $('#catalogo-filtro-tier').value = '';
   $('#catalogo-buscar').value = '';
+}
+
+// El vendedor puede tener un descuento o recargo para toda la tienda. Se
+// aplica al vuelo sobre el precio de catálogo: nada reescribe S.catalogo,
+// así al salir de la tienda los precios vuelven solos a los de siempre.
+function precioDeCompra(item){
+  const base = num(item.precioCompra);
+  const pct = tiendaCargada ? (Number(tiendaCargada.ajustePrecio) || 0) : 0;
+  if(!pct) return base;
+  return Math.max(1, Math.round(base * (1 + pct / 100)));
 }
 
 function salirDeLaTienda(){
@@ -4501,7 +4520,7 @@ function renderCarritoCatalogo(){
   cont.innerHTML = carritoCatalogo.map(ent => {
     const item = S.catalogo.find(x=>x.id===ent.catId);
     if(!item) return '';
-    const subtotal = num(item.precioCompra) * ent.cantidad;
+    const subtotal = precioDeCompra(item) * ent.cantidad;
     total += subtotal;
     return `<div class="carrito-item">
       <span class="carrito-nombre">${esc(item.nombre)} ×${fmt(ent.cantidad)}</span>
@@ -4597,7 +4616,7 @@ function comprarCarrito(){
   let total = 0;
   carritoCatalogo.forEach(ent => {
     const item = S.catalogo.find(x=>x.id===ent.catId);
-    if(item) total += num(item.precioCompra) * ent.cantidad;
+    if(item) total += precioDeCompra(item) * ent.cantidad;
   });
   if(total > num(S.meta.dde)){
     toast(`No te alcanzan los DDE — necesitás ${fmt(total)} y tenés ${fmt(num(S.meta.dde))}`);

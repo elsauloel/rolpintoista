@@ -374,6 +374,19 @@ input[type=file]{display:none}
   border:1px solid var(--copper);background:rgba(201,133,69,.14);color:var(--brass);font-weight:700
 }
 .cat-btn-equipar:hover{background:var(--copper);color:#180F08}
+.botonera-modal{max-width:1500px;width:calc(100% - 20px);max-height:86vh}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));gap:10px;margin-bottom:14px}
+.cat-row.cat-card{flex-direction:column;align-items:stretch;margin-bottom:0;height:100%}
+.cat-card-titulo{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.cat-card-titulo .cat-nombre{min-width:0}
+.cat-tier-badge{
+  font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;border:1px solid;font-weight:700;flex:none;white-space:nowrap;margin-top:1px
+}
+.cat-row.cat-card .cat-mods{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+.cat-mods .mod-plus{color:var(--absenta)}
+.cat-mods .mod-minus{color:var(--danger)}
+.cat-row.cat-card .cat-btn-equipar{width:100%;text-align:center;margin-top:auto}
 .dado-cara{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;
   border:1px solid var(--line);border-radius:var(--r);font-family:"Space Mono",monospace;font-weight:700;font-size:15px;
   background:rgba(0,0,0,.25);color:var(--paper)}
@@ -506,7 +519,7 @@ input[type=file]{display:none}
 </div>
 
 <div class="scrim" id="scrim-equipar-creep">
-  <div class="modal catalogo-modal">
+  <div class="modal catalogo-modal botonera-modal">
     <header><h3>Equipar del fabricante</h3><button class="iconbtn" id="equipar-creep-x">Cerrar</button></header>
     <div class="catalogo-filtro-fila">
       <label class="catalogo-filtro-label">Categoría</label>
@@ -516,7 +529,28 @@ input[type=file]{display:none}
         <option value="escudos">Escudos</option>
         <option value="defensa">Defensa</option>
       </select>
-      <input type="text" id="equipar-creep-buscar" placeholder="Buscar ítem…" style="flex:1;min-width:0">
+      <label class="catalogo-filtro-label">Slot</label>
+      <select id="equipar-creep-filtro-slot">
+        <option value="">Todos</option>
+        <option value="mano">Mano (una mano)</option>
+        <option value="escudo">Escudo</option>
+        <option value="armadura">Armadura</option>
+        <option value="casco">Casco</option>
+        <option value="guantes">Guantes</option>
+        <option value="piernas">Piernas</option>
+        <option value="pies">Pies</option>
+      </select>
+      <label class="catalogo-filtro-label">Tier</label>
+      <select id="equipar-creep-filtro-tier">
+        <option value="">Todos</option>
+        <option value="Común">Común</option>
+        <option value="Buena Calidad">Buena calidad</option>
+        <option value="Raro">Raro</option>
+        <option value="Excepcional">Excepcional</option>
+        <option value="Legendario">Legendario</option>
+      </select>
+      <input type="text" id="equipar-creep-buscar" placeholder="Buscar por nombre, efecto, modificador…" style="flex:1;min-width:0">
+      <button type="button" class="btn ghost" id="equipar-creep-limpiar">Limpiar filtros</button>
     </div>
     <div class="body" id="equipar-creep-lista"></div>
   </div>
@@ -1461,13 +1495,66 @@ let equipandoCreepId = null;
 
 const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
 
+const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
+const STAT_LABEL_GM = {
+  tipo1:'Tipo 2', tipo2:'Tipo 4', tipo3:'Tipo 6', tipo4:'Tipo 8', tipo5:'Tipo 10',
+  pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico',
+  bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.',
+  resm:'Res.M', resmg:'Res.Mg', rescc:'Res.CC',
+  con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int',
+};
+const STAT_FULL_GM = {
+  tipo1:'Resistencia a crítico Tipo 2', tipo2:'Resistencia a crítico Tipo 4', tipo3:'Resistencia a crítico Tipo 6',
+  tipo4:'Resistencia a crítico Tipo 8', tipo5:'Resistencia a crítico Tipo 10',
+  pdg:'Probabilidad de golpe', eva:'Evasión', ini:'Iniciativa', mov:'Movimiento', parry:'Parry', crit:'Daño crítico',
+  bonos:'Bonos', rangocasteo:'Rango de casteo', accionesmax:'Acciones máximas',
+  resm:'Resistencia mágica', resmg:'Resistencia mágica', rescc:'Resistencia a CC',
+  con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', int:'Inteligencia',
+};
+const SLOT_MAP_GM = {
+  arma_1m:'mano', arma_2m:'mano',
+  escudo_1m:'escudo', escudo_2m:'escudo',
+  armadura_blanda:'armadura', armadura_rigida:'armadura',
+  casco_blando:'casco', casco_rigido:'casco',
+  guantes_blandos:'guantes', guantes_rigidos:'guantes',
+  piernas_blandas:'piernas', piernas_rigidas:'piernas',
+  botas_blandas:'pies', botas_rigidas:'pies',
+};
+function slotDeGM(tipoItem){ return SLOT_MAP_GM[tipoItem] || 'otro'; }
+
+function modsResumenHtmlGM(mods){
+  const list = (mods || []).filter(m => m.stat && m.stat !== 'def');
+  if(!list.length) return '';
+  return list.map(m => {
+    const label = TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined ? `Res.Crít. ${STAT_LABEL_GM[m.stat]}` : (STAT_LABEL_GM[m.stat] || m.stat);
+    const val = num(m.val);
+    const suf = m.stat === 'crit' ? '%' : '';
+    const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
+    return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
+  }).join(' · ');
+}
+
+// Texto completo del ítem para la búsqueda (nombre, detalle, tier, categoría,
+// mods en forma corta y completa) — igual criterio que en ficha.html.
+function textoBusquedaDeGM(item){
+  const partes = [item.nombre, item.detalle, item.tier, TIPOITEM_LABEL_GM[item.tipoItem] || item.tipoItem];
+  (item.mods || []).forEach(m => { partes.push(STAT_LABEL_GM[m.stat] || m.stat, STAT_FULL_GM[m.stat]); });
+  return normalizarBusqueda(partes.filter(Boolean).join(' '));
+}
+
 function equipoItemHtml(item, idx){
   const esArma = item.tipoItem.startsWith('arma_');
-  const stat = esArma ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}` : `Defensa +${item.def}`;
-  return `<div class="cat-row">
+  const statTxt = esArma ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}` : `Defensa +${item.def}`;
+  const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+  const modsHtml = modsResumenHtmlGM(item.mods);
+  return `<div class="cat-row cat-card">
     <div class="cat-info">
-      <div class="cat-nombre">${esc(item.nombre)}</div>
-      <div class="cat-meta"><b>${esc(stat)}</b></div>
+      <div class="cat-card-titulo">
+        <div class="cat-nombre">${esc(item.nombre)}</div>
+        ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
+      </div>
+      <div class="cat-meta"><b>${esc(statTxt)}</b> · Peso ${fmt(num(item.peso))}</div>
+      ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
     </div>
     <button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>
@@ -1476,26 +1563,32 @@ function equipoItemHtml(item, idx){
 
 function renderEquiparCreepLista(){
   const filtro = $('#equipar-creep-filtro') ? $('#equipar-creep-filtro').value : '';
+  const filtroSlot = $('#equipar-creep-filtro-slot') ? $('#equipar-creep-filtro-slot').value : '';
+  const filtroTier = $('#equipar-creep-filtro-tier') ? $('#equipar-creep-filtro-tier').value : '';
   const busqueda = normalizarBusqueda($('#equipar-creep-buscar') ? $('#equipar-creep-buscar').value : '');
   let visibles = CATALOGO_EQUIPO.map((it, idx) => ({it, idx}));
   if(filtro === 'armas') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
   if(filtro === 'escudos') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
   if(filtro === 'defensa') visibles = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
-  if(busqueda) visibles = visibles.filter(({it}) => normalizarBusqueda(it.nombre).includes(busqueda));
+  if(filtroSlot) visibles = visibles.filter(({it}) => slotDeGM(it.tipoItem) === filtroSlot);
+  if(filtroTier) visibles = visibles.filter(({it}) => it.tier === filtroTier);
+  if(busqueda) visibles = visibles.filter(({it}) => textoBusquedaDeGM(it).includes(busqueda));
 
   const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
   const escudos = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
   const defensa = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
   let html = '';
-  if(armas.length) html += `<div class="cat-grouphead">Armas</div>` + armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
-  if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div>` + escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
-  if(defensa.length) html += `<div class="cat-grouphead">Defensa</div>` + defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('');
+  if(armas.length) html += `<div class="cat-grouphead">Armas</div><div class="cat-grid">${armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+  if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div><div class="cat-grid">${escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+  if(defensa.length) html += `<div class="cat-grouphead">Defensa</div><div class="cat-grid">${defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
   $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems que coincidan con la búsqueda.</div>`;
 }
 
 function abrirEquiparCreep(scId){
   equipandoCreepId = scId;
   $('#equipar-creep-filtro').value = '';
+  $('#equipar-creep-filtro-slot').value = '';
+  $('#equipar-creep-filtro-tier').value = '';
   $('#equipar-creep-buscar').value = '';
   renderEquiparCreepLista();
   $('#scrim-equipar-creep').classList.add('open');
@@ -2627,7 +2720,16 @@ $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
 $('#equipar-creep-filtro').addEventListener('change', renderEquiparCreepLista);
+$('#equipar-creep-filtro-slot').addEventListener('change', renderEquiparCreepLista);
+$('#equipar-creep-filtro-tier').addEventListener('change', renderEquiparCreepLista);
 $('#equipar-creep-buscar').addEventListener('input', renderEquiparCreepLista);
+$('#equipar-creep-limpiar').addEventListener('click', () => {
+  $('#equipar-creep-filtro').value = '';
+  $('#equipar-creep-filtro-slot').value = '';
+  $('#equipar-creep-filtro-tier').value = '';
+  $('#equipar-creep-buscar').value = '';
+  renderEquiparCreepLista();
+});
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
 $('#hc-efecto-preset').addEventListener('change', e => {
   if(!e.target.value) return;

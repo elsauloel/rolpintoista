@@ -736,6 +736,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   z-index:51;background:transparent;backdrop-filter:none;pointer-events:none
 }
 body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado .modal{pointer-events:auto}
+.pop-check{display:flex;align-items:center;gap:4px;flex:none;cursor:pointer;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pop-check:hover{color:var(--copper)}
+.pop-check input{width:auto;flex:none;margin:0;accent-color:var(--copper);cursor:pointer}
 @media (min-width:1120px){
   body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-view .modal{margin-left:calc(50% - 530px);margin-right:0}
   body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado .modal{margin-left:calc(50% + 10px);margin-right:0}
@@ -2242,6 +2245,12 @@ function aplicarEfectoDeConsumo(it){
 
 // Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y muestra
 // el popup de resultado, igual que un ataque o un chequeo manual.
+// El pop up de la tarjeta al ejecutar se puede prender/apagar por habilidad
+// desde la botonera. Movimiento arranca apagado por ser de uso constante.
+function popupHabilidadActivo(h){
+  return h.popupAlEjecutar ?? (h.nombre !== 'Movimiento');
+}
+
 function tirarExtraDeItem(it){
   const formula = (it.tiradaExtra || '').trim();
   if(!formula) return false;
@@ -2857,6 +2866,7 @@ function renderBotonera(){
           const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
           return `<div class="cat-row${i.nombre==='Movimiento'?' item-movimiento':''}">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+            <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
             <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
           </div>`;
@@ -4838,6 +4848,12 @@ $('#modal-del').onclick = () => {
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
+document.addEventListener('change', e => {
+  const cb = e.target.closest('[data-pophab]');
+  if(!cb) return;
+  const h = S.habilidades.find(x => x.id === cb.dataset.pophab);
+  if(h) h.popupAlEjecutar = cb.checked;
+});
 document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
@@ -4936,7 +4952,7 @@ function ejecutarHabilidad(id){
   if(efecto) renderList('efectos');
   renderAcciones();
   renderVitals();
-  if(it.nombre !== 'Movimiento') openViewer('habilidades', id);
+  if(popupHabilidadActivo(it)) openViewer('habilidades', id);
   const partes = [`ejecutada`];
   if(costoBonos) partes.push(`-${fmt(costoBonos)} Bonos`);
   partes.push(costoAcciones ? `-${fmt(costoAcciones)} Acci${costoAcciones===1?'ón':'ones'}` : 'sin costo de Acciones');
@@ -4968,7 +4984,7 @@ function confirmarCostoVariable(){
   if(efecto) renderList('efectos');
   renderAcciones();
   renderVitals();
-  if(it.nombre !== 'Movimiento') openViewer('habilidades', it.id);
+  if(popupHabilidadActivo(it)) openViewer('habilidades', it.id);
   const partes = [`ejecutada`, `-${fmt(bonos)} Bonos`, `-${fmt(acciones)} Acciones`];
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);

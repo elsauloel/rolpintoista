@@ -1,7 +1,8 @@
 {
-  "tamano": "ambulante",
-  "tamanoLabel": "Vendedor ambulante",
-  "generado": "2026-08-07T19:35:28.929Z",
+  "tamano": "pueblito",
+  "tamanoLabel": "Pueblito",
+  "generado": "2026-08-07T19:42:34.185Z",
+  "ajustePrecio": 0,
   "garantizados": [
     "cat-pocion-hp",
     "cat-pocion-bonos",
@@ -11,13 +12,24 @@
     "cat-pocion-hp",
     "cat-pocion-bonos",
     "cat-revive",
+    "cat-bast-n-flexible",
+    "cat-maza",
+    "cat-hacha",
+    "new-machete-de-podar-rosales-de-vivero",
+    "new-espada-ropera",
+    "cat-hacha-de-batalla",
     "cat-mangual",
-    "new-bate-de-aluminio-de-la-liga-interbarrial",
-    "new-punal-de-asalto",
-    "cat-escudo-triangular",
+    "new-aguja-de-tejer-gigante",
+    "new-peto-de-cuero-curtido",
     "new-guantes-de-horno-de-cocina-industrial",
-    "cat-guantes-de-cuero-reforzado",
-    "cat-pocion-regen",
-    "cat-antidoto"
+    "new-borceguies-reglamentarios-de-recluta",
+    "new-capucha-de-cuero-acolchada",
+    "new-jogging-de-gimnasia-con-rayas-laterales",
+    "new-capucha-de-las-sombras-silentes",
+    "cat-botas-reforzadas",
+    "cat-cura-plus",
+    "cat-raciones",
+    "cat-pocion-regen-grande",
+    "cat-pocion-regen"
   ]
 }

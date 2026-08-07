@@ -1176,6 +1176,11 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
             <option value="Legendario">Legendario</option>
           </select>
         </div>
+        <div class="catalogo-filtro-grupo">
+          <label class="catalogo-filtro-label">Ordenar</label>
+          <select id="catalogo-orden"></select>
+        </div>
+        <button type="button" class="btn ghost" id="catalogo-orden-dir" title="Invertir el orden">↑ Menor a mayor</button>
         <input type="text" id="catalogo-buscar" placeholder="Buscar por nombre, efecto, modificador…">
         <button type="button" class="btn ghost" id="catalogo-limpiar-filtros">Limpiar filtros</button>
         <button type="button" class="btn aleatorio" id="catalogo-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
@@ -3889,6 +3894,8 @@ function ghCabeceras(accept){
 $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#tienda-salir').onclick = () => salirDeLaTienda();
+$('#catalogo-orden').addEventListener('change', e => { catalogoOrden = e.target.value; renderCatalogoModal(); });
+$('#catalogo-orden-dir').addEventListener('click', () => { catalogoOrdenDesc = !catalogoOrdenDesc; renderCatalogoModal(); });
 
 async function abrirPersonajes(){
   const lista = $('#personajes-lista');
@@ -4361,6 +4368,49 @@ const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[
 // mismo (categoría, slot, tier, búsqueda) — la usan tanto el render de
 // la grilla como el botón de Ítem aleatorio, para que "aleatorio" sea
 // siempre "aleatorio dentro de lo que se está viendo".
+// Ordenar por categoría deja los grupos de siempre; cualquier otro
+// criterio pasa a lista plana, porque agrupado no se puede ver de un
+// vistazo lo más caro o lo más pesado del catálogo.
+const TIERS_ORDEN = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+
+// Un solo criterio para "daño o defensa": las armas valen por su daño
+// máximo posible, el resto por los puntos de Defensa que dan.
+function poderDe(item){
+  if(ES_ARMA(item.tipoItem)){
+    return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
+  }
+  return defValorDe(item);
+}
+
+const ORDENES_CATALOGO = {
+  categoria: {label:'Categoría', cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
+  nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
+  precio:    {label:'Precio',    cmp:(a,b) => precioDeCompra(a) - precioDeCompra(b)},
+  peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
+  rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
+  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDe(a) - poderDe(b)},
+};
+
+let catalogoOrden = 'categoria';
+let catalogoOrdenDesc = false;
+
+function ordenarCatalogo(items){
+  const cmp = (ORDENES_CATALOGO[catalogoOrden] || ORDENES_CATALOGO.categoria).cmp;
+  const orden = items.slice().sort((a,b) => cmp(a,b) || a.nombre.localeCompare(b.nombre, 'es'));
+  return catalogoOrdenDesc ? orden.reverse() : orden;
+}
+
+function renderCatalogoOrdenControles(){
+  const sel = $('#catalogo-orden');
+  if(sel && !sel.dataset.listo){
+    sel.innerHTML = Object.entries(ORDENES_CATALOGO).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
+    sel.dataset.listo = '1';
+  }
+  if(sel) sel.value = catalogoOrden;
+  const b = $('#catalogo-orden-dir');
+  if(b) b.textContent = catalogoOrdenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
+}
+
 function catalogoVisibles(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
@@ -4492,11 +4542,21 @@ function renderCatalogoModal(){
     const g = grupoCompraDe(item.tipoItem);
     (grupos[g] = grupos[g] || []).push(item);
   });
-  const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
-  const html = claves.map(g => `
-    <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
-    <div class="cat-grid">${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}</div>
-  `).join('');
+  let html;
+  if(catalogoOrden === 'categoria'){
+    const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
+    html = claves.map(g => `
+      <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
+      <div class="cat-grid">${ordenarCatalogo(grupos[g]).map(catalogoRowHtml).join('')}</div>
+    `).join('');
+  }else{
+    const orden = ordenarCatalogo(visibles);
+    html = orden.length
+      ? `<div class="cat-grouphead">${esc(ORDENES_CATALOGO[catalogoOrden].label)} · ${fmt(orden.length)}</div>
+         <div class="cat-grid">${orden.map(catalogoRowHtml).join('')}</div>`
+      : '';
+  }
+  renderCatalogoOrdenControles();
   const textoBusqueda = $('#catalogo-buscar') ? $('#catalogo-buscar').value.trim() : '';
   let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
   if(tiendaCargada) vacioMsg = textoBusqueda ? `El vendedor no tiene nada que coincida con "${esc(textoBusqueda)}".` : 'El vendedor no tiene nada en esta categoría.';

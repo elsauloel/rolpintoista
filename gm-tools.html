@@ -576,6 +576,11 @@ input[type=file]{display:none}
         <option value="Excepcional">Excepcional</option>
         <option value="Legendario">Legendario</option>
       </select>
+      <div class="catalogo-filtro-grupo">
+        <label class="catalogo-filtro-label">Ordenar</label>
+        <select id="equipar-creep-orden"></select>
+      </div>
+      <button type="button" class="btn ghost" id="equipar-creep-orden-dir" title="Invertir el orden">↑ Menor a mayor</button>
       <input type="text" id="equipar-creep-buscar" placeholder="Buscar por nombre, efecto, modificador…" style="flex:1;min-width:0">
       <button type="button" class="btn ghost" id="equipar-creep-limpiar">Limpiar filtros</button>
       <button type="button" class="btn aleatorio" id="equipar-creep-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
@@ -1627,6 +1632,48 @@ function equiparCreepVisibles(){
   return visibles;
 }
 
+const TIERS_ORDEN_GM = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+
+// Las armas valen por su daño máximo posible, el resto por su Defensa.
+function poderDeGM(it){
+  if(it.tipoItem.startsWith('arma_')){
+    return Math.max(1, num(it.peso) || 1) * (num(it.tipoDado) || 6) + num(it.danoFijo);
+  }
+  return num(it.def);
+}
+
+const ORDENES_GM = {
+  categoria: {label:'Categoría', cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
+  nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
+  precio:    {label:'Precio',    cmp:(a,b) => num(a.precioCompra) - num(b.precioCompra)},
+  peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
+  rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN_GM.indexOf(a.tier) - TIERS_ORDEN_GM.indexOf(b.tier)},
+  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDeGM(a) - poderDeGM(b)},
+};
+
+let equipoOrden = 'categoria';
+let equipoOrdenDesc = false;
+
+// Recibe y devuelve pares {it, idx}: el idx es el índice en
+// CATALOGO_EQUIPO y lo necesita el botón Equipar, así que ordenar no
+// puede perderlo.
+function ordenarEquipo(pares){
+  const cmp = (ORDENES_GM[equipoOrden] || ORDENES_GM.categoria).cmp;
+  const orden = pares.slice().sort((a,b) => cmp(a.it, b.it) || a.it.nombre.localeCompare(b.it.nombre, 'es'));
+  return equipoOrdenDesc ? orden.reverse() : orden;
+}
+
+function renderEquipoOrdenControles(){
+  const sel = $('#equipar-creep-orden');
+  if(sel && !sel.dataset.listo){
+    sel.innerHTML = Object.entries(ORDENES_GM).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
+    sel.dataset.listo = '1';
+  }
+  if(sel) sel.value = equipoOrden;
+  const b = $('#equipar-creep-orden-dir');
+  if(b) b.textContent = equipoOrdenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
+}
+
 function elegirItemAleatorioGM(){
   const visibles = equiparCreepVisibles();
   if(!visibles.length){ toast('No hay ítems que coincidan con los filtros activos'); return; }
@@ -1637,13 +1684,22 @@ function elegirItemAleatorioGM(){
 
 function renderEquiparCreepLista(){
   const visibles = equiparCreepVisibles();
-  const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
-  const escudos = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
-  const defensa = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
   let html = '';
-  if(armas.length) html += `<div class="cat-grouphead">Armas</div><div class="cat-grid">${armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-  if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div><div class="cat-grid">${escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-  if(defensa.length) html += `<div class="cat-grouphead">Defensa</div><div class="cat-grid">${defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+  if(equipoOrden === 'categoria'){
+    const armas = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('arma_')));
+    const escudos = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('escudo')));
+    const defensa = ordenarEquipo(visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo')));
+    if(armas.length) html += `<div class="cat-grouphead">Armas</div><div class="cat-grid">${armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+    if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div><div class="cat-grid">${escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+    if(defensa.length) html += `<div class="cat-grouphead">Defensa</div><div class="cat-grid">${defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+  }else{
+    const orden = ordenarEquipo(visibles);
+    if(orden.length){
+      html += `<div class="cat-grouphead">${esc(ORDENES_GM[equipoOrden].label)} · ${fmt(orden.length)}</div>`;
+      html += `<div class="cat-grid">${orden.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
+    }
+  }
+  renderEquipoOrdenControles();
   $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems que coincidan con la búsqueda.</div>`;
 }
 
@@ -2896,6 +2952,8 @@ $('#equipar-creep-limpiar').addEventListener('click', () => {
   $('#equipar-creep-buscar').value = '';
   renderEquiparCreepLista();
 });
+$('#equipar-creep-orden').addEventListener('change', e => { equipoOrden = e.target.value; renderEquiparCreepLista(); });
+$('#equipar-creep-orden-dir').addEventListener('click', () => { equipoOrdenDesc = !equipoOrdenDesc; renderEquiparCreepLista(); });
 $('#equipar-creep-item-aleatorio').addEventListener('click', elegirItemAleatorioGM);
 $('#item-aleatorio-gm-tirar-de-nuevo').addEventListener('click', elegirItemAleatorioGM);
 $('#item-aleatorio-gm-x').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');

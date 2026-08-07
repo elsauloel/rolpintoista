@@ -600,6 +600,11 @@ a{color:var(--brass)}
 
 /* ---------- Armadura ---------- */
 .armgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+/* La botonera es un panel de página, no un diálogo: va por debajo del resto
+   de los scrim para que lo que se abre desde ella (costo X, elegir arma,
+   catálogo, tarjetas) quede por encima y no tapado, sin depender del orden
+   en que están escritos en el HTML. */
+#scrim-botonera{z-index:49}
 .modal.botonera-modal{max-width:1500px;width:calc(100% - 20px);max-height:none}
 .botonera-modal .body{overflow:visible;max-height:none}
 .botonera-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start;min-width:0}

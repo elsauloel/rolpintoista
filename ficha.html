@@ -356,7 +356,7 @@ a{color:var(--brass)}
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
 
 .carrito-bar{border-bottom:1px solid var(--line);background:rgba(201,133,69,.06);padding:9px 16px}
-.catalogo-filtro-fila{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
+.catalogo-filtro-fila{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
 .catalogo-filtro-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
 #catalogo-filtro{width:auto;min-width:160px;font-family:"Space Mono",monospace;font-size:12px}
 .carrito-lista{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto}
@@ -1107,6 +1107,18 @@ a{color:var(--brass)}
           <option value="consumibles">Consumibles</option>
           <option value="otros">Otros</option>
         </select>
+        <label class="catalogo-filtro-label">Slot</label>
+        <select id="catalogo-filtro-slot">
+          <option value="">Todos</option>
+          <option value="mano">Mano (una mano)</option>
+          <option value="escudo">Escudo</option>
+          <option value="armadura">Armadura</option>
+          <option value="casco">Casco</option>
+          <option value="guantes">Guantes</option>
+          <option value="piernas">Piernas</option>
+          <option value="pies">Pies</option>
+          <option value="otro">Otro</option>
+        </select>
         <label class="catalogo-filtro-label">Tier</label>
         <select id="catalogo-filtro-tier">
           <option value="">Todos</option>
@@ -1116,7 +1128,8 @@ a{color:var(--brass)}
           <option value="Excepcional">Excepcional</option>
           <option value="Legendario">Legendario</option>
         </select>
-        <input type="text" id="catalogo-buscar" placeholder="Buscar ítem…" style="flex:1;min-width:0">
+        <input type="text" id="catalogo-buscar" placeholder="Buscar por nombre, efecto, modificador…" style="flex:1;min-width:0">
+        <button type="button" class="btn ghost" id="catalogo-limpiar-filtros">Limpiar filtros</button>
       </div>
       <div class="carrito-lista" id="carrito-lista"></div>
       <div class="carrito-footer">
@@ -1402,6 +1415,20 @@ const CATEGORIAS = [
   {id:'consumibles', label:'Consumibles'},
 ];
 const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
+
+// Slot de equipamiento: agrupa blanda/rígida bajo el mismo lugar del
+// cuerpo, para el filtro por slot del catálogo del fabricante.
+const SLOT_MAP = {
+  arma_1m:'mano', arma_2m:'mano',
+  escudo_1m:'escudo', escudo_2m:'escudo',
+  armadura_blanda:'armadura', armadura_rigida:'armadura',
+  casco_blando:'casco', casco_rigido:'casco',
+  guantes_blandos:'guantes', guantes_rigidos:'guantes',
+  piernas_blandas:'piernas', piernas_rigidas:'piernas',
+  botas_blandas:'pies', botas_rigidas:'pies',
+};
+const SLOT_LABEL = {mano:'Mano (una mano)', escudo:'Escudo', armadura:'Armadura', casco:'Casco', guantes:'Guantes', piernas:'Piernas', pies:'Pies', otro:'Otro'};
+function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
 
 const GRUPO_COMPRA_MAP = {
   arma_1m:'armas', arma_2m:'armas',
@@ -4199,6 +4226,18 @@ function modsResumenHtml(item){
   }).join(' · ');
 }
 
+// Texto completo del ítem para la búsqueda: nombre, detalle, tier,
+// categoría/slot y todos los mods en su forma legible — así "stun",
+// "veneno" o "constitución" encuentran el ítem aunque esas palabras no
+// estén en el nombre.
+function textoBusquedaDe(item){
+  const partes = [item.nombre, item.detalle, item.tier, CATEGORIA_LABEL[item.tipoItem], SLOT_LABEL[slotDe(item.tipoItem)]];
+  (item.mods || []).forEach(m => {
+    partes.push(STAT_LABEL[m.stat] || m.stat, STAT_FULL[m.stat]);
+  });
+  return normalizarBusqueda(partes.filter(Boolean).join(' '));
+}
+
 function catalogoRowHtml(item){
   const dano = armaDanoTxt(item);
   const defVal = defValorDe(item);
@@ -4234,11 +4273,13 @@ const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[
 function renderCatalogoModal(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
+  const filtroSlot = $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '';
   const filtroTier = $('#catalogo-filtro-tier') ? $('#catalogo-filtro-tier').value : '';
   const busqueda = normalizarBusqueda($('#catalogo-buscar') ? $('#catalogo-buscar').value : '');
   let visibles = filtro ? S.catalogo.filter(item => grupoCompraDe(item.tipoItem) === filtro) : S.catalogo;
+  if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);
   if(filtroTier) visibles = visibles.filter(item => item.tier === filtroTier);
-  if(busqueda) visibles = visibles.filter(item => normalizarBusqueda(item.nombre).includes(busqueda));
+  if(busqueda) visibles = visibles.filter(item => textoBusquedaDe(item).includes(busqueda));
 
   const grupos = {};
   visibles.forEach(item => {
@@ -5049,8 +5090,16 @@ $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='s
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);
+$('#catalogo-filtro-slot').addEventListener('change', renderCatalogoModal);
 $('#catalogo-filtro-tier').addEventListener('change', renderCatalogoModal);
 $('#catalogo-buscar').addEventListener('input', renderCatalogoModal);
+$('#catalogo-limpiar-filtros').addEventListener('click', () => {
+  $('#catalogo-filtro').value = '';
+  $('#catalogo-filtro-slot').value = '';
+  $('#catalogo-filtro-tier').value = '';
+  $('#catalogo-buscar').value = '';
+  renderCatalogoModal();
+});
 $('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
 $('#view-edit-btn').onclick = () => {
   if(!viewing) return;

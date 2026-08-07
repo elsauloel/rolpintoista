@@ -356,8 +356,12 @@ a{color:var(--brass)}
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
 
 .carrito-bar{border-bottom:1px solid var(--line);background:rgba(201,133,69,.06);padding:9px 16px}
-.catalogo-filtro-fila{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
+.catalogo-filtro-fila{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
 .catalogo-filtro-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
+.catalogo-filtro-grupo{display:flex;align-items:center;gap:6px;flex:1 1 180px;min-width:160px}
+.catalogo-filtro-grupo select{width:auto;flex:1;min-width:0}
+.catalogo-filtro-fila #catalogo-buscar{flex:2 1 220px;min-width:180px}
+.catalogo-filtro-fila #catalogo-limpiar-filtros{flex:none}
 #catalogo-filtro{width:auto;min-width:160px;font-family:"Space Mono",monospace;font-size:12px}
 .carrito-lista{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto}
 .carrito-vacio{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
@@ -1101,37 +1105,43 @@ a{color:var(--brass)}
     </header>
     <div class="carrito-bar">
       <div class="catalogo-filtro-fila">
-        <label class="catalogo-filtro-label">Categoría</label>
-        <select id="catalogo-filtro">
-          <option value="">Todas</option>
-          <option value="armas">Armas</option>
-          <option value="escudos">Escudos</option>
-          <option value="defensa">Defensa</option>
-          <option value="consumibles">Consumibles</option>
-          <option value="otros">Otros</option>
-        </select>
-        <label class="catalogo-filtro-label">Slot</label>
-        <select id="catalogo-filtro-slot">
-          <option value="">Todos</option>
-          <option value="mano">Mano (una mano)</option>
-          <option value="escudo">Escudo</option>
-          <option value="armadura">Armadura</option>
-          <option value="casco">Casco</option>
-          <option value="guantes">Guantes</option>
-          <option value="piernas">Piernas</option>
-          <option value="pies">Pies</option>
-          <option value="otro">Otro</option>
-        </select>
-        <label class="catalogo-filtro-label">Tier</label>
-        <select id="catalogo-filtro-tier">
-          <option value="">Todos</option>
-          <option value="Común">Común</option>
-          <option value="Buena Calidad">Buena calidad</option>
-          <option value="Raro">Raro</option>
-          <option value="Excepcional">Excepcional</option>
-          <option value="Legendario">Legendario</option>
-        </select>
-        <input type="text" id="catalogo-buscar" placeholder="Buscar por nombre, efecto, modificador…" style="flex:1;min-width:0">
+        <div class="catalogo-filtro-grupo">
+          <label class="catalogo-filtro-label">Categoría</label>
+          <select id="catalogo-filtro">
+            <option value="">Todas</option>
+            <option value="armas">Armas</option>
+            <option value="escudos">Escudos</option>
+            <option value="defensa">Defensa</option>
+            <option value="consumibles">Consumibles</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+        <div class="catalogo-filtro-grupo">
+          <label class="catalogo-filtro-label">Slot</label>
+          <select id="catalogo-filtro-slot">
+            <option value="">Todos</option>
+            <option value="mano">Mano (una mano)</option>
+            <option value="escudo">Escudo</option>
+            <option value="armadura">Armadura</option>
+            <option value="casco">Casco</option>
+            <option value="guantes">Guantes</option>
+            <option value="piernas">Piernas</option>
+            <option value="pies">Pies</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="catalogo-filtro-grupo">
+          <label class="catalogo-filtro-label">Tier</label>
+          <select id="catalogo-filtro-tier">
+            <option value="">Todos</option>
+            <option value="Común">Común</option>
+            <option value="Buena Calidad">Buena calidad</option>
+            <option value="Raro">Raro</option>
+            <option value="Excepcional">Excepcional</option>
+            <option value="Legendario">Legendario</option>
+          </select>
+        </div>
+        <input type="text" id="catalogo-buscar" placeholder="Buscar por nombre, efecto, modificador…">
         <button type="button" class="btn ghost" id="catalogo-limpiar-filtros">Limpiar filtros</button>
       </div>
       <div class="carrito-lista" id="carrito-lista"></div>

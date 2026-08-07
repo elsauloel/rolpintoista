@@ -626,6 +626,7 @@ a{color:var(--brass)}
 .botonera-tile .bt-value.mod-plus{color:var(--absenta)}
 .botonera-tile .bt-value.mod-minus{color:var(--danger)}
 .botonera-tile .bt-mod{font-family:"Space Mono",monospace;font-size:8.5px;color:var(--muted)}
+.botonera-tile .bt-value-formula{font-size:13px;line-height:1.25;word-break:break-word}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
 .armbox .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .armbox .dv{font-family:"Space Mono",monospace;font-size:24px;font-weight:700;color:var(--brass)}
@@ -1920,7 +1921,7 @@ function renderEfectosArmas(){
   const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
   if(!enManos.length){
     $('#efectos-armas').innerHTML = `<div class="empty">No tenés nada equipado en las manos.</div>`;
-    actualizarTextosCombate(enManos);
+    actualizarTextosCombate();
     return;
   }
   const dosManos = enManos.find(a => a.tipoItem === 'arma_2m' || a.tipoItem === 'escudo_2m');
@@ -1947,26 +1948,33 @@ function renderEfectosArmas(){
     ? `<div class="manos-grid manos-grid-single">${manoHtml(m1, 'Mano 1')}</div>`
     : `<div class="manos-grid">${manoHtml(m1, 'Mano 1')}${manoHtml(m2, 'Mano 2')}</div>`;
 
-  actualizarTextosCombate(enManos);
+  actualizarTextosCombate();
 }
 
-// Los botones de Combate muestran qué van a tirar, para no tener que
-// adivinar antes de apretar.
-function actualizarTextosCombate(enManos){
+// Fórmulas de las 4 tiradas de Combate — se usa tanto para los botones
+// de la caja Combate como para las tiles de la Botonera, así siempre
+// muestran lo mismo.
+function formulasCombate(){
   const c = compute();
   const fPdg = formulaParaValor(c.final.pdg);
   const fEva = formulaParaValor(c.final.eva);
   const fParry = formulaParaValor(c.final.parry);
-  $('#btn-atacar-pdg').textContent = `🎲 Atacar (PdG)${fPdg ? ` · ${fPdg.formula}` : ''}`;
-  $('#btn-esquivar').textContent = `🎲 Esquivar${fEva ? ` · ${fEva.formula}` : ''}`;
-  $('#btn-parry').textContent = `🎲 Parry${fParry ? ` · ${fParry.formula}` : ''}`;
+  const armas = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
+  let danio;
+  if(armas.length === 1) danio = armaDanoTxt(armas[0]);
+  else if(armas.length > 1) danio = 'elegís arma';
+  else danio = 'sin arma equipada';
+  return {pdg: fPdg ? fPdg.formula : '', eva: fEva ? fEva.formula : '', parry: fParry ? fParry.formula : '', danio};
+}
 
-  const armas = (enManos || []).filter(i => ES_ARMA(i.tipoItem));
-  let danoTxt;
-  if(armas.length === 1) danoTxt = ` · ${armaDanoTxt(armas[0])}`;
-  else if(armas.length > 1) danoTxt = ' · elegís arma';
-  else danoTxt = ' · sin arma equipada';
-  $('#btn-danio-arma').textContent = `🎲 Daño Arma${danoTxt}`;
+// Los botones de Combate muestran qué van a tirar, para no tener que
+// adivinar antes de apretar.
+function actualizarTextosCombate(){
+  const f = formulasCombate();
+  $('#btn-atacar-pdg').textContent = `🎲 Atacar (PdG)${f.pdg ? ` · ${f.pdg}` : ''}`;
+  $('#btn-esquivar').textContent = `🎲 Esquivar${f.eva ? ` · ${f.eva}` : ''}`;
+  $('#btn-parry').textContent = `🎲 Parry${f.parry ? ` · ${f.parry}` : ''}`;
+  $('#btn-danio-arma').textContent = `🎲 Daño Arma · ${f.danio}`;
 }
 
 function armasEquipadasConDano(){
@@ -2751,6 +2759,7 @@ function renderBotonera(){
 
   const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
   const sinAccPdg = num(S.acciones) < 1;
+  const fCombate = formulasCombate();
 
   html += `<div class="botonera-grid">
     <div class="botonera-caja">
@@ -2775,16 +2784,16 @@ function renderBotonera(){
       <div class="cat-grouphead" style="margin-top:0">Combate</div>
       <div class="botonera-combate-grid">
         <button type="button" class="botonera-tile" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''} title="Atacar (PdG) · cuesta 1 acción">
-          <span class="bt-label">Atacar (PdG)</span><span class="bt-value">🎲</span>
+          <span class="bt-label">Atacar (PdG)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.pdg)}</span>
         </button>
         <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
-          <span class="bt-label">Daño Arma</span><span class="bt-value">🎲</span>
+          <span class="bt-label">Daño Arma</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.danio)}</span>
         </button>
         <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
-          <span class="bt-label">Esquivar</span><span class="bt-value">🎲</span>
+          <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
         </button>
         <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
-          <span class="bt-label">Parry</span><span class="bt-value">🎲</span>
+          <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
         </button>
       </div>
     </div>

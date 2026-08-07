@@ -62,6 +62,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.ghost{color:var(--muted)}
 .btn.finalizar{background:#C9754A;border-color:#C9754A;color:#1B0F08;font-weight:700}
 .btn.finalizar:hover{background:#DC8B5C;border-color:#DC8B5C}
+.btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
+.btn.aleatorio:hover{background:#9B7BD4;color:#1B0F1F}
 .reporte-seccion-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
 .reporte-lista{display:flex;flex-direction:column;gap:6px}
 .reporte-fila{display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);background:var(--panel2);padding:7px 10px}
@@ -424,6 +426,7 @@ input[type=file]{display:none}
       <span class="turno-badge" id="turno-badge">Turno 1</span>
       <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
       <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
+      <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
       <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
       <button class="btn" id="btn-dados">Dados</button>
       <button class="btn" id="btn-ia">+ Creep con IA</button>
@@ -570,8 +573,20 @@ input[type=file]{display:none}
       </select>
       <input type="text" id="equipar-creep-buscar" placeholder="Buscar por nombre, efecto, modificador…" style="flex:1;min-width:0">
       <button type="button" class="btn ghost" id="equipar-creep-limpiar">Limpiar filtros</button>
+      <button type="button" class="btn aleatorio" id="equipar-creep-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
     </div>
     <div class="body" id="equipar-creep-lista"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-item-aleatorio-gm">
+  <div class="modal" style="max-width:420px">
+    <header><h3>🎲 Ítem aleatorio</h3><button class="iconbtn" id="item-aleatorio-gm-x">Cerrar</button></header>
+    <div class="body" id="item-aleatorio-gm-body"></div>
+    <footer>
+      <button class="btn ghost" id="item-aleatorio-gm-tirar-de-nuevo">🎲 Tirar de nuevo</button>
+      <button class="btn primary" id="item-aleatorio-gm-cerrar">Cerrar</button>
+    </footer>
   </div>
 </div>
 
@@ -1586,11 +1601,13 @@ function equipoItemHtml(item, idx){
       ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
     </div>
-    <button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>
+    ${equipandoCreepId ? `<button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>` : ''}
   </div>`;
 }
 
-function renderEquiparCreepLista(){
+// Igual criterio que catalogoVisibles() en ficha.html: "aleatorio" tiene
+// que respetar los filtros activos ahora mismo, no todo el catálogo.
+function equiparCreepVisibles(){
   const filtro = $('#equipar-creep-filtro') ? $('#equipar-creep-filtro').value : '';
   const filtroSlot = $('#equipar-creep-filtro-slot') ? $('#equipar-creep-filtro-slot').value : '';
   const filtroTier = $('#equipar-creep-filtro-tier') ? $('#equipar-creep-filtro-tier').value : '';
@@ -1602,7 +1619,19 @@ function renderEquiparCreepLista(){
   if(filtroSlot) visibles = visibles.filter(({it}) => slotDeGM(it.tipoItem) === filtroSlot);
   if(filtroTier) visibles = visibles.filter(({it}) => it.tier === filtroTier);
   if(busqueda) visibles = visibles.filter(({it}) => textoBusquedaDeGM(it).includes(busqueda));
+  return visibles;
+}
 
+function elegirItemAleatorioGM(){
+  const visibles = equiparCreepVisibles();
+  if(!visibles.length){ toast('No hay ítems que coincidan con los filtros activos'); return; }
+  const {it, idx} = visibles[Math.floor(Math.random() * visibles.length)];
+  $('#item-aleatorio-gm-body').innerHTML = `<div class="cat-grid">${equipoItemHtml(it, idx)}</div>`;
+  $('#scrim-item-aleatorio-gm').classList.add('open');
+}
+
+function renderEquiparCreepLista(){
+  const visibles = equiparCreepVisibles();
   const armas = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
   const escudos = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
   const defensa = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo'));
@@ -1690,6 +1719,7 @@ function equiparItemEnCreep(idx){
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
   $('#scrim-equipar-creep').classList.remove('open');
+  $('#scrim-item-aleatorio-gm').classList.remove('open');
   renderAll();
 }
 
@@ -2127,6 +2157,10 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.equipardelfabricante){
     abrirEquiparCreep(b.dataset.equipardelfabricante);
+    return;
+  }
+  if(b.id === 'btn-catalogo'){
+    abrirEquiparCreep(null);
     return;
   }
   if(b.dataset.equiparitem !== undefined){
@@ -2843,6 +2877,11 @@ $('#equipar-creep-limpiar').addEventListener('click', () => {
   $('#equipar-creep-buscar').value = '';
   renderEquiparCreepLista();
 });
+$('#equipar-creep-item-aleatorio').addEventListener('click', elegirItemAleatorioGM);
+$('#item-aleatorio-gm-tirar-de-nuevo').addEventListener('click', elegirItemAleatorioGM);
+$('#item-aleatorio-gm-x').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');
+$('#item-aleatorio-gm-cerrar').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');
+$('#scrim-item-aleatorio-gm').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-aleatorio-gm') $('#scrim-item-aleatorio-gm').classList.remove('open'); });
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
 $('#hc-efecto-preset').addEventListener('change', e => {
   if(!e.target.value) return;

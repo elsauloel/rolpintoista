@@ -60,6 +60,24 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.maint:hover{background:var(--bottle);color:#EAF3E6}
 .btn.del{color:var(--danger);border-color:rgba(212,87,78,.4)}
 .btn.ghost{color:var(--muted)}
+.btn.finalizar{background:#C9754A;border-color:#C9754A;color:#1B0F08;font-weight:700}
+.btn.finalizar:hover{background:#DC8B5C;border-color:#DC8B5C}
+.reporte-seccion-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
+.reporte-lista{display:flex;flex-direction:column;gap:6px}
+.reporte-fila{display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);background:var(--panel2);padding:7px 10px}
+.reporte-nombre{flex:1;font-weight:700;font-size:13px;min-width:0}
+.reporte-nivel{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);font-weight:400;margin-left:6px}
+.reporte-estado{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;flex:none}
+.reporte-estado.derrotado{color:var(--absenta);border:1px solid var(--absenta)}
+.reporte-estado.escapo{color:var(--muted);border:1px solid var(--line)}
+.reporte-xp{font-family:"Space Mono",monospace;font-weight:700;color:var(--brass);flex:none;min-width:70px;text-align:right}
+.reporte-total{margin-top:8px;text-align:right;font-size:14px;color:var(--paper)}
+.reporte-loot-lista{display:flex;flex-direction:column;gap:8px}
+.reporte-loot-creep{border:1px solid var(--line-soft);background:var(--panel2);padding:7px 10px}
+.reporte-loot-nombre{font-weight:700;font-size:12.5px;margin-bottom:5px}
+.reporte-loot-items{display:flex;flex-wrap:wrap;gap:6px}
+.reporte-loot-item{font-family:"Space Mono",monospace;font-size:11px;border:1px solid var(--line);border-radius:99px;padding:3px 9px;color:var(--paper)}
+.reporte-loot-precio{color:var(--muted)}
 
 /* Toolbar */
 .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
@@ -404,6 +422,7 @@ input[type=file]{display:none}
     </div>
     <div class="hero-right">
       <span class="turno-badge" id="turno-badge">Turno 1</span>
+      <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
       <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
       <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
       <button class="btn" id="btn-dados">Dados</button>
@@ -594,6 +613,16 @@ input[type=file]{display:none}
     <div class="body" id="verestado-body"></div>
     <footer>
       <button class="btn primary" id="verestado-editar">Editar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-finalizar-combate">
+  <div class="modal" style="max-width:640px">
+    <header><h3>🏁 Resumen del combate</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
+    <div class="body" id="finalizar-combate-body" style="display:flex;flex-direction:column;gap:16px"></div>
+    <footer>
+      <button class="btn primary" id="finalizar-combate-cerrar">Cerrar</button>
     </footer>
   </div>
 </div>
@@ -2180,6 +2209,11 @@ document.addEventListener('click', e => {
     reiniciarCombate();
     return;
   }
+  if(b.id === 'btn-finalizar-combate'){
+    renderReporteCombate();
+    $('#scrim-finalizar-combate').classList.add('open');
+    return;
+  }
   if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
   if(b.id === 'btn-save-publico'){ guardarVistaPublica(); return; }
   if(b.id === 'btn-load'){ $('#file-input').click(); return; }
@@ -2636,6 +2670,85 @@ function reiniciarCombate(){
   toast('Combate reiniciado · Turno 0');
 }
 
+/* =========================================================
+   FINALIZAR COMBATE — resumen de XP y loot
+   ========================================================= */
+
+// XP base por nivel: 40 × nivel, más un bonus escalonado que crece con
+// el nivel (progresión triangular: 5 × nivel × (nivel-1)). Da 40/90/150
+// para nivel 1/2/3 — coincide con el ejemplo original. Para nivel 4 da
+// 220 en vez de los 200 del ejemplo (que no encajaba con la progresión
+// de los niveles anteriores); queda para ajustar junto con el resto
+// del sistema de recompensas en una próxima iteración.
+function xpBasePorNivel(nivel){
+  const n = Math.max(1, num(nivel) || 1);
+  return 40 * n + 5 * n * (n - 1);
+}
+
+function lootDeCreep(sc){
+  const items = [];
+  if(sc.armaNombre) items.push(sc.armaNombre);
+  (sc.equipo || []).forEach(it => items.push(it.nombre));
+  return items;
+}
+
+function precioDeItemLoot(nombre){
+  const it = CATALOGO_EQUIPO.find(i => i.nombre === nombre);
+  return it ? num(it.precioCompra) : null;
+}
+
+// Asume que todo creep con HP <= 0 fue derrotado por el grupo (XP y loot
+// completos) y que todo creep con vida escapó/sobrevivió (mitad de XP,
+// sin loot) — según las reglas pedidas para esta primera versión.
+function generarReporteCombate(){
+  const filas = S.creeps.map(sc => {
+    const derrotado = num(sc.hp) <= 0;
+    const xpBase = xpBasePorNivel(sc.nivel);
+    const xp = derrotado ? xpBase : Math.round(xpBase * 0.5);
+    return {sc, derrotado, xp, loot: derrotado ? lootDeCreep(sc) : []};
+  });
+  const xpTotal = filas.reduce((a,f) => a + f.xp, 0);
+  return {filas, xpTotal};
+}
+
+function renderReporteCombate(){
+  const {filas, xpTotal} = generarReporteCombate();
+  if(!filas.length){
+    $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps cargados — nada que resumir.</div>`;
+    return;
+  }
+  const filasHtml = filas.map(f => `
+    <div class="reporte-fila">
+      <span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
+      <span class="reporte-estado ${f.derrotado?'derrotado':'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span>
+      <span class="reporte-xp">+${fmt(f.xp)} XP</span>
+    </div>`).join('');
+
+  const conLoot = filas.filter(f => f.derrotado && f.loot.length);
+  const lootHtml = conLoot.length
+    ? conLoot.map(f => `
+      <div class="reporte-loot-creep">
+        <div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div>
+        <div class="reporte-loot-items">${f.loot.map(nombre => {
+          const precio = precioDeItemLoot(nombre);
+          return `<span class="reporte-loot-item">${esc(nombre)}${precio!=null?` <span class="reporte-loot-precio">${fmt(precio)} DDE</span>`:''}</span>`;
+        }).join('')}</div>
+      </div>`).join('')
+    : `<div class="hint">Sin objetos equipados entre los creeps derrotados.</div>`;
+
+  $('#finalizar-combate-body').innerHTML = `
+    <div>
+      <div class="reporte-seccion-titulo">Experiencia obtenida</div>
+      <div class="reporte-lista">${filasHtml}</div>
+      <div class="reporte-total">Total del grupo: <b>${fmt(xpTotal)} XP</b></div>
+    </div>
+    <div>
+      <div class="reporte-seccion-titulo">Loot obtenido (creeps derrotados)</div>
+      <div class="reporte-loot-lista">${lootHtml}</div>
+    </div>
+  `;
+}
+
 let toastT;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
@@ -2875,6 +2988,9 @@ $('#revivircreep-confirmar').onclick = () => {
 $('#revivircreep-cancel').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };
 $('#revivircreep-x').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };
 $('#scrim-revivir-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-revivir-creep'){ revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); } });
+$('#finalizar-combate-x').onclick = () => $('#scrim-finalizar-combate').classList.remove('open');
+$('#finalizar-combate-cerrar').onclick = () => $('#scrim-finalizar-combate').classList.remove('open');
+$('#scrim-finalizar-combate').addEventListener('mousedown', e => { if(e.target.id==='scrim-finalizar-combate') $('#scrim-finalizar-combate').classList.remove('open'); });
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;

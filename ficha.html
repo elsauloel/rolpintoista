@@ -354,6 +354,10 @@ a{color:var(--brass)}
   padding:5px 10px;border-radius:99px;white-space:nowrap
 }
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
+.tienda-badge{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--absenta);color:var(--absenta);border-radius:99px;padding:3px 10px;white-space:nowrap
+}
 
 .carrito-bar{border-bottom:1px solid var(--line);background:rgba(201,133,69,.06);padding:9px 16px}
 .catalogo-filtro-fila{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
@@ -1082,6 +1086,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   <button class="btn" id="btn-formulas">Fórmulas</button>
   <button class="btn" id="btn-dados">Dados</button>
   <button class="btn" id="btn-historial">Historial</button>
+  <button class="btn" id="btn-vendedor" title="Bajar la tienda publicada por el GM y comprar">Vendedor</button>
   <button class="btn" id="btn-personajes">Personajes</button>
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Bajar datos</button>
   <button class="btn" id="btn-sync" title="Subir este personaje a GitHub">Subir datos</button>
@@ -1125,6 +1130,8 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <header>
       <h3>Catálogo del fabricante</h3>
       <div style="display:flex;gap:8px;align-items:center">
+        <span class="tienda-badge" id="tienda-badge" style="display:none"></span>
+        <button class="iconbtn" id="tienda-salir" style="display:none">Ver catálogo completo</button>
         <span class="catalogo-dde-badge">DDE disponibles: <b id="catalogo-dde">0</b></span>
         <button class="iconbtn iconbtn-add" id="btn-catalogo-nuevo">+ Ítem al catálogo</button>
         <button class="iconbtn" id="catalogo-x">Cerrar</button>
@@ -3879,6 +3886,8 @@ function ghCabeceras(accept){
 }
 
 $('#btn-personajes').onclick = () => abrirPersonajes();
+$('#btn-vendedor').onclick = () => abrirVendedor();
+$('#tienda-salir').onclick = () => salirDeLaTienda();
 
 async function abrirPersonajes(){
   const lista = $('#personajes-lista');
@@ -4350,11 +4359,99 @@ function catalogoVisibles(){
   const filtroSlot = $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '';
   const filtroTier = $('#catalogo-filtro-tier') ? $('#catalogo-filtro-tier').value : '';
   const busqueda = normalizarBusqueda($('#catalogo-buscar') ? $('#catalogo-buscar').value : '');
-  let visibles = filtro ? S.catalogo.filter(item => grupoCompraDe(item.tipoItem) === filtro) : S.catalogo;
+  // Con una tienda cargada, el catálogo se recorta a lo que ese vendedor
+  // ofrece; los filtros, la búsqueda y el carrito siguen funcionando igual.
+  let base = S.catalogo;
+  if(tiendaCargada){
+    const ofrecidos = new Set(tiendaCargada.items);
+    base = S.catalogo.filter(item => ofrecidos.has(item.id));
+  }
+  let visibles = filtro ? base.filter(item => grupoCompraDe(item.tipoItem) === filtro) : base;
   if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);
   if(filtroTier) visibles = visibles.filter(item => item.tier === filtroTier);
   if(busqueda) visibles = visibles.filter(item => textoBusquedaDe(item).includes(busqueda));
   return visibles;
+}
+
+// Tienda publicada por el GM desde el Vendor Generator. Guarda solo ids:
+// el nombre, la imagen y los stats salen del catálogo de esta misma ficha.
+let tiendaCargada = null;
+const ARCHIVO_TIENDA = 'tienda-publica.json';
+
+function renderCabeceraTienda(){
+  const badge = $('#tienda-badge');
+  const salir = $('#tienda-salir');
+  const nuevo = $('#btn-catalogo-nuevo');
+  if(tiendaCargada){
+    const cuantos = catalogoVisibles().length;
+    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}`;
+    badge.style.display = '';
+    salir.style.display = '';
+    if(nuevo) nuevo.style.display = 'none';
+  }else{
+    badge.style.display = 'none';
+    salir.style.display = 'none';
+    if(nuevo) nuevo.style.display = '';
+  }
+}
+
+function limpiarFiltrosCatalogo(){
+  $('#catalogo-filtro').value = '';
+  $('#catalogo-filtro-slot').value = '';
+  $('#catalogo-filtro-tier').value = '';
+  $('#catalogo-buscar').value = '';
+}
+
+function salirDeLaTienda(){
+  tiendaCargada = null;
+  limpiarFiltrosCatalogo();
+  renderCatalogoModal();
+  toast('Catálogo completo');
+}
+
+async function abrirVendedor(){
+  const btn = $('#btn-vendedor');
+  btn.disabled = true;
+  toast('Buscando la tienda…');
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_TIENDA}?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(resp.status === 404) throw {noExiste: true};
+    // Sin token, GitHub deja 60 consultas por hora y por IP: si varios
+    // jugadores comparten conexión se agota rápido y conviene decirlo.
+    if(resp.status === 429 || resp.status === 403) throw {limite: true};
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const data = await resp.json();
+    const ids = Array.isArray(data.items) ? data.items : [];
+    if(!ids.length) throw {vacia: true};
+
+    tiendaCargada = data;
+    limpiarFiltrosCatalogo();
+    renderCatalogoModal();
+    $('#scrim-catalogo').classList.add('open');
+
+    // Un id que no está en este catálogo es un ítem que el GM tiene y esta
+    // ficha todavía no: conviene avisarlo en vez de esconderlo.
+    const encontrados = catalogoVisibles().length;
+    if(encontrados < ids.length){
+      toast(`Tienda cargada · ${fmt(encontrados)} de ${fmt(ids.length)} ítems (al resto le falta el catálogo actualizado)`);
+    }else{
+      toast(`Tienda cargada · ${fmt(encontrados)} ítems`);
+    }
+  }catch(err){
+    if(err && err.noExiste){
+      toast('Todavía no hay ninguna tienda publicada');
+    }else if(err && err.vacia){
+      toast('La tienda publicada está vacía');
+    }else if(err && err.limite){
+      toast('GitHub te está limitando por consultar mucho sin token — esperá un rato o cargá tu token');
+    }else{
+      console.error('Error trayendo la tienda:', err);
+      toast('No se pudo traer la tienda desde GitHub');
+    }
+  }finally{
+    btn.disabled = false;
+  }
 }
 
 let itemAleatorioActual = null;
@@ -4381,9 +4478,12 @@ function renderCatalogoModal(){
     <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
     <div class="cat-grid">${grupos[g].slice().sort((a,b) => a.nombre.localeCompare(b.nombre, 'es')).map(catalogoRowHtml).join('')}</div>
   `).join('');
+  const textoBusqueda = $('#catalogo-buscar') ? $('#catalogo-buscar').value.trim() : '';
   let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
-  if(S.catalogo.length) vacioMsg = busqueda ? `No hay ítems que coincidan con "${esc($('#catalogo-buscar').value)}".` : 'No hay ítems en esta categoría.';
+  if(tiendaCargada) vacioMsg = textoBusqueda ? `El vendedor no tiene nada que coincida con "${esc(textoBusqueda)}".` : 'El vendedor no tiene nada en esta categoría.';
+  else if(S.catalogo.length) vacioMsg = textoBusqueda ? `No hay ítems que coincidan con "${esc(textoBusqueda)}".` : 'No hay ítems en esta categoría.';
   $('#catalogo-body').innerHTML = html || `<div class="hint">${vacioMsg}</div>`;
+  renderCabeceraTienda();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
   renderCarritoCatalogo();
 }

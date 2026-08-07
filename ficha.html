@@ -385,6 +385,9 @@ a{color:var(--brass)}
 .cat-row .cat-meta{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:2px}
 .cat-row .cat-meta b{color:var(--brass)}
 .cat-row .cat-detalle{font-size:11.5px;color:#C9B8AD;margin-top:3px}
+.cat-row .cat-mods{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+.cat-mods .mod-plus{color:var(--absenta)}
+.cat-mods .mod-minus{color:var(--danger)}
 .cat-row .cat-actions{display:flex;align-items:center;gap:6px;flex:none}
 .cat-qty{width:44px;font-family:"Space Mono",monospace;font-size:13px;text-align:center;padding:5px 2px}
 .cat-btn{
@@ -4180,17 +4183,35 @@ function abrirChooser(target, equipadoPreset){
 
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
 
+// Lista legible de TODOS los mods del ítem (menos Defensa, que ya se ve en
+// el resumen) — atributos secundarios, resistencias a crítico, lo que sea.
+// Así la tarjeta no depende de que el detalle escrito a mano mencione cada
+// mod: siempre refleja los datos reales del ítem.
+function modsResumenHtml(item){
+  const mods = (item.mods || []).filter(m => m.stat && m.stat !== 'def');
+  if(!mods.length) return '';
+  return mods.map(m => {
+    const label = TIPOS_IDS.includes(m.stat) ? `Res.Crít. ${STAT_LABEL[m.stat]}` : (STAT_LABEL[m.stat] || m.stat);
+    const val = num(m.val);
+    const suf = m.stat === 'crit' ? '%' : '';
+    const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
+    return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
+  }).join(' · ');
+}
+
 function catalogoRowHtml(item){
   const dano = armaDanoTxt(item);
   const defVal = defValorDe(item);
   const statTxt = dano ? `Daño ${dano}` : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
   const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
+  const modsHtml = modsResumenHtml(item);
   return `<div class="cat-row cat-card" data-catid="${item.id}">
     ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
     ${thumb(item)}
     <div class="cat-info">
       <div class="cat-nombre">${esc(item.nombre)}</div>
-      <div class="cat-meta"><b>${fmt(num(item.precioCompra))} DDE</b>${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
+      <div class="cat-meta"><b>${fmt(num(item.precioCompra))} DDE</b> · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
+      ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
     </div>
     <div class="cat-actions">

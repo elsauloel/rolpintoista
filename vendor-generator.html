@@ -525,13 +525,11 @@ function modsResumenHtml(item){
   }).join(' · ');
 }
 
-// Para ordenar "por daño o defensa" con un solo criterio: las armas valen
-// por su daño máximo posible, el resto por los puntos de Defensa que dan.
-function poderDe(item){
-  if(ES_ARMA(item.tipoItem)){
-    return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
-  }
-  return defValorDe(item);
+// Daño máximo posible del arma. Lo que no es arma da 0 y queda fuera del
+// orden por daño (ver ordenarItems).
+function danoDe(item){
+  if(!ES_ARMA(item.tipoItem)) return 0;
+  return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
 }
 
 function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
@@ -619,7 +617,8 @@ const ORDENES = {
   precio:    {label:'Precio',    cmp:(a,b) => num(a.precioCompra) - num(b.precioCompra)},
   peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
   rareza:    {label:'Rareza',    cmp:(a,b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)},
-  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDe(a) - poderDe(b)},
+  dano:      {label:'Daño',     valor: danoDe},
+  defensa:   {label:'Defensa',  valor: defValorDe},
 };
 
 let ordenActual = 'categoria';
@@ -629,8 +628,18 @@ let ordenDesc = false;
 // cualquier otro criterio pasa a lista plana, porque agrupado no se puede
 // ver "lo más caro de la tienda" de un vistazo.
 function ordenarItems(items){
-  const cmp = (ORDENES[ordenActual] || ORDENES.categoria).cmp;
-  const orden = items.slice().sort((a, b) => cmp(a, b) || a.nombre.localeCompare(b.nombre, 'es'));
+  const def = ORDENES[ordenActual] || ORDENES.categoria;
+  const porNombre = (a, b) => a.nombre.localeCompare(b.nombre, 'es');
+  // Criterio con valor propio (daño, defensa): lo que no aplica queda
+  // al final siempre, no mezclado entre los que sí tienen.
+  if(def.valor){
+    const con = items.filter(i => def.valor(i) > 0);
+    const sin = items.filter(i => def.valor(i) <= 0).sort(porNombre);
+    con.sort((a, b) => def.valor(a) - def.valor(b) || porNombre(a, b));
+    if(ordenDesc) con.reverse();
+    return [...con, ...sin];
+  }
+  const orden = items.slice().sort((a, b) => def.cmp(a, b) || porNombre(a, b));
   return ordenDesc ? orden.reverse() : orden;
 }
 

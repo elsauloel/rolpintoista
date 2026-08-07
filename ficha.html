@@ -4373,13 +4373,11 @@ const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[
 // vistazo lo más caro o lo más pesado del catálogo.
 const TIERS_ORDEN = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 
-// Un solo criterio para "daño o defensa": las armas valen por su daño
-// máximo posible, el resto por los puntos de Defensa que dan.
-function poderDe(item){
-  if(ES_ARMA(item.tipoItem)){
-    return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
-  }
-  return defValorDe(item);
+// Daño máximo posible del arma. Lo que no es arma da 0 y queda al final
+// del orden por daño (ver ordenarCatalogo).
+function danoDe(item){
+  if(!ES_ARMA(item.tipoItem)) return 0;
+  return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
 }
 
 const ORDENES_CATALOGO = {
@@ -4388,15 +4386,26 @@ const ORDENES_CATALOGO = {
   precio:    {label:'Precio',    cmp:(a,b) => precioDeCompra(a) - precioDeCompra(b)},
   peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
   rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
-  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDe(a) - poderDe(b)},
+  dano:      {label:'Daño',     valor: danoDe},
+  defensa:   {label:'Defensa',  valor: defValorDe},
 };
 
 let catalogoOrden = 'categoria';
 let catalogoOrdenDesc = false;
 
 function ordenarCatalogo(items){
-  const cmp = (ORDENES_CATALOGO[catalogoOrden] || ORDENES_CATALOGO.categoria).cmp;
-  const orden = items.slice().sort((a,b) => cmp(a,b) || a.nombre.localeCompare(b.nombre, 'es'));
+  const def = ORDENES_CATALOGO[catalogoOrden] || ORDENES_CATALOGO.categoria;
+  const porNombre = (a, b) => a.nombre.localeCompare(b.nombre, 'es');
+  // Criterio con valor propio (daño, defensa): lo que no aplica queda al
+  // final siempre, no mezclado entre los que sí tienen.
+  if(def.valor){
+    const con = items.filter(i => def.valor(i) > 0);
+    const sin = items.filter(i => def.valor(i) <= 0).sort(porNombre);
+    con.sort((a, b) => def.valor(a) - def.valor(b) || porNombre(a, b));
+    if(catalogoOrdenDesc) con.reverse();
+    return [...con, ...sin];
+  }
+  const orden = items.slice().sort((a,b) => def.cmp(a,b) || porNombre(a,b));
   return catalogoOrdenDesc ? orden.reverse() : orden;
 }
 

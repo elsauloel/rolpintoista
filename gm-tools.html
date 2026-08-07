@@ -1634,12 +1634,11 @@ function equiparCreepVisibles(){
 
 const TIERS_ORDEN_GM = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 
-// Las armas valen por su daño máximo posible, el resto por su Defensa.
-function poderDeGM(it){
-  if(it.tipoItem.startsWith('arma_')){
-    return Math.max(1, num(it.peso) || 1) * (num(it.tipoDado) || 6) + num(it.danoFijo);
-  }
-  return num(it.def);
+// Daño máximo posible del arma. Lo que no es arma da 0 y queda al final
+// del orden por daño (ver ordenarEquipo).
+function danoDeGM(it){
+  if(!it.tipoItem.startsWith('arma_')) return 0;
+  return Math.max(1, num(it.peso) || 1) * (num(it.tipoDado) || 6) + num(it.danoFijo);
 }
 
 const ORDENES_GM = {
@@ -1648,7 +1647,8 @@ const ORDENES_GM = {
   precio:    {label:'Precio',    cmp:(a,b) => num(a.precioCompra) - num(b.precioCompra)},
   peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
   rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN_GM.indexOf(a.tier) - TIERS_ORDEN_GM.indexOf(b.tier)},
-  poder:     {label:'Daño / Defensa', cmp:(a,b) => poderDeGM(a) - poderDeGM(b)},
+  dano:      {label:'Daño',     valor: danoDeGM},
+  defensa:   {label:'Defensa',  valor: it => num(it.def)},
 };
 
 let equipoOrden = 'categoria';
@@ -1658,8 +1658,18 @@ let equipoOrdenDesc = false;
 // CATALOGO_EQUIPO y lo necesita el botón Equipar, así que ordenar no
 // puede perderlo.
 function ordenarEquipo(pares){
-  const cmp = (ORDENES_GM[equipoOrden] || ORDENES_GM.categoria).cmp;
-  const orden = pares.slice().sort((a,b) => cmp(a.it, b.it) || a.it.nombre.localeCompare(b.it.nombre, 'es'));
+  const def = ORDENES_GM[equipoOrden] || ORDENES_GM.categoria;
+  const porNombre = (a, b) => a.it.nombre.localeCompare(b.it.nombre, 'es');
+  // Criterio con valor propio (daño, defensa): lo que no aplica queda al
+  // final siempre, no mezclado entre los que sí tienen.
+  if(def.valor){
+    const con = pares.filter(p => def.valor(p.it) > 0);
+    const sin = pares.filter(p => def.valor(p.it) <= 0).sort(porNombre);
+    con.sort((a, b) => def.valor(a.it) - def.valor(b.it) || porNombre(a, b));
+    if(equipoOrdenDesc) con.reverse();
+    return [...con, ...sin];
+  }
+  const orden = pares.slice().sort((a,b) => def.cmp(a.it, b.it) || porNombre(a, b));
   return equipoOrdenDesc ? orden.reverse() : orden;
 }
 

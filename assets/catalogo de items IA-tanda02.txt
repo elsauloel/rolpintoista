@@ -1,0 +1,195 @@
+================================================================
+CATÁLOGO COMPLETO — ROL PINTOÍSTA (129 ítems)
+================================================================
+Incluye:
+  - 41 ítems legacy REDISEÑADOS (armas, escudos, armadura) — nombre y
+    concepto originales, stats recalculados desde cero.
+  - 24 ítems legacy de CONSUMIBLES sin modificar, con tier asignado.
+  - 64 ítems NUEVOS de la tanda generada (armas por Tipo, escudos,
+    armadura por slot×material, consumibles).
+Organizado por categoría y, dentro de cada , por tier.
+
+
+================================================================
+PARTE 1 — ARMAS (30 ítems)
+================================================================
+
+---------- COMÚN (20) ----------
+Bastón flexible | cat-bast-n-flexible | d8 | Tipo8 | 85 DDE | Peso 1 | Ignora 1 res. crítica
+Daga | cat-daga | d2 | Tipo2 | 45 DDE | Peso 1 | Ignora 1 res. crítica
+Espada ancha | cat-espada-ancha | d4 | Tipo4 | 31 DDE | Peso 3 | Daño fijo +1
+Espada corta | cat-espada-corta | d4 | Tipo4 | 35 DDE | Peso 1 | Sin mods
+Espada larga | cat-espada-larga | d4 | Tipo4 | 50 DDE | Peso 2 | +1 PdG
+Estoque | cat-estoque | d2 | Tipo2 | 40 DDE | Peso 2 | +1 Iniciativa
+Hacha | cat-hacha | d6 | Tipo6 | 60 DDE | Peso 3 | Rompe armadura
+Hacha de batalla | cat-hacha-de-batalla | d6 | Tipo6 | 55 DDE | Peso 4 | Rompe armadura
+Hacha de mano | cat-hacha-de-mano | d6 | Tipo6 | 65 DDE | Peso 2 | Rompe armadura
+Machete | cat-machete | d4 | Tipo4 | 55 DDE | Peso 1 | +10% daño crítico
+Maza | cat-maza | d8 | Tipo8 | 66 DDE | Peso 2 | Daño fijo +1
+Rompemalla | cat-rompemalla | d2 | Tipo2 | 40 DDE | Peso 2 | Rompe armadura
+Puñal de asalto | new-punal-de-asalto | d2 | Tipo2 | 45 DDE | Peso 1 | Ignora 1 res. crítica
+Espada corta de instrucción | new-espada-corta-instruccion | d4 | Tipo4 | 50 DDE | Peso 2 | +10% daño crítico
+Hachuela de leñador | new-hachuela-de-lenador | d6 | Tipo6 | 65 DDE | Peso 2 | Rompe armadura
+Maza de guardia | new-maza-de-guardia | d8 | Tipo8 | 55 DDE | Peso 3 | Sin mods
+Aguja de tejer gigante (absurdo) | new-aguja-de-tejer-gigante | d2 | Tipo2 | 45 DDE | Peso 1 | Ignora 1 res. crítica
+Machete de podar rosales de vivero (absurdo) | new-machete-podar-rosales | d4 | Tipo4 | 55 DDE | Peso 1 | +10% daño crítico
+Ventilador de techo industrial desmontado (absurdo) | new-ventilador-techo-desmontado | d6 | Tipo6 | 60 DDE | Peso 3 | Rompe armadura
+Bate de aluminio de la Liga Interbarrial (absurdo) | new-bate-de-aluminio-interbarrial | d8 | Tipo8 | 85 DDE | Peso 1 | +10% daño crítico
+
+---------- BUENA CALIDAD (6) ----------
+Mangual | cat-mangual | d8 | Tipo8 | 105 DDE | Peso 2 | +1 Rango; Daño fijo +1
+Martillo | cat-martillo | d8 | Tipo8 | 124 DDE | Peso 3 | Daño fijo +3; +10% crítico; (-1 Iniciativa, drawback)
+Espada ropera | new-espada-ropera | d4 | Tipo2 (desacoplado) | 74 DDE | Peso 1 | Daño fijo +1; +1 PdG
+Sable de caballería | new-sable-de-caballeria | d6 | Tipo4 (desacoplado) | 87 DDE | Peso 2 | Daño fijo +1; +1 PdG
+Hacha de guerra ligera | new-hacha-de-guerra-ligera | d6 | Tipo6 | 82 DDE | Peso 3 | Rompe armadura; Daño fijo +1
+Martillo de sargento | new-martillo-de-sargento | d8 | Tipo8 | 112 DDE | Peso 4 | +1 Parry; +10% crítico
+
+---------- RARO (4) ----------
+Estoque de duelista | new-estoque-de-duelista | d2 | Tipo2 | 165 DDE | Peso 1 | Daño fijo +2; +1 Iniciativa; condicional (ignora 2 res. crít. 1er turno)
+Espada bastarda encantada | new-espada-bastarda-encantada | d6 | Tipo4 | 140 DDE | Peso 3 | Daño fijo +2; +10% crítico; +1 Parry
+Hacha bipenne | new-hacha-bipenne | d6 | Tipo6 | 155 DDE | Peso 4 | Rompe armadura; Daño fijo +3; +1 PdG
+Martillo de guerra rúnico | new-martillo-de-guerra-runico | d8 | Tipo8 | 281 DDE | Peso 5 | Daño fijo +3; +1 Fuerza (atributo); condicional (+50% dmg vs aturdido)
+
+
+================================================================
+PARTE 2 — ESCUDOS (10 ítems)
+================================================================
+
+---------- COMÚN (4) ----------
+Broquel | cat-broquel | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo2
+Escudo pequeño | cat-escudo-peque-o | Defensa +4 | 46 DDE | Peso 2 | +1 ResCrit Tipo6
+Rodela de cuero | new-rodela-de-cuero | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo2
+Tapa de tacho de basura reforzada (absurdo) | new-tapa-de-tacho-reforzada | Defensa +4 | 46 DDE | Peso 2 | +1 ResCrit Tipo8
+
+---------- BUENA CALIDAD (5) ----------
+Escudo grande | cat-escudo-grande | Defensa +7 | 82 DDE | Peso 4 | +1 ResCrit Tipo8
+Escudo pavés | cat-escudo-pav-s | Defensa +6 | 116 DDE | Peso 3 | +1 ResCrit Tipo2; +1 Parry
+Escudo romano | cat-escudo-romano | Defensa +10 | 131 DDE | Peso 5 | +1 ResCrit Tipo8; (-1 Movimiento, drawback)
+Escudo triangular | cat-escudo-triangular | Defensa +7 | 87 DDE | Peso 3 | +1 ResCrit Tipo8
+Escudo de acero laminado | new-escudo-de-acero-laminado | Defensa +7 | 87 DDE | Peso 3 | +1 ResCrit Tipo8
+
+---------- RARO (1) ----------
+Égida menor | new-egida-menor | Defensa +9 | 326 DDE | Peso 3 | +1 ResCrit Tipo4; +1 Parry; condicional (cura 10HP al bloquear crítico)
+
+
+================================================================
+PARTE 3 — ARMADURA (61 ítems)
+================================================================
+
+---------- COMÚN (27) ----------
+Armadura acolchada (torso blanda) | cat-armadura-acolchada | Defensa +4 | 51 DDE | Peso 1 | +1 ResCrit Tipo2
+Botas reforzadas (botas blandas) | cat-botas-reforzadas | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo6
+Casco (casco rígido) | cat-casco | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo8
+Guantes de cuero reforzado (guantes blandos) | cat-guantes-de-cuero-reforzado | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo2
+Guantes finos de señor (guantes blandos) | cat-guantes-finos-de-senor | Defensa +1 | 34 DDE | Peso 0 | +1 mod habilidad (chorear/afanar)
+Pechera (torso blanda) | cat-pechera | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo2
+Sombrero humectante (casco blando) | cat-sombrero-humectante | Defensa +0 | 20 DDE | Peso 0 | +1 Bonos
+Peto de cuero curtido (torso blanda) | new-peto-de-cuero-curtido | Defensa +4 | 51 DDE | Peso 1 | +1 ResCrit Tipo2
+Peto de placas de aprendiz (torso rígida) | new-peto-placas-aprendiz | Defensa +5 | 51 DDE | Peso 3 | +1 ResCrit Tipo8
+Capucha de cuero acolchada (casco blando) | new-capucha-cuero-acolchada | Defensa +2 | 37 DDE | Peso 0 | +1 ResCrit Tipo2
+Capacete de aprendiz de herrero (casco rígido) | new-capacete-aprendiz-herrero | Defensa +3 | 37 DDE | Peso 2 | +1 ResCrit Tipo8
+Guantes de cuero de carretero (guantes blandos) | new-guantes-cuero-carretero | Defensa +2 | 37 DDE | Peso 0 | +1 ResCrit Tipo6
+Manoplas de trabajo de fragua (guantes rígidos) | new-manoplas-trabajo-fragua | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo8
+Calzas de cuero flexible (piernas blandas) | new-calzas-cuero-flexible | Defensa +2 | 32 DDE | Peso 1 | +1 ResCrit Tipo2
+Grebas de aprendiz de milicia (piernas rígidas) | new-grebas-aprendiz-milicia | Defensa +4 | 46 DDE | Peso 2 | +1 ResCrit Tipo8
+Botas de marcha (botas blandas) | new-botas-de-marcha | Defensa +2 | 38 DDE | Peso 1 | +1 Movimiento
+Borceguíes reglamentarios de recluta (botas rígidas) | new-borcegies-reglamentarios-recluta | Defensa +3 | 37 DDE | Peso 2 | +1 ResCrit Tipo8
+Campera de cuero de motociclista con tachas (absurdo, torso blanda) | new-campera-motociclista | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo6
+Chapa de auto abollada ajustada con alambre (absurdo, torso rígida) | new-chapa-de-auto-abollada | Defensa +6 | 59 DDE | Peso 5 | +1 ResCrit Tipo8
+Gorra reglamentaria de la Policía Federal (absurdo, casco blando) | new-gorra-policia-federal | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo8
+Casco de moto vintage pintado a mano (absurdo, casco rígido) | new-casco-moto-vintage | Defensa +5 | 56 DDE | Peso 2 | +1 ResCrit Tipo8
+Mitones tejidos a mano por una abuela legendaria del pueblo (absurdo, guantes blandos) | new-mitones-abuela-legendaria | Defensa +1 | 34 DDE | Peso 0 | +1 Bonos
+Guantes de horno de cocina industrial (absurdo, guantes rígidos) | new-guantes-horno-industrial | Defensa +4 | 46 DDE | Peso 2 | +1 ResCrit Tipo8
+Jogging de gimnasia con rayas laterales (absurdo, piernas blandas) | new-jogging-rayas-laterales | Defensa +1 | 34 DDE | Peso 0 | +1 Movimiento
+Canilleras de arquero de fútbol amateur (absurdo, piernas rígidas) | new-canilleras-futbol-amateur | Defensa +3 | 42 DDE | Peso 1 | +1 ResCrit Tipo8
+Ojotas de goma con flores hawaianas (absurdo, botas blandas) | new-ojotas-flores-hawaianas | Defensa +1 | 34 DDE | Peso 0 | +1 Movimiento
+Botas de esquí de aluminio sin los esquís (absurdo, botas rígidas) | new-botas-esqui-sin-esquis | Defensa +4 | 41 DDE | Peso 3 | +1 ResCrit Tipo8
+
+---------- BUENA CALIDAD (20) ----------
+Armadura con tachas (torso blanda) | cat-armadura-con-tachas | Defensa +6 | 98 DDE | Peso 2 | +1 ResCrit Tipo2; +1 ResCrit Tipo4
+Armadura mediana (torso rígida) | cat-armadura-mediana | Defensa +7 | 140 DDE | Peso 4 | +1 ResCrit Tipo2; +1 ResCrit Tipo4; +1 ResCrit Tipo8
+Cota de malla (torso blanda) | cat-cota-de-malla | Defensa +6 | 127 DDE | Peso 3 | +1 ResCrit Tipo2; +1 ResCrit Tipo4; +1 ResCrit Tipo6
+Grebas (piernas rígidas) | cat-grebas | Defensa +6 | 98 DDE | Peso 2 | +1 ResCrit Tipo6; +1 ResCrit Tipo8
+Guanteletes (guantes rígidos) | cat-guanteletes | Defensa +6 | 127 DDE | Peso 3 | +1 ResCrit Tipo2; +1 ResCrit Tipo4; +1 ResCrit Tipo6
+Mercury threads (botas blandas) | cat-mercury-threads | Defensa +2 | 133 DDE | Peso 0 | +1 Bonos; +1 ResM; +1 ResCC
+Mitones de malla (guantes rígidos) | cat-mitones-de-malla | Defensa +5 | 80 DDE | Peso 2 | +1 ResCrit Tipo2; +1 ResCrit Tipo4
+Sabatón (botas rígidas) | cat-sabaton | Defensa +6 | 127 DDE | Peso 3 | +1 ResCrit Tipo4; +1 ResCrit Tipo6; +1 ResCrit Tipo8; (-1 Movimiento, drawback)
+Yelmo completo (casco rígido) | cat-yelmo-completo | Defensa +6 | 122 DDE | Peso 4 | +1 ResCrit Tipo2; +1 ResCrit Tipo6; +1 ResCrit Tipo8
+Yelmo liviano (casco rígido) | cat-yelmo-liviano | Defensa +5 | 80 DDE | Peso 2 | +1 ResCrit Tipo6; +1 ResCrit Tipo8
+Gambesón acolchado de doble capa (torso blanda) | new-gambeson-doble-capa | Defensa +6 | 98 DDE | Peso 2 | +1 ResCrit Tipo4; +1 ResCrit Tipo6
+Coraza de guardia de cuartel (torso rígida) | new-coraza-guardia-cuartel | Defensa +7 | 106 DDE | Peso 4 | +1 ResCrit Tipo2; +1 ResCrit Tipo8
+Turbante de tela reforzada (casco blando) | new-turbante-tela-reforzada | Defensa +4 | 92 DDE | Peso 1 | +1 ResCrit Tipo4; +1 Rango de casteo
+Yelmo de visera (casco rígido) | new-yelmo-de-visera | Defensa +6 | 98 DDE | Peso 2 | +1 ResCrit Tipo4; +1 ResCrit Tipo8
+Guantes de escalador encerados (guantes blandos) | new-guantes-escalador-encerados | Defensa +3 | 81 DDE | Peso 1 | +1 ResCrit Tipo2; +1 PdG
+Guanteletes de combate (guantes rígidos) | new-guanteletes-de-combate | Defensa +6 | 121 DDE | Peso 2 | +1 ResCrit Tipo2; +1 PdG
+Pantalón reforzado de cazador (piernas blandas) | new-pantalon-reforzado-cazador | Defensa +4 | 87 DDE | Peso 2 | +1 ResCrit Tipo6; +1 Movimiento
+Perneras articuladas (piernas rígidas) | new-perneras-articuladas | Defensa +7 | 111 DDE | Peso 3 | +1 ResCrit Tipo6; +1 ResCrit Tipo8
+Botas de cuero de mercader viajero (botas blandas) | new-botas-mercader-viajero | Defensa +4 | 92 DDE | Peso 1 | +1 Movimiento; +1 ResCrit Tipo6
+Botas de placas del guardia de avanzada (botas rígidas) | new-botas-placas-guardia-avanzada | Defensa +6 | 93 DDE | Peso 3 | +1 ResCrit Tipo2; +1 ResCrit Tipo6
+
+---------- RARO (13) ----------
+Coraza (torso rígida) | cat-coraza | Defensa +10 | 234 DDE | Peso 5 | +1 ResCrit Tipo2/4/6/8 (los 4 tipos estándar)
+Cota de placas (torso rígida) | cat-cota-de-placas | Defensa +9 | 221 DDE | Peso 4 | +1 ResCrit Tipo2/4/6/8
+Gran yelmo (casco rígido) | cat-gran-yelmo | Defensa +9 | 221 DDE | Peso 4 | +1 ResCrit Tipo2/4/6/8
+Manto de cuero de basilisco (torso blanda) | new-manto-cuero-basilisco | Defensa +8 | 188 DDE | Peso 3 | +1 ResCrit Tipo2; +1 ResCrit Tipo8; +1 Evasión
+Coraza de dragón menor (torso rígida) | new-coraza-de-dragon-menor | Defensa +10 | 277 DDE | Peso 4 | +1 ResCrit Tipo2; +1 ResCrit Tipo4; condicional (resiste daño ígneo)
+Capucha de las sombras silentes (casco blando) | new-capucha-sombras-silentes | Defensa +5 | 161 DDE | Peso 1 | +1 ResCrit Tipo2; +1 Evasión; ignora 1 res. crítica
+Yelmo con cresta de comandante (casco rígido) | new-yelmo-cresta-comandante | Defensa +9 | 205 DDE | Peso 4 | +1 ResCrit Tipo4; +1 ResCrit Tipo6; +1 Iniciativa
+Guantes del sanador errante (guantes blandos) | new-guantes-sanador-errante | Defensa +4 | 157 DDE | Peso 1 | +1 Bonos; condicional (cura 5HP al portador al curar aliado)
+Guanteletes del herrero real (guantes rígidos) | new-guanteletes-herrero-real | Defensa +8 | 246 DDE | Peso 3 | +1 ResCrit Tipo2; +1 ResCrit Tipo6; +1 Fuerza (atributo)
+Calzas del corredor de tormentas (piernas blandas) | new-calzas-corredor-tormentas | Defensa +5 | 157 DDE | Peso 2 | +2 Movimiento; +1 ResCrit Tipo8
+Grebas del centinela de hierro (piernas rígidas) | new-grebas-centinela-hierro | Defensa +9 | 205 DDE | Peso 4 | +1 ResCrit Tipo2; +1 ResCrit Tipo8; +1 Parry
+Botas del mensajero veloz (botas blandas) | new-botas-del-mensajero-veloz | Defensa +6 | 186 DDE | Peso 2 | +2 Movimiento; +1 Iniciativa
+Botas de hierro del coloso menor (botas rígidas) | new-botas-hierro-coloso-menor | Defensa +10 | 338 DDE | Peso 5 | +1 ResCrit Tipo4; +1 ResCrit Tipo8; +1 Constitución (atributo)
+
+---------- EXCEPCIONAL (1) ----------
+Zapatillas Nike (botas rígidas) | cat-zapatillas-nike | Defensa +1 | 500 DDE | Peso 0 | +1 Acciones máximas por turno (rompe regla dura)
+
+
+================================================================
+PARTE 4 — CONSUMIBLES (28 ítems)
+================================================================
+
+---------- COMÚN (7) ----------
+Antídoto | cat-antidoto | 10 DDE | Cura estado Veneno
+Cura Plus | cat-cura-plus | 15 DDE | Remueve estados alterados
+Poción de Regeneración | cat-pocion-regen | 15 DDE | Activa Regeneración +10HP/turno×5
+Raciones | cat-raciones | 3 DDE | 2 unidades, +1 Wellness
+Poción de HP (Común, nueva) | new-pocion-hp-comun | 20 DDE | +25 HP instantáneo
+
+---------- BUENA CALIDAD (14) ----------
+Ankh de Reencarnación | cat-ankh | 200 DDE | Revive con 25% HP si está en cinturón al llegar a 0 HP
+Pergamino de luz cegadora | cat-pergamino-luz | 30 DDE | Ceguera en área
+Pergamino de ojo de Kicillof | cat-pergamino-ojo | 30 DDE | Invoca ojo volador espía
+Pergamino de red Nerubian | cat-pergamino-red | 30 DDE | Red que atrapa
+Pergamino de sombras chinescas | cat-pergamino-sombras | 30 DDE | Proyección de sombras
+Pergamino de tentáculo sombrío | cat-pergamino-tentaculo | 30 DDE | Invoca tentáculo controlable
+Pergamino de ventriloquía | cat-pergamino-ventriloquia | 30 DDE | Imita sonidos/voces
+Poción de Bonos | cat-pocion-bonos | 30 DDE | +50% Bonos
+Poción de HP grande | cat-pocion-hp-grande | 20 DDE | 3 cargas, +25HP c/u
+Poción de Regeneración Grande | cat-pocion-regen-grande | 45 DDE | 3 cargas, Regeneración +10HP/turno×5 c/u
+Poción de Regeneración mayor | cat-pocion-regen-mayor | 35 DDE | Regeneración +20HP/turno×5
+Polilla mística | cat-polilla | 50 DDE | +2 a una tirada, se libera y dura hasta usarse
+Raciones Fancy | cat-raciones-fancy | 50 DDE | 5 unidades, +2 Wellness
+
+---------- RARO (5) ----------
+Moneda Re-Roll | cat-moneda-reroll | 100 DDE | Repite tirada, se conserva si gana
+Poción de HP mayor | cat-pocion-hp-mayor | 50 DDE | +100 HP instantáneo
+Poción de Regeneración mayor grande | cat-pocion-regen-mayor-grande | 100 DDE | 3 cargas, Regeneración +20HP/turno×5 c/u
+Revive | cat-revive | 150 DDE | Revive aliado caído (≤5 turnos) al 50% HP, área 5 casillas
+
+---------- EXCEPCIONAL (2) ----------
+Poción de Bonos grande | cat-pocion-bonos-grande | 120 DDE | +100% Bonos
+Poción de HP mayor grande | cat-pocion-hp-mayor-grande | 200 DDE | 3 cargas, +100HP c/u
+
+
+================================================================
+RESUMEN POR TIER (129 ítems)
+================================================================
+Común: 20 armas + 4 escudos + 27 armadura + 7 consumibles = 58
+Buena Calidad: 6 armas + 5 escudos + 20 armadura + 14 consumibles = 45
+Raro: 4 armas + 1 escudo + 13 armadura + 5 consumibles = 23
+Excepcional: 0 armas + 0 escudos + 1 armadura + 2 consumibles = 3
+Legendario: 0
+TOTAL: 58+45+23+3 = 129 ✓
+================================================================

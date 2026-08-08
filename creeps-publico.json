@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-08T20:53:09.504Z",
+  "actualizado": "2026-08-08T20:53:43.551Z",
   "creeps": [
     {
       "id": "whmofqj",
@@ -37,7 +37,7 @@
       "id": "ou37m1b",
       "nombre": "Dentista Menemista",
       "imagen": "",
-      "hp": 45,
+      "hp": 22,
       "hpMax": 45,
       "estados": []
     }

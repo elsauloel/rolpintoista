@@ -1,8 +1,32 @@
 {
-  "actualizado": "2026-08-08T12:34:09.041Z",
+  "actualizado": "2026-08-08T12:35:08.046Z",
   "creeps": [
     {
       "id": "nfnl0ks",
+      "nombre": "Creep nuevo",
+      "imagen": "",
+      "hp": 10,
+      "hpMax": 10,
+      "estados": []
+    },
+    {
+      "id": "gnx6lvm",
+      "nombre": "Creep nuevo",
+      "imagen": "",
+      "hp": 10,
+      "hpMax": 10,
+      "estados": []
+    },
+    {
+      "id": "g9od9a4",
+      "nombre": "Creep nuevo",
+      "imagen": "",
+      "hp": 10,
+      "hpMax": 10,
+      "estados": []
+    },
+    {
+      "id": "0uciuew",
       "nombre": "Creep nuevo",
       "imagen": "",
       "hp": 10,

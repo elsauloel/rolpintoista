@@ -36,14 +36,13 @@
     "int": 12
   },
   "hp": 40,
-  "turno": 23,
+  "turno": 1,
   "log": [
-    "<b style=\"color:var(--brass)\">Turno 23</b>",
-    "<span class=\"gone\">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>",
-    "Bonos y Acciones se reiniciaron."
+    "<b style=\"color:var(--brass)\">Turno 1</b>",
+    "El contador de turno se reinició manualmente."
   ],
   "bonosGastados": 0,
-  "acciones": 3,
+  "acciones": 1,
   "muerto": {
     "activo": false,
     "turnos": 5,
@@ -626,7 +625,8 @@
       "consumible": true,
       "curahp": 25,
       "mods": [],
-      "detalle": "Recupera 25 HP."
+      "detalle": "Recupera 25 HP.",
+      "tier": "Común"
     },
     {
       "id": "cat-pocion-hp-grande",
@@ -640,7 +640,9 @@
       "consumible": true,
       "curahp": 25,
       "mods": [],
-      "detalle": "3 Cargas. Recupera 25 HP por carga."
+      "detalle": "3 Cargas. Recupera 25 HP por carga.",
+      "tier": "Buena Calidad",
+      "cargaMax": 3
     },
     {
       "id": "cat-pocion-hp-mayor",
@@ -654,7 +656,8 @@
       "consumible": true,
       "curahp": 100,
       "mods": [],
-      "detalle": "Recupera 100 HP."
+      "detalle": "Recupera 100 HP.",
+      "tier": "Raro"
     },
     {
       "id": "cat-pocion-hp-mayor-grande",
@@ -668,7 +671,9 @@
       "consumible": true,
       "curahp": 100,
       "mods": [],
-      "detalle": "3 Cargas. Recupera 100 HP por carga."
+      "detalle": "3 Cargas. Recupera 100 HP por carga.",
+      "tier": "Excepcional",
+      "cargaMax": 3
     },
     {
       "id": "cat-pocion-sp",
@@ -710,7 +715,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Remueve estados alterados."
+      "detalle": "Remueve estados alterados.",
+      "tier": "Común"
     },
     {
       "id": "cat-antidoto",
@@ -724,7 +730,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Cura el estado Veneno."
+      "detalle": "Cura el estado Veneno.",
+      "tier": "Común"
     },
     {
       "id": "cat-raciones",
@@ -738,7 +745,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "(2/2) +1 Wellness. (Aplicar a mano al usarla.)"
+      "detalle": "(2/2) +1 Wellness. (Aplicar a mano al usarla.)",
+      "tier": "Común"
     },
     {
       "id": "cat-raciones-fancy",
@@ -752,7 +760,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "(5/5) +2 Wellness. (Aplicar a mano al usarla.)"
+      "detalle": "(5/5) +2 Wellness. (Aplicar a mano al usarla.)",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-ankh",
@@ -766,7 +775,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Se consume al morir el portador. Revive en un 25% del HP máximo. Queda titilando hasta el comienzo de su turno."
+      "detalle": "Se consume al morir el portador. Revive en un 25% del HP máximo. Queda titilando hasta el comienzo de su turno.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-revive",
@@ -780,7 +790,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas."
+      "detalle": "Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.",
+      "tier": "Raro"
     },
     {
       "id": "cat-polilla",
@@ -794,7 +805,11 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Consumible instantáneo. +2 a cualquier tirada."
+      "detalle": "Consumible instantáneo. +2 a cualquier tirada.",
+      "tier": "Buena Calidad",
+      "efectoNombre": "Polilla revoloteando",
+      "efectoPermanente": true,
+      "efectoDetalle": "La polilla revolotea a tu alrededor. Cuando quieras, gastala para sumar +2 a una tirada de dado: borrá este estado en ese momento para marcar que ya la usaste. Hasta entonces queda acá, sin vencerse."
     },
     {
       "id": "cat-moneda-reroll",
@@ -808,7 +823,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Permite repetir una tirada. Se conserva si gana tirando una moneda."
+      "detalle": "Permite repetir una tirada. Se conserva si gana tirando una moneda.",
+      "tier": "Raro"
     },
     {
       "id": "cat-pergamino-luz",
@@ -822,7 +838,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-tentaculo",
@@ -836,7 +853,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-sombras",
@@ -850,7 +868,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-red",
@@ -864,7 +883,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-ojo",
@@ -878,7 +898,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-ventriloquia",
@@ -892,7 +913,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-daga",
@@ -907,7 +929,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Ignora 1 de resistencia crítica."
+      "detalle": "Ignora 1 de resistencia crítica.",
+      "tier": "Común"
     },
     {
       "id": "cat-rompemalla",
@@ -922,7 +945,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Común"
     },
     {
       "id": "cat-espada-ancha",
@@ -937,7 +961,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño amplificado."
+      "detalle": "Daño amplificado.",
+      "tier": "Común"
     },
     {
       "id": "cat-hacha-de-mano",
@@ -952,7 +977,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Común"
     },
     {
       "id": "cat-bast-n-flexible",
@@ -967,7 +993,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Ignora 1 de resistencia crítica."
+      "detalle": "Ignora 1 de resistencia crítica.",
+      "tier": "Común"
     },
     {
       "id": "cat-estoque",
@@ -987,7 +1014,8 @@
           "val": 1
         }
       ],
-      "detalle": "Modificador: '+1 a iniciativa"
+      "detalle": "Modificador: '+1 a iniciativa",
+      "tier": "Común"
     },
     {
       "id": "cat-espada-corta",
@@ -1002,7 +1030,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": ""
+      "detalle": "",
+      "tier": "Común"
     },
     {
       "id": "cat-machete",
@@ -1017,7 +1046,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "+10% de daño crítico"
+      "detalle": "+10% de daño crítico",
+      "tier": "Común"
     },
     {
       "id": "cat-hacha",
@@ -1032,7 +1062,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Común"
     },
     {
       "id": "cat-maza",
@@ -1047,7 +1078,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño amplificado."
+      "detalle": "Daño amplificado.",
+      "tier": "Común"
     },
     {
       "id": "cat-escudo-romano",
@@ -1067,7 +1099,8 @@
           "val": 250
         }
       ],
-      "detalle": "+4 al bloqueo. Movimiento y ataque lento"
+      "detalle": "+4 al bloqueo. Movimiento y ataque lento",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-espada-larga",
@@ -1087,7 +1120,8 @@
           "val": 1
         }
       ],
-      "detalle": "modificador: '+1 al pdg. +1 al parry"
+      "detalle": "modificador: '+1 al pdg. +1 al parry",
+      "tier": "Común"
     },
     {
       "id": "cat-escudo-grande",
@@ -1107,7 +1141,8 @@
           "val": 200
         }
       ],
-      "detalle": "+2 al bloqueo"
+      "detalle": "+2 al bloqueo",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-hacha-de-batalla",
@@ -1122,7 +1157,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Común"
     },
     {
       "id": "cat-mangual",
@@ -1137,7 +1173,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Alcance +1."
+      "detalle": "Alcance +1.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-broquel",
@@ -1157,7 +1194,8 @@
           "val": 50
         }
       ],
-      "detalle": "+2 a estabilidad"
+      "detalle": "+2 a estabilidad",
+      "tier": "Común"
     },
     {
       "id": "cat-martillo",
@@ -1172,7 +1210,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño +50%. Lento."
+      "detalle": "Daño +50%. Lento.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-pav-s",
@@ -1192,7 +1231,8 @@
           "val": 150
         }
       ],
-      "detalle": "+1 a estabilidad, +1 al bloqueo"
+      "detalle": "+1 a estabilidad, +1 al bloqueo",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-triangular",
@@ -1212,7 +1252,8 @@
           "val": 150
         }
       ],
-      "detalle": "+2 al bloqueo"
+      "detalle": "+2 al bloqueo",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-peque-o",
@@ -1232,7 +1273,8 @@
           "val": 100
         }
       ],
-      "detalle": "+1 al bloqueo, +1 a la estabilidad"
+      "detalle": "+1 al bloqueo, +1 a la estabilidad",
+      "tier": "Común"
     },
     {
       "id": "cat-pocion-regen",
@@ -1249,7 +1291,8 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 10,
-      "detalle": "Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Común"
     },
     {
       "id": "cat-pocion-regen-grande",
@@ -1266,7 +1309,9 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 10,
-      "detalle": "3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Buena Calidad",
+      "cargaMax": 3
     },
     {
       "id": "cat-pocion-regen-mayor",
@@ -1283,7 +1328,8 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 20,
-      "detalle": "Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pocion-regen-mayor-grande",
@@ -1300,7 +1346,9 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 20,
-      "detalle": "3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Raro",
+      "cargaMax": 3
     },
     {
       "id": "cat-pocion-bonos",
@@ -1315,7 +1363,8 @@
       "curahp": 0,
       "curabonosPct": 50,
       "mods": [],
-      "detalle": "Restaura la mitad de tu total de Bonos (redondeado hacia arriba)."
+      "detalle": "Restaura la mitad de tu total de Bonos (redondeado hacia arriba).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pocion-bonos-grande",
@@ -1330,7 +1379,8 @@
       "curahp": 0,
       "curabonosPct": 100,
       "mods": [],
-      "detalle": "Restaura todos tus Bonos."
+      "detalle": "Restaura todos tus Bonos.",
+      "tier": "Excepcional"
     },
     {
       "id": "cat-armadura-acolchada",
@@ -1354,7 +1404,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2."
+      "detalle": "Reduce críticos Tipo 2.",
+      "tier": "Común"
     },
     {
       "id": "cat-armadura-con-tachas",
@@ -1382,7 +1433,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2 y 4."
+      "detalle": "Reduce críticos Tipo 2 y 4.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-cota-de-malla",
@@ -1414,7 +1466,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+      "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pechera",
@@ -1438,7 +1491,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2."
+      "detalle": "Reduce críticos Tipo 2.",
+      "tier": "Común"
     },
     {
       "id": "cat-cota-de-placas",
@@ -1474,7 +1528,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8.",
+      "tier": "Raro"
     },
     {
       "id": "cat-coraza",
@@ -1514,7 +1569,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos de cualquier tipo."
+      "detalle": "Reduce críticos de cualquier tipo.",
+      "tier": "Raro"
     },
     {
       "id": "cat-sombrero-humectante",
@@ -1534,7 +1590,8 @@
           "val": 1
         }
       ],
-      "detalle": "+1 a los Bonos máximos."
+      "detalle": "+1 a los Bonos máximos.",
+      "tier": "Común"
     },
     {
       "id": "cat-casco",
@@ -1558,7 +1615,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 8."
+      "detalle": "Reduce críticos Tipo 8.",
+      "tier": "Común"
     },
     {
       "id": "cat-yelmo-liviano",
@@ -1586,7 +1644,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 6 y 8."
+      "detalle": "Reduce críticos Tipo 6 y 8.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-yelmo-completo",
@@ -1618,7 +1677,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 6 y 8."
+      "detalle": "Reduce críticos Tipo 2, 6 y 8.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-gran-yelmo",
@@ -1654,7 +1714,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8.",
+      "tier": "Raro"
     },
     {
       "id": "cat-zapatillas-nike",
@@ -1678,7 +1739,8 @@
           "val": 1
         }
       ],
-      "detalle": "+1 a las Acciones máximas del turno."
+      "detalle": "+1 a las Acciones máximas del turno.",
+      "tier": "Excepcional"
     },
     {
       "id": "cat-botas-reforzadas",
@@ -1702,7 +1764,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 6."
+      "detalle": "Reduce críticos Tipo 6.",
+      "tier": "Común"
     },
     {
       "id": "cat-grebas",
@@ -1730,7 +1793,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 6 y 8."
+      "detalle": "Reduce críticos Tipo 6 y 8.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-sabaton",
@@ -1766,7 +1830,8 @@
           "val": -1
         }
       ],
-      "detalle": "Reduce críticos Tipo 4, 6 y 8. -1 Movimiento."
+      "detalle": "Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-mercury-threads",
@@ -1798,7 +1863,8 @@
           "val": 1
         }
       ],
-      "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC."
+      "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-guantes-finos-de-senor",
@@ -1818,7 +1884,8 @@
           "val": 1
         }
       ],
-      "detalle": "Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar"
+      "detalle": "Dan aspecto de señor fino. No dejan huellas. +1 a tiradas de chorear y afanar",
+      "tier": "Común"
     },
     {
       "id": "cat-guantes-de-cuero-reforzado",
@@ -1842,7 +1909,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2."
+      "detalle": "Reduce críticos Tipo 2.",
+      "tier": "Común"
     },
     {
       "id": "cat-mitones-de-malla",
@@ -1870,7 +1938,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2 y 4."
+      "detalle": "Reduce críticos Tipo 2 y 4.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-guanteletes",
@@ -1902,7 +1971,8 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+      "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-armadura-mediana",
@@ -1934,7 +2004,1582 @@
           "val": 1
         }
       ],
-      "detalle": "Reduce críticos Tipo 2, 4 y 8."
+      "detalle": "Reduce críticos Tipo 2, 4 y 8.",
+      "tier": "Buena Calidad"
+    },
+    {
+      "id": "new-punal-de-asalto",
+      "nombre": "Puñal de asalto",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 45,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 punto de resistencia a crítico del objetivo. Tipo de daño: Tipo 2 (Perforación)."
+    },
+    {
+      "id": "new-espada-ropera",
+      "nombre": "Espada ropera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 1,
+      "precioCompra": 74,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 2 (Perforación) — desacoplada del dado (d4 pero perfora, no corta)."
+    },
+    {
+      "id": "new-estoque-de-duelista",
+      "nombre": "Estoque de duelista",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 2,
+      "precioCompra": 165,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 2 (Perforación). Durante el primer turno de cualquier combate, ignora 2 puntos de resistencia a crítico del objetivo."
+    },
+    {
+      "id": "new-aguja-de-tejer-gigante",
+      "nombre": "Aguja de tejer gigante",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 45,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 punto de resistencia a crítico del objetivo. Tipo de daño: Tipo 2 (Perforación)."
+    },
+    {
+      "id": "new-espada-corta-de-instruccion",
+      "nombre": "Espada corta de instrucción",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 4 (Corte normal)."
+    },
+    {
+      "id": "new-sable-de-caballeria",
+      "nombre": "Sable de caballería",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 87,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 4 (Corte normal) — desacoplado del dado (d6 pero corta limpio, no de impacto)."
+    },
+    {
+      "id": "new-espada-bastarda-encantada",
+      "nombre": "Espada bastarda encantada",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 2,
+      "precioCompra": 140,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 4 (Corte normal)."
+    },
+    {
+      "id": "new-machete-de-podar-rosales-de-vivero",
+      "nombre": "Machete de podar rosales de vivero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 55,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 4 (Corte normal). Corte limpio de jardinero profesional."
+    },
+    {
+      "id": "new-hachuela-de-lenador",
+      "nombre": "Hachuela de leñador",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 65,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto)."
+    },
+    {
+      "id": "new-hacha-de-guerra-ligera",
+      "nombre": "Hacha de guerra ligera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 82,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto)."
+    },
+    {
+      "id": "new-hacha-bipenne",
+      "nombre": "Hacha bipenne",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 3,
+      "precioCompra": 155,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto)."
+    },
+    {
+      "id": "new-ventilador-de-techo-industrial-desmontado",
+      "nombre": "Ventilador de techo industrial desmontado",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura. Tipo de daño: Tipo 6 (Corte con impacto)."
+    },
+    {
+      "id": "new-maza-de-guardia",
+      "nombre": "Maza de guardia",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 55,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente)."
+    },
+    {
+      "id": "new-martillo-de-sargento",
+      "nombre": "Martillo de sargento",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 112,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 1
+        },
+        {
+          "stat": "crit",
+          "val": 10
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente)."
+    },
+    {
+      "id": "new-martillo-de-guerra-runico",
+      "nombre": "Martillo de guerra rúnico",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 5,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 3,
+      "precioCompra": 281,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "fue",
+          "val": 1
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente). +50% de daño contra un objetivo con Stun/Aturdido activo."
+    },
+    {
+      "id": "new-bate-de-aluminio-de-la-liga-interbarrial",
+      "nombre": "Bate de aluminio de la Liga Interbarrial",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 85,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        }
+      ],
+      "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente)."
+    },
+    {
+      "id": "new-rodela-de-cuero",
+      "nombre": "Rodela de cuero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-escudo-de-acero-laminado",
+      "nombre": "Escudo de acero laminado",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 87,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-egida-menor",
+      "nombre": "Égida menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 326,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": "Al bloquear un golpe crítico, cura 10 HP instantáneos al portador."
+    },
+    {
+      "id": "new-tapa-de-tacho-de-basura-reforzada",
+      "nombre": "Tapa de tacho de basura reforzada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 46,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-peto-de-cuero-curtido",
+      "nombre": "Peto de cuero curtido",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 51,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-gambeson-acolchado-de-doble-capa",
+      "nombre": "Gambesón acolchado de doble capa",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-manto-de-cuero-de-basilisco",
+      "nombre": "Manto de cuero de basilisco",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 188,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "eva",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-campera-de-cuero-de-motociclista-con-tachas",
+      "nombre": "Campera de cuero de motociclista con tachas",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-peto-de-placas-de-aprendiz",
+      "nombre": "Peto de placas de aprendiz",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 51,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-coraza-de-guardia-de-cuartel",
+      "nombre": "Coraza de guardia de cuartel",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 106,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-coraza-de-dragon-menor",
+      "nombre": "Coraza de dragón menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 277,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Resiste 1 punto adicional de daño ígneo por turno."
+    },
+    {
+      "id": "new-chapa-de-auto-abollada-ajustada-con-alambre",
+      "nombre": "Chapa de auto abollada ajustada con alambre",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 5,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 59,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capucha-de-cuero-acolchada",
+      "nombre": "Capucha de cuero acolchada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-turbante-de-tela-reforzada",
+      "nombre": "Turbante de tela reforzada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 92,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "rangocasteo",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capucha-de-las-sombras-silentes",
+      "nombre": "Capucha de las sombras silentes",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 161,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "eva",
+          "val": 1
+        }
+      ],
+      "detalle": "Ignora 1 punto de resistencia a crítico del objetivo al atacar sorprendiendo."
+    },
+    {
+      "id": "new-gorra-reglamentaria-de-la-policia-federal",
+      "nombre": "Gorra reglamentaria de la Policía Federal",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capacete-de-aprendiz-de-herrero",
+      "nombre": "Capacete de aprendiz de herrero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-yelmo-de-visera",
+      "nombre": "Yelmo de visera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-yelmo-con-cresta-de-comandante",
+      "nombre": "Yelmo con cresta de comandante",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 205,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-casco-de-moto-vintage-pintado-a-mano",
+      "nombre": "Casco de moto vintage pintado a mano",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 56,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guantes-de-cuero-de-carretero",
+      "nombre": "Guantes de cuero de carretero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guantes-de-escalador-encerados",
+      "nombre": "Guantes de escalador encerados",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 81,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guantes-del-sanador-errante",
+      "nombre": "Guantes del sanador errante",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 157,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": "Al curar a un aliado, el portador también recibe 5 HP instantáneos."
+    },
+    {
+      "id": "new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo",
+      "nombre": "Mitones tejidos a mano por una abuela legendaria del pueblo",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 34,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-manoplas-de-trabajo-de-fragua",
+      "nombre": "Manoplas de trabajo de fragua",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guanteletes-de-combate",
+      "nombre": "Guanteletes de combate",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 121,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guanteletes-del-herrero-real",
+      "nombre": "Guanteletes del herrero real",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 246,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "fue",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-guantes-de-horno-de-cocina-industrial",
+      "nombre": "Guantes de horno de cocina industrial",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 46,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-calzas-de-cuero-flexible",
+      "nombre": "Calzas de cuero flexible",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 32,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-pantalon-reforzado-de-cazador",
+      "nombre": "Pantalón reforzado de cazador",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 87,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-calzas-del-corredor-de-tormentas",
+      "nombre": "Calzas del corredor de tormentas",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 157,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "mov",
+          "val": 2
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-jogging-de-gimnasia-con-rayas-laterales",
+      "nombre": "Jogging de gimnasia con rayas laterales",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 34,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-grebas-de-aprendiz-de-milicia",
+      "nombre": "Grebas de aprendiz de milicia",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 46,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-perneras-articuladas",
+      "nombre": "Perneras articuladas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 111,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-grebas-del-centinela-de-hierro",
+      "nombre": "Grebas del centinela de hierro",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 205,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-canilleras-de-arquero-de-futbol-amateur",
+      "nombre": "Canilleras de arquero de fútbol amateur",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-marcha",
+      "nombre": "Botas de marcha",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 38,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-cuero-de-mercader-viajero",
+      "nombre": "Botas de cuero de mercader viajero",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 92,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-del-mensajero-veloz",
+      "nombre": "Botas del mensajero veloz",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 186,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "mov",
+          "val": 2
+        },
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-ojotas-de-goma-con-flores-hawaianas",
+      "nombre": "Ojotas de goma con flores hawaianas",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 34,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-borceguies-reglamentarios-de-recluta",
+      "nombre": "Borceguíes reglamentarios de recluta",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-placas-del-guardia-de-avanzada",
+      "nombre": "Botas de placas del guardia de avanzada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 93,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-hierro-del-coloso-menor",
+      "nombre": "Botas de hierro del coloso menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 5,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 338,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "con",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-esqui-de-aluminio-sin-los-esquis",
+      "nombre": "Botas de esquí de aluminio sin los esquís",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 0,
+      "danoFijo": 0,
+      "precioCompra": 41,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-pocion-de-hp-comun",
+      "nombre": "Poción de HP (común)",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 20,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 25,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-pocion-de-hp-buena-calidad",
+      "nombre": "Poción de HP (Buena Calidad)",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 40,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 50,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-pocion-de-hp-raro",
+      "nombre": "Poción de HP (Raro)",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 100,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-sifon-de-soda-antiguo-a-presion",
+      "nombre": "Sifón de soda antiguo a presión",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 10,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 10,
+      "mods": [],
+      "detalle": ""
     }
   ],
   "equipo": [

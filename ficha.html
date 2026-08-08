@@ -3596,12 +3596,22 @@ function aplicarFicha(data){
       // y se suman los ítems nuevos que trae esta versión de la ficha y vos todavía no tenías.
       // Si a un ítem que ya tenías nunca le cargaste imagen y la versión de fábrica
       // ahora sí tiene una, se la completamos (sin tocar nada que hayas editado vos).
+      // Con la misma idea se completan los campos que la copia guardada ni
+      // siquiera conoce: son los que se agregaron al juego después de que
+      // guardaste, así que no pudiste haberlos elegido vos. Los que ya
+      // existen se respetan aunque estén vacíos, porque ahí sí decidiste.
       {
         const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
         const frescoPorId = new Map(fresh.catalogo.map(i => [i.id, i]));
         const propioActualizado = propio.map(item => {
           const fresco = frescoPorId.get(item.id);
-          return (fresco && !item.imagen && fresco.imagen) ? {...item, imagen: fresco.imagen} : item;
+          if(!fresco) return item;
+          const actualizado = {...item};
+          Object.keys(fresco).forEach(campo => {
+            if(!(campo in actualizado)) actualizado[campo] = fresco[campo];
+          });
+          if(!actualizado.imagen && fresco.imagen) actualizado.imagen = fresco.imagen;
+          return actualizado;
         });
         const idsPropios = new Set(propio.map(i => i.id));
         const nuevosDeFabrica = fresh.catalogo.filter(i => !idsPropios.has(i.id));

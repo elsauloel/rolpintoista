@@ -1,8 +1,8 @@
 {
-  "actualizado": "2026-08-08T12:35:08.046Z",
+  "actualizado": "2026-08-08T20:53:09.504Z",
   "creeps": [
     {
-      "id": "nfnl0ks",
+      "id": "whmofqj",
       "nombre": "Creep nuevo",
       "imagen": "",
       "hp": 10,
@@ -10,27 +10,35 @@
       "estados": []
     },
     {
-      "id": "gnx6lvm",
-      "nombre": "Creep nuevo",
+      "id": "qsi16w8",
+      "nombre": "Creep nuevo (copia)",
       "imagen": "",
       "hp": 10,
       "hpMax": 10,
       "estados": []
     },
     {
-      "id": "g9od9a4",
-      "nombre": "Creep nuevo",
+      "id": "qij0ti2",
+      "nombre": "Dionisio, el Último Festín",
       "imagen": "",
-      "hp": 10,
-      "hpMax": 10,
+      "hp": 60,
+      "hpMax": 60,
       "estados": []
     },
     {
-      "id": "0uciuew",
-      "nombre": "Creep nuevo",
+      "id": "ex5xjyc",
+      "nombre": "Dionisio, el Último Festín (copia)",
       "imagen": "",
-      "hp": 10,
-      "hpMax": 10,
+      "hp": 60,
+      "hpMax": 60,
+      "estados": []
+    },
+    {
+      "id": "ou37m1b",
+      "nombre": "Dentista Menemista",
+      "imagen": "",
+      "hp": 45,
+      "hpMax": 45,
       "estados": []
     }
   ]

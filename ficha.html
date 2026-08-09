@@ -399,6 +399,10 @@ a{color:var(--brass)}
   font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);width:100%
 }
 .preset-blanco:hover{border-color:var(--copper);color:var(--paper)}
+/* Esquivar ocupa las dos filas a la izquierda; Parry y Bloqueo se apilan
+   a la derecha, que es como quedan mejor los tres juntos. */
+.combate-defensa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.combate-defensa #btn-esquivar{grid-row:span 2}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -1050,9 +1054,10 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
             <div class="dl">Defensa</div>
             <div class="dv"><span id="v-def">0</span></div>
           </button>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button type="button" class="btn" id="btn-esquivar" style="flex:1">🎲 Esquivar</button>
-            <button type="button" class="btn" id="btn-parry" style="flex:1">🎲 Parry</button>
+          <div class="combate-defensa">
+            <button type="button" class="btn" id="btn-esquivar">🎲 Esquivar</button>
+            <button type="button" class="btn" id="btn-parry">🎲 Parry</button>
+            <button type="button" class="btn" id="btn-bloqueo">🎲 Bloqueo</button>
           </div>
           <div id="def-breakdown"></div>
           <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
@@ -1530,7 +1535,7 @@ const GRUPOS = [
     {id:'hpmax', label:'Hp.Max', full:'Health points máximos'}]},
   {id:'fue', label:'Fue', full:'Fuerza', color:'#D07B3A', derived:[
     {id:'dmg', label:'Dmg', full:'Damage'},
-    {id:'potencia', label:'Potencia', full:'Potencia'},
+    {id:'bloqueo', label:'Bloqueo', full:'Bloqueo'},
     {id:'crgmax', label:'Crg.Max', full:'Carga máxima'}]},
   {id:'agl', label:'Agi', full:'Agilidad', color:'#8FB84F', derived:[
     {id:'eva', label:'Eva', full:'Evasión'},
@@ -1657,7 +1662,7 @@ const DEFAULT = {
   armadura:{nota:''},
   formulas:{
     resmg:'con', rescc:'con', hpmax:'con*5',
-    dmg:'fue', potencia:'fue', crgmax:'fue',
+    dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', mov:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
     pdgmg:'int', resm:'int', bonos:'ceil(int/2) - sobrecarga', rangocasteo:'int',
@@ -2122,12 +2127,13 @@ function formulasCombate(){
   const fPdg = formulaParaValor(c.final.pdg);
   const fEva = formulaParaValor(c.final.eva);
   const fParry = formulaParaValor(c.final.parry);
+  const fBloqueo = formulaParaValor(c.final.bloqueo);
   const armas = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
   let danio;
   if(armas.length === 1) danio = armaDanoTxt(armas[0]);
   else if(armas.length > 1) danio = 'elegís arma';
   else danio = 'sin arma equipada';
-  return {pdg: fPdg ? fPdg.formula : '', eva: fEva ? fEva.formula : '', parry: fParry ? fParry.formula : '', danio};
+  return {pdg: fPdg ? fPdg.formula : '', eva: fEva ? fEva.formula : '', parry: fParry ? fParry.formula : '', bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
 }
 
 // Los botones de Combate muestran qué van a tirar, para no tener que
@@ -2137,6 +2143,7 @@ function actualizarTextosCombate(){
   $('#btn-atacar-pdg').textContent = `🎲 Atacar (PdG)${f.pdg ? ` · ${f.pdg}` : ''}`;
   $('#btn-esquivar').textContent = `🎲 Esquivar${f.eva ? ` · ${f.eva}` : ''}`;
   $('#btn-parry').textContent = `🎲 Parry${f.parry ? ` · ${f.parry}` : ''}`;
+  $('#btn-bloqueo').textContent = `🎲 Bloqueo${f.bloqueo ? ` · ${f.bloqueo}` : ''}`;
   $('#btn-danio-arma').textContent = `🎲 Daño Arma · ${f.danio}`;
 }
 
@@ -2978,6 +2985,9 @@ function renderBotonera(){
         <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
           <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
         </button>
+        <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
+          <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
+        </button>
         <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
           <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
         </button>
@@ -3304,6 +3314,7 @@ document.addEventListener('click', e => {
     if(b.dataset.botoneraaccion === 'danio') $('#btn-danio-arma').click();
     if(b.dataset.botoneraaccion === 'esquivar') $('#btn-esquivar').click();
     if(b.dataset.botoneraaccion === 'parry') $('#btn-parry').click();
+    if(b.dataset.botoneraaccion === 'bloqueo') $('#btn-bloqueo').click();
     return;
   }
   if(b.dataset.stat){
@@ -3689,6 +3700,13 @@ function aplicarFicha(data){
     try{
       const fresh = structuredClone(DEFAULT);
       const next = {...fresh, ...data};
+      // Potencia pasó a llamarse Bloqueo: las fichas guardadas antes traen
+      // la fórmula con el nombre viejo. Se renombra para no perderla si
+      // estaba personalizada (si ya tiene Bloqueo, gana el nuevo).
+      if(data.formulas && data.formulas.potencia !== undefined){
+        if(data.formulas.bloqueo === undefined) data.formulas.bloqueo = data.formulas.potencia;
+        delete data.formulas.potencia;
+      }
       ['meta','loot','armadura','caps','formulas'].forEach(k => { next[k] = mergeDeep(fresh[k], data[k]); });
       ['inventario','cinturon','habilidades','pasivas','sociales','efectos','bitacora','invocaciones'].forEach(k => {
         next[k] = Array.isArray(data[k]) && data[k].length ? data[k] : fresh[k];
@@ -5723,6 +5741,7 @@ $('#btn-atacar-pdg').onclick = () => {
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva);
 $('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry);
+$('#btn-bloqueo').onclick = () => tirarValorStat('Bloqueo', compute().final.bloqueo);
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
 $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });

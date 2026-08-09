@@ -903,6 +903,15 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 .ef-chip-datos{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap;flex:none}
 .ef-chip.urgente .ef-chip-datos{color:var(--danger)}
 .ef-chip-pop{align-self:center;padding-right:8px;font-size:9px;color:var(--brass)}
+.ef-chip.con-tip .ef-chip-nombre{border-bottom:1px dotted var(--muted)}
+/* Va fijo al viewport porque la lista de estados scrollea: dentro del
+   chip, el globito quedaría cortado por ese overflow. */
+.ef-tip{
+  position:fixed;z-index:200;display:none;max-width:280px;padding:9px 11px;
+  background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);
+  font-family:"Space Grotesk",system-ui,sans-serif;font-size:12px;line-height:1.45;
+  color:var(--paper);box-shadow:0 10px 26px rgba(0,0,0,.7);pointer-events:none
+}
 .btn.subir{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
 .btn.subir:hover{background:#3A8A6F;border-color:#3A8A6F}
 .btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
@@ -2928,7 +2937,8 @@ const LISTS = {
       if(st > 1) partes.push(`×${fmt(st)}`);
       if(dur) partes.push(dur);
       if(hp) partes.push(`${hp > 0 ? '+' : ''}${fmt(hp)} HP`);
-      return `<div class="ef-chip${activo ? '' : ' pausado'}${urgente ? ' urgente' : ''}" title="${esc(i.detalle || i.nombre)}">
+      const det = (i.detalle || '').trim();
+      return `<div class="ef-chip${activo ? '' : ' pausado'}${urgente ? ' urgente' : ''}${det ? ' con-tip' : ''}"${det ? ` data-tip="${esc(det)}"` : ''}>
         <button type="button" class="ef-chip-toggle" data-toggle="${i.id}" title="${activo ? 'Pausar' : 'Activar'}">${activo ? '✓' : '○'}</button>
         <button type="button" class="ef-chip-cuerpo" data-view="efectos:${i.id}" title="Ver el detalle">
           <span class="ef-chip-nombre">${esc(i.nombre)}</span>
@@ -2960,6 +2970,50 @@ function renderList(key){
   if(key === 'habilidades' && $('#scrim-todas-habilidades').classList.contains('open')) renderTodasHabilidades();
   if(['habilidades','inventario','mochila','equipo','cinturon'].includes(key) && $('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
+
+/* Globito con la descripción del estado, al pasar el cursor. Uno solo
+   para todos los chips, colgado del body y posicionado a mano. */
+let efTipEl = null;
+
+function mostrarEfTip(chip){
+  const det = chip.dataset.tip;
+  if(!det) return;
+  if(!efTipEl){
+    efTipEl = document.createElement('div');
+    efTipEl.className = 'ef-tip';
+    document.body.appendChild(efTipEl);
+  }
+  efTipEl.textContent = det;
+  efTipEl.style.display = 'block';
+  efTipEl.style.left = '0px';
+  efTipEl.style.top = '0px';
+  const r = chip.getBoundingClientRect();
+  const g = efTipEl.getBoundingClientRect();
+  const margen = 8;
+  let left = r.left;
+  if(left + g.width > window.innerWidth - margen) left = window.innerWidth - g.width - margen;
+  if(left < margen) left = margen;
+  // Arriba del chip; si no entra, abajo.
+  let top = r.top - g.height - 6;
+  if(top < margen) top = r.bottom + 6;
+  efTipEl.style.left = `${Math.round(left)}px`;
+  efTipEl.style.top = `${Math.round(top)}px`;
+}
+
+function ocultarEfTip(){
+  if(efTipEl) efTipEl.style.display = 'none';
+}
+
+document.addEventListener('mouseover', e => {
+  const chip = e.target.closest('.ef-chip.con-tip');
+  if(chip) mostrarEfTip(chip);
+});
+document.addEventListener('mouseout', e => {
+  const chip = e.target.closest('.ef-chip.con-tip');
+  if(chip && !chip.contains(e.relatedTarget)) ocultarEfTip();
+});
+// Si la lista scrollea o se cierra la ficha, el globito no puede quedar flotando.
+document.addEventListener('scroll', ocultarEfTip, true);
 
 function renderInventario(){
   renderList('equipo');

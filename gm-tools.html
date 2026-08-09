@@ -1192,6 +1192,57 @@ function actualizarHpMaxPorCon(sc){
   sc.hp = estabaFull ? nuevoHpMax : Math.min(num(sc.hp), nuevoHpMax);
 }
 
+/* El HP acepta "+10" o "-5" además de un número fijo, igual que la ficha:
+   en combate se anota lo que pegó, no el total. Se guarda el valor al
+   entrar al campo para poder sumarle el delta al salir o con Enter. */
+const deltaBase = new WeakMap();
+
+function resolverDeltaHp(input){
+  const sc = S.creeps.find(s => s.id === input.dataset.id);
+  if(!sc) return;
+  const crudo = (input.value || '').trim();
+  const m = crudo.match(/^([+-])\s*(\d+(?:[.,]\d+)?)$/);
+  const base = deltaBase.has(input) ? deltaBase.get(input) : num(sc.hp);
+  let val;
+  if(m){
+    val = base + parseFloat(m[2].replace(',', '.')) * (m[1] === '-' ? -1 : 1);
+  }else if(/^-?\d+(?:[.,]\d+)?$/.test(crudo)){
+    val = parseFloat(crudo.replace(',', '.'));
+  }else{
+    // Ni delta ni número: fue un error de tipeo. Se deja el HP como estaba
+    // en vez de mandarlo a 0, que en combate mataría al creep de una.
+    input.value = fmt(base);
+    return;
+  }
+  sc.hp = val;
+  input.value = fmt(val);
+  deltaBase.set(input, val);
+  // renderAll redibuja la tarjeta entera: badge de muerte, barra y todo.
+  renderAll();
+}
+
+document.addEventListener('focusin', e => {
+  const i = e.target;
+  if(i.dataset && i.dataset.f === 'hp' && i.dataset.id){
+    deltaBase.set(i, num(i.value));
+    i.select();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const i = e.target;
+  if(e.key === 'Enter' && i.dataset && i.dataset.f === 'hp' && i.dataset.id){
+    e.preventDefault();
+    resolverDeltaHp(i);
+    i.blur();
+  }
+});
+
+document.addEventListener('focusout', e => {
+  const i = e.target;
+  if(i.dataset && i.dataset.f === 'hp' && i.dataset.id) resolverDeltaHp(i);
+});
+
 function actualizarVitalesEnDOM(sc, card){
   if(!card) return;
   const inHp = card.querySelector('[data-f="hp"]');
@@ -1391,7 +1442,7 @@ function cardHtml(sc){
       <div class="vitalbar">
         <div class="vital-mini hp">
           <div class="vl">HP</div>
-          <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
         </div>
         <div class="vital-mini acc">
           <div class="vl acc-label">${accLabelHtml(sc)}</div>
@@ -1502,7 +1553,7 @@ function cardCompactoHtml(sc){
       <div class="vitalbar">
         <div class="vital-mini hp">
           <div class="vl">HP</div>
-          <div class="vn"><input type="number" data-f="hp" data-id="${sc.id}" value="${sc.hp}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
         </div>
         <div class="vital-mini acc">
           <div class="vl">Acciones</div>
@@ -2122,6 +2173,9 @@ document.addEventListener('input', e => {
     const sc = S.creeps.find(s=>s.id===t.dataset.id);
     if(!sc) return;
     const campo = t.dataset.f;
+    // El HP se resuelve al salir del campo o con Enter: si se guardara
+    // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
+    if(campo === 'hp') return;
     const numericos = ['nivel','hp','hpMax','acc','accMax','spd','defensa'];
     sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
     if(campo === 'nivel'){

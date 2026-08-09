@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-08T20:53:43.551Z",
+  "actualizado": "2026-08-09T19:42:01.102Z",
   "creeps": [
     {
       "id": "whmofqj",
@@ -7,22 +7,6 @@
       "imagen": "",
       "hp": 10,
       "hpMax": 10,
-      "estados": []
-    },
-    {
-      "id": "qsi16w8",
-      "nombre": "Creep nuevo (copia)",
-      "imagen": "",
-      "hp": 10,
-      "hpMax": 10,
-      "estados": []
-    },
-    {
-      "id": "qij0ti2",
-      "nombre": "Dionisio, el Último Festín",
-      "imagen": "",
-      "hp": 60,
-      "hpMax": 60,
       "estados": []
     },
     {
@@ -37,8 +21,16 @@
       "id": "ou37m1b",
       "nombre": "Dentista Menemista",
       "imagen": "",
-      "hp": 22,
+      "hp": 45,
       "hpMax": 45,
+      "estados": []
+    },
+    {
+      "id": "z1zlu4g",
+      "nombre": "Mirtha Legrand, Reina de los Muertos",
+      "imagen": "",
+      "hp": 50,
+      "hpMax": 50,
       "estados": []
     }
   ]

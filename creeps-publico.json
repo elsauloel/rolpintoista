@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-09T20:02:21.503Z",
+  "actualizado": "2026-08-09T20:08:17.709Z",
   "creeps": [
     {
       "id": "whmofqj",
@@ -15,12 +15,7 @@
       "imagen": "",
       "hp": 10,
       "hpMax": 10,
-      "estados": [
-        {
-          "nombre": "Veneno",
-          "turnos": 4
-        }
-      ]
+      "estados": []
     },
     {
       "id": "ex5xjyc",
@@ -30,7 +25,7 @@
       "hpMax": 60,
       "estados": [
         {
-          "nombre": "Hypeado",
+          "nombre": "Pajaritos",
           "turnos": 2
         }
       ]
@@ -41,7 +36,12 @@
       "imagen": "",
       "hp": 45,
       "hpMax": 45,
-      "estados": []
+      "estados": [
+        {
+          "nombre": "Agotado",
+          "turnos": 1
+        }
+      ]
     },
     {
       "id": "z1zlu4g",
@@ -51,8 +51,8 @@
       "hpMax": 50,
       "estados": [
         {
-          "nombre": "Exhausto",
-          "turnos": 1
+          "nombre": "Hypeado",
+          "turnos": 2
         }
       ]
     }

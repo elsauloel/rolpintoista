@@ -177,7 +177,14 @@ a{color:var(--brass)}
 .bar span{position:absolute;inset:0;width:0;transition:width .35s cubic-bezier(.2,.8,.2,1)}
 .bar.hp span{background:linear-gradient(90deg,var(--wine),#C4485A)}
 .bar.bp span{background:linear-gradient(90deg,#2E6B57,var(--absenta))}
-.steppers{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+.steppers{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap;align-items:center}
+.dano-entrante{display:flex;align-items:center;gap:6px;margin-left:auto}
+.dano-entrante label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.dano-entrante input{
+  width:52px;text-align:center;font-family:"Space Mono",monospace;font-size:12px;
+  padding:3px 6px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
+}
+.dano-entrante input:focus{border-color:var(--danger);background:rgba(212,87,78,.2)}
 .step{
   font-family:"Space Mono",monospace;font-size:11px;padding:3px 9px;
   border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:var(--r);color:var(--muted)
@@ -917,6 +924,10 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           <button class="step" data-hp="1">+1</button>
           <button class="step" data-hp="5">+5</button>
           <button class="step" data-hp="full">Al máximo</button>
+          <span class="dano-entrante">
+            <label for="f-dano-entrante">Daño entrante:</label>
+            <input type="text" inputmode="decimal" id="f-dano-entrante" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta tu Defensa y el resto sale del HP">
+          </span>
         </div>
         <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
       </div>
@@ -3213,6 +3224,34 @@ document.addEventListener('input', e => {
    entrar a la caja.
    ========================================================= */
 
+// Daño entrante: se escribe el golpe crudo y la ficha le descuenta la
+// Defensa. Resta plana con piso en 0 — si la Defensa llega al golpe, no
+// pasa nada. El campo queda vacío después para el próximo.
+function aplicarDanioEntrante(){
+  const campo = $('#f-dano-entrante');
+  const crudo = (campo.value || '').trim();
+  if(!crudo) return;
+  if(!/^\d+(?:[.,]\d+)?$/.test(crudo)){
+    toast('Escribí el daño del golpe, sin signo — la Defensa se resta sola');
+    campo.value = '';
+    return;
+  }
+  const golpe = parseFloat(crudo.replace(',', '.'));
+  const c = compute();
+  const defensa = Number.isNaN(c.final.def) ? 0 : num(c.final.def);
+  const recibido = Math.max(0, golpe - defensa);
+  S.hp = num(S.hp) - recibido;
+  $('#f-hp').value = fmt(S.hp);
+  campo.value = '';
+  renderVitals();
+  refresh();
+  if(recibido <= 0){
+    toast(`Golpe de ${fmt(golpe)} · tu Defensa ${fmt(defensa)} lo frenó entero`);
+  }else{
+    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño`);
+  }
+}
+
 const CAJAS_DELTA = ['f-hp', 'f-dde', 'f-exp'];
 let cajaDeltaBase = {};
 
@@ -3233,6 +3272,12 @@ document.addEventListener('focusin', e => {
   if(CAJAS_DELTA.includes(e.target.id)){ cajaDeltaBase[e.target.id] = num(e.target.value); e.target.select(); }
 });
 document.addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.keyCode === 13) && e.target.id === 'f-dano-entrante'){
+    e.preventDefault();
+    aplicarDanioEntrante();
+    e.target.blur();
+    return;
+  }
   if((e.key === 'Enter' || e.keyCode === 13) && CAJAS_DELTA.includes(e.target.id)){
     e.preventDefault();
     resolverCajaDelta(e.target);

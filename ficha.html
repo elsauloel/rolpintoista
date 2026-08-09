@@ -356,8 +356,26 @@ a{color:var(--brass)}
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
 .cat-meta .precio-lista{text-decoration:line-through;color:var(--muted);margin-right:5px}
 .preset-abrir{width:100%;text-align:left}
+.opcion-fila{display:flex;flex-wrap:wrap;gap:6px}
+.opcion-btn{
+  font-family:"Space Mono",monospace;font-size:10.5px;border:1px solid var(--line);
+  background:var(--panel2);padding:6px 11px;color:var(--muted);border-radius:var(--r)
+}
+.opcion-btn:hover{border-color:var(--copper);color:var(--paper)}
+.opcion-btn.activa{border-color:var(--copper);background:rgba(201,133,69,.18);color:var(--paper);font-weight:700}
+.tipoitem-btn{
+  border:1px solid var(--line);background:var(--panel2);padding:9px 11px;text-align:left;
+  font-size:12px;line-height:1.25;border-left-width:3px;border-left-color:var(--line)
+}
+.tipoitem-btn:hover{border-color:var(--copper);background:var(--panel)}
+.tipoitem-btn.activa{border-color:var(--copper);background:rgba(201,133,69,.18);font-weight:700}
+.tipoitem-btn.armas{border-left-color:var(--danger)}
+.tipoitem-btn.escudos{border-left-color:var(--brass)}
+.tipoitem-btn.defensa{border-left-color:var(--bottle)}
+.tipoitem-btn.consumibles{border-left-color:var(--absenta)}
+.tipoitem-btn.otros{border-left-color:var(--muted)}
 /* Se abre desde el editor, que ya es un scrim: tiene que quedar encima. */
-#scrim-presets{z-index:60}
+#scrim-presets,#scrim-tipoitem{z-index:60}
 .preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .preset-grupo:first-child{margin-top:0}
 .preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
@@ -1243,6 +1261,16 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
       </div>
     </div>
     <div class="body" id="catalogo-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-tipoitem">
+  <div class="modal" style="max-width:620px">
+    <header>
+      <h3>Categoría del ítem</h3>
+      <button class="iconbtn" id="tipoitem-x">Cerrar</button>
+    </header>
+    <div class="body" id="tipoitem-body"></div>
   </div>
 </div>
 
@@ -4148,11 +4176,18 @@ $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#btn-tablero').onclick = () => abrirTablero(false);
 $('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
 $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
+$('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
+$('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
 document.addEventListener('click', e => {
-  const abrir = e.target.closest('#efecto-preset-abrir');
-  if(abrir){ abrirPresetsEfecto(); return; }
-  const btn = e.target.closest('[data-preset]');
-  if(btn && btn.closest('#presets-body')) aplicarPresetEfecto(btn.dataset.preset);
+  if(e.target.closest('#efecto-preset-abrir')){ abrirPresetsEfecto('efecto'); return; }
+  if(e.target.closest('#item-efecto-preset-abrir')){ abrirPresetsEfecto('item'); return; }
+  if(e.target.closest('#tipoitem-abrir')){ abrirTipoItem(); return; }
+  const preset = e.target.closest('[data-preset]');
+  if(preset && preset.closest('#presets-body')){ aplicarPresetEfecto(preset.dataset.preset); return; }
+  const tipo = e.target.closest('[data-tipoitem]');
+  if(tipo){ aplicarTipoItem(tipo.dataset.tipoitem); return; }
+  const cat = e.target.closest('[data-cat-hab]');
+  if(cat && editing){ editing.draft.categoria = cat.dataset.catHab; drawEditor(); return; }
 });
 $('#tablero-refrescar').onclick = () => abrirTablero(true);
 $('#tablero-x').onclick = () => $('#scrim-tablero').classList.remove('open');
@@ -4449,7 +4484,36 @@ function presetBtnHtml(p, valor, clase){
   </button>`;
 }
 
-function abrirPresetsEfecto(){
+// La botonera de estados sirve para dos destinos: el editor de estados
+// (donde el preset llena la ficha entera) y el de ítems/habilidades
+// (donde solo llena los campos del efecto que dispara).
+let presetDestino = 'efecto';
+
+function abrirTipoItem(){
+  const grupos = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', consumibles:'Consumibles', otros:'Otros'};
+  const draft = editing && editing.draft;
+  let html = '';
+  Object.keys(grupos).forEach(g => {
+    const del = CATEGORIAS.filter(c => c.id && grupoCompraDe(c.id) === g);
+    if(!del.length) return;
+    html += `<div class="preset-grupo">${grupos[g]} · ${fmt(del.length)}</div>`;
+    html += `<div class="preset-grid">${del.map(c =>
+      `<button type="button" class="tipoitem-btn ${g} ${draft && draft.tipoItem === c.id ? 'activa' : ''}" data-tipoitem="${esc(c.id)}">${esc(c.label)}</button>`
+    ).join('')}</div>`;
+  });
+  $('#tipoitem-body').innerHTML = html;
+  $('#scrim-tipoitem').classList.add('open');
+}
+
+function aplicarTipoItem(id){
+  $('#scrim-tipoitem').classList.remove('open');
+  if(!editing) return;
+  editing.draft.tipoItem = id;
+  drawEditor();
+}
+
+function abrirPresetsEfecto(destino){
+  presetDestino = destino || 'efecto';
   const propios = S.efectosPersonalizados || [];
   let html = `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
   ['buff','debuff','otro'].forEach(pol => {
@@ -4472,9 +4536,17 @@ function aplicarPresetEfecto(valor){
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
   if(!preset) return;
-  const {nombre, ...resto} = preset;
-  Object.assign(editing.draft, structuredClone(resto));
-  editing.draft.nombre = nombre;
+  if(presetDestino === 'item'){
+    editing.draft.efectoNombre = preset.nombre;
+    editing.draft.efectoTurnos = preset.turnos ?? 0;
+    editing.draft.efectoHpTurno = preset.hpturno ?? 0;
+    editing.draft.efectoPermanente = !!preset.permanente;
+    if(preset.detalle && !(editing.draft.efectoDetalle || '').trim()) editing.draft.efectoDetalle = preset.detalle;
+  }else{
+    const {nombre, ...resto} = preset;
+    Object.assign(editing.draft, structuredClone(resto));
+    editing.draft.nombre = nombre;
+  }
   drawEditor();
 }
 
@@ -5060,16 +5132,16 @@ function drawEditor(){
   }
   html += `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
   if(sc.campos.includes('categoria')){
+    // Son tres opciones: entran todas en una fila, no hace falta desplegable.
     html += `<div class="f"><label>${CAMPO_LABEL.categoria}</label>
-      <select data-c="categoria">
-        ${CATEGORIAS_HABILIDAD.map(c => `<option value="${esc(c)}" ${draft.categoria===c?'selected':''}>${c || '— sin categoría —'}</option>`).join('')}
-      </select></div>`;
+      <div class="opcion-fila">
+        ${CATEGORIAS_HABILIDAD.map(c => `<button type="button" class="opcion-btn ${draft.categoria===c?'activa':''}" data-cat-hab="${esc(c)}">${esc(c || 'Sin categoría')}</button>`).join('')}
+      </div></div>`;
   }
   if(sc.campos.includes('tipoItem')){
+    const catActual = CATEGORIAS.find(c => c.id === draft.tipoItem);
     html += `<div class="f"><label>${CAMPO_LABEL.tipoItem}</label>
-      <select data-c="tipoItem">
-        ${CATEGORIAS.map(c => `<option value="${esc(c.id)}" ${draft.tipoItem===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}
-      </select></div>`;
+      <button type="button" class="btn preset-abrir" id="tipoitem-abrir">${esc(catActual && catActual.id ? catActual.label : '— elegir categoría —')}</button></div>`;
     const slotDef = key !== 'catalogo' ? SLOT_DEFS.find(sd => sd.cats.includes(draft.tipoItem)) : null;
     if(slotDef){
       const slots = computeSlots();
@@ -5140,13 +5212,7 @@ function drawEditor(){
   if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')){
     const personalizadosIt = S.efectosPersonalizados || [];
     html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
-      <select id="item-efecto-preset">
-        <option value="">— elegir preset o escribir a mano —</option>
-        ${optgroupsEfectosPresetHtml()}
-        ${personalizadosIt.length ? `<optgroup label="Mis presets">
-          ${personalizadosIt.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}
-        </optgroup>` : ''}
-      </select>
+      <button type="button" class="btn preset-abrir" id="item-efecto-preset-abrir">Elegir de la lista · ${fmt(EFECTOS_PRESET.length + personalizadosIt.length)} estados</button>
       <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}" style="margin-top:6px"></div>
       <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" data-c="efectoPermanente" ${draft.efectoPermanente?'checked':''} style="width:auto">
@@ -5232,18 +5298,6 @@ function setModVal(draft, statId, val){
 
 function handleModalFieldChange(e){
   const t = e.target;
-  if(t.id === 'item-efecto-preset'){
-    if(!t.value) return;
-    const [tipo, idx] = t.value.split(':');
-    const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
-    if(!preset) return;
-    editing.draft.efectoNombre = preset.nombre;
-    editing.draft.efectoTurnos = preset.turnos ?? 0;
-    editing.draft.efectoHpTurno = preset.hpturno ?? 0;
-    editing.draft.efectoPermanente = !!preset.permanente;
-    drawEditor();
-    return;
-  }
   if(t.dataset.c){
     const c = t.dataset.c;
     editing.draft[c] = t.type === 'checkbox' ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===''?'':num(t.value)) : t.value);
@@ -5347,7 +5401,7 @@ document.addEventListener('change', e => {
   const h = S.habilidades.find(x => x.id === cb.dataset.pophab);
   if(h) h.popupAlEjecutar = cb.checked;
 });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-tablero').classList.remove('open'); $('#scrim-presets').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-tablero').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */

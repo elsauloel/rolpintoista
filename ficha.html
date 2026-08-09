@@ -2275,6 +2275,21 @@ function aplicarRevivirConAnkh(key, id){
   return it.nombre;
 }
 
+/* Toda baja de HP pasa por acá. Antes cada camino asignaba S.hp por su
+   cuenta y algunos dejaban valores negativos: la cabecera mostraba 0 pero
+   por dentro había un pozo (-40, por ejemplo), así que curar +5 dejaba -35
+   y el jugador seguía muerto sin entender por qué. El HP nunca baja de 0. */
+function fijarHp(valor){
+  const c = compute();
+  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+  const tope = hpmax > 0 ? hpmax : Math.max(0, num(valor));
+  S.hp = Math.max(0, Math.min(tope, num(valor)));
+  const campo = $('#f-hp');
+  if(campo) campo.value = fmt(S.hp);
+  renderVitals();   // acá adentro se revisa el Ankh y el estado de muerte
+  return S.hp;
+}
+
 // Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se
 // activa solo (auto-consumo). Si está en la mochila en vez de equipado,
 // NO se activa solo — hay un botón de Consumir aparte para activarlo a
@@ -3329,10 +3344,8 @@ function aplicarDanioEntrante(){
   const c = compute();
   const defensa = Number.isNaN(c.final.def) ? 0 : num(c.final.def);
   const recibido = Math.max(0, golpe - defensa);
-  S.hp = num(S.hp) - recibido;
-  $('#f-hp').value = fmt(S.hp);
+  fijarHp(num(S.hp) - recibido);
   campo.value = '';
-  renderVitals();
   refresh();
   if(recibido <= 0){
     toast(`Golpe de ${fmt(golpe)} · tu Defensa ${fmt(defensa)} lo frenó entero`);
@@ -3350,7 +3363,7 @@ function resolverCajaDelta(t){
   const base = cajaDeltaBase[t.id] ?? 0;
   const val = m ? base + parseFloat(m[2].replace(',', '.')) * (m[1] === '-' ? -1 : 1) : num(raw);
   let final = val;
-  if(t.id === 'f-hp'){ S.hp = val; renderVitals(); }
+  if(t.id === 'f-hp'){ final = fijarHp(val); }
   else if(t.id === 'f-dde'){ S.meta.dde = val; renderExp(); refresh(); }
   else if(t.id === 'f-exp'){ applyExp(val); refresh(); final = S.meta.exp; }
   t.value = fmt(final);
@@ -3460,8 +3473,8 @@ document.addEventListener('click', e => {
   if(b.dataset.hp !== undefined){
     const c = compute();
     const mx = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-    S.hp = b.dataset.hp === 'full' ? mx : Math.min(mx, S.hp + num(b.dataset.hp));
-    $('#f-hp').value = S.hp; renderVitals(); return;
+    fijarHp(b.dataset.hp === 'full' ? mx : num(S.hp) + num(b.dataset.hp));
+    return;
   }
   if(b.id === 'btn-loot-add'){
     S.loot.especial = S.loot.especial || [];
@@ -3731,8 +3744,7 @@ document.addEventListener('click', e => {
       if(num(it.curahp)){
         const c = compute();
         const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-        S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + num(it.curahp)));
-        $('#f-hp').value = S.hp;
+        fijarHp(num(S.hp) + num(it.curahp));
       }
       const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
@@ -5720,8 +5732,9 @@ function mantenimiento(){
   });
 
   if(hpDelta){
-    S.hp = Math.max(0, Math.min(hpmax, num(S.hp) + hpDelta));
-    $('#f-hp').value = S.hp;
+    // Pasa por fijarHp para que el veneno que te deja en 0 active el Ankh
+    // antes de que se descuenten los turnos de muerte, más abajo.
+    fijarHp(num(S.hp) + hpDelta);
   }
 
   if(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0){

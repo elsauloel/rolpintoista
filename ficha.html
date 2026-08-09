@@ -878,6 +878,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 .btn.primary:hover{background:var(--brass)}
 .btn.ghost{color:var(--muted)}
 .btn.del{color:var(--danger);border-color:rgba(212,87,78,.4)}
+/* Se usa a cada rato durante la partida: verde para encontrarlo de una. */
+.btn.subir{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
+.btn.subir:hover{background:#3A8A6F;border-color:#3A8A6F}
 .btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
 .btn.aleatorio:hover{background:#9B7BD4;color:#1B0F1F}
 
@@ -945,6 +948,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           </span>
         </div>
         <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
+        <button type="button" class="btn subir" id="btn-sync" style="width:100%;margin-top:6px" title="Subir este personaje a GitHub y publicar tu estado en el Tablero">⬆ Subir datos</button>
       </div>
       <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
         <span class="acciones-label">Acciones</span>
@@ -1189,7 +1193,6 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   <button class="btn" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">Tablero</button>
   <button class="btn" id="btn-personajes">Personajes</button>
   <button class="btn" id="btn-actualizar" title="Traer la última versión de este personaje desde GitHub">Bajar datos</button>
-  <button class="btn" id="btn-sync" title="Subir este personaje a GitHub">Subir datos</button>
   <button class="btn primary" id="btn-guardar">Guardar ficha</button>
   <input type="file" id="file-input" accept=".json" hidden>
 </div>

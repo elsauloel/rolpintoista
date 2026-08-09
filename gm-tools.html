@@ -109,6 +109,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .tablero-estado b{color:var(--paper);font-weight:700}
 .tablero-caido{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--danger)}
 .tablero-viejo{font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);opacity:.8}
+/* Se usa a cada rato durante la partida: verde para encontrarlo de una. */
+.btn.subir{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
+.btn.subir:hover{background:#3A8A6F;border-color:#3A8A6F}
 .btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
 .btn.aleatorio:hover{background:#9B7BD4;color:#1B0F1F}
 .reporte-seccion-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
@@ -497,6 +500,7 @@ input[type=file]{display:none}
         <button class="btn" id="btn-ia">+ Creep con IA</button>
         <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
         <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
+        <button class="btn subir" id="btn-subir" title="Publicar el estado de los creeps para que los jugadores lo vean en el Tablero">⬆ Subir datos</button>
       </div>
     </div>
   </div>
@@ -506,7 +510,6 @@ input[type=file]{display:none}
     <button class="btn ghost" id="btn-load">Cargar</button>
     <button class="btn" id="btn-save-todo">Guardar todo (para mí)</button>
     <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
-    <button class="btn primary" id="btn-subir">Subir datos</button>
     <input type="file" id="file-input" accept=".json">
   </div>
 

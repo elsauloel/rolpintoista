@@ -62,6 +62,13 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.ghost{color:var(--muted)}
 .btn.finalizar{background:#C9754A;border-color:#C9754A;color:#1B0F08;font-weight:700}
 .btn.finalizar:hover{background:#DC8B5C;border-color:#DC8B5C}
+.dano-entrante{display:flex;align-items:center;gap:5px;margin-top:5px}
+.dano-entrante label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dano-entrante input{
+  width:46px;text-align:center;font-family:"Space Mono",monospace;font-size:11px;
+  padding:2px 4px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
+}
+.dano-entrante input:focus{background:rgba(212,87,78,.2)}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -455,6 +462,7 @@ input[type=file]{display:none}
       <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
       <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
       <button class="btn ghost" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
+      <button class="btn ghost" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
       <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
       <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
       <button class="btn" id="btn-dados">Dados</button>
@@ -609,6 +617,16 @@ input[type=file]{display:none}
       <button type="button" class="btn aleatorio" id="equipar-creep-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
     </div>
     <div class="body" id="equipar-creep-lista"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-historial">
+  <div class="modal" style="max-width:460px">
+    <header><h3>Historial de la sesión</h3><button class="iconbtn" id="historial-x">Cerrar</button></header>
+    <div class="body">
+      <div class="hint" style="margin-bottom:8px">Tiradas y acciones recientes — vive solo en esta pestaña, no se guarda con los creeps.</div>
+      <div id="historial-body" style="display:flex;flex-direction:column;gap:4px;max-height:60vh;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
+    </div>
   </div>
 </div>
 
@@ -861,6 +879,26 @@ function registrarTirada(origen, r){
   dadosHistorial.unshift({origen, ...r, hora: new Date()});
   dadosHistorial = dadosHistorial.slice(0, 20);
   renderDadosHistorial();
+  registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
+}
+
+/* Historial de la sesión: tiradas y acciones, como en la ficha. Se cuelga
+   del toast — todo lo que ya se avisa en pantalla queda anotado sin tener
+   que registrarlo a mano en cada lugar. Vive en la pestaña, no se guarda. */
+let sesionHistorial = [];
+
+function registrarEvento(texto){
+  sesionHistorial.unshift({texto, hora: new Date()});
+  sesionHistorial = sesionHistorial.slice(0, 80);
+  renderHistorialSesion();
+}
+
+function renderHistorialSesion(){
+  const el = $('#historial-body');
+  if(!el) return;
+  el.innerHTML = sesionHistorial.length
+    ? sesionHistorial.map(h => `<div>${horaTxt(h.hora)} — ${esc(h.texto)}</div>`).join('')
+    : '<div style="opacity:.6">Sin eventos todavía.</div>';
 }
 
 function mostrarResultadoDado(origen, r){
@@ -1214,12 +1252,55 @@ function resolverDeltaHp(input){
     input.value = fmt(base);
     return;
   }
+  // El HP del creep es lo que más se toca en combate: queda anotado con
+  // el antes y el después, que es lo que después uno quiere reconstruir.
+  const previo = num(sc.hp);
+  if(val !== previo){
+    const dif = val - previo;
+    registrarEvento(`${sc.nombre || 'Creep'}: ${fmt(previo)} → ${fmt(val)} HP (${dif > 0 ? '+' : ''}${fmt(dif)})`);
+  }
   sc.hp = val;
   input.value = fmt(val);
   deltaBase.set(input, val);
   // renderAll redibuja la tarjeta entera: badge de muerte, barra y todo.
   renderAll();
 }
+
+/* Daño entrante del creep: se escribe el golpe crudo y se le descuenta la
+   Defensa efectiva — la que ya tiene en cuenta si la armadura está rota
+   (mitad) o arruinada (cero). Resta plana con piso en 0, igual que la ficha. */
+function aplicarDanioCreep(input){
+  const sc = S.creeps.find(s => s.id === input.dataset.danocreep);
+  if(!sc) return;
+  const crudo = (input.value || '').trim();
+  if(!crudo) return;
+  if(!/^\d+(?:[.,]\d+)?$/.test(crudo)){
+    toast('Escribí el daño del golpe, sin signo — la Defensa se resta sola');
+    input.value = '';
+    return;
+  }
+  const golpe = parseFloat(crudo.replace(',', '.'));
+  const defensa = creepDefensaEfectiva(sc);
+  const recibido = Math.max(0, golpe - defensa);
+  const previo = num(sc.hp);
+  sc.hp = previo - recibido;
+  input.value = '';
+  if(recibido <= 0){
+    toast(`${sc.nombre || 'Creep'}: golpe de ${fmt(golpe)} · Defensa ${fmt(defensa)} lo frenó entero`);
+  }else{
+    toast(`${sc.nombre || 'Creep'}: ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño (${fmt(previo)} → ${fmt(sc.hp)} HP)`);
+  }
+  renderAll();
+}
+
+document.addEventListener('keydown', e => {
+  const i = e.target;
+  if(e.key === 'Enter' && i.dataset && i.dataset.danocreep){
+    e.preventDefault();
+    aplicarDanioCreep(i);
+    i.blur();
+  }
+});
 
 document.addEventListener('focusin', e => {
   const i = e.target;
@@ -1443,6 +1524,10 @@ function cardHtml(sc){
         <div class="vital-mini hp">
           <div class="vl">HP</div>
           <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="dano-entrante">
+            <label>Daño</label>
+            <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
+          </div>
         </div>
         <div class="vital-mini acc">
           <div class="vl acc-label">${accLabelHtml(sc)}</div>
@@ -1554,6 +1639,10 @@ function cardCompactoHtml(sc){
         <div class="vital-mini hp">
           <div class="vl">HP</div>
           <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="dano-entrante">
+            <label>Daño</label>
+            <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
+          </div>
         </div>
         <div class="vital-mini acc">
           <div class="vl">Acciones</div>
@@ -2329,6 +2418,11 @@ document.addEventListener('click', e => {
     abrirTablero(false);
     return;
   }
+  if(b.id === 'btn-historial'){
+    renderHistorialSesion();
+    $('#scrim-historial').classList.add('open');
+    return;
+  }
   if(b.dataset.equiparitem !== undefined){
     equiparItemEnCreep(num(b.dataset.equiparitem));
     return;
@@ -3095,6 +3189,7 @@ let toastT;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2400);
+  registrarEvento(msg);
 }
 
 // Lo que ven los jugadores: nombre, HP y estados, sin habilidades ni
@@ -3186,6 +3281,8 @@ $('#equipar-creep-orden').addEventListener('change', e => { equipoOrden = e.targ
 $('#equipar-creep-orden-dir').addEventListener('click', () => { equipoOrdenDesc = !equipoOrdenDesc; renderEquiparCreepLista(); });
 $('#tablero-refrescar').addEventListener('click', () => abrirTablero(true));
 $('#tablero-x').addEventListener('click', () => $('#scrim-tablero').classList.remove('open'));
+$('#historial-x').addEventListener('click', () => $('#scrim-historial').classList.remove('open'));
+$('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id === 'scrim-historial') $('#scrim-historial').classList.remove('open'); });
 $('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') $('#scrim-tablero').classList.remove('open'); });
 $('#equipar-creep-item-aleatorio').addEventListener('click', elegirItemAleatorioGM);
 $('#item-aleatorio-gm-tirar-de-nuevo').addEventListener('click', elegirItemAleatorioGM);

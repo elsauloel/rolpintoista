@@ -337,7 +337,7 @@ const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
 const ES_ARMA = catId => CATEGORIAS.find(c=>c.id===catId)?.arma === true;
 
 const CATALOGO = [
-  {id:'cat-pocion-hp', nombre:'Poción de HP', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:5, unidades:1, consumible:true, curahp:25, mods:[], detalle:'Recupera 25 HP.'},
+  {id:'cat-pocion-hp', nombre:'Poción de HP', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:1, consumible:true, curahp:25, mods:[], detalle:'Recupera 25 HP.'},
   {id:'cat-pocion-hp-grande', nombre:'Poción de HP grande', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:1, cargaMax:3, consumible:true, curahp:25, mods:[], detalle:'3 Cargas. Recupera 25 HP por carga.'},
   {id:'cat-pocion-hp-mayor', nombre:'Poción de HP mayor', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:100, mods:[], detalle:'Recupera 100 HP.'},
   {id:'cat-pocion-hp-mayor-grande', nombre:'Poción de HP mayor grande', tier:'Excepcional', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:200, unidades:1, cargaMax:3, consumible:true, curahp:100, mods:[], detalle:'3 Cargas. Recupera 100 HP por carga.'},
@@ -462,9 +462,6 @@ const CATALOGO = [
   {id:'new-botas-de-placas-del-guardia-de-avanzada', nombre:'Botas de placas del guardia de avanzada', tier:'Buena Calidad', imagen:'', tipoItem:'botas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:93, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo1', val:1}, {stat:'tipo3', val:1}], detalle:''},
   {id:'new-botas-de-hierro-del-coloso-menor', nombre:'Botas de hierro del coloso menor', tier:'Raro', imagen:'', tipoItem:'botas_rigidas', peso:5, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:338, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}, {stat:'con', val:1}], detalle:''},
   {id:'new-botas-de-esqui-de-aluminio-sin-los-esquis', nombre:'Botas de esquí de aluminio sin los esquís', tier:'Común', imagen:'', tipoItem:'botas_rigidas', peso:3, ranuras:0, tipoDado:0, danoFijo:0, precioCompra:41, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:''},
-  {id:'new-pocion-de-hp-comun', nombre:'Poción de HP (común)', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:20, unidades:1, consumible:true, curahp:25, mods:[], detalle:''},
-  {id:'new-pocion-de-hp-buena-calidad', nombre:'Poción de HP (Buena Calidad)', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:40, unidades:1, consumible:true, curahp:50, mods:[], detalle:''},
-  {id:'new-pocion-de-hp-raro', nombre:'Poción de HP (Raro)', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:100, mods:[], detalle:''},
   {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda antiguo a presión', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, curahp:10, mods:[], detalle:''},
 ];
 

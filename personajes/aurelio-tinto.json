@@ -620,7 +620,7 @@
       "tipoItem": "consumibles",
       "peso": 0,
       "ranuras": 1,
-      "precioCompra": 5,
+      "precioCompra": 20,
       "unidades": 1,
       "consumible": true,
       "curahp": 25,
@@ -674,34 +674,6 @@
       "detalle": "3 Cargas. Recupera 100 HP por carga.",
       "tier": "Excepcional",
       "cargaMax": 3
-    },
-    {
-      "id": "cat-pocion-sp",
-      "nombre": "Poción de SP",
-      "imagen": "",
-      "tipoItem": "consumibles",
-      "peso": 0,
-      "ranuras": 1,
-      "precioCompra": 30,
-      "unidades": 1,
-      "consumible": true,
-      "curahp": 0,
-      "mods": [],
-      "detalle": "+1 SP. +3 Bonos. (El sistema no aplica SP ni Bonos solo — anotalo a mano al usarla.)"
-    },
-    {
-      "id": "cat-pocion-sp-grande",
-      "nombre": "Poción de SP grande",
-      "imagen": "",
-      "tipoItem": "consumibles",
-      "peso": 0,
-      "ranuras": 1,
-      "precioCompra": 120,
-      "unidades": 2,
-      "consumible": true,
-      "curahp": 0,
-      "mods": [],
-      "detalle": "3 Cargas. +1 SP y +10 Bonos por carga. (Aplicar a mano al usarla.)"
     },
     {
       "id": "cat-cura-plus",
@@ -3519,51 +3491,6 @@
           "val": 1
         }
       ],
-      "detalle": ""
-    },
-    {
-      "id": "new-pocion-de-hp-comun",
-      "nombre": "Poción de HP (común)",
-      "tier": "Común",
-      "imagen": "",
-      "tipoItem": "consumibles",
-      "peso": 0,
-      "ranuras": 1,
-      "precioCompra": 20,
-      "unidades": 1,
-      "consumible": true,
-      "curahp": 25,
-      "mods": [],
-      "detalle": ""
-    },
-    {
-      "id": "new-pocion-de-hp-buena-calidad",
-      "nombre": "Poción de HP (Buena Calidad)",
-      "tier": "Buena Calidad",
-      "imagen": "",
-      "tipoItem": "consumibles",
-      "peso": 0,
-      "ranuras": 1,
-      "precioCompra": 40,
-      "unidades": 1,
-      "consumible": true,
-      "curahp": 50,
-      "mods": [],
-      "detalle": ""
-    },
-    {
-      "id": "new-pocion-de-hp-raro",
-      "nombre": "Poción de HP (Raro)",
-      "tier": "Raro",
-      "imagen": "",
-      "tipoItem": "consumibles",
-      "peso": 0,
-      "ranuras": 1,
-      "precioCompra": 90,
-      "unidades": 1,
-      "consumible": true,
-      "curahp": 100,
-      "mods": [],
       "detalle": ""
     },
     {

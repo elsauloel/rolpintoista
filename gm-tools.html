@@ -40,12 +40,14 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .hero{
   border:1px solid var(--line);border-top:3px solid var(--copper);
   background:linear-gradient(180deg, rgba(201,133,69,.10), rgba(0,0,0,0) 60%), var(--panel);
-  padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  padding:18px 20px;display:flex;flex-direction:column;gap:12px;
   position:sticky;top:0;z-index:60;box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
 }
+.hero-titulo{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero-acciones{display:flex;flex-direction:column;gap:8px}
+.hero-fila{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(22px,3vw,32px);margin:0;letter-spacing:-.01em}
 .hero .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px}
-.hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .turno-badge{
   font-family:"Space Mono",monospace;font-size:12px;border:1px solid var(--line);padding:6px 12px;border-radius:99px;color:var(--muted)
 }
@@ -452,22 +454,28 @@ input[type=file]{display:none}
 <body>
 <div class="wrap">
   <div class="hero">
-    <div>
-      <div class="eyebrow">GM Tools</div>
-      <h1>Creeps en combate</h1>
-    </div>
-    <div class="hero-right">
+    <div class="hero-titulo">
+      <div>
+        <div class="eyebrow">GM Tools</div>
+        <h1>Creeps en combate</h1>
+      </div>
       <span class="turno-badge" id="turno-badge">Turno 1</span>
-      <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
-      <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
-      <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
-      <button class="btn ghost" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
-      <button class="btn ghost" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
-      <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
-      <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
-      <button class="btn" id="btn-dados">Dados</button>
-      <button class="btn" id="btn-ia">+ Creep con IA</button>
-      <button class="btn primary" id="btn-add">+ Creep</button>
+    </div>
+    <div class="hero-acciones">
+      <div class="hero-fila">
+        <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
+        <button class="btn ghost" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
+        <button class="btn ghost" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
+        <button class="btn" id="btn-dados">Dados</button>
+        <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
+        <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
+      </div>
+      <div class="hero-fila">
+        <button class="btn primary" id="btn-add">+ Creep</button>
+        <button class="btn" id="btn-ia">+ Creep con IA</button>
+        <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
+        <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
+      </div>
     </div>
   </div>
 

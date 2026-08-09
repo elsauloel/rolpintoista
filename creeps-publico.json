@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-09T19:42:01.102Z",
+  "actualizado": "2026-08-09T20:02:21.503Z",
   "creeps": [
     {
       "id": "whmofqj",
@@ -10,12 +10,30 @@
       "estados": []
     },
     {
+      "id": "qsi16w8",
+      "nombre": "Creep nuevo (copia)",
+      "imagen": "",
+      "hp": 10,
+      "hpMax": 10,
+      "estados": [
+        {
+          "nombre": "Veneno",
+          "turnos": 4
+        }
+      ]
+    },
+    {
       "id": "ex5xjyc",
       "nombre": "Dionisio, el Último Festín (copia)",
       "imagen": "",
       "hp": 60,
       "hpMax": 60,
-      "estados": []
+      "estados": [
+        {
+          "nombre": "Hypeado",
+          "turnos": 2
+        }
+      ]
     },
     {
       "id": "ou37m1b",
@@ -31,7 +49,12 @@
       "imagen": "",
       "hp": 50,
       "hpMax": 50,
-      "estados": []
+      "estados": [
+        {
+          "nombre": "Exhausto",
+          "turnos": 1
+        }
+      ]
     }
   ]
 }

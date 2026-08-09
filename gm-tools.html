@@ -464,10 +464,9 @@ input[type=file]{display:none}
   </div>
 
   <div class="toolbar">
-    <span class="note">Guardá antes de cerrar la pestaña — esto no se guarda solo. "Guardar todo" baja tu respaldo completo (gm-creeps.json). "Guardar vista pública" baja solo lo que ven los jugadores (creeps-publico.json). "Subir datos" sube esa vista pública al repo.</span>
+    <span class="note">Guardá antes de cerrar la pestaña — esto no se guarda solo. "Guardar todo" baja tu respaldo completo (gm-creeps.json). "Subir datos" publica el estado de los creeps para que los jugadores lo vean en el Tablero.</span>
     <button class="btn ghost" id="btn-load">Cargar</button>
     <button class="btn" id="btn-save-todo">Guardar todo (para mí)</button>
-    <button class="btn" id="btn-save-publico">Guardar vista pública (para jugadores)</button>
     <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
     <button class="btn primary" id="btn-subir">Subir datos</button>
     <input type="file" id="file-input" accept=".json">
@@ -2362,7 +2361,6 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
-  if(b.id === 'btn-save-publico'){ guardarVistaPublica(); return; }
   if(b.id === 'btn-load'){ $('#file-input').click(); return; }
   if(b.id === 'btn-subir'){ subirDatos(); return; }
   if(b.id === 'btn-token'){ ghToken(true).then(t => { if(t) toast('Token de GitHub actualizado'); }); return; }
@@ -3045,6 +3043,8 @@ function toast(msg){
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2400);
 }
 
+// Lo que ven los jugadores: nombre, HP y estados, sin habilidades ni
+// equipo. La sube "Subir datos" y la lee el Tablero de las fichas.
 function armarVistaPublica(){
   return {
     actualizado: new Date().toISOString(),
@@ -3071,11 +3071,6 @@ function descargar(nombreArchivo, objeto){
 function guardarTodo(){
   descargar('gm-creeps.json', S);
   toast('Guardado: tu respaldo completo (gm-creeps.json)');
-}
-
-function guardarVistaPublica(){
-  descargar('creeps-publico.json', armarVistaPublica());
-  toast('Guardado: la vista para jugadores (creeps-publico.json)');
 }
 
 document.addEventListener('change', async e => {

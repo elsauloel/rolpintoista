@@ -35,7 +35,7 @@
     "des": 5,
     "int": 12
   },
-  "hp": -1,
+  "hp": 40,
   "turno": 6,
   "log": [
     "<b style=\"color:var(--brass)\">Turno 6</b>",
@@ -45,9 +45,9 @@
   "bonosGastados": 0,
   "acciones": 3,
   "muerto": {
-    "activo": true,
-    "turnos": 0,
-    "definitivo": true
+    "activo": false,
+    "turnos": 5,
+    "definitivo": false
   },
   "caps": {
     "mochila": 20,

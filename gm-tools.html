@@ -1375,7 +1375,6 @@ function cardHtml(sc){
         <label class="lv-label">Lv</label>
         <input class="lv" type="number" data-f="nivel" data-id="${sc.id}" value="${sc.nivel}">
       </div>
-      <button class="verbtn" data-ver="${sc.id}">Ver</button>
       <button class="verbtn" data-dup="${sc.id}" title="Duplicar este creep">Duplicar</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
@@ -1495,6 +1494,7 @@ function cardCompactoHtml(sc){
       <button type="button" class="eyebtn" data-vermodo="${sc.id}" title="Ver ficha completa">${SVG_OJO_CERRADO}</button>
       <span class="name-compacto">${esc(sc.nombre)}</span>
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
+      <button class="verbtn" data-ver="${sc.id}">Ver</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
     ${muertoBadgeHtml(sc)}

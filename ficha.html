@@ -355,6 +355,32 @@ a{color:var(--brass)}
 }
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
 .cat-meta .precio-lista{text-decoration:line-through;color:var(--muted);margin-right:5px}
+.preset-abrir{width:100%;text-align:left}
+/* Se abre desde el editor, que ya es un scrim: tiene que quedar encima. */
+#scrim-presets{z-index:60}
+.preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.preset-grupo:first-child{margin-top:0}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+.preset-btn{
+  border:1px solid var(--line);background:var(--panel2);padding:9px 10px;text-align:left;
+  display:flex;flex-direction:column;gap:4px;border-left-width:3px;min-height:100%
+}
+.preset-btn:hover{border-color:var(--copper);background:var(--panel)}
+.preset-btn.buff{border-left-color:var(--absenta)}
+.preset-btn.debuff{border-left-color:var(--danger)}
+.preset-btn.otro{border-left-color:var(--muted)}
+.preset-btn.propio{border-left-color:var(--brass)}
+.preset-nombre{font-weight:700;font-size:12.5px;line-height:1.2}
+.preset-datos{display:flex;flex-wrap:wrap;gap:5px}
+.preset-dato{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line-soft);border-radius:99px;padding:1px 6px;color:var(--muted)}
+.preset-dato.bueno{color:var(--absenta);border-color:rgba(168,194,86,.4)}
+.preset-dato.malo{color:var(--danger);border-color:rgba(212,87,78,.4)}
+.preset-detalle{font-size:10.5px;color:var(--muted);line-height:1.35}
+.preset-blanco{
+  border:1px dashed var(--line);background:transparent;padding:9px 10px;text-align:left;
+  font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);width:100%
+}
+.preset-blanco:hover{border-color:var(--copper);color:var(--paper)}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -1217,6 +1243,16 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
       </div>
     </div>
     <div class="body" id="catalogo-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-presets">
+  <div class="modal" style="max-width:760px">
+    <header>
+      <h3>Elegir estado</h3>
+      <button class="iconbtn" id="presets-x">Cerrar</button>
+    </header>
+    <div class="body" id="presets-body"></div>
   </div>
 </div>
 
@@ -4110,6 +4146,14 @@ function ghCabeceras(accept){
 $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#btn-tablero').onclick = () => abrirTablero(false);
+$('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
+$('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
+document.addEventListener('click', e => {
+  const abrir = e.target.closest('#efecto-preset-abrir');
+  if(abrir){ abrirPresetsEfecto(); return; }
+  const btn = e.target.closest('[data-preset]');
+  if(btn && btn.closest('#presets-body')) aplicarPresetEfecto(btn.dataset.preset);
+});
 $('#tablero-refrescar').onclick = () => abrirTablero(true);
 $('#tablero-x').onclick = () => $('#scrim-tablero').classList.remove('open');
 $('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') $('#scrim-tablero').classList.remove('open'); });
@@ -4382,6 +4426,58 @@ const EFECTOS_PRESET = [
 ];
 
 const POLARIDAD_EFECTO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
+// Los presets en grilla: cada uno muestra lo que hace (turnos, HP por
+// turno, stacks) sin tener que abrirlo. Reemplaza al desplegable, donde
+// solo se veía el nombre y había que elegir a ciegas.
+function presetBtnHtml(p, valor, clase){
+  const datos = [];
+  const hpturno = num(p.hpturno);
+  if(hpturno) datos.push(`<span class="preset-dato ${hpturno > 0 ? 'bueno' : 'malo'}">${hpturno > 0 ? '+' : ''}${fmt(hpturno)} HP/turno</span>`);
+  if(p.permanente) datos.push(`<span class="preset-dato">No vence</span>`);
+  else if(num(p.turnos)) datos.push(`<span class="preset-dato">${fmt(num(p.turnos))} turnos</span>`);
+  if(num(p.stacks) > 1) datos.push(`<span class="preset-dato">${fmt(num(p.stacks))} stacks</span>`);
+  (p.mods || []).forEach(m => {
+    if(!m.stat) return;
+    const v = num(m.val);
+    datos.push(`<span class="preset-dato ${v > 0 ? 'bueno' : 'malo'}">${esc(STAT_LABEL[m.stat] || m.stat)} ${v > 0 ? '+' : ''}${fmt(v)}</span>`);
+  });
+  const det = (p.detalle || '').trim();
+  return `<button type="button" class="preset-btn ${clase}" data-preset="${esc(valor)}">
+    <span class="preset-nombre">${esc(p.nombre)}</span>
+    ${datos.length ? `<span class="preset-datos">${datos.join('')}</span>` : ''}
+    ${det ? `<span class="preset-detalle">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</span>` : ''}
+  </button>`;
+}
+
+function abrirPresetsEfecto(){
+  const propios = S.efectosPersonalizados || [];
+  let html = `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
+  ['buff','debuff','otro'].forEach(pol => {
+    const del = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+    if(!del.length) return;
+    html += `<div class="preset-grupo">${POLARIDAD_EFECTO_LABEL[pol]} · ${fmt(del.length)}</div>`;
+    html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtml(p, `std:${i}`, pol)).join('')}</div>`;
+  });
+  if(propios.length){
+    html += `<div class="preset-grupo">Mis presets · ${fmt(propios.length)}</div>`;
+    html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtml(p, `custom:${i}`, 'propio')).join('')}</div>`;
+  }
+  $('#presets-body').innerHTML = html;
+  $('#scrim-presets').classList.add('open');
+}
+
+function aplicarPresetEfecto(valor){
+  $('#scrim-presets').classList.remove('open');
+  if(!valor || !editing) return;
+  const [tipo, idx] = valor.split(':');
+  const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
+  if(!preset) return;
+  const {nombre, ...resto} = preset;
+  Object.assign(editing.draft, structuredClone(resto));
+  editing.draft.nombre = nombre;
+  drawEditor();
+}
+
 function optgroupsEfectosPresetHtml(){
   return ['buff','debuff','otro'].map(pol => {
     const opts = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol);
@@ -4956,15 +5052,9 @@ function drawEditor(){
 
   let html = '';
   if(key === 'efectos' && !editing.id){
-    const personalizados = S.efectosPersonalizados || [];
+    const cuantos = EFECTOS_PRESET.length + (S.efectosPersonalizados || []).length;
     html += `<div class="f"><label>Preset (opcional)</label>
-      <select id="efecto-preset">
-        <option value="">— en blanco —</option>
-        ${optgroupsEfectosPresetHtml()}
-        ${personalizados.length ? `<optgroup label="Mis presets">
-          ${personalizados.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}
-        </optgroup>` : ''}
-      </select>
+      <button type="button" class="btn preset-abrir" id="efecto-preset-abrir">Elegir de la lista · ${fmt(cuantos)} estados</button>
       <div class="hint" style="margin-top:5px">Elegí un preset para completar los valores de base — después podés editar cualquier campo antes de guardar.</div>
     </div>`;
   }
@@ -5142,17 +5232,6 @@ function setModVal(draft, statId, val){
 
 function handleModalFieldChange(e){
   const t = e.target;
-  if(t.id === 'efecto-preset'){
-    if(!t.value) return;
-    const [tipo, idx] = t.value.split(':');
-    const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
-    if(!preset) return;
-    const {nombre, ...resto} = preset;
-    Object.assign(editing.draft, structuredClone(resto));
-    editing.draft.nombre = nombre;
-    drawEditor();
-    return;
-  }
   if(t.id === 'item-efecto-preset'){
     if(!t.value) return;
     const [tipo, idx] = t.value.split(':');
@@ -5268,7 +5347,7 @@ document.addEventListener('change', e => {
   const h = S.habilidades.find(x => x.id === cb.dataset.pophab);
   if(h) h.popupAlEjecutar = cb.checked;
 });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-tablero').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-tablero').classList.remove('open'); $('#scrim-presets').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */

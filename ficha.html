@@ -429,7 +429,22 @@ a{color:var(--brass)}
 .tablero-hp-fill.bajo{background:var(--danger)}
 .tablero-hp-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--paper);flex:none}
 .tablero-estados{display:flex;flex-wrap:wrap;gap:4px}
-.tablero-estado{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line);border-radius:99px;padding:2px 7px;color:var(--muted)}
+.tablero-estado{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line);border-radius:99px;padding:2px 7px;color:var(--muted);position:relative}
+.tablero-estado.con-tip{cursor:help;border-style:dashed}
+.tablero-estado.con-tip:hover{border-color:var(--copper);color:var(--paper)}
+/* El globito se muestra al pasar el cursor, sin clic. Va hacia arriba
+   porque las tarjetas suelen tener los estados abajo de todo. */
+.tablero-estado-tip{
+  display:none;position:absolute;bottom:calc(100% + 6px);left:0;z-index:70;
+  width:230px;max-width:60vw;padding:8px 10px;
+  background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);
+  font-family:"Space Grotesk",system-ui,sans-serif;font-size:11.5px;line-height:1.45;
+  color:var(--paper);text-transform:none;letter-spacing:0;white-space:normal;text-align:left;
+  box-shadow:0 8px 22px rgba(0,0,0,.65);pointer-events:none
+}
+.tablero-estado.con-tip:hover .tablero-estado-tip{display:block}
+/* Cerca del borde derecho se ancla del otro lado para no salirse. */
+.tablero-card:nth-child(3n) .tablero-estado-tip{left:auto;right:0}
 .tablero-estado b{color:var(--paper);font-weight:700}
 .tablero-caido{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--danger)}
 .tablero-viejo{font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);opacity:.8}
@@ -4104,7 +4119,7 @@ function armarTarjetaTablero(){
     muerto: !!(S.muerto && S.muerto.activo),
     estados: (S.efectos || [])
       .filter(e => e.activo !== false)
-      .map(e => ({nombre: e.nombre, turnos: num(e.turnos), permanente: !!e.permanente})),
+      .map(e => ({nombre: e.nombre, turnos: num(e.turnos), permanente: !!e.permanente, detalle: e.detalle || ''})),
     actualizado: new Date().toISOString(),
   };
 }
@@ -4176,9 +4191,10 @@ function tableroCardHtml(x, tipo){
       <span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>
     </div>
     ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
-    ${estados.length ? `<div class="tablero-estados">${estados.map(e =>
-      `<span class="tablero-estado"><b>${esc(e.nombre)}</b>${e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}</span>`
-    ).join('')}</div>` : ''}
+    ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
+      const det = (e.detalle || '').trim();
+      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
+    }).join('')}</div>` : ''}
     ${desde ? `<div class="tablero-viejo">${esc(desde)}</div>` : ''}
   </div>`;
 }

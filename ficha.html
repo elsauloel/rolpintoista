@@ -1189,7 +1189,6 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
       <div id="personajes-lista" style="display:flex;flex-direction:column;gap:9px"></div>
       <button class="btn primary" id="personajes-nuevo" style="width:100%">Ficha nueva</button>
       <button class="btn ghost" id="personajes-archivo" style="width:100%">Cargar un archivo .json</button>
-      <button class="btn ghost" id="personajes-creeps" style="width:100%">Ver estado de los Creeps</button>
     </div>
   </div>
 </div>
@@ -4398,7 +4397,6 @@ $('#personajes-archivo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');
   cargarArchivoLocal();
 };
-$('#personajes-creeps').onclick = () => window.open('creeps-vista.html', '_blank');
 $('#personajes-x').onclick = () => $('#scrim-personajes').classList.remove('open');
 $('#scrim-personajes').addEventListener('mousedown', e => { if(e.target.id==='scrim-personajes') $('#scrim-personajes').classList.remove('open'); });
 

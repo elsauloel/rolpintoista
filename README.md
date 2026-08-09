@@ -46,11 +46,13 @@ con el resto del grupo sin pasar el archivo por WhatsApp, hay dos páginas más:
   recortada: id, nombre, imagen, HP y estados con nombre y turnos). El botón
   **Subir datos** sube directamente `creeps-publico.json` al repo, con el
   mismo token de GitHub que usa **Subir datos** de la ficha.
-- [`creeps-vista.html`](creeps-vista.html) — página de solo lectura para el
-  resto del grupo: con **Cargar datos** eligen el `creeps-publico.json` y ven
-  una tarjeta por creep (imagen, barra de HP, estados con turnos restantes).
+El botón **Tablero** —está tanto en la ficha como en gm-tools— baja ese
+`creeps-publico.json` junto con lo que publicó cada jugador en `tablero/` y
+arma el panorama del combate: una tarjeta por personaje y por creep, con su
+HP y sus estados. No se actualiza solo: cada uno publica lo suyo cuando
+termina su turno y el resto refresca cuando quiere.
 
-Si el máster actualiza `gm-tools.html` o `creeps-vista.html`, esos cambios se
+Si el máster actualiza `gm-tools.html`, esos cambios se
 publican desde `gestor.html` (botón **Subir al repo**), igual que `ficha.html`
 — no desde el botón Subir datos de ninguna de las dos herramientas, que es
 solo para los datos de la partida.
@@ -61,7 +63,6 @@ solo para los datos de la partida.
 ficha.html              La herramienta: ficha de personaje interactiva
 gestor.html             Gestor de la app: actualizarla o publicar tu versión
 gm-tools.html           Panel del máster: creeps en combate (HP, estados, etc.)
-creeps-vista.html       Vista de solo lectura del estado de los creeps
 creeps-publico.json     Estado público de los creeps (lo sube gm-tools.html)
 personajes/              Personajes jugables, listos para cargar en la ficha
   aurelio-tinto.json

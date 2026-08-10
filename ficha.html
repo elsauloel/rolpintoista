@@ -718,6 +718,9 @@ a{color:var(--brass)}
 .botonera-list-subhead:first-child{margin-top:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+/* Esquivar alto a la izquierda; Parry y Bloqueo apilados a la derecha,
+   igual que en la caja Combate de la ficha. */
+.botonera-combate-grid [data-botoneraaccion="esquivar"]{grid-row:span 2}
 @media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .botonera-tile{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
@@ -3102,11 +3105,11 @@ function renderBotonera(){
         <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
           <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
         </button>
-        <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
-          <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
-        </button>
         <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
           <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
+        </button>
+        <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
+          <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
         </button>
       </div>
     </div>

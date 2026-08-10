@@ -924,6 +924,8 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   font-family:"Space Grotesk",system-ui,sans-serif;font-size:12px;line-height:1.45;
   color:var(--paper);box-shadow:0 10px 26px rgba(0,0,0,.7);pointer-events:none
 }
+.btn.vender{background:rgba(224,164,88,.16);border-color:var(--brass);color:var(--brass);font-weight:700}
+.btn.vender:hover{background:var(--brass);color:#1B0F08}
 .btn.subir{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
 .btn.subir:hover{background:#3A8A6F;border-color:#3A8A6F}
 .btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
@@ -1502,6 +1504,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <div class="body" id="view-body"></div>
     <footer style="justify-content:flex-end;gap:8px">
       <button class="btn del" id="view-del-btn">Eliminar</button>
+      <button class="btn vender" id="view-vender-btn">Vender</button>
       <button class="btn primary" id="view-edit-btn">Editar</button>
     </footer>
   </div>
@@ -4820,6 +4823,17 @@ function openViewer(key, id){
   `;
   $('#view-edit-btn').style.display = '';
   $('#view-del-btn').style.display = '';
+  // Vender solo aplica a lo que está en la mochila o el cinturón: el
+  // catálogo es la lista de lo que existe, no cosas que uno tenga.
+  const vendible = ['inventario','cinturon'].includes(key) && precioVentaDe(it) > 0;
+  const btnVender = $('#view-vender-btn');
+  btnVender.style.display = vendible ? '' : 'none';
+  if(vendible){
+    const unidades = num(it.unidades) || 1;
+    btnVender.textContent = unidades > 1
+      ? `Vender 1 (${fmt(precioVentaDe(it))} DDE)`
+      : `Vender (${fmt(precioVentaDe(it))} DDE)`;
+  }
   $('#scrim-view').classList.add('open');
 }
 
@@ -4855,6 +4869,7 @@ function verInvocacion(id){
   `;
   $('#view-edit-btn').style.display = 'none';
   $('#view-del-btn').style.display = 'none';
+  $('#view-vender-btn').style.display = 'none';
   $('#scrim-view').classList.add('open');
 }
 
@@ -5983,6 +5998,37 @@ $('#btn-limpiar-estados').onclick = () => {
   renderList('efectos');
   refresh();
   toast(`${cuantos} estado(s) eliminado(s)`);
+};
+
+/* Vende una unidad y suma los DDE. Lo equipado no se vende de una: hay
+   que sacárselo antes, así no se va por accidente lo que se tiene puesto. */
+$('#view-vender-btn').onclick = () => {
+  if(!viewing) return;
+  const {key, id} = viewing;
+  const it = (S[key] || []).find(x => x.id === id);
+  if(!it) return;
+  if(it.equipado){
+    toast(`${it.nombre} está equipado — sacátelo antes de venderlo`);
+    return;
+  }
+  const precio = precioVentaDe(it);
+  if(!precio){ toast(`${it.nombre} no tiene precio de venta`); return; }
+
+  const unidades = num(it.unidades) || 1;
+  if(unidades > 1){
+    it.unidades = unidades - 1;
+  }else{
+    S[key] = S[key].filter(x => x.id !== id);
+    $('#scrim-view').classList.remove('open');
+    viewing = null;
+  }
+  S.meta.dde = num(S.meta.dde) + precio;
+  $('#f-dde').value = fmt(S.meta.dde);
+
+  if(key === 'inventario') renderInventario(); else renderList('cinturon');
+  refresh();
+  if(viewing) openViewer(key, id);   // sigue abierto: refrescar lo que muestra
+  toast(`Vendiste ${it.nombre} · +${fmt(precio)} DDE (tenés ${fmt(num(S.meta.dde))})`);
 };
 
 $('#view-del-btn').onclick = () => {

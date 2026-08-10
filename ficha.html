@@ -410,6 +410,14 @@ a{color:var(--brass)}
    a la derecha, que es como quedan mejor los tres juntos. */
 .combate-defensa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .combate-defensa #btn-esquivar{grid-row:span 2}
+.hab-costo{
+  font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.04em;
+  color:var(--muted);white-space:nowrap;padding:0 2px
+}
+.habs-grid-costo{
+  font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.04em;
+  color:var(--muted);text-align:center;margin-top:2px
+}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -3056,6 +3064,7 @@ function renderTodasHabilidades(){
         <button class="mini" data-view="habilidades:${i.id}">Ver</button>
         <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar</button>
       </div>
+      ${costoHabilidadTxt(i) ? `<div class="habs-grid-costo">${esc(costoHabilidadTxt(i))}</div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
@@ -3133,6 +3142,7 @@ function renderBotonera(){
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
+            ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
             <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
@@ -5634,6 +5644,18 @@ function parseCostoBonos(costo){
 }
 
 let pendingEjecucion = null;
+
+/* Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta.
+   El costo en bonos es texto libre ("1 bono", "X bonos"), así que se
+   muestra tal cual lo escribió el jugador. */
+function costoHabilidadTxt(h){
+  const partes = [];
+  const acc = num(h.accionesCosto ?? 1);
+  if(acc) partes.push(`${fmt(acc)} ${acc === 1 ? 'acción' : 'acciones'}`);
+  const costo = String(h.costo || '').trim();
+  if(costo) partes.push(costo);
+  return partes.join(' · ');
+}
 
 function esCostoVariable(costo){
   return /x/i.test(String(costo||''));

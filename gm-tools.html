@@ -71,6 +71,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
   padding:2px 4px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
 }
 .dano-entrante input:focus{background:rgba(212,87,78,.2)}
+/* Misma disposición que la caja Combate de la ficha: Esquivar ocupa las
+   dos filas de la izquierda, Parry y Bloqueo se apilan a la derecha. */
+.creep-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
+.creep-combate-grid [data-esquivarcreep]{grid-row:span 2}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -271,6 +275,9 @@ input[type=file]{display:none}
 .botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;min-width:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+/* Esquivar ocupa las dos filas de la izquierda; Parry y Bloqueo se apilan
+   a la derecha, igual que en la tarjeta del creep y en la ficha. */
+.botonera-combate-grid [data-esquivarcreep]{grid-row:span 2}
 @media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .botonera-tile{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
@@ -1456,15 +1463,17 @@ function renderAccionesCreep(){
       <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
     </button>`).join('');
 
+  const fc = formulasCombateCreep(sc);
   const combate = [
-    {nombre:'Atacar (PdG)', disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
-    {nombre:'Daño Arma', disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
-    {nombre:'Esquivar', disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
-    {nombre:'Parry', disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
+    {nombre:'Atacar (PdG)', dado: fc.pdg, disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
+    {nombre:'Daño Arma', dado: danoTxt(sc), disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
+    {nombre:'Esquivar', dado: fc.eva, disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
+    {nombre:'Parry', dado: fc.parry, disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
+    {nombre:'Bloqueo', dado: fc.bloqueo, disabled:false, motivo:'Sin costo', attr:`data-bloqueocreep="${sc.id}"`},
   ];
   const tilesCombate = combate.map(f => `
     <button type="button" class="botonera-tile" ${f.attr} ${f.disabled?'disabled':''} title="${esc(f.motivo)}">
-      <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value">🎲</span>
+      <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>
     </button>`).join('');
 
   const filasHab = sc.habilidades.map(h => {
@@ -1537,8 +1546,21 @@ function muertoBadgeHtml(sc){
   </div>`;
 }
 
+// Qué dado va a tirar cada botón de Combate, para no tener que
+// adivinarlo antes de apretar (igual que en la ficha).
+function formulasCombateCreep(sc){
+  const f = (v) => { const x = formulaParaValor(v); return x ? x.formula : ''; };
+  return {
+    pdg: f(num(sc.des) + attrModTotal(sc, 'des')),
+    eva: f(num(sc.agl) + attrModTotal(sc, 'agl')),
+    parry: f(num(sc.des) + attrModTotal(sc, 'des')),
+    bloqueo: f(num(sc.fue) + attrModTotal(sc, 'fue')),
+  };
+}
+
 function cardHtml(sc){
   if(sc.compacto) return cardCompactoHtml(sc);
+  const fCombate = formulasCombateCreep(sc);
   return `
   <div class="card${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
@@ -1584,11 +1606,12 @@ function cardHtml(sc){
 
       <div>
         <div class="sect-label">Combate</div>
-        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
-          <button type="button" class="addhab" data-atacarcreep="${sc.id}" style="flex:1">🎲 Atacar (PdG)</button>
-          <button type="button" class="addhab" data-daniocreep="${sc.id}" style="flex:1">🎲 Daño Arma</button>
-          <button type="button" class="addhab" data-esquivarcreep="${sc.id}" style="flex:1">🎲 Esquivar</button>
-          <button type="button" class="addhab" data-parrycreep="${sc.id}" style="flex:1">🎲 Parry</button>
+        <div class="creep-combate-grid">
+          <button type="button" class="addhab" data-atacarcreep="${sc.id}">🎲 Atacar (PdG)${fCombate.pdg ? ` · ${fCombate.pdg}` : ''}</button>
+          <button type="button" class="addhab" data-daniocreep="${sc.id}">🎲 Daño Arma · ${esc(danoTxt(sc))}</button>
+          <button type="button" class="addhab" data-esquivarcreep="${sc.id}">🎲 Esquivar${fCombate.eva ? ` · ${fCombate.eva}` : ''}</button>
+          <button type="button" class="addhab" data-parrycreep="${sc.id}">🎲 Parry${fCombate.parry ? ` · ${fCombate.parry}` : ''}</button>
+          <button type="button" class="addhab" data-bloqueocreep="${sc.id}">🎲 Bloqueo${fCombate.bloqueo ? ` · ${fCombate.bloqueo}` : ''}</button>
         </div>
       </div>
 
@@ -2445,6 +2468,13 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const parry = num(sc.des) + attrModTotal(sc, 'des');
     tirarValorStat(`${sc.nombre} · Parry`, parry);
+    return;
+  }
+  if(b.dataset.bloqueocreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.bloqueocreep);
+    if(!sc) return;
+    const bloqueo = num(sc.fue) + attrModTotal(sc, 'fue');
+    tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueo);
     return;
   }
   if(b.dataset.equipardelfabricante){

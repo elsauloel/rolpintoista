@@ -410,6 +410,7 @@ a{color:var(--brass)}
    a la derecha, que es como quedan mejor los tres juntos. */
 .combate-defensa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .combate-defensa #btn-esquivar{grid-row:span 2}
+.hab-accion{display:inline-flex;align-items:center;gap:8px}
 .hab-costo{
   font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.04em;
   color:var(--muted);white-space:nowrap;padding:0 2px
@@ -3142,8 +3143,10 @@ function renderBotonera(){
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-            ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
-            <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
+            <span class="hab-accion">
+              <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
+              ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
+            </span>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
       </div>

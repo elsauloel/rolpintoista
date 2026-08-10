@@ -30,7 +30,7 @@
     "des": 7,
     "int": 5
   },
-  "hp": 23,
+  "hp": 45,
   "turno": 3,
   "log": [
     "<b style=\"color:var(--brass)\">Turno 3</b>",
@@ -55,7 +55,7 @@
     "rescc": "con",
     "hpmax": "con*5",
     "dmg": "fue",
-    "potencia": "fue",
+    "bloqueo": "fue",
     "crgmax": "fue",
     "eva": "agl",
     "ini": "agl",

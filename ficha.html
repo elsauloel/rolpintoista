@@ -4991,6 +4991,9 @@ function renderCatalogoOrdenControles(){
   if(b) b.textContent = catalogoOrdenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
 }
 
+// Rarezas que no se ofrecen en el catálogo general del jugador.
+const TIERS_OCULTOS = ['Excepcional', 'Legendario'];
+
 function catalogoVisibles(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
@@ -5004,6 +5007,10 @@ function catalogoVisibles(){
     const ofrecidos = new Set(tiendaCargada.items);
     base = S.catalogo.filter(item => ofrecidos.has(item.id));
   }
+  // En el catálogo abierto solo se llega hasta Raro. Lo Excepcional y lo
+  // Legendario existe igual: entra por un vendedor que lo ofrezca o de la
+  // mano del máster, no comprándolo de la lista general.
+  if(!tiendaCargada) base = base.filter(item => !TIERS_OCULTOS.includes(item.tier));
   let visibles = filtro ? base.filter(item => grupoCompraDe(item.tipoItem) === filtro) : base;
   if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);
   if(filtroTier) visibles = visibles.filter(item => item.tier === filtroTier);
@@ -5115,7 +5122,18 @@ function elegirItemAleatorio(){
   $('#scrim-item-aleatorio').classList.add('open');
 }
 
+function ajustarFiltroTier(){
+  const sel = $('#catalogo-filtro-tier');
+  if(!sel) return;
+  [...sel.options].forEach(o => {
+    if(!TIERS_OCULTOS.includes(o.value)) return;
+    o.hidden = !tiendaCargada;
+    if(o.hidden && sel.value === o.value) sel.value = '';
+  });
+}
+
 function renderCatalogoModal(){
+  ajustarFiltroTier();
   const visibles = catalogoVisibles();
   const grupos = {};
   visibles.forEach(item => {

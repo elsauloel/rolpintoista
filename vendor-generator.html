@@ -475,26 +475,32 @@ const GARANTIZADOS = ['cat-pocion-hp', 'cat-pocion-bonos', 'cat-revive'];
 /* Pesos de rareza por tamaño. Son probabilidades, no topes: hasta el
    vendedor ambulante puede sacar algo Excepcional, solo que casi nunca. */
 const TAMANOS = {
-  ambulante: {label:'Vendedor ambulante', min:8,  max:12,  pesos:{'Común':78, 'Buena Calidad':18, 'Raro':3.5, 'Excepcional':0.4, 'Legendario':0.1}},
-  pueblito:  {label:'Pueblito',           min:15, max:20,  pesos:{'Común':68, 'Buena Calidad':25, 'Raro':6,   'Excepcional':0.8, 'Legendario':0.2}},
-  aldea:     {label:'Aldea',              min:25, max:35,  pesos:{'Común':55, 'Buena Calidad':32, 'Raro':11,  'Excepcional':1.7, 'Legendario':0.3}},
-  ciudad:    {label:'Ciudad',             min:40, max:60,  pesos:{'Común':42, 'Buena Calidad':35, 'Raro':18,  'Excepcional':4,   'Legendario':1}},
-  capital:   {label:'Capital',            min:70, max:100, pesos:{'Común':30, 'Buena Calidad':33, 'Raro':25,  'Excepcional':9,   'Legendario':3}},
+  ambulante: {label:'Vendedor ambulante', min:8,  max:12,  pesos:{'Común':70, 'Buena Calidad':19, 'Raro':9.9, 'Excepcional':1,   'Legendario':0.1}},
+  pueblito:  {label:'Pueblito',           min:15, max:20,  pesos:{'Común':60, 'Buena Calidad':25, 'Raro':12,  'Excepcional':2.8, 'Legendario':0.2}},
+  aldea:     {label:'Aldea',              min:25, max:35,  pesos:{'Común':50, 'Buena Calidad':30, 'Raro':15,  'Excepcional':4.5, 'Legendario':0.5}},
+  ciudad:    {label:'Ciudad',             min:40, max:60,  pesos:{'Común':35, 'Buena Calidad':35, 'Raro':22,  'Excepcional':7,   'Legendario':1}},
+  capital:   {label:'Capital',            min:70, max:100, pesos:{'Común':20, 'Buena Calidad':30, 'Raro':32,  'Excepcional':15,  'Legendario':3}},
 };
+
+// Sobre el total sorteado, sin contar el stock garantizado.
+const REPARTO = {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10};
 
 // ES_ARMA sale de CATEGORIAS, arriba, junto con el catálogo.
 const ES_DEFENSA = t => t.startsWith('escudo') || t.startsWith('armadura') || t.startsWith('casco')
   || t.startsWith('guantes') || t.startsWith('piernas') || t.startsWith('botas');
 
+// Los escudos son categoría propia: tienen su porcentaje aparte del
+// resto del equipo defensivo.
 function rubroDe(item){
   if(item.consumible || item.tipoItem === 'consumibles') return 'consumibles';
-  if(ES_ARMA(item.tipoItem)) return 'ofensivo';
-  if(ES_DEFENSA(item.tipoItem)) return 'defensivo';
+  if(ES_ARMA(item.tipoItem)) return 'armas';
+  if(item.tipoItem.startsWith('escudo')) return 'escudos';
+  if(ES_DEFENSA(item.tipoItem)) return 'defensivos';
   return 'otros';
 }
 
-const RUBRO_LABEL = {ofensivo:'Armas', defensivo:'Defensa', consumibles:'Consumibles', otros:'Otros'};
-const RUBRO_ORDEN = ['ofensivo', 'defensivo', 'consumibles', 'otros'];
+const RUBRO_LABEL = {armas:'Armas', defensivos:'Defensa', escudos:'Escudos', consumibles:'Consumibles', otros:'Otros'};
+const RUBRO_ORDEN = ['armas', 'escudos', 'defensivos', 'consumibles', 'otros'];
 
 function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 
@@ -546,55 +552,99 @@ function sortearTier(pesos, disponiblesPorTier){
   return posibles[posibles.length - 1];
 }
 
-function elegirDeRubro(candidatos, cantidad, pesos, usados){
-  const porTier = {};
-  candidatos.forEach(it => {
-    if(usados.has(it.id)) return;
-    (porTier[it.tier] = porTier[it.tier] || []).push(it);
-  });
-  const elegidos = [];
-  for(let i = 0; i < cantidad; i++){
-    const tier = sortearTier(pesos, porTier);
-    if(!tier) break;
-    const lista = porTier[tier];
-    const idx = entero(0, lista.length - 1);
-    const item = lista.splice(idx, 1)[0];
-    if(!lista.length) delete porTier[tier];
-    usados.add(item.id);
-    elegidos.push(item);
+
+// Reparte un entero según porcentajes sin que se pierda ni sobre nada:
+// primero la parte entera, y lo que falta va a los de mayor resto.
+function repartirEntero(total, pesos){
+  const claves = Object.keys(pesos);
+  const exacto = claves.map(k => ({k, v: total * pesos[k]}));
+  const base = exacto.map(e => ({...e, n: Math.floor(e.v), resto: e.v - Math.floor(e.v)}));
+  let faltan = total - base.reduce((a, e) => a + e.n, 0);
+  base.sort((a, b) => b.resto - a.resto);
+  for(let i = 0; faltan > 0; i++, faltan--) base[i % base.length].n++;
+  const out = {};
+  base.forEach(e => { out[e.k] = e.n; });
+  return out;
+}
+
+// Una tirada por objeto, con la tabla del tamaño. No hay cupos por tier:
+// dos tiendas del mismo tamaño pueden salir distintas.
+function tirarTier(pesos){
+  const total = Object.values(pesos).reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for(const [tier, peso] of Object.entries(pesos)){
+    r -= peso;
+    if(r <= 0) return tier;
   }
-  return elegidos;
+  return TIERS[0];
+}
+
+/* Elige un ítem de esa categoría y ese tier que no esté ya en la tienda.
+   El catálogo tiene casilleros vacíos (no hay ninguna arma Excepcional,
+   ni un solo Legendario de nada), así que cuando la combinación no existe
+   se cede primero en rareza —buscando el tier más cercano dentro de la
+   misma categoría— y recién si la categoría se agotó entera se sale de
+   ella. Nunca se inventa un ítem ni se deja el lugar vacío. */
+function elegirItem(rubro, tier, usados, porRubroTier){
+  const libres = (lista) => (lista || []).filter(it => !usados.has(it.id));
+
+  const delRubro = porRubroTier[rubro] || {};
+  const exacto = libres(delRubro[tier]);
+  if(exacto.length) return exacto[entero(0, exacto.length - 1)];
+
+  // Mismo rubro, el tier más cercano (a igual distancia, gana el de abajo).
+  const i = TIERS.indexOf(tier);
+  const cercanos = TIERS
+    .map((t, j) => ({t, d: Math.abs(j - i) * 2 + (j > i ? 1 : 0)}))
+    .sort((a, b) => a.d - b.d);
+  for(const {t} of cercanos){
+    const c = libres(delRubro[t]);
+    if(c.length) return c[entero(0, c.length - 1)];
+  }
+
+  // El rubro se quedó sin nada: cualquier otro con ese tier, y si no, lo que haya.
+  for(const otro of RUBRO_ORDEN){
+    if(otro === rubro) continue;
+    const c = libres((porRubroTier[otro] || {})[tier]);
+    if(c.length) return c[entero(0, c.length - 1)];
+  }
+  const cualquiera = libres(CATALOGO);
+  return cualquiera.length ? cualquiera[entero(0, cualquiera.length - 1)] : null;
 }
 
 function generarTienda(claveTamano){
   const cfg = TAMANOS[claveTamano];
   const usados = new Set();
 
-  // 1. Stock garantizado: va siempre y no cuenta para los porcentajes.
+  // 1. Stock garantizado: va siempre y no entra en el reparto de abajo.
   const garantizados = GARANTIZADOS
     .map(id => CATALOGO.find(it => it.id === id))
     .filter(Boolean);
   garantizados.forEach(it => usados.add(it.id));
 
-  // 2. El resto se reparte: hasta 20% consumibles, la otra parte mitad y
-  //    mitad entre ofensivo y defensivo.
-  const total = entero(cfg.min, cfg.max);
-  const nConsumibles = Math.round(total * 0.20);
-  const resto = total - nConsumibles;
-  const nOfensivos = Math.ceil(resto / 2);
-  const nDefensivos = resto - nOfensivos;
-
-  const porRubro = {ofensivo: [], defensivo: [], consumibles: []};
+  // 2. Catálogo indexado por rubro y tier, para elegir rápido.
+  const porRubroTier = {};
   CATALOGO.forEach(it => {
     const r = rubroDe(it);
-    if(porRubro[r]) porRubro[r].push(it);
+    (porRubroTier[r] = porRubroTier[r] || {});
+    (porRubroTier[r][it.tier] = porRubroTier[r][it.tier] || []).push(it);
   });
 
-  const elegidos = [
-    ...elegirDeRubro(porRubro.ofensivo, nOfensivos, cfg.pesos, usados),
-    ...elegirDeRubro(porRubro.defensivo, nDefensivos, cfg.pesos, usados),
-    ...elegirDeRubro(porRubro.consumibles, nConsumibles, cfg.pesos, usados),
-  ];
+  // 3. Cuántos objetos y cómo se reparten entre las categorías.
+  const total = entero(cfg.min, cfg.max);
+  const reparto = repartirEntero(total, REPARTO);
+
+  // 4. Cada lugar tira su propia rareza y busca un ítem que la cumpla.
+  const elegidos = [];
+  Object.entries(reparto).forEach(([rubro, cuantos]) => {
+    for(let i = 0; i < cuantos; i++){
+      const tier = tirarTier(cfg.pesos);
+      const item = elegirItem(rubro, tier, usados, porRubroTier);
+      if(!item) break;   // se acabó el catálogo entero
+      usados.add(item.id);
+      elegidos.push(item);
+    }
+  });
 
   return {
     tamano: claveTamano,

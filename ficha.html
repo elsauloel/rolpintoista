@@ -993,6 +993,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           <div style="display:flex;gap:6px;align-items:center">
             <span class="tag" id="turno-tag">Turno 1</span>
             <button class="iconbtn" id="btn-turno-reset" title="Reiniciar el contador de turno a 1">↺ Turno</button>
+            <button class="iconbtn" id="btn-limpiar-estados" title="Sacar todos los estados alterados de una vez">⌫ Limpiar</button>
             <button class="iconbtn iconbtn-add" data-add="efectos">+ Estado</button>
           </div>
         </header>
@@ -1487,7 +1488,8 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   <div class="modal view-modal">
     <header><h3 id="view-title-header">Ítem</h3><button class="iconbtn" id="view-x">Cerrar</button></header>
     <div class="body" id="view-body"></div>
-    <footer style="justify-content:flex-end">
+    <footer style="justify-content:flex-end;gap:8px">
+      <button class="btn del" id="view-del-btn">Eliminar</button>
       <button class="btn primary" id="view-edit-btn">Editar</button>
     </footer>
   </div>
@@ -4793,6 +4795,7 @@ function openViewer(key, id){
     ${it.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(it.detalle)}</div>` : ''}
   `;
   $('#view-edit-btn').style.display = '';
+  $('#view-del-btn').style.display = '';
   $('#scrim-view').classList.add('open');
 }
 
@@ -4827,6 +4830,7 @@ function verInvocacion(id){
     </div>
   `;
   $('#view-edit-btn').style.display = 'none';
+  $('#view-del-btn').style.display = 'none';
   $('#scrim-view').classList.add('open');
 }
 
@@ -5915,6 +5919,30 @@ $('#view-edit-btn').onclick = () => {
   if(!viewing) return;
   $('#scrim-view').classList.remove('open');
   openEditor(viewing.key, viewing.id);
+};
+
+$('#btn-limpiar-estados').onclick = () => {
+  const cuantos = (S.efectos || []).length;
+  if(!cuantos){ toast('No hay estados para limpiar'); return; }
+  if(!confirm(`¿Sacar los ${cuantos} estado(s) alterado(s)?`)) return;
+  S.efectos = [];
+  renderList('efectos');
+  refresh();
+  toast(`${cuantos} estado(s) eliminado(s)`);
+};
+
+$('#view-del-btn').onclick = () => {
+  if(!viewing) return;
+  const {key, id} = viewing;
+  const it = (S[key] || []).find(x => x.id === id);
+  if(!it) return;
+  if(!confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
+  S[key] = S[key].filter(x => x.id !== id);
+  $('#scrim-view').classList.remove('open');
+  viewing = null;
+  if(key === 'inventario') renderInventario(); else renderList(key);
+  refresh();
+  toast(`${it.nombre || 'Ítem'} eliminado`);
 };
 
 function fichaNueva(){

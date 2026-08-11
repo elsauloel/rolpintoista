@@ -24,6 +24,7 @@ ETIQ = {
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
     'Detalle del estado equipado':'equipoEstadoDetalle',
+    'Legacy':'legacy',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',
 }
 
@@ -70,6 +71,9 @@ def leer():
                 if k.startswith('mod_'):
                     if v not in (None, '') and num(v) != 0:
                         it['mods'].append({'stat': k[4:], 'val': num(v)})
+                    continue
+                if k == 'legacy':
+                    it[k] = str(v).strip().lower() in ('sí','si','x','true','1','yes') if v else False
                     continue
                 if k == 'efectoPermanente':
                     it[k] = str(v).strip().lower() in ('sí','si','true','x','1') if v else False

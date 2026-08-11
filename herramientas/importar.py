@@ -130,6 +130,8 @@ def item_js(it, con_imagen=True):
     if it.get('cargaMax'):
         partes.append("cargaMax:%s" % it['cargaMax'])
     partes.append("consumible:%s" % ('true' if es_cons else 'false'))
+    if it.get('legacy'):
+        partes.append("legacy:true")
     partes.append("curahp:%s" % it.get('curahp', 0))
     if it.get('curabonosPct'):
         partes.append("curabonosPct:%s" % it['curabonosPct'])

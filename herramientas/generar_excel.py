@@ -33,7 +33,7 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
               'resm','rescc','rangocasteo','accionesmax','dmg','potencia','hpmax','crgmax','bloqueo','rng','pdgmg']
 
 COLUMNAS = {
-    'Consumibles': BASE + ['unidades','cargaMax','curahp','curabonosPct',
+    'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle'],
     'Armas':       BASE + ['tipoDado','danoFijo'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
@@ -54,6 +54,7 @@ ETIQUETAS = {
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
     'equipoEstadoDetalle':'Detalle del estado equipado',
+    'legacy':'Legacy',
     'mods_extra':'Otros modificadores','tiene_imagen':'Tiene imagen',
     'mod_def':'Defensa','mod_tipo1':'Res.Crít Tipo 2','mod_tipo2':'Res.Crít Tipo 4',
     'mod_tipo3':'Res.Crít Tipo 6','mod_tipo4':'Res.Crít Tipo 8','mod_tipo5':'Res.Crít Tipo 10',
@@ -76,6 +77,8 @@ def valor(it, col):
             if m['stat'] == stat:
                 return m['val']
         return ''
+    if col == 'legacy':
+        return 'si' if it.get('legacy') else ''
     v = it.get(col, '')
     if isinstance(v, bool):
         return 'sí' if v else ''

@@ -35,10 +35,10 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 COLUMNAS = {
     'Consumibles': BASE + ['unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle'],
-    'Armas':       BASE + ['tipoDado','danoFijo'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']],
-    'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'],
+    'Armas':       BASE + ['tipoDado','danoFijo'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
-                   ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']],
+                   ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Otros':       BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
 }
 # Al final de cada pestaña: lo que no tiene columna propia y el aviso de imagen
@@ -52,6 +52,8 @@ ETIQUETAS = {
     'curahp':'Cura HP','curabonosPct':'Cura Bonos (%)',
     'efectoNombre':'Estado que aplica','efectoTurnos':'Turnos del estado',
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',
+    'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
+    'equipoEstadoDetalle':'Detalle del estado equipado',
     'mods_extra':'Otros modificadores','tiene_imagen':'Tiene imagen',
     'mod_def':'Defensa','mod_tipo1':'Res.Crít Tipo 2','mod_tipo2':'Res.Crít Tipo 4',
     'mod_tipo3':'Res.Crít Tipo 6','mod_tipo4':'Res.Crít Tipo 8','mod_tipo5':'Res.Crít Tipo 10',

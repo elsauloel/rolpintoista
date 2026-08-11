@@ -22,6 +22,8 @@ ETIQ = {
     'Constitución':'mod_con','Res. mágica':'mod_resm','Res. CC':'mod_rescc',
     'Rango casteo':'mod_rangocasteo','Acciones máx.':'mod_accionesmax','Bloqueo':'mod_bloqueo',
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
+    'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
+    'Detalle del estado equipado':'equipoEstadoDetalle',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',
 }
 
@@ -73,7 +75,7 @@ def leer():
                     it[k] = str(v).strip().lower() in ('sí','si','true','x','1') if v else False
                     continue
                 if k in ('peso','ranuras','precioCompra','tipoDado','danoFijo','unidades',
-                         'cargaMax','curahp','curabonosPct','efectoTurnos','efectoHpTurno'):
+                         'cargaMax','curahp','curabonosPct','efectoTurnos','efectoHpTurno','equipoEstadoHpTurno'):
                     it[k] = num(v)
                     continue
                 it[k] = (v if v is not None else '')

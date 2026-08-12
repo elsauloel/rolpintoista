@@ -2330,7 +2330,12 @@
   "precioCompra": 800,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "parry+2, bloqueo +1, rango +1",
   "_tiene_imagen": false
  },
@@ -2346,7 +2351,12 @@
   "precioCompra": 140,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1, bloqueo +1",
   "_tiene_imagen": false
  },
@@ -2681,6 +2691,10 @@
    {
     "stat": "parry",
     "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 3
    }
   ],
   "detalle": "parry +2, bloqueo +3",
@@ -2999,7 +3013,12 @@
   "precioCompra": 500,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
   "detalle": "parry +2, bloqueo +3",
   "_tiene_imagen": false
  },
@@ -3353,7 +3372,12 @@
   "precioCompra": 115,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "bloqueo +1",
   "_tiene_imagen": false
  },
@@ -3369,7 +3393,12 @@
   "precioCompra": 135,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
   "detalle": "bloqueo +2",
   "_tiene_imagen": false
  },
@@ -3447,7 +3476,12 @@
   "precioCompra": 130,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
   "detalle": "bloqueo +3",
   "_tiene_imagen": false
  },
@@ -3463,7 +3497,12 @@
   "precioCompra": 160,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
   "detalle": "Bloqueo +3",
   "_tiene_imagen": false
  },
@@ -3495,7 +3534,12 @@
   "precioCompra": 90,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "bloqueo +1",
   "_tiene_imagen": false
  },
@@ -3511,7 +3555,12 @@
   "precioCompra": 1400,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
   "detalle": "La mitad del daño ignora armadura. bloqueo +3",
   "_tiene_imagen": false
  },
@@ -3591,7 +3640,12 @@
   "precioCompra": 1400,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
   "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones",
   "_tiene_imagen": false
  },
@@ -3733,7 +3787,12 @@
   "precioCompra": 120,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "bloqueo +1",
   "_tiene_imagen": false
  },
@@ -3828,6 +3887,10 @@
    {
     "stat": "def",
     "val": 7
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
   "detalle": "Parry +3, bloqueo +1, resistencia a críticos tipo 2 y 4",
@@ -3847,6 +3910,10 @@
    {
     "stat": "def",
     "val": 10
+   },
+   {
+    "stat": "bloqueo",
+    "val": 4
    }
   ],
   "detalle": "parry  +4, bloqueo +4, inmuniza rupturas de armadura",
@@ -3889,6 +3956,10 @@
    {
     "stat": "def",
     "val": 4
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
    }
   ],
   "detalle": "bloqueo +2",
@@ -4108,6 +4179,10 @@
    {
     "stat": "def",
     "val": 6
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
    }
   ],
   "detalle": "bloqueo +2",
@@ -4127,6 +4202,10 @@
    {
     "stat": "def",
     "val": 8
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
    }
   ],
   "detalle": "bloqueo +2, Resistencia a críticos 4, 6 y 8",
@@ -4146,6 +4225,10 @@
    {
     "stat": "def",
     "val": 4
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
   "detalle": "parry +2, bloqueo +1. Si bloquea con exito, +2 a pg en próximo ataque",

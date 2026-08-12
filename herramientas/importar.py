@@ -185,12 +185,16 @@ def item_gm(it):
         "precioCompra:%s" % it.get('precioCompra', 0),
         "def:%s" % dfs,
     ]
+    if it['tipoItem'] == 'consumibles':
+        partes.append("consumible:true")
+        if it.get('curahp'): partes.append("curahp:%s" % it['curahp'])
+        if it.get('legacy'): partes.append("legacy:true")
     if otros:
         partes.append("mods:%s" % mods_js(otros))
     partes.append("detalle:'%s'" % esc_js(it.get('detalle')))
     return '{' + ', '.join(partes) + '}'
 
-equipo = [it for it in items if it['tipoItem'] != 'consumibles' and it['tipoItem']]
+equipo = [it for it in items if it['tipoItem']]
 tg = open(GM, encoding="utf-8", newline="").read().replace("\r\n", "\n")
 mg = re.search(r"const CATALOGO_EQUIPO = \[\n.*?\n\];", tg, re.S)
 assert mg, "no encontré CATALOGO_EQUIPO"

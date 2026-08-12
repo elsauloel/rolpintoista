@@ -69,7 +69,7 @@
   "tier": "Buena Calidad",
   "tipoItem": "consumibles",
   "peso": 0,
-  "ranuras": 0,
+  "ranuras": 1,
   "precioCompra": 30,
   "unidades": 1,
   "consumible": true,
@@ -740,9 +740,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida (pergamino)",
   "efectoPermanente": true,
-  "efectoDetalle": "HP máximo +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+  "efectoDetalle": "HP máximo +10. Dura hasta el fin del combate (bórralo a mano al terminar).",
   "mods": [],
-  "detalle": "Otorga +1 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida (pergamino)'.",
+  "detalle": "Otorga +10 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida (pergamino)'.",
   "_tiene_imagen": false
  },
  {
@@ -758,9 +758,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida mayor (pergamino)",
   "efectoPermanente": true,
-  "efectoDetalle": "HP máximo +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+  "efectoDetalle": "HP máximo +20. Dura hasta el fin del combate (bórralo a mano al terminar).",
   "mods": [],
-  "detalle": "Otorga +2 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida mayor (pergamino)'.",
+  "detalle": "Otorga +20 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida mayor (pergamino)'.",
   "_tiene_imagen": false
  },
  {
@@ -776,9 +776,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida superior (pergamino)",
   "efectoPermanente": true,
-  "efectoDetalle": "HP máximo +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+  "efectoDetalle": "HP máximo +30. Dura hasta el fin del combate (bórralo a mano al terminar).",
   "mods": [],
-  "detalle": "Otorga +3 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida superior (pergamino)'.",
+  "detalle": "Otorga +30 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida superior (pergamino)'.",
   "_tiene_imagen": false
  },
  {
@@ -2040,9 +2040,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida (poción)",
   "efectoTurnos": 4,
-  "efectoDetalle": "HP máximo +1 mientras dure (4 turnos).",
+  "efectoDetalle": "HP máximo +10 mientras dure (4 turnos).",
   "mods": [],
-  "detalle": "Otorga +1 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida (poción)'.",
+  "detalle": "Otorga +10 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida (poción)'.",
   "_tiene_imagen": false
  },
  {
@@ -2058,9 +2058,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida mayor (poción)",
   "efectoTurnos": 4,
-  "efectoDetalle": "HP máximo +2 mientras dure (4 turnos).",
+  "efectoDetalle": "HP máximo +20 mientras dure (4 turnos).",
   "mods": [],
-  "detalle": "Otorga +2 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida mayor (poción)'.",
+  "detalle": "Otorga +20 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida mayor (poción)'.",
   "_tiene_imagen": false
  },
  {
@@ -2076,9 +2076,9 @@
   "curahp": 0,
   "efectoNombre": "Vitalidad Extendida superior (poción)",
   "efectoTurnos": 4,
-  "efectoDetalle": "HP máximo +3 mientras dure (4 turnos).",
+  "efectoDetalle": "HP máximo +30 mientras dure (4 turnos).",
   "mods": [],
-  "detalle": "Otorga +3 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida superior (poción)'.",
+  "detalle": "Otorga +30 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida superior (poción)'.",
   "_tiene_imagen": false
  },
  {
@@ -2279,11 +2279,75 @@
   "ranuras": 0,
   "tipoDado": 2,
   "danoFijo": 0,
-  "precioCompra": 500,
+  "precioCompra": 1100,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "critico +2, dza +2, 50% de chance de stunear",
+  "detalle": "critico +2, dza +2, aplica veneno severo",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-baston-de-monje",
+  "nombre": "Bastón de monje",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 1,
+  "precioCompra": 90,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "rango +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-bate-de-baseball",
+  "nombre": "Bate de Baseball",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 1,
+  "precioCompra": 90,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-baculo-shao-lin",
+  "nombre": "Báculo Shao Lin",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 1,
+  "precioCompra": 800,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "parry+2, bloqueo +1, rango +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-baculo-de-batalla",
+  "nombre": "Báculo de batalla",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 140,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "rango +1, bloqueo +1",
   "_tiene_imagen": false
  },
  {
@@ -2304,7 +2368,7 @@
     "val": 10
    }
   ],
-  "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente).",
+  "detalle": "",
   "_tiene_imagen": false
  },
  {
@@ -2316,7 +2380,7 @@
   "ranuras": 0,
   "tipoDado": 4,
   "danoFijo": 0,
-  "precioCompra": 55,
+  "precioCompra": 69,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2329,6 +2393,27 @@
   "_tiene_imagen": false
  },
  {
+  "id": "new-cimitarra-de-guardia",
+  "nombre": "Cimitarra de guardia",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 75,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "detalle": "Parry +2",
+  "_tiene_imagen": false
+ },
+ {
   "id": "new-colmillo-dientes-de-sable",
   "nombre": "Colmillo dientes de sable",
   "tier": "Excepcional",
@@ -2337,11 +2422,27 @@
   "ranuras": 0,
   "tipoDado": 2,
   "danoFijo": 1,
-  "precioCompra": 150,
+  "precioCompra": 900,
   "consumible": false,
   "curahp": 0,
   "mods": [],
   "detalle": "Deja sangrando x2hp",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-cuchilla-de-carnicero",
+  "nombre": "Cuchilla de carnicero",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 110,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rompe armadura",
   "_tiene_imagen": false
  },
  {
@@ -2416,17 +2517,17 @@
  {
   "id": "cat-espada-ancha",
   "nombre": "Espada ancha",
-  "tier": "Buena Calidad",
+  "tier": "Común",
   "tipoItem": "arma_1m",
   "peso": 1,
   "ranuras": 1,
   "tipoDado": 4,
   "danoFijo": 1,
-  "precioCompra": 60,
+  "precioCompra": 70,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Daño amplificado.",
+  "detalle": "",
   "_tiene_imagen": true
  },
  {
@@ -2437,11 +2538,20 @@
   "peso": 2,
   "ranuras": 0,
   "tipoDado": 4,
-  "danoFijo": 0,
+  "danoFijo": 1,
   "precioCompra": 120,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "detalle": "parry+1, bloqueo+1",
   "_tiene_imagen": false
  },
@@ -2478,15 +2588,68 @@
   "_tiene_imagen": false
  },
  {
+  "id": "new-espada-corta-oxidada",
+  "nombre": "Espada corta oxidada",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 70,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "envenena x 50% de chances",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-espada-de-nosferatu",
+  "nombre": "Espada de Nosferatu",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 2,
+  "precioCompra": 1300,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "50% de chances de ignorar armadura. Drena hp igual al daño ejercido",
+  "_tiene_imagen": false
+ },
+ {
   "id": "cat-espada-larga",
   "nombre": "Espada larga",
   "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
-  "peso": 2,
+  "peso": 1,
   "ranuras": 1,
   "tipoDado": 4,
   "danoFijo": 0,
-  "precioCompra": 80,
+  "precioCompra": 90,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "detalle": "pdg +2",
+  "_tiene_imagen": true
+ },
+ {
+  "id": "new-espada-larga-de-dorne",
+  "nombre": "Espada larga de Dorne",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 500,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2495,19 +2658,19 @@
     "val": 1
    }
   ],
-  "detalle": "Pdg +1",
-  "_tiene_imagen": true
+  "detalle": "pdg+2, envenena",
+  "_tiene_imagen": false
  },
  {
   "id": "new-espadon",
   "nombre": "Espadón",
   "tier": "Excepcional",
   "tipoItem": "arma_1m",
-  "peso": 3,
+  "peso": 4,
   "ranuras": 1,
-  "tipoDado": 6,
-  "danoFijo": 2,
-  "precioCompra": 140,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 500,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2520,7 +2683,7 @@
     "val": 1
    }
   ],
-  "detalle": "bloqueo +2",
+  "detalle": "parry +2, bloqueo +3",
   "_tiene_imagen": false
  },
  {
@@ -2598,6 +2761,100 @@
   "_tiene_imagen": false
  },
  {
+  "id": "new-falchion",
+  "nombre": "Falchion",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 75,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Ingora 1 de resistencia al crítico",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-flamberge",
+  "nombre": "Flamberge",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 2,
+  "precioCompra": 550,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "detalle": "sangrado, +1 pdg",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-garra-de-fafner",
+  "nombre": "Garra de Fafner",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 1,
+  "precioCompra": 1100,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "cat-maza",
+  "nombre": "Garrote",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 1,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 60,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "",
+  "_tiene_imagen": true
+ },
+ {
+  "id": "new-gladius",
+  "nombre": "Gladius",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 3,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 400,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "detalle": "parry +2, bloqueo +2",
+  "_tiene_imagen": false
+ },
+ {
   "id": "cat-hacha",
   "nombre": "Hacha",
   "tier": "Común",
@@ -2614,6 +2871,54 @@
   "_tiene_imagen": true
  },
  {
+  "id": "new-hacha-con-pico",
+  "nombre": "Hacha con pico",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 110,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "ignora 1 de resistencia al crítico",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-danesa",
+  "nombre": "Hacha danesa",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 130,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-de-durin",
+  "nombre": "Hacha de Durin",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 4,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 1,
+  "precioCompra": 1200,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Arruina armadura. +2 a la fuerza. deja lisiado",
+  "_tiene_imagen": false
+ },
+ {
   "id": "cat-hacha-de-batalla",
   "nombre": "Hacha de batalla",
   "tier": "Buena Calidad",
@@ -2622,7 +2927,7 @@
   "ranuras": 1,
   "tipoDado": 6,
   "danoFijo": 0,
-  "precioCompra": 90,
+  "precioCompra": 110,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2633,6 +2938,38 @@
   ],
   "detalle": "Rompe armadura. +1 al bloqueo",
   "_tiene_imagen": true
+ },
+ {
+  "id": "new-hacha-de-constructor",
+  "nombre": "Hacha de constructor",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 90,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rompe armadura",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-de-doble-filo",
+  "nombre": "Hacha de doble filo",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 1,
+  "precioCompra": 100,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rompe armadura.",
+  "_tiene_imagen": false
  },
  {
   "id": "cat-hacha-de-mano",
@@ -2651,19 +2988,147 @@
   "_tiene_imagen": true
  },
  {
+  "id": "new-hacha-de-guardia-real",
+  "nombre": "Hacha de guardia real",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 1,
+  "precioCompra": 500,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "parry +2, bloqueo +3",
+  "_tiene_imagen": false
+ },
+ {
   "id": "new-hacha-de-guerra-ligera",
   "nombre": "Hacha de guerra ligera",
   "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
-  "peso": 3,
+  "peso": 2,
   "ranuras": 1,
   "tipoDado": 6,
   "danoFijo": 1,
-  "precioCompra": 82,
+  "precioCompra": 100,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Rompe armadura",
+  "detalle": "",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-de-guerra-pesada",
+  "nombre": "Hacha de guerra pesada",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 130,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Arruina armadura",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-de-lenador",
+  "nombre": "Hacha de leñador",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 60,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-de-madera-mistica",
+  "nombre": "Hacha de madera mística",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 600,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rompe armadura. Drena 50% del daño.",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-dentada",
+  "nombre": "Hacha dentada",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 1,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 115,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "50% de dejar sangrando",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-filo-de-diamante",
+  "nombre": "Hacha filo de diamante",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 3,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 450,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Crítico aumentado. Arruina armadura.",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hacha-oxidada",
+  "nombre": "Hacha oxidada",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 50,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "50% de chances de envenenar",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-hachuela",
+  "nombre": "Hachuela",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 40,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "",
   "_tiene_imagen": false
  },
  {
@@ -2691,11 +3156,36 @@
   "ranuras": 0,
   "tipoDado": 4,
   "danoFijo": 0,
-  "precioCompra": 0,
+  "precioCompra": 75,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "",
+  "detalle": "sangrado 50%",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-katana",
+  "nombre": "Katana",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 120,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "detalle": "pdg+2, crítico +1",
   "_tiene_imagen": false
  },
  {
@@ -2707,7 +3197,7 @@
   "ranuras": 0,
   "tipoDado": 2,
   "danoFijo": 0,
-  "precioCompra": 70,
+  "precioCompra": 75,
   "consumible": false,
   "curahp": 0,
   "mods": [],
@@ -2723,11 +3213,27 @@
   "ranuras": 0,
   "tipoDado": 2,
   "danoFijo": 2,
-  "precioCompra": 80,
+  "precioCompra": 110,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Daño amplificado.",
+  "detalle": "rango +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-lucero-del-alba",
+  "nombre": "Lucero del alba",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 150,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Ignora 1 de res al crítico, rango +1",
   "_tiene_imagen": false
  },
  {
@@ -2747,6 +3253,31 @@
   "_tiene_imagen": false
  },
  {
+  "id": "new-mandoble",
+  "nombre": "Mandoble",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 110,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "detalle": "Parry+2, bloqueo+1",
+  "_tiene_imagen": false
+ },
+ {
   "id": "cat-mangual",
   "nombre": "Mangual",
   "tier": "Raro",
@@ -2755,12 +3286,28 @@
   "ranuras": 1,
   "tipoDado": 8,
   "danoFijo": 1,
-  "precioCompra": 120,
+  "precioCompra": 160,
   "consumible": false,
   "curahp": 0,
   "mods": [],
   "detalle": "Alcance +1.",
   "_tiene_imagen": true
+ },
+ {
+  "id": "new-mangual",
+  "nombre": "Mangual",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 4,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 150,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "rango +1",
+  "_tiene_imagen": false
  },
  {
   "id": "cat-martillo",
@@ -2770,13 +3317,77 @@
   "peso": 3,
   "ranuras": 1,
   "tipoDado": 8,
-  "danoFijo": 3,
-  "precioCompra": 124,
+  "danoFijo": 0,
+  "precioCompra": 100,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Daño +50%. Lento.",
+  "detalle": "",
   "_tiene_imagen": true
+ },
+ {
+  "id": "new-martillo-de-vulcano",
+  "nombre": "Martillo de Vulcano",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 5,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 1600,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-martillo-de-bola",
+  "nombre": "Martillo de bola",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 115,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "bloqueo +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-martillo-de-cabeza-plana",
+  "nombre": "Martillo de cabeza plana",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 135,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "bloqueo +2",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-martillo-de-cantero",
+  "nombre": "Martillo de cantero",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 70,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "rango +1",
+  "_tiene_imagen": false
  },
  {
   "id": "new-martillo-de-guerra-runico",
@@ -2786,8 +3397,8 @@
   "peso": 3,
   "ranuras": 1,
   "tipoDado": 8,
-  "danoFijo": 3,
-  "precioCompra": 170,
+  "danoFijo": 1,
+  "precioCompra": 850,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2796,19 +3407,19 @@
     "val": 1
    }
   ],
-  "detalle": "25% de chances de dejar en pajaritos",
+  "detalle": "Deja en pajaritos",
   "_tiene_imagen": false
  },
  {
   "id": "new-martillo-de-sargento",
   "nombre": "Martillo de sargento",
-  "tier": "Buena Calidad",
+  "tier": "Raro",
   "tipoItem": "arma_1m",
   "peso": 4,
   "ranuras": 1,
   "tipoDado": 8,
   "danoFijo": 0,
-  "precioCompra": 112,
+  "precioCompra": 140,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2821,39 +3432,87 @@
     "val": 1
    }
   ],
-  "detalle": "Tipo de daño: Tipo 8 (Impacto/contundente).",
+  "detalle": "",
   "_tiene_imagen": false
  },
  {
-  "id": "cat-maza",
-  "nombre": "Maza",
-  "tier": "Común",
+  "id": "new-martillo-ergonomico",
+  "nombre": "Martillo ergonómico",
+  "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
-  "peso": 2,
-  "ranuras": 1,
+  "peso": 1,
+  "ranuras": 0,
   "tipoDado": 8,
-  "danoFijo": 1,
-  "precioCompra": 66,
+  "danoFijo": 0,
+  "precioCompra": 130,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Bloqueo +1",
-  "_tiene_imagen": true
+  "detalle": "bloqueo +3",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-maza-de-acero",
+  "nombre": "Maza de acero",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 3,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 160,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Bloqueo +3",
+  "_tiene_imagen": false
  },
  {
   "id": "new-maza-de-guardia",
   "nombre": "Maza de guardia",
-  "tier": "Común",
+  "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
   "peso": 3,
   "ranuras": 1,
   "tipoDado": 8,
   "danoFijo": 0,
-  "precioCompra": 55,
+  "precioCompra": 90,
   "consumible": false,
   "curahp": 0,
   "mods": [],
-  "detalle": "Bloqueo +1",
+  "detalle": "",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-maza-de-hierro",
+  "nombre": "Maza de hierro",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 90,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "bloqueo +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-maza-de-vibranium",
+  "nombre": "Maza de vibranium",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 4,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 2,
+  "precioCompra": 1400,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "La mitad del daño ignora armadura. bloqueo +3",
   "_tiene_imagen": false
  },
  {
@@ -2913,7 +3572,7 @@
   "ranuras": 0,
   "tipoDado": 2,
   "danoFijo": 2,
-  "precioCompra": 150,
+  "precioCompra": 850,
   "consumible": false,
   "curahp": 0,
   "mods": [],
@@ -2921,9 +3580,41 @@
   "_tiene_imagen": false
  },
  {
+  "id": "new-reflejo-de-acero",
+  "nombre": "Reflejo de Acero",
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 3,
+  "precioCompra": 1400,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-rompefilas",
+  "nombre": "Rompefilas",
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "peso": 4,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 900,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia",
+  "_tiene_imagen": false
+ },
+ {
   "id": "cat-rompemalla",
   "nombre": "Rompemalla",
-  "tier": "Buena Calidad",
+  "tier": "Raro",
   "tipoItem": "arma_1m",
   "peso": 2,
   "ranuras": 1,
@@ -2937,8 +3628,8 @@
   "_tiene_imagen": true
  },
  {
-  "id": "new-sable",
-  "nombre": "Sable",
+  "id": "new-sable-comun",
+  "nombre": "Sable común",
   "tier": "Común",
   "tipoItem": "arma_1m",
   "peso": 1,
@@ -2957,11 +3648,36 @@
   "nombre": "Sable de caballería",
   "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 75,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "detalle": "pdg +1, parry +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-sable-militar",
+  "nombre": "Sable militar",
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
   "peso": 2,
-  "ranuras": 1,
-  "tipoDado": 6,
-  "danoFijo": 1,
-  "precioCompra": 87,
+  "ranuras": 0,
+  "tipoDado": 4,
+  "danoFijo": 0,
+  "precioCompra": 80,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -2970,7 +3686,55 @@
     "val": 1
    }
   ],
-  "detalle": "",
+  "detalle": "pdg +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-sagaris",
+  "nombre": "Sagaris",
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 1,
+  "precioCompra": 130,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "Rompe armadura. Sangrado.",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-tomahawk",
+  "nombre": "Tomahawk",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 1,
+  "ranuras": 0,
+  "tipoDado": 6,
+  "danoFijo": 0,
+  "precioCompra": 60,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "rango +1",
+  "_tiene_imagen": false
+ },
+ {
+  "id": "new-garrote-de-hueso",
+  "nombre": "garrote de hueso",
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "precioCompra": 120,
+  "consumible": false,
+  "curahp": 0,
+  "mods": [],
+  "detalle": "bloqueo +1",
   "_tiene_imagen": false
  },
  {
@@ -3057,7 +3821,7 @@
   "tipoItem": "escudo_1m",
   "peso": 2,
   "ranuras": 0,
-  "precioCompra": 190,
+  "precioCompra": 650,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -3076,7 +3840,7 @@
   "tipoItem": "escudo_1m",
   "peso": 3,
   "ranuras": 0,
-  "precioCompra": 600,
+  "precioCompra": 1100,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -3085,7 +3849,7 @@
     "val": 10
    }
   ],
-  "detalle": "parry  +4, bloqueo +4, inmuniza ruptura de armadura",
+  "detalle": "parry  +4, bloqueo +4, inmuniza rupturas de armadura",
   "_tiene_imagen": false
  },
  {
@@ -3375,7 +4139,7 @@
   "tipoItem": "escudo_1m",
   "peso": 2,
   "ranuras": 0,
-  "precioCompra": 220,
+  "precioCompra": 750,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -3467,7 +4231,7 @@
   "tipoItem": "escudo_1m",
   "peso": 3,
   "ranuras": 0,
-  "precioCompra": 250,
+  "precioCompra": 850,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -4432,7 +5196,7 @@
   "tipoItem": "guantes_rigidos",
   "peso": 2,
   "ranuras": 0,
-  "precioCompra": 500,
+  "precioCompra": 1200,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -4553,7 +5317,7 @@
   "tipoItem": "guantes_blandos",
   "peso": 0,
   "ranuras": 0,
-  "precioCompra": 180,
+  "precioCompra": 500,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -4576,7 +5340,7 @@
   "tipoItem": "guantes_blandos",
   "peso": 0,
   "ranuras": 0,
-  "precioCompra": 250,
+  "precioCompra": 650,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -4761,7 +5525,7 @@
   "tipoItem": "guantes_blandos",
   "peso": 1,
   "ranuras": 0,
-  "precioCompra": 200,
+  "precioCompra": 750,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -4780,7 +5544,7 @@
   "tipoItem": "guantes_blandos",
   "peso": 0,
   "ranuras": 0,
-  "precioCompra": 500,
+  "precioCompra": 900,
   "consumible": false,
   "curahp": 0,
   "mods": [
@@ -5316,10 +6080,14 @@
   "tipoItem": "casco_blando",
   "peso": 0,
   "ranuras": 0,
-  "precioCompra": 20,
+  "precioCompra": 120,
   "consumible": false,
   "curahp": 0,
   "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
    {
     "stat": "bonos",
     "val": 1

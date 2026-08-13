@@ -128,10 +128,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .ajuste-preset.activo{border-color:var(--copper);background:rgba(201,133,69,.18);color:var(--paper);font-weight:700}
 
 .agregar-fila{
-  display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);
+  border:1px solid var(--line-soft);
   background:var(--panel2);padding:7px 10px;margin-bottom:6px
 }
+.agregar-fila-top{display:flex;align-items:center;gap:10px}
 .agregar-fila .cat-nombre{flex:1}
+.agregar-fila .cat-detalle{margin-top:5px}
 .scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;z-index:80;padding:24px;overflow:hidden}
 .scrim.open{display:flex;align-items:flex-start;justify-content:center}
 .modal{
@@ -1126,11 +1128,14 @@ function renderAgregarLista(){
     const defVal = defValorDe(it);
     const statTxt = dano ? `Daño ${dano}` : (defVal ? `Def ${defVal>0?'+':''}${fmt(defVal)}` : '');
     return `<div class="agregar-fila">
-      <div class="cat-nombre">${esc(it.nombre)}</div>
-      <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(it.tier)}</div>
-      <span class="cat-meta">${fmt(precioAjustado(it))} DDE · Peso ${fmt(num(it.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}</span>
-      <button type="button" class="iconbtn" data-ver="${esc(it.id)}">Ver</button>
-      <button type="button" class="iconbtn" data-agregar="${esc(it.id)}">Agregar</button>
+      <div class="agregar-fila-top">
+        <div class="cat-nombre">${esc(it.nombre)}</div>
+        <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(it.tier)}</div>
+        <span class="cat-meta">${fmt(precioAjustado(it))} DDE · Peso ${fmt(num(it.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}</span>
+        <button type="button" class="iconbtn" data-ver="${esc(it.id)}">Ver</button>
+        <button type="button" class="iconbtn" data-agregar="${esc(it.id)}">Agregar</button>
+      </div>
+      ${it.detalle ? `<div class="cat-detalle">${esc(it.detalle)}</div>` : ''}
     </div>`;
   }).join('');
 }

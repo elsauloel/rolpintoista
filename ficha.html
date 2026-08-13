@@ -209,6 +209,15 @@ a{color:var(--brass)}
   margin:0;font-family:"Fraunces",serif;font-weight:600;font-size:16px;letter-spacing:.01em;
 }
 .card .body{padding:13px}
+.titulo-colapsable{display:flex;align-items:center;gap:8px;min-width:0}
+.colapsar-btn{
+  font-size:13px;line-height:1;padding:3px 6px;border:1px solid var(--line);border-radius:var(--r);
+  color:var(--muted);background:none;cursor:pointer;flex:none
+}
+.colapsar-btn:hover{border-color:var(--copper);color:var(--brass)}
+.card.colapsada .body{display:none}
+.card.colapsada > header{border-bottom:none}
+.card.colapsada > header > *:not(.titulo-colapsable){display:none}
 .hint{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:.04em}
 .iconbtn{
   font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
@@ -1106,7 +1115,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <div class="col">
       <section class="card">
         <header>
-          <h2>Atributos</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="atributos" title="Contraer/expandir">👁</button><h2>Atributos</h2></div>
           <span class="hint">tocá un stat para ver de dónde sale</span>
         </header>
         <div class="body">
@@ -1117,7 +1126,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
       <section class="card">
         <header>
-          <h2>Bitácora</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora</h2></div>
           <button class="iconbtn iconbtn-add" id="btn-bitacora-add">+ Página</button>
         </header>
         <div class="body">
@@ -1143,7 +1152,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <!-- COLUMNA 2 -->
     <div class="col">
       <section class="card">
-        <header><h2>COMBATE</h2></header>
+        <header><div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="combate" title="Contraer/expandir">👁</button><h2>COMBATE</h2></div></header>
         <div class="body">
           <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
           <div id="efectos-armas"></div>
@@ -1177,7 +1186,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
       <section class="card">
         <header>
-          <h2>Cinturón</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="cinturon" title="Contraer/expandir">👁</button><h2>Cinturón</h2></div>
           <button class="iconbtn iconbtn-add" data-add-chooser="cinturon">+ Ítem</button>
         </header>
         <div class="body">
@@ -1189,7 +1198,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
       <section class="card">
         <header>
-          <h2>Equipo</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="equipo" title="Contraer/expandir">👁</button><h2>Equipado</h2></div>
           <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
         </header>
         <div class="body">
@@ -1205,7 +1214,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <div class="col">
       <section class="card">
         <header>
-          <h2>Habilidades</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="habilidades" title="Contraer/expandir">👁</button><h2>Habilidades</h2></div>
           <div style="display:flex;gap:8px">
             <button class="iconbtn" id="btn-ver-todas-habilidades">Ver todas</button>
             <button class="iconbtn iconbtn-add" data-add="habilidades">+ Habilidad</button>
@@ -1216,7 +1225,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
       <section class="card">
         <header>
-          <h2>Pasivas</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="pasivas" title="Contraer/expandir">👁</button><h2>Habilidades pasivas</h2></div>
           <button class="iconbtn iconbtn-add" data-add="pasivas">+ Pasiva</button>
         </header>
         <div class="body" id="list-pasivas"></div>
@@ -1224,7 +1233,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
       <section class="card">
         <header>
-          <h2>Sociales</h2>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="sociales" title="Contraer/expandir">👁</button><h2>Habilidades sociales</h2></div>
           <button class="iconbtn iconbtn-add" data-add="sociales">+ Social</button>
         </header>
         <div class="body" id="list-sociales"></div>
@@ -3692,8 +3701,36 @@ document.addEventListener('focusout', e => {
   if(CAJAS_DELTA.includes(e.target.id)) resolverCajaDelta(e.target);
 });
 
+// Contenedores principales que se pueden contraer a solo el título con el
+// ojito del header. El estado se guarda en localStorage (por navegador,
+// no viaja con la ficha) para que no haya que volver a cerrarlos cada vez.
+function cargarColapsados(){
+  try{ return JSON.parse(localStorage.getItem('ficha-colapsados') || '{}'); }catch(e){ return {}; }
+}
+function guardarColapsados(estado){
+  try{ localStorage.setItem('ficha-colapsados', JSON.stringify(estado)); }catch(e){}
+}
+function pintarColapsable(btn, colapsada){
+  const card = btn.closest('.card');
+  if(card) card.classList.toggle('colapsada', colapsada);
+  btn.textContent = colapsada ? '🙈' : '👁';
+}
+function toggleColapsable(btn){
+  const key = btn.dataset.colapsar;
+  const estado = cargarColapsados();
+  estado[key] = !estado[key];
+  guardarColapsados(estado);
+  pintarColapsable(btn, estado[key]);
+}
+function aplicarColapsados(){
+  const estado = cargarColapsados();
+  document.querySelectorAll('[data-colapsar]').forEach(btn => pintarColapsable(btn, !!estado[btn.dataset.colapsar]));
+}
+
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
+
+  if(b && b.dataset.colapsar){ toggleColapsable(b); return; }
 
   const tile = e.target.closest('.d');
   if(tile && !b){
@@ -6392,6 +6429,7 @@ $('#btn-turno-reset').onclick = () => {
 };
 
 renderAll();
+aplicarColapsados();
 </script>
 </body>
 </html>

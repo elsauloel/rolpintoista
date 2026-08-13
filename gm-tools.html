@@ -2248,14 +2248,10 @@ const TIPOITEM_LABEL_GM = {
 };
 const TIPO_STAT_A_CRIT_IDX = {tipo1:0, tipo2:1, tipo3:2, tipo4:3, tipo5:4};
 
-// Hornea sobre campos propios del creep los mods que necesitan quedar
-// guardados ahí (Res. a crítico, Acciones máx., Velocidad): son valores
-// que el máster también edita a mano, así que no alcanza con sumarlos al
-// vuelo. El resto de los stats derivados (Dmg, Bloqueo, PdG, Eva, Parry,
-// Res.M, Res.CC, etc.) no necesitan esto — creepModTotal() los suma en
-// vivo leyendo sc.equipo directamente, igual que collectMods() en
-// ficha.html. "Bonos" es la única excepción real: los creeps no tienen
-// ese recurso, así que un mod de bonos queda solo en el detalle del ítem.
+// Aplica (signo 1) o revierte (signo -1) los modificadores de un ítem de
+// equipo sobre los campos del creep que tienen dónde guardarlos. Bonos/Res.M/
+// Res.CC no tienen campo propio en un creep, así que quedan solo en el
+// detalle del ítem — no se pierden, simplemente no suman a ningún número.
 function aplicarModsEquipo(sc, mods, signo){
   (mods||[]).forEach(m => {
     if(TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined){

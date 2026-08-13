@@ -38,6 +38,11 @@
   ],
   "bonosGastados": 0,
   "acciones": 3,
+  "muerto": {
+    "activo": false,
+    "turnos": 5,
+    "definitivo": false
+  },
   "caps": {
     "mochila": 30,
     "cinturon": 5
@@ -50,7 +55,7 @@
     "rescc": "con",
     "hpmax": "con*5",
     "dmg": "fue",
-    "potencia": "fue",
+    "bloqueo": "fue",
     "crgmax": "fue",
     "eva": "agl",
     "ini": "agl",
@@ -58,6 +63,7 @@
     "rng": "des",
     "pdg": "des",
     "crit": "des",
+    "parry": "des",
     "pdgmg": "int",
     "resm": "int",
     "bonos": "ceil(int/2) - sobrecarga",
@@ -626,6 +632,7 @@
       "usadaEsteTurno": false
     }
   ],
+  "efectosPersonalizados": [],
   "invocaciones": [],
   "catalogo": [
     {
@@ -640,7 +647,9 @@
       "consumible": true,
       "curahp": 25,
       "mods": [],
-      "detalle": "Recupera 25 HP."
+      "detalle": "Recupera 25 HP.",
+      "tier": "Común",
+      "legacy": true
     },
     {
       "id": "cat-pocion-hp-grande",
@@ -654,7 +663,10 @@
       "consumible": true,
       "curahp": 25,
       "mods": [],
-      "detalle": "3 Cargas. Recupera 25 HP por carga."
+      "detalle": "3 Cargas. Recupera 25 HP por carga.",
+      "tier": "Raro",
+      "cargaMax": 3,
+      "legacy": true
     },
     {
       "id": "cat-pocion-hp-mayor",
@@ -668,7 +680,9 @@
       "consumible": true,
       "curahp": 100,
       "mods": [],
-      "detalle": "Recupera 100 HP."
+      "detalle": "Recupera 100 HP.",
+      "tier": "Raro",
+      "legacy": true
     },
     {
       "id": "cat-pocion-hp-mayor-grande",
@@ -682,7 +696,10 @@
       "consumible": true,
       "curahp": 100,
       "mods": [],
-      "detalle": "3 Cargas. Recupera 100 HP por carga."
+      "detalle": "3 Cargas. Recupera 100 HP por carga.",
+      "tier": "Excepcional",
+      "cargaMax": 3,
+      "legacy": true
     },
     {
       "id": "cat-cura-plus",
@@ -696,7 +713,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Remueve estados alterados."
+      "detalle": "Remueve estados alterados.",
+      "tier": "Común",
+      "legacy": true
     },
     {
       "id": "cat-antidoto",
@@ -710,7 +729,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Cura el estado Veneno."
+      "detalle": "Cura el estado Veneno.",
+      "tier": "Común",
+      "legacy": true
     },
     {
       "id": "cat-raciones",
@@ -724,7 +745,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "(2/2) +1 Wellness. (Aplicar a mano al usarla.)"
+      "detalle": "(2/2) +1 Wellness. (Aplicar a mano al usarla.)",
+      "tier": "Común",
+      "legacy": true
     },
     {
       "id": "cat-raciones-fancy",
@@ -738,7 +761,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "(5/5) +2 Wellness. (Aplicar a mano al usarla.)"
+      "detalle": "(5/5) +2 Wellness. (Aplicar a mano al usarla.)",
+      "tier": "Buena Calidad",
+      "legacy": true
     },
     {
       "id": "cat-ankh",
@@ -752,7 +777,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Se consume al morir el portador. Revive en un 25% del HP máximo. Queda titilando hasta el comienzo de su turno."
+      "detalle": "Se consume al morir el portador. Revive en un 25% del HP máximo. Queda titilando hasta el comienzo de su turno.",
+      "tier": "Raro",
+      "legacy": true
     },
     {
       "id": "cat-revive",
@@ -766,7 +793,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas."
+      "detalle": "Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.",
+      "tier": "Buena Calidad",
+      "legacy": true
     },
     {
       "id": "cat-polilla",
@@ -780,7 +809,12 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Consumible instantáneo. +2 a cualquier tirada."
+      "detalle": "Consumible instantáneo. +2 a cualquier tirada.",
+      "tier": "Raro",
+      "legacy": true,
+      "efectoNombre": "Polilla revoloteando",
+      "efectoPermanente": true,
+      "efectoDetalle": "La polilla revolotea a tu alrededor. Cuando quieras, gastala para sumar +2 a una tirada de dado: borrá este estado en ese momento para marcar que ya la usaste. Hasta entonces queda acá, sin vencerse."
     },
     {
       "id": "cat-moneda-reroll",
@@ -794,7 +828,9 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Permite repetir una tirada. Se conserva si gana tirando una moneda."
+      "detalle": "Permite repetir una tirada. Se conserva si gana tirando una moneda.",
+      "tier": "Buena Calidad",
+      "legacy": true
     },
     {
       "id": "cat-pergamino-luz",
@@ -808,7 +844,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Emite una luz brillante que ciega a los que la ven directamente. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-tentaculo",
@@ -822,7 +859,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Invoca un tentáculo de cualquier superficie, permitiendo controlarlo para realizar acciones. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-sombras",
@@ -836,7 +874,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Proyecta una sombra mágica que puede representar cualquier forma deseada. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-red",
@@ -850,7 +889,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Crea una red mágica que atrapa a un personaje impidiéndole moverse o volar mientras permanece atrapado. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-ojo",
@@ -864,7 +904,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Invoca un ojo volador etéreo e invisible, que transmite al usuario todo lo que ve. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-pergamino-ventriloquia",
@@ -878,7 +919,8 @@
       "consumible": true,
       "curahp": 0,
       "mods": [],
-      "detalle": "Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20)."
+      "detalle": "Emite cualquier sonido deseado, puede imitar voces y otros efectos. Requiere: 1 Pergamino + 1 Loot mágico (costo de crafteo 20).",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-daga",
@@ -908,7 +950,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Raro"
     },
     {
       "id": "cat-espada-ancha",
@@ -923,7 +966,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño amplificado."
+      "detalle": "Daño amplificado.",
+      "tier": "Común"
     },
     {
       "id": "cat-hacha-de-mano",
@@ -938,7 +982,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Raro"
     },
     {
       "id": "cat-bast-n-flexible",
@@ -973,7 +1018,8 @@
           "val": 1
         }
       ],
-      "detalle": "Modificador: '+1 a iniciativa"
+      "detalle": "Modificador: '+1 a iniciativa",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-espada-corta",
@@ -988,7 +1034,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": ""
+      "detalle": "",
+      "tier": "Común"
     },
     {
       "id": "cat-machete",
@@ -1018,7 +1065,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Común"
     },
     {
       "id": "cat-maza",
@@ -1033,7 +1081,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño amplificado."
+      "detalle": "Daño amplificado.",
+      "tier": "Común"
     },
     {
       "id": "cat-escudo-romano",
@@ -1053,7 +1102,8 @@
           "val": 250
         }
       ],
-      "detalle": "+4 al bloqueo. Movimiento y ataque lento"
+      "detalle": "+4 al bloqueo. Movimiento y ataque lento",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-espada-larga",
@@ -1073,7 +1123,8 @@
           "val": 1
         }
       ],
-      "detalle": "modificador: '+1 al pdg. +1 al parry"
+      "detalle": "modificador: '+1 al pdg. +1 al parry",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-grande",
@@ -1093,7 +1144,8 @@
           "val": 200
         }
       ],
-      "detalle": "+2 al bloqueo"
+      "detalle": "+2 al bloqueo",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-hacha-de-batalla",
@@ -1108,7 +1160,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Rompe armadura."
+      "detalle": "Rompe armadura.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-mangual",
@@ -1123,7 +1176,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Alcance +1."
+      "detalle": "Alcance +1.",
+      "tier": "Raro"
     },
     {
       "id": "cat-broquel",
@@ -1143,7 +1197,8 @@
           "val": 50
         }
       ],
-      "detalle": "+2 a estabilidad"
+      "detalle": "+2 a estabilidad",
+      "tier": "Común"
     },
     {
       "id": "cat-martillo",
@@ -1158,7 +1213,8 @@
       "consumible": false,
       "curahp": 0,
       "mods": [],
-      "detalle": "Daño +50%. Lento."
+      "detalle": "Daño +50%. Lento.",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-pav-s",
@@ -1178,7 +1234,8 @@
           "val": 150
         }
       ],
-      "detalle": "+1 a estabilidad, +1 al bloqueo"
+      "detalle": "+1 a estabilidad, +1 al bloqueo",
+      "tier": "Raro"
     },
     {
       "id": "cat-escudo-triangular",
@@ -1198,7 +1255,8 @@
           "val": 150
         }
       ],
-      "detalle": "+2 al bloqueo"
+      "detalle": "+2 al bloqueo",
+      "tier": "Buena Calidad"
     },
     {
       "id": "cat-escudo-peque-o",
@@ -1218,7 +1276,8 @@
           "val": 100
         }
       ],
-      "detalle": "+1 al bloqueo, +1 a la estabilidad"
+      "detalle": "+1 al bloqueo, +1 a la estabilidad",
+      "tier": "Común"
     },
     {
       "id": "cat-pocion-regen",
@@ -1235,7 +1294,9 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 10,
-      "detalle": "Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "Recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Común",
+      "legacy": true
     },
     {
       "id": "cat-pocion-regen-grande",
@@ -1252,7 +1313,10 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 10,
-      "detalle": "3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "3 Cargas. Cada carga recupera 50 HP a lo largo de 5 turnos (10 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Raro",
+      "cargaMax": 3,
+      "legacy": true
     },
     {
       "id": "cat-pocion-regen-mayor",
@@ -1269,7 +1333,9 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 20,
-      "detalle": "Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "Recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Buena Calidad",
+      "legacy": true
     },
     {
       "id": "cat-pocion-regen-mayor-grande",
@@ -1286,7 +1352,10 @@
       "efectoNombre": "Regeneración (poción)",
       "efectoTurnos": 5,
       "efectoHpTurno": 20,
-      "detalle": "3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\"."
+      "detalle": "3 Cargas. Cada carga recupera 100 HP a lo largo de 5 turnos (20 por turno). Al consumirla se activa sola el estado \"Regeneración (poción)\".",
+      "tier": "Excepcional",
+      "cargaMax": 3,
+      "legacy": true
     },
     {
       "id": "cat-pocion-bonos",
@@ -1301,7 +1370,9 @@
       "curahp": 0,
       "curabonosPct": 50,
       "mods": [],
-      "detalle": "Restaura la mitad de tu total de Bonos (redondeado hacia arriba)."
+      "detalle": "Restaura la mitad de tu total de Bonos (redondeado hacia arriba).",
+      "tier": "Buena Calidad",
+      "legacy": true
     },
     {
       "id": "cat-pocion-bonos-grande",
@@ -1316,7 +1387,5532 @@
       "curahp": 0,
       "curabonosPct": 100,
       "mods": [],
-      "detalle": "Restaura todos tus Bonos."
+      "detalle": "Restaura todos tus Bonos.",
+      "tier": "Buena Calidad",
+      "legacy": true
+    },
+    {
+      "id": "new-oleo-reparador",
+      "nombre": "Oleo reparador",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "legacy": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Repara armadura"
+    },
+    {
+      "id": "new-pergamino-de-alcance-extendido",
+      "nombre": "Pergamino de Alcance Extendido",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-alcance-extendido-mayor",
+      "nombre": "Pergamino de Alcance Extendido mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-alcance-extendido-superior",
+      "nombre": "Pergamino de Alcance Extendido superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-escudo-arcano",
+      "nombre": "Pergamino de Escudo Arcano",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia mágica +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Resistencia mágica durante todo el combate. Al usarlo se activa el estado 'Escudo Arcano (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-escudo-arcano-mayor",
+      "nombre": "Pergamino de Escudo Arcano mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia mágica +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Resistencia mágica durante todo el combate. Al usarlo se activa el estado 'Escudo Arcano mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-escudo-arcano-superior",
+      "nombre": "Pergamino de Escudo Arcano superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia mágica +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Resistencia mágica durante todo el combate. Al usarlo se activa el estado 'Escudo Arcano superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-extension-del-conjuro",
+      "nombre": "Pergamino de Extensión del Conjuro",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango de Casteo +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Rango de Casteo durante todo el combate. Al usarlo se activa el estado 'Extensión del Conjuro (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-extension-del-conjuro-mayor",
+      "nombre": "Pergamino de Extensión del Conjuro mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango de Casteo +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Rango de Casteo durante todo el combate. Al usarlo se activa el estado 'Extensión del Conjuro mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-extension-del-conjuro-superior",
+      "nombre": "Pergamino de Extensión del Conjuro superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Rango de Casteo +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Rango de Casteo durante todo el combate. Al usarlo se activa el estado 'Extensión del Conjuro superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-foco-arcano",
+      "nombre": "Pergamino de Foco Arcano",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de golpe mágico +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Probabilidad de golpe mágico durante todo el combate. Al usarlo se activa el estado 'Foco Arcano (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-foco-arcano-mayor",
+      "nombre": "Pergamino de Foco Arcano mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de golpe mágico +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Probabilidad de golpe mágico durante todo el combate. Al usarlo se activa el estado 'Foco Arcano mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-foco-arcano-superior",
+      "nombre": "Pergamino de Foco Arcano superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de golpe mágico +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Probabilidad de golpe mágico durante todo el combate. Al usarlo se activa el estado 'Foco Arcano superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-furia-de-combate",
+      "nombre": "Pergamino de Furia de Combate",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Daño +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Daño durante todo el combate. Al usarlo se activa el estado 'Furia de Combate (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-furia-de-combate-mayor",
+      "nombre": "Pergamino de Furia de Combate mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Daño +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Daño durante todo el combate. Al usarlo se activa el estado 'Furia de Combate mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-furia-de-combate-superior",
+      "nombre": "Pergamino de Furia de Combate superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Daño +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Daño durante todo el combate. Al usarlo se activa el estado 'Furia de Combate superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-muralla-personal",
+      "nombre": "Pergamino de Muralla Personal",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bloqueo +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Bloqueo durante todo el combate. Al usarlo se activa el estado 'Muralla Personal (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-muralla-personal-mayor",
+      "nombre": "Pergamino de Muralla Personal mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bloqueo +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Bloqueo durante todo el combate. Al usarlo se activa el estado 'Muralla Personal mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-muralla-personal-superior",
+      "nombre": "Pergamino de Muralla Personal superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bloqueo +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Bloqueo durante todo el combate. Al usarlo se activa el estado 'Muralla Personal superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-ojo-del-verdugo",
+      "nombre": "Pergamino de Ojo del Verdugo",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Crítico +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Crítico durante todo el combate. Al usarlo se activa el estado 'Ojo del Verdugo (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-ojo-del-verdugo-mayor",
+      "nombre": "Pergamino de Ojo del Verdugo mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Crítico +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Crítico durante todo el combate. Al usarlo se activa el estado 'Ojo del Verdugo mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-ojo-del-verdugo-superior",
+      "nombre": "Pergamino de Ojo del Verdugo superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Crítico +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Crítico durante todo el combate. Al usarlo se activa el estado 'Ojo del Verdugo superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-paso-fantasma",
+      "nombre": "Pergamino de Paso Fantasma",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Evasión +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Evasión durante todo el combate. Al usarlo se activa el estado 'Paso Fantasma (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-paso-fantasma-mayor",
+      "nombre": "Pergamino de Paso Fantasma mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Evasión +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Evasión durante todo el combate. Al usarlo se activa el estado 'Paso Fantasma mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-paso-fantasma-superior",
+      "nombre": "Pergamino de Paso Fantasma superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Evasión +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Evasión durante todo el combate. Al usarlo se activa el estado 'Paso Fantasma superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-piernas-de-viento",
+      "nombre": "Pergamino de Piernas de Viento",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Movimiento +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Movimiento durante todo el combate. Al usarlo se activa el estado 'Piernas de Viento (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-piernas-de-viento-mayor",
+      "nombre": "Pergamino de Piernas de Viento mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Movimiento +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Movimiento durante todo el combate. Al usarlo se activa el estado 'Piernas de Viento mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-piernas-de-viento-superior",
+      "nombre": "Pergamino de Piernas de Viento superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Movimiento +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Movimiento durante todo el combate. Al usarlo se activa el estado 'Piernas de Viento superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-punteria-certera",
+      "nombre": "Pergamino de Puntería Certera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de Golpe +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Probabilidad de Golpe durante todo el combate. Al usarlo se activa el estado 'Puntería Certera (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-punteria-certera-mayor",
+      "nombre": "Pergamino de Puntería Certera mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de Golpe +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Probabilidad de Golpe durante todo el combate. Al usarlo se activa el estado 'Puntería Certera mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-punteria-certera-superior",
+      "nombre": "Pergamino de Puntería Certera superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Probabilidad de Golpe +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Probabilidad de Golpe durante todo el combate. Al usarlo se activa el estado 'Puntería Certera superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reflejo-de-acero",
+      "nombre": "Pergamino de Reflejo de Acero",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Parry +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Parry durante todo el combate. Al usarlo se activa el estado 'Reflejo de Acero (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reflejo-de-acero-mayor",
+      "nombre": "Pergamino de Reflejo de Acero mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Parry +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Parry durante todo el combate. Al usarlo se activa el estado 'Reflejo de Acero mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reflejo-de-acero-superior",
+      "nombre": "Pergamino de Reflejo de Acero superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Parry +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Parry durante todo el combate. Al usarlo se activa el estado 'Reflejo de Acero superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reserva-ampliada",
+      "nombre": "Pergamino de Reserva Ampliada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bonos máximos +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Bonos máximos durante todo el combate. Al usarlo se activa el estado 'Reserva Ampliada (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reserva-ampliada-mayor",
+      "nombre": "Pergamino de Reserva Ampliada mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bonos máximos +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Bonos máximos durante todo el combate. Al usarlo se activa el estado 'Reserva Ampliada mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-reserva-ampliada-superior",
+      "nombre": "Pergamino de Reserva Ampliada superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Bonos máximos +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Bonos máximos durante todo el combate. Al usarlo se activa el estado 'Reserva Ampliada superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-vitalidad-extendida",
+      "nombre": "Pergamino de Vitalidad Extendida",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "HP máximo +10. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +10 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-vitalidad-extendida-mayor",
+      "nombre": "Pergamino de Vitalidad Extendida mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "HP máximo +20. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +20 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-vitalidad-extendida-superior",
+      "nombre": "Pergamino de Vitalidad Extendida superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "HP máximo +30. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +30 a HP máximo durante todo el combate. Al usarlo se activa el estado 'Vitalidad Extendida superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-voluntad-de-hierro",
+      "nombre": "Pergamino de Voluntad de Hierro",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia a CC +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Resistencia a CC durante todo el combate. Al usarlo se activa el estado 'Voluntad de Hierro (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-voluntad-de-hierro-mayor",
+      "nombre": "Pergamino de Voluntad de Hierro mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 120,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia a CC +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Resistencia a CC durante todo el combate. Al usarlo se activa el estado 'Voluntad de Hierro mayor (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-voluntad-de-hierro-superior",
+      "nombre": "Pergamino de Voluntad de Hierro superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 180,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro superior (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Resistencia a CC +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +3 a Resistencia a CC durante todo el combate. Al usarlo se activa el estado 'Voluntad de Hierro superior (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-impetu",
+      "nombre": "Pergamino de Ímpetu",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ímpetu (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Acciones máximas +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +1 a Acciones máximas durante todo el combate. Al usarlo se activa el estado 'Ímpetu (pergamino)'."
+    },
+    {
+      "id": "new-pergamino-de-impetu-mayor",
+      "nombre": "Pergamino de Ímpetu mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ímpetu mayor (pergamino)",
+      "efectoPermanente": true,
+      "efectoDetalle": "Acciones máximas +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+      "mods": [],
+      "detalle": "Otorga +2 a Acciones máximas durante todo el combate. Al usarlo se activa el estado 'Ímpetu mayor (pergamino)'."
+    },
+    {
+      "id": "new-pocion-de-alcance-extendido",
+      "nombre": "Poción de Alcance Extendido",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Rango durante 4 turnos. Al consumirla se activa el estado 'Alcance Extendido (poción)'."
+    },
+    {
+      "id": "new-pocion-de-alcance-extendido-mayor",
+      "nombre": "Poción de Alcance Extendido mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Rango durante 4 turnos. Al consumirla se activa el estado 'Alcance Extendido mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-alcance-extendido-superior",
+      "nombre": "Poción de Alcance Extendido superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Alcance Extendido superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Rango durante 4 turnos. Al consumirla se activa el estado 'Alcance Extendido superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-clarividencia",
+      "nombre": "Poción de Clarividencia",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Clarividencia (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Inteligencia +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'."
+    },
+    {
+      "id": "new-pocion-de-clarividencia-mayor",
+      "nombre": "Poción de Clarividencia Mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +2 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'."
+    },
+    {
+      "id": "new-pocion-de-clarividencia-superior",
+      "nombre": "Poción de Clarividencia Superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 225,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +3 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'."
+    },
+    {
+      "id": "new-pocion-de-escudo-arcano",
+      "nombre": "Poción de Escudo Arcano",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia mágica +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado 'Escudo Arcano (poción)'."
+    },
+    {
+      "id": "new-pocion-de-escudo-arcano-mayor",
+      "nombre": "Poción de Escudo Arcano mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia mágica +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado 'Escudo Arcano mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-escudo-arcano-superior",
+      "nombre": "Poción de Escudo Arcano superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Escudo Arcano superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia mágica +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado 'Escudo Arcano superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-extension-del-conjuro",
+      "nombre": "Poción de Extensión del Conjuro",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango de Casteo +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Rango de Casteo durante 4 turnos. Al consumirla se activa el estado 'Extensión del Conjuro (poción)'."
+    },
+    {
+      "id": "new-pocion-de-extension-del-conjuro-mayor",
+      "nombre": "Poción de Extensión del Conjuro mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango de Casteo +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Rango de Casteo durante 4 turnos. Al consumirla se activa el estado 'Extensión del Conjuro mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-extension-del-conjuro-superior",
+      "nombre": "Poción de Extensión del Conjuro superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Extensión del Conjuro superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Rango de Casteo +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Rango de Casteo durante 4 turnos. Al consumirla se activa el estado 'Extensión del Conjuro superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-foco-arcano",
+      "nombre": "Poción de Foco Arcano",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de golpe mágico +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Probabilidad de golpe mágico durante 4 turnos. Al consumirla se activa el estado 'Foco Arcano (poción)'."
+    },
+    {
+      "id": "new-pocion-de-foco-arcano-mayor",
+      "nombre": "Poción de Foco Arcano mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de golpe mágico +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Probabilidad de golpe mágico durante 4 turnos. Al consumirla se activa el estado 'Foco Arcano mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-foco-arcano-superior",
+      "nombre": "Poción de Foco Arcano superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Foco Arcano superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de golpe mágico +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Probabilidad de golpe mágico durante 4 turnos. Al consumirla se activa el estado 'Foco Arcano superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-fuerza-del-toro",
+      "nombre": "Poción de Fuerza del Toro",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Fuerza del Toro (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Fuerza +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'."
+    },
+    {
+      "id": "new-pocion-de-fuerza-del-toro-mayor",
+      "nombre": "Poción de Fuerza del Toro Mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +2 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'."
+    },
+    {
+      "id": "new-pocion-de-fuerza-del-toro-superior",
+      "nombre": "Poción de Fuerza del Toro Superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 225,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +3 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'."
+    },
+    {
+      "id": "new-pocion-de-furia-de-combate",
+      "nombre": "Poción de Furia de Combate",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Daño +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Daño durante 4 turnos. Al consumirla se activa el estado 'Furia de Combate (poción)'."
+    },
+    {
+      "id": "new-pocion-de-furia-de-combate-mayor",
+      "nombre": "Poción de Furia de Combate mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Daño +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Daño durante 4 turnos. Al consumirla se activa el estado 'Furia de Combate mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-furia-de-combate-superior",
+      "nombre": "Poción de Furia de Combate superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Furia de Combate superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Daño +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Daño durante 4 turnos. Al consumirla se activa el estado 'Furia de Combate superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-manos-ligeras",
+      "nombre": "Poción de Manos Ligeras",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Manos Ligeras (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Destreza +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'."
+    },
+    {
+      "id": "new-pocion-de-manos-ligeras-mayor",
+      "nombre": "Poción de Manos Ligeras Mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +2 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'."
+    },
+    {
+      "id": "new-pocion-de-manos-ligeras-superior",
+      "nombre": "Poción de Manos Ligeras Superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 225,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +3 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'."
+    },
+    {
+      "id": "new-pocion-de-muralla-personal",
+      "nombre": "Poción de Muralla Personal",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bloqueo +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Bloqueo durante 4 turnos. Al consumirla se activa el estado 'Muralla Personal (poción)'."
+    },
+    {
+      "id": "new-pocion-de-muralla-personal-mayor",
+      "nombre": "Poción de Muralla Personal mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bloqueo +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Bloqueo durante 4 turnos. Al consumirla se activa el estado 'Muralla Personal mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-muralla-personal-superior",
+      "nombre": "Poción de Muralla Personal superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Muralla Personal superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bloqueo +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Bloqueo durante 4 turnos. Al consumirla se activa el estado 'Muralla Personal superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-ojo-del-verdugo",
+      "nombre": "Poción de Ojo del Verdugo",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Crítico +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Crítico durante 4 turnos. Al consumirla se activa el estado 'Ojo del Verdugo (poción)'."
+    },
+    {
+      "id": "new-pocion-de-ojo-del-verdugo-mayor",
+      "nombre": "Poción de Ojo del Verdugo mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Crítico +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Crítico durante 4 turnos. Al consumirla se activa el estado 'Ojo del Verdugo mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-ojo-del-verdugo-superior",
+      "nombre": "Poción de Ojo del Verdugo superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ojo del Verdugo superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Crítico +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Crítico durante 4 turnos. Al consumirla se activa el estado 'Ojo del Verdugo superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-paso-fantasma",
+      "nombre": "Poción de Paso Fantasma",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Evasión +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Evasión durante 4 turnos. Al consumirla se activa el estado 'Paso Fantasma (poción)'."
+    },
+    {
+      "id": "new-pocion-de-paso-fantasma-mayor",
+      "nombre": "Poción de Paso Fantasma mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Evasión +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Evasión durante 4 turnos. Al consumirla se activa el estado 'Paso Fantasma mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-paso-fantasma-superior",
+      "nombre": "Poción de Paso Fantasma superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Paso Fantasma superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Evasión +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Evasión durante 4 turnos. Al consumirla se activa el estado 'Paso Fantasma superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piel-de-roble",
+      "nombre": "Poción de Piel de Roble",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piel de Roble (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Constitución +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piel-de-roble-mayor",
+      "nombre": "Poción de Piel de Roble Mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +2 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piel-de-roble-superior",
+      "nombre": "Poción de Piel de Roble Superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 225,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +3 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piernas-de-viento",
+      "nombre": "Poción de Piernas de Viento",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Movimiento +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Movimiento durante 4 turnos. Al consumirla se activa el estado 'Piernas de Viento (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piernas-de-viento-mayor",
+      "nombre": "Poción de Piernas de Viento mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Movimiento +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Movimiento durante 4 turnos. Al consumirla se activa el estado 'Piernas de Viento mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-piernas-de-viento-superior",
+      "nombre": "Poción de Piernas de Viento superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Piernas de Viento superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Movimiento +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Movimiento durante 4 turnos. Al consumirla se activa el estado 'Piernas de Viento superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-pies-veloces",
+      "nombre": "Poción de Pies Veloces",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 75,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Pies Veloces (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Agilidad +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'."
+    },
+    {
+      "id": "new-pocion-de-pies-veloces-mayor",
+      "nombre": "Poción de Pies Veloces Mayor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 150,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +2 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'."
+    },
+    {
+      "id": "new-pocion-de-pies-veloces-superior",
+      "nombre": "Poción de Pies Veloces Superior",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 225,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Otorga +3 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'."
+    },
+    {
+      "id": "new-pocion-de-punteria-certera",
+      "nombre": "Poción de Puntería Certera",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de Golpe +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Probabilidad de Golpe durante 4 turnos. Al consumirla se activa el estado 'Puntería Certera (poción)'."
+    },
+    {
+      "id": "new-pocion-de-punteria-certera-mayor",
+      "nombre": "Poción de Puntería Certera mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de Golpe +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Probabilidad de Golpe durante 4 turnos. Al consumirla se activa el estado 'Puntería Certera mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-punteria-certera-superior",
+      "nombre": "Poción de Puntería Certera superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Puntería Certera superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Probabilidad de Golpe +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Probabilidad de Golpe durante 4 turnos. Al consumirla se activa el estado 'Puntería Certera superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reflejo-de-acero",
+      "nombre": "Poción de Reflejo de Acero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Parry +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Parry durante 4 turnos. Al consumirla se activa el estado 'Reflejo de Acero (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reflejo-de-acero-mayor",
+      "nombre": "Poción de Reflejo de Acero mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Parry +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Parry durante 4 turnos. Al consumirla se activa el estado 'Reflejo de Acero mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reflejo-de-acero-superior",
+      "nombre": "Poción de Reflejo de Acero superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reflejo de Acero superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Parry +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Parry durante 4 turnos. Al consumirla se activa el estado 'Reflejo de Acero superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reserva-ampliada",
+      "nombre": "Poción de Reserva Ampliada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bonos máximos +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Bonos máximos durante 4 turnos. Al consumirla se activa el estado 'Reserva Ampliada (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reserva-ampliada-mayor",
+      "nombre": "Poción de Reserva Ampliada mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bonos máximos +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Bonos máximos durante 4 turnos. Al consumirla se activa el estado 'Reserva Ampliada mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-reserva-ampliada-superior",
+      "nombre": "Poción de Reserva Ampliada superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Reserva Ampliada superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Bonos máximos +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Bonos máximos durante 4 turnos. Al consumirla se activa el estado 'Reserva Ampliada superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-vitalidad-extendida",
+      "nombre": "Poción de Vitalidad Extendida",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "HP máximo +10 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +10 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida (poción)'."
+    },
+    {
+      "id": "new-pocion-de-vitalidad-extendida-mayor",
+      "nombre": "Poción de Vitalidad Extendida mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "HP máximo +20 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +20 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-vitalidad-extendida-superior",
+      "nombre": "Poción de Vitalidad Extendida superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Vitalidad Extendida superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "HP máximo +30 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +30 a HP máximo durante 4 turnos. Al consumirla se activa el estado 'Vitalidad Extendida superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-voluntad-de-hierro",
+      "nombre": "Poción de Voluntad de Hierro",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 30,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia a CC +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Resistencia a CC durante 4 turnos. Al consumirla se activa el estado 'Voluntad de Hierro (poción)'."
+    },
+    {
+      "id": "new-pocion-de-voluntad-de-hierro-mayor",
+      "nombre": "Poción de Voluntad de Hierro mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia a CC +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Resistencia a CC durante 4 turnos. Al consumirla se activa el estado 'Voluntad de Hierro mayor (poción)'."
+    },
+    {
+      "id": "new-pocion-de-voluntad-de-hierro-superior",
+      "nombre": "Poción de Voluntad de Hierro superior",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Voluntad de Hierro superior (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Resistencia a CC +3 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +3 a Resistencia a CC durante 4 turnos. Al consumirla se activa el estado 'Voluntad de Hierro superior (poción)'."
+    },
+    {
+      "id": "new-pocion-de-impetu",
+      "nombre": "Poción de Ímpetu",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 50,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ímpetu (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Acciones máximas +1 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +1 a Acciones máximas durante 4 turnos. Al consumirla se activa el estado 'Ímpetu (poción)'."
+    },
+    {
+      "id": "new-pocion-de-impetu-mayor",
+      "nombre": "Poción de Ímpetu mayor",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 100,
+      "unidades": 1,
+      "consumible": true,
+      "curahp": 0,
+      "efectoNombre": "Ímpetu mayor (poción)",
+      "efectoTurnos": 4,
+      "efectoDetalle": "Acciones máximas +2 mientras dure (4 turnos).",
+      "mods": [],
+      "detalle": "Otorga +2 a Acciones máximas durante 4 turnos. Al consumirla se activa el estado 'Ímpetu mayor (poción)'."
+    },
+    {
+      "id": "new-sifon-de-soda-antiguo-a-presion",
+      "nombre": "Sifón de soda",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "consumibles",
+      "peso": 0,
+      "ranuras": 1,
+      "precioCompra": 10,
+      "unidades": 1,
+      "consumible": true,
+      "legacy": true,
+      "curahp": 10,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-aguijon-de-esgrima",
+      "nombre": "Aguijón de esgrima",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "parry +2, pdg +1"
+    },
+    {
+      "id": "new-aguijon-de-manticora",
+      "nombre": "Aguijón de mantícora",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 1100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "critico +2, dza +2, aplica veneno severo"
+    },
+    {
+      "id": "new-baston-de-monje",
+      "nombre": "Bastón de monje",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 1,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-bate-de-baseball",
+      "nombre": "Bate de Baseball",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 1,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-baculo-shao-lin",
+      "nombre": "Báculo Shao Lin",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 1,
+      "precioCompra": 800,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "parry+2, bloqueo +1, rango +1"
+    },
+    {
+      "id": "new-baculo-de-batalla",
+      "nombre": "Báculo de batalla",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 140,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1, bloqueo +1"
+    },
+    {
+      "id": "new-cachiporra",
+      "nombre": "Cachiporra",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-cimitarra",
+      "nombre": "Cimitarra",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 69,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": "parry +1"
+    },
+    {
+      "id": "new-cimitarra-de-guardia",
+      "nombre": "Cimitarra de guardia",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 2
+        }
+      ],
+      "detalle": "Parry +2"
+    },
+    {
+      "id": "new-colmillo-dientes-de-sable",
+      "nombre": "Colmillo dientes de sable",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 1,
+      "precioCompra": 900,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Deja sangrando x2hp"
+    },
+    {
+      "id": "new-cuchilla-de-carnicero",
+      "nombre": "Cuchilla de carnicero",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura"
+    },
+    {
+      "id": "new-cuchillo-de-cazador",
+      "nombre": "Cuchillo de cazador",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-daga",
+      "nombre": "Daga",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 1,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-daga-de-capitan",
+      "nombre": "Daga de Capitán",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "pdg +1"
+    },
+    {
+      "id": "new-daga-de-guardia",
+      "nombre": "Daga de guardia",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 1,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 punto de resistencia al crítico"
+    },
+    {
+      "id": "new-espada-bastarda",
+      "nombre": "Espada bastarda",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 1,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 1
+        },
+        {
+          "stat": "bloqueo",
+          "val": 1
+        }
+      ],
+      "detalle": "parry+1, bloqueo+1"
+    },
+    {
+      "id": "new-espada-corta-de-instruccion",
+      "nombre": "Espada corta de instrucción",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-espada-corta-oxidada",
+      "nombre": "Espada corta oxidada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "envenena x 50% de chances"
+    },
+    {
+      "id": "new-espada-de-nosferatu",
+      "nombre": "Espada de Nosferatu",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 2,
+      "precioCompra": 1300,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "50% de chances de ignorar armadura. Drena hp igual al daño ejercido"
+    },
+    {
+      "id": "new-espada-larga-de-dorne",
+      "nombre": "Espada larga de Dorne",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 500,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "pdg+2, envenena"
+    },
+    {
+      "id": "new-espadon",
+      "nombre": "Espadón",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 500,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": "parry +2, bloqueo +3"
+    },
+    {
+      "id": "new-estilete-de-competencia",
+      "nombre": "Estilete de competencia",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Crítico +1"
+    },
+    {
+      "id": "new-estileto-comun",
+      "nombre": "Estileto común",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "crítico +1"
+    },
+    {
+      "id": "new-estoque-de-duelista",
+      "nombre": "Estoque de duelista",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 2,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": "Ingora 2 de resistencia al crítico"
+    },
+    {
+      "id": "new-falchion",
+      "nombre": "Falchion",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ingora 1 de resistencia al crítico"
+    },
+    {
+      "id": "new-flamberge",
+      "nombre": "Flamberge",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 2,
+      "precioCompra": 550,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "sangrado, +1 pdg"
+    },
+    {
+      "id": "new-garra-de-fafner",
+      "nombre": "Garra de Fafner",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 1100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha."
+    },
+    {
+      "id": "new-gladius",
+      "nombre": "Gladius",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 400,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 2
+        },
+        {
+          "stat": "bloqueo",
+          "val": 2
+        }
+      ],
+      "detalle": "parry +2, bloqueo +2"
+    },
+    {
+      "id": "new-hacha-con-pico",
+      "nombre": "Hacha con pico",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "ignora 1 de resistencia al crítico"
+    },
+    {
+      "id": "new-hacha-danesa",
+      "nombre": "Hacha danesa",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 130,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal."
+    },
+    {
+      "id": "new-hacha-de-durin",
+      "nombre": "Hacha de Durin",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 1200,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Arruina armadura. +2 a la fuerza. deja lisiado"
+    },
+    {
+      "id": "new-hacha-de-constructor",
+      "nombre": "Hacha de constructor",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura"
+    },
+    {
+      "id": "new-hacha-de-doble-filo",
+      "nombre": "Hacha de doble filo",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "new-hacha-de-guardia-real",
+      "nombre": "Hacha de guardia real",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 500,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "parry +2, bloqueo +3"
+    },
+    {
+      "id": "new-hacha-de-guerra-ligera",
+      "nombre": "Hacha de guerra ligera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-hacha-de-guerra-pesada",
+      "nombre": "Hacha de guerra pesada",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 130,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Arruina armadura"
+    },
+    {
+      "id": "new-hacha-de-lenador",
+      "nombre": "Hacha de leñador",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-hacha-de-madera-mistica",
+      "nombre": "Hacha de madera mística",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 600,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura. Drena 50% del daño."
+    },
+    {
+      "id": "new-hacha-dentada",
+      "nombre": "Hacha dentada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 115,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "50% de dejar sangrando"
+    },
+    {
+      "id": "new-hacha-filo-de-diamante",
+      "nombre": "Hacha filo de diamante",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 450,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Crítico aumentado. Arruina armadura."
+    },
+    {
+      "id": "new-hacha-oxidada",
+      "nombre": "Hacha oxidada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "50% de chances de envenenar"
+    },
+    {
+      "id": "new-hachuela",
+      "nombre": "Hachuela",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-horquilla",
+      "nombre": "Horquilla",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 50,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-hoz",
+      "nombre": "Hoz",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "sangrado 50%"
+    },
+    {
+      "id": "new-katana",
+      "nombre": "Katana",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 2
+        },
+        {
+          "stat": "crit",
+          "val": 1
+        }
+      ],
+      "detalle": "pdg+2, crítico +1"
+    },
+    {
+      "id": "new-lanza-corta",
+      "nombre": "Lanza corta",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-lanza-militar",
+      "nombre": "Lanza militar",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 2,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-lucero-del-alba",
+      "nombre": "Lucero del alba",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 150,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Ignora 1 de res al crítico, rango +1"
+    },
+    {
+      "id": "new-machete",
+      "nombre": "Machete",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "romper armadura 50%"
+    },
+    {
+      "id": "new-mandoble",
+      "nombre": "Mandoble",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "parry",
+          "val": 2
+        },
+        {
+          "stat": "bloqueo",
+          "val": 1
+        }
+      ],
+      "detalle": "Parry+2, bloqueo+1"
+    },
+    {
+      "id": "new-mangual",
+      "nombre": "Mangual",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 150,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-martillo-de-vulcano",
+      "nombre": "Martillo de Vulcano",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 5,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 1600,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado"
+    },
+    {
+      "id": "new-martillo-de-bola",
+      "nombre": "Martillo de bola",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 115,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "bloqueo +1"
+    },
+    {
+      "id": "new-martillo-de-cabeza-plana",
+      "nombre": "Martillo de cabeza plana",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 135,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "bloqueo +2"
+    },
+    {
+      "id": "new-martillo-de-cantero",
+      "nombre": "Martillo de cantero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-martillo-de-guerra-runico",
+      "nombre": "Martillo de guerra rúnico",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 1,
+      "precioCompra": 850,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "fue",
+          "val": 1
+        }
+      ],
+      "detalle": "Deja en pajaritos"
+    },
+    {
+      "id": "new-martillo-de-sargento",
+      "nombre": "Martillo de sargento",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 140,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "crit",
+          "val": 10
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-martillo-ergonomico",
+      "nombre": "Martillo ergonómico",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 130,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "bloqueo +3"
+    },
+    {
+      "id": "new-maza-de-acero",
+      "nombre": "Maza de acero",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 160,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Bloqueo +3"
+    },
+    {
+      "id": "new-maza-de-guardia",
+      "nombre": "Maza de guardia",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-maza-de-hierro",
+      "nombre": "Maza de hierro",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "bloqueo +1"
+    },
+    {
+      "id": "new-maza-de-vibranium",
+      "nombre": "Maza de vibranium",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 2,
+      "precioCompra": 1400,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "La mitad del daño ignora armadura. bloqueo +3"
+    },
+    {
+      "id": "new-pica-hielos",
+      "nombre": "Pica Hielos",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 1,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": ""
+    },
+    {
+      "id": "new-pico-de-guerra",
+      "nombre": "Pico de guerra",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1, 50% de romper armadura"
+    },
+    {
+      "id": "new-punal-aserrado",
+      "nombre": "Puñal aserrado",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 0,
+      "precioCompra": 100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura."
+    },
+    {
+      "id": "new-punal-de-dorne",
+      "nombre": "Puñal de Dorne",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 2,
+      "danoFijo": 2,
+      "precioCompra": 850,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Veneno stock 4"
+    },
+    {
+      "id": "new-reflejo-de-acero",
+      "nombre": "Reflejo de Acero",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 3,
+      "precioCompra": 1400,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones"
+    },
+    {
+      "id": "new-rompefilas",
+      "nombre": "Rompefilas",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 900,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia"
+    },
+    {
+      "id": "new-sable-comun",
+      "nombre": "Sable común",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "iniciativa +1"
+    },
+    {
+      "id": "new-sable-de-caballeria",
+      "nombre": "Sable de caballería",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 75,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": "pdg +1, parry +1"
+    },
+    {
+      "id": "new-sable-militar",
+      "nombre": "Sable militar",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 4,
+      "danoFijo": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "pdg +1"
+    },
+    {
+      "id": "new-sagaris",
+      "nombre": "Sagaris",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 1,
+      "precioCompra": 130,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "Rompe armadura. Sangrado."
+    },
+    {
+      "id": "new-tomahawk",
+      "nombre": "Tomahawk",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "rango +1"
+    },
+    {
+      "id": "new-garrote-de-hueso",
+      "nombre": "garrote de hueso",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "arma_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "tipoDado": 8,
+      "danoFijo": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [],
+      "detalle": "bloqueo +1"
+    },
+    {
+      "id": "new-broquel-de-acero",
+      "nombre": "Broquel de acero",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Parry +3, resistencia a críticos tipo 2 y 4"
+    },
+    {
+      "id": "new-broquel-de-hierro",
+      "nombre": "Broquel de hierro",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 2
+        }
+      ],
+      "detalle": "parry +2, resistencia a críticos tipo 4"
+    },
+    {
+      "id": "new-broquel-de-titanio",
+      "nombre": "Broquel de titanio",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 650,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        }
+      ],
+      "detalle": "Parry +3, bloqueo +1, resistencia a críticos tipo 2 y 4"
+    },
+    {
+      "id": "new-escudo-de-shiryu",
+      "nombre": "Escudo de ShiRyu",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 1100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        }
+      ],
+      "detalle": "parry  +4, bloqueo +4, inmuniza rupturas de armadura"
+    },
+    {
+      "id": "new-escudo-de-acero-laminado",
+      "nombre": "Escudo de acero laminado",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-escudo-de-asalto",
+      "nombre": "Escudo de asalto",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        }
+      ],
+      "detalle": "bloqueo +2"
+    },
+    {
+      "id": "new-escudo-de-cuero-endurecido",
+      "nombre": "Escudo de cuero endurecido",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 2 y 4"
+    },
+    {
+      "id": "new-escudo-de-escamas",
+      "nombre": "Escudo de escamas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 90,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 6 y 8"
+    },
+    {
+      "id": "new-escudo-de-madera",
+      "nombre": "Escudo de madera",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 4 y 6"
+    },
+    {
+      "id": "new-escudo-de-torre",
+      "nombre": "Escudo de torre",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 6,
+      "ranuras": 0,
+      "precioCompra": 140,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        },
+        {
+          "stat": "bloqueo",
+          "val": 3
+        }
+      ],
+      "detalle": "parry +1, bloqueo +3"
+    },
+    {
+      "id": "new-escudo-triangular",
+      "nombre": "Escudo triangular",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 160,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        }
+      ],
+      "detalle": "bloqueo +2, Resistencia a críticos 4, 6 y 8"
+    },
+    {
+      "id": "new-rodela-de-cobra",
+      "nombre": "Rodela de cobra",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 750,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        }
+      ],
+      "detalle": "parry +2, bloqueo +1. Si bloquea con exito, +2 a pg en próximo ataque"
+    },
+    {
+      "id": "new-rodela-de-cuero",
+      "nombre": "Rodela de cuero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 1,
+      "ranuras": 1,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 2"
+    },
+    {
+      "id": "new-tapa-de-tacho-de-basura-reforzada",
+      "nombre": "Rodela de madera",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 4 y 6"
+    },
+    {
+      "id": "new-tapa-de-tacho-de-basura",
+      "nombre": "Tapa de tacho de basura",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        }
+      ],
+      "detalle": "Resistencia a críticos tipo 8"
+    },
+    {
+      "id": "new-egida-de-gladiador",
+      "nombre": "Égida de Gladiador",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 850,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 2
+        },
+        {
+          "stat": "bloqueo",
+          "val": 4
+        }
+      ],
+      "detalle": "bloqueo +4, +1 a resistencia de todo crítico"
+    },
+    {
+      "id": "new-egida-menor",
+      "nombre": "Égida menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "escudo_1m",
+      "peso": 3,
+      "ranuras": 1,
+      "precioCompra": 130,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        }
+      ],
+      "detalle": "Resistencia a todos los críticos +1"
+    },
+    {
+      "id": "cat-armadura-acolchada",
+      "nombre": "Armadura acolchada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 51,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "cat-armadura-con-tachas",
+      "nombre": "Armadura con tachas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4."
+    },
+    {
+      "id": "cat-armadura-mediana",
+      "nombre": "Armadura mediana",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 140,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 8."
+    },
+    {
+      "id": "new-borceguies-reglamentarios-de-recluta",
+      "nombre": "Borceguíes reglamentarios de recluta",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-cuero-de-mercader-viajero",
+      "nombre": "Botas de cuero de mercader viajero",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 92,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-esqui-de-aluminio-sin-los-esquis",
+      "nombre": "Botas de esquí de aluminio sin los esquís",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 41,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-hierro-del-coloso-menor",
+      "nombre": "Botas de hierro del coloso menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 5,
+      "ranuras": 0,
+      "precioCompra": 338,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "con",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-marcha",
+      "nombre": "Botas de marcha",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 38,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-de-placas-del-guardia-de-avanzada",
+      "nombre": "Botas de placas del guardia de avanzada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 93,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-botas-del-mensajero-veloz",
+      "nombre": "Botas del mensajero veloz",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 186,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "mov",
+          "val": 2
+        },
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-botas-reforzadas",
+      "nombre": "Botas reforzadas",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6."
+    },
+    {
+      "id": "new-calzas-de-cuero-flexible",
+      "nombre": "Calzas de cuero flexible",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 32,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-calzas-del-corredor-de-tormentas",
+      "nombre": "Calzas del corredor de tormentas",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 157,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 2
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-campera-de-cuero-de-motociclista-con-tachas",
+      "nombre": "Campera de cuero de motociclista con tachas",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-canilleras-de-arquero-de-futbol-amateur",
+      "nombre": "Canilleras de arquero de fútbol amateur",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capacete-de-aprendiz-de-herrero",
+      "nombre": "Capacete de aprendiz de herrero",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capucha-de-cuero-acolchada",
+      "nombre": "Capucha de cuero acolchada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 37,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-capucha-de-las-sombras-silentes",
+      "nombre": "Capucha de las sombras silentes",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 161,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "eva",
+          "val": 1
+        }
+      ],
+      "detalle": "Ignora 1 punto de resistencia a crítico del objetivo al atacar sorprendiendo."
+    },
+    {
+      "id": "cat-casco",
+      "nombre": "Casco",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 8."
+    },
+    {
+      "id": "new-casco-de-moto-vintage-pintado-a-mano",
+      "nombre": "Casco de moto vintage pintado a mano",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 56,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-chapa-de-auto-abollada-ajustada-con-alambre",
+      "nombre": "Chapa de auto abollada ajustada con alambre",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 5,
+      "ranuras": 0,
+      "precioCompra": 59,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-coraza",
+      "nombre": "Coraza",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 5,
+      "ranuras": 0,
+      "precioCompra": 234,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos de cualquier tipo."
+    },
+    {
+      "id": "new-coraza-de-dragon-menor",
+      "nombre": "Coraza de dragón menor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 277,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Resiste 1 punto adicional de daño ígneo por turno."
+    },
+    {
+      "id": "new-coraza-de-guardia-de-cuartel",
+      "nombre": "Coraza de guardia de cuartel",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 106,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-cota-de-malla",
+      "nombre": "Cota de malla",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 127,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+    },
+    {
+      "id": "cat-cota-de-placas",
+      "nombre": "Cota de placas",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 221,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+    },
+    {
+      "id": "new-gambeson-acolchado-de-doble-capa",
+      "nombre": "Gambesón acolchado de doble capa",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-gorra-reglamentaria-de-la-policia-federal",
+      "nombre": "Gorra reglamentaria de la Policía Federal",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-gran-yelmo",
+      "nombre": "Gran yelmo",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 221,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+    },
+    {
+      "id": "cat-grebas",
+      "nombre": "Grebas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6 y 8."
+    },
+    {
+      "id": "new-grebas-de-aprendiz-de-milicia",
+      "nombre": "Grebas de aprendiz de milicia",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 46,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-grebas-del-centinela-de-hierro",
+      "nombre": "Grebas del centinela de hierro",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 205,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "parry",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-guanteletes",
+      "nombre": "Guanteletes",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 85,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4 y 6."
+    },
+    {
+      "id": "new-guanteletes-de-adamantium",
+      "nombre": "Guanteletes de adamantium",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 1200,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 10
+        },
+        {
+          "stat": "tipo1",
+          "val": 2
+        },
+        {
+          "stat": "tipo2",
+          "val": 2
+        },
+        {
+          "stat": "tipo3",
+          "val": 2
+        },
+        {
+          "stat": "tipo4",
+          "val": 2
+        },
+        {
+          "stat": "tipo5",
+          "val": 2
+        }
+      ],
+      "detalle": "reduce todos los críticos x2"
+    },
+    {
+      "id": "new-guanteletes-de-combate",
+      "nombre": "Guanteletes de combate",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 110,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6 y 8."
+    },
+    {
+      "id": "new-guanteletes-del-herrero-real",
+      "nombre": "Guanteletes del herrero real",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 180,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        },
+        {
+          "stat": "fue",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 4, 6, 8 y 10."
+    },
+    {
+      "id": "new-guantes-de-lupin",
+      "nombre": "Guantes de Lupin",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 500,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "des",
+          "val": 1
+        }
+      ],
+      "detalle": "destreza +1"
+    },
+    {
+      "id": "new-guantes-de-mickey",
+      "nombre": "Guantes de Mickey",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 650,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "int",
+          "val": 2
+        }
+      ],
+      "detalle": "inteligencia +2"
+    },
+    {
+      "id": "new-guantes-de-cuero-tachonado",
+      "nombre": "Guantes de cuero Tachonado",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 4 y 6."
+    },
+    {
+      "id": "new-guantes-de-cuero-de-carretero",
+      "nombre": "Guantes de cuero de blando",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "cat-guantes-de-cuero-reforzado",
+      "nombre": "Guantes de cuero reforzado",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 45,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4."
+    },
+    {
+      "id": "new-guantes-de-duelista",
+      "nombre": "Guantes de duelista",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "parry",
+          "val": 2
+        }
+      ],
+      "detalle": "parry +2"
+    },
+    {
+      "id": "new-guantes-de-escalador-encerados",
+      "nombre": "Guantes de escalador encerados",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 25,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "pdg",
+          "val": 1
+        }
+      ],
+      "detalle": "Buen agarre para trepar y colgar de un acantilado."
+    },
+    {
+      "id": "new-guantes-de-horno-de-cocina-industrial",
+      "nombre": "Guantes de horno de cocina industrial",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 60,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4. Reduce en 1 el daño de fuego."
+    },
+    {
+      "id": "new-guantes-de-piel-de-troll",
+      "nombre": "Guantes de piel de troll",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 750,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        }
+      ],
+      "detalle": "Otorga regeneración de +3hp x mantenimiento (aplicar a mano)."
+    },
+    {
+      "id": "new-guantes-de-piel-de-unicornio",
+      "nombre": "Guantes de piel de unicornio",
+      "tier": "Legendario",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 900,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        },
+        {
+          "stat": "resm",
+          "val": 5
+        }
+      ],
+      "detalle": "Resistencia a todos los críticos. +5 a resistencia mágica"
+    },
+    {
+      "id": "new-guantes-de-tela-acolchada",
+      "nombre": "Guantes de tela acolchada",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 30,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos tipo 4."
+    },
+    {
+      "id": "new-guantes-del-sanador-errante",
+      "nombre": "Guantes del sanador errante",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": "Al curar a un aliado, el portador también recibe 5 HP instantáneos."
+    },
+    {
+      "id": "cat-guantes-finos-de-senor",
+      "nombre": "Guantes finos de señor",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        }
+      ],
+      "detalle": "Dan aspecto de señor fino. No dejan huellas. +1 a todas las tiradas de interacción social"
+    },
+    {
+      "id": "new-jogging-de-gimnasia-con-rayas-laterales",
+      "nombre": "Jogging de gimnasia con rayas laterales",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 34,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-manoplas-de-escamas",
+      "nombre": "Manoplas de escamas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 100,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 4 y 6."
+    },
+    {
+      "id": "new-manoplas-de-trabajo-de-fragua",
+      "nombre": "Manoplas de trabajo de fragua",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 40,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce en 1 el daño de fuego."
+    },
+    {
+      "id": "new-manoplas-laminadas",
+      "nombre": "Manoplas laminadas",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_rigidos",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 150,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 4, 6 y 8."
+    },
+    {
+      "id": "new-manto-de-cuero-de-basilisco",
+      "nombre": "Manto de cuero de basilisco",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 188,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 8
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "eva",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-mercury-threads",
+      "nombre": "Mercury threads",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 133,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 2
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        },
+        {
+          "stat": "resm",
+          "val": 1
+        },
+        {
+          "stat": "rescc",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC."
+    },
+    {
+      "id": "new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo",
+      "nombre": "Mitones de abuela",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 20,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": "Tejido con patrones florales. Muy abrigaditos."
+    },
+    {
+      "id": "cat-mitones-de-malla",
+      "nombre": "Mitones de malla",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 70,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2 y 4."
+    },
+    {
+      "id": "new-mitones-de-piel-de-owl-bear",
+      "nombre": "Mitones de piel de owl-bear",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "guantes_blandos",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 175,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo3",
+          "val": 2
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "tipo5",
+          "val": 1
+        }
+      ],
+      "detalle": "Reducción fuerte a críticos tipo 6, leve a 8 y 10"
+    },
+    {
+      "id": "new-ojotas-de-goma-con-flores-hawaianas",
+      "nombre": "Ojotas de goma con flores hawaianas",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "botas_blandas",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 34,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-pantalon-reforzado-de-cazador",
+      "nombre": "Pantalón reforzado de cazador",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "piernas_blandas",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 87,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos tipo 6"
+    },
+    {
+      "id": "cat-pechera",
+      "nombre": "Pechera",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 42,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 3
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2."
+    },
+    {
+      "id": "new-perneras-articuladas",
+      "nombre": "Perneras articuladas",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "piernas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 111,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 7
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-peto-de-cuero-curtido",
+      "nombre": "Peto de cuero curtido",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_blanda",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 51,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-peto-de-placas-de-aprendiz",
+      "nombre": "Peto de placas de aprendiz",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "armadura_rigida",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 51,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-sabaton",
+      "nombre": "Sabatón",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 3,
+      "ranuras": 0,
+      "precioCompra": 127,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        },
+        {
+          "stat": "mov",
+          "val": -1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 4, 6 y 8. -1 Movimiento."
+    },
+    {
+      "id": "cat-sombrero-humectante",
+      "nombre": "Sombrero humectante",
+      "tier": "Común",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 120,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "bonos",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a los Bonos máximos."
+    },
+    {
+      "id": "new-turbante-de-tela-reforzada",
+      "nombre": "Turbante de tela reforzada",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_blando",
+      "peso": 1,
+      "ranuras": 0,
+      "precioCompra": 92,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 4
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "rangocasteo",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-yelmo-completo",
+      "nombre": "Yelmo completo",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 122,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 2, 6 y 8."
+    },
+    {
+      "id": "new-yelmo-con-cresta-de-comandante",
+      "nombre": "Yelmo con cresta de comandante",
+      "tier": "Raro",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 4,
+      "ranuras": 0,
+      "precioCompra": 205,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 9
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "ini",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "new-yelmo-de-visera",
+      "nombre": "Yelmo de visera",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 98,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 6
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": ""
+    },
+    {
+      "id": "cat-yelmo-liviano",
+      "nombre": "Yelmo liviano",
+      "tier": "Buena Calidad",
+      "imagen": "",
+      "tipoItem": "casco_rigido",
+      "peso": 2,
+      "ranuras": 0,
+      "precioCompra": 80,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 5
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
+        }
+      ],
+      "detalle": "Reduce críticos Tipo 6 y 8."
+    },
+    {
+      "id": "cat-zapatillas-nike",
+      "nombre": "Zapatillas Nike",
+      "tier": "Excepcional",
+      "imagen": "",
+      "tipoItem": "botas_rigidas",
+      "peso": 0,
+      "ranuras": 0,
+      "precioCompra": 500,
+      "consumible": false,
+      "curahp": 0,
+      "mods": [
+        {
+          "stat": "def",
+          "val": 1
+        },
+        {
+          "stat": "accionesmax",
+          "val": 1
+        }
+      ],
+      "detalle": "+1 a las Acciones máximas del turno."
     }
   ]
 }

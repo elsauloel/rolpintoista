@@ -1,14 +1,6 @@
 {
-  "actualizado": "2026-08-13T02:16:38.174Z",
+  "actualizado": "2026-08-13T02:17:15.836Z",
   "creeps": [
-    {
-      "id": "usfoqgv",
-      "nombre": "Creep nuevo",
-      "imagen": "",
-      "hp": 10,
-      "hpMax": 10,
-      "estados": []
-    },
     {
       "id": "21xc9hg",
       "nombre": "Zombie jugador de baseball",

@@ -790,12 +790,9 @@ function tirarTier(pesos){
    misma categoría— y recién si la categoría se agotó entera se sale de
    ella. Nunca se inventa un ítem ni se deja el lugar vacío. */
 function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy){
-  // Los legacy son "los de siempre" (Poción de HP, Antídoto...): hay
-  // pocos en el catálogo, así que cuando un lugar pide específicamente
-  // uno de ellos se permite repetir (más stock de lo mismo), a
-  // diferencia del resto de la tienda, donde cada ítem sale una sola vez.
   const libres = (lista) => (lista || [])
-    .filter(it => soloLegacy ? it.legacy : !usados.has(it.id));
+    .filter(it => !usados.has(it.id))
+    .filter(it => !soloLegacy || it.legacy);
 
   const delRubro = porRubroTier[rubro] || {};
   const exacto = libres(delRubro[tier]);
@@ -843,13 +840,21 @@ function generarTienda(claveTamano, categoria){
   });
 
   // 3. Cuántos objetos y cómo se reparten entre las categorías.
-  const total = entero(cfg.min, cfg.max);
+  // En Alquimista, al menos 40% de TODOS los slots expuestos (contando
+  // el stock garantizado, que ya es legacy) tienen que ser legacy — y
+  // como acá nada se repite, el catálogo pone un techo: solo hay
+  // legacyDisponibleTotal ítems legacy en total, así que una tienda no
+  // puede tener más de legacyDisponibleTotal/0.4 ítems sin que el 40%
+  // deje de ser alcanzable. Si el tamaño tirado se pasa de ese techo, la
+  // tienda sale más chica (nunca más grande que el rango normal).
+  let total = entero(cfg.min, cfg.max);
+  const legacyDisponibleTotal = CATALOGO.filter(it => it.legacy).length;
+  if(cat === 'alquimista'){
+    const topeTotal = Math.max(garantizados.length, Math.floor(legacyDisponibleTotal / 0.4));
+    total = Math.min(total, Math.max(0, topeTotal - garantizados.length));
+  }
   const reparto = repartirEntero(total, REPARTO_POR_CATEGORIA[cat]);
 
-  // En Alquimista, al menos 40% de TODOS los slots expuestos (contando
-  // el stock garantizado, que ya es legacy) tienen que ser legacy. Se
-  // calcula cuánto falta después de contar lo garantizado, y se le pide
-  // esa cantidad al sorteo de consumibles de abajo.
   const legacyGarantizados = garantizados.filter(it => it.legacy).length;
   const totalSlots = garantizados.length + total;
   const legacyMinimoAlquimista = cat === 'alquimista'

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vendor Generator — Tiendas</title>
+<title>Generador de Tiendas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -161,7 +161,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="hero">
     <div>
       <div class="eyebrow">Rol Pintoísta</div>
-      <h1>Vendor Generator</h1>
+      <h1>Generador de Tiendas</h1>
     </div>
     <div class="hero-right">
       <a class="btn ghost" href="ficha.html">Abrir ficha</a>
@@ -183,9 +183,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
           <option value="capital">Capital</option>
         </select>
       </div>
-      <button class="btn primary" id="btn-generar">Generar Shop</button>
+      <div class="campo">
+        <label for="f-categoria">Categoría de tienda</label>
+        <select id="f-categoria">
+          <option value="ramos" selected>Ramos generales</option>
+          <option value="alquimista">Alquimista</option>
+          <option value="herrero">Herrero</option>
+        </select>
+      </div>
+      <button class="btn primary" id="btn-generar">Generar tienda</button>
       <button class="btn" id="btn-regenerar" disabled>Regenerar</button>
-      <button class="btn publicar" id="btn-publicar" disabled>Publicar Shop</button>
+      <button class="btn publicar" id="btn-publicar" disabled>Publicar tienda</button>
+      <button class="btn ghost" id="btn-personalizada">+ Tienda personalizada</button>
     </div>
     <div class="hint" id="hint-tamano" style="margin-top:10px"></div>
   </div>
@@ -470,12 +479,12 @@ const CATALOGO = [
   {id:'cat-raciones-fancy', nombre:'Raciones Fancy', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:5, consumible:true, legacy:true, curahp:0, mods:[], detalle:'(5/5) +2 Wellness. (Aplicar a mano al usarla.)'},
   {id:'cat-revive', nombre:'Revive', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:120, unidades:1, consumible:true, legacy:true, curahp:0, mods:[], detalle:'Revive con 50% del HP a 1 aliado caído hace 5 turnos o menos, dentro de un área de 5 casillas.'},
   {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, legacy:true, curahp:10, mods:[], detalle:''},
-  {id:'new-aguijon-de-esgrima', nombre:'Aguijón de esgrima', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'parry +2, pdg +1'},
-  {id:'new-aguijon-de-manticora', nombre:'Aguijón de mantícora', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:1100, consumible:false, curahp:0, mods:[], detalle:'critico +2, dza +2, aplica veneno severo'},
-  {id:'new-baston-de-monje', nombre:'Bastón de monje', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
+  {id:'new-aguijon-de-esgrima', nombre:'Aguijón de esgrima', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}, {stat:'parry', val:2}], detalle:'parry +2, pdg +1'},
+  {id:'new-aguijon-de-manticora', nombre:'Aguijón de mantícora', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:1100, consumible:false, curahp:0, mods:[{stat:'crit', val:2}], detalle:'critico +2, dza +2, aplica veneno severo'},
+  {id:'new-baston-de-monje', nombre:'Bastón de monje', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
   {id:'new-bate-de-baseball', nombre:'Bate de Baseball', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:''},
-  {id:'new-baculo-shao-lin', nombre:'Báculo Shao Lin', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:800, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'parry+2, bloqueo +1, rango +1'},
-  {id:'new-baculo-de-batalla', nombre:'Báculo de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'rango +1, bloqueo +1'},
+  {id:'new-baculo-shao-lin', nombre:'Báculo Shao Lin', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:800, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:1}, {stat:'rng', val:1}], detalle:'parry+2, bloqueo +1, rango +1'},
+  {id:'new-baculo-de-batalla', nombre:'Báculo de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}, {stat:'rng', val:1}], detalle:'rango +1, bloqueo +1'},
   {id:'new-cachiporra', nombre:'Cachiporra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:''},
   {id:'new-cimitarra', nombre:'Cimitarra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:69, consumible:false, curahp:0, mods:[{stat:'parry', val:1}], detalle:'parry +1'},
   {id:'new-cimitarra-de-guardia', nombre:'Cimitarra de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'parry', val:2}], detalle:'Parry +2'},
@@ -494,8 +503,8 @@ const CATALOGO = [
   {id:'cat-espada-larga', nombre:'Espada larga', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}], detalle:'pdg +2'},
   {id:'new-espada-larga-de-dorne', nombre:'Espada larga de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'pdg+2, envenena'},
   {id:'new-espadon', nombre:'Espadón', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'crit', val:10}, {stat:'parry', val:1}, {stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3'},
-  {id:'new-estilete-de-competencia', nombre:'Estilete de competencia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'Crítico +1'},
-  {id:'new-estileto-comun', nombre:'Estileto común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'crítico +1'},
+  {id:'new-estilete-de-competencia', nombre:'Estilete de competencia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'crit', val:1}], detalle:'Crítico +1'},
+  {id:'new-estileto-comun', nombre:'Estileto común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'crit', val:1}], detalle:'crítico +1'},
   {id:'cat-estoque', nombre:'Estoque', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Modificador: +1 a iniciativa'},
   {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:2, danoFijo:2, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Ingora 2 de resistencia al crítico'},
   {id:'new-falchion', nombre:'Falchion', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'Ingora 1 de resistencia al crítico'},
@@ -505,13 +514,13 @@ const CATALOGO = [
   {id:'new-gladius', nombre:'Gladius', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:400, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:2}], detalle:'parry +2, bloqueo +2'},
   {id:'cat-hacha', nombre:'Hacha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
   {id:'new-hacha-con-pico', nombre:'Hacha con pico', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'ignora 1 de resistencia al crítico'},
-  {id:'new-hacha-danesa', nombre:'Hacha danesa', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.'},
+  {id:'new-hacha-danesa', nombre:'Hacha danesa', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.'},
   {id:'new-hacha-de-durin', nombre:'Hacha de Durin', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:1200, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura. +2 a la fuerza. deja lisiado'},
   {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'Rompe armadura. +1 al bloqueo'},
   {id:'new-hacha-de-constructor', nombre:'Hacha de constructor', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura'},
   {id:'new-hacha-de-doble-filo', nombre:'Hacha de doble filo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
   {id:'cat-hacha-de-mano', nombre:'Hacha de doble filo', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Ignora 1 resistencia al crítico'},
-  {id:'new-hacha-de-guardia-real', nombre:'Hacha de guardia real', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3'},
+  {id:'new-hacha-de-guardia-real', nombre:'Hacha de guardia real', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3'},
   {id:'new-hacha-de-guerra-ligera', nombre:'Hacha de guerra ligera', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:1, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:''},
   {id:'new-hacha-de-guerra-pesada', nombre:'Hacha de guerra pesada', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura'},
   {id:'new-hacha-de-lenador', nombre:'Hacha de leñador', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:''},
@@ -520,21 +529,21 @@ const CATALOGO = [
   {id:'new-hacha-filo-de-diamante', nombre:'Hacha filo de diamante', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:450, consumible:false, curahp:0, mods:[], detalle:'Crítico aumentado. Arruina armadura.'},
   {id:'new-hacha-oxidada', nombre:'Hacha oxidada', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'50% de chances de envenenar'},
   {id:'new-hachuela', nombre:'Hachuela', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:''},
-  {id:'new-horquilla', nombre:'Horquilla', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
+  {id:'new-horquilla', nombre:'Horquilla', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
   {id:'new-hoz', nombre:'Hoz', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'sangrado 50%'},
   {id:'new-katana', nombre:'Katana', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}, {stat:'crit', val:1}], detalle:'pdg+2, crítico +1'},
-  {id:'new-lanza-corta', nombre:'Lanza corta', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
-  {id:'new-lanza-militar', nombre:'Lanza militar', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:2, precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
-  {id:'new-lucero-del-alba', nombre:'Lucero del alba', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 de res al crítico, rango +1'},
+  {id:'new-lanza-corta', nombre:'Lanza corta', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
+  {id:'new-lanza-militar', nombre:'Lanza militar', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:2, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
+  {id:'new-lucero-del-alba', nombre:'Lucero del alba', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Ignora 1 de res al crítico, rango +1'},
   {id:'new-machete', nombre:'Machete', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'romper armadura 50%'},
   {id:'new-mandoble', nombre:'Mandoble', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:1}], detalle:'Parry+2, bloqueo+1'},
-  {id:'cat-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:160, consumible:false, curahp:0, mods:[], detalle:'Alcance +1.'},
-  {id:'new-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
+  {id:'cat-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:160, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Alcance +1.'},
+  {id:'new-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
   {id:'cat-martillo', nombre:'Martillo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:''},
   {id:'new-martillo-de-vulcano', nombre:'Martillo de Vulcano', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:5, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:1600, consumible:false, curahp:0, mods:[], detalle:'Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado'},
   {id:'new-martillo-de-bola', nombre:'Martillo de bola', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:115, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1'},
   {id:'new-martillo-de-cabeza-plana', nombre:'Martillo de cabeza plana', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:135, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:2}], detalle:'bloqueo +2'},
-  {id:'new-martillo-de-cantero', nombre:'Martillo de cantero', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
+  {id:'new-martillo-de-cantero', nombre:'Martillo de cantero', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
   {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:850, consumible:false, curahp:0, mods:[{stat:'fue', val:1}], detalle:'Deja en pajaritos'},
   {id:'new-martillo-de-sargento', nombre:'Martillo de sargento', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'crit', val:10}, {stat:'parry', val:1}], detalle:''},
   {id:'new-martillo-ergonomico', nombre:'Martillo ergonómico', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'bloqueo +3'},
@@ -543,23 +552,23 @@ const CATALOGO = [
   {id:'new-maza-de-hierro', nombre:'Maza de hierro', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1'},
   {id:'new-maza-de-vibranium', nombre:'Maza de vibranium', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:2, precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'La mitad del daño ignora armadura. bloqueo +3'},
   {id:'new-pica-hielos', nombre:'Pica Hielos', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:''},
-  {id:'new-pico-de-guerra', nombre:'Pico de guerra', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'rango +1, 50% de romper armadura'},
+  {id:'new-pico-de-guerra', nombre:'Pico de guerra', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1, 50% de romper armadura'},
   {id:'new-punal-aserrado', nombre:'Puñal aserrado', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:0, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.'},
   {id:'new-punal-de-dorne', nombre:'Puñal de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:2, danoFijo:2, precioCompra:850, consumible:false, curahp:0, mods:[], detalle:'Veneno stock 4'},
-  {id:'new-reflejo-de-acero', nombre:'Reflejo de Acero', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:3, precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:2}], detalle:'Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones'},
+  {id:'new-reflejo-de-acero', nombre:'Reflejo de Acero', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:3, precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'parry', val:3}, {stat:'bloqueo', val:2}], detalle:'Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones'},
   {id:'new-rompefilas', nombre:'Rompefilas', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:900, consumible:false, curahp:0, mods:[], detalle:'Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia'},
   {id:'cat-rompemalla', nombre:'Rompemalla', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:2, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'50% chance de Romper armadura.'},
-  {id:'new-sable-comun', nombre:'Sable común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:'iniciativa +1'},
+  {id:'new-sable-comun', nombre:'Sable común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'iniciativa +1'},
   {id:'new-sable-de-caballeria', nombre:'Sable de caballería', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}, {stat:'parry', val:1}], detalle:'pdg +1, parry +1'},
   {id:'new-sable-militar', nombre:'Sable militar', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'pdg +1'},
   {id:'new-sagaris', nombre:'Sagaris', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Sangrado.'},
-  {id:'new-tomahawk', nombre:'Tomahawk', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'rango +1'},
+  {id:'new-tomahawk', nombre:'Tomahawk', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'rango +1'},
   {id:'new-garrote-de-hueso', nombre:'garrote de hueso', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1'},
-  {id:'new-broquel-de-acero', nombre:'Broquel de acero', tier:'Raro', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Parry +3, resistencia a críticos tipo 2 y 4'},
+  {id:'new-broquel-de-acero', nombre:'Broquel de acero', tier:'Raro', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'parry', val:3}], detalle:'Parry +3, resistencia a críticos tipo 2 y 4'},
   {id:'cat-broquel', nombre:'Broquel de bronce', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:1, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'parry', val:1}], detalle:'parry +1'},
   {id:'new-broquel-de-hierro', nombre:'Broquel de hierro', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo2', val:1}, {stat:'parry', val:2}], detalle:'parry +2, resistencia a críticos tipo 4'},
-  {id:'new-broquel-de-titanio', nombre:'Broquel de titanio', tier:'Excepcional', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:650, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'bloqueo', val:1}], detalle:'Parry +3, bloqueo +1, resistencia a críticos tipo 2 y 4'},
-  {id:'new-escudo-de-shiryu', nombre:'Escudo de ShiRyu', tier:'Legendario', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:0, precioCompra:1100, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'bloqueo', val:4}], detalle:'parry  +4, bloqueo +4, inmuniza rupturas de armadura'},
+  {id:'new-broquel-de-titanio', nombre:'Broquel de titanio', tier:'Excepcional', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:650, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'parry', val:3}, {stat:'bloqueo', val:1}], detalle:'Parry +3, bloqueo +1, resistencia a críticos tipo 2 y 4'},
+  {id:'new-escudo-de-shiryu', nombre:'Escudo de ShiRyu', tier:'Legendario', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:0, precioCompra:1100, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'parry', val:4}, {stat:'bloqueo', val:4}], detalle:'parry  +4, bloqueo +4, inmuniza rupturas de armadura'},
   {id:'new-escudo-de-acero-laminado', nombre:'Escudo de acero laminado', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo4', val:1}], detalle:''},
   {id:'new-escudo-de-asalto', nombre:'Escudo de asalto', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:4, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'bloqueo', val:2}], detalle:'bloqueo +2'},
   {id:'new-escudo-de-cuero-endurecido', nombre:'Escudo de cuero endurecido', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:4}], detalle:'Resistencia a críticos tipo 2 y 4'},
@@ -572,7 +581,7 @@ const CATALOGO = [
   {id:'cat-escudo-romano', nombre:'Escudo romano', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:6, ranuras:1, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:10}, {stat:'bloqueo', val:3}], detalle:'bloqueo +3'},
   {id:'cat-escudo-triangular', nombre:'Escudo triangular', tier:'Buena Calidad', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'bloqueo', val:2}], detalle:'bloqueo +2'},
   {id:'new-escudo-triangular', nombre:'Escudo triangular', tier:'Raro', imagen:'', tipoItem:'escudo_1m', peso:4, ranuras:0, precioCompra:160, consumible:false, curahp:0, mods:[{stat:'def', val:8}, {stat:'bloqueo', val:2}], detalle:'bloqueo +2, Resistencia a críticos 4, 6 y 8'},
-  {id:'new-rodela-de-cobra', nombre:'Rodela de cobra', tier:'Excepcional', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'bloqueo', val:1}], detalle:'parry +2, bloqueo +1. Si bloquea con exito, +2 a pg en próximo ataque'},
+  {id:'new-rodela-de-cobra', nombre:'Rodela de cobra', tier:'Excepcional', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'parry', val:2}, {stat:'bloqueo', val:1}], detalle:'parry +2, bloqueo +1. Si bloquea con exito, +2 a pg en próximo ataque'},
   {id:'new-rodela-de-cuero', nombre:'Rodela de cuero', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:1, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:1}], detalle:'Resistencia a críticos tipo 2'},
   {id:'new-tapa-de-tacho-de-basura-reforzada', nombre:'Rodela de madera', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:3, ranuras:1, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Resistencia a críticos tipo 4 y 6'},
   {id:'new-tapa-de-tacho-de-basura', nombre:'Tapa de tacho de basura', tier:'Común', imagen:'', tipoItem:'escudo_1m', peso:1, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:3}], detalle:'Resistencia a críticos tipo 8'},
@@ -622,7 +631,7 @@ const CATALOGO = [
   {id:'new-guantes-de-duelista', nombre:'Guantes de duelista', tier:'Raro', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'parry', val:2}], detalle:'parry +2'},
   {id:'new-guantes-de-escalador-encerados', nombre:'Guantes de escalador encerados', tier:'Buena Calidad', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, precioCompra:25, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo1', val:1}, {stat:'pdg', val:1}], detalle:'Buen agarre para trepar y colgar de un acantilado.'},
   {id:'new-guantes-de-horno-de-cocina-industrial', nombre:'Guantes de horno de cocina industrial', tier:'Común', imagen:'', tipoItem:'guantes_rigidos', peso:2, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos Tipo 2 y 4. Reduce en 1 el daño de fuego.'},
-  {id:'new-guantes-de-piel-de-troll', nombre:'Guantes de piel de troll', tier:'Excepcional', imagen:'', tipoItem:'guantes_blandos', peso:1, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:4}], detalle:'Otorga regeneración de +3hp x mantenimiento (aplicar a mano).'},
+  {id:'new-guantes-de-piel-de-troll', nombre:'Guantes de piel de troll', tier:'Excepcional', imagen:'', tipoItem:'guantes_blandos', peso:1, ranuras:0, precioCompra:750, consumible:false, curahp:0, equipoEstadoNombre:'Regeneración (guantes de piel de troll)', equipoEstadoHpTurno:3, equipoEstadoDetalle:'Cura 3 HP por mantenimiento mientras tengas los Guantes de piel de troll equipados.', mods:[{stat:'def', val:4}], detalle:'Otorga regeneración de +3hp x mantenimiento (aplicar a mano).'},
   {id:'new-guantes-de-piel-de-unicornio', nombre:'Guantes de piel de unicornio', tier:'Legendario', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, precioCompra:900, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}, {stat:'resm', val:5}], detalle:'Resistencia a todos los críticos. +5 a resistencia mágica'},
   {id:'new-guantes-de-tela-acolchada', nombre:'Guantes de tela acolchada', tier:'Común', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, precioCompra:30, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo2', val:1}], detalle:'Reduce críticos tipo 4.'},
   {id:'new-guantes-del-sanador-errante', nombre:'Guantes del sanador errante', tier:'Raro', imagen:'', tipoItem:'guantes_blandos', peso:0, ranuras:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'bonos', val:1}], detalle:'Al curar a un aliado, el portador también recibe 5 HP instantáneos.'},
@@ -669,8 +678,16 @@ const TAMANOS = {
   capital:   {label:'Capital',            min:70, max:100, pesos:{'Común':20, 'Buena Calidad':30, 'Raro':32,  'Excepcional':15,  'Legendario':3}},
 };
 
-// Sobre el total sorteado, sin contar el stock garantizado.
-const REPARTO = {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10};
+// Sobre el total sorteado, sin contar el stock garantizado. Cada
+// categoría de tienda reparte distinto: Ramos generales es la mezcla de
+// siempre, Alquimista solo vende consumibles y Herrero solo equipo (sin
+// pociones ni pergaminos).
+const REPARTO_POR_CATEGORIA = {
+  ramos:      {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10},
+  alquimista: {consumibles:1},
+  herrero:    {armas:0.45, defensivos:0.35, escudos:0.20},
+};
+const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero'};
 
 // ES_ARMA sale de CATEGORIAS, arriba, junto con el catálogo.
 const ES_DEFENSA = t => t.startsWith('escudo') || t.startsWith('armadura') || t.startsWith('casco')
@@ -801,12 +818,15 @@ function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy){
   return cualquiera.length ? cualquiera[entero(0, cualquiera.length - 1)] : null;
 }
 
-function generarTienda(claveTamano){
+function generarTienda(claveTamano, categoria){
   const cfg = TAMANOS[claveTamano];
+  const cat = REPARTO_POR_CATEGORIA[categoria] ? categoria : 'ramos';
   const usados = new Set();
 
   // 1. Stock garantizado: va siempre y no entra en el reparto de abajo.
-  const garantizados = GARANTIZADOS
+  // Son todos consumibles (pociones, revive), así que un Herrero no los
+  // vende — solo Ramos generales y Alquimista.
+  const garantizados = cat === 'herrero' ? [] : GARANTIZADOS
     .map(id => CATALOGO.find(it => it.id === id))
     .filter(Boolean);
   garantizados.forEach(it => usados.add(it.id));
@@ -821,7 +841,7 @@ function generarTienda(claveTamano){
 
   // 3. Cuántos objetos y cómo se reparten entre las categorías.
   const total = entero(cfg.min, cfg.max);
-  const reparto = repartirEntero(total, REPARTO);
+  const reparto = repartirEntero(total, REPARTO_POR_CATEGORIA[cat]);
 
   // 4. Cada lugar tira su propia rareza y busca un ítem que la cumpla.
   const elegidos = [];
@@ -845,6 +865,8 @@ function generarTienda(claveTamano){
   return {
     tamano: claveTamano,
     tamanoLabel: cfg.label,
+    categoria: cat,
+    categoriaLabel: CATEGORIA_TIENDA_LABEL[cat],
     generado: new Date().toISOString(),
     ajustePrecio: 0,
     garantizados: garantizados.map(it => it.id),
@@ -1003,6 +1025,7 @@ function renderPreview(){
   const pct = ajusteActual();
   $('#preview-resumen').innerHTML =
     `<span class="resumen-chip">${esc(tiendaActual.tamanoLabel)}</span>` +
+    (tiendaActual.categoriaLabel ? `<span class="resumen-chip">${esc(tiendaActual.categoriaLabel)}</span>` : '') +
     `<span class="resumen-chip">Ítems <b>${fmt(items.length)}</b></span>` +
     (pct ? `<span class="resumen-chip" style="border-color:${pct < 0 ? 'var(--absenta)' : 'var(--brass)'}">${pct < 0 ? 'Descuento' : 'Recargo'} <b>${fmt(Math.abs(pct))}%</b></span>` : '') +
     TIERS.filter(t => porTier[t]).map(t =>
@@ -1102,8 +1125,9 @@ function aplicarAjuste(pct){
 
 function generar(){
   const clave = $('#f-tamano').value;
+  const categoria = $('#f-categoria').value;
   const ajustePrevio = ajusteActual();
-  tiendaActual = generarTienda(clave);
+  tiendaActual = generarTienda(clave, categoria);
   // Regenerar cambia el stock, no la política de precios del vendedor.
   tiendaActual.ajustePrecio = ajustePrevio;
   renderPreview();
@@ -1112,10 +1136,31 @@ function generar(){
   toast(`Tienda generada · ${tiendaActual.items.length} ítems`);
 }
 
+// Arranca vacía: el usuario la arma ítem por ítem con "+ Agregar ítems",
+// en vez de sortearla.
+function crearTiendaPersonalizada(){
+  tiendaActual = {
+    tamano: 'personalizada',
+    tamanoLabel: 'Tienda personalizada',
+    categoria: 'personalizada',
+    categoriaLabel: '',
+    generado: new Date().toISOString(),
+    ajustePrecio: 0,
+    garantizados: [],
+    items: [],
+  };
+  renderPreview();
+  $('#btn-regenerar').disabled = false;
+  $('#btn-publicar').disabled = false;
+  toast('Tienda personalizada creada — usá "+ Agregar ítems" para cargarla');
+}
+
 function actualizarHint(){
   const cfg = TAMANOS[$('#f-tamano').value];
+  const categoria = $('#f-categoria').value;
   $('#hint-tamano').textContent =
-    `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems, más los consumibles de stock fijo (Poción de HP, Poción de Bonos y Revive).`;
+    `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems` +
+    (categoria === 'herrero' ? '.' : `, más los consumibles de stock fijo (Poción de HP, Poción de Bonos y Revive).`);
 }
 
 /* ---------- GitHub ---------- */
@@ -1258,12 +1303,13 @@ async function publicarShop(){
   toast('Publicando en GitHub…');
   try{
     const b64 = await aBase64(JSON.stringify(tiendaActual, null, 2));
-    await ghSubir(ARCHIVO_TIENDA, b64, token, `Publicar tienda (${tiendaActual.tamanoLabel})`);
+    const etiqueta = tiendaActual.categoriaLabel ? `${tiendaActual.tamanoLabel} · ${tiendaActual.categoriaLabel}` : tiendaActual.tamanoLabel;
+    await ghSubir(ARCHIVO_TIENDA, b64, token, `Publicar tienda (${etiqueta})`);
     toast('Tienda publicada ✓ — los jugadores ya pueden cargarla');
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá Publicar Shop de nuevo');
+      toast('El token no sirve o venció — tocá Publicar tienda de nuevo');
     }else{
       console.error('Error publicando la tienda:', err);
       toast('No se pudo publicar — revisá la consola');
@@ -1276,9 +1322,11 @@ async function publicarShop(){
 /* ---------- Eventos ---------- */
 
 $('#f-tamano').addEventListener('change', actualizarHint);
+$('#f-categoria').addEventListener('change', actualizarHint);
 $('#btn-generar').addEventListener('click', generar);
 $('#btn-regenerar').addEventListener('click', generar);
 $('#btn-publicar').addEventListener('click', publicarShop);
+$('#btn-personalizada').addEventListener('click', crearTiendaPersonalizada);
 $('#btn-token').addEventListener('click', () => ghToken(true));
 $('#btn-agregar-items').addEventListener('click', abrirAgregar);
 $('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));

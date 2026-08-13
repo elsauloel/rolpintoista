@@ -2266,7 +2266,16 @@
   "precioCompra": 110,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
   "detalle": "parry +2, pdg +1",
   "_tiene_imagen": false
  },
@@ -2282,7 +2291,12 @@
   "precioCompra": 1100,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
   "detalle": "critico +2, dza +2, aplica veneno severo",
   "_tiene_imagen": false
  },
@@ -2298,7 +2312,12 @@
   "precioCompra": 90,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -2332,7 +2351,15 @@
   "curahp": 0,
   "mods": [
    {
+    "stat": "parry",
+    "val": 2
+   },
+   {
     "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
     "val": 1
    }
   ],
@@ -2354,6 +2381,10 @@
   "mods": [
    {
     "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
     "val": 1
    }
   ],
@@ -2712,7 +2743,12 @@
   "precioCompra": 75,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
   "detalle": "Crítico +1",
   "_tiene_imagen": false
  },
@@ -2728,7 +2764,12 @@
   "precioCompra": 50,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
   "detalle": "crítico +1",
   "_tiene_imagen": false
  },
@@ -2912,7 +2953,12 @@
   "precioCompra": 130,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.",
   "_tiene_imagen": false
  },
@@ -3014,6 +3060,10 @@
   "consumible": false,
   "curahp": 0,
   "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
    {
     "stat": "bloqueo",
     "val": 3
@@ -3162,7 +3212,12 @@
   "precioCompra": 50,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3219,7 +3274,12 @@
   "precioCompra": 75,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3235,7 +3295,12 @@
   "precioCompra": 110,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3251,7 +3316,12 @@
   "precioCompra": 150,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "Ignora 1 de res al crítico, rango +1",
   "_tiene_imagen": false
  },
@@ -3308,7 +3378,12 @@
   "precioCompra": 160,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "Alcance +1.",
   "_tiene_imagen": true
  },
@@ -3324,7 +3399,12 @@
   "precioCompra": 150,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3414,7 +3494,12 @@
   "precioCompra": 70,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3592,7 +3677,12 @@
   "precioCompra": 90,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1, 50% de romper armadura",
   "_tiene_imagen": false
  },
@@ -3641,6 +3731,10 @@
   "consumible": false,
   "curahp": 0,
   "mods": [
+   {
+    "stat": "parry",
+    "val": 3
+   },
    {
     "stat": "bloqueo",
     "val": 2
@@ -3693,7 +3787,12 @@
   "precioCompra": 40,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
   "detalle": "iniciativa +1",
   "_tiene_imagen": false
  },
@@ -3771,7 +3870,12 @@
   "precioCompra": 60,
   "consumible": false,
   "curahp": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
   "detalle": "rango +1",
   "_tiene_imagen": false
  },
@@ -3818,6 +3922,10 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 3
    }
   ],
   "detalle": "Parry +3, resistencia a críticos tipo 2 y 4",
@@ -3889,6 +3997,18 @@
     "val": 7
    },
    {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 3
+   },
+   {
     "stat": "bloqueo",
     "val": 1
    }
@@ -3910,6 +4030,10 @@
    {
     "stat": "def",
     "val": 10
+   },
+   {
+    "stat": "parry",
+    "val": 4
    },
    {
     "stat": "bloqueo",
@@ -4225,6 +4349,10 @@
    {
     "stat": "def",
     "val": 4
+   },
+   {
+    "stat": "parry",
+    "val": 2
    },
    {
     "stat": "bloqueo",
@@ -5611,6 +5739,9 @@
   "precioCompra": 750,
   "consumible": false,
   "curahp": 0,
+  "equipoEstadoNombre": "Regeneración (guantes de piel de troll)",
+  "equipoEstadoHpTurno": 3,
+  "equipoEstadoDetalle": "Cura 3 HP por mantenimiento mientras tengas los Guantes de piel de troll equipados.",
   "mods": [
    {
     "stat": "def",

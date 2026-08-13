@@ -19,6 +19,10 @@
   --wine:#8C2F3E;
   --bottle:#2E6B57;
   --absenta:#A8C256;
+  --steel:#6E85A0;
+  --tan:#A67B4D;
+  --plum:#8A6A93;
+  --teal:#3E8A93;
   --paper:#EDE3D2;
   --muted:#9A867E;
   --danger:#D4574E;
@@ -201,7 +205,18 @@ a{color:var(--brass)}
 @media(max-width:760px){.cols{grid-template-columns:1fr}}
 .col{display:flex;flex-direction:column;gap:16px;min-width:0}
 
-.card{border:1px solid var(--line);background:var(--panel);}
+.card{border:1px solid var(--line);border-top:3px solid var(--line);background:var(--panel);}
+/* Cada contenedor del home tiene su propia tonalidad, para reconocerlo
+   de un vistazo aunque esté colapsado a solo el título. */
+.card--atributos{border-top-color:var(--copper)}
+.card--bitacora{border-top-color:var(--brass)}
+.card--mochila{border-top-color:var(--steel)}
+.card--combate{border-top-color:var(--wine)}
+.card--cinturon{border-top-color:var(--tan)}
+.card--equipo{border-top-color:var(--bottle)}
+.card--habilidades{border-top-color:var(--absenta)}
+.card--pasivas{border-top-color:var(--plum)}
+.card--sociales{border-top-color:var(--teal)}
 .card > header{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:9px 13px;border-bottom:1px solid var(--line);
@@ -1156,7 +1171,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   <div class="cols">
     <!-- COLUMNA 1 -->
     <div class="col">
-      <section class="card">
+      <section class="card card--atributos">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="atributos" title="Contraer/expandir">👁</button><h2>Atributos</h2></div>
           <span class="hint">tocá un stat para ver de dónde sale</span>
@@ -1167,7 +1182,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
       </section>
 
-      <section class="card">
+      <section class="card card--bitacora">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora</h2></div>
           <button class="iconbtn iconbtn-add" id="btn-bitacora-add">+ Página</button>
@@ -1178,7 +1193,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
       </section>
 
-      <section class="card">
+      <section class="card card--mochila">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="mochila" title="Contraer/expandir">👁</button><h2>Mochila</h2></div>
           <button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button>
@@ -1194,7 +1209,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
     <!-- COLUMNA 2 -->
     <div class="col">
-      <section class="card">
+      <section class="card card--combate">
         <header><div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="combate" title="Contraer/expandir">👁</button><h2>COMBATE</h2></div></header>
         <div class="body">
           <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
@@ -1227,7 +1242,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
       </section>
 
-      <section class="card">
+      <section class="card card--cinturon">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="cinturon" title="Contraer/expandir">👁</button><h2>Cinturón</h2></div>
           <button class="iconbtn iconbtn-add" data-add-chooser="cinturon">+ Ítem</button>
@@ -1239,7 +1254,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
       </section>
 
-      <section class="card">
+      <section class="card card--equipo">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="equipo" title="Contraer/expandir">👁</button><h2>Equipado</h2></div>
           <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
@@ -1255,7 +1270,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 
     <!-- COLUMNA 3 -->
     <div class="col">
-      <section class="card">
+      <section class="card card--habilidades">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="habilidades" title="Contraer/expandir">👁</button><h2>Habilidades</h2></div>
           <div style="display:flex;gap:8px">
@@ -1266,7 +1281,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         <div class="body" id="list-habilidades"></div>
       </section>
 
-      <section class="card">
+      <section class="card card--pasivas">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="pasivas" title="Contraer/expandir">👁</button><h2>Habilidades pasivas</h2></div>
           <button class="iconbtn iconbtn-add" data-add="pasivas">+ Pasiva</button>
@@ -1274,7 +1289,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         <div class="body" id="list-pasivas"></div>
       </section>
 
-      <section class="card">
+      <section class="card card--sociales">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="sociales" title="Contraer/expandir">👁</button><h2>Habilidades sociales</h2></div>
           <button class="iconbtn iconbtn-add" data-add="sociales">+ Social</button>

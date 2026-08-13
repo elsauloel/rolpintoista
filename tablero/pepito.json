@@ -1,0 +1,11 @@
+{
+  "tipo": "pj",
+  "nombre": "pepito",
+  "nivel": 1,
+  "imagen": "",
+  "hp": 1,
+  "hpMax": 0,
+  "muerto": false,
+  "estados": [],
+  "actualizado": "2026-08-12T20:39:28.781Z"
+}

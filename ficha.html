@@ -3325,9 +3325,13 @@ function renderBotonera(){
   $('#botonera-badge-bonos').textContent = `Bonos ${fmt(bonosDisponibles)}/${fmt(bonosBase)}`;
 
   // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva,
-  // Parry, Bloqueo) no hace falta repetirlos acá.
+  // Parry, Bloqueo) no hace falta repetirlos acá. Los 5 principales (Con,
+  // Fue, Agi, Des, Int) van siempre, igual que en el contenedor de Atributos.
   const STATS_REDUNDANTES_COMBATE = ['pdg', 'eva', 'parry', 'bloqueo'];
-  const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id));
+  const statsRollables = [
+    ...ATTR_LIST,
+    ...STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
+  ];
   const sinAccPdg = num(S.acciones) < 1;
   const fCombate = formulasCombate();
 

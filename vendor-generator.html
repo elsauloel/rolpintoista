@@ -56,6 +56,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 .panel{border:1px solid var(--line);background:var(--panel);padding:16px 18px;margin-top:16px}
 .panel-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:12px}
+.tienda-nombre-input{
+  background:transparent;border:1px solid transparent;border-bottom:1px solid var(--line-soft);
+  color:var(--paper);font-size:20px;font-weight:700;padding:2px 4px;width:100%;margin-bottom:12px
+}
+.tienda-nombre-input:hover{border-color:var(--line)}
+.tienda-nombre-input:focus{outline:none;border-color:var(--copper);background:var(--panel2)}
 .controles{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .campo{display:flex;flex-direction:column;gap:5px;flex:0 1 260px}
 .campo label{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -203,6 +209,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
   <div class="panel" id="panel-preview" style="display:none">
     <div class="panel-titulo">Vista previa del catálogo</div>
+    <input type="text" id="tienda-nombre" class="tienda-nombre-input" placeholder="Nombre de la tienda" maxlength="60">
     <div class="resumen" id="preview-resumen"></div>
     <div class="barra-edicion">
       <div class="ajuste-grupo">
@@ -691,6 +698,19 @@ const REPARTO_POR_CATEGORIA = {
 };
 const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero'};
 
+// Nombre por defecto sugerido según tamaño y rubro — el usuario lo puede
+// pisar a mano después, esto solo evita arrancar con el campo vacío.
+function nombreAutoTienda(tamano, categoria){
+  const tamanoLabel = (TAMANOS[tamano] || {}).label || '';
+  if(categoria === 'ramos'){
+    if(tamano === 'ambulante') return 'Vendedor ambulante';
+    return `Tienda de ${tamanoLabel.toLowerCase()}`;
+  }
+  const catLabel = CATEGORIA_TIENDA_LABEL[categoria] || categoria;
+  if(tamano === 'ambulante') return `${catLabel} ambulante`;
+  return `${catLabel} de ${tamanoLabel.toLowerCase()}`;
+}
+
 // ES_ARMA sale de CATEGORIAS, arriba, junto con el catálogo.
 const ES_DEFENSA = t => t.startsWith('escudo') || t.startsWith('armadura') || t.startsWith('casco')
   || t.startsWith('guantes') || t.startsWith('piernas') || t.startsWith('botas');
@@ -890,6 +910,7 @@ function generarTienda(claveTamano, categoria){
     tamanoLabel: cfg.label,
     categoria: cat,
     categoriaLabel: CATEGORIA_TIENDA_LABEL[cat],
+    nombre: nombreAutoTienda(claveTamano, cat),
     generado: new Date().toISOString(),
     ajustePrecio: 0,
     garantizados: garantizados.map(it => it.id),
@@ -1051,6 +1072,7 @@ function verItem(id){
 
 function renderPreview(){
   if(!tiendaActual){ $('#panel-preview').style.display = 'none'; return; }
+  $('#tienda-nombre').value = tiendaActual.nombre || '';
   const garantizados = new Set(tiendaActual.garantizados);
   const items = tiendaActual.items.map(id => CATALOGO.find(it => it.id === id)).filter(Boolean);
 
@@ -1164,9 +1186,12 @@ function generar(){
   const clave = $('#f-tamano').value;
   const categoria = $('#f-categoria').value;
   const ajustePrevio = ajusteActual();
+  // Si el usuario ya le puso nombre a mano, regenerar el stock no se lo pisa.
+  const nombrePrevio = tiendaActual && tiendaActual.nombrePersonalizado ? tiendaActual.nombre : null;
   tiendaActual = generarTienda(clave, categoria);
   // Regenerar cambia el stock, no la política de precios del vendedor.
   tiendaActual.ajustePrecio = ajustePrevio;
+  if(nombrePrevio){ tiendaActual.nombre = nombrePrevio; tiendaActual.nombrePersonalizado = true; }
   renderPreview();
   $('#btn-regenerar').disabled = false;
   $('#btn-publicar').disabled = false;
@@ -1181,6 +1206,7 @@ function crearTiendaPersonalizada(){
     tamanoLabel: 'Tienda personalizada',
     categoria: 'personalizada',
     categoriaLabel: '',
+    nombre: 'Tienda personalizada',
     generado: new Date().toISOString(),
     ajustePrecio: 0,
     garantizados: [],
@@ -1340,7 +1366,7 @@ async function publicarShop(){
   toast('Publicando en GitHub…');
   try{
     const b64 = await aBase64(JSON.stringify(tiendaActual, null, 2));
-    const etiqueta = tiendaActual.categoriaLabel ? `${tiendaActual.tamanoLabel} · ${tiendaActual.categoriaLabel}` : tiendaActual.tamanoLabel;
+    const etiqueta = tiendaActual.nombre || (tiendaActual.categoriaLabel ? `${tiendaActual.tamanoLabel} · ${tiendaActual.categoriaLabel}` : tiendaActual.tamanoLabel);
     await ghSubir(ARCHIVO_TIENDA, b64, token, `Publicar tienda (${etiqueta})`);
     toast('Tienda publicada ✓ — los jugadores ya pueden cargarla');
   }catch(err){
@@ -1366,6 +1392,11 @@ $('#btn-publicar').addEventListener('click', publicarShop);
 $('#btn-personalizada').addEventListener('click', crearTiendaPersonalizada);
 $('#btn-token').addEventListener('click', () => ghToken(true));
 $('#btn-agregar-items').addEventListener('click', abrirAgregar);
+$('#tienda-nombre').addEventListener('input', e => {
+  if(!tiendaActual) return;
+  tiendaActual.nombre = e.target.value;
+  tiendaActual.nombrePersonalizado = true;
+});
 $('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));
 $('#scrim-agregar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-agregar') $('#scrim-agregar').classList.remove('open'); });
 $('#agregar-buscar').addEventListener('input', renderAgregarLista);

@@ -187,6 +187,8 @@ a{color:var(--brass)}
   padding:3px 6px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
 }
 .dano-entrante input:focus{border-color:var(--danger);background:rgba(212,87,78,.2)}
+.dano-critico-check{display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none!important;letter-spacing:0!important}
+.dano-critico-check input{width:auto!important;padding:0!important;border:none!important;background:none!important}
 .step{
   font-family:"Space Mono",monospace;font-size:11px;padding:3px 9px;
   border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:var(--r);color:var(--muted)
@@ -1055,6 +1057,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           <span class="dano-entrante">
             <label for="f-dano-entrante">Daño entrante:</label>
             <input type="text" inputmode="decimal" id="f-dano-entrante" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta tu Defensa y el resto sale del HP">
+            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
+              <input type="checkbox" id="f-dano-critico">Fue crítico
+            </label>
           </span>
         </div>
         <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
@@ -2263,6 +2268,10 @@ function compute(){
     if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
     if(!Number.isNaN(final.eva)) final.eva = Math.floor(final.eva / 2);
   }
+  if(efectosActivos.some(e => e.lisiado)){
+    if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
+    if(!Number.isNaN(final.parry)) final.parry = Math.floor(final.parry / 2);
+  }
   const armaduraArruinada = efectosActivos.some(e => e.armaduraArruinada);
   const armaduraRota = efectosActivos.some(e => e.armaduraRota);
   if(armaduraArruinada){
@@ -2730,10 +2739,33 @@ function configEfectoDe(it){
   return base && (base.efectoNombre || '').trim() ? base : it;
 }
 
+// Invulnerable bloquea cualquier debuff nuevo; Inmunidad a CC / Sangre
+// pura / Coagulación extrema bloquean solo su categoría (marcada en el
+// preset con esCC/esVeneno/esSangrado). objEfecto puede ser un preset o
+// un draft del editor — a los dos les alcanza con tener polaridad/las
+// banderas de categoría.
+function estaBloqueadoElDebuff(objEfecto){
+  if(!objEfecto || objEfecto.polaridad !== 'debuff') return false;
+  const activos = (S.efectos || []).filter(e => e.activo !== false);
+  if(activos.some(e => e.invulnerable)) return true;
+  if(objEfecto.esCC && activos.some(e => e.inmunidadCC)) return true;
+  if(objEfecto.esVeneno && activos.some(e => e.sangrePura)) return true;
+  if(objEfecto.esSangrado && activos.some(e => e.coagulacionExtrema)) return true;
+  return false;
+}
+
 function aplicarEfectoDeConsumo(it){
   const src = configEfectoDe(it);
   const nombre = (src.efectoNombre || '').trim();
   if(!nombre) return null;
+  // El ítem no sabe de categorías/inmunidades — se infiere buscando un
+  // preset con el mismo nombre (así "Veneno", "Sangrado", etc. quedan
+  // bloqueados por sus inmunidades aunque lleguen desde un consumible).
+  const preset = EFECTOS_PRESET.find(p => p.nombre === nombre);
+  if(estaBloqueadoElDebuff(preset)){
+    toast(`Inmune ahora mismo — ${nombre} no hizo efecto`);
+    return null;
+  }
   const turnos = num(src.efectoTurnos);
   const hpturno = num(src.efectoHpTurno);
   const permanente = !!src.efectoPermanente;
@@ -2742,6 +2774,7 @@ function aplicarEfectoDeConsumo(it){
   // acordarse de qué ítem salió. Si el ítem no trae un texto pensado para el
   // estado, se usa el suyo, que es mejor que nada.
   const detalle = (src.efectoDetalle || '').trim() || (src.detalle || '').trim();
+  const categorias = preset ? {polaridad:preset.polaridad, esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado} : {};
   let ef = S.efectos.find(e => e.nombre === nombre);
   if(ef){
     ef.turnos = turnos;
@@ -2750,8 +2783,9 @@ function aplicarEfectoDeConsumo(it){
     ef.permanente = permanente;
     ef.mods = mods;
     if(detalle) ef.detalle = detalle;
+    Object.assign(ef, categorias);
   }else{
-    ef = {id:uid(), nombre, imagen:'', turnos, stacks:1, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods};
+    ef = {id:uid(), nombre, imagen:'', turnos, stacks:1, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
     S.efectos.push(ef);
   }
   return ef;
@@ -2961,13 +2995,24 @@ function formulaParaValor(valor){
   return {combo, mod, formula};
 }
 
-function tirarValorStat(nombre, valor){
+// Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
+// con el total más alto. statId es opcional — solo importa para esos tres.
+function tirarValorStat(nombre, valor, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
-  const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
-  const r = {formula: f.formula, rolls, mod: f.mod, total};
-  mostrarResultadoDado(nombre, r);
+  const conVentaja = ['pdg','parry','eva'].includes(statId) &&
+    (S.efectos||[]).some(e => e.activo !== false && e.afortunado);
+  const tirar = () => {
+    const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+    return {rolls, total: rolls.reduce((a,b)=>a+b,0) + f.mod};
+  };
+  let intento = tirar();
+  if(conVentaja){
+    const segundo = tirar();
+    if(segundo.total > intento.total) intento = segundo;
+  }
+  const r = {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total};
+  mostrarResultadoDado(conVentaja ? `${nombre} (Afortunado)` : nombre, r);
 }
 
 function ejecutarTiradaManual(){
@@ -3701,16 +3746,53 @@ function aplicarDanioEntrante(){
     return;
   }
   const golpe = parseFloat(crudo.replace(',', '.'));
+  const critCheck = $('#f-dano-critico');
+  const fueCritico = !!(critCheck && critCheck.checked);
+  const efectosActivosDano = (S.efectos || []).filter(e => e.activo !== false);
+
+  if(efectosActivosDano.some(e => e.invulnerable)){
+    campo.value = '';
+    if(critCheck) critCheck.checked = false;
+    toast(`Invulnerable: el golpe de ${fmt(golpe)} no hizo nada`);
+    return;
+  }
+  if(fueCritico && efectosActivosDano.some(e => e.blindado)){
+    campo.value = '';
+    critCheck.checked = false;
+    toast(`Blindado: el golpe crítico de ${fmt(golpe)} no hizo nada`);
+    return;
+  }
+
   const c = compute();
   const defensa = Number.isNaN(c.final.def) ? 0 : num(c.final.def);
-  const recibido = Math.max(0, golpe - defensa);
+  let recibido = Math.max(0, golpe - defensa);
+
+  // Escudo mágico absorbe antes que el HP — el primer estado activo con
+  // puntos restantes se lleva el golpe.
+  const escudo = efectosActivosDano.find(e => num(e.escudoMagico) > 0);
+  let absorbido = 0;
+  if(escudo && recibido > 0){
+    absorbido = Math.min(recibido, num(escudo.escudoMagico));
+    escudo.escudoMagico = num(escudo.escudoMagico) - absorbido;
+    recibido -= absorbido;
+  }
+
   fijarHp(num(S.hp) - recibido);
   campo.value = '';
+  if(critCheck) critCheck.checked = false;
   refresh();
-  if(recibido <= 0){
+
+  const extra = [];
+  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagico ? ` (quedan ${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
+  if(recibido > 0 && efectosActivosDano.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.25))} al atacante`);
+  const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
+
+  if(recibido <= 0 && !absorbido){
     toast(`Golpe de ${fmt(golpe)} · tu Defensa ${fmt(defensa)} lo frenó entero`);
+  }else if(recibido <= 0){
+    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)}${sufijo}`);
   }else{
-    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño`);
+    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño${sufijo}`);
   }
 }
 
@@ -3841,7 +3923,7 @@ document.addEventListener('click', e => {
   if(b.dataset.tirarstat){
     const c = compute();
     const id = b.dataset.tirarstat;
-    tirarValorStat(STAT_LABEL[id] || id, c.final[id]);
+    tirarValorStat(STAT_LABEL[id] || id, c.final[id], id);
     return;
   }
   if(b.dataset.botoneraaccion){
@@ -4979,7 +5061,7 @@ const SCHEMA = {
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
-  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
+  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
 };
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', accionesCosto:'velocidad (acciones)', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
@@ -4991,15 +5073,16 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   curabonosPct:'% de Bonos al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarAccionesMax:'Forzar Acciones máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
+  escudoMagico:'Escudo mágico — puntos de daño que absorbe (se descuentan solos, dejalo en 0 si no aplica)',
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax','equipoEstadoHpTurno'];
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax','equipoEstadoHpTurno','escudoMagico'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
 const EFECTOS_PRESET = [
-  {nombre:'Veneno', polaridad:'debuff', stacks:4, turnos:4, hpturno:-1, stacksturno:-1,
+  {nombre:'Veneno', polaridad:'debuff', stacks:4, turnos:4, hpturno:-1, stacksturno:-1, esVeneno:true,
     detalle:'Pierde 1 HP por stack cada turno. Se agota junto con los stacks (y con los turnos, que arrancan igualados).'},
   {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpturno:5, stacksturno:0,
     detalle:'Cura HP cada turno.'},
@@ -5007,9 +5090,9 @@ const EFECTOS_PRESET = [
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Cansado', polaridad:'debuff', turnos:1, mods:[{stat:'accionesmax', val:-1}],
     detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:1, forzarAccionesMax:1,
+  {nombre:'Exhausto', polaridad:'debuff', turnos:1, forzarAccionesMax:1, esCC:true,
     detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:1, forzarAccionesMax:0,
+  {nombre:'Stun', polaridad:'debuff', turnos:1, forzarAccionesMax:0, esCC:true,
     detalle:'Sin Acciones este turno.'},
   {nombre:'Hypeado', polaridad:'buff', turnos:2, mods:[{stat:'accionesmax', val:1}],
     detalle:'+1 a las Acciones máximas del turno.'},
@@ -5017,10 +5100,28 @@ const EFECTOS_PRESET = [
     detalle:'Corta a la mitad (redondeado hacia abajo) el valor total de Defensa y Resistencia a crítico del personaje.'},
   {nombre:'Arruina armadura', polaridad:'debuff', turnos:2, armaduraArruinada:true,
     detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Resistencia a crítico. No afecta guantes, cascos, botas ni otro equipo.'},
-  {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpturno:-1, stacksturno:1, permanente:true,
+  {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpturno:-1, stacksturno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
-  {nombre:'Sangrado', polaridad:'debuff', stacks:1, turnos:0, hpturno:-2, stacksturno:0, permanente:true,
+  {nombre:'Sangrado', polaridad:'debuff', stacks:1, turnos:0, hpturno:-2, stacksturno:0, permanente:true, esSangrado:true,
     detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
+  {nombre:'Lisiado', polaridad:'debuff', turnos:2, lisiado:true,
+    detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Invulnerable', polaridad:'buff', turnos:1, invulnerable:true,
+    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff nuevo mientras dure.'},
+  {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
+    detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
+  {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
+    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 25% del daño al atacante. Ojo: el daño al atacante hay que cargarlo a mano en su ficha, esto solo avisa cuánto es.'},
+  {nombre:'Escudo mágico', polaridad:'buff', turnos:0, permanente:true, escudoMagico:10,
+    detalle:'Absorbe los siguientes 10 puntos de daño de cualquier fuente antes de que le toquen el HP (editable al elegir el preset).'},
+  {nombre:'Afortunado', polaridad:'buff', turnos:2, afortunado:true,
+    detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
+  {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
+    detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, coagulacionExtrema:true,
+    detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
+    detalle:'Inmune a golpes críticos: al cargar el daño entrante, tildá "Fue crítico" y se anula solo.'},
 ];
 
 const POLARIDAD_EFECTO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
@@ -5797,7 +5898,7 @@ function openEditor(key, id, equipadoPreset){
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curabonosPct:0, cargaMax:1, cargaActual:1,
-    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, tiradaExtra:'',
+    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
@@ -6094,6 +6195,10 @@ $('#modal-body').addEventListener('change', async e => {
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;
   if(!draft.nombre.trim()) draft.nombre = 'Sin nombre';
+  if(key === 'efectos' && !id && draft.activo !== false && estaBloqueadoElDebuff(draft)){
+    toast(`Inmune ahora mismo — ${draft.nombre} no se pudo aplicar`);
+    return;
+  }
   if(key === 'inventario' && draft.tipoItem === 'consumibles' && draft.equipado){
     // Los consumibles no van a "Equipo": si se marcan como equipados, pasan al cinturón.
     if(id) S.inventario = S.inventario.filter(x => x.id !== id);
@@ -6289,11 +6394,20 @@ function mantenimiento(){
   let hpDelta = 0;
   const vencidos = [];
 
+  const efectosActivosMant = S.efectos.filter(e => e.activo !== false);
+  const esInvulnerable = efectosActivosMant.some(e => e.invulnerable);
+  const inmuneVenenoMant = efectosActivosMant.some(e => e.sangrePura);
+  const inmuneSangradoMant = efectosActivosMant.some(e => e.coagulacionExtrema);
+
   S.efectos.forEach(e => {
     if(e.activo === false) return;
     const stacks = Math.max(1, num(e.stacks) || 1);
 
-    const hp = num(e.hpturno) * stacks;
+    let hp = num(e.hpturno) * stacks;
+    if(hp < 0 && (esInvulnerable || (e.esVeneno && inmuneVenenoMant) || (e.esSangrado && inmuneSangradoMant))){
+      log.push(`<b>${esc(e.nombre)}</b> <span class="heal">bloqueado por inmunidad</span>`);
+      hp = 0;
+    }
     if(hp){
       hpDelta += hp;
       log.push(`<b>${esc(e.nombre)}</b> <span class="${hp<0?'dmg':'heal'}">${hp>0?'+':''}${fmt(hp)} HP</span>`);
@@ -6468,11 +6582,11 @@ $('#btn-atacar-pdg').onclick = () => {
   if(num(S.acciones) < 1){ toast('No te quedan Acciones para atacar'); return; }
   S.acciones = num(S.acciones) - 1;
   renderAcciones();
-  tirarValorStat('PdG', compute().final.pdg);
+  tirarValorStat('PdG', compute().final.pdg, 'pdg');
 };
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
-$('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva);
-$('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry);
+$('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva, 'eva');
+$('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry, 'parry');
 $('#btn-bloqueo').onclick = () => tirarValorStat('Bloqueo', compute().final.bloqueo);
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
 $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });

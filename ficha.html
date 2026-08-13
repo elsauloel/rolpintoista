@@ -2850,9 +2850,9 @@ function precioVentaDe(i){
 
 function armaDanoTxt(i, extra){
   if(!ES_ARMA(i.tipoItem)) return '';
-  const dados = Math.max(1, num(i.peso) || 1);
+  const dados = Math.max(1, num(i.peso) || 1) + Math.max(0, num(i.danoAmplificado));
   const tipo = num(i.tipoDado) || 6;
-  const fijo = num(i.danoFijo) + num(extra);
+  const fijo = num(i.danoFijo) + (i.armaDeRango ? 0 : num(extra));
   return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
 }
 
@@ -5055,9 +5055,9 @@ function toast(msg){
    ========================================================= */
 
 const SCHEMA = {
-  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
+  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
-  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
+  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
@@ -5069,6 +5069,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
   categoria:'Categoría', unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
+  danoAmplificado:'Daño amplificado (dados extra sin sumar peso)', armaDeRango:'Arma de rango (el botón de Daño Arma no suma el stat Dmg)',
   manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoDetalle:'Detalle del estado',
   curabonosPct:'% de Bonos al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
@@ -5076,7 +5077,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   escudoMagico:'Escudo mágico — puntos de daño que absorbe (se descuentan solos, dejalo en 0 si no aplica)',
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax','equipoEstadoHpTurno','escudoMagico'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
@@ -5895,7 +5896,7 @@ function openEditor(key, id, equipadoPreset){
   const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
     activo:true, stacks:1, costo:'', accionesCosto:1, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
-    job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, manoPreferida:'',
+    job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curabonosPct:0, cargaMax:1, cargaActual:1,
     forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'',
@@ -5912,7 +5913,7 @@ function openEditor(key, id, equipadoPreset){
 function drawEditor(){
   const {key, draft} = editing;
   const sc = SCHEMA[key];
-  const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada'];
+  const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada','armaDeRango'];
   const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
   const cortos = sc.campos.filter(c => c!=='detalle' && !ESPECIALES.includes(c) && !FLAGS.includes(c));
   const flags = sc.campos.filter(c => FLAGS.includes(c));
@@ -6041,8 +6042,9 @@ function drawEditor(){
           ${DADOS_ARMA.map(d => `<option value="${d}" ${(num(draft.tipoDado)||6)===d?'selected':''}>d${d}${d===10?' (explosivos/modernas)':''}</option>`).join('')}
         </select></div>
       <div class="f"><label>${CAMPO_LABEL.danoFijo}</label><input data-c="danoFijo" type="number" step="any" value="${esc(draft.danoFijo??0)}"></div>
+      <div class="f"><label>${CAMPO_LABEL.danoAmplificado}</label><input data-c="danoAmplificado" type="number" step="1" min="0" value="${esc(draft.danoAmplificado??0)}"></div>
     </div>
-    <div class="hint" id="dano-hint" style="margin:-4px 0 8px">Daño: ${armaDanoTxt(draft)} (peso × d${num(draft.tipoDado)||6}, más el fijo)</div>`;
+    <div class="hint" id="dano-hint" style="margin:-4px 0 8px">Daño: ${armaDanoTxt(draft)} (peso × d${num(draft.tipoDado)||6}${num(draft.danoAmplificado)?` + ${num(draft.danoAmplificado)} dado${num(draft.danoAmplificado)>1?'s':''} por daño amplificado`:''}, más el fijo)</div>`;
   }
   if(sc.campos.includes('precioVentaAuto')){
     html += `<div class="f"><label>Precio de venta (mitad de compra)</label>
@@ -6124,9 +6126,10 @@ function handleModalFieldChange(e){
     const c = t.dataset.c;
     editing.draft[c] = t.type === 'checkbox' ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===''?'':num(t.value)) : t.value);
     if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ drawEditor(); return; }
-    if(['peso','tipoDado','danoFijo'].includes(c)){
+    if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');
-      if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||6}, más el fijo)`;
+      const da = num(editing.draft.danoAmplificado);
+      if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||6}${da?` + ${da} dado${da>1?'s':''} por daño amplificado`:''}, más el fijo)`;
     }
   }
   if(t.dataset.defmod){

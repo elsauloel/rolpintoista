@@ -790,9 +790,12 @@ function tirarTier(pesos){
    misma categoría— y recién si la categoría se agotó entera se sale de
    ella. Nunca se inventa un ítem ni se deja el lugar vacío. */
 function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy){
+  // Los legacy son "los de siempre" (Poción de HP, Antídoto...): hay
+  // pocos en el catálogo, así que cuando un lugar pide específicamente
+  // uno de ellos se permite repetir (más stock de lo mismo), a
+  // diferencia del resto de la tienda, donde cada ítem sale una sola vez.
   const libres = (lista) => (lista || [])
-    .filter(it => !usados.has(it.id))
-    .filter(it => !soloLegacy || it.legacy);
+    .filter(it => soloLegacy ? it.legacy : !usados.has(it.id));
 
   const delRubro = porRubroTier[rubro] || {};
   const exacto = libres(delRubro[tier]);
@@ -843,13 +846,26 @@ function generarTienda(claveTamano, categoria){
   const total = entero(cfg.min, cfg.max);
   const reparto = repartirEntero(total, REPARTO_POR_CATEGORIA[cat]);
 
+  // En Alquimista, al menos 40% de TODOS los slots expuestos (contando
+  // el stock garantizado, que ya es legacy) tienen que ser legacy. Se
+  // calcula cuánto falta después de contar lo garantizado, y se le pide
+  // esa cantidad al sorteo de consumibles de abajo.
+  const legacyGarantizados = garantizados.filter(it => it.legacy).length;
+  const totalSlots = garantizados.length + total;
+  const legacyMinimoAlquimista = cat === 'alquimista'
+    ? Math.max(0, Math.ceil(totalSlots * 0.4) - legacyGarantizados)
+    : 0;
+
   // 4. Cada lugar tira su propia rareza y busca un ítem que la cumpla.
   const elegidos = [];
   Object.entries(reparto).forEach(([rubro, cuantos]) => {
     // La mitad de los consumibles sale de los esenciales: son los que
     // siempre hacen falta. La otra mitad, y todo el resto de los rubros,
-    // se sortea entre todo lo que haya.
-    const conLegacy = rubro === 'consumibles' ? Math.round(cuantos / 2) : 0;
+    // se sortea entre todo lo que haya. En Alquimista el piso es el 40%
+    // ya calculado arriba en vez de la mitad.
+    const conLegacy = rubro === 'consumibles'
+      ? (cat === 'alquimista' ? Math.min(cuantos, legacyMinimoAlquimista) : Math.round(cuantos / 2))
+      : 0;
     for(let i = 0; i < cuantos; i++){
       const tier = tirarTier(cfg.pesos);
       const soloLegacy = i < conLegacy;
@@ -906,6 +922,17 @@ function ordenarItems(items){
   }
   const orden = items.slice().sort((a, b) => def.cmp(a, b) || porNombre(a, b));
   return ordenDesc ? orden.reverse() : orden;
+}
+
+// Entre los consumibles, los legacy (Poción de HP, Antídoto, etc. — "los
+// de siempre") van primero, sea cual sea el criterio de orden elegido.
+// No toca el orden de nada que no sea consumible: el sort es estable y
+// el comparador da 0 apenas uno de los dos no es consumible.
+function conLegacyPrimero(items){
+  return items.slice().sort((a, b) => {
+    if(rubroDe(a) !== 'consumibles' || rubroDe(b) !== 'consumibles') return 0;
+    return (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0);
+  });
 }
 
 function renderOrdenControles(){
@@ -1035,13 +1062,13 @@ function renderPreview(){
   let html = '';
   if(ordenActual === 'categoria'){
     RUBRO_ORDEN.forEach(rubro => {
-      const delRubro = ordenarItems(items.filter(it => rubroDe(it) === rubro));
+      const delRubro = conLegacyPrimero(ordenarItems(items.filter(it => rubroDe(it) === rubro)));
       if(!delRubro.length) return;
       html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
       html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
     });
   }else{
-    const orden = ordenarItems(items);
+    const orden = conLegacyPrimero(ordenarItems(items));
     html += `<div class="cat-grouphead">${esc(ORDENES[ordenActual].label)} · ${fmt(orden.length)}</div>`;
     html += `<div class="cat-grid">${orden.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
   }

@@ -5456,7 +5456,7 @@ function statsComparablesDe(item){
   const defVal = defValorDe(item);
   if(defVal) out.def = defVal;
   if(ES_ARMA(item.tipoItem)){
-    const dados = Math.max(1, num(item.peso) || 1), caras = num(item.tipoDado) || 6, fijo = num(item.danoFijo);
+    const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado)), caras = num(item.tipoDado) || 6, fijo = num(item.danoFijo);
     out.danoprom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
   }
   (item.mods || []).forEach(m => {
@@ -5495,7 +5495,11 @@ function renderComparar(){
     ${equipados.map(e => `<button type="button" class="${e.id===equipado.id?'activo':''}" data-comparar-elegir="${e.id}">${esc(e.nombre)}</button>`).join('')}
   </div>` : '';
 
-  const filasHtml = claves.map(k => {
+  const pesoEq = num(equipado.peso), pesoNuevo = num(item.peso);
+  const pesoCls = pesoNuevo < pesoEq ? 'mejora' : pesoNuevo > pesoEq ? 'empeora' : '';
+  const filaPeso = `<tr><td>Peso</td><td>${fmt(pesoEq)}</td><td class="${pesoCls}">${fmt(pesoNuevo)}${pesoNuevo<pesoEq?' ▲':pesoNuevo>pesoEq?' ▼':''}</td></tr>`;
+
+  const filasHtml = filaPeso + claves.map(k => {
     const ve = statsEq[k] || 0, vn = statsNuevo[k] || 0;
     const cls = vn > ve ? 'mejora' : vn < ve ? 'empeora' : '';
     const label = STAT_COMPARABLE_LABEL[k] || STAT_LABEL[k] || k;
@@ -5514,10 +5518,10 @@ function renderComparar(){
         <div class="cat-meta">${precioTiendaHtml(item)} · Peso ${fmt(num(item.peso))}</div>
       </div>
     </div>
-    ${claves.length ? `<table class="comparar-tabla">
+    <table class="comparar-tabla">
       <thead><tr><th>Stat</th><th>Equipado</th><th>Nuevo</th></tr></thead>
       <tbody>${filasHtml}</tbody>
-    </table>` : `<div class="hint">Ninguno de los dos tiene stats numéricos para comparar.</div>`}
+    </table>
   `;
 }
 
@@ -5538,7 +5542,8 @@ const TIERS_ORDEN = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendar
 // del orden por daño (ver ordenarCatalogo).
 function danoDe(item){
   if(!ES_ARMA(item.tipoItem)) return 0;
-  return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 6) + num(item.danoFijo);
+  const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
+  return dados * (num(item.tipoDado) || 6) + num(item.danoFijo);
 }
 
 const ORDENES_CATALOGO = {

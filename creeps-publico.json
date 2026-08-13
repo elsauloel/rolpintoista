@@ -1,8 +1,8 @@
 {
-  "actualizado": "2026-08-09T20:08:42.029Z",
+  "actualizado": "2026-08-13T02:16:38.174Z",
   "creeps": [
     {
-      "id": "whmofqj",
+      "id": "usfoqgv",
       "nombre": "Creep nuevo",
       "imagen": "",
       "hp": 10,
@@ -10,57 +10,12 @@
       "estados": []
     },
     {
-      "id": "qsi16w8",
-      "nombre": "Creep nuevo (copia)",
-      "imagen": "",
-      "hp": 10,
-      "hpMax": 10,
-      "estados": []
-    },
-    {
-      "id": "ex5xjyc",
-      "nombre": "Dionisio, el Último Festín (copia)",
-      "imagen": "",
-      "hp": 60,
-      "hpMax": 60,
-      "estados": [
-        {
-          "nombre": "Pajaritos",
-          "turnos": 2,
-          "permanente": false,
-          "detalle": "PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure."
-        }
-      ]
-    },
-    {
-      "id": "ou37m1b",
-      "nombre": "Dentista Menemista",
-      "imagen": "",
-      "hp": 45,
-      "hpMax": 45,
-      "estados": [
-        {
-          "nombre": "Agotado",
-          "turnos": 1,
-          "permanente": false,
-          "detalle": "-1 a las Acciones máximas del turno."
-        }
-      ]
-    },
-    {
-      "id": "z1zlu4g",
-      "nombre": "Mirtha Legrand, Reina de los Muertos",
+      "id": "21xc9hg",
+      "nombre": "Zombie jugador de baseball",
       "imagen": "",
       "hp": 50,
       "hpMax": 50,
-      "estados": [
-        {
-          "nombre": "Hypeado",
-          "turnos": 2,
-          "permanente": false,
-          "detalle": "+1 a las Acciones máximas del turno."
-        }
-      ]
+      "estados": []
     }
   ]
 }

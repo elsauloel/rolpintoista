@@ -5791,7 +5791,7 @@
     "val": 5
    }
   ],
-  "detalle": "Resistencia a todos los críticos. +5 a resistencia mágica",
+  "detalle": "Resistencia a todos los críticos. +5 a resistencia mental",
   "_tiene_imagen": false
  },
  {
@@ -6022,7 +6022,7 @@
     "val": 1
    }
   ],
-  "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC.",
+  "detalle": "+1 a los Bonos máximos, +1 Res.Mt y +1 Res.CC.",
   "_tiene_imagen": false
  },
  {

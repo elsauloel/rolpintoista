@@ -19,7 +19,7 @@ ETIQ = {
     'Res.Crít Tipo 6':'mod_tipo3','Res.Crít Tipo 8':'mod_tipo4','Res.Crít Tipo 10':'mod_tipo5',
     'Movimiento':'mod_mov','Bonos':'mod_bonos','Evasión':'mod_eva','Iniciativa':'mod_ini',
     'PdG':'mod_pdg','Crítico %':'mod_crit','Parry':'mod_parry','Fuerza':'mod_fue',
-    'Constitución':'mod_con','Res. mágica':'mod_resm','Res. CC':'mod_rescc',
+    'Constitución':'mod_con','Res. mental':'mod_resm','Res. CC':'mod_rescc',
     'Rango casteo':'mod_rangocasteo','Acciones máx.':'mod_accionesmax','Bloqueo':'mod_bloqueo',
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',

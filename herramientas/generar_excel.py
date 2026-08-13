@@ -60,7 +60,7 @@ ETIQUETAS = {
     'mod_tipo3':'Res.Crít Tipo 6','mod_tipo4':'Res.Crít Tipo 8','mod_tipo5':'Res.Crít Tipo 10',
     'mod_mov':'Movimiento','mod_bonos':'Bonos','mod_eva':'Evasión','mod_ini':'Iniciativa',
     'mod_pdg':'PdG','mod_crit':'Crítico %','mod_parry':'Parry','mod_fue':'Fuerza','mod_con':'Constitución',
-    'mod_resm':'Res. mágica','mod_rescc':'Res. CC','mod_rangocasteo':'Rango casteo',
+    'mod_resm':'Res. mental','mod_rescc':'Res. CC','mod_rangocasteo':'Rango casteo',
     'mod_accionesmax':'Acciones máx.','mod_bloqueo':'Bloqueo','mod_int':'Inteligencia','mod_des':'Destreza','mod_agl':'Agilidad',
 }
 

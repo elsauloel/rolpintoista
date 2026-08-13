@@ -34,7 +34,7 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
-                           'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle'],
+                           'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
     'Armas':       BASE + ['tipoDado','danoFijo'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
@@ -52,6 +52,7 @@ ETIQUETAS = {
     'curahp':'Cura HP','curabonosPct':'Cura Bonos (%)',
     'efectoNombre':'Estado que aplica','efectoTurnos':'Turnos del estado',
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',
+    'efectoMods_extra':'Modificadores del estado',
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
     'equipoEstadoDetalle':'Detalle del estado equipado',
     'legacy':'Legacy',
@@ -71,6 +72,8 @@ def valor(it, col):
         propios = {c[4:] for c in COLUMNAS[categoria(it)] if c.startswith('mod_')}
         extra = [f"{m['stat']}:{m['val']}" for m in it.get('mods', []) if m['stat'] not in propios]
         return '; '.join(extra)
+    if col == 'efectoMods_extra':
+        return '; '.join(f"{m['stat']}:{m['val']}" for m in it.get('efectoMods', []))
     if col.startswith('mod_'):
         stat = col[4:]
         for m in it.get('mods', []):

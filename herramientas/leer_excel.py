@@ -24,6 +24,7 @@ ETIQ = {
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
     'Detalle del estado equipado':'equipoEstadoDetalle',
+    'Modificadores del estado':'efectoMods_extra',
     'Legacy':'legacy',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',
 }
@@ -55,7 +56,7 @@ def leer():
             for k, v in zip(cab, f):
                 if k: d[k] = v
             if not d.get('nombre'): continue          # fila vacía
-            it = {'_hoja': hoja, '_fila': nfila, 'mods': []}
+            it = {'_hoja': hoja, '_fila': nfila, 'mods': [], 'efectoMods': []}
             for k, v in d.items():
                 if k == 'tiene_imagen': continue
                 if k == 'mods_extra':
@@ -67,6 +68,16 @@ def leer():
                                 if s: it['mods'].append({'stat': s, 'val': num(val)})
                             elif par.strip():
                                 avisos.append(f"{hoja} fila {nfila}: no entiendo {par.strip()!r} en Otros modificadores")
+                    continue
+                if k == 'efectoMods_extra':
+                    if v:
+                        for par in str(v).split(';'):
+                            if ':' in par:
+                                s, val = par.split(':', 1)
+                                s = s.strip()
+                                if s: it['efectoMods'].append({'stat': s, 'val': num(val)})
+                            elif par.strip():
+                                avisos.append(f"{hoja} fila {nfila}: no entiendo {par.strip()!r} en Modificadores del estado")
                     continue
                 if k.startswith('mod_'):
                     if v not in (None, '') and num(v) != 0:

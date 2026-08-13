@@ -1063,6 +1063,12 @@
   "efectoNombre": "Clarividencia (poción)",
   "efectoTurnos": 4,
   "efectoDetalle": "Inteligencia +1 mientras dure (4 turnos).",
+  "efectoMods": [
+   {
+    "stat": "int",
+    "val": 1
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +1 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
   "_tiene_imagen": false
@@ -1078,6 +1084,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Clarividencia (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "int",
+    "val": 2
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +2 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
   "_tiene_imagen": false
@@ -1093,6 +1107,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Clarividencia (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "int",
+    "val": 3
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +3 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
   "_tiene_imagen": false
@@ -1273,6 +1295,12 @@
   "efectoNombre": "Fuerza del Toro (poción)",
   "efectoTurnos": 4,
   "efectoDetalle": "Fuerza +1 mientras dure (4 turnos).",
+  "efectoMods": [
+   {
+    "stat": "fue",
+    "val": 1
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +1 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'.",
   "_tiene_imagen": false
@@ -1288,6 +1316,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Fuerza del Toro (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "fue",
+    "val": 2
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +2 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'.",
   "_tiene_imagen": false
@@ -1303,6 +1339,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Fuerza del Toro (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "fue",
+    "val": 3
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +3 a Fuerza durante 4 turnos. Al consumirla se activa el estado 'Fuerza del Toro (poción)'.",
   "_tiene_imagen": false
@@ -1441,6 +1485,12 @@
   "efectoNombre": "Manos Ligeras (poción)",
   "efectoTurnos": 4,
   "efectoDetalle": "Destreza +1 mientras dure (4 turnos).",
+  "efectoMods": [
+   {
+    "stat": "des",
+    "val": 1
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +1 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'.",
   "_tiene_imagen": false
@@ -1456,6 +1506,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Manos Ligeras (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "des",
+    "val": 2
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +2 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'.",
   "_tiene_imagen": false
@@ -1471,6 +1529,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Manos Ligeras (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "des",
+    "val": 3
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +3 a Destreza durante 4 turnos. Al consumirla se activa el estado 'Manos Ligeras (poción)'.",
   "_tiene_imagen": false
@@ -1651,6 +1717,12 @@
   "efectoNombre": "Piel de Roble (poción)",
   "efectoTurnos": 4,
   "efectoDetalle": "Constitución +1 mientras dure (4 turnos).",
+  "efectoMods": [
+   {
+    "stat": "con",
+    "val": 1
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +1 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'.",
   "_tiene_imagen": false
@@ -1666,6 +1738,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Piel de Roble (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "con",
+    "val": 2
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +2 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'.",
   "_tiene_imagen": false
@@ -1681,6 +1761,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Piel de Roble (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "con",
+    "val": 3
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +3 a Constitución durante 4 turnos. Al consumirla se activa el estado 'Piel de Roble (poción)'.",
   "_tiene_imagen": false
@@ -1753,6 +1841,12 @@
   "efectoNombre": "Pies Veloces (poción)",
   "efectoTurnos": 4,
   "efectoDetalle": "Agilidad +1 mientras dure (4 turnos).",
+  "efectoMods": [
+   {
+    "stat": "agl",
+    "val": 1
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +1 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'.",
   "_tiene_imagen": false
@@ -1768,6 +1862,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Pies Veloces (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "agl",
+    "val": 2
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +2 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'.",
   "_tiene_imagen": false
@@ -1783,6 +1885,14 @@
   "unidades": 1,
   "consumible": true,
   "curahp": 0,
+  "efectoNombre": "Pies Veloces (poción)",
+  "efectoTurnos": 4,
+  "efectoMods": [
+   {
+    "stat": "agl",
+    "val": 3
+   }
+  ],
   "mods": [],
   "detalle": "Otorga +3 a Agilidad durante 4 turnos. Al consumirla se activa el estado 'Pies Veloces (poción)'.",
   "_tiene_imagen": false

@@ -142,6 +142,8 @@ def item_js(it, con_imagen=True):
         if it.get('efectoPermanente'): partes.append("efectoPermanente:true")
         if (it.get('efectoDetalle') or '').strip():
             partes.append("efectoDetalle:'%s'" % esc_js(it['efectoDetalle']))
+        if it.get('efectoMods'):
+            partes.append("efectoMods:%s" % mods_js(it['efectoMods']))
     if (it.get('equipoEstadoNombre') or '').strip():
         partes.append("equipoEstadoNombre:'%s'" % esc_js(it['equipoEstadoNombre']))
         if it.get('equipoEstadoHpTurno'):

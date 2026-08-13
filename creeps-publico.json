@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-08-13T02:17:15.836Z",
+  "actualizado": "2026-08-13T02:28:53.034Z",
   "creeps": [
     {
       "id": "21xc9hg",
@@ -7,6 +7,14 @@
       "imagen": "",
       "hp": 50,
       "hpMax": 50,
+      "estados": []
+    },
+    {
+      "id": "5ztd2dw",
+      "nombre": "Zombie Liniero Blindado",
+      "imagen": "",
+      "hp": 60,
+      "hpMax": 60,
       "estados": []
     }
   ]

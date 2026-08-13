@@ -764,6 +764,11 @@ a{color:var(--brass)}
 .botonera-grid-even{grid-template-columns:1fr 1fr}
 @media(max-width:820px){.botonera-grid,.botonera-grid-even{grid-template-columns:1fr}}
 .botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;margin-bottom:14px;min-width:0}
+.botonera-caja-head{display:flex;align-items:center;gap:8px}
+.botonera-caja.colapsada{padding-bottom:10px}
+.botonera-caja.colapsada > *:not(.botonera-caja-head){display:none}
+.botonera-combate-wrap{display:flex;flex-direction:column;gap:6px}
+.botonera-combate-bottom{margin-top:2px;padding-top:8px;border-top:1px dashed var(--line-soft)}
 .botonera-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;align-content:start}
 .botonera-list-grid .cat-row{margin-bottom:0}
 .botonera-list-subhead{
@@ -775,7 +780,7 @@ a{color:var(--brass)}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 /* Esquivar alto a la izquierda; Parry y Bloqueo apilados a la derecha,
    igual que en la caja Combate de la ficha. */
-.botonera-combate-grid [data-botoneraaccion="esquivar"]{grid-row:span 2}
+.botonera-combate-bottom [data-botoneraaccion="esquivar"]{grid-row:span 2}
 @media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .botonera-tile{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
@@ -3424,27 +3429,31 @@ function renderBotonera(){
 
   html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0">Combate</div>
-      <div class="botonera-combate-grid">
-        <button type="button" class="botonera-tile" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''} title="Atacar (PdG) · cuesta 1 acción">
-          <span class="bt-label">Atacar (PdG)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.pdg)}</span>
-        </button>
-        <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
-          <span class="bt-label">Daño Arma</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.danio)}</span>
-        </button>
-        <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
-          <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
-        </button>
-        <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
-          <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
-        </button>
-        <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
-          <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
-        </button>
+      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
+      <div class="botonera-combate-wrap">
+        <div class="botonera-combate-grid">
+          <button type="button" class="botonera-tile" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''} title="Atacar (PdG) · cuesta 1 acción">
+            <span class="bt-label">Atacar (PdG)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.pdg)}</span>
+          </button>
+          <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
+            <span class="bt-label">Daño Arma</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.danio)}</span>
+          </button>
+        </div>
+        <div class="botonera-combate-grid botonera-combate-bottom">
+          <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
+            <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
+          </button>
+          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
+            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
+          </button>
+          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
+            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
+          </button>
+        </div>
       </div>
     </div>
     <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0">Tiradas de stats</div>
+      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-stats" title="Contraer/expandir">👁</button><span>Tiradas de stats</span></div>
       <div class="botonera-stats-grid">
         ${statsRollables.map(s => {
           const m = c.modTotal[s.id];
@@ -3463,14 +3472,16 @@ function renderBotonera(){
     </div>
   </div>`;
 
-  const consumibles = [
-    ...S.inventario.filter(i => i.consumible).map(i => ({i, key:'inventario'})),
-    ...S.cinturon.filter(i => i.consumible).map(i => ({i, key:'cinturon'})),
-  ];
+  const consumiblesCinturon = S.cinturon.filter(i => i.consumible);
+  const consumiblesMochila = S.inventario.filter(i => i.consumible);
+  const filaConsumible = (i, key) => `<div class="cat-row">
+    <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+    ${consumeButton(i, key)}
+  </div>`;
 
   html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0">Habilidades</div>
+      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>
       <div class="botonera-list-grid">
         ${S.habilidades.length ? S.habilidades.map(i => {
           const noEspameable = i.categoria === 'No espameable';
@@ -3490,25 +3501,22 @@ function renderBotonera(){
       </div>
     </div>
     <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0">Consumibles</div>
+      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-consumibles" title="Contraer/expandir">👁</button><span>Consumibles</span></div>
       <div class="botonera-list-grid">
-        ${consumibles.length ? [
-          {label:'Cinturón', key:'cinturon'},
-          {label:'Mochila', key:'inventario'},
-        ].map(({label, key}) => {
-          const items = consumibles.filter(c => c.key === key);
-          if(!items.length) return '';
-          return `<div class="botonera-list-subhead">${esc(label)}</div>` + items.map(({i}) => `
-            <div class="cat-row">
-              <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
-              ${consumeButton(i, key)}
-            </div>`).join('');
-        }).join('') : `<div class="hint">Sin consumibles.</div>`}
+        ${consumiblesCinturon.length ? consumiblesCinturon.map(i => filaConsumible(i, 'cinturon')).join('') : `<div class="hint">Sin consumibles en el cinturón.</div>`}
       </div>
     </div>
   </div>`;
 
+  html += `<div class="botonera-caja">
+    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-consumibles-mochila" title="Contraer/expandir">👁</button><span>Consumibles en mochila</span></div>
+    <div class="botonera-list-grid">
+      ${consumiblesMochila.length ? consumiblesMochila.map(i => filaConsumible(i, 'inventario')).join('') : `<div class="hint">Sin consumibles en la mochila.</div>`}
+    </div>
+  </div>`;
+
   $('#botonera-body').innerHTML = html;
+  aplicarColapsados();
 }
 
 function renderLootEspecial(){
@@ -3842,8 +3850,8 @@ function guardarColapsados(estado){
   try{ localStorage.setItem('ficha-colapsados', JSON.stringify(estado)); }catch(e){}
 }
 function pintarColapsable(btn, colapsada){
-  const card = btn.closest('.card');
-  if(card) card.classList.toggle('colapsada', colapsada);
+  const cont = btn.closest('.card') || btn.closest('.botonera-caja');
+  if(cont) cont.classList.toggle('colapsada', colapsada);
   btn.textContent = colapsada ? '🙈' : '👁';
 }
 function toggleColapsable(btn){

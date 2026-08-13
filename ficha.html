@@ -2874,7 +2874,7 @@ function renderDadosHistorial(){
 /* ---------- Tirar dados a partir del valor de un stat ---------- */
 
 const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
-const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'];
+const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'mov', 'rng', 'crit', 'rangocasteo', 'def', 'accionesmax'];
 
 function combosDeSuma(n, k, minIdx){
   if(k === 0) return n === 0 ? [[]] : [];
@@ -3324,29 +3324,14 @@ function renderBotonera(){
   const bonosDisponibles = bonosBase - num(S.bonosGastados);
   $('#botonera-badge-bonos').textContent = `Bonos ${fmt(bonosDisponibles)}/${fmt(bonosBase)}`;
 
-  const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
+  // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva,
+  // Parry, Bloqueo) no hace falta repetirlos acá.
+  const STATS_REDUNDANTES_COMBATE = ['pdg', 'eva', 'parry', 'bloqueo'];
+  const statsRollables = STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id));
   const sinAccPdg = num(S.acciones) < 1;
   const fCombate = formulasCombate();
 
-  html += `<div class="botonera-grid">
-    <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0">Tiradas de stats</div>
-      <div class="botonera-stats-grid">
-        ${statsRollables.map(s => {
-          const m = c.modTotal[s.id];
-          const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
-          const origins = c.mods[s.id] || [];
-          const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
-          const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
-          return `
-          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
-            <span class="bt-label">${esc(s.label)}</span>
-            <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
-            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
-          </button>`;
-        }).join('')}
-      </div>
-    </div>
+  html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead" style="margin-top:0">Combate</div>
       <div class="botonera-combate-grid">
@@ -3365,6 +3350,24 @@ function renderBotonera(){
         <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
           <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
         </button>
+      </div>
+    </div>
+    <div class="botonera-caja">
+      <div class="cat-grouphead" style="margin-top:0">Tiradas de stats</div>
+      <div class="botonera-stats-grid">
+        ${statsRollables.map(s => {
+          const m = c.modTotal[s.id];
+          const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
+          const origins = c.mods[s.id] || [];
+          const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
+          const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
+          return `
+          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
+            <span class="bt-label">${esc(s.label)}</span>
+            <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
+            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
+          </button>`;
+        }).join('')}
       </div>
     </div>
   </div>`;

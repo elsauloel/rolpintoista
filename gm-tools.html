@@ -71,6 +71,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
   padding:2px 4px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
 }
 .dano-entrante input:focus{background:rgba(212,87,78,.2)}
+.dano-critico-check{display:flex;align-items:center;gap:3px;cursor:pointer;text-transform:none!important;letter-spacing:0!important}
+.dano-critico-check input{width:auto!important;padding:0!important;border:none!important;background:none!important}
 /* Misma disposición que la caja Combate de la ficha: Esquivar ocupa las
    dos filas de la izquierda, Parry y Bloqueo se apilan a la derecha. */
 .creep-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
@@ -794,6 +796,7 @@ input[type=file]{display:none}
         <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" id="ec-hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
         <div class="mini-f"><label>Stacks por turno</label><input type="number" id="ec-stacksturno" value="0"></div>
+        <div class="mini-f"><label>Escudo mágico (absorbe daño)</label><input type="number" id="ec-escudomagico" min="0" value="0"></div>
       </div>
       <div style="display:flex;gap:16px">
         <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
@@ -1065,12 +1068,24 @@ function formulaParaValor(valor){
   return {combo, mod, formula};
 }
 
-function tirarValorStat(nombre, valor){
+// Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
+// con el total más alto. sc+statId son opcionales — solo importan para
+// esos tres stats de un creep con ese estado activo.
+function tirarValorStat(nombre, valor, sc, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
-  const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
-  mostrarResultadoDado(nombre, {formula: f.formula, rolls, mod: f.mod, total});
+  const conVentaja = sc && ['pdg','parry','eva'].includes(statId) &&
+    (sc.estados||[]).some(e => e.activo !== false && e.afortunado);
+  const tirar = () => {
+    const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+    return {rolls, total: rolls.reduce((a,b)=>a+b,0) + f.mod};
+  };
+  let intento = tirar();
+  if(conVentaja){
+    const segundo = tirar();
+    if(segundo.total > intento.total) intento = segundo;
+  }
+  mostrarResultadoDado(conVentaja ? `${nombre} (Afortunado)` : nombre, {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total});
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
@@ -1589,15 +1604,48 @@ function aplicarDanioCreep(input){
     return;
   }
   const golpe = parseFloat(crudo.replace(',', '.'));
+  const critInput = document.querySelector(`[data-danocreepcritico="${sc.id}"]`);
+  const fueCritico = !!(critInput && critInput.checked);
+  const activos = (sc.estados||[]).filter(e => e.activo !== false);
+
+  if(activos.some(e => e.invulnerable)){
+    input.value = '';
+    if(critInput) critInput.checked = false;
+    toast(`${sc.nombre || 'Creep'}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`);
+    return;
+  }
+  if(fueCritico && activos.some(e => e.blindado)){
+    input.value = '';
+    critInput.checked = false;
+    toast(`${sc.nombre || 'Creep'}: Blindado, el golpe crítico de ${fmt(golpe)} no hizo nada`);
+    return;
+  }
+
   const defensa = creepDefensaEfectiva(sc);
-  const recibido = Math.max(0, golpe - defensa);
+  let recibido = Math.max(0, golpe - defensa);
+
+  const escudo = activos.find(e => num(e.escudoMagico) > 0);
+  let absorbido = 0;
+  if(escudo && recibido > 0){
+    absorbido = Math.min(recibido, num(escudo.escudoMagico));
+    escudo.escudoMagico = num(escudo.escudoMagico) - absorbido;
+    recibido -= absorbido;
+  }
+
   const previo = num(sc.hp);
   sc.hp = previo - recibido;
   input.value = '';
+  if(critInput) critInput.checked = false;
+
+  const extra = [];
+  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagico ? ` (quedan ${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
+  if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.25))} al atacante`);
+  const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
+
   if(recibido <= 0){
-    toast(`${sc.nombre || 'Creep'}: golpe de ${fmt(golpe)} · Defensa ${fmt(defensa)} lo frenó entero`);
+    toast(`${sc.nombre || 'Creep'}: golpe de ${fmt(golpe)} · Defensa ${fmt(defensa)} lo frenó entero${sufijo}`);
   }else{
-    toast(`${sc.nombre || 'Creep'}: ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño (${fmt(previo)} → ${fmt(sc.hp)} HP)`);
+    toast(`${sc.nombre || 'Creep'}: ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño (${fmt(previo)} → ${fmt(sc.hp)} HP)${sufijo}`);
   }
   renderAll();
 }
@@ -1713,7 +1761,11 @@ function creepStatValor(sc, statId){
   // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
   // que arrastra a todos sus derivados) como lo que apunta directo al
   // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza).
-  return num(sc[d.attr]) + creepModTotal(sc, d.attr) + creepModTotal(sc, statId);
+  let v = num(sc[d.attr]) + creepModTotal(sc, d.attr) + creepModTotal(sc, statId);
+  if((statId === 'pdg' || statId === 'parry') && (sc.estados||[]).some(e => e.activo !== false && e.lisiado)){
+    v = Math.floor(v / 2);
+  }
+  return v;
 }
 
 function renderAccionesCreep(){
@@ -1854,6 +1906,9 @@ function cardHtml(sc){
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
+            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
+              <input type="checkbox" data-danocreepcritico="${sc.id}">Crít
+            </label>
           </div>
         </div>
         <div class="vital-mini acc">
@@ -1970,6 +2025,9 @@ function cardCompactoHtml(sc){
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
+            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
+              <input type="checkbox" data-danocreepcritico="${sc.id}">Crít
+            </label>
           </div>
         </div>
         <div class="vital-mini acc">
@@ -1984,8 +2042,14 @@ function cardCompactoHtml(sc){
   </div>`;
 }
 
+// Banderas que un estado de creep puede llevar más allá de lo genérico
+// (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
+// que un solo array evita repetirlas en los 4 lugares que las tocan
+// (abrir editor, guardar, elegir preset, guardar como preset personalizado).
+const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+
 const ESTADOS_PRESET_GM = [
-  {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1,
+  {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
     detalle:'Pierde 1 HP por stack cada turno.'},
   {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
     detalle:'Cura HP cada turno.'},
@@ -1993,9 +2057,9 @@ const ESTADOS_PRESET_GM = [
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Cansado', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
     detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+  {nombre:'Exhausto', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0, esCC:true,
     detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+  {nombre:'Stun', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0, esCC:true,
     detalle:'Sin Acciones este turno.'},
   {nombre:'Hypeado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0,
     detalle:'+1 a las Acciones máximas del turno.'},
@@ -2003,10 +2067,28 @@ const ESTADOS_PRESET_GM = [
     detalle:'Corta a la mitad (redondeado hacia abajo) la Defensa y Res. a crítico totales.'},
   {nombre:'Arruina armadura', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, armaduraArruinada:true,
     detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico. No afecta el resto del equipo.'},
-  {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true,
+  {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
-  {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-2, stacksTurno:0, permanente:true,
+  {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-2, stacksTurno:0, permanente:true, esSangrado:true,
     detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
+  {nombre:'Lisiado', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, lisiado:true,
+    detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Invulnerable', polaridad:'buff', turnos:1, stacks:1, hpTurno:0, invulnerable:true,
+    detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff nuevo mientras dure.'},
+  {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
+    detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
+  {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
+    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 25% del daño al atacante (avisa cuánto es, se cobra a mano).'},
+  {nombre:'Escudo mágico', polaridad:'buff', turnos:0, stacks:1, hpTurno:0, permanente:true, escudoMagico:10,
+    detalle:'Absorbe los siguientes 10 puntos de daño de cualquier fuente antes de que le toquen el HP (editable al elegir el preset).'},
+  {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
+    detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
+  {nombre:'Sangre pura', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, sangrePura:true,
+    detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, coagulacionExtrema:true,
+    detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Blindado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, blindado:true,
+    detalle:'Inmune a golpes críticos: al cargar el daño, tildá "Crít" y se anula solo.'},
 ];
 
 const POLARIDAD_ESTADO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
@@ -2029,21 +2111,43 @@ const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int'};
 // Crea o refresca un estado del creep a partir de una habilidad con un
 // efecto configurado (preset o a mano) — igual variedad que en ficha.html:
 // nombre, turnos, stacks, HP por turno, detalle y modificadores de atributo.
+// Invulnerable bloquea cualquier debuff nuevo; Inmunidad a CC / Sangre
+// pura / Coagulación extrema bloquean solo su categoría (esCC/esVeneno/
+// esSangrado, la misma marca que llevan los presets).
+function estaBloqueadoElDebuffCreep(sc, objEfecto){
+  if(!objEfecto || objEfecto.polaridad !== 'debuff') return false;
+  const activos = (sc.estados || []).filter(e => e.activo !== false);
+  if(activos.some(e => e.invulnerable)) return true;
+  if(objEfecto.esCC && activos.some(e => e.inmunidadCC)) return true;
+  if(objEfecto.esVeneno && activos.some(e => e.sangrePura)) return true;
+  if(objEfecto.esSangrado && activos.some(e => e.coagulacionExtrema)) return true;
+  return false;
+}
+
 function aplicarEfectoDeConsumoCreep(sc, h){
   const nombre = (h.efectoNombre || '').trim();
   if(!nombre) return null;
+  // La habilidad no sabe de categorías/inmunidades — se infiere buscando
+  // un preset con el mismo nombre, igual que en ficha.html.
+  const preset = ESTADOS_PRESET_GM.find(p => p.nombre === nombre);
   const turnos = num(h.efectoTurnos);
   const stacks = Math.max(1, num(h.efectoStacks) || 1);
   const hpTurno = num(h.efectoHpTurno);
-  const polaridad = h.efectoPolaridad || 'otro';
+  const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
+  if(estaBloqueadoElDebuffCreep(sc, {polaridad, esCC: preset && preset.esCC, esVeneno: preset && preset.esVeneno, esSangrado: preset && preset.esSangrado})){
+    toast(`${sc.nombre}: inmune ahora mismo — ${nombre} no hizo efecto`);
+    return null;
+  }
   const detalle = h.efectoDetalle || '';
   const mods = structuredClone(h.efectoMods || []);
+  const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado} : {};
   let es = sc.estados.find(x => x.nombre === nombre);
   if(es){
     es.turnos = turnos; es.stacks = stacks; es.hpTurno = hpTurno;
     es.polaridad = polaridad; es.detalle = detalle; es.mods = mods;
+    Object.assign(es, categorias);
   }else{
-    es = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods};
+    es = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
     sc.estados.push(es);
   }
   return es;
@@ -2542,8 +2646,8 @@ function abrirEditorEstadoCreep(scId, esId){
   $('#ec-activo').checked = es ? es.activo !== false : true;
   $('#ec-permanente').checked = es ? !!es.permanente : false;
   $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
-  $('#ec-preset').dataset.armadurarota = es ? (es.armaduraRota ? '1' : '') : '';
-  $('#ec-preset').dataset.armaduraarruinada = es ? (es.armaduraArruinada ? '1' : '') : '';
+  FLAGS_ESTADO_CREEP.forEach(f => { $('#ec-preset').dataset[f.toLowerCase()] = es && es[f] ? '1' : ''; });
+  $('#ec-escudomagico').value = es ? (es.escudoMagico ?? 0) : 0;
   renderEcMods();
   actualizarBotonesPresetEc();
   $('#scrim-estado-creep').classList.add('open');
@@ -2583,10 +2687,16 @@ function guardarEditorEstadoCreep(){
     activo: $('#ec-activo').checked,
     permanente: $('#ec-permanente').checked,
     polaridad: $('#ec-preset').dataset.polaridad || 'otro',
-    armaduraRota: $('#ec-preset').dataset.armadurarota === '1',
-    armaduraArruinada: $('#ec-preset').dataset.armaduraarruinada === '1',
+    escudoMagico: num($('#ec-escudomagico').value) || 0,
     mods: structuredClone(ecMods),
   };
+  FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
+  if(!editingEstadoCreep.esId && datos.activo && estaBloqueadoElDebuffCreep(sc, datos)){
+    toast(`${sc.nombre}: inmune ahora mismo — ${nombre} no se pudo aplicar`);
+    editingEstadoCreep = null;
+    $('#scrim-estado-creep').classList.remove('open');
+    return;
+  }
   let es;
   if(editingEstadoCreep.esId){
     es = sc.estados.find(x => x.id === editingEstadoCreep.esId);
@@ -2785,7 +2895,7 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s=>s.id===scId);
     const d = CREEP_STAT_LOOKUP[statId];
     if(!sc || !d) return;
-    tirarValorStat(`${sc.nombre} · ${d.label}`, creepStatValor(sc, statId));
+    tirarValorStat(`${sc.nombre} · ${d.label}`, creepStatValor(sc, statId), sc, statId);
     return;
   }
   if(b.dataset.atacarcreep){
@@ -2795,7 +2905,7 @@ document.addEventListener('click', e => {
     sc.acc = num(sc.acc) - 1;
     renderAll();
     const pdg = creepStatValor(sc, 'pdg');
-    tirarValorStat(`${sc.nombre} · PdG`, pdg);
+    tirarValorStat(`${sc.nombre} · PdG`, pdg, sc, 'pdg');
     return;
   }
   if(b.dataset.daniocreep){
@@ -2809,14 +2919,14 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s=>s.id===b.dataset.esquivarcreep);
     if(!sc) return;
     const eva = creepStatValor(sc, 'eva');
-    tirarValorStat(`${sc.nombre} · Esquivar`, eva);
+    tirarValorStat(`${sc.nombre} · Esquivar`, eva, sc, 'eva');
     return;
   }
   if(b.dataset.parrycreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
     const parry = creepStatValor(sc, 'parry');
-    tirarValorStat(`${sc.nombre} · Parry`, parry);
+    tirarValorStat(`${sc.nombre} · Parry`, parry, sc, 'parry');
     return;
   }
   if(b.dataset.bloqueocreep){
@@ -3481,10 +3591,15 @@ function mantenimiento(){
         enCooldown++;
       }
     });
+    const activosMant = sc.estados.filter(e => e.activo !== false);
+    const esInvulnerableMant = activosMant.some(e => e.invulnerable);
+    const inmuneVenenoMant = activosMant.some(e => e.sangrePura);
+    const inmuneSangradoMant = activosMant.some(e => e.coagulacionExtrema);
     sc.estados.forEach(es => {
       if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos ni stacks
       const stacks = Math.max(1, num(es.stacks) || 1);
-      const cambio = num(es.hpTurno) * stacks;
+      let cambio = num(es.hpTurno) * stacks;
+      if(cambio < 0 && (esInvulnerableMant || (es.esVeneno && inmuneVenenoMant) || (es.esSangrado && inmuneSangradoMant))) cambio = 0;
       if(cambio){
         sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + cambio));
         hpAplicado++;
@@ -3774,9 +3889,9 @@ $('#ec-preset').addEventListener('change', e => {
   $('#ec-stacksturno').value = preset.stacksTurno ?? 0;
   $('#ec-activo').checked = true;
   $('#ec-permanente').checked = !!preset.permanente;
+  $('#ec-escudomagico').value = preset.escudoMagico ?? 0;
   e.target.dataset.polaridad = preset.polaridad || 'otro';
-  e.target.dataset.armadurarota = preset.armaduraRota ? '1' : '';
-  e.target.dataset.armaduraarruinada = preset.armaduraArruinada ? '1' : '';
+  FLAGS_ESTADO_CREEP.forEach(f => { e.target.dataset[f.toLowerCase()] = preset[f] ? '1' : ''; });
   ecMods = structuredClone(preset.mods || []);
   renderEcMods();
   actualizarBotonesPresetEc();
@@ -3821,10 +3936,10 @@ $('#ec-guardarpreset').onclick = () => {
     turnos: Math.max(0, num($('#ec-turnos').value) || 0), stacks: Math.max(1, num($('#ec-stacks').value) || 1),
     hpTurno: num($('#ec-hpturno').value) || 0, stacksTurno: num($('#ec-stacksturno').value) || 0,
     detalle: $('#ec-detalle').value,
-    armaduraRota: $('#ec-preset').dataset.armadurarota === '1',
-    armaduraArruinada: $('#ec-preset').dataset.armaduraarruinada === '1',
+    escudoMagico: num($('#ec-escudomagico').value) || 0,
     mods: structuredClone(ecMods),
   };
+  FLAGS_ESTADO_CREEP.forEach(f => { preset[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
   S.estadosPersonalizados = S.estadosPersonalizados || [];
   const idx = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
   if(idx >= 0) S.estadosPersonalizados[idx] = preset; else S.estadosPersonalizados.push(preset);

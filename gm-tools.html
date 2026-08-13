@@ -1438,15 +1438,20 @@ function fileToDataURL(file, maxDim=480, quality=0.85){
 
 let S = { turno:1, creeps:[] };
 
-function danoTxt(sc){
+function danoTxt(sc, extra){
   const dados = Math.max(1, num(sc.armaPeso)||1);
   const tipo = num(sc.armaTipo)||6;
-  const fijo = num(sc.armaFijo);
+  const fijo = num(sc.armaFijo) + num(extra);
   return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
 }
 
-function attrModTotal(sc, statId){
+// Suma los modificadores que apuntan a un stat puntual, vengan del equipo
+// puesto o de estados activos — mismo criterio que collectMods()+modTotal
+// en ficha.html, para que un ítem con "bloqueo +N" o un estado que suba
+// Fuerza afecten al creep de verdad y no solo la Res. a crítico.
+function creepModTotal(sc, statId){
   let total = 0;
+  (sc.equipo||[]).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
   (sc.estados||[]).forEach(es => {
     if(es.activo === false) return;
     const stacks = Math.max(1, num(es.stacks)||1);
@@ -1493,13 +1498,17 @@ function creepArmaduraOrigenTxt(sc){
 // Nombres de los estados activos que aportan un mod a ese stat, para
 // poder mostrar "de dónde sale" al tocar el indicador +/-.
 function origenesModCreep(sc, statId){
-  return (sc.estados||[])
+  const deEquipo = (sc.equipo||[])
+    .filter(it => (it.mods||[]).some(m => m.stat === statId))
+    .map(it => it.nombre || '(sin nombre)');
+  const deEstados = (sc.estados||[])
     .filter(es => es.activo !== false && (es.mods||[]).some(m => m.stat === statId))
     .map(es => es.nombre || '(sin nombre)');
+  return [...deEquipo, ...deEstados];
 }
 
 function attrCellHtml(sc, a){
-  const mod = attrModTotal(sc, a);
+  const mod = creepModTotal(sc, a);
   const cls = mod>0 ? 'mod-plus' : mod<0 ? 'mod-minus' : '';
   const origenes = mod ? origenesModCreep(sc, a) : [];
   const texto = `Base ${fmt(num(sc[a]))} ${mod>0?'+':''}${fmt(mod)}${origenes.length?` por ${esc(origenes.join(', '))}`:''}`;
@@ -1523,7 +1532,7 @@ function attrCellHtml(sc, a){
 // recorta hp si se pasa del nuevo máximo. Después el máster puede seguir
 // editando hp/hpMax a mano hasta que con vuelva a cambiar.
 function actualizarHpMaxPorCon(sc){
-  const conEfectivo = num(sc.con) + attrModTotal(sc, 'con');
+  const conEfectivo = num(sc.con) + creepModTotal(sc, 'con');
   const nuevoHpMax = Math.max(0, conEfectivo * 5);
   const estabaFull = num(sc.hp) >= num(sc.hpMax);
   sc.hpMax = nuevoHpMax;
@@ -1701,7 +1710,10 @@ const CREEP_STAT_LOOKUP = Object.fromEntries(CREEP_DERIVED_STATS.map(d => [d.id,
 function creepStatValor(sc, statId){
   const d = CREEP_STAT_LOOKUP[statId];
   if(!d) return 0;
-  return num(sc[d.attr]) + attrModTotal(sc, d.attr);
+  // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
+  // que arrastra a todos sus derivados) como lo que apunta directo al
+  // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza).
+  return num(sc[d.attr]) + creepModTotal(sc, d.attr) + creepModTotal(sc, statId);
 }
 
 function renderAccionesCreep(){
@@ -1718,7 +1730,7 @@ function renderAccionesCreep(){
   const fc = formulasCombateCreep(sc);
   const combate = [
     {nombre:'Atacar (PdG)', dado: fc.pdg, disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
-    {nombre:'Daño Arma', dado: danoTxt(sc), disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
+    {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {nombre:'Esquivar', dado: fc.eva, disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
     {nombre:'Parry', dado: fc.parry, disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
     {nombre:'Bloqueo', dado: fc.bloqueo, disabled:false, motivo:'Sin costo', attr:`data-bloqueocreep="${sc.id}"`},
@@ -1803,10 +1815,10 @@ function muertoBadgeHtml(sc){
 function formulasCombateCreep(sc){
   const f = (v) => { const x = formulaParaValor(v); return x ? x.formula : ''; };
   return {
-    pdg: f(num(sc.des) + attrModTotal(sc, 'des')),
-    eva: f(num(sc.agl) + attrModTotal(sc, 'agl')),
-    parry: f(num(sc.des) + attrModTotal(sc, 'des')),
-    bloqueo: f(num(sc.fue) + attrModTotal(sc, 'fue')),
+    pdg: f(creepStatValor(sc, 'pdg')),
+    eva: f(creepStatValor(sc, 'eva')),
+    parry: f(creepStatValor(sc, 'parry')),
+    bloqueo: f(creepStatValor(sc, 'bloqueo')),
   };
 }
 
@@ -1860,7 +1872,7 @@ function cardHtml(sc){
         <div class="sect-label">Combate</div>
         <div class="creep-combate-grid">
           <button type="button" class="addhab" data-atacarcreep="${sc.id}">🎲 Atacar (PdG)${fCombate.pdg ? ` · ${fCombate.pdg}` : ''}</button>
-          <button type="button" class="addhab" data-daniocreep="${sc.id}">🎲 Daño Arma · ${esc(danoTxt(sc))}</button>
+          <button type="button" class="addhab" data-daniocreep="${sc.id}">🎲 Daño Arma · ${esc(danoTxt(sc, creepStatValor(sc, 'dmg')))}</button>
           <button type="button" class="addhab" data-esquivarcreep="${sc.id}">🎲 Esquivar${fCombate.eva ? ` · ${fCombate.eva}` : ''}</button>
           <button type="button" class="addhab" data-parrycreep="${sc.id}">🎲 Parry${fCombate.parry ? ` · ${fCombate.parry}` : ''}</button>
           <button type="button" class="addhab" data-bloqueocreep="${sc.id}">🎲 Bloqueo${fCombate.bloqueo ? ` · ${fCombate.bloqueo}` : ''}</button>
@@ -2236,10 +2248,14 @@ const TIPOITEM_LABEL_GM = {
 };
 const TIPO_STAT_A_CRIT_IDX = {tipo1:0, tipo2:1, tipo3:2, tipo4:3, tipo5:4};
 
-// Aplica (signo 1) o revierte (signo -1) los modificadores de un ítem de
-// equipo sobre los campos del creep que tienen dónde guardarlos. Bonos/Res.M/
-// Res.CC no tienen campo propio en un creep, así que quedan solo en el
-// detalle del ítem — no se pierden, simplemente no suman a ningún número.
+// Hornea sobre campos propios del creep los mods que necesitan quedar
+// guardados ahí (Res. a crítico, Acciones máx., Velocidad): son valores
+// que el máster también edita a mano, así que no alcanza con sumarlos al
+// vuelo. El resto de los stats derivados (Dmg, Bloqueo, PdG, Eva, Parry,
+// Res.M, Res.CC, etc.) no necesitan esto — creepModTotal() los suma en
+// vivo leyendo sc.equipo directamente, igual que collectMods() en
+// ficha.html. "Bonos" es la única excepción real: los creeps no tienen
+// ese recurso, así que un mod de bonos queda solo en el detalle del ítem.
 function aplicarModsEquipo(sc, mods, signo){
   (mods||[]).forEach(m => {
     if(TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined){
@@ -2782,35 +2798,35 @@ document.addEventListener('click', e => {
     if(num(sc.acc) < 1){ toast(`${sc.nombre}: no le quedan acciones para atacar`); return; }
     sc.acc = num(sc.acc) - 1;
     renderAll();
-    const pdg = num(sc.des) + attrModTotal(sc, 'des');
+    const pdg = creepStatValor(sc, 'pdg');
     tirarValorStat(`${sc.nombre} · PdG`, pdg);
     return;
   }
   if(b.dataset.daniocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.daniocreep);
     if(!sc) return;
-    const r = tirarDados(danoTxt(sc));
+    const r = tirarDados(danoTxt(sc, creepStatValor(sc, 'dmg')));
     if(r) mostrarResultadoDado(`${sc.nombre} · Daño`, r);
     return;
   }
   if(b.dataset.esquivarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.esquivarcreep);
     if(!sc) return;
-    const eva = num(sc.agl) + attrModTotal(sc, 'agl');
+    const eva = creepStatValor(sc, 'eva');
     tirarValorStat(`${sc.nombre} · Esquivar`, eva);
     return;
   }
   if(b.dataset.parrycreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
-    const parry = num(sc.des) + attrModTotal(sc, 'des');
+    const parry = creepStatValor(sc, 'parry');
     tirarValorStat(`${sc.nombre} · Parry`, parry);
     return;
   }
   if(b.dataset.bloqueocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.bloqueocreep);
     if(!sc) return;
-    const bloqueo = num(sc.fue) + attrModTotal(sc, 'fue');
+    const bloqueo = creepStatValor(sc, 'bloqueo');
     tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueo);
     return;
   }

@@ -2423,7 +2423,7 @@ function formulasCombate(){
   const fBloqueo = formulaParaValor(c.final.bloqueo);
   const armas = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
   let danio;
-  if(armas.length === 1) danio = armaDanoTxt(armas[0]);
+  if(armas.length === 1) danio = armaDanoTxt(armas[0], c.final.dmg);
   else if(armas.length > 1) danio = 'elegís arma';
   else danio = 'sin arma equipada';
   return {pdg: fPdg ? fPdg.formula : '', eva: fEva ? fEva.formula : '', parry: fParry ? fParry.formula : '', bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
@@ -2449,7 +2449,8 @@ function armasEquipadasConDano(){
 }
 
 function tirarDanoDeArma(it){
-  const r = tirarDados(armaDanoTxt(it));
+  const dmg = compute().final.dmg;
+  const r = tirarDados(armaDanoTxt(it, dmg));
   if(!r) return;
   mostrarResultadoDado(it.nombre, r);
 }
@@ -2458,9 +2459,10 @@ function pedirArmaYTirar(){
   const armas = armasEquipadasConDano();
   if(!armas.length){ toast('No tenés ningún arma equipada con daño para tirar'); return; }
   if(armas.length === 1){ tirarDanoDeArma(armas[0].item); return; }
+  const dmg = compute().final.dmg;
   $('#elegir-arma-lista').innerHTML = armas.map(a => `
     <button class="btn" data-elegirarma="${a.item.id}" style="width:100%">
-      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${esc(armaDanoTxt(a.item))}
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${esc(armaDanoTxt(a.item, dmg))}
     </button>`).join('');
   $('#scrim-elegir-arma').classList.add('open');
 }
@@ -2750,11 +2752,11 @@ function precioVentaDe(i){
   return Math.round((num(i.precioCompra) / 2) * 100) / 100;
 }
 
-function armaDanoTxt(i){
+function armaDanoTxt(i, extra){
   if(!ES_ARMA(i.tipoItem)) return '';
   const dados = Math.max(1, num(i.peso) || 1);
   const tipo = num(i.tipoDado) || 6;
-  const fijo = num(i.danoFijo);
+  const fijo = num(i.danoFijo) + num(extra);
   return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
 }
 

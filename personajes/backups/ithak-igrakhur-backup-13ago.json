@@ -80,22 +80,68 @@
     {
       "id": "ithak-coraza",
       "nombre": "Coraza",
-      "imagen": "",
-      "tipoItem": "armadura_rigida",
       "peso": 5,
       "ranuras": 1,
-      "precioCompra": 100,
-      "equipado": true,
-      "unidades": 1,
-      "consumible": false,
-      "curahp": 0,
+      "detalle": "Reduce críticos de cualquier tipo.",
       "mods": [
         {
           "stat": "def",
           "val": 12
+        },
+        {
+          "stat": "tipo1",
+          "val": 1
+        },
+        {
+          "stat": "tipo2",
+          "val": 1
+        },
+        {
+          "stat": "tipo3",
+          "val": 1
+        },
+        {
+          "stat": "tipo4",
+          "val": 1
         }
       ],
-      "detalle": "Reduce críticos de cualquier tipo."
+      "equipado": true,
+      "activo": true,
+      "stacks": 1,
+      "costo": "",
+      "accionesCosto": 1,
+      "dado": "",
+      "turnos": "",
+      "hpturno": 0,
+      "stacksturno": 0,
+      "permanente": false,
+      "popup": false,
+      "job": true,
+      "origen": "",
+      "imagen": "",
+      "categoria": "",
+      "tipoItem": "armadura_rigida",
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "manoPreferida": "",
+      "unidades": 1,
+      "consumible": false,
+      "curahp": 0,
+      "precioCompra": 100,
+      "usadaEsteTurno": false,
+      "efectoNombre": "",
+      "efectoTurnos": 0,
+      "efectoHpTurno": 0,
+      "efectoPermanente": false,
+      "efectoDetalle": "",
+      "curabonosPct": 0,
+      "cargaMax": 1,
+      "cargaActual": 1,
+      "forzarAccionesMax": "",
+      "mitadPdgEva": false,
+      "armaduraRota": false,
+      "armaduraArruinada": false,
+      "tiradaExtra": ""
     },
     {
       "id": "ithak-mercury-threads",

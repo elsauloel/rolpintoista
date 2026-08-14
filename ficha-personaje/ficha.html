@@ -4409,7 +4409,7 @@ $('#btn-formulas').onclick = () => openFormulas();
 
 /* =========================================================
    SINCRONIZAR CON GITHUB
-   Sube la ficha actual a personajes/ del repo (y un backup
+   Sube la ficha actual a datos/personajes/ del repo (y un backup
    con fecha), usando la API de contenidos de GitHub.
    ========================================================= */
 
@@ -4635,13 +4635,13 @@ $('#btn-sync').onclick = async () => {
   try{
     const b64 = await aBase64(JSON.stringify(S, null, 2));
     const quien = S.meta.nombre || nombre;
-    await ghSubir(`personajes/${nombre}.json`, b64, token, `Sincronizar ficha de ${quien}`);
-    await ghSubir(`personajes/backups/${nombre}-backup-${fecha}.json`, b64, token, `Backup de ${quien} (${fecha})`);
+    await ghSubir(`datos/personajes/${nombre}.json`, b64, token, `Sincronizar ficha de ${quien}`);
+    await ghSubir(`datos/personajes/backups/${nombre}-backup-${fecha}.json`, b64, token, `Backup de ${quien} (${fecha})`);
     // La tarjeta del tablero viaja con el mismo botón: subir el personaje ya
     // es "avisar en qué estado quedé", así que no hace falta un paso aparte.
     // Va en su propio archivo para que nadie pise lo que publicó otro.
     const b64Tablero = await aBase64(JSON.stringify(armarTarjetaTablero(), null, 2));
-    await ghSubir(`tablero/${nombre}.json`, b64Tablero, token, `Tablero: estado de ${quien}`);
+    await ghSubir(`datos/tablero/${nombre}.json`, b64Tablero, token, `Tablero: estado de ${quien}`);
     toast('Ficha sincronizada con GitHub ✓');
   }catch(err){
     if(err && err.auth){
@@ -4724,18 +4724,18 @@ async function bajarTablero(){
   const fichas = [];
   // El listado de la carpeta dice qué publicó cada uno; después se baja
   // cada archivo. Son pocos (uno por jugador), así que alcanza.
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/tablero?ref=${GH_BRANCH}`;
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/datos/tablero?ref=${GH_BRANCH}`;
   const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
   if(resp.status === 429 || resp.status === 403) throw {limite: true};
   if(resp.ok){
     const cuerpo = await resp.json();
     const lista = (Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || [])).filter(x => x.name.endsWith('.json'));
-    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`tablero/${x.name}`).catch(() => null)));
+    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`datos/tablero/${x.name}`).catch(() => null)));
     bajadas.forEach(d => { if(d && d.nombre) fichas.push(d); });
   }
   let creeps = [];
   let selloCreeps = null;
-  const pub = await ghLeerJson('creeps-publico.json').catch(() => null);
+  const pub = await ghLeerJson('datos/creeps-publico.json').catch(() => null);
   if(pub && Array.isArray(pub.creeps)){
     creeps = pub.creeps;
     selloCreeps = pub.actualizado || null;
@@ -4866,7 +4866,7 @@ async function abrirPersonajes(){
   lista.innerHTML = '<div class="hint">Buscando personajes en GitHub…</div>';
   $('#scrim-personajes').classList.add('open');
   try{
-    const url = `https://api.github.com/repos/${GH_REPO}/contents/personajes?ref=${GH_BRANCH}`;
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/datos/personajes?ref=${GH_BRANCH}`;
     const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github+json'), cache: 'no-store'});
     if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
     const archivos = (await resp.json()).filter(x => x.type === 'file' && x.name.endsWith('.json'));
@@ -4901,7 +4901,7 @@ async function abrirPersonajes(){
 
 async function borrarDeGitHub(ruta, nombre){
   const aviso = `Esto borra a ${nombre} del repo de GitHub, para todos.\n\n` +
-                `Los backups de personajes/backups/ no se tocan, así que un personaje borrado por error se puede recuperar desde ahí.\n\n¿Seguís?`;
+                `Los backups de datos/personajes/backups/ no se tocan, así que un personaje borrado por error se puede recuperar desde ahí.\n\n¿Seguís?`;
   if(!confirm(aviso)) return;
   const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
@@ -5005,14 +5005,14 @@ $('#btn-actualizar-gestor').onclick = async () => {
       if(permiso !== 'granted') carpeta = null;
     }
     if(!carpeta){
-      toast('Elegí la carpeta del repo (la que tiene ficha.html)');
+      toast('Elegí la carpeta del repo (la que tiene gestor.html)');
       try{
         carpeta = await showDirectoryPicker({mode: 'readwrite'});
       }catch(e){ return; } // canceló
       try{
-        await carpeta.getFileHandle('ficha.html');
+        await carpeta.getFileHandle('gestor.html');
       }catch(e){
-        toast('Esa carpeta no tiene ficha.html adentro — no parece el repo');
+        toast('Esa carpeta no tiene gestor.html adentro — no parece el repo');
         return;
       }
       await idbCarpeta(carpeta);
@@ -5052,7 +5052,7 @@ $('#btn-actualizar').onclick = () => {
     return;
   }
   const slug = nombreActual.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
-  cargarDesdeGitHub(`personajes/${slug}.json`, nombreActual);
+  cargarDesdeGitHub(`datos/personajes/${slug}.json`, nombreActual);
 };
 
 $('#personajes-nuevo').onclick = () => {
@@ -5644,7 +5644,7 @@ function catalogoVisibles(){
 // Tienda publicada por el GM desde el Vendor Generator. Guarda solo ids:
 // el nombre, la imagen y los stats salen del catálogo de esta misma ficha.
 let tiendaCargada = null;
-const ARCHIVO_TIENDA = 'tienda-publica.json';
+const ARCHIVO_TIENDA = 'datos/tienda-publica.json';
 
 function renderCabeceraTienda(){
   const badge = $('#tienda-badge');

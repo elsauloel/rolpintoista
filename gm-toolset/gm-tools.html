@@ -3070,7 +3070,7 @@ document.addEventListener('click', e => {
 
 /* =========================================================
    SUBIR DATOS A GITHUB
-   Sube solo creeps-publico.json (la vista recortada para
+   Sube solo datos/creeps-publico.json (la vista recortada para
    jugadores) al repo. gm-creeps.json nunca se sube — es el
    respaldo privado del máster y se queda en su compu.
    ========================================================= */
@@ -3231,7 +3231,7 @@ function aBase64(texto){
    rareza queda anotada en la consola. */
 /* =========================================================
    TABLERO DE COMBATE
-   Junta lo que publicó cada jugador (tablero/*.json, que sube cada ficha
+   Junta lo que publicó cada jugador (datos/tablero/*.json, que sube cada ficha
    con "Subir datos") con los creeps que subiste vos. Se refresca cuando
    lo pedís, no solo: así nadie ve datos a medio turno.
    ========================================================= */
@@ -3253,12 +3253,12 @@ async function bajarTablero(){
   const cab = {Accept: 'application/vnd.github.object+json'};
   const token = localStorage.getItem('gh-token');
   if(token) cab.Authorization = 'Bearer ' + token.trim();
-  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/tablero?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/datos/tablero?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
   if(resp.status === 429 || resp.status === 403) throw {limite: true};
   if(resp.ok){
     const cuerpo = await resp.json();
     const lista = (Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || [])).filter(x => x.name.endsWith('.json'));
-    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`tablero/${x.name}`).catch(() => null)));
+    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`datos/tablero/${x.name}`).catch(() => null)));
     bajadas.forEach(d => { if(d && d.nombre) fichas.push(d); });
   }
   // Los creeps salen del estado que tenés abierto ahora, no de GitHub: para
@@ -3415,14 +3415,14 @@ async function subirDatos(){
   toast('Subiendo a GitHub…');
   try{
     const b64 = await aBase64(JSON.stringify(armarVistaPublica(), null, 2));
-    await ghSubir('creeps-publico.json', b64, token, 'Actualizar estado de los creeps');
+    await ghSubir('datos/creeps-publico.json', b64, token, 'Actualizar estado de los creeps');
     toast('Estado de los creeps subido a GitHub ✓');
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
       toast('El token no sirve o venció — tocá Subir datos de nuevo');
     }else{
-      console.error('Error subiendo creeps-publico.json:', err);
+      console.error('Error subiendo datos/creeps-publico.json:', err);
       toast('No se pudo subir — revisá la consola');
     }
   }finally{

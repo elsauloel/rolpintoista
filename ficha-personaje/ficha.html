@@ -1420,6 +1420,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
             <option value="Raro">Raro</option>
             <option value="Excepcional">Excepcional</option>
             <option value="Legendario">Legendario</option>
+            <option value="A definir">A definir</option>
           </select>
         </div>
         <div class="catalogo-filtro-grupo">
@@ -5386,7 +5387,7 @@ function abrirChooser(target, equipadoPreset){
   $('#scrim-chooser').classList.add('open');
 }
 
-const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
+const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
 
 // Lista legible de TODOS los mods del ítem (menos Defensa, que ya se ve en
 // el resumen) — atributos secundarios, resistencias a crítico, lo que sea.
@@ -6240,7 +6241,7 @@ function slugItemCatalogo(s){
 function itemComoEntradaDeCatalogo(draft){
   return {
     id: 'new-' + slugItemCatalogo(draft.nombre),
-    nombre: draft.nombre, tier: 'Común', imagen: draft.imagen || '',
+    nombre: draft.nombre, tier: 'A definir', imagen: draft.imagen || '',
     tipoItem: draft.tipoItem, peso: num(draft.peso), ranuras: num(draft.ranuras) || 1,
     ...(ES_ARMA(draft.tipoItem) ? {
       tipoDado: num(draft.tipoDado) || 6, danoFijo: num(draft.danoFijo),
@@ -6264,8 +6265,8 @@ async function agregarAlCatalogoDelFabricante(){
   if(!draft.nombre.trim()){ toast('Poné un nombre antes de agregarlo al catálogo'); return; }
   if(!draft.tipoItem){ toast('Elegí una categoría antes de agregarlo al catálogo'); return; }
   const aviso = `Esto publica "${draft.nombre}" en el catálogo del fabricante — va a quedar disponible para que ` +
-    `cualquier jugador lo compre desde cualquier ficha (con tier Común por ahora; se puede ajustar después desde ` +
-    `el editor de catálogo). No borra ni modifica tu ítem acá, solo agrega una copia al catálogo compartido.\n\n¿Seguís?`;
+    `cualquier jugador lo compre desde cualquier ficha (con tier "A definir" hasta que alguien le asigne uno real ` +
+    `desde el editor de catálogo). No borra ni modifica tu ítem acá, solo agrega una copia al catálogo compartido.\n\n¿Seguís?`;
   if(!confirm(aviso)) return;
   const token = await ghToken(false);
   if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }

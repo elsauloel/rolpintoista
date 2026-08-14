@@ -184,7 +184,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const uid = () => Math.random().toString(36).slice(2, 8);
 const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 
-const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+const TIERS = ['A definir', 'Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 const DADOS_ARMA = [2, 4, 6, 8, 10];
 const CATEGORIAS = [
   {id:'', label:'— elegir categoría —'},

@@ -654,6 +654,7 @@ input[type=file]{display:none}
         <option value="Raro">Raro</option>
         <option value="Excepcional">Excepcional</option>
         <option value="Legendario">Legendario</option>
+        <option value="A definir">A definir</option>
       </select>
       </div>
       <div class="catalogo-filtro-grupo">
@@ -2173,7 +2174,7 @@ let equipandoCreepId = null;
 
 const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
 
-const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4'};
+const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
 const STAT_LABEL_GM = {
   tipo1:'Tipo 2', tipo2:'Tipo 4', tipo3:'Tipo 6', tipo4:'Tipo 8', tipo5:'Tipo 10',
   pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico',
@@ -2463,7 +2464,10 @@ function abrirItemCustomGM(){
   $('#icg-creep').innerHTML = S.creeps.map(sc => `<option value="${sc.id}" ${sc.id===equipandoCreepId?'selected':''}>${esc(sc.nombre)}</option>`).join('') || '<option value="">— no hay creeps —</option>';
   $('#icg-nombre').value = '';
   $('#icg-tipo').innerHTML = TIPOITEM_OPCIONES_GM.map(o => `<option value="${o.v}">${o.l}</option>`).join('');
+  // Arranca en "A definir" a propósito: si el GM no toca el tier, que
+  // quede marcado como pendiente de curar en vez de "Común" en falso.
   $('#icg-tier').innerHTML = Object.keys(TIER_COLOR).map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  $('#icg-tier').value = 'A definir';
   $('#icg-dado').innerHTML = DADOS_ARMA.map(d=>`<option value="${d}">d${d}</option>`).join('');
   $('#icg-peso').value = 1; $('#icg-fijo').value = 0;
   $('#icg-amplificado').value = 0; $('#icg-derango').checked = false;
@@ -2519,7 +2523,7 @@ function icgComoEntradaDeCatalogo(){
   const esArma = tipoItem.startsWith('arma_');
   return {
     id: 'new-' + slugItemCatalogo(nombre),
-    nombre, tier: $('#icg-tier').value || 'Común', imagen: '',
+    nombre, tier: $('#icg-tier').value || 'A definir', imagen: '',
     tipoItem, peso: num(esArma ? $('#icg-peso').value : $('#icg-peso2').value) || 0, ranuras: 1,
     ...(esArma ? {
       tipoDado: num($('#icg-dado').value) || 6, danoFijo: num($('#icg-fijo').value),

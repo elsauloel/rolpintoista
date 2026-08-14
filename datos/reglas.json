@@ -1,0 +1,17 @@
+{
+  "titulo": "Manual del jugador — Piratas en el espacio",
+  "actualizado": "",
+  "capitulos": [
+    {
+      "id": "como-se-usa-este-manual",
+      "titulo": "Cómo se usa este manual",
+      "secciones": [
+        {
+          "id": "ejemplo",
+          "titulo": "Sección de ejemplo (borrar cuando haya contenido real)",
+          "contenido": "Este manual todavía no tiene reglas cargadas — arrancó vacío a propósito.\n\nCada capítulo es un tema grande (Combate, Habilidades, Creación de personaje, etc.) y cada sección es una página dentro de ese tema. El contenido de esta sección soporta párrafos separados por una línea en blanco, y líneas que empiezan con \"- \" se muestran como lista.\n\n- Para agregar contenido real: abrí manual.html, tocá \"Editar\", agregá capítulos y secciones desde ahí.\n- No hace falta tocar el HTML para sumar reglas nuevas — todo el texto vive en este mismo archivo (datos/reglas.json).\n- Guardá con \"Guardar\" (baja el .json) o \"Subir datos\" (lo publica en GitHub, mismo token que usan las otras herramientas)."
+        }
+      ]
+    }
+  ]
+}

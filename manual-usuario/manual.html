@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual del jugador — Piratas en el espacio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper);
+  font-family:"Space Grotesk", system-ui, sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  min-height:100vh;
+}
+h1,h2,h3{font-family:"Fraunces",serif;font-weight:600;margin:0}
+button{font:inherit;cursor:pointer}
+.hint{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;color:var(--muted)}
+.btn{
+  border:1px solid var(--line);background:var(--panel2);color:var(--paper);
+  padding:7px 12px;border-radius:var(--r);font-size:13px
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#1c1208;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.ghost{background:none}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.iconbtn{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);padding:4px 8px;font-size:12px}
+.iconbtn:hover{border-color:var(--copper);color:var(--brass)}
+input[type=text],textarea{
+  width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--paper);
+  padding:8px 10px;border-radius:var(--r);font-family:inherit;font-size:14px
+}
+textarea{resize:vertical;min-height:160px;line-height:1.6}
+input:focus,textarea:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+
+header{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:14px 22px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18)
+}
+header h1{font-size:19px}
+header .estado{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted)}
+header .estado.ok{color:var(--absenta)}
+header .estado.err{color:var(--danger)}
+header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
+@media(max-width:760px){.layout{grid-template-columns:1fr}}
+
+nav.toc{border-right:1px solid var(--line);padding:16px 10px;overflow-y:auto}
+nav.toc .capitulo{margin-bottom:4px}
+nav.toc .capitulo-head{
+  display:flex;align-items:center;gap:6px;padding:8px 8px;border-radius:var(--r);cursor:pointer;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)
+}
+nav.toc .capitulo-head:hover{background:var(--panel2)}
+nav.toc .capitulo-head .car{transition:transform .15s;flex:none;font-size:10px;color:var(--muted)}
+nav.toc .capitulo.cerrado .car{transform:rotate(-90deg)}
+nav.toc .capitulo.cerrado .secciones{display:none}
+nav.toc .secciones{display:flex;flex-direction:column;gap:2px;margin:2px 0 8px;padding-left:14px}
+nav.toc .seccion-btn{
+  text-align:left;border:none;background:none;color:var(--paper);padding:6px 8px;border-radius:var(--r);
+  font-size:13px;border-left:2px solid transparent
+}
+nav.toc .seccion-btn:hover{background:var(--panel2)}
+nav.toc .seccion-btn.activa{background:var(--panel2);border-left-color:var(--copper);color:var(--brass);font-weight:700}
+nav.toc .vacio{color:var(--muted);font-size:12px;padding:4px 8px}
+nav.toc .toc-edit-row{display:flex;gap:6px;padding:8px}
+
+main.contenido{padding:26px 34px;max-width:760px;overflow-y:auto}
+main.contenido .sin-seleccion{color:var(--muted);margin-top:40px;text-align:center}
+main.contenido .cap-eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin-bottom:6px}
+main.contenido h2{font-size:26px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+main.contenido .cuerpo{font-size:15px;line-height:1.7}
+main.contenido .cuerpo p{margin:0 0 14px}
+main.contenido .cuerpo ul{margin:0 0 14px;padding-left:22px}
+main.contenido .cuerpo li{margin-bottom:4px}
+main.contenido .cuerpo .vacia{color:var(--muted);font-style:italic}
+
+.edicion-caja{border:1px solid var(--line);background:var(--panel2);border-radius:var(--r);padding:14px;margin-top:10px;display:flex;flex-direction:column;gap:10px}
+.edicion-caja .f{display:flex;flex-direction:column;gap:5px}
+.edicion-caja label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.edicion-caja .fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.edicion-caja .fila-derecha{margin-left:auto}
+.modo-edicion main.contenido .cuerpo{display:none}
+main.contenido .editor-seccion{display:none}
+.modo-edicion main.contenido .editor-seccion{display:block}
+.modo-edicion .solo-lectura{display:none}
+#btn-editar.activo{background:var(--wine);border-color:var(--wine);color:var(--paper)}
+
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
+  background:var(--panel2);border:1px solid var(--copper);color:var(--paper);padding:10px 16px;
+  border-radius:var(--r);font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:90vw
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>📖 Manual del jugador</h1>
+    <div class="estado" id="estado">Sin cargar todavía.</div>
+  </div>
+  <div class="acciones">
+    <button class="iconbtn" id="btn-traer" title="Traer la última versión publicada">⬇ Traer última versión</button>
+    <button class="iconbtn" id="btn-cargar-archivo" title="Cargar un reglas.json local">Cargar archivo…</button>
+    <input type="file" id="input-archivo" accept="application/json" style="display:none">
+    <button class="iconbtn" id="btn-guardar" title="Descargar el estado actual como reglas.json">Guardar</button>
+    <button class="btn" id="btn-subir" title="Publicar en GitHub (datos/reglas.json)">Subir datos</button>
+    <button class="btn" id="btn-editar" title="Activar/desactivar modo edición">✏ Editar</button>
+    <button class="iconbtn" id="btn-token" title="Cambiar el token de GitHub">Token</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc" id="toc"></nav>
+  <main class="contenido" id="contenido">
+    <div class="sin-seleccion">Elegí una sección del índice para leerla.</div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Manual del jugador — HTML standalone, sin dependencias.
+   El contenido (capítulos → secciones → texto) vive en
+   datos/reglas.json, no acá: este archivo es solo la
+   estructura de navegación + el editor. Mismo patrón de
+   guardado/carga en JSON y sincronización con GitHub que
+   ficha.html, gm-tools.html y vendor-generator.html.
+   ========================================================= */
+
+const GH_REPO = 'elsauloel/rolpintoista';
+const GH_BRANCH = 'main';
+const ARCHIVO_REGLAS = 'datos/reglas.json';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+let M = { titulo: 'Manual del jugador', actualizado: '', capitulos: [] };
+let seleccion = null;   // {capId, secId}
+let editando = false;
+let cerrados = new Set(JSON.parse(localStorage.getItem('manual-cerrados') || '[]'));
+
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function estado(msg, clase){
+  const el = $('#estado');
+  el.textContent = msg;
+  el.className = 'estado' + (clase ? ' ' + clase : '');
+}
+
+/* ---------- Render: texto plano con párrafos y listas "- " ---------- */
+function cuerpoHtml(texto){
+  const t = (texto || '').trim();
+  if(!t) return `<p class="vacia">Todavía no hay contenido en esta sección.</p>`;
+  const bloques = t.split(/\n{2,}/);
+  return bloques.map(b => {
+    const lineas = b.split('\n').map(l => l.trim()).filter(Boolean);
+    if(lineas.length && lineas.every(l => l.startsWith('- '))){
+      return `<ul>${lineas.map(l => `<li>${esc(l.slice(2))}</li>`).join('')}</ul>`;
+    }
+    return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
+  }).join('');
+}
+
+/* ---------- Índice (sidebar) ---------- */
+function renderToc(){
+  const nav = $('#toc');
+  if(!M.capitulos.length){
+    nav.innerHTML = `<div class="vacio">Sin capítulos todavía.</div>` + tocEditRow();
+    return;
+  }
+  nav.innerHTML = M.capitulos.map(cap => {
+    const cerrado = cerrados.has(cap.id);
+    const secs = (cap.secciones || []).map(sec => `
+      <button type="button" class="seccion-btn ${seleccion && seleccion.capId===cap.id && seleccion.secId===sec.id ? 'activa' : ''}"
+        data-ir="${cap.id}:${sec.id}">${esc(sec.titulo || 'Sin título')}</button>`).join('')
+      || `<div class="vacio">Sin secciones.</div>`;
+    return `
+    <div class="capitulo ${cerrado ? 'cerrado' : ''}" data-cap="${cap.id}">
+      <div class="capitulo-head" data-toggle="${cap.id}">
+        <span class="car">▾</span><span>${esc(cap.titulo || 'Sin título')}</span>
+      </div>
+      <div class="secciones">${secs}</div>
+    </div>`;
+  }).join('') + tocEditRow();
+}
+function tocEditRow(){
+  return `<div class="toc-edit-row solo-lectura-oculto" id="toc-edit-row" style="display:${editando?'flex':'none'}">
+    <button type="button" class="iconbtn" id="btn-nuevo-capitulo" style="flex:1">+ Capítulo</button>
+  </div>`;
+}
+
+/* ---------- Contenido principal ---------- */
+function seccionActual(){
+  if(!seleccion) return null;
+  const cap = M.capitulos.find(c => c.id === seleccion.capId);
+  const sec = cap && (cap.secciones || []).find(s => s.id === seleccion.secId);
+  return cap && sec ? {cap, sec} : null;
+}
+
+function renderContenido(){
+  const cont = $('#contenido');
+  const actual = seccionActual();
+  if(!actual){
+    cont.innerHTML = `<div class="sin-seleccion">Elegí una sección del índice para leerla.</div>`;
+    return;
+  }
+  const {cap, sec} = actual;
+  cont.innerHTML = `
+    <div class="cap-eyebrow">${esc(cap.titulo)}</div>
+    <h2>${esc(sec.titulo || 'Sin título')}</h2>
+    <div class="cuerpo">${cuerpoHtml(sec.contenido)}</div>
+    <div class="editor-seccion">
+      <div class="edicion-caja">
+        <div class="f"><label>Título de la sección</label><input type="text" data-editar="titulo" value="${esc(sec.titulo)}"></div>
+        <div class="f"><label>Contenido (línea en blanco = párrafo nuevo, "- " al inicio = ítem de lista)</label>
+          <textarea data-editar="contenido" rows="14">${esc(sec.contenido)}</textarea>
+        </div>
+        <div class="fila">
+          <button type="button" class="iconbtn" id="btn-borrar-seccion">Borrar esta sección</button>
+          <span class="fila-derecha hint">capítulo: ${esc(cap.titulo)}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function irA(capId, secId){
+  seleccion = {capId, secId};
+  renderToc();
+  renderContenido();
+}
+
+/* ---------- Edición: capítulos y secciones ---------- */
+function nuevoCapitulo(){
+  const titulo = prompt('Nombre del capítulo (ej. Combate, Creación de personaje):');
+  if(!titulo || !titulo.trim()) return;
+  const cap = {id: uid(), titulo: titulo.trim(), secciones: []};
+  M.capitulos.push(cap);
+  renderToc();
+  nuevaSeccion(cap.id);
+}
+function nuevaSeccion(capId){
+  const cap = M.capitulos.find(c => c.id === capId);
+  if(!cap) return;
+  const titulo = prompt('Nombre de la sección (ej. Cómo funciona el daño):');
+  if(!titulo || !titulo.trim()) return;
+  cap.secciones = cap.secciones || [];
+  const sec = {id: uid(), titulo: titulo.trim(), contenido: ''};
+  cap.secciones.push(sec);
+  cerrados.delete(capId);
+  guardarCerrados();
+  irA(cap.id, sec.id);
+}
+function borrarCapitulo(capId){
+  const cap = M.capitulos.find(c => c.id === capId);
+  if(!cap) return;
+  if(!confirm(`¿Borrar el capítulo "${cap.titulo}" y todas sus secciones?`)) return;
+  M.capitulos = M.capitulos.filter(c => c.id !== capId);
+  if(seleccion && seleccion.capId === capId) seleccion = null;
+  renderToc(); renderContenido();
+}
+function borrarSeccionActual(){
+  const actual = seccionActual();
+  if(!actual) return;
+  if(!confirm(`¿Borrar la sección "${actual.sec.titulo}"?`)) return;
+  actual.cap.secciones = actual.cap.secciones.filter(s => s.id !== actual.sec.id);
+  seleccion = null;
+  renderToc(); renderContenido();
+}
+function guardarCerrados(){
+  localStorage.setItem('manual-cerrados', JSON.stringify([...cerrados]));
+}
+
+function setModoEdicion(on){
+  editando = on;
+  document.body.classList.toggle('modo-edicion', on);
+  $('#btn-editar').classList.toggle('activo', on);
+  renderToc();
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener('click', e => {
+  const toggle = e.target.closest('[data-toggle]');
+  if(toggle){
+    const id = toggle.dataset.toggle;
+    if(cerrados.has(id)) cerrados.delete(id); else cerrados.add(id);
+    guardarCerrados();
+    renderToc();
+    return;
+  }
+  const ir = e.target.closest('[data-ir]');
+  if(ir){ const [capId, secId] = ir.dataset.ir.split(':'); irA(capId, secId); return; }
+
+  if(e.target.id === 'btn-nuevo-capitulo'){ nuevoCapitulo(); return; }
+  if(e.target.id === 'btn-borrar-seccion'){ borrarSeccionActual(); return; }
+});
+
+document.addEventListener('input', e => {
+  const campo = e.target.dataset && e.target.dataset.editar;
+  if(!campo) return;
+  const actual = seccionActual();
+  if(!actual) return;
+  actual.sec[campo] = e.target.value;
+  if(campo === 'titulo') renderToc();
+});
+
+// Botón "capítulo" también permite agregarle una sección y borrarlo, con
+// clic derecho para no llenar la barra de botones — más simple: dos clics
+// largos no hacen falta, alcanza con el prompt de arriba. Para borrar un
+// capítulo entero se ofrece un botón por capítulo solo en modo edición.
+document.addEventListener('contextmenu', e => {
+  const head = e.target.closest('.capitulo-head');
+  if(!head || !editando) return;
+  e.preventDefault();
+  const capId = head.dataset.toggle;
+  const accion = prompt('Escribí "sección" para agregar una sección nueva acá, o "borrar" para borrar este capítulo:');
+  if(!accion) return;
+  if(accion.trim().toLowerCase().startsWith('sec')) nuevaSeccion(capId);
+  else if(accion.trim().toLowerCase().startsWith('borr')) borrarCapitulo(capId);
+});
+
+$('#btn-editar').onclick = () => setModoEdicion(!editando);
+
+/* ---------- Carga / guardado local ---------- */
+function aplicarDatos(datos, origen){
+  M = Object.assign({titulo: 'Manual del jugador', actualizado: '', capitulos: []}, datos);
+  seleccion = null;
+  renderToc();
+  renderContenido();
+  estado(origen, 'ok');
+}
+
+$('#btn-guardar').onclick = () => {
+  M.actualizado = new Date().toISOString();
+  const blob = new Blob([JSON.stringify(M, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reglas.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Descargado: reglas.json');
+};
+
+$('#btn-cargar-archivo').onclick = () => $('#input-archivo').click();
+$('#input-archivo').onchange = async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const datos = JSON.parse(await file.text());
+    aplicarDatos(datos, `Cargado desde ${file.name}`);
+    toast('Manual cargado desde archivo local');
+  }catch(err){
+    toast('Ese archivo no es un JSON válido');
+  }
+  e.target.value = '';
+};
+
+/* ---------- GitHub: mismo patrón de token que las otras herramientas ---------- */
+function ghCabeceras(accept){
+  const cab = {Accept: accept};
+  const token = localStorage.getItem('gh-token');
+  if(token) cab.Authorization = 'Bearer ' + token.trim();
+  return cab;
+}
+const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
+
+function ghPedirToken(){
+  return new Promise(res => {
+    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
+    const fondo = document.createElement('div');
+    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+    const caja = document.createElement('div');
+    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:460px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
+    caja.innerHTML =
+      '<h3 style="margin:0 0 10px;font-size:16px">Token de GitHub</h3>' +
+      '<ol style="margin:0 0 14px;padding-left:20px">' +
+        '<li>Tocá <b>Abrir GitHub</b>: se abre en otra pestaña, ya con los permisos correctos elegidos.</li>' +
+        '<li>Bajá hasta el final y tocá <b>Generate token</b>.</li>' +
+        '<li>Copiá el token verde (ojo: solo se muestra una vez).</li>' +
+        '<li>Volvé <b>a esta pestaña</b> y pegalo en el casillero de abajo.</li>' +
+      '</ol>' +
+      '<button type="button" data-gh="abrir" style="' + btnCss + ';width:100%;margin-bottom:10px">Abrir GitHub ↗</button>' +
+      '<input type="text" data-gh="input" placeholder="Pegá el token acá (ghp_…)" ' +
+        'style="width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin-bottom:12px">' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" data-gh="cancelar" style="' + btnCss + '">Cancelar</button>' +
+        '<button type="button" data-gh="guardar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Guardar</button>' +
+      '</div>' +
+      '<div style="margin-top:10px;opacity:.65;font-size:12px">Queda guardado en este navegador (mismo token que usan las otras herramientas).</div>';
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    const campo = caja.querySelector('[data-gh="input"]');
+    campo.focus();
+    const cerrar = valor => { fondo.remove(); res(valor); };
+    caja.querySelector('[data-gh="abrir"]').onclick = () => window.open(GH_TOKEN_URL, '_blank');
+    caja.querySelector('[data-gh="cancelar"]').onclick = () => cerrar(null);
+    caja.querySelector('[data-gh="guardar"]').onclick = () => cerrar(campo.value.trim() || null);
+    fondo.onmousedown = ev => { if(ev.target === fondo) cerrar(null); };
+  });
+}
+async function ghToken(pedirDeNuevo){
+  let t = localStorage.getItem('gh-token');
+  if(!t || pedirDeNuevo){
+    t = await ghPedirToken();
+    if(t) localStorage.setItem('gh-token', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+function aBase64(texto){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(new Blob([texto]));
+  });
+}
+async function shaRemoto(ruta){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
+  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
+  if(resp.status === 404) return null;
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} consultando ${ruta}`);
+  return (await resp.json()).sha;
+}
+async function ghSubir(ruta, texto, token, mensaje){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
+  const sha = await shaRemoto(ruta);
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'},
+    body: JSON.stringify({message: mensaje, content: await aBase64(texto), branch: GH_BRANCH, ...(sha ? {sha} : {})}),
+  });
+  if(resp.status === 401 || resp.status === 403) throw {auth: true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
+}
+
+async function traerUltimaVersion(silencioso){
+  if(!silencioso){ estado('Buscando la última versión…'); }
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_REGLAS}?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(resp.status === 404){
+      if(!silencioso) estado('Todavía no hay reglas.json publicado en GitHub — arrancás con el esqueleto local.', 'err');
+      return;
+    }
+    if(resp.status === 429 || resp.status === 403){
+      if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err');
+      return;
+    }
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const datos = await resp.json();
+    aplicarDatos(datos, 'Última versión traída de GitHub ✓');
+  }catch(err){
+    console.error('Error trayendo el manual:', err);
+    estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
+  }
+}
+$('#btn-traer').onclick = () => traerUltimaVersion(false);
+
+$('#btn-subir').onclick = async () => {
+  const btn = $('#btn-subir');
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede subir'); return; }
+  btn.disabled = true;
+  toast('Subiendo a GitHub…');
+  try{
+    M.actualizado = new Date().toISOString();
+    await ghSubir(ARCHIVO_REGLAS, JSON.stringify(M, null, 2), token, 'Actualizar manual del jugador');
+    toast('Manual publicado en GitHub ✓');
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá Subir datos de nuevo');
+    }else{
+      console.error('Error subiendo el manual:', err);
+      toast('No se pudo subir — revisá la consola');
+    }
+  }finally{
+    btn.disabled = false;
+  }
+};
+
+$('#btn-token').onclick = async () => {
+  if(await ghToken(true)) toast('Token actualizado.');
+};
+
+/* ---------- Arranque: trae la última versión sola; si falla, se queda
+   con el esqueleto vacío para no bloquear la edición offline. ---------- */
+renderToc();
+renderContenido();
+traerUltimaVersion(true);
+</script>
+</body>
+</html>

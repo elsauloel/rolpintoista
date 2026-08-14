@@ -63,12 +63,12 @@ a{color:var(--copper)}
 
   <div class="panel">
     <h2>Carpeta del repo</h2>
-    <div class="hint" id="carpeta-info">Todavía no elegiste la carpeta. Es la que tiene <b>ficha.html</b> adentro; se elige una sola vez.</div>
+    <div class="hint" id="carpeta-info">Todavía no elegiste la carpeta. Es la raíz del repo (la que tiene <b>gestor.html</b> adentro); se elige una sola vez.</div>
     <div class="fila">
       <button id="btn-carpeta">Elegir carpeta…</button>
-      <a href="ficha.html" target="_blank">Abrir la ficha →</a>
-      <a href="gm-tools.html" target="_blank">Abrir GM tools →</a>
-      <a href="vendor-generator.html" target="_blank">Abrir vendedor →</a>
+      <a href="ficha-personaje/ficha.html" target="_blank">Abrir la ficha →</a>
+      <a href="gm-toolset/gm-tools.html" target="_blank">Abrir GM tools →</a>
+      <a href="gm-toolset/vendor-generator.html" target="_blank">Abrir vendedor →</a>
     </div>
   </div>
 
@@ -112,7 +112,9 @@ a{color:var(--copper)}
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'main';
 // Archivos que componen la herramienta en sí (los personajes y los creeps se sincronizan desde sus propias páginas).
-const ARCHIVOS_APP = ['ficha.html', 'gestor.html', 'gm-tools.html', 'vendor-generator.html', 'README.md'];
+// Las rutas son relativas a la raíz del repo, tanto para GitHub como para
+// la carpeta local — por eso pueden tener subcarpetas (ver resolverDir()).
+const ARCHIVOS_APP = ['ficha-personaje/ficha.html', 'gestor.html', 'gm-toolset/gm-tools.html', 'gm-toolset/vendor-generator.html', 'README.md'];
 
 const $ = s => document.querySelector(s);
 function log(msg){
@@ -177,9 +179,9 @@ async function conseguirCarpeta(interactivo){
     return null; // canceló
   }
   try{
-    await carpeta.getFileHandle('ficha.html');
+    await (await carpeta.getDirectoryHandle('ficha-personaje')).getFileHandle('ficha.html');
   }catch(e){
-    estado('Esa carpeta no tiene ficha.html adentro — elegí la carpeta del repo.', 'err');
+    estado('Esa carpeta no tiene ficha-personaje/ficha.html adentro — elegí la carpeta raíz del repo.', 'err');
     carpeta = null;
     return null;
   }
@@ -189,8 +191,21 @@ async function conseguirCarpeta(interactivo){
   return carpeta;
 }
 
-async function leerLocal(dir, nombre){
+// Resuelve una ruta tipo "gm-toolset/gm-tools.html" a {dir, nombre} navegando
+// las subcarpetas necesarias a partir de la carpeta raíz elegida. Con
+// crear=true las va creando si no existen (hace falta al escribir).
+async function resolverDir(dirRaiz, ruta, crear){
+  const partes = ruta.split('/');
+  const nombre = partes.pop();
+  let dir = dirRaiz;
+  for(const parte of partes){
+    dir = await dir.getDirectoryHandle(parte, {create: !!crear});
+  }
+  return {dir, nombre};
+}
+async function leerLocal(dirRaiz, ruta){
   try{
+    const {dir, nombre} = await resolverDir(dirRaiz, ruta, false);
     const fh = await dir.getFileHandle(nombre);
     // Normaliza CRLF→LF: git guarda LF en el repo, pero en Windows los
     // archivos suelen estar en disco con CRLF (core.autocrlf).
@@ -199,7 +214,8 @@ async function leerLocal(dir, nombre){
     return null;
   }
 }
-async function escribirLocal(dir, nombre, contenido){
+async function escribirLocal(dirRaiz, ruta, contenido){
+  const {dir, nombre} = await resolverDir(dirRaiz, ruta, true);
   const fh = await dir.getFileHandle(nombre, {create: true});
   const w = await fh.createWritable();
   await w.write(contenido);

@@ -8,8 +8,8 @@ import pathlib
 AQUI = pathlib.Path(__file__).resolve().parent
 RAIZ = AQUI.parent
 
-FICHA = str(RAIZ / "ficha.html")
-GM = str(RAIZ / "gm-tools.html")
-VENDOR = str(RAIZ / "vendor-generator.html")
+FICHA = str(RAIZ / "ficha-personaje" / "ficha.html")
+GM = str(RAIZ / "gm-toolset" / "gm-tools.html")
+VENDOR = str(RAIZ / "gm-toolset" / "vendor-generator.html")
 XLSX = str(RAIZ / "assets" / "catalogo.xlsx")
 SP = str(AQUI)

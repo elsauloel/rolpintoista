@@ -883,6 +883,7 @@ input[type=file]{display:none}
       <div class="f"><label>Detalle</label><textarea id="icg-detalle"></textarea></div>
     </div>
     <footer>
+      <button class="btn ghost" id="icg-catalogo" title="Publica este ítem en el catálogo del fabricante, para que cualquiera lo pueda comprar">📦 Agregar al catálogo</button>
       <button class="btn ghost" id="itemcustomgm-cancel">Cancelar</button>
       <button class="btn primary" id="itemcustomgm-guardar">Crear y equipar</button>
     </footer>
@@ -2504,6 +2505,65 @@ function guardarItemCustomGM(){
   renderAll();
 }
 
+function slugItemCatalogo(s){
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'item';
+}
+
+// Arma una entrada de catálogo directo desde el formulario de Ítem custom
+// (no desde el creep) — así funciona sin importar si ya se apretó "Crear
+// y equipar" o no.
+function icgComoEntradaDeCatalogo(){
+  const nombre = $('#icg-nombre').value.trim();
+  const tipoItem = $('#icg-tipo').value;
+  const esArma = tipoItem.startsWith('arma_');
+  return {
+    id: 'new-' + slugItemCatalogo(nombre),
+    nombre, tier: $('#icg-tier').value || 'Común', imagen: '',
+    tipoItem, peso: num(esArma ? $('#icg-peso').value : $('#icg-peso2').value) || 0, ranuras: 1,
+    ...(esArma ? {
+      tipoDado: num($('#icg-dado').value) || 6, danoFijo: num($('#icg-fijo').value),
+      danoAmplificado: num($('#icg-amplificado').value), armaDeRango: $('#icg-derango').checked,
+    } : {}),
+    precioCompra: 0, unidades: 1, cargaMax: 0, consumible: false, curahp: 0,
+    mods: structuredClone(icgMods.filter(m => m.stat)),
+    detalle: $('#icg-detalle').value || '',
+  };
+}
+
+async function agregarItemCustomAlCatalogo(){
+  const nombre = $('#icg-nombre').value.trim();
+  const tipoItem = $('#icg-tipo').value;
+  if(!nombre){ toast('Poné un nombre antes de agregarlo al catálogo'); return; }
+  if(!tipoItem){ toast('Elegí un tipo de ítem antes de agregarlo al catálogo'); return; }
+  const aviso = `Esto publica "${nombre}" en el catálogo del fabricante — va a quedar disponible para que ` +
+    `cualquier jugador lo compre desde su ficha. No hace falta elegir un creep para esto: se publica igual, ` +
+    `equipes o no a alguien.\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }
+  const btn = $('#icg-catalogo');
+  btn.disabled = true;
+  toast('Publicando en el catálogo…');
+  try{
+    const actual = (await ghLeerJson('datos/catalogo.json').catch(() => null)) || [];
+    const nuevo = icgComoEntradaDeCatalogo();
+    actual.push(nuevo);
+    await ghSubir('datos/catalogo.json', await aBase64(JSON.stringify(actual, null, 2)), token, `Catálogo: agregar "${nuevo.nombre}" (desde gm-tools)`);
+    toast(`"${nuevo.nombre}" publicado en el catálogo ✓ — falta correr importar_json.py para que llegue a las 3 herramientas`);
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá de nuevo y pegá uno nuevo');
+    }else{
+      console.error('Error publicando en el catálogo:', err);
+      toast('No se pudo publicar — revisá la consola');
+    }
+  }finally{
+    btn.disabled = false;
+  }
+}
+
 let editingHabCreep = null;
 
 function abrirEditorHabCreep(scId, habId){
@@ -3934,6 +3994,7 @@ $('#itemcustomgm-x').onclick = () => $('#scrim-item-custom-gm').classList.remove
 $('#itemcustomgm-cancel').onclick = () => $('#scrim-item-custom-gm').classList.remove('open');
 $('#scrim-item-custom-gm').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-custom-gm') $('#scrim-item-custom-gm').classList.remove('open'); });
 $('#itemcustomgm-guardar').onclick = guardarItemCustomGM;
+$('#icg-catalogo').onclick = agregarItemCustomAlCatalogo;
 $('#icg-tipo').addEventListener('change', actualizarCamposIcg);
 $('#icg-addmod').onclick = () => { icgMods.push({stat:'def', val:0}); renderIcgMods(); };
 $('#icg-mods-lista').addEventListener('change', e => {

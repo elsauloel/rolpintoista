@@ -1697,7 +1697,10 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <header><h3 id="modal-title">Editar</h3><button class="iconbtn" id="modal-x">Cerrar</button></header>
     <div class="body" id="modal-body"></div>
     <footer>
-      <button class="btn del" id="modal-del">Eliminar</button>
+      <div style="display:flex;gap:9px">
+        <button class="btn del" id="modal-del">Eliminar</button>
+        <button class="btn ghost" id="modal-catalogo" style="display:none" title="Publica este ítem en el catálogo del fabricante, para que cualquiera lo pueda comprar">📦 Agregar al catálogo</button>
+      </div>
       <div style="display:flex;gap:9px">
         <button class="btn ghost" id="modal-cancel">Cancelar</button>
         <button class="btn primary" id="modal-save">Guardar</button>
@@ -5645,6 +5648,7 @@ function catalogoVisibles(){
 // el nombre, la imagen y los stats salen del catálogo de esta misma ficha.
 let tiendaCargada = null;
 const ARCHIVO_TIENDA = 'datos/tienda-publica.json';
+const ARCHIVO_CATALOGO = 'datos/catalogo.json';
 
 function renderCabeceraTienda(){
   const badge = $('#tienda-badge');
@@ -5933,6 +5937,7 @@ function openEditor(key, id, equipadoPreset){
   editing = {key, id, draft: structuredClone(item)};
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
+  $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
   drawEditor();
   $('#scrim').classList.add('open');
   setTimeout(()=>$('#modal-body').querySelector('input')?.focus(), 40);
@@ -6223,6 +6228,70 @@ $('#modal-body').addEventListener('change', async e => {
     }
   }
 });
+function slugItemCatalogo(s){
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'item';
+}
+
+// Convierte un ítem de inventario/cinturón (instancia de un personaje) en
+// una entrada de catálogo del fabricante: descarta lo que solo tiene
+// sentido para una instancia (equipado, cargaActual, manoPreferida) y le
+// pone un id y un tier nuevos, porque el catálogo no los hereda de nada.
+function itemComoEntradaDeCatalogo(draft){
+  return {
+    id: 'new-' + slugItemCatalogo(draft.nombre),
+    nombre: draft.nombre, tier: 'Común', imagen: draft.imagen || '',
+    tipoItem: draft.tipoItem, peso: num(draft.peso), ranuras: num(draft.ranuras) || 1,
+    ...(ES_ARMA(draft.tipoItem) ? {
+      tipoDado: num(draft.tipoDado) || 6, danoFijo: num(draft.danoFijo),
+      danoAmplificado: num(draft.danoAmplificado), armaDeRango: !!draft.armaDeRango,
+    } : {}),
+    precioCompra: num(draft.precioCompra),
+    unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
+    consumible: !!draft.consumible, curahp: num(draft.curahp), curabonosPct: num(draft.curabonosPct),
+    efectoNombre: draft.efectoNombre || '', efectoTurnos: num(draft.efectoTurnos),
+    efectoHpTurno: num(draft.efectoHpTurno), efectoPermanente: !!draft.efectoPermanente,
+    efectoDetalle: draft.efectoDetalle || '', efectoMods: structuredClone(draft.efectoMods || []),
+    equipoEstadoNombre: draft.equipoEstadoNombre || '', equipoEstadoHpTurno: num(draft.equipoEstadoHpTurno),
+    equipoEstadoDetalle: draft.equipoEstadoDetalle || '',
+    mods: structuredClone((draft.mods || []).filter(m => m.stat)),
+    detalle: draft.detalle || '',
+  };
+}
+
+async function agregarAlCatalogoDelFabricante(){
+  const {draft} = editing;
+  if(!draft.nombre.trim()){ toast('Poné un nombre antes de agregarlo al catálogo'); return; }
+  if(!draft.tipoItem){ toast('Elegí una categoría antes de agregarlo al catálogo'); return; }
+  const aviso = `Esto publica "${draft.nombre}" en el catálogo del fabricante — va a quedar disponible para que ` +
+    `cualquier jugador lo compre desde cualquier ficha (con tier Común por ahora; se puede ajustar después desde ` +
+    `el editor de catálogo). No borra ni modifica tu ítem acá, solo agrega una copia al catálogo compartido.\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }
+  const btn = $('#modal-catalogo');
+  btn.disabled = true;
+  toast('Publicando en el catálogo…');
+  try{
+    const actual = (await ghLeerJson(ARCHIVO_CATALOGO).catch(() => null)) || [];
+    const nuevo = itemComoEntradaDeCatalogo(draft);
+    actual.push(nuevo);
+    await ghSubir(ARCHIVO_CATALOGO, await aBase64(JSON.stringify(actual, null, 2)), token, `Catálogo: agregar "${nuevo.nombre}" (desde la ficha)`);
+    toast(`"${nuevo.nombre}" publicado en el catálogo ✓ — falta correr importar_json.py para que llegue a las 3 herramientas`);
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá de nuevo y pegá uno nuevo');
+    }else{
+      console.error('Error publicando en el catálogo:', err);
+      toast('No se pudo publicar — revisá la consola');
+    }
+  }finally{
+    btn.disabled = false;
+  }
+}
+$('#modal-catalogo').onclick = agregarAlCatalogoDelFabricante;
+
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;
   if(!draft.nombre.trim()) draft.nombre = 'Sin nombre';

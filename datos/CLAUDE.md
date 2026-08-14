@@ -16,8 +16,12 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
 ## Contenido
 
 - **`catalogo.json`** — el catálogo de ítems, fuente única. Se edita con
-  `catalogo-editor.html` (acá mismo) o con `assets/catalogo.xlsx`; los dos
-  caminos conviven y convergen acá vía `herramientas/importar_json.py` /
+  `catalogo-editor.html` (acá mismo), con `assets/catalogo.xlsx`, o desde
+  el botón "📦 Agregar al catálogo" que tienen `ficha-personaje/ficha.html`
+  (editor de ítems de Mochila/Equipo/Cinturón) y `gm-toolset/gm-tools.html`
+  (modal de Ítem custom) — un jugador o el GM pueden publicar ahí mismo,
+  con confirmación, un ítem que crearon en la mesa. Los tres caminos
+  conviven y convergen acá vía `herramientas/importar_json.py` /
   `herramientas/importar.py`. Ver `herramientas/LEEME.md` para el flujo
   completo — **nunca se edita este archivo a mano ni se edita el catálogo
   embebido en los HTML de juego directamente**, siempre por ese pipeline.

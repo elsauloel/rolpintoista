@@ -48,6 +48,11 @@ En desarrollo activo, las dos.
   consumibles no equipables; `CATALOGO` en vendor-generator.html, sin
   imágenes) — se sincroniza desde `datos/catalogo.json`, **no se edita a
   mano acá**. Ver [`datos/CLAUDE.md`](../datos/CLAUDE.md).
+- **gm-tools.html produce, opcionalmente**: el modal de Ítem custom tiene
+  un botón "📦 Agregar al catálogo" (`agregarItemCustomAlCatalogo()`) que
+  arma la entrada de catálogo directo desde el formulario (funciona con o
+  sin creep elegido) y la sube a `datos/catalogo.json`, con confirmación
+  explícita. No corre `importar_json.py` sola.
 - **gm-tools.html** produce/consume `datos/creeps-publico.json` y lee
   `datos/tablero/*.json`.
 - **vendor-generator.html** produce `datos/tienda-publica.json` (formato

@@ -42,6 +42,13 @@ más cambia sesión a sesión.
   imágenes) — se sincroniza desde `datos/catalogo.json` corriendo
   `herramientas/importar_json.py` (o `importar.py` si se editó el Excel).
   **No se edita a mano acá** — ver [`datos/CLAUDE.md`](../datos/CLAUDE.md).
+- **Produce, opcionalmente**: el editor de ítems de Mochila/Equipo/Cinturón
+  tiene un botón "📦 Agregar al catálogo" (`agregarAlCatalogoDelFabricante()`)
+  que convierte el ítem del jugador en una entrada de catálogo (descarta
+  campos de instancia como `equipado`/`cargaActual`, le pone tier "Común"
+  por default) y la sube directo a `datos/catalogo.json`, con confirmación
+  explícita antes de publicar. No corre `importar_json.py` sola — eso
+  sigue siendo un paso aparte.
 - **Produce/consume vía GitHub** (botones Personajes/Subir datos/Bajar
   datos/Tablero/Vendedor): `datos/personajes/*.json`,
   `datos/personajes/backups/*.json`, `datos/tablero/*.json`,

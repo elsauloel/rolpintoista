@@ -1,26 +1,17 @@
 # -*- coding: utf-8 -*-
-import sys, pathlib
+import sys, pathlib, json
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from rutas import FICHA, GM, VENDOR, XLSX, SP
 
-# Importa el Excel al codigo: corrige lo obvio, genera ids para los items
-# nuevos, conserva las imagenes por id, reescribe los tres catalogos y deja
-# datos/catalogo.json al día (así el editor HTML siempre parte de lo último,
-# venga de donde venga el último cambio: Excel o el editor).
-from leer_excel import leer
-from catalogo_comun import corregir, imagenes_por_id, escribir_htmls, guardar_catalogo_json
+# Importa datos/catalogo.json (la fuente que llena catalogo-editor.html) al
+# código: corrige lo obvio, genera ids para los items nuevos, reescribe los
+# tres catálogos y regraba datos/catalogo.json con los ids que se hayan
+# generado — así el editor, en su próxima carga, ya los tiene.
+from catalogo_comun import corregir, escribir_htmls, guardar_catalogo_json, CATALOGO_JSON
 
-items, avisos = leer()
-
-# Las imagenes no vienen del Excel (pesan demasiado para editarlas ahí):
-# se conservan las que ya estaban en ficha.html, por id.
-imagenes = imagenes_por_id()
-for it in items:
-    it['imagen'] = imagenes.get(it.get('id'), '')
-
+items = json.load(open(CATALOGO_JSON, encoding='utf-8'))
 items, correcciones = corregir(items)
 
-# ---------- Aviso: efectos escritos que el codigo no respalda ----------
 from detectar_efectos import analizar as _analizar
 _rev, _ = _analizar(items)
 _YA = {'Ankh de Reencarnación'}
@@ -37,16 +28,13 @@ print("=== CORRECCIONES APLICADAS ===")
 for c in correcciones: print("  ", c)
 print(f"\nÍtems a escribir: {len(items)}")
 
-con_imagen = sum(1 for it in items if it.get('imagen'))
-print("Imágenes conservadas:", con_imagen)
-
 conteos = escribir_htmls(items)
 print(f"ficha.html: catálogo reescrito ({conteos['ficha']} ítems)")
 print(f"vendor-generator.html: catálogo reescrito ({conteos['vendor']} ítems)")
 print(f"gm-tools.html: catálogo de equipo reescrito ({conteos['gm']} ítems)")
 
 guardar_catalogo_json(items)
-print("datos/catalogo.json: actualizado")
+print("datos/catalogo.json: regrabado (con los ids nuevos, si hubo)")
 
 if _pend:
     print("")

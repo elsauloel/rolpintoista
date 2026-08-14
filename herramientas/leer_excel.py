@@ -11,7 +11,8 @@ from openpyxl import load_workbook
 ETIQ = {
     'ID (no tocar)':'id','Nombre':'nombre','Tier':'tier','Tipo de ítem':'tipoItem',
     'Peso':'peso','Ranuras':'ranuras','Precio (DDE)':'precioCompra','Detalle':'detalle',
-    'Tipo de dado':'tipoDado','Daño fijo':'danoFijo','Unidades':'unidades','Cargas':'cargaMax',
+    'Tipo de dado':'tipoDado','Daño fijo':'danoFijo','Daño amplificado':'danoAmplificado',
+    'Arma de rango':'armaDeRango','Unidades':'unidades','Cargas':'cargaMax',
     'Cura HP':'curahp','Cura Bonos (%)':'curabonosPct','Estado que aplica':'efectoNombre',
     'Turnos del estado':'efectoTurnos','HP por turno':'efectoHpTurno',
     'Estado permanente':'efectoPermanente','Detalle del estado':'efectoDetalle',
@@ -83,13 +84,13 @@ def leer():
                     if v not in (None, '') and num(v) != 0:
                         it['mods'].append({'stat': k[4:], 'val': num(v)})
                     continue
-                if k == 'legacy':
+                if k in ('legacy','armaDeRango'):
                     it[k] = str(v).strip().lower() in ('sí','si','x','true','1','yes') if v else False
                     continue
                 if k == 'efectoPermanente':
                     it[k] = str(v).strip().lower() in ('sí','si','true','x','1') if v else False
                     continue
-                if k in ('peso','ranuras','precioCompra','tipoDado','danoFijo','unidades',
+                if k in ('peso','ranuras','precioCompra','tipoDado','danoFijo','danoAmplificado','unidades',
                          'cargaMax','curahp','curabonosPct','efectoTurnos','efectoHpTurno','equipoEstadoHpTurno'):
                     it[k] = num(v)
                     continue

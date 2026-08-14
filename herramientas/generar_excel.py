@@ -10,9 +10,12 @@ import json
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
+from catalogo_comun import CATALOGO_JSON
 
 
-items = json.load(open(SP + "/catalogo_items.json", encoding="utf-8"))
+items = json.load(open(CATALOGO_JSON, encoding="utf-8"))
+for it in items:
+    it['_tiene_imagen'] = bool(it.get('imagen'))
 
 DEFENSIVOS = {'armadura_blanda','armadura_rigida','casco_blando','casco_rigido',
               'guantes_blandos','guantes_rigidos','piernas_blandas','piernas_rigidas',
@@ -35,7 +38,7 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
-    'Armas':       BASE + ['tipoDado','danoFijo'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
@@ -48,7 +51,8 @@ for k in COLUMNAS:
 ETIQUETAS = {
     'id':'ID (no tocar)','nombre':'Nombre','tier':'Tier','tipoItem':'Tipo de ítem',
     'peso':'Peso','ranuras':'Ranuras','precioCompra':'Precio (DDE)','detalle':'Detalle',
-    'tipoDado':'Tipo de dado','danoFijo':'Daño fijo','unidades':'Unidades','cargaMax':'Cargas',
+    'tipoDado':'Tipo de dado','danoFijo':'Daño fijo','danoAmplificado':'Daño amplificado','armaDeRango':'Arma de rango',
+    'unidades':'Unidades','cargaMax':'Cargas',
     'curahp':'Cura HP','curabonosPct':'Cura Bonos (%)',
     'efectoNombre':'Estado que aplica','efectoTurnos':'Turnos del estado',
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor de catálogo — Piratas en el espacio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper);
+  font-family:"Space Grotesk", system-ui, sans-serif;
+  font-size:14px;
+  line-height:1.45;
+  min-height:100vh;
+}
+h1,h2,h3{font-family:"Fraunces",serif;font-weight:600;margin:0}
+button{font:inherit;cursor:pointer}
+.hint{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.05em;color:var(--muted);line-height:1.6}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--paper);padding:7px 12px;border-radius:var(--r);font-size:13px}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#1c1208;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.del{border-color:var(--danger);color:var(--danger)}
+.btn.del:hover{background:var(--danger);color:var(--paper)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.iconbtn{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);padding:4px 8px;font-size:12px}
+.iconbtn:hover{border-color:var(--copper);color:var(--brass)}
+input,select,textarea{
+  width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--paper);
+  padding:7px 9px;border-radius:var(--r);font-family:inherit;font-size:13.5px
+}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+input[type=checkbox]{width:auto}
+label.chk{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px}
+
+header{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:14px 22px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18);position:sticky;top:0;z-index:10
+}
+header h1{font-size:19px}
+header .estado{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted)}
+header .estado.ok{color:var(--absenta)}
+header .estado.err{color:var(--danger)}
+header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.aviso-sync{
+  background:rgba(201,133,69,.1);border-bottom:1px solid var(--line);padding:8px 22px;
+  font-family:"Space Mono",monospace;font-size:11px;color:var(--brass);letter-spacing:.02em
+}
+
+.barra{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line-soft)
+}
+.barra input,.barra select{width:auto}
+.barra .buscar{flex:1;min-width:180px}
+
+.wrap{padding:18px 22px 60px}
+.grupo-head{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);
+  margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line-soft)
+}
+.grupo-head:first-child{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.card{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 11px;display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.card:hover{border-color:var(--copper)}
+.card img{width:40px;height:40px;object-fit:cover;border:1px solid var(--line);flex:none;background:var(--panel)}
+.card .sinfoto{width:40px;height:40px;border:1px dashed var(--line);flex:none;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px}
+.card .cinfo{min-width:0;flex:1}
+.card .cnombre{font-weight:700;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .ctier{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
+.card .cmeta{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:3px}
+.card .cdetalle{font-size:11px;color:var(--muted);margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.vacio{color:var(--muted);padding:30px 0;text-align:center}
+
+.scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;z-index:80}
+.scrim.open{display:flex}
+.modal{max-width:640px;width:100%;margin:0 auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel);display:flex;flex-direction:column}
+.modal header{position:static;padding:12px 16px;background:none}
+.modal .body{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.modal footer{display:flex;gap:8px;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line)}
+.seccion{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:12px;display:flex;flex-direction:column;gap:10px}
+.seccion-titulo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper)}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.05em;color:var(--muted)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.modrow{display:grid;grid-template-columns:1fr 90px 30px;gap:6px;align-items:center}
+.modrow .mini{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);height:100%}
+.modrow .mini:hover{border-color:var(--danger);color:var(--danger)}
+.imagen-fila{display:flex;gap:10px;align-items:center}
+.imagen-fila img{width:64px;height:64px;object-fit:cover;border:1px solid var(--line);background:var(--panel2)}
+.imagen-fila .sinimg{width:64px;height:64px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);flex:none}
+
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
+  background:var(--panel2);border:1px solid var(--copper);color:var(--paper);padding:10px 16px;
+  border-radius:var(--r);font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:90vw
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🧰 Editor de catálogo</h1>
+    <div class="estado" id="estado">Sin cargar todavía.</div>
+  </div>
+  <div class="acciones">
+    <button class="iconbtn" id="btn-traer">⬇ Traer última versión</button>
+    <button class="iconbtn" id="btn-cargar-archivo">Cargar archivo…</button>
+    <input type="file" id="input-archivo" accept="application/json" style="display:none">
+    <button class="iconbtn" id="btn-guardar">Guardar</button>
+    <button class="btn" id="btn-subir">Subir datos</button>
+    <button class="btn primary" id="btn-nuevo">+ Nuevo ítem</button>
+    <button class="iconbtn" id="btn-token">Token</button>
+  </div>
+</header>
+
+<div class="aviso-sync">
+  Esto edita <b>datos/catalogo.json</b> únicamente. Para que los cambios aparezcan en la ficha, en gm-tools y en
+  el vendedor hace falta correr <code>herramientas/importar_json.py</code> después (pedíselo a Claude, o corrélo vos).
+</div>
+
+<div class="barra">
+  <input type="text" class="buscar" id="f-buscar" placeholder="Buscar por nombre…">
+  <select id="f-tipo"></select>
+  <select id="f-tier"><option value="">Todos los tiers</option></select>
+  <span class="hint" id="f-conteo"></span>
+</div>
+
+<div class="wrap" id="lista"></div>
+
+<div class="scrim" id="scrim-editor">
+  <div class="modal">
+    <header>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="modal-titulo">Ítem</h3>
+        <button class="iconbtn" id="modal-x">Cerrar</button>
+      </div>
+    </header>
+    <div class="body" id="modal-body"></div>
+    <footer>
+      <button class="btn del" id="modal-borrar" style="display:none">Borrar ítem</button>
+      <div style="flex:1"></div>
+      <button class="btn ghost" id="modal-cancelar">Cancelar</button>
+      <button class="btn primary" id="modal-guardar">Guardar ítem</button>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Editor de catálogo — HTML standalone, sin dependencias.
+   Fuente y destino: datos/catalogo.json (un array de ítems). No toca
+   ficha.html/gm-tools.html/vendor-generator.html directamente — eso lo
+   hace herramientas/importar_json.py, aparte. Mismo patrón de
+   guardado/carga JSON y sincronización con GitHub que el resto de las
+   herramientas (mismo token de localStorage).
+   ========================================================= */
+
+const GH_REPO = 'elsauloel/rolpintoista';
+const GH_BRANCH = 'main';
+const ARCHIVO_CATALOGO = 'datos/catalogo.json';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 8);
+const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+
+const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+const DADOS_ARMA = [2, 4, 6, 8, 10];
+const CATEGORIAS = [
+  {id:'', label:'— elegir categoría —'},
+  {id:'arma_1m', label:'Arma de una mano', arma:true},
+  {id:'arma_2m', label:'Arma de dos manos', arma:true},
+  {id:'escudo_1m', label:'Escudo de una mano'},
+  {id:'escudo_2m', label:'Escudo de dos manos'},
+  {id:'armadura_blanda', label:'Armadura blanda'},
+  {id:'armadura_rigida', label:'Armadura rígida'},
+  {id:'guantes_blandos', label:'Guantes blandos'},
+  {id:'guantes_rigidos', label:'Guantes rígidos'},
+  {id:'piernas_blandas', label:'Piernas blandas'},
+  {id:'piernas_rigidas', label:'Piernas rígidas'},
+  {id:'casco_blando', label:'Casco blando'},
+  {id:'casco_rigido', label:'Casco rígido'},
+  {id:'botas_blandas', label:'Botas blandas'},
+  {id:'botas_rigidas', label:'Botas rígidas'},
+  {id:'anillos', label:'Anillos'},
+  {id:'otros', label:'Otros'},
+  {id:'consumibles', label:'Consumibles'},
+];
+const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c => [c.id, c.label]));
+const esArmaTipo = t => t === 'arma_1m' || t === 'arma_2m';
+const esConsumibleTipo = t => t === 'consumibles';
+
+// Mismo set que STATS_OK en herramientas/catalogo_comun.py — si un stat no
+// está acá, el importador lo descarta al reimportar.
+const STATS = [
+  {id:'con', label:'Constitución'}, {id:'fue', label:'Fuerza'}, {id:'agl', label:'Agilidad'},
+  {id:'des', label:'Destreza'}, {id:'int', label:'Inteligencia'},
+  {id:'def', label:'Defensa'}, {id:'dmg', label:'Dmg'}, {id:'bloqueo', label:'Bloqueo'},
+  {id:'eva', label:'Evasión'}, {id:'ini', label:'Iniciativa'}, {id:'mov', label:'Movimiento'},
+  {id:'rng', label:'Rango'}, {id:'pdg', label:'PdG'}, {id:'crit', label:'Crítico'}, {id:'parry', label:'Parry'},
+  {id:'pdgmg', label:'PdG mágico'}, {id:'resm', label:'Res. mental'}, {id:'bonos', label:'Bonos'},
+  {id:'rangocasteo', label:'Rango casteo'}, {id:'rescc', label:'Res. CC'},
+  {id:'hpmax', label:'HP máx.'}, {id:'crgmax', label:'Carga máx.'}, {id:'accionesmax', label:'Acciones máx.'},
+  {id:'tipo1', label:'Res.Crít Tipo 2'}, {id:'tipo2', label:'Res.Crít Tipo 4'}, {id:'tipo3', label:'Res.Crít Tipo 6'},
+  {id:'tipo4', label:'Res.Crít Tipo 8'}, {id:'tipo5', label:'Res.Crít Tipo 10'},
+];
+const STAT_LABEL = Object.fromEntries(STATS.map(s => [s.id, s.label]));
+
+function slug(s){
+  return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'item';
+}
+
+let CATALOGO = [];
+let filtro = {texto: '', tipo: '', tier: ''};
+let editing = null; // draft en edición, o null
+
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function estado(msg, clase){
+  const el = $('#estado');
+  el.textContent = msg;
+  el.className = 'estado' + (clase ? ' ' + clase : '');
+}
+
+/* ---------- Filtros ---------- */
+function poblarFiltros(){
+  $('#f-tipo').innerHTML = `<option value="">Todas las categorías</option>` +
+    CATEGORIAS.filter(c => c.id).map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('');
+  $('#f-tier').innerHTML = `<option value="">Todos los tiers</option>` +
+    TIERS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+}
+
+function itemsFiltrados(){
+  const texto = filtro.texto.trim().toLowerCase();
+  return CATALOGO.filter(it => {
+    if(filtro.tipo && it.tipoItem !== filtro.tipo) return false;
+    if(filtro.tier && it.tier !== filtro.tier) return false;
+    if(texto && !(it.nombre || '').toLowerCase().includes(texto)) return false;
+    return true;
+  });
+}
+
+function grupoDe(it){
+  if(it.tipoItem === 'consumibles') return 'Consumibles';
+  if(esArmaTipo(it.tipoItem)) return 'Armas';
+  if(it.tipoItem === 'escudo_1m' || it.tipoItem === 'escudo_2m') return 'Escudos';
+  if((it.tipoItem || '').startsWith('armadura') || ['guantes_blandos','guantes_rigidos','piernas_blandas','piernas_rigidas','casco_blando','casco_rigido','botas_blandas','botas_rigidas'].includes(it.tipoItem)) return 'Defensivos';
+  return 'Otros';
+}
+const ORDEN_GRUPO = ['Consumibles', 'Armas', 'Escudos', 'Defensivos', 'Otros'];
+
+function metaTxt(it){
+  const partes = [`Peso ${num(it.peso)}`, `${num(it.precioCompra)} DDE`];
+  if(esArmaTipo(it.tipoItem) && it.tipoDado){
+    const dados = Math.max(1, num(it.peso) || 1) + Math.max(0, num(it.danoAmplificado));
+    partes.push(`${dados}d${it.tipoDado}${num(it.danoFijo) ? ` +${num(it.danoFijo)}` : ''}`);
+  }
+  if(it.consumible) partes.push(`${num(it.unidades) || 1} un.`);
+  return partes.join(' · ');
+}
+
+function renderLista(){
+  const items = itemsFiltrados();
+  $('#f-conteo').textContent = `${items.length} de ${CATALOGO.length} ítems`;
+  if(!items.length){
+    $('#lista').innerHTML = `<div class="vacio">No hay ítems que coincidan con el filtro.</div>`;
+    return;
+  }
+  let html = '';
+  ORDEN_GRUPO.forEach(grupo => {
+    const delGrupo = items.filter(it => grupoDe(it) === grupo);
+    if(!delGrupo.length) return;
+    delGrupo.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    html += `<div class="grupo-head">${grupo} · ${delGrupo.length}</div><div class="grid">`;
+    html += delGrupo.map(it => `
+      <div class="card" data-abrir="${esc(it.id)}">
+        ${it.imagen ? `<img src="${it.imagen}" alt="">` : `<div class="sinfoto">·</div>`}
+        <div class="cinfo">
+          <div class="cnombre">${esc(it.nombre)}</div>
+          <div class="ctier" style="color:var(--copper)">${esc(it.tier)} · ${esc(CATEGORIA_LABEL[it.tipoItem] || it.tipoItem)}</div>
+          <div class="cmeta">${esc(metaTxt(it))}</div>
+          ${it.detalle ? `<div class="cdetalle">${esc(it.detalle)}</div>` : ''}
+        </div>
+      </div>`).join('');
+    html += `</div>`;
+  });
+  $('#lista').innerHTML = html;
+}
+
+/* ---------- Editor de ítem ---------- */
+function defaultsItem(){
+  return {
+    id: '', nombre: '', tier: 'Común', imagen: '', tipoItem: '', peso: 0, ranuras: 0,
+    tipoDado: 6, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
+    precioCompra: 0, unidades: 1, cargaMax: 0, consumible: false, legacy: false,
+    curahp: 0, curabonosPct: 0,
+    efectoNombre: '', efectoTurnos: 0, efectoHpTurno: 0, efectoPermanente: false, efectoDetalle: '', efectoMods: [],
+    equipoEstadoNombre: '', equipoEstadoHpTurno: 0, equipoEstadoDetalle: '',
+    mods: [], detalle: '',
+  };
+}
+
+function abrirEditor(id){
+  const original = id ? CATALOGO.find(it => it.id === id) : null;
+  editing = {id, draft: Object.assign(defaultsItem(), original ? structuredClone(original) : {})};
+  $('#modal-titulo').textContent = original ? 'Editar ítem' : 'Nuevo ítem';
+  $('#modal-borrar').style.display = original ? '' : 'none';
+  drawEditor();
+  $('#scrim-editor').classList.add('open');
+}
+function cerrarEditor(){
+  $('#scrim-editor').classList.remove('open');
+  editing = null;
+}
+
+function modsHtml(lista, dataAttr){
+  return `<div id="${dataAttr}-lista">${(lista || []).map((m, i) => `
+    <div class="modrow">
+      <select data-${dataAttr}-stat="${i}">
+        <option value="">— elegir stat —</option>
+        ${STATS.map(s => `<option value="${s.id}" ${m.stat === s.id ? 'selected' : ''}>${esc(s.label)}</option>`).join('')}
+      </select>
+      <input type="number" step="any" data-${dataAttr}-val="${i}" value="${esc(m.val)}">
+      <button type="button" class="iconbtn mini" data-${dataAttr}-rm="${i}">×</button>
+    </div>`).join('')}</div>
+    <button type="button" class="iconbtn" id="${dataAttr}-add" style="align-self:flex-start">+ Modificador</button>`;
+}
+
+function drawEditor(){
+  const d = editing.draft;
+  const esArma = esArmaTipo(d.tipoItem);
+  const esCons = d.tipoItem === 'consumibles';
+  let html = `
+    <div class="seccion">
+      <div class="seccion-titulo">Básico</div>
+      <div class="f"><label>Nombre</label><input type="text" data-c="nombre" value="${esc(d.nombre)}" placeholder="ej. Hacha de mano"></div>
+      <div class="f2">
+        <div class="f"><label>Categoría</label>
+          <select data-c="tipoItem">${CATEGORIAS.map(c => `<option value="${c.id}" ${d.tipoItem === c.id ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select>
+        </div>
+        <div class="f"><label>Tier</label>
+          <select data-c="tier">${TIERS.map(t => `<option value="${esc(t)}" ${d.tier === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="f3">
+        <div class="f"><label>Peso</label><input type="number" step="any" data-c="peso" value="${esc(d.peso)}"></div>
+        <div class="f"><label>Ranuras (mochila)</label><input type="number" step="1" data-c="ranuras" value="${esc(d.ranuras)}"></div>
+        <div class="f"><label>Precio de compra</label><input type="number" step="any" data-c="precioCompra" value="${esc(d.precioCompra)}"></div>
+      </div>
+      <div class="f"><label>Detalle (lo que lee el jugador)</label><textarea data-c="detalle" rows="3">${esc(d.detalle)}</textarea></div>
+      <div class="imagen-fila">
+        ${d.imagen ? `<img id="editor-img-preview" src="${d.imagen}" alt="">` : `<div class="sinimg" id="editor-img-preview">sin foto</div>`}
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <input type="file" id="editor-img-file" accept="image/*">
+          ${d.imagen ? `<button type="button" class="iconbtn" id="editor-img-quitar" style="align-self:flex-start">Quitar imagen</button>` : ''}
+        </div>
+      </div>
+      <label class="chk"><input type="checkbox" data-c="legacy" ${d.legacy ? 'checked' : ''}> Legacy (cuenta para el piso de ítems clásicos del Alquimista)</label>
+    </div>`;
+
+  if(esArma){
+    html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Arma</div>
+      <div class="f3">
+        <div class="f"><label>Dado</label>
+          <select data-c="tipoDado">${DADOS_ARMA.map(v => `<option value="${v}" ${num(d.tipoDado) === v ? 'selected' : ''}>d${v}</option>`).join('')}</select>
+        </div>
+        <div class="f"><label>Daño fijo</label><input type="number" step="any" data-c="danoFijo" value="${esc(d.danoFijo)}"></div>
+        <div class="f"><label>Daño amplificado</label><input type="number" step="1" min="0" data-c="danoAmplificado" value="${esc(d.danoAmplificado)}"></div>
+      </div>
+      <div class="hint" id="editor-dano-hint"></div>
+      <label class="chk"><input type="checkbox" data-c="armaDeRango" ${d.armaDeRango ? 'checked' : ''}> Arma de rango (el botón Daño Arma no le suma el stat Dmg)</label>
+    </div>`;
+  }
+
+  if(esCons){
+    html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Consumible</div>
+      <div class="f3">
+        <div class="f"><label>Unidades</label><input type="number" step="1" data-c="unidades" value="${esc(d.unidades)}"></div>
+        <div class="f"><label>Cargas por unidad</label><input type="number" step="1" data-c="cargaMax" value="${esc(d.cargaMax)}"></div>
+        <div class="f"><label>Cura HP (negativo daña)</label><input type="number" step="any" data-c="curahp" value="${esc(d.curahp)}"></div>
+      </div>
+      <div class="f"><label>Cura Bonos (%)</label><input type="number" step="any" data-c="curabonosPct" value="${esc(d.curabonosPct)}"></div>
+      <div class="f"><label>Nombre del estado que aplica al consumir (opcional)</label><input type="text" data-c="efectoNombre" value="${esc(d.efectoNombre)}" placeholder="ej. Veneno"></div>
+      <div class="f3">
+        <div class="f"><label>Turnos del estado</label><input type="number" step="1" data-c="efectoTurnos" value="${esc(d.efectoTurnos)}"></div>
+        <div class="f"><label>HP por turno del estado</label><input type="number" step="any" data-c="efectoHpTurno" value="${esc(d.efectoHpTurno)}"></div>
+        <label class="chk" style="align-self:flex-end;padding-bottom:8px"><input type="checkbox" data-c="efectoPermanente" ${d.efectoPermanente ? 'checked' : ''}> No vence</label>
+      </div>
+      <div class="f"><label>Detalle del estado</label><textarea data-c="efectoDetalle" rows="2">${esc(d.efectoDetalle)}</textarea></div>
+      <div class="f"><label>Modificadores del estado</label>${modsHtml(d.efectoMods, 'efm')}</div>
+    </div>`;
+  }else if(d.tipoItem){
+    html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Estado al equipar (opcional)</div>
+      <div class="f"><label>Nombre del estado</label><input type="text" data-c="equipoEstadoNombre" value="${esc(d.equipoEstadoNombre)}" placeholder="ej. Regeneración"></div>
+      <div class="f"><label>HP por turno (mientras esté puesto)</label><input type="number" step="any" data-c="equipoEstadoHpTurno" value="${esc(d.equipoEstadoHpTurno)}"></div>
+      <div class="f"><label>Detalle del estado</label><textarea data-c="equipoEstadoDetalle" rows="2">${esc(d.equipoEstadoDetalle)}</textarea></div>
+    </div>`;
+  }
+
+  html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Modificadores (mientras esté equipado)</div>
+      ${modsHtml(d.mods, 'mod')}
+    </div>`;
+
+  $('#modal-body').innerHTML = html;
+  if(esArma) actualizarDanoHint();
+}
+
+function actualizarDanoHint(){
+  const d = editing.draft;
+  const dados = Math.max(1, num(d.peso) || 1) + Math.max(0, num(d.danoAmplificado));
+  const hint = $('#editor-dano-hint');
+  if(hint) hint.textContent = `Daño: ${dados}d${num(d.tipoDado) || 6}${num(d.danoFijo) ? ` + ${num(d.danoFijo)}` : ''} (peso × dado${num(d.danoAmplificado) ? ` + ${num(d.danoAmplificado)} por daño amplificado` : ''})`;
+}
+
+document.addEventListener('input', e => {
+  if(!editing) return;
+  const t = e.target;
+  const d = editing.draft;
+  if(t.dataset.c){
+    const campo = t.dataset.c;
+    const numericos = ['peso','ranuras','tipoDado','danoFijo','danoAmplificado','precioCompra','unidades','cargaMax','curahp','curabonosPct','efectoTurnos','efectoHpTurno','equipoEstadoHpTurno'];
+    d[campo] = t.type === 'checkbox' ? t.checked : (numericos.includes(campo) ? num(t.value) : t.value);
+    if(campo === 'tipoItem'){ d.consumible = esConsumibleTipo(d.tipoItem); drawEditor(); return; }
+    if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(campo)) actualizarDanoHint();
+    return;
+  }
+  for(const [prefijo, arr] of [['mod', 'mods'], ['efm', 'efectoMods']]){
+    const iStat = t.dataset[prefijo + 'Stat'];
+    const iVal = t.dataset[prefijo + 'Val'];
+    if(iStat !== undefined){ d[arr][+iStat] = d[arr][+iStat] || {stat:'', val:0}; d[arr][+iStat].stat = t.value; }
+    if(iVal !== undefined){ d[arr][+iVal] = d[arr][+iVal] || {stat:'', val:0}; d[arr][+iVal].val = num(t.value); }
+  }
+});
+
+document.addEventListener('click', e => {
+  const abrir = e.target.closest('[data-abrir]');
+  if(abrir){ abrirEditor(abrir.dataset.abrir); return; }
+
+  if(!editing) return;
+  const d = editing.draft;
+  if(e.target.id === 'mod-add'){ d.mods.push({stat:'', val:0}); drawEditor(); return; }
+  if(e.target.id === 'efm-add'){ d.efectoMods.push({stat:'', val:0}); drawEditor(); return; }
+  const rmMod = e.target.closest('[data-mod-rm]');
+  if(rmMod){ d.mods.splice(+rmMod.dataset.modRm, 1); drawEditor(); return; }
+  const rmEfm = e.target.closest('[data-efm-rm]');
+  if(rmEfm){ d.efectoMods.splice(+rmEfm.dataset.efmRm, 1); drawEditor(); return; }
+  if(e.target.id === 'editor-img-quitar'){ d.imagen = ''; drawEditor(); return; }
+});
+
+document.addEventListener('change', async e => {
+  if(e.target.id === 'editor-img-file' && editing){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { editing.draft.imagen = reader.result; drawEditor(); };
+    reader.readAsDataURL(file);
+  }
+});
+
+function guardarItemActual(){
+  const d = editing.draft;
+  if(!d.nombre.trim()){ toast('Poné un nombre antes de guardar'); return; }
+  if(!d.tipoItem){ toast('Elegí una categoría antes de guardar'); return; }
+  if(!d.id) d.id = 'new-' + slug(d.nombre);
+  d.consumible = esConsumibleTipo(d.tipoItem);
+  d.mods = (d.mods || []).filter(m => m.stat);
+  d.efectoMods = (d.efectoMods || []).filter(m => m.stat);
+
+  const idx = CATALOGO.findIndex(it => it.id === editing.id);
+  if(idx >= 0) CATALOGO[idx] = d;
+  else CATALOGO.push(d);
+
+  cerrarEditor();
+  renderLista();
+  toast('Ítem guardado (acordate de bajar/subir el JSON para persistirlo)');
+}
+
+function borrarItemActual(){
+  if(!editing || !editing.id) return;
+  const it = CATALOGO.find(x => x.id === editing.id);
+  if(!confirm(`¿Borrar "${it ? it.nombre : editing.id}" del catálogo?`)) return;
+  CATALOGO = CATALOGO.filter(x => x.id !== editing.id);
+  cerrarEditor();
+  renderLista();
+  toast('Ítem borrado');
+}
+
+$('#btn-nuevo').onclick = () => abrirEditor(null);
+$('#modal-x').onclick = cerrarEditor;
+$('#modal-cancelar').onclick = cerrarEditor;
+$('#modal-guardar').onclick = guardarItemActual;
+$('#modal-borrar').onclick = borrarItemActual;
+$('#scrim-editor').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editor') cerrarEditor(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#scrim-editor').classList.contains('open')) cerrarEditor(); });
+
+/* ---------- Filtros: eventos ---------- */
+$('#f-buscar').addEventListener('input', e => { filtro.texto = e.target.value; renderLista(); });
+$('#f-tipo').addEventListener('change', e => { filtro.tipo = e.target.value; renderLista(); });
+$('#f-tier').addEventListener('change', e => { filtro.tier = e.target.value; renderLista(); });
+
+/* ---------- Carga / guardado local ---------- */
+function aplicarDatos(datos, origen){
+  CATALOGO = Array.isArray(datos) ? datos : [];
+  renderLista();
+  estado(`${origen} — ${CATALOGO.length} ítems`, 'ok');
+}
+
+$('#btn-guardar').onclick = () => {
+  const blob = new Blob([JSON.stringify(CATALOGO, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'catalogo.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Descargado: catalogo.json');
+};
+
+$('#btn-cargar-archivo').onclick = () => $('#input-archivo').click();
+$('#input-archivo').onchange = async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const datos = JSON.parse(await file.text());
+    aplicarDatos(datos, `Cargado desde ${file.name}`);
+  }catch(err){
+    toast('Ese archivo no es un JSON válido');
+  }
+  e.target.value = '';
+};
+
+/* ---------- GitHub: mismo patrón de token que las otras herramientas ---------- */
+function ghCabeceras(accept){
+  const cab = {Accept: accept};
+  const token = localStorage.getItem('gh-token');
+  if(token) cab.Authorization = 'Bearer ' + token.trim();
+  return cab;
+}
+const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
+
+function ghPedirToken(){
+  return new Promise(res => {
+    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
+    const fondo = document.createElement('div');
+    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+    const caja = document.createElement('div');
+    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:460px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
+    caja.innerHTML =
+      '<h3 style="margin:0 0 10px;font-size:16px">Token de GitHub</h3>' +
+      '<ol style="margin:0 0 14px;padding-left:20px">' +
+        '<li>Tocá <b>Abrir GitHub</b>: se abre en otra pestaña, ya con los permisos correctos elegidos.</li>' +
+        '<li>Bajá hasta el final y tocá <b>Generate token</b>.</li>' +
+        '<li>Copiá el token verde (ojo: solo se muestra una vez).</li>' +
+        '<li>Volvé <b>a esta pestaña</b> y pegalo en el casillero de abajo.</li>' +
+      '</ol>' +
+      '<button type="button" data-gh="abrir" style="' + btnCss + ';width:100%;margin-bottom:10px">Abrir GitHub ↗</button>' +
+      '<input type="text" data-gh="input" placeholder="Pegá el token acá (ghp_…)" ' +
+        'style="width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin-bottom:12px">' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" data-gh="cancelar" style="' + btnCss + '">Cancelar</button>' +
+        '<button type="button" data-gh="guardar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Guardar</button>' +
+      '</div>' +
+      '<div style="margin-top:10px;opacity:.65;font-size:12px">Queda guardado en este navegador (mismo token que usan las otras herramientas).</div>';
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    const campo = caja.querySelector('[data-gh="input"]');
+    campo.focus();
+    const cerrar = valor => { fondo.remove(); res(valor); };
+    caja.querySelector('[data-gh="abrir"]').onclick = () => window.open(GH_TOKEN_URL, '_blank');
+    caja.querySelector('[data-gh="cancelar"]').onclick = () => cerrar(null);
+    caja.querySelector('[data-gh="guardar"]').onclick = () => cerrar(campo.value.trim() || null);
+    fondo.onmousedown = ev => { if(ev.target === fondo) cerrar(null); };
+  });
+}
+async function ghToken(pedirDeNuevo){
+  let t = localStorage.getItem('gh-token');
+  if(!t || pedirDeNuevo){
+    t = await ghPedirToken();
+    if(t) localStorage.setItem('gh-token', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+function aBase64(texto){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(new Blob([texto]));
+  });
+}
+async function shaRemoto(ruta){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
+  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
+  if(resp.status === 404) return null;
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} consultando ${ruta}`);
+  return (await resp.json()).sha;
+}
+async function ghSubir(ruta, texto, token, mensaje){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
+  const sha = await shaRemoto(ruta);
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'},
+    body: JSON.stringify({message: mensaje, content: await aBase64(texto), branch: GH_BRANCH, ...(sha ? {sha} : {})}),
+  });
+  if(resp.status === 401 || resp.status === 403) throw {auth: true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
+}
+
+async function traerUltimaVersion(silencioso){
+  if(!silencioso) estado('Buscando la última versión…');
+  try{
+    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_CATALOGO}?ref=${GH_BRANCH}`;
+    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+    if(resp.status === 404){
+      if(!silencioso) estado('Todavía no hay catalogo.json publicado en GitHub.', 'err');
+      return;
+    }
+    if(resp.status === 429 || resp.status === 403){
+      if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err');
+      return;
+    }
+    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+    const datos = await resp.json();
+    aplicarDatos(datos, 'Última versión traída de GitHub ✓');
+  }catch(err){
+    console.error('Error trayendo el catálogo:', err);
+    estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
+  }
+}
+$('#btn-traer').onclick = () => traerUltimaVersion(false);
+
+$('#btn-subir').onclick = async () => {
+  const btn = $('#btn-subir');
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede subir'); return; }
+  btn.disabled = true;
+  toast('Subiendo a GitHub…');
+  try{
+    await ghSubir(ARCHIVO_CATALOGO, JSON.stringify(CATALOGO, null, 2), token, 'Actualizar catálogo');
+    toast('Catálogo publicado en GitHub ✓ — corré importar_json.py para que llegue a las 3 herramientas');
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá Subir datos de nuevo');
+    }else{
+      console.error('Error subiendo el catálogo:', err);
+      toast('No se pudo subir — revisá la consola');
+    }
+  }finally{
+    btn.disabled = false;
+  }
+};
+
+$('#btn-token').onclick = async () => {
+  if(await ghToken(true)) toast('Token actualizado.');
+};
+
+/* ---------- Arranque ---------- */
+poblarFiltros();
+renderLista();
+traerUltimaVersion(true);
+</script>
+</body>
+</html>

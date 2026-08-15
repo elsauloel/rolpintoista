@@ -100,7 +100,7 @@
     "efectoMods": [],
     "id": "new-oleo-reparador",
     "nombre": "Oleo reparador",
-    "tier": "Buena Calidad",
+    "tier": "Común",
     "tipoItem": "consumibles",
     "peso": 0,
     "ranuras": 1,
@@ -116,78 +116,6 @@
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
-    "consumible": true,
-    "imagen": ""
-  },
-  {
-    "mods": [],
-    "efectoMods": [],
-    "id": "new-pergamino-de-alcance-extendido",
-    "nombre": "Pergamino de Alcance Extendido",
-    "tier": "Buena Calidad",
-    "tipoItem": "consumibles",
-    "peso": 0,
-    "ranuras": 1,
-    "precioCompra": 60,
-    "detalle": "Otorga +1 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido (pergamino)'.",
-    "legacy": false,
-    "unidades": 1,
-    "cargaMax": 0,
-    "curahp": 0,
-    "curabonosPct": 0,
-    "efectoNombre": "Alcance Extendido (pergamino)",
-    "efectoTurnos": 0,
-    "efectoHpTurno": 0,
-    "efectoPermanente": true,
-    "efectoDetalle": "Rango +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
-    "consumible": true,
-    "imagen": ""
-  },
-  {
-    "mods": [],
-    "efectoMods": [],
-    "id": "new-pergamino-de-alcance-extendido-mayor",
-    "nombre": "Pergamino de Alcance Extendido mayor",
-    "tier": "Raro",
-    "tipoItem": "consumibles",
-    "peso": 0,
-    "ranuras": 1,
-    "precioCompra": 120,
-    "detalle": "Otorga +2 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido mayor (pergamino)'.",
-    "legacy": false,
-    "unidades": 1,
-    "cargaMax": 0,
-    "curahp": 0,
-    "curabonosPct": 0,
-    "efectoNombre": "Alcance Extendido mayor (pergamino)",
-    "efectoTurnos": 0,
-    "efectoHpTurno": 0,
-    "efectoPermanente": true,
-    "efectoDetalle": "Rango +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
-    "consumible": true,
-    "imagen": ""
-  },
-  {
-    "mods": [],
-    "efectoMods": [],
-    "id": "new-pergamino-de-alcance-extendido-superior",
-    "nombre": "Pergamino de Alcance Extendido superior",
-    "tier": "Excepcional",
-    "tipoItem": "consumibles",
-    "peso": 0,
-    "ranuras": 1,
-    "precioCompra": 180,
-    "detalle": "Otorga +3 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido superior (pergamino)'.",
-    "legacy": false,
-    "unidades": 1,
-    "cargaMax": 0,
-    "curahp": 0,
-    "curabonosPct": 0,
-    "efectoNombre": "Alcance Extendido superior (pergamino)",
-    "efectoTurnos": 0,
-    "efectoHpTurno": 0,
-    "efectoPermanente": true,
-    "efectoDetalle": "Rango +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
     "consumible": true,
     "imagen": ""
   },
@@ -842,6 +770,78 @@
   {
     "mods": [],
     "efectoMods": [],
+    "id": "new-pergamino-de-alcance-extendido",
+    "nombre": "Pergamino de Rango Extendido",
+    "tier": "Buena Calidad",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 60,
+    "detalle": "Otorga +1 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido (pergamino)'.",
+    "legacy": false,
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "efectoNombre": "Alcance Extendido (pergamino)",
+    "efectoTurnos": 0,
+    "efectoHpTurno": 0,
+    "efectoPermanente": true,
+    "efectoDetalle": "Rango +1. Dura hasta el fin del combate (bórralo a mano al terminar).",
+    "consumible": true,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-pergamino-de-alcance-extendido-mayor",
+    "nombre": "Pergamino de Rango Extendido mayor",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 120,
+    "detalle": "Otorga +2 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido mayor (pergamino)'.",
+    "legacy": false,
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "efectoNombre": "Alcance Extendido mayor (pergamino)",
+    "efectoTurnos": 0,
+    "efectoHpTurno": 0,
+    "efectoPermanente": true,
+    "efectoDetalle": "Rango +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
+    "consumible": true,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-pergamino-de-alcance-extendido-superior",
+    "nombre": "Pergamino de Rango Extendido superior",
+    "tier": "Excepcional",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 180,
+    "detalle": "Otorga +3 a Rango durante todo el combate. Al usarlo se activa el estado 'Alcance Extendido superior (pergamino)'.",
+    "legacy": false,
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "efectoNombre": "Alcance Extendido superior (pergamino)",
+    "efectoTurnos": 0,
+    "efectoHpTurno": 0,
+    "efectoPermanente": true,
+    "efectoDetalle": "Rango +3. Dura hasta el fin del combate (bórralo a mano al terminar).",
+    "consumible": true,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
     "id": "new-pergamino-de-reflejo-de-acero",
     "nombre": "Pergamino de Reflejo de Acero",
     "tier": "Buena Calidad",
@@ -1441,12 +1441,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "int",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-clarividencia",
     "nombre": "Poción de Clarividencia",
     "tier": "Buena Calidad",
@@ -1470,12 +1465,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "int",
-        "val": 2
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-clarividencia-mayor",
     "nombre": "Poción de Clarividencia Mayor",
     "tier": "Raro",
@@ -1489,8 +1479,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Clarividencia (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1499,12 +1489,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "int",
-        "val": 3
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-clarividencia-superior",
     "nombre": "Poción de Clarividencia Superior",
     "tier": "Excepcional",
@@ -1518,8 +1503,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Clarividencia (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1744,12 +1729,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "fue",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-fuerza-del-toro",
     "nombre": "Poción de Fuerza del Toro",
     "tier": "Buena Calidad",
@@ -1773,12 +1753,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "fue",
-        "val": 2
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-fuerza-del-toro-mayor",
     "nombre": "Poción de Fuerza del Toro Mayor",
     "tier": "Raro",
@@ -1792,8 +1767,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Fuerza del Toro (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1802,12 +1777,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "fue",
-        "val": 3
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-fuerza-del-toro-superior",
     "nombre": "Poción de Fuerza del Toro Superior",
     "tier": "Excepcional",
@@ -1821,8 +1791,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Fuerza del Toro (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1999,12 +1969,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "des",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-manos-ligeras",
     "nombre": "Poción de Manos Ligeras",
     "tier": "Buena Calidad",
@@ -2028,12 +1993,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "des",
-        "val": 2
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-manos-ligeras-mayor",
     "nombre": "Poción de Manos Ligeras Mayor",
     "tier": "Raro",
@@ -2047,8 +2007,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Manos Ligeras (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2057,12 +2017,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "des",
-        "val": 3
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-manos-ligeras-superior",
     "nombre": "Poción de Manos Ligeras Superior",
     "tier": "Excepcional",
@@ -2076,8 +2031,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Manos Ligeras (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2302,12 +2257,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "con",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-piel-de-roble",
     "nombre": "Poción de Piel de Roble",
     "tier": "Buena Calidad",
@@ -2331,12 +2281,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "con",
-        "val": 2
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-piel-de-roble-mayor",
     "nombre": "Poción de Piel de Roble Mayor",
     "tier": "Raro",
@@ -2350,8 +2295,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Piel de Roble (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2360,12 +2305,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "con",
-        "val": 3
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-piel-de-roble-superior",
     "nombre": "Poción de Piel de Roble Superior",
     "tier": "Excepcional",
@@ -2379,8 +2319,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Piel de Roble (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2461,12 +2401,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "agl",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-pies-veloces",
     "nombre": "Poción de Pies Veloces",
     "tier": "Buena Calidad",
@@ -2490,12 +2425,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "agl",
-        "val": 2
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-pies-veloces-mayor",
     "nombre": "Poción de Pies Veloces Mayor",
     "tier": "Raro",
@@ -2509,8 +2439,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Pies Veloces (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2519,12 +2449,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "agl",
-        "val": 3
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-pies-veloces-superior",
     "nombre": "Poción de Pies Veloces Superior",
     "tier": "Excepcional",
@@ -2538,8 +2463,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Pies Veloces (poción)",
-    "efectoTurnos": 4,
+    "efectoNombre": "",
+    "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -3171,16 +3096,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "pdg",
-        "val": 1
-      },
-      {
-        "stat": "parry",
-        "val": 2
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-aguijon-de-esgrima",
     "nombre": "Aguijón de esgrima",
@@ -3192,8 +3108,6 @@
     "detalle": "parry +2, pdg +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3201,12 +3115,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "crit",
-        "val": 2
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-aguijon-de-manticora",
     "nombre": "Aguijón de mantícora",
@@ -3218,8 +3127,6 @@
     "detalle": "critico +2, dza +2, aplica veneno severo",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3227,12 +3134,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-baston-de-monje",
     "nombre": "Bastón de monje",
@@ -3241,11 +3143,9 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 8,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3265,8 +3165,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3276,15 +3174,7 @@
   {
     "mods": [
       {
-        "stat": "parry",
-        "val": 2
-      },
-      {
         "stat": "bloqueo",
-        "val": 1
-      },
-      {
-        "stat": "rng",
         "val": 1
       }
     ],
@@ -3296,11 +3186,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 800,
-    "detalle": "parry+2, bloqueo +1, rango +1",
+    "detalle": "parry+2, bloqueo +1, alcance +1",
     "tipoDado": 8,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3312,10 +3200,6 @@
       {
         "stat": "bloqueo",
         "val": 1
-      },
-      {
-        "stat": "rng",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -3326,11 +3210,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 140,
-    "detalle": "rango +1, bloqueo +1",
+    "detalle": "alcance +1, bloqueo +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3355,8 +3237,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3381,8 +3261,6 @@
     "detalle": "parry +1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3407,8 +3285,6 @@
     "detalle": "Parry +2",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3428,8 +3304,6 @@
     "detalle": "Deja sangrando x2hp",
     "tipoDado": 2,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3449,8 +3323,6 @@
     "detalle": "Rompe armadura",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3470,8 +3342,6 @@
     "detalle": "",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3491,8 +3361,6 @@
     "detalle": "",
     "tipoDado": 2,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3517,8 +3385,6 @@
     "detalle": "pdg +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3538,8 +3404,6 @@
     "detalle": "Ignora 1 punto de resistencia al crítico",
     "tipoDado": 2,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3559,8 +3423,6 @@
     "detalle": "",
     "tipoDado": 4,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3589,8 +3451,6 @@
     "detalle": "parry+1, bloqueo+1",
     "tipoDado": 4,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3610,8 +3470,6 @@
     "detalle": "",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3631,8 +3489,6 @@
     "detalle": "",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3652,8 +3508,6 @@
     "detalle": "envenena x 50% de chances",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3673,8 +3527,6 @@
     "detalle": "50% de chances de ignorar armadura. Drena hp igual al daño ejercido",
     "tipoDado": 4,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3699,8 +3551,6 @@
     "detalle": "pdg +2",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3725,8 +3575,6 @@
     "detalle": "pdg+2, envenena",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3759,8 +3607,6 @@
     "detalle": "parry +2, bloqueo +3",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3768,12 +3614,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "crit",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-estilete-de-competencia",
     "nombre": "Estilete de competencia",
@@ -3785,8 +3626,6 @@
     "detalle": "Crítico +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3794,12 +3633,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "crit",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-estileto-comun",
     "nombre": "Estileto común",
@@ -3811,8 +3645,6 @@
     "detalle": "crítico +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3837,8 +3669,6 @@
     "detalle": "Modificador: +1 a iniciativa",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3863,8 +3693,6 @@
     "detalle": "Ingora 2 de resistencia al crítico",
     "tipoDado": 2,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3884,8 +3712,6 @@
     "detalle": "Ingora 1 de resistencia al crítico",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3910,8 +3736,6 @@
     "detalle": "sangrado, +1 pdg",
     "tipoDado": 4,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3931,8 +3755,6 @@
     "detalle": "Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3952,8 +3774,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -3982,8 +3802,6 @@
     "detalle": "parry +2, bloqueo +2",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4003,8 +3821,6 @@
     "detalle": "Rompe armadura.",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4024,8 +3840,6 @@
     "detalle": "ignora 1 de resistencia al crítico",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4033,12 +3847,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-hacha-danesa",
     "nombre": "Hacha danesa",
@@ -4047,11 +3856,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Rango +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.",
+    "detalle": "alcance +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4071,8 +3878,6 @@
     "detalle": "Arruina armadura. +2 a la fuerza. deja lisiado",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4097,8 +3902,6 @@
     "detalle": "Rompe armadura. +1 al bloqueo",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4118,8 +3921,6 @@
     "detalle": "Rompe armadura",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4139,8 +3940,6 @@
     "detalle": "Rompe armadura.",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4160,8 +3959,6 @@
     "detalle": "Rompe armadura. Ignora 1 resistencia al crítico",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4170,10 +3967,6 @@
   },
   {
     "mods": [
-      {
-        "stat": "parry",
-        "val": 2
-      },
       {
         "stat": "bloqueo",
         "val": 3
@@ -4190,8 +3983,6 @@
     "detalle": "parry +2, bloqueo +3",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4211,8 +4002,6 @@
     "detalle": "",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4232,8 +4021,6 @@
     "detalle": "Arruina armadura",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4253,8 +4040,6 @@
     "detalle": "",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4274,8 +4059,6 @@
     "detalle": "Rompe armadura. Drena 50% del daño.",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4295,8 +4078,6 @@
     "detalle": "50% de dejar sangrando",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4316,8 +4097,6 @@
     "detalle": "Crítico aumentado. Arruina armadura.",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4337,8 +4116,6 @@
     "detalle": "50% de chances de envenenar",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4358,8 +4135,6 @@
     "detalle": "",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4367,12 +4142,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-horquilla",
     "nombre": "Horquilla",
@@ -4381,11 +4151,9 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4405,8 +4173,6 @@
     "detalle": "sangrado 50%",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4435,8 +4201,6 @@
     "detalle": "pdg+2, crítico +1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4444,12 +4208,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-lanza-corta",
     "nombre": "Lanza corta",
@@ -4458,11 +4217,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 75,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4470,12 +4227,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-lanza-militar",
     "nombre": "Lanza militar",
@@ -4484,11 +4236,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 2,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4496,12 +4246,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-lucero-del-alba",
     "nombre": "Lucero del alba",
@@ -4510,11 +4255,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 150,
-    "detalle": "Ignora 1 de res al crítico, rango +1",
+    "detalle": "Ignora 1 de res al crítico, alcance +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4534,8 +4277,6 @@
     "detalle": "romper armadura 50%",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4564,8 +4305,6 @@
     "detalle": "Parry+2, bloqueo+1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4573,12 +4312,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "cat-mangual",
     "nombre": "Mangual",
@@ -4590,8 +4324,6 @@
     "detalle": "Alcance +1.",
     "tipoDado": 8,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4599,12 +4331,7 @@
     "imagen": "data:image/jpeg;base64,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"
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-mangual",
     "nombre": "Mangual",
@@ -4613,11 +4340,9 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 150,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4637,8 +4362,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4658,8 +4381,6 @@
     "detalle": "Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4684,8 +4405,6 @@
     "detalle": "bloqueo +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4710,8 +4429,6 @@
     "detalle": "bloqueo +2",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4719,12 +4436,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-martillo-de-cantero",
     "nombre": "Martillo de cantero",
@@ -4733,11 +4445,9 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4762,8 +4472,6 @@
     "detalle": "Deja en pajaritos",
     "tipoDado": 8,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4792,8 +4500,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4818,8 +4524,6 @@
     "detalle": "bloqueo +3",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4844,8 +4548,6 @@
     "detalle": "Bloqueo +3",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4865,8 +4567,6 @@
     "detalle": "",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4891,8 +4591,6 @@
     "detalle": "bloqueo +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4917,8 +4615,6 @@
     "detalle": "La mitad del daño ignora armadura. bloqueo +3",
     "tipoDado": 8,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4938,8 +4634,6 @@
     "detalle": "",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4947,12 +4641,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-pico-de-guerra",
     "nombre": "Pico de guerra",
@@ -4961,11 +4650,9 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "rango +1, 50% de romper armadura",
+    "detalle": "alcance +1, 50% de romper armadura",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -4985,8 +4672,6 @@
     "detalle": "Rompe armadura.",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5006,8 +4691,6 @@
     "detalle": "Veneno stock 4",
     "tipoDado": 2,
     "danoFijo": 2,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5016,10 +4699,6 @@
   },
   {
     "mods": [
-      {
-        "stat": "parry",
-        "val": 3
-      },
       {
         "stat": "bloqueo",
         "val": 2
@@ -5036,8 +4715,6 @@
     "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones",
     "tipoDado": 4,
     "danoFijo": 3,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5057,8 +4734,6 @@
     "detalle": "Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5078,8 +4753,6 @@
     "detalle": "50% chance de Romper armadura.",
     "tipoDado": 2,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5087,12 +4760,7 @@
     "imagen": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wAARCAEyAO8DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD7KoPv0oPNcb8QviF4e+HHhK48Q+Ibry4U+WGBCPMuZOyIO59+gHJoA6LUNZ0zSkjk1LUbWySQ7Ua5nWIMfQbiMmqB8ZeFh18SaQP+3+L/AOKr5It9HuPibe3XxQ+NDG20aSJotK0UM48hG+4VAIJY9eeTnJrAXwb8OWJP/CC3GAcZW6c/1rmliIRdjeNGTVz7UPjXwmOvifRx9b+H/wCKpo8c+EO3inRf/BhD/wDFV8WP4N+G3/Qi3H43kg/rVO58H/DN51T/AIQ27jlEbSR21vdyNJc47ZJwuOuaSxMX0H7CR9wf8Jv4RP8AzNGjH/uIQ/8AxVL/AMJr4T/6GfR//BhD/wDFV8OL4P8Ahns/eeCNSjb0a+fI/WhfBnww6N4Q1H6jUHo+sx7MPYSPuQeNfCh6eJtHP/b/AA//ABVH/CaeFP8AoZtH/wDA+H/4qvhmXwD8NpZI5YfDWqwRqSGVtQI8w+gyM/lTh4I+GI4/4RTUyffUX/oKPrMOzF7CR9xnxt4T7+J9H/8AA+H/AOKpP+E38I/9DRo3/gwh/wDiq+G38GfDUHCeEbv/AIFqMtNTwh8Nww3eD7gr7ahLR9Zj2D2Ej7n/AOE28JE5HifRz/3EIf8A4ql/4TTwp1HiXSP/AAPh/wDiq+GG8KfDVHyPBt0y+n26Sm/8It8OSePBl0P+3ySj6zHsx+wl3Puk+NPCnfxNo/8A4Hw//FUn/Ca+Ex18T6P/AOB8P/xVfC//AAifw6Y7f+EPugf+vx/8aih8IfD2KIRyeFbydsk72um9enBo+sx7C9hI+7f+E28J9vE+j/8AgfD/APFUv/CaeFP+hm0f/wAD4f8A4qvhVvCXw5OF/wCEQulY9Abx1J/Wmjwd8Ov+hTuzjqft7f40fWY9h+wkfdn/AAmnhQdfE2j/APgfD/8AFUh8beE/+hn0f/wPh/8Aiq+Ez4Q+HY+YeEbxkxkt9uYY/wDHqrjw18NHGR4Yuhnp/p5/xo+sx7C9hI+8/wDhN/CX/Q0aN/4MIf8A4ql/4Tbwl/0M+j/+B8P/AMVXwaPCfw4J58M3Y/7iB/xph8J/D0Z2+F58Du2osKPrMezD2Eu596/8Jt4S/wChn0f/AMGEP/xVA8aeEz08TaOf+3+H/wCKr4BfQfhxGM/8I2T7f2m1QnSfh0xwnhebPot+TVe3XZi9i+5+gn/Ca+FB/wAzNo4/7f4f/iqB418JnhfE2jk+1/D/APFV+e82neAIoy3/AAh0nHrfnmsy4g8CkbF8LSwMejJds+P6U1WT6MPZPufo7/wmfhUf8zJpA/7f4v8A4qk/4TPwqf8AmZdI/wDA+H/4qvz103S/BN1DuPgy4fHG/wC0N83/AI8K2o/CPgyfS7u4h8ISQvGFVHnmcKWJ5Aw3JA5pe3XYaot9T9Cra5gu7aO4t5UmikUMjxsGVgehBHBFTV8V/CH4s3Pws1ODwl4pupJ/BV3KVsr5/mbTXJ+4/wD0zz+XUcZr7OgniuYEmikWRHUMro2VYHkEHuDW0ZKSujFpxdmNuZTBbSy7d2xGbAOM4BP9K+KdIuIvip4hvvit8SNShksNMne20vQYiWERVuPlP3iTznueT0xX2nfjNlcD/pk//oJr4C8En/i3sQI4Gq3JH51lXk1DQ1opOWpd+JPxAuFn/eFEukXNvaZylqn95vc/mfpXgL6zqMl3NPDdS5lcsxZz87dz7Uut3FxPqk0c8zSZYyOzHJck9SaZa2zSFURCzN0HrWmFw0bameIrtPQP7W1cnP2p/wDv43+NPGs6urBvtLbh0PmNn+dQTuYruSG2eO4jTjeRxnviojPcngJEPwrdxoxdmYqVWSujRXxBr/Rb6X/v6/8AjUg8Q+Igf+QhKD/12b/GssS3jDAEYx7U3/TpFDhgAenaoaoIte2Zpza1rs5Rpr0yNHyjNISUz6E8imrrevIOL6Uf9tm/xqgLe9P8eaekdzgfJEfc0r0B2rF4+IPEGMfb5P8Av83+NA8ReIMY+3Sf9/G/xqiyXIIwkJycUfZ7wjP7r8qV8OO1ctvr2unk3j/9/G/xpg1zWz/y9Of+Bn/Golhvl5CwE+4pdmodlh/Bad8N3Fy1+xMdY1k4PnNkd8n/ABpkep6zGu1LiQDOeXP+NM26grhWSLJ5Hy0oW+/6Y8+1Pmw/cXLiOw59T1dyC8xYjoSSSKZ9u1Q/8tf0pdt+B1h/KkAv8f8ALH8qObD9w5a/YQ3uqHgTY/Cm/adTPWT9BTo/7QYsAsR2nB4p5XUx/BF+VPmw/cXJX7EXm6if+Wx/AUofUB/y9SL9Aas2tpr98jSWGnTXiIcM1vbPKo+pUEVDLLqMM/kzIsUw6xyRFWH1B5q/3BH74b5moHj7bNQW1A9buY0jTXzDaTEPotKZ78/88T+FLmw4+WuM/wBN6/apB+FJ/ph63bn65p4mv92f3QP0pPtF6ef3R/AUc1AOWsSxyX6LtW8cCt/wz4s1HQb4rJI9xDL8skDv8sy+2fuuOx/Csy1RbjTfODlrmNyJ1P8ACv8ACQPSq93bEALIuAw3DPcetaTw0ZQukRGvKMrNntUsen+IdFaS2Iu7G5G1kPDA+hH8LCvaf2WvEut/aNe8A3erLqukaNbxXFhKwPmQq7MDFk9VGOPTtxXzZ8OoxF4W1+/kmkZ2hKYJ4G3IH4+9e6/spLt+IfilSP8AmEWn/oxq8ykuWbiehU96KkfXF9/x6Tf9c2/9BNfAvghA3w9j4/5itz/M1983xxZzn0jf/wBBNfA/gV8fD1O+dUuf5mqxHwCofEeG69GF12QKOqKf51Ra5xAbe38xZG4lYnt6Cr2tn/idsP8Apkv8zWey/wCkzY/vCuqMnCimjmlFSqtMlhQKoUCpliLPhUz+FWoIEDAkZb3q2iETjA6V5c6mp6cKehVhspJG2YA+tTQacTZxyF85ZhgdsGte3iwwbGCTRbIBp0Y9ZJAf++q5nVZ0KkrlX+z0Cr1OfU1Lb2cHmhWiXHTGO9aghDmMAYxyaIYgGLfxbs1g6rtubqmr7GZcWS+dCFjHNwibQOuTV+G0g8mXfCu5c44qa5jP2m0ljPW7iP8A49V023/HxjqSw/Ws5VNFqXGCuysllb+Un7lNxX09qfBBGI4lCDOBnitCOFfLC4yQoz+VJEgVUwM4WsXNmqiUHt45L21JQZEMzdOuMU/7LBklYl3euKuFPLvrUN82bab+lIqHziF9M0c2iDlM+a0R2fKL8rEDioktIxCSIlznHStRl3PtPQfM340GIG3ynAyKam7C5UzHitogt46ou77QFGB/srXp3wZ+GWkePfEb6l4mG3w5aT/ZYLbds/tK5HLKSOfLQYzjqSB61wdvbny75lHC3XB99i12Hw/+IkXh6fwZp5iLJZ2LyxKpxunLOzZ9yx5+gr0sHaUpSfSx52MvFRiup9V+OPB0lp4UEPh/VBottZxHyrOyItkIGD8u3Ga+NfGmsTXF3HZ+KXOtadICkV1MB9qsz2ZJBycHkqcg16T/AMLbj1Sf7Vr1/dzMr+Y1tGMeccjCbs4jUdx1OK8L8W6stzdSW6Iu15Wmxuz5OTnb/OvRhJykedKKSKUVsuZbedUae3fY7AcOOquPYjmori1QMpCLjODxVgSGXVBJwrPZQl1J5zzj9MVM6FmQds1wVfcqNI9Cl79NNmZ9mQHlRVf7IohQ7ByCT+dbDxYIYLx3qq6ZgQ+oPH4mpjMqUDHaKS3lS5tTtlToOzDuDTpZ4LmPzrdJFXhWVuit6CrsyDjA6CqEI/0K6Hb7QP5V7eArSleD2PHxtKMbTW56N8OwD4H1fIyCrfzr3L9lj/kpXi320m0H/kRq8L+HxYeAdZK9djf+hV7p+yz/AMlM8XD/AKhVr/6MauSP8VnRL+Gj6y1D/jxuf+uT/wDoJr8//Brunw5hZGwf7WuBx/vGv0A1DmyuP+uT/wDoJr8//BoA+HUJbodWnx9dxp4j4AofEeMa5g69J/uD+ZqkAGvJh/trV/WwP7flx/d/qapIv+nTg/8APRa6JaYdMwj/AB2jajQ+YT15FX4Iv9JZjgHb0qvEnzfU1dhAN3x0xXgTke7BFiCNmZD1+bBpYUVrK3jXtLJn/vqrFl8sisRkbqWxjV7K3YD5mllP0+audy/r7zdLX+vItRqFlAbsKIYhvl3cfMdtTBD57DvxSpGS0nIwG/pWFzaxBcKRb25UYYXkAz6fMK0JYds1yin/AJaMuf8AgVVJAW+zK3T7bBjPf5hWy6A3VyTgASuR/wB9VMnZL+uw4q7ZVX5W29eMCmRxBVVAc/WrKqAFOPmbJ59O1PB27W2j5ztzj2rPmNLFQqDqVttGSbacZ+gFSrEpY8c0ctrNoFHyi3uP/QRVgLhywOMDn3ob0X9dWJLcz44WaW5LHIUqB+VIU2WZAHGetaLR/wCj/JwznJPvUE8R+yMD146d6fMHKU9NUtY6gjHn7WxH1wmKp6T8PvE3jPVZrDwxawusd2xtJ5rpYSsgwZFTu2M5PFXbeSOztNUuZmKxQXDyOR6BEP8An61kaHY+E30DVtc1vXdS07WCofT4bCNtrSMSWLv0UAYGB716eDn7OUptXR52Lp+1iorc5/Wn8QaTfzWuqyoJI3KPNBghiDg5I9+9VY7CON1udWlFta43t8+ZJh6KO+fWqFzc3C3ima+kurQnDORkhe+abbQoGtnMfLycbucLzgfyr2vaRSujx1Tk5crLiNNc3k99OuySZshR/wAs1H3VH0GK6K0Jmihd+SMhvfFY6x4JNb2n27Lp6sR8zEtj2ryK9Tm95nq0IcvuohkXLAk8k9PSoJIgsEZxwV/qavyj5lHHBwT61TKk2SMTkbTj8zWMWbyRnTA7c+vOayrb/jzuuP8Al4H8q2pk+6o/u5rHtxi2vAT0uR/Kvdyx++/Q8TMV7i9TvPA8rRfD/VNhALEJ+b17z+yyVb4m+MdpBC6XaDg5/javA/A6E+Dbo4yn2pMg9Opr279kcbfiP45TGALOD/0a1KH8Ril8CPsG9/49J/8Arm3/AKCa+APCi5+G9mB1/ti4/wDQjX3/AHv/AB6T/wDXNv8A0E18CeDlLfDy056avP8A+htSxPwFYf4jxXWhnxDOPQY/8eqqBi+ufUSrV7WgD4kuvYn/ANCNVCv+nXhHaVa6Z/7qn6HPT/3l/M6CMfzGatQoftmc44JqCHJJ464zVyBf+JgoJ6pXzUnufQxWxfjiZY4snrz9aNPUfYIeORNKP1q0iANFnnpx6DNPso1NhAVIKmacj/vquVy0f9dzpUdSWFVk3s3zYIFSIuRIFHINEKhUO0gfNn61LArb5jjA3cfSsbmyRWukz9gY8H7ZB/6GK2G/1s5BAPmNn86z58n7CSB8t3D+PzCr0gMl1IQcAu3Hr81TJ3SHFasbtDSIBzhSaRwJIoApyTIOnYYNSKP3zqOvl0RoP3aLxjk1NyrEcca/2jbKvykQXA+nyrSzZRWK4IJwfzqVQo1W2Gc7be4Y/ktDLuRgDjJBz9CKL7f11YW3EYHyF453EflxURTzbTJyDuB+hqww+VFxxuY4/GljQY8oHI3d+9JsaRx+tXdpifSJmLG4vhNPEgJYwqqnHH94gCui8deONJn8O6L4Z0z7XBZ2VuXmiuLL7OrXLfewCM4A4Gai8F+IPCujfEW78S6reF47ebKots82ViXKjgYAaQLk+gPrXE+NvE03iLV7rUbi6N7JcyGV5McMxOeB29hXr06fM4wcX/VvI82c7Xldf1/X4nO/Z3bygGKidtrL/eUcn+VXJF2zW/p5g/kaWxh/fOxlMiwr5a5/hJ5P+FXGtXuLvToUXma4WMH6nFdk5+9Y44xurm3Y6KGWOadwwdd4QenvWn5aqpw20AccdfatEQpFOYhwFYoB7DioRB+6JbryMV4rqOTuz1lTUVoZBi3GMtwC1Uym20hHbZ/U1rGMhYsnoTVDJewgJGDs49xuNbxkZSRnTIck+ny1gRgiG845+0j/ANBrpnXAcY75rnFH7i+Pf7UP/Qa9/Kneo/Q8LM9Ka9TuPA//ACIOoHPS5U/qa9z/AGVY1j+J3jbAwG0+1b85GrwjwUQPAt8n8TzgD8zXvv7Li7fib4xH/ULtP/Q2qo/xGRL+Gj6yvR/os3/XNv8A0E18DeCgR8PbQsDhtXnwf+Bmvvq7/wCPaX/cb+Rr4J8HKT8OLAg8f2tc8f8AbRqWJ+ArD/GeKawo/wCEkvAP7zf+h1VAH268B4/fLV3VufEtyPUZ/wDHqrlANSvQf+eqfyrqqf7mn5o5qX+9tepuWgzA7ZyTJgVoRRMdRHPAjqhakfZ+OPnOfzrbiQCXeByRzXy9R2bPpILRFpFzOoz0UD9alsVUaVbbRj97Pn/vqoozm7jweMD+dWNOZX0q1AXjzZ+fX5q5JfD/AF5nSt/68ieKLMAA69/zqWAHdKMcZz+lOiXIb5SB0Ge9SRYABJAUjnPrWNzVIhuh/wAeC7fla8gO71G6rgXN5ISe5wPxqrfZRdP7YvIAP++quBALk/8AAjn8aUn7qKj8THquVYhfvDJb2FJ5KpOhc4AjLfWrCD92qgE7o+Prmqf9oaaupi1kv7YXJURrEZRuzx+vtWau9im0txVAbU4Nqlma0nAGcf3aVVIPzj8u1Kqsuu2SAYza3BI9OFqyiDeu7OM8029F/XViW7KzgAxt15cD9KyNd1D+ztDu7pXCOy+XGTxhm4H5cn8K25MMkbAYVix5+tclq93BN4qstPljSWO1QzMkgyjSt8se72GcmtsPHnmr9NTOq7R066HTaN4q8N6D8OLzR9J1e3bU7pktZI1Xg2yjcxDEYLPIRn2WvGtSzJfSXEW2N4wZCQODjsR+leq/EzXdLvb1NKsZrK703TY1tLaWCBUWRVABcYGSScnNeWW9lNLPHCozb3DjknnapyRXs4VKN6j09TzcQ21yL8C9YW/kWKq3+sYb2+p5Nb2kRb9V0yRukdzGQPqaoFCCxVc9RW/pMHlQaZIfvS30QB9hmuetO6b7l0oapdjoZAPPl9mYkfjUWB5Ltjv1qd0J8zHUyHPsM1CwxFICfl3EmvLiz0mjLlYIkLMMgtjj1rMVf9AtGPBMfT0+Y1rlFZLckYCvkZrMxmwtC3HyH/0I11xen9eZzSTKkoPkuQASzcAdq5pBm0vif+fwD/x2umBJj6feya5tQRZX3/X6P/Qa+jyj+I/Q8DNf4a9TrvBQ3eF5FH/PdifwzX0D+y+P+Ln+Mj/1DLT/ANDavAfAIz4fuMjjfMR+Ve+/sunPxM8Yn/qGWn/obVcf4rM3/DR9YXn/AB6zf9c2/wDQTXwX4NOPhrZn/qK3X/oZr7zv+LKc/wDTN/8A0E18E+Defhpaf9hS6/8AQjSxPwDw/wAZ43qgB8T3AHdQf/HqrycalqHtMgqe/wCfE0v+4v8AOmSAf2tqef8AnutddX/cl6o5aX++P0ZtRofs6joTJmtyFfkHGT+lZKEABnHyqdx+lbcIPkxqcbtv86+Rqs+qpoWz+bVJEK9FVgfxqxpceNGtC3H76b/0Km2KFLpt3JZwOfSp9MT/AIk9uS2T50/Hp89Yzen3fkzWK1/ryLUYyHfJ2rUvlkLGmPvEA/jTIyIoW75PSrAyZINxxlxxXOalO+UFrHapwL6AD/vqtAhvtkpPGNw2+mKpXe9hZFQUY30OAe2H61dmyLp/V2lJPrzRL4V8xx3ZHc3Ft/aGj2F3JJDZ3bMbqSE4k8iNd7qp7MwGM10vxd8aeAb3whp3h/wXbWFjZSQhJraOzTcnRlYSY3bweM5561yV/p41QW0MVyba8tE+0QSgbtrZxyO4I4NcLdeHdS064Ny9lZRtk7JTOXRSe6R/yz0r28vrUoUuRuz/AD7Hj4+jVnU5kro6/wAM6r4XmsLQ6l8QdS0jWIUe2khudJW6gQEgfK4OdpAHXkV3A8Ja5c2a32heKvCut2pwVlAkts9PqAa8ZXw7pDXkVvDcXFvItsZZLjO4yvuHVTxjrUX9natpT/atLmeRgQfN0+ZoZB7lM8/rWz+qVXZxS+VjFLFU1dSf5nqGoeHPiNp+lyyr4IkvxGreVcaZdJdxhjyNyg7sfhXN+FofBsBvNZ1fxd4g8MeMrGHeI7uzjdbyZgQURWHAHA+b19qTwr8efHnhG5d4biz1aGQjzI9StFD8dvMTDA+/Neh6j8fvB3jqy03T/Evh200YpKXvGmgF3FcrtwFWT78eDg5PpXTGjSoxk4R3+ZzyrVarSlLb5Hzxry3a3rySXsGob2J3xL5b+v3f8Ks6KRIz3KsxhiQRJuGCSeWrqtV8L+GdSmutV0UHRI4XMkBWX7TayKCNvI+ZCfSuetre90rzIdYiEIuJDLHMpBik3Y4DDj8KxqVITpWhv2NqanGp75eMeUwDknn6100kYt49DhXjZexKT74OaztKtUn1C3QgMu7cfcAZ/pWxquTeaSWGP+JhD09ya8ac7yUT1oRtFyL29VnkUH7ufzqtNgwFQ3PXirEyAPKVXguc/QGo7gAWxAHbJrjjY62Z/LGAerdqznXbplq2Mny24/4Ga1YMFIG77uPyrMIxpFsO/lMf/HjXVF/195i0UkIFop71zajdp9+3/T8P/Qa6Uf6tVOMbf1rngANN1L0+3L/6BX0uTfxZeh85m/8ADXqdf4AQf8IxdyE4w03Fe7fstHPxK8Y/9gu0/wDQ3rwjwCkn/CJ37fwmSUL9eK92/ZaP/FzPGA/6hdr/AOjGq4/xWZv+Gj6yv+bOcf8ATN//AEE18FeCUY/DS244GrXIB9fmNfet+cWc59InP/jpr4Q8D4b4Z2vPA1a5P/jxoxXwDw/xnid8D/wkk3c7F/8AQqJh/wATXVVPXzl/kKL11PiabbyNg/8AQqU5Ov34PUyp/Kuut/uK9UctH/fX6M3GB8p95/hxW0pyFVRnCg1h7t1qSMkspJ9q3LI/6Pnqdin9K+RqbH1VMs2C5MbE7f3gHP1qfTTs0O3bHPnT9f8AfqKzx9nXnLFxj65qTSox/YsLSMeZ5+PQb655bP1/zNo7r+uxat8taSA/fEn55q4y4kjOOjgfSqMR3204xt3jOB2rRV1+TPPAOKxZqitqCLGbBQ2WN/D/AOhVakCi7Zy2BiTJNUb92xZz7N5F7C5Hr83Sr88Z+1KmOhfINTLZfMcd2RW4H9pmYDCm3CD3+as7W7C5vYIZrYb2VipTOD9RWyAq4Zzwo7Dmk4MLHGAHBx6UozaakhyimrM5BNCuv7WiSWVY3a0Z8Dnbhl4/Wlj06+guUTarbTkMGwPz7V0uA2voT20+bn/gaVT1Wzv7yA6dpcLTahqDpZW0aDlpJCFGPpkn8K66c5TlGPf/ADOacYwi5dit4O0DTdW02w0/U/DMdtqesJPc6fqjyGRNSZJDmPB4Q8EAjqfrWP8AE7QtAsdb0/Q9CsDb3FrZRyXhUHe08vz7D/uJtH4mvqjWfhtbX/hXR9E0a9isZPDaJLY3rr8qmBeXb0VyCT9a+Qdc1jWvE2uX2r6hd28d1qUzXUwtV2g54Az2UADA9K+uS0PlXqzlVj1PSGMsUstt0LFG/mveuj0vxU6OftcEUyN/rGhQPHJ/10iP8xg1HHo4UWe+MHzlN07MeTGrFVH4sD+VWLrS7G6HnvAAx53p8p/SuKvUpqXLNHZRpVJQ5os6jSf7JnuPtfhaa0t5nXEljPIfIY8Z2FvmiJ6YOR70alqtu1/Z2d1b3NnqNnfQvPZtEXkVQclhtB3DvkVxK6Bef2fc39pfKBbqXKTjDEDHRh3r2f4f/EHwX4S+HOvaTqsd3J4mvYfm1CPJmmJX5EWTqiL8uMHnJzWKw1Gq+dPVff8AM1+sVqK5HszDjvrS+DS2U6yxGQ8jgj2IPIPsajmkARomySRgYrk9Kv57zxHDeNnzbwvHM2eJdig7z6kHjNdNKG84EnhucV42Iw/sKnJe569Cv7aHNYbBlBEAm4A9fes7H/EotWPVrduP+BHFaVsP3cTscZdvxrOBDaPaHGP3GP8Ax41Ef6/E0kUtv7v58ZHGPUVzuP8AiWajjp9vX/0CuglJDBOvy8n05rn/APmFah/2EB/6BX0+S/xX6Hzmb/wl6nXeAlk/4RKVwf3ZuJRj32g5r3X9lv8A5Kj4wH/ULtv/AEY1eHeASE8BXEjf8/bD/wAcNe0/sptv+J3jM5J/4ltt1/66NVw/iy+ZnL+Gj641H/jwuf8Ari//AKCa+DPBLMPhlANp2/2nc/N2zuPFfemoc2Nx/wBcn/8AQTXwh4F5+E2z/qLzf+hNRivgHhvjPELjJ8SyjH/LP+tTvgeI789g6n9KrXh/4qWTPQBv0NWCN2uX590P6V2Vv9wt5o5KP++/Jm1ECbdIx/EmM1rab+9tl3HaFGCazIFwIeDwozWnpqDy5lPBGeK+Rq7H1VPc07NkIVuB84xx2zTLJwPDsZ53GabHtl6S0AAVeh4P61DpPmSeHEJAA+0ThffDVzNaN+a/U6E9UvX9C+oaOPA7p3rQKFe+WKACqbMJbdDg8rzirshyse3rxj2rBmqRHcf6yxD9BewrwOPvCr10wGoyuzceYy/nWfcP5ZscnJN/F+J3VanbdcyMBwJeaUlohp6sSWZUaBSQWlkCj8smpVI8mUMRy+R7jiqkqBri0wo3LISPb5TU6KCEyOcnBqdEkPdjYY/M1iI46WE//oaV2Pw20hdX+K9pM0cjp4fs5NVATIzcMRFApI92Zsf7Ncra4Gqwr0zZTD/x9K95/Z10lf8AhGb/AMUyx5PiC9Z4iR1tLfMcZ9syFzXq5bT56yn0iv8AM8zMKnJSce7IvjZfS+GPgjrMNtMYtR1fytHtuxIcjzP/ABwNn618gRabtlt9MsY8ySFYl9WYnAJr6F/aQ8Qf2x8UNP8ADER/0Tw9am4n97iboPqEA/76rw6eFk0++vUdo5iBa27L1M0p28fRN5z9K+mukj55Jsz4pYrnULq6i+eDcLe3P/TGMbFP44J/GrkEXm2oVVyTkAevNUbWBLYNbxtmOFjGD6gVuaChmnXI+WIEn354r5vEVOaTmfQUIcsVAoz6TfQReXcW5aI8kDkH8qwJrK4iNvbwpDcxNIIohMSpjz0XI6rXqAlKqHVsPtyPxrA1i0gmn0uWLasr3sSMVGM5z2/Cpw2LnF2LxGFhJEOh6W9rcvd300ckyx+TGsSbY4U6kKO5J71ovh54yh3ZUjI71YaLyWcDnJ496pW6tGoJOD8xx6ZrklUlVk5yep0RpqnHkitAjf8AdxAAlhkcdOtZzOf7ItVXoIQPrya0IzhY+cZcc1mPtOlW3ljAEQGD6hjmqj/X4gyB0YF/QHj6VgIP+JPqOf8AoID/ANAroZ8lyAcZH51gAgaLqQzz/aK/+gV9Pkn8V+h85nH8Jep2vw8VJPAV2HHCXEjj6hOP517D+yhj/hZ/jPHbTrcf+RDXjHgKKS4+HupQxkg/aCxI7L3/AJCvaP2UERfiX41MedrafbNz7yNVQ/iyIl/DR9d3/wDx5T/9cn/9BNfBfgqYRfC6GPblpdanAPphia+9L7iznz/zzf8A9BNfAfhQxJ8KlupX2rb6vcv9SSQB+ZFLFfAPD/GeMX/HiKcj+45/WrBcLrF+T3EY/QVBqCldcl3DDeSSR9TUzLnUr1+4kiH6Cuur/uXzRy0v98+TOiyQI/7wPFa1hgJKx6kmsWYnZ8vBVhWtasAigHqa+SqLQ+qg9S7DIyKrcblbHTt6UukYPhazPTdNOfzem2uJGKEYy/GexpNI48MWSNyfMl4/4Gawl8L9V+pqviXo/wBC/bkpAdw6DvVxmDSx46YGaqSnZA46fJwSKljDbkyRkDJP0FYNX1Nr9CDUMedYMTz/AGjCPrlqs30q25nuJZFjiSXLMxwOuOapXTrJLp5Azi+gJ+u6rs8lpF4hea/0+PUba0s5LlLaVtqGZ3CI7cHO3JIBGM1rGPNyxfmZOXLdryIpNX0cXEJGp2pClicSDjirkU0E9qs0E8cyFvvRsGH6Vzmva1a2vh977TrD7PdlxGGmkWZeTyQuwAVk+D7rZFqsW3ObhHJx1JQ5/Wr+rXpuoun9fqT7e1RQfU6u+mka5tdOsg8moanDLp9miDJaWVkVf55r7b0Cz0rwh4Qit1YRaZolmIfMxgeTbrhmP+8wZq+TfhNpDa98ddBlyiw6DZz6pPI4yEP3Iz9d5B/Cvc/jnr/9gfA6606ybyrzxC8elWoI+bym/wBY3T+4GP8AwKvey6koUU+54mPqc9W3Y+T9S1248QavrHiy9ZxPrV3Jd7XOSkZOI0/BMD8KgnKGW1tc/wDHpCbmXHaaXhB9Qgz+NDW9u+oQWrfLZ243SEdFjQZY/pWQ1zJJZi7cbZb+Y3bj+6pOEX6BcfnW2Llam4rroZYaN6ifYljRR9pJIUCY4yceldP4dt1GmtIkkbvISdquCQOg4rJ8O2ehXGnT6jq0FzPdtfPCmxVZI41CkkBv4iTVTxpJpum2tk+hWywvteb7U0YSclXGBlcADHbFeFKPPP2KerPajLkh7V7HWOjiDf2G1T9CRWVfW5S50x0bhdShBPr94VqfaPNs93QOEb+RqrqZDXGnInA/tKD+ZrjptqR1Ts0TTMd7hmyd5z+dUYyHeRScYUgH9atXi7LvavUSkn2FVcgXE3AHzkYoitAb1Ej+7GW5Oayv+XK0H+x/7NWnE+IkIwTk/hWZ8o0i0kHOIyT/AN9VtH+vxM5Ec4J3jGMcfWsED/iT6gPTUR/6BW/J/rWJwdwzWC3Gkan/ANhEf+gV9Nkn8V+h87nH8Nep2/wuI/4RDWVJwNrn9SK9m/ZUTyviV4wX00y1/wDRjV4j8PxCvgHVSZAJXlUImeSA5JNe5/su4/4Wd4yx/wBAy1/9GPVR/isiX8NH1fqP/Hhc/wDXF/8A0E1+ffheBrj4babA3MEuuXBkX+8FLED86/QTUBmyuPeJ/wD0E18FeCUVvhxakjmPU7ll+u9hRifgDD6yPEtU+XxFOozjyyB+dWAQ2oXg9Z4v5CoNWH/FRT8c+X/WpAP+JndD/pvF/Kuqrrgl6o56X++fJ/obl4xCSkHof61p2hJMZPTBPvWVKd7zJgcnFaVs3yIAMEj8q+VmvdPpoPU0kRh+8GMCQGotKONAshnnfLx6fOalhz5pBOAF3GodOCjw9aFRhmeQ5/4Ga538L9V+TN18X3/oa10w+yu3UkDFSxASOg68dKqyE/ZR70+13+eJd2F+YYFYW0Neoi2j3t/HAl7a2S2x+3TXN0GMaRodoG1QWZixAAFVJheX9tqmoSX+mxqSunwKqTb7gowkd1QKSqgYyWwOaz9ZvGtdTEW8KJLVTg8btsuTWTYa7rFro4GjXTW1xI9zFMyEAyRSYDLk9M4r0qFNNKUtv6f6Hn1ajTajuUfEU01vZW0ck1pdRSuJ43tZN6uBxjpkYPY1seFtKvUtZZ/7c0GH7UwkMdzcMrIfwUjvXI61CUisbckZihO4LyAS2cVswXM8GmbYG/fOBHGAeSxwBj3ya65w/dKEOr/U54z/AHjlLoj64/Zo0NLLwxr3jPVpLYvrF2LWBkOU+z2/GVJHIZ2P/fNcl+0D4si8QfFC20i2O+18NWh3+hupgDj/AICgH517Roui2XhPwx4a8JTuqW+iWCvev2G1fMmY/Via+PdT1q58Q6lqHiCcb7nWr2S9IA/hZsRL+ChRXrRioxUV0PKk3KTk+pk69MbDwvKyFRPqsv2OLccfukw0p/ElF+hNUNOTUtf33K3Gi6fGh2gXFwV9Oi4JxVfxhc/aPES6ah3Q6TELQY6NJndKfrvJH/ARVe1EUWnryocjn3571w4pp2S3OzCp7vY6fSB9j0GVZ7iBymo3AaWJvkb5YxlSe1YvjN1mtNOETKVdZUzngZKmk0HUp7AR39sIGuLDU3miW4iEsTEqvDIeGHHSszWZjIlr5zq07zSSybFCgFucADgfTtXLCklWU7632+R1SqN0+S2lv1Opu7jWNF0KDUbrU9Iu7bamIIQwkkTIUlfp3rTu5cy6bJnI/tGAjPpk4rg7+eK809RCjAx2ro2QMZyMAflXTXt/DHBp0eWDx3cDNkdMHmuWdL4XbW7OiFSzavpodJev+/lA7SH+dZpIErMeSxJ+tMOp29xdSBNw3yEqWGAealKbpHPTaAAPrzXHGLjozscubVDFBFrEcdTxVCEK2gWo7bCD/wB9mrwI+y23oDnFUY2J0G13YBKHIAwB85rWP6/5mbevy/yGzf6wrjGBkGsJh/xKdT/7CI/9Arakbd5ZPXbWKf8AkD6kB/0ER/6AK+iyX+K/Q8DN/wCEvU7D4bJG3hfVlkjDEK5Un+E7q9s/ZVcv8SvGLHvplr/6MavE/hwSvhXV2x/BL/M17V+yiCPiJ4s3dTpVqf8AyI9XH+KzN/w0fW9/j7Fcf9cn/wDQTXwP4OYD4bWnq2pXOP8Avtq+97//AI8rj/rk/wD6Ca+B/BoB+Gdvkfd1G5I/77ajE/B8x4f4jxXUv+RhuOc/J/WnswGoXbZwwmhxUWpsP7emY94x/OnOQNRu/aaKuqo/9jS80c1P/e2/Jm6Objg87xWig2qrA/xkVmRf60HHG+r6FRGcnnzCf0r5iaPpIGvCqsY177Ofxqnprt/YVkp/haQf+PGpIZQYCB97ZjNVbFtmiWi9xv8A/Qq51H3X6r9TW+v9eRtxMHskJ6H/ABpYZsJEoHHP45qvFKBZoccKhOKS1bMULMcEDNZcujNbjL+ystQu9OTUbZZoRcBSDkHaRyMjntXOQaSkWl2DAlHlhM7D2Z22/oK2dauntbWGdAWZZlAH1GP61c1mOGLUTa28ZVLWCC2UY5ykS7v/AB4tXVTlKNNK+n+X/DnPOMXN6a/1/kefazGsd0sDryIgT+Jru/gd4ZtNe+KHh8XNsr2+mGTVrx2GQY4uUQj0L7R+NcLrZabXZ2bgK0cIA7AL/wDXr3/9m7w/La+EvEviuYc3sq6ZbcclY/3kn4ZKCvcop8i1PGrP3mei/FXxDcWvwy1uRZSuoeIp10qJh12sd0xH0QEV8+28kemm51VYx5OlQedGmOGk4SFPxcr+Ga9I+MGpLJ400zw1Eo8vQLLzZz/09XGCR+CAf99V5rq00cNhp+nmMZmc6pcD/pmmUgX8W3t+AraUuSLk+hhGPM0l1Ocm8MWMOnm5upbiS6bBkbzMBnPLdvXNZp0XTyxUiQ/VzW/f3qyWMS4+Zm3E/wCfrWSXO8HHBHFeLCpVavJnsSp01okUtNtA2m3sMYO2K8AHt8v/ANao9T09otPimPOZwn5qf8K2/DK+ZputpsyBfRMW/ujDin63bGPw3cTE8QXULY+uRWzqtVuXzX4pGap3pc3qZWk2NhJY291MjPICSwLnaSD3H4Vd1BjN5Dscs1whOazNIlzYMndZXH05zWlKQVt++Jk5/CondVHccLOCsTDOWA/D610UUgMUsjcsVBP5Vn21jDNarMXYMWIZR061Zc/u7gKMDt+Argm1LRHdC8dyVP8Aj0gyMisxD/xKbUHgbWwP+BGrSTEW9uh46VTDA6ZaY5G1v/QjRFfn/mEn/X3Ecjnyo+PpWWuTpWo5/wCggv8A6AKvSMdiA9MkVRQ/8SjUM9ft4/8AQBX0eTq1V+jPn82f7peqOj8FXn2TwjfxiNneffEmB0Jfkn2xmvff2W1C/ErxcB0GlWoH/fx68K8DBR4Jvn2/N9okXPtgcV7v+y5/yUnxb/2CrX/0Y9VH+K/mJ/w0fV1/xZXH/XJ//QTXwP4N5+GVuN23Op3IBH+81ffGoc2Nz/1yf/0E18CeC+fhxapgnOqXJz6fM1LE/APD/EeJ6opTXJkPUR4/WnNg315/12i/lS6v83iG4I7p/Wo3fbfXo6t5kZA/Cuqf+6L1RzU9MV8mb0b/ADD/AHs1Y3745mztwazY5AZQT0BzUwkzBKOma+ecD34z0NaCYRhg3TbUFrLnR7fHq/8AOokk2q+7n5agsZAdKtxnu/8AOs+TT5/5lc+v9eR0FuSbNFJ6p1p0Mn7mLb1UflVa2lVo44x97bnPpzTbbIVBnG0kH8652tzoUtiy0RvdT0q18lpzLfwDyl6vhskDP0q1KZdS1medsIby7dmP90M5/kKTR5M+KbSVDtNjb3F8Wx02RnafzIqOyZIzCZXCJEN7k+irk0Suopf1/WgRs5NnBag8f2+6nj+eP7S7If7wBIH8hX2x4C0iz8KeAvD2kXjCGDT9P/tDUHPHLL58pP0BC/hXyH8PdCbxZ8RvDmhmDzIbm8WW4U8AQod8hPsFBr6d+K+uyQfDbVzAAl54puxpUAH8EJO+Y/ggC/jX0VOPKrHgVXdnh6Xt74r8RXer3BK3Wv3j3b7v+WaOflH0WMD8q5jU9W/tTULy/jj8uC6kEdsp/ht4xsjH4gZ+pNbVy8tro97cWY2TXONPtcD7pk+8R6YjB/OuWu9kcyQoQY4UEa49BWOInoo9zTDx15uwhJaNTu4TIxSJjeDTA4WPJ/iakVsuAK4rHbc2/CJ22HiQdB9otz/489O8T7U8OX6jPziJgAM8hx/SmeDzE+n+Kd4ZmDWzR4OPm8wjJ9uTWhdRSz6TrMKv5ZNhIwOM5AIJH44rmqPlxHN5r8kdFNc1C3k/1OL0thGbqL0l3fgRWhI2Eg9POX+RrMtCqXMh/vRo39KtSS/JF0AEgIrtmrzOODtE6nS5t0MsXdW3ClklKmXGAGFYun3ojumU8Bxtq3LKDgfSuB02pHcqicSaaTa8QPPtVQSsun2Yxxhsf99GlmlAeM9flqor4soMnPyk49PmrSMdP68zNy1/ryLDk9D9RVFf+QLfn/p/H/oAqV5cyMSeoFQI2dCvPe/H/oAr3MoVqj9Dxs0d6a9TsvBCg/DvU3zgrdtj/vkV7p+y0D/wsbxaT/0C7Uf+RHrwjwMwHw81TIzi6Yj67RXvH7LRz8RPF5P/AEDLX/0Y9Ef4jE/4aPq++5s5/wDrk/8A6Ca+BPBYJ+HcAUfMNRusf99NX35ff8ek/wD1zb/0E1+ffhSVk+HtsFYg/wBpXJyP95qWJ+ArD/EeOanxr0wPXywP1qOVY21e7Zi4IYY2/Snam3/E8mIXqg/nSS/8ha84/iH8q6pf7r9xyxX+0/eW7ZbV32yzXCDsVxVgx6aFIeW9cn+6QKoxn5jnirKhD3J+orx5XvuexG1ti7DFpBXl9RJ9nFWo7DQRCF36kg64Ei/4VnRsE/hyDVhJMngKPqcVzyv0bNly9jVit9Fj2kvqfyjAxKg/pRjRI2IU6oM9vMX/AAqiodhwQcdlalIUjlpOe2BWVu7NL9kaumPZx/29PZLdMfsMVoHuGDFTLKN2MDptBqG+kSHR9QkbnNs4T6ngfzqPTy1v4buJxydQ1EqMj+CFP/inFU9YuNnh66JH+saOP6Ddk/yocb1FHzX6DjK1Nv1PRP2e9Hb+0vEHiaRcfY7ZdNtzj/lpLy5H0RSPxroPjDqySeMLLw7ACyeHbHbJgdbq4wz/APfKbR+NdP8ABjTLfw/8NNIvdVxHDP8AaPEF+WH3IFGEB+qp/wCPV4+NZk1DVNU8X6ugJaSTV7lD0LMcxxfmUSve6WPCvd3MfW3t11KHS7iS4WPS48SG2cKTcyAM+SQeFXav1Brkbo2rXjG3a5EWf+Wjgt/KrbzFrNpJ5DJdzSNNM5/idjlj+ZrMyA3r9K4W+abZ2pcsFEnK2m0KGucj/bH+FOiit5J0jDXByf74H9KgHJzgYq1ZqiyNIxxxgVL0Vy46ux03he3tIoPEgtvNCLBav+9IJ3eZz0FaE6LPa3UZYrutJwMdztJx+lY/hubaviMcYNvb9f8ArpWvbBZb+CGQlI5NyMRyQCCDXmVrqbb8vyR6NKzgkvP82cBAsbTwmRpFDQDHl45INWHjsjjcbnjn74qmhCPa88APHn6VM/TGCR716slrueYnpYeTaD5lN1nsTJWtCmjSQq7vqe7HOJFxn8qxQB3yPpVyy24YbzgHPSs5x03NIPU1o7fRSPmfUeOmZF/wqKWDRlQKhv1A9XU/0qLK5xucD6ConKEEGT9MVzpO+7N21bYZKmlr9xr0n3ZajhKnQLrbu2/bxjd1+4Khl2gkBj9MU+1P/FOXX/X+P/QK97LFab9GeJmLvBeqOz8FEr8Pb/HOb/b/AOO175+y0P8Ai4fjH2060H/j714D4N5+Hd976iP/AEGve/2Vsjx/4xB5/wCJda8/9tHrBfxWaP8Aho+sr7/j0n/65v8A+gmvz58JoW8AQAdTqN0B/wB9Gv0Fvv8Aj0n/AOub/wDoJr8/PCDqfAtugPzDU7nj/gRp4j4R0PiPGtTGNbmXuEA/WoLyXytZuwc5LDp9Ks6oR/wkFwf9kfzqOdfM1a8YED5gP0rql/uyv5HLH/eNPMYLlAwwr59NtSi7HQI+f92pktgFyBz3J61P5O0ZxxXkuUT1VGRVF4q/wyfgtOXUYyM7ZCAcZC9KsLbNMzAEAJ95v7v+J9qeLVcBVG1R2/r71LcOpSUuhAupDdkRyD/gNTHVEC5ZHwOT8tK8SRIzOQiKMknt71Zj0sxabPqGo2pdnhJtraTICAjiVx6+g/E1L9nu0UlU2Rr20Kx+HNIUkl5I5Llwexkfj9FqrcaTc65caZoVnlp9S1CK3T3Lcf1qzdyGG4S2UfLbQRQgfRAT+pNdl8KFjuPinoFw0AlNjBeaiqYzl44iEP5kVz0E5Vk33v8Aqb1mo0WvL/gHonxUvYPDvw2k8O6fMxOqzR6PCx+99jtlUyn6MVVfxr5+8Uaitho1lpTAiS+kF7cKBz5a5ES/idzY9lr1P4p3lvceNvsc82dP8N2MdvO45xI2JJ8f7RZlQD1rxu+F9c38+sajLHbvdMG8kDLIoACoP91QB+FevUqRgtTyadNzehlSXySR7Y4JST6Rmqy3cakho5M+m2r9zdTTHapKIOijv9arcYBzXPG1tjple+5D9tQDlXz/ALtSrqsKIF8t/rtq3FZXU+DHGQv948Cr8Fm1v/yxSVz/ABMc4+npUyqU1uvxHGE3syz4SlhuoPEchDAC0jKjH8QkGK3rSbyby1mccI4yPasjQYZ0vNYQ7E86zWTIGeFlXP8AOrczmON2I+4M151e0pu3X/JHoUbxgr/1qcTfOsE7H+GK6f8AAZNM+3xycDJ9gKl1UeXqN5uGALoNg+h5pjoZIWZURXT5l2rjpXrRs4ps8uV+Z2E+08Y8tz+FSQXwjk3FG9OlKu2SNZF6EZp0VuXk3AZIGcetS+W2qGlK+jJTeNnPluM+1K9020ExSfUirCKjKA3CHoT/AAn/AApTAUzxjHBFY3j2NrS7lGS4yPmjcfhVi1YtoVwf+n0HH/AKcYsdRhfX0pbdQulXSel4P/QK9XLmnUdux5mPTUFfudh4IkX/AIQq7hbq1/kD6LXv/wCyyMfEXxoPTT7X/wBDevnzwUinwrcSE4KXTn9BX0J+y1j/AIWL40/7B9p/6G9YL+KzV/w0fV1//wAedx/1yf8A9BNfnr4SdI/AQndgqpqlwST2GWr9Cr7mznH/AEyf/wBBNfnBpEz/APCrb6FoWUHU5FRv7+XOcfSniFeIUPiPM9TL/wBtzb1wxUcVZt0zqd6SMsHGPyqPV2z4in/3F/lVqyKC81B3YKquuWJwBxWtZ/7J9xnS/wB5+8tLHk4Jx6DtU0UAmAcEiIdGHV/Zf6mpjbq0avKn7tuQh4Z/qP4R+pqfJJBbljwFA7duOwrwnI9pRIvKAAVECqOir0/D/GnLEiKWdgFAySeAB6/SrCKBkkj3Pb8P8aLGexj8Uacuq2f23T1Ek81sX2CXYMqGPpnnHeove5TVhLXSVlhXUtQDojjdZWwX5n/6bOD0X+6D169KtX1vcz6XKtsjzzMOkzfM4yM81NqXivQbvU2u4tO1gxytukaS5i3H02jbgAdAPSpbXxL4ZecLLba3DBjkgwyNu+mBxWclVdpcu3Q0i6aTjfcxNTeaW9mnj0W/iSRt2GdGI4AIz6cV2fwR1E6Z8U7vVb20kgtrDQL2VUmxk4T/ABxVCTVfCckTt9v1VSBlUNkuW/HdgVmSnQbyNXh8TX+mPLC1vPGtmSXjY/NGSG5HFdGHquEk5xsvmzCvS5o2jK/3GH4j8UPc3rRxOtwWne8upW6T3Tkkn3VM4Hvk+lYcP23UJzIEluHPUgE4/wAK7m00jwHaquNZJc/8tbiwkb+TVqWv/COOTFF4usrcA4Hm2c0an8RmqqYtN3jB/cyaeFaVpSRxsXhy4wrXcqRIRn5BvP6dK07TQNOUMTexoy85lGC304rppIdKjZVXxjojA9SryjH/AI5TBDprKT/wk+iuo9ZnH80rhlWqS3v93/AOyNGnHYxpLFUUbL92PZUw2f0qD7FIp+e4JB/vRjmuga2sQgKeINGbPZboj/2WoTb2iEOdd0wMP4hck/0qFN/0jRxRzguoNN1C4a6ulAnsXhjYrtG/zFOPyFQjUdLnLQTXypHIpG9Tnac11NyumywgXWs6HKo5G6Vj+m2qkFppE6kxXmhkA42mXaf1WtlNWu07/wBeRk4u9k0cFqkS3WubLWQXKFUfMfOSFx+dWrTSrnzFeVQi/wB1mArvoNOsMlYdR0WFiOcXIX9QtVotLtrySRIdU0ltmSxE5LYAySAQM/QVr9bfLypaIy+rK/M3ueeT232DUbizBysTZXPdTyK1bKEGLdjJbkY7is7VtQhvtaWS2hZLdIhEjP8AekC/xN6Z9OwxU1hMUmEe7amev92u2ak4Jvc44OKm0tjRMS8naCMc+9PEPyiIncxGYm/vAdVPuP1FW/LJbceuPm+vc0xoFxsOQCQQR1Vh0Irj5js5SgYyBz90iqSZWyvF7C7H/oFbLK0m/wCRfPjG5wvSQf3wP5jtWQMfZrzHQ3v/ALLXsZW71H6HkZkrU16nS+D52i8KXAABL3RUA+/WvoX9lUk/Ebxt7WFr/wChvXzx4TCDw5lyQPtUhAA6nHFfRH7Kwx8RvGvvYWh/8feqX8Vkv+Gj6yvyBZzn0if/ANBNfnt4WIm8DWEZTONRuzk+5av0IvxmxuB6xP8A+gmvz98HxD/hBLRicEX90R/301TifgHQ+I8a1Nca9IP+mYq5psKNqN5M2CUcEbjwvHXHc1X1UgeIJP8Ac/rS2U8X264XOXYhlH94Y5rard4XQypWWJ1OhEhIYxgDHO5/5mnLyO4GMknq3+AqGNuBkbj6dhUxZYomld8kYxxnBPTA7n2rwWuh7iZMWWNDLMwRVAPTO3047k9hWLqUoTULR7nEUGyRAvdSR/Ee5Nail22vMoVkyUTOdp7sT3Y/p2qlfWi3cPlv06/SqptRlqTNNx0Mn7RHsADRMfdsUwyRbsq4X6SCpf8AhHV6gnnoKgHhxpFecZEW7ZGf75H3iPYV1p0u5yv2nYkF3bpgPcYB9WzUq3ERGUlU/wDAwKpjw4xOAxpT4bcEfMTn9abVL+YE6v8AKaP2lQMmVF/7aCn+apAMbK3vuFZLeH5FZR6jP4ZwP1p58NTjo2PxqOSkvtF89X+U0Wc9PKz+IqMcMCV6/SqEnh+5SJpPM4Vd3U0o8N3+AS+Gx0yeKajTt8Quap/KX+WBXywAf9mo9m3Ay4HQfIKqf2FqQHyzMfbcaYdD1BlDNKcH/aNNKH8wnKf8pfHyjkfmuKa/lkjdH+O3P61mPo9/vdGLkIAc5PIPSnx6dqcabUldVHbNPkj0kLnl1iXkcqGCAYPXinQMpnRgp3KQRx0qi1jq2OJH/Oo/smq70HnP8/y8Hv6U+SL+0hc8l9liHDXcYjOWG4kenNbem2hfdKy5AG3b65qHTtGeORTKcbuv9410SxxQhURdo6H/AD+tY16q+GJrRpveRBbyNGxt3HKjKt/eT/EdDUzAlTjgDj/CmtGzSAhgsiHK/X0/HpTrxVt2R1nWRHXcCo6D0I7Y6EVx7s6tkVCv7wfvDFMDmOUfwn39j3FY7Ss9veO0YjLXmSo6A7RnFaryLk78BSM8+lZarvsZpQrbJbksjEYDAAAkHvzXt5XF+0foePmT/dr1N3w0+PDxPpPJX0f+yoS3xB8Yk99NtP8A0N6+cvC0SyeH7jecCNpXH1yK+jP2UufHvi8+umWn/ob1S/isj/l2j62uxm2m/wCubfyNfn94UIHgW0x1GoXf/oxq/QO5z5EmAT8jcDvwa/Ovwlr+kx6R/YVzBcm8tL24knT/AFZTdI2MA8k46iliE3EdB2keS6wT/wAJA5PdP61oBxfWUNpdMqNANtvcBcNEewJHVa7TxN4EtzELnT2G05MFx2fvskHY+9ectLLaSNBcIUkQ7SrcYPpXbhK0HHkZx4qlJSU0acGpKgaO6ZYbiM7ZATxn1HrVq3vrZmE8s8eRny1LD5c9Sfc/pVC01C0giKfYbK5ZjlpblQ7Mfz4HtVwatad9I0kj/rmB/Ws5ZbTlqp2NFmFSOjhctG+tCf8Aj4j/AO+xxSi8s8jFxDkerjGfWqn9rWWcnRtH+gj6frStqli/zf2VpCY7CMD+tQsoh/z8/Av+1ZfyfiPmv7Z5RAt9FGXBLybh8i9z/vHoBU/9pWk20faIY40UIibxhFHQf1PvVE6np5H/ACC9L/74pg1Gw76Zpn/fFP8AsiDX8T8BLNZ3+D8TXF3YYyLmE4/2xyaYl5aSSkvdxe5LjpWT/aFgFObDTDn/AGOlINQsOh0zSz/2z/8Ar1P9jx/5+fgX/asv+ff4mra3lrKxnkuYlDMWALjgDhR/M1aN5Ynn7ZBgdP3grBN9px5Gm6b+Cf8A16UX9j/0DtM/GMf40nk8W7+0/AazaS/5d/ibc1zYtAoW6g/eOq/6wcAHJP6U77XZsSxu4ST/ANNBWIuoWA/5hmmH/tn/APXphvbbJ/4lunj28oVP9jx/5+fgP+1pf8+/xOhW6tNy7rqABUA/1gqs17YlUAuoeWz98cVjfbrXP/IM0/8A7900Xlrt5sLDH/XIULKI/wDPz8Aeayf2PxNcXloLtVNzDtmiaP744I+ZSf1povbIZUzx49NwrL+22gXAsdPH/bIUn220yM2Wn/TyxVf2TD/n5+BP9qS/k/E01v7Qlczx5A2n5x7Ux5rSVGUXMaseQ24cMOh/Os5ryw3D/QdP/wC+KVL2yXObHTyD/wBMx/jVrKY/8/PwJeZy/kNQX1pJBHOJo0Zh8ylgNp7j86l/tGzcKXuIsn5W+cfgaxze2BH/AB46f/37H+NMW8gU/La2GP8AriKl5TD+f8BrM5/yfj/wDWa/swxAuIj77xzVee+tdwYzxsGPz4YdezVV/tG3H/Lpp3/fhalGoQ44tdPP/bFaqOU019v8BSzOf8n4/wDAJILWG6tn1K/d10qNtkcaHD3kg/hHoo7mq97qU168SzEJFCuyGFBhIV67VH+c1Fc3qMEC7Io1ziND8iE9So7e9T6JokviC8fdIbfTbfBuLgDr6Inqxr0E6eFp8sf+HOC1TE1OaX/DG34T+fw7dsOR85/8er6J/ZRB/wCE88WHHXTbb/0Y9eQBNHsdOmaO1WwtEh8oCHlnb+Ec/eY9zXr/AOyfPFN448WGNwSunWwYDsfMevGpy5puR6s1yxsfXbEmvnf46fAg+K2fxv4HijtPFlsu6WBQFTUlHY9hJjoe/Q19E4pGAYYNdTVznPzp8O+IDfpc6fdQeRdQhku7O4+QoV+8CD0I/SiK08MJNNcy6fpepPN0e9bzCq9gOa+s/iD+zz4H8feJ/wDhJLp77StSkTZcS6c6oLn0ZwRgt2z371yg/ZJ8DgYPiHxAf+2sf/xNcrw+vus6VW01R88N/wAIqBj/AIRrw4P+2X/16Rf+EWOf+Kb8OZHpF/8AXr6Gf9kfwM3TxD4gH/bWP/Cox+yH4Izn/hI/EP8A38j/AMKX1d9w9sux4Cf+EZZUDeG9AIHQCL/69J5Hhhmz/wAI1oI+kR/xr6A/4ZF8FD7viXxEP+2sf+FMP7Ing0/8zT4iz/10j/wo+rvuP2y7Hgwg8NgceG9Cz/1z/wDr0j2+gHAHhrQj9IT/AI170P2RPB3/AENXiP8A7+R/4Uv/AAyP4RHTxb4kH/bVP8KX1eXcPbR7HgX2bQs8eF9F4/6YH/Gg2+gk5PhfRfwgP+NfQC/sleEl6+LvEp/7bIP6U/8A4ZM8Hd/FPiU/9t0/wo+ry7j9tHsfOr2Ogs+4eHNJyw5xEQB+tRmx0LH/ACLWk/8Afo/419HH9kvwf/D4q8Sj/tun+FKv7JvhIdfFviU/9tk/wo9hLuL20ex82SWOiSLsPhrSwD/diIP86qw6P4dt4ti6LYPk53SMXP55r6eP7J3g9lw3inxKf+26f4VCv7I3gxFCp4n8RBR0Hmx/4VSoS7i9rHsfNY0/w9kZ0LSTj1B5/WpVs/DiyeYvh/SQx7YJH5Zr6S/4ZJ8GD/mZvEX/AH9j/wAKQ/sleDyc/wDCU+Is/wDXSP8Awo9hLuHtY9j5we08PzlSNA0obePkjPP60i6bofbQtKH1jNfR4/ZK8ID/AJmvxGB7SRj+lO/4ZK8Gnr4p8Sn/ALbp/hS9hLuP2sex84/YNCO0HQ9KGP8Apn/9eo5tO0UAOmi6K3+yEwf519Jn9krwdjjxT4lH/bZP8KZ/wyR4P7+KvEh/7ax/4Uewl3F7aPY+ZTZ6SW50DS1x22f/AF6X7BoxIf8A4R3S+PRCM/rX0wf2R/Bp/wCZp8R/9/Y/8KVf2SPB4PPivxKR6ecn+FV7GXcXtV2PmdbHSN4J0DTefVOBTGtdFVj/AMSDSfrt/wDr19PH9krwYRz4o8SH/tun+FMP7I3gk9fEviM/WZP8KFRl3D2q7HzEltopP/IF0rn1H/16v2/2KG2NsjWtlapum2QnIz3wvdj2r6O/4ZG8Ej/mY/EP4yR/4U5f2SfBCtk+I/EP4Sxj+lHsZdw9qux8v6RofiT4keMbbwx4Ytt1ywz8x/dWUX8Ukh9f1PQV96/C74Y6F8MfCUejaSgmuZMPe3zriS6l7sfQDoF7Cpfhv8MfDHwz8Ptpfh+CRpJn8y5vJyGmuG7bm9B2HQV3HSt4xUVZGMpOTFHSk70UVZI4dKaetFFACiloooAT1oFFFAAKD1oooAO1L6UUUAIKWiigBB1pRRRQAlFFFAB6UooooAD0o7UUUAIOtB60UUAFKelFFACU2iigBRSnrRRQB//Z"
   },
   {
-    "mods": [
-      {
-        "stat": "ini",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-sable-comun",
     "nombre": "Sable común",
@@ -5104,8 +4772,6 @@
     "detalle": "iniciativa +1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5134,8 +4800,6 @@
     "detalle": "pdg +1, parry +1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5160,8 +4824,6 @@
     "detalle": "pdg +1",
     "tipoDado": 4,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5181,8 +4843,6 @@
     "detalle": "Rompe armadura. Sangrado.",
     "tipoDado": 6,
     "danoFijo": 1,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5190,12 +4850,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-tomahawk",
     "nombre": "Tomahawk",
@@ -5204,11 +4859,9 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "rango +1",
+    "detalle": "alcance +1",
     "tipoDado": 6,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5233,8 +4886,6 @@
     "detalle": "bloqueo +1",
     "tipoDado": 8,
     "danoFijo": 0,
-    "danoAmplificado": 0,
-    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5254,10 +4905,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "parry",
-        "val": 3
       }
     ],
     "efectoMods": [],
@@ -5341,18 +4988,6 @@
         "val": 7
       },
       {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "parry",
-        "val": 3
-      },
-      {
         "stat": "bloqueo",
         "val": 1
       }
@@ -5378,10 +5013,6 @@
       {
         "stat": "def",
         "val": 10
-      },
-      {
-        "stat": "parry",
-        "val": 4
       },
       {
         "stat": "bloqueo",
@@ -5751,10 +5382,6 @@
         "val": 4
       },
       {
-        "stat": "parry",
-        "val": 2
-      },
-      {
         "stat": "bloqueo",
         "val": 1
       }
@@ -5955,25 +5582,1671 @@
     "imagen": ""
   },
   {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-policromatico",
+    "nombre": "Anillo Policromático",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 11000,
+    "detalle": "Al iniciar el combate, elegí un atributo principal. Obtiene +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [
       {
-        "stat": "def",
-        "val": 4
-      },
-      {
-        "stat": "tipo1",
+        "stat": "rng",
         "val": 1
       }
     ],
     "efectoMods": [],
-    "id": "cat-armadura-acolchada",
-    "nombre": "Armadura acolchada",
+    "id": "new-anillo-de-alcance-extendido",
+    "nombre": "Anillo de Alcance Extendido",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Rango +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-alcance-extendido-mayor",
+    "nombre": "Anillo de Alcance Extendido mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Rango +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-alcance-extendido-superior",
+    "nombre": "Anillo de Alcance Extendido superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Rango +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crgmax",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-alforja-sin-fondo",
+    "nombre": "Anillo de Alforja sin Fondo",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Carga máxima +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crgmax",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-alforja-sin-fondo-mayor",
+    "nombre": "Anillo de Alforja sin Fondo mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Carga máxima +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crgmax",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-alforja-sin-fondo-superior",
+    "nombre": "Anillo de Alforja sin Fondo superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Carga máxima +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "int",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-clarividencia",
+    "nombre": "Anillo de Clarividencia",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Mientras esté equipado, otorga Inteligencia +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "int",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-clarividencia-superior",
+    "nombre": "Anillo de Clarividencia superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 9000,
+    "detalle": "Mientras esté equipado, otorga Inteligencia +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resmg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-escudo-arcano",
+    "nombre": "Anillo de Escudo Arcano",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Resistencia mágica +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resmg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-escudo-arcano-mayor",
+    "nombre": "Anillo de Escudo Arcano mayor",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Resistencia mágica +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resmg",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-escudo-arcano-superior",
+    "nombre": "Anillo de Escudo Arcano superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Resistencia mágica +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-extension-del-conjuro",
+    "nombre": "Anillo de Extensión del Conjuro",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Rango de Casteo +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-extension-del-conjuro-mayor",
+    "nombre": "Anillo de Extensión del Conjuro mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Rango de Casteo +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rangocasteo",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-extension-del-conjuro-superior",
+    "nombre": "Anillo de Extensión del Conjuro superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Rango de Casteo +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdgmg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-foco-arcano",
+    "nombre": "Anillo de Foco Arcano",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de golpe mágico +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdgmg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-foco-arcano-mayor",
+    "nombre": "Anillo de Foco Arcano mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de golpe mágico +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdgmg",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-foco-arcano-superior",
+    "nombre": "Anillo de Foco Arcano superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de golpe mágico +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-fuerza-del-toro",
+    "nombre": "Anillo de Fuerza del Toro",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Mientras esté equipado, otorga Fuerza +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "fue",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-fuerza-del-toro-superior",
+    "nombre": "Anillo de Fuerza del Toro superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 9000,
+    "detalle": "Mientras esté equipado, otorga Fuerza +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "dmg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-furia-de-combate",
+    "nombre": "Anillo de Furia de Combate",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Daño +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "dmg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-furia-de-combate-mayor",
+    "nombre": "Anillo de Furia de Combate mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Daño +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "dmg",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-furia-de-combate-superior",
+    "nombre": "Anillo de Furia de Combate superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Daño +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-inmutabilidad",
+    "nombre": "Anillo de Inmutabilidad",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total al stun y pajaritos",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-instinto-de-combate",
+    "nombre": "Anillo de Instinto de Combate",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Iniciativa +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-instinto-de-combate-mayor",
+    "nombre": "Anillo de Instinto de Combate mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Iniciativa +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-instinto-de-combate-superior",
+    "nombre": "Anillo de Instinto de Combate superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Iniciativa +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "des",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-manos-ligeras",
+    "nombre": "Anillo de Manos Ligeras",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Mientras esté equipado, otorga Destreza +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "des",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-manos-ligeras-superior",
+    "nombre": "Anillo de Manos Ligeras superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 9000,
+    "detalle": "Mientras esté equipado, otorga Destreza +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-muralla-personal",
+    "nombre": "Anillo de Muralla Personal",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Bloqueo +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-muralla-personal-mayor",
+    "nombre": "Anillo de Muralla Personal mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Bloqueo +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-muralla-personal-superior",
+    "nombre": "Anillo de Muralla Personal superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Bloqueo +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-ojo-del-verdugo",
+    "nombre": "Anillo de Ojo del Verdugo",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Crítico +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-ojo-del-verdugo-mayor",
+    "nombre": "Anillo de Ojo del Verdugo mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Crítico +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-ojo-del-verdugo-superior",
+    "nombre": "Anillo de Ojo del Verdugo superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Crítico +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-paso-fantasma",
+    "nombre": "Anillo de Paso Fantasma",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Evasión +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "eva",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-paso-fantasma-mayor",
+    "nombre": "Anillo de Paso Fantasma mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Evasión +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "eva",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-paso-fantasma-superior",
+    "nombre": "Anillo de Paso Fantasma superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Evasión +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-piel-de-roble",
+    "nombre": "Anillo de Piel de Roble",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Mientras esté equipado, otorga Constitución +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "con",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-piel-de-roble-superior",
+    "nombre": "Anillo de Piel de Roble superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 9000,
+    "detalle": "Mientras esté equipado, otorga Constitución +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-piernas-de-viento",
+    "nombre": "Anillo de Piernas de Viento",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Movimiento +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "mov",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-piernas-de-viento-mayor",
+    "nombre": "Anillo de Piernas de Viento mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Movimiento +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "mov",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-piernas-de-viento-superior",
+    "nombre": "Anillo de Piernas de Viento superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Movimiento +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-pies-veloces",
+    "nombre": "Anillo de Pies Veloces",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Mientras esté equipado, otorga Agilidad +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "agl",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-pies-veloces-superior",
+    "nombre": "Anillo de Pies Veloces superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 9000,
+    "detalle": "Mientras esté equipado, otorga Agilidad +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-punteria-certera",
+    "nombre": "Anillo de Puntería Certera",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de Golpe +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-punteria-certera-mayor",
+    "nombre": "Anillo de Puntería Certera mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de Golpe +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-punteria-certera-superior",
+    "nombre": "Anillo de Puntería Certera superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Probabilidad de Golpe +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reflejo-de-acero",
+    "nombre": "Anillo de Reflejo de Acero",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Parry +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reflejo-de-acero-mayor",
+    "nombre": "Anillo de Reflejo de Acero mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Parry +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reflejo-de-acero-superior",
+    "nombre": "Anillo de Reflejo de Acero superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Parry +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bonos",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reserva-ampliada",
+    "nombre": "Anillo de Reserva Ampliada",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Bonos máximos +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reserva-ampliada-mayor",
+    "nombre": "Anillo de Reserva Ampliada mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Bonos máximos +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bonos",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-reserva-ampliada-superior",
+    "nombre": "Anillo de Reserva Ampliada superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Bonos máximos +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-sangre-limpia",
+    "nombre": "Anillo de Sangre limpia",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total todo tipo de venenos",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "hpmax",
+        "val": 10
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-vitalidad-extendida",
+    "nombre": "Anillo de Vitalidad Extendida",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga HP máximo +10.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "hpmax",
+        "val": 20
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-vitalidad-extendida-mayor",
+    "nombre": "Anillo de Vitalidad Extendida mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga HP máximo +20.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "hpmax",
+        "val": 30
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-vitalidad-extendida-superior",
+    "nombre": "Anillo de Vitalidad Extendida superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga HP máximo +30.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-voluntad-de-hierro",
+    "nombre": "Anillo de Voluntad de Hierro",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "detalle": "Mientras esté equipado, otorga Resistencia mental +1.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-voluntad-de-hierro-mayor",
+    "nombre": "Anillo de Voluntad de Hierro mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Mientras esté equipado, otorga Resistencia mental +2.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "resm",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-de-voluntad-de-hierro-superior",
+    "nombre": "Anillo de Voluntad de Hierro superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "detalle": "Mientras esté equipado, otorga Resistencia mental +3.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-armadura-indestructible",
+    "nombre": "Anillo de armadura indestructible",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total al armadura rota o arruinada",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-blindaje",
+    "nombre": "Anillo de blindaje",
+    "tier": "Excepcional",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2500,
+    "detalle": "Otorga 1 de resistencia a todos los críticos",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-cascara-protectora",
+    "nombre": "Anillo de cáscara protectora",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, anula el efecto del primer ataque o hechizo cada combate",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-mente-certera",
+    "nombre": "Anillo de mente certera",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total confusión, control mental e ilusiones",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-superlinfocitos",
+    "nombre": "Anillo de superlinfocitos",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total al sangrado",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-tendones-firmes",
+    "nombre": "Anillo de tendones firmes",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total a lisiado, inmovilizado y rengo",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-anillo-de-vigor",
+    "nombre": "Anillo de vigor",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Mientras esté equipado, otorga inmunidad total al cansancio y exhausto",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-armadura-de-cuero-blando",
+    "nombre": "Armadura de cuero blando",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 51,
-    "detalle": "Reduce críticos Tipo 2.",
+    "precioCompra": 50,
+    "detalle": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5984,7 +7257,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
+        "val": 3
       },
       {
         "stat": "tipo1",
@@ -5996,13 +7269,13 @@
       }
     ],
     "efectoMods": [],
-    "id": "cat-armadura-con-tachas",
-    "nombre": "Armadura con tachas",
+    "id": "new-armadura-de-cuero-reforzado",
+    "nombre": "Armadura de cuero reforzado",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
-    "peso": 2,
+    "peso": 1,
     "ranuras": 0,
-    "precioCompra": 98,
+    "precioCompra": 90,
     "detalle": "Reduce críticos Tipo 2 y 4.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -6332,7 +7605,29 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-camiseta-de-lona",
+    "nombre": "Camiseta de lona",
+    "tier": "Común",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
       },
       {
         "stat": "tipo3",
@@ -6344,9 +7639,9 @@
     "nombre": "Campera de cuero de motociclista con tachas",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
-    "peso": 1,
+    "peso": 2,
     "ranuras": 0,
-    "precioCompra": 42,
+    "precioCompra": 70,
     "detalle": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -6543,6 +7838,146 @@
   {
     "mods": [
       {
+        "stat": "capcinturon",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-1",
+    "nombre": "Cinturón +1",
+    "tier": "Común",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 40,
+    "detalle": "Ranuras para consumibles +1",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "capcinturon",
+        "val": 10
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-de-alquimista",
+    "nombre": "Cinturón de Alquimista",
+    "tier": "Excepcional",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 500,
+    "detalle": "Ranuras para consumibles +10",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-de-batalla",
+    "nombre": "Cinturón de batalla",
+    "tier": "Buena Calidad",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 80,
+    "detalle": "Ranuras para consumibles +1",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "capcinturon",
+        "val": 5
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-de-boticario",
+    "nombre": "Cinturón de boticario",
+    "tier": "Raro",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 200,
+    "detalle": "Ranuras para consumibles +5",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "capcinturon",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-de-capitan",
+    "nombre": "Cinturón de capitán",
+    "tier": "Raro",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 180,
+    "detalle": "Ranuras para consumibles +3",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "capcinturon",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cinturon-de-utilidad",
+    "nombre": "Cinturón de utilidad",
+    "tier": "Buena Calidad",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 3,
+    "precioCompra": 120,
+    "detalle": "Ranuras para consumibles +3",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
         "stat": "def",
         "val": 10
       },
@@ -6646,7 +8081,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
+        "val": 5
       },
       {
         "stat": "tipo1",
@@ -6666,9 +8101,9 @@
     "nombre": "Cota de malla",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
-    "peso": 3,
+    "peso": 2,
     "ranuras": 0,
-    "precioCompra": 127,
+    "precioCompra": 100,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -6718,15 +8153,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
+        "val": 3
       }
     ],
     "efectoMods": [],
@@ -6734,10 +8161,10 @@
     "nombre": "Gambesón acolchado de doble capa",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
-    "peso": 2,
+    "peso": 1,
     "ranuras": 0,
-    "precioCompra": 98,
-    "detalle": "",
+    "precioCompra": 80,
+    "detalle": "Reduce críticos tipo 4",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7066,7 +8493,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 1
+        "val": 3
       },
       {
         "stat": "des",
@@ -7076,12 +8503,12 @@
     "efectoMods": [],
     "id": "new-guantes-de-lupin",
     "nombre": "Guantes de Lupin",
-    "tier": "Excepcional",
+    "tier": "Legendario",
     "tipoItem": "guantes_blandos",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 500,
-    "detalle": "destreza +1",
+    "precioCompra": 1850,
+    "detalle": "destreza +2",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7092,7 +8519,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 1
+        "val": 3
       },
       {
         "stat": "int",
@@ -7102,11 +8529,11 @@
     "efectoMods": [],
     "id": "new-guantes-de-mickey",
     "nombre": "Guantes de Mickey",
-    "tier": "Excepcional",
+    "tier": "Legendario",
     "tipoItem": "guantes_blandos",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 650,
+    "precioCompra": 1850,
     "detalle": "inteligencia +2",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -7148,7 +8575,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo2",
@@ -7164,9 +8591,9 @@
     "nombre": "Guantes de cuero de blando",
     "tier": "Común",
     "tipoItem": "guantes_blandos",
-    "peso": 0,
+    "peso": 1,
     "ranuras": 0,
-    "precioCompra": 40,
+    "precioCompra": 60,
     "detalle": "Reduce críticos Tipo 2.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -7309,10 +8736,10 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 750,
-    "detalle": "Otorga regeneración de +3hp x mantenimiento (aplicar a mano).",
-    "equipoEstadoNombre": "Regeneración (guantes de piel de troll)",
-    "equipoEstadoHpTurno": 3,
-    "equipoEstadoDetalle": "Cura 3 HP por mantenimiento mientras tengas los Guantes de piel de troll equipados.",
+    "detalle": "Otorga regeneración de +3hp x mantenimiento.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
   },
@@ -7343,7 +8770,7 @@
         "val": 1
       },
       {
-        "stat": "resm",
+        "stat": "resmg",
         "val": 5
       }
     ],
@@ -7355,7 +8782,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 900,
-    "detalle": "Resistencia a todos los críticos. +5 a resistencia mental",
+    "detalle": "Resistencia a todos los críticos. +5 a resistencia mágica",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7380,8 +8807,8 @@
     "tipoItem": "guantes_blandos",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 30,
-    "detalle": "Reduce críticos tipo 4.",
+    "precioCompra": 80,
+    "detalle": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7556,40 +8983,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 8
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "eva",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "new-manto-de-cuero-de-basilisco",
-    "nombre": "Manto de cuero de basilisco",
-    "tier": "Raro",
-    "tipoItem": "armadura_blanda",
-    "peso": 3,
-    "ranuras": 0,
-    "precioCompra": 188,
-    "detalle": "",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 2
       },
       {
@@ -7597,7 +8990,7 @@
         "val": 1
       },
       {
-        "stat": "resm",
+        "stat": "resmg",
         "val": 1
       },
       {
@@ -7613,7 +9006,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 133,
-    "detalle": "+1 a los Bonos máximos, +1 Res.Mt y +1 Res.CC.",
+    "detalle": "+1 a los Bonos máximos, +1 Res.M y +1 Res.CC.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7638,7 +9031,7 @@
     "tipoItem": "guantes_blandos",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 20,
+    "precioCompra": 40,
     "detalle": "Tejido con patrones florales. Muy abrigaditos.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -7784,8 +9177,42 @@
     "tipoItem": "armadura_blanda",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 42,
+    "precioCompra": 80,
     "detalle": "Reduce críticos Tipo 2.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-manto-de-cuero-de-basilisco",
+    "nombre": "Pechera de cuero de rinoceronte",
+    "tier": "Raro",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 188,
+    "detalle": "inmunidad a armadura rota/arruinada",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -7840,7 +9267,7 @@
     "tipoItem": "armadura_blanda",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 51,
+    "precioCompra": 90,
     "detalle": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -7932,6 +9359,28 @@
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "+1 a los Bonos máximos.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-toga-de-maestre",
+    "nombre": "Toga de Maestre",
+    "tier": "Excepcional",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 750,
+    "detalle": "Ranuras para consumibles +3, inteligencia +1",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",

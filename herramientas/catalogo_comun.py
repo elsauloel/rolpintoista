@@ -18,8 +18,21 @@ CATALOGO_JSON = str(pathlib.Path(RAIZ) / "datos" / "catalogo.json")
 TIERS_OK = {'común':'Común', 'buena calidad':'Buena Calidad', 'raro':'Raro',
             'excepcional':'Excepcional', 'legendario':'Legendario'}
 STATS_OK = {'def','tipo1','tipo2','tipo3','tipo4','tipo5','mov','bonos','eva','ini','pdg','crit',
-            'parry','fue','con','int','agl','des','resm','rescc','rangocasteo','accionesmax',
-            'dmg','bloqueo','hpmax','crgmax','rng','pdgmg'}
+            'parry','fue','con','int','agl','des','resm','resmg','rescc','rangocasteo','accionesmax',
+            'dmg','bloqueo','hpmax','crgmax','rng','pdgmg','capcinturon'}
+
+# Nombres en español completo que se usan en "Otros modificadores" (sobre
+# todo en Accesorios) y no coinciden con el id interno del stat. Sin este
+# mapeo, corregir() los descarta en silencio — pasó con casi todos los
+# anillos la primera vez que se cargó la pestaña Accesorios.
+ALIAS_STATS = {
+    'fuerza': 'fue', 'constitucion': 'con', 'inteligencia': 'int',
+    'destreza': 'des', 'agilidad': 'agl',
+    'resistenciamagica': 'resmg', 'resistenciamental': 'resm', 'resistenciacc': 'rescc',
+    'dano': 'dmg', 'cargamax': 'crgmax', 'evasion': 'eva', 'iniciativa': 'ini',
+    'rango': 'rng', 'critico': 'crit', 'pdgmagico': 'pdgmg', 'defensa': 'def',
+    'accionesmaximas': 'accionesmax', 'movimiento': 'mov',
+}
 
 
 def slug(s):
@@ -52,13 +65,23 @@ def corregir(items):
             if nuevo:
                 correcciones.append(f"{et}: sin tipo -> '{nuevo}'")
                 it['tipoItem'] = nuevo
+        # El tipoItem siempre va en minúsculas ("Cinturon" -> "cinturon"): así
+        # no importa cómo se haya tipeado en el Excel o el editor.
+        tipoNormalizado = (it.get('tipoItem') or '').strip().lower()
+        if tipoNormalizado != (it.get('tipoItem') or ''):
+            it['tipoItem'] = tipoNormalizado
 
         limpios = []
         for m in it.get('mods', []):
             s = (m.get('stat') or '').strip()
-            if s not in STATS_OK and s.lower() in STATS_OK:
-                correcciones.append(f"{et}: modificador '{s}' -> '{s.lower()}'")
-                s = s.lower()
+            low = re.sub(r'[^a-z0-9]', '', s.lower())
+            if low in ALIAS_STATS:
+                if ALIAS_STATS[low] != s:
+                    correcciones.append(f"{et}: modificador '{s}' -> '{ALIAS_STATS[low]}'")
+                s = ALIAS_STATS[low]
+            elif s not in STATS_OK and low in STATS_OK:
+                correcciones.append(f"{et}: modificador '{s}' -> '{low}'")
+                s = low
             if s in STATS_OK:
                 limpios.append({'stat': s, 'val': m['val']})
             else:
@@ -199,7 +222,7 @@ def item_gm(it):
 
 
 def orden_categoria(it):
-    orden_hoja = {'Consumibles': 0, 'Armas': 1, 'Escudos': 2, 'Defensivos': 3, 'Otros': 4}
+    orden_hoja = {'Consumibles': 0, 'Armas': 1, 'Escudos': 2, 'Defensivos': 3, 'Accesorios': 4, 'Otros': 5}
     if it.get('_hoja'):
         return orden_hoja.get(it['_hoja'], 9)
     t = it.get('tipoItem', '')

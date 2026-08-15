@@ -4362,30 +4362,20 @@ function aplicarFicha(data){
       ['inventario','cinturon','habilidades','pasivas','sociales','efectos','bitacora','invocaciones'].forEach(k => {
         next[k] = Array.isArray(data[k]) && data[k].length ? data[k] : fresh[k];
       });
-      // El catálogo se combina por id: se respetan tus ítems propios y ediciones,
-      // y se suman los ítems nuevos que trae esta versión de la ficha y vos todavía no tenías.
-      // Si a un ítem que ya tenías nunca le cargaste imagen y la versión de fábrica
-      // ahora sí tiene una, se la completamos (sin tocar nada que hayas editado vos).
-      // Con la misma idea se completan los campos que la copia guardada ni
-      // siquiera conoce: son los que se agregaron al juego después de que
-      // guardaste, así que no pudiste haberlos elegido vos. Los que ya
-      // existen se respetan aunque estén vacíos, porque ahí sí decidiste.
+      // El catálogo NO es un dato del personaje: es la referencia compartida
+      // del juego, así que siempre gana la versión fresca de esta ficha —
+      // si cambiaste un precio en el catálogo del fabricante, cargar un
+      // personaje viejo no debe volver a mostrar el precio congelado de
+      // cuando se guardó. Lo único que se conserva de `data.catalogo` son
+      // los ids que esta versión de la ficha ni conoce: ítems que en algún
+      // momento se agregaron directo al catálogo de esa ficha puntual y
+      // nunca se publicaron al catálogo compartido (antes de que existiera
+      // el botón "Agregar al catálogo").
       {
         const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
-        const frescoPorId = new Map(fresh.catalogo.map(i => [i.id, i]));
-        const propioActualizado = propio.map(item => {
-          const fresco = frescoPorId.get(item.id);
-          if(!fresco) return item;
-          const actualizado = {...item};
-          Object.keys(fresco).forEach(campo => {
-            if(!(campo in actualizado)) actualizado[campo] = fresco[campo];
-          });
-          if(!actualizado.imagen && fresco.imagen) actualizado.imagen = fresco.imagen;
-          return actualizado;
-        });
-        const idsPropios = new Set(propio.map(i => i.id));
-        const nuevosDeFabrica = fresh.catalogo.filter(i => !idsPropios.has(i.id));
-        next.catalogo = [...propioActualizado, ...nuevosDeFabrica];
+        const frescoIds = new Set(fresh.catalogo.map(i => i.id));
+        const soloLocal = propio.filter(item => !frescoIds.has(item.id));
+        next.catalogo = [...structuredClone(fresh.catalogo), ...soloLocal];
       }
       // Migración: fichas viejas guardaban equipo y mochila como listas separadas.
       if(!(Array.isArray(data.inventario) && data.inventario.length) && (Array.isArray(data.equipo) || Array.isArray(data.mochila))){

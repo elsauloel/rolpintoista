@@ -411,6 +411,10 @@ a{color:var(--brass)}
 .tipoitem-btn.otros{border-left-color:var(--muted)}
 /* Se abre desde el editor, que ya es un scrim: tiene que quedar encima. */
 #scrim-presets,#scrim-tipoitem{z-index:60}
+/* El botón Ver de una tarjeta de preset abre #scrim-view sin cerrar
+   #scrim-presets (para poder seguir mirando la lista) — sin esto quedaba
+   tapado detrás, con el z-index parejo de .scrim por defecto. */
+body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .preset-grupo:first-child{margin-top:0}
 .preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}

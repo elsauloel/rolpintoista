@@ -245,6 +245,8 @@ a{color:var(--brass)}
   border-color:var(--copper);color:var(--brass);background:rgba(201,133,69,.14);font-weight:700
 }
 .iconbtn-add:hover{background:var(--copper);color:#180F08}
+#modal-activar{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
+#modal-activar:hover{background:#3B8A6E;border-color:#3B8A6E}
 
 /* ---------- Atributos ---------- */
 .ptbar{
@@ -764,6 +766,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .mini.on{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6}
 .mini.danger{color:var(--danger);border-color:rgba(212,87,78,.45)}
 .mini.danger:hover{background:var(--danger);border-color:var(--danger);color:#fff}
+#efecto-preset-guardar{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+#efecto-preset-guardar:hover{background:var(--brass);border-color:var(--brass)}
 .empty{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding:8px 2px}
 .dado-btn{background:none;border:none;cursor:pointer;font-size:13px;line-height:1;opacity:.55;padding:0 2px;flex:none}
 .dado-btn:hover{opacity:1}
@@ -1473,7 +1477,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <header>
       <h3>Elegir estado</h3>
       <div style="display:flex;gap:8px">
-        <button class="iconbtn" id="presets-personalizado" style="display:none">Estado personalizado</button>
+        <button class="iconbtn iconbtn-add" id="presets-personalizado" style="display:none">Estado personalizado</button>
         <button class="iconbtn" id="presets-x">Cerrar</button>
       </div>
     </header>

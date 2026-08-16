@@ -6087,6 +6087,16 @@ function openEditor(key, id, equipadoPreset){
   setTimeout(()=>$('#modal-body').querySelector('input')?.focus(), 40);
 }
 
+function campoImagenHtml(draft){
+  return `<div class="f">
+    <label>${CAMPO_LABEL.imagen}</label>
+    <button type="button" class="itempick" id="itempick">
+      ${draft.imagen ? `<img src="${draft.imagen}" alt="">` : `<span class="itempick-empty">+<small>Imagen</small></span>`}
+    </button>
+    ${draft.imagen ? `<button type="button" class="mini" id="itempick-remove" style="margin-top:6px">Quitar imagen</button>` : ''}
+    <input type="file" id="itempick-input" accept="image/*" hidden>
+  </div>`;
+}
 function drawEditor(){
   const {key, draft} = editing;
   const sc = SCHEMA[key];
@@ -6105,6 +6115,9 @@ function drawEditor(){
     </div>`;
   }
   html += `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
+  if(key === 'habilidades' && sc.campos.includes('detalle')){
+    html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
+  }
   if(sc.campos.includes('categoria')){
     // Son tres opciones: entran todas en una fila, no hace falta desplegable.
     html += `<div class="f"><label>${CAMPO_LABEL.categoria}</label>
@@ -6134,15 +6147,8 @@ function drawEditor(){
       <div class="hint" style="margin-top:5px">Define en qué mano aparece dentro de "Efectos de equipo" cuando tenés dos cosas equipadas.</div>
     </div>`;
   }
-  if(sc.campos.includes('imagen')){
-    html += `<div class="f">
-      <label>${CAMPO_LABEL.imagen}</label>
-      <button type="button" class="itempick" id="itempick">
-        ${draft.imagen ? `<img src="${draft.imagen}" alt="">` : `<span class="itempick-empty">+<small>Imagen</small></span>`}
-      </button>
-      ${draft.imagen ? `<button type="button" class="mini" id="itempick-remove" style="margin-top:6px">Quitar imagen</button>` : ''}
-      <input type="file" id="itempick-input" accept="image/*" hidden>
-    </div>`;
+  if(sc.campos.includes('imagen') && key !== 'habilidades'){
+    html += campoImagenHtml(draft);
   }
   const resto = cortos.filter(c => {
     if(c==='nombre') return false;
@@ -6151,6 +6157,7 @@ function drawEditor(){
     if(c==='forzarAccionesMax') return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
+    if(key === 'habilidades' && c === 'tiradaExtra') return false;
     return true;
   });
   const esDefensivo = CATEGORIAS.find(c => c.id === draft.tipoItem)?.defensivo === true;
@@ -6160,6 +6167,15 @@ function drawEditor(){
       <input data-c="${c}" ${CAMPO_NUM.includes(c)?'type="number" step="any"':''} value="${esc(draft[c]??'')}"></div>`).join('')
       + (esDefensivo ? `<div class="f"><label>Defensa</label><input data-defmod="def" type="number" step="any" value="${getModVal(draft,'def')}"></div>` : '')
       + `</div>`;
+  }
+  if(key === 'habilidades'){
+    html += `<div class="f2">
+      <div class="f"><label>${CAMPO_LABEL.tiradaExtra}</label><input data-c="tiradaExtra" value="${esc(draft.tiradaExtra??'')}"></div>
+      <label class="f" style="display:flex;align-items:center;height:100%;gap:8px;cursor:pointer">
+        <input type="checkbox" data-c="job" ${draft.job !== false ? 'checked' : ''} style="width:auto">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL.job}</span>
+      </label>
+    </div>`;
   }
   if(esDefensivo){
     html += `<div class="f">
@@ -6229,13 +6245,13 @@ function drawEditor(){
     </div>`;
   }
   const FLAGS_OCULTOS = ['mitadPdgEva','armaduraRota','armaduraArruinada'];
-  flags.filter(c => !FLAGS_OCULTOS.includes(c)).forEach(c => {
+  flags.filter(c => !FLAGS_OCULTOS.includes(c) && !(key === 'habilidades' && c === 'job')).forEach(c => {
     const on = (c==='activo' || c==='job') ? draft[c] !== false : !!draft[c];
     html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
       <input type="checkbox" data-c="${c}" ${on?'checked':''} style="width:auto">
       <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL[c]}</span></label>`;
   });
-  if(sc.campos.includes('detalle'))
+  if(sc.campos.includes('detalle') && key !== 'habilidades')
     html += `<div class="f"><label>Detalle</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
 
   if(sc.mods){
@@ -6277,6 +6293,9 @@ function drawEditor(){
       ${yaGuardado ? `<button type="button" class="mini danger" id="efecto-preset-borrar" style="margin-left:6px">Borrar preset "${esc(draft.nombre)}"</button>` : ''}
       <div class="hint" style="margin-top:5px">Guarda esta configuración (turnos, stacks, HP por turno, modificadores, etc.) en tu ficha para poder elegirla de nuevo desde el desplegable de arriba.</div>
     </div>`;
+  }
+  if(key === 'habilidades' && sc.campos.includes('imagen')){
+    html += campoImagenHtml(draft);
   }
   $('#modal-body').innerHTML = html;
 }

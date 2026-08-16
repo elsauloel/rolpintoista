@@ -236,7 +236,12 @@ def orden_categoria(it):
 
 def escribir_htmls(items):
     """Reescribe el catálogo embebido en ficha.html (con imagen),
-    vendor-generator.html (sin imagen) y gm-tools.html (formato de equipo)."""
+    vendor-generator.html (sin imagen) y gm-tools.html (formato de equipo).
+    Los ítems marcados 'ocultoEnCatalogo' (columna del Excel, para lo que
+    todavía no se auditó/balanceó) no se escriben acá — siguen enteros en
+    datos/catalogo.json, vía guardar_catalogo_json(), para poder editarlos
+    desde catalogo-editor.html."""
+    items = [it for it in items if not it.get('ocultoEnCatalogo')]
     items = sorted(items, key=lambda x: (orden_categoria(x), x['nombre']))
 
     t = open(FICHA, encoding="utf-8", newline="").read().replace("\r\n", "\n")

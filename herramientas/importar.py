@@ -42,7 +42,13 @@ _pend = [r for r in _rev if r['it']['nombre'] not in _YA and not _cubierto(r)]
 
 print("=== CORRECCIONES APLICADAS ===")
 for c in correcciones: print("  ", c)
-print(f"\nÍtems a escribir: {len(items)}")
+print(f"\nÍtems totales: {len(items)}")
+
+ocultos = [it for it in items if it.get('ocultoEnCatalogo')]
+if ocultos:
+    print(f"Ocultos del catálogo (no van a ficha/vendor/gm-tools, siguen en catalogo.json): {len(ocultos)}")
+    for it in sorted(ocultos, key=lambda x: x['nombre']):
+        print("  ", it['nombre'])
 
 con_imagen = sum(1 for it in items if it.get('imagen'))
 print("Imágenes conservadas:", con_imagen)

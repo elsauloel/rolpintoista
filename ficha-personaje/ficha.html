@@ -1248,8 +1248,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           <button class="iconbtn iconbtn-add" data-add-chooser="cinturon">+ Ítem</button>
         </header>
         <div class="body">
-          <div class="cap"><span>Ranuras usadas</span><span><b id="cap-cinturon-n">0</b> / <input id="f-capcinturon" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"></span></div>
+          <div class="cap"><span>Ranuras usadas</span><span><b id="cap-cinturon-n">0</b> / <b id="cap-cinturon-total">0</b></span></div>
           <div class="capbar" id="cap-cinturon-bar"><span></span></div>
+          <div class="hint" style="margin-top:5px">Base: <input id="f-capcinturon" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"><span id="cap-cinturon-bonus-txt"></span></div>
           <div id="list-cinturon"></div>
         </div>
       </section>
@@ -2775,7 +2776,12 @@ function renderVitals(){
   const crg = Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax;
   setCap('equipo', c.pesoEquipado, crg);
   setCap('mochila', S.inventario.filter(i=>!i.equipado).reduce((a,i)=>a+ranurasDe(i),0), num(S.caps.mochila));
-  setCap('cinturon', S.cinturon.length, capCinturonEfectivo());
+  const capCinturonBase = num(S.caps.cinturon);
+  const capCinturonTotal = capCinturonEfectivo();
+  setCap('cinturon', S.cinturon.length, capCinturonTotal);
+  $('#cap-cinturon-total').textContent = fmt(capCinturonTotal);
+  const bonusCinturon = capCinturonTotal - capCinturonBase;
+  $('#cap-cinturon-bonus-txt').textContent = bonusCinturon ? ` (+${fmt(bonusCinturon)} del cinturón equipado)` : '';
   $('#cap-equipo-t').textContent = fmt(crg);
 
   const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;

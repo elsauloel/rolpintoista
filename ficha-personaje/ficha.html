@@ -429,6 +429,16 @@ a{color:var(--brass)}
 .preset-dato.bueno{color:var(--absenta);border-color:rgba(168,194,86,.4)}
 .preset-dato.malo{color:var(--danger);border-color:rgba(212,87,78,.4)}
 .preset-detalle{font-size:10.5px;color:var(--muted);line-height:1.35}
+.preset-card{
+  border:1px solid var(--line);background:var(--panel2);padding:9px 10px;
+  display:flex;flex-direction:column;gap:6px;border-left-width:3px
+}
+.preset-card.buff{border-left-color:var(--absenta)}
+.preset-card.debuff{border-left-color:var(--danger)}
+.preset-card.otro{border-left-color:var(--muted)}
+.preset-card.propio{border-left-color:var(--brass)}
+.preset-card-btns{display:flex;gap:5px;margin-top:2px}
+.preset-card-btns .mini{flex:1;text-align:center}
 .preset-blanco{
   border:1px dashed var(--line);background:transparent;padding:9px 10px;text-align:left;
   font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);width:100%
@@ -4975,6 +4985,10 @@ document.addEventListener('click', e => {
   if(e.target.closest('#efecto-preset-abrir')){ abrirPresetsEfecto('efecto'); return; }
   if(e.target.closest('#item-efecto-preset-abrir')){ abrirPresetsEfecto('item'); return; }
   if(e.target.closest('#tipoitem-abrir')){ abrirTipoItem(); return; }
+  const presetVer = e.target.closest('[data-presetver]');
+  if(presetVer){ verPresetEfecto(presetVer.dataset.presetver); return; }
+  const presetEdit = e.target.closest('[data-presetedit]');
+  if(presetEdit){ editarPresetEfecto(presetEdit.dataset.presetedit); return; }
   const preset = e.target.closest('[data-preset]');
   if(preset && preset.closest('#presets-body')){ aplicarPresetEfecto(preset.dataset.preset); return; }
   const tipo = e.target.closest('[data-tipoitem]');
@@ -5297,11 +5311,65 @@ function presetBtnHtml(p, valor, clase){
     datos.push(`<span class="preset-dato ${v > 0 ? 'bueno' : 'malo'}">${esc(STAT_LABEL[m.stat] || m.stat)} ${v > 0 ? '+' : ''}${fmt(v)}</span>`);
   });
   const det = (p.detalle || '').trim();
-  return `<button type="button" class="preset-btn ${clase}" data-preset="${esc(valor)}">
+  const cuerpo = `
     <span class="preset-nombre">${esc(p.nombre)}</span>
     ${datos.length ? `<span class="preset-datos">${datos.join('')}</span>` : ''}
-    ${det ? `<span class="preset-detalle">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</span>` : ''}
+    ${det ? `<span class="preset-detalle">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</span>` : ''}`;
+  // El selector "directo" (botón + Estado) da tres acciones por tarjeta en
+  // vez de activar con un solo clic; los otros destinos (rellenar el
+  // editor de un ítem/efecto) siguen siendo un único botón clickeable.
+  if(presetDestino === 'directo'){
+    return `<div class="preset-card ${clase}">
+      ${cuerpo}
+      <div class="preset-card-btns">
+        <button type="button" class="mini" data-presetver="${esc(valor)}">Ver</button>
+        <button type="button" class="mini" data-preset="${esc(valor)}">Activar</button>
+        <button type="button" class="mini" data-presetedit="${esc(valor)}">Editar</button>
+      </div>
+    </div>`;
+  }
+  return `<button type="button" class="preset-btn ${clase}" data-preset="${esc(valor)}">${cuerpo}
   </button>`;
+}
+
+function verPresetEfecto(valor){
+  const [tipo, idx] = valor.split(':');
+  const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
+  if(!preset) return;
+  viewing = null;
+  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  const L = [];
+  L.push(linea('Duración', preset.permanente ? 'Permanente' : (num(preset.turnos) > 0 ? `${fmt(num(preset.turnos))} turno(s)` : 'Sin duración fija')));
+  if(num(preset.stacks) > 1) L.push(linea('Stacks', fmt(num(preset.stacks))));
+  if(num(preset.hpturno)) L.push(linea('HP por turno (por stack)', `${num(preset.hpturno)>0?'+':''}${fmt(num(preset.hpturno))}`));
+  const pMods = (preset.mods || []);
+  if(pMods.length) L.push(linea('Modificadores', pMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+  $('#view-title-header').textContent = preset.nombre || 'Estado';
+  $('#view-body').innerHTML = `
+    <div class="view-wrap">
+      <div class="view-info">
+        <div class="view-title">${esc(preset.nombre)}</div>
+        <div class="view-lines">${L.filter(Boolean).join('') || '<div class="view-line"><span class="view-value">Sin datos adicionales.</span></div>'}</div>
+      </div>
+    </div>
+    ${preset.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(preset.detalle)}</div>` : ''}
+  `;
+  $('#view-edit-btn').style.display = 'none';
+  $('#view-del-btn').style.display = 'none';
+  $('#view-vender-btn').style.display = 'none';
+  $('#scrim-view').classList.add('open');
+}
+
+function editarPresetEfecto(valor){
+  const [tipo, idx] = valor.split(':');
+  const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
+  if(!preset) return;
+  $('#scrim-presets').classList.remove('open');
+  openEditor('efectos', null);
+  const {nombre, ...resto} = preset;
+  Object.assign(editing.draft, structuredClone(resto));
+  editing.draft.nombre = nombre;
+  drawEditor();
 }
 
 // La botonera de estados sirve para dos destinos: el editor de estados

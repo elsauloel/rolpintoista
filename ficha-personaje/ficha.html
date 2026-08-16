@@ -1457,7 +1457,10 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   <div class="modal" style="max-width:760px">
     <header>
       <h3>Elegir estado</h3>
-      <button class="iconbtn" id="presets-x">Cerrar</button>
+      <div style="display:flex;gap:8px">
+        <button class="iconbtn" id="presets-personalizado" style="display:none">Estado personalizado</button>
+        <button class="iconbtn" id="presets-x">Cerrar</button>
+      </div>
     </header>
     <div class="body" id="presets-body"></div>
   </div>
@@ -4078,6 +4081,7 @@ document.addEventListener('click', e => {
     renderLootEspecial();
     return;
   }
+  if(b.dataset.add === 'efectos'){ abrirPresetsEfecto('directo'); return; }
   if(b.dataset.add){ openEditor(b.dataset.add, null); return; }
   if(b.dataset.addInv !== undefined){ abrirChooser('inventario', b.dataset.addInv === '1'); return; }
   if(b.dataset.addChooser){ abrirChooser(b.dataset.addChooser, true); return; }
@@ -4927,6 +4931,7 @@ $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#btn-tablero').onclick = () => abrirTablero(false);
 $('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
+$('#presets-personalizado').onclick = () => { $('#scrim-presets').classList.remove('open'); openEditor('efectos', null); };
 $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
 $('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
 $('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
@@ -5290,7 +5295,10 @@ function aplicarTipoItem(id){
 function abrirPresetsEfecto(destino){
   presetDestino = destino || 'efecto';
   const propios = S.efectosPersonalizados || [];
-  let html = `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
+  // "Directo" (el + Estado de arriba) activa el estado con un clic — no
+  // tiene sentido el atajo de "empezar en blanco" acá, para eso está el
+  // botón "Estado personalizado" del header, que sí abre el editor.
+  let html = presetDestino === 'directo' ? '' : `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
   ['buff','debuff','otro'].forEach(pol => {
     const del = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
     if(!del.length) return;
@@ -5302,15 +5310,42 @@ function abrirPresetsEfecto(destino){
     html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtml(p, `custom:${i}`, 'propio')).join('')}</div>`;
   }
   $('#presets-body').innerHTML = html;
+  $('#presets-personalizado').style.display = presetDestino === 'directo' ? '' : 'none';
   $('#scrim-presets').classList.add('open');
+}
+
+// Construye el efecto igual que si se hubiera abierto el editor en blanco,
+// se le hubiera aplicado el preset a mano y se hubiera tocado Guardar — sin
+// mostrar nada de eso: abre y cierra el editor en el mismo tick, así el
+// navegador nunca llega a pintar el paso intermedio.
+function activarEfectoPreset(preset){
+  openEditor('efectos', null);
+  const {nombre, ...resto} = preset;
+  Object.assign(editing.draft, structuredClone(resto));
+  editing.draft.nombre = nombre;
+  const draft = editing.draft;
+  closeModal();
+  if(draft.activo !== false && estaBloqueadoElDebuff(draft)){
+    toast(`Inmune ahora mismo — ${draft.nombre} no se pudo aplicar`);
+    return;
+  }
+  S.efectos.push(draft);
+  renderList('efectos');
+  refresh();
+  toast(`${draft.nombre} activado`);
 }
 
 function aplicarPresetEfecto(valor){
   $('#scrim-presets').classList.remove('open');
-  if(!valor || !editing) return;
+  if(!valor) return;
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
   if(!preset) return;
+  if(presetDestino === 'directo'){
+    activarEfectoPreset(preset);
+    return;
+  }
+  if(!editing) return;
   if(presetDestino === 'item'){
     editing.draft.efectoNombre = preset.nombre;
     editing.draft.efectoTurnos = preset.turnos ?? 0;

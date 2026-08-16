@@ -121,7 +121,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-escudo-arcano",
     "nombre": "Pergamino de Escudo Arcano",
     "tier": "Buena Calidad",
@@ -145,7 +150,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-escudo-arcano-mayor",
     "nombre": "Pergamino de Escudo Arcano mayor",
     "tier": "Raro",
@@ -169,7 +179,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-escudo-arcano-superior",
     "nombre": "Pergamino de Escudo Arcano superior",
     "tier": "Excepcional",
@@ -193,7 +208,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-extension-del-conjuro",
     "nombre": "Pergamino de Extensión del Conjuro",
     "tier": "Buena Calidad",
@@ -217,7 +237,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-extension-del-conjuro-mayor",
     "nombre": "Pergamino de Extensión del Conjuro mayor",
     "tier": "Raro",
@@ -241,7 +266,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-extension-del-conjuro-superior",
     "nombre": "Pergamino de Extensión del Conjuro superior",
     "tier": "Excepcional",
@@ -265,7 +295,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-foco-arcano",
     "nombre": "Pergamino de Foco Arcano",
     "tier": "Buena Calidad",
@@ -289,7 +324,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-foco-arcano-mayor",
     "nombre": "Pergamino de Foco Arcano mayor",
     "tier": "Raro",
@@ -313,7 +353,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-foco-arcano-superior",
     "nombre": "Pergamino de Foco Arcano superior",
     "tier": "Excepcional",
@@ -337,7 +382,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-furia-de-combate",
     "nombre": "Pergamino de Furia de Combate",
     "tier": "Buena Calidad",
@@ -361,7 +411,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-furia-de-combate-mayor",
     "nombre": "Pergamino de Furia de Combate mayor",
     "tier": "Raro",
@@ -385,7 +440,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-furia-de-combate-superior",
     "nombre": "Pergamino de Furia de Combate superior",
     "tier": "Excepcional",
@@ -409,7 +469,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-muralla-personal",
     "nombre": "Pergamino de Muralla Personal",
     "tier": "Buena Calidad",
@@ -433,7 +498,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-muralla-personal-mayor",
     "nombre": "Pergamino de Muralla Personal mayor",
     "tier": "Raro",
@@ -457,7 +527,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-muralla-personal-superior",
     "nombre": "Pergamino de Muralla Personal superior",
     "tier": "Excepcional",
@@ -481,7 +556,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-ojo-del-verdugo",
     "nombre": "Pergamino de Ojo del Verdugo",
     "tier": "Buena Calidad",
@@ -505,7 +585,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-ojo-del-verdugo-mayor",
     "nombre": "Pergamino de Ojo del Verdugo mayor",
     "tier": "Raro",
@@ -529,7 +614,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-ojo-del-verdugo-superior",
     "nombre": "Pergamino de Ojo del Verdugo superior",
     "tier": "Excepcional",
@@ -553,7 +643,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-paso-fantasma",
     "nombre": "Pergamino de Paso Fantasma",
     "tier": "Buena Calidad",
@@ -577,7 +672,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-paso-fantasma-mayor",
     "nombre": "Pergamino de Paso Fantasma mayor",
     "tier": "Raro",
@@ -601,7 +701,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-paso-fantasma-superior",
     "nombre": "Pergamino de Paso Fantasma superior",
     "tier": "Excepcional",
@@ -625,7 +730,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-piernas-de-viento",
     "nombre": "Pergamino de Piernas de Viento",
     "tier": "Buena Calidad",
@@ -649,7 +759,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-piernas-de-viento-mayor",
     "nombre": "Pergamino de Piernas de Viento mayor",
     "tier": "Raro",
@@ -673,7 +788,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-piernas-de-viento-superior",
     "nombre": "Pergamino de Piernas de Viento superior",
     "tier": "Excepcional",
@@ -697,7 +817,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-punteria-certera",
     "nombre": "Pergamino de Puntería Certera",
     "tier": "Buena Calidad",
@@ -721,7 +846,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-punteria-certera-mayor",
     "nombre": "Pergamino de Puntería Certera mayor",
     "tier": "Raro",
@@ -745,7 +875,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-punteria-certera-superior",
     "nombre": "Pergamino de Puntería Certera superior",
     "tier": "Excepcional",
@@ -769,7 +904,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-alcance-extendido",
     "nombre": "Pergamino de Rango Extendido",
     "tier": "Buena Calidad",
@@ -793,7 +933,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-alcance-extendido-mayor",
     "nombre": "Pergamino de Rango Extendido mayor",
     "tier": "Raro",
@@ -817,7 +962,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-alcance-extendido-superior",
     "nombre": "Pergamino de Rango Extendido superior",
     "tier": "Excepcional",
@@ -841,7 +991,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-reflejo-de-acero",
     "nombre": "Pergamino de Reflejo de Acero",
     "tier": "Buena Calidad",
@@ -865,7 +1020,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-reflejo-de-acero-mayor",
     "nombre": "Pergamino de Reflejo de Acero mayor",
     "tier": "Raro",
@@ -889,7 +1049,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-reflejo-de-acero-superior",
     "nombre": "Pergamino de Reflejo de Acero superior",
     "tier": "Excepcional",
@@ -913,7 +1078,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-reserva-ampliada",
     "nombre": "Pergamino de Reserva Ampliada",
     "tier": "Buena Calidad",
@@ -937,7 +1107,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-reserva-ampliada-mayor",
     "nombre": "Pergamino de Reserva Ampliada mayor",
     "tier": "Raro",
@@ -961,7 +1136,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-reserva-ampliada-superior",
     "nombre": "Pergamino de Reserva Ampliada superior",
     "tier": "Excepcional",
@@ -985,7 +1165,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 10
+      }
+    ],
     "id": "new-pergamino-de-vitalidad-extendida",
     "nombre": "Pergamino de Vitalidad Extendida",
     "tier": "Buena Calidad",
@@ -1009,7 +1194,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 20
+      }
+    ],
     "id": "new-pergamino-de-vitalidad-extendida-mayor",
     "nombre": "Pergamino de Vitalidad Extendida mayor",
     "tier": "Raro",
@@ -1033,7 +1223,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 30
+      }
+    ],
     "id": "new-pergamino-de-vitalidad-extendida-superior",
     "nombre": "Pergamino de Vitalidad Extendida superior",
     "tier": "Excepcional",
@@ -1057,7 +1252,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-voluntad-de-hierro",
     "nombre": "Pergamino de Voluntad de Hierro",
     "tier": "Buena Calidad",
@@ -1081,7 +1281,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-voluntad-de-hierro-mayor",
     "nombre": "Pergamino de Voluntad de Hierro mayor",
     "tier": "Raro",
@@ -1105,7 +1310,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
     "id": "new-pergamino-de-voluntad-de-hierro-superior",
     "nombre": "Pergamino de Voluntad de Hierro superior",
     "tier": "Excepcional",
@@ -1273,7 +1483,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "accionesmax",
+        "val": 1
+      }
+    ],
     "id": "new-pergamino-de-impetu",
     "nombre": "Pergamino de Ímpetu",
     "tier": "Buena Calidad",
@@ -1297,7 +1512,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "accionesmax",
+        "val": 2
+      }
+    ],
     "id": "new-pergamino-de-impetu-mayor",
     "nombre": "Pergamino de Ímpetu mayor",
     "tier": "Raro",

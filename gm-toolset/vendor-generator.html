@@ -213,6 +213,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div class="resumen" id="preview-resumen"></div>
     <div class="barra-edicion">
       <div class="ajuste-grupo">
+        <label for="preview-buscar">Buscar</label>
+        <input type="text" id="preview-buscar" placeholder="Buscar por nombre…" style="width:200px">
+      </div>
+      <div class="ajuste-grupo">
         <label for="f-ajuste">Precios</label>
         <input type="number" id="f-ajuste" step="5" value="0" title="Porcentaje sobre el precio de catálogo: negativo descuenta, positivo recarga">
         <span class="hint">%</span>
@@ -1224,6 +1228,8 @@ function renderPreview(){
   $('#tienda-nombre').value = tiendaActual.nombre || '';
   const garantizados = new Set(tiendaActual.garantizados);
   const items = tiendaActual.items.map(id => CATALOGO.find(it => it.id === id)).filter(Boolean);
+  const textoBusqueda = ($('#preview-buscar').value || '').trim().toLowerCase();
+  const visibles = textoBusqueda ? items.filter(it => it.nombre.toLowerCase().includes(textoBusqueda)) : items;
 
   const porTier = {};
   items.forEach(it => porTier[it.tier] = (porTier[it.tier] || 0) + 1);
@@ -1238,15 +1244,17 @@ function renderPreview(){
     ).join('');
 
   let html = '';
-  if(ordenActual === 'categoria'){
+  if(!visibles.length){
+    html = `<div class="hint">Ningún ítem de la tienda coincide con "${esc(textoBusqueda)}".</div>`;
+  }else if(ordenActual === 'categoria'){
     RUBRO_ORDEN.forEach(rubro => {
-      const delRubro = conLegacyPrimero(ordenarItems(items.filter(it => rubroDe(it) === rubro)));
+      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)));
       if(!delRubro.length) return;
       html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
       html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
     });
   }else{
-    const orden = conLegacyPrimero(ordenarItems(items));
+    const orden = conLegacyPrimero(ordenarItems(visibles));
     html += `<div class="cat-grouphead">${esc(ORDENES[ordenActual].label)} · ${fmt(orden.length)}</div>`;
     html += `<div class="cat-grid">${orden.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
   }
@@ -1549,6 +1557,7 @@ $('#tienda-nombre').addEventListener('input', e => {
 $('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));
 $('#scrim-agregar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-agregar') $('#scrim-agregar').classList.remove('open'); });
 $('#agregar-buscar').addEventListener('input', renderAgregarLista);
+$('#preview-buscar').addEventListener('input', renderPreview);
 $('#agregar-rubro').addEventListener('change', renderAgregarLista);
 $('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));

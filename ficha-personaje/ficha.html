@@ -2382,6 +2382,11 @@ function compute(){
     if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
     if(!Number.isNaN(final.parry)) final.parry = Math.floor(final.parry / 2);
   }
+  if(efectosActivos.some(e => e.inmovilizado)){
+    if(!Number.isNaN(final.mov)) final.mov = 0;
+  }else if(efectosActivos.some(e => e.rengo)){
+    if(!Number.isNaN(final.mov)) final.mov = Math.floor(final.mov / 2);
+  }
   const armaduraArruinada = efectosActivos.some(e => e.armaduraArruinada);
   const armaduraRota = efectosActivos.some(e => e.armaduraRota);
   if(armaduraArruinada){
@@ -2872,6 +2877,14 @@ function estaBloqueadoElDebuff(objEfecto){
   if(objEfecto.esVeneno && activos.some(e => e.sangrePura)) return true;
   if(objEfecto.esSangrado && activos.some(e => e.coagulacionExtrema)) return true;
   return false;
+}
+
+// Oleo reparador: quita Armadura rota y Armadura arruinada si están
+// activas (son permanentes, no vencen solas). Devuelve cuántas se quitaron.
+function repararArmadura(){
+  const antes = S.efectos.length;
+  S.efectos = S.efectos.filter(e => e.nombre !== 'Armadura rota' && e.nombre !== 'Armadura arruinada');
+  return antes - S.efectos.length;
 }
 
 function aplicarEfectoDeConsumo(it){
@@ -3907,7 +3920,7 @@ function aplicarDanioEntrante(){
 
   const extra = [];
   if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagico ? ` (quedan ${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
-  if(recibido > 0 && efectosActivosDano.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.25))} al atacante`);
+  if(recibido > 0 && efectosActivosDano.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
   if(recibido <= 0 && !absorbido){
@@ -4351,8 +4364,9 @@ document.addEventListener('click', e => {
       const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
       const bonosRestaurados = restaurarBonosDeConsumo(it);
+      const reparados = it.nombre === 'Oleo reparador' ? repararArmadura() : 0;
       if(key === 'inventario') renderInventario(); else renderList('cinturon');
-      if(efecto) renderList('efectos');
+      if(efecto || reparados) renderList('efectos');
       renderVitals();
       renderAcciones();
       const partes = [];
@@ -4361,6 +4375,7 @@ document.addEventListener('click', e => {
       partes.push(`-${costoAcciones} Acci${costoAcciones===1?'ón':'ones'}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+      if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
       toast(`${it.nombre}: ${partes.join(' · ')}`);
     }
     return;
@@ -5202,35 +5217,39 @@ const EFECTOS_PRESET = [
     detalle:'Pierde 1 HP por stack cada turno. Se agota junto con los stacks (y con los turnos, que arrancan igualados).'},
   {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpturno:5, stacksturno:0,
     detalle:'Cura HP cada turno.'},
-  {nombre:'Pajaritos', polaridad:'debuff', turnos:2, mitadPdgEva:true,
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:1, mods:[{stat:'accionesmax', val:-1}],
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, mods:[{stat:'accionesmax', val:-1}],
     detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:1, forzarAccionesMax:1, esCC:true,
+  {nombre:'Exhausto', polaridad:'debuff', turnos:3, forzarAccionesMax:1, esCC:true,
     detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:1, forzarAccionesMax:0, esCC:true,
+  {nombre:'Stun', polaridad:'debuff', turnos:2, forzarAccionesMax:0, esCC:true,
     detalle:'Sin Acciones este turno.'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:2, mods:[{stat:'accionesmax', val:1}],
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, mods:[{stat:'accionesmax', val:1}],
     detalle:'+1 a las Acciones máximas del turno.'},
-  {nombre:'Rompe armadura', polaridad:'debuff', turnos:2, armaduraRota:true,
-    detalle:'Corta a la mitad (redondeado hacia abajo) el valor total de Defensa y Resistencia a crítico del personaje.'},
-  {nombre:'Arruina armadura', polaridad:'debuff', turnos:2, armaduraArruinada:true,
-    detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Resistencia a crítico. No afecta guantes, cascos, botas ni otro equipo.'},
+  {nombre:'Armadura rota', polaridad:'debuff', turnos:0, permanente:true, armaduraRota:true,
+    detalle:'Corta a la mitad (redondeado hacia abajo) el valor total de Defensa y Resistencia a crítico del personaje. Permanente — se quita con Oleo reparador.'},
+  {nombre:'Armadura arruinada', polaridad:'debuff', turnos:0, permanente:true, armaduraArruinada:true,
+    detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Resistencia a crítico. No afecta guantes, cascos, botas ni otro equipo. Permanente — se quita con Oleo reparador.'},
   {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpturno:-1, stacksturno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
   {nombre:'Sangrado', polaridad:'debuff', stacks:1, turnos:0, hpturno:-2, stacksturno:0, permanente:true, esSangrado:true,
     detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
-  {nombre:'Lisiado', polaridad:'debuff', turnos:2, lisiado:true,
+  {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Invulnerable', polaridad:'buff', turnos:1, invulnerable:true,
-    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff nuevo mientras dure.'},
+  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true,
+    detalle:'El Movimiento queda en 0 mientras dure.'},
+  {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true,
+    detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
+    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
     detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
-    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 25% del daño al atacante. Ojo: el daño al atacante hay que cargarlo a mano en su ficha, esto solo avisa cuánto es.'},
-  {nombre:'Escudo mágico', polaridad:'buff', turnos:0, permanente:true, escudoMagico:10,
-    detalle:'Absorbe los siguientes 10 puntos de daño de cualquier fuente antes de que le toquen el HP (editable al elegir el preset).'},
-  {nombre:'Afortunado', polaridad:'buff', turnos:2, afortunado:true,
+    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante. Ojo: el daño al atacante hay que cargarlo a mano en su ficha, esto solo avisa cuánto es.'},
+  {nombre:'Escudo mágico', polaridad:'buff', turnos:3, escudoMagico:10,
+    detalle:'Durante 3 turnos, absorbe los primeros 10 puntos de daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP (cantidad editable al elegir el preset).'},
+  {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
     detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},

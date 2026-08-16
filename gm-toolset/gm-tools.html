@@ -1728,7 +1728,7 @@ function aplicarDanioCreep(input){
 
   const extra = [];
   if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagico ? ` (quedan ${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
-  if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.25))} al atacante`);
+  if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
   if(recibido <= 0){
@@ -1853,6 +1853,11 @@ function creepStatValor(sc, statId){
   let v = num(sc[d.attr]) + creepModTotal(sc, d.attr) + creepModTotal(sc, statId);
   if((statId === 'pdg' || statId === 'parry') && (sc.estados||[]).some(e => e.activo !== false && e.lisiado)){
     v = Math.floor(v / 2);
+  }
+  if(statId === 'mov'){
+    const activos = (sc.estados||[]).filter(e => e.activo !== false);
+    if(activos.some(e => e.inmovilizado)) v = 0;
+    else if(activos.some(e => e.rengo)) v = Math.floor(v / 2);
   }
   return v;
 }
@@ -2135,41 +2140,45 @@ function cardCompactoHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','inmovilizado','rengo','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
     detalle:'Pierde 1 HP por stack cada turno.'},
   {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
     detalle:'Cura HP cada turno.'},
-  {nombre:'Pajaritos', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0,
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0,
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0,
     detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0, esCC:true,
+  {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true,
     detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:1, stacks:1, hpTurno:0, esCC:true,
+  {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true,
     detalle:'Sin Acciones este turno.'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0,
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0,
     detalle:'+1 a las Acciones máximas del turno.'},
-  {nombre:'Rompe armadura', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, armaduraRota:true,
-    detalle:'Corta a la mitad (redondeado hacia abajo) la Defensa y Res. a crítico totales.'},
-  {nombre:'Arruina armadura', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, armaduraArruinada:true,
-    detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico. No afecta el resto del equipo.'},
+  {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
+    detalle:'Corta a la mitad (redondeado hacia abajo) la Defensa y Res. a crítico totales. Permanente — se quita con Oleo reparador.'},
+  {nombre:'Armadura arruinada', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraArruinada:true,
+    detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico. No afecta el resto del equipo. Permanente — se quita con Oleo reparador.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
   {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-2, stacksTurno:0, permanente:true, esSangrado:true,
     detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
-  {nombre:'Lisiado', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, lisiado:true,
+  {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Invulnerable', polaridad:'buff', turnos:1, stacks:1, hpTurno:0, invulnerable:true,
-    detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff nuevo mientras dure.'},
+  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true,
+    detalle:'El Movimiento queda en 0 mientras dure.'},
+  {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true,
+    detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
+    detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
     detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
-    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 25% del daño al atacante (avisa cuánto es, se cobra a mano).'},
-  {nombre:'Escudo mágico', polaridad:'buff', turnos:0, stacks:1, hpTurno:0, permanente:true, escudoMagico:10,
-    detalle:'Absorbe los siguientes 10 puntos de daño de cualquier fuente antes de que le toquen el HP (editable al elegir el preset).'},
+    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante (avisa cuánto es, se cobra a mano).'},
+  {nombre:'Escudo mágico', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
+    detalle:'Durante 3 turnos, absorbe los primeros 10 puntos de daño de cualquier fuente —incluso true damage— antes de que le toquen el HP (editable al elegir el preset).'},
   {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, sangrePura:true,

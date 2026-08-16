@@ -273,7 +273,8 @@ input[type=file]{display:none}
 .acciones-modal{max-width:1400px!important;width:calc(100% - 20px)}
 .acciones-modal .body{max-height:none!important;overflow:visible!important}
 .botonera-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start;min-width:0;margin-bottom:14px}
-@media(max-width:820px){.botonera-grid{grid-template-columns:1fr}}
+.botonera-grid-even{grid-template-columns:1fr 1fr}
+@media(max-width:820px){.botonera-grid,.botonera-grid-even{grid-template-columns:1fr}}
 .botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;min-width:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -1831,11 +1832,16 @@ function renderAll(){
 
 let accionesCreepId = null;
 
-// Mismos stats secundarios derivados que un PJ (Res.Mg/Res.CC de Con, Dmg/
+// Los 5 atributos base (entradas con attr apuntando a sí mismas) más los
+// stats secundarios derivados de un PJ (Res.Mg/Res.CC de Con, Dmg/
 // Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry de Des,
 // PdG.Mg/Res.M/Rango de casteo de Int), sin agregar una grilla a la ficha
-// del creep — se tiran desde acá, en Acciones.
+// del creep — se tiran desde acá, en Acciones. El set completo se usa
+// también para cálculos internos (formulasCombateCreep, danoTxt, etc.);
+// CREEP_STATS_TIRADA_IDS más abajo recorta cuáles se muestran como botón.
 const CREEP_DERIVED_STATS = [
+  {id:'con', label:'Con', attr:'con'}, {id:'fue', label:'Fue', attr:'fue'},
+  {id:'agl', label:'Agi', attr:'agl'}, {id:'des', label:'Des', attr:'des'}, {id:'int', label:'Int', attr:'int'},
   {id:'resmg', label:'Res.Mg', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
   {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
   {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
@@ -1843,14 +1849,22 @@ const CREEP_DERIVED_STATS = [
   {id:'pdgmg', label:'PdG.Mg', attr:'int'}, {id:'resm', label:'Res.Mt', attr:'int'}, {id:'rangocasteo', label:'Rango de casteo', attr:'int'},
 ];
 
+// Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
+// Botonera de la ficha: los 5 atributos base + los secundarios que no
+// tienen ya su propio botón en la caja de Combate.
+const CREEP_STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'int', 'resmg', 'rescc', 'ini', 'pdgmg', 'resm'];
+
 const CREEP_STAT_LOOKUP = Object.fromEntries(CREEP_DERIVED_STATS.map(d => [d.id, d]));
 function creepStatValor(sc, statId){
   const d = CREEP_STAT_LOOKUP[statId];
   if(!d) return 0;
   // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
   // que arrastra a todos sus derivados) como lo que apunta directo al
-  // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza).
-  let v = num(sc[d.attr]) + creepModTotal(sc, d.attr) + creepModTotal(sc, statId);
+  // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza). Para un
+  // atributo base tirado directo (statId === d.attr) no hay que sumar el
+  // mod dos veces.
+  let v = num(sc[d.attr]) + creepModTotal(sc, d.attr);
+  if(statId !== d.attr) v += creepModTotal(sc, statId);
   if((statId === 'pdg' || statId === 'parry') && (sc.estados||[]).some(e => e.activo !== false && e.lisiado)){
     v = Math.floor(v / 2);
   }
@@ -1867,7 +1881,7 @@ function renderAccionesCreep(){
   if(!sc) return;
   const sinAcc = num(sc.acc) < 1;
 
-  const tilesStats = CREEP_DERIVED_STATS.map(d => `
+  const tilesStats = CREEP_STATS_TIRADA_IDS.map(id => CREEP_STAT_LOOKUP[id]).map(d => `
     <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
       <span class="bt-label">${esc(d.label)}</span>
       <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
@@ -1910,14 +1924,14 @@ function renderAccionesCreep(){
     </div>`;
 
   $('#acciones-creep-lista').innerHTML = `
-    <div class="botonera-grid">
-      <div class="botonera-caja">
-        <div class="acciones-grupo-label" style="margin-top:0">Tiradas de stats</div>
-        <div class="botonera-stats-grid">${tilesStats}</div>
-      </div>
+    <div class="botonera-grid botonera-grid-even">
       <div class="botonera-caja">
         <div class="acciones-grupo-label" style="margin-top:0">Combate</div>
         <div class="botonera-combate-grid">${tilesCombate}</div>
+      </div>
+      <div class="botonera-caja">
+        <div class="acciones-grupo-label" style="margin-top:0">Tiradas de stats</div>
+        <div class="botonera-stats-grid">${tilesStats}</div>
       </div>
     </div>
     <div class="botonera-caja">

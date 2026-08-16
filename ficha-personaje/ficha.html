@@ -1713,7 +1713,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 <!-- MODAL -->
 <div class="scrim" id="scrim">
   <div class="modal">
-    <header><h3 id="modal-title">Editar</h3><button class="iconbtn" id="modal-x">Cerrar</button></header>
+    <header><h3 id="modal-title">Editar</h3><button class="iconbtn" id="modal-activar" style="display:none">Activar</button><button class="iconbtn" id="modal-x">Cerrar</button></header>
     <div class="body" id="modal-body"></div>
     <footer>
       <div style="display:flex;gap:9px">
@@ -4989,7 +4989,6 @@ $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scr
 $('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
 $('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
 document.addEventListener('click', e => {
-  if(e.target.closest('#efecto-preset-abrir')){ abrirPresetsEfecto('efecto'); return; }
   if(e.target.closest('#item-efecto-preset-abrir')){ abrirPresetsEfecto('item'); return; }
   if(e.target.closest('#tipoitem-abrir')){ abrirTipoItem(); return; }
   const presetVer = e.target.closest('[data-presetver]');
@@ -6172,6 +6171,7 @@ function openEditor(key, id, equipadoPreset){
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
   $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
+  $('#modal-activar').style.display = key === 'efectos' ? '' : 'none';
   drawEditor();
   $('#scrim').classList.add('open');
   setTimeout(()=>$('#modal-body').querySelector('input')?.focus(), 40);
@@ -6197,15 +6197,18 @@ function drawEditor(){
   const esArma = ES_ARMA(draft.tipoItem);
 
   let html = '';
-  if(key === 'efectos' && !editing.id){
-    const cuantos = EFECTOS_PRESET.length + (S.efectosPersonalizados || []).length;
-    html += `<div class="f"><label>Preset (opcional)</label>
-      <button type="button" class="btn preset-abrir" id="efecto-preset-abrir">Elegir de la lista · ${fmt(cuantos)} estados</button>
-      <div class="hint" style="margin-top:5px">Elegí un preset para completar los valores de base — después podés editar cualquier campo antes de guardar.</div>
-    </div>`;
-  }
   html += `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
   if(key === 'habilidades' && sc.campos.includes('detalle')){
+    html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
+  }
+  if(key === 'efectos'){
+    const personalizados = S.efectosPersonalizados || [];
+    const yaGuardado = personalizados.some(p => p.nombre === draft.nombre);
+    html += `<div class="f">
+      <button type="button" class="mini" id="efecto-preset-guardar">${yaGuardado ? 'Actualizar' : 'Guardar'} como preset personalizado</button>
+      ${yaGuardado ? `<button type="button" class="mini danger" id="efecto-preset-borrar" style="margin-left:6px">Borrar preset "${esc(draft.nombre)}"</button>` : ''}
+      <div class="hint" style="margin-top:5px">Guarda esta configuración (turnos, stacks, HP por turno, modificadores, etc.) para poder elegirla de nuevo junto a los demás presets.</div>
+    </div>`;
     html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
   }
   if(sc.campos.includes('categoria')){
@@ -6237,7 +6240,7 @@ function drawEditor(){
       <div class="hint" style="margin-top:5px">Define en qué mano aparece dentro de "Efectos de equipo" cuando tenés dos cosas equipadas.</div>
     </div>`;
   }
-  if(sc.campos.includes('imagen') && key !== 'habilidades'){
+  if(sc.campos.includes('imagen') && key !== 'habilidades' && key !== 'efectos'){
     html += campoImagenHtml(draft);
   }
   const resto = cortos.filter(c => {
@@ -6341,7 +6344,7 @@ function drawEditor(){
       <input type="checkbox" data-c="${c}" ${on?'checked':''} style="width:auto">
       <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL[c]}</span></label>`;
   });
-  if(sc.campos.includes('detalle') && key !== 'habilidades')
+  if(sc.campos.includes('detalle') && key !== 'habilidades' && key !== 'efectos')
     html += `<div class="f"><label>Detalle</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
 
   if(sc.mods){
@@ -6375,16 +6378,7 @@ function drawEditor(){
       ` : `<button type="button" class="iconbtn iconbtn-add" id="addestadoequipo">+ Estado alterado</button>`}
     </div>`;
   }
-  if(key === 'efectos'){
-    const personalizados = S.efectosPersonalizados || [];
-    const yaGuardado = personalizados.some(p => p.nombre === draft.nombre);
-    html += `<div class="f" style="border-top:1px dashed var(--line-soft);padding-top:10px">
-      <button type="button" class="mini" id="efecto-preset-guardar">${yaGuardado ? 'Actualizar' : 'Guardar'} como preset personalizado</button>
-      ${yaGuardado ? `<button type="button" class="mini danger" id="efecto-preset-borrar" style="margin-left:6px">Borrar preset "${esc(draft.nombre)}"</button>` : ''}
-      <div class="hint" style="margin-top:5px">Guarda esta configuración (turnos, stacks, HP por turno, modificadores, etc.) en tu ficha para poder elegirla de nuevo desde el desplegable de arriba.</div>
-    </div>`;
-  }
-  if(key === 'habilidades' && sc.campos.includes('imagen')){
+  if((key === 'habilidades' || key === 'efectos') && sc.campos.includes('imagen')){
     html += campoImagenHtml(draft);
   }
   $('#modal-body').innerHTML = html;
@@ -6585,6 +6579,7 @@ $('#modal-del').onclick = () => {
 };
 $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
+$('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
 document.addEventListener('change', e => {
   const cb = e.target.closest('[data-pophab]');

@@ -799,7 +799,7 @@ input[type=file]{display:none}
         <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" id="ec-hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
         <div class="mini-f"><label>Stacks por turno</label><input type="number" id="ec-stacksturno" value="0"></div>
-        <div class="mini-f"><label>Escudo mágico (absorbe daño)</label><input type="number" id="ec-escudomagico" min="0" value="0"></div>
+        <div class="mini-f"><label>Escudo mágico (HP secundario, se recarga cada Mantenimiento)</label><input type="number" id="ec-escudomagico" min="0" value="0"></div>
       </div>
       <div style="display:flex;gap:16px">
         <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
@@ -1699,11 +1699,12 @@ function aplicarDanioCreep(input){
   const defensa = creepDefensaEfectiva(sc);
   let recibido = Math.max(0, golpe - defensa);
 
-  const escudo = activos.find(e => num(e.escudoMagico) > 0);
+  const escudo = activos.find(e => num(e.escudoMagico) > 0 && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
   let absorbido = 0;
   if(escudo && recibido > 0){
-    absorbido = Math.min(recibido, num(escudo.escudoMagico));
-    escudo.escudoMagico = num(escudo.escudoMagico) - absorbido;
+    const actual = num(escudo.escudoMagicoActual ?? escudo.escudoMagico);
+    absorbido = Math.min(recibido, actual);
+    escudo.escudoMagicoActual = actual - absorbido;
     recibido -= absorbido;
   }
 
@@ -1713,7 +1714,7 @@ function aplicarDanioCreep(input){
   if(critInput) critInput.checked = false;
 
   const extra = [];
-  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagico ? ` (quedan ${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
+  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagicoActual ? ` (quedan ${fmt(escudo.escudoMagicoActual)}/${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
   if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
@@ -2177,7 +2178,7 @@ const ESTADOS_PRESET_GM = [
   {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
     detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante (avisa cuánto es, se cobra a mano).'},
   {nombre:'Escudo mágico', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
-    detalle:'Durante 3 turnos, absorbe los primeros 10 puntos de daño de cualquier fuente —incluso true damage— antes de que le toquen el HP (editable al elegir el preset).'},
+    detalle:'Durante 3 turnos, funciona como una barra de HP secundaria de 10 puntos: absorbe todo el daño de cualquier fuente —incluso true damage— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo (editable al elegir el preset).'},
   {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, sangrePura:true,
@@ -2889,10 +2890,11 @@ function estadoHtml(scId, es){
   const stacks = Math.max(1, num(es.stacks) || 1);
   const hpTotal = num(es.hpTurno) * stacks;
   const efectoTxt = es.detalle ? es.detalle : (hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)} HP/turno` : 'Sin efecto numérico');
+  const escudoTxt = num(es.escudoMagico) > 0 ? ` · 🛡${fmt(num(es.escudoMagicoActual ?? es.escudoMagico))}/${fmt(num(es.escudoMagico))}` : '';
   return `<div class="estado-compacto estado-${es.polaridad||'otro'}">
     <div class="estado-compacto-info">
       <div class="estado-compacto-nombre">${esc(es.nombre || '(sin nombre)')}</div>
-      <div class="estado-compacto-meta">${esc(efectoTxt)} · ${fmt(num(es.turnos))} turno(s)</div>
+      <div class="estado-compacto-meta">${esc(efectoTxt)} · ${fmt(num(es.turnos))} turno(s)${escudoTxt}</div>
     </div>
     <button class="rm" data-editarestado="${scId}:${es.id}" title="Editar">✎</button>
     <button class="rm" data-rmestado="${scId}:${es.id}">×</button>
@@ -3769,6 +3771,9 @@ function mantenimiento(){
     const inmuneSangradoMant = activosMant.some(e => e.coagulacionExtrema);
     sc.estados.forEach(es => {
       if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos ni stacks
+      // Escudo mágico funciona como una barra de HP secundaria: se recarga
+      // entera cada Mantenimiento mientras el estado siga activo.
+      if(num(es.escudoMagico) > 0) es.escudoMagicoActual = num(es.escudoMagico);
       const stacks = Math.max(1, num(es.stacks) || 1);
       let cambio = num(es.hpTurno) * stacks;
       if(cambio < 0 && (esInvulnerableMant || (es.esVeneno && inmuneVenenoMant) || (es.esSangrado && inmuneSangradoMant))) cambio = 0;

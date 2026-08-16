@@ -2890,9 +2890,16 @@ function cargaIndicator(i){
 // tiene y el consumible no hace nada. Se busca el original por nombre, que
 // es la única referencia al catálogo que sobrevive a la copia.
 function configEfectoDe(it){
-  if((it.efectoNombre || '').trim()) return it;
+  // El catálogo es la referencia compartida y siempre gana sobre lo que
+  // haya quedado copiado en el ítem al comprarlo/agregarlo — si se le
+  // completó el efecto en el catálogo después (como pasó con las pociones
+  // y pergaminos que ya tenían nombre de estado pero sin modificadores),
+  // los ítems que la gente ya tenía en la mochila tienen que verlo también.
+  // Solo se usa lo propio del ítem si no hay match en el catálogo (algo
+  // 100% custom, nunca publicado).
   const base = (S.catalogo || []).find(c => c.nombre === it.nombre);
-  return base && (base.efectoNombre || '').trim() ? base : it;
+  if(base && (base.efectoNombre || '').trim()) return base;
+  return it;
 }
 
 // Invulnerable bloquea cualquier debuff nuevo; Inmunidad a CC / Sangre

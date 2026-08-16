@@ -19,13 +19,15 @@ for it in items:
 
 DEFENSIVOS = {'armadura_blanda','armadura_rigida','casco_blando','casco_rigido',
               'guantes_blandos','guantes_rigidos','piernas_blandas','piernas_rigidas',
-              'botas_blandas','botas_rigidas'}
+              'botas_blandas','botas_rigidas','cinturon'}
+ACCESORIOS = {'anillos'}
 
 def categoria(it):
     t = it['tipoItem']
     if it.get('consumible') or t == 'consumibles': return 'Consumibles'
     if t.startswith('arma_'): return 'Armas'
     if t.startswith('escudo'): return 'Escudos'
+    if t in ACCESORIOS: return 'Accesorios'
     if t in DEFENSIVOS: return 'Defensivos'
     return 'Otros'
 
@@ -42,6 +44,7 @@ COLUMNAS = {
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
     'Otros':       BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
 }
 # Al final de cada pestaña: lo que no tiene columna propia y el aviso de imagen
@@ -99,7 +102,7 @@ CAB_ID = PatternFill('solid', fgColor='4A2E1C')
 FUENTE = Font(bold=True, color='F0E4D0', size=10)
 
 resumen = {}
-for cat in ['Consumibles','Armas','Escudos','Defensivos','Otros']:
+for cat in ['Consumibles','Armas','Escudos','Defensivos','Accesorios','Otros']:
     ws = wb.create_sheet(cat)
     cols = COLUMNAS[cat]
     ws.append([ETIQUETAS.get(c, c) for c in cols])

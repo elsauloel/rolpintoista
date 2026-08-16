@@ -12,6 +12,11 @@ from catalogo_comun import corregir, imagenes_por_id, escribir_htmls, guardar_ca
 
 items, avisos = leer()
 
+if avisos:
+    print("=== AVISOS DE LECTURA DEL EXCEL ===")
+    for a in avisos: print("  ", a)
+    print("")
+
 # Las imagenes no vienen del Excel (pesan demasiado para editarlas ahí):
 # se conservan las que ya estaban en ficha.html, por id.
 imagenes = imagenes_por_id()

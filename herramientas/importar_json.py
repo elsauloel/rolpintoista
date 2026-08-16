@@ -19,8 +19,11 @@ import re as _re
 def _cubierto(r):
     d, it = r['detalle'].lower(), r['it']
     if it.get('curahp') and _re.search(r'recupera \d+ ?hp|cura \d+ ?hp', d): return True
-    if (it.get('efectoNombre') or '').strip(): return True
+    # efectoNombre solo no alcanza: el estado tiene que traer algo que lo
+    # haga (mods o hp/turno) — si no, se activa un estado que no hace nada.
+    if (it.get('efectoNombre') or '').strip() and (it.get('efectoMods') or it.get('efectoHpTurno')): return True
     if it.get('curabonosPct') and 'bonos' in d: return True
+    if it.get('mods'): return True
     return False
 _pend = [r for r in _rev if r['it']['nombre'] not in _YA and not _cubierto(r)]
 

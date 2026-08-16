@@ -1321,7 +1321,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-alcance-extendido",
     "nombre": "Poción de Alcance Extendido",
     "tier": "Común",
@@ -1345,7 +1350,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-alcance-extendido-mayor",
     "nombre": "Poción de Alcance Extendido mayor",
     "tier": "Buena Calidad",
@@ -1369,7 +1379,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-alcance-extendido-superior",
     "nombre": "Poción de Alcance Extendido superior",
     "tier": "Raro",
@@ -1441,7 +1456,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "int",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-clarividencia",
     "nombre": "Poción de Clarividencia",
     "tier": "Buena Calidad",
@@ -1465,7 +1485,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "int",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-clarividencia-mayor",
     "nombre": "Poción de Clarividencia Mayor",
     "tier": "Raro",
@@ -1479,8 +1504,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Clarividencia (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1489,7 +1514,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "int",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-clarividencia-superior",
     "nombre": "Poción de Clarividencia Superior",
     "tier": "Excepcional",
@@ -1503,8 +1533,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Clarividencia (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1513,7 +1543,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-escudo-arcano",
     "nombre": "Poción de Escudo Arcano",
     "tier": "Común",
@@ -1537,7 +1572,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-escudo-arcano-mayor",
     "nombre": "Poción de Escudo Arcano mayor",
     "tier": "Buena Calidad",
@@ -1561,7 +1601,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "resmg",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-escudo-arcano-superior",
     "nombre": "Poción de Escudo Arcano superior",
     "tier": "Raro",
@@ -1585,7 +1630,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-extension-del-conjuro",
     "nombre": "Poción de Extensión del Conjuro",
     "tier": "Común",
@@ -1609,7 +1659,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-extension-del-conjuro-mayor",
     "nombre": "Poción de Extensión del Conjuro mayor",
     "tier": "Buena Calidad",
@@ -1633,7 +1688,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rangocasteo",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-extension-del-conjuro-superior",
     "nombre": "Poción de Extensión del Conjuro superior",
     "tier": "Raro",
@@ -1657,7 +1717,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-foco-arcano",
     "nombre": "Poción de Foco Arcano",
     "tier": "Común",
@@ -1681,7 +1746,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-foco-arcano-mayor",
     "nombre": "Poción de Foco Arcano mayor",
     "tier": "Buena Calidad",
@@ -1705,7 +1775,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdgmg",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-foco-arcano-superior",
     "nombre": "Poción de Foco Arcano superior",
     "tier": "Raro",
@@ -1729,7 +1804,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-fuerza-del-toro",
     "nombre": "Poción de Fuerza del Toro",
     "tier": "Buena Calidad",
@@ -1753,7 +1833,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "fue",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-fuerza-del-toro-mayor",
     "nombre": "Poción de Fuerza del Toro Mayor",
     "tier": "Raro",
@@ -1767,8 +1852,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Fuerza del Toro (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1777,7 +1862,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "fue",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-fuerza-del-toro-superior",
     "nombre": "Poción de Fuerza del Toro Superior",
     "tier": "Excepcional",
@@ -1791,8 +1881,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Fuerza del Toro (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -1801,7 +1891,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-furia-de-combate",
     "nombre": "Poción de Furia de Combate",
     "tier": "Común",
@@ -1825,7 +1920,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-furia-de-combate-mayor",
     "nombre": "Poción de Furia de Combate mayor",
     "tier": "Buena Calidad",
@@ -1849,7 +1949,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "dmg",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-furia-de-combate-superior",
     "nombre": "Poción de Furia de Combate superior",
     "tier": "Raro",
@@ -1969,7 +2074,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "des",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-manos-ligeras",
     "nombre": "Poción de Manos Ligeras",
     "tier": "Buena Calidad",
@@ -1993,7 +2103,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "des",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-manos-ligeras-mayor",
     "nombre": "Poción de Manos Ligeras Mayor",
     "tier": "Raro",
@@ -2007,8 +2122,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Manos Ligeras (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2017,7 +2132,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "des",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-manos-ligeras-superior",
     "nombre": "Poción de Manos Ligeras Superior",
     "tier": "Excepcional",
@@ -2031,8 +2151,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Manos Ligeras (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2041,7 +2161,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-muralla-personal",
     "nombre": "Poción de Muralla Personal",
     "tier": "Común",
@@ -2065,7 +2190,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-muralla-personal-mayor",
     "nombre": "Poción de Muralla Personal mayor",
     "tier": "Buena Calidad",
@@ -2089,7 +2219,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bloqueo",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-muralla-personal-superior",
     "nombre": "Poción de Muralla Personal superior",
     "tier": "Raro",
@@ -2113,7 +2248,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-ojo-del-verdugo",
     "nombre": "Poción de Ojo del Verdugo",
     "tier": "Común",
@@ -2137,7 +2277,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-ojo-del-verdugo-mayor",
     "nombre": "Poción de Ojo del Verdugo mayor",
     "tier": "Buena Calidad",
@@ -2161,7 +2306,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "crit",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-ojo-del-verdugo-superior",
     "nombre": "Poción de Ojo del Verdugo superior",
     "tier": "Raro",
@@ -2185,7 +2335,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-paso-fantasma",
     "nombre": "Poción de Paso Fantasma",
     "tier": "Común",
@@ -2209,7 +2364,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-paso-fantasma-mayor",
     "nombre": "Poción de Paso Fantasma mayor",
     "tier": "Buena Calidad",
@@ -2233,7 +2393,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "eva",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-paso-fantasma-superior",
     "nombre": "Poción de Paso Fantasma superior",
     "tier": "Raro",
@@ -2257,7 +2422,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-piel-de-roble",
     "nombre": "Poción de Piel de Roble",
     "tier": "Buena Calidad",
@@ -2281,7 +2451,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "con",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-piel-de-roble-mayor",
     "nombre": "Poción de Piel de Roble Mayor",
     "tier": "Raro",
@@ -2295,8 +2470,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Piel de Roble (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2305,7 +2480,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "con",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-piel-de-roble-superior",
     "nombre": "Poción de Piel de Roble Superior",
     "tier": "Excepcional",
@@ -2319,8 +2499,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Piel de Roble (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2329,7 +2509,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-piernas-de-viento",
     "nombre": "Poción de Piernas de Viento",
     "tier": "Común",
@@ -2353,7 +2538,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-piernas-de-viento-mayor",
     "nombre": "Poción de Piernas de Viento mayor",
     "tier": "Buena Calidad",
@@ -2377,7 +2567,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "mov",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-piernas-de-viento-superior",
     "nombre": "Poción de Piernas de Viento superior",
     "tier": "Raro",
@@ -2401,7 +2596,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-pies-veloces",
     "nombre": "Poción de Pies Veloces",
     "tier": "Buena Calidad",
@@ -2425,7 +2625,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "agl",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-pies-veloces-mayor",
     "nombre": "Poción de Pies Veloces Mayor",
     "tier": "Raro",
@@ -2439,8 +2644,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Pies Veloces (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2449,7 +2654,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "agl",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-pies-veloces-superior",
     "nombre": "Poción de Pies Veloces Superior",
     "tier": "Excepcional",
@@ -2463,8 +2673,8 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "",
-    "efectoTurnos": 0,
+    "efectoNombre": "Pies Veloces (poción)",
+    "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "",
@@ -2473,7 +2683,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-punteria-certera",
     "nombre": "Poción de Puntería Certera",
     "tier": "Común",
@@ -2497,7 +2712,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-punteria-certera-mayor",
     "nombre": "Poción de Puntería Certera mayor",
     "tier": "Buena Calidad",
@@ -2521,7 +2741,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "pdg",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-punteria-certera-superior",
     "nombre": "Poción de Puntería Certera superior",
     "tier": "Raro",
@@ -2545,7 +2770,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-reflejo-de-acero",
     "nombre": "Poción de Reflejo de Acero",
     "tier": "Común",
@@ -2569,7 +2799,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-reflejo-de-acero-mayor",
     "nombre": "Poción de Reflejo de Acero mayor",
     "tier": "Buena Calidad",
@@ -2593,7 +2828,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "parry",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-reflejo-de-acero-superior",
     "nombre": "Poción de Reflejo de Acero superior",
     "tier": "Raro",
@@ -2713,7 +2953,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-reserva-ampliada",
     "nombre": "Poción de Reserva Ampliada",
     "tier": "Común",
@@ -2737,7 +2982,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-reserva-ampliada-mayor",
     "nombre": "Poción de Reserva Ampliada mayor",
     "tier": "Buena Calidad",
@@ -2761,7 +3011,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "bonos",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-reserva-ampliada-superior",
     "nombre": "Poción de Reserva Ampliada superior",
     "tier": "Raro",
@@ -2785,7 +3040,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 10
+      }
+    ],
     "id": "new-pocion-de-vitalidad-extendida",
     "nombre": "Poción de Vitalidad Extendida",
     "tier": "Común",
@@ -2809,7 +3069,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 20
+      }
+    ],
     "id": "new-pocion-de-vitalidad-extendida-mayor",
     "nombre": "Poción de Vitalidad Extendida mayor",
     "tier": "Buena Calidad",
@@ -2833,7 +3098,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "hpmax",
+        "val": 30
+      }
+    ],
     "id": "new-pocion-de-vitalidad-extendida-superior",
     "nombre": "Poción de Vitalidad Extendida superior",
     "tier": "Raro",
@@ -2857,7 +3127,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-voluntad-de-hierro",
     "nombre": "Poción de Voluntad de Hierro",
     "tier": "Común",
@@ -2881,7 +3156,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-voluntad-de-hierro-mayor",
     "nombre": "Poción de Voluntad de Hierro mayor",
     "tier": "Buena Calidad",
@@ -2905,7 +3185,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
     "id": "new-pocion-de-voluntad-de-hierro-superior",
     "nombre": "Poción de Voluntad de Hierro superior",
     "tier": "Raro",
@@ -2929,7 +3214,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "accionesmax",
+        "val": 1
+      }
+    ],
     "id": "new-pocion-de-impetu",
     "nombre": "Poción de Ímpetu",
     "tier": "Común",
@@ -2953,7 +3243,12 @@
   },
   {
     "mods": [],
-    "efectoMods": [],
+    "efectoMods": [
+      {
+        "stat": "accionesmax",
+        "val": 2
+      }
+    ],
     "id": "new-pocion-de-impetu-mayor",
     "nombre": "Poción de Ímpetu mayor",
     "tier": "Buena Calidad",
@@ -7282,7 +7577,28 @@
     "imagen": ""
   },
   {
-    "mods": [],
+    "mods": [
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "tipo5",
+        "val": 1
+      }
+    ],
     "efectoMods": [],
     "id": "new-anillo-de-blindaje",
     "nombre": "Anillo de blindaje",

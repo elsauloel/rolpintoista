@@ -43,6 +43,10 @@ para la lógica de corrección/escritura.
   // Si NO es consumible (equipo que se puede llevar puesto):
   "equipoEstadoNombre": "",       // estado que se activa solo al equiparlo
   "equipoEstadoHpTurno": 0, "equipoEstadoDetalle": "",
+  "equipoEstadoPreset": "",       // opcional: nombre EXACTO de un preset de EFECTOS_PRESET
+                                   // (Afortunado, Sangre pura, etc.) cuya mecánica real hereda
+                                   // el estado de equipo, sin importar qué diga equipoEstadoNombre.
+                                   // Vacío = el estado es solo un cartel (recordatorio manual).
 
   "legacy": false,                // cuenta para el piso de ítems clásicos del Alquimista
   "mods": [{"stat": "pdg", "val": 1}],  // se suman al stat mientras esté equipado

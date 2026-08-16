@@ -33,6 +33,10 @@ def _cubierto(r):
     if (it.get('efectoNombre') or '').strip() and (it.get('efectoMods') or it.get('efectoHpTurno')): return True
     if it.get('curabonosPct') and 'bonos' in d: return True
     if it.get('mods'): return True
+    # Estado al equipar: cuenta como cubierto aunque no tenga preset —
+    # "recordatorio sin mecánica automática" es un resultado a propósito
+    # para lo que de verdad no se puede automatizar todavía.
+    if (it.get('equipoEstadoNombre') or '').strip(): return True
     return False
 _pend = [r for r in _rev if r['it']['nombre'] not in _YA and not _cubierto(r)]
 

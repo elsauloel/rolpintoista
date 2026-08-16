@@ -24,7 +24,7 @@ ETIQ = {
     'Rango casteo':'mod_rangocasteo','Acciones máx.':'mod_accionesmax','Bloqueo':'mod_bloqueo',
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
-    'Detalle del estado equipado':'equipoEstadoDetalle',
+    'Detalle del estado equipado':'equipoEstadoDetalle','Estado al equipar (preset)':'equipoEstadoPreset',
     'Modificadores del estado':'efectoMods_extra',
     'Legacy':'legacy',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',

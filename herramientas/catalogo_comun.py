@@ -188,6 +188,8 @@ def item_js(it, con_imagen=True):
             partes.append("equipoEstadoHpTurno:%s" % it['equipoEstadoHpTurno'])
         if (it.get('equipoEstadoDetalle') or '').strip():
             partes.append("equipoEstadoDetalle:'%s'" % esc_js(it['equipoEstadoDetalle']))
+        if (it.get('equipoEstadoPreset') or '').strip():
+            partes.append("equipoEstadoPreset:'%s'" % esc_js(it['equipoEstadoPreset']))
     partes.append("mods:%s" % mods_js(it['mods']))
     partes.append("detalle:'%s'" % esc_js(it.get('detalle')))
     return '{' + ', '.join(partes) + '}'

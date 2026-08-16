@@ -44,7 +44,8 @@ COLUMNAS = {
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
-    'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
+    'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def',
+                           'equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle','equipoEstadoPreset'],
     'Otros':       BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
 }
 # Al final de cada pestaña: lo que no tiene columna propia y el aviso de imagen
@@ -62,6 +63,7 @@ ETIQUETAS = {
     'efectoMods_extra':'Modificadores del estado',
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
     'equipoEstadoDetalle':'Detalle del estado equipado',
+    'equipoEstadoPreset':'Estado al equipar (preset)',
     'legacy':'Legacy',
     'mods_extra':'Otros modificadores','tiene_imagen':'Tiene imagen',
     'mod_def':'Defensa','mod_tipo1':'Res.Crít Tipo 2','mod_tipo2':'Res.Crít Tipo 4',
@@ -147,6 +149,9 @@ filas = [
     ('Consumibles', 'Unidades es cuántas trae. Cargas es cuántos usos por unidad. Cura HP suma vida al consumirlo (negativo daña).'),
     ('Estado que aplica', 'Si tiene nombre, al consumir el ítem se activa ese estado alterado. Turnos, HP por turno y Detalle configuran ese estado.'),
     ('Estado permanente', 'Con "sí", el estado no vence: queda hasta que el jugador lo borre a mano.'),
+    ('', ''),
+    ('Estado al equipar', 'Igual que "Estado que aplica" pero para equipo (armas, escudos, defensivos, accesorios): el estado se activa solo mientras el ítem está puesto y se va al sacárselo — no cuenta turnos.'),
+    ('Estado al equipar (preset)', 'Opcional. Si el nombre de un preset de la ficha (Afortunado, Sangre pura, etc.) va acá, el ítem hereda esa mecánica real además de mostrar su propio nombre en "Estado al equipar" — así "Afortunado (anillo)" da ventaja de verdad en vez de ser solo un cartel. Dejalo vacío si el efecto no tiene un preset que lo cubra: el estado va a aparecer igual, como recordatorio, pero sin aplicarse solo.'),
     ('', ''),
     ('Tiene imagen', 'Solo informativo. Las imágenes NO están en este Excel porque pesan cientos de KB cada una; viven en el programa y se conservan solas al reimportar, siempre que no cambies el ID.'),
     ('', ''),

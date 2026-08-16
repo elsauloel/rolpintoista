@@ -323,7 +323,7 @@ function defaultsItem(){
     precioCompra: 0, unidades: 1, cargaMax: 0, consumible: false, legacy: false,
     curahp: 0, curabonosPct: 0,
     efectoNombre: '', efectoTurnos: 0, efectoHpTurno: 0, efectoPermanente: false, efectoDetalle: '', efectoMods: [],
-    equipoEstadoNombre: '', equipoEstadoHpTurno: 0, equipoEstadoDetalle: '',
+    equipoEstadoNombre: '', equipoEstadoHpTurno: 0, equipoEstadoDetalle: '', equipoEstadoPreset: '',
     mods: [], detalle: '',
   };
 }
@@ -428,6 +428,9 @@ function drawEditor(){
       <div class="f"><label>Nombre del estado</label><input type="text" data-c="equipoEstadoNombre" value="${esc(d.equipoEstadoNombre)}" placeholder="ej. Regeneración"></div>
       <div class="f"><label>HP por turno (mientras esté puesto)</label><input type="number" step="any" data-c="equipoEstadoHpTurno" value="${esc(d.equipoEstadoHpTurno)}"></div>
       <div class="f"><label>Detalle del estado</label><textarea data-c="equipoEstadoDetalle" rows="2">${esc(d.equipoEstadoDetalle)}</textarea></div>
+      <div class="f"><label>Preset que hereda (opcional)</label><input type="text" data-c="equipoEstadoPreset" value="${esc(d.equipoEstadoPreset)}" placeholder="ej. Afortunado, Sangre pura, Coagulación extrema…">
+        <div class="hint">Si el nombre coincide EXACTO con un preset de Estados alterados de la ficha, el ítem hereda su mecánica real además de mostrar su propio nombre de arriba. Dejalo vacío si el efecto no tiene un preset que lo cubra — el estado va a aparecer igual, como recordatorio, pero sin aplicarse solo.</div>
+      </div>
     </div>`;
   }
 

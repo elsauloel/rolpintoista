@@ -3200,7 +3200,10 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-mant'){
+    // Sube los datos solo, para minimizar el riesgo de perder avance por
+    // olvidarse de tocar "Subir datos" con frecuencia.
     mantenimiento();
+    subirDatos();
     return;
   }
   if(b.id === 'btn-reset'){

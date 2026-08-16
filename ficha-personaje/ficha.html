@@ -7062,8 +7062,14 @@ function fichaNueva(){
   $('#f-nombre').focus();
 }
 
-$('#btn-mantenimiento').onclick = mantenimiento;
-$('#btn-mantenimiento-flotante').onclick = mantenimiento;
+// Mantenimiento sube los datos solo, para minimizar el riesgo de perder
+// avance por olvidarse de tocar "Subir datos" con frecuencia.
+function mantenimientoYSubir(){
+  mantenimiento();
+  $('#btn-sync').click();
+}
+$('#btn-mantenimiento').onclick = mantenimientoYSubir;
+$('#btn-mantenimiento-flotante').onclick = mantenimientoYSubir;
 $('#btn-reset').onclick = fichaNueva;
 $('#btn-turno-reset').onclick = () => {
   if(!confirm('Esto vuelve el contador de turno a 1. No toca Bonos, Acciones ni los estados alterados. ¿Seguís?')) return;

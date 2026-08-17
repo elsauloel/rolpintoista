@@ -40,9 +40,9 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
-    'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Armas':       BASE + ['descripcionNarrativa','tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
-    'Defensivos':  BASE + ['ocultoEnCatalogo', 'mod_def'] + ['mod_'+s for s in CRIT] +
+    'Defensivos':  BASE + ['descripcionNarrativa', 'mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def',
                            'equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle','equipoEstadoPreset'],
@@ -64,7 +64,7 @@ ETIQUETAS = {
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
     'equipoEstadoDetalle':'Detalle del estado equipado',
     'equipoEstadoPreset':'Estado al equipar (preset)',
-    'ocultoEnCatalogo':'Ocultar en el catálogo',
+    'descripcionNarrativa':'Descripción narrativa',
     'legacy':'Legacy',
     'mods_extra':'Otros modificadores','tiene_imagen':'Tiene imagen',
     'mod_def':'Defensa','mod_tipo1':'Res.Crít Tipo 2','mod_tipo2':'Res.Crít Tipo 4',
@@ -75,9 +75,15 @@ ETIQUETAS = {
     'mod_accionesmax':'Acciones máx.','mod_bloqueo':'Bloqueo','mod_int':'Inteligencia','mod_des':'Destreza','mod_agl':'Agilidad',
 }
 
+MARCA_OCULTO = 'ocultar en el catálogo'
+
 def valor(it, col):
     if col == 'tiene_imagen':
         return 'sí' if it.get('_tiene_imagen') else ''
+    # La marca de "todavía sin auditar" vive en la celda del precio: hay que
+    # devolverla tal cual al regenerar, o se pierde y el ítem se publica.
+    if col == 'precioCompra' and it.get('ocultoEnCatalogo'):
+        return MARCA_OCULTO
     if col == 'mods_extra':
         propios = {c[4:] for c in COLUMNAS[categoria(it)] if c.startswith('mod_')}
         extra = [f"{m['stat']}:{m['val']}" for m in it.get('mods', []) if m['stat'] not in propios]
@@ -154,7 +160,8 @@ filas = [
     ('Estado al equipar', 'Igual que "Estado que aplica" pero para equipo (armas, escudos, defensivos, accesorios): el estado se activa solo mientras el ítem está puesto y se va al sacárselo — no cuenta turnos.'),
     ('Estado al equipar (preset)', 'Opcional. Si el nombre de un preset de la ficha (Afortunado, Sangre pura, etc.) va acá, el ítem hereda esa mecánica real además de mostrar su propio nombre en "Estado al equipar" — así "Afortunado (anillo)" da ventaja de verdad en vez de ser solo un cartel. Dejalo vacío si el efecto no tiene un preset que lo cubra: el estado va a aparecer igual, como recordatorio, pero sin aplicarse solo.'),
     ('', ''),
-    ('Ocultar en el catálogo', '(Solo en Defensivos, por ahora.) Con "sí", el ítem no se escribe a ficha.html/vendor-generator.html/gm-tools.html — no aparece para comprar, equipar en creeps, ni en tiendas generadas. Sigue entero en datos/catalogo.json y en este Excel para poder editarlo. Pensado para ítems generados en automático que todavía no se auditaron/balancearon.'),
+    ('Ocultar del catálogo', 'Para ítems generados en automático que todavía no se auditaron ni balancearon: en vez del número, escribí "ocultar en el catálogo" en su celda de Precio (DDE). Ese ítem no se escribe a ficha.html/vendor-generator.html/gm-tools.html — no se puede comprar, no sale en tiendas generadas, no se puede equipar en un creep — pero sigue entero acá y en datos/catalogo.json para irlo revisando. Cuando esté listo, reemplazá el texto por su precio real.'),
+    ('Descripción narrativa', 'Texto de color: qué se ve, de qué está hecho, su historia. Solo se muestra en la tarjeta que se abre con el botón "Ver". No afecta ninguna mecánica — todo lo que el ítem HACE va en Detalle.'),
     ('', ''),
     ('Tiene imagen', 'Solo informativo. Las imágenes NO están en este Excel porque pesan cientos de KB cada una; viven en el programa y se conservan solas al reimportar, siempre que no cambies el ID.'),
     ('', ''),

@@ -5,6 +5,7 @@ from rutas import FICHA, GM, VENDOR, XLSX, SP
 
 # Lee el Excel y reconstruye los items del catalogo. Se usa para comparar
 # contra el codigo antes de aplicar nada.
+import re
 from openpyxl import load_workbook
 
 
@@ -25,8 +26,7 @@ ETIQ = {
     'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
     'Detalle del estado equipado':'equipoEstadoDetalle','Estado al equipar (preset)':'equipoEstadoPreset',
-    'Ocultar en el catálogo':'ocultoEnCatalogo', 'ocultar del catálogo':'ocultoEnCatalogo',
-    'ocultar del catáolgo':'ocultoEnCatalogo',
+    'Descripción narrativa':'descripcionNarrativa',
     'Modificadores del estado':'efectoMods_extra',
     'Legacy':'legacy',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',
@@ -50,7 +50,10 @@ def leer():
         ws = wb[hoja]
         filas = list(ws.iter_rows(values_only=True))
         if not filas: continue
-        desconocidas = [c for c in filas[0] if c and c not in ETIQ]
+        # "Column 38", "Column 39"... son columnas fantasma que Excel deja al
+        # extender una tabla: no las anuncia como columna nueva del usuario.
+        desconocidas = [c for c in filas[0]
+                        if c and c not in ETIQ and not re.fullmatch(r'Column \d+', str(c).strip())]
         for c in desconocidas:
             avisos.append(f"{hoja}: columna desconocida {c!r} (se ignora)")
         cab = [ETIQ.get(c, None) for c in filas[0]]
@@ -86,8 +89,15 @@ def leer():
                     if v not in (None, '') and num(v) != 0:
                         it['mods'].append({'stat': k[4:], 'val': num(v)})
                     continue
-                if k in ('legacy','armaDeRango','ocultoEnCatalogo'):
+                if k in ('legacy','armaDeRango'):
                     it[k] = str(v).strip().lower() in ('sí','si','x','true','1','yes') if v else False
+                    continue
+                # Marcar un ítem como "no publicable todavía" se hace escribiendo
+                # texto en su celda de precio (donde iría el número), en vez de
+                # tener una columna aparte solo para eso.
+                if k == 'precioCompra' and isinstance(v, str) and v.strip() and num(v) == 0:
+                    it['ocultoEnCatalogo'] = True
+                    it['precioCompra'] = 0
                     continue
                 if k == 'efectoPermanente':
                     it[k] = str(v).strip().lower() in ('sí','si','true','x','1') if v else False

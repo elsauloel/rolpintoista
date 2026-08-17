@@ -192,6 +192,8 @@ def item_js(it, con_imagen=True):
             partes.append("equipoEstadoPreset:'%s'" % esc_js(it['equipoEstadoPreset']))
     partes.append("mods:%s" % mods_js(it['mods']))
     partes.append("detalle:'%s'" % esc_js(it.get('detalle')))
+    if (it.get('descripcionNarrativa') or '').strip():
+        partes.append("descripcionNarrativa:'%s'" % esc_js(it['descripcionNarrativa']))
     return '{' + ', '.join(partes) + '}'
 
 

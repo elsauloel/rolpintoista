@@ -6675,6 +6675,33 @@
     "imagen": ""
   },
   {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-alpargatas-de-yute",
+    "nombre": "Alpargatas de yute",
+    "tier": "Común",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "detalle": "Movimiento +1.",
+    "descripcionNarrativa": "Suela de soga trenzada. Livianas, baratas, se deshacen con la lluvia.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-anillo-policromatico",
@@ -8722,7 +8749,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-compuesta",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura compuesta",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_rigida",
@@ -8730,6 +8756,7 @@
     "ranuras": 0,
     "precioCompra": 100,
     "detalle": "Reduce críticos tipo 6 y 8",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8745,7 +8772,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-compuesta-revestida-de-acero",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura compuesta revestida de acero",
     "tier": "Raro",
     "tipoItem": "armadura_rigida",
@@ -8753,6 +8779,7 @@
     "ranuras": 0,
     "precioCompra": 180,
     "detalle": "Reduce críticos tipo 6 y 8",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8768,7 +8795,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-de-cuero-blando",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura de cuero blando",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -8776,6 +8802,7 @@
     "ranuras": 0,
     "precioCompra": 50,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8799,7 +8826,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-de-cuero-reforzado",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura de cuero reforzado",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
@@ -8807,6 +8833,7 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Reduce críticos Tipo 2 y 4.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8834,7 +8861,6 @@
     ],
     "efectoMods": [],
     "id": "cat-armadura-mediana",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura de cuero rígido",
     "tier": "Común",
     "tipoItem": "armadura_rigida",
@@ -8842,6 +8868,7 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Reduce críticos Tipo 2 y 4",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8857,7 +8884,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-de-hojalata",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura de hojalata",
     "tier": "Común",
     "tipoItem": "armadura_rigida",
@@ -8865,6 +8891,7 @@
     "ranuras": 0,
     "precioCompra": 60,
     "detalle": "Reduce críticos tipo 2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8880,7 +8907,6 @@
     ],
     "efectoMods": [],
     "id": "new-armadura-de-placas",
-    "ocultoEnCatalogo": false,
     "nombre": "Armadura de placas",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_rigida",
@@ -8888,6 +8914,63 @@
     "ranuras": 0,
     "precioCompra": 100,
     "detalle": "Reduce críticos tipo 4 y 6",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-bacinete-de-recluta",
+    "nombre": "Bacinete de recluta",
+    "tier": "Común",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1.",
+    "descripcionNarrativa": "Acero de baja ley, sin visera. Reglamentario para la tropa nueva.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "capcinturon",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-bandolera-de-lona",
+    "nombre": "Bandolera de lona",
+    "tier": "Común",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 2,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Ranuras para consumibles +2.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8907,7 +8990,6 @@
     ],
     "efectoMods": [],
     "id": "new-bata-de-sandro",
-    "ocultoEnCatalogo": false,
     "nombre": "Bata de Sandro",
     "tier": "Legendario",
     "tipoItem": "armadura_blanda",
@@ -8915,6 +8997,71 @@
     "ranuras": 0,
     "precioCompra": 1600,
     "detalle": "Aura de espinas (de rosas). Regeneración x5hp. Resistencia mágica +5. Cualquier interacción social debe tirar Resistencia Mental para no caer seducidx de manera irrefrenable.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-bombachas-de-campo",
+    "nombre": "Bombachas de campo",
+    "tier": "Común",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Movimiento +1.",
+    "descripcionNarrativa": "Amplias, cómodas y hechas para caminar todo el día.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-bombachas-del-arriero-incansable",
+    "nombre": "Bombachas del arriero incansable",
+    "tier": "Raro",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Constitución +1. Movimiento +1. Resistencia a CC +1.",
+    "descripcionNarrativa": "Tela reforzada en la entrepierna. Aguantan semanas de marcha sin ceder.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8934,7 +9081,6 @@
     ],
     "efectoMods": [],
     "id": "new-borceguies-reglamentarios-de-recluta",
-    "ocultoEnCatalogo": false,
     "nombre": "Borceguíes de punta de acero",
     "tier": "Buena Calidad",
     "tipoItem": "botas_rigidas",
@@ -8942,6 +9088,334 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Reduce críticos tipo 6 y 8",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-borceguies-de-puntera-de-acero",
+    "nombre": "Borceguíes de puntera de acero",
+    "tier": "Común",
+    "tipoItem": "botas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "descripcionNarrativa": "De taller mecánico, no de campo de batalla. Igual sirven.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-con-espolones-de-gallo-de-rina",
+    "nombre": "Botas con espolones de gallo de riña",
+    "tier": "Raro",
+    "tipoItem": "botas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipo 4: +1. Iniciativa +2. PdG +1.",
+    "descripcionNarrativa": "Espolones de acero al talón. Patean primero.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 5
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-bilbo",
+    "nombre": "Botas de Bilbo",
+    "tier": "Legendario",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +3. Resistencia a críticos tipo 4: +2. Agilidad +1. Movimiento +2. Evasión +5.",
+    "descripcionNarrativa": "No hace falta calzarlas. Los pies ya vienen así.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 5
+      },
+      {
+        "stat": "eva",
+        "val": 3
+      },
+      {
+        "stat": "ini",
+        "val": 4
+      },
+      {
+        "stat": "agl",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-hermes",
+    "nombre": "Botas de Hermes",
+    "tier": "Legendario",
+    "tipoItem": "botas_rigidas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Agilidad +2. Movimiento +5. Evasión +3. Iniciativa +4.",
+    "descripcionNarrativa": "Dos alitas al tobillo y el suelo pasa a ser opcional.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 11
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-acero-de-bariloche",
+    "nombre": "Botas de acero de Bariloche",
+    "tier": "Legendario",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia a CC +3.",
+    "descripcionNarrativa": "Forjadas en la cordillera con nieve que nunca se derritió del todo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-botas-de-cabalgata",
+    "nombre": "Botas de cabalgata",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "eva",
+        "val": 3
+      },
+      {
+        "stat": "ini",
+        "val": 3
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-casco-de-pombero",
+    "nombre": "Botas de casco de pombero",
+    "tier": "Excepcional",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Agilidad +1. Evasión +3. Iniciativa +3.",
+    "descripcionNarrativa": "Nadie escucha venir al que las lleva. Ni siquiera él mismo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 3
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-crin-de-unicornio",
+    "nombre": "Botas de crin de unicornio",
+    "tier": "Excepcional",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Movimiento +3. Evasión +2. Resistencia mental +2.",
+    "descripcionNarrativa": "Crin trenzada en la suela. Casi no tocan el suelo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8957,7 +9431,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-de-cuero",
-    "ocultoEnCatalogo": false,
     "nombre": "Botas de cuero",
     "tier": "Común",
     "tipoItem": "botas_rigidas",
@@ -8965,6 +9438,7 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -8975,7 +9449,15 @@
     "mods": [
       {
         "stat": "def",
-        "val": 4
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -8983,19 +9465,20 @@
       },
       {
         "stat": "mov",
-        "val": 1
+        "val": -1
       }
     ],
     "efectoMods": [],
-    "id": "new-botas-de-cuero-de-mercader-viajero",
-    "ocultoEnCatalogo": false,
-    "nombre": "Botas de cuero baratas",
-    "tier": "Buena Calidad",
+    "id": "ia-botas-de-cuero-de-rinoceronte",
+    "nombre": "Botas de cuero de rinoceronte",
+    "tier": "Raro",
     "tipoItem": "botas_blandas",
-    "peso": 1,
+    "peso": 2,
     "ranuras": 0,
-    "precioCompra": 90,
-    "detalle": "",
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipo 6: +1. Movimiento -1.",
+    "descripcionNarrativa": "Cuero macizo de bestia grande. Nada las corta, pero se sienten.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9015,7 +9498,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-de-esqui",
-    "ocultoEnCatalogo": false,
     "nombre": "Botas de esquí",
     "tier": "Común",
     "tipoItem": "botas_rigidas",
@@ -9023,6 +9505,114 @@
     "ranuras": 0,
     "precioCompra": 70,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-esqui-sin-los-esquis",
+    "nombre": "Botas de esquí sin los esquís",
+    "tier": "Común",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +2. Movimiento -1. Evasión -1.",
+    "descripcionNarrativa": "Plástico duro imposible de doblar. Protegen mucho, caminan horrible.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-gamuza-cosida-a-mano",
+    "nombre": "Botas de gamuza cosida a mano",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "Movimiento +1. Evasión +1.",
+    "descripcionNarrativa": "Gamuza blanda con costura invisible. Se sienten como una segunda piel.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-hierro-del-coloso-menor",
+    "nombre": "Botas de hierro del coloso menor",
+    "tier": "Raro",
+    "tipoItem": "botas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +3. Resistencia a críticos tipo 4: +2. Fuerza +1. Movimiento -1.",
+    "descripcionNarrativa": "Cada pisada deja marca en la tierra.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9050,7 +9640,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-de-hierro-del-coloso-menor",
-    "ocultoEnCatalogo": false,
     "nombre": "Botas de hierro pesadas",
     "tier": "Raro",
     "tipoItem": "botas_rigidas",
@@ -9058,6 +9647,193 @@
     "ranuras": 0,
     "precioCompra": 180,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-lona-de-recluta",
+    "nombre": "Botas de lona de recluta",
+    "tier": "Común",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "descripcionNarrativa": "Lona rígida con cordones largos. Reglamentarias y ampollosas.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-marcha-reforzadas",
+    "nombre": "Botas de marcha reforzadas",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Constitución +1.",
+    "descripcionNarrativa": "Pensadas para caminar mucho con peso encima.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 3
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-pezuna-de-yastay",
+    "nombre": "Botas de pezuña de yastay",
+    "tier": "Excepcional",
+    "tipoItem": "botas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +2. Agilidad +1. Movimiento +3. Resistencia a CC +1.",
+    "descripcionNarrativa": "Pezuña del guardián andino. Sube cerros como si fueran llanura.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-piel-de-carpincho",
+    "nombre": "Botas de piel de carpincho",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "detalle": "Resistencia a críticos tipo 6: +1. Resistencia a CC +1.",
+    "descripcionNarrativa": "Impermeables por naturaleza. Andan bien en el barro.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-piel-de-chupacabras",
+    "nombre": "Botas de piel de chupacabras",
+    "tier": "Excepcional",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Agilidad +1. Movimiento +1. Evasión +2.",
+    "descripcionNarrativa": "Piel correosa que se ajusta sola al pie. Deja huellas raras.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9081,7 +9857,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-de-placas-del-guardia-de-avanzada",
-    "ocultoEnCatalogo": false,
     "nombre": "Botas de placas del guardia de avanzada",
     "tier": "Buena Calidad",
     "tipoItem": "botas_rigidas",
@@ -9089,6 +9864,155 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Reduce críticos 4 y 6",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 6
+      },
+      {
+        "stat": "ini",
+        "val": 3
+      },
+      {
+        "stat": "agl",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-siete-leguas",
+    "nombre": "Botas de siete leguas",
+    "tier": "Legendario",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Agilidad +2. Movimiento +6. Iniciativa +3.",
+    "descripcionNarrativa": "Cada paso cubre lo que otros hacen en una jornada.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-de-suela-claveteada",
+    "nombre": "Botas de suela claveteada",
+    "tier": "Común",
+    "tipoItem": "botas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +1.",
+    "descripcionNarrativa": "Clavos en la suela para agarrar el piso. Marcan el camino.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-del-mensajero-veloz",
+    "nombre": "Botas del mensajero veloz",
+    "tier": "Raro",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Agilidad +1. Movimiento +2. Iniciativa +2.",
+    "descripcionNarrativa": "Suela finita y flexible. Están hechas para no frenar nunca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botas-del-vadeador-de-cienagas",
+    "nombre": "Botas del vadeador de ciénagas",
+    "tier": "Raro",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1. Constitución +1. Movimiento +1. Resistencia a CC +2.",
+    "descripcionNarrativa": "Cuero engrasado hasta la rodilla. El barro no las frena.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9104,7 +10028,6 @@
     ],
     "efectoMods": [],
     "id": "new-botines-de-cuero-fino",
-    "ocultoEnCatalogo": false,
     "nombre": "Botines de cuero fino",
     "tier": "Común",
     "tipoItem": "botas_blandas",
@@ -9112,6 +10035,105 @@
     "ranuras": 0,
     "precioCompra": 40,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-botines-de-soldado-raso",
+    "nombre": "Botines de soldado raso",
+    "tier": "Común",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "detalle": "Resistencia a críticos tipos 6: +1.",
+    "descripcionNarrativa": "Usados por alguien más antes. Todavía dan para una campaña.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-botines-tachonados-de-correo",
+    "nombre": "Botines tachonados de correo",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "detalle": "Resistencia a críticos tipos 4: +1. Iniciativa +1.",
+    "descripcionNarrativa": "Refuerzo metálico en puntera y talón, hechos para andar rápido.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-cuero-de-vaca",
+    "nombre": "Calzas de cuero de vaca",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +1.",
+    "descripcionNarrativa": "Cuero parejo y bien curtido, cortado a medida.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9131,7 +10153,6 @@
     ],
     "efectoMods": [],
     "id": "new-calzas-de-cuero-flexible",
-    "ocultoEnCatalogo": true,
     "nombre": "Calzas de cuero flexible",
     "tier": "Común",
     "tipoItem": "piernas_blandas",
@@ -9139,6 +10160,215 @@
     "ranuras": 0,
     "precioCompra": 50,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-lana-tosca",
+    "nombre": "Calzas de lana tosca",
+    "tier": "Común",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "descripcionNarrativa": "Lana áspera tejida a máquina. Abrigan y poco más.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-piel-de-carpincho",
+    "nombre": "Calzas de piel de carpincho",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1. Constitución +1.",
+    "descripcionNarrativa": "Piel de carpincho curtida, blanda y sorprendentemente resistente.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-piel-de-chupacabras",
+    "nombre": "Calzas de piel de chupacabras",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Constitución +1. Movimiento +1. Regeneración +1 HP por turno.",
+    "descripcionNarrativa": "Piel correosa del críptido. Se regenera sola de los cortes chicos.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 1,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-piel-de-troll",
+    "nombre": "Calzas de piel de troll",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Constitución +2. Regeneración +2 HP por turno.",
+    "descripcionNarrativa": "Piel de troll curtida en verde. Sigue queriendo cerrarse sola.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 2,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-de-seda-de-gusano-de-cueva",
+    "nombre": "Calzas de seda de gusano de cueva",
+    "tier": "Raro",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +2. Agilidad +1. Evasión +2.",
+    "descripcionNarrativa": "Seda tejida en la oscuridad. Casi no se siente puesta.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-calzas-del-caminante-de-sal",
+    "nombre": "Calzas del caminante de sal",
+    "tier": "Raro",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Movimiento +2. Evasión +1. Resistencia a CC +1.",
+    "descripcionNarrativa": "Fibra tratada en salinas. Nunca se empapa, nunca pesa.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9162,7 +10392,6 @@
     ],
     "efectoMods": [],
     "id": "new-calzas-del-corredor-de-tormentas",
-    "ocultoEnCatalogo": true,
     "nombre": "Calzas del corredor de tormentas",
     "tier": "Raro",
     "tipoItem": "piernas_blandas",
@@ -9170,6 +10399,7 @@
     "ranuras": 0,
     "precioCompra": 157,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9185,7 +10415,6 @@
     ],
     "efectoMods": [],
     "id": "new-camisa-de-pelo-de-unicornio",
-    "ocultoEnCatalogo": false,
     "nombre": "Camisa de pelo de unicornio",
     "tier": "Excepcional",
     "tipoItem": "armadura_blanda",
@@ -9193,6 +10422,7 @@
     "ranuras": 0,
     "precioCompra": 900,
     "detalle": "resistencia mental +5, resistencia mágica +5, resistencia a cc +5",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9208,7 +10438,6 @@
     ],
     "efectoMods": [],
     "id": "new-camiseta-de-cuero-flexible",
-    "ocultoEnCatalogo": false,
     "nombre": "Camiseta de cuero flexible",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
@@ -9216,6 +10445,7 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9231,7 +10461,6 @@
     ],
     "efectoMods": [],
     "id": "new-camiseta-de-lona",
-    "ocultoEnCatalogo": false,
     "nombre": "Camiseta de lona",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -9239,6 +10468,7 @@
     "ranuras": 0,
     "precioCompra": 40,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9258,7 +10488,6 @@
     ],
     "efectoMods": [],
     "id": "new-campera-de-cuero-de-motociclista-con-tachas",
-    "ocultoEnCatalogo": false,
     "nombre": "Campera de cuero de motociclista con tachas",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -9266,6 +10495,7 @@
     "ranuras": 0,
     "precioCompra": 70,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9285,7 +10515,6 @@
     ],
     "efectoMods": [],
     "id": "new-canilleras-de-arquero-de-futbol-amateur",
-    "ocultoEnCatalogo": true,
     "nombre": "Canilleras de arquero de fútbol amateur",
     "tier": "Común",
     "tipoItem": "piernas_rigidas",
@@ -9293,6 +10522,39 @@
     "ranuras": 0,
     "precioCompra": 42,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-canilleras-de-milicia",
+    "nombre": "Canilleras de milicia",
+    "tier": "Común",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 8: +1.",
+    "descripcionNarrativa": "Reglamentarias, incómodas y todas iguales.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9312,7 +10574,6 @@
     ],
     "efectoMods": [],
     "id": "new-capacete-de-aprendiz-de-herrero",
-    "ocultoEnCatalogo": true,
     "nombre": "Capacete de aprendiz de herrero",
     "tier": "Común",
     "tipoItem": "casco_rigido",
@@ -9320,6 +10581,107 @@
     "ranuras": 0,
     "precioCompra": 37,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capacete-de-hojalata",
+    "nombre": "Capacete de hojalata",
+    "tier": "Común",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Hojalata martillada de fábrica mayorista. Cumple, apenas.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capucha-acolchada-de-sastre",
+    "nombre": "Capucha acolchada de sastre",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Relleno de guata cosido en capas parejas. Trabajo prolijo de taller.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capucha-de-crin-de-chupacabras",
+    "nombre": "Capucha de crin de chupacabras",
+    "tier": "Excepcional",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Iniciativa +1. Resistencia mental +2.",
+    "descripcionNarrativa": "Crin áspera de chupacabras trenzada a mano. Nadie se le acerca de frente.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9339,7 +10701,6 @@
     ],
     "efectoMods": [],
     "id": "new-capucha-de-cuero-acolchada",
-    "ocultoEnCatalogo": true,
     "nombre": "Capucha de cuero acolchada",
     "tier": "Común",
     "tipoItem": "casco_blando",
@@ -9347,6 +10708,30 @@
     "ranuras": 0,
     "precioCompra": 37,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capucha-de-lana-cruda",
+    "nombre": "Capucha de lana cruda",
+    "tier": "Común",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "",
+    "descripcionNarrativa": "Lana sin teñir de oveja de descarte. Pica un poco.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9370,7 +10755,6 @@
     ],
     "efectoMods": [],
     "id": "new-capucha-de-las-sombras-silentes",
-    "ocultoEnCatalogo": true,
     "nombre": "Capucha de las sombras silentes",
     "tier": "Raro",
     "tipoItem": "casco_blando",
@@ -9378,6 +10762,147 @@
     "ranuras": 0,
     "precioCompra": 161,
     "detalle": "Ignora 1 punto de resistencia a crítico del objetivo al atacar sorprendiendo.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capucha-del-cazador-silencioso",
+    "nombre": "Capucha del cazador silencioso",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Evasión +1. Iniciativa +1.",
+    "descripcionNarrativa": "Tejido tratado con grasa animal que no hace ruido al moverse.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capuz-de-cuero-curtido",
+    "nombre": "Capuz de cuero curtido",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +1.",
+    "descripcionNarrativa": "Cuero bien curtido que cubre cabeza y nuca. Desvía golpes de refilón.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capuz-de-lana-de-yacumama",
+    "nombre": "Capuz de lana de yacumama",
+    "tier": "Excepcional",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1. Inteligencia +1. Rango de casteo +2.",
+    "descripcionNarrativa": "Fibra de la serpiente madre del agua. Sigue húmeda aunque esté seca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "bonos",
+        "val": 1
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-capuz-del-escriba-errante",
+    "nombre": "Capuz del escriba errante",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Inteligencia +1. Bonos +1. Rango de casteo +1.",
+    "descripcionNarrativa": "Paño grueso con bolsillos internos para tinta. Ordena la cabeza.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9397,7 +10922,6 @@
     ],
     "efectoMods": [],
     "id": "cat-casco",
-    "ocultoEnCatalogo": true,
     "nombre": "Casco",
     "tier": "Común",
     "tipoItem": "casco_rigido",
@@ -9405,6 +10929,7 @@
     "ranuras": 0,
     "precioCompra": 42,
     "detalle": "Reduce críticos Tipo 8.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9420,7 +10945,6 @@
     ],
     "efectoMods": [],
     "id": "new-casco-cervecero-de-homero",
-    "ocultoEnCatalogo": false,
     "nombre": "Casco cervecero de homero",
     "tier": "Raro",
     "tipoItem": "casco_rigido",
@@ -9428,6 +10952,55 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Ranuras de cinturón +2",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 6
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-magneto",
+    "nombre": "Casco de Magneto",
+    "tier": "Legendario",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +2. Inteligencia +1. Resistencia mental +6.",
+    "descripcionNarrativa": "Nadie entra en esa cabeza. Nadie.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9443,7 +11016,6 @@
     ],
     "efectoMods": [],
     "id": "new-casco-de-magnetto",
-    "ocultoEnCatalogo": false,
     "nombre": "Casco de Magnetto",
     "tier": "Legendario",
     "tipoItem": "casco_rigido",
@@ -9451,6 +11023,7 @@
     "ranuras": 0,
     "precioCompra": 1400,
     "detalle": "Inmunidad a control o intrusión mental. +2 de resistencia a todos los críticos",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9466,7 +11039,6 @@
     ],
     "efectoMods": [],
     "id": "new-casco-de-xacier",
-    "ocultoEnCatalogo": false,
     "nombre": "Casco de Xacier",
     "tier": "Legendario",
     "tipoItem": "casco_rigido",
@@ -9474,6 +11046,195 @@
     "ranuras": 0,
     "precioCompra": 1100,
     "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-acero-de-meteorito",
+    "nombre": "Casco de acero de meteorito",
+    "tier": "Raro",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +1.",
+    "descripcionNarrativa": "Hierro caído del cielo, más denso de lo normal. Vale lo que pesa.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-bandas-remachadas",
+    "nombre": "Casco de bandas remachadas",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_rigido",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +2. Resistencia a críticos tipos 4 y 6: +1. Movimiento -1.",
+    "descripcionNarrativa": "Segmentos de acero en cúpula. Cobertura pareja a costa de peso.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-cuero-endurecido",
+    "nombre": "Casco de cuero endurecido",
+    "tier": "Común",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Cuero hervido y prensado hasta ponerse duro. Barato y efectivo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-escamas-superpuestas",
+    "nombre": "Casco de escamas superpuestas",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +1.",
+    "descripcionNarrativa": "Placas chicas remachadas sobre base de cuero. Buen trabajo de herrería.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-hueso-de-trauco",
+    "nombre": "Casco de hueso de trauco",
+    "tier": "Excepcional",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +2. Inteligencia +1. Evasión +1. Resistencia mental +3.",
+    "descripcionNarrativa": "Hueso del duende chilote, tallado con cuidado. Confunde al que lo mira de frente.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9493,7 +11254,6 @@
     ],
     "efectoMods": [],
     "id": "new-casco-de-moto-vintage-pintado-a-mano",
-    "ocultoEnCatalogo": true,
     "nombre": "Casco de moto vintage pintado a mano",
     "tier": "Común",
     "tipoItem": "casco_rigido",
@@ -9501,6 +11261,35 @@
     "ranuras": 0,
     "precioCompra": 56,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-casco-de-obra-abollado",
+    "nombre": "Casco de obra abollado",
+    "tier": "Común",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "descripcionNarrativa": "Plástico duro con la calcomanía medio despegada. No pregunten de dónde salió.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9524,7 +11313,6 @@
     ],
     "efectoMods": [],
     "id": "new-chaleco-de-kevlar",
-    "ocultoEnCatalogo": false,
     "nombre": "Chaleco de Kevlar",
     "tier": "Raro",
     "tipoItem": "armadura_blanda",
@@ -9532,6 +11320,83 @@
     "ranuras": 0,
     "precioCompra": 130,
     "detalle": "Resistencia a críticos tipo 4, doble resistencia a críticos tipo 2 ",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 3
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-chiripa-de-peron",
+    "nombre": "Chiripá de Perón",
+    "tier": "Legendario",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Constitución +1. Movimiento +1. Resistencia mental +3. Resistencia a CC +3.",
+    "descripcionNarrativa": "Nadie que lo lleve puesto camina solo. La conducción se nota en el andar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinto-de-cuero-remachado",
+    "nombre": "Cinto de cuero remachado",
+    "tier": "Común",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 1,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Ranuras para consumibles +1.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9547,7 +11412,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-1",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón +1",
     "tier": "Común",
     "tipoItem": "cinturon",
@@ -9555,6 +11419,7 @@
     "ranuras": 1,
     "precioCompra": 40,
     "detalle": "Ranuras para consumibles +1",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9570,7 +11435,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-de-alquimista",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón de Alquimista",
     "tier": "Excepcional",
     "tipoItem": "cinturon",
@@ -9578,6 +11442,7 @@
     "ranuras": 0,
     "precioCompra": 500,
     "detalle": "Ranuras para consumibles +10",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9597,7 +11462,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-de-batalla",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón de batalla",
     "tier": "Buena Calidad",
     "tipoItem": "cinturon",
@@ -9605,6 +11469,7 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "Ranuras para consumibles +1",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9620,7 +11485,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-de-boticario",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón de boticario",
     "tier": "Raro",
     "tipoItem": "cinturon",
@@ -9628,6 +11492,55 @@
     "ranuras": 0,
     "precioCompra": 200,
     "detalle": "Ranuras para consumibles +5",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 4
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      },
+      {
+        "stat": "capcinturon",
+        "val": 10
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-de-campeon-del-mundo",
+    "nombre": "Cinturón de campeón del mundo",
+    "tier": "Legendario",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 10,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +2. Constitución +1. Resistencia mental +4. Resistencia a CC +3. Ranuras para consumibles +10.",
+    "descripcionNarrativa": "El que lo lleva puesto no afloja nunca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9647,7 +11560,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-de-capitan",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón de capitán",
     "tier": "Raro",
     "tipoItem": "cinturon",
@@ -9655,6 +11567,119 @@
     "ranuras": 0,
     "precioCompra": 180,
     "detalle": "Ranuras para consumibles +3",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      },
+      {
+        "stat": "capcinturon",
+        "val": 12
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-de-cuero-de-leviatan",
+    "nombre": "Cinturón de cuero de Leviatán",
+    "tier": "Legendario",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 12,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Constitución +1. Resistencia a CC +2. Ranuras para consumibles +12.",
+    "descripcionNarrativa": "Guarda más de lo que su tamaño permite.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 8
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-de-cuero-de-sirena",
+    "nombre": "Cinturón de cuero de sirena",
+    "tier": "Excepcional",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 8,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia mental +2. Rango de casteo +1. Ranuras para consumibles +8.",
+    "descripcionNarrativa": "Las botellas nunca se rompen adentro.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-de-herramientas-de-taller",
+    "nombre": "Cinturón de herramientas de taller",
+    "tier": "Común",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 2,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Movimiento -1. Ranuras para consumibles +2.",
+    "descripcionNarrativa": "Pesa lo suyo cargado.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9670,7 +11695,6 @@
     ],
     "efectoMods": [],
     "id": "new-cinturon-de-utilidad",
-    "ocultoEnCatalogo": false,
     "nombre": "Cinturón de utilidad",
     "tier": "Buena Calidad",
     "tipoItem": "cinturon",
@@ -9678,6 +11702,99 @@
     "ranuras": 3,
     "precioCompra": 120,
     "detalle": "Ranuras para consumibles +3",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "eva",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 6
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-del-contrabandista",
+    "nombre": "Cinturón del contrabandista",
+    "tier": "Raro",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 6,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Evasión +1. Iniciativa +1. Ranuras para consumibles +6.",
+    "descripcionNarrativa": "Tiene compartimentos que nadie encuentra.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cinturon-del-explorador",
+    "nombre": "Cinturón del explorador",
+    "tier": "Buena Calidad",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 4,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Movimiento +1. Ranuras para consumibles +4.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cofia-de-anillas-sueltas",
+    "nombre": "Cofia de anillas sueltas",
+    "tier": "Común",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +1. Movimiento -1.",
+    "descripcionNarrativa": "Anillado irregular remachado sobre un gorro de tela. Pesa más de lo que protege.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9693,14 +11810,104 @@
     ],
     "efectoMods": [],
     "id": "new-coraza-de-mithril",
-    "ocultoEnCatalogo": false,
     "nombre": "Coraza de Mithril",
     "tier": "Legendario",
     "tipoItem": "armadura_rigida",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 1800,
+    "detalle": "Reduce críticos de cualquier tipo. indestructible",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-coraza-de-bandas-remachadas",
+    "nombre": "Coraza de bandas remachadas",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +1. Movimiento -2.",
+    "descripcionNarrativa": "Franjas de acero articuladas sobre cuero. Clásico de armería seria.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-coraza-de-escama-de-quetzalcoatl",
+    "nombre": "Coraza de escama de Quetzalcóatl",
+    "tier": "Excepcional",
+    "tipoItem": "armadura_rigida",
     "peso": 2,
     "ranuras": 0,
-    "precioCompra": 1750,
-    "detalle": "Reduce críticos de cualquier tipo. indestructible",
+    "precioCompra": 1100,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Movimiento +1. Resistencia mental +2. Rango de casteo +2.",
+    "descripcionNarrativa": "Escamas iridiscentes de la serpiente emplumada. Cambia de color con la luz.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9724,7 +11931,6 @@
     ],
     "efectoMods": [],
     "id": "new-coraza-de-guardia-de-cuartel",
-    "ocultoEnCatalogo": false,
     "nombre": "Coraza de guardia de cuartel",
     "tier": "Común",
     "tipoItem": "armadura_rigida",
@@ -9732,6 +11938,7 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Reduce críticos tipo 4, 6 y 8",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9767,7 +11974,6 @@
     ],
     "efectoMods": [],
     "id": "new-coraza-de-hierro",
-    "ocultoEnCatalogo": false,
     "nombre": "Coraza de hierro",
     "tier": "Raro",
     "tipoItem": "armadura_rigida",
@@ -9775,6 +11981,54 @@
     "ranuras": 0,
     "precioCompra": 250,
     "detalle": "Reduce críticos de cualquier tipo.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 11
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": -2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-coraza-de-placa-de-anquilosaurio",
+    "nombre": "Coraza de placa de anquilosaurio",
+    "tier": "Excepcional",
+    "tipoItem": "armadura_rigida",
+    "peso": 4,
+    "ranuras": 0,
+    "precioCompra": 850,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +3. Resistencia a críticos tipos 2 y 4: +1. Constitución +1. Movimiento -1.",
+    "descripcionNarrativa": "Osteodermos fósiles encastrados en acero. Pesa como un animal entero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9798,14 +12052,104 @@
     ],
     "efectoMods": [],
     "id": "new-coraza-de-titanio",
-    "ocultoEnCatalogo": false,
     "nombre": "Coraza de titanio",
     "tier": "Excepcional",
     "tipoItem": "armadura_rigida",
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 750,
-    "detalle": "Reduce críticos de cualquier tipo.",
+    "detalle": "Reduce 2 críticos de cualquier tipo. indestructible",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 12
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 3
+      },
+      {
+        "stat": "rescc",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-coraza-del-endoesqueleto",
+    "nombre": "Coraza del Endoesqueleto",
+    "tier": "Legendario",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 2000,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia mental +3. Resistencia a CC +4.",
+    "descripcionNarrativa": "Aleación que no existe todavía. No siente dolor, no negocia, no se detiene.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-cota-de-escamas-de-cuero",
+    "nombre": "Cota de escamas de cuero",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipos 6: +1.",
+    "descripcionNarrativa": "Escamas de cuero hervido cosidas en hileras. Trabajo paciente de taller.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9821,7 +12165,6 @@
     ],
     "efectoMods": [],
     "id": "new-cota-de-malla-de-bilbo",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de malla de Bilbo",
     "tier": "Legendario",
     "tipoItem": "armadura_blanda",
@@ -9829,6 +12172,7 @@
     "ranuras": 0,
     "precioCompra": 1350,
     "detalle": "Reduce críticos Tipo 2, 4 y 6. Evasión +2. indestructible",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9856,7 +12200,6 @@
     ],
     "efectoMods": [],
     "id": "cat-cota-de-malla",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de malla de acero",
     "tier": "Buena Calidad",
     "tipoItem": "armadura_blanda",
@@ -9864,6 +12207,7 @@
     "ranuras": 0,
     "precioCompra": 100,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9879,7 +12223,6 @@
     ],
     "efectoMods": [],
     "id": "new-cota-de-malla-de-aluminio-reforzado",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de malla de aluminio reforzado",
     "tier": "Raro",
     "tipoItem": "armadura_blanda",
@@ -9887,6 +12230,7 @@
     "ranuras": 0,
     "precioCompra": 180,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9902,7 +12246,6 @@
     ],
     "efectoMods": [],
     "id": "new-cota-de-malla-de-hierro",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de malla de hierro",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -9910,6 +12253,7 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9925,7 +12269,6 @@
     ],
     "efectoMods": [],
     "id": "new-cota-de-malla-de-titanio",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de malla de titanio",
     "tier": "Excepcional",
     "tipoItem": "armadura_blanda",
@@ -9933,6 +12276,7 @@
     "ranuras": 0,
     "precioCompra": 750,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9964,7 +12308,6 @@
     ],
     "efectoMods": [],
     "id": "cat-cota-de-placas",
-    "ocultoEnCatalogo": false,
     "nombre": "Cota de placas",
     "tier": "Raro",
     "tipoItem": "armadura_rigida",
@@ -9972,6 +12315,116 @@
     "ranuras": 0,
     "precioCompra": 210,
     "detalle": "Reduce críticos Tipo 2, 4, 6 y 8.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-escarpines-de-fieltro",
+    "nombre": "Escarpines de fieltro",
+    "tier": "Común",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Evasión +1.",
+    "descripcionNarrativa": "Fieltro grueso sin suela. Silenciosos, incómodos en piedra.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "capcinturon",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-faja-de-tela-cruda",
+    "nombre": "Faja de tela cruda",
+    "tier": "Común",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 1,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Ranuras para consumibles +1.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-gambeson-acolchado-de-doble-capa",
+    "nombre": "Gambesón acolchado de doble capa",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Reduce críticos tipo 4",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-gambeson-del-veterano-de-frontera",
+    "nombre": "Gambesón del veterano de frontera",
+    "tier": "Raro",
+    "tipoItem": "armadura_blanda",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 270,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a CC +1.",
+    "descripcionNarrativa": "Relleno apretado hasta el hueso, con remiendos de tres campañas distintas.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -9983,18 +12436,31 @@
       {
         "stat": "def",
         "val": 3
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 5
+      },
+      {
+        "stat": "agl",
+        "val": 1
       }
     ],
     "efectoMods": [],
-    "id": "new-gambeson-acolchado-de-doble-capa",
-    "ocultoEnCatalogo": false,
-    "nombre": "Gambesón acolchado de doble capa",
-    "tier": "Buena Calidad",
-    "tipoItem": "armadura_blanda",
-    "peso": 1,
+    "id": "ia-gorra-de-marty-mcfly",
+    "nombre": "Gorra de Marty McFly",
+    "tier": "Legendario",
+    "tipoItem": "casco_blando",
+    "peso": 0,
     "ranuras": 0,
-    "precioCompra": 80,
-    "detalle": "Reduce críticos tipo 4",
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Agilidad +1. Evasión +2. Iniciativa +5.",
+    "descripcionNarrativa": "Se adelanta medio segundo a todo. Siempre llega antes de que empiece.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10014,7 +12480,6 @@
     ],
     "efectoMods": [],
     "id": "new-gorra-reglamentaria-de-la-policia-federal",
-    "ocultoEnCatalogo": true,
     "nombre": "Gorra reglamentaria de la Policía Federal",
     "tier": "Común",
     "tipoItem": "casco_blando",
@@ -10022,6 +12487,66 @@
     "ranuras": 0,
     "precioCompra": 42,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-gorro-de-fieltro-de-feria",
+    "nombre": "Gorro de fieltro de feria",
+    "tier": "Común",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "descripcionNarrativa": "Fieltro prensado de puesto mayorista. Amortigua algún roce.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-gorro-de-piel-de-zorro",
+    "nombre": "Gorro de piel de zorro",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1. Resistencia mental +1.",
+    "descripcionNarrativa": "Piel espesa y bien curada. Abriga y amortigua lo suyo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10053,7 +12578,6 @@
     ],
     "efectoMods": [],
     "id": "cat-gran-yelmo",
-    "ocultoEnCatalogo": true,
     "nombre": "Gran yelmo",
     "tier": "Raro",
     "tipoItem": "casco_rigido",
@@ -10061,6 +12585,55 @@
     "ranuras": 0,
     "precioCompra": 221,
     "detalle": "Reduce críticos Tipo 2, 4, 6 y 8.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-gran-yelmo-del-torneo",
+    "nombre": "Gran yelmo del torneo",
+    "tier": "Raro",
+    "tipoItem": "casco_rigido",
+    "peso": 4,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Resistencia a críticos tipo 8: +1. Movimiento -1. Evasión -1.",
+    "descripcionNarrativa": "Cobertura total de placa. No se ve casi nada, pero tampoco entra casi nada.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10084,7 +12657,6 @@
     ],
     "efectoMods": [],
     "id": "cat-grebas",
-    "ocultoEnCatalogo": true,
     "nombre": "Grebas",
     "tier": "Buena Calidad",
     "tipoItem": "piernas_rigidas",
@@ -10092,6 +12664,79 @@
     "ranuras": 0,
     "precioCompra": 98,
     "detalle": "Reduce críticos Tipo 6 y 8.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-acero-templado",
+    "nombre": "Grebas de acero templado",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1.",
+    "descripcionNarrativa": "Acero bien trabajado, articulado en la rodilla.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-anillas-cosidas",
+    "nombre": "Grebas de anillas cosidas",
+    "tier": "Común",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1. Movimiento -1.",
+    "descripcionNarrativa": "Aros de metal remachados sobre cuero grueso. Pesan una barbaridad.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10111,7 +12756,6 @@
     ],
     "efectoMods": [],
     "id": "new-grebas-de-aprendiz-de-milicia",
-    "ocultoEnCatalogo": true,
     "nombre": "Grebas de aprendiz de milicia",
     "tier": "Común",
     "tipoItem": "piernas_rigidas",
@@ -10119,6 +12763,271 @@
     "ranuras": 0,
     "precioCompra": 46,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-bandas-articuladas",
+    "nombre": "Grebas de bandas articuladas",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Resistencia a críticos tipos 4 y 8: +1. Movimiento -1.",
+    "descripcionNarrativa": "Segmentos que se deslizan uno sobre otro. Cobertura alta, paso corto.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-casco-de-unicornio",
+    "nombre": "Grebas de casco de unicornio",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Agilidad +1. Movimiento +2. Resistencia mental +2.",
+    "descripcionNarrativa": "Pezuña de unicornio laminada. Liviana de un modo que no debería.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-escama-de-yacumama",
+    "nombre": "Grebas de escama de yacumama",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +3. Resistencia a críticos tipos 4 y 6: +2. Agilidad +1. Movimiento +1.",
+    "descripcionNarrativa": "Escamas de la serpiente madre del agua. Se deslizan solas al caminar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-hojalata",
+    "nombre": "Grebas de hojalata",
+    "tier": "Común",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Chapa fina atada con correas de cuero. Suena al caminar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 12
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-del-coloso-de-rodas",
+    "nombre": "Grebas del Coloso de Rodas",
+    "tier": "Legendario",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia a CC +3.",
+    "descripcionNarrativa": "Bronce de una estatua que ya no existe. Sigue de pie igual.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-del-centinela-de-hierro",
+    "nombre": "Grebas del centinela de hierro",
+    "tier": "Raro",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +2. Constitución +1. Movimiento -1.",
+    "descripcionNarrativa": "Hierro macizo sin adornos. El que las lleva no retrocede porque no puede.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10146,7 +13055,6 @@
     ],
     "efectoMods": [],
     "id": "new-grebas-del-centinela-de-hierro",
-    "ocultoEnCatalogo": true,
     "nombre": "Grebas del centinela de hierro",
     "tier": "Raro",
     "tipoItem": "piernas_rigidas",
@@ -10154,6 +13062,87 @@
     "ranuras": 0,
     "precioCompra": 205,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-del-guardia-de-puente",
+    "nombre": "Grebas del guardia de puente",
+    "tier": "Raro",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 8: +2. Movimiento -1. Parry +2. Resistencia a CC +2.",
+    "descripcionNarrativa": "Pensadas para plantarse en un lugar y no moverse de ahí.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-mixtas-de-escudero",
+    "nombre": "Grebas mixtas de escudero",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +1. Parry +1.",
+    "descripcionNarrativa": "Placa al frente, malla en la articulación. Solución de compromiso.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10181,7 +13170,6 @@
     ],
     "efectoMods": [],
     "id": "cat-guanteletes",
-    "ocultoEnCatalogo": false,
     "nombre": "Guanteletes",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_rigidos",
@@ -10189,6 +13177,47 @@
     "ranuras": 0,
     "precioCompra": 85,
     "detalle": "Reduce críticos Tipo 2, 4 y 6.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guanteletes-de-acero-templado",
+    "nombre": "Guanteletes de acero templado",
+    "tier": "Buena Calidad",
+    "tipoItem": "guantes_rigidos",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1. Parry +1.",
+    "descripcionNarrativa": "Articulados dedo por dedo. Buen trabajo de armería.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10224,7 +13253,6 @@
     ],
     "efectoMods": [],
     "id": "new-guanteletes-de-adamantium",
-    "ocultoEnCatalogo": false,
     "nombre": "Guanteletes de adamantium",
     "tier": "Legendario",
     "tipoItem": "guantes_rigidos",
@@ -10232,6 +13260,7 @@
     "ranuras": 0,
     "precioCompra": 1200,
     "detalle": "reduce todos los críticos x2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10267,7 +13296,6 @@
     ],
     "efectoMods": [],
     "id": "new-guanteletes-de-combate",
-    "ocultoEnCatalogo": false,
     "nombre": "Guanteletes de combate",
     "tier": "Raro",
     "tipoItem": "guantes_rigidos",
@@ -10275,6 +13303,99 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Reduce críticos Tipo 2, 4, 6 y 8.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 2
+      },
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guanteletes-de-garra-de-lobizon",
+    "nombre": "Guanteletes de garra de lobizón",
+    "tier": "Excepcional",
+    "tipoItem": "guantes_rigidos",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +3. Resistencia a críticos tipos 2 y 6: +2. Fuerza +1. PdG +2.",
+    "descripcionNarrativa": "Garras del séptimo hijo varón, montadas en acero. Se afilan solas los martes.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 5
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "des",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guanteletes-de-la-mano-de-dios",
+    "nombre": "Guanteletes de la Mano de Dios",
+    "tier": "Legendario",
+    "tipoItem": "guantes_rigidos",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipo 6: +2. Destreza +2. PdG +5. Parry +2.",
+    "descripcionNarrativa": "Nadie vio bien lo que pasó. El resultado quedó igual.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10314,7 +13435,6 @@
     ],
     "efectoMods": [],
     "id": "new-guanteletes-del-herrero-real",
-    "ocultoEnCatalogo": false,
     "nombre": "Guanteletes del herrero real",
     "tier": "Raro",
     "tipoItem": "guantes_rigidos",
@@ -10322,6 +13442,7 @@
     "ranuras": 0,
     "precioCompra": 180,
     "detalle": "Reduce críticos Tipo 2, 4, 6, 8 y 10.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10341,7 +13462,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-lupin",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de Lupin",
     "tier": "Legendario",
     "tipoItem": "guantes_blandos",
@@ -10349,6 +13469,7 @@
     "ranuras": 0,
     "precioCompra": 1850,
     "detalle": "destreza +2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10368,7 +13489,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-mickey",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de Mickey",
     "tier": "Legendario",
     "tipoItem": "guantes_blandos",
@@ -10376,6 +13496,7 @@
     "ranuras": 0,
     "precioCompra": 1850,
     "detalle": "inteligencia +2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10399,7 +13520,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-cuero-tachonado",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de cuero Tachonado",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_blandos",
@@ -10407,6 +13527,7 @@
     "ranuras": 0,
     "precioCompra": 70,
     "detalle": "Reduce críticos Tipo 4 y 6.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10430,7 +13551,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-cuero-de-carretero",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de cuero de blando",
     "tier": "Común",
     "tipoItem": "guantes_blandos",
@@ -10438,6 +13558,39 @@
     "ranuras": 0,
     "precioCompra": 60,
     "detalle": "Reduce críticos Tipo 2.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guantes-de-cuero-hervido",
+    "nombre": "Guantes de cuero hervido",
+    "tier": "Común",
+    "tipoItem": "guantes_rigidos",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Cuero prensado hasta ponerse duro. El primer paso del que no tiene plata.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10461,7 +13614,6 @@
     ],
     "efectoMods": [],
     "id": "cat-guantes-de-cuero-reforzado",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de cuero reforzado",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_blandos",
@@ -10469,6 +13621,7 @@
     "ranuras": 0,
     "precioCompra": 45,
     "detalle": "Reduce críticos Tipo 2 y 4.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10488,7 +13641,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-duelista",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de duelista",
     "tier": "Raro",
     "tipoItem": "guantes_blandos",
@@ -10496,6 +13648,7 @@
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "parry +2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10519,7 +13672,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-escalador-encerados",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de escalador encerados",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_blandos",
@@ -10527,6 +13679,7 @@
     "ranuras": 0,
     "precioCompra": 25,
     "detalle": "Buen agarre para trepar y colgar de un acantilado.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10554,7 +13707,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-horno-de-cocina-industrial",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de horno de cocina industrial",
     "tier": "Común",
     "tipoItem": "guantes_rigidos",
@@ -10562,6 +13714,71 @@
     "ranuras": 0,
     "precioCompra": 60,
     "detalle": "Reduce críticos Tipo 2 y 4. Reduce en 1 el daño de fuego.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guantes-de-lana-de-descarte",
+    "nombre": "Guantes de lana de descarte",
+    "tier": "Común",
+    "tipoItem": "guantes_blandos",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "",
+    "descripcionNarrativa": "Tejidos a máquina, con un dedo ya empezando a deshilacharse.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 2
+      },
+      {
+        "stat": "des",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-guantes-de-piel-de-curupi",
+    "nombre": "Guantes de piel de curupí",
+    "tier": "Excepcional",
+    "tipoItem": "guantes_blandos",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Destreza +1. PdG +2.",
+    "descripcionNarrativa": "Piel del duende guaranítico del monte. Agarran lo que no se deja agarrar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10577,7 +13794,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-piel-de-troll",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de piel de troll",
     "tier": "Excepcional",
     "tipoItem": "guantes_blandos",
@@ -10585,6 +13801,7 @@
     "ranuras": 0,
     "precioCompra": 750,
     "detalle": "Otorga regeneración de +3hp x mantenimiento.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10624,7 +13841,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-piel-de-unicornio",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de piel de unicornio",
     "tier": "Legendario",
     "tipoItem": "guantes_blandos",
@@ -10632,6 +13848,7 @@
     "ranuras": 0,
     "precioCompra": 900,
     "detalle": "Resistencia a todos los críticos. +5 a resistencia mágica",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10651,7 +13868,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-de-tela-acolchada",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes de tela acolchada",
     "tier": "Común",
     "tipoItem": "guantes_blandos",
@@ -10659,6 +13875,7 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10678,7 +13895,6 @@
     ],
     "efectoMods": [],
     "id": "new-guantes-del-sanador-errante",
-    "ocultoEnCatalogo": true,
     "nombre": "Guantes del sanador errante",
     "tier": "Raro",
     "tipoItem": "guantes_blandos",
@@ -10686,6 +13902,7 @@
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "Al curar a un aliado, el portador también recibe 5 HP instantáneos.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10701,7 +13918,6 @@
     ],
     "efectoMods": [],
     "id": "cat-guantes-finos-de-senor",
-    "ocultoEnCatalogo": false,
     "nombre": "Guantes finos de señor",
     "tier": "Raro",
     "tipoItem": "guantes_blandos",
@@ -10709,6 +13925,7 @@
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "Dan aspecto de señor fino. No dejan huellas. +1 a todas las tiradas de interacción social",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10728,7 +13945,6 @@
     ],
     "efectoMods": [],
     "id": "new-jogging-de-gimnasia-con-rayas-laterales",
-    "ocultoEnCatalogo": true,
     "nombre": "Jogging de gimnasia con rayas laterales",
     "tier": "Común",
     "tipoItem": "piernas_blandas",
@@ -10736,6 +13952,7 @@
     "ranuras": 0,
     "precioCompra": 34,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10759,7 +13976,6 @@
     ],
     "efectoMods": [],
     "id": "new-manoplas-de-escamas",
-    "ocultoEnCatalogo": false,
     "nombre": "Manoplas de escamas",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_rigidos",
@@ -10767,6 +13983,115 @@
     "ranuras": 0,
     "precioCompra": 100,
     "detalle": "Reduce críticos Tipo 4 y 6.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-manoplas-de-hojalata",
+    "nombre": "Manoplas de hojalata",
+    "tier": "Común",
+    "tipoItem": "guantes_rigidos",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Chapa fina remachada al dorso. Suenan más de lo que sirven.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-manoplas-de-hueso-de-espinosaurio",
+    "nombre": "Manoplas de hueso de espinosaurio",
+    "tier": "Excepcional",
+    "tipoItem": "guantes_rigidos",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +3. Resistencia a críticos tipos 2, 4 y 6: +2. Fuerza +1. Movimiento -1.",
+    "descripcionNarrativa": "Falanges fósiles de un depredador que ya nadie recuerda haber visto.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-manoplas-de-tachos-recortados",
+    "nombre": "Manoplas de tachos recortados",
+    "tier": "Común",
+    "tipoItem": "guantes_rigidos",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +1. Movimiento -1.",
+    "descripcionNarrativa": "Dos fondos de olla atados con alambre. Nadie dijo que fuera elegante.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10786,7 +14111,6 @@
     ],
     "efectoMods": [],
     "id": "new-manoplas-de-trabajo-de-fragua",
-    "ocultoEnCatalogo": false,
     "nombre": "Manoplas de trabajo de fragua",
     "tier": "Común",
     "tipoItem": "guantes_rigidos",
@@ -10794,6 +14118,7 @@
     "ranuras": 0,
     "precioCompra": 40,
     "detalle": "Reduce en 1 el daño de fuego.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10821,7 +14146,6 @@
     ],
     "efectoMods": [],
     "id": "new-manoplas-laminadas",
-    "ocultoEnCatalogo": false,
     "nombre": "Manoplas laminadas",
     "tier": "Raro",
     "tipoItem": "guantes_rigidos",
@@ -10829,6 +14153,86 @@
     "ranuras": 0,
     "precioCompra": 150,
     "detalle": "Reduce críticos Tipo 4, 6 y 8.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-manoplas-mixtas-de-guardia",
+    "nombre": "Manoplas mixtas de guardia",
+    "tier": "Buena Calidad",
+    "tipoItem": "guantes_rigidos",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +1. PdG +1.",
+    "descripcionNarrativa": "Dorso en placa, palma en malla para no perder el agarre.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-media-armadura-de-escudero",
+    "nombre": "Media armadura de escudero",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 2 y 4: +1.",
+    "descripcionNarrativa": "Placa en torso y hombros, malla en las juntas. Solución de compromiso honesta.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10852,7 +14256,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-del-mensajero-veloz",
-    "ocultoEnCatalogo": false,
     "nombre": "Medias de Pelo de Unicornio",
     "tier": "Legendario",
     "tipoItem": "botas_blandas",
@@ -10860,6 +14263,7 @@
     "ranuras": 0,
     "precioCompra": 1250,
     "detalle": "movimiento +2, resistencia mágica +5, resistencia al cc +5, resistencia mental +5",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10887,7 +14291,6 @@
     ],
     "efectoMods": [],
     "id": "cat-mercury-threads",
-    "ocultoEnCatalogo": false,
     "nombre": "Mercury threads",
     "tier": "Excepcional",
     "tipoItem": "botas_blandas",
@@ -10895,6 +14298,7 @@
     "ranuras": 0,
     "precioCompra": 600,
     "detalle": "bonos máximos +1 , +1 Res.M y +1 Res.CC.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10914,7 +14318,6 @@
     ],
     "efectoMods": [],
     "id": "new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo",
-    "ocultoEnCatalogo": false,
     "nombre": "Mitones de abuela",
     "tier": "Común",
     "tipoItem": "guantes_blandos",
@@ -10922,6 +14325,39 @@
     "ranuras": 0,
     "precioCompra": 40,
     "detalle": "Tejido con patrones florales. Muy abrigaditos.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-mitones-de-arriero",
+    "nombre": "Mitones de arriero",
+    "tier": "Común",
+    "tipoItem": "guantes_blandos",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +1. PdG +1.",
+    "descripcionNarrativa": "Cuero blando sin dedos, para no perder tacto con la rienda.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10945,7 +14381,6 @@
     ],
     "efectoMods": [],
     "id": "cat-mitones-de-malla",
-    "ocultoEnCatalogo": false,
     "nombre": "Mitones de malla",
     "tier": "Buena Calidad",
     "tipoItem": "guantes_blandos",
@@ -10953,6 +14388,7 @@
     "ranuras": 0,
     "precioCompra": 70,
     "detalle": "Reduce críticos Tipo 2 y 4.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -10980,7 +14416,6 @@
     ],
     "efectoMods": [],
     "id": "new-mitones-de-piel-de-owl-bear",
-    "ocultoEnCatalogo": false,
     "nombre": "Mitones de piel de owl-bear",
     "tier": "Raro",
     "tipoItem": "guantes_blandos",
@@ -10988,6 +14423,295 @@
     "ranuras": 0,
     "precioCompra": 175,
     "detalle": "Reducción fuerte a críticos tipo 6, leve a 8 y 10",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-mocasines-del-rastreador-silencioso",
+    "nombre": "Mocasines del rastreador silencioso",
+    "tier": "Raro",
+    "tipoItem": "botas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +1. Evasión +2. Iniciativa +1.",
+    "descripcionNarrativa": "Suela de cuero blando sin costura externa. No hacen ruido en ningún piso.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-mascara-de-tela-de-arana-gigante",
+    "nombre": "Máscara de tela de araña gigante",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipo 4: +1. Evasión +1.",
+    "descripcionNarrativa": "Hebra de araña de cueva, más resistente de lo que parece.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-acolchado-de-aprendiz",
+    "nombre": "Pantalón acolchado de aprendiz",
+    "tier": "Común",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Relleno desparejo pero abundante. Lo que le falta de prolijo le sobra de grueso.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 4
+      },
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-de-sandro",
+    "nombre": "Pantalón de Sandro",
+    "tier": "Legendario",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Agilidad +1. Movimiento +2. Evasión +4. Iniciativa +2.",
+    "descripcionNarrativa": "Terciopelo negro entallado. Se mueve antes de que el cuerpo decida moverse.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-de-cuero-de-rinoceronte",
+    "nombre": "Pantalón de cuero de rinoceronte",
+    "tier": "Raro",
+    "tipoItem": "piernas_blandas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipo 6: +1. Constitución +1.",
+    "descripcionNarrativa": "Cuero grueso de bestia grande. Pesado, pero casi no lo atraviesan.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-de-lana-de-yastay",
+    "nombre": "Pantalón de lana de yastay",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1. Constitución +1. Movimiento +2. Resistencia a CC +2.",
+    "descripcionNarrativa": "Fibra del guardián andino de las vicuñas. Camina la altura sin cansarse.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-de-lienzo-basto",
+    "nombre": "Pantalón de lienzo basto",
+    "tier": "Común",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "",
+    "descripcionNarrativa": "Lienzo grueso de puesto de feria. Se rompe en la rodilla al mes.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pantalon-de-lino-trenzado",
+    "nombre": "Pantalón de lino trenzado",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_blandas",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Movimiento +1. Evasión +1.",
+    "descripcionNarrativa": "Lino de hebra fina, fresco y liviano. Buen trabajo de sastre.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11011,7 +14735,6 @@
     ],
     "efectoMods": [],
     "id": "new-pantalon-reforzado-de-cazador",
-    "ocultoEnCatalogo": true,
     "nombre": "Pantalón reforzado de cazador",
     "tier": "Buena Calidad",
     "tipoItem": "piernas_blandas",
@@ -11019,6 +14742,7 @@
     "ranuras": 0,
     "precioCompra": 87,
     "detalle": "Reduce críticos tipo 6",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11029,7 +14753,34 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-pasamontanas-de-tejido-basto",
+    "nombre": "Pasamontañas de tejido basto",
+    "tier": "Común",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 50,
+    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "descripcionNarrativa": "Tejido grueso que cubre cabeza y cuello. Abriga tanto que da calor de más.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
       },
       {
         "stat": "tipo1",
@@ -11038,7 +14789,6 @@
     ],
     "efectoMods": [],
     "id": "cat-pechera",
-    "ocultoEnCatalogo": false,
     "nombre": "Pechera acolchada",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -11046,6 +14796,7 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "Reduce críticos Tipo 2.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11073,7 +14824,6 @@
     ],
     "efectoMods": [],
     "id": "new-manto-de-cuero-de-basilisco",
-    "ocultoEnCatalogo": false,
     "nombre": "Pechera de cuero de rinoceronte",
     "tier": "Raro",
     "tipoItem": "armadura_blanda",
@@ -11081,6 +14831,43 @@
     "ranuras": 0,
     "precioCompra": 200,
     "detalle": "inmunidad a armadura rota/arruinada",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "bonos",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-peluca-de-moria",
+    "nombre": "Peluca de Moria",
+    "tier": "Legendario",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Inteligencia +1. Bonos +2. Resistencia mental +4.",
+    "descripcionNarrativa": "Volumen imposible, presencia inapelable. Nadie le discute nada al que la lleva.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11104,7 +14891,6 @@
     ],
     "efectoMods": [],
     "id": "new-perneras-articuladas",
-    "ocultoEnCatalogo": true,
     "nombre": "Perneras articuladas",
     "tier": "Buena Calidad",
     "tipoItem": "piernas_rigidas",
@@ -11112,6 +14898,243 @@
     "ranuras": 0,
     "precioCompra": 111,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo3",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 4
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-homero",
+    "nombre": "Perneras de Homero",
+    "tier": "Legendario",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +4. Resistencia a críticos tipo 6: +3. Constitución +2. Movimiento -1. Regeneración +2 HP por turno.",
+    "descripcionNarrativa": "No tienen ninguna explicación técnica. Aguantan todo igual.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 2,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-acero-de-meteorito",
+    "nombre": "Perneras de acero de meteorito",
+    "tier": "Raro",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Resistencia a críticos tipo 8: +1. Resistencia mental +1.",
+    "descripcionNarrativa": "Metal caído del cielo. Densidad rara, peso engañoso.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-caparazon-de-tatu-carreta",
+    "nombre": "Perneras de caparazón de tatú carreta",
+    "tier": "Raro",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 8: +2. Resistencia a críticos tipo 4: +1. Constitución +1.",
+    "descripcionNarrativa": "Placas del armadillo gigante, encastradas con cuero.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-cuero-hervido",
+    "nombre": "Perneras de cuero hervido",
+    "tier": "Común",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Cuero prensado hasta ponerse rígido. El paso obligado del que arranca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-escamas",
+    "nombre": "Perneras de escamas",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipos 2 y 6: +1.",
+    "descripcionNarrativa": "Placas superpuestas sobre base de cuero. Prolijo y flexible.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-perneras-de-hueso-de-coloso-menor",
+    "nombre": "Perneras de hueso de coloso menor",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +3. Resistencia a críticos tipos 2, 4 y 6: +2. Fuerza +1. Movimiento -1.",
+    "descripcionNarrativa": "Fémur de gigante tallado en placas. Pesa como corresponde.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11131,7 +15154,6 @@
     ],
     "efectoMods": [],
     "id": "new-peto-de-cuero-curtido",
-    "ocultoEnCatalogo": false,
     "nombre": "Peto de cuero curtido",
     "tier": "Común",
     "tipoItem": "armadura_blanda",
@@ -11139,6 +15161,7 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11158,7 +15181,6 @@
     ],
     "efectoMods": [],
     "id": "new-peto-de-placas-de-aprendiz",
-    "ocultoEnCatalogo": false,
     "nombre": "Peto de placas de aprendiz",
     "tier": "Común",
     "tipoItem": "armadura_rigida",
@@ -11166,6 +15188,35 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "Reduce críticos tipo 4 y 6",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-polainas-de-cuero-remendado",
+    "nombre": "Polainas de cuero remendado",
+    "tier": "Común",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +1.",
+    "descripcionNarrativa": "Retazos de cuero cosidos entre sí. Cada parche cuenta una historia.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11181,7 +15232,6 @@
     ],
     "efectoMods": [],
     "id": "new-polainas-de-malla",
-    "ocultoEnCatalogo": false,
     "nombre": "Polainas de malla",
     "tier": "Raro",
     "tipoItem": "botas_blandas",
@@ -11189,6 +15239,39 @@
     "ranuras": 0,
     "precioCompra": 140,
     "detalle": "Reduce críticos tipo 2 y 4",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-polainas-tachonadas-de-taller",
+    "nombre": "Polainas tachonadas de taller",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Remaches de bronce parejos en rodilla y espinilla.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11208,7 +15291,6 @@
     ],
     "efectoMods": [],
     "id": "new-chapa-de-auto-abollada-ajustada-con-alambre",
-    "ocultoEnCatalogo": false,
     "nombre": "Puerta de auto ajustada con alambre",
     "tier": "Común",
     "tipoItem": "armadura_rigida",
@@ -11216,6 +15298,391 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Reduce críticos tipo 6 y 8",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-rodilleras-de-tacho-recortado",
+    "nombre": "Rodilleras de tacho recortado",
+    "tier": "Común",
+    "tipoItem": "piernas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +1. Evasión -1.",
+    "descripcionNarrativa": "Dos tapas de tacho atadas a la rodilla. Funciona, no pregunten cómo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-acero-de-meteorito",
+    "nombre": "Sabatones de acero de meteorito",
+    "tier": "Raro",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Resistencia a críticos tipo 8: +1. Resistencia mental +1.",
+    "descripcionNarrativa": "Metal del cielo en la suela. Densidad rara.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-acero-templado",
+    "nombre": "Sabatones de acero templado",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1.",
+    "descripcionNarrativa": "Placas articuladas en el empeine. Buen trabajo de herrero.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-anillas",
+    "nombre": "Sabatones de anillas",
+    "tier": "Común",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1. Movimiento -1.",
+    "descripcionNarrativa": "Aros remachados sobre el empeine. Pesan y se nota.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-caparazon-de-tatu-carreta",
+    "nombre": "Sabatones de caparazón de tatú carreta",
+    "tier": "Excepcional",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 2: +3. Resistencia a críticos tipos 4 y 8: +2. Constitución +1. Resistencia a CC +2.",
+    "descripcionNarrativa": "Placas del armadillo gigante, encastradas sin costura.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-escamas",
+    "nombre": "Sabatones de escamas",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipos 2 y 6: +1.",
+    "descripcionNarrativa": "Placas chicas superpuestas. Flexibles para lo que son.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-hojalata",
+    "nombre": "Sabatones de hojalata",
+    "tier": "Común",
+    "tipoItem": "botas_rigidas",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Chapa fina sobre botín de cuero. Ruidosos y básicos.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 3
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-de-hueso-de-troll",
+    "nombre": "Sabatones de hueso de troll",
+    "tier": "Excepcional",
+    "tipoItem": "botas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 8: +3. Resistencia a críticos tipos 2, 4 y 6: +2. Constitución +2. Movimiento -1. Regeneración +1 HP por turno.",
+    "descripcionNarrativa": "Hueso de troll pulido. Se repara solo entre combate y combate.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 1,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-del-centinela-de-hierro",
+    "nombre": "Sabatones del centinela de hierro",
+    "tier": "Raro",
+    "tipoItem": "botas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +2. Movimiento -1. Resistencia a CC +2.",
+    "descripcionNarrativa": "Hierro macizo. El que los lleva se planta y no lo mueve nadie.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sabatones-mixtos-de-escudero",
+    "nombre": "Sabatones mixtos de escudero",
+    "tier": "Buena Calidad",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +1. Parry +1.",
+    "descripcionNarrativa": "Puntera y empeine en placa, tobillo en malla.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11247,7 +15714,6 @@
     ],
     "efectoMods": [],
     "id": "cat-sabaton",
-    "ocultoEnCatalogo": false,
     "nombre": "Sabatón",
     "tier": "Buena Calidad",
     "tipoItem": "botas_rigidas",
@@ -11255,6 +15721,58 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Reduce críticos Tipo 4, 6 y 8. -1 Movimiento.",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-sobretodo-de-exhibicionista",
+    "nombre": "Sobretodo de exhibicionista",
+    "tier": "Raro",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "ranuras para consumibles +6 (cinturón)",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "bonos",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-sombrero-de-paja-trenzada",
+    "nombre": "Sombrero de paja trenzada",
+    "tier": "Común",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Bonos +1.",
+    "descripcionNarrativa": "Paja trenzada a mano. Protege más del sol que de los golpes.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11274,7 +15792,6 @@
     ],
     "efectoMods": [],
     "id": "cat-sombrero-humectante",
-    "ocultoEnCatalogo": false,
     "nombre": "Sombrero humectante",
     "tier": "Común",
     "tipoItem": "casco_blando",
@@ -11282,6 +15799,7 @@
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "+1 a los Bonos máximos.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11297,14 +15815,14 @@
     ],
     "efectoMods": [],
     "id": "new-soquetes-de-paso-firme",
-    "ocultoEnCatalogo": false,
     "nombre": "Soquetes de paso firme",
     "tier": "Buena Calidad",
     "tipoItem": "botas_blandas",
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "inmune a restricciones en movilidad",
+    "detalle": "inmune a restricciones en movilidad. Resistencia al CC: +2",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11312,10 +15830,14 @@
     "imagen": ""
   },
   {
-    "mods": [],
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      }
+    ],
     "efectoMods": [],
     "id": "new-soquetes-de-paso-ligero",
-    "ocultoEnCatalogo": false,
     "nombre": "Soquetes de paso ligero",
     "tier": "Buena Calidad",
     "tipoItem": "botas_blandas",
@@ -11323,6 +15845,71 @@
     "ranuras": 0,
     "precioCompra": 110,
     "detalle": "Evasión +2",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "capcinturon",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-tirador-de-rastra",
+    "nombre": "Tirador de rastra",
+    "tier": "Buena Calidad",
+    "tipoItem": "cinturon",
+    "peso": 0,
+    "ranuras": 3,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Ranuras para consumibles +3.",
+    "descripcionNarrativa": "Monedas de plata cosidas al cuero.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-tocado-de-plumas-de-pombero",
+    "nombre": "Tocado de plumas de pombero",
+    "tier": "Excepcional",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Agilidad +1. Evasión +2. Iniciativa +2.",
+    "descripcionNarrativa": "Plumas del duende guaraní del monte. Los pasos del que lo lleva no se oyen.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11338,7 +15925,6 @@
     ],
     "efectoMods": [],
     "id": "new-toga-de-maestre",
-    "ocultoEnCatalogo": false,
     "nombre": "Toga de Maestre",
     "tier": "Excepcional",
     "tipoItem": "armadura_blanda",
@@ -11346,6 +15932,35 @@
     "ranuras": 0,
     "precioCompra": 750,
     "detalle": "Ranuras para consumibles +3, inteligencia +1",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-turbante-de-seda-cruda",
+    "nombre": "Turbante de seda cruda",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Inteligencia +1.",
+    "descripcionNarrativa": "Vueltas de seda de buena hebra. Liviano y cómodo para concentrarse.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11369,7 +15984,6 @@
     ],
     "efectoMods": [],
     "id": "new-turbante-de-tela-reforzada",
-    "ocultoEnCatalogo": true,
     "nombre": "Turbante de tela reforzada",
     "tier": "Buena Calidad",
     "tipoItem": "casco_blando",
@@ -11377,6 +15991,146 @@
     "ranuras": 0,
     "precioCompra": 92,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-vincha-de-cuero-crudo",
+    "nombre": "Vincha de cuero crudo",
+    "tier": "Común",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 50,
+    "detalle": "Resistencia mental +1.",
+    "descripcionNarrativa": "Una tira de cuero sin curtir atada en la frente. Mantiene el pelo a raya.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-vincha-del-sueno-liviano",
+    "nombre": "Vincha del sueño liviano",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Iniciativa +2. Resistencia mental +1.",
+    "descripcionNarrativa": "Cuero fino con cuentas de hueso que tintinean apenas. Cuesta agarrarlo desprevenido.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-abierto-de-sargento",
+    "nombre": "Yelmo abierto de sargento",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +1. PdG +1.",
+    "descripcionNarrativa": "Frente en placa, nuca en malla. Visibilidad a cambio de un punto débil atrás.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-alado-del-martin-fierro",
+    "nombre": "Yelmo alado del Martín Fierro",
+    "tier": "Legendario",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipo 4: +3. Resistencia a críticos tipos 2 y 6: +2. Parry +2. Resistencia a CC +3.",
+    "descripcionNarrativa": "Chapa de facón viejo con dos alas de ñandú. El que lo lleva no se achica ante nadie.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11404,7 +16158,6 @@
     ],
     "efectoMods": [],
     "id": "cat-yelmo-completo",
-    "ocultoEnCatalogo": true,
     "nombre": "Yelmo completo",
     "tier": "Buena Calidad",
     "tipoItem": "casco_rigido",
@@ -11412,6 +16165,7 @@
     "ranuras": 0,
     "precioCompra": 122,
     "detalle": "Reduce críticos Tipo 2, 6 y 8.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11439,7 +16193,6 @@
     ],
     "efectoMods": [],
     "id": "new-yelmo-con-cresta-de-comandante",
-    "ocultoEnCatalogo": true,
     "nombre": "Yelmo con cresta de comandante",
     "tier": "Raro",
     "tipoItem": "casco_rigido",
@@ -11447,6 +16200,163 @@
     "ranuras": 0,
     "precioCompra": 205,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "fue",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-con-cuerno-de-rinoceronte",
+    "nombre": "Yelmo con cuerno de rinoceronte",
+    "tier": "Raro",
+    "tipoItem": "casco_rigido",
+    "peso": 3,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 8: +2. Fuerza +1. Movimiento -1.",
+    "descripcionNarrativa": "Cuerno macizo montado sobre acero. Embiste primero, piensa después.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-de-asta-de-unicornio",
+    "nombre": "Yelmo de asta de unicornio",
+    "tier": "Excepcional",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2 y 8: +2. Resistencia mental +2. Rango de casteo +2.",
+    "descripcionNarrativa": "Un fragmento del cuerno montado al frente. Purifica lo que toca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-de-caparazon-de-peuchen",
+    "nombre": "Yelmo de caparazón de peuchen",
+    "tier": "Excepcional",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Resistencia mental +2.",
+    "descripcionNarrativa": "Escama del vampiro cambiaformas mapuche. Se acomoda sola a la cabeza.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-de-nasal",
+    "nombre": "Yelmo de nasal",
+    "tier": "Buena Calidad",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1.",
+    "descripcionNarrativa": "Acero bien templado con barra nasal. Clásico y confiable.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11470,7 +16380,6 @@
     ],
     "efectoMods": [],
     "id": "new-yelmo-de-visera",
-    "ocultoEnCatalogo": true,
     "nombre": "Yelmo de visera",
     "tier": "Buena Calidad",
     "tipoItem": "casco_rigido",
@@ -11478,6 +16387,47 @@
     "ranuras": 0,
     "precioCompra": 98,
     "detalle": "",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-yelmo-del-centinela-insomne",
+    "nombre": "Yelmo del centinela insomne",
+    "tier": "Raro",
+    "tipoItem": "casco_rigido",
+    "peso": 2,
+    "ranuras": 0,
+    "ocultoEnCatalogo": true,
+    "precioCompra": 0,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Iniciativa +1. Resistencia mental +2.",
+    "descripcionNarrativa": "Acero con incrustaciones de obsidiana pulida. El que lo lleva no se distrae.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11501,7 +16451,6 @@
     ],
     "efectoMods": [],
     "id": "cat-yelmo-liviano",
-    "ocultoEnCatalogo": false,
     "nombre": "Yelmo liviano",
     "tier": "Buena Calidad",
     "tipoItem": "casco_rigido",
@@ -11509,6 +16458,7 @@
     "ranuras": 0,
     "precioCompra": 80,
     "detalle": "Reduce críticos Tipo 6 y 8.",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11528,7 +16478,6 @@
     ],
     "efectoMods": [],
     "id": "cat-zapatillas-nike",
-    "ocultoEnCatalogo": false,
     "nombre": "Zapatillas Nike",
     "tier": "Excepcional",
     "tipoItem": "botas_rigidas",
@@ -11536,29 +16485,7 @@
     "ranuras": 0,
     "precioCompra": 650,
     "detalle": "+1 a las Acciones máximas del turno.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "mov",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "new-ojotas-de-goma-con-flores-hawaianas",
-    "ocultoEnCatalogo": false,
-    "nombre": "Zapatillas cómodas",
-    "tier": "Común",
-    "tipoItem": "botas_blandas",
-    "peso": 1,
-    "ranuras": 0,
-    "precioCompra": 50,
-    "detalle": "movimiento +1",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11574,7 +16501,6 @@
     ],
     "efectoMods": [],
     "id": "new-zapatillas-de-maraton",
-    "ocultoEnCatalogo": false,
     "nombre": "Zapatillas de maratón",
     "tier": "Buena Calidad",
     "tipoItem": "botas_blandas",
@@ -11582,6 +16508,7 @@
     "ranuras": 0,
     "precioCompra": 90,
     "detalle": "Movimiento +3",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11601,7 +16528,6 @@
     ],
     "efectoMods": [],
     "id": "cat-botas-reforzadas",
-    "ocultoEnCatalogo": false,
     "nombre": "alpargatas de cuero",
     "tier": "Común",
     "tipoItem": "botas_blandas",
@@ -11609,6 +16535,7 @@
     "ranuras": 0,
     "precioCompra": 60,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11628,7 +16555,6 @@
     ],
     "efectoMods": [],
     "id": "new-botas-de-marcha",
-    "ocultoEnCatalogo": false,
     "nombre": "soquetes de lona",
     "tier": "Común",
     "tipoItem": "botas_blandas",
@@ -11636,6 +16562,7 @@
     "ranuras": 0,
     "precioCompra": 60,
     "detalle": "",
+    "descripcionNarrativa": "",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",

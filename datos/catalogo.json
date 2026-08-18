@@ -146,7 +146,7 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Blindado (pergamino)",
+    "efectoNombre": "Inmune a golpes críticos (pergamino)",
     "efectoPreset": "",
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
@@ -679,7 +679,7 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Inmunidad a CC (pergamino)",
+    "efectoNombre": "Inmune a CC (pergamino)",
     "efectoPreset": "",
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
@@ -1475,7 +1475,7 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Sangre pura (pergamino)",
+    "efectoNombre": "Inmune a veneno (pergamino)",
     "efectoPreset": "",
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
@@ -1998,7 +1998,7 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Blindado (poción)",
+    "efectoNombre": "Inmune a golpes críticos (poción)",
     "efectoPreset": "",
     "efectoTurnos": 3,
     "efectoHpTurno": 0,
@@ -2847,7 +2847,7 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "efectoNombre": "Inmunidad a CC (poción)",
+    "efectoNombre": "Inmune a CC (poción)",
     "efectoPreset": "",
     "efectoTurnos": 3,
     "efectoHpTurno": 0,
@@ -6583,6 +6583,14 @@
         "val": 7
       },
       {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
         "stat": "parry",
         "val": 3
       },
@@ -6634,9 +6642,9 @@
     "detalle": "parry  +4, bloqueo +4, inmuniza rupturas de armadura",
     "descripcionNarrativa": "Del dragón. Aguanta lo que sea y no deja que la armadura se rompa.",
     "tipoDado": 0,
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (escudo)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -6701,6 +6709,14 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -6725,6 +6741,14 @@
       {
         "stat": "def",
         "val": 6
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -6943,6 +6967,18 @@
         "val": 6
       },
       {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
         "stat": "bloqueo",
         "val": 2
       }
@@ -6969,6 +7005,18 @@
       {
         "stat": "def",
         "val": 8
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
       },
       {
         "stat": "bloqueo",
@@ -7093,6 +7141,10 @@
       {
         "stat": "def",
         "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9158,9 +9210,9 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "equipoEstadoNombre": "Armadura indestructible (anillo)",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (anillo)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "Mientras esté equipado, se supone inmune a Armadura rota y Armadura arruinada. Recordatorio: no hay un preset que bloquee esos estados — hay que respetarlo a mano (no aplicárselos, o quitárselos apenas se equipa el anillo).",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "equipoEstadoPreset": "",
     "consumible": false,
     "imagen": ""
@@ -9279,9 +9331,9 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "equipoEstadoNombre": "Mente certera (anillo)",
+    "equipoEstadoNombre": "Inmune a confusión, control mental e ilusiones (anillo)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "Mientras esté equipado, se supone inmune a confusión, control mental e ilusiones. Recordatorio: esos estados todavía no existen en el sistema, así que esto queda como aviso nomás.",
+    "equipoEstadoDetalle": "Mientras esté equipado, no se le pueden aplicar confusión, control mental ni ilusiones.",
     "equipoEstadoPreset": "",
     "consumible": false,
     "imagen": ""
@@ -9329,9 +9381,9 @@
     "cargaMax": 0,
     "curahp": 0,
     "curabonosPct": 0,
-    "equipoEstadoNombre": "Tendones firmes (anillo)",
+    "equipoEstadoNombre": "Inmune a lisiado, inmovilizado y rengo (anillo)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "Mientras esté equipado, se supone inmune a Lisiado, Inmovilizado y Rengo. Recordatorio: no hay un preset que bloquee los tres juntos — hay que respetarlo a mano.",
+    "equipoEstadoDetalle": "Mientras esté equipado, no se le pueden aplicar lisiado, inmovilizado ni rengo.",
     "equipoEstadoPreset": "",
     "consumible": false,
     "imagen": ""
@@ -9366,6 +9418,14 @@
       {
         "stat": "def",
         "val": 8
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9389,6 +9449,14 @@
       {
         "stat": "def",
         "val": 10
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9501,6 +9569,10 @@
       {
         "stat": "def",
         "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9524,6 +9596,14 @@
       {
         "stat": "def",
         "val": 7
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9698,6 +9778,10 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       },
       {
         "stat": "tipo4",
@@ -10473,6 +10557,10 @@
       },
       {
         "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
         "val": 1
       },
       {
@@ -11649,6 +11737,26 @@
       {
         "stat": "def",
         "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -11661,9 +11769,9 @@
     "precioCompra": 1400,
     "detalle": "Inmunidad a control o intrusión mental. +2 de resistencia a todos los críticos",
     "descripcionNarrativa": "Púrpura y rojo, con la línea de la mandíbula marcada. Blinda la mente entera.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a control mental (casco)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, no se le puede aplicar control ni intrusión mental.",
     "consumible": false,
     "imagen": ""
   },
@@ -12443,6 +12551,26 @@
       {
         "stat": "def",
         "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "tipo5",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12455,9 +12583,9 @@
     "precioCompra": 1800,
     "detalle": "Reduce críticos de cualquier tipo. indestructible",
     "descripcionNarrativa": "Plateada, casi sin peso, imposible de romper. La joya de la montaña.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -12559,6 +12687,14 @@
       },
       {
         "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
         "val": 1
       },
       {
@@ -12680,11 +12816,23 @@
       },
       {
         "stat": "tipo1",
-        "val": 1
+        "val": 2
       },
       {
         "stat": "tipo2",
-        "val": 1
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -12697,9 +12845,9 @@
     "precioCompra": 750,
     "detalle": "Reduce 2 críticos de cualquier tipo. indestructible",
     "descripcionNarrativa": "Gris mate y liviana para su volumen. No se abolla ni se raya.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -12800,6 +12948,18 @@
         "val": 10
       },
       {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
         "stat": "eva",
         "val": 2
       }
@@ -12814,9 +12974,9 @@
     "precioCompra": 1350,
     "detalle": "Reduce críticos Tipo 2, 4 y 6. Evasión +2. indestructible",
     "descripcionNarrativa": "Liviana como una camisa y más dura que cualquier cosa. Un regalo con historia.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (cota de malla)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -12860,6 +13020,18 @@
       {
         "stat": "def",
         "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12883,6 +13055,18 @@
       {
         "stat": "def",
         "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12906,6 +13090,18 @@
       {
         "stat": "def",
         "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -13019,6 +13215,10 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14180,6 +14380,10 @@
       {
         "stat": "def",
         "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
       },
       {
         "stat": "tipo2",
@@ -15485,9 +15689,9 @@
     "precioCompra": 200,
     "detalle": "inmunidad a armadura rota/arruinada",
     "descripcionNarrativa": "Piel de bestia grande, gruesa como una tabla. No hay golpe que la abolle.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (pechera)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -15828,6 +16032,14 @@
         "val": 5
       },
       {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
         "stat": "tipo4",
         "val": 1
       }
@@ -15881,6 +16093,14 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15936,6 +16156,10 @@
       {
         "stat": "def",
         "val": 6
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       },
       {
         "stat": "tipo4",
@@ -16484,9 +16708,9 @@
     "precioCompra": 80,
     "detalle": "inmune a restricciones en movilidad. Resistencia al CC: +2",
     "descripcionNarrativa": "Tejido apretado con suela de goma. Nada logra sacarte de donde estás parado.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a restricciones de movilidad (calzado)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, no se le pueden aplicar lisiado, inmovilizado ni rengo.",
     "consumible": false,
     "imagen": ""
   },

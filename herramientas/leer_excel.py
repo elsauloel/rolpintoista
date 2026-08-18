@@ -10,7 +10,7 @@ from openpyxl import load_workbook
 
 
 ETIQ = {
-    'ID (no tocar)':'id','Nombre':'nombre','Tier':'tier','Tipo de ítem':'tipoItem',
+    'ID (no tocar)':'id','Nombre':'nombre','Tier':'tier','tier':'tier','Tipo de ítem':'tipoItem',
     'Peso':'peso','Ranuras':'ranuras','Precio (DDE)':'precioCompra','Detalle':'detalle',
     'Tipo de dado':'tipoDado','Daño fijo':'danoFijo','Daño amplificado':'danoAmplificado',
     'Arma de rango':'armaDeRango','Unidades':'unidades','Cargas':'cargaMax',

@@ -241,9 +241,9 @@ def orden_categoria(it):
 
 
 def escribir_htmls(items):
-    """Reescribe el catálogo embebido en ficha.html, vendor-generator.html
-    y gm-tools.html (formato de equipo) — las tres con imagen, para que el
-    botón "Ver" de cada herramienta pueda mostrarla.
+    """Reescribe el catálogo embebido en ficha.html (con imagen),
+    vendor-generator.html y gm-tools.html (sin imagen, para no engordarlos —
+    el botón "Ver" de esas dos muestra todo lo demás igual).
     Los ítems marcados 'ocultoEnCatalogo' (columna del Excel, para lo que
     todavía no se auditó/balanceó) no se escriben acá — siguen enteros en
     datos/catalogo.json, vía guardar_catalogo_json(), para poder editarlos
@@ -261,7 +261,7 @@ def escribir_htmls(items):
     tv = open(VENDOR, encoding="utf-8", newline="").read().replace("\r\n", "\n")
     m = re.search(r"const CATALOGO = \[\n.*?\n\];", tv, re.S)
     assert m, "no encontré CATALOGO en el vendor"
-    nuevo_v = 'const CATALOGO = [\n' + ',\n'.join('  ' + item_js(it) for it in items) + ',\n];'
+    nuevo_v = 'const CATALOGO = [\n' + ',\n'.join('  ' + item_js(it, con_imagen=False) for it in items) + ',\n];'
     tv = tv[:m.start()] + nuevo_v + tv[m.end():]
     open(VENDOR, "w", encoding="utf-8", newline="").write(tv.replace("\n", "\r\n"))
 
@@ -269,7 +269,7 @@ def escribir_htmls(items):
     tg = open(GM, encoding="utf-8", newline="").read().replace("\r\n", "\n")
     mg = re.search(r"const CATALOGO_EQUIPO = \[\n.*?\n\];", tg, re.S)
     assert mg, "no encontré CATALOGO_EQUIPO"
-    nuevo_g = 'const CATALOGO_EQUIPO = [\n' + ',\n'.join('  ' + item_gm(it) for it in equipo) + ',\n];'
+    nuevo_g = 'const CATALOGO_EQUIPO = [\n' + ',\n'.join('  ' + item_gm(it, con_imagen=False) for it in equipo) + ',\n];'
     tg = tg[:mg.start()] + nuevo_g + tg[mg.end():]
     open(GM, "w", encoding="utf-8", newline="").write(tg.replace("\n", "\r\n"))
 

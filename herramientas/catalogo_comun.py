@@ -197,7 +197,7 @@ def item_js(it, con_imagen=True):
     return '{' + ', '.join(partes) + '}'
 
 
-def item_gm(it):
+def item_gm(it, con_imagen=True):
     es_arma = it['tipoItem'].startswith('arma_')
     dfs = sum(m['val'] for m in it['mods'] if m['stat'] == 'def')
     otros = [m for m in it['mods'] if m['stat'] != 'def']
@@ -222,6 +222,10 @@ def item_gm(it):
     if otros:
         partes.append("mods:%s" % mods_js(otros))
     partes.append("detalle:'%s'" % esc_js(it.get('detalle')))
+    if (it.get('descripcionNarrativa') or '').strip():
+        partes.append("descripcionNarrativa:'%s'" % esc_js(it['descripcionNarrativa']))
+    if con_imagen and it.get('imagen'):
+        partes.append("imagen:'%s'" % it['imagen'])
     return '{' + ', '.join(partes) + '}'
 
 
@@ -237,8 +241,9 @@ def orden_categoria(it):
 
 
 def escribir_htmls(items):
-    """Reescribe el catálogo embebido en ficha.html (con imagen),
-    vendor-generator.html (sin imagen) y gm-tools.html (formato de equipo).
+    """Reescribe el catálogo embebido en ficha.html, vendor-generator.html
+    y gm-tools.html (formato de equipo) — las tres con imagen, para que el
+    botón "Ver" de cada herramienta pueda mostrarla.
     Los ítems marcados 'ocultoEnCatalogo' (columna del Excel, para lo que
     todavía no se auditó/balanceó) no se escriben acá — siguen enteros en
     datos/catalogo.json, vía guardar_catalogo_json(), para poder editarlos
@@ -256,7 +261,7 @@ def escribir_htmls(items):
     tv = open(VENDOR, encoding="utf-8", newline="").read().replace("\r\n", "\n")
     m = re.search(r"const CATALOGO = \[\n.*?\n\];", tv, re.S)
     assert m, "no encontré CATALOGO en el vendor"
-    nuevo_v = 'const CATALOGO = [\n' + ',\n'.join('  ' + item_js(it, con_imagen=False) for it in items) + ',\n];'
+    nuevo_v = 'const CATALOGO = [\n' + ',\n'.join('  ' + item_js(it) for it in items) + ',\n];'
     tv = tv[:m.start()] + nuevo_v + tv[m.end():]
     open(VENDOR, "w", encoding="utf-8", newline="").write(tv.replace("\n", "\r\n"))
 

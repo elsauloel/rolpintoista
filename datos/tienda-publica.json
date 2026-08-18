@@ -4,10 +4,12 @@
   "categoria": "personalizada",
   "categoriaLabel": "",
   "nombre": "Tienda personalizada",
-  "generado": "2026-08-18T21:00:24.658Z",
+  "generado": "2026-08-18T22:39:52.928Z",
   "ajustePrecio": 0,
   "garantizados": [],
   "items": [
-    "new-anillo-de-leprechaun"
+    "ia-calzas-de-piel-de-troll",
+    "new-guantes-de-piel-de-troll",
+    "ia-sabatones-de-hueso-de-troll"
   ]
 }

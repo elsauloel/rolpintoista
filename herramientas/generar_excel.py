@@ -32,7 +32,7 @@ def categoria(it):
     return 'Otros'
 
 # --- Columnas por pestaña ---
-BASE = ['id','nombre','tier','tipoItem','peso','ranuras','precioCompra','detalle']
+BASE = ['id','nombre','tier','tipoItem','peso','ranuras','precioCompra','detalle','descripcionNarrativa']
 CRIT = ['tipo1','tipo2','tipo3','tipo4','tipo5']
 OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','agl','des',
               'resm','rescc','rangocasteo','accionesmax','dmg','potencia','hpmax','crgmax','bloqueo','rng','pdgmg']
@@ -40,9 +40,9 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
-    'Armas':       BASE + ['descripcionNarrativa','tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
-    'Defensivos':  BASE + ['descripcionNarrativa', 'mod_def'] + ['mod_'+s for s in CRIT] +
+    'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def',
                            'equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle','equipoEstadoPreset'],

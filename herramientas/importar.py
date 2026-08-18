@@ -34,8 +34,9 @@ def _cubierto(r):
     d, it = r['detalle'].lower(), r['it']
     if it.get('curahp') and _re.search(r'recupera \d+ ?hp|cura \d+ ?hp', d): return True
     # efectoNombre solo no alcanza: el estado tiene que traer algo que lo
-    # haga (mods o hp/turno) — si no, se activa un estado que no hace nada.
-    if (it.get('efectoNombre') or '').strip() and (it.get('efectoMods') or it.get('efectoHpTurno')): return True
+    # haga (mods, hp/turno, o un preset del que heredar la mecánica real)
+    # — si no, se activa un estado que no hace nada.
+    if (it.get('efectoNombre') or '').strip() and (it.get('efectoMods') or it.get('efectoHpTurno') or (it.get('efectoPreset') or '').strip()): return True
     if it.get('curabonosPct') and 'bonos' in d: return True
     if it.get('mods'): return True
     # Estado al equipar: cuenta como cubierto aunque no tenga preset —

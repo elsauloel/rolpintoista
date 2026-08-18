@@ -15,6 +15,7 @@ ETIQ = {
     'Tipo de dado':'tipoDado','Daño fijo':'danoFijo','Daño amplificado':'danoAmplificado',
     'Arma de rango':'armaDeRango','Unidades':'unidades','Cargas':'cargaMax',
     'Cura HP':'curahp','Cura Bonos (%)':'curabonosPct','Estado que aplica':'efectoNombre',
+    'Estado que aplica (preset)':'efectoPreset',
     'Turnos del estado':'efectoTurnos','HP por turno':'efectoHpTurno',
     'Estado permanente':'efectoPermanente','Detalle del estado':'efectoDetalle',
     'Defensa':'mod_def','Res.Crít Tipo 2':'mod_tipo1','Res.Crít Tipo 4':'mod_tipo2',

@@ -39,7 +39,7 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
-                           'efectoNombre','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
+                           'efectoNombre','efectoPreset','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
     'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
@@ -58,7 +58,7 @@ ETIQUETAS = {
     'tipoDado':'Tipo de dado','danoFijo':'Daño fijo','danoAmplificado':'Daño amplificado','armaDeRango':'Arma de rango',
     'unidades':'Unidades','cargaMax':'Cargas',
     'curahp':'Cura HP','curabonosPct':'Cura Bonos (%)',
-    'efectoNombre':'Estado que aplica','efectoTurnos':'Turnos del estado',
+    'efectoNombre':'Estado que aplica','efectoPreset':'Estado que aplica (preset)','efectoTurnos':'Turnos del estado',
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',
     'efectoMods_extra':'Modificadores del estado',
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
@@ -155,6 +155,7 @@ filas = [
     ('', ''),
     ('Consumibles', 'Unidades es cuántas trae. Cargas es cuántos usos por unidad. Cura HP suma vida al consumirlo (negativo daña).'),
     ('Estado que aplica', 'Si tiene nombre, al consumir el ítem se activa ese estado alterado. Turnos, HP por turno y Detalle configuran ese estado.'),
+    ('Estado que aplica (preset)', 'Opcional, mismo mecanismo que "Estado al equipar (preset)" pero para consumibles. Si el nombre de un preset de la ficha (Afortunado, Coagulación extrema, etc.) va acá, el ítem hereda esa mecánica real al consumirse, aunque "Estado que aplica" tenga otro nombre — así "Coagulación extrema (pergamino)" da inmunidad de verdad en vez de ser solo un cartel.'),
     ('Estado permanente', 'Con "sí", el estado no vence: queda hasta que el jugador lo borre a mano.'),
     ('', ''),
     ('Estado al equipar', 'Igual que "Estado que aplica" pero para equipo (armas, escudos, defensivos, accesorios): el estado se activa solo mientras el ítem está puesto y se va al sacárselo — no cuenta turnos.'),

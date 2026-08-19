@@ -16641,7 +16641,7 @@
       },
       {
         "stat": "tipo1",
-        "val": 1
+        "val": 2
       },
       {
         "stat": "tipo2",
@@ -16653,7 +16653,7 @@
       },
       {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
@@ -16668,7 +16668,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 900,
-    "detalle": "Resistencia a críticos tipo 8: +2. Resistencia a críticos tipos 2, 4 y 6: +1. Movimiento -1. Regeneración +5 HP por turno.",
+    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipos 8, 4 y 6: +1. Movimiento -1. Regeneración +5 HP por turno.",
     "descripcionNarrativa": "Hueso de troll pulido. Se repara solo entre combate y combate.",
     "equipoEstadoNombre": "Regeneración (sabatones)",
     "equipoEstadoHpTurno": 5,

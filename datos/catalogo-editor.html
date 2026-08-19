@@ -295,12 +295,27 @@ function poblarFiltros(){
     TIERS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
 }
 
+const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+// Busca por nombre, Detalle, descripción narrativa, tier/categoría,
+// nombre y detalle del efecto/estado (consumible o al equipar), y los
+// stats de los modificadores — no solo el nombre del ítem.
+function textoBusquedaDe(it){
+  const partes = [
+    it.nombre, it.detalle, it.descripcionNarrativa, it.tier, CATEGORIA_LABEL[it.tipoItem],
+    it.efectoNombre, it.efectoDetalle, it.equipoEstadoNombre, it.equipoEstadoDetalle, it.equipoEstadoPreset,
+  ];
+  (it.mods || []).forEach(m => partes.push(STAT_LABEL[m.stat] || m.stat));
+  (it.efectoMods || []).forEach(m => partes.push(STAT_LABEL[m.stat] || m.stat));
+  return normalizarBusqueda(partes.filter(Boolean).join(' '));
+}
+
 function itemsFiltrados(){
-  const texto = filtro.texto.trim().toLowerCase();
+  const texto = normalizarBusqueda(filtro.texto);
   return CATALOGO.filter(it => {
     if(filtro.tipo && it.tipoItem !== filtro.tipo) return false;
     if(filtro.tier && it.tier !== filtro.tier) return false;
-    if(texto && !(it.nombre || '').toLowerCase().includes(texto)) return false;
+    if(texto && !textoBusquedaDe(it).includes(texto)) return false;
     return true;
   });
 }

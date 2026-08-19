@@ -872,7 +872,7 @@ const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 
 /* Consumibles que todo vendedor ofrece siempre, sin importar el tamaño.
    No entran en los porcentajes del resto del catálogo. */
-const GARANTIZADOS = ['cat-pocion-hp', 'cat-pocion-bonos', 'cat-revive'];
+const GARANTIZADOS = ['cat-pocion-hp', 'cat-pocion-bonos', 'cat-revive', 'cat-raciones'];
 
 /* Pesos de rareza por tamaño. Son probabilidades, no topes: hasta el
    vendedor ambulante puede sacar algo Excepcional, solo que casi nunca. */
@@ -1486,7 +1486,7 @@ function actualizarHint(){
   const categoria = $('#f-categoria').value;
   $('#hint-tamano').textContent =
     `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems` +
-    (categoria === 'herrero' ? '.' : `, más los consumibles de stock fijo (Poción de HP, Poción de Bonos y Revive).`);
+    (categoria === 'herrero' ? '.' : `, más los consumibles de stock fijo (Poción de HP, Poción de Bonos, Revive y Raciones).`);
 }
 
 /* ---------- GitHub ---------- */

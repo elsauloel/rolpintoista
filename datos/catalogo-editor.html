@@ -75,8 +75,9 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 }
 .grupo-head:first-child{margin-top:0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.card{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 11px;display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.card{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 11px;display:flex;flex-direction:column;gap:9px}
 .card:hover{border-color:var(--copper)}
+.card-top{display:flex;gap:10px;align-items:flex-start}
 .card img{width:40px;height:40px;object-fit:cover;border:1px solid var(--line);flex:none;background:var(--panel)}
 .card .sinfoto{width:40px;height:40px;border:1px dashed var(--line);flex:none;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px}
 .card .cinfo{min-width:0;flex:1}
@@ -84,7 +85,31 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .card .ctier{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
 .card .cmeta{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:3px}
 .card .cdetalle{font-size:11px;color:var(--muted);margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.card-acciones{display:flex;gap:6px}
+.card-acciones button{
+  flex:1;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 9px;border-radius:var(--r);border:1px solid var(--line);color:var(--muted);background:none
+}
+.card-acciones button:hover{border-color:var(--copper);color:var(--brass)}
 .vacio{color:var(--muted);padding:30px 0;text-align:center}
+
+.view-wrap{display:flex;gap:0}
+.view-image-wrap{
+  width:180px;flex:none;aspect-ratio:1/1;background:#0B0708;display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--line);overflow:hidden
+}
+.view-image{width:100%;height:100%;object-fit:contain}
+.view-image-empty{font-family:"Fraunces",serif;font-size:13px;color:var(--muted);text-align:center;padding:0 10px}
+.view-info{flex:1;min-width:0;padding:14px 16px}
+.view-title{font-family:"Fraunces",serif;font-weight:700;font-size:19px;margin-bottom:9px}
+.view-lines{display:flex;flex-direction:column;gap:5px}
+.view-line{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
+.view-label{color:var(--muted);flex:none}
+.view-value{color:var(--paper);text-align:right}
+.view-detalle{padding:13px 16px;border-top:1px dashed var(--line);font-size:13px;line-height:1.55;color:#DCCFC5;white-space:pre-wrap}
+.view-detalle .view-label{display:block;color:var(--copper);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
+.view-narrativa{font-style:italic;color:#B9A796}
+@media(max-width:480px){.view-wrap{flex-direction:column}.view-image-wrap{width:100%;border-right:none;border-bottom:1px solid var(--line)}}
 
 .scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;z-index:80}
 .scrim.open{display:flex}
@@ -160,6 +185,18 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
       <button class="btn ghost" id="modal-cancelar">Cancelar</button>
       <button class="btn primary" id="modal-guardar">Guardar ítem</button>
     </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-ver">
+  <div class="modal">
+    <header>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="ver-titulo">Ítem</h3>
+        <button class="iconbtn" id="ver-x">Cerrar</button>
+      </div>
+    </header>
+    <div class="body" id="ver-body"></div>
   </div>
 </div>
 
@@ -301,19 +338,79 @@ function renderLista(){
     delGrupo.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
     html += `<div class="grupo-head">${grupo} · ${delGrupo.length}</div><div class="grid">`;
     html += delGrupo.map(it => `
-      <div class="card" data-abrir="${esc(it.id)}">
-        ${it.imagen ? `<img src="${it.imagen}" alt="">` : `<div class="sinfoto">·</div>`}
-        <div class="cinfo">
-          <div class="cnombre">${esc(it.nombre)}</div>
-          <div class="ctier" style="color:var(--copper)">${esc(it.tier)} · ${esc(CATEGORIA_LABEL[it.tipoItem] || it.tipoItem)}</div>
-          <div class="cmeta">${esc(metaTxt(it))}</div>
-          ${it.detalle ? `<div class="cdetalle">${esc(it.detalle)}</div>` : ''}
+      <div class="card">
+        <div class="card-top">
+          ${it.imagen ? `<img src="${it.imagen}" alt="">` : `<div class="sinfoto">·</div>`}
+          <div class="cinfo">
+            <div class="cnombre">${esc(it.nombre)}</div>
+            <div class="ctier" style="color:var(--copper)">${esc(it.tier)} · ${esc(CATEGORIA_LABEL[it.tipoItem] || it.tipoItem)}</div>
+            <div class="cmeta">${esc(metaTxt(it))}</div>
+            ${it.detalle ? `<div class="cdetalle">${esc(it.detalle)}</div>` : ''}
+          </div>
+        </div>
+        <div class="card-acciones">
+          <button type="button" data-ver="${esc(it.id)}">Ver</button>
+          <button type="button" data-editar="${esc(it.id)}">Editar</button>
         </div>
       </div>`).join('');
     html += `</div>`;
   });
   $('#lista').innerHTML = html;
 }
+
+/* ---------- Ver ítem (solo lectura) ---------- */
+function verItem(id){
+  const item = CATALOGO.find(it => it.id === id);
+  if(!item) return;
+  const linea = (label, val) => (val === '' || val === null || val === undefined)
+    ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+  const esArma = esArmaTipo(item.tipoItem);
+  const esCons = esConsumibleTipo(item.tipoItem);
+  const L = [];
+  L.push(linea('Categoría', CATEGORIA_LABEL[item.tipoItem] || item.tipoItem));
+  if(item.tier) L.push(linea('Tier', item.tier));
+  if(esArma){
+    const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
+    L.push(linea('Daño', `${dados}d${num(item.tipoDado) || 6}${num(item.danoFijo) ? ` +${num(item.danoFijo)}` : ''}`));
+  }
+  L.push(linea('Peso', num(item.peso)));
+  L.push(linea('Precio', `${num(item.precioCompra)} DDE`));
+  if(esCons) L.push(linea('Unidades', `${num(item.unidades) || 1}${item.cargaMax ? ` · ${num(item.cargaMax)} cargas c/u` : ''}`));
+  const mods = (item.mods || []).filter(m => m.stat);
+  if(mods.length) L.push(linea('Modificadores', mods.map(m => `${STAT_LABEL[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`).join(', ')));
+  if(esCons && item.efectoNombre){
+    const efm = (item.efectoMods || []).filter(m => m.stat);
+    L.push(linea('Estado al consumir', item.efectoNombre + (item.efectoPermanente ? ' (no vence)' : item.efectoTurnos ? ` (${num(item.efectoTurnos)} turnos)` : '')));
+    if(item.efectoHpTurno) L.push(linea('HP/turno del estado', num(item.efectoHpTurno)));
+    if(efm.length) L.push(linea('Mods del estado', efm.map(m => `${STAT_LABEL[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`).join(', ')));
+  }
+  if(!esCons && item.equipoEstadoNombre){
+    L.push(linea('Estado al equipar', item.equipoEstadoNombre + (item.equipoEstadoPreset ? ` (preset: ${item.equipoEstadoPreset})` : '')));
+    if(item.equipoEstadoHpTurno) L.push(linea('HP/turno del estado', num(item.equipoEstadoHpTurno)));
+  }
+  if(item.legacy) L.push(linea('Legacy', 'Sí'));
+
+  $('#ver-titulo').textContent = item.nombre || 'Ítem';
+  $('#ver-body').innerHTML = `
+    <div class="view-wrap">
+      <div class="view-image-wrap">${item.imagen ? `<img src="${esc(item.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
+      <div class="view-info">
+        <div class="view-title">${esc(item.nombre)}</div>
+        <div class="view-lines">${L.filter(Boolean).join('')}</div>
+      </div>
+    </div>
+    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+    ${esCons && item.efectoDetalle ? `<div class="view-detalle"><span class="view-label">Detalle del estado</span>${esc(item.efectoDetalle)}</div>` : ''}
+    ${!esCons && item.equipoEstadoDetalle ? `<div class="view-detalle"><span class="view-label">Detalle del estado</span>${esc(item.equipoEstadoDetalle)}</div>` : ''}
+    ${(item.descripcionNarrativa || '').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
+  `;
+  $('#scrim-ver').classList.add('open');
+}
+function cerrarVer(){
+  $('#scrim-ver').classList.remove('open');
+}
+$('#ver-x').onclick = cerrarVer;
+$('#scrim-ver').addEventListener('mousedown', e => { if(e.target.id === 'scrim-ver') cerrarVer(); });
 
 /* ---------- Editor de ítem ---------- */
 function defaultsItem(){
@@ -472,8 +569,10 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('click', e => {
-  const abrir = e.target.closest('[data-abrir]');
-  if(abrir){ abrirEditor(abrir.dataset.abrir); return; }
+  const ver = e.target.closest('[data-ver]');
+  if(ver){ verItem(ver.dataset.ver); return; }
+  const editar = e.target.closest('[data-editar]');
+  if(editar){ abrirEditor(editar.dataset.editar); return; }
 
   if(!editing) return;
   const d = editing.draft;
@@ -530,7 +629,11 @@ $('#modal-cancelar').onclick = cerrarEditor;
 $('#modal-guardar').onclick = guardarItemActual;
 $('#modal-borrar').onclick = borrarItemActual;
 $('#scrim-editor').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editor') cerrarEditor(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#scrim-editor').classList.contains('open')) cerrarEditor(); });
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if($('#scrim-editor').classList.contains('open')) cerrarEditor();
+  if($('#scrim-ver').classList.contains('open')) cerrarVer();
+});
 
 /* ---------- Filtros: eventos ---------- */
 $('#f-buscar').addEventListener('input', e => { filtro.texto = e.target.value; renderLista(); });

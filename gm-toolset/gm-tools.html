@@ -410,6 +410,30 @@ input[type=file]{display:none}
   border:1px solid var(--line);padding:3px 8px;color:var(--muted);border-radius:var(--r);white-space:nowrap
 }
 .iconbtn:hover{border-color:var(--copper);color:var(--brass)}
+.iconbtn-add{border-color:var(--copper);color:var(--brass);background:rgba(201,133,69,.14);font-weight:700}
+.iconbtn-add:hover{background:var(--copper);color:#180F08}
+/* Selector de presets de estado: se abre desde el editor del creep, que
+   ya es un scrim — tiene que quedar encima (mismo criterio que
+   #scrim-ver-item). */
+#scrim-presets-creep{z-index:85}
+.preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.preset-grupo:first-child{margin-top:0}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+.preset-btn{
+  border:1px solid var(--line);background:var(--panel2);padding:9px 10px;text-align:left;
+  display:flex;flex-direction:column;gap:4px;border-left-width:3px;min-height:100%;cursor:pointer
+}
+.preset-btn:hover{border-color:var(--copper);background:var(--panel)}
+.preset-btn.buff{border-left-color:var(--absenta)}
+.preset-btn.debuff{border-left-color:var(--danger)}
+.preset-btn.otro{border-left-color:var(--muted)}
+.preset-btn.propio{border-left-color:var(--brass)}
+.preset-nombre{font-weight:700;font-size:12.5px;line-height:1.2}
+.preset-datos{display:flex;flex-wrap:wrap;gap:5px}
+.preset-dato{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line-soft);border-radius:99px;padding:1px 6px;color:var(--muted)}
+.preset-dato.bueno{color:var(--absenta);border-color:rgba(168,194,86,.4)}
+.preset-dato.malo{color:var(--danger);border-color:rgba(212,87,78,.4)}
+.preset-detalle{font-size:10.5px;color:var(--muted);line-height:1.35}
 .view-wrap{display:flex;gap:0}
 .view-image-wrap{
   width:180px;flex:none;aspect-ratio:1/1;background:#0B0708;display:flex;align-items:center;justify-content:center;
@@ -804,6 +828,19 @@ input[type=file]{display:none}
       <button class="btn ghost" id="revivircreep-cancel">Cancelar</button>
       <button class="btn primary" id="revivircreep-confirmar">Revivir</button>
     </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-presets-creep">
+  <div class="modal" style="max-width:760px">
+    <header>
+      <h3>Elegir estado</h3>
+      <div style="display:flex;gap:8px">
+        <button class="iconbtn iconbtn-add" id="presets-creep-personalizado">Estado personalizado</button>
+        <button class="iconbtn" id="presets-creep-x">Cerrar</button>
+      </div>
+    </header>
+    <div class="body" id="presets-creep-body"></div>
   </div>
 </div>
 
@@ -2334,6 +2371,86 @@ function optgroupsEstadosPersonalizadosHtml(){
   return `<optgroup label="Mis presets">${personalizados.map((p,i) => `<option value="custom:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
 }
 
+// Selector de presets con tarjetas — mismo mecanismo que "+ Estado" en
+// ficha.html: clic en una tarjeta activa el estado directo sobre el
+// creep, sin pasar por el editor. "Estado personalizado" abre el
+// editor de siempre para armar uno de cero.
+function presetBtnHtmlCreep(p, valor, clase){
+  const datos = [];
+  const hpTurno = num(p.hpTurno);
+  if(hpTurno) datos.push(`<span class="preset-dato ${hpTurno > 0 ? 'bueno' : 'malo'}">${hpTurno > 0 ? '+' : ''}${fmt(hpTurno)} HP/turno</span>`);
+  if(p.permanente) datos.push(`<span class="preset-dato">No vence</span>`);
+  else if(num(p.turnos)) datos.push(`<span class="preset-dato">${fmt(num(p.turnos))} turnos</span>`);
+  if(num(p.stacks) > 1) datos.push(`<span class="preset-dato">${fmt(num(p.stacks))} stacks</span>`);
+  if(num(p.escudoMagico) > 0) datos.push(`<span class="preset-dato bueno">🛡${fmt(num(p.escudoMagico))}/turno</span>`);
+  (p.mods || []).forEach(m => {
+    if(!m.stat) return;
+    const v = num(m.val);
+    datos.push(`<span class="preset-dato ${v > 0 ? 'bueno' : 'malo'}">${esc(ATTR_LABELS[m.stat] || m.stat)} ${v > 0 ? '+' : ''}${fmt(v)}</span>`);
+  });
+  const det = (p.detalle || '').trim();
+  return `<button type="button" class="preset-btn ${clase}" data-presetcreep="${esc(valor)}">
+    <span class="preset-nombre">${esc(p.nombre)}</span>
+    ${datos.length ? `<span class="preset-datos">${datos.join('')}</span>` : ''}
+    ${det ? `<span class="preset-detalle">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</span>` : ''}
+  </button>`;
+}
+
+let presetsCreepScId = null;
+function abrirPresetsEstadoCreep(scId){
+  presetsCreepScId = scId;
+  const propios = S.estadosPersonalizados || [];
+  let html = '';
+  ['buff','debuff','otro'].forEach(pol => {
+    const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+    if(!del.length) return;
+    html += `<div class="preset-grupo">${POLARIDAD_ESTADO_LABEL[pol]} · ${fmt(del.length)}</div>`;
+    html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtmlCreep(p, `std:${i}`, pol)).join('')}</div>`;
+  });
+  if(propios.length){
+    html += `<div class="preset-grupo">Mis presets · ${fmt(propios.length)}</div>`;
+    html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtmlCreep(p, `custom:${i}`, 'propio')).join('')}</div>`;
+  }
+  $('#presets-creep-body').innerHTML = html;
+  $('#scrim-presets-creep').classList.add('open');
+}
+
+function activarEstadoPresetCreep(preset){
+  $('#scrim-presets-creep').classList.remove('open');
+  const sc = S.creeps.find(s => s.id === presetsCreepScId);
+  if(!sc) return;
+  const datos = {
+    nombre: preset.nombre,
+    detalle: preset.detalle || '',
+    turnos: preset.turnos ?? 0,
+    stacks: preset.stacks ?? 1,
+    hpTurno: preset.hpTurno ?? 0,
+    stacksTurno: preset.stacksTurno ?? 0,
+    activo: true,
+    permanente: !!preset.permanente,
+    escudoMagico: preset.escudoMagico ?? 0,
+    polaridad: preset.polaridad || 'otro',
+    mods: structuredClone(preset.mods || []),
+  };
+  FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = !!preset[f]; });
+  if(estaBloqueadoElDebuffCreep(sc, datos)){
+    toast(`${sc.nombre}: inmune ahora mismo — ${preset.nombre} no se pudo aplicar`);
+    return;
+  }
+  const es = {id: uid(), ...datos};
+  sc.estados.push(es);
+  if((datos.mods||[]).some(m=>m.stat==='con')) actualizarHpMaxPorCon(sc);
+  renderAll();
+  toast(`${sc.nombre}: ${preset.nombre} activado`);
+}
+
+function aplicarPresetEstadoCreep(valor){
+  const [tipo, idx] = valor.split(':');
+  const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
+  if(!preset) return;
+  activarEstadoPresetCreep(preset);
+}
+
 const ATTR_IDS = ['con','fue','agl','des','int'];
 const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int'};
 
@@ -3317,7 +3434,11 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.addestado){
-    abrirEditorEstadoCreep(b.dataset.addestado, null);
+    abrirPresetsEstadoCreep(b.dataset.addestado);
+    return;
+  }
+  if(b.dataset.presetcreep){
+    aplicarPresetEstadoCreep(b.dataset.presetcreep);
     return;
   }
   if(b.dataset.editarestado){
@@ -4229,6 +4350,9 @@ $('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
 $('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#scrim-estado-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-estado-creep'){ editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); } });
+$('#presets-creep-x').onclick = () => $('#scrim-presets-creep').classList.remove('open');
+$('#presets-creep-personalizado').onclick = () => { $('#scrim-presets-creep').classList.remove('open'); abrirEditorEstadoCreep(presetsCreepScId, null); };
+$('#scrim-presets-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets-creep') $('#scrim-presets-creep').classList.remove('open'); });
 $('#ec-nombre').addEventListener('input', actualizarBotonesPresetEc);
 $('#ec-preset').addEventListener('change', e => {
   if(!e.target.value) return;

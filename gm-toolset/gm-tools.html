@@ -2682,6 +2682,18 @@ function ordenarEquipo(pares){
   return equipoOrdenDesc ? orden.reverse() : orden;
 }
 
+// Entre los consumibles, los legacy ("los de siempre") van primero, sea
+// cual sea el criterio de orden elegido. Acá no hay concepto de stock
+// fijo (eso es propio de una tienda generada, no de este catálogo de
+// equipo). No toca el orden de nada que no sea consumible: el sort es
+// estable y el comparador da 0 apenas uno de los dos no es consumible.
+function conLegacyPrimeroGM(pares){
+  return pares.slice().sort((a, b) => {
+    if(a.it.tipoItem !== 'consumibles' || b.it.tipoItem !== 'consumibles') return 0;
+    return (b.it.legacy ? 1 : 0) - (a.it.legacy ? 1 : 0);
+  });
+}
+
 function renderEquipoOrdenControles(){
   const sel = $('#equipar-creep-orden');
   if(sel && !sel.dataset.listo){
@@ -2708,13 +2720,13 @@ function renderEquiparCreepLista(){
     const armas = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('arma_')));
     const escudos = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('escudo')));
     const defensa = ordenarEquipo(visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo') && it.tipoItem !== 'consumibles'));
-    const consumibles = ordenarEquipo(visibles.filter(({it}) => it.tipoItem === 'consumibles'));
+    const consumibles = conLegacyPrimeroGM(ordenarEquipo(visibles.filter(({it}) => it.tipoItem === 'consumibles')));
     if(armas.length) html += `<div class="cat-grouphead">Armas</div><div class="cat-grid">${armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
     if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div><div class="cat-grid">${escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
     if(defensa.length) html += `<div class="cat-grouphead">Defensa</div><div class="cat-grid">${defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
     if(consumibles.length) html += `<div class="cat-grouphead">Consumibles</div><div class="cat-grid">${consumibles.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
   }else{
-    const orden = ordenarEquipo(visibles);
+    const orden = conLegacyPrimeroGM(ordenarEquipo(visibles));
     if(orden.length){
       html += `<div class="cat-grouphead">${esc(ORDENES_GM[equipoOrden].label)} · ${fmt(orden.length)}</div>`;
       html += `<div class="cat-grid">${orden.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;

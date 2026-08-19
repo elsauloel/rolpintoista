@@ -1829,7 +1829,7 @@ const GRUPO_COMPRA_MAP = {
   otros:'otros', '':'otros'
 };
 const GRUPO_COMPRA_LABEL = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', accesorios:'Accesorios', consumibles:'Consumibles', otros:'Otros'};
-const GRUPO_COMPRA_ORDEN = ['armas','escudos','defensa','accesorios','consumibles','otros'];
+const GRUPO_COMPRA_ORDEN = ['consumibles','armas','defensa','escudos','accesorios','otros'];
 function grupoCompraDe(tipoItem){ return GRUPO_COMPRA_MAP[tipoItem] || 'otros'; }
 const ORDEN_EQUIPO = {
   arma_1m:1, arma_2m:1,
@@ -5979,6 +5979,21 @@ function ordenarCatalogo(items){
   return catalogoOrdenDesc ? orden.reverse() : orden;
 }
 
+// Dentro de "consumibles": si hay una tienda cargada, primero su stock
+// fijo (tiendaCargada.garantizados), después los legacy ("los de
+// siempre"), después el resto. Sin tienda cargada no hay stock fijo, así
+// que solo se aplica el criterio legacy. No toca el orden de nada que no
+// sea consumible: el sort es estable y el comparador da 0 apenas uno de
+// los dos no es consumible.
+function conStockYLegacyPrimero(items){
+  const garantizados = tiendaCargada && Array.isArray(tiendaCargada.garantizados) ? new Set(tiendaCargada.garantizados) : null;
+  const rango = it => (garantizados && garantizados.has(it.id)) ? 0 : (it.legacy ? 1 : 2);
+  return items.slice().sort((a, b) => {
+    if(grupoCompraDe(a.tipoItem) !== 'consumibles' || grupoCompraDe(b.tipoItem) !== 'consumibles') return 0;
+    return rango(a) - rango(b);
+  });
+}
+
 function renderCatalogoOrdenControles(){
   const sel = $('#catalogo-orden');
   if(sel && !sel.dataset.listo){
@@ -6150,10 +6165,10 @@ function renderCatalogoModal(){
     const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
     html = claves.map(g => `
       <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
-      <div class="cat-grid">${ordenarCatalogo(grupos[g]).map(catalogoRowHtml).join('')}</div>
+      <div class="cat-grid">${conStockYLegacyPrimero(ordenarCatalogo(grupos[g])).map(catalogoRowHtml).join('')}</div>
     `).join('');
   }else{
-    const orden = ordenarCatalogo(visibles);
+    const orden = conStockYLegacyPrimero(ordenarCatalogo(visibles));
     html = orden.length
       ? `<div class="cat-grouphead">${esc(ORDENES_CATALOGO[catalogoOrden].label)} · ${fmt(orden.length)}</div>
          <div class="cat-grid">${orden.map(catalogoRowHtml).join('')}</div>`

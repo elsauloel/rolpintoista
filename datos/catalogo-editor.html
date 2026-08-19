@@ -335,7 +335,10 @@ function renderLista(){
   ORDEN_GRUPO.forEach(grupo => {
     const delGrupo = items.filter(it => grupoDe(it) === grupo);
     if(!delGrupo.length) return;
-    delGrupo.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    // Entre los consumibles, los legacy ("los de siempre") van primero;
+    // acá no hay concepto de stock fijo, eso es propio de una tienda
+    // generada. El resto de los grupos queda alfabético como siempre.
+    delGrupo.sort((a, b) => (grupo === 'Consumibles' ? (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0) : 0) || a.nombre.localeCompare(b.nombre, 'es'));
     html += `<div class="grupo-head">${grupo} · ${delGrupo.length}</div><div class="grid">`;
     html += delGrupo.map(it => `
       <div class="card">

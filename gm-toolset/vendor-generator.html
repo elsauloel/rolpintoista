@@ -939,7 +939,7 @@ function rubroDe(item){
 }
 
 const RUBRO_LABEL = {armas:'Armas', defensivos:'Defensa', escudos:'Escudos', accesorios:'Accesorios', consumibles:'Consumibles', otros:'Otros'};
-const RUBRO_ORDEN = ['armas', 'escudos', 'defensivos', 'accesorios', 'consumibles', 'otros'];
+const RUBRO_ORDEN = ['consumibles', 'armas', 'defensivos', 'escudos', 'accesorios', 'otros'];
 
 function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 
@@ -1205,14 +1205,16 @@ function ordenarItems(items){
   return ordenDesc ? orden.reverse() : orden;
 }
 
-// Entre los consumibles, los legacy (Poción de HP, Antídoto, etc. — "los
-// de siempre") van primero, sea cual sea el criterio de orden elegido.
-// No toca el orden de nada que no sea consumible: el sort es estable y
-// el comparador da 0 apenas uno de los dos no es consumible.
-function conLegacyPrimero(items){
+// Entre los consumibles: primero el stock fijo de la tienda actual (si
+// hay), después los legacy (Poción de HP, Antídoto, etc. — "los de
+// siempre"), después el resto — sea cual sea el criterio de orden
+// elegido. No toca el orden de nada que no sea consumible: el sort es
+// estable y el comparador da 0 apenas uno de los dos no es consumible.
+function conLegacyPrimero(items, garantizados){
+  const rango = it => (garantizados && garantizados.has(it.id)) ? 0 : (it.legacy ? 1 : 2);
   return items.slice().sort((a, b) => {
     if(rubroDe(a) !== 'consumibles' || rubroDe(b) !== 'consumibles') return 0;
-    return (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0);
+    return rango(a) - rango(b);
   });
 }
 
@@ -1354,13 +1356,13 @@ function renderPreview(){
     html = `<div class="hint">Ningún ítem de la tienda coincide con "${esc(textoBusqueda)}".</div>`;
   }else if(ordenActual === 'categoria'){
     RUBRO_ORDEN.forEach(rubro => {
-      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)));
+      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)), garantizados);
       if(!delRubro.length) return;
       html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
       html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
     });
   }else{
-    const orden = conLegacyPrimero(ordenarItems(visibles));
+    const orden = conLegacyPrimero(ordenarItems(visibles), garantizados);
     html += `<div class="cat-grouphead">${esc(ORDENES[ordenActual].label)} · ${fmt(orden.length)}</div>`;
     html += `<div class="cat-grid">${orden.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
   }

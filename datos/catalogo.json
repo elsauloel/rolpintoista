@@ -4280,7 +4280,7 @@
     "precioCompra": 10,
     "detalle": "",
     "descripcionNarrativa": "Sifón de vidrio azul con la etiqueta despegada. Nadie recuerda quién lo cargó.",
-    "legacy": true,
+    "legacy": false,
     "unidades": 1,
     "cargaMax": 0,
     "curahp": 10,
@@ -4298,7 +4298,7 @@
     "mods": [],
     "efectoMods": [],
     "id": "new-vendas",
-    "nombre": "VEndas",
+    "nombre": "Vendas",
     "tier": "Común",
     "tipoItem": "consumibles",
     "peso": 0,
@@ -5293,7 +5293,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "alcance +1. Rompe armadura. Un hacha vikinga de asta larga y hoja delgada muy veloz y letal.",
+    "detalle": "alcance +1. Rompe armadura. ",
     "descripcionNarrativa": "Asta larga y hoja delgada. Vikinga, veloz y letal.",
     "tipoDado": 6,
     "danoFijo": 0,
@@ -10100,62 +10100,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 11
-      },
-      {
-        "stat": "tipo1",
-        "val": 3
-      },
-      {
-        "stat": "tipo2",
-        "val": 3
-      },
-      {
-        "stat": "tipo3",
-        "val": 3
-      },
-      {
-        "stat": "tipo4",
-        "val": 3
-      },
-      {
-        "stat": "tipo5",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": -1
-      },
-      {
-        "stat": "con",
-        "val": 2
-      },
-      {
-        "stat": "rescc",
-        "val": 3
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-botas-de-acero-de-bariloche",
-    "nombre": "Botas de acero de Bariloche",
-    "tier": "Legendario",
-    "tipoItem": "botas_rigidas",
-    "peso": 2,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia a CC +3.",
-    "descripcionNarrativa": "Forjadas en la cordillera con nieve que nunca se derritió del todo.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 5
       },
       {
@@ -10252,8 +10196,12 @@
         "val": 4
       },
       {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
@@ -10269,10 +10217,10 @@
     "nombre": "Botas de esquí sin los esquís",
     "tier": "Común",
     "tipoItem": "botas_rigidas",
-    "peso": 2,
+    "peso": 3,
     "ranuras": 0,
-    "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipo 8: +2. Movimiento -1. Evasión -1.",
+    "precioCompra": 90,
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1. Movimiento -1. Evasión -1.",
     "descripcionNarrativa": "Plástico duro imposible de doblar. Protegen mucho, caminan horrible.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10318,20 +10266,20 @@
         "val": 8
       },
       {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
         "stat": "tipo2",
         "val": 2
       },
       {
         "stat": "tipo4",
-        "val": 3
-      },
-      {
-        "stat": "mov",
-        "val": -1
-      },
-      {
-        "stat": "fue",
         "val": 1
+      },
+      {
+        "stat": "hpmax",
+        "val": 10
       }
     ],
     "efectoMods": [],
@@ -10341,9 +10289,8 @@
     "tipoItem": "botas_rigidas",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 8: +3. Resistencia a críticos tipo 4: +2. Fuerza +1. Movimiento -1.",
+    "precioCompra": 220,
+    "detalle": "Resistencia a críticos tipo 8: +1. Resistencia a críticos tipo 2 y 4: +2. Hp máximo: +10.",
     "descripcionNarrativa": "Cada pisada deja marca en la tierra.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10420,11 +10367,7 @@
         "val": 4
       },
       {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -10436,7 +10379,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1. HP máximo +10",
+    "detalle": "Resistencia a críticos tipos 4: +1. HP máximo +10",
     "descripcionNarrativa": "Pensadas para caminar mucho con peso encima.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10451,15 +10394,15 @@
         "val": 6
       },
       {
-        "stat": "tipo4",
-        "val": 2
+        "stat": "tipo1",
+        "val": 3
       },
       {
         "stat": "mov",
         "val": 2
       },
       {
-        "stat": "agl",
+        "stat": "eva",
         "val": 1
       },
       {
@@ -10475,7 +10418,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 850,
-    "detalle": "Resistencia a críticos tipos 8: +2. Movimiento +2. Resistencia a CC +1. Agilidad +1.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Movimiento +2. Resistencia a CC +1. Evasión +1.",
     "descripcionNarrativa": "Pezuña del guardián andino. Sube cerros como si fueran llanura.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10549,7 +10492,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 550,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +1. Movimiento +1. Evasión +2. Habilita sigilo durante la noche y en espacios cerrados",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +1. Movimiento +1. Evasión +2. Habilita sigilo durante la noche y en espacios poco iluminados",
     "descripcionNarrativa": "Piel correosa que se ajusta sola al pie. Deja huellas raras.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10702,6 +10645,61 @@
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "tipo5",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "con",
+        "val": 2
+      },
+      {
+        "stat": "resm",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-botas-de-vibranium",
+    "nombre": "Botas de vibranium",
+    "tier": "Legendario",
+    "tipoItem": "botas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 1650,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
+    "descripcionNarrativa": "Forjadas en la Wakanda",
+    "equipoEstadoNombre": "Armadura indestructible (botas)",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "Mientras estén equipadas, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -11275,7 +11273,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 4
+        "val": 3
       },
       {
         "stat": "tipo3",
@@ -11709,7 +11707,7 @@
         "val": 3
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
       }
     ],
@@ -11721,7 +11719,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Reduce críticos Tipo 8.",
+    "detalle": "Reduce críticos Tipo 6.",
     "descripcionNarrativa": "El casco básico de cualquier tropa. Nadie recuerda el suyo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11756,54 +11754,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 9
-      },
-      {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "int",
-        "val": 1
-      },
-      {
-        "stat": "resm",
-        "val": 6
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-casco-de-magneto",
-    "nombre": "Casco de Magneto",
-    "tier": "Legendario",
-    "tipoItem": "casco_rigido",
-    "peso": 2,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +2. Inteligencia +1. Resistencia mental +6.",
-    "descripcionNarrativa": "Nadie entra en esa cabeza. Nadie.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 6
       },
       {
@@ -11825,6 +11775,10 @@
       {
         "stat": "tipo5",
         "val": 2
+      },
+      {
+        "stat": "resmg",
+        "val": 10
       }
     ],
     "efectoMods": [],
@@ -11834,8 +11788,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "precioCompra": 1400,
-    "detalle": "Inmunidad a control o intrusión mental. +2 de resistencia a todos los críticos",
+    "precioCompra": 1200,
+    "detalle": "Inmunidad a control o intrusión mental. +2 de resistencia a todos los críticos. +10 al daño mágico. +10 a resistencia mágica.",
     "descripcionNarrativa": "Púrpura y rojo, con la línea de la mandíbula marcada. Blinda la mente entera.",
     "equipoEstadoNombre": "Inmune a control mental (casco)",
     "equipoEstadoHpTurno": 0,
@@ -11848,26 +11802,6 @@
       {
         "stat": "def",
         "val": 5
-      },
-      {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "tipo5",
-        "val": 2
       }
     ],
     "efectoMods": [],
@@ -11877,8 +11811,8 @@
     "tipoItem": "casco_rigido",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 1100,
-    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social",
+    "precioCompra": 1200,
+    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a inteligencia",
     "descripcionNarrativa": "Del otro lado de la discusión. Amplifica en vez de bloquear.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12112,7 +12046,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 5
+        "val": 4
       },
       {
         "stat": "tipo4",
@@ -12126,8 +12060,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "precioCompra": 50,
-    "detalle": "",
+    "precioCompra": 60,
+    "detalle": "Reduce críticos Tipo 8.",
     "descripcionNarrativa": "Llamas anaranjadas sobre fondo negro. Un trabajo de amor.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12372,16 +12306,8 @@
         "val": 5
       },
       {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
         "stat": "con",
-        "val": 1
+        "val": 2
       },
       {
         "stat": "resm",
@@ -12393,7 +12319,7 @@
       },
       {
         "stat": "capcinturon",
-        "val": 10
+        "val": 5
       }
     ],
     "efectoMods": [],
@@ -12403,10 +12329,9 @@
     "tipoItem": "cinturon",
     "peso": 1,
     "ranuras": 10,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +2. Constitución +1. Resistencia mental +4. Resistencia a CC +3. Ranuras para consumibles +10.",
-    "descripcionNarrativa": "El que lo lleva puesto no afloja nunca.",
+    "precioCompra": 1350,
+    "detalle": "Constitución +2. Resistencia mental +4. Resistencia a CC +3. Ranuras para consumibles +5. Reconocimiento social. 25% de descuento en tiendas de herrero.",
+    "descripcionNarrativa": "El mismo que usó Mohammed Alí.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -12674,26 +12599,6 @@
       {
         "stat": "def",
         "val": 12
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12703,8 +12608,8 @@
     "tipoItem": "armadura_rigida",
     "peso": 5,
     "ranuras": 1,
-    "precioCompra": 100,
-    "detalle": "Reduce críticos de cualquier tipo.",
+    "precioCompra": 120,
+    "detalle": "Resistencia a críticos 2, 4 y 6: +1",
     "descripcionNarrativa": "Pieza única forjada de un solo golpe de fragua, sin costuras a la vista.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12747,7 +12652,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 1800,
-    "detalle": "Reduce críticos de cualquier tipo. indestructible",
+    "detalle": "Inmune a golpes críticos. indestructible",
     "descripcionNarrativa": "Plateada, casi sin peso, imposible de romper. La joya de la montaña.",
     "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
     "equipoEstadoHpTurno": 0,
@@ -12935,19 +12840,19 @@
       },
       {
         "stat": "tipo1",
-        "val": 1
+        "val": 3
       },
       {
         "stat": "tipo2",
-        "val": 1
+        "val": 3
       },
       {
         "stat": "tipo3",
-        "val": 3
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 3
+        "val": 1
       },
       {
         "stat": "mov",
@@ -12965,8 +12870,8 @@
     "tipoItem": "armadura_rigida",
     "peso": 4,
     "ranuras": 0,
-    "precioCompra": 850,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +3. Resistencia a críticos tipos 2 y 4: +1. Constitución +1. Movimiento -1.",
+    "precioCompra": 750,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipos 2 y 4: +3. Constitución +1. Movimiento -1.",
     "descripcionNarrativa": "Osteodermos fósiles encastrados en acero. Pesa como un animal entero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12990,15 +12895,11 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "tipo5",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -13008,8 +12909,8 @@
     "tipoItem": "armadura_rigida",
     "peso": 4,
     "ranuras": 0,
-    "precioCompra": 750,
-    "detalle": "Reduce 2 críticos de cualquier tipo. indestructible",
+    "precioCompra": 550,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipos 6 y 8: +1. Armadura indestructible.",
     "descripcionNarrativa": "Gris mate y liviana para su volumen. No se abolla ni se raya.",
     "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
     "equipoEstadoHpTurno": 0,
@@ -13033,19 +12934,11 @@
       },
       {
         "stat": "tipo3",
-        "val": 3
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 3
-      },
-      {
-        "stat": "tipo5",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": -1
+        "val": 1
       },
       {
         "stat": "con",
@@ -13053,10 +12946,6 @@
       },
       {
         "stat": "resm",
-        "val": 3
-      },
-      {
-        "stat": "rescc",
         "val": 4
       }
     ],
@@ -13067,8 +12956,8 @@
     "tipoItem": "armadura_rigida",
     "peso": 3,
     "ranuras": 0,
-    "precioCompra": 2000,
-    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia mental +3. Resistencia a CC +4.",
+    "precioCompra": 1650,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Constitución +2. Resistencia mental +4.",
     "descripcionNarrativa": "Aleación que no existe todavía. No siente dolor, no negocia, no se detiene.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13970,15 +13859,15 @@
       },
       {
         "stat": "tipo3",
-        "val": 3
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 3
+        "val": 1
       },
       {
         "stat": "tipo5",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
@@ -13989,8 +13878,8 @@
         "val": 2
       },
       {
-        "stat": "rescc",
-        "val": 3
+        "stat": "resm",
+        "val": 4
       }
     ],
     "efectoMods": [],
@@ -14002,11 +13891,11 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +3. Resistencia a críticos tipo 10: +2. Constitución +2. Movimiento -1. Resistencia a CC +3.",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
     "descripcionNarrativa": "Bronce de una estatua que ya no existe. Sigue de pie igual.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Armadura indestructible (grebas)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -14058,23 +13947,27 @@
       },
       {
         "stat": "tipo2",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo3",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
         "val": -1
       },
       {
-        "stat": "con",
-        "val": 1
+        "stat": "resm",
+        "val": 3
+      },
+      {
+        "stat": "rescc",
+        "val": 3
       }
     ],
     "efectoMods": [],
@@ -14085,7 +13978,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 220,
-    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +2. Constitución +1. Movimiento -1.",
+    "detalle": "Resistencia a críticos tipos 2: +2. Resistencia a críticos tipos 4, 6 y 8: +1. Resistencia a CC +3. Resistencia Mental +3. Movimiento -1.",
     "descripcionNarrativa": "Hierro macizo sin adornos. El que las lleva no retrocede porque no puede.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14283,7 +14176,7 @@
     "tipoItem": "guantes_rigidos",
     "peso": 2,
     "ranuras": 0,
-    "precioCompra": 1200,
+    "precioCompra": 1400,
     "detalle": "reduce todos los críticos x2",
     "descripcionNarrativa": "No se rayan, no se abollan, no se rompen. Fin de la discusión.",
     "equipoEstadoNombre": "",
@@ -15922,46 +15815,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 9
-      },
-      {
-        "stat": "tipo3",
-        "val": 3
-      },
-      {
-        "stat": "tipo4",
-        "val": 4
-      },
-      {
-        "stat": "mov",
-        "val": -1
-      },
-      {
-        "stat": "con",
-        "val": 2
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-perneras-de-homero",
-    "nombre": "Perneras de Homero",
-    "tier": "Legendario",
-    "tipoItem": "piernas_rigidas",
-    "peso": 1,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 8: +4. Resistencia a críticos tipo 6: +3. Constitución +2. Movimiento -1. Regeneración +2 HP por turno.",
-    "descripcionNarrativa": "No tienen ninguna explicación técnica. Aguantan todo igual.",
-    "equipoEstadoNombre": "Regeneración (perneras)",
-    "equipoEstadoHpTurno": 2,
-    "equipoEstadoDetalle": "Cura 2 HP cada turno mientras estén equipadas.",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 7
       },
       {
@@ -16537,22 +16390,6 @@
       {
         "stat": "def",
         "val": 7
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "con",
-        "val": 1
-      },
-      {
-        "stat": "rescc",
-        "val": 2
       }
     ],
     "efectoMods": [],
@@ -16563,7 +16400,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 750,
-    "detalle": "Resistencia a críticos tipo 4: +1. Constitución +1. Resistencia a CC +2.",
+    "detalle": "Resistencia a críticos tipo 6: +1. Constitución +1. Resistencia a CC +2.",
     "descripcionNarrativa": "Placas del armadillo gigante, encastradas sin costura.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16658,10 +16495,6 @@
       {
         "stat": "mov",
         "val": -1
-      },
-      {
-        "stat": "con",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16672,7 +16505,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 900,
-    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipos 8, 4 y 6: +1. Movimiento -1. Constitución +1. Regeneración +5 HP por turno.",
+    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipos 8, 4 y 6: +1. Movimiento -1. Regeneración +5 HP por turno.",
     "descripcionNarrativa": "Hueso de troll pulido. Se repara solo entre combate y combate.",
     "equipoEstadoNombre": "Regeneración (sabatones)",
     "equipoEstadoHpTurno": 5,
@@ -17260,23 +17093,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 7
-      },
-      {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": -1
-      },
-      {
-        "stat": "fue",
-        "val": 1
+        "val": 6
       }
     ],
     "efectoMods": [],
@@ -17286,9 +17103,8 @@
     "tipoItem": "casco_rigido",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 8: +2. Fuerza +1. Movimiento -1.",
+    "precioCompra": 190,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Movimiento -1.",
     "descripcionNarrativa": "Cuerno macizo montado sobre acero. Embiste primero, piensa después.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17301,22 +17117,6 @@
       {
         "stat": "def",
         "val": 8
-      },
-      {
-        "stat": "tipo1",
-        "val": 3
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "resm",
-        "val": 2
-      },
-      {
-        "stat": "rangocasteo",
-        "val": 2
       }
     ],
     "efectoMods": [],
@@ -17327,7 +17127,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 800,
-    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia mental +3. Rango de casteo +2.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia mental +3. Rango de casteo +2. Daño mágico +5",
     "descripcionNarrativa": "Un fragmento del cuerno montado al frente. Purifica lo que toca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

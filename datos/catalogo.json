@@ -16658,10 +16658,6 @@
       {
         "stat": "mov",
         "val": -1
-      },
-      {
-        "stat": "con",
-        "val": 2
       }
     ],
     "efectoMods": [],
@@ -16675,8 +16671,8 @@
     "detalle": "Resistencia a críticos tipo 8: +2. Resistencia a críticos tipos 2, 4 y 6: +1. Movimiento -1. Regeneración +5 HP por turno.",
     "descripcionNarrativa": "Hueso de troll pulido. Se repara solo entre combate y combate.",
     "equipoEstadoNombre": "Regeneración (sabatones)",
-    "equipoEstadoHpTurno": 1,
-    "equipoEstadoDetalle": "Cura 1 HP cada turno mientras estén equipados.",
+    "equipoEstadoHpTurno": 5,
+    "equipoEstadoDetalle": "Cura 5 HP cada turno mientras estén equipados.",
     "consumible": false,
     "imagen": ""
   },

@@ -49,6 +49,8 @@ def analizar(items):
         if it.get('curabonosPct'): tiene.append('cura Bonos')
         if (it.get('efectoNombre') or '').strip(): tiene.append('aplica estado')
         if (it.get('tiradaExtra') or '').strip(): tiene.append('tirada extra')
+        if it.get('danoAmplificado'): tiene.append('daño amplificado')
+        if it.get('equipoEstadoNombre') and (it.get('equipoEstadoNombre') or '').strip(): tiene.append('estado al equipar')
         revisar.append({'it': it, 'detalle': det, 'senales': golpes, 'configurado': tiene})
     return revisar, ok
 

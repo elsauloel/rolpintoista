@@ -25,6 +25,7 @@ def _cubierto(r):
     if (it.get('efectoNombre') or '').strip() and (it.get('efectoMods') or it.get('efectoHpTurno') or (it.get('efectoPreset') or '').strip()): return True
     if it.get('curabonosPct') and 'bonos' in d: return True
     if it.get('mods'): return True
+    if it.get('danoAmplificado'): return True
     if (it.get('equipoEstadoNombre') or '').strip(): return True
     return False
 _pend = [r for r in _rev if r['it']['nombre'] not in _YA and not _cubierto(r)]

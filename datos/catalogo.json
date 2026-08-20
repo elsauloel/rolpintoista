@@ -4948,10 +4948,6 @@
   {
     "mods": [
       {
-        "stat": "crit",
-        "val": 10
-      },
-      {
         "stat": "parry",
         "val": 2
       },
@@ -5062,12 +5058,7 @@
     "imagen": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wAARCAE0APMDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD7J71FcXMFrBJPcSpFFGpd5HYKqKBkkk9AKLm4htbeSeeRIoo1LvI5wqKBkkk9AB3r5B8deOdf+PvimfwR4HuZbHwJZybNS1RBtN+w/gX/AGeOB3+8eKTaSuxpNuyPUpv2o/hFHcSxR6rqVykcjR+dBp0rxuQcZVgOR70z/hqX4Tdr3WD9NLl/wrybWvFWh+DdCtfC3hKO0g0vSyTLfTIGVnPBAJHIz/EfvH2rBg+JDNIGbXNKK/3RCvP6VxvE9kdKod2e7f8ADU3wn73msj/uFy/4UH9qf4SD/l/1f/wVy/4V4p/wsj+7qmmN9YV/wqOT4iSuCq3+kAkY3eQmR9OKX1p/yj9gu57f/wANT/CX/n91j/wVy/4Uf8NT/CT/AJ/9X/8ABXL/AIV4ZJ8SZ4Y1MuraOo+6D5Ckk/lUC/Ety2f7V0o/9u6/4UfWZfyi9gu57wf2qvhCp+bUdWH10yX/AApP+Grfg/8A9BTVf/BbLXgy+P8AzLp7n+0dMaQgKQ1tGVA9gRxUh8cCQHdc6OT6m0j/AMKPrMv5R+wXc92/4as+EB/5ieq/+C2X/Cj/AIar+EH/AEE9V/8ABZL/AIV4cvjt1xm70cY7C1j/AMKUePSSf9M0of8AbtHx+lL60/5Q+rrue4f8NV/CD/oJar/4LJf8KP8Ahqv4RdtR1Y/9wyWvEv8AhPGVCDqGk59Taxf4VWk8fxq25tV0xfb7PHj9BTWJf8ofV13Pdf8Ahqv4Q99R1YfXTJaX/hqr4Q4z/aWrH/uGS/4V4Q3xAtiCTq+lcjnFsn/xNQJ8RrUp+7vdOnXnGYEX/wBlp/WZfyi9gu577/w1Z8IB11HVh/3DZKX/AIar+D3/AEFdU/8ABbL/AIV8/t8RYsEbdIJ9TGv/AMTUbfEYHpHo3/flT/Sj6zL+UPYLufQf/DVvweH/ADFdU/8ABbL/AIUn/DV3wd/6Cuqf+C2SvnST4huWZt2joDxj7Ih/pTR8QlK4EuiAjubKP/Cj6xL+X+vuD2C/mPo3/hq74PZ/5Cmqf+C2SlH7Vnwf/wCgpqn/AILZf8K+cD8RTnIm0YY7rYp/hTZPiN5qhHvdMjA/uWSD/wBlp/WJfy/19wexX8x9Jf8ADVfwg/6Ceq4/7Bkv+FIf2rfg8OuramP+4bL/AIV80j4iKoKjVbEf9uif4VHL8R2K4F3pj47myjJ/lTVeX8ovYrufTX/DVvwd/wCgrqf/AILZf8KP+GrPg931bVB/3DZf8K+WJviNdBWIawc9gthGP6VnSfEPV3BVDZLnv9lj/qKpVZdifZrufXK/tV/B5/uarqjfTTJT/Snj9qf4Qk4/tTVc+n9mTf4V8s6b42KWam61CximySY0s1AH4gVs6d48W4vjb2t/YzXLIwRRAoYHHUZHUdql15L7I1RT6n2X4C+KPgz4kWV3c+FNUN19jcJPDLE0UseehKNztPr7Gu29DX5zwXfiHwl4vg8ceCrjyNYh/wCPm2/5Z3qfxKyjgk9x+I5r7Y+FfxR0H4oeFE1fSm8i7iwl9YOf3lrJ6H1U9j3reE1NXRlODi7M9CooorQg+e/2rLy9j+G2iaVb39za2ur61BZXq27bWmhYMSmfTIBx3xzxXmGu+JND8LeF/wDhFfCsP9j6Vax7LuSTh+esef4ierMOW6DivS/2q13eDvB//Yy2o/Rq+efiQgWHVVIyDdg4+ik1x4jVpHVR2bPLfFXiibVJvs0RKQKcpF/7O/v6L2rmhLcgZFxJx71HbReZg5wSeSa0nFvaWvnXCby4Iij7ufU+wr0aVCKjqcFStJyKmbxufOmP60mLv/ntL+VQRrOEyJWX2BqULcMoJnfketRz0l0L5KjHAXWf9dID+Ap2++4/fTfpUfkXDDHnOR9aetrMy/69/wA6n2tHqivZ1RSbw8+dNn8KTF3186b8hSfZ5PPCmd/u5zmnfZJCcfaJPzpe1o9g9lV7hi77yy/kKbtus/62T8hUq2MjdZpRSnTpz0eY+9L21EfsapDsuif9bJ+QoCXQOBLJ+lSx2N224hpuGK8e1PGnXuSyvMD35qvbUeovY1iEpdHgyyn8RSCK6B+WWUfjU39l3JBLPL+dNOnXavGqPL+8baOfahV6HYPYVgEN0essmfrSGC4B/wBbKPxqT+ybgpv3TH3zR/Z92SF82f2oWIodgdCsRmGc/K08xHpuqP7I/wDeep2027UEmSYAckntXQeHPh1488YW7XPhnQdT1O2Th7lE2QqfTe2BVxrUXsiJUqq3ZzP2VwMB5R+NH2WTqHk/Ouw1P4T/ABG0iLzrzQLp0Gc/ZZ0nZfqqEmuVW1nJZRcSh1O1lbgqfQg8im6tJatCVKo9mR/ZZM43SZ/3qPsjjghv++qVLS8dN/my4JPehrO4yf3kxx15qfb0ew/YVRv2X5iNrfnSG05ztb86cYLkcGWamGGdWK+fKCBnrT9vS7B7Cr3BrRQeU5pI5JrKdZoWZdpB+U4II7g9iKt2DojSWVwQpmYNHM3Zh/CT6Gp7m1CLhvlcE5UjkV0KnGpDmiYucoTtI9N8K6/H4hjjtppo4tRVdwdvlSYD+L/ZPrXoPwyFrpn7RPhG60Wee2fUZ57W/wDKOyK7UQOwyv8AvKDz3Ga8i+FqKmp6y4AyllIBn3xXqXwybPx48DD/AKf5v/SaSvH5eSrZHqX5qd2fd9FFFdpyHz5+1OM+DvB+f+hntP5PXzv8T5EiS/yeXvCAP+2Zr6H/AGqc/wDCGeEMdf8AhJrT+T184/FWQLaTKUJY3jEkdR+7Ncdb44nTSfuyPDbWRobczIFJT5sMMg804tJdXDXVwwaRugHRR2AFRQ5/s+X/AHP61ftbffCjsOMdK7MRNxhFdzmowUptkaRM2QBnirMVoWijy2MqDgVYRFBIxjK8VPEh8mHj+AV5cqh6UYDY7FPKYsWOPerEdjFsHyDirezbakjnjNTxxjam7pXK6jOlU0ZiW0a6mmUGPIYgY75q0kEYboAT3xU2w/2ogI627/zqaOLgkc8jmplNlxgiEQguo2g46/WpjBukAA5HP0q2IsXHTinwRljI+MZOB9KyczRQMqG22W57/wCkyD+VSxxBo5cDgVZjjZ7TAOALyXnuelPRcRygnH/6qpzEolAQjy1wvYU0wB9T09Og88/+gmr+wrEhxwAM0sQjXVrDK7h5zD/x00c36i5SgI18tlHrSeUAQcYxV+CANGWHNMMZMpYnvjFNSBo7T4XeB9O8Xaxfav4mST/hFNDKi4iQlTqFy3MduCO3G5sduOM19p6b4Q0zU/CtvFqO1rSaACGytD5VtaoRwiIvHAPJPU18UeFdZu9N8IaJptvqU8MN5dXN3Km4eWshk8snHrtUdTxkV7RafFmfSbOXTNHvS1vCmxnc7hnB6D+eK9iKUIpJHjzbnJts5f4n6JpljM0OjyJstp3WK7gwki49GXkYrwTUHu9a1GeO7k83WY1JguSBuudvJikx94kfdY854Oc16D4g8Z3V/qN3eap9lhtI4Hihg02LZvctkSuGPLdq830yK8vtUint1aeUToxaPqp3ZyR2rSK0szOT1uipaDztKtJlA+dWP/jxqTyOG461ZWAQXmrW6jEdvfzxoo6AbulPKcSBvUc/hXlVHyzaPUp+9BMygmc+gpAhLSEjj5R/Or6xHBX61WKkGVuw28fnTUgcShPBHKjqygikgmupoZbWdkdbRN6yH75UnAXPcValHoMZqrAdt1fjHBth/wChivVwFR+05b6HmY2C5Oa2p2Xw0ONS1vn/AJc5D+RWvTvhl/yXnwMR/wA/8v8A6TyV5V8N3ZdW1hQMhrKYHPb7teq/DP8A5Lt4E/6/5f8A0mkrKf8AHfqXD+Cj7xooorqOc+f/ANqLH/CI+DSRkDxTZfyevnX4nYm+2OOM3TsB/wBs2r6L/aiVn8HeD1QZY+KbLGfo9fOnxIAWC6WRiuJmyR6+W1cVf44nVR+FngcA/wCJfKf9j+ta1suLWP6Vlwf8gyX/AHP/AGatm0UGzj9cV0YzSEDLCaykWI1BYH2NW0VZIIAoxiJc/WoIkJOOhA/pV2GI/ZodnP7pc8148metFE+wG3CA9RVpU+4uPlyM0gjO+JAOtTYxNFk+tczZ0JFcRk6qhHQWsjf+PVYiTKsB/dBNKi/8TND0P2N//Qqngj+Vz0HAqJS0LjEVF3OW9ASTT4UG6NSdu9gAacq/I4LZHap4yFltMrg76ybNUjPhQfYAO63s+fzFJszHMCO5q7boTp2/+9e3H8xUbhfLkH4VfNqRy6ELxnaM9AVGKZHbvJq+nqgAzPz7fKauSKdxBHcHNPgULq+n+Ydq+ccn/gJo5tPvFy3KcCgRHsMf0pqRqBEPXJ5q1Eg+zcddv9KgcqqRM5ACgnJ7CmtRPQo266zcu/hnRNFu9VuEu/PtjagsUWUAMjD3IUj3qHX7XxR4Yv5rDX9Dv9IvIQC6M4JUHkHH9RWj4S0jxbrNxq+t6JrkuiWVsDftKN/Kx/cf5Qe44z1Pauf8UeKfEOtahLJ4nv5NXuidxuJWG/OMdsDAx0wMV9FSb5UnufP1EuZtbGJJe3mosApeUFjtC9zWzpPmaVejUWmZVtULytG2N7fwxA98nH6mseNGtpLWe28udbsM5hZio+XjJx0/rVszXV1MDeMgWMny4YhiOPPcDufc1U6ighQpuTHadfTiMtcSl/tUjSyk/wB4nrW2UAUgnJPb+tc7aoPsEPc7SP1NdOEMcQ+UswUAjPtXj1n7zZ69Fe6kVApJfnGAce1VAMi4HTGz+taDJtkOf7pqqY+Zx7Rn+dSmU0UJAd3P51VhP+mXwA622P8Ax8VflGdxYcYNZ8Rxe3oz/wAuv/s4r1cB/FR5eO/hM6b4eMV1PWyoz/okg/MrXq/wyx/wvbwGP+n6X/0nkryL4fTmPWtSUYPmxtGc+hBP9K9d+Gf/ACXfwCP+n2b/ANJpKc/479SIfwV6H3jRRRXUYHgn7ThA8J+Dcn/marL+T184/FH/AI9L0/8ATyf/AEA19H/tNY/4RfwXnn/iq7L/ANBkr51+KYzZX3bFz0z/ALBrgr/xInXR+CR4DCMaVMf9j/2aty0H+iRfQVj2mDpsxbkCJv51tWgH2OLAySBXVj1aEPQxwWs5lyPEcjd/lP8AKtC3Ae0gx2iXNVI03yFWGMqf5VdtFItLcKc5jUn3rwpvQ9qC1LqgCaEHvmpNhN1HgZAzRGT9pGMYA7+9TFGN2CTxt5x2rludKRCFUasoJ6WT/nvqxaqdjArkHtmnG3J1m3VTndZyE/8AfVTW4wHVv4alvQqKIlVQpbsef6VIRmW3P92QcU6UKi7Q3AUAH8c1NCMMmcDJA5+tQ31KsU7Ug6djPP224/mKlhjHlSFl53GizjX+yoyG3N9tuc/99CpeBE+0kkkkmqk9WJLREXJkkz2wM1HKjnUNPihYb2uBgt0HByaljTl2LZU46+tKrRx61pPmOEVrkrz2+Rqa3/rsS9iOBFZdhY421g68P9Eh05ruO3e7fYZZDxHGPvMcc47V0ForGTHQHiq/hNPBOv8Aj0v4u1a3s7LzhAhmkKKkS/ebI7nnHuRXVhot1L9jmxEkoW7mn4g0d/CfgCwj0Xx9cXT6rEtzNYwsrW6xLxFvIOQ2cnb2FeSee91qAiugFY53HP4k11njn/hHrzW7m+8NafHots7ExW9tMXVFHC5JJyT1J9TXFxKkyi3lDmd5AqkHgL/FXtwta7PGkm3Y2NPtIEgScg+ZKuck9AeQP61ajhO75hg5p8K71bbgKvb09K3tFsopZ1nmIIDhVU9Ca8irVd3Jnq06eiijE0uweW2t5GUrCpJJP8XzHgVu3EYBbDY+nep7JB/YGnA94n/9Daorlj5swPIUL+HtXPKblN/11OmMVGKKjx4U4HUEc1UIAebbz8sX9avv88R2nAGcn86qqu5bhtvKiLj86pMlozbhCDn14NZMQ/4mN8P+nT/2YVuyjJcMORWRGANR1AH/AJ8j/wChivYy53rI8nMFakzc+HluJ9b1PJwI4Xk/Lj+teu/DQ4+P/gJMcG7mYf8AgPJXkfw9mEOq6uWBIe2kQc9CSvNeufDnj9oD4ejv9qnH/ku9a1P479TKH8Feh94UUUV0nOeB/tPEr4T8GMByPFVkf/HZK+dvimCbK8cnrc/+yGvor9p7/kUvBn/Y1WX/AKDJXzZ8S/NEWpB3JAu+hPT5K4a6/eROul8EjxKzTOkzk/8APM4/76rbswRbRMOmAKy7Nc6HctnpCf8A0KtW0wLKInrtBrqzH4KfoYYB+/Mvo22YqOu3r6cGtC32i3tgD/yyUVnp8zBkHUYH5VpWSBba0bG4+UpIzXz09j3obl5FAkLfSp1CLcYY4GOtIAuCxJwcAU9F3zMMnjqe1cjZ1JD42P8AbiBP4bKUD/vqiADdgA/Pn8KbCCviWFQeDZzfzFPgQ7wSxwQelD2+QkLPH8qIeSWAqeIAzKv+0Ofxpsu12hBJ+91qG5e68+zsbGZILy/uFtYppOVhzyzn/dGTRCLqNQW7CclBOT2Q60heHS5DIVU/2jdLgsAeqnpmnDIgmJ+Xbzz3rvtT0L4TaJ8IW1fTbe31HXZ3byv7Wj+03F3g4aVgCPKVsEjHbHWvHtEvZf7WudNt9NvZIrxBPa2UKNPIhzyF77O/PSvRq4CSTknd9jz6WNjJqLVkb6ybpD8vDICR7ikMHmazpBxn/Ssc/wC4a1I/Dvixx9oh8J3OwDGJry3jf8VL5FWLnQPFmmXmmXWqeBtftYY5vtBkS289TGFOSDGT2Nc31estVE6HXpPTmOZ1md9P0N/KfbPcHyIj6E9T+ArU0LxH4M0H4earp0dpcRavqGy2Bns0MRt1ILvvcEszkYwMYFY2mW2h+NfFdvpWseJJdBkmuPstujwDZCh6vIWIwx/D60eP9R1ZbmPTLbxW/ifStMjNpareW6wypGvGFCnBHHHfFenhsO6cFzbs86vXU5+7sjh9TFvJeySWCLGCSdkX3fwFOsITNN5/l7BEnl9c7nPLH8sCsZJ8tLcJL9neM5RO5bPQV19pAIbdIc5YLlie7Hk/rWuInyQt3M8PHnlfsFuoBcEZOa6zT4GhtxGQNykMfY1i6famXUAFHAIY+wFdGjNHcypn0YV4laV9EexSjbUzYF2eH9OOf4ZBn/to1MnQlZWxjdg9fSrcClvDmmHGTtb9ZWpJ4y0Eig9FzUJ6v1f5l20M9lAh4IXPr+NVIz8l0P8ArkD+tXp8G0kIHAHGfbj/ABqqi/Jfccgw4/EkVqtiGZzbts7epwDWMmf7Rv8A/rzP/oYrdZSoZW65OayERRqGo4Of9CPX/fFezlutdHj5lpRZreAFD6rqgb7vkNn/AL6Ar1j4bAr+0H8Pw2ci8nH1/wBHkry34eoz6nrITnFpIf8Ax4V6r8OyX+P3w8J+99smz/4DyV0Tf79+phD+Cj7zoooroMDwT9p3/kUfBuf+hrsf/QZK+dPifhv7Qz0+0/8AtM19E/tQHHg/wafTxXY/+gyV85/E/Kx37Z4Nxnr/ANMzXDX/AIkTrpfAzxa03DQrgAfKbc5P/Aq17dcW0P8AugfpWbYENoF2vpbf+zVq2gHlwhj1UfyrqzP4KfoYZf8AHP1LFsDkKeMHmtS0O3T4GB+byBVOCItISB94k8/Sr1i4Ol2AABLW6nn3r5yo9D34I0Yz+6HzccZqa3zukPpjrUMWcqpOKnjJF1MeoLAfpXKzqQ1BjxDa7gRm0n4/EVMGBlIQYRVwKhSVz4gjVj8qWUxQemSM1NEGG4nqwyD60m9vT/MEKcgx87hu5HpWVron8iC+iieY2Nz5zxxn5jGQVbHuAc1qlSiDjpg0+MtFICeA0nHvV06jpyU10JqU1OLi+p5pdPq0k4e0na6hcfu7hW4K9s88Y7g07TfFmv6XcanFp15AVuNguGaIOZAnQAnnbnsDg10EXhfR7+xe7ngkWd72eItHJtDKDxkVefw7pl1pq2UKCza3JMMsY+ZD3z/eB7ivbePpx0aZ4ywFR6pox7X4ia7p5F2NO0G9SMgkT6ejA/UZr0PTP2g2k8VweI/EOi31veDy90ujXxjTYowEEL5AXH8IIzXk2paJLaXX2e8CQSScRyqcwzfQ/wAJ9jVKE3b2q2kdvEVhypdl3H8a7ouM480dUcUlKEuWW59meIPih8E/iZ4ekkTStF1TWSh2WWtRfY584PypKByc+j18/eNPh9odnbWt3Z6nP4dvLpN39nXzNNEjY5USAblAzjkEe9eYXW2F/s95AIHXjco+U/UHkGr9t4m1O1t1s5Lj7ZZD7sFyS6Af7J6r+Bp2d7k3WxSv9PvdHe3e9tiLszgwyqyyQTJ7MDgkH+ddIG/ecnFVor60ldzZEKsgzJp92A6P/uno36NTEMUgafS1kMcYPmWMhLSRAdTGTy6+qn5h71zYik6iTXQ6cPVUG0+p0+jqNlzOWI5CAevc/wBK112vdt/eCgZ96r6XEjaNayW8iSJKu/ehyMnr/hVqJFWZl7g5NfNyleTPoIq0UQWQA8PaVk9Yn/RzUc/y+aFHbB5qOxlx4d0x/SOQf+RDUk6ttuHH3SoINO1pP1f5hf3UULlcQnPAIxj/AD9KijYhNQBHIEPPpyatXCE24PUkZ/SqiuD9vEZyD5Wc/jWqd1/XdGbWpSmICuv4k1kAA6lf8YzY/wDs4rXcq2/BzlTWTEd2qago5xY/+zrXtZX/AB0ePmf8Bmz8O939ra2qnANpJn/vpa9S+HAH/C+/h8R2vZh/5LvXmPw1wdT14kHixkP/AI8K9S+Gw/4vv4B9RfTf+k8ldE/479Tnh/BXofd1FFFdRzngP7UWB4L8IE9vFVj/AOgyV84/E4loL9s5H2jH/kM19GftSf8AIl+Dz/1NNl/6DJXzr8UcmK/IQpGkoH++xU5P5YFcNf8AiROul8EjxvT8f2Jdf9ep/wDQq1rdT5cDf7I/lWPpx/4kl3j/AJ9T/wChVsW7lYYAehUY/KunM/gp+hhl3x1PU04fmbYeg5zn2NXbKIDStNBPzG3jqja5acdg3H6Vo6cWk06yym0rEq4znIHGa+bnov68z6GG/wDXkX4+rnqV4zTsFp5dhyVkH8qWJSocYPXvT0Xa0xHXcrE/hXMdBAsqJ4gBl4H2KXGPXdVtiiwgg8+X0quRbv4ijWRct9il8vno2RU0mfJwwydoxQ+gl1HqAEBY9ufekUbngG7awfOD6elKuCww2MDOfWiPb9tHqMY/OpKG6fCRpOMZA1C4OfyqhqiXCxIYd3zMchfWtSxZv7HjUdPt1yT+YoZtskWR0bOPanzNTbE43jY4u+1DybeWynIupHU/6KFMjE9sgdPrXZfCTxH4H8J65psnjb7TaxQq9xJ9ps3Ieb+FPccda46XVfEvh/Wb7TNJt4pEadrokWwd5Vbn5m6lR0x0FdxN+0Fqt14En8HeIPDFpbLO4LXtrCN2wHJXY4IwenBGK+nw1NRhdddT5zEVHKdn00OL+IGvWnifXL/X0hRZNQnknwpHG48D8FAz71wOxre3LSn9w5IC9yfVfSt7WI9KurhZtHaOJZj/AAHEZPuD901SMVzeTvJvFtJbgQCJlztAHOfqa6XJRV2c8YuTsihDvlhAYblzgH1/wrVt7uWBka4ZxsPyXMf+sjx0z6ikW3vUjZpLW2mUdSpKmriabfXEnlQ6UWccHM3yj61n7amvtIv2U3pZnUeH5b++1+x0zQIYJNS1V9jwM4S2du02f4O+RXSeOfD/AIo+HmuLZ6pqejatfhQ9xp9kJFeFTyMMwAY49M15r4X1a+8Ia22vLDGZra48sIwysMincuR6ZGR9K6Dxl4/174l63Zz6vMLm+jxGkoRUKJuLc7ccDJ5rKeHpTbk43bNY16sEoqVki/prRzeGdHkRsxsshB/7atxV4N52m5LHJRuD261jeG4JDok0wYm2kv5Tb+gTIzj2z/Ktd3K2Ei/dOGGfxNfPVo8tSUV3Peovmpxk+xHI2YvmHPljgewrNQANfc4LCI/XrWkSVC7hn93/AEqtHGp+2sQCQkIHtndUxdky2tUZMhwkp28dBis2DjVtQyMbtP8A/ai1pOcW6spzlsGs9CP7Uvf+vE/+jFr3cq/jo8XM/wCAzZ+HeV1HXwpxutChPplwf6V6n8Nwf+F8+Ave9mx/4DyV5L4DR213VHUnZDHvdQeGXaRj8yDXqXwyG79oLwAxdiRdT8Z4/wCPd+a6Ki/fv1OWm/3K9D71ooorqMDwH9qL/kSfCP8A2NVj/KSvnX4qSsYNQjbp9pGPb92a+i/2oefBXhH/ALGqx/lJXzl8VopFF7IcCNrgd+/lmuKv/EidVL4JHjWmDGhXZP8Az7H/ANCrUhBMcDA9AP6VnaZzod0PS0b+Zq/ak4iJJAMYA9zXVmfwU/RmGX/HU9TXt8KsQB+YDOfc1q2SqujWZU/MsY3e3NY8CsZ41DBcEA5+ladi+3SoD1DxjP518zUWh9FT3NWLY8LnO4BgfxqeMjzJsjKZA+tU7fIgYKCR3qaDLxOD1J6Vys6exSMcieL4I2ywS2kZWz1Q/wBc1pMQUADD7ozx0PpVRiH8W25V8g2EoJ/GpSwEJU9h1qpPb0/zJit/UlQfMmemCKlhIF22V+8Bjn3qtE+8pjJOcfWpB5n2uAqQFyQ+e47Vmy0PsnI0yIM2B9uuP5ipJ1SObfLIFjjBZ3J4CgZJ/Kq1ixOkQ4GSL25z+YrX0TQJfGfjLRfBkW4pqUu+8df+WVnGd0rH6gbfxrSnSdSryLqzKpUUKfO+h6Z8NPAS3fgI6zqds51XxfIJEQjBttPQ4jT23nk+oIrxX4xtp158T7zQtBhjj0zw9GLIFAMPOeZWHvnj/gNfaPjLWrTwH8O9b8XzRx262FpttLfgBTjZDEB9cV8HwWtwtmJrp2lvbkm5uHPVpHOST7819ZCKirI+ZlJyd2cZcWa6ZdwyTvst5yyuFGencDvWtZ5vLu4vRG8cTqiR+Z95gq43H61s63prweJDYyoM6XaokgPI86Qb2/IED8KZbLu2nHBHf0rhxde16aOzC0b2myjcqUtJj04GPzrRt724tJ3aJx8x+ZWGQ1QX8LSWUixDLEZ5+tSXOn3ttcSrJEX2nBePkV5zalHX+tj0FdO6DUNMg1a6e9sbpbO7mGJoZhujm9CfepNN8L34cxXd1aWdq/Eos1/eSD0yegqAxsYgCSCfwNSyahf+THB5uFUbdw+8R6Zq1WrKPJCRDpUpS5pROk0uWGTwrpkcO0CFGQqOow7UyVG+ysrnop6fWuX0uYx2EEiMVcBvmHX7xrqILhrnSzKwAc5U46ZzXDUg4zb8zuhJSil5CTKQXYc7V6fhVaNoy14N4DFIcLn2arl2Qnmru28AZ+prM2/6ReqADtjiJ9uTRHVP+uwSdmincJtgQYwC2azAM6rf9v8AQB/6MWta7H3VHIDHPPSs3GNTvu/+gD/0Yte3lX8ePzPGzT+A/kanw5BbWfEK+to36NXpHwyYr+0J4BRhhhdzAj/t3krz34aqG1vxDnp9jcn8xXoPw2GP2jPASg5AupyCf+uEldU/94fqckP4C9D75ooorqMDwP8Aag/5EzwgP+pqsf5SV84fFSQvHfIei3ec/wDbI8V9H/tPgnwd4PA/6Gqx/lJXzd8UhhNQ/wCvoZP/AGzNcNf+JE66XwSPIdLP/Ejuv+vR/wCdaNufkgHX5VP6VmaW2NEuwP8An1cfrWrZj5I2HP7ofyrqzT+HS9GYZd8dT1RoW4Zr5AB/EOPwrTtQF0m0jI/5YnJ+jGqcKFb3cvPzD+VXLDDWtszsSBGR+pr5qex9DDctWkhaDLdgcVahYlFfdhjwfeqdko+zJuzhgT+tWrdv3THHANc0up0LoMkUr4og2nk2U38xT5FUQMS2cgVF5yDxVakgkfY5V6+4p0u6QYHZcY96e9vT/MF1J4iPNTA24fGPTipoyfPXcOdwqBZN0QYDOJVOfwqWPmZ2B5Djms2VcbpyFdNB3ctfXGAfqK9y+AWn/ZNN174gtah59WlGnaWrnGbeI/O30aT88V8/wC+vtIg0vTEaTUdS1OawtVXk75GAJ/AZNfYultovgnQCszrHovhLTwpf+FvLXk/8CfJ+pr2sBStKVV+n+Z5GOq+7GmvU8i/aQ8TvrXi7w98OllzFYJ/amrIh+XzCP3cZ+gyce4ry7TvsS6hc6zqXGn6ZG15OAcbgv3EHuzbVH1rHt9Rv9f1LVvFupsx1DxBcvcMWPKRZ+UfTGB9BT/ENzDa2Wk+GST5t+41K+A7RqCIIj9Tucj/dr1pzUYuT6Hlwi5NRXUwUmuJ7W4vb3/j9vJZLqc/7bnOPwHFJAFEac5bb+VRCQyxSszYJJ5NWrZfkUE9gK+dnJtuT6s9+EUkoroWXsrhtDvbmJcsYyiDPU5Ga2bgMblyw8tixBXOcHA4zUt2nkaFNEOPLiAx6HIJpNTXy7iYEEkODx9RXHzuX9eh1cnKPmt7WZts8CPtbaD0I49awNT0uS3m8yJC0J6dyv1rduGw5YHjzc/Wo5GJlV89Tg+9KEnHUcoqS1OMsIpJbC3hgXc+Gz7fMetdbDCtvpKwF+hwT696g0uMDw9pxVFUursxHVvnbFWZDhJuM856+1a1anNJrz/UilDlin5EN05khfA5YHrVKErnUGHV0iz+tWSRJGgztBz1/GqMRyb32SIfzojs/66oHuiObl5QOT978azNy/wBoakCSP9BGD6fvBV51cRCTd14zWYhzf6p6f2cP/Rq17eUr/aEeNmn8Bm38MnVdV8RtJ90WEvT616P8NVYftFeAHx8puJ+fX9xJXnHwzXOp+I+M/wCgyZ/MV6f8OCh+PHw+VWGVvbjjv/x7yV1T/wB4fqc0P4C9D7uooorqOY8F/acZV8H+DmYgAeKrE8/7slfNfxPbfb6iQchrwHP/AGzNfSP7UC7vCHg0Hp/wlVl/6DJXzX8TDmC+UcAXJ/8AQDXDX/iROuj8EjyHS/8AkD3I/wCnZv51p2h/0WIqcfuxz+FZel/8gq6x2tX/AJ1p6dg2YJPPljj8K680/h0/Q58u/iVDZRzuBLYOR/KrenB1sbfIOSpOD9eKpxEeYpb1WrdpcFrG1LEligGfxNfMT2Poobly1kZIIywwyggiprWQtbOpYAkk/U1CrDcijk7s/pSwYFo+fvFj/Oud6nQiBd/9v2xx0tZf5itBFwoc55B/EYqiWb+3bUxn/l2m3fTIqwkjLFjd2qpdPT/MlW1JLWTfZgj5QccVLbsftkqH7pKms61dlgZR82GxVp7hLRZruU/JEm9vfHapcXeyHfTU9D/Z80RtU8bal4kmizZ+FxOYCejXk5wv4qgJrsPjhqTw+DNG8CW7n7T4muftV4wPKWcJyc/7zV2Pwh8MTeHfAGmaHcwiDUr7/iaakc/dlm5VSf8AYjx9M14L4y8SweLPiN4i8RWe4WhkGmWLE5BtoflLD03Nk8V9XTgoRUUfM1Z88nIz7G3s7i+d5f8AR9NtommlP/PK3jGT+YGPqa4fULi4v9WttcvYfKutTnkuCn/POPbtij+ioAK6LW5JF0m00GNtkmskXV4e6WkbfIh/33Gf+A1zerXLXGs2x6LExUD0+X/61cOLq6qkvNv7tDswlPR1H8iBseQ64yS3atTSgJbuFSuQp3N9BWNExaBgB3710OjQtGiTk/fbH1AB/rXl1NIs9SGsjT1KZvsF6rgZ8s4/Op9Q3f2hJlstuGfyFU9U2+Rc5yF8tRVjVHVb+4I5zKMfpXGlorf1sdN9X/XchvGCKmehkUfrSScmJj0RiaddDOG/2wajBV3CH16VS2ExlkQPDWm5OPkfH/fbUScifJ24XPNRWZDaFppx91ZBz/vtT7vDu4XhQCP0pte8/V/mJP3URxkFVHUgE8VThB3ahnk7If61LC5xJhsER9ar2zlmvhuxkRZP51olv/XVEN6ogmOYXBBwjHFZa7vt+pjp/oA/9GrWlO21nXqG6is6Bd+oamc9NOB/8irXuZUv9oR42aO9B/I1fh08kd/4iKPs3WoQn2L9K9K+GZz+0J4Eb/p+mH/kCSvMfARzfeIIj0aBDn/gdepfDRQPj74EPf7fN/6TyV0T/wB4fqc0P4C9D71ooorqOc8F/ac/5E/wef8Aqa7H/wBBkr5r+Ja/uL8ntdH/ANANfSX7T/8AyJfhDt/xVVj/AOgyV82/E/5bO9Uc/wClf+yGuGv/ABInXS+CR43prKuk3eeB9lYfrWpYkC0jzz8mP0rIsjnSLn2tz/6FWlYnEMOTwR/SurMtadP0OfL9KlQ2I2JeIN1+U1PaMy2lkMgkqM/mapI/zxE5+6KmtX22lmxOSUB/U189Jaf15nvReptxl1mJ4w1NtJkMbDr8zA/nUAkLNHjue9MjbYEA43Zb8c1zW0Om+pKuTrkWMlVtpv5ipo2DPz90LwKox3B/tiMk4/0WXAHuafDMd65PzNkVTi7L0/zITVywwCPKi/KDhgK3fCmhnxd8QdG8ONIY7SWX7ZfSD/lnawfO/wCZAArmJXP2lAM5I28969s+BujhNI1rxTPGfM1i4XS7M9/s0R3Skf7z4HvXZhKfNUUn01OXFVOWm0uuh6P8SfE83hz4X65q0Mvk6rrB+w2QH3vNm44/3Y+T6V84afY2kKxWbs0en2UW6eRf4IUGXf69fxNd/wDGPXhrHxGj0SFw1n4XiKOQfla+lGW/74TA/GvM9duPI0W30RDtuNZYTXB7pZoeB7b3H5CvbbUVdnipOTsjPe9a8uNQ8QzqY2vnzFG3WKAcRJ7fLjPvWBK2bu07lpT/AOgmtDVbr90kQH3myQOwHSsxf+Pm2Y9pP6GvBTc5OpLrc9yyjFQj0JYcsNg6k4rrlURQRIp2+WOPriuZ0mIyXg+XcifMx9K6F5BsbccbR+fFc9XWVjopaK5HrMrNYS7eSyAfrU11KftkhbnDg1R1Bj9hJPB2px+Iqa5f/SJy3XPb61HLov67FX1f9dyxPMdpxzt61HG+2aJx/ETUMr5SU+4pocfum6YZv5UuXQq+otg5fR7JV/gEhP8A32ammfbPJx0JB/75qDTmP9hacThSUf8A9DNQXU2LmU+rH+VO15tev5k3tFBbsCjs3Qxmq0LD/TfUiL+ZqYHbC2wYAjIqlHIP9KAP8MX9a1S3M29hjuXeTnbngGq9qUW/1Lfwv9nAH2/erT3YllGM5PNQQnN3qmef9A/9qCvZyz/eEeRmT/cM0PA3Op69uYqjQIGI6/6wV6n8M95+PngMt/z/AM3/AKTyV5R4KZ11fU0XBMnlrz9Sf6V638L1z8dfAbHg/b58j/t3krep/vD9TCn/AAF6H3pRRRXSYHgf7UH/ACJPhL/sarH/ANBkr5t+KGPsN0Qc5u8n/vg19I/tQn/ih/Cf/Y02P/oMlfNPxPWRbG7U5B+05P8A3ya4a/8AEiddL+HI8asjjSbnJ/5Yn/0Kr9q4FtDzzxWdZDOlXP8A1xP/AKFVqzb/AEaImuzHL93TObBu05mtFId0WDjA61Nbt/o9pg9Ixgfiaz45ADy3FS2s2+1tQOyf1rw5Q0PajJG2ZgI9x6hscVI7jZDjtkZrKWTdaMc5+fIqRrg+VknkGudwN+cnjP8AxMYiTz9ncfrUivnaw6A1neds1FApyPIcfrUqykRbS3WqcSOYtXIuppI4LNDJe3Ei28CjqZHO1R+ua+ubKKw+Hfg2SV18yw8HaYOP+es45x7lpW/IV4F8G9Mj1T4iPrlyrPbeHLf7WuOhuX+SEH6ctXffGPXHttP8P+B4pN0l239uaoO5QHEEbfVstXrYWnyU7vqeZiqnNOy6HmltFJOTJqs5M8zSX+pT/wC2x3yn8B8orl7rUf7Y1e+18QG3W9YC3gJz5MCjEafkMn3NbGuX5tfDH2EH/TddJDN3jtEb5z/wNvlHqAa5d59iZ4AUcAelZ4uenIupWFhrzvoQXche9KDkKNvP61Xkk2TQrnIDk5/CqhmZnLN1PNMkdnmt1Xqz4Fc8YdDplM6nSGCafK5PzSHOPYdK0Gl+aYY645/CsiORYbUwx/wLjPqf85qZJ9wk5/u/yrilG7bOyMtEiS/mH2N9xz93H/fQq3e8Xlxg4w3A/GsW/f8A0WZs8cfzq9eTH7TKzHLFs0ctkv67CUtX/Xcsuw2vgYBIzTZsgo2eA1U/OO8oTkEZ/GnTz/NEd3G7+lTyj5iayl/4kVgrcgrJgf8AAjUVw2ZnHXAzVC3uj/Y+njdyquAP+BE1K0oLSnvt/rWjhaTfr+ZKleKLTOPsrhgQNn41nxsVkue4Kx9Pqamef906scsQRmqEUwRriPOfkTP61UI6MiUtUTEneCD93JNQ2zbrvVMcf6B/7UWm+b8ruT1U0yxffcarz/y5Af8AkRa9bLo/v0eXmD/cs1vA8by69qIVcohR3PoADz+eK9g+F4x8dfAv/X9P/wCk8leT/D1iupeIGAJxaZx/wKvW/hhj/heHgbv/AKbMf/JeStKv8d+pnSX7leh91UUUV0mB4H+1CP8AihfCn/Y1WP8AKSvm74oyNNBeqcfJc8H28s19H/tR/wDIjeFD6eKbH+UlfMnxKPmW93z/AMvRP/jhrirr95E6qT9yR5BZH/iT3P8A1w/9mpYUiECfPLnHtim2WP7Juf8Argf/AEKmwEGBOecV3Yz4IehyYX45mnb2tm6b7ma6C9vLA5/GrKWmkKUCyagEHoVqnBtEfOc1bjGeRtH+9XiSb7nsRt2LaW2igbEudRx9VpjWulGTb5+pAdeStV3dUyZCiqP4jwBQBeTWj3Vpp9xc26dZgNqD6Mev4VnaW9zS62sXYLLRGfe9xqSsBgH5aJbTRlDMbvVNigk4CjgCo9Ps7m5w9xqEFoD/AMs4cO/4k8Cty08Hxa5rGkaDazXk15ql7FbKzy8BScuSo7bQalO9RQ5tWN6Qc+XRH0H8GPCsGkfDXTBe5gOrF9a1GZ+qW6g7AfogJ+rV5Jq2qTeOPG+q+JrgG1h1OUyIDwLWyiGEHthBn6tXs3xZ12HQvh62jaawjn8RSjS7XbwY7CAASP8ARtoWvANZlMGgw6Yh8u41n95LjjyrJDwPbew/ECvbclFXex46i5Sst2cZqet2et61dancC+jViIraKFOI4F4Rfy5PuTVWZI5Nq21vqhB+9vTr9K6INIXCRyZ7BU7e1OfUBAChkm8xTygP9a8WeIcpXS/H/gHsQw6jGzf4HJ/YZ2bC2Oon/gFWLS2sQ7HUYNXUqfk8pV4PvmtS51C4nJ/eFE9Ax/U1n7jnIbr7mtVUnJa6EOnFPQuM+hqvXXVHvGhqP7VoC8m81hB33Qio4o5pGKxKzn27VbTTJiAZi2P7q81m3FfEylGT2Q3zvCsyFJtWvip6hwFzVtf7BuCfKvr6X3DpUvlHCgwjC8AOgb+lRPbQSZE2nWjj18oAn8qxc4vq/wAP8kbcj8hfs+j7tzT6nxxkMtIYNHlfaJtSYdfvCqh06w3nyFmgPQiGUj9DQbG/jJa2vN4/uXKY/wDHhVafzf1+IrNdCV7PRYcRRtqShRwNy8ULFpLEKJNSbnkllqCT7XFD5t7ZSxxjrKg3oPxHT8aRZojHvieMjs3Wq95rci6T2LMkOjEkB9RyPVlqi9vpgYsPtwJ4J3rUm/fzuB98VFIEOQzj8BimrrqxOz6Fd47LJAlvMf8AAadpqxpPqiwmRlNmOZOv+sWo5AoOVbmnaYcT6r/15/8AtRa9fL/4yPJx/wDCZ0/w6bbqniDjObJh/wCPCvVfhaf+L5eBvT7bN/6TyV5N8PSf7V1sDn/RXz/30K9X+F5P/C8vAw/6fpf/AEnkqav8d+o6f8Feh930UUV1GB4F+1EAfA3hTPT/AISmx/lJXzP8TQoiuynT7Sf/AEWa+l/2pP8AkQvCxA5Hiixx+UlfMvxMBNhcN0Juec9vkNcVf44nTS+CR47aEf2Rcf8AXAj9aqwTqIwOeB6VLbE/2XMB/wA8j/OrNtbkxqT8ox1Nd2LklCF+xy4WLc5W7ix3UQQAk5+la2i2V/r2pLp+lQedMVLu7nZHCg6u7HhVHrVSOADhRj3Nd5oVp5PgOwnsL50OpSSTXuyIN86NtSMk9Qo5x0ySa8OvVjCPMj2aNOU5ctxqaJpWmkxweVq150a7njyin0ijPAH+03J9KZJBcTsokJk2D5VPOz6KOB+Aq7BAVUrNcySj1faoH5VaCQBkkEihkIZWDgMpHoRXkyqu927nqRpq1loZCWryMN9uJMesNeo/BLw8978SrrUFi2nSdPKRFhwtxctsU89wgY159eSNd3klxI/mTTNuZzJjJ/DpXpfgTUT4W+AniLxlZZa/1vVXsdNjHzNI4XyI8euMu1ejgIudTm7HBjpKFPl7nNfETXbbxR8RdQvhN5egaQn2C1fslrCf3kg93fOPXivM5tftby8utZumVZrsgR24Ut5MK8Rx/gOT7mn+KdVtdOt08NwOk/kur38gOVd1+7CD3APLepNcr9vmv52mklDluuOAPoK9HEpzXL06/wCRwYZ8j5+vQvXmvyzAwwxG3jPXYMM341Uhu484YSL/ALwq7a6Zd3v/AB7wtKvQkfdH1NbMXhkW7Az2zzt7J8o/xrgdSjTXKdyp1ZvmMm3UXOfLKDsWkcKB+dbFtotoygy3STN/djcbf/r1eTTLdU2Np8AX3gB/nUi6dYplvslqmPWID+Vck69/hdjqhQt8WpEtpCo8tGUD0VhintYOoBVW29yWHFK2m6c4x9it3z6Lj+RqNtB010KtpyYPX53/AJZrHmj1f4f8E15X0X9fcV2mtod/+mxDbwcSg4PpUSyzTAvBazzr0DlQin8TV5NL0qEBI7KKPt8q/wAzSGwsQSBGVHtIwFaKUCXGRUaxupFPmmFCe0YLEfjUP2JVYIzuxA6M/JrQe0sQAjTzoTzhZyDio5LDSJQA8Tye7z5P501O27/AThfb8yOKJ4mPltJGT1wxAP17Gqd3pVjM7SiT7BOf+W0ZG0n/AGl7/hV42tmFEaRKVXoGlJ/rUq2kLL8trCfwBoU+V3TBw5lZo5GeWWxna2vgFmAyGU5WRT0ZT6GoG1GP1Yj/AHTWx4sjWI6ZLOgiuN5AQdou365rMMQcnYQwHXvXoU3GUFNrc86opRm4p7FRrpGJJVv++as6SyySaowzj7H/AO1Fpxg2g8cfy/8ArU7T1Ec2qD/py/8Aai16mAadZWPNxyapO50Xw+Yx6nru0ZJtWAH416z8L+fjl4Ez1+2TZ/C3kryLwI+zWNa9Ps5/nXq/wpLH46eBNx5+1zf+k8lRU/jv1Kp/wV6H3nRRRXSYHgf7UH/IjeFP+xqsP5SV8y/FJtyXnbN3n/xw19NftQ/8iN4U/wCxpsf5SV8ufE5jtuAOc3Rz7fIa4638SJ1UvgkePW5xpsv/AFyP862rSICJDjkqOaxIBnTJf+uR/nXRWu7y4Y4lDyMoOCcKo/vMewrbMH7kLdjPBL3pikKg3OcL3Pr7Vs+ENeisNKg0rVoJrnRp5POkjgbbLE/TzIz644Kngj3qu8McYVlHmOB99h1+g/hHp3rGsZDHAkbLkxs0bj0Oa8eynBp/1uesvcmmewXWk6NPapdeGrODWbTGZJYi0kkfs8ZO5T+FZy2Ec6FF0ZAB1zbgY/GuDsb+7stRS6sLiW2uk+7JC+xvwPf6Gujt/F2o3Ooyza9HFr8DKEa3uWaAx47qY+h+oINcDw8ls/6/r0O2NZPdFq8t9PgtLl1tLJmhid2ULuIwpOOKl8aeL28N+B/BXg7S5Ua90/TBPmL5vImuAWeQ4/5abSFHoOetasN58Pr6xZJLjUfDshUgpPbLdwH23x4b8xWZY+H9D/tW9t/D8+kXEdqsZe+NwLdZGcZCoJsMSO/FdOFruhGV4tnNiaCrSjZ2PMrDw/qN3CrNAY9xzvmPX8Otb9j4Ts4ZcXTyTueygIK9K/4RHxSS0iaVKLfHyyW0Yn3fipIqu2j3kBIuP7QRu+6EJ/MVhVx1SV9bG9LB01bqc3H4b0wJxBgD+HzXAH4A0x9F08Di3lAB/huJB/Wtzy4Y3wLm6yOu11Of0pWljJOy1kbHeSVRXKq0/wCZ/edTpQ7GRDpaoQ1tNeQY/wCmxcH8Gq/svEbMF9Mqd1nhWQfpipvtC+VtaGOJs8BZA1I0pYbsrjr8oAz/AI1LnJvUajFbEbJekZ+1x+p22oGf1qpPBfO5ePUnjDDGDCp/KrnmyF8COMDrmSQD9BTfs9/MWjSe3g3Hg26Ev+ZHH5U07b2BpdDN+zamvDaopOf+WlmCf504h1UrJNFM3cmLYa0103UZ4zJHHc3gDFDIrB+R1B9D7UHRdXiUPPALdfW4nSIY/E03UXVr8CVCxlqyK+93ijVVOWPQD+Zq4IZZIRcCFJoSMiSNQwx74GR+IqK6udHs5MXniKwRh/DbMbhx7fIMfrXOaj4k0VDI+lWd2150S9eTyCh9Qq5J/wCBVrCnOpsn/XrYznUjDdo3vsf2yXZb2kc7+ghB/l0rI1C50HRbhvtljaahcrkfZYSyhW7b2BwB7DmsbVPFut6szLJdtbQMAGgtv3atxyWxySe/aufIUjgcdgBXfRwsl/EfyX+Zw1cSn8C+8nvrya+kFxdNvkeVT7KOwHoAOBVm2ZUnDNkA8HHUVmTtzFFjDlgcegFWkdmZVIyScDHeu+UfdSRxRleV2bkiBvnjOR2I71Sh+S71DAwGsxx/20WtAxN5XmKMFF/eKP4l/vj3HcfjVEgrd3u7/n0U5Hf94K0y1/v0Z5gv3LNHwcXXVdYKgEmML+ZzXsHwqx/wvXwL/wBfkw/8l5K8d8HsF1rUgTwdoz+devfCon/he3gMet7N/wCk8lbVf4z9TCn/AAV6H3vRRRXQYngf7UOD4G8Kf9jTY/ykr5c+JSAG6I/5+j/6Aa+ov2oRnwP4T/7Gmx/9Bkr5f+I6MPtYc5YXGfzRq463xo6aXwM8dg/5Bcv/AFyP866ewRVgjVFxkBjnucdTXMQ8aVKc/wDLP+tdRZEmCEYJ4GBjj8u5q8x+CHoLAfFMuNllwDnPf1+lYWoWtxZ3BuoACzD54z/EPf0NdCCo3DOWHAI5APv6n2qhcrIUAUB2fkZ5H+8fb+deRTm0z1ZxujLtr+2uWVM+XJ/ck4P4GtJJiGAlBbHRujD8e9ZFxo6uxYZLHkse/vVYR6nZDEUpZB/C/wAwrocIT+FmKqTh8SOoeVZGt4gx2O/zHpkAZouJVuY1S42bl4PmKCGx0IOK5oavKksTT2xXY2SUPXitCHW7NztebyvaRSP1rGVCcbNI2jXjLRs3LCSa0YSWE727Dva3BjP/AI6RWk/i7xlEEhi8T6wkatv2Pdu4H13ZyPauda4jkwbe4thjnOAxNSM+6MFn8xT1wMD8MVlZp3ZrdNWR1L/EnxlNM0v9qxRhjnEdhCF/LbUyfEjxSTiW60qc/wDTfS4if0AriCYFbMbyx/7vSmtK5P8Ax8Ow91odOL6fgCk0dvP8SvELE/6JoSDtt0xBn8c1n/8ACw/ESzTyltMbztuUaxQouOm1c4Hv61yTy8ZLHg9dg/xqMyZ5+b9BVKhDrFfcQ6sujOrf4h+IycJLp0J/6Z6bEP55qpceO/FrtvOvXEfp5SJGB9AornC3Yn8AaZnBOFORVrD0v5V9yIdaf8z+8tjWNUF9c3h1C5W4uwfOcPhpfdsd6pSnzSWk3St6vlj+tIxJP3DjFRseMl+PUtxXSopao53J9RrSbFx36ACm4+XgH8RUb3FuCQZV4/u1C12QCUhZh6tW6i+xk5JdSfnsBUTXG1isZ8yT0HQUzybmdsO20H+Fa1LTR5Am4p5aZwWahuMV7zJSlLZFGOBsedISznkmt+x05oys8+Aeqjr+NTw2iWzHaNz9CTWksS/ZNysA0eBt77T0I/lXDVruWiOylRUdWM8vADRnlTlWHrWLIgS+vgvC/ZAQv9394vH0rXkYqSVyrfofY1jyOrX94c8m0/P5xXXln8dHLmP8Fljwqf8Aic3+f70f8zXsPwnkX/hoLwLCc5W7uGz2P+jyV5D4TUNquo55+VD+pr174V/8l78CNjn7bKM/9u8ldVT+Mzlp/wAJH35RRRW5keBftRHHgPwsf+ppsf8A0GWvlr4gMSLwnvcn/wBAavqL9qbjwB4XYsFC+J7Ikk4AG2XmvnLxDoba7bXU1tdQyK0xljRDkyrt2sAegPJxXHW0mmdVJXi0eJ6a0SRRGW3S4QZzG5IB/KtaOV7FI2DlrSQ7Uf8AiQ/3G9PY96pXNi+j3Qt5MmFifKkIxn2YdmHpUqyFoXt8jZOMNuHAH976ivWdOniaXKzzOedCrzI1GnTaFQgsw+VemR6n0H86jV35BYsc8k/xf4D0FQrYaRGq7dX1DOOSLdf/AIqn/ZtOA41vUPxt1/8Aiq8z+y6q0TX3nof2nT6p/cWlG4bjn6d/r9ak8tD8uwFuh7gew96oiCxDjGt6h658gcfrUgis1yV1+/XjH/Hsv+NS8qr9195azOj1T+4jksYLiRt0YaJDhiP42/uj2Heq8ukRMpJAX0AqyILRYUiTxBf7E+6v2ZcD9aT7Pa7R/wAT29/G2H+NaLLsQtmvvIeYYd7p/cZkuhDGcDJ4AHU03+w54kYrM6YBJwxwK0/It9+f7evM+v2cf404w27I0ba7elSMEfZxz+tX9RxW1195H13Ddn9xkCw1ZI1PnyjcM43Uhj1xRtE8hH+fatlooDj/AIn96cDA/wBHH+NIIrY4J1+9yP8Ap2H+NH1HEdeUPrtDpzGN5euHgsx/4CKb5WrMMmQ/98g1uNDaFsnX73n/AKdx/jTfKtVXamu3mPQ2w/xp/Ua/aIfXaPeRimDVWP3zn2QCmmy1KQnc8v8AKtry7fPOtXv/AIDj/GmlI9x26veEe8I/xo+p4j+6L65Qe9zGfS73Zucuyfxbn7VaXQWB5hH4nNXzFC0bI+r3hVhgjyRz+tGI8ADXLzA6fuBx+tDweKto194LF4a+qf3EKaIASCUTHoKsjSLXbsf5tw259PemkRD7ut3hPfMA/wAaQ7P+gvdEd/3K/wCNYvAYl/aX3mix2HXR/cadpb28VvEyxKhIKv6hxwean+UFywBDcOKxdkYZtmsXh3ncxES9fz61IGjCn/ib3pPvCn+NZvK67d7r7zVZnRStZ/caU3yDPB2859RUYmAZXTBZMkA9x3U/Ws5xCUVRq962eo8lAB+tN8u2PXU73Pb90n+NNZVW6tfeS8zpPa/3F+Z5Lm5isdPj+0XE/wDqV9sclvQAdSemKhv49MsrT7FZot3clt1xqDZy7f3Yx/Cn15PXiq9teDTI7uK2kMgvdqSXDptkVR/AMHAUnBP0FUrmXy8k/TAHX2r1sLhoYaF38R5eJxE8ROy2Nbwe3/E+uo8f6zao9sBjXr3woBPx38C57X0v/pPJXC+FPCk9nPb3N07JqM0m54ONsKlcAMf73c+g4616D8KkVfjz4IRXRyt9OCVORkQSV5cpqVW6PSjFxpWZ960UUV1HOcR8S/h1onxN8FzeG9baWJS4nt7iE/NbzKCFkA6Njccg9QT06j4XvdN8TfCvxpN4R8WW5IJ3xSx/6u7jzgTRE9/VfXg8iv0dPuK4n4kfDbw98TPCz6JrsJWRCZLS9jA82zlxw6H8sr0I/AiJwU1Zlwk4u6PiXxH4Ztde037dbMjLMoZmx8r+j+zCsCL4deGUjUS+J9SZ8DcUtQBn2zmvRJPgR8dLFH0q107T7y0hmYpOuoLGJ8cBypORkc4pq/A347Ac6Lp4P/YUX/GuWMK0dIs3lKlLdHBt8PPDAwR4r1ED/r2Timj4f+Gu/ivUB7G3jH9a9BHwP+O+3H9kWIHtqiU4fA/47jppll/4NlP9Kv8A2j+Yn9x/KeeHwB4cAz/wlOoj626VTPgnw/uI/wCEi1HAOBmGIZ/Nq9O/4Uj8eR00nT2+upof6VXPwK+PBJP9jafyc/8AISjp3xP8wrUP5Tzn/hBtBKgx+IdRJ9BBCf5NTX8EaGDhfEV+P96GIf8As1ejn4DfHR/v6JpZ/wB7UIj/AEqUfAj43qoH9g6Z9F1NAPyxRfEfzBah/KeYHwVpAUt/wkd9gf8ATGP/AOKqNvCOkAca9f5944/8a9S/4UX8cAMDw/p//g0Smn4EfHI/8wLT/wDwZR0XxH8wWofynlX/AAiWmH73iG8X28lP/iqU+ENLyAniG8IxnJhj/wDiq9UHwG+OPfQtO/8ABnH/AIUv/CiPjjj/AJAWnf8Agzj/AMKd8R/MFqHY8qPhDTAP+RgvAf8ArjH/APFVFH4Nt8Ez+KCOeBHbjp75I5r1k/An454ONC04f9xKM0L8CfjnjEmg6fJ7/wBpxj+VHNiP5hctDseWJ4L05s58RXOf+uCD+bVKPA+l7cnxFdZ/65R//FV6iPgR8bc/8gDTh/3FUqT/AIUV8bf+gFpv46qp/pRfEfzD5aHY8q/4QrTMc69fj/t0FMbwXooXnxNdqfe1X/GvVD8BvjYASPD2lk+2ox5/lULfAn44E/8AIs2R+mqx/wBTRfEfzMLUex5lD4J0iZii+I7t2Ayf3CjAqf8A4QHSjx/wkF1n/ritejJ8CvjlGSY/DdmhPf8AtWP/ABqwPgj8eMc6HZD/ALiqUr4j+Zhaj/KeWt4J0ZF48RXRb08lah/4QuxDHdrtxt7Hykr1g/A345t10Sw/8Gkf+FJ/wor44j/mB6d/4NEoviP5gtR7HlY8FaYynGu3RI5IMSChfBullc/25dAe8aD+deqf8KL+OWc/2Jpp+upR/wCFIfgZ8cz/AMwTT/w1OP8Awp3xH8wWo9jyk+DdMIwdcucHj/VIf61raL4X06y1WKaCefULvG22MsQCxP8A3sDOTjp6V3rfAj45kYGi2H/g0j/wpi/Ar47xvvTRLIMOhGrJn+dTJVpKzY06Sd0jjfEGtQaTbTadZ3AyuRdXWefdVP8AOvWf2bPhPr+p+JtP+KWvedpmmWW5tKtCMPdFlKmRs9Ewxx3J9hza+GP7Mut3Xiv+2PinaW0Wm2LB7fSrecSrdydd0jD+AenUn26/X0UCQxpHGioiAKqqMBQOgArSnT5dWROfNsTUUUVsZBijAoooATYv90Umxf7ooooANi/3RRsX+6KKKADYv90UbF/uiiigBdi/3RSbF/uiiigA2L/dFGxf7ooooANi/wB0UbF/uiiigA2L/dFGxf7ooooANi/3RRsX+6KKKADYv90UbF/uiiigBdi/3RSbF/uiiigA2L/dFLsX+6KKKAE2L/dFGxf7ooooANi/3RRsX+7RRQAoVR0FLRRQAUUUUAf/2Q=="
   },
   {
-    "mods": [
-      {
-        "stat": "ini",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-estoque-de-duelista",
     "nombre": "Estoque de duelista",
@@ -5089,7 +5080,12 @@
     "imagen": ""
   },
   {
-    "mods": [],
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 4
+      }
+    ],
     "efectoMods": [],
     "id": "new-facon-de-martin-fierro",
     "nombre": "Facón de Martín Fierro",
@@ -6021,12 +6017,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "fue",
-        "val": 1
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-martillo-de-guerra-runico",
     "nombre": "Martillo de guerra rúnico",
@@ -7046,18 +7037,6 @@
         "val": 6
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "bloqueo",
         "val": 2
       }
@@ -7192,10 +7171,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7268,10 +7243,6 @@
       {
         "stat": "tipo5",
         "val": 1
-      },
-      {
-        "stat": "parry",
-        "val": 2
       },
       {
         "stat": "bloqueo",
@@ -9496,41 +9467,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 9
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "new-armadura",
-    "nombre": "Armadura",
-    "tier": "Común",
-    "tipoItem": "armadura_rigida",
-    "peso": 4,
-    "ranuras": 1,
-    "precioCompra": 0,
-    "detalle": "Reduce críticos de Tipo 2, 4 y 8.",
-    "descripcionNarrativa": "Placas lisas sin blasón ni marca de herrero. Cumple, y con eso alcanza.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 8
       },
       {
@@ -9596,11 +9532,11 @@
         "val": 5
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -9612,7 +9548,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 70,
-    "detalle": "Reduce críticos Tipo 4 y 8.",
+    "detalle": "Reduce críticos Tipo 2 y 4.",
     "descripcionNarrativa": "Cuero grueso reforzado con hileras de remaches. Se nota el peso apenas te la ponés.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -9686,10 +9622,6 @@
       },
       {
         "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
         "val": 1
       }
     ],
@@ -9771,15 +9703,34 @@
     "mods": [
       {
         "stat": "def",
+        "val": 10
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-armadura-pesada-de-hierro",
+    "nombre": "Armadura pesada de hierro",
+    "tier": "Común",
+    "tipoItem": "armadura_rigida",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 100,
+    "detalle": "",
+    "descripcionNarrativa": "Placas lisas sin blasón ni marca de herrero. Cumple, y con eso alcanza.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 4
       },
       {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
+        "stat": "tipo1",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -9790,7 +9741,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1.",
+    "detalle": "Resistencia a críticos tipos 2: +2.",
     "descripcionNarrativa": "Acero de baja ley, sin visera. Reglamentario para la tropa nueva.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -9828,10 +9779,6 @@
         "val": 5
       },
       {
-        "stat": "resm",
-        "val": 5
-      },
-      {
         "stat": "resmg",
         "val": 5
       }
@@ -9857,6 +9804,14 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "resm",
+        "val": 4
+      },
+      {
+        "stat": "rescc",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -10017,14 +9972,6 @@
         "val": 8
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
         "stat": "mov",
         "val": 3
       },
@@ -10069,10 +10016,6 @@
       },
       {
         "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "mov",
         "val": 2
       },
       {
@@ -10305,15 +10248,7 @@
         "val": 10
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
         "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "con",
         "val": 1
       }
     ],
@@ -10325,7 +10260,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 180,
-    "detalle": "Resistencia a críticos 4 y 8: +1",
+    "detalle": "Resistencia a críticos 8: +1",
     "descripcionNarrativa": "Macizas hasta lo absurdo. Cada paso deja marca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10367,8 +10302,12 @@
         "val": 4
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
+      },
+      {
+        "stat": "hpmax",
+        "val": 10
       }
     ],
     "efectoMods": [],
@@ -10376,10 +10315,10 @@
     "nombre": "Botas de marcha reforzadas",
     "tier": "Buena Calidad",
     "tipoItem": "botas_rigidas",
-    "peso": 2,
+    "peso": 1,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Resistencia a críticos tipos 4: +1. HP máximo +10",
+    "detalle": "Resistencia a críticos tipos 2: +1. HP máximo +10",
     "descripcionNarrativa": "Pensadas para caminar mucho con peso encima.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10434,10 +10373,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "mov",
         "val": 1
       },
       {
@@ -10507,10 +10442,6 @@
         "val": 7
       },
       {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
         "stat": "tipo2",
         "val": 1
       },
@@ -10542,8 +10473,12 @@
         "val": 6
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       },
       {
         "stat": "mov",
@@ -10555,7 +10490,7 @@
       },
       {
         "stat": "agl",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -10566,7 +10501,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 1500,
-    "detalle": "Resistencia a críticos tipo 4: +2. Agilidad +1. Movimiento +6. Iniciativa +3.",
+    "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipo 4: +1. Agilidad +1. Movimiento +6. Iniciativa +3.",
     "descripcionNarrativa": "Cada paso cubre lo que otros hacen en una jornada.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10616,7 +10551,7 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 2
       },
       {
@@ -10625,11 +10560,15 @@
       },
       {
         "stat": "eva",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "resm",
         "val": 2
+      },
+      {
+        "stat": "resmg",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -10640,7 +10579,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 900,
-    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Movimiento +3. Evasión +2. Resistencia mental +2.",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Movimiento +3. Evasión +1. Resistencia mental +2. Resistencia mágica +1.",
     "descripcionNarrativa": "Crin trenzada en la suela. Casi no tocan el suelo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10755,10 +10694,6 @@
       {
         "stat": "ini",
         "val": 2
-      },
-      {
-        "stat": "agl",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -10782,6 +10717,10 @@
       {
         "stat": "def",
         "val": 5
+      },
+      {
+        "stat": "eva",
+        "val": 3
       },
       {
         "stat": "ini",
@@ -10838,10 +10777,6 @@
         "val": 2
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
         "stat": "tipo3",
         "val": 1
       }
@@ -10870,10 +10805,6 @@
       },
       {
         "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
         "val": 1
       },
       {
@@ -10993,6 +10924,10 @@
       {
         "stat": "tipo2",
         "val": 1
+      },
+      {
+        "stat": "hpmax",
+        "val": 10
       }
     ],
     "efectoMods": [],
@@ -11000,7 +10935,7 @@
     "nombre": "Calzas de piel de carpincho",
     "tier": "Buena Calidad",
     "tipoItem": "piernas_blandas",
-    "peso": 1,
+    "peso": 2,
     "ranuras": 0,
     "precioCompra": 120,
     "detalle": "Resistencia a críticos tipo 4: +1. Hp Máximo +10.",
@@ -11058,16 +10993,8 @@
         "val": 5
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
         "stat": "con",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -11081,8 +11008,8 @@
     "detalle": "Constitución +1. Regeneración +3 HP por turno.",
     "descripcionNarrativa": "Piel de troll curtida en verde. Sigue queriendo cerrarse sola.",
     "equipoEstadoNombre": "Regeneración (calzas)",
-    "equipoEstadoHpTurno": 2,
-    "equipoEstadoDetalle": "Cura 2 HP cada turno mientras estén equipadas.",
+    "equipoEstadoHpTurno": 3,
+    "equipoEstadoDetalle": "Cura 3 HP cada turno mientras estén equipadas.",
     "consumible": false,
     "imagen": ""
   },
@@ -11093,12 +11020,12 @@
         "val": 4
       },
       {
-        "stat": "tipo1",
+        "stat": "eva",
         "val": 2
       },
       {
-        "stat": "eva",
-        "val": 2
+        "stat": "ini",
+        "val": 3
       },
       {
         "stat": "agl",
@@ -11125,14 +11052,10 @@
     "mods": [
       {
         "stat": "def",
-        "val": 5
+        "val": 3
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "mov",
+        "stat": "eva",
         "val": 2
       }
     ],
@@ -11141,11 +11064,10 @@
     "nombre": "Calzas del corredor de tormentas",
     "tier": "Raro",
     "tipoItem": "piernas_blandas",
-    "peso": 2,
+    "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 140,
+    "detalle": "Evasión +2.",
     "descripcionNarrativa": "Tela oscura que chisporrotea apenas cuando hay viento.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11330,7 +11252,7 @@
         "val": 2
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
       }
     ],
@@ -11342,7 +11264,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "Resistencia a críticos tipos 4: +1.",
+    "detalle": "Resistencia a críticos tipos 2: +1.",
     "descripcionNarrativa": "Reglamentarias, incómodas y todas iguales.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11354,11 +11276,15 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 4
       },
       {
-        "stat": "tipo4",
-        "val": 1
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -11368,9 +11294,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 80,
+    "detalle": "Resistencia a críticos tipos 2: +2. Evasión -1",
     "descripcionNarrativa": "Hecho por alguien que recién aprendía. Se nota en los remaches.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11396,8 +11321,7 @@
     "tipoItem": "casco_rigido",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Hojalata martillada de fábrica mayorista. Cumple, apenas.",
     "equipoEstadoNombre": "",
@@ -11534,10 +11458,6 @@
       {
         "stat": "def",
         "val": 5
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
       },
       {
         "stat": "eva",
@@ -11691,7 +11611,7 @@
     "tipoItem": "casco_blando",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 170,
+    "precioCompra": 240,
     "detalle": "Inteligencia +1. Bonos +1. Rango de casteo +1.",
     "descripcionNarrativa": "Paño grueso con bolsillos internos para tinta. Ordena la cabeza.",
     "equipoEstadoNombre": "",
@@ -11707,7 +11627,7 @@
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -11719,7 +11639,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Reduce críticos Tipo 6.",
+    "detalle": "Reduce críticos Tipo 4.",
     "descripcionNarrativa": "El casco básico de cualquier tropa. Nadie recuerda el suyo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11802,6 +11722,30 @@
       {
         "stat": "def",
         "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "tipo5",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -11864,7 +11808,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
+        "val": 4
       },
       {
         "stat": "tipo2",
@@ -11876,10 +11820,10 @@
       },
       {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
-        "stat": "mov",
+        "stat": "eva",
         "val": -1
       }
     ],
@@ -11890,9 +11834,8 @@
     "tipoItem": "casco_rigido",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 8: +2. Resistencia a críticos tipos 4 y 6: +1. Movimiento -1.",
+    "precioCompra": 140,
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1. Evasión -1.",
     "descripcionNarrativa": "Segmentos de acero en cúpula. Cobertura pareja a costa de peso.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11971,46 +11914,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 7
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "eva",
-        "val": 1
-      },
-      {
-        "stat": "int",
-        "val": 1
-      },
-      {
-        "stat": "resm",
-        "val": 3
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-casco-de-hueso-de-trauco",
-    "nombre": "Casco de hueso de trauco",
-    "tier": "Excepcional",
-    "tipoItem": "casco_rigido",
-    "peso": 1,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 6: +2. Inteligencia +1. Evasión +1. Resistencia mental +3.",
-    "descripcionNarrativa": "Hueso del duende chilote, tallado con cuidado. Confunde al que lo mira de frente.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 4
       },
       {
@@ -12051,6 +11954,10 @@
       {
         "stat": "tipo4",
         "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -12060,8 +11967,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "precioCompra": 60,
-    "detalle": "Reduce críticos Tipo 8.",
+    "precioCompra": 70,
+    "detalle": "Reduce críticos Tipo 8. Evasión -1",
     "descripcionNarrativa": "Llamas anaranjadas sobre fondo negro. Un trabajo de amor.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12073,11 +11980,15 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo4",
         "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -12087,10 +11998,52 @@
     "tipoItem": "casco_rigido",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 8: +1. Evasión -1.",
     "descripcionNarrativa": "Plástico duro con la calcomanía medio despegada. No pregunten de dónde salió.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-casco-de-paquicefalosaurio",
+    "nombre": "Casco de paquicefalosaurio",
+    "tier": "Excepcional",
+    "tipoItem": "casco_rigido",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 550,
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1. Inteligencia +1. Evasión +2. Resistencia mental +3.",
+    "descripcionNarrativa": "Riesgo de que te griten \"pelado puto!\" por la calle.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -12122,54 +12075,6 @@
     "precioCompra": 130,
     "detalle": "Resistencia a críticos tipo 4, doble resistencia a críticos tipo 2 ",
     "descripcionNarrativa": "Fibra sintética que no pertenece a esta época y a nadie le importa.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
-        "val": 7
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": 1
-      },
-      {
-        "stat": "con",
-        "val": 1
-      },
-      {
-        "stat": "resm",
-        "val": 3
-      },
-      {
-        "stat": "rescc",
-        "val": 3
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-chiripa-de-peron",
-    "nombre": "Chiripá de Perón",
-    "tier": "Legendario",
-    "tipoItem": "piernas_blandas",
-    "peso": 0,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Constitución +1. Movimiento +1. Resistencia mental +3. Resistencia a CC +3.",
-    "descripcionNarrativa": "Nadie que lo lleve puesto camina solo. La conducción se nota en el andar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -12452,12 +12357,8 @@
         "val": 1
       },
       {
-        "stat": "mov",
-        "val": -1
-      },
-      {
         "stat": "capcinturon",
-        "val": 2
+        "val": 3
       }
     ],
     "efectoMods": [],
@@ -12539,19 +12440,18 @@
       },
       {
         "stat": "capcinturon",
-        "val": 4
+        "val": 3
       }
     ],
     "efectoMods": [],
     "id": "ia-cinturon-del-explorador",
     "nombre": "Cinturón del explorador",
-    "tier": "Buena Calidad",
+    "tier": "Raro",
     "tipoItem": "cinturon",
     "peso": 0,
     "ranuras": 4,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Movimiento +1. Ranuras para consumibles +4.",
+    "precioCompra": 160,
+    "detalle": "Movimiento +1. Ranuras para consumibles +3.",
     "descripcionNarrativa": "Correas cruzadas y hebillas de bronce. Todo a mano y nada colgando.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12568,14 +12468,6 @@
       {
         "stat": "tipo1",
         "val": 1
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "mov",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -12598,7 +12490,19 @@
     "mods": [
       {
         "stat": "def",
-        "val": 12
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12719,7 +12623,7 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
@@ -12739,10 +12643,10 @@
     "nombre": "Coraza de escama de Quetzalcóatl",
     "tier": "Excepcional",
     "tipoItem": "armadura_rigida",
-    "peso": 2,
+    "peso": 3,
     "ranuras": 0,
     "precioCompra": 1100,
-    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Movimiento +1. Resistencia mental +2. Rango de casteo +2.",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Al tipo 6: +1. Movimiento +1. Resistencia mental +2. Rango de casteo +2.",
     "descripcionNarrativa": "Escamas iridiscentes de la serpiente emplumada. Cambia de color con la luz.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12754,7 +12658,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 8
+        "val": 7
       },
       {
         "stat": "tipo1",
@@ -12769,8 +12673,8 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
-        "val": 1
+        "stat": "eva",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -12781,7 +12685,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "Reduce críticos tipo 4, 6 y 8",
+    "detalle": "Reduce críticos tipo 2, 4 y 6. evasión -1",
     "descripcionNarrativa": "Reglamentaria, pesada, con el número de inventario grabado atrás.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13299,16 +13203,16 @@
         "val": 7
       },
       {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
         "stat": "tipo2",
         "val": 2
       },
       {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
         "stat": "rescc",
-        "val": 1
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -13319,7 +13223,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 270,
-    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a CC +1.",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a CC +2.",
     "descripcionNarrativa": "Relleno apretado hasta el hueso, con remiendos de tres campañas distintas.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13368,10 +13272,6 @@
       {
         "stat": "def",
         "val": 3
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -13381,8 +13281,7 @@
     "tipoItem": "casco_blando",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 40,
     "detalle": "",
     "descripcionNarrativa": "Visera rígida y escudo dorado. Impone más de lo que protege.",
     "equipoEstadoNombre": "",
@@ -13449,7 +13348,7 @@
       },
       {
         "stat": "resm",
-        "val": 2
+        "val": 3
       }
     ],
     "efectoMods": [],
@@ -13531,11 +13430,11 @@
         "val": 1
       },
       {
-        "stat": "mov",
+        "stat": "eva",
         "val": -1
       },
       {
-        "stat": "eva",
+        "stat": "pdg",
         "val": -1
       }
     ],
@@ -13547,76 +13446,8 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 140,
-    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Resistencia a críticos tipo 8: +1. Movimiento -1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +2. Resistencia a críticos tipo 8: +1. Evasión -1. Pdg -1.",
     "descripcionNarrativa": "Cobertura total de placa. No se ve casi nada, pero tampoco entra casi nada.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
-        "val": 6
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "cat-grebas",
-    "nombre": "Grebas",
-    "tier": "Buena Calidad",
-    "tipoItem": "piernas_rigidas",
-    "peso": 2,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Reduce críticos Tipo 6 y 8.",
-    "descripcionNarrativa": "Placas al frente de la pierna, atadas con correas atrás.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
-        "val": 5
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-grebas-de-acero-templado",
-    "nombre": "Grebas de acero templado",
-    "tier": "Buena Calidad",
-    "tipoItem": "piernas_rigidas",
-    "peso": 2,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1.",
-    "descripcionNarrativa": "Acero bien trabajado, articulado en la rodilla.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -13636,9 +13467,67 @@
       {
         "stat": "tipo2",
         "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "cat-grebas",
+    "nombre": "Grebas",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "detalle": "Reduce críticos Tipo 2 y 4.",
+    "descripcionNarrativa": "Placas al frente de la pierna, atadas con correas atrás.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       },
       {
         "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "ia-grebas-de-acero-templado",
+    "nombre": "Grebas de acero templado",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_rigidas",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "descripcionNarrativa": "Acero bien trabajado, articulado en la rodilla.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
         "val": 1
       },
       {
@@ -13903,42 +13792,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 9
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "parry",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "new-grebas-del-centinela-de-hierro",
-    "nombre": "Grebas del centinela de hierro",
-    "tier": "Raro",
-    "tipoItem": "piernas_rigidas",
-    "peso": 4,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
-    "descripcionNarrativa": "Hierro macizo sin un solo adorno. El que las lleva no retrocede.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 8
       },
       {
@@ -13993,24 +13846,12 @@
         "val": 7
       },
       {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
         "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": -1
-      },
-      {
-        "stat": "parry",
-        "val": 2
-      },
-      {
-        "stat": "rescc",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14020,13 +13861,12 @@
     "tipoItem": "piernas_rigidas",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4 y 8: +2. Movimiento -1. Parry +2. Resistencia a CC +2.",
+    "precioCompra": 160,
+    "detalle": "Resistencia a críticos tipos 2: +2.  Tipo 4: +1. Inmunidad a restricciones de movimiento.",
     "descripcionNarrativa": "Pensadas para plantarse en un lugar y no moverse de ahí.",
-    "equipoEstadoNombre": "",
+    "equipoEstadoNombre": "Inmune a restricciones de movimiento (grebas)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
+    "equipoEstadoDetalle": "Mientras esté equipado, no se le pueden aplicar restricciones de movimiento (Lisiado, Inmovilizado, Rengo).",
     "consumible": false,
     "imagen": ""
   },
@@ -14106,7 +13946,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 5
+        "val": 4
       },
       {
         "stat": "tipo1",
@@ -14114,10 +13954,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
         "val": 1
       },
       {
@@ -14132,9 +13968,8 @@
     "tipoItem": "guantes_rigidos",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1. Parry +1.",
+    "precioCompra": 140,
+    "detalle": "Resistencia a críticos tipos 2 y 6: +1. Parry +1.",
     "descripcionNarrativa": "Articulados dedo por dedo. Buen trabajo de armería.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14205,10 +14040,6 @@
       },
       {
         "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "pdg",
         "val": 1
       }
     ],
@@ -14344,10 +14175,6 @@
       },
       {
         "stat": "tipo5",
-        "val": 1
-      },
-      {
-        "stat": "fue",
         "val": 1
       }
     ],
@@ -14509,11 +14336,11 @@
         "val": 3
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -14524,9 +14351,8 @@
     "tipoItem": "guantes_rigidos",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "precioCompra": 50,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +1.",
     "descripcionNarrativa": "Cuero prensado hasta ponerse duro. El primer paso del que no tiene plata.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14598,14 +14424,6 @@
       {
         "stat": "def",
         "val": 2
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "pdg",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14798,10 +14616,6 @@
       {
         "stat": "def",
         "val": 4
-      },
-      {
-        "stat": "bonos",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14909,8 +14723,16 @@
         "val": 3
       },
       {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
         "stat": "tipo3",
         "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -14920,9 +14742,8 @@
     "tipoItem": "guantes_rigidos",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 4 y 6: +1. PdG -1",
     "descripcionNarrativa": "Chapa fina remachada al dorso. Suenan más de lo que sirven.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14982,10 +14803,6 @@
       {
         "stat": "def",
         "val": 3
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15083,7 +14900,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
+        "val": 5
       },
       {
         "stat": "tipo1",
@@ -15095,10 +14912,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "parry",
         "val": 1
       }
     ],
@@ -15110,7 +14923,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 2 y 4: +1.",
+    "detalle": "Resistencia a críticos tipos 2, 4 y 6: +1.",
     "descripcionNarrativa": "Placa en torso y hombros, malla en las juntas. Solución de compromiso honesta.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15127,10 +14940,6 @@
       {
         "stat": "mov",
         "val": 2
-      },
-      {
-        "stat": "ini",
-        "val": 1
       },
       {
         "stat": "resm",
@@ -15201,6 +15010,18 @@
       {
         "stat": "def",
         "val": 4
+      },
+      {
+        "stat": "eva",
+        "val": 3
+      },
+      {
+        "stat": "int",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -15347,10 +15168,6 @@
         "val": 2
       },
       {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
         "stat": "eva",
         "val": 2
       },
@@ -15445,10 +15262,6 @@
         "val": 6
       },
       {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
         "stat": "mov",
         "val": 2
       },
@@ -15472,8 +15285,7 @@
     "tipoItem": "piernas_blandas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 1350,
     "detalle": "Agilidad +1. Movimiento +2. Evasión +4. Iniciativa +2.",
     "descripcionNarrativa": "Terciopelo negro entallado. Se mueve antes de que el cuerpo decida moverse.",
     "equipoEstadoNombre": "",
@@ -15594,7 +15406,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "mov",
@@ -15608,12 +15420,11 @@
     "efectoMods": [],
     "id": "ia-pantalon-de-lino-trenzado",
     "nombre": "Pantalón de lino trenzado",
-    "tier": "Buena Calidad",
+    "tier": "Raro",
     "tipoItem": "piernas_blandas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 110,
     "detalle": "Movimiento +1. Evasión +1.",
     "descripcionNarrativa": "Lino de hebra fina, fresco y liviano. Buen trabajo de sastre.",
     "equipoEstadoNombre": "",
@@ -15630,10 +15441,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "mov",
         "val": 1
       }
     ],
@@ -15661,7 +15468,7 @@
         "val": 2
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
       }
     ],
@@ -15673,7 +15480,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "detalle": "Resistencia a críticos tipo 2: +1.",
     "descripcionNarrativa": "Tejido grueso que cubre cabeza y cuello. Abriga tanto que da calor de más.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15713,18 +15520,6 @@
       {
         "stat": "def",
         "val": 6
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "eva",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15822,11 +15617,11 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 2
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
       },
       {
@@ -15843,7 +15638,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Resistencia a críticos tipo 8: +1. Resistencia mental +1.",
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipo 6: +1. Resistencia mental +1.",
     "descripcionNarrativa": "Metal caído del cielo. Densidad rara, peso engañoso.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15855,7 +15650,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 7
+        "val": 6
       },
       {
         "stat": "tipo1",
@@ -15866,12 +15661,8 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "rescc",
         "val": 2
-      },
-      {
-        "stat": "con",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15881,9 +15672,8 @@
     "tipoItem": "piernas_rigidas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 8: +2. Resistencia a críticos tipo 4: +1. Constitución +1.",
+    "precioCompra": 180,
+    "detalle": "Resistencia a críticos tipos 2: +2. Resistencia a críticos tipo 4: +1. Resistencia a CC: +2",
     "descripcionNarrativa": "Placas del armadillo gigante, encastradas con cuero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15958,7 +15748,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 12
+        "val": 15
       },
       {
         "stat": "tipo1",
@@ -15974,15 +15764,11 @@
       },
       {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "mov",
         "val": -1
-      },
-      {
-        "stat": "fue",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15990,10 +15776,10 @@
     "nombre": "Perneras de hueso de coloso menor",
     "tier": "Excepcional",
     "tipoItem": "piernas_rigidas",
-    "peso": 4,
+    "peso": 5,
     "ranuras": 0,
     "precioCompra": 450,
-    "detalle": "Resistencia a críticos tipo 8: +2. Resistencia a críticos tipos 2, 4 y 6: +1. Fuerza +1. Movimiento -1.",
+    "detalle": "Resistencia a críticos tipos 2, 4, 6 y 8: +1. Movimiento -1.",
     "descripcionNarrativa": "Fémur de gigante tallado en placas. Pesa como corresponde.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16040,10 +15826,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
         "val": 1
       }
     ],
@@ -16194,6 +15976,14 @@
       {
         "stat": "def",
         "val": 5
+      },
+      {
+        "stat": "eva",
+        "val": 4
+      },
+      {
+        "stat": "agl",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -16216,7 +16006,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 6
+        "val": 4
       },
       {
         "stat": "tipo3",
@@ -16260,13 +16050,12 @@
     ],
     "efectoMods": [],
     "id": "ia-rodilleras-de-tacho-recortado",
-    "nombre": "Rodilleras de tacho recortado",
+    "nombre": "Rodilleras de Hueso",
     "tier": "Común",
     "tipoItem": "piernas_rigidas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "Resistencia a críticos tipo 8: +1. Evasión -1.",
     "descripcionNarrativa": "Dos tapas de tacho atadas a la rodilla. Funciona, no pregunten cómo.",
     "equipoEstadoNombre": "",
@@ -16279,15 +16068,11 @@
     "mods": [
       {
         "stat": "def",
-        "val": 7
-      },
-      {
-        "stat": "tipo1",
-        "val": 2
+        "val": 4
       },
       {
         "stat": "tipo3",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo4",
@@ -16295,6 +16080,10 @@
       },
       {
         "stat": "resm",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
         "val": 1
       }
     ],
@@ -16307,7 +16096,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 6: +2. Resistencia a críticos tipo 8: +1. Resistencia mental +1.",
+    "detalle": "Resistencia a críticos tipos 8 y 6: +1. Resistencia mental +1. Resistencia a CC +1.",
     "descripcionNarrativa": "Metal del cielo en la suela. Densidad rara.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16390,6 +16179,18 @@
       {
         "stat": "def",
         "val": 7
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "con",
+        "val": 1
+      },
+      {
+        "stat": "rescc",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -16520,14 +16321,6 @@
         "val": 8
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
         "stat": "tipo3",
         "val": 1
       },
@@ -16572,10 +16365,6 @@
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "parry",
         "val": 1
       }
     ],
@@ -16784,11 +16573,11 @@
     "efectoMods": [],
     "id": "ia-tirador-de-rastra",
     "nombre": "Tirador de rastra",
-    "tier": "Buena Calidad",
+    "tier": "Raro",
     "tipoItem": "cinturon",
     "peso": 0,
     "ranuras": 3,
-    "precioCompra": 160,
+    "precioCompra": 140,
     "detalle": "Ranuras para consumibles +3.",
     "descripcionNarrativa": "Monedas de plata cosidas al cuero.",
     "equipoEstadoNombre": "",
@@ -16877,7 +16666,7 @@
     "efectoMods": [],
     "id": "ia-turbante-de-seda-cruda",
     "nombre": "Turbante de seda cruda",
-    "tier": "Buena Calidad",
+    "tier": "Raro",
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
@@ -16895,14 +16684,41 @@
     "mods": [
       {
         "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "bonos",
+        "val": 3
+      },
+      {
+        "stat": "accionesmax",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-turbante-de-seda-refinada",
+    "nombre": "Turbante de seda refinada",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 160,
+    "detalle": "bonos +3. Acciones máximas por turno: +1",
+    "descripcionNarrativa": "",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 4
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "rangocasteo",
+        "stat": "tipo4",
         "val": 1
       }
     ],
@@ -16913,9 +16729,8 @@
     "tipoItem": "casco_blando",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 90,
+    "detalle": "Resistencia a críticos tipo 8: +1",
     "descripcionNarrativa": "Vueltas de paño grueso con una placa escondida adentro.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16953,28 +16768,23 @@
   {
     "mods": [
       {
-        "stat": "def",
-        "val": 2
-      },
-      {
         "stat": "ini",
-        "val": 2
+        "val": 3
       },
       {
         "stat": "resm",
-        "val": 1
+        "val": 2
       }
     ],
     "efectoMods": [],
     "id": "ia-vincha-del-sueno-liviano",
-    "nombre": "Vincha del sueño liviano",
+    "nombre": "Vincha del sueño reparador",
     "tier": "Raro",
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Iniciativa +2. Resistencia mental +1.",
+    "precioCompra": 170,
+    "detalle": "Iniciativa +3. Resistencia mental +2. Luego de un descanso completo, despertás con el estado \"Bien descansado: absorbe los primeros 20 puntos de daño en un combate\".",
     "descripcionNarrativa": "Cuero fino con cuentas de hueso que tintinean apenas. Cuesta agarrarlo desprevenido.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17025,10 +16835,6 @@
         "val": 6
       },
       {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
         "stat": "tipo3",
         "val": 1
       },
@@ -17060,15 +16866,7 @@
         "val": 9
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "ini",
+        "stat": "tipo1",
         "val": 1
       }
     ],
@@ -17079,9 +16877,8 @@
     "tipoItem": "casco_rigido",
     "peso": 4,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 80,
+    "detalle": "Resistencia a críticos tipos 2: +1.",
     "descripcionNarrativa": "Cresta de crin teñida. Se lo distingue desde el otro lado del campo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17094,6 +16891,18 @@
       {
         "stat": "def",
         "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -17117,6 +16926,18 @@
       {
         "stat": "def",
         "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "resm",
+        "val": 3
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -17179,19 +17000,23 @@
     "mods": [
       {
         "stat": "def",
-        "val": 5
+        "val": 4
       },
       {
         "stat": "tipo1",
         "val": 1
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       },
       {
         "stat": "tipo4",
         "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": -1
       }
     ],
     "efectoMods": [],
@@ -17201,9 +17026,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2, 6 y 8: +1.",
+    "precioCompra": 120,
+    "detalle": "Resistencia a críticos tipos 2, 4 y 8: +1. PdG -1",
     "descripcionNarrativa": "Acero bien templado con barra nasal. Clásico y confiable.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17218,11 +17042,11 @@
         "val": 6
       },
       {
-        "stat": "tipo2",
+        "stat": "tipo1",
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -17233,9 +17057,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 90,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +1.",
     "descripcionNarrativa": "Visera levadiza para respirar entre asalto y asalto.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

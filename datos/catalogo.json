@@ -12526,26 +12526,6 @@
       {
         "stat": "def",
         "val": 10
-      },
-      {
-        "stat": "tipo1",
-        "val": 1
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12558,9 +12538,9 @@
     "precioCompra": 1800,
     "detalle": "Inmune a golpes críticos. indestructible",
     "descripcionNarrativa": "Plateada, casi sin peso, imposible de romper. La joya de la montaña.",
-    "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
+    "equipoEstadoNombre": "Inmune a golpes críticos (Coraza de Mithril)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
+    "equipoEstadoDetalle": "Mientras esté equipada: es inmune a golpes críticos, y la armadura rota o arruinada no le hace nada (indestructible).",
     "consumible": false,
     "imagen": ""
   },

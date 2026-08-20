@@ -1018,6 +1018,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 .btn.subir:hover{background:#3A8A6F;border-color:#3A8A6F}
 .btn.aleatorio{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE;font-weight:700}
 .btn.aleatorio:hover{background:#9B7BD4;color:#1B0F1F}
+.btn.vercompleto{background:rgba(90,166,199,.16);border-color:#5AA6C7;color:#AEDCEF;font-weight:700}
+.btn.vercompleto:hover{background:#5AA6C7;color:#0B1A20}
+.btn.vercompleto.activo{background:#5AA6C7;color:#0B1A20}
 
 .modal.reminder{border-top-color:var(--copper);max-width:440px}
 .reminder-item{border:1px solid var(--line-soft);background:var(--panel2);padding:10px 12px;margin-bottom:9px}
@@ -1455,6 +1458,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
       <div class="carrito-lista" id="carrito-lista"></div>
       <div class="carrito-footer">
         <span>Total: <b id="carrito-total">0</b> DDE</span>
+        <button type="button" class="btn vercompleto" id="catalogo-ver-completo" title="Ver el catálogo completo: sin restricción de tienda, sin esconder Excepcional/Legendario ni consumibles no esenciales">👁</button>
         <button type="button" class="btn aleatorio" id="catalogo-item-aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
         <button class="btn ghost" id="carrito-vaciar">Vaciar</button>
         <button class="btn primary" id="carrito-comprar" disabled>Comprar</button>
@@ -6036,6 +6040,11 @@ function renderCatalogoOrdenControles(){
 // Rarezas que no se ofrecen en el catálogo general del jugador.
 const TIERS_OCULTOS = ['Excepcional', 'Legendario'];
 
+// Botón del ojo en el footer: ignora tanto el recorte de la tienda cargada
+// como el filtro de tier/consumibles del catálogo general — muestra
+// literalmente todo lo que hay en S.catalogo, de referencia.
+let verCatalogoCompleto = false;
+
 function catalogoVisibles(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
   const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
@@ -6045,14 +6054,14 @@ function catalogoVisibles(){
   // Con una tienda cargada, el catálogo se recorta a lo que ese vendedor
   // ofrece; los filtros, la búsqueda y el carrito siguen funcionando igual.
   let base = S.catalogo;
-  if(tiendaCargada){
+  if(tiendaCargada && !verCatalogoCompleto){
     const ofrecidos = new Set(tiendaCargada.items);
     base = S.catalogo.filter(item => ofrecidos.has(item.id));
   }
   // En el catálogo abierto solo se llega hasta Raro. Lo Excepcional y lo
   // Legendario existe igual: entra por un vendedor que lo ofrezca o de la
   // mano del máster, no comprándolo de la lista general.
-  if(!tiendaCargada){
+  if(!tiendaCargada && !verCatalogoCompleto){
     base = base.filter(item => !TIERS_OCULTOS.includes(item.tier));
     // De los consumibles, el catálogo abierto solo ofrece los esenciales.
     // El resto existe igual, pero se consigue en un vendedor.
@@ -7151,6 +7160,12 @@ $('#catalogo-limpiar-filtros').addEventListener('click', () => {
   renderCatalogoModal();
 });
 $('#catalogo-item-aleatorio').addEventListener('click', elegirItemAleatorio);
+$('#catalogo-ver-completo').addEventListener('click', () => {
+  verCatalogoCompleto = !verCatalogoCompleto;
+  $('#catalogo-ver-completo').classList.toggle('activo', verCatalogoCompleto);
+  renderCatalogoModal();
+  toast(verCatalogoCompleto ? 'Mostrando el catálogo completo, sin filtros' : 'Volviendo a la vista normal del catálogo');
+});
 $('#item-aleatorio-tirar-de-nuevo').addEventListener('click', elegirItemAleatorio);
 $('#item-aleatorio-x').onclick = () => $('#scrim-item-aleatorio').classList.remove('open');
 $('#item-aleatorio-cerrar').onclick = () => $('#scrim-item-aleatorio').classList.remove('open');

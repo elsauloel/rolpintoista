@@ -11391,12 +11391,8 @@
         "val": 3
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
+        "stat": "rescc",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -11406,9 +11402,8 @@
     "tipoItem": "casco_blando",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
+    "precioCompra": 80,
+    "detalle": "Resistencia a CC +2",
     "descripcionNarrativa": "Relleno de guata cosido en capas parejas. Trabajo prolijo de taller.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11423,11 +11418,7 @@
         "val": 4
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
+        "stat": "eva",
         "val": 2
       },
       {
@@ -11437,6 +11428,10 @@
       {
         "stat": "resm",
         "val": 2
+      },
+      {
+        "stat": "hpmax",
+        "val": 20
       }
     ],
     "efectoMods": [],
@@ -11446,9 +11441,8 @@
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Iniciativa +1. Resistencia mental +2.",
+    "precioCompra": 750,
+    "detalle": "Iniciativa +1. Resistencia mental +2. Hp Máximo: +20. Evasión +2",
     "descripcionNarrativa": "Crin áspera de chupacabras trenzada a mano. Nadie se le acerca de frente.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12722,7 +12716,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo3",
@@ -12749,7 +12743,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 1100,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Al tipo 6: +1. Movimiento +1. Resistencia mental +2. Rango de casteo +2.",
+    "detalle": "Resistencia a críticos tipos 2: +2. Tipo 4 y 6: +1. Movimiento +1. Resistencia mental +2. Rango de casteo +2.",
     "descripcionNarrativa": "Escamas iridiscentes de la serpiente emplumada. Cambia de color con la luz.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

@@ -55,10 +55,12 @@ para la lógica de corrección/escritura.
 ```
 
 **Categorías válidas de `tipoItem`**: `arma_1m`, `arma_2m`, `escudo_1m`,
-`escudo_2m`, `armadura_blanda`, `armadura_rigida`, `casco_blando`,
-`casco_rigido`, `guantes_blandos`, `guantes_rigidos`, `piernas_blandas`,
-`piernas_rigidas`, `botas_blandas`, `botas_rigidas`, `anillos`, `otros`,
-`consumibles`.
+`escudo_2m`, `armadura_blanda`, `armadura_rigida`, `cabeza`, `manos`,
+`piernas`, `pies`, `cinturon`, `anillos`, `otros`, `consumibles`.
+Armadura sigue separada en blanda/rígida (dos slots de equipo
+distintos); cabeza/manos/piernas/pies fusionaron sus versiones
+"blanda" y "rígida" en una sola categoría con un solo slot de equipo
+cada una (ver `SLOT_DEFS` en ficha.html).
 
 **Stats válidos en `mods`/`efectoMods`** (si no está en esta lista, el
 importador lo descarta): `con`, `fue`, `agl`, `des`, `int`, `def`, `dmg`,

@@ -231,14 +231,10 @@ const CATEGORIAS = [
   {id:'escudo_2m', label:'Escudo de dos manos'},
   {id:'armadura_blanda', label:'Armadura blanda'},
   {id:'armadura_rigida', label:'Armadura rígida'},
-  {id:'guantes_blandos', label:'Guantes blandos'},
-  {id:'guantes_rigidos', label:'Guantes rígidos'},
-  {id:'piernas_blandas', label:'Piernas blandas'},
-  {id:'piernas_rigidas', label:'Piernas rígidas'},
-  {id:'casco_blando', label:'Casco blando'},
-  {id:'casco_rigido', label:'Casco rígido'},
-  {id:'botas_blandas', label:'Botas blandas'},
-  {id:'botas_rigidas', label:'Botas rígidas'},
+  {id:'manos', label:'Manos'},
+  {id:'piernas', label:'Piernas'},
+  {id:'cabeza', label:'Cabeza'},
+  {id:'pies', label:'Pies'},
   {id:'cinturon', label:'Cinturón'},
   {id:'anillos', label:'Anillos'},
   {id:'otros', label:'Otros'},
@@ -324,7 +320,7 @@ function grupoDe(it){
   if(it.tipoItem === 'consumibles') return 'Consumibles';
   if(esArmaTipo(it.tipoItem)) return 'Armas';
   if(it.tipoItem === 'escudo_1m' || it.tipoItem === 'escudo_2m') return 'Escudos';
-  if((it.tipoItem || '').startsWith('armadura') || ['guantes_blandos','guantes_rigidos','piernas_blandas','piernas_rigidas','casco_blando','casco_rigido','botas_blandas','botas_rigidas'].includes(it.tipoItem)) return 'Defensivos';
+  if((it.tipoItem || '').startsWith('armadura') || ['manos','piernas','cabeza','pies'].includes(it.tipoItem)) return 'Defensivos';
   return 'Otros';
 }
 const ORDEN_GRUPO = ['Consumibles', 'Armas', 'Escudos', 'Defensivos', 'Otros'];

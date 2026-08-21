@@ -17,9 +17,7 @@ items = json.load(open(CATALOGO_JSON, encoding="utf-8"))
 for it in items:
     it['_tiene_imagen'] = bool(it.get('imagen'))
 
-DEFENSIVOS = {'armadura_blanda','armadura_rigida','casco_blando','casco_rigido',
-              'guantes_blandos','guantes_rigidos','piernas_blandas','piernas_rigidas',
-              'botas_blandas','botas_rigidas','cinturon'}
+DEFENSIVOS = {'armadura_blanda','armadura_rigida','cabeza','manos','piernas','pies','cinturon'}
 ACCESORIOS = {'anillos'}
 
 def categoria(it):
@@ -145,7 +143,7 @@ filas = [
     ('Borrar un ítem', 'Borrá la fila entera. Al reimportar deja de estar en el catálogo.'),
     ('', ''),
     ('Tier', 'Común · Buena Calidad · Raro · Excepcional · Legendario. Se escribe igual, con las mayúsculas puestas.'),
-    ('Tipo de ítem', 'Define cómo se comporta y en qué ranura entra. Valores válidos: arma_1m, arma_2m, escudo_1m, escudo_2m, armadura_blanda, armadura_rigida, casco_blando, casco_rigido, guantes_blandos, guantes_rigidos, piernas_blandas, piernas_rigidas, botas_blandas, botas_rigidas, consumibles, anillos, otros.'),
+    ('Tipo de ítem', 'Define cómo se comporta y en qué ranura entra. Valores válidos: arma_1m, arma_2m, escudo_1m, escudo_2m, armadura_blanda, armadura_rigida, cabeza, manos, piernas, pies, cinturon, consumibles, anillos, otros.'),
     ('Peso', 'En las armas es además la cantidad de dados que tira: peso 3 con dado d6 = 3d6.'),
     ('Tipo de dado', 'El número del dado del arma: 2, 4, 6, 8 o 10.'),
     ('Daño fijo', 'Se suma al resultado de los dados.'),

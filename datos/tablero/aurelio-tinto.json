@@ -6,6 +6,13 @@
   "hp": 40,
   "hpMax": 40,
   "muerto": false,
-  "estados": [],
-  "actualizado": "2026-08-21T03:09:37.774Z"
+  "estados": [
+    {
+      "nombre": "Bien descansado",
+      "turnos": 0,
+      "permanente": true,
+      "detalle": ""
+    }
+  ],
+  "actualizado": "2026-08-21T03:16:02.547Z"
 }

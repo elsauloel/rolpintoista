@@ -3802,6 +3802,7 @@ function renderBotonera(){
   const consumiblesMochila = S.inventario.filter(i => i.consumible);
   const filaConsumible = (i, key) => `<div class="cat-row">
     <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+    <button class="mini" data-view="${key}:${i.id}">Ver</button>
     ${consumeButton(i, key)}
   </div>`;
 

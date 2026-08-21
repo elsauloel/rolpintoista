@@ -1,20 +1,28 @@
 {
-  "actualizado": "2026-08-13T02:28:53.034Z",
+  "actualizado": "2026-08-21T02:34:05.350Z",
   "creeps": [
     {
-      "id": "21xc9hg",
-      "nombre": "Zombie jugador de baseball",
+      "id": "4be8g7k",
+      "nombre": "Creep nuevo",
       "imagen": "",
-      "hp": 50,
-      "hpMax": 50,
+      "hp": 10,
+      "hpMax": 10,
       "estados": []
     },
     {
-      "id": "5ztd2dw",
-      "nombre": "Zombie Liniero Blindado",
+      "id": "7v9msrs",
+      "nombre": "Avispa gigante venenosa",
       "imagen": "",
-      "hp": 60,
-      "hpMax": 60,
+      "hp": 30,
+      "hpMax": 30,
+      "estados": []
+    },
+    {
+      "id": "amtwrlp",
+      "nombre": "Hippie Avispero",
+      "imagen": "",
+      "hp": 40,
+      "hpMax": 40,
       "estados": []
     }
   ]

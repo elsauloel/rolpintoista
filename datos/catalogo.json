@@ -9516,7 +9516,7 @@
     "tipoItem": "armadura_rigida",
     "peso": 4,
     "ranuras": 0,
-    "precioCompra": 180,
+    "precioCompra": 160,
     "detalle": "Reduce críticos tipo 6 y 8",
     "descripcionNarrativa": "Base compuesta con una capa exterior de acero. Lo mejor de los dos mundos y el peso de ambos.",
     "equipoEstadoNombre": "",
@@ -10599,7 +10599,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -10634,7 +10634,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 1650,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia a críticos tipos 4: +2. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
     "descripcionNarrativa": "Forjadas en la Wakanda",
     "equipoEstadoNombre": "Armadura indestructible (botas)",
     "equipoEstadoHpTurno": 0,
@@ -10822,6 +10822,29 @@
     "precioCompra": 120,
     "detalle": "Resistencia a críticos tipos 4: +1. Iniciativa +1.",
     "descripcionNarrativa": "Refuerzo metálico en puntera y talón, hechos para andar rápido.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-calzas-de-bordado-runico",
+    "nombre": "Calzas de bordado rúnico",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas_blandas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Daño mágico +3",
+    "descripcionNarrativa": "Hilos plateados cosidos en espiral, todavía tibios al tacto.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -11195,6 +11218,37 @@
     "mods": [
       {
         "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "int",
+        "val": 3
+      },
+      {
+        "stat": "resmg",
+        "val": 5
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-camison-de-galadriel",
+    "nombre": "Camisón de Galadriel",
+    "tier": "Legendario",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 1550,
+    "detalle": "Inmunidad total a intrusión mental, así como +5 a la resistencia mágica a sí misma y aliados en un rago de 5 casilleros alrededor. +3 a inteligencia. ",
+    "descripcionNarrativa": "Tela que parece tejida con luz de luna. No se ensucia, no se arruga, no envejece.",
+    "equipoEstadoNombre": "Inmune a intrusión mental (Camisón de Galadriel)",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "Mientras esté equipada, es inmune a intrusión mental. También otorga +5 a la resistencia mágica a los aliados en un rango de 5 casilleros (aura, no automatizada).",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 3
       },
       {
@@ -11435,6 +11489,33 @@
       {
         "stat": "def",
         "val": 1
+      },
+      {
+        "stat": "int",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-capucha-de-escriba-de-gremio",
+    "nombre": "Capucha de escriba de gremio",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Inteligencia +1",
+    "descripcionNarrativa": "Forro con bolsillos para tinta y plumas. Huele a papel viejo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -11579,6 +11660,37 @@
     "precioCompra": 0,
     "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1. Inteligencia +1. Rango de casteo +2.",
     "descripcionNarrativa": "Fibra de la serpiente madre del agua. Sigue húmeda aunque esté seca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-capuz-de-vidente-de-feria",
+    "nombre": "Capuz de vidente de feria",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "Inteligencia +1. Rango de casteo +1.",
+    "descripcionNarrativa": "Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -12073,7 +12185,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Resistencia a críticos tipo 4, doble resistencia a críticos tipo 2 ",
+    "detalle": "Resistencia a críticos tipo 4: +1., resistencia a críticos tipo 2: +2",
     "descripcionNarrativa": "Fibra sintética que no pertenece a esta época y a nadie le importa.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12277,24 +12389,16 @@
         "val": 4
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
         "stat": "con",
-        "val": 1
+        "val": 2
       },
       {
-        "stat": "rescc",
+        "stat": "resm",
         "val": 2
       },
       {
         "stat": "capcinturon",
-        "val": 12
+        "val": 10
       }
     ],
     "efectoMods": [],
@@ -12304,9 +12408,8 @@
     "tipoItem": "cinturon",
     "peso": 1,
     "ranuras": 12,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Constitución +1. Resistencia a CC +2. Ranuras para consumibles +12.",
+    "precioCompra": 1100,
+    "detalle": "Constitución +2. Resistencia mental +2. Ranuras para consumibles +10.",
     "descripcionNarrativa": "Guarda más de lo que su tamaño permite.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12526,6 +12629,26 @@
       {
         "stat": "def",
         "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "tipo5",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12538,9 +12661,9 @@
     "precioCompra": 1800,
     "detalle": "Inmune a golpes críticos. indestructible",
     "descripcionNarrativa": "Plateada, casi sin peso, imposible de romper. La joya de la montaña.",
-    "equipoEstadoNombre": "Inmune a golpes críticos (Coraza de Mithril)",
+    "equipoEstadoNombre": "Inmune a rotura de armadura (coraza)",
     "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "Mientras esté equipada: es inmune a golpes críticos, y la armadura rota o arruinada no le hace nada (indestructible).",
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
   },
@@ -12728,7 +12851,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -12740,6 +12863,10 @@
       },
       {
         "stat": "mov",
+        "val": -1
+      },
+      {
+        "stat": "eva",
         "val": -1
       },
       {
@@ -12755,7 +12882,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 750,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipos 2 y 4: +3. Constitución +1. Movimiento -1.",
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipos 2: +3. Resistencia a críticos tipos 4: +2. Constitución +1. Movimiento -1. Evasión -1.",
     "descripcionNarrativa": "Osteodermos fósiles encastrados en acero. Pesa como un animal entero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12814,7 +12941,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -12841,7 +12968,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 1650,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Constitución +2. Resistencia mental +4.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia a críticos tipos 4: +2. Resistencia a críticos tipos 6 y 8: +1. Constitución +2. Resistencia mental +4.",
     "descripcionNarrativa": "Aleación que no existe todavía. No siente dolor, no negocia, no se detiene.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13105,6 +13232,41 @@
         "val": 1
       },
       {
+        "stat": "bonos",
+        "val": 2
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 2
+      },
+      {
+        "stat": "pdgmg",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-diadema-del-canalizador",
+    "nombre": "Diadema del canalizador",
+    "tier": "Raro",
+    "tipoItem": "casco_blando",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 140,
+    "detalle": "Pdg. Mg.: +3. Bonos +2.  Rango Cast.: +2.",
+    "descripcionNarrativa": "Aro delgado con una gema al centro que sigue el pulso de quien la lleva.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
         "stat": "eva",
         "val": 1
       }
@@ -13227,7 +13389,7 @@
       },
       {
         "stat": "agl",
-        "val": 1
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -13237,9 +13399,8 @@
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Agilidad +1. Evasión +2. Iniciativa +5.",
+    "precioCompra": 1200,
+    "detalle": "Agilidad +2. Evasión +2. Iniciativa +5.",
     "descripcionNarrativa": "Se adelanta medio segundo a todo. Siempre llega antes de que empiece.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13645,50 +13806,6 @@
     "mods": [
       {
         "stat": "def",
-        "val": 9
-      },
-      {
-        "stat": "tipo1",
-        "val": 3
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "mov",
-        "val": 1
-      },
-      {
-        "stat": "agl",
-        "val": 1
-      }
-    ],
-    "efectoMods": [],
-    "id": "ia-grebas-de-escama-de-yacumama",
-    "nombre": "Grebas de escama de yacumama",
-    "tier": "Excepcional",
-    "tipoItem": "piernas_rigidas",
-    "peso": 2,
-    "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 2: +3. Resistencia a críticos tipos 4 y 6: +2. Agilidad +1. Movimiento +1.",
-    "descripcionNarrativa": "Escamas de la serpiente madre del agua. Se deslizan solas al caminar.",
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false,
-    "imagen": ""
-  },
-  {
-    "mods": [
-      {
-        "stat": "def",
         "val": 3
       },
       {
@@ -13716,6 +13833,49 @@
     "mods": [
       {
         "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "agl",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-grebas-de-piel-de-hipogrifo",
+    "nombre": "Grebas de piel de hipogrifo",
+    "tier": "Excepcional",
+    "tipoItem": "piernas_rigidas",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 750,
+    "detalle": "Resistencia a críticos tipo 2: +3. Resistencia a críticos tipos 4: +2. Resistencia a críticos tipo 6: +1. Agilidad +1. Movimiento +1.",
+    "descripcionNarrativa": "Escamas de la serpiente madre del agua. Se deslizan solas al caminar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 12
       },
       {
@@ -13724,7 +13884,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -13760,7 +13920,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia a críticos tipos 4: +2. Resistencia a críticos tipos 6 y 8: +1. Resistencia a críticos tipo 10: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
     "descripcionNarrativa": "Bronce de una estatua que ya no existe. Sigue de pie igual.",
     "equipoEstadoNombre": "Armadura indestructible (grebas)",
     "equipoEstadoHpTurno": 0,
@@ -14047,23 +14207,23 @@
       },
       {
         "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       },
       {
         "stat": "pdg",
         "val": 2
       },
       {
-        "stat": "fue",
-        "val": 1
+        "stat": "crit",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -14073,9 +14233,8 @@
     "tipoItem": "guantes_rigidos",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 4: +3. Resistencia a críticos tipos 2 y 6: +2. Fuerza +1. PdG +2.",
+    "precioCompra": 750,
+    "detalle": "Resistencia a críticos tipos 2: +3 Resistencia a críticos tipos 4: +2. Resistencia a críticos tipos 6: +1.  PdG +2. Crítico +2.",
     "descripcionNarrativa": "Garras del séptimo hijo varón, montadas en acero. Se afilan solas los martes.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14095,7 +14254,7 @@
       },
       {
         "stat": "tipo2",
-        "val": 3
+        "val": 2
       },
       {
         "stat": "tipo3",
@@ -14123,7 +14282,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 2 y 4: +3. Resistencia a críticos tipo 6: +2. Destreza +2. PdG +5. Parry +2.",
+    "detalle": "Resistencia a críticos tipos 2: +3. Resistencia a críticos tipos 4: +2. Resistencia a críticos tipo 6: +2. Destreza +2. PdG +5. Parry +2.",
     "descripcionNarrativa": "Nadie vio bien lo que pasó. El resultado quedó igual.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14222,6 +14381,29 @@
     "precioCompra": 1850,
     "detalle": "inteligencia +2",
     "descripcionNarrativa": "Cuatro dedos y una sonrisa. Nadie hace preguntas.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-guantes-de-crupier",
+    "nombre": "Guantes de crupier",
+    "tier": "Común",
+    "tipoItem": "guantes_blandos",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 80,
+    "detalle": "Bonos +2",
+    "descripcionNarrativa": "Cuero fino, ajustado a cada dedo. Ideales para repartir cartas — o algo más.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -14458,7 +14640,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 5
+        "val": 4
       },
       {
         "stat": "tipo1",
@@ -14482,7 +14664,7 @@
     "nombre": "Guantes de piel de curupí",
     "tier": "Excepcional",
     "tipoItem": "guantes_blandos",
-    "peso": 0,
+    "peso": 1,
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
@@ -14641,7 +14823,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 1
+        "val": 2
       },
       {
         "stat": "mov",
@@ -14655,8 +14837,7 @@
     "tipoItem": "piernas_blandas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "",
     "descripcionNarrativa": "Tres rayas al costado. Cómodo hasta lo sospechoso.",
     "equipoEstadoNombre": "",
@@ -15116,10 +15297,6 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "tipo5",
         "val": 1
       }
@@ -15131,9 +15308,8 @@
     "tipoItem": "guantes_blandos",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Reducción fuerte a críticos tipo 6, leve a 8 y 10",
+    "precioCompra": 170,
+    "detalle": "Reducción a críticos tipos 6 y 10: +1",
     "descripcionNarrativa": "Pelaje áspero de bestia grande. Abrigan y aguantan.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15179,6 +15355,68 @@
         "val": 3
       },
       {
+        "stat": "bonos",
+        "val": 3
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "accionesmax",
+        "val": 1
+      },
+      {
+        "stat": "resmg",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-mascara-de-diablada-boliviana",
+    "nombre": "Máscara de diablada boliviana",
+    "tier": "Excepcional",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 520,
+    "detalle": "Inteligencia +1. Acciones +1. Bonos +3. Resistencia mágica +4.",
+    "descripcionNarrativa": "Colores estridentes y cuernos tallados. Da miedo de cerca, buena suerte de lejos.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-mascara-del-espiritu-del-bosque-mononoke",
+    "nombre": "Máscara del espíritu del bosque (Mononoke)",
+    "tier": "Legendario",
+    "tipoItem": "casco_blando",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 1350,
+    "detalle": "Otorga regeneración +5hp y +1 a resistencia de todos los críticos a todos los aliados en un rago de 5 alrededor",
+    "descripcionNarrativa": "Madera tallada con la calma de un bosque que todavía respira.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
         "stat": "tipo1",
         "val": 2
       },
@@ -15192,16 +15430,15 @@
       }
     ],
     "efectoMods": [],
-    "id": "ia-mascara-de-tela-de-arana-gigante",
-    "nombre": "Máscara de tela de araña gigante",
+    "id": "new-mascara-samurai",
+    "nombre": "Máscara samurai",
     "tier": "Raro",
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 330,
     "detalle": "Resistencia a críticos tipo 2: +2. Resistencia a críticos tipo 4: +1. Evasión +1.",
-    "descripcionNarrativa": "Hebra de araña de cueva, más resistente de lo que parece.",
+    "descripcionNarrativa": "Metal lacado con una expresión fija de furia. Intimidante incluso guardada.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -15363,6 +15600,10 @@
       {
         "stat": "def",
         "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15372,9 +15613,8 @@
     "tipoItem": "piernas_blandas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 60,
+    "detalle": "Evasión +1",
     "descripcionNarrativa": "Lienzo grueso de puesto de feria. Se rompe en la rodilla al mes.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15420,7 +15660,7 @@
         "val": 4
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo1",
         "val": 1
       }
     ],
@@ -15431,9 +15671,8 @@
     "tipoItem": "piernas_blandas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Reduce críticos tipo 6",
+    "precioCompra": 70,
+    "detalle": "Reduce críticos tipo 2",
     "descripcionNarrativa": "Parches de cuero en rodillas y muslos, gastados de arrastrarse.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15590,7 +15829,7 @@
     "mods": [
       {
         "stat": "def",
-        "val": 7
+        "val": 6
       },
       {
         "stat": "tipo1",
@@ -15616,8 +15855,7 @@
     "tipoItem": "piernas_rigidas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 330,
     "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipo 6: +1. Resistencia mental +1.",
     "descripcionNarrativa": "Metal caído del cielo. Densidad rara, peso engañoso.",
     "equipoEstadoNombre": "",
@@ -15829,6 +16067,53 @@
     "mods": [
       {
         "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      },
+      {
+        "stat": "int",
+        "val": 1
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-peto-runico",
+    "nombre": "Peto rúnico",
+    "tier": "Raro",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 190,
+    "detalle": "Resistencia a críticos tipos 2 y 4: +2. Resistencia a críticos tipo 6: +1. Inteligencia +1. Rango de casteo +1. Evasión -1.",
+    "descripcionNarrativa": "Runas grabadas a cincel, todavía brillan tenue cuando hay magia cerca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 2
       },
       {
@@ -15926,11 +16211,11 @@
         "val": 4
       },
       {
-        "stat": "tipo2",
-        "val": 2
+        "stat": "tipo1",
+        "val": 1
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -15939,11 +16224,10 @@
     "nombre": "Polainas tachonadas de taller",
     "tier": "Buena Calidad",
     "tipoItem": "piernas_blandas",
-    "peso": 1,
+    "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1.",
+    "precioCompra": 110,
+    "detalle": "Resistencia a críticos tipo 2 y 4: +1.",
     "descripcionNarrativa": "Remaches de bronce parejos en rodilla y espinilla.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15973,7 +16257,7 @@
     "tipoItem": "armadura_blanda",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 0,
+    "precioCompra": 1750,
     "detalle": "Agilidad +2. Evasión +4. Chance de reflejar maleficios (hechizos y debuffs): 50%. Efecto secreto por set completo.",
     "descripcionNarrativa": "Poncho pesado de lana cruda, con flecos deshilachados de tanto viaje. Dicen que devuelve lo que le tiran.",
     "equipoEstadoNombre": "",
@@ -16055,10 +16339,6 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "resm",
         "val": 1
       },
@@ -16072,11 +16352,10 @@
     "nombre": "Sabatones de acero de meteorito",
     "tier": "Raro",
     "tipoItem": "botas_rigidas",
-    "peso": 2,
+    "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 8 y 6: +1. Resistencia mental +1. Resistencia a CC +1.",
+    "precioCompra": 210,
+    "detalle": "Resistencia a críticos tipos 6: +1. Resistencia mental +1. Resistencia a CC +1.",
     "descripcionNarrativa": "Metal del cielo en la suela. Densidad rara.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16592,7 +16871,7 @@
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 330,
+    "precioCompra": 440,
     "detalle": "Agilidad +1. Evasión +2. Iniciativa +2.",
     "descripcionNarrativa": "Plumas del ave mesoamericano. Los pasos del que lo lleva no se oyen.",
     "equipoEstadoNombre": "",
@@ -16650,8 +16929,7 @@
     "tipoItem": "casco_blando",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 140,
     "detalle": "Inteligencia +1.",
     "descripcionNarrativa": "Vueltas de seda de buena hebra. Liviano y cómodo para concentrarse.",
     "equipoEstadoNombre": "",
@@ -16715,6 +16993,56 @@
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-tunica-de-acolito",
+    "nombre": "Túnica de acólito",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Bonos +2",
+    "descripcionNarrativa": "Tela áspera, sin adornos. La primera prenda de cualquiera que empieza a estudiar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-tunica-de-sanador",
+    "nombre": "Túnica de sanador",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "detalle": "Regeneración +2. Cualquier efecto de sanación que ejecute sana +5",
+    "descripcionNarrativa": "Lino blanco que no se mancha de sangre, por más que debería.",
+    "equipoEstadoNombre": "Regeneración (túnica)",
+    "equipoEstadoHpTurno": 2,
+    "equipoEstadoDetalle": "Cura 2 HP cada turno mientras esté equipada.",
     "consumible": false,
     "imagen": ""
   },
@@ -17053,16 +17381,20 @@
         "val": 6
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
       },
       {
         "stat": "ini",
         "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": -1
       },
       {
         "stat": "resm",
@@ -17076,9 +17408,8 @@
     "tipoItem": "casco_rigido",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Iniciativa +1. Resistencia mental +2.",
+    "precioCompra": 160,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +1. Iniciativa +1. Resistencia mental +2. PdG -1",
     "descripcionNarrativa": "Acero con incrustaciones de obsidiana pulida. El que lo lleva no se distrae.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

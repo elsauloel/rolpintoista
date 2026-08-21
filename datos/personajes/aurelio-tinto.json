@@ -14,7 +14,7 @@
     {
       "id": "1m5vfp1",
       "nombre": "IDEAS DE SKILLS",
-      "texto": "- idea de skill: CLEANSE. Anula todos los estados alterados, salvo aquellos que sean otorgados de forma permanente por algún objeto equipado.\n- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado"
+      "texto": "- idea de skill: ANGEL GUARDIAN . crea un estado alterado por x turnos, que hace que si muere el pj con el estado activado, sucede lo mismo que si tuviera un ankh equipado"
     },
     {
       "id": "b279ilr",
@@ -22,7 +22,7 @@
       "texto": "- enrra encontró un croquis con unas coordinadas que llevan al planeta zapato. levemente más pequeño que la tierra. mucho oro, muchas empresas. Pueblitos con su propia ley\n- entregamos los cuerpos de los científicos, negociamos una recompensa\n- nos anotamos al concurso anual de guisos para ganar el lanzallamas, para poder enfrentar a las avispas gigantes qe defienden el observatorio"
     }
   ],
-  "bitacoraActiva": "b279ilr",
+  "bitacoraActiva": "1m5vfp1",
   "loot": {
     "normal": 0,
     "magico": 0,
@@ -867,6 +867,58 @@
       "curahp": 0,
       "precioCompra": 0,
       "usadaEsteTurno": false
+    },
+    {
+      "id": "bnb0j5g",
+      "nombre": "Cleanse (definir)",
+      "peso": 0,
+      "ranuras": 1,
+      "detalle": "",
+      "mods": [],
+      "equipado": true,
+      "activo": true,
+      "stacks": 1,
+      "costo": "",
+      "accionesCosto": 1,
+      "dado": "",
+      "turnos": "",
+      "hpturno": 0,
+      "stacksturno": 0,
+      "permanente": false,
+      "popup": false,
+      "job": true,
+      "origen": "",
+      "imagen": "",
+      "categoria": "",
+      "tipoItem": "",
+      "tipoDado": 6,
+      "danoFijo": 0,
+      "danoAmplificado": 0,
+      "armaDeRango": false,
+      "manoPreferida": "",
+      "unidades": 1,
+      "consumible": false,
+      "curahp": 0,
+      "precioCompra": 0,
+      "usadaEsteTurno": false,
+      "efectoNombre": "",
+      "efectoTurnos": 0,
+      "efectoHpTurno": 0,
+      "efectoPermanente": false,
+      "efectoDetalle": "",
+      "efectoMods": [],
+      "curabonosPct": 0,
+      "cargaMax": 1,
+      "cargaActual": 1,
+      "forzarAccionesMax": "",
+      "mitadPdgEva": false,
+      "armaduraRota": false,
+      "armaduraArruinada": false,
+      "escudoMagico": 0,
+      "tiradaExtra": "",
+      "equipoEstadoNombre": "",
+      "equipoEstadoHpTurno": 0,
+      "equipoEstadoDetalle": ""
     }
   ],
   "pasivas": [

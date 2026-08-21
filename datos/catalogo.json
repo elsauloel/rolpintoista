@@ -5758,6 +5758,28 @@
     "imagen": ""
   },
   {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-lanzallamas",
+    "nombre": "Lanzallamas",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "detalle": "Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.",
+    "descripcionNarrativa": "Tanque de presión con boquilla ennegrecida. Silba antes de escupir fuego.",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": true,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [
       {
         "stat": "rng",

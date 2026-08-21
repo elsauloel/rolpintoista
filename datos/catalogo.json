@@ -17559,5 +17559,24 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "new-lanzallamas",
+    "nombre": "Lanzallamas",
+    "tier": "Raro",
+    "imagen": "",
+    "tipoItem": "arma_2m",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "consumible": false,
+    "legacy": false,
+    "mods": [],
+    "detalle": "Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.",
+    "descripcionNarrativa": "",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": true
   }
 ]

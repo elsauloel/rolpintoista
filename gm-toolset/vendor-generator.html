@@ -166,6 +166,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .modal .filtros select{flex:1 1 150px;width:auto}
 .iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
 .iconbtn:hover{border-color:var(--copper);color:var(--paper)}
+.modal footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}
+
+/* Formulario de "Crear ítem nuevo" — mismo patrón que datos/catalogo-editor.html. */
+.f{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.f label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.seccion{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.seccion-titulo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper)}
+.modrow{display:grid;grid-template-columns:1fr 90px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.modrow .mini{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);height:100%}
+.modrow .mini:hover{border-color:var(--danger);color:var(--danger)}
+label.chk{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px}
+input[type=checkbox]{width:auto}
 
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--panel);
@@ -244,6 +258,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       </div>
       <button type="button" class="ajuste-preset" id="btn-orden-dir">↑ Menor a mayor</button>
       <button type="button" class="btn" id="btn-agregar-items">+ Agregar ítems</button>
+      <button type="button" class="btn" id="btn-item-nuevo">+ Crear ítem nuevo</button>
     </div>
     <div id="preview-lista"></div>
   </div>
@@ -276,6 +291,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
       </select>
     </div>
     <div class="body" id="agregar-lista"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-item-nuevo">
+  <div class="modal">
+    <header>
+      <h3>Crear ítem nuevo</h3>
+      <button class="iconbtn" id="itemnuevo-x">Cerrar</button>
+    </header>
+    <div class="body" id="itemnuevo-body"></div>
+    <footer>
+      <button class="btn ghost" id="itemnuevo-cancelar">Cancelar</button>
+      <button class="btn primary" id="itemnuevo-crear">Crear y agregar a la tienda</button>
+    </footer>
   </div>
 </div>
 
@@ -1430,6 +1459,10 @@ function quitarItem(id){
   tiendaActual.items = tiendaActual.items.filter(x => x !== id);
   // Si sacan un consumible del stock fijo se respeta: es la tienda del GM.
   tiendaActual.garantizados = (tiendaActual.garantizados || []).filter(x => x !== id);
+  // Si era un ítem custom recién creado y todavía no se publicó, sacarlo
+  // de la tienda lo descarta del todo — que no termine igual en el
+  // catálogo compartido la próxima vez que se publique.
+  itemsCustomPendientes = itemsCustomPendientes.filter(x => x !== id);
   renderPreview();
   renderAgregarLista();
   toast(`${item ? item.nombre : 'Ítem'} fuera de la tienda`);
@@ -1443,6 +1476,157 @@ function agregarItem(id){
   renderPreview();
   renderAgregarLista();
   toast(`${item ? item.nombre : 'Ítem'} agregado`);
+}
+
+/* ---------- Crear ítem nuevo ----------
+   Ítem hecho a mano por el GM para esta tienda, no viene del catálogo
+   sincronizado. Se guarda en CATALOGO en memoria para que se vea en la
+   vista previa como cualquier otro, y su id queda en itemsCustomPendientes
+   hasta que se publica la tienda — recién ahí se sube también a
+   datos/catalogo.json (si no, tienda-publica.json apuntaría a un id que
+   no existe para los jugadores, que leen del catálogo sincronizado). */
+let itemNuevoDraft = null;
+let itemsCustomPendientes = [];
+
+function defaultsItemNuevo(){
+  return {
+    nombre:'', tier:'Común', tipoItem:'', peso:0, ranuras:1, precioCompra:0, detalle:'', descripcionNarrativa:'',
+    tipoDado:6, danoFijo:0, danoAmplificado:0, armaDeRango:false,
+    unidades:1, cargaMax:0, curahp:0,
+    mods:[],
+  };
+}
+
+function modsHtmlItemNuevo(){
+  const d = itemNuevoDraft;
+  return `<div id="itemnuevo-mods-lista">${(d.mods || []).map((m, i) => `
+    <div class="modrow">
+      <select data-modstat="${i}">
+        <option value="">— elegir stat —</option>
+        ${MOD_TARGETS.map(s => `<option value="${s.id}" ${m.stat === s.id ? 'selected' : ''}>${esc(s.label)}</option>`).join('')}
+      </select>
+      <input type="number" step="any" data-modval="${i}" value="${esc(m.val)}">
+      <button type="button" class="iconbtn mini" data-modrm="${i}">×</button>
+    </div>`).join('')}</div>
+    <button type="button" class="iconbtn" id="itemnuevo-mod-add" style="align-self:flex-start">+ Modificador</button>`;
+}
+
+function drawItemNuevo(){
+  const d = itemNuevoDraft;
+  const esArma = ES_ARMA(d.tipoItem);
+  const esCons = d.tipoItem === 'consumibles';
+  let html = `
+    <div class="seccion">
+      <div class="f"><label>Nombre</label><input type="text" id="itemnuevo-nombre" value="${esc(d.nombre)}" placeholder="ej. Espada del alba"></div>
+      <div class="f2">
+        <div class="f"><label>Categoría</label>
+          <select id="itemnuevo-tipo">${CATEGORIAS.map(c => `<option value="${c.id}" ${d.tipoItem === c.id ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select>
+        </div>
+        <div class="f"><label>Tier</label>
+          <select id="itemnuevo-tier">${TIERS.map(t => `<option value="${esc(t)}" ${d.tier === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="f3">
+        <div class="f"><label>Peso</label><input type="number" step="any" id="itemnuevo-peso" value="${esc(d.peso)}"></div>
+        <div class="f"><label>Ranuras (mochila)</label><input type="number" step="1" id="itemnuevo-ranuras" value="${esc(d.ranuras)}"></div>
+        <div class="f"><label>Precio (DDE)</label><input type="number" step="any" id="itemnuevo-precio" value="${esc(d.precioCompra)}"></div>
+      </div>
+      <div class="f"><label>Detalle (lo que lee el jugador)</label><textarea id="itemnuevo-detalle" rows="3">${esc(d.detalle)}</textarea></div>
+      <div class="f"><label>Descripción narrativa</label><textarea id="itemnuevo-narrativa" rows="2">${esc(d.descripcionNarrativa)}</textarea></div>
+    </div>`;
+
+  if(esArma){
+    html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Arma</div>
+      <div class="f3">
+        <div class="f"><label>Dado</label>
+          <select id="itemnuevo-dado">${DADOS_ARMA.map(v => `<option value="${v}" ${num(d.tipoDado) === v ? 'selected' : ''}>d${v}</option>`).join('')}</select>
+        </div>
+        <div class="f"><label>Daño fijo</label><input type="number" step="any" id="itemnuevo-fijo" value="${esc(d.danoFijo)}"></div>
+        <div class="f"><label>Daño amplificado</label><input type="number" step="1" min="0" id="itemnuevo-amplificado" value="${esc(d.danoAmplificado)}"></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="itemnuevo-derango" ${d.armaDeRango ? 'checked' : ''}> Arma de rango</label>
+    </div>`;
+  }
+  if(esCons){
+    html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Consumible</div>
+      <div class="f3">
+        <div class="f"><label>Unidades</label><input type="number" step="1" id="itemnuevo-unidades" value="${esc(d.unidades)}"></div>
+        <div class="f"><label>Cargas por unidad</label><input type="number" step="1" id="itemnuevo-cargamax" value="${esc(d.cargaMax)}"></div>
+        <div class="f"><label>Cura HP</label><input type="number" step="any" id="itemnuevo-curahp" value="${esc(d.curahp)}"></div>
+      </div>
+    </div>`;
+  }
+  html += `
+    <div class="seccion">
+      <div class="seccion-titulo">Modificadores (mientras esté equipado)</div>
+      ${modsHtmlItemNuevo()}
+    </div>`;
+  $('#itemnuevo-body').innerHTML = html;
+}
+
+function leerCamposItemNuevo(){
+  const d = itemNuevoDraft;
+  d.nombre = $('#itemnuevo-nombre').value;
+  d.tipoItem = $('#itemnuevo-tipo').value;
+  d.tier = $('#itemnuevo-tier').value;
+  d.peso = num($('#itemnuevo-peso').value);
+  d.ranuras = num($('#itemnuevo-ranuras').value);
+  d.precioCompra = num($('#itemnuevo-precio').value);
+  d.detalle = $('#itemnuevo-detalle').value;
+  d.descripcionNarrativa = $('#itemnuevo-narrativa').value;
+  // Guardado por existencia: si el select de categoría acaba de cambiar,
+  // la sección arma/consumible vieja todavía está en el DOM (o la nueva
+  // todavía no se dibujó) — leer sin chequear tira null.
+  if(ES_ARMA(d.tipoItem) && $('#itemnuevo-dado')){
+    d.tipoDado = num($('#itemnuevo-dado').value) || 6;
+    d.danoFijo = num($('#itemnuevo-fijo').value);
+    d.danoAmplificado = Math.max(0, num($('#itemnuevo-amplificado').value));
+    d.armaDeRango = $('#itemnuevo-derango').checked;
+  }
+  if(d.tipoItem === 'consumibles' && $('#itemnuevo-unidades')){
+    d.unidades = num($('#itemnuevo-unidades').value) || 1;
+    d.cargaMax = num($('#itemnuevo-cargamax').value);
+    d.curahp = num($('#itemnuevo-curahp').value);
+  }
+}
+
+function abrirItemNuevo(){
+  if(!tiendaActual){ toast('Primero generá una tienda'); return; }
+  itemNuevoDraft = defaultsItemNuevo();
+  drawItemNuevo();
+  $('#scrim-item-nuevo').classList.add('open');
+}
+
+function slugItemNuevo(s){
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'item';
+}
+
+function crearItemNuevo(){
+  leerCamposItemNuevo();
+  const d = itemNuevoDraft;
+  if(!d.nombre.trim()){ toast('Poné un nombre antes de crear el ítem'); return; }
+  if(!d.tipoItem){ toast('Elegí una categoría antes de crear el ítem'); return; }
+  let id = 'new-' + slugItemNuevo(d.nombre);
+  if(CATALOGO.some(it => it.id === id)) id += '-' + Math.random().toString(36).slice(2, 6);
+  const nuevo = {
+    id, nombre: d.nombre.trim(), tier: d.tier, imagen: '', tipoItem: d.tipoItem,
+    peso: d.peso, ranuras: d.ranuras, precioCompra: d.precioCompra,
+    consumible: d.tipoItem === 'consumibles', legacy: false,
+    mods: (d.mods || []).filter(m => m.stat),
+    detalle: d.detalle, descripcionNarrativa: d.descripcionNarrativa,
+    ...(ES_ARMA(d.tipoItem) ? {tipoDado: d.tipoDado, danoFijo: d.danoFijo, danoAmplificado: d.danoAmplificado, armaDeRango: d.armaDeRango} : {}),
+    ...(d.tipoItem === 'consumibles' ? {unidades: d.unidades, cargaMax: d.cargaMax, curahp: d.curahp} : {}),
+  };
+  CATALOGO.push(nuevo);
+  itemsCustomPendientes.push(nuevo.id);
+  agregarItem(nuevo.id);
+  $('#scrim-item-nuevo').classList.remove('open');
+  toast(`"${nuevo.nombre}" creado y agregado a la tienda — publicá la tienda para que llegue al catálogo`);
 }
 
 function renderAgregarLista(){
@@ -1549,6 +1733,7 @@ function actualizarHint(){
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'main';
 const ARCHIVO_TIENDA = 'datos/tienda-publica.json';
+const ARCHIVO_CATALOGO = 'datos/catalogo.json';
 
 const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
 
@@ -1675,6 +1860,38 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }
 
+async function ghLeerJson(ruta){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
+  const cab = {Accept: 'application/vnd.github.raw+json'};
+  const token = localStorage.getItem('gh-token');
+  if(token) cab.Authorization = 'Bearer ' + token.trim();
+  const resp = await fetch(url, {headers: cab, cache: 'no-store'});
+  if(resp.status === 404) return null;
+  if(resp.status === 401 || resp.status === 403) throw {auth: true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} leyendo ${ruta}`);
+  return await resp.json();
+}
+
+// Si se crearon ítems nuevos para esta tienda, hay que publicarlos en el
+// catálogo compartido ANTES de publicar la tienda — si no, tienda-publica.json
+// termina apuntando a un id que no existe en el catálogo que lee la ficha
+// de los jugadores. Se trae la versión más nueva de GitHub (no la que
+// tiene esta pestaña embebida, que puede estar vieja) para no pisar
+// ítems que otro haya agregado mientras tanto.
+async function publicarItemsCustomEnCatalogo(token){
+  if(!itemsCustomPendientes.length) return;
+  const actual = (await ghLeerJson(ARCHIVO_CATALOGO).catch(() => null)) || [];
+  const idsActuales = new Set(actual.map(it => it.id));
+  const nuevos = itemsCustomPendientes
+    .map(id => CATALOGO.find(it => it.id === id))
+    .filter(it => it && !idsActuales.has(it.id));
+  if(!nuevos.length){ itemsCustomPendientes = []; return; }
+  const combinado = [...actual, ...nuevos];
+  const nombres = nuevos.map(it => it.nombre).join(', ');
+  await ghSubir(ARCHIVO_CATALOGO, await aBase64(JSON.stringify(combinado, null, 2)), token, `Catálogo: agregar ${nombres} (desde el generador de tiendas)`);
+  itemsCustomPendientes = [];
+}
+
 async function publicarShop(){
   if(!tiendaActual){ toast('Primero generá una tienda'); return; }
   const btn = $('#btn-publicar');
@@ -1683,10 +1900,17 @@ async function publicarShop(){
   btn.disabled = true;
   toast('Publicando en GitHub…');
   try{
+    const habiaCustom = itemsCustomPendientes.length > 0;
+    if(habiaCustom){
+      toast('Publicando ítems nuevos en el catálogo…');
+      await publicarItemsCustomEnCatalogo(token);
+    }
     const b64 = await aBase64(JSON.stringify(tiendaActual, null, 2));
     const etiqueta = tiendaActual.nombre || (tiendaActual.categoriaLabel ? `${tiendaActual.tamanoLabel} · ${tiendaActual.categoriaLabel}` : tiendaActual.tamanoLabel);
     await ghSubir(ARCHIVO_TIENDA, b64, token, `Publicar tienda (${etiqueta})`);
-    toast('Tienda publicada ✓ — los jugadores ya pueden cargarla');
+    toast(habiaCustom
+      ? 'Tienda e ítems nuevos publicados ✓ — falta correr importar_json.py para que los ítems lleguen a ficha/gm-tools'
+      : 'Tienda publicada ✓ — los jugadores ya pueden cargarla');
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
@@ -1710,6 +1934,27 @@ $('#btn-publicar').addEventListener('click', publicarShop);
 $('#btn-personalizada').addEventListener('click', crearTiendaPersonalizada);
 $('#btn-token').addEventListener('click', () => ghToken(true));
 $('#btn-agregar-items').addEventListener('click', abrirAgregar);
+$('#btn-item-nuevo').addEventListener('click', abrirItemNuevo);
+$('#itemnuevo-x').addEventListener('click', () => $('#scrim-item-nuevo').classList.remove('open'));
+$('#itemnuevo-cancelar').addEventListener('click', () => $('#scrim-item-nuevo').classList.remove('open'));
+$('#scrim-item-nuevo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-item-nuevo') $('#scrim-item-nuevo').classList.remove('open'); });
+$('#itemnuevo-crear').addEventListener('click', crearItemNuevo);
+$('#itemnuevo-body').addEventListener('change', e => {
+  if(e.target.id === 'itemnuevo-tipo'){ leerCamposItemNuevo(); drawItemNuevo(); }
+});
+$('#itemnuevo-body').addEventListener('click', e => {
+  if(!itemNuevoDraft) return;
+  if(e.target.id === 'itemnuevo-mod-add'){ leerCamposItemNuevo(); itemNuevoDraft.mods.push({stat:'', val:0}); drawItemNuevo(); return; }
+  const rm = e.target.closest('[data-modrm]');
+  if(rm){ leerCamposItemNuevo(); itemNuevoDraft.mods.splice(+rm.dataset.modrm, 1); drawItemNuevo(); }
+});
+$('#itemnuevo-body').addEventListener('input', e => {
+  if(!itemNuevoDraft) return;
+  const iStat = e.target.dataset.modstat;
+  const iVal = e.target.dataset.modval;
+  if(iStat !== undefined){ itemNuevoDraft.mods[+iStat] = itemNuevoDraft.mods[+iStat] || {stat:'', val:0}; itemNuevoDraft.mods[+iStat].stat = e.target.value; }
+  if(iVal !== undefined){ itemNuevoDraft.mods[+iVal] = itemNuevoDraft.mods[+iVal] || {stat:'', val:0}; itemNuevoDraft.mods[+iVal].val = num(e.target.value); }
+});
 $('#tienda-nombre').addEventListener('input', e => {
   if(!tiendaActual) return;
   tiendaActual.nombre = e.target.value;
@@ -1736,6 +1981,7 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){
     $('#scrim-agregar').classList.remove('open');
     $('#scrim-ver').classList.remove('open');
+    $('#scrim-item-nuevo').classList.remove('open');
   }
 });
 document.addEventListener('click', e => {

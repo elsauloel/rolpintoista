@@ -29,11 +29,11 @@
     "especial": []
   },
   "attrs": {
-    "con": 8,
+    "con": 9,
     "fue": 5,
-    "agl": 6,
+    "agl": 7,
     "des": 5,
-    "int": 12
+    "int": 13
   },
   "hp": 40,
   "turno": 2,

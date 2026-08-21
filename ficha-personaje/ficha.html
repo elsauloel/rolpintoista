@@ -6110,6 +6110,7 @@ function renderCabeceraTienda(){
   const badge = $('#tienda-badge');
   const salir = $('#tienda-salir');
   const nuevo = $('#btn-catalogo-nuevo');
+  const verCompleto = $('#catalogo-ver-completo');
   if(tiendaCargada){
     const pct = Number(tiendaCargada.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
@@ -6117,10 +6118,15 @@ function renderCabeceraTienda(){
     badge.style.display = '';
     salir.style.display = '';
     if(nuevo) nuevo.style.display = 'none';
+    // El botón de ver todo sin filtros es para navegar el catálogo del
+    // fabricante en general, no para saltarse lo que ofrece un vendedor
+    // puntual — a un jugador no le corresponde en esa vista.
+    if(verCompleto) verCompleto.style.display = 'none';
   }else{
     badge.style.display = 'none';
     salir.style.display = 'none';
     if(nuevo) nuevo.style.display = '';
+    if(verCompleto) verCompleto.style.display = '';
   }
 }
 
@@ -6165,6 +6171,8 @@ async function abrirVendedor(){
     if(!ids.length) throw {vacia: true};
 
     tiendaCargada = data;
+    verCatalogoCompleto = false;
+    if($('#catalogo-ver-completo')) $('#catalogo-ver-completo').classList.remove('activo');
     limpiarFiltrosCatalogo();
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');

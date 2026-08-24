@@ -1846,7 +1846,7 @@ const SLOT_DEFS = [
   {id:'torso_rigida', label:'Armadura rígida', cats:['armadura_rigida'], max:1},
   {id:'manos', label:'Manos', cats:['manos'], max:1},
   {id:'manos_arma', label:'Manos (armas y escudos)', cats:['arma_1m','arma_2m','escudo_1m','escudo_2m'], max:2, peso:{arma_1m:1, arma_2m:2, escudo_1m:1, escudo_2m:2}},
-  {id:'anillos', label:'Anillos', cats:['anillos'], max:10},
+  {id:'anillos', label:'Anillos', cats:['anillos'], max:2},
   {id:'pies', label:'Pies', cats:['pies'], max:1},
   {id:'piernas', label:'Piernas', cats:['piernas'], max:1},
   {id:'cinturon', label:'Cinturón', cats:['cinturon'], max:1},
@@ -5848,12 +5848,9 @@ function precioTiendaHtml(item){
   return `<span class="precio-lista">${fmt(base)}</span><b>${fmt(final)} DDE</b>`;
 }
 
-// Slot que ocupa un ítem según SLOT_DEFS (blanda y rígida son slots
-// aparte, igual que en el toggle de equipar), y si ese slot ya está lleno
-// o ya hay algo del mismo tipo puesto (para el botón Comparar). Devuelve
-// null para lo que no ocupa un slot del cuerpo (consumibles, anillos sin
-// tope real, etc. — bueno, anillos sí tiene SLOT_DEF, así que también
-// aplica, con max:10 rara vez se ve "ocupado" pero Comparar sirve igual).
+// Slot que ocupa un ítem según SLOT_DEFS, y si ese slot ya está lleno o
+// ya hay algo del mismo tipo puesto (para el botón Comparar). Devuelve
+// null para lo que no ocupa un slot del cuerpo (consumibles, etc.).
 function slotOcupadoInfo(item){
   const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(item.tipoItem));
   if(!slotDef) return null;

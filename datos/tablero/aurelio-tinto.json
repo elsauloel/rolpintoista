@@ -12,7 +12,13 @@
       "turnos": 0,
       "permanente": true,
       "detalle": ""
+    },
+    {
+      "nombre": "Sin nombre",
+      "turnos": 0,
+      "permanente": true,
+      "detalle": ""
     }
   ],
-  "actualizado": "2026-09-10T02:21:39.867Z"
+  "actualizado": "2026-09-10T03:51:08.666Z"
 }

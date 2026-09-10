@@ -41,10 +41,9 @@
     "int": 13
   },
   "hp": 45,
-  "turno": 4,
+  "turno": 5,
   "log": [
-    "<b style=\"color:var(--brass)\">Turno 4</b>",
-    "<b>Bien descansado</b> escudo recargado a 20",
+    "<b style=\"color:var(--brass)\">Turno 5</b>",
     "Bonos y Acciones se reiniciaron."
   ],
   "bonosGastados": 0,

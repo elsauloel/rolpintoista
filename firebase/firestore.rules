@@ -105,6 +105,23 @@ service cloud.firestore {
         }
       }
 
+      // Creeps del GM en vivo (gm-toolset/gm-tools.html). El documento
+      // principal es lo que ven todos (nombre, orden, color, resumen de HP y
+      // estados, miniatura, firma); privado/ficha y privado/imagen tienen el
+      // creep completo y solo los ve el GM. Solo el GM escribe.
+      match /creeps/{id} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c);
+        match /privado/{doc} {
+          allow read, write: if esGM(c);
+        }
+      }
+
+      // Estado general del GM (por ahora, el contador de turno).
+      match /gm/{doc} {
+        allow read, write: if esGM(c);
+      }
+
       // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y
       // edita solo su dueño. tipo 'creep': solo el GM. El GM además puede
       // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.

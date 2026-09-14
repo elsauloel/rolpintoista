@@ -1892,8 +1892,8 @@ const DEFAULT = {
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
-  attrs:{con:0, fue:0, agl:0, des:0, int:0},
-  hp:1, turno:1, log:[], bonosGastados:0, acciones:3,
+  attrs:{con:1, fue:1, agl:1, des:1, int:1},
+  hp:5, turno:1, log:[], bonosGastados:0, acciones:3,
   muerto:{activo:false, turnos:5, definitivo:false},
   caps:{mochila:20, cinturon:5},
   armadura:{nota:''},
@@ -7148,12 +7148,13 @@ function fichaNueva(){
   S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, wld:'', imagen:''};
   S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
-  S.attrs = {con:0, fue:0, agl:0, des:0, int:0};
+  S.attrs = {con:1, fue:1, agl:1, des:1, int:1};
   S.hp = 0; S.turno = 1; S.log = []; S.bonosGastados = 0; S.acciones = 3;
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
   S.habilidades = [structuredClone(DEFAULT.habilidades[0])];
   S.acciones = compute().final.accionesmax;
+  { const hpmax = compute().final.hpmax; S.hp = Number.isNaN(hpmax) ? 0 : hpmax; }  // arranca con la vida llena
   openStat = null;
   renderAll();
   $('#f-nombre').focus();

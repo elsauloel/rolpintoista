@@ -26,10 +26,14 @@ En desarrollo activo, las dos.
   de la ficha: ahí se aplican los mods de equipo/estados a los stats
   finales de cada creep, incluyendo las mismas inmunidades/interceptores
   de daño (Invulnerable, Escudo mágico, etc.) espejados desde la ficha.
-- El botón "Guardar" baja `gm-creeps.json` (respaldo completo, **nunca**
-  se sube al repo) y opcionalmente `datos/creeps-publico.json` (recorte
-  público: id, nombre, imagen, HP, estados). El botón "Subir datos" sube
-  directamente ese recorte.
+- **En vivo con Firebase** (rama `nueva-version`, bloque "CREEPS EN VIVO"
+  al final del script): si se entró a la mesa como GM, los creeps y el
+  turno se cargan de `campanas/{id}/creeps` y se guardan solos (ver
+  [`docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Ya no hay
+  "Subir datos". Si entra un jugador, no se guarda nada. Los "personajes
+  del GM" (PNJ aliados, etc.) se manejan como creeps.
+- "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
+  sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)
   arma tarjetas a partir de sus creeps en vivo + lo que bajó de
   `datos/tablero/*.json`.

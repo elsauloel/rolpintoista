@@ -47,6 +47,16 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   retrato achicado a 96 px para el token del mapa. Todos los miembros leen
   todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools) y solo puede cambiar `duenoUid`. La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
+- `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {nivel, hp,
+  hpMax, muerto, estados[]}, miniatura, firma, actualizado}`. Lo público de
+  cada creep de `gm-toolset/gm-tools.html` (bloque "CREEPS EN VIVO"); lo
+  leen todos. El creep completo va en `creeps/{id}/privado/ficha` (`{json}`,
+  sin imagen) y su imagen en `creeps/{id}/privado/imagen` (`{dato}`): eso
+  solo lo lee el GM. `firma` es un hash del contenido para que otra pestaña
+  del GM note el cambio. Solo el GM escribe. Los "personajes del GM" (PNJ
+  aliados, comerciantes…) también son creeps.
+- `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
+  gm-tools. Solo el GM.
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
   'pj'|'creep', duenoUid, col, fila, creado}`. Tokens del mapa de
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,

@@ -144,6 +144,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 /* Toolbar */
 .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
 .toolbar .note{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-right:auto}
+.toolbar .note[data-estado="ok"]{color:var(--absenta)}
+.toolbar .note[data-estado="error"]{color:var(--danger)}
 input[type=file]{display:none}
 
 /* Grid */
@@ -568,15 +570,14 @@ input[type=file]{display:none}
         <button class="btn" id="btn-ia">+ Creep con IA</button>
         <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
         <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
-        <button class="btn subir" id="btn-subir" title="Publicar el estado de los creeps para que los jugadores lo vean en el Tablero">⬆ Subir datos</button>
       </div>
     </div>
   </div>
 
   <div class="toolbar">
-    <span class="note">Guardá antes de cerrar la pestaña — esto no se guarda solo. "Guardar todo" baja tu respaldo completo (gm-creeps.json). "Subir datos" publica el estado de los creeps para que los jugadores lo vean en el Tablero.</span>
-    <button class="btn ghost" id="btn-load">Cargar</button>
-    <button class="btn" id="btn-save-todo">Guardar todo (para mí)</button>
+    <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
+    <button class="btn ghost" id="btn-load" title="Reemplazar los creeps por los de un archivo gm-creeps.json">Cargar archivo</button>
+    <button class="btn" id="btn-save-todo" title="Bajar una copia de respaldo de todos los creeps (gm-creeps.json)">Guardar copia</button>
     <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
     <input type="file" id="file-input" accept=".json">
   </div>
@@ -1740,8 +1741,8 @@ const DADOS_ARMA = [2,4,6,8,10];
 function nuevoCreep(){
   return {
     id: uid(), nombre:'Creep nuevo', imagen:'', nivel:1, color: COLORES[Math.floor(Math.random()*COLORES.length)],
-    hp:10, hpMax:10, acc:3, accMax:3, spd:5,
-    con:0, fue:0, agl:0, des:0, int:0,
+    hp:5, hpMax:5, acc:3, accMax:3, spd:5,  // Hp.Max = Con*5
+    con:1, fue:1, agl:1, des:1, int:1,
     armaTipo:6, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
     defensa:0, armaduraTipo:'', equipo:[],
     crit:[0,0,0,0,0],
@@ -1873,13 +1874,19 @@ function attrCellHtml(sc, a){
    a propósito.
    ========================================================= */
 
-// Recalcula hpMax = con*5 (con efectivo, con estados incluidos) cuando
-// cambia con. Si el creep estaba a HP lleno lo deja lleno; si no, sólo
-// recorta hp si se pasa del nuevo máximo. Después el máster puede seguir
-// editando hp/hpMax a mano hasta que con vuelva a cambiar.
+// ¿Estos modificadores cambian el Hp.Max? (Con, o Hp.Max directo)
+function modsAfectanHp(mods){
+  return (mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax');
+}
+
+// Recalcula hpMax = con*5 + mods de Hp.Max (con efectivo; equipo y estados
+// incluidos, igual que en la ficha) cuando cambia con o algo que da Hp.Max.
+// Si el creep estaba a HP lleno lo deja lleno; si no, sólo recorta hp si se
+// pasa del nuevo máximo. Después el máster puede seguir editando hp/hpMax a
+// mano hasta el próximo recálculo.
 function actualizarHpMaxPorCon(sc){
   const conEfectivo = num(sc.con) + creepModTotal(sc, 'con');
-  const nuevoHpMax = Math.max(0, conEfectivo * 5);
+  const nuevoHpMax = Math.max(0, conEfectivo * 5 + creepModTotal(sc, 'hpmax'));
   const estabaFull = num(sc.hp) >= num(sc.hpMax);
   sc.hpMax = nuevoHpMax;
   sc.hp = estabaFull ? nuevoHpMax : Math.min(num(sc.hp), nuevoHpMax);
@@ -2527,7 +2534,7 @@ function activarEstadoPresetCreep(preset){
   }
   const es = {id: uid(), ...datos};
   sc.estados.push(es);
-  if((datos.mods||[]).some(m=>m.stat==='con')) actualizarHpMaxPorCon(sc);
+  if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
   renderAll();
   toast(`${sc.nombre}: ${preset.nombre} activado`);
 }
@@ -2863,6 +2870,7 @@ function quitarEquipoDeCreep(scId, equipoId){
   aplicarModsEquipo(sc, item.mods, -1);
   sc.equipo = sc.equipo.filter(x => x.id !== equipoId);
   actualizarArmaduraTipo(sc);
+  if(modsAfectanHp(item.mods)) actualizarHpMaxPorCon(sc);
   renderAll();
   toast(`${item.nombre} quitado`);
 }
@@ -2878,6 +2886,7 @@ function equiparItemEnCreep(idx){
     sc.equipo = sc.equipo || [];
     sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || ''});
     actualizarArmaduraTipo(sc);
+    if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
     sc.armaTipo = item.tipoDado;
@@ -2968,6 +2977,7 @@ function guardarItemCustomGM(){
     sc.equipo = sc.equipo || [];
     sc.equipo.push({id: uid(), nombre, tipoItem, def, mods, detalle});
     actualizarArmaduraTipo(sc);
+    if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
   }
   toast(`${sc.nombre} equipado con ${nombre}`);
   registrarEvento(`✎ Ítem custom: ${sc.nombre} equipado con ${nombre}`);
@@ -3255,7 +3265,7 @@ function guardarEditorEstadoCreep(){
     es = {id: uid(), ...datos};
     sc.estados.push(es);
   }
-  const teniaCon = (datos.mods||[]).some(m=>m.stat==='con');
+  const teniaCon = modsAfectanHp(datos.mods);
   if(teniaCon) actualizarHpMaxPorCon(sc);
   editingEstadoCreep = null;
   $('#scrim-estado-creep').classList.remove('open');
@@ -3548,7 +3558,7 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s=>s.id===scId);
     if(sc){
       const es = sc.estados.find(x=>x.id===estId);
-      const teniaCon = es && (es.mods||[]).some(m=>m.stat==='con');
+      const teniaCon = es && modsAfectanHp(es.mods);
       sc.estados = sc.estados.filter(es=>es.id!==estId);
       if(teniaCon) actualizarHpMaxPorCon(sc);
       renderAll();
@@ -3575,7 +3585,7 @@ document.addEventListener('click', e => {
     sc.acc = Math.max(0, num(sc.acc) - costoAcciones);
     h.cdActual = num(h.cd);
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
-    if(efecto && (efecto.mods||[]).some(m=>m.stat==='con')) actualizarHpMaxPorCon(sc);
+    if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
     if(h.tiradaExtra) tirarExtraDeHab(h);
     const partes = [`ejecutada`, costoAcciones ? `−${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : 'sin costo de Acciones'];
@@ -3585,10 +3595,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-mant'){
-    // Sube los datos solo, para minimizar el riesgo de perder avance por
-    // olvidarse de tocar "Subir datos" con frecuencia.
-    mantenimiento();
-    subirDatos();
+    mantenimiento();  // los creeps se guardan solos en la mesa
     return;
   }
   if(b.id === 'btn-reset'){
@@ -3601,8 +3608,11 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
-  if(b.id === 'btn-load'){ $('#file-input').click(); return; }
-  if(b.id === 'btn-subir'){ subirDatos(); return; }
+  if(b.id === 'btn-load'){
+    if(gmVivo.listo && !confirm('Cargar un archivo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
+    $('#file-input').click();
+    return;
+  }
   if(b.id === 'btn-token'){ ghToken(true).then(t => { if(t) toast('Token de GitHub actualizado'); }); return; }
   if(b.id === 'btn-ia'){ $('#ia-prompt').value = ''; poblarSelectorModelos(); $('#scrim-ia').classList.add('open'); $('#ia-prompt').focus(); return; }
   if(b.id === 'ia-x'){ $('#scrim-ia').classList.remove('open'); return; }
@@ -3611,10 +3621,9 @@ document.addEventListener('click', e => {
 });
 
 /* =========================================================
-   SUBIR DATOS A GITHUB
-   Sube solo datos/creeps-publico.json (la vista recortada para
-   jugadores) al repo. gm-creeps.json nunca se sube — es el
-   respaldo privado del máster y se queda en su compu.
+   GITHUB
+   Queda solo para el catálogo ("Agregar al catálogo"). Los creeps
+   ya no se suben acá: se guardan solos en la mesa (ver CREEPS EN VIVO).
    ========================================================= */
 
 const GH_REPO = 'elsauloel/rolpintoista';
@@ -3949,29 +3958,6 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }
 
-async function subirDatos(){
-  const btn = $('#btn-subir');
-  const token = await ghToken(false);
-  if(!token){ toast('Sin token no se puede subir'); return; }
-  btn.disabled = true;
-  toast('Subiendo a GitHub…');
-  try{
-    const b64 = await aBase64(JSON.stringify(armarVistaPublica(), null, 2));
-    await ghSubir('datos/creeps-publico.json', b64, token, 'Actualizar estado de los creeps');
-    toast('Estado de los creeps subido a GitHub ✓');
-  }catch(err){
-    if(err && err.auth){
-      localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá Subir datos de nuevo');
-    }else{
-      console.error('Error subiendo datos/creeps-publico.json:', err);
-      toast('No se pudo subir — revisá la consola');
-    }
-  }finally{
-    btn.disabled = false;
-  }
-}
-
 /* =========================================================
    GENERAR CREEP CON IA (OpenRouter)
    Usa un modelo gratuito de OpenRouter para armar un creep
@@ -4174,7 +4160,10 @@ function mantenimiento(){
       if(!es.permanente && num(es.turnos) > 0) es.turnos = Math.max(0, num(es.turnos) - 1);
     });
     const antes = sc.estados.length;
-    sc.estados = sc.estados.filter(es => es.activo === false || (es.permanente ? num(es.stacks) !== 0 : (es.turnos > 0 && num(es.stacks) !== 0)));
+    const sigue = es => es.activo === false || (es.permanente ? num(es.stacks) !== 0 : (es.turnos > 0 && num(es.stacks) !== 0));
+    const vencenConHp = sc.estados.some(es => !sigue(es) && modsAfectanHp(es.mods));
+    sc.estados = sc.estados.filter(sigue);
+    if(vencenConHp) actualizarHpMaxPorCon(sc);
     vencidos += antes - sc.estados.length;
   });
   renderAll();
@@ -4293,22 +4282,6 @@ function toast(msg){
   registrarEvento(msg);
 }
 
-// Lo que ven los jugadores: nombre, HP y estados, sin habilidades ni
-// equipo. La sube "Subir datos" y la lee el Tablero de las fichas.
-function armarVistaPublica(){
-  return {
-    actualizado: new Date().toISOString(),
-    creeps: S.creeps.map(sc => ({
-      id: sc.id,
-      nombre: sc.nombre,
-      imagen: sc.imagen || '',
-      hp: num(sc.hp),
-      hpMax: num(sc.hpMax),
-      estados: (sc.estados||[]).map(es => ({ nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, detalle: es.detalle || '' }))
-    }))
-  };
-}
-
 function descargar(nombreArchivo, objeto){
   const blob = new Blob([JSON.stringify(objeto, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -4423,7 +4396,7 @@ $('#verestado-eliminar').onclick = () => {
   const sc = S.creeps.find(s => s.id === scId);
   if(sc){
     const es = sc.estados.find(x => x.id === esId);
-    const teniaCon = es && (es.mods||[]).some(m=>m.stat==='con');
+    const teniaCon = es && modsAfectanHp(es.mods);
     sc.estados = sc.estados.filter(x => x.id !== esId);
     if(teniaCon) actualizarHpMaxPorCon(sc);
     renderAll();
@@ -4802,7 +4775,7 @@ async function mesaEntrarConCodigo(){
     try{
       await fbRegistrarMiembro(datos.nombre, datos.codigo);
       fbMiembro = await fbLeerMiembro();
-      if(fbMiembro){ mesaEscuchar(); return; }
+      if(fbMiembro){ gmAlEntrar(); return; }
       error = 'No se pudo confirmar la entrada, probá de nuevo.';
     }catch(err){
       console.error('Error entrando a la mesa:', err);
@@ -4853,8 +4826,326 @@ async function mesaIniciar(){
     return;
   }
   fbMiembro = await fbLeerMiembro();
-  if(fbMiembro) mesaEscuchar();
+  if(fbMiembro) gmAlEntrar();
   else mesaMostrarEntrar();
+}
+
+/* =========================================================
+   CREEPS EN VIVO (Firebase)
+   Los creeps del GM se guardan solos en campanas/<campaña>/creeps/<id>:
+   - el documento principal es lo que ven los jugadores: nombre, orden,
+     color, resumen (HP, estados), miniatura de la imagen y una firma
+     (hash) del contenido para darse cuenta de cambios de otra pestaña;
+   - creeps/<id>/privado/ficha {json} es el creep completo (sin imagen)
+     y creeps/<id>/privado/imagen {dato} su imagen: eso lo lee solo el GM.
+   El contador de turno va en campanas/<campaña>/gm/estado.
+   Cada creep se escribe cuando deja de cambiar ~1,2 s (o cada 5 s si no
+   para), por el tope diario de escrituras del plan gratis.
+   Solo el GM guarda (lo imponen las reglas). Ver docs/workflow-firebase.md.
+   ========================================================= */
+
+const GM_GUARDAR_QUIETO_MS = 1200;
+const GM_GUARDAR_MAX_MS = 5000;
+const GM_LOTE_MAX_BYTES = 8 * 1024 * 1024;  // tope de Firebase por lote: 10 MB
+const CREEP_MINIATURA_PX = 96;
+
+const gmVivo = {
+  activo: false,       // entró a la mesa como GM
+  listo: false,        // ya se cargaron los creeps de la mesa
+  ultimo: {},          // id -> {json, imagen, publico} tal como quedó guardado
+  firmas: {},          // id -> firma guardada (para ignorar el eco de lo propio)
+  sucios: {},          // id -> {clave, desde, cambio}
+  ultimoTurno: null,
+  escribiendo: false,
+  reintentarDesde: 0,
+  cola: Promise.resolve(),
+};
+
+function gmHash(s){
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for(let i = 0; i < s.length; i++){
+    const ch = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+function creepFichaJson(sc){
+  return JSON.stringify({...sc, imagen: ''});
+}
+
+// Lo que ven los jugadores de cada creep (sin habilidades, equipo ni stats).
+function creepPublico(sc, orden){
+  const hp = num(sc.hp);
+  return {
+    nombre: String(sc.nombre || 'Creep').slice(0, 60),
+    orden,
+    color: String(sc.color || ''),
+    resumen: {
+      nivel: num(sc.nivel),
+      hp,
+      hpMax: num(sc.hpMax),
+      muerto: hp <= 0,
+      estados: (sc.estados || [])
+        .filter(es => es && es.activo !== false && es.nombre)
+        .slice(0, 30)
+        .map(es => ({
+          nombre: String(es.nombre).slice(0, 60),
+          turnos: num(es.turnos),
+          permanente: !!es.permanente,
+          polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
+        })),
+    },
+  };
+}
+
+function creepMiniatura(dataUrl){
+  return new Promise(res => {
+    if(!dataUrl){ res(''); return; }
+    const img = new Image();
+    img.onload = () => {
+      const lado = Math.min(img.naturalWidth, img.naturalHeight);
+      if(!lado){ res(''); return; }
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = CREEP_MINIATURA_PX;
+      canvas.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, CREEP_MINIATURA_PX, CREEP_MINIATURA_PX);
+      try{ res(canvas.toDataURL('image/jpeg', 0.8)); }catch(e){ res(''); }
+    };
+    img.onerror = () => res('');
+    img.src = dataUrl;
+  });
+}
+
+function gmEstado(texto, tipo){
+  const el = $('#gm-guardado-estado');
+  if(!el) return;
+  el.textContent = texto;
+  el.dataset.estado = tipo || '';
+}
+
+function gmEstadoAlDia(){
+  const g = gmVivo;
+  if(!fbMiembro){ gmEstado('Sin entrar a la mesa: los creeps no se guardan.'); return; }
+  if(!g.activo){ gmEstado('Entraste como jugador: solo el GM guarda creeps en la mesa.', 'error'); return; }
+  if(!g.listo){ gmEstado('Cargando creeps de la mesa…'); return; }
+  if(g.reintentarDesde){ gmEstado('⚠ No se pudieron guardar los creeps — reintentando', 'error'); return; }
+  if(g.escribiendo){ gmEstado('Guardando…'); return; }
+  if(Object.keys(g.sucios).length){ gmEstado('Cambios sin guardar…'); return; }
+  gmEstado(`✓ Creeps guardados en la mesa (${S.creeps.length})`, 'ok');
+}
+
+/* ---------- Guardado ---------- */
+
+async function gmGuardarTick(forzar){
+  const g = gmVivo;
+  if(!g.activo || !g.listo || g.escribiendo) return;
+  const ahora = Date.now();
+  if(g.reintentarDesde && ahora < g.reintentarDesde && !forzar) return;
+
+  const actuales = new Map();
+  S.creeps.forEach((sc, i) => {
+    actuales.set(sc.id, {json: creepFichaJson(sc), imagen: sc.imagen || '', publico: JSON.stringify(creepPublico(sc, i)), sc, orden: i});
+  });
+  const guardar = [];
+  actuales.forEach((a, id) => {
+    const u = g.ultimo[id];
+    if(u && u.json === a.json && u.imagen === a.imagen && u.publico === a.publico){ delete g.sucios[id]; return; }
+    const clave = a.json + '|' + a.publico + '|' + a.imagen.length + gmHash(a.imagen);
+    const s = g.sucios[id];
+    if(!s) g.sucios[id] = {clave, desde: ahora, cambio: ahora};
+    else if(s.clave !== clave){ s.clave = clave; s.cambio = ahora; }
+    const t = g.sucios[id];
+    if(forzar || ahora - t.cambio >= GM_GUARDAR_QUIETO_MS || ahora - t.desde >= GM_GUARDAR_MAX_MS) guardar.push([id, a]);
+  });
+  const borrar = Object.keys(g.ultimo).filter(id => !actuales.has(id));
+  const turnoCambio = num(S.turno) !== g.ultimoTurno;
+  if(!guardar.length && !borrar.length && !turnoCambio){ gmEstadoAlDia(); return; }
+
+  g.escribiendo = true;
+  gmEstadoAlDia();
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const col = fbDb.collection(fbRutaCampana('creeps'));
+  const batch = fbDb.batch();
+  const hechos = [];
+  let bytes = 0, ops = 0;
+  for(const [id, a] of guardar){
+    const u = g.ultimo[id];
+    const imagenCambio = !u || u.imagen !== a.imagen;
+    const peso = a.json.length + (imagenCambio ? a.imagen.length : 0) + 2000;
+    if(hechos.length && (bytes + peso > GM_LOTE_MAX_BYTES || ops + 3 > 450)) break;  // el resto, en la próxima vuelta
+    bytes += peso; ops += 3;
+    const firma = gmHash(a.json) + '-' + gmHash(a.imagen);
+    const doc = {...JSON.parse(a.publico), firma, actualizado: ts};
+    if(imagenCambio) doc.miniatura = await creepMiniatura(a.imagen);
+    const base = col.doc(id);
+    batch.set(base, doc, {merge: true});
+    batch.set(base.collection('privado').doc('ficha'), {json: a.json});
+    if(imagenCambio) batch.set(base.collection('privado').doc('imagen'), {dato: a.imagen});
+    g.firmas[id] = firma;
+    hechos.push([id, a]);
+  }
+  const borrados = borrar.slice(0, Math.max(0, Math.floor((450 - ops) / 3)));
+  borrados.forEach(id => {
+    const base = col.doc(id);
+    batch.delete(base.collection('privado').doc('ficha'));
+    batch.delete(base.collection('privado').doc('imagen'));
+    batch.delete(base);
+  });
+  if(turnoCambio) batch.set(fbDb.doc(fbRutaCampana('gm/estado')), {turno: num(S.turno), actualizado: ts});
+
+  try{
+    await batch.commit();
+    hechos.forEach(([id, a]) => {
+      g.ultimo[id] = {json: a.json, imagen: a.imagen, publico: a.publico};
+      const s = g.sucios[id];
+      if(s && s.clave === a.json + '|' + a.publico + '|' + a.imagen.length + gmHash(a.imagen)) delete g.sucios[id];
+    });
+    borrados.forEach(id => { delete g.ultimo[id]; delete g.firmas[id]; delete g.sucios[id]; });
+    if(turnoCambio) g.ultimoTurno = num(S.turno);
+    g.reintentarDesde = 0;
+  }catch(err){
+    console.error('No se pudieron guardar los creeps en la mesa:', err);
+    if(!g.reintentarDesde){
+      toast(err.code === 'permission-denied'
+        ? 'La mesa no te deja guardar creeps (¿entraste como GM?)'
+        : 'No se pudieron guardar los creeps en la mesa — se reintenta solo');
+    }
+    g.reintentarDesde = Date.now() + 8000;
+  }finally{
+    g.escribiendo = false;
+    gmEstadoAlDia();
+  }
+}
+
+setInterval(() => gmGuardarTick(false), 1000);
+
+function gmHayPendiente(){
+  const g = gmVivo;
+  if(!g.activo || !g.listo) return false;
+  if(g.escribiendo || num(S.turno) !== g.ultimoTurno) return true;
+  const ids = new Set(S.creeps.map(sc => sc.id));
+  if(Object.keys(g.ultimo).some(id => !ids.has(id))) return true;
+  return S.creeps.some((sc, i) => {
+    const u = g.ultimo[sc.id];
+    return !u || u.json !== creepFichaJson(sc) || u.imagen !== (sc.imagen || '') || u.publico !== JSON.stringify(creepPublico(sc, i));
+  });
+}
+
+window.addEventListener('beforeunload', e => {
+  if(!gmHayPendiente()) return;
+  gmGuardarTick(true);
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+/* ---------- Carga y cambios desde otra pestaña ---------- */
+
+async function gmLeerCreep(doc){
+  const base = doc.ref;
+  const [ficha, imagen] = await Promise.all([
+    base.collection('privado').doc('ficha').get(),
+    base.collection('privado').doc('imagen').get(),
+  ]);
+  let datos = {};
+  const json = ficha.exists ? String(ficha.data().json || '') : '';
+  try{ datos = json ? JSON.parse(json) : {}; }catch(e){ datos = {}; }
+  const sc = Object.assign(nuevoCreep(), datos, {id: doc.id});
+  sc.imagen = imagen.exists ? String(imagen.data().dato || '') : '';
+  if(!ficha.exists){ sc.nombre = doc.data().nombre || sc.nombre; }
+  if(!sc.habilidades.some(h => h.nombre === 'Movimiento')){
+    sc.habilidades = [{id: uid(), nombre: 'Movimiento', detalle: '', cd: 0, cdActual: 0}, ...sc.habilidades];
+  }
+  return sc;
+}
+
+function gmMarcarGuardado(sc, orden, firma){
+  gmVivo.ultimo[sc.id] = {json: creepFichaJson(sc), imagen: sc.imagen || '', publico: JSON.stringify(creepPublico(sc, orden))};
+  gmVivo.firmas[sc.id] = firma;
+  delete gmVivo.sucios[sc.id];
+}
+
+async function gmProcesarSnapshot(snap){
+  const g = gmVivo;
+  if(!g.listo){
+    if(!snap.empty){
+      const docs = snap.docs.slice().sort((a, b) => num(a.data().orden) - num(b.data().orden));
+      const creeps = await Promise.all(docs.map(gmLeerCreep));
+      S.creeps = creeps;
+      renderAll();  // normaliza los creeps
+      S.creeps.forEach((sc, i) => gmMarcarGuardado(sc, i, docs[i].data().firma || ''));
+      toast(`${creeps.length} creep(s) cargados de la mesa`);
+    }
+    // Si la mesa no tenía creeps, se suben los que haya en pantalla.
+    try{
+      const est = await fbDb.doc(fbRutaCampana('gm/estado')).get();
+      if(est.exists && est.data().turno !== undefined){
+        S.turno = num(est.data().turno);
+        g.ultimoTurno = S.turno;
+        renderAll();
+      }
+    }catch(err){ console.error('No se pudo leer el turno:', err); }
+    g.listo = true;
+    gmEstadoAlDia();
+    return;
+  }
+
+  let cambio = false;
+  for(const ch of snap.docChanges()){
+    if(ch.doc.metadata.hasPendingWrites) continue;
+    const id = ch.doc.id;
+    if(ch.type === 'removed'){
+      if(g.ultimo[id] && S.creeps.some(sc => sc.id === id)){
+        S.creeps = S.creeps.filter(sc => sc.id !== id);
+        delete g.ultimo[id]; delete g.firmas[id]; delete g.sucios[id];
+        cambio = true;
+      }
+      continue;
+    }
+    const d = ch.doc.data();
+    if(!d.firma || d.firma === g.firmas[id]) continue;
+    const sc = await gmLeerCreep(ch.doc);
+    const idx = S.creeps.findIndex(x => x.id === id);
+    if(idx >= 0) S.creeps[idx] = sc;
+    else S.creeps.splice(Math.min(S.creeps.length, Math.max(0, num(d.orden))), 0, sc);
+    gmMarcarGuardado(sc, S.creeps.indexOf(sc), d.firma);
+    cambio = true;
+  }
+  if(cambio){
+    renderAll();
+    toast('Los creeps se actualizaron desde otra pestaña');
+    gmEstadoAlDia();
+  }
+}
+
+function gmEscuchar(){
+  fbDb.collection(fbRutaCampana('creeps')).onSnapshot(snap => {
+    gmVivo.cola = gmVivo.cola.then(() => gmProcesarSnapshot(snap)).catch(err => {
+      console.error('Error aplicando los creeps de la mesa:', err);
+      if(!gmVivo.listo) gmEstado('⚠ No se pudieron cargar los creeps — mirá la consola', 'error');
+    });
+  }, err => {
+    console.error('Error escuchando los creeps:', err);
+    gmEstado('⚠ No se pudieron leer los creeps. ¿Están publicadas las reglas nuevas?', 'error');
+  });
+  fbDb.doc(fbRutaCampana('gm/estado')).onSnapshot(doc => {
+    if(!gmVivo.listo || doc.metadata.hasPendingWrites || !doc.exists) return;
+    const turno = num(doc.data().turno);
+    if(turno === gmVivo.ultimoTurno) return;
+    gmVivo.ultimoTurno = turno;
+    S.turno = turno;
+    renderAll();
+  }, err => console.error('Error escuchando el turno:', err));
+}
+
+// Se llama cuando ya se entró a la mesa.
+function gmAlEntrar(){
+  mesaEscuchar();
+  gmVivo.activo = fbMiembro.gm === true;
+  gmEstadoAlDia();
+  if(gmVivo.activo) gmEscuchar();
 }
 
 mesaIniciar();

@@ -53,6 +53,9 @@ su casa:
   - **La ficha de personaje es solo de jugadores.** El GM usa gm-tools para
     sus creeps y sus propios personajes (que son creeps con otro nombre:
     PNJ aliados, comerciantes…). Si el GM abre la ficha, solo mira.
+  - **Stats iniciales en 1** (Con, Fue, Agi, Des, Int) para personajes y
+    creeps nuevos; la vida arranca llena. En creeps, Hp.Max = Con×5 + mods de
+    Hp.Max (equipo y estados), igual que en la ficha.
   - Rol visible en la cajita Mesa ("· GM" / "· jugador"). Es por navegador.
   - Fichas de creeps: solo el GM las ve y modifica. Los jugadores ven de
     cada creep solo el token, la barra de vida y los estados.
@@ -79,7 +82,7 @@ su casa:
 | 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | ✅ Hecho y probado |
 | 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | En curso |
 | 3a | Ficha guardada sola en Firebase por partes; Personajes lista los de la mesa (propios / de otros en solo lectura); se van Subir/Bajar datos | ✅ Hecho y probado |
-| 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | Pendiente |
+| 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
 | 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | Pendiente |
 
 **Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y

@@ -100,6 +100,9 @@ su casa:
 | 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
 | 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
 
+**Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde
+`nueva-version`, activo desde el 14/9/2026).
+
 **Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y
 movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),
 publicar en una web, pasar catálogo/tienda/manual a Firebase.

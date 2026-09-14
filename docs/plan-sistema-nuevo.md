@@ -30,7 +30,10 @@ su casa:
 - Sin backend propio ni build step: cada herramienta sigue siendo un
   `.html` que se abre con doble clic. Firebase (proyecto `rol-pintoista`,
   plan Spark gratis, sin tarjeta) es el backend en vivo.
-- **Imágenes: se omiten mientras compliquen** (tokens con color e inicial).
+- **Imágenes: solo las necesarias, y siempre que no compliquen**: retrato
+  en la cabecera de la ficha, imagen propia de cada creep, miniatura de
+  esas en el token vinculado, e imagen de fondo del mapa. Las de ítems,
+  habilidades y catálogo quedan afuera por ahora.
 - Catálogo, tienda, manual y `herramientas/*.py` quedan como están por ahora.
 - El usuario no es técnico: explicarle en palabras simples y con pasos
   concretos en la consola de Firebase.
@@ -70,7 +73,10 @@ su casa:
 | 0 | Firebase: proyecto, auth anónima, código, reglas, página de prueba | ✅ Hecho y probado |
 | 1 | Mesa: tiradas compartidas en vivo (cajita flotante en ficha y gm-tools) | ✅ Hecho y probado |
 | 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | ✅ Hecho y probado |
-| 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | Pendiente |
+| 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | En curso |
+| 3a | Ficha guardada sola en Firebase por partes; Personajes lista los de la mesa (propios / de otros en solo lectura); se van Subir/Bajar datos | ✅ Hecho y probado |
+| 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | Pendiente |
+| 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | Pendiente |
 
 **Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y
 movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),

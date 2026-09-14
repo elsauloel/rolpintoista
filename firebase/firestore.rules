@@ -69,6 +69,39 @@ service cloud.firestore {
         allow delete: if esGM(c);
       }
 
+      // Fichas de personaje en vivo (ficha-personaje/ficha.html).
+      // Documento principal: {duenoUid, nombre, resumen, miniatura, creado,
+      // actualizado}; contenido en partes/{parte}: {json, actualizado}.
+      // Todos los miembros las ven; solo el dueño las crea, modifica y
+      // borra. El GM solo puede reasignar el dueño (nada más).
+      match /fichas/{f} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['duenoUid', 'nombre', 'resumen', 'miniatura', 'creado', 'actualizado'])
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() <= 60
+          && request.resource.data.miniatura is string
+          && request.resource.data.miniatura.size() < 60000;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['duenoUid', 'nombre', 'resumen', 'miniatura', 'creado', 'actualizado'])
+          && request.resource.data.miniatura is string
+          && request.resource.data.miniatura.size() < 60000
+          && (
+            (resource.data.duenoUid == request.auth.uid
+              && request.resource.data.duenoUid == resource.data.duenoUid)
+            || (esGM(c)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid']))
+          );
+        allow delete: if esMiembro(c) && resource.data.duenoUid == request.auth.uid;
+
+        match /partes/{p} {
+          allow read: if esMiembro(c);
+          allow write: if esMiembro(c)
+            && get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid;
+        }
+      }
+
       // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y
       // edita solo su dueño. tipo 'creep': solo el GM. El GM además puede
       // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.

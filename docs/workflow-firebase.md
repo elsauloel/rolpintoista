@@ -34,6 +34,19 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`.
+- `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
+  hpMax, bonos, bonosMax, muerto, estados[{nombre, turnos, permanente,
+  polaridad}]}, miniatura, creado, actualizado}`. Una por personaje
+  (`ficha-personaje/ficha.html`, bloque "FICHA EN VIVO"). El contenido va
+  en `fichas/{id}/partes/{parte}` — `{json, actualizado}`, con `parte` en
+  `general`, `notas`, `inventario`, `cinturon`, `habilidades`, `efectos`,
+  `invocaciones`, `otros`, `catalogo` (solo ítems propios que no están en
+  el catálogo compartido) y `retrato` (la imagen de la cabecera). Cada
+  parte es el JSON de esas claves de `S`; las imágenes embebidas de ítems,
+  habilidades, etc. se guardan vacías a propósito. `miniatura` es el
+  retrato achicado a 96 px para el token del mapa. Todos los miembros leen
+  todo; solo el dueño escribe; el GM solo puede cambiar `duenoUid`. La ficha
+  escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
   'pj'|'creep', duenoUid, col, fila, creado}`. Tokens del mapa de
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,

@@ -49,13 +49,20 @@ más cambia sesión a sesión.
   por default) y la sube directo a `datos/catalogo.json`, con confirmación
   explícita antes de publicar. No corre `importar_json.py` sola — eso
   sigue siendo un paso aparte.
-- **Produce/consume vía GitHub** (botones Personajes/Subir datos/Bajar
-  datos/Tablero/Vendedor): `datos/personajes/*.json`,
-  `datos/personajes/backups/*.json`, `datos/tablero/*.json`,
-  `datos/creeps-publico.json` (solo lectura, lo publica gm-tools),
-  `datos/tienda-publica.json` (solo lectura, lo publica vendor-generator).
+- **En vivo con Firebase** (rama `nueva-version`, bloque "FICHA EN VIVO"
+  al final del script): el personaje abierto se guarda solo en
+  `campanas/{id}/fichas/{fichaId}` por partes (ver
+  [`docs/workflow-firebase.md`](../docs/workflow-firebase.md)). El botón
+  👥 Personajes lista los de la mesa; los de otros jugadores se abren en
+  solo lectura. El personaje abierto se recuerda en el `#id` de la URL y en
+  `localStorage` (`ficha-actual`). Ya no hay Subir/Bajar datos.
+- **Todavía vía GitHub**: Tablero (`datos/tablero/*.json`,
+  `datos/creeps-publico.json` — pasa a Firebase en el Paso 3c) y Vendedor
+  (`datos/tienda-publica.json`).
 - **Exporta/importa localmente**: el personaje completo a un `.json`
-  (botón Guardar ficha / Cargar archivo), ver `datos/esquema.md`.
+  (botón Guardar copia / Cargar archivo), ver `datos/esquema.md`. Con un
+  personaje abierto, cargar un archivo reemplaza su contenido en la mesa;
+  sin ninguno, lo crea como personaje nuevo.
 
 ## Dependencias con otras carpetas
 

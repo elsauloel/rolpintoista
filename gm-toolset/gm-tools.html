@@ -4778,7 +4778,7 @@ function mesaEscuchar(){
   fbDb.collection(fbRutaCampana('tiradas'))
     .orderBy('cuando', 'desc').limit(MESA_MAX)
     .onSnapshot(snap => {
-      mesaEstado(`en vivo · ${fbMiembro.nombre}`);
+      mesaEstado(`en vivo · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
       mesaRender(snap.docs);
     }, err => {
       console.error('Error escuchando la mesa:', err);

@@ -36,11 +36,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   tiradas libres con `desde: 'mapa'`.
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, bonos, bonosMax, muerto, estados[{nombre, turnos, permanente,
-  polaridad}]}, miniatura, creado, actualizado}`. Una por personaje
+  polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},
+  miniatura, creado, actualizado}`. Una por personaje
   (`ficha-personaje/ficha.html`, bloque "FICHA EN VIVO"). El contenido va
   en `fichas/{id}/partes/{parte}` — `{json, actualizado}`, con `parte` en
   `general`, `notas`, `inventario`, `cinturon`, `habilidades`, `efectos`,
-  `invocaciones`, `otros`, `catalogo` (solo ítems propios que no están en
+  `invocaciones`, `imgInvocaciones` (imagen de cada invocación, por id), `otros`, `catalogo` (solo ítems propios que no están en
   el catálogo compartido) y `retrato` (la imagen de la cabecera). Cada
   parte es el JSON de esas claves de `S`; las imágenes embebidas de ítems,
   habilidades, etc. se guardan vacías a propósito. `miniatura` es el
@@ -64,7 +65,8 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   unidades del mapa. La ven todos; solo el GM la escribe.
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
   'pj'|'creep', duenoUid, col, fila, creado, fichaId?}`. `fichaId` vincula
-  el token a una ficha (pj) o a un creep: el mapa toma de ahí nombre,
+  el token a una ficha (pj), a una invocación de una ficha
+  (`<fichaId>~<idInvocación>`, tipo pj) o a un creep: el mapa toma de ahí nombre,
   miniatura, barras (vida roja; SP azul, solo PJ) y estados. Tokens del mapa de
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
   solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más

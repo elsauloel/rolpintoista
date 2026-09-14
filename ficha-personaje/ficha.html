@@ -3391,8 +3391,8 @@ function nuevaInvocacion(){
   return {
     id: uid(), nombre:'Invocación nueva', imagen:'', color: INV_COLORES[Math.floor(Math.random()*INV_COLORES.length)],
     activa:true, cooldown:3, cooldownActual:3,
-    hp:10, hpMax:10, acc:3, accMax:3, spd:5,
-    con:0, fue:0, agl:0, des:0, int:0,
+    hp:5, hpMax:5, acc:3, accMax:3, spd:5,  // Hp.Max = Con*5
+    con:1, fue:1, agl:1, des:1, int:1,
     armaTipo:6, armaPeso:1, armaFijo:0,
     defensa:0,
     crit:[0,0,0,0,0],
@@ -4017,6 +4017,26 @@ function refresh(){
    EVENTOS
    ========================================================= */
 
+// Invocaciones: Hp.Max = Con*5, igual que en los creeps. Se recalcula al
+// terminar de editar la Constitución (no en cada tecla, para que borrar o
+// escribir "12" no pase por valores intermedios). Si estaba con la vida
+// llena queda llena; si no, solo se recorta si se pasa del nuevo máximo.
+document.addEventListener('change', e => {
+  const t = e.target;
+  if(t.dataset.invf !== 'con' || !t.dataset.invid) return;
+  const inv = S.invocaciones.find(x => x.id === t.dataset.invid);
+  if(!inv) return;
+  const nuevoHpMax = Math.max(0, num(inv.con) * 5);
+  const estabaFull = num(inv.hp) >= num(inv.hpMax);
+  inv.hpMax = nuevoHpMax;
+  inv.hp = estabaFull ? nuevoHpMax : Math.min(num(inv.hp), nuevoHpMax);
+  const card = t.closest('.inv-card');
+  if(card){
+    card.querySelector('[data-invf="hp"]').value = inv.hp;
+    card.querySelector('[data-invf="hpMax"]').value = inv.hpMax;
+  }
+});
+
 document.addEventListener('input', e => {
   const t = e.target;
   if(t.id === 'f-nombre'){ S.meta.nombre = t.value; return; }
@@ -4066,6 +4086,7 @@ document.addEventListener('input', e => {
     const noNumericos = ['nombre'];
     inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
     if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));
+
     if(['armaTipo','armaPeso','armaFijo'].includes(campo)){
       const preview = t.closest('.inv-armaline')?.querySelector('.inv-danopreview b');
       if(preview) preview.textContent = invDanoTxt(inv);
@@ -7446,9 +7467,11 @@ async function mesaIniciar(){
    el contenido va repartido en fichas/<id>/partes/<parte> (general,
    inventario, efectos…) para escribir solo lo que cambió, y espaciado
    por el tope diario de escrituras del plan gratis.
-   Imágenes: solo se guarda el retrato de la cabecera (parte "retrato").
-   Las de ítems, habilidades y catálogo no viajan (quedan vacías al
-   volver a abrir la ficha).
+   Imágenes: solo se guardan el retrato de la cabecera (parte "retrato")
+   y las de las invocaciones (parte "imgInvocaciones"). Las de ítems,
+   habilidades y catálogo no viajan (quedan vacías al volver a abrir).
+   Las invocaciones también se publican en el resumen (nombre, HP,
+   miniatura) para poder vincularlas a un token del mapa.
    Todos los miembros ven cualquier ficha de PJ; solo el dueño la
    modifica (lo imponen las reglas). Ver docs/workflow-firebase.md.
    ========================================================= */
@@ -7491,7 +7514,21 @@ function fichaPartesActuales(){
   // (ítems agregados a mano en esta ficha), igual que en aplicarFicha().
   res.catalogo = fichaSerializar({catalogo: (S.catalogo || []).filter(i => !CATALOGO_IDS.has(i.id))});
   res.retrato = JSON.stringify(S.meta.imagen || '');
+  res.imgInvocaciones = JSON.stringify(fichaImagenesInvocaciones());
   return res;
+}
+
+// {idInvocación: imagen} de las invocaciones que tienen imagen propia.
+function fichaImagenesInvocaciones(){
+  const res = {};
+  (S.invocaciones || []).forEach(inv => {
+    if(inv && typeof inv.imagen === 'string' && inv.imagen.startsWith('data:')) res[inv.id] = inv.imagen;
+  });
+  return res;
+}
+
+function fichaPonerImagenesInvocaciones(mapa){
+  (S.invocaciones || []).forEach(inv => { if(inv) inv.imagen = (mapa && mapa[inv.id]) || ''; });
 }
 
 // Pasa una parte guardada a claves de S (sin tocarlo todavía).
@@ -7499,11 +7536,13 @@ function fichaLeerParte(parte, json){
   let datos;
   try{ datos = JSON.parse(json); }catch(e){ return {}; }
   if(parte === 'retrato') return {retrato: typeof datos === 'string' ? datos : ''};
+  if(parte === 'imgInvocaciones') return {imgInvocaciones: datos && typeof datos === 'object' ? datos : {}};
   return datos && typeof datos === 'object' ? datos : {};
 }
 
 function fichaAplicarParte(parte, datos){
   if(parte === 'retrato'){ S.meta.imagen = datos.retrato || ''; return; }
+  if(parte === 'imgInvocaciones'){ fichaPonerImagenesInvocaciones(datos.imgInvocaciones); return; }
   if(parte === 'catalogo'){
     const propios = Array.isArray(datos.catalogo) ? datos.catalogo : [];
     S.catalogo = (S.catalogo || []).filter(i => CATALOGO_IDS.has(i.id)).concat(propios);
@@ -7511,6 +7550,11 @@ function fichaAplicarParte(parte, datos){
   }
   if(datos.meta) datos.meta.imagen = S.meta.imagen;
   Object.keys(datos).forEach(k => { S[k] = datos[k]; });
+  if(parte === 'invocaciones' && fichaVivo){
+    let mapa = {};
+    try{ mapa = JSON.parse(fichaVivo.ultimo.imgInvocaciones || '{}'); }catch(e){}
+    fichaPonerImagenesInvocaciones(mapa);
+  }
 }
 
 function fichaResumen(){
@@ -7533,7 +7577,32 @@ function fichaResumen(){
         permanente: !!e.permanente,
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
       })),
+    invocaciones: (S.invocaciones || [])
+      .filter(inv => inv && inv.id)
+      .slice(0, 20)
+      .map(inv => ({
+        id: String(inv.id),
+        nombre: String(inv.nombre || 'Invocación').slice(0, 60),
+        hp: num(inv.hp),
+        hpMax: num(inv.hpMax),
+        activa: inv.activa !== false,
+        miniatura: fichaMiniaturaInvocacion(inv.imagen),
+      })),
   };
+}
+
+// Miniaturas de las invocaciones para el resumen: se calculan aparte (tardan
+// un instante) y, cuando están, se vuelve a revisar el resumen.
+const miniaturasInvocaciones = new Map();  // imagen -> miniatura ('' mientras se calcula)
+function fichaMiniaturaInvocacion(imagen){
+  if(!imagen || !imagen.startsWith('data:')) return '';
+  if(miniaturasInvocaciones.has(imagen)) return miniaturasInvocaciones.get(imagen);
+  miniaturasInvocaciones.set(imagen, '');
+  fichaMiniatura(imagen).then(m => {
+    miniaturasInvocaciones.set(imagen, m);
+    if(fichaVivo) fichaVivo.revisarResumen = true;
+  });
+  return '';
 }
 
 function fichaNombre(){
@@ -7725,16 +7794,20 @@ function fichaEscuchar(f){
       if(!f.cargada){
         const datos = {};
         let retrato = '';
+        let imgInvocaciones = {};
         snap.docs.forEach(d => {
           const json = String(d.data().json || '');
           f.ultimo[d.id] = json;
           const leido = fichaLeerParte(d.id, json);
           if(d.id === 'retrato') retrato = leido.retrato;
+          else if(d.id === 'imgInvocaciones') imgInvocaciones = leido.imgInvocaciones;
           else Object.assign(datos, leido);
         });
         if(!datos.meta) datos.meta = {};
         datos.meta.imagen = retrato;
         aplicarFicha(datos);
+        fichaPonerImagenesInvocaciones(imgInvocaciones);
+        renderInvocaciones();
         f.cargada = true;
         f.revisarResumen = true;
         fichaMostrarLectura();

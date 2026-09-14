@@ -328,10 +328,27 @@ const SP_COLOR = '#3F86E0';
 const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
 const ANCHO_CASILLA = HEX * SQ3;
 
-// Ficha o creep al que está vinculado el token (si sigue existiendo).
+// Ficha, invocación o creep al que está vinculado el token (si sigue
+// existiendo). Las invocaciones van como "<fichaId>~<idInvocación>" y
+// salen del resumen de la ficha de su personaje.
+const SEP_INVOCACION = '~';
 function vinculo(t){
   if(!t || !t.fichaId) return null;
-  return (t.tipo === 'creep' ? creepsPub : fichasPub).get(t.fichaId) || null;
+  if(t.tipo === 'creep') return creepsPub.get(t.fichaId) || null;
+  const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+  const ficha = fichasPub.get(fichaId);
+  if(!ficha) return null;
+  if(!invId) return ficha;
+  const inv = ((ficha.resumen && ficha.resumen.invocaciones) || []).find(i => i.id === invId);
+  if(!inv) return null;
+  return {
+    nombre: String(inv.nombre || 'Invocación'),
+    duenoUid: ficha.duenoUid,
+    miniatura: inv.miniatura || '',
+    deQuien: ficha.nombre,
+    invocacion: true,
+    resumen: {hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false, estados: []},
+  };
 }
 function nombreDe(t){
   const v = vinculo(t);
@@ -348,7 +365,7 @@ function estadoDe(t){
     ? entre01(num(r.hpPct) / 100)
     : (num(r.hpMax) > 0 ? entre01(num(r.hp) / num(r.hpMax)) : 0);
   const sp = t.tipo === 'pj' && num(r.bonosMax) > 0 ? entre01(num(r.bonos) / num(r.bonosMax)) : null;
-  return {hp, sp, muerto: !!r.muerto, estados: Array.isArray(r.estados) ? r.estados : []};
+  return {hp, sp, muerto: !!r.muerto, dormida: !!r.dormida, estados: Array.isArray(r.estados) ? r.estados : []};
 }
 
 const imagenesCache = new Map();  // data URL -> Image
@@ -557,7 +574,7 @@ function dibujar(){
       ctx.drawImage(mini, x - rad, y - rad, rad * 2, rad * 2);
       ctx.restore();
     }
-    if(est && est.muerto){
+    if(est && (est.muerto || est.dormida)){
       ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
       ctx.fillStyle = 'rgba(15,12,14,.62)'; ctx.fill();
     }
@@ -969,9 +986,17 @@ function opcionesVinculo(tipo, elegido){
   if(tipo === 'creep'){
     lista = [...creepsPub.entries()].sort((a, b) => num(a[1].orden) - num(b[1].orden));
   }else{
-    lista = [...fichasPub.entries()]
+    // Cada personaje propio y, debajo, sus invocaciones.
+    lista = [];
+    [...fichasPub.entries()]
       .filter(([, f]) => f.duenoUid === fbUsuario.uid)
-      .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+      .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'))
+      .forEach(([id, f]) => {
+        lista.push([id, f]);
+        ((f.resumen && f.resumen.invocaciones) || []).forEach(inv => {
+          lista.push([id + SEP_INVOCACION + inv.id, {nombre: `   ↳ ${inv.nombre || 'Invocación'} (invocación de ${f.nombre})`}]);
+        });
+      });
   }
   const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
   return '<option value="">Sin vincular</option>' + lista.map(([id, v]) =>
@@ -985,11 +1010,14 @@ function htmlEstadoToken(t){
   const v = vinculo(t);
   const est = estadoDe(t);
   if(!v || !est) return t.fichaId ? '<p class="ayuda" style="margin-top:6px">La ficha vinculada ya no existe.</p>' : '';
+  const extra = v.invocacion
+    ? `<div class="dato" style="color:var(--muted)">Invocación de ${esc(v.deQuien || '?')}${est.dormida ? ' · no invocada' : ''}</div>`
+    : '';
   const r = v.resumen || {};
   const barra = (valor, color, texto) =>
     `<div class="barra"><i style="width:${Math.round(valor * 100)}%;background:${color}"></i></div>` +
     (texto ? `<div class="barra-txt">${texto}</div>` : '');
-  let html = '<div class="estado-token">';
+  let html = '<div class="estado-token">' + extra;
   if(t.tipo === 'pj'){
     html += barra(est.hp, HP_COLOR, `Vida ${fmt(Math.max(0, num(r.hp)))} / ${fmt(num(r.hpMax))}`);
     if(est.sp !== null) html += barra(est.sp, SP_COLOR, `SP ${fmt(num(r.bonos))} / ${fmt(num(r.bonosMax))}`);
@@ -1011,7 +1039,7 @@ function renderPanel(forzar){
   const clave = JSON.stringify([creando, panelFondo, seleccion]);
   const v = t ? vinculo(t) : null;
   const opciones = (creando || t) ? [
-    [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre),
+    [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre + JSON.stringify(((f.resumen && f.resumen.invocaciones) || []).map(i => [i.id, i.nombre]))),
     [...creepsPub.entries()].map(([id, c]) => id + c.nombre),
   ] : null;
   const firma = clave + '|' + JSON.stringify([
@@ -1078,7 +1106,7 @@ function renderPanel(forzar){
     const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
     const alVincular = () => {
       const id = $('#nuevo-vinculo').value;
-      const vv = id ? (tipoActual() === 'creep' ? creepsPub : fichasPub).get(id) : null;
+      const vv = id ? vinculo({tipo: tipoActual(), fichaId: id}) : null;
       if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
     };
     $('#nuevo-vinculo').onchange = alVincular;
@@ -1106,7 +1134,7 @@ function renderPanel(forzar){
   const editable = puedoMover(t);
   let color = t.color;
   panel.innerHTML =
-    `<h2>${t.tipo === 'creep' ? 'Creep' : 'Personaje'}</h2>` +
+    `<h2>${t.tipo === 'creep' ? 'Creep' : (v && v.invocacion ? 'Invocación' : 'Personaje')}</h2>` +
     `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
     htmlEstadoToken(t) +
     (editable
@@ -1132,7 +1160,7 @@ function renderPanel(forzar){
     conectarColores(panel, c => color = c);
     const guardar = () => {
       const fichaId = $('#token-vinculo').value;
-      const vv = fichaId ? (t.tipo === 'creep' ? creepsPub : fichasPub).get(fichaId) : null;
+      const vv = fichaId ? vinculo({tipo: t.tipo, fichaId}) : null;
       const nombre = ($('#token-nombre').value.trim() || (vv ? vv.nombre : '')).slice(0, 40);
       if(!nombre){ toast('El token necesita un nombre'); return; }
       const cambios = {nombre, color};

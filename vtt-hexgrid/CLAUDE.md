@@ -25,8 +25,9 @@ nuevo de Rol Pintoísta. Paso 2 de
 - Panel del costado: crear token (jugador: siempre PJ propio; GM: creep o
   PJ), vincularlo a una ficha propia o a un creep, editar nombre/color,
   sacar del mapa, y el GM puede reasignar el dueño de un PJ.
-- Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha o
-  el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP
+- Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha,
+  la invocación (`<fichaId>~<idInvocación>`, sale del resumen de la ficha;
+  solo barra de vida, apagada si no está invocada) o el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP
   (azul); arriba, circulitos con la inicial de cada estado (verde
   beneficio, violeta perjuicio). Caído/derrotado: oscurecido con una ✕.
   Lee `fichas` y `creeps` (solo lo público). De los creeps solo llega el

@@ -1,5 +1,12 @@
 # Piratas en el espacio — herramientas de campaña
 
+> **Rama `nueva-version` (carpeta `rol-nueva-version`): sistema nuevo de
+> Rol Pintoísta en vivo con Firebase.** Antes de tocar nada acá, leer
+> [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (decisiones y
+> estado) y [`docs/workflow-firebase.md`](docs/workflow-firebase.md). Lo
+> que sigue en este archivo describe la versión con sync por GitHub y se
+> va a ir actualizando a medida que avance la migración.
+
 Conjunto de herramientas HTML standalone para una campaña de rol homebrew.
 No hay backend ni base de datos: cada herramienta es un único archivo
 `.html` que se abre haciendo doble clic (o arrastrándolo a una pestaña del

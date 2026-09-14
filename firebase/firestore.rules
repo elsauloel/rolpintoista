@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Reglas de Firestore del proyecto rol-pintoista.
+// Este archivo es la copia versionada: para aplicarlas, se pega el
+// contenido entero en la consola de Firebase (Firestore Database →
+// Reglas → Publicar). Ver docs/workflow-firebase.md.
+//
+// Todo cuelga de campanas/{campana}: cada campaña de Rol Pintoísta tiene
+// sus propios miembros, tiradas, mapa, etc., sin mezclarse con otras.
+// Lo que no está explícitamente permitido acá queda bloqueado.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esMiembro(c) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid));
+    }
+    function esGM(c) {
+      return esMiembro(c)
+        && get(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
+    }
+
+    match /campanas/{c} {
+      allow read: if esMiembro(c);
+      allow write: if false;
+
+      // El código de campaña vive en privado/acceso ({codigo: "..."}).
+      // Nadie lo lee ni lo escribe desde el navegador: se carga a mano en
+      // la consola. La regla de miembros lo consulta con get(), que no
+      // está sujeto a estas restricciones.
+      match /privado/{doc} {
+        allow read, write: if false;
+      }
+
+      // Un documento por navegador que entró con el código correcto.
+      // gm siempre arranca en false; al GM se lo marca a mano en la consola.
+      match /miembros/{uid} {
+        allow read: if esMiembro(c) || (request.auth != null && request.auth.uid == uid);
+        allow create: if request.auth != null
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['nombre', 'codigo', 'gm', 'creado'])
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 40
+          && request.resource.data.gm == false
+          && request.resource.data.codigo == get(/databases/$(database)/documents/campanas/$(c)/privado/acceso).data.codigo;
+        // Cada uno puede cambiar su nombre, pero no darse permisos de GM.
+        allow update: if (request.auth != null
+            && request.auth.uid == uid
+            && request.resource.data.gm == resource.data.gm
+            && request.resource.data.codigo == resource.data.codigo)
+          || esGM(c);
+        allow delete: if esGM(c);
+      }
+
+      // Paso 0: colección para probar la conexión en vivo.
+      match /prueba/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c) && request.resource.data.uid == request.auth.uid;
+        allow delete: if esGM(c);
+      }
+    }
+  }
+}

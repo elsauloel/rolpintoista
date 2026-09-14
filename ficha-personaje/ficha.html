@@ -4640,6 +4640,7 @@ $('#btn-guardar').onclick = () => {
   toast('Ficha guardada');
 };
 function cargarArchivoLocal(){
+  if(fbMiembro && fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
   if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cargarle un archivo'); return; }
   const aviso = fichaVivo
     ? `Cargar un archivo reemplaza todo el contenido de "${S.meta.nombre || 'este personaje'}" en la mesa: nombre, atributos, items, habilidades, estados.\n\n¿Seguís?`
@@ -7457,6 +7458,7 @@ const CATALOGO_IDS = new Set(DEFAULT.catalogo.map(c => c.id));
 const GUARDAR_QUIETO_MS = 1200;  // se escribe cuando una parte deja de cambiar este rato…
 const GUARDAR_MAX_MS = 5000;     // …o, si no para de cambiar (tipeando), como mucho cada tanto
 const MINIATURA_PX = 96;
+const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
 
 let fichaVivo = null;
 
@@ -7674,7 +7676,7 @@ function fichaRecordar(id){
 function fichaNuevoEstado(id, duenoUid, cargada){
   return {
     id, duenoUid,
-    soloLectura: duenoUid !== fbUsuario.uid,
+    soloLectura: duenoUid !== fbUsuario.uid || !!fbMiembro.gm,  // el GM solo mira
     cargada,
     ultimo: {}, sucias: {}, enviando: {},
     ultimoResumen: '', revisarResumen: false,
@@ -7696,7 +7698,7 @@ function fichaEscuchar(f){
       return;
     }
     const d = doc.data();
-    const lectura = d.duenoUid !== fbUsuario.uid;
+    const lectura = d.duenoUid !== fbUsuario.uid || !!fbMiembro.gm;
     f.duenoUid = d.duenoUid;
     if(lectura !== f.soloLectura){
       f.soloLectura = lectura;
@@ -7795,6 +7797,7 @@ async function fichaAbrir(id){
 
 async function crearPersonajeNuevo(datos){
   if(!fbDb || !fbMiembro){ toast('Entrá a la mesa (cajita Mesa) para crear personajes'); return; }
+  if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
   if(!datos && !confirm('¿Crear un personaje nuevo, en blanco, en la mesa?\n\nEl personaje que tenés abierto queda guardado como está.')) return;
   await fichaSoltar();
   if(datos) aplicarFicha(datos); else fichaNueva();
@@ -7885,13 +7888,21 @@ async function abrirPersonajes(){
       }
       lista.appendChild(wrap);
     };
-    titulo('Tus personajes');
-    if(mias.length) mias.forEach(x => fila(x, true));
-    else titulo('Todavía no tenés ninguno: creá uno nuevo o cargá un archivo.');
-    if(otras.length){
-      titulo('De los demás (solo para ver)');
-      otras.forEach(x => fila(x, false));
+    if(fbMiembro.gm){
+      // El GM usa gm-tools para lo suyo: acá solo mira las fichas de los jugadores.
+      titulo('Personajes de los jugadores (solo para ver). Los tuyos y los creeps se manejan desde gm-tools.');
+      if(todas.length) todas.forEach(x => fila(x, false));
+      else titulo('Todavía nadie creó personajes.');
+    }else{
+      titulo('Tus personajes');
+      if(mias.length) mias.forEach(x => fila(x, true));
+      else titulo('Todavía no tenés ninguno: creá uno nuevo o cargá un archivo.');
+      if(otras.length){
+        titulo('De los demás (solo para ver)');
+        otras.forEach(x => fila(x, false));
+      }
     }
+    ['#personajes-nuevo', '#personajes-archivo'].forEach(s => { $(s).style.display = fbMiembro.gm ? 'none' : ''; });
   }catch(err){
     console.error('Error listando personajes:', err);
     lista.innerHTML = '<div class="hint">No se pudo traer la lista de personajes. ¿Están publicadas las reglas nuevas?</div>';

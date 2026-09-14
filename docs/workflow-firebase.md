@@ -45,7 +45,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   parte es el JSON de esas claves de `S`; las imágenes embebidas de ítems,
   habilidades, etc. se guardan vacías a propósito. `miniatura` es el
   retrato achicado a 96 px para el token del mapa. Todos los miembros leen
-  todo; solo el dueño escribe; el GM solo puede cambiar `duenoUid`. La ficha
+  todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools) y solo puede cambiar `duenoUid`. La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
   'pj'|'creep', duenoUid, col, fila, creado}`. Tokens del mapa de

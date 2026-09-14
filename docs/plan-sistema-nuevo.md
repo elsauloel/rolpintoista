@@ -50,6 +50,10 @@ su casa:
     todos los miembros la ven. Un jugador puede tener **varios personajes**.
   - El GM ve todas las fichas de PJ pero **no las modifica**; solo puede
     reasignar el dueño (para cuando alguien cambia de compu).
+  - **La ficha de personaje es solo de jugadores.** El GM usa gm-tools para
+    sus creeps y sus propios personajes (que son creeps con otro nombre:
+    PNJ aliados, comerciantes…). Si el GM abre la ficha, solo mira.
+  - Rol visible en la cajita Mesa ("· GM" / "· jugador"). Es por navegador.
   - Fichas de creeps: solo el GM las ve y modifica. Los jugadores ven de
     cada creep solo el token, la barra de vida y los estados.
   - El daño recibido lo aplica el dueño en su propia ficha.

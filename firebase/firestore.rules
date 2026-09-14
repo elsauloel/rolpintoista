@@ -72,12 +72,14 @@ service cloud.firestore {
       // Fichas de personaje en vivo (ficha-personaje/ficha.html).
       // Documento principal: {duenoUid, nombre, resumen, miniatura, creado,
       // actualizado}; contenido en partes/{parte}: {json, actualizado}.
-      // Todos los miembros las ven; solo el dueño las crea, modifica y
-      // borra. El GM solo puede reasignar el dueño (nada más).
+      // Son solo de jugadores: todos los miembros las ven; solo el dueño las
+      // crea, modifica y borra. El GM no crea ni edita fichas (lo suyo va en
+      // gm-tools); solo puede reasignar el dueño.
       match /fichas/{f} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
           && request.resource.data.keys().hasOnly(['duenoUid', 'nombre', 'resumen', 'miniatura', 'creado', 'actualizado'])
+          && !esGM(c)
           && request.resource.data.duenoUid == request.auth.uid
           && request.resource.data.nombre is string
           && request.resource.data.nombre.size() <= 60
@@ -98,7 +100,8 @@ service cloud.firestore {
         match /partes/{p} {
           allow read: if esMiembro(c);
           allow write: if esMiembro(c)
-            && get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid;
+            && get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid
+            && !esGM(c);
         }
       }
 

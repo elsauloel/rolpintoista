@@ -17,8 +17,10 @@ nuevo de Rol Pintoísta. Paso 2 de
 - Dibujado en un `<canvas>`, solo las casillas visibles.
 - Tokens en Firestore `campanas/{id}/tokens` (esquema en
   [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)): círculo de
-  color con la inicial y el nombre debajo. Borde dorado = lo podés mover;
-  borde de guiones = creep. Varios en la misma casilla se acomodan en ronda.
+  color con la inicial y el nombre debajo. Borde (`BORDE`/`claseToken()`):
+  blanco = tuyos, verde = personajes de otros jugadores, rojo = vinculados a
+  un creep de gm-tools, ocre = NPC (token del GM sin creep vinculado).
+  Varios en la misma casilla se acomodan en ronda.
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.

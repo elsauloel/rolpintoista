@@ -77,6 +77,9 @@ aside{
 .barra i{display:block;height:100%;transition:width .3s}
 .barra-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:12px;color:var(--muted)}
+.leyenda span{display:flex;align-items:center;gap:5px}
+.leyenda i{width:13px;height:13px;border-radius:50%;border:3px solid;background:#17121A}
 .chip{font-size:11px;padding:1px 7px;border:1px solid;border-left-width:4px;border-radius:var(--r);background:rgba(0,0,0,.25)}
 
 #mesa{flex:1;display:flex;flex-direction:column;min-height:0;font-family:"Space Mono",monospace;font-size:12px}
@@ -229,6 +232,17 @@ let arrastreFondo = null;     // {inicioX, inicioY, x, y}
 
 const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256', '#D4574E', '#E0C35A', '#4FA3A0', '#9A867E'];
 const HP_COLOR = '#D64545';
+// Borde de cada token según de quién es.
+const BORDE = {
+  propio: '#EDE3D2',   // blanco: los tuyos
+  jugador: '#4CB86A',  // verde: personajes de otros jugadores
+  creep: '#D64545',    // rojo: vinculados a un creep de gm-tools
+  npc: '#CC8A2E',      // ocre: tokens del GM sin creep vinculado
+};
+function claseToken(t){
+  if(t.tipo === 'creep') return t.fichaId ? 'creep' : 'npc';
+  return fbUsuario && t.duenoUid === fbUsuario.uid ? 'propio' : 'jugador';
+}
 const SP_COLOR = '#3F86E0';
 const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
 const ANCHO_CASILLA = HEX * SQ3;
@@ -484,12 +498,10 @@ function dibujar(){
       ctx.fillStyle = 'rgba(15,12,14,.62)'; ctx.fill();
     }
     ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
-    // Creeps con borde oscuro de guiones; los que puedo mover, con borde dorado.
-    ctx.lineWidth = Math.max(2 / z, rad * 0.1);
-    if(t.tipo === 'creep'){ ctx.setLineDash([rad * 0.3, rad * 0.18]); ctx.strokeStyle = '#0F0C0E'; }
-    else ctx.strokeStyle = puedoMover(t) ? '#E0A458' : 'rgba(237,227,210,.55)';
+    // Borde: blanco tuyos, verde otros jugadores, rojo creeps, ocre NPC.
+    ctx.lineWidth = Math.max(2.5 / z, rad * 0.13);
+    ctx.strokeStyle = BORDE[claseToken(t)];
     ctx.stroke();
-    ctx.setLineDash([]);
 
     if(seleccion === d.id){
       ctx.beginPath(); ctx.arc(x, y, rad + 5 / z, 0, 2 * Math.PI);
@@ -1001,7 +1013,8 @@ function renderPanel(forzar){
     const tipoInicial = soyGM ? 'creep' : 'pj';
     panel.innerHTML =
       '<h2>Nuevo token</h2>' +
-      (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' : '') +
+      (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' +
+        '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde ocre.</p>' : '') +
       `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '')}</select>` +
       '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
       '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
@@ -1031,15 +1044,21 @@ function renderPanel(forzar){
   if(!t){
     panel.innerHTML =
       '<h2>Token</h2>' +
-      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos (borde dorado) para moverlos. ' +
-      'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>';
+      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos. ' +
+      'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>' +
+      '<div class="leyenda">' +
+        `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +
+        `<span><i style="border-color:${BORDE.jugador}"></i>Otros jugadores</span>` +
+        `<span><i style="border-color:${BORDE.creep}"></i>Creeps</span>` +
+        `<span><i style="border-color:${BORDE.npc}"></i>NPC</span>` +
+      '</div>';
     return;
   }
 
   const editable = puedoMover(t);
   let color = t.color;
   panel.innerHTML =
-    `<h2>${t.tipo === 'creep' ? 'Creep' : (v && v.invocacion ? 'Invocación' : 'Personaje')}</h2>` +
+    `<h2>${t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje')}</h2>` +
     `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
     htmlEstadoToken(t) +
     (editable
@@ -1059,7 +1078,7 @@ function renderPanel(forzar){
       (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +
       (puedoBorrar(t) ? '<button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button>' : '') +
     '</div>' +
-    (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? 'Los creeps los mueve el GM.' : 'Este personaje lo mueve su dueño.'}</p>` : '');
+    (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
 
   if(editable){
     conectarColores(panel, c => color = c);

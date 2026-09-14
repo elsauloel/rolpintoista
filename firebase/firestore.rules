@@ -54,6 +54,21 @@ service cloud.firestore {
         allow delete: if esGM(c);
       }
 
+      // Tiradas de dados compartidas (cajita "Mesa" de ficha y gm-tools).
+      // Cada uno publica solo a su nombre; nadie las edita; el GM puede borrar.
+      match /tiradas/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.total is number
+          && request.resource.data.rolls is list
+          && request.resource.data.rolls.size() <= 100
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+        allow delete: if esGM(c);
+      }
+
       // Paso 0: colección para probar la conexión en vivo.
       match /prueba/{id} {
         allow read: if esMiembro(c);

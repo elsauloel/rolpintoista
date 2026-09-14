@@ -26,6 +26,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   lo lee desde el navegador; se carga y se cambia a mano en la consola.
 - `campanas/{id}/miembros/{uid}` — `{nombre, codigo, gm, creado}`. Uno por
   navegador que entró con el código. `gm` arranca en `false`.
+- `campanas/{id}/tiradas/{auto}` — `{uid, jugador, quien, origen, formula,
+  rolls[], mod, total, desde: 'ficha'|'gm', cuando}`. Una por tirada. La
+  publica `registrarTirada()` (ficha.html y gm-tools.html, vía
+  `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
+  edita; el GM puede borrarlas. El bloque "MESA" está copiado igual en las
+  dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
 - `campanas/{id}/prueba/{auto}` — mensajes de
   [`../firebase/prueba-conexion.html`](../firebase/prueba-conexion.html),
   solo para verificar la conexión.

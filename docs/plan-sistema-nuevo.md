@@ -69,7 +69,7 @@ su casa:
 |---|---|---|
 | 0 | Firebase: proyecto, auth anónima, código, reglas, página de prueba | ✅ Hecho y probado |
 | 1 | Mesa: tiradas compartidas en vivo (cajita flotante en ficha y gm-tools) | ✅ Hecho y probado |
-| 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | Pendiente |
+| 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | ✅ Hecho y probado |
 | 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | Pendiente |
 
 **Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y

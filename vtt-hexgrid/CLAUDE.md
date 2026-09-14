@@ -2,28 +2,43 @@
 
 ## Qué es
 
-Mapa hexagonal virtual (VTT — virtual tabletop) para la campaña. Pensado
-como una herramienta futura, no una en desarrollo.
+Mapa de hexágonos compartido en vivo (VTT — virtual tabletop) del sistema
+nuevo de Rol Pintoísta. Paso 2 de
+[`../docs/plan-sistema-nuevo.md`](../docs/plan-sistema-nuevo.md).
 
 ## Estado actual
 
-**En pausa / planificación. No hay spec funcional ni código todavía.**
-Esta carpeta existe solo como reserva de espacio en la estructura del
-repo para cuando el proyecto arranque.
+`mapa.html`: un solo archivo, se abre con doble clic.
 
-Se revisó el repo completo al reorganizarlo (agosto 2026) buscando algún
-documento de spec, notas de diseño o mockup relacionado con un mapa
-hexagonal — no se encontró ninguno. Si en algún momento aparece un
-documento de spec (fuera de este repo, o que el usuario provea), va acá.
+- Grilla de hexágonos "de punta arriba", sin bordes (se desplaza y hace
+  zoom libremente). Filas impares corridas medio hexágono; cada token guarda
+  su casilla como `{col, fila}`. La vista (desplazamiento y zoom) se
+  recuerda por navegador en `localStorage` (`mapa-vista`).
+- Dibujado en un `<canvas>`, solo las casillas visibles.
+- Tokens en Firestore `campanas/{id}/tokens` (esquema en
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)): círculo de
+  color con la inicial y el nombre debajo. Borde dorado = lo podés mover;
+  borde de guiones = creep. Varios en la misma casilla se acomodan en ronda.
+- Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
+  el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
+  token deslizarse a la casilla nueva.
+- Panel del costado: crear token (jugador: siempre PJ propio; GM: creep o
+  PJ), editar nombre/color, sacar del mapa, y el GM puede reasignar el dueño
+  de un PJ.
+- Mesa al costado: mismas tiradas en vivo que ficha y gm-tools, más una
+  "tirada libre" por fórmula (`desde: 'mapa'`).
 
-**Importante para sesiones futuras**: no asumir que hay código, un spec,
-o siquiera una decisión de alcance tomada para esta herramienta. Antes de
-proponer trabajo acá, preguntar directamente qué se espera que haga el
-mapa hexagonal — no hay contexto previo del que partir.
+Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
+la interfaz: el GM **no** mueve tokens de PJ (solo reasigna el dueño).
+
+## Pendiente (Paso 3 y después)
+
+Barras de vida/SP y estados en los tokens conectados a las fichas; imagen
+de fondo; alcance y movimiento; niebla; ocultar tokens.
 
 ## Dependencias con otras carpetas
 
-Ninguna todavía. Cuando se implemente, es razonable esperar que necesite
-leer personajes/creeps desde `../datos/` (posiciones, HP) para mostrarlos
-en el mapa, pero eso es una suposición a confirmar cuando arranque el
-diseño, no algo decidido.
+- `../firebase/firestore.rules` — reglas de `tokens` y `tiradas`.
+- El bloque `fb*` (entrada con código) y la Mesa están copiados de
+  `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`; si se cambia
+  la forma de entrar, cambiarlo en los tres.

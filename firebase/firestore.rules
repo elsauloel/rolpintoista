@@ -69,6 +69,41 @@ service cloud.firestore {
         allow delete: if esGM(c);
       }
 
+      // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y
+      // edita solo su dueño. tipo 'creep': solo el GM. El GM además puede
+      // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.
+      function tokenValido(d) {
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado'])
+          && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 40
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.tipo in ['pj', 'creep']
+          && d.duenoUid is string
+          && d.col is int && d.col >= -2000 && d.col <= 2000
+          && d.fila is int && d.fila >= -2000 && d.fila <= 2000;
+      }
+      match /tokens/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && tokenValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time
+          && (request.resource.data.tipo == 'pj' || esGM(c));
+        allow update: if esMiembro(c)
+          && tokenValido(request.resource.data)
+          && request.resource.data.tipo == resource.data.tipo
+          && request.resource.data.creado == resource.data.creado
+          && (
+            (resource.data.tipo == 'pj'
+              && resource.data.duenoUid == request.auth.uid
+              && request.resource.data.duenoUid == resource.data.duenoUid)
+            || (resource.data.tipo == 'creep' && esGM(c))
+            || (resource.data.tipo == 'pj' && esGM(c)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid']))
+          );
+        allow delete: if esMiembro(c)
+          && (resource.data.duenoUid == request.auth.uid || esGM(c));
+      }
+
       // Paso 0: colección para probar la conexión en vivo.
       match /prueba/{id} {
         allow read: if esMiembro(c);

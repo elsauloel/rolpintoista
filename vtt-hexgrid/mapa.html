@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa — Rol Pintoísta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--ink);color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.4;
+  display:flex;flex-direction:column;overflow:hidden
+}
+input,select,button{font-family:inherit;color:inherit}
+input,select{
+  min-width:0;background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--paper);padding:6px 8px;width:100%
+}
+select option{background:var(--panel)}
+input:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+button{cursor:pointer;background:none;border:none;padding:0}
+button:disabled{opacity:.5;cursor:not-allowed}
+[hidden]{display:none!important}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);white-space:nowrap
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.peligro{border-color:var(--wine);color:var(--danger)}
+.btn.peligro:hover{border-color:var(--danger)}
+
+header{
+  display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
+}
+header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
+#estado{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:1;min-width:120px}
+.zoom{display:flex;gap:4px}
+.zoom .btn{padding:7px 10px}
+
+main{flex:1;display:flex;min-height:0}
+#lienzo-caja{flex:1;position:relative;min-width:0;min-height:0}
+#lienzo{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block;cursor:default}
+#aviso-mapa{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:340px;text-align:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;color:var(--muted)
+}
+#aviso-mapa .btn{margin-top:10px}
+
+aside{
+  width:330px;flex:none;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line);min-height:0
+}
+.seccion{padding:12px 14px;border-bottom:1px solid var(--line)}
+.seccion h2{
+  margin:0 0 8px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400
+}
+.ayuda{color:var(--muted);font-size:12.5px;margin:0}
+.fila{display:flex;gap:8px;align-items:center;margin-top:8px}
+.etiqueta{font-size:11.5px;color:var(--muted);margin:8px 0 3px;display:block}
+.colores{display:flex;flex-wrap:wrap;gap:5px}
+.color{width:24px;height:24px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+.color.elegido{border-color:var(--paper)}
+.dato{font-size:12.5px;margin-top:4px}
+.dato b{color:var(--brass);font-weight:500}
+
+#mesa{flex:1;display:flex;flex-direction:column;min-height:0;font-family:"Space Mono",monospace;font-size:12px}
+#mesa h2{padding:12px 14px 0;margin:0}
+#mesa-cuerpo{flex:1;overflow-y:auto;padding:8px 14px;display:flex;flex-direction:column;gap:5px}
+.mesa-tirada{padding:5px 7px;border-radius:var(--r);background:var(--line-soft);transition:background 1.2s}
+.mesa-tirada.nueva{background:var(--wine);transition:none}
+.mesa-quien{color:var(--brass);font-weight:700}
+.mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
+.mesa-detalle{color:var(--muted);font-size:10.5px}
+.mesa-vacia{color:var(--muted);font-size:11px}
+#mesa-tirar{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
+
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
+  font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:95
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:760px){
+  main{flex-direction:column}
+  aside{width:auto;height:45vh;border-left:none;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>⬡ Mapa</h1>
+  <span id="estado">conectando…</span>
+  <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+  <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
+  <div class="zoom">
+    <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
+    <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
+  </div>
+</header>
+
+<main>
+  <div id="lienzo-caja">
+    <canvas id="lienzo"></canvas>
+    <div id="aviso-mapa" hidden></div>
+  </div>
+  <aside>
+    <div class="seccion" id="panel-token"></div>
+    <div id="mesa">
+      <h2>🎲 Mesa</h2>
+      <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
+      <form id="mesa-tirar">
+        <input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off">
+        <button type="submit" class="btn">Tirar</button>
+      </form>
+    </div>
+  </aside>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script>
+/* =========================================================
+   MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
+   Mapa compartido en vivo: tokens en campanas/<campaña>/tokens, que
+   cada uno mueve arrastrando (los PJ su dueño, los creeps el GM) y
+   todos ven al instante. Al costado, la Mesa de tiradas.
+   Ver docs/plan-sistema-nuevo.md y docs/workflow-firebase.md.
+   ========================================================= */
+
+const $ = s => document.querySelector(s);
+const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
+const esc = s => String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function horaTxt(fecha){
+  const p = n => String(n).padStart(2, '0');
+  return `${p(fecha.getHours())}:${p(fecha.getMinutes())}:${p(fecha.getSeconds())}`;
+}
+
+/* ---------- Firebase (mismo bloque fb* que ficha y gm-tools) ---------- */
+
+const FB_CONFIG = {
+  apiKey: 'AIzaSyAqvIuDU4IkIn548wwGPLtM_KSI5zjIP4s',
+  authDomain: 'rol-pintoista.firebaseapp.com',
+  projectId: 'rol-pintoista',
+  storageBucket: 'rol-pintoista.appspot.com',
+  messagingSenderId: '110064054820',
+  appId: '1:110064054820:web:03d21067e2f831be2a1eb1',
+};
+const FB_CAMPANA = 'piratas-en-el-espacio';
+
+let fbDb = null;
+let fbUsuario = null;
+let fbMiembro = null;
+
+function fbRutaCampana(sub){
+  return `campanas/${FB_CAMPANA}` + (sub ? '/' + sub : '');
+}
+
+function fbIniciar(){
+  if(!window.firebase) return false;
+  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+  fbDb = firebase.firestore();
+  return true;
+}
+
+function fbEntrar(){
+  return new Promise((res, rej) => {
+    const cortar = firebase.auth().onAuthStateChanged(async u => {
+      if(u){ cortar(); fbUsuario = u; res(u); return; }
+      try{ await firebase.auth().signInAnonymously(); }
+      catch(err){ cortar(); rej(err); }
+    });
+  });
+}
+
+async function fbLeerMiembro(){
+  try{
+    const doc = await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).get();
+    return doc.exists ? doc.data() : null;
+  }catch(err){
+    return null;
+  }
+}
+
+async function fbRegistrarMiembro(nombre, codigo){
+  await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).set({
+    nombre, codigo, gm: false,
+    creado: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+function fbPedirCodigo(error){
+  return new Promise(res => {
+    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
+    const campoCss = 'width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin:4px 0 12px';
+    const fondo = document.createElement('div');
+    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+    const caja = document.createElement('div');
+    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:420px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
+    caja.innerHTML =
+      '<h3 style="margin:0 0 6px;font-size:16px">Entrar a la mesa</h3>' +
+      '<p style="margin:0 0 12px;opacity:.8">Solo la primera vez en este navegador. Después queda recordado.</p>' +
+      '<label>Tu nombre (así te ven los demás)</label>' +
+      '<input type="text" data-fb="nombre" maxlength="40" style="' + campoCss + '">' +
+      '<label>Código de campaña (te lo pasa el GM)</label>' +
+      '<input type="text" data-fb="codigo" style="' + campoCss + '">' +
+      '<div data-fb="error" style="color:#e77;margin:-4px 0 10px"></div>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" data-fb="cancelar" style="' + btnCss + '">Cancelar</button>' +
+        '<button type="button" data-fb="entrar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Entrar</button>' +
+      '</div>';
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    const campoNombre = caja.querySelector('[data-fb="nombre"]');
+    const campoCodigo = caja.querySelector('[data-fb="codigo"]');
+    caja.querySelector('[data-fb="error"]').textContent = error || '';
+    campoNombre.focus();
+    const cerrar = valor => {
+      document.removeEventListener('keydown', teclas);
+      fondo.remove();
+      res(valor);
+    };
+    const confirmar = () => {
+      const nombre = campoNombre.value.trim();
+      const codigo = campoCodigo.value.trim();
+      if(!nombre || !codigo){ caja.querySelector('[data-fb="error"]').textContent = 'Completá los dos campos.'; return; }
+      cerrar({nombre, codigo});
+    };
+    const teclas = e => {
+      if(e.key === 'Escape') cerrar(null);
+      if(e.key === 'Enter' && (document.activeElement === campoNombre || document.activeElement === campoCodigo)) confirmar();
+    };
+    document.addEventListener('keydown', teclas);
+    caja.querySelector('[data-fb="cancelar"]').onclick = () => cerrar(null);
+    caja.querySelector('[data-fb="entrar"]').onclick = confirmar;
+    fondo.onmousedown = e => { if(e.target === fondo) cerrar(null); };
+  });
+}
+
+function estado(texto){ $('#estado').textContent = texto; }
+
+/* ---------- Geometría de hexágonos ----------
+   Hexágonos "de punta arriba" en filas; las filas impares corridas medio
+   hexágono a la derecha. Cada token guarda su casilla como {col, fila}. */
+
+const HEX = 40;                 // radio del hexágono, en unidades del mapa
+const SQ3 = Math.sqrt(3);
+const ZOOM_MIN = 0.25, ZOOM_MAX = 3;
+const ESQUINAS = Array.from({length: 6}, (_, i) => {
+  const a = Math.PI / 180 * (60 * i - 30);
+  return [HEX * Math.cos(a), HEX * Math.sin(a)];
+});
+
+function hexCentro(col, fila){
+  return { x: HEX * SQ3 * (col + 0.5 * (fila & 1)), y: HEX * 1.5 * fila };
+}
+
+function mundoAHex(x, y){
+  const q = (SQ3 / 3 * x - y / 3) / HEX;
+  const r = (2 / 3 * y) / HEX;
+  const s = -q - r;
+  let rq = Math.round(q), rr = Math.round(r);
+  const rs = Math.round(s);
+  const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
+  if(dq > dr && dq > ds) rq = -rr - rs;
+  else if(dr > ds) rr = -rq - rs;
+  return { col: rq + (rr - (rr & 1)) / 2, fila: rr };
+}
+
+/* ---------- Estado ---------- */
+
+const lienzo = $('#lienzo');
+const ctx = lienzo.getContext('2d');
+let dpr = 1, anchoPx = 0, altoPx = 0;
+let vista = { x: 0, y: 0, zoom: 1 };   // x,y: dónde cae el origen del mapa en pantalla (px)
+
+const tokens = new Map();     // id -> datos del documento
+const visibles = new Map();   // id -> {x, y} posición dibujada (se acerca a la real con animación)
+let disposicion = [];         // [{id, x, y, radio}] del último dibujo, en orden de dibujo
+const miembros = new Map();   // uid -> {nombre, gm}
+let soyGM = false;
+let seleccion = null;
+let arrastre = null;          // {id, x, y, inicioX, inicioY, movio}
+let paneo = null;             // {inicioX, inicioY, x, y}
+let hexDestino = null;
+let creando = false;
+
+const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256', '#D4574E', '#E0C35A', '#4FA3A0', '#9A867E'];
+
+function puedoMover(t){
+  if(!t || !fbUsuario) return false;
+  return t.tipo === 'creep' ? soyGM : t.duenoUid === fbUsuario.uid;
+}
+function puedoBorrar(t){
+  return !!t && !!fbUsuario && (t.duenoUid === fbUsuario.uid || soyGM);
+}
+function nombreMiembro(uid){
+  const m = miembros.get(uid);
+  return m ? m.nombre : '(alguien que ya no está)';
+}
+function inicial(nombre){
+  const letra = Array.from(String(nombre || '?').trim())[0] || '?';
+  return letra.toUpperCase();
+}
+
+/* ---------- Vista ---------- */
+
+function guardarVista(){
+  try{ localStorage.setItem('mapa-vista', JSON.stringify(vista)); }catch(e){}
+}
+function cargarVista(){
+  try{
+    const v = JSON.parse(localStorage.getItem('mapa-vista') || 'null');
+    if(v && Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.zoom)){ vista = v; return true; }
+  }catch(e){}
+  return false;
+}
+function pantallaAMundo(px, py){
+  return { x: (px - vista.x) / vista.zoom, y: (py - vista.y) / vista.zoom };
+}
+function posEvento(e){
+  const r = lienzo.getBoundingClientRect();
+  return { px: e.clientX - r.left, py: e.clientY - r.top };
+}
+function centrarEn(x, y){
+  vista.x = anchoPx / 2 - x * vista.zoom;
+  vista.y = altoPx / 2 - y * vista.zoom;
+  guardarVista(); pedirDibujo();
+}
+function zoomEn(px, py, factor){
+  const nuevo = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, vista.zoom * factor));
+  const m = pantallaAMundo(px, py);
+  vista.zoom = nuevo;
+  vista.x = px - m.x * nuevo;
+  vista.y = py - m.y * nuevo;
+  guardarVista(); pedirDibujo();
+}
+function centrarEnMios(){
+  const mios = [...tokens.values()].filter(t => puedoMover(t) && t.tipo === 'pj');
+  const lista = mios.length ? mios : (soyGM ? [...tokens.values()] : []);
+  if(!lista.length){ centrarEn(0, 0); return; }
+  const cs = lista.map(t => hexCentro(t.col, t.fila));
+  centrarEn(cs.reduce((a, c) => a + c.x, 0) / cs.length, cs.reduce((a, c) => a + c.y, 0) / cs.length);
+}
+
+function ajustarTamano(){
+  const r = lienzo.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1;
+  anchoPx = r.width; altoPx = r.height;
+  lienzo.width = Math.round(r.width * dpr);
+  lienzo.height = Math.round(r.height * dpr);
+  // La primera vez que se conoce el tamaño, si no había una vista guardada,
+  // se pone la casilla 0,0 en el medio.
+  if(!ajustarTamano.hecho && anchoPx > 0){
+    ajustarTamano.hecho = true;
+    ajustarTamano.habiaVista = cargarVista();
+    if(!ajustarTamano.habiaVista) centrarEn(0, 0);
+  }
+  pedirDibujo();
+}
+
+/* ---------- Dibujo ---------- */
+
+let dibujoPedido = false;
+function pedirDibujo(){
+  if(dibujoPedido) return;
+  dibujoPedido = true;
+  requestAnimationFrame(() => {
+    dibujoPedido = false;
+    if(dibujar()) pedirDibujo();
+  });
+}
+
+function trazarHex(cx, cy){
+  ctx.moveTo(cx + ESQUINAS[0][0], cy + ESQUINAS[0][1]);
+  for(let i = 1; i < 6; i++) ctx.lineTo(cx + ESQUINAS[i][0], cy + ESQUINAS[i][1]);
+  ctx.closePath();
+}
+
+// Dónde va cada token: si varios comparten casilla, se acomodan en ronda.
+function calcularDisposicion(){
+  const orden = [...tokens.entries()]
+    .map(([id, t]) => ({id, t}))
+    .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
+  const grupos = new Map();
+  orden.forEach(o => {
+    if(arrastre && arrastre.id === o.id) return;
+    const k = o.t.col + ',' + o.t.fila;
+    if(!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(o);
+  });
+  const res = [];
+  grupos.forEach(grupo => {
+    const n = grupo.length;
+    grupo.forEach((o, i) => {
+      const c = hexCentro(o.t.col, o.t.fila);
+      if(n === 1){ res.push({id: o.id, x: c.x, y: c.y, radio: HEX * 0.68, solo: true}); return; }
+      const ang = -Math.PI / 2 + i * 2 * Math.PI / n;
+      const d = HEX * (n > 4 ? 0.45 : 0.38);
+      res.push({id: o.id, x: c.x + d * Math.cos(ang), y: c.y + d * Math.sin(ang), radio: HEX * (n > 4 ? 0.3 : 0.42)});
+    });
+  });
+  if(arrastre && tokens.has(arrastre.id)) res.push({id: arrastre.id, x: arrastre.x, y: arrastre.y, radio: HEX * 0.68, solo: true, arrastrado: true});
+  return res;
+}
+
+// Devuelve true si todavía hay algo animándose.
+function dibujar(){
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#0F0C0E';
+  ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+  const z = vista.zoom;
+  ctx.setTransform(dpr * z, 0, 0, dpr * z, dpr * vista.x, dpr * vista.y);
+
+  // Grilla: solo las casillas que se ven.
+  const a = pantallaAMundo(0, 0), b = pantallaAMundo(anchoPx, altoPx);
+  const filaMin = Math.floor(a.y / (1.5 * HEX)) - 1, filaMax = Math.ceil(b.y / (1.5 * HEX)) + 1;
+  const colMin = Math.floor(a.x / (SQ3 * HEX)) - 1, colMax = Math.ceil(b.x / (SQ3 * HEX)) + 1;
+  ctx.beginPath();
+  for(let f = filaMin; f <= filaMax; f++){
+    for(let c = colMin; c <= colMax; c++){
+      const p = hexCentro(c, f);
+      trazarHex(p.x, p.y);
+    }
+  }
+  ctx.fillStyle = '#17121A';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(201,133,69,.28)';
+  ctx.lineWidth = 1 / z;
+  ctx.stroke();
+
+  // Casilla de origen marcada apenas, como referencia.
+  ctx.beginPath(); trazarHex(0, 0);
+  ctx.strokeStyle = 'rgba(224,164,88,.45)'; ctx.lineWidth = 2 / z; ctx.stroke();
+
+  if(arrastre && arrastre.movio && hexDestino){
+    const p = hexCentro(hexDestino.col, hexDestino.fila);
+    ctx.beginPath(); trazarHex(p.x, p.y);
+    ctx.fillStyle = 'rgba(224,164,88,.18)'; ctx.fill();
+    ctx.strokeStyle = '#E0A458'; ctx.lineWidth = 2 / z; ctx.stroke();
+  }
+
+  // Tokens.
+  disposicion = calcularDisposicion();
+  let animando = false;
+  const etiquetas = HEX * z >= 22;
+  disposicion.forEach(d => {
+    const t = tokens.get(d.id);
+    let v = visibles.get(d.id);
+    if(!v || d.arrastrado){ v = {x: d.x, y: d.y}; visibles.set(d.id, v); }
+    else{
+      const dx = d.x - v.x, dy = d.y - v.y;
+      if(Math.abs(dx) + Math.abs(dy) > 0.5){ v.x += dx * 0.25; v.y += dy * 0.25; animando = true; }
+      else{ v.x = d.x; v.y = d.y; }
+    }
+    const x = v.x, y = v.y, rad = d.radio;
+
+    ctx.beginPath(); ctx.arc(x + 2 / z, y + 3 / z, rad, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
+    ctx.fillStyle = t.color || '#9A867E'; ctx.fill();
+    // Creeps con borde oscuro de guiones; los que puedo mover, con borde dorado.
+    ctx.lineWidth = Math.max(2 / z, rad * 0.1);
+    if(t.tipo === 'creep'){ ctx.setLineDash([rad * 0.3, rad * 0.18]); ctx.strokeStyle = '#0F0C0E'; }
+    else ctx.strokeStyle = puedoMover(t) ? '#E0A458' : 'rgba(237,227,210,.55)';
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if(seleccion === d.id){
+      ctx.beginPath(); ctx.arc(x, y, rad + 5 / z, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
+    }
+
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `700 ${rad * 0.95}px "Space Grotesk", system-ui, sans-serif`;
+    ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 3;
+    ctx.fillText(inicial(t.nombre), x, y + rad * 0.05);
+    ctx.shadowBlur = 0;
+
+    // Con varios en la misma casilla, el nombre solo del seleccionado.
+    if(etiquetas && (d.solo || seleccion === d.id)){
+      const tam = 11 / z;
+      ctx.font = `500 ${tam}px "Space Grotesk", system-ui, sans-serif`;
+      const texto = t.nombre.length > 18 ? t.nombre.slice(0, 17) + '…' : t.nombre;
+      const w = ctx.measureText(texto).width + 8 / z;
+      const ty = y + rad + 9 / z;
+      ctx.fillStyle = 'rgba(15,12,14,.8)';
+      ctx.fillRect(x - w / 2, ty - tam * 0.7, w, tam * 1.4);
+      ctx.fillStyle = '#EDE3D2';
+      ctx.fillText(texto, x, ty);
+    }
+  });
+  return animando;
+}
+
+function tokenEn(x, y){
+  for(let i = disposicion.length - 1; i >= 0; i--){
+    const d = disposicion[i];
+    const v = visibles.get(d.id) || d;
+    if(Math.hypot(v.x - x, v.y - y) <= d.radio + 3) return d.id;
+  }
+  return null;
+}
+
+/* ---------- Mouse / dedo sobre el mapa ---------- */
+
+lienzo.addEventListener('pointerdown', e => {
+  if(e.button !== 0 && e.pointerType === 'mouse') return;
+  const {px, py} = posEvento(e);
+  const m = pantallaAMundo(px, py);
+  const id = tokenEn(m.x, m.y);
+  lienzo.setPointerCapture(e.pointerId);
+  if(id){
+    seleccionar(id);
+    const t = tokens.get(id);
+    if(puedoMover(t)){
+      const v = visibles.get(id) || hexCentro(t.col, t.fila);
+      arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false};
+      lienzo.style.cursor = 'grabbing';
+      return;
+    }
+  }else{
+    seleccionar(null);
+  }
+  paneo = {inicioX: px, inicioY: py, x: vista.x, y: vista.y};
+  lienzo.style.cursor = 'grabbing';
+});
+
+lienzo.addEventListener('pointermove', e => {
+  const {px, py} = posEvento(e);
+  if(arrastre){
+    if(!arrastre.movio && Math.hypot(px - arrastre.inicioX, py - arrastre.inicioY) < 4) return;
+    arrastre.movio = true;
+    const m = pantallaAMundo(px, py);
+    arrastre.x = m.x + arrastre.dx; arrastre.y = m.y + arrastre.dy;
+    hexDestino = mundoAHex(arrastre.x, arrastre.y);
+    pedirDibujo();
+    return;
+  }
+  if(paneo){
+    vista.x = paneo.x + px - paneo.inicioX;
+    vista.y = paneo.y + py - paneo.inicioY;
+    pedirDibujo();
+    return;
+  }
+  const m = pantallaAMundo(px, py);
+  const id = tokenEn(m.x, m.y);
+  lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : 'default';
+});
+
+function soltar(){
+  if(arrastre){
+    const a = arrastre;
+    arrastre = null;
+    const t = tokens.get(a.id);
+    if(a.movio && t && hexDestino && (hexDestino.col !== t.col || hexDestino.fila !== t.fila)){
+      visibles.set(a.id, {x: a.x, y: a.y});
+      moverToken(a.id, hexDestino.col, hexDestino.fila);
+    }
+    hexDestino = null;
+    pedirDibujo();
+  }
+  if(paneo){ paneo = null; guardarVista(); }
+  lienzo.style.cursor = 'default';
+}
+lienzo.addEventListener('pointerup', soltar);
+lienzo.addEventListener('pointercancel', soltar);
+
+lienzo.addEventListener('wheel', e => {
+  e.preventDefault();
+  const {px, py} = posEvento(e);
+  zoomEn(px, py, Math.exp(-e.deltaY * 0.0015));
+}, {passive: false});
+
+$('#btn-acercar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 1.25);
+$('#btn-alejar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 0.8);
+$('#btn-centrar').onclick = centrarEnMios;
+
+document.addEventListener('keydown', e => {
+  if(e.target.closest && e.target.closest('input,select,textarea')) return;
+  if(e.key === 'Escape') seleccionar(null);
+  if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
+});
+
+/* ---------- Tokens en Firestore ---------- */
+
+function coleccionTokens(){ return fbDb.collection(fbRutaCampana('tokens')); }
+
+async function moverToken(id, col, fila){
+  const t = tokens.get(id);
+  if(!t) return;
+  // Se mueve ya en pantalla; si Firebase lo rechaza, vuelve solo a su lugar.
+  t.col = col; t.fila = fila;
+  renderPanel();
+  try{
+    await coleccionTokens().doc(id).update({col, fila});
+  }catch(err){
+    console.error('No se pudo mover el token:', err);
+    toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
+  }
+}
+
+async function crearToken(datos){
+  const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
+  const casilla = mundoAHex(vistaCentro.x, vistaCentro.y);
+  try{
+    const ref = await coleccionTokens().add({
+      nombre: datos.nombre,
+      color: datos.color,
+      tipo: datos.tipo,
+      duenoUid: fbUsuario.uid,
+      col: casilla.col,
+      fila: casilla.fila,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    creando = false;
+    seleccionar(ref.id);
+  }catch(err){
+    console.error('No se pudo crear el token:', err);
+    toast('No se pudo crear el token' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+}
+
+async function editarToken(id, cambios){
+  try{
+    await coleccionTokens().doc(id).update(cambios);
+    toast('Token guardado');
+  }catch(err){
+    console.error('No se pudo guardar el token:', err);
+    toast('No se pudo guardar' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+}
+
+async function borrarToken(id){
+  const t = tokens.get(id);
+  if(!puedoBorrar(t)) return;
+  if(!confirm(`¿Sacar el token "${t.nombre}" del mapa?`)) return;
+  try{
+    await coleccionTokens().doc(id).delete();
+  }catch(err){
+    console.error('No se pudo borrar el token:', err);
+    toast('No se pudo borrar el token');
+  }
+}
+
+function escucharTokens(){
+  coleccionTokens().onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){
+        tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
+        if(seleccion === ch.doc.id) seleccion = null;
+        return;
+      }
+      const d = ch.doc.data({serverTimestamps: 'estimate'});
+      tokens.set(ch.doc.id, {
+        nombre: String(d.nombre || '?'),
+        color: d.color,
+        tipo: d.tipo === 'creep' ? 'creep' : 'pj',
+        duenoUid: d.duenoUid,
+        col: Math.round(num(d.col)),
+        fila: Math.round(num(d.fila)),
+        creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : 0,
+      });
+    });
+    const primeraVez = !escucharTokens.listo;
+    escucharTokens.listo = true;
+    if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
+    renderPanel();
+    pedirDibujo();
+  }, err => {
+    console.error('Error escuchando los tokens:', err);
+    mostrarAviso('No se pudieron leer los tokens. ¿Están publicadas las reglas nuevas de Firestore? (mirá la consola)');
+  });
+}
+
+function escucharMiembros(){
+  fbDb.collection(fbRutaCampana('miembros')).onSnapshot(snap => {
+    miembros.clear();
+    snap.docs.forEach(d => miembros.set(d.id, {nombre: String(d.data().nombre || '?'), gm: d.data().gm === true}));
+    const yo = miembros.get(fbUsuario.uid);
+    if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
+    estado(`en vivo · ${fbMiembro.nombre}${soyGM ? ' (GM)' : ''}`);
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando miembros:', err));
+}
+
+/* ---------- Panel del costado ---------- */
+
+let firmaPanel = '';
+
+function seleccionar(id){
+  if(seleccion === id && !creando) return;
+  seleccion = id;
+  if(id) creando = false;
+  renderPanel();
+  pedirDibujo();
+}
+
+function htmlColores(elegido, habilitado){
+  return '<div class="colores">' + COLORES.map(c =>
+    `<button type="button" class="color${c.toLowerCase() === String(elegido).toLowerCase() ? ' elegido' : ''}" data-color="${c}" style="background:${c}" ${habilitado ? '' : 'disabled'} title="${c}"></button>`
+  ).join('') + '</div>';
+}
+
+function conectarColores(caja, alElegir){
+  caja.querySelectorAll('[data-color]').forEach(b => b.onclick = () => {
+    caja.querySelectorAll('[data-color]').forEach(x => x.classList.toggle('elegido', x === b));
+    alElegir(b.dataset.color);
+  });
+}
+
+function renderPanel(forzar){
+  const panel = $('#panel-token');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  const clave = JSON.stringify([creando, seleccion]);
+  const firma = clave + '|' + JSON.stringify([t && [t.nombre, t.color, t.tipo, t.duenoUid, t.col, t.fila], soyGM, [...miembros.entries()], !!fbMiembro]);
+  if(!forzar){
+    if(firma === firmaPanel) return;
+    // Si sigue abierto el mismo token (o el formulario de nuevo token), no
+    // pisar lo que alguien está escribiendo o eligiendo en el panel.
+    const mismoPanel = firmaPanel.startsWith(clave + '|');
+    if(mismoPanel && (creando || panel.contains(document.activeElement))) return;
+  }
+  firmaPanel = firma;
+  $('#btn-nuevo').disabled = !fbMiembro;
+
+  if(creando){
+    let color = COLORES[Math.floor(Math.random() * COLORES.length)];
+    panel.innerHTML =
+      '<h2>Nuevo token</h2>' +
+      '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
+      (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' : '') +
+      '<label class="etiqueta">Color</label>' + htmlColores(color, true) +
+      '<div class="fila"><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button></div>' +
+      '<p class="ayuda" style="margin-top:8px">Aparece en el centro de lo que estás viendo.</p>';
+    conectarColores(panel, c => color = c);
+    const crear = () => {
+      const nombre = $('#nuevo-nombre').value.trim();
+      if(!nombre){ $('#nuevo-nombre').focus(); return; }
+      crearToken({nombre, color, tipo: soyGM ? $('#nuevo-tipo').value : 'pj'});
+    };
+    $('#nuevo-crear').onclick = crear;
+    $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
+    $('#nuevo-cancelar').onclick = () => { creando = false; renderPanel(true); };
+    $('#nuevo-nombre').focus();
+    return;
+  }
+
+  if(!t){
+    panel.innerHTML =
+      '<h2>Token</h2>' +
+      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos (borde dorado) para moverlos. ' +
+      'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>';
+    return;
+  }
+
+  const editable = puedoMover(t);
+  let color = t.color;
+  panel.innerHTML =
+    `<h2>${t.tipo === 'creep' ? 'Creep' : 'Personaje'}</h2>` +
+    (editable
+      ? `<label class="etiqueta">Nombre</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
+        '<label class="etiqueta">Color</label>' + htmlColores(t.color, true)
+      : `<div class="dato"><b>${esc(t.nombre)}</b></div>`) +
+    (t.tipo === 'pj' ? `<div class="dato">Dueño: ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
+    `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
+    (soyGM && t.tipo === 'pj'
+      ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de compu)</label>' +
+        '<div class="fila" style="margin-top:0"><select id="token-dueno">' +
+        [...miembros.entries()].map(([uid, m]) => `<option value="${esc(uid)}"${uid === t.duenoUid ? ' selected' : ''}>${esc(m.nombre)}${m.gm ? ' (GM)' : ''}</option>`).join('') +
+        '</select><button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
+      : '') +
+    '<div class="fila">' +
+      (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +
+      (puedoBorrar(t) ? '<button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button>' : '') +
+    '</div>' +
+    (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? 'Los creeps los mueve el GM.' : 'Este personaje lo mueve su dueño.'}</p>` : '');
+
+  if(editable){
+    conectarColores(panel, c => color = c);
+    const guardar = () => {
+      const nombre = $('#token-nombre').value.trim();
+      if(!nombre){ toast('El token necesita un nombre'); return; }
+      editarToken(seleccion, {nombre, color});
+    };
+    $('#token-guardar').onclick = guardar;
+    $('#token-nombre').onkeydown = e => { if(e.key === 'Enter') guardar(); };
+  }
+  if($('#token-borrar')) $('#token-borrar').onclick = () => borrarToken(seleccion);
+  if($('#token-dueno-ok')) $('#token-dueno-ok').onclick = () => {
+    const nuevo = $('#token-dueno').value;
+    if(nuevo && nuevo !== t.duenoUid) editarToken(seleccion, {duenoUid: nuevo});
+  };
+}
+
+$('#btn-nuevo').onclick = () => {
+  if(!fbMiembro) return;
+  creando = true; seleccion = null;
+  renderPanel(true); pedirDibujo();
+};
+
+/* ---------- Mesa (tiradas compartidas) ---------- */
+
+const MESA_MAX = 30;
+let mesaIdsVistos = null;
+
+function parseDados(formula){
+  const limpio = String(formula || '').trim().toLowerCase().replace(/\s+/g, '');
+  if(!limpio) return null;
+  const dadoRe = /(\d*)d(\d+)/g;
+  const dados = [];
+  let m;
+  while((m = dadoRe.exec(limpio))){
+    const n = m[1] ? parseInt(m[1], 10) : 1;
+    const caras = parseInt(m[2], 10);
+    if(n < 1 || n > 100 || caras < 2) return null;
+    dados.push({n, caras});
+  }
+  const sinDados = limpio.replace(/\d*d\d+/g, '');
+  let mod = 0;
+  const modRe = /([+-]\d+)/g;
+  let mm;
+  while((mm = modRe.exec(sinDados))) mod += parseInt(mm[1], 10);
+  if(!dados.length && !mod) return null;
+  if(/[^+\-0-9]/.test(sinDados.replace(/[+-]\d+/g, ''))) return null;
+  return {dados, mod};
+}
+
+function tirarDados(formula){
+  const p = parseDados(formula);
+  if(!p) return null;
+  const rolls = [];
+  p.dados.forEach(d => { for(let i = 0; i < d.n; i++) rolls.push(1 + Math.floor(Math.random() * d.caras)); });
+  const suma = rolls.reduce((a, b) => a + b, 0);
+  const formulaTxt = p.dados.map(d => `${d.n}d${d.caras}`).join('+') + (p.mod ? (p.mod > 0 ? `+${p.mod}` : `${p.mod}`) : '');
+  return { formula: formulaTxt || `${p.mod}`, rolls, mod: p.mod, total: suma + p.mod };
+}
+
+async function mesaPublicar(origen, r){
+  if(!fbDb || !fbUsuario || !fbMiembro){ toast('Entrá a la mesa para tirar'); return; }
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid,
+      jugador: fbMiembro.nombre,
+      quien: '',
+      origen: String(origen || ''),
+      formula: String(r.formula || ''),
+      rolls: (r.rolls || []).slice(0, 100),
+      mod: num(r.mod),
+      total: num(r.total),
+      desde: 'mapa',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo publicar la tirada en la mesa:', err);
+    toast('La tirada no se pudo compartir con la mesa');
+  }
+}
+
+function mesaRender(docs){
+  const cuerpo = $('#mesa-cuerpo');
+  const primeraVez = mesaIdsVistos === null;
+  cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
+  docs.forEach(d => {
+    const t = d.data({serverTimestamps: 'estimate'});
+    const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
+    const quien = t.quien || t.jugador || '?';
+    const jugador = t.quien && t.jugador && t.quien !== t.jugador ? ` · ${t.jugador}` : '';
+    const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
+    const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
+    const div = document.createElement('div');
+    div.className = 'mesa-tirada' + (nueva ? ' nueva' : '');
+    div.innerHTML =
+      `<span class="mesa-total">${fmt(num(t.total))}</span>` +
+      `<span class="mesa-quien">${esc(quien)}</span> ${esc(t.origen)}` +
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(jugador)}${esc(hora)}</div>`;
+    if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+    cuerpo.appendChild(div);
+  });
+  mesaIdsVistos = new Set(docs.map(d => d.id));
+}
+
+function mesaEscuchar(){
+  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
+  fbDb.collection(fbRutaCampana('tiradas'))
+    .orderBy('cuando', 'desc').limit(MESA_MAX)
+    .onSnapshot(snap => mesaRender(snap.docs), err => {
+      console.error('Error escuchando la mesa:', err);
+      $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudieron leer las tiradas — mirá la consola.</div>';
+    });
+}
+
+$('#mesa-tirar').onsubmit = e => {
+  e.preventDefault();
+  const r = tirarDados($('#mesa-formula').value);
+  if(!r){ toast('Fórmula no válida — ej: 2d6+3'); return; }
+  mesaPublicar('Tirada libre', r);
+  $('#mesa-formula').value = '';
+};
+
+/* ---------- Arranque ---------- */
+
+function mostrarAviso(html, boton){
+  const a = $('#aviso-mapa');
+  a.innerHTML = html + (boton ? `<div><button type="button" class="btn primary" id="aviso-boton">${esc(boton.texto)}</button></div>` : '');
+  a.hidden = false;
+  if(boton) $('#aviso-boton').onclick = boton.accion;
+}
+
+function arrancarEnVivo(){
+  $('#aviso-mapa').hidden = true;
+  estado(`en vivo · ${fbMiembro.nombre}`);
+  soyGM = fbMiembro.gm === true;
+  escucharMiembros();
+  escucharTokens();
+  mesaEscuchar();
+  renderPanel(true);
+}
+
+async function entrarConCodigo(){
+  let error = '';
+  for(;;){
+    const datos = await fbPedirCodigo(error);
+    if(!datos) return;
+    try{
+      await fbRegistrarMiembro(datos.nombre, datos.codigo);
+      fbMiembro = await fbLeerMiembro();
+      if(fbMiembro){ arrancarEnVivo(); return; }
+      error = 'No se pudo confirmar la entrada, probá de nuevo.';
+    }catch(err){
+      console.error('Error entrando a la mesa:', err);
+      error = err.code === 'permission-denied' ? 'El código no es correcto.' : 'No se pudo entrar: ' + err.message;
+    }
+  }
+}
+
+async function iniciar(){
+  new ResizeObserver(ajustarTamano).observe(lienzo);
+  ajustarTamano();
+  renderPanel(true);
+
+  if(!fbIniciar()){
+    estado('sin internet');
+    mostrarAviso('No se pudo cargar Firebase. Revisá la conexión y recargá la página.');
+    $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Sin conexión.</div>';
+    return;
+  }
+  try{
+    await fbEntrar();
+  }catch(err){
+    console.error('Error entrando a Firebase:', err);
+    estado('sin conexión');
+    mostrarAviso('No se pudo conectar con Firebase. Revisá la conexión y recargá la página.');
+    return;
+  }
+  fbMiembro = await fbLeerMiembro();
+  if(fbMiembro){ arrancarEnVivo(); return; }
+  estado('sin entrar');
+  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Entrá con el código de campaña para ver las tiradas.</div>';
+  mostrarAviso('Para ver el mapa y mover tus tokens, entrá con el código de campaña.', {texto: 'Entrar a la mesa', accion: entrarConCodigo});
+}
+
+iniciar();
+</script>
+</body>
+</html>

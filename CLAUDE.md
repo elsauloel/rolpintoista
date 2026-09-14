@@ -54,7 +54,7 @@ GitHub vía la API de contenidos (con un token personal guardado en
 | [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas | En desarrollo activo |
 | [`datos/`](datos/CLAUDE.md) | JSONs de la partida (personajes, tablero, catálogo) + el editor de catálogo | En uso activo |
 | [`manual-usuario/`](manual-usuario/CLAUDE.md) | Manual de reglas de la campaña | **En construcción, sin contenido todavía** — solo el esqueleto |
-| [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa hexagonal virtual | **En pausa** — sin spec ni código todavía |
+| [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa de hexágonos en vivo con tokens (`mapa.html`, Firebase) | En desarrollo activo (Paso 2) |
 | [`docs/`](docs/CLAUDE.md) | Workflow de GitHub/Gestor, notas generales | Con contenido básico |
 | `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Fuera del alcance de esta reorganización de carpetas — ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |

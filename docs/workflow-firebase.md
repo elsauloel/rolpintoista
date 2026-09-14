@@ -32,6 +32,14 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
   edita; el GM puede borrarlas. El bloque "MESA" está copiado igual en las
   dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
+  El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
+  tiradas libres con `desde: 'mapa'`.
+- `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
+  'pj'|'creep', duenoUid, col, fila, creado}`. Tokens del mapa de
+  hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
+  solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
+  de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`
+  al soltar.
 - `campanas/{id}/prueba/{auto}` — mensajes de
   [`../firebase/prueba-conexion.html`](../firebase/prueba-conexion.html),
   solo para verificar la conexión.

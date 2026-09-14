@@ -107,6 +107,11 @@ async function fbEntrarAPartida(){
     location.replace(fbUrlInicio(FB_CAMPANA));
     return 'redirigiendo';
   }
+  // Credencial renovada si todavía no refleja el email confirmado.
+  try{
+    const cred = await u.getIdTokenResult();
+    if(!cred.claims.email_verified) await u.getIdToken(true);
+  }catch(e){}
   const [miembro, partida] = await Promise.all([fbLeerMiembro(), fbLeerPartida()]);
   if(!miembro || !partida){
     location.replace(fbUrlInicio(FB_CAMPANA));

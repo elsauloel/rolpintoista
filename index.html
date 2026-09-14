@@ -502,7 +502,7 @@ function alEntrar(){
 function iniciar(){
   if(!fbIniciar()){ mostrar('sin-conexion'); return; }
   firebase.auth().getRedirectResult().catch(err => { $('#login-error').textContent = textoError(err); });
-  firebase.auth().onAuthStateChanged(u => {
+  firebase.auth().onAuthStateChanged(async u => {
     fbUsuario = u || null;
     if(!u || u.isAnonymous){ mostrar('login'); return; }
     if(!fbCuentaConfirmada(u)){
@@ -510,6 +510,12 @@ function iniciar(){
       mostrar('confirmar');
       return;
     }
+    // Si el email se confirmó después de iniciar sesión, la credencial que
+    // ven las reglas puede seguir diciendo "sin confirmar": se renueva.
+    try{
+      const cred = await u.getIdTokenResult();
+      if(!cred.claims.email_verified) await u.getIdToken(true);
+    }catch(e){}
     alEntrar();
   });
 }

@@ -10,7 +10,10 @@ que verse en vivo entre jugadores.
 - Proyecto Firebase: `rol-pintoista`, plan Spark (gratis, sin tarjeta).
 - Authentication: solo el proveedor **Anónimo**. No se usa "Acceder con
   Google" porque no funciona abriendo los HTML con doble clic (`file://`);
-  queda como opción si algún día las herramientas se publican en una web.
+  con el sitio en GitHub Pages ya sería posible (pendiente).
+- **Dominios autorizados** (Authentication → Configuración → Dominios
+  autorizados): además de los que vienen (`localhost`, los de Firebase),
+  `elsauloel.github.io` para el sitio de GitHub Pages.
 - Firestore: reglas versionadas en [`../firebase/firestore.rules`](../firebase/firestore.rules).
   Para aplicarlas: consola → Firestore Database → Reglas → pegar todo →
   Publicar. El archivo del repo y la consola tienen que quedar iguales.

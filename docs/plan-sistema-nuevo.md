@@ -70,6 +70,17 @@ su casa:
   plan gratis.
 - **Dados en el navegador de cada uno** (sin servidor que tire): aceptado
   entre amigos.
+- **Sitio web con GitHub Pages** (gratis, repo público): se publica la rama
+  `nueva-version` desde la raíz, en `https://elsauloel.github.io/rolpintoista/`
+  (`index.html` con links a cada herramienta; `.nojekyll` para que GitHub
+  sirva los archivos tal cual). Cada push a `nueva-version` se publica solo
+  en 1–2 minutos, así que **solo se sube lo ya probado**. Cuando empiecen
+  las partidas de verdad se puede pasar a publicar desde otra rama. Abrir
+  por la web y abrir con doble clic son identidades distintas en Firebase:
+  al pasar a la web cada uno vuelve a entrar con el código (el GM se
+  remarca en la consola y reasigna los personajes si hace falta). En la web
+  se oculta "Actualizar gestor" de la ficha. Abrir con doble clic sigue
+  funcionando.
 - **Botones de GitHub se eliminan** (no solo se desactivan) en el mismo
   paso en que Firebase los reemplaza. "Traer última versión"/`gestor.html`
   actualizan código, no datos: solo se van si se decide publicar las

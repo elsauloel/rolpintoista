@@ -5243,6 +5243,10 @@ async function gitBlobSha(texto){
   return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Publicada como página web no hay carpeta local que actualizar: el sitio
+// se actualiza solo con cada cambio subido a GitHub.
+if(location.protocol.startsWith('http')) $('#btn-actualizar-gestor').style.display = 'none';
+
 $('#btn-actualizar-gestor').onclick = async () => {
   if(!window.showDirectoryPicker){
     toast('Este navegador no soporta escribir archivos — usá Chrome o Edge');

@@ -35,8 +35,8 @@ En desarrollo activo, las dos.
 - "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
   sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)
-  arma tarjetas a partir de sus creeps en vivo + lo que bajó de
-  `datos/tablero/*.json`.
+  arma tarjetas con los creeps abiertos (con números) + las fichas de los
+  jugadores en vivo desde Firebase.
 
 ### vendor-generator.html
 - `generarTienda(tamano, categoria)` sortea el stock según los pesos de

@@ -56,9 +56,11 @@ más cambia sesión a sesión.
   👥 Personajes lista los de la mesa; los de otros jugadores se abren en
   solo lectura. El personaje abierto se recuerda en el `#id` de la URL y en
   `localStorage` (`ficha-actual`). Ya no hay Subir/Bajar datos.
-- **Todavía vía GitHub**: Tablero (`datos/tablero/*.json`,
-  `datos/creeps-publico.json` — pasa a Firebase en el Paso 3c) y Vendedor
-  (`datos/tienda-publica.json`).
+- **Tablero en vivo**: mientras está abierto escucha `fichas` y `creeps`
+  (lo público) y se redibuja solo; de los creeps muestra la barra de vida
+  sin números.
+- **Todavía vía GitHub**: Vendedor (`datos/tienda-publica.json`) y
+  "Agregar al catálogo".
 - **Exporta/importa localmente**: el personaje completo a un `.json`
   (botón Guardar copia / Cargar archivo), ver `datos/esquema.md`. Con un
   personaje abierto, cargar un archivo reemplaza su contenido en la mesa;

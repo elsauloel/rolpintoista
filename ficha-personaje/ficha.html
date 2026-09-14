@@ -477,9 +477,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .tablero-nivel{font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted);font-weight:400}
 .tablero-hp-fila{display:flex;align-items:center;gap:7px}
 .tablero-hp-barra{flex:1;height:7px;background:var(--panel);border:1px solid var(--line-soft);overflow:hidden}
-.tablero-hp-fill{height:100%;background:var(--absenta);transition:width .2s}
-.tablero-hp-fill.medio{background:var(--brass)}
-.tablero-hp-fill.bajo{background:var(--danger)}
+.tablero-hp-fill{height:100%;background:#D64545;transition:width .2s}
+.tablero-hp-fill.sp{background:#3F86E0}
 .tablero-hp-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--paper);flex:none}
 .tablero-estados{display:flex;flex-wrap:wrap;gap:4px}
 .tablero-estado{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line);border-radius:99px;padding:2px 7px;color:var(--muted);position:relative}
@@ -5002,28 +5001,8 @@ $('#btn-sync-reset').onclick = () => {
 
 /* =========================================================
    TABLERO DE COMBATE
-   Cada uno publica su estado cuando termina su turno (la ficha con
-   "Subir datos", el GM con el suyo) y el tablero los junta. No se
-   actualiza solo a propósito: se refresca cuando vos lo pedís.
+   Personajes y creeps de la mesa, en vivo (ver "Tablero en vivo").
    ========================================================= */
-
-function armarTarjetaTablero(){
-  const c = compute();
-  const hpMax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-  return {
-    tipo: 'pj',
-    nombre: S.meta.nombre || 'Sin nombre',
-    nivel: num(S.meta.nivel),
-    imagen: S.meta.imagen || '',
-    hp: num(S.hp),
-    hpMax,
-    muerto: !!(S.muerto && S.muerto.activo),
-    estados: (S.efectos || [])
-      .filter(e => e.activo !== false)
-      .map(e => ({nombre: e.nombre, turnos: num(e.turnos), permanente: !!e.permanente, detalle: e.detalle || ''})),
-    actualizado: new Date().toISOString(),
-  };
-}
 
 async function ghLeerJson(ruta){
   const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
@@ -5034,33 +5013,54 @@ async function ghLeerJson(ruta){
   return await resp.json();
 }
 
-async function bajarTablero(){
-  const fichas = [];
-  // El listado de la carpeta dice qué publicó cada uno; después se baja
-  // cada archivo. Son pocos (uno por jugador), así que alcanza.
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/datos/tablero?ref=${GH_BRANCH}`;
-  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
-  if(resp.status === 429 || resp.status === 403) throw {limite: true};
-  if(resp.ok){
-    const cuerpo = await resp.json();
-    const lista = (Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || [])).filter(x => x.name.endsWith('.json'));
-    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`datos/tablero/${x.name}`).catch(() => null)));
-    bajadas.forEach(d => { if(d && d.nombre) fichas.push(d); });
-  }
-  let creeps = [];
-  let selloCreeps = null;
-  const pub = await ghLeerJson('datos/creeps-publico.json').catch(() => null);
-  if(pub && Array.isArray(pub.creeps)){
-    creeps = pub.creeps;
-    selloCreeps = pub.actualizado || null;
-  }
-  return {fichas, creeps, selloCreeps};
+/* ---------- Tablero en vivo (Firebase) ----------
+   Mientras el Tablero está abierto escucha las fichas de los jugadores
+   (y, en la ficha, lo público de los creeps) y se redibuja solo. Al
+   cerrarlo deja de escuchar. Mismo bloque en ficha.html y gm-tools.html,
+   salvo de dónde salen los creeps. */
+
+let tableroCortes = [];
+const tableroDatos = {fichas: null, creeps: null};
+
+function tableroFechaIso(ts){
+  return ts && ts.toDate ? ts.toDate().toISOString() : '';
 }
 
-function hpFillClase(hp, hpMax){
-  if(!hpMax) return '';
-  const pct = hp / hpMax;
-  return pct <= 0.25 ? 'bajo' : pct <= 0.6 ? 'medio' : '';
+function tarjetaDeFicha(doc){
+  const d = doc.data({serverTimestamps: 'estimate'});
+  const r = d.resumen || {};
+  return {
+    nombre: d.nombre || 'Sin nombre', nivel: num(r.nivel), imagen: d.miniatura || '',
+    hp: num(r.hp), hpMax: num(r.hpMax), bonos: num(r.bonos), bonosMax: num(r.bonosMax),
+    muerto: !!r.muerto, estados: r.estados || [], actualizado: tableroFechaIso(d.actualizado),
+  };
+}
+
+function tableroCerrar(){
+  tableroCortes.forEach(cortar => cortar());
+  tableroCortes = [];
+  tableroDatos.fichas = tableroDatos.creeps = null;
+  $('#scrim-tablero').classList.remove('open');
+}
+
+function tableroEscucharColeccion(coleccion, clave, aTarjeta){
+  tableroCortes.push(fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
+    tableroDatos[clave] = snap.docs.map(aTarjeta);
+    renderTablero();
+  }, err => {
+    console.error(`Error escuchando ${coleccion} para el tablero:`, err);
+    $('#tablero-body').innerHTML = '<div class="hint">No se pudo leer el tablero. ¿Están publicadas las reglas nuevas?</div>';
+  }));
+}
+
+function tarjetaDeCreep(doc){
+  const d = doc.data({serverTimestamps: 'estimate'});
+  const r = d.resumen || {};
+  return {
+    nombre: d.nombre || 'Creep', imagen: d.miniatura || '', orden: num(d.orden),
+    hpPct: r.hpPct !== undefined ? num(r.hpPct) : (num(r.hpMax) > 0 ? Math.round(num(r.hp) / num(r.hpMax) * 100) : 0),
+    muerto: !!r.muerto, estados: r.estados || [], actualizado: tableroFechaIso(d.actualizado),
+  };
 }
 
 function haceCuanto(iso){
@@ -5076,10 +5076,17 @@ function haceCuanto(iso){
 }
 
 function tableroCardHtml(x, tipo){
+  // De los creeps, los jugadores reciben solo el porcentaje de vida
+  // (hpPct): la barra se muestra sin números.
+  const conNumeros = x.hpPct === undefined || x.hpPct === null;
   const hp = num(x.hp);
   const hpMax = num(x.hpMax);
-  const pct = hpMax > 0 ? Math.max(0, Math.min(100, (hp / hpMax) * 100)) : 0;
-  const caido = hp <= 0 || x.muerto;
+  const pct = conNumeros
+    ? (hpMax > 0 ? Math.max(0, Math.min(100, (hp / hpMax) * 100)) : 0)
+    : Math.max(0, Math.min(100, num(x.hpPct)));
+  const caido = conNumeros ? (hp <= 0 || x.muerto) : !!x.muerto;
+  const spMax = num(x.bonosMax);
+  const spPct = spMax > 0 ? Math.max(0, Math.min(100, (num(x.bonos) / spMax) * 100)) : 0;
   const estados = (x.estados || []).filter(e => e && e.nombre);
   const desde = haceCuanto(x.actualizado);
   return `<div class="tablero-card ${tipo === 'pj' ? 'es-pj' : 'es-creep'}${caido ? ' caido' : ''}">
@@ -5088,9 +5095,13 @@ function tableroCardHtml(x, tipo){
       <div class="tablero-nombre">${esc(x.nombre)}${x.nivel ? ` <span class="tablero-nivel">Lv ${fmt(num(x.nivel))}</span>` : ''}</div>
     </div>
     <div class="tablero-hp-fila">
-      <div class="tablero-hp-barra"><div class="tablero-hp-fill ${hpFillClase(hp, hpMax)}" style="width:${pct}%"></div></div>
-      <span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill" style="width:${pct}%"></div></div>
+      ${conNumeros ? `<span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
     </div>
+    ${spMax > 0 ? `<div class="tablero-hp-fila">
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill sp" style="width:${spPct}%"></div></div>
+      <span class="tablero-hp-txt">${fmt(num(x.bonos))}/${fmt(spMax)} SP</span>
+    </div>` : ''}
     ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
     ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
       const det = (e.detalle || '').trim();
@@ -5100,10 +5111,14 @@ function tableroCardHtml(x, tipo){
   </div>`;
 }
 
-function renderTablero(datos){
-  const {fichas, creeps, selloCreeps} = datos;
+function renderTablero(){
+  const {fichas, creeps} = tableroDatos;
+  if(fichas === null || creeps === null){
+    $('#tablero-body').innerHTML = '<div class="hint">Cargando…</div>';
+    return;
+  }
   if(!fichas.length && !creeps.length){
-    $('#tablero-body').innerHTML = `<div class="hint">Todavía no hay nada publicado. Cada jugador aparece acá cuando toca "Subir datos", y los creeps cuando el GM sube los suyos.</div>`;
+    $('#tablero-body').innerHTML = '<div class="hint">Todavía no hay personajes ni creeps en la mesa.</div>';
     $('#tablero-sello').textContent = '';
     return;
   }
@@ -5114,33 +5129,27 @@ function renderTablero(datos){
     html += `<div class="tablero-grid">${orden.map(x => tableroCardHtml(x, 'pj')).join('')}</div>`;
   }
   if(creeps.length){
-    html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)}${selloCreeps ? ` · ${esc(haceCuanto(selloCreeps))}` : ''}</div>`;
-    html += `<div class="tablero-grid">${creeps.map(x => tableroCardHtml(x, 'creep')).join('')}</div>`;
+    const orden = creeps.slice().sort((a, b) => a.orden - b.orden);
+    html += `<div class="tablero-grupo">Creeps · ${fmt(orden.length)}</div>`;
+    html += `<div class="tablero-grid">${orden.map(x => tableroCardHtml(x, 'creep')).join('')}</div>`;
   }
   $('#tablero-body').innerHTML = html;
-  const vivos = creeps.filter(c => num(c.hp) > 0).length;
-  $('#tablero-sello').textContent = creeps.length ? `${fmt(vivos)} creep(s) en pie` : '';
+  const enPie = creeps.filter(c => !c.muerto).length;
+  $('#tablero-sello').textContent = creeps.length ? `${fmt(enPie)} creep(s) en pie · en vivo` : 'en vivo';
 }
 
-async function abrirTablero(refrescando){
-  const btn = $('#btn-tablero');
-  if(!refrescando) $('#tablero-body').innerHTML = `<div class="hint">Bajando el estado publicado…</div>`;
+function abrirTablero(){
   $('#scrim-tablero').classList.add('open');
-  btn.disabled = true;
-  $('#tablero-refrescar').disabled = true;
-  try{
-    renderTablero(await bajarTablero());
-  }catch(err){
-    if(err && err.limite){
-      $('#tablero-body').innerHTML = `<div class="hint">GitHub cortó las consultas por un rato (pasa cuando varios miran seguido desde la misma conexión sin token). Probá de nuevo en unos minutos.</div>`;
-    }else{
-      console.error('Error bajando el tablero:', err);
-      $('#tablero-body').innerHTML = `<div class="hint">No se pudo bajar el tablero — revisá la consola.</div>`;
-    }
-  }finally{
-    btn.disabled = false;
-    $('#tablero-refrescar').disabled = false;
+  $('#tablero-refrescar').style.display = 'none';
+  if(!fbDb || !fbMiembro){
+    $('#tablero-body').innerHTML = '<div class="hint">Entrá a la mesa (cajita 🎲 Mesa) para ver el tablero.</div>';
+    $('#tablero-sello').textContent = '';
+    return;
   }
+  if(tableroCortes.length){ renderTablero(); return; }
+  renderTablero();
+  tableroEscucharColeccion('fichas', 'fichas', tarjetaDeFicha);
+  tableroEscucharColeccion('creeps', 'creeps', tarjetaDeCreep);
 }
 
 function ghCabeceras(accept){
@@ -5152,7 +5161,7 @@ function ghCabeceras(accept){
 
 $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
-$('#btn-tablero').onclick = () => abrirTablero(false);
+$('#btn-tablero').onclick = () => abrirTablero();
 $('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
 $('#presets-personalizado').onclick = () => { $('#scrim-presets').classList.remove('open'); openEditor('efectos', null); };
 $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
@@ -5172,9 +5181,8 @@ document.addEventListener('click', e => {
   const cat = e.target.closest('[data-cat-hab]');
   if(cat && editing){ editing.draft.categoria = cat.dataset.catHab; drawEditor(); return; }
 });
-$('#tablero-refrescar').onclick = () => abrirTablero(true);
-$('#tablero-x').onclick = () => $('#scrim-tablero').classList.remove('open');
-$('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') $('#scrim-tablero').classList.remove('open'); });
+$('#tablero-x').onclick = tableroCerrar;
+$('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') tableroCerrar(); });
 $('#tienda-salir').onclick = () => salirDeLaTienda();
 $('#catalogo-orden').addEventListener('change', e => { catalogoOrden = e.target.value; renderCatalogoModal(); });
 $('#catalogo-orden-dir').addEventListener('click', () => { catalogoOrdenDesc = !catalogoOrdenDesc; renderCatalogoModal(); });
@@ -6689,7 +6697,7 @@ document.addEventListener('change', e => {
   const h = S.habilidades.find(x => x.id === cb.dataset.pophab);
   if(h) h.popupAlEjecutar = cb.checked;
 });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-tablero').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-dados').classList.remove('open'); $('#scrim-resultado-dado').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); if($('#scrim-tablero').classList.contains('open')) tableroCerrar(); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 /* ---- Panel de fórmulas ---- */

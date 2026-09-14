@@ -23,18 +23,26 @@ nuevo de Rol Pintoísta. Paso 2 de
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.
 - Panel del costado: crear token (jugador: siempre PJ propio; GM: creep o
-  PJ), editar nombre/color, sacar del mapa, y el GM puede reasignar el dueño
-  de un PJ.
+  PJ), vincularlo a una ficha propia o a un creep, editar nombre/color,
+  sacar del mapa, y el GM puede reasignar el dueño de un PJ.
+- Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha o
+  el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP
+  (azul); arriba, circulitos con la inicial de cada estado (verde
+  beneficio, violeta perjuicio). Caído/derrotado: oscurecido con una ✕.
+  Lee `fichas` y `creeps` (solo lo público). De los creeps solo llega el
+  porcentaje de vida.
+- Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
+  el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
+  la grilla.
 - Mesa al costado: mismas tiradas en vivo que ficha y gm-tools, más una
   "tirada libre" por fórmula (`desde: 'mapa'`).
 
 Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
 la interfaz: el GM **no** mueve tokens de PJ (solo reasigna el dueño).
 
-## Pendiente (Paso 3 y después)
+## Pendiente (más adelante)
 
-Barras de vida/SP y estados en los tokens conectados a las fichas; imagen
-de fondo; alcance y movimiento; niebla; ocultar tokens.
+Alcance y movimiento; niebla; ocultar tokens; tiradas desde el token.
 
 ## Dependencias con otras carpetas
 

@@ -72,6 +72,12 @@ aside{
 .color.elegido{border-color:var(--paper)}
 .dato{font-size:12.5px;margin-top:4px}
 .dato b{color:var(--brass);font-weight:500}
+.estado-token{margin:8px 0 4px}
+.barra{height:9px;background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
+.barra i{display:block;height:100%;transition:width .3s}
+.barra-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.chip{font-size:11px;padding:1px 7px;border:1px solid;border-left-width:4px;border-radius:var(--r);background:rgba(0,0,0,.25)}
 
 #mesa{flex:1;display:flex;flex-direction:column;min-height:0;font-family:"Space Mono",monospace;font-size:12px}
 #mesa h2{padding:12px 14px 0;margin:0}
@@ -102,6 +108,8 @@ aside{
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+  <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
+  <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
   <div class="zoom">
     <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
@@ -305,8 +313,56 @@ let arrastre = null;          // {id, x, y, inicioX, inicioY, movio}
 let paneo = null;             // {inicioX, inicioY, x, y}
 let hexDestino = null;
 let creando = false;
+let panelFondo = false;       // GM: panel de la imagen de fondo abierto
+
+// Lo público de fichas y creeps, para vincularlos a los tokens.
+const fichasPub = new Map();  // fichaId -> {nombre, duenoUid, resumen, miniatura}
+const creepsPub = new Map();  // creepId -> {nombre, orden, resumen, miniatura}
+let fondo = null;             // {dato, x, y, ancho} en unidades del mapa
+let moverFondo = false;       // GM: arrastrar mueve el fondo en vez de la vista
+let arrastreFondo = null;     // {inicioX, inicioY, x, y}
 
 const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256', '#D4574E', '#E0C35A', '#4FA3A0', '#9A867E'];
+const HP_COLOR = '#D64545';
+const SP_COLOR = '#3F86E0';
+const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
+const ANCHO_CASILLA = HEX * SQ3;
+
+// Ficha o creep al que está vinculado el token (si sigue existiendo).
+function vinculo(t){
+  if(!t || !t.fichaId) return null;
+  return (t.tipo === 'creep' ? creepsPub : fichasPub).get(t.fichaId) || null;
+}
+function nombreDe(t){
+  const v = vinculo(t);
+  return v && v.nombre ? v.nombre : t.nombre;
+}
+// Barras (0 a 1) y estados del token vinculado. De los creeps solo se
+// publica el porcentaje de vida, sin números; los PJ tienen además SP.
+function estadoDe(t){
+  const v = vinculo(t);
+  if(!v || !v.resumen) return null;
+  const r = v.resumen;
+  const entre01 = x => Math.max(0, Math.min(1, x));
+  const hp = r.hpPct !== undefined
+    ? entre01(num(r.hpPct) / 100)
+    : (num(r.hpMax) > 0 ? entre01(num(r.hp) / num(r.hpMax)) : 0);
+  const sp = t.tipo === 'pj' && num(r.bonosMax) > 0 ? entre01(num(r.bonos) / num(r.bonosMax)) : null;
+  return {hp, sp, muerto: !!r.muerto, estados: Array.isArray(r.estados) ? r.estados : []};
+}
+
+const imagenesCache = new Map();  // data URL -> Image
+function imagenLista(url){
+  if(!url) return null;
+  let img = imagenesCache.get(url);
+  if(!img){
+    img = new Image();
+    img.onload = () => pedirDibujo();
+    img.src = url;
+    imagenesCache.set(url, img);
+  }
+  return img.complete && img.naturalWidth ? img : null;
+}
 
 function puedoMover(t){
   if(!t || !fbUsuario) return false;
@@ -433,6 +489,13 @@ function dibujar(){
   const z = vista.zoom;
   ctx.setTransform(dpr * z, 0, 0, dpr * z, dpr * vista.x, dpr * vista.y);
 
+  // Imagen de fondo (la pone el GM), debajo de la grilla.
+  const imgFondo = fondo ? imagenLista(fondo.dato) : null;
+  if(imgFondo){
+    const alto = fondo.ancho * imgFondo.naturalHeight / imgFondo.naturalWidth;
+    ctx.drawImage(imgFondo, fondo.x, fondo.y, fondo.ancho, alto);
+  }
+
   // Grilla: solo las casillas que se ven.
   const a = pantallaAMundo(0, 0), b = pantallaAMundo(anchoPx, altoPx);
   const filaMin = Math.floor(a.y / (1.5 * HEX)) - 1, filaMax = Math.ceil(b.y / (1.5 * HEX)) + 1;
@@ -444,9 +507,11 @@ function dibujar(){
       trazarHex(p.x, p.y);
     }
   }
-  ctx.fillStyle = '#17121A';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(201,133,69,.28)';
+  if(!imgFondo){
+    ctx.fillStyle = '#17121A';
+    ctx.fill();
+  }
+  ctx.strokeStyle = imgFondo ? 'rgba(15,12,14,.45)' : 'rgba(201,133,69,.28)';
   ctx.lineWidth = 1 / z;
   ctx.stroke();
 
@@ -479,8 +544,24 @@ function dibujar(){
     ctx.beginPath(); ctx.arc(x + 2 / z, y + 3 / z, rad, 0, 2 * Math.PI);
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
 
+    const vin = vinculo(t);
+    const est = estadoDe(t);
+    const nombre = nombreDe(t);
+    const mini = vin ? imagenLista(vin.miniatura) : null;
+
     ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
     ctx.fillStyle = t.color || '#9A867E'; ctx.fill();
+    if(mini){
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI); ctx.clip();
+      ctx.drawImage(mini, x - rad, y - rad, rad * 2, rad * 2);
+      ctx.restore();
+    }
+    if(est && est.muerto){
+      ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(15,12,14,.62)'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
     // Creeps con borde oscuro de guiones; los que puedo mover, con borde dorado.
     ctx.lineWidth = Math.max(2 / z, rad * 0.1);
     if(t.tipo === 'creep'){ ctx.setLineDash([rad * 0.3, rad * 0.18]); ctx.strokeStyle = '#0F0C0E'; }
@@ -493,20 +574,63 @@ function dibujar(){
       ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
     }
 
-    ctx.fillStyle = '#fff';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = `700 ${rad * 0.95}px "Space Grotesk", system-ui, sans-serif`;
-    ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 3;
-    ctx.fillText(inicial(t.nombre), x, y + rad * 0.05);
-    ctx.shadowBlur = 0;
+    if(!mini){
+      ctx.fillStyle = '#fff';
+      ctx.font = `700 ${rad * 0.95}px "Space Grotesk", system-ui, sans-serif`;
+      ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 3;
+      ctx.fillText(inicial(nombre), x, y + rad * 0.05);
+      ctx.shadowBlur = 0;
+    }
+    if(est && est.muerto){
+      ctx.strokeStyle = HP_COLOR; ctx.lineWidth = Math.max(2 / z, rad * 0.14);
+      const k = rad * 0.45;
+      ctx.beginPath(); ctx.moveTo(x - k, y - k); ctx.lineTo(x + k, y + k); ctx.moveTo(x + k, y - k); ctx.lineTo(x - k, y + k); ctx.stroke();
+    }
+
+    // Barras: vida (roja) y, en los PJ, SP (azul), justo debajo del token.
+    let debajo = y + rad + 3 / z;
+    if(est){
+      const bw = rad * 1.8, bh = Math.max(3 / z, rad * 0.13);
+      const barra = (valor, color) => {
+        ctx.fillStyle = 'rgba(15,12,14,.85)';
+        ctx.fillRect(x - bw / 2 - 1 / z, debajo - 1 / z, bw + 2 / z, bh + 2 / z);
+        ctx.fillStyle = color;
+        ctx.fillRect(x - bw / 2, debajo, bw * valor, bh);
+        debajo += bh + 2 / z;
+      };
+      barra(est.hp, HP_COLOR);
+      if(est.sp !== null) barra(est.sp, SP_COLOR);
+    }
+
+    // Estados: circulitos con la inicial sobre el borde de arriba del token
+    // (verde = beneficio, violeta = perjuicio). Con varios en la misma
+    // casilla, solo los del seleccionado.
+    if(est && est.estados.length && (d.solo || seleccion === d.id)){
+      const max = 5;
+      const lista = est.estados.slice(0, max);
+      const r = Math.max(5 / z, rad * 0.24);
+      lista.forEach((e, i) => {
+        const ang = -Math.PI / 2 + (i - (lista.length - 1) / 2) * 0.62;
+        const ex = x + rad * Math.cos(ang), ey = y + rad * Math.sin(ang);
+        const resto = i === max - 1 && est.estados.length > max;
+        ctx.beginPath(); ctx.arc(ex, ey, r, 0, 2 * Math.PI);
+        ctx.fillStyle = resto ? '#3B2E34' : (ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']);
+        ctx.fill();
+        ctx.strokeStyle = '#0F0C0E'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `700 ${r * 1.15}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillText(resto ? '+' + (est.estados.length - max + 1) : inicial(e.nombre), ex, ey + r * 0.06);
+      });
+    }
 
     // Con varios en la misma casilla, el nombre solo del seleccionado.
     if(etiquetas && (d.solo || seleccion === d.id)){
       const tam = 11 / z;
       ctx.font = `500 ${tam}px "Space Grotesk", system-ui, sans-serif`;
-      const texto = t.nombre.length > 18 ? t.nombre.slice(0, 17) + '…' : t.nombre;
+      const texto = nombre.length > 18 ? nombre.slice(0, 17) + '…' : nombre;
       const w = ctx.measureText(texto).width + 8 / z;
-      const ty = y + rad + 9 / z;
+      const ty = debajo + 7 / z;
       ctx.fillStyle = 'rgba(15,12,14,.8)';
       ctx.fillRect(x - w / 2, ty - tam * 0.7, w, tam * 1.4);
       ctx.fillStyle = '#EDE3D2';
@@ -544,6 +668,11 @@ lienzo.addEventListener('pointerdown', e => {
     }
   }else{
     seleccionar(null);
+    if(moverFondo && soyGM && fondo){
+      arrastreFondo = {inicioX: px, inicioY: py, x: fondo.x, y: fondo.y};
+      lienzo.style.cursor = 'move';
+      return;
+    }
   }
   paneo = {inicioX: px, inicioY: py, x: vista.x, y: vista.y};
   lienzo.style.cursor = 'grabbing';
@@ -560,6 +689,12 @@ lienzo.addEventListener('pointermove', e => {
     pedirDibujo();
     return;
   }
+  if(arrastreFondo){
+    fondo.x = arrastreFondo.x + (px - arrastreFondo.inicioX) / vista.zoom;
+    fondo.y = arrastreFondo.y + (py - arrastreFondo.inicioY) / vista.zoom;
+    pedirDibujo();
+    return;
+  }
   if(paneo){
     vista.x = paneo.x + px - paneo.inicioX;
     vista.y = paneo.y + py - paneo.inicioY;
@@ -568,7 +703,7 @@ lienzo.addEventListener('pointermove', e => {
   }
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
-  lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : 'default';
+  lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
 
 function soltar(){
@@ -584,6 +719,11 @@ function soltar(){
     pedirDibujo();
   }
   if(paneo){ paneo = null; guardarVista(); }
+  if(arrastreFondo){
+    const movido = fondo.x !== arrastreFondo.x || fondo.y !== arrastreFondo.y;
+    arrastreFondo = null;
+    if(movido) guardarFondo({x: fondo.x, y: fondo.y});
+  }
   lienzo.style.cursor = 'default';
 }
 lienzo.addEventListener('pointerup', soltar);
@@ -627,7 +767,7 @@ async function crearToken(datos){
   const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
   const casilla = mundoAHex(vistaCentro.x, vistaCentro.y);
   try{
-    const ref = await coleccionTokens().add({
+    const doc = {
       nombre: datos.nombre,
       color: datos.color,
       tipo: datos.tipo,
@@ -635,7 +775,9 @@ async function crearToken(datos){
       col: casilla.col,
       fila: casilla.fila,
       creado: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+    if(datos.fichaId) doc.fichaId = datos.fichaId;
+    const ref = await coleccionTokens().add(doc);
     creando = false;
     seleccionar(ref.id);
   }catch(err){
@@ -680,6 +822,7 @@ function escucharTokens(){
         color: d.color,
         tipo: d.tipo === 'creep' ? 'creep' : 'pj',
         duenoUid: d.duenoUid,
+        fichaId: typeof d.fichaId === 'string' ? d.fichaId : '',
         col: Math.round(num(d.col)),
         fila: Math.round(num(d.fila)),
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : 0,
@@ -695,6 +838,92 @@ function escucharTokens(){
     mostrarAviso('No se pudieron leer los tokens. ¿Están publicadas las reglas nuevas de Firestore? (mirá la consola)');
   });
 }
+
+// Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
+// las barras, estados e imagen de los tokens vinculados.
+function escucharVinculables(){
+  const escuchar = (coleccion, mapa, campos) => fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ mapa.delete(ch.doc.id); return; }
+      const d = ch.doc.data();
+      const o = {};
+      campos.forEach(k => { o[k] = d[k]; });
+      o.nombre = String(d.nombre || '?');
+      mapa.set(ch.doc.id, o);
+    });
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error(`Error escuchando ${coleccion}:`, err));
+  escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura']);
+}
+
+function escucharFondo(){
+  fbDb.doc(fbRutaCampana('mapa/fondo')).onSnapshot(doc => {
+    if(arrastreFondo) return;
+    const d = doc.exists ? doc.data() : null;
+    fondo = d && d.dato ? {dato: d.dato, x: num(d.x), y: num(d.y), ancho: num(d.ancho) || ANCHO_CASILLA * 20} : null;
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando el fondo del mapa:', err));
+}
+
+async function guardarFondo(cambios){
+  try{
+    await fbDb.doc(fbRutaCampana('mapa/fondo')).set({...cambios, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+  }catch(err){
+    console.error('No se pudo guardar el fondo:', err);
+    toast(err.code === 'permission-denied' ? 'Solo el GM puede cambiar el fondo' : 'No se pudo guardar el fondo');
+  }
+}
+
+// Achica la imagen hasta que entre en un documento de Firebase (tope 1 MB).
+function prepararImagenFondo(file){
+  return new Promise((res, rej) => {
+    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('bad-image'));
+      img.onload = () => {
+        let lado = 2000, calidad = 0.82, dato = '';
+        for(let i = 0; i < 8; i++){
+          const escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.naturalWidth * escala);
+          canvas.height = Math.round(img.naturalHeight * escala);
+          const c = canvas.getContext('2d');
+          c.fillStyle = '#17121A'; c.fillRect(0, 0, canvas.width, canvas.height);
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dato = canvas.toDataURL('image/jpeg', calidad);
+          if(dato.length < 900000) break;
+          lado = Math.round(lado * 0.8); calidad = Math.max(0.6, calidad - 0.05);
+        }
+        dato.length < 900000 ? res(dato) : rej(new Error('muy-grande'));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+$('#fondo-archivo').onchange = async ev => {
+  const file = ev.target.files[0];
+  ev.target.value = '';
+  if(!file) return;
+  toast('Preparando la imagen…');
+  try{
+    const dato = await prepararImagenFondo(file);
+    // Si no había fondo, arranca con la esquina en la casilla 0,0 y 20 casillas de ancho.
+    const base = fondo ? {} : {x: -ANCHO_CASILLA / 2, y: -HEX, ancho: ANCHO_CASILLA * 20};
+    await guardarFondo({dato, ...base});
+    toast('Fondo cargado');
+  }catch(err){
+    console.error('No se pudo cargar el fondo:', err);
+    toast(err.message === 'muy-grande' ? 'La imagen es demasiado pesada' : 'No se pudo usar esa imagen');
+  }
+};
 
 function escucharMiembros(){
   fbDb.collection(fbRutaCampana('miembros')).onSnapshot(snap => {
@@ -733,40 +962,136 @@ function conectarColores(caja, alElegir){
   });
 }
 
+// Opciones para vincular un token: los personajes propios (jugador) o los
+// creeps (GM), según el tipo de token.
+function opcionesVinculo(tipo, elegido){
+  let lista;
+  if(tipo === 'creep'){
+    lista = [...creepsPub.entries()].sort((a, b) => num(a[1].orden) - num(b[1].orden));
+  }else{
+    lista = [...fichasPub.entries()]
+      .filter(([, f]) => f.duenoUid === fbUsuario.uid)
+      .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+  }
+  const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
+  return '<option value="">Sin vincular</option>' + lista.map(([id, v]) =>
+    `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`
+  ).join('');
+}
+
+// Barras y estados en el panel. De los PJ se ven los números (su ficha es
+// visible para todos); de los creeps, solo cuán llena está la barra.
+function htmlEstadoToken(t){
+  const v = vinculo(t);
+  const est = estadoDe(t);
+  if(!v || !est) return t.fichaId ? '<p class="ayuda" style="margin-top:6px">La ficha vinculada ya no existe.</p>' : '';
+  const r = v.resumen || {};
+  const barra = (valor, color, texto) =>
+    `<div class="barra"><i style="width:${Math.round(valor * 100)}%;background:${color}"></i></div>` +
+    (texto ? `<div class="barra-txt">${texto}</div>` : '');
+  let html = '<div class="estado-token">';
+  if(t.tipo === 'pj'){
+    html += barra(est.hp, HP_COLOR, `Vida ${fmt(Math.max(0, num(r.hp)))} / ${fmt(num(r.hpMax))}`);
+    if(est.sp !== null) html += barra(est.sp, SP_COLOR, `SP ${fmt(num(r.bonos))} / ${fmt(num(r.bonosMax))}`);
+  }else{
+    html += barra(est.hp, HP_COLOR, 'Vida');
+  }
+  if(est.muerto) html += `<div class="dato" style="color:${HP_COLOR}">${t.tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>`;
+  if(est.estados.length){
+    html += '<div class="chips">' + est.estados.map(e =>
+      `<span class="chip" style="border-color:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']}">${esc(e.nombre)}${e.permanente || !num(e.turnos) ? '' : ` · ${fmt(num(e.turnos))}t`}</span>`
+    ).join('') + '</div>';
+  }
+  return html + '</div>';
+}
+
 function renderPanel(forzar){
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
-  const clave = JSON.stringify([creando, seleccion]);
-  const firma = clave + '|' + JSON.stringify([t && [t.nombre, t.color, t.tipo, t.duenoUid, t.col, t.fila], soyGM, [...miembros.entries()], !!fbMiembro]);
+  const clave = JSON.stringify([creando, panelFondo, seleccion]);
+  const v = t ? vinculo(t) : null;
+  const opciones = (creando || t) ? [
+    [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre),
+    [...creepsPub.entries()].map(([id, c]) => id + c.nombre),
+  ] : null;
+  const firma = clave + '|' + JSON.stringify([
+    t && [t.nombre, t.color, t.tipo, t.duenoUid, t.col, t.fichaId, t.fila],
+    v && [v.nombre, v.resumen],
+    opciones, soyGM, [...miembros.entries()], !!fbMiembro,
+    panelFondo && fondo && [fondo.ancho, !!fondo.dato], moverFondo,
+  ]);
   if(!forzar){
     if(firma === firmaPanel) return;
-    // Si sigue abierto el mismo token (o el formulario de nuevo token), no
-    // pisar lo que alguien está escribiendo o eligiendo en el panel.
+    // Si sigue abierto el mismo panel, no pisar lo que alguien está
+    // escribiendo o eligiendo.
     const mismoPanel = firmaPanel.startsWith(clave + '|');
     if(mismoPanel && (creando || panel.contains(document.activeElement))) return;
   }
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
+  $('#btn-fondo').hidden = !soyGM;
+
+  if(panelFondo && soyGM){
+    const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
+    panel.innerHTML =
+      '<h2>Fondo del mapa</h2>' +
+      '<div class="fila" style="margin-top:0">' +
+        `<button type="button" class="btn primary" id="fondo-cargar">${fondo ? 'Cambiar imagen' : 'Cargar imagen'}</button>` +
+        (fondo ? '<button type="button" class="btn peligro" id="fondo-quitar">Quitar</button>' : '') +
+      '</div>' +
+      (fondo
+        ? `<label class="etiqueta">Ancho, en casillas</label><div class="fila" style="margin-top:0"><input id="fondo-ancho" type="number" min="1" max="400" step="0.5" value="${casillas}"><button type="button" class="btn" id="fondo-ancho-ok">Aplicar</button></div>` +
+          `<label class="fila" style="cursor:pointer"><input type="checkbox" id="fondo-mover" style="width:auto"${moverFondo ? ' checked' : ''}> Arrastrar el fondo con el mouse</label>` +
+          '<p class="ayuda" style="margin-top:6px">Con esa casilla tildada, arrastrar un lugar vacío mueve la imagen para acomodarla a la grilla. Destildala para volver a desplazar la vista.</p>'
+        : '<p class="ayuda" style="margin-top:8px">La imagen se achica sola para que entre en la mesa. Todos la ven debajo de la grilla.</p>') +
+      '<div class="fila"><button type="button" class="btn" id="fondo-cerrar">Listo</button></div>';
+    $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
+    $('#fondo-cerrar').onclick = () => { panelFondo = false; moverFondo = false; renderPanel(true); pedirDibujo(); };
+    if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
+      if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
+      try{ await fbDb.doc(fbRutaCampana('mapa/fondo')).delete(); moverFondo = false; }
+      catch(err){ console.error(err); toast('No se pudo quitar el fondo'); }
+    };
+    if($('#fondo-ancho-ok')) $('#fondo-ancho-ok').onclick = () => {
+      const n = num($('#fondo-ancho').value);
+      if(n < 1 || n > 400){ toast('Poné un ancho entre 1 y 400 casillas'); return; }
+      fondo.ancho = n * ANCHO_CASILLA;
+      pedirDibujo();
+      guardarFondo({ancho: fondo.ancho});
+    };
+    if($('#fondo-mover')) $('#fondo-mover').onchange = e => { moverFondo = e.target.checked; };
+    return;
+  }
 
   if(creando){
     let color = COLORES[Math.floor(Math.random() * COLORES.length)];
+    const tipoInicial = soyGM ? 'creep' : 'pj';
     panel.innerHTML =
       '<h2>Nuevo token</h2>' +
-      '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
       (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' : '') +
-      '<label class="etiqueta">Color</label>' + htmlColores(color, true) +
+      `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '')}</select>` +
+      '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
+      '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
       '<div class="fila"><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button></div>' +
-      '<p class="ayuda" style="margin-top:8px">Aparece en el centro de lo que estás viendo.</p>';
+      '<p class="ayuda" style="margin-top:8px">Vinculado, el token toma el nombre, la imagen, las barras y los estados de su ficha. Aparece en el centro de lo que estás viendo.</p>';
     conectarColores(panel, c => color = c);
+    const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
+    const alVincular = () => {
+      const id = $('#nuevo-vinculo').value;
+      const vv = id ? (tipoActual() === 'creep' ? creepsPub : fichasPub).get(id) : null;
+      if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
+    };
+    $('#nuevo-vinculo').onchange = alVincular;
+    if(soyGM) $('#nuevo-tipo').onchange = () => { $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), ''); };
     const crear = () => {
       const nombre = $('#nuevo-nombre').value.trim();
       if(!nombre){ $('#nuevo-nombre').focus(); return; }
-      crearToken({nombre, color, tipo: soyGM ? $('#nuevo-tipo').value : 'pj'});
+      crearToken({nombre, color, tipo: tipoActual(), fichaId: $('#nuevo-vinculo').value});
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
     $('#nuevo-cancelar').onclick = () => { creando = false; renderPanel(true); };
-    $('#nuevo-nombre').focus();
+    $('#nuevo-vinculo').focus();
     return;
   }
 
@@ -782,10 +1107,13 @@ function renderPanel(forzar){
   let color = t.color;
   panel.innerHTML =
     `<h2>${t.tipo === 'creep' ? 'Creep' : 'Personaje'}</h2>` +
+    `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
+    htmlEstadoToken(t) +
     (editable
-      ? `<label class="etiqueta">Nombre</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
+      ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
+        `<label class="etiqueta">Nombre (si no está vinculado)</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
         '<label class="etiqueta">Color</label>' + htmlColores(t.color, true)
-      : `<div class="dato"><b>${esc(t.nombre)}</b></div>`) +
+      : '') +
     (t.tipo === 'pj' ? `<div class="dato">Dueño: ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
     `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
     (soyGM && t.tipo === 'pj'
@@ -803,9 +1131,13 @@ function renderPanel(forzar){
   if(editable){
     conectarColores(panel, c => color = c);
     const guardar = () => {
-      const nombre = $('#token-nombre').value.trim();
+      const fichaId = $('#token-vinculo').value;
+      const vv = fichaId ? (t.tipo === 'creep' ? creepsPub : fichasPub).get(fichaId) : null;
+      const nombre = ($('#token-nombre').value.trim() || (vv ? vv.nombre : '')).slice(0, 40);
       if(!nombre){ toast('El token necesita un nombre'); return; }
-      editarToken(seleccion, {nombre, color});
+      const cambios = {nombre, color};
+      cambios.fichaId = fichaId ? fichaId : firebase.firestore.FieldValue.delete();
+      editarToken(seleccion, cambios);
     };
     $('#token-guardar').onclick = guardar;
     $('#token-nombre').onkeydown = e => { if(e.key === 'Enter') guardar(); };
@@ -817,9 +1149,18 @@ function renderPanel(forzar){
   };
 }
 
+$('#btn-fondo').onclick = () => {
+  if(!soyGM) return;
+  panelFondo = !panelFondo;
+  if(panelFondo){ creando = false; seleccion = null; }
+  else moverFondo = false;
+  renderPanel(true);
+  pedirDibujo();
+};
+
 $('#btn-nuevo').onclick = () => {
   if(!fbMiembro) return;
-  creando = true; seleccion = null;
+  creando = true; seleccion = null; panelFondo = false; moverFondo = false;
   renderPanel(true); pedirDibujo();
 };
 
@@ -936,6 +1277,8 @@ function arrancarEnVivo(){
   estado(`en vivo · ${fbMiembro.nombre}`);
   soyGM = fbMiembro.gm === true;
   escucharMiembros();
+  escucharVinculables();
+  escucharFondo();
   escucharTokens();
   mesaEscuchar();
   renderPanel(true);

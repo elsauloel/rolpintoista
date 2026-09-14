@@ -91,9 +91,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .tablero-nivel{font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted);font-weight:400}
 .tablero-hp-fila{display:flex;align-items:center;gap:7px}
 .tablero-hp-barra{flex:1;height:7px;background:var(--panel);border:1px solid var(--line-soft);overflow:hidden}
-.tablero-hp-fill{height:100%;background:var(--absenta)}
-.tablero-hp-fill.medio{background:var(--brass)}
-.tablero-hp-fill.bajo{background:var(--danger)}
+.tablero-hp-fill{height:100%;background:#D64545}
+.tablero-hp-fill.sp{background:#3F86E0}
 .tablero-hp-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--paper);flex:none}
 .tablero-estados{display:flex;flex-wrap:wrap;gap:4px}
 .tablero-estado{font-family:"Space Mono",monospace;font-size:9.5px;border:1px solid var(--line);border-radius:99px;padding:2px 7px;color:var(--muted);position:relative}
@@ -2077,6 +2076,7 @@ function renderAll(){
   S.creeps.forEach(normalizarCreep);
   grid.innerHTML = S.creeps.map(sc => cardHtml(sc)).join('');
   if($('#scrim-acciones-creep').classList.contains('open')) renderAccionesCreep();
+  renderTablero();  // si está abierto, refleja los cambios de los creeps
 }
 
 let accionesCreepId = null;
@@ -3506,7 +3506,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-tablero'){
-    abrirTablero(false);
+    abrirTablero();
     return;
   }
   if(b.id === 'btn-historial'){
@@ -3782,9 +3782,8 @@ function aBase64(texto){
    rareza queda anotada en la consola. */
 /* =========================================================
    TABLERO DE COMBATE
-   Junta lo que publicó cada jugador (datos/tablero/*.json, que sube cada ficha
-   con "Subir datos") con los creeps que subiste vos. Se refresca cuando
-   lo pedís, no solo: así nadie ve datos a medio turno.
+   Personajes de los jugadores en vivo (Firebase) y tus creeps tal como
+   los tenés abiertos (ver "Tablero en vivo").
    ========================================================= */
 
 async function ghLeerJson(ruta){
@@ -3799,22 +3798,49 @@ async function ghLeerJson(ruta){
   return await resp.json();
 }
 
-async function bajarTablero(){
-  const fichas = [];
-  const cab = {Accept: 'application/vnd.github.object+json'};
-  const token = localStorage.getItem('gh-token');
-  if(token) cab.Authorization = 'Bearer ' + token.trim();
-  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/datos/tablero?ref=${GH_BRANCH}`, {headers: cab, cache: 'no-store'});
-  if(resp.status === 429 || resp.status === 403) throw {limite: true};
-  if(resp.ok){
-    const cuerpo = await resp.json();
-    const lista = (Array.isArray(cuerpo) ? cuerpo : (cuerpo.entries || [])).filter(x => x.name.endsWith('.json'));
-    const bajadas = await Promise.all(lista.map(x => ghLeerJson(`datos/tablero/${x.name}`).catch(() => null)));
-    bajadas.forEach(d => { if(d && d.nombre) fichas.push(d); });
-  }
-  // Los creeps salen del estado que tenés abierto ahora, no de GitHub: para
-  // vos son en vivo, y así ves el tablero sin tener que subirlos primero.
-  const creeps = S.creeps.map(sc => ({
+/* ---------- Tablero en vivo (Firebase) ----------
+   Mientras el Tablero está abierto escucha las fichas de los jugadores
+   (y, en la ficha, lo público de los creeps) y se redibuja solo. Al
+   cerrarlo deja de escuchar. Mismo bloque en ficha.html y gm-tools.html,
+   salvo de dónde salen los creeps. */
+
+let tableroCortes = [];
+const tableroDatos = {fichas: null, creeps: null};
+
+function tableroFechaIso(ts){
+  return ts && ts.toDate ? ts.toDate().toISOString() : '';
+}
+
+function tarjetaDeFicha(doc){
+  const d = doc.data({serverTimestamps: 'estimate'});
+  const r = d.resumen || {};
+  return {
+    nombre: d.nombre || 'Sin nombre', nivel: num(r.nivel), imagen: d.miniatura || '',
+    hp: num(r.hp), hpMax: num(r.hpMax), bonos: num(r.bonos), bonosMax: num(r.bonosMax),
+    muerto: !!r.muerto, estados: r.estados || [], actualizado: tableroFechaIso(d.actualizado),
+  };
+}
+
+function tableroCerrar(){
+  tableroCortes.forEach(cortar => cortar());
+  tableroCortes = [];
+  tableroDatos.fichas = tableroDatos.creeps = null;
+  $('#scrim-tablero').classList.remove('open');
+}
+
+function tableroEscucharColeccion(coleccion, clave, aTarjeta){
+  tableroCortes.push(fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
+    tableroDatos[clave] = snap.docs.map(aTarjeta);
+    renderTablero();
+  }, err => {
+    console.error(`Error escuchando ${coleccion} para el tablero:`, err);
+    $('#tablero-body').innerHTML = '<div class="hint">No se pudo leer el tablero. ¿Están publicadas las reglas nuevas?</div>';
+  }));
+}
+
+// En gm-tools los creeps salen de lo que tenés abierto (con números).
+function tableroCreepsLocales(){
+  return S.creeps.map(sc => ({
     nombre: sc.nombre,
     nivel: num(sc.nivel),
     imagen: sc.imagen || '',
@@ -3822,13 +3848,6 @@ async function bajarTablero(){
     hpMax: num(sc.hpMax),
     estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, detalle: es.detalle || ''})),
   }));
-  return {fichas, creeps};
-}
-
-function hpFillClase(hp, hpMax){
-  if(!hpMax) return '';
-  const pct = hp / hpMax;
-  return pct <= 0.25 ? 'bajo' : pct <= 0.6 ? 'medio' : '';
 }
 
 function haceCuanto(iso){
@@ -3844,10 +3863,17 @@ function haceCuanto(iso){
 }
 
 function tableroCardHtml(x, tipo){
+  // De los creeps, los jugadores reciben solo el porcentaje de vida
+  // (hpPct): la barra se muestra sin números.
+  const conNumeros = x.hpPct === undefined || x.hpPct === null;
   const hp = num(x.hp);
   const hpMax = num(x.hpMax);
-  const pct = hpMax > 0 ? Math.max(0, Math.min(100, (hp / hpMax) * 100)) : 0;
-  const caido = hp <= 0 || x.muerto;
+  const pct = conNumeros
+    ? (hpMax > 0 ? Math.max(0, Math.min(100, (hp / hpMax) * 100)) : 0)
+    : Math.max(0, Math.min(100, num(x.hpPct)));
+  const caido = conNumeros ? (hp <= 0 || x.muerto) : !!x.muerto;
+  const spMax = num(x.bonosMax);
+  const spPct = spMax > 0 ? Math.max(0, Math.min(100, (num(x.bonos) / spMax) * 100)) : 0;
   const estados = (x.estados || []).filter(e => e && e.nombre);
   const desde = haceCuanto(x.actualizado);
   return `<div class="tablero-card ${tipo === 'pj' ? 'es-pj' : 'es-creep'}${caido ? ' caido' : ''}">
@@ -3856,9 +3882,13 @@ function tableroCardHtml(x, tipo){
       <div class="tablero-nombre">${esc(x.nombre)}${x.nivel ? ` <span class="tablero-nivel">Lv ${fmt(num(x.nivel))}</span>` : ''}</div>
     </div>
     <div class="tablero-hp-fila">
-      <div class="tablero-hp-barra"><div class="tablero-hp-fill ${hpFillClase(hp, hpMax)}" style="width:${pct}%"></div></div>
-      <span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill" style="width:${pct}%"></div></div>
+      ${conNumeros ? `<span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
     </div>
+    ${spMax > 0 ? `<div class="tablero-hp-fila">
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill sp" style="width:${spPct}%"></div></div>
+      <span class="tablero-hp-txt">${fmt(num(x.bonos))}/${fmt(spMax)} SP</span>
+    </div>` : ''}
     ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
     ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
       const det = (e.detalle || '').trim();
@@ -3868,23 +3898,22 @@ function tableroCardHtml(x, tipo){
   </div>`;
 }
 
-function renderTablero(datos){
-  const {fichas, creeps} = datos;
-  if(!fichas.length && !creeps.length){
-    $('#tablero-body').innerHTML = `<div class="hint">No hay creeps cargados ni jugadores publicados. Cada jugador aparece acá cuando toca "Subir datos" en su ficha.</div>`;
-    $('#tablero-sello').textContent = '';
-    return;
-  }
+function renderTablero(){
+  if(!$('#scrim-tablero').classList.contains('open')) return;
+  const fichas = tableroDatos.fichas;
+  const creeps = tableroCreepsLocales();
   let html = '';
-  if(fichas.length){
+  if(fichas === null){
+    html += `<div class="tablero-grupo">Personajes</div><div class="hint">${fbMiembro ? 'Cargando…' : 'Entrá a la mesa para ver los personajes de los jugadores.'}</div>`;
+  }else if(fichas.length){
     const orden = fichas.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-    html += `<div class="tablero-grupo">Personajes · ${fmt(orden.length)}</div>`;
+    html += `<div class="tablero-grupo">Personajes · ${fmt(orden.length)} · en vivo</div>`;
     html += `<div class="tablero-grid">${orden.map(x => tableroCardHtml(x, 'pj')).join('')}</div>`;
   }else{
-    html += `<div class="tablero-grupo">Personajes</div><div class="hint">Ningún jugador publicó su estado todavía.</div>`;
+    html += `<div class="tablero-grupo">Personajes</div><div class="hint">Ningún jugador creó personajes todavía.</div>`;
   }
   if(creeps.length){
-    html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)} · en vivo</div>`;
+    html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)}</div>`;
     html += `<div class="tablero-grid">${creeps.map(x => tableroCardHtml(x, 'creep')).join('')}</div>`;
   }
   $('#tablero-body').innerHTML = html;
@@ -3892,22 +3921,11 @@ function renderTablero(datos){
   $('#tablero-sello').textContent = creeps.length ? `${fmt(enPie)} creep(s) en pie` : '';
 }
 
-async function abrirTablero(refrescando){
-  if(!refrescando) $('#tablero-body').innerHTML = `<div class="hint">Bajando lo que publicaron los jugadores…</div>`;
+function abrirTablero(){
   $('#scrim-tablero').classList.add('open');
-  $('#tablero-refrescar').disabled = true;
-  try{
-    renderTablero(await bajarTablero());
-  }catch(err){
-    if(err && err.limite){
-      $('#tablero-body').innerHTML = `<div class="hint">GitHub cortó las consultas por un rato (pasa cuando varios miran seguido desde la misma conexión sin token). Probá de nuevo en unos minutos.</div>`;
-    }else{
-      console.error('Error bajando el tablero:', err);
-      $('#tablero-body').innerHTML = `<div class="hint">No se pudo bajar el tablero — revisá la consola.</div>`;
-    }
-  }finally{
-    $('#tablero-refrescar').disabled = false;
-  }
+  $('#tablero-refrescar').style.display = 'none';
+  renderTablero();
+  if(fbDb && fbMiembro && !tableroCortes.length) tableroEscucharColeccion('fichas', 'fichas', tarjetaDeFicha);
 }
 
 async function ghShaPorListado(ruta, cab){
@@ -4355,11 +4373,10 @@ $('#equipar-creep-limpiar').addEventListener('click', () => {
 });
 $('#equipar-creep-orden').addEventListener('change', e => { equipoOrden = e.target.value; renderEquiparCreepLista(); });
 $('#equipar-creep-orden-dir').addEventListener('click', () => { equipoOrdenDesc = !equipoOrdenDesc; renderEquiparCreepLista(); });
-$('#tablero-refrescar').addEventListener('click', () => abrirTablero(true));
-$('#tablero-x').addEventListener('click', () => $('#scrim-tablero').classList.remove('open'));
+$('#tablero-x').addEventListener('click', tableroCerrar);
 $('#historial-x').addEventListener('click', () => $('#scrim-historial').classList.remove('open'));
 $('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id === 'scrim-historial') $('#scrim-historial').classList.remove('open'); });
-$('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') $('#scrim-tablero').classList.remove('open'); });
+$('#scrim-tablero').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tablero') tableroCerrar(); });
 $('#equipar-creep-item-aleatorio').addEventListener('click', elegirItemAleatorioGM);
 $('#item-aleatorio-gm-tirar-de-nuevo').addEventListener('click', elegirItemAleatorioGM);
 $('#item-aleatorio-gm-x').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');
@@ -4878,16 +4895,16 @@ function creepFichaJson(sc){
 }
 
 // Lo que ven los jugadores de cada creep (sin habilidades, equipo ni stats).
+// De la vida solo se publica el porcentaje: los números quedan para el GM.
 function creepPublico(sc, orden){
   const hp = num(sc.hp);
+  const hpMax = num(sc.hpMax);
   return {
     nombre: String(sc.nombre || 'Creep').slice(0, 60),
     orden,
     color: String(sc.color || ''),
     resumen: {
-      nivel: num(sc.nivel),
-      hp,
-      hpMax: num(sc.hpMax),
+      hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
       estados: (sc.estados || [])
         .filter(es => es && es.activo !== false && es.nombre)
@@ -4981,7 +4998,7 @@ async function gmGuardarTick(forzar){
     const doc = {...JSON.parse(a.publico), firma, actualizado: ts};
     if(imagenCambio) doc.miniatura = await creepMiniatura(a.imagen);
     const base = col.doc(id);
-    batch.set(base, doc, {merge: true});
+    batch.set(base, doc, {mergeFields: Object.keys(doc)});  // reemplaza el resumen entero, conserva la miniatura
     batch.set(base.collection('privado').doc('ficha'), {json: a.json});
     if(imagenCambio) batch.set(base.collection('privado').doc('imagen'), {dato: a.imagen});
     g.firmas[id] = firma;
@@ -5075,7 +5092,13 @@ async function gmProcesarSnapshot(snap){
       const creeps = await Promise.all(docs.map(gmLeerCreep));
       S.creeps = creeps;
       renderAll();  // normaliza los creeps
-      S.creeps.forEach((sc, i) => gmMarcarGuardado(sc, i, docs[i].data().firma || ''));
+      S.creeps.forEach((sc, i) => {
+        gmMarcarGuardado(sc, i, docs[i].data().firma || '');
+        // Creeps guardados con el formato viejo (vida en números a la vista de
+        // todos): se vuelven a publicar solos con solo el porcentaje.
+        const r = docs[i].data().resumen;
+        if(!r || r.hpPct === undefined || r.hp !== undefined) gmVivo.ultimo[sc.id].publico = '';
+      });
       toast(`${creeps.length} creep(s) cargados de la mesa`);
     }
     // Si la mesa no tenía creeps, se suben los que haya en pantalla.

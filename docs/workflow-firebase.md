@@ -47,8 +47,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   retrato achicado a 96 px para el token del mapa. Todos los miembros leen
   todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools) y solo puede cambiar `duenoUid`. La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
-- `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {nivel, hp,
-  hpMax, muerto, estados[]}, miniatura, firma, actualizado}`. Lo público de
+- `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
+  muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se
+  publica el porcentaje (`hpPct`, 0–100): los jugadores ven la barra sin
+  números. Lo público de
   cada creep de `gm-toolset/gm-tools.html` (bloque "CREEPS EN VIVO"); lo
   leen todos. El creep completo va en `creeps/{id}/privado/ficha` (`{json}`,
   sin imagen) y su imagen en `creeps/{id}/privado/imagen` (`{dato}`): eso
@@ -57,8 +59,13 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   aliados, comerciantes…) también son creeps.
 - `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
   gm-tools. Solo el GM.
+- `campanas/{id}/mapa/fondo` — `{dato, x, y, ancho, actualizado}`. Imagen de
+  fondo del mapa (data URL achicada a < 900 KB), con su posición y ancho en
+  unidades del mapa. La ven todos; solo el GM la escribe.
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
-  'pj'|'creep', duenoUid, col, fila, creado}`. Tokens del mapa de
+  'pj'|'creep', duenoUid, col, fila, creado, fichaId?}`. `fichaId` vincula
+  el token a una ficha (pj) o a un creep: el mapa toma de ahí nombre,
+  miniatura, barras (vida roja; SP azul, solo PJ) y estados. Tokens del mapa de
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
   solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
   de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`

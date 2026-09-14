@@ -61,6 +61,9 @@ su casa:
     cada creep solo el token, la barra de vida y los estados.
   - El daño recibido lo aplica el dueño en su propia ficha.
   - Tiradas del GM: visibles para todos (tiradas secretas, más adelante).
+  - **Vida de los creeps**: los jugadores solo ven cuán llena está la barra
+    (se publica el porcentaje, no los números). Los creeps no tienen SP.
+  - Barras: **vida roja, SP azul** (en tokens y Tablero).
 - **Fichas en vivo, guardadas por partes** (recursos, estados, inventario,
   atributos…), con escrituras espaciadas (~1 s) por el tope diario del
   plan gratis.
@@ -80,10 +83,10 @@ su casa:
 | 0 | Firebase: proyecto, auth anónima, código, reglas, página de prueba | ✅ Hecho y probado |
 | 1 | Mesa: tiradas compartidas en vivo (cajita flotante en ficha y gm-tools) | ✅ Hecho y probado |
 | 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | ✅ Hecho y probado |
-| 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | En curso |
+| 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | ✅ Hecho y probado |
 | 3a | Ficha guardada sola en Firebase por partes; Personajes lista los de la mesa (propios / de otros en solo lectura); se van Subir/Bajar datos | ✅ Hecho y probado |
 | 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
-| 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | Pendiente |
+| 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
 
 **Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y
 movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),

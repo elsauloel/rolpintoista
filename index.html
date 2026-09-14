@@ -8,12 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* Página de inicio del sitio (GitHub Pages): links a cada herramienta.
-   Las herramientas no dependen de esta página; se pueden abrir directo. */
+/* Inicio del sitio: iniciar sesión, elegir o crear partida y abrir sus
+   herramientas. La lógica de cuenta y partida compartida con las
+   herramientas está en comun/sesion.js. */
 :root{
   --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
   --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57;
-  --paper:#EDE3D2; --muted:#9A867E; --r:3px;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -24,68 +25,496 @@ body{
     radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
   color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.5;min-height:100vh
 }
-main{max-width:860px;margin:0 auto;padding:48px 20px 40px}
-.eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper)}
-h1{font-family:"Fraunces",Georgia,serif;font-weight:900;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:6px 0 10px;color:var(--brass)}
-.sub{color:var(--muted);margin:0 0 32px;max-width:560px}
-h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:30px 0 10px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-a.tool{
-  display:flex;flex-direction:column;gap:6px;padding:16px 16px 14px;background:var(--panel);
-  border:1px solid var(--line);border-radius:var(--r);color:inherit;text-decoration:none;transition:border-color .15s,transform .15s
+[hidden]{display:none!important}
+input,button{font-family:inherit;color:inherit}
+input{
+  width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:9px 10px;font-size:15px
 }
-a.tool:hover,a.tool:focus-visible{border-color:var(--copper);transform:translateY(-1px);outline:none}
-.tool .titulo{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
-.tool .desc{color:var(--muted);font-size:13.5px}
-.tool .tag{align-self:flex-start;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r);border:1px solid var(--line);color:var(--muted)}
-.tool.principal{border-color:var(--copper);background:linear-gradient(180deg,rgba(201,133,69,.1),transparent 70%),var(--panel)}
-.nota{margin-top:34px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:13.5px}
-.nota b{color:var(--paper);font-weight:500}
+input:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+a{color:var(--brass)}
+
+main{max-width:860px;margin:0 auto;padding:40px 20px 48px}
+.barra{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
+.eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper)}
+.cuenta{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);display:flex;gap:10px;align-items:center}
+h1{font-family:"Fraunces",Georgia,serif;font-weight:900;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:6px 0 10px;color:var(--brass)}
+.sub{color:var(--muted);margin:0 0 28px;max-width:580px}
+h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:30px 0 10px}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:10px 16px;border:1px solid var(--line);border-radius:var(--r);background:none;white-space:nowrap
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.chico{padding:5px 10px;font-size:10.5px}
+.enlace{background:none;border:none;color:var(--brass);text-decoration:underline;padding:0;font-size:13.5px}
+
+.caja{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.acceso{max-width:420px}
+.google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 14px;
+  background:#fff;color:#1f1f1f;border:1px solid #dadce0;border-radius:var(--r);font-weight:500;font-size:15px
+}
+.google:hover{background:#f3f3f3}
+.separador{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:18px 0}
+.separador::before,.separador::after{content:"";flex:1;height:1px;background:var(--line)}
+.pestanas{display:flex;gap:4px;margin-bottom:14px}
+.pestanas button{flex:1;background:none;border:1px solid var(--line);border-radius:var(--r);padding:7px;font-size:13.5px;color:var(--muted)}
+.pestanas button.activa{border-color:var(--copper);color:var(--paper)}
+label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+.fila{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.error{color:var(--danger);font-size:13.5px;min-height:1.2em;margin-top:10px}
+.ok{color:#8FC7A5;font-size:13.5px;margin-top:10px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.tarjeta{
+  display:flex;flex-direction:column;gap:6px;padding:16px 16px 14px;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--r);color:inherit;text-decoration:none;text-align:left;
+  transition:border-color .15s,transform .15s;font-size:15px
+}
+a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--copper);transform:translateY(-1px);outline:none}
+.tarjeta .titulo{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.tarjeta .desc{color:var(--muted);font-size:13.5px}
+.tag{align-self:flex-start;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r);border:1px solid var(--line);color:var(--muted)}
+.tag.gm{border-color:var(--copper);color:var(--brass)}
+.tag.jugador{border-color:var(--bottle);color:#8FC7A5}
+.tarjeta.principal{border-color:var(--copper);background:linear-gradient(180deg,rgba(201,133,69,.1),transparent 70%),var(--panel)}
+.tarjeta.nueva{border-style:dashed;align-items:flex-start;justify-content:center;min-height:110px;background:none}
+.vacio{color:var(--muted);font-size:14px}
+.nota{margin-top:30px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:13.5px}
 </style>
 </head>
 <body>
 <main>
-  <div class="eyebrow">Rol Pintoísta</div>
-  <h1>La mesa</h1>
-  <p class="sub">Herramientas para jugar en vivo, cada uno desde su casa. La primera vez te pide tu nombre y el código de campaña que te pasa el GM.</p>
-
-  <h2>Para jugar</h2>
-  <div class="grid">
-    <a class="tool principal" href="vtt-hexgrid/mapa.html">
-      <span class="titulo">⬡ Mapa</span>
-      <span class="desc">Tablero de hexágonos con los tokens de todos, en vivo, y la mesa de tiradas.</span>
-    </a>
-    <a class="tool principal" href="ficha-personaje/ficha.html">
-      <span class="titulo">📜 Ficha de personaje</span>
-      <span class="desc">Tus personajes: atributos, inventario, habilidades y tiradas. Se guarda sola.</span>
-      <span class="tag">Jugadores</span>
-    </a>
+  <div class="barra">
+    <div class="eyebrow">Rol Pintoísta</div>
+    <div class="cuenta" id="cuenta" hidden><span id="cuenta-email"></span><button type="button" class="btn chico" id="btn-salir">Salir</button></div>
   </div>
 
-  <h2>Para el GM</h2>
-  <div class="grid">
-    <a class="tool" href="gm-toolset/gm-tools.html">
-      <span class="titulo">⚔ GM Tools</span>
-      <span class="desc">Creeps y personajes del GM en combate. Se guardan solos.</span>
-      <span class="tag">GM</span>
-    </a>
-    <a class="tool" href="gm-toolset/vendor-generator.html">
-      <span class="titulo">🏪 Generador de tiendas</span>
-      <span class="desc">Arma el stock de un vendedor para que los jugadores compren.</span>
-      <span class="tag">GM</span>
-    </a>
-  </div>
+  <!-- Cargando -->
+  <section id="vista-cargando">
+    <p class="sub">Cargando…</p>
+  </section>
 
-  <h2>Referencia</h2>
-  <div class="grid">
-    <a class="tool" href="manual-usuario/manual.html">
-      <span class="titulo">📖 Manual</span>
-      <span class="desc">Reglas del juego.</span>
-      <span class="tag">En construcción</span>
-    </a>
-  </div>
+  <!-- Sin conexión -->
+  <section id="vista-sin-conexion" hidden>
+    <h1>La mesa</h1>
+    <p class="sub">No se pudo conectar. Revisá la conexión a internet y recargá la página.</p>
+  </section>
 
-  <p class="nota"><b>¿Cambiaste de navegador o borraste los datos?</b> Vas a tener que volver a poner tu nombre y el código, y el GM te reasigna tus personajes. Guardá este link en favoritos para volver.</p>
+  <!-- Iniciar sesión -->
+  <section id="vista-login" hidden>
+    <h1>La mesa</h1>
+    <p class="sub">Herramientas para jugar en vivo, cada uno desde su casa. Entrá con tu cuenta para ver las partidas.</p>
+    <div class="caja acceso">
+      <button type="button" class="google" id="btn-google">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Entrar con Google
+      </button>
+      <div class="separador">o con email</div>
+      <div class="pestanas">
+        <button type="button" class="activa" data-modo="entrar">Entrar</button>
+        <button type="button" data-modo="crear">Crear cuenta</button>
+      </div>
+      <form id="form-email">
+        <label for="in-email">Email</label>
+        <input id="in-email" type="email" autocomplete="email" required>
+        <label for="in-clave">Contraseña</label>
+        <input id="in-clave" type="password" autocomplete="current-password" minlength="6" required>
+        <div id="campo-clave2" hidden>
+          <label for="in-clave2">Repetí la contraseña</label>
+          <input id="in-clave2" type="password" autocomplete="new-password" minlength="6">
+        </div>
+        <div class="fila">
+          <button type="submit" class="btn primary" id="btn-email">Entrar</button>
+          <button type="button" class="enlace" id="btn-olvide">Olvidé mi contraseña</button>
+        </div>
+        <div class="error" id="login-error"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Falta confirmar el email -->
+  <section id="vista-confirmar" hidden>
+    <h1>Confirmá tu email</h1>
+    <p class="sub">Te mandamos un mail a <b id="confirmar-email"></b> con un link. Tocalo (mirá también en correo no deseado) y después volvé acá.</p>
+    <div class="fila">
+      <button type="button" class="btn primary" id="btn-ya-confirme">Ya lo confirmé</button>
+      <button type="button" class="btn" id="btn-reenviar">Reenviar mail</button>
+    </div>
+    <div class="error" id="confirmar-error"></div>
+  </section>
+
+  <!-- Lista de partidas -->
+  <section id="vista-partidas" hidden>
+    <h1>Partidas</h1>
+    <p class="sub">Entrá a una partida o creá una nueva. Quien crea la partida es su GM; los que se unen son jugadores.</p>
+    <div class="grid" id="lista-partidas"></div>
+
+    <div class="caja" id="crear-partida" hidden style="margin-top:18px;max-width:460px">
+      <b>Nueva partida</b>
+      <form id="form-crear">
+        <label for="in-partida-nombre">Nombre de la partida</label>
+        <input id="in-partida-nombre" maxlength="60" required placeholder="Ej: Piratas en el espacio">
+        <label for="in-partida-apodo">Tu nombre en esta partida</label>
+        <input id="in-partida-apodo" maxlength="40" required placeholder="Así te ven los demás">
+        <div class="fila">
+          <button type="submit" class="btn primary">Crear y entrar como GM</button>
+          <button type="button" class="btn" id="btn-crear-cancelar">Cancelar</button>
+        </div>
+        <div class="error" id="crear-error"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Una partida -->
+  <section id="vista-partida" hidden>
+    <button type="button" class="enlace" id="btn-volver">← Todas las partidas</button>
+    <h1 id="partida-nombre"></h1>
+    <p class="sub" id="partida-sub"></p>
+
+    <div class="caja" id="unirse" hidden style="max-width:460px">
+      <b>Unirte a esta partida</b>
+      <form id="form-unirse">
+        <label for="in-apodo">Tu nombre en esta partida</label>
+        <input id="in-apodo" maxlength="40" required placeholder="Así te ven los demás">
+        <div class="fila"><button type="submit" class="btn primary">Unirme como jugador</button></div>
+        <div class="error" id="unirse-error"></div>
+      </form>
+    </div>
+
+    <div id="herramientas" hidden>
+      <h2>Para jugar</h2>
+      <div class="grid">
+        <a class="tarjeta principal" data-herramienta="vtt-hexgrid/mapa.html">
+          <span class="titulo">⬡ Mapa</span>
+          <span class="desc">Tablero de hexágonos con los tokens de todos, en vivo, y la mesa de tiradas.</span>
+        </a>
+        <a class="tarjeta principal" data-herramienta="ficha-personaje/ficha.html" data-solo="jugador">
+          <span class="titulo">📜 Ficha de personaje</span>
+          <span class="desc">Tus personajes de esta partida: atributos, inventario, habilidades y tiradas. Se guarda sola.</span>
+        </a>
+        <a class="tarjeta" data-herramienta="ficha-personaje/ficha.html" data-solo="gm">
+          <span class="titulo">📜 Fichas de los jugadores</span>
+          <span class="desc">Mirá los personajes de la partida (solo lectura).</span>
+        </a>
+      </div>
+      <div data-solo="gm">
+        <h2>Para el GM</h2>
+        <div class="grid">
+          <a class="tarjeta principal" data-herramienta="gm-toolset/gm-tools.html">
+            <span class="titulo">⚔ GM Tools</span>
+            <span class="desc">Creeps y personajes del GM en combate. Se guardan solos.</span>
+          </a>
+          <a class="tarjeta" data-herramienta="gm-toolset/vendor-generator.html">
+            <span class="titulo">🏪 Generador de tiendas</span>
+            <span class="desc">Arma el stock de un vendedor para que los jugadores compren.</span>
+          </a>
+        </div>
+      </div>
+      <h2>Referencia</h2>
+      <div class="grid">
+        <a class="tarjeta" data-herramienta="manual-usuario/manual.html">
+          <span class="titulo">📖 Manual</span>
+          <span class="desc">Reglas del juego.</span>
+          <span class="tag">En construcción</span>
+        </a>
+      </div>
+    </div>
+  </section>
 </main>
+
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="comun/sesion.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+const VISTAS = ['cargando', 'sin-conexion', 'login', 'confirmar', 'partidas', 'partida'];
+function mostrar(vista){
+  VISTAS.forEach(v => { $('#vista-' + v).hidden = v !== vista; });
+  $('#cuenta').hidden = !['confirmar', 'partidas', 'partida'].includes(vista);
+  if(fbUsuario) $('#cuenta-email').textContent = fbUsuario.email || fbUsuario.displayName || '';
+}
+
+// Mensajes de Firebase Auth en castellano simple.
+function textoError(err){
+  const c = err && err.code || '';
+  const m = {
+    'auth/invalid-email': 'Ese email no es válido.',
+    'auth/missing-password': 'Falta la contraseña.',
+    'auth/weak-password': 'La contraseña tiene que tener al menos 6 caracteres.',
+    'auth/email-already-in-use': 'Ya hay una cuenta con ese email. Usá "Entrar" (o "Entrar con Google" si la creaste así).',
+    'auth/invalid-credential': 'Email o contraseña incorrectos.',
+    'auth/wrong-password': 'Email o contraseña incorrectos.',
+    'auth/user-not-found': 'No hay ninguna cuenta con ese email.',
+    'auth/too-many-requests': 'Demasiados intentos seguidos. Esperá un rato y probá de nuevo.',
+    'auth/popup-closed-by-user': 'Se cerró la ventana de Google antes de terminar.',
+    'auth/network-request-failed': 'Sin conexión. Revisá internet y probá de nuevo.',
+    'auth/unauthorized-domain': 'Este sitio no está autorizado en Firebase (Authentication → Configuración → Dominios autorizados).',
+    'auth/operation-not-allowed': 'Ese método de acceso no está activado en Firebase (Authentication → Método de acceso).',
+    'permission-denied': 'La mesa no lo permite (¿están publicadas las reglas nuevas?).',
+  };
+  return m[c] || ('No se pudo: ' + (err && err.message || err));
+}
+
+/* ---------- Iniciar sesión ---------- */
+
+let modoEmail = 'entrar';
+document.querySelectorAll('.pestanas button').forEach(b => b.onclick = () => {
+  modoEmail = b.dataset.modo;
+  document.querySelectorAll('.pestanas button').forEach(x => x.classList.toggle('activa', x === b));
+  $('#campo-clave2').hidden = modoEmail !== 'crear';
+  $('#in-clave2').required = modoEmail === 'crear';
+  $('#in-clave').autocomplete = modoEmail === 'crear' ? 'new-password' : 'current-password';
+  $('#btn-email').textContent = modoEmail === 'crear' ? 'Crear cuenta' : 'Entrar';
+  $('#btn-olvide').hidden = modoEmail === 'crear';
+  $('#login-error').textContent = '';
+});
+
+$('#btn-google').onclick = async () => {
+  $('#login-error').textContent = '';
+  const proveedor = new firebase.auth.GoogleAuthProvider();
+  proveedor.setCustomParameters({prompt: 'select_account'});
+  try{
+    await firebase.auth().signInWithPopup(proveedor);
+  }catch(err){
+    // En algunos celulares la ventanita está bloqueada: se va a Google y vuelve.
+    if(err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment'){
+      await firebase.auth().signInWithRedirect(proveedor);
+      return;
+    }
+    if(err.code !== 'auth/cancelled-popup-request') $('#login-error').textContent = textoError(err);
+  }
+};
+
+$('#form-email').onsubmit = async e => {
+  e.preventDefault();
+  const email = $('#in-email').value.trim();
+  const clave = $('#in-clave').value;
+  $('#login-error').textContent = '';
+  $('#btn-email').disabled = true;
+  try{
+    if(modoEmail === 'crear'){
+      if(clave !== $('#in-clave2').value){ $('#login-error').textContent = 'Las contraseñas no coinciden.'; return; }
+      const cred = await firebase.auth().createUserWithEmailAndPassword(email, clave);
+      await cred.user.sendEmailVerification({url: location.origin + location.pathname});
+    }else{
+      await firebase.auth().signInWithEmailAndPassword(email, clave);
+    }
+  }catch(err){
+    $('#login-error').textContent = textoError(err);
+  }finally{
+    $('#btn-email').disabled = false;
+  }
+};
+
+$('#btn-olvide').onclick = async () => {
+  const email = $('#in-email').value.trim();
+  if(!email){ $('#login-error').textContent = 'Escribí tu email arriba y tocá de nuevo "Olvidé mi contraseña".'; return; }
+  try{
+    await firebase.auth().sendPasswordResetEmail(email);
+    $('#login-error').innerHTML = '<span class="ok">Listo: si hay una cuenta con ese email, te llega un mail para elegir otra contraseña.</span>';
+  }catch(err){
+    $('#login-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-salir').onclick = () => firebase.auth().signOut();
+
+$('#btn-ya-confirme').onclick = async () => {
+  $('#confirmar-error').textContent = '';
+  try{
+    await fbUsuario.reload();
+    await fbUsuario.getIdToken(true);  // para que las reglas vean el email confirmado
+    fbUsuario = firebase.auth().currentUser;
+    if(fbCuentaConfirmada(fbUsuario)) alEntrar();
+    else $('#confirmar-error').textContent = 'Todavía figura sin confirmar. Tocá el link del mail y probá de nuevo.';
+  }catch(err){
+    $('#confirmar-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-reenviar').onclick = async () => {
+  $('#confirmar-error').textContent = '';
+  try{
+    await fbUsuario.sendEmailVerification({url: location.origin + location.pathname});
+    $('#confirmar-error').innerHTML = '<span class="ok">Mail reenviado.</span>';
+  }catch(err){
+    $('#confirmar-error').textContent = textoError(err);
+  }
+};
+
+/* ---------- Partidas ---------- */
+
+let partidas = [];  // [{id, nombre, gmNombre, miembro}]
+
+async function cargarPartidas(){
+  const snap = await fbDb.collection('campanas').get();
+  const lista = snap.docs
+    .map(d => ({id: d.id, ...d.data()}))
+    .filter(p => p.gmUid);  // las de antes del sistema de cuentas no tienen GM
+  await Promise.all(lista.map(async p => {
+    try{
+      const m = await fbDb.doc(`campanas/${p.id}/miembros/${fbUsuario.uid}`).get();
+      p.miembro = m.exists ? m.data() : null;
+    }catch(e){ p.miembro = null; }
+  }));
+  // Primero donde ya estás, después las demás; cada grupo por nombre.
+  partidas = lista.sort((a, b) => (!!b.miembro - !!a.miembro) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+}
+
+function renderPartidas(){
+  const cont = $('#lista-partidas');
+  cont.innerHTML = partidas.map(p => `
+    <button type="button" class="tarjeta${p.miembro ? ' principal' : ''}" data-partida="${esc(p.id)}">
+      <span class="titulo">${esc(p.nombre)}</span>
+      <span class="desc">GM: ${esc(p.gmNombre || '?')}${p.miembro ? ` · vos: ${esc(p.miembro.nombre)}` : ''}</span>
+      ${p.miembro
+        ? (p.miembro.gm ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag jugador">Sos jugador</span>')
+        : '<span class="tag">Unirse</span>'}
+    </button>`).join('') +
+    `<button type="button" class="tarjeta nueva" id="btn-nueva-partida">
+      <span class="titulo">+ Crear partida</span>
+      <span class="desc">Vas a ser su GM.</span>
+    </button>`;
+  cont.querySelectorAll('[data-partida]').forEach(b => b.onclick = () => irAPartida(b.dataset.partida));
+  $('#btn-nueva-partida').onclick = () => {
+    $('#crear-partida').hidden = false;
+    $('#in-partida-nombre').focus();
+  };
+}
+
+async function verPartidas(){
+  history.replaceState(null, '', location.pathname);
+  FB_CAMPANA = '';
+  mostrar('partidas');
+  $('#lista-partidas').innerHTML = '<p class="vacio">Cargando partidas…</p>';
+  try{
+    await cargarPartidas();
+    renderPartidas();
+  }catch(err){
+    console.error('No se pudieron leer las partidas:', err);
+    $('#lista-partidas').innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+  }
+}
+
+$('#btn-crear-cancelar').onclick = () => { $('#crear-partida').hidden = true; };
+
+$('#form-crear').onsubmit = async e => {
+  e.preventDefault();
+  const nombre = $('#in-partida-nombre').value.trim();
+  const apodo = $('#in-partida-apodo').value.trim();
+  if(!nombre || !apodo) return;
+  $('#crear-error').textContent = '';
+  try{
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const ref = fbDb.collection('campanas').doc();
+    const batch = fbDb.batch();
+    batch.set(ref, {nombre, gmUid: fbUsuario.uid, gmNombre: apodo, creado: ts});
+    batch.set(ref.collection('miembros').doc(fbUsuario.uid), {nombre: apodo, gm: true, creado: ts});
+    await batch.commit();
+    $('#form-crear').reset();
+    $('#crear-partida').hidden = true;
+    irAPartida(ref.id);
+  }catch(err){
+    console.error('No se pudo crear la partida:', err);
+    $('#crear-error').textContent = textoError(err);
+  }
+};
+
+/* ---------- Una partida ---------- */
+
+async function irAPartida(id){
+  FB_CAMPANA = id;
+  history.replaceState(null, '', location.pathname + '?partida=' + encodeURIComponent(id));
+  mostrar('partida');
+  $('#partida-nombre').textContent = '…';
+  $('#partida-sub').textContent = '';
+  $('#unirse').hidden = true;
+  $('#herramientas').hidden = true;
+  const [doc, miembro] = await Promise.all([
+    fbDb.doc(fbRutaCampana()).get().catch(() => null),
+    fbLeerMiembro(),
+  ]);
+  if(!doc || !doc.exists || !doc.data().gmUid){
+    fbRecordarPartida('');
+    verPartidas();
+    return;
+  }
+  const p = doc.data();
+  fbPartida = p;
+  fbMiembro = miembro;
+  $('#partida-nombre').textContent = p.nombre;
+  if(!miembro){
+    $('#partida-sub').textContent = `GM: ${p.gmNombre || '?'}. Todavía no estás en esta partida.`;
+    $('#unirse').hidden = false;
+    $('#in-apodo').focus();
+    return;
+  }
+  fbRecordarPartida(id);
+  $('#partida-sub').textContent = miembro.gm
+    ? `Sos el GM, como ${miembro.nombre}.`
+    : `Jugás como ${miembro.nombre}. GM: ${p.gmNombre || '?'}.`;
+  document.querySelectorAll('[data-herramienta]').forEach(a => {
+    a.href = a.dataset.herramienta + '?partida=' + encodeURIComponent(id);
+  });
+  document.querySelectorAll('[data-solo]').forEach(el => {
+    el.hidden = el.dataset.solo === 'gm' ? !miembro.gm : !!miembro.gm;
+  });
+  $('#herramientas').hidden = false;
+}
+
+$('#form-unirse').onsubmit = async e => {
+  e.preventDefault();
+  const apodo = $('#in-apodo').value.trim();
+  if(!apodo) return;
+  $('#unirse-error').textContent = '';
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).set({
+      nombre: apodo, gm: false, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    $('#form-unirse').reset();
+    irAPartida(FB_CAMPANA);
+  }catch(err){
+    console.error('No se pudo unir a la partida:', err);
+    $('#unirse-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-volver').onclick = () => verPartidas();
+
+/* ---------- Arranque ---------- */
+
+function alEntrar(){
+  const pedida = new URLSearchParams(location.search).get('partida');
+  if(pedida) irAPartida(pedida);
+  else verPartidas();
+}
+
+function iniciar(){
+  if(!fbIniciar()){ mostrar('sin-conexion'); return; }
+  firebase.auth().getRedirectResult().catch(err => { $('#login-error').textContent = textoError(err); });
+  firebase.auth().onAuthStateChanged(u => {
+    fbUsuario = u || null;
+    if(!u || u.isAnonymous){ mostrar('login'); return; }
+    if(!fbCuentaConfirmada(u)){
+      $('#confirmar-email').textContent = u.email || '';
+      mostrar('confirmar');
+      return;
+    }
+    alEntrar();
+  });
+}
+
+iniciar();
+</script>
 </body>
 </html>

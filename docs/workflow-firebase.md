@@ -8,9 +8,10 @@ que verse en vivo entre jugadores.
 ## Proyecto
 
 - Proyecto Firebase: `rol-pintoista`, plan Spark (gratis, sin tarjeta).
-- Authentication: solo el proveedor **Anónimo**. No se usa "Acceder con
-  Google" porque no funciona abriendo los HTML con doble clic (`file://`);
-  con el sitio en GitHub Pages ya sería posible (pendiente).
+- Authentication: proveedores **Google** y **Correo electrónico/contraseña**
+  (con confirmación del email por link). Solo se usan desde el sitio web
+  (GitHub Pages): no funcionan abriendo los HTML con doble clic. El
+  proveedor Anónimo ya no se usa (se puede desactivar).
 - **Dominios autorizados** (Authentication → Configuración → Dominios
   autorizados): además de los que vienen (`localhost`, los de Firebase),
   `elsauloel.github.io` para el sitio de GitHub Pages.
@@ -19,16 +20,37 @@ que verse en vivo entre jugadores.
   Publicar. El archivo del repo y la consola tienen que quedar iguales.
 - SDK: versión *compat* cargada por `<script>` desde
   `https://www.gstatic.com/firebasejs/12.3.0/…`, sin build step.
+- **Sesión compartida**: [`../comun/sesion.js`](../comun/sesion.js) tiene la
+  configuración, la cuenta y la partida actual (`FB_CAMPANA`, `fbUsuario`,
+  `fbMiembro`, `fbPartida`, `fbEntrarAPartida()`). Lo cargan `index.html` y
+  las herramientas; ya no hay un bloque copiado en cada una.
+
+## Cómo se entra
+
+1. `index.html`: iniciar sesión con Google, o con email y contraseña (al
+   crear la cuenta llega un mail con el link de confirmación; sin
+   confirmar no se ve nada).
+2. Lista de partidas: todas las del sitio (grupo cerrado de amigos). Se
+   entra a una donde ya estás, te unís a otra eligiendo tu nombre en esa
+   partida, o creás una nueva (quedás como su GM).
+3. Página de la partida: links a las herramientas con `?partida=<id>`
+   (GM Tools y el generador de tiendas solo para el GM; la ficha para
+   jugadores, y para el GM en solo lectura).
+4. Cada herramienta, sin sesión confirmada, sin partida o sin ser miembro,
+   vuelve sola al inicio. El botón ⌂ vuelve a la partida.
 
 ## Estructura de datos
 
 Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
 
-- `campanas/{id}` — `{nombre}`.
-- `campanas/{id}/privado/acceso` — `{codigo}`. El código de campaña. Nadie
-  lo lee desde el navegador; se carga y se cambia a mano en la consola.
-- `campanas/{id}/miembros/{uid}` — `{nombre, codigo, gm, creado}`. Uno por
-  navegador que entró con el código. `gm` arranca en `false`.
+- `campanas/{id}` — `{nombre, gmUid, gmNombre, creado}`. Una partida. La ve
+  cualquier cuenta confirmada; la crea cualquiera (en el mismo lote que su
+  miembro con `gm: true`); solo el GM la renombra o la borra. Las que no
+  tienen `gmUid` (anteriores a las cuentas) no aparecen en el inicio.
+- `campanas/{id}/miembros/{uid}` — `{nombre, gm, creado}`. Uno por cuenta en
+  cada partida; `nombre` es el apodo elegido al unirse. `gm: true` solo lo
+  puede tener quien creó la partida; nadie cambia `gm` después. Cada uno
+  cambia su nombre o se va; el GM puede sacar a alguien.
 - `campanas/{id}/tiradas/{auto}` — `{uid, jugador, quien, origen, formula,
   rolls[], mod, total, desde: 'ficha'|'gm', cuando}`. Una por tirada. La
   publica `registrarTirada()` (ficha.html y gm-tools.html, vía
@@ -75,26 +97,24 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
   de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`
   al soltar.
-- `campanas/{id}/prueba/{auto}` — mensajes de
-  [`../firebase/prueba-conexion.html`](../firebase/prueba-conexion.html),
-  solo para verificar la conexión.
 
-`piratas-en-el-espacio` es por ahora solo el espacio de pruebas: la campaña
-real de ese nombre se sigue jugando con las herramientas de GitHub (rama
-`main`) y no se migra.
+`campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
+cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se
+puede borrar desde la consola.
 
 ## Tareas de mantenimiento (en la consola)
 
-- **Marcar al GM**: Datos → `campanas/{id}/miembros` → el documento del GM
-  (se reconoce por el campo `nombre`) → editar `gm` a `true` (tipo boolean).
-- **Cambiar el código**: editar `codigo` en `campanas/{id}/privado/acceso`.
-  Los que ya entraron siguen adentro; solo afecta a los nuevos.
-- **Sacar a alguien**: borrar su documento en `miembros`.
-- **Alguien borró los datos del navegador**: vuelve a poner nombre y código
-  (queda un documento viejo suyo en `miembros`, se puede borrar).
+- **Activar los métodos de acceso**: Authentication → Método de acceso →
+  Google (elegir el email de soporte) y Correo electrónico/contraseña
+  (solo la primera opción, no "vínculo de correo electrónico").
+- **Dominios autorizados**: Authentication → Configuración → Dominios
+  autorizados → `elsauloel.github.io`.
+- **Sacar a alguien de una partida**: borrar su documento en
+  `campanas/{id}/miembros` (más adelante, desde la página de la partida).
+- **Borrar una partida entera**: en Firestore, sobre el documento de la
+  partida, "Eliminar documento" marcando también las subcolecciones.
 
 ## Cómo probar
 
-Abrir `firebase/prueba-conexion.html` con doble clic en una ventana normal y
-en una de incógnito (dos "jugadores" distintos), entrar con el código en
-ambas y escribir: el mensaje aparece al instante en la otra.
+Dos perfiles de Chrome (o una ventana normal y una de incógnito) con
+cuentas distintas: uno crea la partida (GM) y el otro se une (jugador).

@@ -48,6 +48,6 @@ Alcance y movimiento; niebla; ocultar tokens; tiradas desde el token.
 ## Dependencias con otras carpetas
 
 - `../firebase/firestore.rules` — reglas de `tokens` y `tiradas`.
-- El bloque `fb*` (entrada con código) y la Mesa están copiados de
-  `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`; si se cambia
-  la forma de entrar, cambiarlo en los tres.
+- `../comun/sesion.js` — cuenta y partida (`?partida=<id>`); sin sesión o
+  sin ser miembro vuelve al inicio (`../index.html`). El botón ⌂ vuelve a
+  la partida. La Mesa de tiradas está copiada de la ficha y gm-tools.

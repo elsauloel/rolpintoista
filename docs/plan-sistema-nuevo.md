@@ -41,8 +41,14 @@ su casa:
 ## Decisiones tomadas
 
 - **Firestore** (no Realtime Database). SDK compat por `<script>`.
-- **Entrada**: sesión anónima + código de campaña la primera vez por
-  navegador. GM marcado a mano en la consola (`miembros/{uid}.gm`).
+- **Entrada** (desde el Paso 4): cuenta de Google, o email y contraseña con
+  confirmación por link. El sitio arranca pidiendo iniciar sesión; después
+  muestra **todas las partidas** (grupo cerrado de 4 amigos: cualquiera ve
+  todas y se une con un clic) y permite crear una. **Quien crea la partida
+  es su GM**; los que se unen son jugadores. **El nombre se elige al entrar
+  a cada partida.** Se arrancó de cero: los datos de prueba anteriores
+  (identidades anónimas) no se migran. Antes: sesión anónima + código de
+  campaña (Pasos 0–3).
 - **Datos agrupados por campaña**: `campanas/{id}/...`.
   `piratas-en-el-espacio` es por ahora solo espacio de pruebas.
 - **Permisos** (impuestos en `firebase/firestore.rules`, no solo en la UI):
@@ -99,6 +105,8 @@ su casa:
 | 3a | Ficha guardada sola en Firebase por partes; Personajes lista los de la mesa (propios / de otros en solo lectura); se van Subir/Bajar datos | ✅ Hecho y probado |
 | 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
 | 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
+| 4 | Cuentas y partidas: login con Google o email confirmado, inicio con la lista de partidas, crear (GM) o unirse (jugador), herramientas por partida (`?partida=`), sesión compartida en `comun/sesion.js` | Hecho, falta probar |
+| 4c | Manejo de la partida para el GM: ver jugadores, sacar a alguien, renombrar o borrar la partida | Pendiente |
 
 **Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde
 `nueva-version`, activo desde el 14/9/2026).
@@ -111,11 +119,11 @@ publicar en una web, pasar catálogo/tienda/manual a Firebase.
 
 - En `miembros` quedan documentos repetidos de pruebas en incógnito
   ("Pepe"): se pueden borrar desde la consola.
-- `firebase/prueba-conexion.html` y la colección `prueba` se pueden quitar
-  cuando ya no sirvan.
+- Borrar desde la consola `campanas/piratas-en-el-espacio` (datos de prueba
+  anónimos) y desactivar el proveedor Anónimo en Authentication.
 
 ## Cómo se prueba cada paso
 
-Dos ventanas (una normal como GM y una de incógnito como jugador), abriendo
-los archivos de `rol-nueva-version` con doble clic. Commit y push a
-`nueva-version` apenas un paso queda probado.
+Desde el sitio web, con dos cuentas distintas (dos perfiles de Chrome, o
+una ventana normal y una de incógnito): una como GM y otra como jugador.
+Cada push a `nueva-version` se publica solo.

@@ -531,6 +531,8 @@ input[type=file]{display:none}
 #mesa-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;user-select:none;border-bottom:1px solid var(--line-soft)}
 #mesa.colapsada #mesa-cabecera{border-bottom:none}
 #mesa.aviso #mesa-cabecera{background:var(--wine)}
+#mesa-cabecera .fb-inicio{color:var(--muted);text-decoration:none;font-size:13px;padding:0 2px}
+#mesa-cabecera .fb-inicio:hover{color:var(--brass)}
 #mesa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
 #mesa-estado{flex:1;text-align:right;font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #mesa-flecha{color:var(--muted);width:10px}
@@ -1006,6 +1008,7 @@ input[type=file]{display:none}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/sesion.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
@@ -4596,121 +4599,20 @@ renderAll();
    MESA — tiradas compartidas en vivo (Firebase)
    Todas las tiradas pasan por registrarTirada(), que además las
    publica en campanas/<campaña>/tiradas; la cajita "Mesa" muestra
-   las últimas de todos al instante. Sin internet o sin haber entrado
-   con el código de campaña, las tiradas funcionan igual que antes,
-   solo que no se comparten. Este bloque está copiado igual en
+   las últimas de todos al instante. La cuenta y la partida salen de
+   comun/sesion.js; sin internet las tiradas funcionan igual, solo que
+   no se comparten. Este bloque está copiado igual en
    ficha.html y gm-tools.html (salvo MESA_DESDE y mesaQuien) — ver
    docs/workflow-firebase.md.
    ========================================================= */
 
-const FB_CONFIG = {
-  apiKey: 'AIzaSyAqvIuDU4IkIn548wwGPLtM_KSI5zjIP4s',
-  authDomain: 'rol-pintoista.firebaseapp.com',
-  projectId: 'rol-pintoista',
-  storageBucket: 'rol-pintoista.appspot.com',
-  messagingSenderId: '110064054820',
-  appId: '1:110064054820:web:03d21067e2f831be2a1eb1',
-};
-const FB_CAMPANA = 'piratas-en-el-espacio';
 const MESA_DESDE = 'gm';
 const MESA_MAX = 30;
 
-let fbDb = null;
-let fbUsuario = null;
-let fbMiembro = null;
 let mesaIdsVistos = null;
 
 // En gm-tools el origen ya trae el nombre del creep; se muestra el jugador (GM).
 function mesaQuien(){ return ''; }
-
-function fbRutaCampana(sub){
-  return `campanas/${FB_CAMPANA}` + (sub ? '/' + sub : '');
-}
-
-function fbIniciar(){
-  if(!window.firebase) return false;
-  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-  fbDb = firebase.firestore();
-  return true;
-}
-
-// Entra de forma anónima. La sesión queda recordada en el navegador y es
-// la misma para todas las herramientas abiertas con doble clic.
-function fbEntrar(){
-  return new Promise((res, rej) => {
-    const cortar = firebase.auth().onAuthStateChanged(async u => {
-      if(u){ cortar(); fbUsuario = u; res(u); return; }
-      try{ await firebase.auth().signInAnonymously(); }
-      catch(err){ cortar(); rej(err); }
-    });
-  });
-}
-
-async function fbLeerMiembro(){
-  try{
-    const doc = await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).get();
-    return doc.exists ? doc.data() : null;
-  }catch(err){
-    return null;
-  }
-}
-
-async function fbRegistrarMiembro(nombre, codigo){
-  await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).set({
-    nombre, codigo, gm: false,
-    creado: firebase.firestore.FieldValue.serverTimestamp(),
-  });
-}
-
-// Cartel para entrar a la campaña la primera vez (mismo estilo que el del
-// token de GitHub). Devuelve {nombre, codigo} o null si se cancela.
-function fbPedirCodigo(error){
-  return new Promise(res => {
-    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
-    const campoCss = 'width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin:4px 0 12px';
-    const fondo = document.createElement('div');
-    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
-    const caja = document.createElement('div');
-    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:420px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
-    caja.innerHTML =
-      '<h3 style="margin:0 0 6px;font-size:16px">Entrar a la mesa</h3>' +
-      '<p style="margin:0 0 12px;opacity:.8">Solo la primera vez en este navegador. Después queda recordado.</p>' +
-      '<label>Tu nombre (así te ven los demás)</label>' +
-      '<input type="text" data-fb="nombre" maxlength="40" style="' + campoCss + '">' +
-      '<label>Código de campaña (te lo pasa el GM)</label>' +
-      '<input type="text" data-fb="codigo" style="' + campoCss + '">' +
-      '<div data-fb="error" style="color:#e77;margin:-4px 0 10px"></div>' +
-      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-        '<button type="button" data-fb="cancelar" style="' + btnCss + '">Cancelar</button>' +
-        '<button type="button" data-fb="entrar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Entrar</button>' +
-      '</div>';
-    fondo.appendChild(caja);
-    document.body.appendChild(fondo);
-    const campoNombre = caja.querySelector('[data-fb="nombre"]');
-    const campoCodigo = caja.querySelector('[data-fb="codigo"]');
-    caja.querySelector('[data-fb="error"]').textContent = error || '';
-    campoNombre.focus();
-    const cerrar = valor => {
-      document.removeEventListener('keydown', teclas);
-      fondo.remove();
-      res(valor);
-    };
-    const confirmar = () => {
-      const nombre = campoNombre.value.trim();
-      const codigo = campoCodigo.value.trim();
-      if(!nombre || !codigo){ caja.querySelector('[data-fb="error"]').textContent = 'Completá los dos campos.'; return; }
-      cerrar({nombre, codigo});
-    };
-    const teclas = e => {
-      if(e.key === 'Escape') cerrar(null);
-      if(e.key === 'Enter' && (document.activeElement === campoNombre || document.activeElement === campoCodigo)) confirmar();
-    };
-    document.addEventListener('keydown', teclas);
-    caja.querySelector('[data-fb="cancelar"]').onclick = () => cerrar(null);
-    caja.querySelector('[data-fb="entrar"]').onclick = confirmar;
-    fondo.onmousedown = e => { if(e.target === fondo) cerrar(null); };
-  });
-}
 
 function mesaEstado(texto){
   $('#mesa-estado').textContent = texto;
@@ -4768,7 +4670,7 @@ function mesaEscuchar(){
   fbDb.collection(fbRutaCampana('tiradas'))
     .orderBy('cuando', 'desc').limit(MESA_MAX)
     .onSnapshot(snap => {
-      mesaEstado(`en vivo · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
+      mesaEstado(`${fbPartida.nombre} · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
       mesaRender(snap.docs);
     }, err => {
       console.error('Error escuchando la mesa:', err);
@@ -4777,36 +4679,12 @@ function mesaEscuchar(){
     });
 }
 
-function mesaMostrarEntrar(){
-  mesaEstado('sin entrar');
-  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Entrá con el código de campaña para ver y compartir las tiradas.</div>' +
-    '<button type="button" class="btn" id="mesa-entrar">Entrar a la mesa</button>';
-  $('#mesa-entrar').onclick = mesaEntrarConCodigo;
-}
-
-async function mesaEntrarConCodigo(){
-  let error = '';
-  for(;;){
-    const datos = await fbPedirCodigo(error);
-    if(!datos) return;
-    try{
-      await fbRegistrarMiembro(datos.nombre, datos.codigo);
-      fbMiembro = await fbLeerMiembro();
-      if(fbMiembro){ gmAlEntrar(); return; }
-      error = 'No se pudo confirmar la entrada, probá de nuevo.';
-    }catch(err){
-      console.error('Error entrando a la mesa:', err);
-      error = err.code === 'permission-denied' ? 'El código no es correcto.' : 'No se pudo entrar: ' + err.message;
-    }
-  }
-}
-
 async function mesaIniciar(){
   const mesa = document.createElement('div');
   mesa.id = 'mesa';
   mesa.innerHTML =
     '<div id="mesa-cabecera" title="Achicar o agrandar">' +
-      '<span id="mesa-titulo">🎲 Mesa</span><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
+      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">🎲 Mesa</span><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-cuerpo"></div>';
   document.body.appendChild(mesa);
@@ -4827,24 +4705,17 @@ async function mesaIniciar(){
   let colapsada = false;
   try{ colapsada = localStorage.getItem('mesa-colapsada') === '1'; }catch(e){}
   aplicarColapso(colapsada);
-  $('#mesa-cabecera').onclick = () => aplicarColapso(!mesa.classList.contains('colapsada'));
+  $('#mesa-cabecera').onclick = e => { if(!e.target.closest('.fb-inicio')) aplicarColapso(!mesa.classList.contains('colapsada')); };
 
-  if(!fbIniciar()){
+  // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
+  const entrada = await fbEntrarAPartida();
+  if(entrada === 'redirigiendo') return;
+  if(entrada !== 'ok'){
     mesaEstado('sin internet');
     $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudo cargar Firebase. Las tiradas siguen funcionando, pero no se comparten.</div>';
     return;
   }
-  try{
-    await fbEntrar();
-  }catch(err){
-    console.error('Error entrando a Firebase:', err);
-    mesaEstado('sin conexión');
-    $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudo conectar. Las tiradas siguen funcionando, pero no se comparten.</div>';
-    return;
-  }
-  fbMiembro = await fbLeerMiembro();
-  if(fbMiembro) gmAlEntrar();
-  else mesaMostrarEntrar();
+  gmAlEntrar();
 }
 
 /* =========================================================

@@ -105,6 +105,7 @@ aside{
 </head>
 <body>
 <header>
+  <a id="link-inicio" class="btn" href="../index.html" title="Volver al inicio de la partida">⌂</a>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
@@ -140,6 +141,7 @@ aside{
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/sesion.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -167,104 +169,7 @@ function horaTxt(fecha){
 
 /* ---------- Firebase (mismo bloque fb* que ficha y gm-tools) ---------- */
 
-const FB_CONFIG = {
-  apiKey: 'AIzaSyAqvIuDU4IkIn548wwGPLtM_KSI5zjIP4s',
-  authDomain: 'rol-pintoista.firebaseapp.com',
-  projectId: 'rol-pintoista',
-  storageBucket: 'rol-pintoista.appspot.com',
-  messagingSenderId: '110064054820',
-  appId: '1:110064054820:web:03d21067e2f831be2a1eb1',
-};
-const FB_CAMPANA = 'piratas-en-el-espacio';
 
-let fbDb = null;
-let fbUsuario = null;
-let fbMiembro = null;
-
-function fbRutaCampana(sub){
-  return `campanas/${FB_CAMPANA}` + (sub ? '/' + sub : '');
-}
-
-function fbIniciar(){
-  if(!window.firebase) return false;
-  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-  fbDb = firebase.firestore();
-  return true;
-}
-
-function fbEntrar(){
-  return new Promise((res, rej) => {
-    const cortar = firebase.auth().onAuthStateChanged(async u => {
-      if(u){ cortar(); fbUsuario = u; res(u); return; }
-      try{ await firebase.auth().signInAnonymously(); }
-      catch(err){ cortar(); rej(err); }
-    });
-  });
-}
-
-async function fbLeerMiembro(){
-  try{
-    const doc = await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).get();
-    return doc.exists ? doc.data() : null;
-  }catch(err){
-    return null;
-  }
-}
-
-async function fbRegistrarMiembro(nombre, codigo){
-  await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).set({
-    nombre, codigo, gm: false,
-    creado: firebase.firestore.FieldValue.serverTimestamp(),
-  });
-}
-
-function fbPedirCodigo(error){
-  return new Promise(res => {
-    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
-    const campoCss = 'width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin:4px 0 12px';
-    const fondo = document.createElement('div');
-    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
-    const caja = document.createElement('div');
-    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:420px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
-    caja.innerHTML =
-      '<h3 style="margin:0 0 6px;font-size:16px">Entrar a la mesa</h3>' +
-      '<p style="margin:0 0 12px;opacity:.8">Solo la primera vez en este navegador. Después queda recordado.</p>' +
-      '<label>Tu nombre (así te ven los demás)</label>' +
-      '<input type="text" data-fb="nombre" maxlength="40" style="' + campoCss + '">' +
-      '<label>Código de campaña (te lo pasa el GM)</label>' +
-      '<input type="text" data-fb="codigo" style="' + campoCss + '">' +
-      '<div data-fb="error" style="color:#e77;margin:-4px 0 10px"></div>' +
-      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-        '<button type="button" data-fb="cancelar" style="' + btnCss + '">Cancelar</button>' +
-        '<button type="button" data-fb="entrar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Entrar</button>' +
-      '</div>';
-    fondo.appendChild(caja);
-    document.body.appendChild(fondo);
-    const campoNombre = caja.querySelector('[data-fb="nombre"]');
-    const campoCodigo = caja.querySelector('[data-fb="codigo"]');
-    caja.querySelector('[data-fb="error"]').textContent = error || '';
-    campoNombre.focus();
-    const cerrar = valor => {
-      document.removeEventListener('keydown', teclas);
-      fondo.remove();
-      res(valor);
-    };
-    const confirmar = () => {
-      const nombre = campoNombre.value.trim();
-      const codigo = campoCodigo.value.trim();
-      if(!nombre || !codigo){ caja.querySelector('[data-fb="error"]').textContent = 'Completá los dos campos.'; return; }
-      cerrar({nombre, codigo});
-    };
-    const teclas = e => {
-      if(e.key === 'Escape') cerrar(null);
-      if(e.key === 'Enter' && (document.activeElement === campoNombre || document.activeElement === campoCodigo)) confirmar();
-    };
-    document.addEventListener('keydown', teclas);
-    caja.querySelector('[data-fb="cancelar"]').onclick = () => cerrar(null);
-    caja.querySelector('[data-fb="entrar"]').onclick = confirmar;
-    fondo.onmousedown = e => { if(e.target === fondo) cerrar(null); };
-  });
-}
 
 function estado(texto){ $('#estado').textContent = texto; }
 
@@ -948,7 +853,7 @@ function escucharMiembros(){
     snap.docs.forEach(d => miembros.set(d.id, {nombre: String(d.data().nombre || '?'), gm: d.data().gm === true}));
     const yo = miembros.get(fbUsuario.uid);
     if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
-    estado(`en vivo · ${fbMiembro.nombre}${soyGM ? ' (GM)' : ''}`);
+    estado(`${fbPartida.nombre} · ${fbMiembro.nombre}${soyGM ? ' (GM)' : ''}`);
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando miembros:', err));
@@ -1302,7 +1207,7 @@ function mostrarAviso(html, boton){
 
 function arrancarEnVivo(){
   $('#aviso-mapa').hidden = true;
-  estado(`en vivo · ${fbMiembro.nombre}`);
+  estado(`${fbPartida.nombre} · ${fbMiembro.nombre}`);
   soyGM = fbMiembro.gm === true;
   escucharMiembros();
   escucharVinculables();
@@ -1312,47 +1217,22 @@ function arrancarEnVivo(){
   renderPanel(true);
 }
 
-async function entrarConCodigo(){
-  let error = '';
-  for(;;){
-    const datos = await fbPedirCodigo(error);
-    if(!datos) return;
-    try{
-      await fbRegistrarMiembro(datos.nombre, datos.codigo);
-      fbMiembro = await fbLeerMiembro();
-      if(fbMiembro){ arrancarEnVivo(); return; }
-      error = 'No se pudo confirmar la entrada, probá de nuevo.';
-    }catch(err){
-      console.error('Error entrando a la mesa:', err);
-      error = err.code === 'permission-denied' ? 'El código no es correcto.' : 'No se pudo entrar: ' + err.message;
-    }
-  }
-}
-
 async function iniciar(){
   new ResizeObserver(ajustarTamano).observe(lienzo);
   ajustarTamano();
   renderPanel(true);
 
-  if(!fbIniciar()){
+  // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
+  const entrada = await fbEntrarAPartida();
+  if(entrada === 'redirigiendo') return;
+  if(entrada !== 'ok'){
     estado('sin internet');
     mostrarAviso('No se pudo cargar Firebase. Revisá la conexión y recargá la página.');
     $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Sin conexión.</div>';
     return;
   }
-  try{
-    await fbEntrar();
-  }catch(err){
-    console.error('Error entrando a Firebase:', err);
-    estado('sin conexión');
-    mostrarAviso('No se pudo conectar con Firebase. Revisá la conexión y recargá la página.');
-    return;
-  }
-  fbMiembro = await fbLeerMiembro();
-  if(fbMiembro){ arrancarEnVivo(); return; }
-  estado('sin entrar');
-  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Entrá con el código de campaña para ver las tiradas.</div>';
-  mostrarAviso('Para ver el mapa y mover tus tokens, entrá con el código de campaña.', {texto: 'Entrar a la mesa', accion: entrarConCodigo});
+  $('#link-inicio').href = fbUrlInicio(FB_CAMPANA);
+  arrancarEnVivo();
 }
 
 iniciar();

@@ -1021,8 +1021,10 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 /* ---------- Mesa: tiradas compartidas en vivo (Firebase) ---------- */
 #mesa{
   position:fixed;right:16px;bottom:72px;z-index:45;width:310px;max-width:calc(100vw - 32px);
-  /* Recuadro claro para que no se pierda contra el fondo de la herramienta. */
-  background:var(--panel);border:2px solid var(--paper);border-radius:var(--r);
+  /* Relleno más claro y recuadro crema para que no se pierda contra el
+     fondo de la herramienta. Los textos grises se aclaran para leerse. */
+  --muted:#D2C4BA;
+  background:#4B3F45;border:2px solid var(--paper);border-radius:var(--r);
   box-shadow:0 0 0 3px rgba(0,0,0,.45),0 10px 24px -8px rgba(0,0,0,.6);font-family:"Space Mono",monospace;font-size:12px;color:var(--paper)
 }
 #mesa-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line-soft)}
@@ -1040,7 +1042,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 #mesa-tirar{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--line-soft)}
 #mesa-tirar input{flex:1;min-width:0}
 #mesa.colapsada #mesa-tirar{display:none}
-.mesa-tirada{padding:5px 7px;border-radius:var(--r);background:var(--line-soft);transition:background 1.2s}
+.mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
 .mesa-quien{color:var(--brass);font-weight:700}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}

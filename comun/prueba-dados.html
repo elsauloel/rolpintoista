@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prueba de dados 3D — Rol Pintoísta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Página de prueba para elegir cómo se ven y suenan los dados 3D antes de
+   sumarlos a mapa, ficha y gm-tools. No usa Firebase ni guarda nada en la
+   partida: lo elegido queda en este navegador (localStorage). Librería:
+   dice-box-threejs (MIT), desde jsDelivr, con sus texturas y sonidos. */
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --line:#3B2E34; --copper:#C98545; --brass:#E0A458;
+  --paper:#EDE3D2; --muted:#9A867E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--ink);color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;display:flex;overflow:hidden}
+button,input,select{font-family:inherit;color:inherit}
+aside{width:320px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow-y:auto}
+h1{font-size:18px;margin:0 0 4px;color:var(--brass)}
+.sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+h2{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:18px 0 8px}
+label{display:block;font-size:12.5px;color:var(--muted);margin:8px 0 3px}
+input[type=text],select{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:var(--r);color:var(--paper);padding:7px 8px}
+input[type=range]{width:100%}
+input[type=color]{width:44px;height:30px;border:1px solid var(--line);background:none;padding:0;border-radius:var(--r)}
+.fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r);background:none;cursor:pointer}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.chico{padding:5px 8px;font-size:10.5px}
+.check{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--paper);font-size:13px;cursor:pointer}
+.valor{font-family:"Space Mono",monospace;font-size:11px;color:var(--brass)}
+#escenario{flex:1;position:relative;overflow:hidden;
+  /* Imitación del mapa, para ver los dados encima de algo parecido. */
+  background:
+    radial-gradient(circle at 30% 40%, rgba(122,79,168,.35), transparent 45%),
+    radial-gradient(circle at 75% 65%, rgba(46,107,87,.35), transparent 45%),
+    repeating-linear-gradient(60deg, rgba(201,133,69,.12) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(-60deg, rgba(201,133,69,.12) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(0deg, rgba(201,133,69,.12) 0 1px, transparent 1px 40px),
+    #17121A}
+#dados{position:absolute;inset:0;pointer-events:none}
+#dados canvas{display:block}
+#resultado{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(26,20,24,.92);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 18px;font-family:"Space Mono",monospace;font-size:13px;display:none;text-align:center
+}
+#resultado b{font-size:22px;color:var(--brass);margin-left:8px}
+#aviso{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(26,20,24,.92);border:1px solid var(--line);border-radius:var(--r);padding:8px 14px;color:var(--muted);font-size:12.5px}
+@media(max-width:760px){body{flex-direction:column}aside{width:auto;max-height:52vh;border-right:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<aside>
+  <h1>🎲 Dados 3D</h1>
+  <p class="sub">Página de prueba: elegí colores, material y sonido. No se guarda nada en la partida.</p>
+
+  <label class="check"><input type="checkbox" id="animacion" checked> Animación de dados activada</label>
+
+  <h2>Tirar</h2>
+  <div class="fila">
+    <input type="text" id="formula" value="2d6+3" style="flex:1;width:auto">
+    <button type="button" class="btn primary" id="tirar">Tirar</button>
+  </div>
+  <div class="fila" style="margin-top:8px" id="rapidos"></div>
+
+  <h2>Aspecto</h2>
+  <label for="colorset">Juego de colores</label>
+  <select id="colorset"></select>
+  <div id="personalizado">
+    <div class="fila" style="margin-top:8px">
+      <div><label for="color-fondo">Dado</label><input type="color" id="color-fondo" value="#8C2F3E"></div>
+      <div><label for="color-numero">Números</label><input type="color" id="color-numero" value="#FFFFFF"></div>
+      <div><label for="color-borde">Borde</label><input type="color" id="color-borde" value="#000000"></div>
+    </div>
+    <label for="textura">Textura</label>
+    <select id="textura"></select>
+  </div>
+  <label for="material">Material (brillo y sonido del dado)</label>
+  <select id="material">
+    <option value="plastic">Plástico</option>
+    <option value="wood">Madera</option>
+    <option value="metal">Metal</option>
+    <option value="glass">Vidrio</option>
+    <option value="none">Mate</option>
+  </select>
+  <label for="tamano">Tamaño <span class="valor" id="tamano-v"></span></label>
+  <input type="range" id="tamano" min="50" max="160" step="5" value="100">
+  <label for="fuerza">Fuerza del tiro <span class="valor" id="fuerza-v"></span></label>
+  <input type="range" id="fuerza" min="0.5" max="3" step="0.1" value="1.3">
+  <label class="check"><input type="checkbox" id="sombras" checked> Sombras</label>
+
+  <h2>Sonido</h2>
+  <label class="check"><input type="checkbox" id="sonido" checked> Sonido al golpear</label>
+  <label for="superficie">Contra qué golpean</label>
+  <select id="superficie">
+    <option value="green-felt">Paño (fieltro)</option>
+    <option value="taverntable">Mesa de madera</option>
+    <option value="default">Bandeja de madera</option>
+    <option value="stainless">Metal</option>
+  </select>
+  <label for="volumen">Volumen <span class="valor" id="volumen-v"></span></label>
+  <input type="range" id="volumen" min="0" max="100" step="5" value="70">
+
+  <h2>Cuánto tarda</h2>
+  <p class="sub" id="rendimiento">Tirá para medir.</p>
+</aside>
+
+<main id="escenario">
+  <div id="dados"></div>
+  <div id="aviso">Cargando dados…</div>
+  <div id="resultado"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/dist/dice-box-threejs.umd.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const RECURSOS = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/public/';
+const DiceBox = (() => { const m = window['dice-box-threejs']; return m && m.default ? m.default : m; })();
+
+// Juegos de colores de la librería que tienen sentido para el juego.
+const COLORSETS = [
+  ['personalizado', 'Personalizado (elegís vos)'],
+  ['white', 'Blanco'], ['black', 'Negro'], ['bronze', 'Bronce'],
+  ['fire', 'Fuego'], ['ice', 'Hielo'], ['poison', 'Veneno'], ['acid', 'Ácido'],
+  ['thunder', 'Trueno'], ['lightning', 'Rayo'], ['air', 'Aire'], ['water', 'Agua'],
+  ['earth', 'Tierra'], ['force', 'Fuerza'], ['psychic', 'Psíquico'], ['necrotic', 'Necrótico'],
+  ['radiant', 'Radiante'], ['bloodmoon', 'Luna de sangre'], ['starynight', 'Noche estrellada'],
+  ['astralsea', 'Mar astral'], ['glitterparty', 'Brillantina'], ['dragons', 'Dragones'],
+];
+const TEXTURAS = [
+  ['none', 'Lisa'], ['wood', 'Madera'], ['metal', 'Metal'], ['marble', 'Mármol'], ['cloudy', 'Nubes'],
+  ['fire', 'Fuego'], ['ice', 'Hielo'], ['water', 'Agua'], ['paper', 'Papel'], ['speckles', 'Moteado'],
+  ['glitter', 'Brillantina'], ['stars', 'Estrellas'], ['stainedglass', 'Vitral'], ['skulls', 'Calaveras'],
+  ['dragon', 'Escamas de dragón'], ['lizard', 'Lagarto'], ['leopard', 'Leopardo'], ['bronze01', 'Bronce'],
+];
+$('#colorset').innerHTML = COLORSETS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+$('#textura').innerHTML = TEXTURAS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+$('#rapidos').innerHTML = ['1d2', '1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '3d6', '2d20+5', '1d20+1d8+2']
+  .map(f => `<button type="button" class="btn chico" data-f="${f}">${f}</button>`).join('');
+
+/* ---------- Preferencias (quedan en este navegador) ---------- */
+const CAMPOS = ['animacion', 'colorset', 'color-fondo', 'color-numero', 'color-borde', 'textura', 'material', 'tamano', 'fuerza', 'sombras', 'sonido', 'superficie', 'volumen'];
+function leerPrefs(){
+  try{
+    const p = JSON.parse(localStorage.getItem('dados3d-prueba') || '{}');
+    CAMPOS.forEach(id => {
+      if(p[id] === undefined) return;
+      const el = $('#' + id);
+      if(el.type === 'checkbox') el.checked = !!p[id]; else el.value = p[id];
+    });
+  }catch(e){}
+}
+function guardarPrefs(){
+  const p = {};
+  CAMPOS.forEach(id => { const el = $('#' + id); p[id] = el.type === 'checkbox' ? el.checked : el.value; });
+  try{ localStorage.setItem('dados3d-prueba', JSON.stringify(p)); }catch(e){}
+}
+
+/* ---------- Caja de dados ----------
+   Se vuelve a armar cuando cambia algo del aspecto o del sonido (la
+   librería carga los sonidos del material solo al iniciar). */
+let caja = null;
+let armando = null;
+
+function config(){
+  const personal = $('#colorset').value === 'personalizado';
+  const material = $('#material').value;
+  const c = {
+    assetPath: RECURSOS,
+    sounds: $('#sonido').checked,
+    volume: Number($('#volumen').value),
+    shadows: $('#sombras').checked,
+    theme_surface: $('#superficie').value,
+    theme_material: material,
+    baseScale: Number($('#tamano').value),
+    strength: Number($('#fuerza').value),
+    gravity_multiplier: 400,
+    light_intensity: 0.8,
+  };
+  if(personal){
+    // El nombre identifica la combinación: la librería guarda cada juego por nombre.
+    const fondo = $('#color-fondo').value, numero = $('#color-numero').value, borde = $('#color-borde').value, textura = $('#textura').value;
+    c.theme_customColorset = {name: `rp-${fondo}-${numero}-${borde}-${textura}-${material}`, foreground: numero, background: fondo, outline: borde, texture: textura, material};
+  }else{
+    c.theme_colorset = $('#colorset').value;
+  }
+  return c;
+}
+
+async function armarCaja(){
+  $('#personalizado').hidden = $('#colorset').value !== 'personalizado';
+  $('#tamano-v').textContent = $('#tamano').value + '%';
+  $('#fuerza-v').textContent = $('#fuerza').value;
+  $('#volumen-v').textContent = $('#volumen').value + '%';
+  guardarPrefs();
+  if(!$('#animacion').checked){ caja = null; $('#dados').innerHTML = ''; $('#aviso').textContent = 'Animación desactivada: solo se muestra el resultado.'; $('#aviso').hidden = false; return; }
+  const t0 = performance.now();
+  $('#aviso').textContent = 'Cargando dados…';
+  $('#aviso').hidden = false;
+  $('#dados').innerHTML = '';
+  const nueva = new DiceBox('#dados', config());
+  armando = nueva.initialize().then(() => {
+    caja = nueva;
+    $('#aviso').hidden = true;
+    $('#rendimiento').textContent = `Preparar los dados: ${Math.round(performance.now() - t0)} ms.`;
+  }).catch(err => {
+    console.error(err);
+    $('#aviso').textContent = 'No se pudieron cargar los dados — mirá la consola.';
+  });
+  return armando;
+}
+
+let rearmarT;
+function rearmar(){ clearTimeout(rearmarT); rearmarT = setTimeout(armarCaja, 250); }
+
+/* ---------- Tirada ----------
+   Como en las herramientas: primero se tira el número (en el navegador) y
+   después los dados 3D caen mostrando ese mismo resultado. */
+function parsear(formula){
+  const limpio = String(formula || '').toLowerCase().replace(/\s+/g, '');
+  const grupos = [];
+  let mod = 0;
+  const re = /([+-]?)(\d*)d(\d+)|([+-]?\d+)/g;
+  let m;
+  while((m = re.exec(limpio))){
+    if(m[3]){
+      const n = Math.min(20, Math.max(1, parseInt(m[2] || '1', 10)));
+      grupos.push({n, caras: parseInt(m[3], 10)});
+    }else if(m[4]){
+      mod += parseInt(m[4], 10);
+    }
+  }
+  return grupos.length ? {grupos, mod} : null;
+}
+
+let tirando = false;
+async function tirar(formula){
+  const p = parsear(formula);
+  if(!p){ $('#aviso').textContent = 'Fórmula no válida (ej: 2d6+3)'; $('#aviso').hidden = false; return; }
+  const resultados = p.grupos.map(g => Array.from({length: g.n}, () => 1 + Math.floor(Math.random() * g.caras)));
+  const total = resultados.flat().reduce((a, b) => a + b, 0) + p.mod;
+  const texto = p.grupos.map((g, i) => `${g.n}d${g.caras} [${resultados[i].join(', ')}]`).join(' + ') + (p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : '');
+  const mostrar = () => { $('#resultado').innerHTML = `${texto}<b>${total}</b>`; $('#resultado').style.display = 'block'; };
+  $('#resultado').style.display = 'none';
+
+  if(!$('#animacion').checked){ mostrar(); return; }
+  if(armando) await armando;
+  if(!caja || tirando) return;
+  tirando = true;
+  // Notación de la librería con resultados fijados: 2d6@3,5 (un grupo por tipo de dado).
+  const notacion = p.grupos.map((g, i) => `${g.n}d${g.caras}`).join('+') + '@' + resultados.flat().join(',');
+  const t0 = performance.now();
+  try{
+    await caja.roll(notacion);
+    $('#rendimiento').textContent = `Última tirada: ${Math.round(performance.now() - t0)} ms hasta que quedaron quietos.`;
+    mostrar();
+  }catch(err){
+    console.error(err);
+    mostrar();
+  }finally{
+    tirando = false;
+  }
+}
+
+$('#tirar').onclick = () => tirar($('#formula').value);
+$('#formula').onkeydown = e => { if(e.key === 'Enter') tirar($('#formula').value); };
+$('#rapidos').onclick = e => { const b = e.target.closest('[data-f]'); if(b){ $('#formula').value = b.dataset.f; tirar(b.dataset.f); } };
+['colorset', 'color-fondo', 'color-numero', 'color-borde', 'textura', 'material', 'tamano', 'fuerza', 'sombras', 'sonido', 'superficie', 'volumen', 'animacion']
+  .forEach(id => $('#' + id).addEventListener(id.startsWith('color-') || id === 'tamano' || id === 'fuerza' || id === 'volumen' ? 'change' : 'input', rearmar));
+['tamano', 'fuerza', 'volumen'].forEach(id => $('#' + id).addEventListener('input', () => {
+  $('#tamano-v').textContent = $('#tamano').value + '%';
+  $('#fuerza-v').textContent = $('#fuerza').value;
+  $('#volumen-v').textContent = $('#volumen').value + '%';
+}));
+window.addEventListener('resize', rearmar);
+
+if(!DiceBox){
+  $('#aviso').textContent = 'No se pudo cargar la librería de dados (¿sin internet?).';
+}else{
+  leerPrefs();
+  armarCaja();
+}
+</script>
+</body>
+</html>

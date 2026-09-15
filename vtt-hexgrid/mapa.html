@@ -112,6 +112,12 @@ aside{
   background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
   font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:95
 }
+#botonera-capa{position:fixed;inset:0;z-index:90}
+#botonera-marco{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color-scheme:normal}
+#botonera-cargando{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px 18px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.6)
+}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:760px){
@@ -157,6 +163,11 @@ aside{
     </div>
   </aside>
 </main>
+
+<div id="botonera-capa" hidden>
+  <iframe id="botonera-marco" title="Botonera" src="about:blank"></iframe>
+  <div id="botonera-cargando" hidden>Abriendo la Botonera… <button type="button" class="btn" id="botonera-cargando-x">Cancelar</button></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1454,6 +1465,10 @@ function renderPanel(forzar){
   const botonFicha = fichaDeToken
     ? `<a class="btn" href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(fichaDeToken)}" target="_blank" rel="noopener" style="text-decoration:none" title="Abrir la ficha en una pestaña nueva">📄 Ficha</a>`
     : '';
+  // Tu propio personaje (no sus invocaciones): la Botonera de la ficha, ahí mismo.
+  const botonBotonera = fichaDeToken && !(v && v.invocacion) && !soyGM && v && v.duenoUid === fbUsuario.uid
+    ? `<button type="button" class="btn" id="token-botonera" title="Abrir la Botonera de la ficha sin salir del mapa">⚡ Botonera</button>`
+    : '';
 
   // Vista normal: nombre, vida/SP (editables si corresponde), estados.
   if(!editandoToken || !puedeEditar){
@@ -1462,13 +1477,14 @@ function renderPanel(forzar){
       `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
       (t.tipo === 'pj' ? `<div class="dato" style="color:var(--muted)">de ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
       htmlEstadoToken(t) +
-      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar</button>' : ''}${botonFicha}</div>` : '') +
+      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar</button>' : ''}${botonFicha}${botonBotonera}</div>` : '') +
       (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
     panel.querySelectorAll('[data-vital]').forEach(input => {
       input.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); aplicarVital(input); } if(e.key === 'Escape') { input.blur(); renderPanel(true); } };
       input.onfocus = () => input.select();
     });
     if($('#token-editar')) $('#token-editar').onclick = () => { editandoToken = true; renderPanel(true); };
+    if($('#token-botonera')) $('#token-botonera').onclick = () => abrirBotonera(fichaDeToken);
     return;
   }
 
@@ -1532,6 +1548,39 @@ $('#btn-nuevo').onclick = () => {
   creando = true; seleccion = null; panelFondo = false; moverFondo = false;
   renderPanel(true); pedirDibujo();
 };
+
+/* ---------- Botonera de la ficha, dentro del mapa ----------
+   Carga la ficha en un iframe (?modo=botonera), que muestra solo la
+   Botonera. El iframe queda cargado mientras sea el mismo personaje, así
+   volver a abrirla es instantáneo. Lo que se haga ahí se guarda en la
+   ficha como siempre y se ve en el token. */
+let botonera = {fichaId: '', lista: false};
+
+function abrirBotonera(fichaId){
+  const capa = $('#botonera-capa');
+  const marco = $('#botonera-marco');
+  capa.hidden = false;
+  if(botonera.fichaId === fichaId && botonera.lista){
+    marco.contentWindow.postMessage({tipo: 'abrir-botonera'}, location.origin);
+    return;
+  }
+  botonera = {fichaId, lista: false};
+  $('#botonera-cargando').hidden = false;
+  marco.src = `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`;
+}
+
+function cerrarBotonera(){
+  $('#botonera-capa').hidden = true;
+  $('#botonera-cargando').hidden = true;
+}
+
+window.addEventListener('message', e => {
+  if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
+  if(e.data.tipo === 'botonera-lista'){ botonera.lista = true; $('#botonera-cargando').hidden = true; }
+  if(e.data.tipo === 'botonera-cerrada') cerrarBotonera();
+});
+
+$('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
 
 /* ---------- Mesa (tiradas compartidas) ---------- */
 

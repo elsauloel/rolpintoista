@@ -1054,6 +1054,15 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
   padding:7px 14px;font-family:"Space Mono",monospace;font-size:11.5px;box-shadow:0 8px 20px -8px rgba(0,0,0,.7);pointer-events:none
 }
 </style>
+<style>
+/* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
+   muestra solo la Botonera y sus ventanitas, con fondo transparente. */
+html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
+html.modo-botonera body > :not(.scrim):not(.toast){display:none!important}
+</style>
+<script>
+if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -7411,6 +7420,7 @@ function fichaEscuchar(f){
         f.revisarResumen = true;
         fichaMostrarLectura();
         fichaEstadoAlDia();
+        if(MODO_BOTONERA) botoneraModoAbrir();
         return;
       }
       let cambio = false;
@@ -7628,6 +7638,35 @@ async function fbAlEntrar(){
   fichaRecordar('');
   fichaEstadoAlDia();
   abrirPersonajes();
+}
+
+/* ---------- Modo botonera (dentro del mapa) ----------
+   El mapa abre esta ficha en un iframe con ?modo=botonera: al cargar el
+   personaje se abre la Botonera; cuando se cierran todas las ventanitas
+   se le avisa al mapa para que oculte el iframe, y el mapa puede pedir
+   que se vuelva a abrir sin recargar. */
+const MODO_BOTONERA = document.documentElement.classList.contains('modo-botonera');
+
+function botoneraAvisarMapa(tipo){
+  if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
+}
+
+function botoneraModoAbrir(){
+  renderBotonera();
+  $('#scrim-botonera').classList.add('open');
+  botoneraAvisarMapa('botonera-lista');
+}
+
+if(MODO_BOTONERA){
+  const revisarCerrada = () => {
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open')) botoneraAvisarMapa('botonera-cerrada');
+  };
+  const observador = new MutationObserver(revisarCerrada);
+  document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
+  window.addEventListener('message', e => {
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir();
+  });
 }
 
 mesaIniciar();

@@ -49,6 +49,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **⚡ Botonera** (solo en tu propio personaje): abre la ficha en un iframe
+  a pantalla completa con `?modo=botonera`, que muestra solo la Botonera.
+  Se hablan con `postMessage` (`botonera-lista`, `botonera-cerrada`,
+  `abrir-botonera`); el iframe queda cargado para reabrir al instante.
 - Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha,
   la invocación (`<fichaId>~<idInvocación>`, sale del resumen de la ficha;
   solo barra de vida, apagada si no está invocada) o el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP

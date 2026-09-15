@@ -69,6 +69,10 @@ más cambia sesión a sesión.
   👥 Personajes lista los de la mesa; los de otros jugadores se abren en
   solo lectura. El personaje abierto se recuerda en el `#id` de la URL y en
   `localStorage` (`ficha-actual`). Ya no hay Subir/Bajar datos.
+- **Modo botonera** (`?modo=botonera`, bloque al final del script): lo usa
+  el mapa en un iframe. Oculta todo menos las ventanitas (`.scrim`) con
+  fondo transparente, abre la Botonera al cargar el personaje y le avisa
+  al mapa cuando no queda ninguna ventanita abierta.
 - **Sin Tablero**: el botón 📋 Tablero se quitó de la ficha porque las
   barras y estados de todos ya se ven en los tokens del mapa
   (`vtt-hexgrid/mapa.html`). gm-tools conserva el suyo.

@@ -24,9 +24,17 @@ nuevo de Rol Pintoísta. Paso 2 de
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.
-- Panel del costado: crear token (jugador: siempre PJ propio; GM: creep o
-  PJ), vincularlo a una ficha propia o a un creep, editar nombre/color,
-  sacar del mapa, y el GM puede reasignar el dueño de un PJ.
+- Panel del costado: crear token (jugador: siempre PJ propio; GM: creep/NPC
+  o PJ). Al seleccionar un token se ven nombre, vida/SP y estados; "✎ Editar"
+  abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa".
+- **Vida y SP desde el mapa** (`cambiarVidaPj`, `cambiarVidaCreep`): el
+  dueño de un PJ (o invocación) y el GM en sus creeps escriben un valor o
+  +N/-N. Se guarda en una transacción sobre la parte de la ficha
+  (`general` o `invocaciones`) + su resumen, o sobre
+  `creeps/{id}/privado/ficha` + `resumen.hpPct` + `firma` (con el mismo hash
+  que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
+  entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
+  creeps escuchando la parte privada del seleccionado.
 - Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha,
   la invocación (`<fichaId>~<idInvocación>`, sale del resumen de la ficha;
   solo barra de vida, apagada si no está invocada) o el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP

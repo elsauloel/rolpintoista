@@ -73,6 +73,12 @@ aside{
 .dato{font-size:12.5px;margin-top:4px}
 .dato b{color:var(--brass);font-weight:500}
 .estado-token{margin:8px 0 4px}
+.vital{margin-top:8px}
+.vital-cab{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
+.vital-titulo{color:var(--muted);min-width:34px}
+.vital-num,.vital-max{font-family:"Space Mono",monospace;font-size:12px}
+.vital-in{width:64px;padding:3px 6px;font-family:"Space Mono",monospace;font-size:13px;text-align:right}
+.vital .barra{margin-top:4px}
 .barra{height:9px;background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
 .barra i{display:block;height:100%;transition:width .3s}
 .barra-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
@@ -222,6 +228,9 @@ let paneo = null;             // {inicioX, inicioY, x, y}
 let hexDestino = null;
 let creando = false;
 let panelFondo = false;       // GM: panel de la imagen de fondo abierto
+let editandoToken = false;    // panel del token en modo "Editar"
+// GM: HP y HP máx. del creep seleccionado (de su parte privada, que solo lee el GM).
+let creepPrivado = {id: '', hp: null, hpMax: null, cortar: null};
 
 // Lo público de fichas y creeps, para vincularlos a los tokens.
 const fichasPub = new Map();  // fichaId -> {nombre, duenoUid, resumen, miniatura}
@@ -877,6 +886,7 @@ let firmaPanel = '';
 
 function seleccionar(id){
   if(seleccion === id && !creando) return;
+  if(seleccion !== id) editandoToken = false;
   seleccion = id;
   if(id) creando = false;
   renderPanel();
@@ -927,20 +937,30 @@ function htmlEstadoToken(t){
   const v = vinculo(t);
   const est = estadoDe(t);
   if(!v || !est) return t.fichaId ? '<p class="ayuda" style="margin-top:6px">La ficha vinculada ya no existe.</p>' : '';
-  const extra = v.invocacion
-    ? `<div class="dato" style="color:var(--muted)">Invocación de ${esc(v.deQuien || '?')}${est.dormida ? ' · no invocada' : ''}</div>`
-    : '';
   const r = v.resumen || {};
-  const barra = (valor, color, texto) =>
-    `<div class="barra"><i style="width:${Math.round(valor * 100)}%;background:${color}"></i></div>` +
-    (texto ? `<div class="barra-txt">${texto}</div>` : '');
-  let html = '<div class="estado-token">' + extra;
+  const puede = puedoCambiarVida(t);
+  // Una vital: título, número (o campo para cambiarlo) y barra.
+  const vital = (clave, titulo, valor, maximo, llenado, color) => {
+    let numeros = '';
+    if(valor !== null){
+      numeros = puede
+        ? `<input class="vital-in" data-vital="${clave}" inputmode="decimal" value="${fmt(valor)}" title="Escribí el valor, o +5 / -3 para sumar o restar, y apretá Enter"><span class="vital-max">/ ${fmt(maximo)}</span>`
+        : `<span class="vital-num">${fmt(valor)} / ${fmt(maximo)}</span>`;
+    }
+    return `<div class="vital"><div class="vital-cab"><span class="vital-titulo">${titulo}</span>${numeros}</div>` +
+      `<div class="barra"><i style="width:${Math.round(llenado * 100)}%;background:${color}"></i></div></div>`;
+  };
+  let html = '<div class="estado-token">';
+  if(v.invocacion) html += `<div class="dato" style="color:var(--muted)">Invocación de ${esc(v.deQuien || '?')}${est.dormida ? ' · no invocada' : ''}</div>`;
   if(t.tipo === 'pj'){
-    html += barra(est.hp, HP_COLOR, `Vida ${fmt(Math.max(0, num(r.hp)))} / ${fmt(num(r.hpMax))}`);
-    if(est.sp !== null) html += barra(est.sp, SP_COLOR, `SP ${fmt(num(r.bonos))} / ${fmt(num(r.bonosMax))}`);
+    html += vital('hp', 'Vida', Math.max(0, num(r.hp)), num(r.hpMax), est.hp, HP_COLOR);
+    if(est.sp !== null) html += vital('sp', 'SP', num(r.bonos), num(r.bonosMax), est.sp, SP_COLOR);
   }else{
-    html += barra(est.hp, HP_COLOR, 'Vida');
+    // Creep: números solo para el GM (los lee de la parte privada).
+    const nums = soyGM && creepPrivado.id === t.fichaId && creepPrivado.hp !== null;
+    html += vital('hp', 'Vida', nums ? creepPrivado.hp : null, nums ? creepPrivado.hpMax : null, est.hp, HP_COLOR);
   }
+  if(puede) html += '<p class="ayuda" style="margin-top:4px">Escribí el valor o +5 / -3 y apretá Enter. Se guarda también en la ficha.</p>';
   if(est.muerto) html += `<div class="dato" style="color:${HP_COLOR}">${t.tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>`;
   if(est.estados.length){
     html += '<div class="chips">' + est.estados.map(e =>
@@ -950,10 +970,146 @@ function htmlEstadoToken(t){
   return html + '</div>';
 }
 
+// Vida y SP desde el mapa, guardados en la ficha o en el creep, así los ve
+// cambiados la ficha, gm-tools, el tablero y los demás. Los PJ los cambia
+// su dueño; los creeps, el GM (lo imponen las reglas).
+function puedoCambiarVida(t){
+  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
+  const v = vinculo(t);
+  return !!v && !soyGM && v.duenoUid === fbUsuario.uid;
+}
+
+// "12" fija el valor; "+5" / "-3" suma o resta. null si no se entiende.
+function leerValorVital(texto, actual){
+  const crudo = String(texto || '').trim().replace(',', '.').replace('−', '-');
+  const m = crudo.match(/^([+-])\s*(\d+(?:\.\d+)?)$/);
+  if(m) return actual + parseFloat(m[2]) * (m[1] === '-' ? -1 : 1);
+  if(/^\d+(?:\.\d+)?$/.test(crudo)) return parseFloat(crudo);
+  return null;
+}
+const ERROR_TIPEO = 'tipeo';
+
+// Mismo hash que gm-tools usa para la firma del creep (gmHash): al cambiar
+// la firma, gm-tools se da cuenta y trae el creep actualizado.
+function hashGm(s){
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for(let i = 0; i < s.length; i++){
+    const ch = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+async function cambiarVidaCreep(creepId, texto){
+  const base = fbDb.doc(fbRutaCampana(`creeps/${creepId}`));
+  const privRef = base.collection('privado').doc('ficha');
+  await fbDb.runTransaction(async tx => {
+    const [priv, pub] = await Promise.all([tx.get(privRef), tx.get(base)]);
+    if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
+    const sc = JSON.parse(priv.data().json || '{}');
+    const hpMax = num(sc.hpMax);
+    const nuevo = leerValorVital(texto, num(sc.hp));
+    if(nuevo === null) throw new Error(ERROR_TIPEO);
+    sc.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
+    const json = JSON.stringify(sc);
+    // La firma es hash(creep)-hash(imagen); la imagen no cambia.
+    const firmaVieja = String(pub.data().firma || '');
+    const parteImagen = firmaVieja.includes('-') ? firmaVieja.slice(firmaVieja.indexOf('-') + 1) : hashGm('');
+    tx.set(privRef, {json});
+    tx.update(base, {
+      'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
+      'resumen.muerto': sc.hp <= 0,
+      firma: hashGm(json) + '-' + parteImagen,
+      actualizado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  });
+}
+
+async function cambiarVidaPj(t, clave, texto){
+  const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc(invId ? 'invocaciones' : 'general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    const cambios = {actualizado: ts};
+    if(invId){
+      const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv) throw new Error('La invocación ya no existe');
+      const nuevo = leerValorVital(texto, num(inv.hp));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      inv.hp = Math.max(0, num(inv.hpMax) > 0 ? Math.min(num(inv.hpMax), nuevo) : nuevo);
+      cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i);
+    }else if(clave === 'hp'){
+      const hpMax = num(r.hpMax);
+      const nuevo = leerValorVital(texto, num(datos.hp));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      datos.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
+      cambios['resumen.hp'] = datos.hp;
+    }else{
+      // SP = Bonos disponibles = máximo - gastados (igual que en la ficha).
+      const bonosMax = num(r.bonosMax);
+      const nuevo = leerValorVital(texto, bonosMax - num(datos.bonosGastados));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      const sp = Math.min(bonosMax, nuevo);
+      datos.bonosGastados = bonosMax - sp;
+      cambios['resumen.bonos'] = sp;
+    }
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, cambios);
+  });
+}
+
+async function aplicarVital(input){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!puedoCambiarVida(t)) return;
+  const texto = input.value;
+  input.disabled = true;
+  try{
+    if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
+    else await cambiarVidaPj(t, input.dataset.vital, texto);
+  }catch(err){
+    console.error('No se pudo cambiar la vida:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
+  }finally{
+    input.disabled = false;
+    input.blur();
+    renderPanel(true);
+  }
+}
+
+// GM: mientras un creep está seleccionado, escucha su parte privada para
+// mostrar la vida con números.
+function actualizarEscuchaCreep(){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  const querido = soyGM && t && t.tipo === 'creep' && t.fichaId ? t.fichaId : '';
+  if(creepPrivado.id === querido) return;
+  if(creepPrivado.cortar) creepPrivado.cortar();
+  creepPrivado = {id: querido, hp: null, hpMax: null, cortar: null};
+  if(!querido) return;
+  creepPrivado.cortar = fbDb.doc(fbRutaCampana(`creeps/${querido}/privado/ficha`)).onSnapshot(doc => {
+    if(creepPrivado.id !== querido) return;
+    let sc = {};
+    try{ sc = doc.exists ? JSON.parse(doc.data().json || '{}') : {}; }catch(e){}
+    creepPrivado.hp = doc.exists ? num(sc.hp) : null;
+    creepPrivado.hpMax = doc.exists ? num(sc.hpMax) : null;
+    renderPanel();
+  }, err => console.error('Error leyendo el creep:', err));
+}
+
 function renderPanel(forzar){
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
-  const clave = JSON.stringify([creando, panelFondo, seleccion]);
+  actualizarEscuchaCreep();
+  const clave = JSON.stringify([creando, panelFondo, seleccion, editandoToken]);
   const v = t ? vinculo(t) : null;
   const opciones = (creando || t) ? [
     [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre + JSON.stringify(((f.resumen && f.resumen.invocaciones) || []).map(i => [i.id, i.nombre]))),
@@ -964,6 +1120,7 @@ function renderPanel(forzar){
     v && [v.nombre, v.resumen],
     opciones, soyGM, [...miembros.entries()], !!fbMiembro,
     panelFondo && fondo && [fondo.ancho, !!fondo.dato], moverFondo,
+    creepPrivado.id && [creepPrivado.hp, creepPrivado.hpMax],
   ]);
   if(!forzar){
     if(firma === firmaPanel) return;
@@ -1056,40 +1213,61 @@ function renderPanel(forzar){
   }
 
   const editable = puedoMover(t);
+  const titulo = t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje');
+  const puedeEditar = editable || soyGM;
+
+  // Vista normal: nombre, vida/SP (editables si corresponde), estados.
+  if(!editandoToken || !puedeEditar){
+    panel.innerHTML =
+      `<h2>${titulo}</h2>` +
+      `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
+      (t.tipo === 'pj' ? `<div class="dato" style="color:var(--muted)">de ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
+      htmlEstadoToken(t) +
+      (puedeEditar ? '<div class="fila"><button type="button" class="btn" id="token-editar">✎ Editar</button></div>' : '') +
+      (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
+    panel.querySelectorAll('[data-vital]').forEach(input => {
+      input.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); aplicarVital(input); } if(e.key === 'Escape') { input.blur(); renderPanel(true); } };
+      input.onfocus = () => input.select();
+    });
+    if($('#token-editar')) $('#token-editar').onclick = () => { editandoToken = true; renderPanel(true); };
+    return;
+  }
+
+  // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
   let color = t.color;
   panel.innerHTML =
-    `<h2>${t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje')}</h2>` +
-    `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
-    htmlEstadoToken(t) +
+    `<h2>Editar ${titulo.toLowerCase()}</h2>` +
     (editable
       ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
         `<label class="etiqueta">Nombre (si no está vinculado)</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
         '<label class="etiqueta">Color</label>' + htmlColores(t.color, true)
-      : '') +
-    (t.tipo === 'pj' ? `<div class="dato">Dueño: ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
+      : `<div class="dato"><b>${esc(nombreDe(t))}</b></div>`) +
     `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
     (soyGM && t.tipo === 'pj'
-      ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de compu)</label>' +
+      ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de cuenta)</label>' +
         '<div class="fila" style="margin-top:0"><select id="token-dueno">' +
         [...miembros.entries()].map(([uid, m]) => `<option value="${esc(uid)}"${uid === t.duenoUid ? ' selected' : ''}>${esc(m.nombre)}${m.gm ? ' (GM)' : ''}</option>`).join('') +
         '</select><button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
       : '') +
     '<div class="fila">' +
       (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +
-      (puedoBorrar(t) ? '<button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button>' : '') +
+      '<button type="button" class="btn" id="token-volver">Volver</button>' +
     '</div>' +
-    (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
+    (puedoBorrar(t) ? '<div class="fila"><button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button></div>' : '');
 
+  $('#token-volver').onclick = () => { editandoToken = false; renderPanel(true); };
   if(editable){
     conectarColores(panel, c => color = c);
-    const guardar = () => {
+    const guardar = async () => {
       const fichaId = $('#token-vinculo').value;
       const vv = fichaId ? vinculo({tipo: t.tipo, fichaId}) : null;
       const nombre = ($('#token-nombre').value.trim() || (vv ? vv.nombre : '')).slice(0, 40);
       if(!nombre){ toast('El token necesita un nombre'); return; }
       const cambios = {nombre, color};
       cambios.fichaId = fichaId ? fichaId : firebase.firestore.FieldValue.delete();
-      editarToken(seleccion, cambios);
+      await editarToken(seleccion, cambios);
+      editandoToken = false;
+      renderPanel(true);
     };
     $('#token-guardar').onclick = guardar;
     $('#token-nombre').onkeydown = e => { if(e.key === 'Enter') guardar(); };

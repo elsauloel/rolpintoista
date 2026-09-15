@@ -69,6 +69,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   padding:9px 16px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);white-space:nowrap
 }
 .btn:hover{border-color:var(--copper)}
+a.btn{text-decoration:none;display:inline-block}
 .btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
 .btn.primary:hover{background:var(--brass)}
 .btn.maint{background:rgba(46,107,87,.2);border-color:var(--bottle);color:#CFE6D8;font-weight:700}
@@ -152,10 +153,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .reporte-loot-precio{color:var(--muted)}
 
 /* Toolbar */
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
-.toolbar .note{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-right:auto}
-.toolbar .note[data-estado="ok"]{color:var(--absenta)}
-.toolbar .note[data-estado="error"]{color:var(--danger)}
+/* Estado del guardado de los creeps, al final de la barra superior. */
+.accesos .note{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-left:auto;min-width:0;text-align:right}
+.accesos .note[data-estado="ok"]{color:var(--absenta)}
+.accesos .note[data-estado="error"]{color:var(--danger)}
+@media(max-width:700px){.accesos .note{flex-basis:100%;margin-left:0;text-align:left}}
 input[type=file]{display:none}
 
 /* Grid */
@@ -626,6 +628,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
       <button type="button" class="iconbtn dk-guardar" id="btn-respaldo-partida" title="Bajar un respaldo de toda la partida: personajes, creeps, tokens, mapa y tiradas">💾 Respaldo partida</button>
       <button type="button" class="iconbtn" id="btn-load" title="Reemplazar los creeps de la mesa por los de un respaldo de la partida (o una copia gm-creeps.json)">📂 Cargar respaldo</button>
       <input type="file" id="file-input" accept=".json">
+      <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
     </nav>
     <div class="hero-titulo">
       <div>
@@ -643,9 +646,6 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
     </div>
   </div>
 
-  <div class="toolbar">
-    <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
-  </div>
 
   <div id="empty" class="empty-state" style="display:none">Sin creeps todavía. Tocá "+ Creep" para agregar el primero.</div>
   <div class="grid" id="grid"></div>

@@ -796,7 +796,7 @@ input[type=file]{display:none}
       <div class="f"><label>Nombre</label><input type="text" id="hc-nombre"></div>
       <div class="row3">
         <div class="mini-f"><label>Costo (texto libre)</label><input type="text" id="hc-costo" placeholder="ej. 1 bono"></div>
-        <div class="mini-f"><label>Acciones que gasta</label><input type="number" id="hc-acciones" min="0" value="1"></div>
+        <div class="mini-f"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1"></div>
         <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0"></div>
       </div>
       <div class="f"><label>Detalle</label><textarea id="hc-detalle"></textarea></div>
@@ -1757,7 +1757,8 @@ const DADOS_ARMA = [2,4,6,8,10];
 function nuevoCreep(){
   return {
     id: uid(), nombre:'Creep nuevo', imagen:'', nivel:1, color: COLORES[Math.floor(Math.random()*COLORES.length)],
-    hp:5, hpMax:5, acc:3, accMax:3, spd:5,  // Hp.Max = Con*5
+    hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
+    nitros:1, ataquesTurno:0,  // No2 máx. = Agilidad + mods (creepNitrosMax)
     con:1, fue:1, agl:1, des:1, int:1,
     armaTipo:6, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
     defensa:0, armaduraTipo:'', equipo:[],
@@ -2066,15 +2067,64 @@ function actualizarBadgePresupuesto(sc, card){
   badge.setAttribute('style', attrBudgetStyle(sc));
 }
 
-function accLabelHtml(sc){
-  const fueraDeRegla = num(sc.accMax) !== 3;
-  return `Acciones${fueraDeRegla ? ` <span style="color:var(--danger);text-transform:none;letter-spacing:0">(regla: 3)</span>` : ''}`;
+/* =========================================================
+   NITROS (No2) de los creeps — mismas reglas que la ficha (bloque IT2 de
+   ficha.html). Reemplazan a las Acciones: el máximo es Agilidad efectiva
+   + mods de No2 (los viejos de Movimiento y Acciones máx. cuentan como
+   No2, igual que en la ficha) y se recargan en cada Mantenimiento.
+   sc.nitros = los que le quedan en el turno; sc.ataquesTurno = ataques
+   hechos desde el último Mantenimiento.
+   ========================================================= */
+const IT2_CREEP = {
+  nitrosHabilidad: 1,            // costo por defecto de una habilidad
+  nitrosMover: 1,                // Movimiento: por casillero
+  nitrosMoverRengo: 2,
+  redondeoPrimerAtaque: Math.ceil,
+};
+
+function creepNitrosMax(sc){
+  let v = num(sc.agl) + creepModTotal(sc, 'agl')
+    + creepModTotal(sc, 'nitros') + creepModTotal(sc, 'mov') + creepModTotal(sc, 'accionesmax');
+  // Stun, Exhausto: el más bajo activo gana.
+  const forzados = (sc.estados || [])
+    .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
+    .map(e => num(e.forzarNitros));
+  if(forzados.length) v = Math.min(v, ...forzados);
+  return Math.max(0, v);
 }
-function actualizarAccLabelEnDOM(sc, card){
-  if(!card) return;
-  const label = card.querySelector('.acc-label');
-  if(label) label.innerHTML = accLabelHtml(sc);
+
+function creepEstadoActivo(sc, flag){
+  return (sc.estados || []).some(e => e.activo !== false && e[flag]);
 }
+
+// Movimiento es un casillero por ejecución: Rengo lo cobra doble.
+function costoNitrosHabCreep(sc, h){
+  if(h.nombre === 'Movimiento') return creepEstadoActivo(sc, 'rengo') ? IT2_CREEP.nitrosMoverRengo : IT2_CREEP.nitrosMover;
+  return num(h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad);
+}
+
+// Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
+function costoAtaqueCreep(sc){
+  const tipo = num(sc.armaTipo) || 6;
+  return num(sc.ataquesTurno) === 0 ? IT2_CREEP.redondeoPrimerAtaque(tipo / 2) : tipo;
+}
+
+// Por qué no se puede ejecutar una habilidad ahora ('' = se puede).
+function bloqueoHabCreep(sc, h){
+  if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
+  if(h.nombre === 'Movimiento' && creepEstadoActivo(sc, 'inmovilizado')) return 'Inmovilizado';
+  if(num(sc.nitros) < costoNitrosHabCreep(sc, h)) return 'Sin No2';
+  return '';
+}
+
+// Estados de creeps guardados antes de los No2: los presets que tocaban
+// Acciones pasan a tocar No2 (solo si el estado no trae ya ese efecto).
+const ESTADOS_NITROS_MIGRAR = {
+  Cansado: {mods:[{stat:'nitros', val:-1}]},
+  Hypeado: {mods:[{stat:'nitros', val:1}]},
+  Exhausto: {forzarNitros:1},
+  Stun: {forzarNitros:0},
+};
 
 // Rellena campos que creeps viejos (guardados antes de una función nueva)
 // pueden no tener, para que el resto del código no se tope con undefined.
@@ -2083,6 +2133,28 @@ function normalizarCreep(sc){
   while(crit.length < 5) crit.push(0);
   sc.crit = crit.slice(0, 5);
   sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
+  sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
+  sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
+  // Acciones → No2.
+  if(sc.acc !== undefined || sc.accMax !== undefined){
+    delete sc.acc;
+    delete sc.accMax;
+    sc.estados.forEach(es => {
+      const m = ESTADOS_NITROS_MIGRAR[es.nombre];
+      if(!m) return;
+      const yaTiene = (es.forzarNitros !== undefined && es.forzarNitros !== '') || (es.mods || []).some(x => x.stat === 'nitros');
+      if(yaTiene) return;
+      if(m.mods) es.mods = [...(es.mods || []), ...structuredClone(m.mods)];
+      if(m.forzarNitros !== undefined) es.forzarNitros = m.forzarNitros;
+    });
+  }
+  sc.habilidades.forEach(h => {
+    if(h.accionesCosto === undefined) return;
+    if(h.nitrosCosto === undefined) h.nitrosCosto = h.accionesCosto;
+    delete h.accionesCosto;
+  });
+  if(sc.nitros === undefined || sc.nitros === null) sc.nitros = creepNitrosMax(sc);
+  if(sc.ataquesTurno === undefined) sc.ataquesTurno = 0;
   return sc;
 }
 
@@ -2145,7 +2217,9 @@ function creepStatValor(sc, statId){
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
   if(!sc) return;
-  const sinAcc = num(sc.acc) < 1;
+  const costoAtaque = costoAtaqueCreep(sc);
+  const sinNitrosAtaque = num(sc.nitros) < costoAtaque;
+  const cualAtaque = num(sc.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
 
   const tilesStats = CREEP_STATS_TIRADA_IDS.map(id => CREEP_STAT_LOOKUP[id]).map(d => `
     <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
@@ -2155,7 +2229,7 @@ function renderAccionesCreep(){
 
   const fc = formulasCombateCreep(sc);
   const combate = [
-    {nombre:'Atacar (PdG)', dado: fc.pdg, disabled: sinAcc, motivo: sinAcc ? 'Sin acciones' : `${fmt(num(sc.acc))} acción(es) · cuesta 1`, attr:`data-atacarcreep="${sc.id}"`},
+    {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, disabled: sinNitrosAtaque, motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {nombre:'Esquivar', dado: fc.eva, disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
     {nombre:'Parry', dado: fc.parry, disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
@@ -2167,19 +2241,16 @@ function renderAccionesCreep(){
     </button>`).join('');
 
   const filasHab = sc.habilidades.map(h => {
-    const enCooldown = num(h.cdActual) > 0;
-    const costoAcciones = h.accionesCosto ?? 1;
-    const sinAcciones = num(sc.acc) < costoAcciones;
-    const bloqueada = enCooldown || sinAcciones;
-    let motivo;
-    if(enCooldown) motivo = `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
-    else if(sinAcciones) motivo = 'Sin acciones';
-    else motivo = costoAcciones ? `${fmt(costoAcciones)} acción(es)` : 'Sin costo';
-    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: bloqueada, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
+    const bloqueo = bloqueoHabCreep(sc, h);
+    const costo = costoNitrosHabCreep(sc, h);
+    const partes = [costo ? `${fmt(costo)} No2` : 'Sin costo'];
+    if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
+    const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
+    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
   });
 
   $('#acciones-creep-titulo').textContent = sc.nombre;
-  $('#acciones-creep-badge').textContent = `${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}`;
+  $('#acciones-creep-badge').textContent = `No2 ${fmt(num(sc.nitros))}/${fmt(creepNitrosMax(sc))}`;
 
   const filaHab = f => `
     <div class="accion-row${f.nombre==='Movimiento'?' item-movimiento':''}">
@@ -2216,8 +2287,8 @@ function abrirVerHabAccion(scId, habId){
   const sc = S.creeps.find(s => s.id === scId);
   const h = sc && sc.habilidades.find(x => x.id === habId);
   if(!h) return;
-  const costo = h.accionesCosto ?? 1;
-  const costoTxt = costo ? `${fmt(costo)} acción(es)` : 'Sin costo';
+  const costo = costoNitrosHabCreep(sc, h);
+  const costoTxt = costo ? `${fmt(costo)} No2` : 'Sin costo';
   const cdTxt = num(h.cd) > 0 ? `${fmt(num(h.cd))} turno(s) de cooldown` : 'Sin cooldown';
   $('#verhab-nombre').textContent = h.nombre || 'Sin nombre';
   $('#verhab-body').innerHTML = `
@@ -2285,9 +2356,9 @@ function cardHtml(sc){
             </label>
           </div>
         </div>
-        <div class="vital-mini acc">
-          <div class="vl acc-label">${accLabelHtml(sc)}</div>
-          <div class="vn"><input type="number" data-f="acc" data-id="${sc.id}" value="${sc.acc}"><span class="vmax">/ </span><input type="number" data-f="accMax" data-id="${sc.id}" value="${sc.accMax}"></div>
+        <div class="vital-mini acc" title="Nitros: se gastan al atacar, moverse y usar habilidades. Máximo = Agilidad + mods; se recargan en cada Mantenimiento">
+          <div class="vl">No2</div>
+          <div class="vn"><input type="number" data-f="nitros" data-id="${sc.id}" value="${fmt(num(sc.nitros))}"><span class="vmax">/ ${fmt(creepNitrosMax(sc))}</span></div>
         </div>
       </div>
 
@@ -2356,7 +2427,7 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Habilidades</div>
         <div class="hab-list" style="margin-top:4px">
-          ${sc.habilidades.map(h => habHtml(sc.id, h, num(sc.acc)<=0)).join('')}
+          ${sc.habilidades.map(h => habHtml(sc, h)).join('')}
         </div>
         <button class="addhab" data-addhab="${sc.id}" style="margin-top:6px">+ Habilidad</button>
       </div>
@@ -2404,10 +2475,10 @@ function cardCompactoHtml(sc){
             </label>
           </div>
         </div>
-        <div class="vital-mini acc">
-          <div class="vl">Acciones</div>
-          <div class="vn-static">${fmt(num(sc.acc))}/${fmt(num(sc.accMax))}</div>
-          <div class="acc-mini-bar"><div class="acc-mini-fill" style="width:${num(sc.accMax)>0 ? Math.max(0,Math.min(100,num(sc.acc)/num(sc.accMax)*100)) : 0}%"></div></div>
+        <div class="vital-mini acc" title="Nitros: se gastan al atacar, moverse y usar habilidades. Máximo = Agilidad + mods; se recargan en cada Mantenimiento">
+          <div class="vl">No2</div>
+          <div class="vn-static">${fmt(num(sc.nitros))}/${fmt(creepNitrosMax(sc))}</div>
+          <div class="acc-mini-bar"><div class="acc-mini-fill" style="width:${creepNitrosMax(sc)>0 ? Math.max(0,Math.min(100,num(sc.nitros)/creepNitrosMax(sc)*100)) : 0}%"></div></div>
         </div>
       </div>
       <div class="chips-estados">${chips}<button type="button" class="chip-estado chip-add" data-addestado="${sc.id}">+ Estado</button></div>
@@ -2429,14 +2500,14 @@ const ESTADOS_PRESET_GM = [
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0,
-    detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true,
-    detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true,
-    detalle:'Sin Acciones este turno.'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0,
-    detalle:'+1 a las Acciones máximas del turno.'},
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:-1}],
+    detalle:'-1 a los No2 máximos. ⚠ Valor provisorio (antes −1 Acción).'},
+  {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true, forzarNitros:1,
+    detalle:'Como mucho 1 No2 por turno, sin importar el máximo normal. ⚠ Valor provisorio (antes 1 Acción).'},
+  {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, forzarNitros:0,
+    detalle:'Sin No2 este turno.'},
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:1}],
+    detalle:'+1 a los No2 máximos. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
     detalle:'Corta a la mitad (redondeado hacia abajo) la Defensa y Res. a crítico totales. Permanente — se quita con Oleo reparador.'},
   {nombre:'Armadura arruinada', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraArruinada:true,
@@ -2541,6 +2612,7 @@ function activarEstadoPresetCreep(preset){
     activo: true,
     permanente: !!preset.permanente,
     escudoMagico: preset.escudoMagico ?? 0,
+    forzarNitros: preset.forzarNitros ?? '',
     polaridad: preset.polaridad || 'otro',
     mods: structuredClone(preset.mods || []),
   };
@@ -2624,7 +2696,7 @@ const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8D
 const STAT_LABEL_GM = {
   tipo1:'Tipo 2', tipo2:'Tipo 4', tipo3:'Tipo 6', tipo4:'Tipo 8', tipo5:'Tipo 10',
   pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico',
-  bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.',
+  bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
   resm:'Res.Mt', resmg:'Res.Mg', rescc:'Res.CC',
   con:'Con', fue:'Fue', agl:'Agi', des:'Des', int:'Int',
 };
@@ -2632,7 +2704,7 @@ const STAT_FULL_GM = {
   tipo1:'Resistencia a crítico Tipo 2', tipo2:'Resistencia a crítico Tipo 4', tipo3:'Resistencia a crítico Tipo 6',
   tipo4:'Resistencia a crítico Tipo 8', tipo5:'Resistencia a crítico Tipo 10',
   pdg:'Probabilidad de golpe', eva:'Evasión', ini:'Iniciativa', mov:'Movimiento', parry:'Parry', crit:'Daño crítico',
-  bonos:'Bonos', rangocasteo:'Rango de casteo', accionesmax:'Acciones máximas',
+  bonos:'Bonos', rangocasteo:'Rango de casteo', accionesmax:'Acciones máximas', nitros:'Nitros',
   resm:'Resistencia mental', resmg:'Resistencia mágica', rescc:'Resistencia a CC',
   con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', int:'Inteligencia',
 };
@@ -2864,8 +2936,6 @@ function aplicarModsEquipo(sc, mods, signo){
     if(TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined){
       const i = TIPO_STAT_A_CRIT_IDX[m.stat];
       sc.crit[i] = num(sc.crit[i]) + signo * num(m.val);
-    }else if(m.stat === 'accionesmax'){
-      sc.accMax = num(sc.accMax) + signo * num(m.val);
     }else if(m.stat === 'mov'){
       sc.spd = num(sc.spd) + signo * num(m.val);
     }
@@ -3070,7 +3140,7 @@ function abrirEditorHabCreep(scId, habId){
   editingHabCreep = {scId, habId};
   $('#hc-nombre').value = h.nombre || '';
   $('#hc-costo').value = h.costo || '';
-  $('#hc-acciones').value = h.accionesCosto ?? 1;
+  $('#hc-acciones').value = h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad;
   $('#hc-cd').value = h.cd || 0;
   $('#hc-detalle').value = h.detalle || '';
   $('#hc-tirada').value = h.tiradaExtra || '';
@@ -3092,7 +3162,7 @@ function guardarEditorHabCreep(){
   if(!h){ editingHabCreep = null; return; }
   h.nombre = $('#hc-nombre').value.trim() || 'Sin nombre';
   h.costo = $('#hc-costo').value;
-  h.accionesCosto = Math.max(0, num($('#hc-acciones').value) || 0);
+  h.nitrosCosto = Math.max(0, num($('#hc-acciones').value) || 0);
   h.cd = Math.max(0, num($('#hc-cd').value) || 0);
   h.detalle = $('#hc-detalle').value;
   h.tiradaExtra = $('#hc-tirada').value.trim();
@@ -3150,7 +3220,7 @@ function verCreep(id){
   const L = [];
   L.push(linea('Nivel', fmt(num(sc.nivel))));
   L.push(linea('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`));
-  L.push(linea('Acciones', `${fmt(num(sc.acc))} / ${fmt(num(sc.accMax))}`));
+  L.push(linea('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`));
   L.push(linea('Velocidad', fmt(num(sc.spd))));
   const defBase = num(sc.defensa), defEf = creepDefensaEfectiva(sc);
   L.push(linea('Defensa', defEf !== defBase ? `${fmt(defEf)} (base ${fmt(defBase)}, reducida por estado)` : fmt(defBase)));
@@ -3224,6 +3294,7 @@ function abrirEditorEstadoCreep(scId, esId){
   $('#ec-permanente').checked = es ? !!es.permanente : false;
   $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
   FLAGS_ESTADO_CREEP.forEach(f => { $('#ec-preset').dataset[f.toLowerCase()] = es && es[f] ? '1' : ''; });
+  $('#ec-preset').dataset.forzarnitros = es && es.forzarNitros !== undefined && es.forzarNitros !== null ? String(es.forzarNitros) : '';
   $('#ec-escudomagico').value = es ? (es.escudoMagico ?? 0) : 0;
   renderEcMods();
   actualizarBotonesPresetEc();
@@ -3242,11 +3313,18 @@ function renderEcMods(){
   $('#ec-mods-lista').innerHTML = ecMods.map((m,i) => `
     <div class="est-modrow">
       <select data-ecmodstat="${i}">
-        ${ATTR_IDS.map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${ATTR_LABELS[a]}</option>`).join('')}
+        ${[...ATTR_IDS, 'nitros'].map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${a === 'nitros' ? 'No2 máx.' : ATTR_LABELS[a]}</option>`).join('')}
       </select>
       <input type="number" data-ecmodval="${i}" value="${m.val}">
       <button class="rm" data-ecmodrm="${i}">×</button>
     </div>`).join('');
+}
+
+// El tope de No2 (Stun, Exhausto) no tiene campo propio en el editor: viaja
+// con el preset elegido o con el estado que se está editando.
+function forzarNitrosDelEditor(){
+  const v = $('#ec-preset').dataset.forzarnitros;
+  return v === undefined || v === '' ? '' : num(v);
 }
 
 function guardarEditorEstadoCreep(){
@@ -3265,6 +3343,7 @@ function guardarEditorEstadoCreep(){
     permanente: $('#ec-permanente').checked,
     polaridad: $('#ec-preset').dataset.polaridad || 'otro',
     escudoMagico: num($('#ec-escudomagico').value) || 0,
+    forzarNitros: forzarNitrosDelEditor(),
     mods: structuredClone(ecMods),
   };
   FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
@@ -3305,9 +3384,12 @@ function estadoHtml(scId, es){
   </div>`;
 }
 
-function habHtml(scId, h, sinAcciones){
-  const enCooldown = num(h.cdActual) > 0;
-  const bloqueado = enCooldown || sinAcciones;
+function habHtml(sc, h){
+  const scId = sc.id;
+  const bloqueo = bloqueoHabCreep(sc, h);
+  const bloqueado = !!bloqueo;
+  const costo = costoNitrosHabCreep(sc, h);
+  const estadoTxt = bloqueo || `Disponible · ${costo ? `${fmt(costo)} No2` : 'sin costo'}`;
   const esMovimiento = h.nombre === 'Movimiento';
 
   if(esMovimiento){
@@ -3318,8 +3400,8 @@ function habHtml(scId, h, sinAcciones){
         <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
       </div>
       <div class="hab-bottom">
-        <span class="hab-estado ${sinAcciones?'cd':'ok'}">${sinAcciones ? 'Sin acciones' : 'Disponible'}</span>
-        <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${sinAcciones?'disabled':''}>Ejecutar</button>
+        <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
+        <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
       </div>
     </div>`;
   }
@@ -3336,7 +3418,7 @@ function habHtml(scId, h, sinAcciones){
     </div>
     <div class="hab-detalle-text${h.detalle ? '' : ' vacio'}">${h.detalle ? esc(h.detalle) : 'Sin detalle — tocá ✎ para escribir uno.'}</div>
     <div class="hab-bottom">
-      <span class="hab-estado ${bloqueado?'cd':'ok'}">${enCooldown ? `En cooldown · ${fmt(num(h.cdActual))} turno(s)` : (sinAcciones ? 'Sin acciones' : 'Disponible')}</span>
+      <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
       <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
     </div>
   </div>`;
@@ -3366,13 +3448,10 @@ document.addEventListener('input', e => {
     // El HP se resuelve al salir del campo o con Enter: si se guardara
     // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
     if(campo === 'hp') return;
-    const numericos = ['nivel','hp','hpMax','acc','accMax','spd','defensa'];
+    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa'];
     sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
     if(campo === 'nivel'){
       actualizarBadgePresupuesto(sc, t.closest('.card'));
-    }
-    if(campo === 'accMax'){
-      actualizarAccLabelEnDOM(sc, t.closest('.card'));
     }
     return;
   }
@@ -3479,11 +3558,18 @@ document.addEventListener('click', e => {
   if(b.dataset.atacarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.atacarcreep);
     if(!sc) return;
-    if(num(sc.acc) < 1){ toast(`${sc.nombre}: no le quedan acciones para atacar`); return; }
-    sc.acc = num(sc.acc) - 1;
+    const costo = costoAtaqueCreep(sc);
+    if(costo > num(sc.nitros)){
+      toast(`${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);
+      return;
+    }
+    const primero = num(sc.ataquesTurno) === 0;
+    sc.nitros = num(sc.nitros) - costo;
+    sc.ataquesTurno = num(sc.ataquesTurno) + 1;
     renderAll();
     const pdg = creepStatValor(sc, 'pdg');
     tirarValorStat(`${sc.nombre} · PdG`, pdg, sc, 'pdg');
+    toast(`${sc.nombre}: −${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`);
     return;
   }
   if(b.dataset.daniocreep){
@@ -3593,19 +3679,19 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s=>s.id===scId);
     const h = sc && sc.habilidades.find(x=>x.id===habId);
     if(!sc || !h) return;
-    const costoAcciones = h.accionesCosto ?? 1;
-    if(costoAcciones > num(sc.acc)){
-      toast(`${sc.nombre}: no le quedan acciones este turno`);
+    const bloqueo = bloqueoHabCreep(sc, h);
+    if(bloqueo){
+      toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`);
       return;
     }
-    if(num(h.cdActual) > 0) return;
-    sc.acc = Math.max(0, num(sc.acc) - costoAcciones);
+    const costo = costoNitrosHabCreep(sc, h);
+    sc.nitros = num(sc.nitros) - costo;
     h.cdActual = num(h.cd);
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
     if(h.tiradaExtra) tirarExtraDeHab(h);
-    const partes = [`ejecutada`, costoAcciones ? `−${fmt(costoAcciones)} Acción${costoAcciones===1?'':'es'}` : 'sin costo de Acciones'];
+    const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
     toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
@@ -4047,7 +4133,7 @@ const IA_SISTEMA = `Sos un asistente que diseña enemigos ("creeps") para un jue
   "habilidades": [{"nombre": string, "detalle": string, "cd": number}],
   "notas": string
 }
-No incluyas hp, hpMax, acc ni accMax — esos se calculan aparte con fórmulas fijas del juego, no los inventes vos.
+No incluyas hp, hpMax ni nitros — esos se calculan aparte con fórmulas fijas del juego, no los inventes vos.
 Regla de atributos: con + fue + agl + des + int debe sumar aproximadamente 33 + 3×(nivel-1) puntos (a nivel 1 son ~33 puntos repartidos entre los cinco). Repartilos de forma pareja o especializada según el concepto (ej. un tanque con con y fue altos y agl/int bajos), pero respetá ese total aproximado — no generes números al azar sin relación con el nivel pedido. Variá los valores según cada creep, no repitas siempre el mismo patrón.
 Regla de arma: "armaPeso" es la cantidad de dados que tira el arma al hacer daño (el daño final es armaPeso × d(armaTipo) + armaFijo) — SIEMPRE un número entero, normalmente 1 a 3 (hasta 4 o 5 solo para un arma pesada de dos manos). Nunca un decimal ni un número grande.
 Regla de resistencia a crítico ("crit", 4 valores para armas Tipo 2/4/6/8): en este juego esa resistencia la da la armadura equipada, no el cuerpo del bicho — así que lo normal es [0,0,0,0]. Solo poné algún 1, 2 o máximo 3 en algún valor si el concepto del creep tiene explícitamente una coraza, caparazón o blindaje pesado (ej. un cangrejo acorazado, un robot blindado). Un animal común (perro, rata, lobo) va siempre en [0,0,0,0].
@@ -4081,7 +4167,7 @@ const CREEP_SCHEMA = {
   additionalProperties: false,
 };
 
-// hp/hpMax = con*5 y acc/accMax = 3 son reglas fijas del juego (ver ficha.html).
+// hp/hpMax = con*5 y No2 = agl son reglas fijas del juego (ver ficha.html).
 // No se le piden al modelo porque los modelos gratuitos las ignoran o inventan
 // números — se calculan siempre acá, así el creep generado nunca las rompe.
 function creepDesdeIA(data){
@@ -4092,7 +4178,7 @@ function creepDesdeIA(data){
     nombre: (data.nombre || base.nombre).toString(),
     nivel: num(data.nivel) || 1,
     hp: hpMax, hpMax,
-    acc: 3, accMax: 3,
+    nitros: Math.max(0, num(data.agl)),
     spd: num(data.spd) || 5,
     con, fue: num(data.fue), agl: num(data.agl), des: num(data.des), int: num(data.int),
     armaTipo: DADOS_ARMA.includes(num(data.armaTipo)) ? num(data.armaTipo) : 6,
@@ -4179,7 +4265,7 @@ function mantenimiento(){
   let hpAplicado = 0;
   let vencidos = 0;
   S.creeps.forEach(sc => {
-    sc.acc = sc.accMax;
+    sc.ataquesTurno = 0;
     sc.habilidades.forEach(h => {
       if(num(h.cdActual) > 0){
         h.cdActual = Math.max(0, num(h.cdActual) - 1);
@@ -4212,6 +4298,8 @@ function mantenimiento(){
     sc.estados = sc.estados.filter(sigue);
     if(vencenConHp) actualizarHpMaxPorCon(sc);
     vencidos += antes - sc.estados.length;
+    // Se recargan después de los estados: un Stun que venció ya no los topea.
+    sc.nitros = creepNitrosMax(sc);
   });
   renderAll();
   const detalle = [
@@ -4219,7 +4307,7 @@ function mantenimiento(){
     hpAplicado ? `${hpAplicado} estado(s) aplicados` : '',
     vencidos ? `${vencidos} estado(s) vencidos` : '',
   ].filter(Boolean).join(' · ');
-  toast(`Turno ${S.turno} · Acciones reiniciadas${detalle ? ` · ${detalle}` : ''}`);
+  toast(`Turno ${S.turno} · No2 recargados${detalle ? ` · ${detalle}` : ''}`);
 }
 
 function reiniciarCombate(){
@@ -4481,6 +4569,7 @@ $('#ec-preset').addEventListener('change', e => {
   $('#ec-escudomagico').value = preset.escudoMagico ?? 0;
   e.target.dataset.polaridad = preset.polaridad || 'otro';
   FLAGS_ESTADO_CREEP.forEach(f => { e.target.dataset[f.toLowerCase()] = preset[f] ? '1' : ''; });
+  e.target.dataset.forzarnitros = preset.forzarNitros !== undefined && preset.forzarNitros !== null ? String(preset.forzarNitros) : '';
   ecMods = structuredClone(preset.mods || []);
   renderEcMods();
   actualizarBotonesPresetEc();
@@ -4527,6 +4616,7 @@ $('#ec-guardarpreset').onclick = () => {
     hpTurno: num($('#ec-hpturno').value) || 0, stacksTurno: num($('#ec-stacksturno').value) || 0,
     detalle: $('#ec-detalle').value,
     escudoMagico: num($('#ec-escudomagico').value) || 0,
+    forzarNitros: forzarNitrosDelEditor(),
     mods: structuredClone(ecMods),
   };
   FLAGS_ESTADO_CREEP.forEach(f => { preset[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });

@@ -32,6 +32,15 @@ En desarrollo activo, las dos.
   [`docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Ya no hay
   "Subir datos". Si entra un jugador, no se guarda nada. Los "personajes
   del GM" (PNJ aliados, etc.) se manejan como creeps.
+- **Nitros (No2)** en lugar de Acciones (bloque `IT2_CREEP`, mismas reglas
+  que el `IT2` de la ficha): máximo = Agilidad efectiva + mods de `nitros`
+  (los viejos `mov`/`accionesmax` cuentan como No2), topeado por
+  `forzarNitros` de Stun/Exhausto (`creepNitrosMax`). `sc.nitros` es lo que
+  queda y se recarga en `mantenimiento()`. El botón ⚡ Acciones cobra: atacar
+  Tipo ÷ 2 el primer ataque del turno y Tipo completo después
+  (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD,
+  Movimiento 1 por casillero (2 con Rengo, bloqueado con Inmovilizado).
+  Los creeps viejos se convierten solos en `normalizarCreep`.
 - "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
   sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)
@@ -44,7 +53,25 @@ En desarrollo activo, las dos.
   (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero).
   Alquimista tiene un piso de 40% de ítems "legacy", con el tamaño
   topeado si no hay suficientes legacy disponibles para sostenerlo.
-- El botón "Subir datos" publica el resultado en `datos/tienda-publica.json`.
+- "🎲 Otro" en cada tarjeta (`rerollItem()`) cambia ese ítem por otro del
+  mismo rubro que no esté en la tienda, tirando la rareza con la tabla del
+  tamaño (en una tienda personalizada, misma rareza). El stock fijo no se
+  rerolea.
+- **En vivo con Firebase** (bloque "Tienda en vivo" al final del script):
+  solo para el GM. La tienda que se arma se guarda sola en
+  `campanas/{id}/tienda/borrador`; "Publicar tienda" la copia a
+  `tienda/publicada`, que es la que abren los jugadores desde la ficha, y
+  "Cerrar tienda" la borra. Los ítems creados a mano viajan dentro de la
+  tienda (`itemsDatos`): ya no se suben a `datos/catalogo.json`. Ver
+  [`docs/workflow-firebase.md`](../docs/workflow-firebase.md). Ya no hay
+  token ni botones de GitHub.
+- **Tiendas guardadas** (bloque "Tiendas guardadas"): `campanas/{id}/tiendas`,
+  una por lugar al que se vuelve. La tienda abierta recuerda de cuál salió
+  (`tiendaActual.guardadaId`); guardar es a mano y, si hay cambios sin
+  guardar, se pide confirmación antes de reemplazarla. "Generar tienda"
+  arma una nueva (sin nombre ni lugar en la lista); "Regenerar" vuelve a
+  sortear el stock de la abierta conservando nombre, ajuste de precios y
+  lugar en la lista.
 
 ## Formato de datos
 
@@ -59,8 +86,9 @@ En desarrollo activo, las dos.
   explícita. No corre `importar_json.py` sola.
 - **gm-tools.html** produce/consume `datos/creeps-publico.json` y lee
   `datos/tablero/*.json`.
-- **vendor-generator.html** produce `datos/tienda-publica.json` (formato
-  en `datos/esquema.md`), que después lee `ficha-personaje/ficha.html`.
+- **vendor-generator.html** produce `campanas/{id}/tienda/publicada` en
+  Firebase, que después lee `ficha-personaje/ficha.html` (botón Vendedor).
+  `datos/tienda-publica.json` es de la versión vieja y ya no se usa.
 
 ## Dependencias con otras carpetas
 

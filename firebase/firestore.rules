@@ -152,6 +152,21 @@ service cloud.firestore {
         allow read, write: if esGM(c);
       }
 
+      // Tienda del vendedor (gm-toolset/vendor-generator.html): {json,
+      // actualizado}. borrador = la que el GM está armando, solo la ve él.
+      // publicada = la que los jugadores abren con el botón Vendedor de la
+      // ficha. Solo el GM escribe.
+      match /tienda/{doc} {
+        allow read: if (doc == 'publicada' && esMiembro(c)) || esGM(c);
+        allow write: if esGM(c) && doc in ['borrador', 'publicada'];
+      }
+
+      // Tiendas guardadas con nombre (una por lugar o vendedor al que se
+      // vuelve): {nombre, json, actualizado}. Solo el GM.
+      match /tiendas/{id} {
+        allow read, write: if esGM(c);
+      }
+
       // Imagen de fondo del mapa: {dato, x, y, ancho, actualizado}. La ven
       // todos; solo el GM la pone, la mueve o la quita.
       match /mapa/{doc} {

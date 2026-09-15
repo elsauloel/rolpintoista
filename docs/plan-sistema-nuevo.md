@@ -34,7 +34,8 @@ su casa:
   en la cabecera de la ficha, imagen propia de cada creep, miniatura de
   esas en el token vinculado, e imagen de fondo del mapa. Las de ítems,
   habilidades y catálogo quedan afuera por ahora.
-- Catálogo, tienda, manual y `herramientas/*.py` quedan como están por ahora.
+- Catálogo, manual y `herramientas/*.py` quedan como están por ahora. La
+  tienda pasó a Firebase (Paso 5).
 - El usuario no es técnico: explicarle en palabras simples y con pasos
   concretos en la consola de Firebase.
 
@@ -108,6 +109,7 @@ su casa:
 | 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
 | 4 | Cuentas y partidas: login con Google o email confirmado, inicio con la lista de partidas, crear (GM) o unirse (jugador), herramientas por partida (`?partida=`), sesión compartida en `comun/sesion.js` | Hecho, falta probar |
 | 4c | Manejo de la partida para el GM: ver jugadores, sacar a alguien, renombrar o borrar la partida | Pendiente |
+| 5 | Tienda en vivo: el GM arma la tienda en el generador (se guarda sola), rerolea ítems sueltos, la publica o la cierra; guarda tiendas con nombre (una por lugar) para reabrirlas, modificarlas o regenerarlas; los jugadores la abren con 🏪 Vendedor en la ficha. Se van el token y los botones de GitHub del generador | Hecho, falta probar (y pegar las reglas nuevas en la consola) |
 
 **Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde
 `nueva-version`, activo desde el 14/9/2026).

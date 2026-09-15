@@ -6,9 +6,10 @@
 
    - Todos: partida, miembros, personajes (armados igual que "Guardar
      copia" de la ficha, con retrato e imágenes de invocaciones), tokens,
-     mapa, tiradas, y lo público de los creeps.
+     mapa, tiradas, lo público de los creeps y la tienda publicada.
    - El GM, además: los creeps completos con su imagen y el turno
-     (gmCreeps, con la forma de gm-creeps.json). Los jugadores no pueden
+     (gmCreeps, con la forma de gm-creeps.json) y el borrador de la tienda
+     que está armando. Los jugadores no pueden
      leer eso (lo imponen las reglas), así que su respaldo no lo trae.
 
    Para recuperar: "Cargar archivo" en la ficha (pregunta qué personaje)
@@ -34,12 +35,20 @@ async function fbArmarRespaldo(){
   const docs = async ref => (await ref.get()).docs;
   const plano = d => ({id: d.id, ...d.data()});
   const esGM = !!(fbMiembro && fbMiembro.gm);
-  const [partida, miembros, fichasDocs, creepsDocs, tokens, mapa, tiradas, gm] = await Promise.all([
+  const [partida, miembros, fichasDocs, creepsDocs, tokens, mapa, tiradas, gm, tiendaPublicada, tiendaBorrador] = await Promise.all([
     base.get(),
     docs(base.collection('miembros')), docs(base.collection('fichas')), docs(base.collection('creeps')),
     docs(base.collection('tokens')), docs(base.collection('mapa')), docs(base.collection('tiradas')),
     esGM ? docs(base.collection('gm')) : Promise.resolve([]),
+    base.collection('tienda').doc('publicada').get(),
+    esGM ? base.collection('tienda').doc('borrador').get() : Promise.resolve(null),
   ]);
+  const tiendasGuardadas = esGM ? await docs(base.collection('tiendas')) : [];
+  // Tienda del vendedor: el json tal cual lo guarda el generador de tiendas.
+  const tiendaJson = d => {
+    if(!d || !d.exists) return null;
+    try{ return JSON.parse(d.data().json || ''); }catch(e){ return null; }
+  };
   const nombres = Object.fromEntries(miembros.map(m => [m.id, m.data().nombre]));
 
   // Personajes: se juntan sus partes como las arma la ficha al abrirse.
@@ -73,6 +82,10 @@ async function fbArmarRespaldo(){
     tokens: tokens.map(plano),
     mapa: mapa.map(plano),
     tiradas: tiradas.map(plano),
+    tienda: {
+      publicada: tiendaJson(tiendaPublicada),
+      ...(esGM ? {borrador: tiendaJson(tiendaBorrador), guardadas: tiendasGuardadas.map(d => ({id: d.id, nombre: d.data().nombre, tienda: tiendaJson(d)}))} : {}),
+    },
   };
 
   // Solo el GM: creeps completos, con su imagen, en el orden de gm-tools.

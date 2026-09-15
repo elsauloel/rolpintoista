@@ -1320,7 +1320,7 @@ if(new URLSearchParams(location.search).get('modo') === 'botonera') document.doc
   <span class="note" id="guardado-estado">Sin personaje abierto: los cambios no se guardan.</span>
   <button class="btn del" id="btn-reset" title="Crear un personaje nuevo en la mesa">＋ Personaje nuevo</button>
   <button class="btn dk-historial" id="btn-historial">🕘 Historial</button>
-  <button class="btn dk-vendedor" id="btn-vendedor" title="Bajar la tienda publicada por el GM y comprar">🏪 Vendedor</button>
+  <button class="btn dk-vendedor" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar">🏪 Vendedor</button>
   <button class="btn dk-personajes" id="btn-personajes">👥 Personajes</button>
   <button class="btn primary" id="btn-guardar" title="Bajar una copia de respaldo de la ficha a un archivo .json">💾 Guardar copia</button>
   <input type="file" id="file-input" accept=".json" hidden>
@@ -5249,7 +5249,7 @@ function narrativaDe(it){
 }
 
 function openViewer(key, id){
-  const it = S[key].find(x => x.id === id);
+  const it = key === 'catalogo' ? itemCatalogo(id) : S[key].find(x => x.id === id);
   if(!it) return;
   viewing = {key, id};
 
@@ -5489,7 +5489,7 @@ let comparandoItemId = null;
 let comparandoEquipadoId = null;
 
 function abrirComparar(itemId){
-  const item = S.catalogo.find(it => it.id === itemId);
+  const item = itemCatalogo(itemId);
   const info = item && slotOcupadoInfo(item);
   if(!item || !info || !info.equipados.length) return;
   comparandoItemId = itemId;
@@ -5499,7 +5499,7 @@ function abrirComparar(itemId){
 }
 
 function renderComparar(){
-  const item = S.catalogo.find(it => it.id === comparandoItemId);
+  const item = itemCatalogo(comparandoItemId);
   if(!item){ $('#scrim-comparar').classList.remove('open'); return; }
   const info = slotOcupadoInfo(item);
   const equipados = info ? info.equipados : [];
@@ -5638,8 +5638,7 @@ function catalogoVisibles(){
   // ofrece; los filtros, la búsqueda y el carrito siguen funcionando igual.
   let base = S.catalogo;
   if(tiendaCargada && !verCatalogoCompleto){
-    const ofrecidos = new Set(tiendaCargada.items);
-    base = S.catalogo.filter(item => ofrecidos.has(item.id));
+    base = tiendaCargada.items.map(itemCatalogo).filter(Boolean);
   }
   // En el catálogo abierto solo se llega hasta Raro. Lo Excepcional y lo
   // Legendario existe igual: entra por un vendedor que lo ofrezca o de la
@@ -5657,11 +5656,20 @@ function catalogoVisibles(){
   return visibles;
 }
 
-// Tienda publicada por el GM desde el Vendor Generator. Guarda solo ids:
-// el nombre, la imagen y los stats salen del catálogo de esta misma ficha.
+// Tienda publicada por el GM desde el generador de tiendas, en
+// campanas/<partida>/tienda/publicada ({json, actualizado}). Trae los ids
+// que ofrece y los datos de esos ítems (itemsDatos, sin imagen): si esta
+// ficha tiene el ítem en su catálogo se usa el suyo (con imagen), y si no
+// (un ítem creado por el GM) el de la tienda.
 let tiendaCargada = null;
-const ARCHIVO_TIENDA = 'datos/tienda-publica.json';
+let tiendaEscucha = null;  // listener de la tienda publicada, mientras haya uno
 const ARCHIVO_CATALOGO = 'datos/catalogo.json';
+
+function itemCatalogo(id){
+  return S.catalogo.find(x => x.id === id)
+    || (tiendaCargada && Array.isArray(tiendaCargada.itemsDatos) ? tiendaCargada.itemsDatos.find(x => x && x.id === id) : null)
+    || null;
+}
 
 function renderCabeceraTienda(){
   const badge = $('#tienda-badge');
@@ -5706,56 +5714,66 @@ function precioDeCompra(item){
 
 function salirDeLaTienda(){
   tiendaCargada = null;
+  dejarDeEscucharTienda();
   limpiarFiltrosCatalogo();
   renderCatalogoModal();
   toast('Catálogo completo');
 }
 
+function tiendaDesdeDoc(snap){
+  if(!snap.exists) return null;
+  let t;
+  try{ t = JSON.parse(snap.data().json || ''); }catch(e){ return null; }
+  return t && Array.isArray(t.items) && t.items.length ? t : null;
+}
+
 async function abrirVendedor(){
+  if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede abrir la tienda'); return; }
   const btn = $('#btn-vendedor');
   btn.disabled = true;
-  toast('Buscando la tienda…');
   try{
-    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_TIENDA}?ref=${GH_BRANCH}`;
-    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
-    if(resp.status === 404) throw {noExiste: true};
-    // Sin token, GitHub deja 60 consultas por hora y por IP: si varios
-    // jugadores comparten conexión se agota rápido y conviene decirlo.
-    if(resp.status === 429 || resp.status === 403) throw {limite: true};
-    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
-    const data = await resp.json();
-    const ids = Array.isArray(data.items) ? data.items : [];
-    if(!ids.length) throw {vacia: true};
+    const tienda = tiendaDesdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get());
+    if(!tienda){ toast('El GM no tiene ninguna tienda abierta'); return; }
 
-    tiendaCargada = data;
+    tiendaCargada = tienda;
     verCatalogoCompleto = false;
     if($('#catalogo-ver-completo')) $('#catalogo-ver-completo').classList.remove('activo');
     limpiarFiltrosCatalogo();
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');
-
-    // Un id que no está en este catálogo es un ítem que el GM tiene y esta
-    // ficha todavía no: conviene avisarlo en vez de esconderlo.
-    const encontrados = catalogoVisibles().length;
-    if(encontrados < ids.length){
-      toast(`Tienda cargada · ${fmt(encontrados)} de ${fmt(ids.length)} ítems (al resto le falta el catálogo actualizado)`);
-    }else{
-      toast(`Tienda cargada · ${fmt(encontrados)} ítems`);
-    }
+    toast(`${tienda.nombre || 'Tienda'} · ${fmt(catalogoVisibles().length)} ítems`);
+    escucharTienda();
   }catch(err){
-    if(err && err.noExiste){
-      toast('Todavía no hay ninguna tienda publicada');
-    }else if(err && err.vacia){
-      toast('La tienda publicada está vacía');
-    }else if(err && err.limite){
-      toast('GitHub te está limitando por consultar mucho sin token — esperá un rato o cargá tu token');
-    }else{
-      console.error('Error trayendo la tienda:', err);
-      toast('No se pudo traer la tienda desde GitHub');
-    }
+    console.error('Error trayendo la tienda:', err);
+    toast('No se pudo abrir la tienda — revisá la consola');
   }finally{
     btn.disabled = false;
   }
+}
+
+// Mientras el jugador está en la tienda, los cambios del GM (publicar otra
+// o cerrarla) le llegan solos. Se deja de escuchar al salir de la tienda.
+function escucharTienda(){
+  if(tiendaEscucha) return;
+  let primera = true;
+  tiendaEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
+    if(primera){ primera = false; return; }  // es la misma que se acaba de abrir
+    if(!tiendaCargada){ dejarDeEscucharTienda(); return; }
+    const nueva = tiendaDesdeDoc(snap);
+    tiendaCargada = nueva;
+    // Lo que ya no se vende sale del carrito.
+    const antes = carritoCatalogo.length;
+    carritoCatalogo = nueva ? carritoCatalogo.filter(e => nueva.items.includes(e.catId)) : [];
+    if(!nueva) dejarDeEscucharTienda();
+    renderCatalogoModal();
+    const quitados = antes - carritoCatalogo.length;
+    toast((nueva ? 'El GM cambió la tienda' : 'El GM cerró la tienda')
+      + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
+  }, err => console.error('No se pudo escuchar la tienda:', err));
+}
+
+function dejarDeEscucharTienda(){
+  if(tiendaEscucha){ tiendaEscucha(); tiendaEscucha = null; }
 }
 
 let itemAleatorioActual = null;
@@ -5824,7 +5842,7 @@ function renderCarritoCatalogo(){
   }
   let total = 0;
   cont.innerHTML = carritoCatalogo.map(ent => {
-    const item = S.catalogo.find(x=>x.id===ent.catId);
+    const item = itemCatalogo(ent.catId);
     if(!item) return '';
     const subtotal = precioDeCompra(item) * ent.cantidad;
     total += subtotal;
@@ -5890,7 +5908,7 @@ function crearItemsDesdeCatalogo(item, cantidad){
 }
 
 function agregarDesdeCatalogo(id){
-  const item = S.catalogo.find(x=>x.id===id);
+  const item = itemCatalogo(id);
   if(!item) return;
   const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
   const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
@@ -5901,7 +5919,7 @@ function agregarDesdeCatalogo(id){
 }
 
 function agregarAlCarrito(id){
-  const item = S.catalogo.find(x=>x.id===id);
+  const item = itemCatalogo(id);
   if(!item) return;
   const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
   const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
@@ -5921,7 +5939,7 @@ function comprarCarrito(){
   if(!carritoCatalogo.length) return;
   let total = 0;
   carritoCatalogo.forEach(ent => {
-    const item = S.catalogo.find(x=>x.id===ent.catId);
+    const item = itemCatalogo(ent.catId);
     if(item) total += precioDeCompra(item) * ent.cantidad;
   });
   if(total > num(S.meta.dde)){
@@ -5931,7 +5949,7 @@ function comprarCarrito(){
   S.meta.dde = num(S.meta.dde) - total;
   $('#f-dde').value = fmt(S.meta.dde);
   carritoCatalogo.forEach(ent => {
-    const item = S.catalogo.find(x=>x.id===ent.catId);
+    const item = itemCatalogo(ent.catId);
     if(item) crearItemsDesdeCatalogo(item, ent.cantidad);
   });
   const cantidadItems = carritoCatalogo.length;

@@ -89,6 +89,23 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   aliados, comerciantes…) también son creeps.
 - `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
   gm-tools. Solo el GM.
+- `campanas/{id}/tienda/borrador` y `campanas/{id}/tienda/publicada` —
+  `{json, actualizado}`. La tienda del vendedor de
+  `gm-toolset/vendor-generator.html`. `json` es la tienda (`{nombre, tamano,
+  tamanoLabel, categoria, categoriaLabel, generado, ajustePrecio,
+  garantizados[], items[], itemsDatos[]}`); `itemsDatos` son los ítems
+  completos sin imagen, para que la ficha muestre y venda también los
+  creados a mano por el GM. `borrador` es la que el GM está armando: se
+  guarda sola ~1,2 s después de cada cambio y solo la ve el GM.
+  `publicada` cambia solo con "Publicar tienda" (o se borra con "Cerrar
+  tienda"); la leen todos y la abre el botón 🏪 Vendedor de la ficha, que
+  además escucha los cambios mientras el jugador está en la tienda. Solo el
+  GM escribe. El json puede traer `guardadaId`: de qué tienda guardada salió.
+- `campanas/{id}/tiendas/{auto}` — `{nombre, json, actualizado}`. Tiendas
+  guardadas con nombre, una por lugar o vendedor al que se vuelve (ej. el
+  pueblito Zapallo); `json` con la misma forma que `tienda/*`. Se guardan a
+  mano ("💾 Guardar tienda" / "Guardar cambios"), se abren tal cual y se
+  pueden modificar o regenerar. Solo el GM las ve y escribe.
 - `campanas/{id}/mapa/fondo` — `{x, y, ancho, actualizado}`: posición y ancho
   del fondo del mapa, en unidades del mapa. `campanas/{id}/mapa/fondoImagen`
   — `{dato, actualizado}`: la imagen (data URL achicada a < 900 KB). Van
@@ -123,9 +140,10 @@ con "💾 Respaldo partida" en gm-tools. El código está en
 [`../comun/respaldo.js`](../comun/respaldo.js). Baja
 `respaldo-<partida>-<fecha>.json` con `{tipo: 'respaldo-partida', version,
 creado, hechoPor{nombre, gm}, partida, miembros, fichas[{id, nombre,
-duenoUid, dueno, ficha}], creepsPublicos, tokens, mapa, tiradas}` y, solo
-si lo baja el GM, `gmCreeps{turno, creeps}` (los jugadores no pueden leer
-los creeps completos). Fechas en texto ISO. `ficha` tiene la forma de
+duenoUid, dueno, ficha}], creepsPublicos, tokens, mapa, tiradas,
+tienda{publicada}}` y, solo si lo baja el GM, `gmCreeps{turno, creeps}` y
+`tienda.borrador` y `tienda.guardadas[{id, nombre, tienda}]` (los jugadores
+no pueden leer los creeps completos, el borrador ni las tiendas guardadas). Fechas en texto ISO. `ficha` tiene la forma de
 "Guardar copia" de la ficha (con retrato e imágenes de invocaciones) y
 `gmCreeps` la de `gm-creeps.json`. Para recuperar: en la ficha, "Cargar
 archivo" con el respaldo pregunta qué personaje cargar; en gm-tools,

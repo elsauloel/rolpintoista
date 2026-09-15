@@ -76,8 +76,12 @@ más cambia sesión a sesión.
 - **Sin Tablero**: el botón 📋 Tablero se quitó de la ficha porque las
   barras y estados de todos ya se ven en los tokens del mapa
   (`vtt-hexgrid/mapa.html`). gm-tools conserva el suyo.
-- **Todavía vía GitHub**: Vendedor (`datos/tienda-publica.json`) y
-  "Agregar al catálogo".
+- **Vendedor en vivo**: 🏪 Vendedor lee `campanas/{id}/tienda/publicada`
+  (la publica el GM desde `gm-toolset/vendor-generator.html`) y la escucha
+  mientras el jugador está en la tienda. Los ítems se buscan con
+  `itemCatalogo(id)`: primero en `S.catalogo` y, si no está (ítem creado
+  por el GM), en `tiendaCargada.itemsDatos`.
+- **Todavía vía GitHub**: "Agregar al catálogo".
 - **Exporta/importa localmente**: el personaje completo a un `.json`
   (botón Guardar copia / Cargar archivo), ver `datos/esquema.md`. Con un
   personaje abierto, cargar un archivo reemplaza su contenido en la mesa;

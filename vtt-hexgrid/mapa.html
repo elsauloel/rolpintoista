@@ -39,6 +39,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.primary:hover{background:var(--brass)}
 .btn.peligro{border-color:var(--wine);color:var(--danger)}
 .btn.peligro:hover{border-color:var(--danger)}
+#btn-dados.activo{border-color:var(--brass);color:var(--brass)}
 
 header{
   display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
@@ -162,6 +163,7 @@ aside{
   <button type="button" class="btn" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)" hidden>⟳ Mantenimiento</button>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
+  <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
   <div class="zoom">
     <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
@@ -205,6 +207,7 @@ aside{
 <script src="../comun/sesion.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
+<script src="../comun/grilla-dados.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1979,6 +1982,8 @@ function mesaEscuchar(){
 $('#mesa-dados').innerHTML = dadosBotonHtml();
 dadosConectarBoton($('#mesa-dados'));
 $('#mesa-historial').innerHTML = mesaBorrarHtml();
+// Grilla de dados debajo del botón de la barra de arriba (comun/grilla-dados.js).
+grillaConectar($('#btn-dados'), {lado: 'abajo', alTirar: f => mesaPublicar('Tirada libre', tirarDados(f))});
 
 $('#mesa-tirar').onsubmit = e => {
   e.preventDefault();

@@ -67,6 +67,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   cualquiera de las tres se borran solas las de más de 48 h (como mucho
   una vez por hora por navegador). Para guardar una sesión, bajar antes el
   respaldo 💾.
+  **Grilla de dados** ([`../comun/grilla-dados.js`](../comun/grilla-dados.js)):
+  botón 🎲 Dados (al pie de la Mesa flotante; en el mapa, en la barra de
+  arriba) que despliega D4…D100 × 1–6; cada clic es una "Tirada libre"
+  común (no escribe nada distinto).
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},

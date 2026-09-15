@@ -544,6 +544,10 @@ input[type=file]{display:none}
 #mesa-tirar{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--line-soft)}
 #mesa-tirar input{flex:1;min-width:0}
 #mesa.colapsada #mesa-tirar{display:none}
+#mesa-grilla{padding:0 10px 8px}
+#mesa-grilla .btn{width:100%}
+#mesa-grilla .btn.activo{border-color:var(--brass);color:var(--brass)}
+#mesa.colapsada #mesa-grilla{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
@@ -1017,6 +1021,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
+<script src="../comun/grilla-dados.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
@@ -4787,10 +4792,13 @@ async function mesaIniciar(){
       fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + '<a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙</a>' + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-cuerpo"></div>' +
-    '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>';
+    '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>' +
+    '<div id="mesa-grilla"><button type="button" class="btn" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button></div>';
   document.body.appendChild(mesa);
   const cabecera = $('#mesa-cabecera');
   dadosConectarBoton(mesa);
+  // Grilla de dados al costado de la cajita (comun/grilla-dados.js).
+  grillaConectar($('#mesa-grilla button'), {ancla: mesa, alTirar: f => registrarTirada('Tirada libre', tirarDados(f))});
 
   // Tirada libre por fórmula, igual que en el mapa: se publica en la Mesa
   // y queda en el historial de la sesión.

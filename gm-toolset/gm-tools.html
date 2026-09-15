@@ -515,7 +515,8 @@ input[type=file]{display:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ---------- Mesa: tiradas compartidas en vivo (Firebase) ---------- */
 #mesa{
-  position:fixed;right:16px;bottom:16px;z-index:45;width:310px;max-width:calc(100vw - 32px);
+  /* Encima del encabezado fijo (60), debajo de ventanas (80), avisos y dados 3D. */
+  position:fixed;right:16px;bottom:16px;z-index:65;width:310px;max-width:calc(100vw - 32px);
   /* Relleno más claro y recuadro crema para que no se pierda contra el
      fondo de la herramienta. Los textos grises se aclaran para leerse. */
   --muted:#D2C4BA;
@@ -549,6 +550,16 @@ input[type=file]{display:none}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-entrar{margin-top:8px;align-self:flex-start}
 </style>
+<style>
+/* Modo acciones (?modo=acciones&creep=<id>): gm-tools se abre adentro del
+   mapa y muestra solo la ventana de Acciones del creep (y las que se abren
+   desde ahí), con fondo transparente. */
+html.modo-acciones, html.modo-acciones body{background:transparent!important;min-height:0}
+html.modo-acciones body > :not(.scrim):not(.toast){display:none!important}
+</style>
+<script>
+if(new URLSearchParams(location.search).get('modo') === 'acciones') document.documentElement.classList.add('modo-acciones');
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -5101,7 +5112,7 @@ async function gmProcesarSnapshot(snap){
   const g = gmVivo;
   if(!g.listo){
     // En segundo plano (iframe del mapa) no se sube el creep en blanco del arranque.
-    if(snap.empty && document.documentElement.classList.contains("modo-mantenimiento")) S.creeps = [];
+    if(snap.empty && (document.documentElement.classList.contains("modo-mantenimiento") || document.documentElement.classList.contains("modo-acciones"))) S.creeps = [];
     if(!snap.empty){
       const docs = snap.docs.slice().sort((a, b) => num(a.data().orden) - num(b.data().orden));
       const creeps = await Promise.all(docs.map(gmLeerCreep));
@@ -5128,6 +5139,7 @@ async function gmProcesarSnapshot(snap){
     g.listo = true;
     gmEstadoAlDia();
     gmMantenimientoRevisar();
+    if(MODO_ACCIONES) accionesModoAbrir(new URLSearchParams(location.search).get('creep'));
     return;
   }
 
@@ -5228,6 +5240,35 @@ async function mantenimientoGlobal(){
 
 function gmAvisarMapa(tipo){
   if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
+}
+
+/* ---------- Modo acciones (dentro del mapa) ----------
+   El mapa del GM abre gm-tools en un iframe con ?modo=acciones&creep=<id>:
+   al cargar los creeps se abre la ventana de Acciones de ese creep; cuando
+   se cierran todas las ventanitas se le avisa al mapa para que oculte el
+   iframe, y el mapa puede pedir abrir las de otro creep sin recargar. Lo
+   que se haga se guarda solo, como siempre. */
+const MODO_ACCIONES = document.documentElement.classList.contains('modo-acciones');
+
+function accionesModoAbrir(creepId){
+  if(!S.creeps.some(sc => sc.id === creepId)){
+    toast('Ese creep ya no está en gm-tools');
+    gmAvisarMapa('acciones-cerrada');
+    return;
+  }
+  abrirAccionesCreep(creepId);
+  gmAvisarMapa('acciones-lista');
+}
+
+if(MODO_ACCIONES){
+  const observador = new MutationObserver(() => {
+    if(gmVivo.listo && !document.querySelector('.scrim.open')) gmAvisarMapa('acciones-cerrada');
+  });
+  document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
+  window.addEventListener('message', e => {
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
+  });
 }
 
 async function gmMantenimientoRevisar(){

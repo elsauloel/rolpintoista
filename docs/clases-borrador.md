@@ -23,7 +23,13 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 - **Acciones** → hoy serían **Nitros (No2)**. "Ataque" = lo que cuesta
   atacar (Tipo ÷ 2 el primero del turno, Tipo después). "Ataque +1" =
   eso más 1.
-- **Bonos** → hoy serían **SP**.
+- **Bonos** → hoy serían **SP**. Contexto: antes 1 Int = 1 Bono que se
+  recargaba entero cada turno; ahora 1 Int = 3 SP y el SP va a tener una
+  regeneración base por turno, también según Int (en definición).
+  **Provisorio: 1 Bono = 1 SP**, lo mismo que ya usa la ficha para el
+  equipo viejo (`IT2.spPorBono`). Se revisa cuando esté definida la
+  regeneración: si es generosa (cerca de Int por turno), los costos
+  convienen subirlos.
 - Shooter y Debuffer traen además **SP: Liviano / Normal / Pesado**, de
   otra iteración.
 - Las tarjetas del Debuffer (con número en azul) son de una iteración

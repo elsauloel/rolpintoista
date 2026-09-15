@@ -84,8 +84,9 @@ su casa:
   las partidas de verdad se puede pasar a publicar desde otra rama. Abrir
   por la web y abrir con doble clic son identidades distintas en Firebase:
   al pasar a la web cada uno vuelve a entrar con el código (el GM se
-  remarca en la consola y reasigna los personajes si hace falta). En la web
-  se oculta "Actualizar gestor" de la ficha. Abrir con doble clic sigue
+  remarca en la consola y reasigna los personajes si hace falta). La ficha
+  ya no tiene el menú ⚙ Ajustes (Cambiar token, Actualizar gestor): en su
+  lugar hay accesos directos al mapa y al inicio. Abrir con doble clic sigue
   funcionando.
 - **Botones de GitHub se eliminan** (no solo se desactivan) en el mismo
   paso en que Firebase los reemplaza. "Traer última versión"/`gestor.html`

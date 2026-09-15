@@ -85,5 +85,6 @@ más cambia sesión a sesión.
   catálogo (indirectamente, vía el pipeline de `herramientas/`).
 - `gm-toolset/gm-tools.html` — comparten el formato de efecto/estado (duplicados en el código de cada uno, no
   importados).
-- `gestor.html` (en la raíz) — lo actualiza a él y viceversa (el botón
-  "Actualizar gestor" de la ficha trae la última versión de `gestor.html`).
+- `vtt-hexgrid/mapa.html` e `index.html` — accesos directos arriba a la
+  derecha (🗺 Mapa, ⌂ Inicio), con `?partida=` de la partida abierta. El
+  menú ⚙ Ajustes (Cambiar token, Actualizar gestor) se quitó.

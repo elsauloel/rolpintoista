@@ -64,7 +64,7 @@ Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/e
 
 ## Cosas que hay que saber antes de tocar código acá
 
-- **"Traer última versión" (en `gestor.html` y en el botón ⚙ de la ficha)
+- **"Traer última versión" (en `gestor.html`; en la rama `nueva-version` la ficha ya no lo tiene)
   sobreescribe el archivo local sin avisar si hay cambios sin commitear.**
   Ya pasó una vez que esto pisó trabajo en curso. Regla operativa: commitear
   y pushear cada bloque de cambios apenas queda probado, no dejar trabajo

@@ -46,6 +46,21 @@ header{
 header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #estado{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:1;min-width:120px}
 .zoom{display:flex;gap:4px}
+/* Switch Narrativo / Combate (lo cambia el GM; todos ven en qué modo está) */
+#modo-switch{
+  display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:999px;border:1px solid;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;color:var(--paper)
+}
+#modo-switch .perilla{width:34px;height:18px;border-radius:999px;position:relative;transition:background .2s}
+#modo-switch .perilla::after{
+  content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s
+}
+#modo-switch[data-modo="narrativo"]{border-color:#3E9B5B;color:#8FD6A5}
+#modo-switch[data-modo="narrativo"] .perilla{background:#3E9B5B}
+#modo-switch[data-modo="combate"]{border-color:#D64545;color:#F0A39C}
+#modo-switch[data-modo="combate"] .perilla{background:#D64545}
+#modo-switch[data-modo="combate"] .perilla::after{left:18px}
+#modo-switch:disabled{opacity:1;cursor:default}
 .zoom .btn{padding:7px 10px}
 
 main{flex:1;display:flex;min-height:0}
@@ -131,6 +146,9 @@ aside{
   <a id="link-inicio" class="btn" href="../index.html" title="Volver al inicio de la partida">⌂</a>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
+  <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
+    <span class="perilla"></span><span id="modo-texto">Narrativo</span>
+  </button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
@@ -302,10 +320,10 @@ const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256
 const HP_COLOR = '#D64545';
 // Borde de cada token según de quién es.
 const BORDE = {
-  propio: '#EDE3D2',   // blanco: los tuyos
+  propio: '#E0A458',   // dorado: los tuyos
   jugador: '#4CB86A',  // verde: personajes de otros jugadores
   creep: '#D64545',    // rojo: vinculados a un creep de gm-tools
-  npc: '#CC8A2E',      // ocre: tokens del GM sin creep vinculado
+  npc: '#9A958F',      // gris: tokens del GM sin creep vinculado
 };
 function claseToken(t){
   if(t.tipo === 'creep') return t.fichaId ? 'creep' : 'npc';
@@ -380,10 +398,51 @@ function imagenLista(url){
   return img.complete && img.naturalWidth ? img : null;
 }
 
+/* ---------- Modo del mapa: narrativo / combate ----------
+   campanas/<partida>/mapa/modo = {modo}. Lo cambia el GM y lo ven todos.
+   Narrativo (verde): la estela se ve pero moverse no gasta No2.
+   Combate (rojo): cada casillero gasta No2; solo se pide confirmar si el
+   movimiento se pasa de los No2 que quedan. */
+let modoMapa = 'narrativo';
+
+function renderModo(){
+  const b = $('#modo-switch');
+  const combate = modoMapa === 'combate';
+  b.dataset.modo = modoMapa;
+  b.setAttribute('aria-checked', combate ? 'true' : 'false');
+  $('#modo-texto').textContent = combate ? 'Combate' : 'Narrativo';
+  b.disabled = !soyGM;
+  b.title = soyGM ? `Pasar a modo ${combate ? 'narrativo' : 'combate'}` : 'Modo del mapa (lo cambia el GM)';
+}
+
+function escucharModo(){
+  fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
+    const nuevo = doc.exists && doc.data().modo === 'combate' ? 'combate' : 'narrativo';
+    if(nuevo !== modoMapa && escucharModo.listo) toast(nuevo === 'combate' ? '⚔ Modo combate: moverse gasta No2' : '🌿 Modo narrativo: moverse no gasta No2');
+    escucharModo.listo = true;
+    modoMapa = nuevo;
+    renderModo();
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando el modo del mapa:', err));
+}
+
+$('#modo-switch').onclick = async () => {
+  if(!soyGM) return;
+  const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
+  try{
+    await fbDb.doc(fbRutaCampana('mapa/modo')).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){
+    console.error('No se pudo cambiar el modo:', err);
+    toast('No se pudo cambiar el modo del mapa');
+  }
+};
+
 // Nitros que cuesta mover este token: solo los PJ vinculados a su ficha
 // (no las invocaciones, ni creeps, ni NPC). null = se mueve sin costo, como
 // también una ficha que todavía no publicó sus Nitros (abrila una vez).
 function costoMoverDe(t){
+  if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
   if(!t || t.tipo !== 'pj' || !t.fichaId || t.fichaId.includes(SEP_INVOCACION)) return null;
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
@@ -622,7 +681,7 @@ function dibujar(){
       ctx.fillStyle = 'rgba(15,12,14,.62)'; ctx.fill();
     }
     ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
-    // Borde: blanco tuyos, verde otros jugadores, rojo creeps, ocre NPC.
+    // Borde: dorado tuyos, verde otros jugadores, rojo creeps, gris NPC.
     ctx.lineWidth = Math.max(2.5 / z, rad * 0.13);
     ctx.strokeStyle = BORDE[claseToken(t)];
     ctx.stroke();
@@ -808,7 +867,9 @@ function soltar(){
       visibles.set(a.id, {x: a.x, y: a.y});
       if(a.costo){
         rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles};
-        mostrarConfirmacionRuta();
+        // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
+        if(pasos * a.costo.porCasillero > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
+        else confirmarRuta();
       }else{
         const fin = a.ruta[pasos];
         moverToken(a.id, fin.col, fin.fila, a.ruta);
@@ -1118,6 +1179,7 @@ function escucharMiembros(){
     snap.docs.forEach(d => miembros.set(d.id, {nombre: String(d.data().nombre || '?'), gm: d.data().gm === true}));
     const yo = miembros.get(fbUsuario.uid);
     if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
+    renderModo();
     estado(`${fbPartida.nombre} · ${fbMiembro.nombre}${soyGM ? ' (GM)' : ''}`);
     renderPanel();
     pedirDibujo();
@@ -1415,7 +1477,7 @@ function renderPanel(forzar){
     panel.innerHTML =
       '<h2>Nuevo token</h2>' +
       (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' +
-        '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde ocre.</p>' : '') +
+        '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde gris.</p>' : '') +
       `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '')}</select>` +
       '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
       '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
@@ -1445,7 +1507,7 @@ function renderPanel(forzar){
   if(!t){
     panel.innerHTML =
       '<h2>Token</h2>' +
-      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero (tus personajes gastan No2 al confirmar). ' +
+      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ' +
       'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>' +
       '<div class="leyenda">' +
         `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +
@@ -1697,6 +1759,7 @@ function arrancarEnVivo(){
   escucharMiembros();
   escucharVinculables();
   escucharFondo();
+  escucharModo();
   escucharTokens();
   mesaEscuchar();
   renderPanel(true);

@@ -18,8 +18,14 @@ nuevo de Rol Pintoísta. Paso 2 de
 - Tokens en Firestore `campanas/{id}/tokens` (esquema en
   [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)): círculo de
   color con la inicial y el nombre debajo. Borde (`BORDE`/`claseToken()`):
-  blanco = tuyos, verde = personajes de otros jugadores, rojo = vinculados a
-  un creep de gm-tools, ocre = NPC (token del GM sin creep vinculado).
+  dorado = tuyos, verde = personajes de otros jugadores, rojo = vinculados a
+  un creep de gm-tools, gris = NPC (token del GM sin creep vinculado).
+- **Modo narrativo / combate** (switch en la cabecera, `modoMapa`, doc
+  `campanas/{id}/mapa/modo` = `{modo}`): lo cambia el GM y lo ven todos.
+  Narrativo (verde): la estela se ve pero mover no gasta No2
+  (`costoMoverDe` devuelve null). Combate (rojo): mover gasta No2 y la
+  confirmación solo aparece si el movimiento se pasa de los No2 que quedan;
+  si alcanzan, se descuenta directo.
   Varios en la misma casilla se acomodan en ronda.
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el

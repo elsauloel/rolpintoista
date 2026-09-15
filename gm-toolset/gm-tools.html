@@ -215,7 +215,13 @@ input[type=file]{display:none}
 .arma-compacta-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
 .arma-dano{font-family:"Space Mono",monospace;font-size:13px;color:var(--brass);font-weight:700}
 .arma-detalle{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
-.sect-arma-nombre{color:var(--paper);text-transform:none;letter-spacing:0;font-weight:700}
+.equipado-nombre{flex:1;min-width:0;font-weight:700;font-size:13px;color:var(--paper)}
+/* Separa los bloques del editor del creep (Equipados, Habilidades). */
+.editar-separador{
+  display:flex;align-items:center;gap:10px;margin:10px 0 0;
+  font-family:"Space Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--brass)
+}
+.editar-separador::before,.editar-separador::after{content:"";flex:1;border-top:2px solid rgba(201,133,69,.45)}
 
 .crit-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .crit-cell label{display:block;font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);text-align:center;margin-bottom:2px}
@@ -2403,43 +2409,49 @@ function cardHtml(sc){
         </div>
       </div>
 
+      <div class="editar-separador"><span>Equipados</span></div>
+
       <div>
-        <div class="sect-label">Arma${sc.armaNombre ? ` · <span class="sect-arma-nombre">${esc(sc.armaNombre)}</span>` : ''}</div>
+        <div class="sect-label">Arma</div>
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
+            <span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
             <span class="arma-dano">${danoTxt(sc)}</span>
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
-          ${sc.armaDetalle ? `<div class="arma-detalle">${esc(sc.armaDetalle)}</div>` : ''}
-        </div>
-        <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
-      </div>
-
-      <div>
-        <div class="sect-label">Res. a críticos</div>
-        <div class="crit-grid" style="margin-top:4px">
-          ${['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0
-            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">${fmt(creepCritEfectivo(sc,i))}</button>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
-            : '').join('') || '<div class="hint">Sin resistencias a crítico — se suman al equipar armadura.</div>'}
+          <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div>
         </div>
       </div>
 
       <div>
-        <div class="sect-label">Equipo</div>
+        <div class="sect-label">Armadura</div>
         <div class="equipo-list" style="margin-top:4px">
           ${sc.equipo.length ? sc.equipo.map(it => `
             <div class="equipo-item">
               <div class="equipo-item-info">
                 <div class="equipo-item-nombre">${esc(it.nombre)}</div>
                 <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.def?` · Defensa +${fmt(it.def)}`:''}</div>
+                ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
               </div>
               <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
-            </div>`).join('') : `<div class="hint">Sin equipo defensivo.</div>`}
+            </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
         </div>
+        <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
 
+      ${sc.crit.some(v => num(v) !== 0) ? `
       <div>
-        <div class="sect-label">Habilidades</div>
+        <div class="sect-label">Res. a críticos</div>
+        <div class="crit-grid" style="margin-top:4px">
+          ${['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0
+            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">${fmt(creepCritEfectivo(sc,i))}</button>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
+            : '').join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="editar-separador"><span>Habilidades</span></div>
+
+      <div>
         <div class="hab-list" style="margin-top:4px">
           ${sc.habilidades.map(h => habHtml(sc, h)).join('')}
         </div>

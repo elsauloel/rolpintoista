@@ -44,7 +44,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
   position:sticky;top:0;z-index:60;box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
 }
 .hero-titulo{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.hero-acciones{display:flex;flex-direction:column;gap:8px}
+/* Barra superior: accesos y herramientas con botones chicos (mismo diseño que la ficha). */
+.accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+.accesos .iconbtn{text-decoration:none}
+.accesos-sep{width:1px;align-self:stretch;background:var(--line);margin:0 3px}
+.accesos .iconbtn.dk-tablero{background:rgba(91,141,190,.16);border-color:#5B8DBE;color:#B9D2EA}
+.accesos .iconbtn.dk-tablero:hover{background:#5B8DBE;color:#0B1520}
+.accesos .iconbtn.dk-historial{background:rgba(46,107,87,.18);border-color:var(--bottle);color:#8FCDBB}
+.accesos .iconbtn.dk-historial:hover{background:var(--bottle);color:#08150F}
+.accesos .iconbtn.dk-reset{border-color:var(--wine);color:var(--danger)}
+.accesos .iconbtn.dk-reset:hover{background:var(--wine);color:var(--paper)}
+.accesos .iconbtn.dk-catalogo{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE}
+.accesos .iconbtn.dk-catalogo:hover{background:#9B7BD4;color:#1B0F1F}
+.accesos .iconbtn.dk-guardar{background:rgba(201,133,69,.2);border-color:var(--copper);color:var(--brass)}
+.accesos .iconbtn.dk-guardar:hover{background:var(--copper);color:#180F08}
 .hero-fila{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(22px,3vw,32px);margin:0;letter-spacing:-.01em}
 .hero .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px}
@@ -600,6 +613,20 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <body>
 <div class="wrap">
   <div class="hero">
+    <!-- BARRA SUPERIOR: accesos y herramientas, con botones chicos como en la ficha (los href los completa el script con la partida) -->
+    <nav class="accesos">
+      <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
+      <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
+      <span class="accesos-sep"></span>
+      <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
+      <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
+      <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Vuelve el contador de turnos a cero">↺ Reiniciar combate</button>
+      <button type="button" class="iconbtn dk-catalogo" id="btn-catalogo" title="Catálogo de equipo para los creeps">⚔ Catálogo</button>
+      <span class="accesos-sep"></span>
+      <button type="button" class="iconbtn dk-guardar" id="btn-respaldo-partida" title="Bajar un respaldo de toda la partida: personajes, creeps, tokens, mapa y tiradas">💾 Respaldo partida</button>
+      <button type="button" class="iconbtn" id="btn-load" title="Reemplazar los creeps de la mesa por los de un respaldo de la partida (o una copia gm-creeps.json)">📂 Cargar respaldo</button>
+      <input type="file" id="file-input" accept=".json">
+    </nav>
     <div class="hero-titulo">
       <div>
         <div class="eyebrow">GM Tools</div>
@@ -607,31 +634,18 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
       </div>
       <span class="turno-badge" id="turno-badge">Turno 1</span>
     </div>
-    <div class="hero-acciones">
-      <div class="hero-fila">
-        <button class="btn maint" id="btn-mant" title="Pasa el turno para toda la mesa: fichas de los jugadores y creeps">Mantenimiento · toda la mesa</button>
-        <button class="btn ghost" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
-        <button class="btn ghost" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
-        <button class="btn" id="btn-dados">Dados</button>
-        <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
-        <button class="btn ghost" id="btn-reset">Reiniciar combate</button>
-      </div>
-      <div class="hero-fila">
-        <button class="btn primary" id="btn-add">+ Creep</button>
-        <button class="btn" id="btn-ia">+ Creep con IA</button>
-        <a class="btn ghost" href="vendor-generator.html" target="_blank" rel="noopener">🏪 Vendedor</a>
-        <button class="btn ghost" id="btn-catalogo">⚔ Catálogo</button>
-      </div>
+    <div class="hero-fila">
+      <button class="btn maint" id="btn-mant" title="Pasa el turno para toda la mesa: fichas de los jugadores y creeps">Mantenimiento · toda la mesa</button>
+      <button class="btn primary" id="btn-add">+ Creep</button>
+      <button class="btn" id="btn-ia">+ Creep con IA</button>
+      <a class="btn ghost" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva">🏪 Vendedor</a>
+      <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
     </div>
   </div>
 
   <div class="toolbar">
     <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
-    <button class="btn ghost" id="btn-load" title="Reemplazar los creeps por los de un archivo gm-creeps.json">Cargar archivo</button>
     <button class="btn" id="btn-save-todo" title="Bajar una copia de respaldo de todos los creeps (gm-creeps.json)">Guardar copia</button>
-    <button class="btn" id="btn-respaldo-partida" title="Bajar un respaldo de toda la partida: personajes, creeps, tokens, mapa y tiradas">💾 Respaldo partida</button>
-    <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
-    <input type="file" id="file-input" accept=".json">
   </div>
 
   <div id="empty" class="empty-state" style="display:none">Sin creeps todavía. Tocá "+ Creep" para agregar el primero.</div>
@@ -684,38 +698,6 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
   </div>
 </div>
 
-<div class="scrim" id="scrim-dados">
-  <div class="modal" style="max-width:400px">
-    <header><h3>Tirar dados</h3><button class="iconbtn" id="dados-x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:12px">
-      <div class="f">
-        <label>Fórmula (ej. 3d8+9, 2d6+1d12, 1d20-2)</label>
-        <input type="text" id="f-dados-formula" placeholder="1d20">
-      </div>
-      <button class="btn primary" id="dados-tirar" style="width:100%">Tirar</button>
-      <div id="dados-resultado" class="hint" style="font-size:16px;color:var(--paper);min-height:24px"></div>
-      <div style="display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--line-soft)">
-        <label class="hint" style="flex:none">Cantidad</label>
-        <input type="number" id="f-dados-cantidad" value="1" min="1" style="width:56px">
-        <label class="hint" style="flex:none">+ daño fijo</label>
-        <input type="number" id="f-dados-fijo" value="0" style="width:56px">
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button type="button" class="btn" data-dadorapido="4" style="flex:1">1d4</button>
-        <button type="button" class="btn" data-dadorapido="6" style="flex:1">1d6</button>
-        <button type="button" class="btn" data-dadorapido="8" style="flex:1">1d8</button>
-        <button type="button" class="btn" data-dadorapido="10" style="flex:1">1d10</button>
-        <button type="button" class="btn" data-dadorapido="12" style="flex:1">1d12</button>
-        <button type="button" class="btn" data-dadorapido="20" style="flex:1">1d20</button>
-        <button type="button" class="btn" data-dadorapido="100" style="flex:1">1d100</button>
-      </div>
-      <div>
-        <div class="hint" style="margin-bottom:6px">Historial</div>
-        <div id="dados-historial" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="scrim" id="scrim-elegir-arma">
   <div class="modal" style="max-width:320px">
@@ -1109,13 +1091,9 @@ function horaTxt(fecha){
   return `${p(fecha.getHours())}:${p(fecha.getMinutes())}:${p(fecha.getSeconds())}`;
 }
 
-let dadosHistorial = [];
-
+// Toda tirada va a la Mesa (la tirada libre por fórmula también está ahí).
 function registrarTirada(origen, r){
-  dadosHistorial.unshift({origen, ...r, hora: new Date()});
   mesaPublicar(origen, r);
-  dadosHistorial = dadosHistorial.slice(0, 20);
-  renderDadosHistorial();
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
 }
 
@@ -1136,32 +1114,6 @@ function renderHistorialSesion(){
   el.innerHTML = sesionHistorial.length
     ? sesionHistorial.map(h => `<div>${horaTxt(h.hora)} — ${esc(h.texto)}</div>`).join('')
     : '<div style="opacity:.6">Sin eventos todavía.</div>';
-}
-
-function renderDadosHistorial(){
-  const el = $('#dados-historial');
-  if(!el) return;
-  el.innerHTML = dadosHistorial.length
-    ? dadosHistorial.map(r => `<div>${horaTxt(r.hora)} — <b style="color:var(--brass)">${fmt(r.total)}</b> — ${esc(r.origen)}: ${esc(r.formula)} [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''}</div>`).join('')
-    : '<div style="opacity:.6">Sin tiradas todavía.</div>';
-}
-
-function ejecutarTiradaManual(){
-  const formula = $('#f-dados-formula').value.trim() || '1d20';
-  const r = tirarDados(formula);
-  if(!r){
-    $('#dados-resultado').textContent = 'Fórmula inválida — usá algo como 3d8+9, 1d20 o 2d6-1';
-    return;
-  }
-  $('#dados-resultado').innerHTML = `<b style="color:var(--brass);font-size:22px">${fmt(r.total)}</b> &nbsp; (${esc(r.formula)}: [${r.rolls.join(', ')}]${r.mod ? ` ${r.mod > 0 ? '+' : ''}${r.mod}` : ''})`;
-  registrarTirada('Manual', r);
-}
-
-function tirarRapido(caras){
-  const cant = Math.max(1, num($('#f-dados-cantidad').value) || 1);
-  const fijo = num($('#f-dados-fijo').value) || 0;
-  $('#f-dados-formula').value = `${cant}d${caras}${fijo ? `${fijo>0?'+':''}${fijo}` : ''}`;
-  ejecutarTiradaManual();
 }
 
 /* ---------- Descomponer un valor de stat en dados reales (portado de ficha.html) ---------- */
@@ -3634,10 +3586,6 @@ document.addEventListener('click', e => {
     abrirVerHabAccion(scId, habId);
     return;
   }
-  if(b.dataset.dadorapido){
-    tirarRapido(num(b.dataset.dadorapido));
-    return;
-  }
   if(b.dataset.tirarstatcreep){
     const [scId, statId] = b.dataset.tirarstatcreep.split(':');
     const sc = S.creeps.find(s=>s.id===scId);
@@ -3816,11 +3764,10 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-load'){
-    if(gmVivo.listo && !confirm('Cargar un archivo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
+    if(gmVivo.listo && !confirm('Cargar un respaldo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
     $('#file-input').click();
     return;
   }
-  if(b.id === 'btn-token'){ ghToken(true).then(t => { if(t) toast('Token de GitHub actualizado'); }); return; }
   if(b.id === 'btn-ia'){ $('#ia-prompt').value = ''; poblarSelectorModelos(); $('#scrim-ia').classList.add('open'); $('#ia-prompt').focus(); return; }
   if(b.id === 'ia-x'){ $('#scrim-ia').classList.remove('open'); return; }
   if(b.id === 'ia-token'){ if(orKey(true)) toast('Clave de OpenRouter actualizada'); return; }
@@ -4539,9 +4486,13 @@ document.addEventListener('change', async e => {
   }
 });
 
+// Accesos de la barra de arriba: abren la misma partida que esta pestaña.
+if(typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA){
+  $('#acceso-mapa').href = '../vtt-hexgrid/mapa.html?partida=' + encodeURIComponent(FB_CAMPANA);
+  $('#acceso-inicio').href = fbUrlInicio(FB_CAMPANA);
+}
 $('#view-x').onclick = () => $('#scrim-view').classList.remove('open');
 $('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
-$('#btn-dados').onclick = () => { $('#f-dados-formula').value = ''; $('#dados-resultado').textContent = ''; $('#scrim-dados').classList.add('open'); setTimeout(()=>$('#f-dados-formula').focus(), 40); };
 // Versión nueva (rama nueva-version): "Traer última versión" traería la
 // versión de main y pisaría los cambios de esta carpeta, así que queda
 // desactivado hasta que esta versión pase a ser la principal.
@@ -4566,10 +4517,6 @@ document.addEventListener('keydown', e => {
 $('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cerrarEditarCreep(); });
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
-$('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');
-$('#dados-tirar').onclick = ejecutarTiradaManual;
-$('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); ejecutarTiradaManual(); } });
-$('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
 $('#equipar-creep-filtro').addEventListener('change', renderEquiparCreepLista);

@@ -43,6 +43,12 @@ En desarrollo activo, las dos.
   habilidad Movimiento). Los creeps viejos se convierten solos en
   `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se
   saca siempre).
+- **Botones**: barra superior `.accesos` con botones chicos, como la ficha
+  (Inicio, Mapa, Tablero, Historial, Reiniciar combate, Catálogo, Respaldo
+  partida, Cargar respaldo); la cabecera deja Mantenimiento, + Creep,
+  + Creep con IA, Vendedor y Finalizar Combate. Sin botón Dados (la tirada
+  libre está en la Mesa) ni token de GitHub. "Cargar respaldo" usa
+  `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
 - **Tarjetas y edición**: la grilla muestra siempre la tarjeta compacta
   (`cardCompactoHtml`). El lápiz abre la ficha completa (`cardHtml`) en la
   ventana `#scrim-editar-creep` (`abrirEditarCreep`/`renderEditarCreep`,

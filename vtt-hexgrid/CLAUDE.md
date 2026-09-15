@@ -26,7 +26,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   token deslizarse a la casilla nueva.
 - Panel del costado: crear token (jugador: siempre PJ propio; GM: creep/NPC
   o PJ). Al seleccionar un token se ven nombre, vida/SP y estados; "✎ Editar"
-  abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa".
+  abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa". Los PJ (y sus
+  invocaciones) vinculados tienen "📄 Ficha", que abre la ficha en otra
+  pestaña (`ficha.html?partida=…#<fichaId>`; la de otro jugador, en solo
+  lectura, sin pasar a ser "la tuya" en ese navegador).
 - **Vida y SP desde el mapa** (`cambiarVidaPj`, `cambiarVidaCreep`): el
   dueño de un PJ (o invocación) y el GM en sus creeps escriben un valor o
   +N/-N. Se guarda en una transacción sobre la parte de la ficha

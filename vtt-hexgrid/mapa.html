@@ -1227,6 +1227,12 @@ function renderPanel(forzar){
   const editable = puedoMover(t);
   const titulo = t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje');
   const puedeEditar = editable || soyGM;
+  // Personajes (y sus invocaciones) vinculados a una ficha: botón para
+  // abrirla en otra pestaña. La de otro jugador se abre en solo lectura.
+  const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+  const botonFicha = fichaDeToken
+    ? `<a class="btn" href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(fichaDeToken)}" target="_blank" rel="noopener" style="text-decoration:none" title="Abrir la ficha en una pestaña nueva">📄 Ficha</a>`
+    : '';
 
   // Vista normal: nombre, vida/SP (editables si corresponde), estados.
   if(!editandoToken || !puedeEditar){
@@ -1235,7 +1241,7 @@ function renderPanel(forzar){
       `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
       (t.tipo === 'pj' ? `<div class="dato" style="color:var(--muted)">de ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
       htmlEstadoToken(t) +
-      (puedeEditar ? '<div class="fila"><button type="button" class="btn" id="token-editar">✎ Editar</button></div>' : '') +
+      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar</button>' : ''}${botonFicha}</div>` : '') +
       (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
     panel.querySelectorAll('[data-vital]').forEach(input => {
       input.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); aplicarVital(input); } if(e.key === 'Escape') { input.blur(); renderPanel(true); } };

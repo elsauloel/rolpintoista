@@ -7366,8 +7366,11 @@ window.addEventListener('beforeunload', e => {
 
 /* ---------- Abrir, escuchar, soltar ---------- */
 
-function fichaRecordar(id){
-  try{ localStorage.setItem('ficha-actual-' + FB_CAMPANA, id || ''); }catch(e){}
+// soloEnPestana: la ficha de otro jugador (abierta desde el mapa o desde
+// Personajes) queda en la dirección, pero no pasa a ser "la tuya" en este
+// navegador.
+function fichaRecordar(id, soloEnPestana){
+  if(!soloEnPestana){ try{ localStorage.setItem('ficha-actual-' + FB_CAMPANA, id || ''); }catch(e){} }
   try{ history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); }catch(e){}
 }
 
@@ -7491,7 +7494,7 @@ async function fichaAbrir(id){
   await fichaSoltar();
   const f = fichaNuevoEstado(id, doc.data().duenoUid, false);
   fichaVivo = f;
-  fichaRecordar(id);
+  fichaRecordar(id, doc.data().duenoUid !== (fbUsuario && fbUsuario.uid));
   fichaEstadoAlDia();
   fichaEscuchar(f);
   return true;

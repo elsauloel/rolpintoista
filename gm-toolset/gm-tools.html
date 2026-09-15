@@ -70,6 +70,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
 }
 .btn:hover{border-color:var(--copper)}
 a.btn{text-decoration:none;display:inline-block}
+/* Personajes: lista desplegable de las fichas de la partida (igual que en el mapa). */
+.btn.btn-personajes{background:rgba(63,111,176,.2);border-color:#3F6FB0;color:#B9D2EA}
+.btn.btn-personajes:hover,.btn.btn-personajes[aria-expanded="true"]{background:#3F6FB0;border-color:#5B8DBE;color:#F2F6FB}
+.desplegable{position:relative}
+.desplegable-lista{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:70;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid #3F6FB0;border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:5px
+}
+.desplegable-lista a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);color:var(--paper);text-decoration:none}
+.desplegable-lista a:hover{background:rgba(63,111,176,.25)}
+.desplegable-lista .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+.desplegable-lista .pj-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desplegable-lista .pj-dueno{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.desplegable-vacio{padding:8px 10px;color:var(--muted);font-size:12px}
 .btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
 .btn.primary:hover{background:var(--brass)}
 .btn.maint{background:rgba(46,107,87,.2);border-color:var(--bottle);color:#CFE6D8;font-weight:700}
@@ -696,6 +710,10 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
       <button class="btn primary" id="btn-add">+ Creep</button>
       <button class="btn" id="btn-ia">+ Creep con IA</button>
       <a class="btn ghost" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva">🏪 Vendedor</a>
+      <div class="desplegable" id="personajes-caja">
+        <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
+        <div class="desplegable-lista" id="personajes-lista" hidden></div>
+      </div>
       <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
     </div>
   </div>
@@ -4644,6 +4662,49 @@ document.addEventListener('change', async e => {
     toast('No se pudo cargar esa imagen');
   }
 });
+
+/* ---------- Personajes: lista de las fichas de la partida ----------
+   Se leen al abrir la lista (gm-tools no las escucha siempre, solo con el
+   Tablero abierto). Cada una abre en una pestaña nueva, en solo lectura. */
+async function renderListaPersonajes(){
+  const caja = $('#personajes-lista');
+  if(!fbDb || !fbMiembro){ caja.innerHTML = '<div class="desplegable-vacio">Sin conexión con la partida.</div>'; return; }
+  caja.innerHTML = '<div class="desplegable-vacio">Cargando…</div>';
+  try{
+    const [fichas, miembros] = await Promise.all([
+      fbDb.collection(fbRutaCampana('fichas')).get(),
+      fbDb.collection(fbRutaCampana('miembros')).get(),
+    ]);
+    const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
+    const lista = fichas.docs.map(d => ({id: d.id, ...d.data()}))
+      .sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'));
+    caja.innerHTML = lista.length
+      ? lista.map(f => {
+          const dueno = nombres.get(f.duenoUid);
+          const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : '<span class="pj-mini"></span>';
+          return `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(f.id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
+            `${mini}<span class="pj-nombre">${esc(f.nombre || 'Sin nombre')}</span>${dueno ? `<span class="pj-dueno">${esc(dueno)}</span>` : ''}</a>`;
+        }).join('')
+      : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
+  }catch(err){
+    console.error('No se pudieron leer los personajes:', err);
+    caja.innerHTML = '<div class="desplegable-vacio">No se pudieron leer los personajes — mirá la consola.</div>';
+  }
+}
+
+function abrirListaPersonajes(abrir){
+  $('#personajes-lista').hidden = !abrir;
+  $('#btn-personajes').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  if(abrir) renderListaPersonajes();
+}
+
+$('#btn-personajes').onclick = () => abrirListaPersonajes($('#personajes-lista').hidden);
+// Se cierra al elegir una ficha, al tocar afuera o con Escape.
+$('#personajes-lista').addEventListener('click', e => { if(e.target.closest('a')) abrirListaPersonajes(false); });
+document.addEventListener('pointerdown', e => {
+  if(!$('#personajes-lista').hidden && !e.target.closest('#personajes-caja')) abrirListaPersonajes(false);
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#personajes-lista').hidden) abrirListaPersonajes(false); });
 
 // Accesos de la barra de arriba: abren la misma partida que esta pestaña.
 if(typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA){

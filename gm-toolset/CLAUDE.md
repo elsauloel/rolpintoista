@@ -46,7 +46,9 @@ En desarrollo activo, las dos.
 - **Botones**: barra superior `.accesos` con botones chicos, como la ficha
   (Inicio, Mapa, Tablero, Historial, Reiniciar combate, Catálogo, Respaldo
   partida, Cargar respaldo); la cabecera deja Mantenimiento, + Creep,
-  + Creep con IA, Vendedor y Finalizar Combate. Sin botón Dados (la tirada
+  + Creep con IA, Vendedor, 👥 Personajes y Finalizar Combate.
+  Personajes (`renderListaPersonajes`) lee `fichas` y `miembros` al abrir
+  la lista y abre cada ficha en otra pestaña. Sin botón Dados (la tirada
   libre está en la Mesa), token de GitHub ni Guardar copia (lo cubre
   Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.

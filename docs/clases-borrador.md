@@ -1,10 +1,13 @@
 # Clases — borrador de trabajo
 
-Transcripción de `00-clases.pdf` (skills de clases prearmadas) para
-revisarlas **clase por clase, skill por skill** y dejarlas en el sistema
-actual (Nitros/No2 y SP). Cuando una skill queda cerrada se marca ✅ y se
-reescribe con los costos nuevos; lo que sigue con ⏳ está tal cual venía
-del PDF, mezcla de iteraciones viejas.
+Transcripción de `00-clases.pdf` (**segunda versión**, la iteración más
+parecida al sistema actual) para revisarla **clase por clase, skill por
+skill**. Cuando una skill queda cerrada se marca ✅ y se reescribe con los
+costos nuevos; lo que sigue con ⏳ está tal cual venía del PDF.
+
+La primera versión del PDF (Acciones/Bonos) se descartó; de ella solo
+quedan las reglas generales de abajo y las tarjetas del Debuffer, que ya
+estaban en este mismo formato.
 
 ## Reglas de clase (decididas)
 
@@ -18,208 +21,209 @@ del PDF, mezcla de iteraciones viejas.
 Hoy la ficha tiene Clase como texto libre y cada habilidad/pasiva con Job
 cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 
-## Cómo leer el PDF viejo
+## Reglas generales (decididas)
 
-- **Acciones** → hoy serían **Nitros (No2)**. "Ataque" = lo que cuesta
-  atacar (Tipo ÷ 2 el primero del turno, Tipo después). "Ataque +1" =
-  eso más 1.
-- **Bonos** → hoy serían **SP**. Contexto: antes 1 Int = 1 Bono que se
-  recargaba entero cada turno; ahora 1 Int = 3 SP y el SP va a tener una
-  regeneración base por turno, también según Int (en definición).
-  **Provisorio: 1 Bono = 1 SP**, lo mismo que ya usa la ficha para el
-  equipo viejo (`IT2.spPorBono`). Se revisa cuando esté definida la
-  regeneración: si es generosa (cerca de Int por turno), los costos
-  convienen subirlos.
-- Shooter y Debuffer traen además **SP: Liviano / Normal / Pesado**, de
-  otra iteración.
-- Las tarjetas del Debuffer (con número en azul) son de una iteración
-  más nueva: el número azul parece ser el costo en SP (Maldición
-  debilitante dice "SP: (5)" y tiene un 5).
-
-## Términos a confirmar (no existen hoy en la ficha)
-
-| Término | Qué parece ser | Duda |
-|---|---|---|
-| Spammeable | Se puede usar varias veces por turno | La ficha ya tiene Espameable / No espameable: ¿las que no dicen nada son No espameables? |
-| Flash | Se usa fuera de tu turno / como reacción | ¿Sigue existiendo? ¿Tiene costo distinto? |
-| Causa fatiga | Penalidad después de usarla | **Pendiente: el usuario lo define con el grupo.** Las skills se cierran igual, con "Causa fatiga" tal cual |
-| En flor de 1 | Área: los 6 hexágonos alrededor | Confirmar |
-| XdT4, dT8… | Dados del tipo indicado (d4, d8) | ¿"T" = Tipo de arma? |
-| PG | Probabilidad de golpe (hoy PdG) | Confirmar |
-| Peso del ataque | ¿Tipo del arma? | Confirmar |
-| Crítico mejorado | ¿Crítico con un número menor? | No existe hoy |
-| Res.Crit | Hoy es Resistencia a crítico por Tipo (Tipo 2…Tipo 10) | ¿A cuál suma? |
-| Res.M / ESP | Hoy Res.Mg (Con) o Res.Mt (Int); ESP ya no es stat | ¿Cuál corresponde? |
-| True damage / Holy / wicked / sónico | Tipos de daño | No hay tipos de daño en la ficha |
-| Stacks de veneno | El preset Veneno de la ficha | ¿Cuánto hace cada stack? |
-
-## Cerrado en la revisión
-
-- **Peso** del arma = cantidad de dados de daño; **Tipo** = caras. "+X al
-  peso" = +X dados; "dT8" = dados de Tipo 8.
-- **Espameable**: se puede repetir en el turno; el límite lo ponen los
-  Nitros.
-- **Acciones → Nitros**: "Acciones: N" del PDF pasa a costar N No2.
+- **SP**: 1 Int = 3 SP. Va a tener una regeneración base por turno según
+  Int (en definición). Los costos se revisan cuando esté definida.
+- **Peso** del arma = cantidad de dados de daño; **Tipo** = caras.
+  "T2 P1" = Tipo 2, Peso 1 (1d2). **Amplificar** el daño = dados de más
+  (en la ficha, `danoAmplificado` ya suma dados).
 - **Flash** = no cuesta Nitros y se puede usar durante el turno de
-  cualquier jugador. "Acciones: 0" es siempre Flash, lo diga o no (ej.
-  Estoicismo). Se declara cuando el que tiene el turno anuncia una
+  cualquier jugador. Se declara cuando el que tiene el turno anuncia una
   acción, **antes** de que tire los dados (nunca después de ver el
   resultado).
+- **Espameable**: se puede repetir en el turno; el límite lo ponen los
+  Nitros.
+- **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
+  corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
+  completo después) y cuenta como ataque del turno.
 - **A definir en mesa**: si una duda no se cierra en la revisión, la skill
   lleva una nota "⚖ A definir en mesa" que tiene que verse en su tarjeta
   para todos, así se decide entre todxs la próxima vez que aparezca en
   una partida.
-- **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
-  corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
-  completo después) y cuenta como ataque del turno.
+- **Causa fatiga**: pendiente, el usuario lo define con el grupo.
+
+## Cómo leer esta versión (a confirmar)
+
+- **Número azul** de cada tarjeta = costo en **SP**.
+- **NO2: (N)** = costo en Nitros. Las que no lo dicen: si son un ataque,
+  costo "Ataque"; si no, sin definir.
+- En Mago aparece "NO2: (3) / (1 + 1B)": lo segundo es la notación vieja
+  (Acciones + Bonos); vale lo primero.
+- **Flash (SP x 2)**: Flash que cuesta el doble de SP. Choca con la regla
+  de Flash en un caso: **Parry** dice "NO2: 1" y Flash.
+- **Tipo de efecto (stat del que lo usa / stat del que resiste)**:
+  Hechizo (PG: Int · Daño: Esp), Onda expansiva (Fuerza / Constitución),
+  Maldición (Esp / Res.M).
+- **Esp / Especial**: stat viejo que hoy no existe.
+- **Critical Matters**: si el ataque es crítico, el efecto cambia.
+- Sin mecánica hoy: Lento, Acumulable, crítico mejorado, true damage,
+  holy, dodge roll, cooldown del arma, Percepción, stacks de veneno.
 
 ## Warrior ⏳
 
-1. ✅ **Turboimpacto** (Pegar fuerte) — **No2:** ataque. **SP:** X (máx.
-   3). **Espameable.** Ataque con +X dados de daño del Tipo del arma.
-2. ✅ **Arte de la guerra** — **Flash.** **SP:** 1. +2 a una sola tirada
-   de PdG o de Parry. No se puede usar más de una vez sobre la misma
-   tirada.
-   ⚖ A definir en mesa: ¿se puede usar en todas las tiradas que quieras
-   dentro del mismo turno, o una sola vez por turno?
-3. ✅ **Sacadito** — **No2:** ataque (todos los golpes juntos cuestan los
-   Nitros de un solo ataque, lo que corresponda al usarla; cuenta como un
-   ataque del turno). **SP:** 3. Tira 1d4 y hace 1 + ese resultado ataques
-   seguidos; cada uno tira PdG y daño. **Causa fatiga.**
-4. **Cañón vasco** — Acciones: 1 / Ataque. Bonos: X ≤ Fue.
-   Salta X casillas a X altura. Tira FUE para hacer esa cantidad de daño
-   sónico en flor de 1. Tiene +X daño para atacar a un objetivo al caer.
-5. **Remolino** — Acciones: X. Bonos: X.
-   Ataque en flor. Causa fatiga.
-6. **Estoicismo** — Acciones: 0. Bonos: 1.
-   +3 Def. para el siguiente ataque. +2 Def. extra y +1 Res.Crit por cada
-   enemigo adyacente.
-7. **Megaguachazo** — Acciones: Ataque + 1. Bonos: 3.
-   Ataque con +3 PG, +3 FUE y +50% DMG. Anula la próxima recarga de
-   Bonos. Causa fatiga.
-8. **Carga** — Acciones: Ataque + 1. Bonos: X ≤ AGI.
-   Se mueve X en línea recta. Ataca con +X a PG y daño. Tira FUE para
-   empujar X. Daño de colisión T8 igual a la distancia restante. Causa
-   fatiga.
-9. **Doble ataque** — Acciones: Ataque. Bonos: 1.
-   Realiza un ataque adicional.
+1. **Arte de la guerra** [2] — +2 fijo a una tirada de PG, Parry, Bloqueo
+   o Daño.
+   *(En la versión descartada se había decidido: Flash, 1 SP, +2 a una
+   sola tirada de PdG o Parry, no más de una vez por tirada; ⚖ a definir
+   si se puede usar en varias tiradas del mismo turno.)*
+2. **Amplificar daño** [X] — Amplifica en X el daño de un ataque. X no
+   puede ser mayor a 3.
+3. **Sacadito** [3] — Recibe 10 Nitros que puede utilizar en ataques
+   consecutivos iguales. Acumulable con otros skills con la condición de
+   que todos los ataques sean idénticos.
+4. **Cañón Vasco** [2 + X] — X no puede ser mayor a FUE. Salta X casillas
+   a X altura. Si aterriza en un enemigo, lo empuja 1 casillero. Al caer,
+   hace X + FUE (tira) daño de onda expansiva en área. Puede atacar a un
+   objetivo al caer con +X al daño.
+5. **Carga** [X] — Se desplaza X casilleros en línea recta, gastando los
+   No2 correspondientes. Al finalizar el recorrido, ataca con +X al daño
+   y a la PG.
+6. **Estoicismo** [2] — NO2: (0). Flash. +2 Def por cada enemigo
+   adyacente. +1 Res.Crit *.
+7. **Remolino** [3] — Ataque que daña a todos los objetivos adyacentes.
+   Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto
+   de ambas posiciones. Repetirlo de inmediato ignora el cooldown del
+   arma.
+8. **Parry** [2] — NO2: 1. Cooldown: 1. Flash. Reemplaza la EV por PG en
+   una tirada de evasión. El que tenga el arma más pesada tiene una
+   bonificación igual a la diferencia en el peso de las armas.
+9. **Contraataque** [2] — Permite realizar un ataque de oportunidad
+   después de esquivar un ataque.
 
 ## Asalto ⏳
 
-1. **Tajear** — Acciones: Ataque. Bonos: 1.
-   Crítico mejorado. Deja heridas de 2 de daño por 2 turnos. Si es
-   crítico, en vez de eso deja heridas permanentes de 3 de daño.
-2. **Lisiar** — Acciones: Ataque. Bonos: 1.
-   Crítico mejorado. Reduce las tiradas de DES y AGI en 1 por 2 turnos.
-   Si es crítico, en vez de eso reduce en 2 por 3 turnos.
-3. **Backstab** — Acciones: Ataque. Bonos: 2.
-   Spammeable. Únicamente por la espalda. Máx. 1 vez por turno. +5 DMG.
-   *(Dice Spammeable y a la vez máx. 1 por turno.)*
-4. **Dash** — Acciones: 0. Bonos: 1.
-   Se desplaza hasta 4 casillas en línea recta atravesando a los
-   enemigos. Puede atacar a los enemigos atravesados gastando las
-   acciones correspondientes.
-5. **Sprint** — Acciones: Movimiento. Bonos: X ≤ Agi.
-   Spammeable. +X movimiento adicional.
-6. **Invi** — Acciones: 1. Bonos: 1.
-   Permanece invisible mientras no realice una acción de combate. El
-   efecto finaliza al quedarse sin acciones o sin bonos. No puede
-   activarse si ya se desactivó este turno.
-7. **Veneno** — Acciones: 1. Bonos: 2.
-   Modifica un arma para que aplique 2 stacks de veneno en los próximos 2
-   ataques. *(El Debuffer tiene otro Veneno.)*
-8. **Asesinar** — Acciones: Ataque + 1. Bonos: 3.
-   No recupera SP ni Bonos en el próximo mantenimiento. Crítico mejorado.
-   +2 Crit. +3 PG. +6 daño. Tiene chances de asesinar si es crítico
-   (6-: 10%, 7+: 25%, 17+: 50%, 20 natural: 100%). Causa fatiga.
-9. **Robar SP** — Acciones: Ataque. Bonos: 3.
-   Spammeable. Crítico mejorado. Si es crítico, recupera SP y el objetivo
-   pierde SP.
+1. **Dash** [3] — NO2: (1 + Ataque). Avanza 3 casilleros en línea recta
+   atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2
+   fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si
+   atraviesa un enemigo de esta forma, se desplaza un casillero adicional.
+2. **Lisiar** [2] — Ataque con +1 al crítico. Causa lesión de -1 de PG al
+   objetivo durante 2 turnos. *Critical Matters:* si es crítico, cambia
+   el efecto a -2 fijo a la PG por 2 turnos.
+3. **Tajear** [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño
+   por 3 turnos. *Critical Matters:* si es crítico, cambia el efecto a 5
+   de daño hasta curarse.
+4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (INT). El
+   rango para esta tirada depende de a qué velocidad se mueva: a
+   velocidad normal (1 No2 por casillero) el rango es una flor de 3; a
+   velocidad lenta (2 No2 por casillero), una flor de 2.
+5. **Envenenar arma** [2] — Mejora el arma con veneno que le otorga +3
+   fijo al daño y aplica 3 stacks de veneno. Duración: 2 ataques.
+6. **Backstab** [2] — Únicamente por la espalda. +5 daño fijo. Ignora 1
+   de resistencia a crítico.
+7. **Degollar** [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al
+   crítico. Interrumpe su turno y se pasa al final de la tabla de
+   iniciativa. Hasta su próximo turno pierde 50% de evasión y no puede
+   usar No2 para responder a acciones enemigas.
+8. **Sprint** [1] — 2 No2: avanza 3 casillas.
+9. **Tronco de huída** [2] — +2 fijo a una tirada de evasión con giro.
+10. **Robar SP** [1] — Gana 2 SP por cada crítico obtenido.
 
 ## Tanque ⏳
 
-1. **Blindaje** — Acciones: 0. Bonos: 1.
-   Flash. La próxima vez que reciba daño lo reduce en 5.
-2. **Caer al rescate** — Acciones: 1. Bonos: X ≤ 3.
-   Flash. Se mueve X casillas hacia un objetivo. Tira FUE para empujarlo
-   la misma distancia. Si hay un aliado en flor de 1, este puede moverse a
-   cualquier casillero en el área.
-3. **Miti Miti** — Acciones: 1. Bonos: 1.
-   Designa un objetivo para absorber la mitad del daño que reciba durante
-   2 turnos.
-4. **Shockwave** — Acciones: 1. Bonos: 1.
-   Tira FUE vs Res.CC para causar pajaritos en flor de 1 por 1 turno.
-   Causa fatiga.
-5. **Provocar** — Acciones: 1. Bonos: 1.
-   Tira INT para obligar a un objetivo a atacarlo.
-6. **Sonic boom** — Acciones: 1. Bonos: 2.
-   Tira FUE vs Res.CC. En cono al frente, hace daño sónico igual a la
-   diferencia. Los objetivos afectados pierden 1 acción y la mitad del
-   movimiento por 1 turno.
-7. **Curarse** — Acciones: 1. Bonos: 1.
-   Tira CON. Se cura el doble del resultado.
-8. **Espinas** — Acciones: 1. Bonos: 1.
-   Por 2 turnos devuelve como true damage 1/4 del daño de ataque que
-   reciba.
-9. **Piel resistente** — Acciones: 1. Bonos: 2.
-   Por 2 turnos gana 3 Def, 3 Res.M, 1 Res.CC, 1 Res.Crit. Causa fatiga.
+Estados que define la clase:
+- **Pajaritos**: reduce a la mitad todas las tiradas de DES, INT y AGI.
+- **Sentado**: -2 a la evasión. No puede atacar. En cualquier momento
+  puede gastar 1 No2 para pararse.
+
+1. **Blindaje** [1] — Flash (SP x 2). NO2: (0). Otorga un blindaje que
+   absorbe 8 de daño de la próxima fuente de daño este turno.
+2. **Shockwave** [4] — Onda expansiva (Fuerza / Constitución). Flash (SP
+   x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos
+   hasta el final de su próximo turno.
+3. **Aura de espinas** [1] — Devuelve 1/4 del daño del ataque como true
+   damage hasta el comienzo del próximo turno.
+4. **Recuperación** [1] — NO2: (2). Recupera 9 HP.
+5. **Sonic Boom** [2] — Onda expansiva (Fuerza / Constitución). Flash (SP
+   x 2). Golpea el piso creando una onda de choque en un cono al frente,
+   que hace perder una cantidad de No2 igual a 1 + la diferencia en la
+   tirada. Si perdiera todos los No2 de este modo, queda Sentado.
+6. **Piel resistente** [5] — Otorga una armadura temporal: Defensa 5, Res.
+   Mágica 5, reduce críticos de todo tipo. Duración: 2 turnos.
+7. **Daño en área** [2] — Ataque con daño en área de flor. No afecta al
+   tanque.
+8. **Takle** [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque
+   con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2
+   Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final
+   de la tabla de iniciativa. Si ya era último en iniciativa, en vez de
+   eso pierde el turno.
+9. **Taunt** [1] — Tira Especial + 1 contra Inteligencia para obligar a
+   un enemigo a atacarlo hasta el final de su próximo turno.
+10. **Miti-Miti** [2] — Marca un personaje como protegido. El protegido
+    comparte con el tanque la mitad del daño que recibe. Duración: 1
+    turno.
 
 ## Mago ⏳
 
-1. **Chispazo** (Proyectil mágico) — Acciones: 1. Bonos: 1.
-   Spammeable. Hechizo. Daño a un objetivo. 1dT4 + INT.
-2. **Rayo mágico** — Acciones: 1. Bonos: X ≤ INT.
-   Spammeable. Hechizo. Daño a un objetivo. XdT2 + INT.
-3. **Bola explosiva** — Acciones: 2. Bonos: 3.
-   Hechizo. 4dT10 + INT en flor de 1.
-4. **Ráfaga arcana** — Acciones: 1. Bonos: 1.
-   Hechizo. 3dT6 + INT en cono al frente.
-5. **Tormenta** — Acciones: 2. Bonos: 3.
-   Hechizo. 1d4 chispazos a todos los enemigos. Causa fatiga.
-6. **Toque mágico** — Acciones: 1. Bonos: 1.
-   Hechizo. Toque meleé. Si acierta, 3dT8 + INT. Causa fatiga.
-7. **Carga elemental** — Acciones: gratis con efecto mágico. Bonos: 1.
-   +2d daño. Añade efecto elemental. El efecto se multiplica con el
-   crítico. Fuego: stackea -1 HP máx./turno. Hielo: stackea 1 acción para
-   actuar. Rayo: pierde 1 bono o stackea -1 bono el próximo turno.
-   Tierra: +1d daño.
-8. **Control mental** — Acciones: X. Bonos: X.
-   Tira INT vs Res.M para comandar a un objetivo por X acciones. No puede
-   dañarse a sí mismo.
-9. **Mirror image** — Acciones: 1. Bonos: 2.
-   Crean espejismos que confunden a cualquier atacante por 2 turnos. 4 en
-   6 chances de fallar el ataque. Se desactiva si el ataque resulta
-   exitoso. Causa fatiga.
+Salvo Carga Elemental, todas son **Hechizo (PG: Int · Daño: Esp)**.
+
+1. **Chispazo** [1] — NO2: (3). Dispara un proyectil T2 P1 que ignora
+   armadura.
+2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
+   tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
+   Inteligencia.
+3. **Orbe arcano** [4] — NO2: (5). Dispara un orbe arcano que hace daño en
+   área tipo 5. Amplifica el daño en 4. Área: flor de 1.
+4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
+   proyectiles arcanos T2 P1 en flor de 2. Caen aleatoriamente sobre todos
+   los objetivos posibles. Esquivable solo con dodge roll.
+5. **Ráfaga arcana** [2] — NO2: (3). Dispara una ráfaga arcana que hace
+   daño en área tipo 3. Área: cono de 3 al frente.
+6. **Toque mágico** [3] — NO2: (4). Requiere un toque físico con la mano o
+   el arma, usando PG contra Evasión. No se puede bloquear. A distancia
+   melé, hace 3d T4 + ESP de daño mágico.
+7. **Carga Elemental** [X] — Modifica un skill de daño mágico para que
+   tenga propiedades elementales. Cada nivel en este skill otorga nuevos
+   elementos. X es la mitad del coste del skill. Elementos: **Fuego** +50%
+   de daño. **Frío** -1 No2 cada 5 de daño (mínimo 1). **Eléctrico** el
+   daño se propaga a enemigos hasta 5 de distancia.
+8. **Armadura Mágica** [5] — NO2: (3). Crea una armadura mágica que reduce
+   el daño recibido en un 50% (máximo 10). Cuando termina el efecto, hace
+   daño mágico en área de flor igual al daño absorbido. Duración: 2
+   turnos.
+9. **Telekinesis** [15] — NO2: (3). Mueve y controla un objeto con la
+   mente. Puede usarse para arrebatar el arma a un enemigo con Int/Fue, y
+   usarla para atacar: atacar así usa INT como PG y ESP como daño. Paga 1
+   SP por cada No2 que use para atacar o mover el objeto. El objeto queda
+   controlado el resto del turno; puede gastar 1 SP para contrarrestar con
+   INT cualquier intento de otro personaje de quitarle el control. En cada
+   mantenimiento puede pagar 1 SP para conservar el control durante el
+   turno.
+10. **Control Mental** [7] — NO2: (3). Tira Int contra (Int + Res.M) de
+    otro personaje. Si gana, puede controlarlo y obligarlo a realizar
+    cualquier acción que no implique dañarse a sí mismo. Paga 1 SP y 1 No2
+    por cada No2 que gaste el personaje controlado. El efecto concluye
+    inmediatamente.
 
 ## Shooter ⏳
 
-1. **Apuntar** — Acciones: X. SP: Normal. Bonos: 1.
-   +2 PG. +1 Crit. × X.
-2. **Apuntar +** — Acciones: X. SP: Pesado. Bonos: 1.
-   +4 PG. +1 Crit. × X. *(¿Versión mejorada de Apuntar o skill aparte?)*
-3. **Marcar** — Acciones: 1. SP: Normal. Bonos: 1.
-   Designa un objetivo como marcado por 2 turnos. Obtiene +1 PG, +1 Daño
-   y +1 Crítico contra el objetivo marcado.
-4. **Perforante** — Acciones: Ataque. SP: Normal. Bonos: 1.
-   Ataque a distancia que atraviesa el primer objetivo y puede alcanzar a
-   un objetivo adicional.
-5. **Multiobjetivo** — Acciones: Ataque + 1. SP: Pesado. Bonos: X ≤ 5.
-   Ataque a distancia que puede alcanzar hasta X objetivos posicionados al
-   frente.
-6. **Longshot** — Acciones: Ataque. SP: Liviano. Bonos: X ≤ DES.
-   Incrementa el rango en X.
-7. **Ricochet** — Acciones: Ataque. SP: Liviano. Bonos: 2.
-   El ataque puede rebotar contra el escenario para alcanzar objetivos que
-   no estén al alcance en línea directa.
-8. **Headshot** — Acciones: Ataque. SP: Pesado. Bonos: 1.
-   Ataque con +1 al crítico y crítico mejorado. Daño +5. +2 fijo a PG.
-   Falla si no es crítico.
-9. **Enlazar** — Acciones: 1. SP: Normal. Bonos: 1.
-   DES vs AGI para dejar enlazado a un objetivo, impidiéndole alejarse y
-   reduciendo su AGI a la mitad. Cada turno puede tirar DES para anular el
-   efecto.
-10. **Trampa** — Acciones: 1. SP: Normal. Bonos: 2.
-    Deja una trampa invisible. Stun por 1 turno al que la pise.
+1. **Apuntar** [X] — X No2: +X a la PG y al crítico en el próximo ataque a
+   distancia (X ≤ 3).
+2. **Acelerado** [1] — Reduce el cooldown de un ataque. Repetible (+1 SP
+   por repetición).
+3. **Enfocado** [1] — +2 de daño al próximo ataque. Repetible (+1 SP por
+   repetición).
+4. **Parry a distancia** [2] — Flash. Realiza un ataque de rango como
+   instantáneo. Si se hace como respuesta a un ataque, tira Agilidad para
+   cancelarlo.
+5. **Headshot** [4] — Ataque con +1 al crítico y crítico mejorado. Daño
+   +5. +2 fijo a PG. Falla si no es crítico.
+6. **Proyectil perforante** [2] — Ataque que continúa hasta alcanzar un
+   segundo objetivo. Todos los efectos especiales se pierden después del
+   primer objetivo.
+7. **Marcar** [3] — Designa un objetivo como marcado; sigue marcado hasta
+   que ataque a un objetivo diferente. Obtiene +1 PG, +1 Daño y +1 Crítico
+   contra el objetivo marcado.
+8. **Repetición** [X] — Realiza X ataques consecutivos idénticos entre sí
+   (los ataques gastan No2 normalmente). Por cada ataque adicional al
+   primero suma +1 a la PG y amplifica +1 el daño.
+9. **Disparo múltiple** [X] — Ataca simultáneamente a múltiples objetivos
+   en línea directa en un área de cono ancho. X es igual al doble del
+   número de objetivos adicionales.
+10. **Tiro con comba** [1] — Altera la trayectoria de un ataque de rango
+    para esquivar obstáculos entre el tirador y el objetivo. Desvío máximo:
+    2 casillas en una dirección. Cada casilla de desvío cuenta como +1 de
+    distancia.
 
 **Reglas del tiro** (no es skill, va al manual): el ataque a distancia
 funciona igual a un ataque normal. Con mecanismos, la FUE del ataque la da
@@ -229,70 +233,55 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 
 ## Support ⏳
 
-1. **Toque sanador** — Acciones: 1. Bonos: 1.
-   Spammeable. Toque directo que cura 1 + 1d8 HP.
-2. **Empower** — Acciones: 1. Bonos: 1.
-   Spammeable. Flash. +3 a cualquier tirada propia o de un aliado.
-3. **Blessing** — Acciones: 1. Bonos: 2.
-   +1 fijo en todas las tiradas por 2 turnos.
-4. **Shield** — Acciones: 1. Bonos: 1.
-   Flash. Otorga un blindaje temporal que absorbe 14 de HP hasta el final
-   del turno.
-5. **Re-Roll** — Acciones: 2. Bonos: 3.
-   Flash. Permite rerolear tiradas aliadas.
-6. **Transferir SP** — Acciones: 1. Bonos: 1.
-   Recarga el SP de un aliado.
-7. **Gran curación** — Acciones: 1. Bonos: 1.
-   Cura 4d6+4 distribuidos entre cualquier número de objetivos.
-8. **Smite** — Acciones: 1. Bonos: 1.
-   Spammeable. 1d6+1 daño Holy inesquivable. ×2 daño vs wicked.
-9. **Acelerador** — Acciones: 1. Bonos: 1.
-   Marca una casilla con flechitas para adelante (>>). Si un aliado la
-   pisa gana +1 Acción.
+1. **Empower** [2] — NO2: (0). +3 a cualquier tirada propia o de un
+   aliado.
+2. **Blessing** [5] — +1 fijo en todas las tiradas por 2 turnos.
+3. **Heal** [2] — NO2: (1). Cura 4 + 1d6 HP.
+4. **Shield** [2] — Flash (SP x 2). Otorga un blindaje temporal que
+   absorbe 14 de HP hasta el final del turno.
+5. **Acelerador** [1] — Marca una casilla con flechitas para adelante
+   (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por
+   turno). Duración: 10 turnos.
+6. **Endurecimiento** [5] — Otorga una armadura temporal: Defensa 3, Res.
+   Mágica 3, reduce críticos de todo tipo. Duración: 2 turnos.
+7. **Re-roll** [2] — Flash. Permite rerolear tiradas aliadas. Lento.
+8. **Smite** [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4
+   de daño.
+9. **Transferir SP** [1] — Transfiere 1d6 SP entre sí mismo y un aliado.
+10. **Adrenalina** [5] — Otorga +1 a Destreza, Fuerza y Agilidad durante 2
+    turnos. Acumulable. Lento.
 
 ## Debuffer ⏳
 
-El PDF trae **dos versiones**: una lista (Acciones/SP/Bonos) y tarjetas
-más nuevas (número azul = costo, "Maldición (Esp / Res.M)" = se resiste
-con Res.M). Van juntas por nombre.
+En el PDF nuevo la página del Debuffer repite las tarjetas del Support.
+**A confirmar:** usar las tarjetas del Debuffer de la versión anterior, que
+ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
 
-1. **Enyetar** — Lista: Acciones 1, SP Normal, Bonos 1.
-   Tarjeta: 5. Maldición (Esp / Res.M). Flash. Obliga a repetir una tirada
-   y quedarse con el valor más bajo.
-2. **Confusión** — Lista: Acciones 1, SP Normal, Bonos 2.
-   Tarjeta: 5. Maldición (Esp / Res.M). Antes de realizar un ataque o
-   habilidad con objetivo, tira 1d4: 1) el debuffer elige el objetivo;
-   2) gasta los No2 pero no realiza la acción; 3) elige el objetivo al
-   azar; 4) actúa normalmente. Los objetivos alternativos deben estar en
-   un radio de 3 No2; si la acción requiere moverse, deberá hacerlo.
-   Duración: 2 turnos.
-3. **Miedo** — Lista: Acciones 1, SP Normal, Bonos 2. *(Sin descripción.)*
-4. **Debilidad** — Lista: Acciones 1, SP Pesado, Bonos 2. *(Sin
-   descripción. ¿Es la Maldición debilitante?)*
-5. **Maldición debilitante** — Tarjeta: 5. Maldición (ESP / Res.M).
-   SP: (5). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.
-6. **Maldición extenuante** — Tarjeta: 3. Maldición (Esp / Res.M).
-   Incrementa en 1 los nitros de todas las acciones. Debe pagar 1 nitro
-   para moverse cada 2 casillas. Duración: 1 turno. Acumulable. Lento.
-7. **Maldición tormentosa** — Tarjeta: 5. Maldición (Esp / Res.M).
-   Por cada acción recibe daño igual a No2 -1. Debe pagar 1 HP para
-   moverse cada 2 casillas. Duración: 3 turnos. Acumulable. Lento.
-8. **Drenar vida** — Lista: Acciones 1, SP Normal, Bonos X.
-   Tarjeta: X. Tira X + 1dX. X no puede ser mayor a ESP. El objetivo tira
-   resistencia mágica. Drena una cantidad de HP igual a la diferencia. El
-   HP obtenido así puede acumularse hasta 50% por encima del máximo.
-9. **Balas de sangre** — Lista: Acciones 1, SP Liviano, Bonos 1.
-   Tarjeta: 1. Gasta X HP (máximo ESP). Dispara un proyectil tipo 1. El
-   peso del proyectil es igual a la cantidad de vida gastada.
-10. **Transferencia de HP / Transfusión sanguínea** — Lista: Acciones 1,
-    SP Liviano, Bonos 1. Tarjeta: 1. Transfiere hasta 20 de HP de un
-    personaje aliado a otro.
-11. **Veneno** — Lista: Acciones 1, SP Liviano, Bonos 1.
-    Tarjeta: 2. Maldición (Esp / Res.M). Aplica 3 stacks de veneno.
-12. **Parálisis** — Lista: Acciones 2, SP Pesado, Bonos 3. *(Sin
-    descripción.)*
-13. **Nube tóxica** — Lista: Acciones 1, SP Normal, Bonos 3.
-    Tarjeta: 3. Crea un área de flor que aplica 3 stacks de veneno al que
-    entre en ella o esté en su interior durante el mantenimiento. Solo
-    aplica 1 stack a personajes ya envenenados. Duración: 3 turnos.
-    *("Lento" en las maldiciones: sin definir.)*
+1. **Enyetar** [5] — Maldición (Esp / Res.M). Flash. Obliga a repetir una
+   tirada y quedarse con el valor más bajo.
+2. **Confusión** [5] — Maldición (Esp / Res.M). Antes de realizar un
+   ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el
+   objetivo; 2) gasta los No2 pero no realiza la acción; 3) elige el
+   objetivo al azar; 4) actúa normalmente. Los objetivos alternativos
+   deben estar en un radio de 3 No2; si la acción requiere moverse, deberá
+   hacerlo. Duración: 2 turnos.
+3. **Maldición debilitante** [5] — Maldición (Esp / Res.M). -1 a todas las
+   tiradas. Duración: 2 turnos. Acumulable. Lento.
+4. **Maldición extenuante** [3] — Maldición (Esp / Res.M). Incrementa en 1
+   los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse cada 2
+   casillas. Duración: 1 turno. Acumulable. Lento.
+5. **Maldición tormentosa** [5] — Maldición (Esp / Res.M). Por cada acción
+   recibe daño igual a No2 - 1. Debe pagar 1 HP para moverse cada 2
+   casillas. Duración: 3 turnos. Acumulable. Lento.
+6. **Drenar vida** [X] — Tira X + 1dX. X no puede ser mayor a ESP. El
+   objetivo tira resistencia mágica. Drena HP igual a la diferencia. El HP
+   obtenido así puede acumularse hasta 50% por encima del máximo.
+7. **Balas de sangre** [1] — Gasta X HP (máximo ESP). Dispara un proyectil
+   tipo 1. El peso del proyectil es igual a la vida gastada.
+8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un
+   personaje aliado a otro.
+9. **Veneno** [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.
+10. **Nube tóxica** [3] — Crea un área de flor que aplica 3 stacks de
+    veneno al que entre en ella o esté en su interior durante el
+    mantenimiento. Solo aplica 1 stack a personajes ya envenenados.
+    Duración: 3 turnos.

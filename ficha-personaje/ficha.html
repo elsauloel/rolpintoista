@@ -3112,12 +3112,26 @@ function popupHabilidadActivo(h){
   return h.popupAlEjecutar ?? true;
 }
 
+// Stats secundarios que se pueden tirar (los que tienen 🎲 en Atributos).
+function STATS_CON_TIRADA(){
+  return STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
+}
+
+// Al ejecutar: tira el stat vinculado (con su valor del momento, mods
+// incluidos) y/o la fórmula manual. Se puede tener las dos.
 function tirarExtraDeItem(it){
+  let tiro = false;
+  const stat = it.tiradaStat;
+  if(stat && (ATTR_LIST.some(a => a.id === stat) || STATS_CON_TIRADA().some(s => s.id === stat))){
+    tirarValorStat(`${it.nombre} · ${STAT_LABEL[stat]}`, compute().final[stat], stat);
+    tiro = true;
+  }
   const formula = (it.tiradaExtra || '').trim();
-  if(!formula) return false;
-  const r = tirarDados(formula);
-  if(r) registrarTirada(it.nombre, r);
-  return !!r;
+  if(formula){
+    const r = tirarDados(formula);
+    if(r){ registrarTirada(it.nombre, r); tiro = true; }
+  }
+  return tiro;
 }
 
 function restaurarSpDeConsumo(it){
@@ -4956,7 +4970,8 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
   escudoMagico:'Escudo mágico — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
-  tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)'};
+  tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
+  tiradaStat:'Tirar un stat al ejecutar (opcional)'};
 const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
@@ -5931,7 +5946,7 @@ function openEditor(key, id, equipadoPreset){
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
-    forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'',
+    forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
@@ -6013,7 +6028,8 @@ function drawEditor(){
   const resto = cortos.filter(c => {
     if(c==='nombre') return false;
     if(c==='curahp') return false;
-    if(['efectoNombre','efectoTurnos','efectoHpTurno','curaspPct'].includes(c)) return false;
+    // Los campos del estado alterado van juntos en su propia sección (más abajo).
+    if(['efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','curaspPct'].includes(c)) return false;
     if(c==='forzarNitros') return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
@@ -6029,8 +6045,19 @@ function drawEditor(){
       + `</div>`;
   }
   if(key === 'habilidades'){
+    const opcionStat = s => `<option value="${s.id}" ${draft.tiradaStat === s.id ? 'selected' : ''}>${esc(s.label)} · ${esc(s.full)}</option>`;
     html += `<div class="f2">
+      <div class="f"><label>${CAMPO_LABEL.tiradaStat}</label>
+        <select data-c="tiradaStat">
+          <option value="">— ninguno —</option>
+          <optgroup label="Principales">${ATTR_LIST.map(opcionStat).join('')}</optgroup>
+          <optgroup label="Secundarios">${STATS_CON_TIRADA().map(opcionStat).join('')}</optgroup>
+        </select>
+      </div>
       <div class="f"><label>${CAMPO_LABEL.tiradaExtra}</label><input data-c="tiradaExtra" value="${esc(draft.tiradaExtra??'')}"></div>
+    </div>
+    <div class="hint" style="margin:-4px 0 8px">El stat se tira con su valor del momento (con los modificadores de equipo y estados activos), igual que su 🎲. Si cargás las dos cosas, se tiran las dos.</div>
+    <div class="f2">
       <label class="f" style="display:flex;align-items:center;height:100%;gap:8px;cursor:pointer">
         <input type="checkbox" data-c="job" ${draft.job !== false ? 'checked' : ''} style="width:auto">
         <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL.job}</span>

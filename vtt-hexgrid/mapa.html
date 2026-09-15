@@ -89,6 +89,20 @@ aside{
   margin:0 0 8px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400
 }
 .ayuda{color:var(--muted);font-size:12.5px;margin:0}
+.con-ayuda{display:flex;align-items:center;gap:8px;margin-bottom:0!important}
+.ayuda-icono{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+  border:1px solid var(--line);color:var(--muted);font-size:10.5px;cursor:help;letter-spacing:0;outline:none
+}
+.ayuda-icono:hover,.ayuda-icono:focus{border-color:var(--copper);color:var(--brass)}
+.ayuda-globo{
+  display:none;position:absolute;top:calc(100% + 8px);left:-58px;z-index:30;width:280px;max-width:calc(100vw - 40px);
+  background:var(--panel2,#221A1E);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;
+  box-shadow:0 10px 24px rgba(0,0,0,.55);font-family:"Space Grotesk",system-ui,sans-serif;font-size:12.5px;line-height:1.45;
+  letter-spacing:0;text-transform:none;color:var(--paper);font-weight:400;cursor:default
+}
+.ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
+.ayuda-globo .leyenda{margin-top:8px}
 .fila{display:flex;gap:8px;align-items:center;margin-top:8px}
 .etiqueta{font-size:11.5px;color:var(--muted);margin:8px 0 3px;display:block}
 .colores{display:flex;flex-wrap:wrap;gap:5px}
@@ -1718,15 +1732,20 @@ function renderPanel(forzar){
 
   if(!t){
     panel.innerHTML =
-      '<h2>Token</h2>' +
-      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ' +
-      'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>' +
-      '<div class="leyenda">' +
-        `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +
-        `<span><i style="border-color:${BORDE.jugador}"></i>Otros jugadores</span>` +
-        `<span><i style="border-color:${BORDE.creep}"></i>Creeps</span>` +
-        `<span><i style="border-color:${BORDE.npc}"></i>NPC</span>` +
-      '</div>';
+      // La ayuda queda escondida detrás del (?): aparece al pasar el cursor
+      // (o al tocarlo en pantallas táctiles).
+      '<h2 class="con-ayuda">Token <span class="ayuda-icono" tabindex="0" aria-label="Ayuda">?' +
+        '<span class="ayuda-globo" role="tooltip">' +
+          'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ' +
+          'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.' +
+          '<span class="leyenda">' +
+            `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +
+            `<span><i style="border-color:${BORDE.jugador}"></i>Otros jugadores</span>` +
+            `<span><i style="border-color:${BORDE.creep}"></i>Creeps</span>` +
+            `<span><i style="border-color:${BORDE.npc}"></i>NPC</span>` +
+          '</span>' +
+        '</span>' +
+      '</span></h2>';
     return;
   }
 

@@ -86,6 +86,11 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
 .tarjeta.principal{border-color:var(--copper);background:linear-gradient(180deg,rgba(201,133,69,.1),transparent 70%),var(--panel)}
 .tarjeta.nueva{border-style:dashed;align-items:flex-start;justify-content:center;min-height:110px;background:none}
 .vacio{color:var(--muted);font-size:14px}
+.fila-nombre{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:10px;align-items:center;margin-top:12px}
+.fila-nombre .partida{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila-nombre .partida small{display:block;color:var(--muted);font-size:11.5px}
+.fila-nombre input{padding:7px 9px;font-size:14px}
+@media(max-width:560px){.fila-nombre{grid-template-columns:1fr auto}.fila-nombre .partida{grid-column:1 / -1}}
 .nota{margin-top:30px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:13.5px}
 </style>
 </head>
@@ -93,7 +98,15 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
 <main>
   <div class="barra">
     <div class="eyebrow">Rol Pintoísta</div>
-    <div class="cuenta" id="cuenta" hidden><span id="cuenta-email"></span><button type="button" class="btn chico" id="btn-salir">Salir</button></div>
+    <div class="cuenta" id="cuenta" hidden><span id="cuenta-email"></span><button type="button" class="btn chico" id="btn-nombres" title="Cambiar el nombre con el que te ven en cada partida">✎ Mi nombre</button><button type="button" class="btn chico" id="btn-salir">Salir</button></div>
+  </div>
+
+  <!-- Cambiar el nombre en cada partida -->
+  <div class="caja" id="panel-nombres" hidden style="margin-bottom:22px;max-width:560px">
+    <b>Cómo te ven los demás</b>
+    <p class="vacio" style="margin:6px 0 4px">El nombre es por partida: en cada una podés llamarte distinto.</p>
+    <div id="lista-nombres"></div>
+    <div class="fila"><button type="button" class="btn" id="btn-nombres-cerrar">Listo</button></div>
   </div>
 
   <!-- Cargando -->
@@ -241,6 +254,10 @@ const VISTAS = ['cargando', 'sin-conexion', 'login', 'confirmar', 'partidas', 'p
 function mostrar(vista){
   VISTAS.forEach(v => { $('#vista-' + v).hidden = v !== vista; });
   $('#cuenta').hidden = !['confirmar', 'partidas', 'partida'].includes(vista);
+  // "Mi nombre" solo con la cuenta confirmada (en partidas o en una partida).
+  const conPartidas = ['partidas', 'partida'].includes(vista);
+  $('#btn-nombres').hidden = !conPartidas;
+  if(!conPartidas) $('#panel-nombres').hidden = true;
   if(fbUsuario) $('#cuenta-email').textContent = fbUsuario.email || fbUsuario.displayName || '';
 }
 
@@ -327,7 +344,68 @@ $('#btn-olvide').onclick = async () => {
   }
 };
 
-$('#btn-salir').onclick = () => firebase.auth().signOut();
+$('#btn-salir').onclick = () => { $('#panel-nombres').hidden = true; firebase.auth().signOut(); };
+
+/* ---------- Cambiar el nombre (por partida) ----------
+   El nombre vive en campanas/<id>/miembros/<uid>.nombre: cada uno puede
+   cambiar el suyo (lo permiten las reglas). Si sos el GM, también se
+   actualiza el "GM: …" que se ve en la lista de partidas. */
+
+async function abrirNombres(){
+  const panel = $('#panel-nombres');
+  panel.hidden = false;
+  const cont = $('#lista-nombres');
+  cont.innerHTML = '<p class="vacio">Cargando tus partidas…</p>';
+  try{
+    await cargarPartidas();
+  }catch(err){
+    cont.innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+    return;
+  }
+  const mias = partidas.filter(p => p.miembro);
+  if(!mias.length){
+    cont.innerHTML = '<p class="vacio">Todavía no estás en ninguna partida.</p>';
+    return;
+  }
+  cont.innerHTML = mias.map(p => `
+    <form class="fila-nombre" data-partida="${esc(p.id)}">
+      <span class="partida">${esc(p.nombre)}<small>${p.miembro.gm ? 'Sos el GM' : 'Sos jugador'}</small></span>
+      <input maxlength="40" required value="${esc(p.miembro.nombre)}" aria-label="Tu nombre en ${esc(p.nombre)}">
+      <button type="submit" class="btn chico">Guardar</button>
+    </form>`).join('') + '<div class="error" id="nombres-error"></div>';
+  cont.querySelectorAll('form').forEach(f => f.onsubmit = e => { e.preventDefault(); guardarNombre(f); });
+}
+
+async function guardarNombre(form){
+  const id = form.dataset.partida;
+  const p = partidas.find(x => x.id === id);
+  const nombre = form.querySelector('input').value.trim().slice(0, 40);
+  const boton = form.querySelector('button');
+  $('#nombres-error').textContent = '';
+  if(!p || !nombre || nombre === p.miembro.nombre) return;
+  boton.disabled = true;
+  try{
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(`campanas/${id}/miembros/${fbUsuario.uid}`), {nombre});
+    if(p.miembro.gm && p.gmUid === fbUsuario.uid) lote.update(fbDb.doc(`campanas/${id}`), {gmNombre: nombre});
+    await lote.commit();
+    p.miembro.nombre = nombre;
+    if(p.miembro.gm) p.gmNombre = nombre;
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+    // Refleja el cambio en lo que está a la vista.
+    if(!$('#vista-partidas').hidden) renderPartidas();
+    if(!$('#vista-partida').hidden && FB_CAMPANA === id) irAPartida(id);
+  }catch(err){
+    console.error('No se pudo cambiar el nombre:', err);
+    $('#nombres-error').textContent = textoError(err);
+  }finally{
+    boton.disabled = false;
+  }
+}
+
+$('#btn-nombres').onclick = () => { if($('#panel-nombres').hidden) abrirNombres(); else $('#panel-nombres').hidden = true; };
+$('#btn-nombres-cerrar').onclick = () => { $('#panel-nombres').hidden = true; };
 
 $('#btn-ya-confirme').onclick = async () => {
   $('#confirmar-error').textContent = '';

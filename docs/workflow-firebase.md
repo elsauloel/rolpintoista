@@ -33,6 +33,8 @@ que verse en vivo entre jugadores.
 2. Lista de partidas: todas las del sitio (grupo cerrado de amigos). Se
    entra a una donde ya estás, te unís a otra eligiendo tu nombre en esa
    partida, o creás una nueva (quedás como su GM).
+   Arriba, "✎ Mi nombre" permite cambiar el nombre en cada partida donde
+   estás (y, si sos el GM, también el `gmNombre` de la partida).
 3. Página de la partida: links a las herramientas con `?partida=<id>`
    (GM Tools y el generador de tiendas solo para el GM; la ficha para
    jugadores, y para el GM en solo lectura).

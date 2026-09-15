@@ -183,21 +183,8 @@ a{color:var(--brass)}
 .bar span{position:absolute;inset:0;width:0;transition:width .35s cubic-bezier(.2,.8,.2,1)}
 .bar.hp span{background:linear-gradient(90deg,var(--wine),#C4485A)}
 .bar.bp span{background:linear-gradient(90deg,#2E6B57,var(--absenta))}
-.steppers{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap;align-items:center}
-.dano-entrante{display:flex;align-items:center;gap:6px;margin-left:auto}
-.dano-entrante label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-.dano-entrante input{
-  width:52px;text-align:center;font-family:"Space Mono",monospace;font-size:12px;
-  padding:3px 6px;border:1px solid var(--danger);background:rgba(212,87,78,.1);color:var(--paper);border-radius:var(--r)
-}
-.dano-entrante input:focus{border-color:var(--danger);background:rgba(212,87,78,.2)}
-.dano-critico-check{display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none!important;letter-spacing:0!important}
-.dano-critico-check input{width:auto!important;padding:0!important;border:none!important;background:none!important}
-.step{
-  font-family:"Space Mono",monospace;font-size:11px;padding:3px 9px;
-  border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:var(--r);color:var(--muted)
-}
-.step:hover{border-color:var(--copper);color:var(--paper)}
+.bar.sp span{background:linear-gradient(90deg,#1F4E8C,#3F86E0)}
+.vital .top.vital-segunda{margin-top:12px}
 
 /* ---------- Grilla principal ---------- */
 .cols{display:grid;grid-template-columns:1.05fr .95fr 1fr;gap:16px;margin-top:16px;align-items:start}
@@ -1031,7 +1018,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
   body{background:#fff;color:#000}
-  .dock,.iconbtn,.mini,.steppers,.menu-ajustes{display:none}
+  .dock,.iconbtn,.mini,.menu-ajustes{display:none}
   .card,.attr,.item{border-color:#999}
 }
 /* ---------- Mesa: tiradas compartidas en vivo (Firebase) ---------- */
@@ -1086,21 +1073,11 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
           <span class="nums"><input id="f-hp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="max">/ <span id="v-hpmax">0</span></span></span>
         </div>
         <div class="bar hp"><span id="bar-hp"></span></div>
-        <div class="steppers">
-          <button class="step" data-hp="-10">−10</button>
-          <button class="step" data-hp="-5">−5</button>
-          <button class="step" data-hp="-1">−1</button>
-          <button class="step" data-hp="1">+1</button>
-          <button class="step" data-hp="5">+5</button>
-          <button class="step" data-hp="full">Al máximo</button>
-          <span class="dano-entrante">
-            <label for="f-dano-entrante">Daño entrante:</label>
-            <input type="text" inputmode="decimal" id="f-dano-entrante" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta tu Defensa y el resto sale del HP">
-            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
-              <input type="checkbox" id="f-dano-critico">Fue crítico
-            </label>
-          </span>
+        <div class="top vital-segunda">
+          <span class="name">Special Power</span>
+          <span class="nums"><input id="f-sp-vital" type="text" inputmode="decimal" title="SP disponible. Escribí un número para fijarlo, o +5 / -3 para sumar o restar y apretá Enter. No se recarga al pasar turno"><span class="max">/ <span id="v-spmax-vital">0</span></span></span>
         </div>
+        <div class="bar sp"><span id="bar-sp"></span></div>
         <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
       </div>
       <div class="nitros-box" id="nitros-box" title="Nitros: se gastan al moverse, atacar, usar habilidades y consumir. Se recargan al máximo (substat No2) en cada Mantenimiento">
@@ -2987,6 +2964,10 @@ function renderVitals(){
   const sp = spMax - gastado;
   const fSp = $('#f-sp');
   if(document.activeElement !== fSp) fSp.value = fmt(sp);
+  // Segunda barra del recuadro de vida (arriba de todo).
+  if(document.activeElement !== $('#f-sp-vital')) $('#f-sp-vital').value = fmt(Math.max(0, sp));
+  $('#v-spmax-vital').textContent = fmt(spMax);
+  $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
   $('#v-sp-natural-btn').textContent = `/ ${fmt(spMax)}`;
   $('#c-sp').classList.toggle('penal', sp < 0);
   $('#c-sp').title = `Special Power (${S.formulas.sp || 'int*3'}): se gasta al usar habilidades y no se recarga al pasar turno — solo con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
@@ -4107,79 +4088,13 @@ document.addEventListener('input', e => {
 });
 
 /* =========================================================
-   CAJAS CON DELTA (Vida, DDE, Experiencia)
+   CAJAS CON DELTA (Vida, SP, DDE, Experiencia)
    Escribir un número fija el valor. Escribir +50 / -35 y
    apretar Enter suma o resta eso al valor que había al
    entrar a la caja.
    ========================================================= */
 
-// Daño entrante: se escribe el golpe crudo y la ficha le descuenta la
-// Defensa. Resta plana con piso en 0 — si la Defensa llega al golpe, no
-// pasa nada. El campo queda vacío después para el próximo.
-function aplicarDanioEntrante(){
-  const campo = $('#f-dano-entrante');
-  const crudo = (campo.value || '').trim();
-  if(!crudo) return;
-  if(!/^\d+(?:[.,]\d+)?$/.test(crudo)){
-    toast('Escribí el daño del golpe, sin signo — la Defensa se resta sola');
-    campo.value = '';
-    return;
-  }
-  const golpe = parseFloat(crudo.replace(',', '.'));
-  const critCheck = $('#f-dano-critico');
-  const fueCritico = !!(critCheck && critCheck.checked);
-  const efectosActivosDano = (S.efectos || []).filter(e => e.activo !== false);
-
-  if(efectosActivosDano.some(e => e.invulnerable)){
-    campo.value = '';
-    if(critCheck) critCheck.checked = false;
-    toast(`Invulnerable: el golpe de ${fmt(golpe)} no hizo nada`);
-    return;
-  }
-  if(fueCritico && efectosActivosDano.some(e => e.blindado)){
-    campo.value = '';
-    critCheck.checked = false;
-    toast(`Blindado: el golpe crítico de ${fmt(golpe)} no hizo nada`);
-    return;
-  }
-
-  const c = compute();
-  const defensa = Number.isNaN(c.final.def) ? 0 : num(c.final.def);
-  let recibido = Math.max(0, golpe - defensa);
-
-  // Escudo mágico absorbe antes que el HP — funciona como una barra de HP
-  // secundaria (escudoMagico es el máximo, escudoMagicoActual lo que le
-  // queda; se recarga entera en cada Mantenimiento). El primer estado
-  // activo con puntos restantes se lleva el golpe.
-  const escudo = efectosActivosDano.find(e => num(e.escudoMagico) > 0 && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
-  let absorbido = 0;
-  if(escudo && recibido > 0){
-    const actual = num(escudo.escudoMagicoActual ?? escudo.escudoMagico);
-    absorbido = Math.min(recibido, actual);
-    escudo.escudoMagicoActual = actual - absorbido;
-    recibido -= absorbido;
-  }
-
-  fijarHp(num(S.hp) - recibido);
-  campo.value = '';
-  if(critCheck) critCheck.checked = false;
-  refresh();
-
-  const extra = [];
-  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagicoActual ? ` (quedan ${fmt(escudo.escudoMagicoActual)}/${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
-  if(recibido > 0 && efectosActivosDano.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
-  const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
-
-  if(recibido <= 0 && !absorbido){
-    toast(`Golpe de ${fmt(golpe)} · tu Defensa ${fmt(defensa)} lo frenó entero`);
-  }else if(recibido <= 0){
-    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)}${sufijo}`);
-  }else{
-    toast(`Golpe de ${fmt(golpe)} − Defensa ${fmt(defensa)} = ${fmt(recibido)} de daño${sufijo}`);
-  }
-}
-
-const CAJAS_DELTA = ['f-hp', 'f-dde', 'f-exp'];
+const CAJAS_DELTA = ['f-hp', 'f-sp-vital', 'f-dde', 'f-exp'];
 let cajaDeltaBase = {};
 
 function resolverCajaDelta(t){
@@ -4189,6 +4104,7 @@ function resolverCajaDelta(t){
   const val = m ? base + parseFloat(m[2].replace(',', '.')) * (m[1] === '-' ? -1 : 1) : num(raw);
   let final = val;
   if(t.id === 'f-hp'){ final = fijarHp(val); }
+  else if(t.id === 'f-sp-vital'){ const max = spMaximo(); final = Math.min(max, val); S.spGastado = max - final; renderVitals(); }
   else if(t.id === 'f-dde'){ S.meta.dde = val; renderExp(); refresh(); }
   else if(t.id === 'f-exp'){ applyExp(val); refresh(); final = S.meta.exp; }
   t.value = fmt(final);
@@ -4199,12 +4115,6 @@ document.addEventListener('focusin', e => {
   if(CAJAS_DELTA.includes(e.target.id)){ cajaDeltaBase[e.target.id] = num(e.target.value); e.target.select(); }
 });
 document.addEventListener('keydown', e => {
-  if((e.key === 'Enter' || e.keyCode === 13) && e.target.id === 'f-dano-entrante'){
-    e.preventDefault();
-    aplicarDanioEntrante();
-    e.target.blur();
-    return;
-  }
   if((e.key === 'Enter' || e.keyCode === 13) && CAJAS_DELTA.includes(e.target.id)){
     e.preventDefault();
     resolverCajaDelta(e.target);
@@ -4323,12 +4233,6 @@ document.addEventListener('click', e => {
     return;
   }
 
-  if(b.dataset.hp !== undefined){
-    const c = compute();
-    const mx = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-    fijarHp(b.dataset.hp === 'full' ? mx : num(S.hp) + num(b.dataset.hp));
-    return;
-  }
   if(b.id === 'btn-loot-add'){
     S.loot.especial = S.loot.especial || [];
     S.loot.especial.push({id:uid(), nombre:'', cantidad:1});

@@ -44,9 +44,10 @@ más cambia sesión a sesión.
   `renderAll`). Las invocaciones siguen con sus propias Acciones.
 - **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
   Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
-  `esVeneno`, `esSangrado`). `aplicarDanioEntrante()` es donde
-  Invulnerable/Blindado/Escudo mágico interceptan el daño antes de que
-  llegue al HP.
+  `esVeneno`, `esSangrado`). Ya no hay "Daño entrante": el HP se edita a
+  mano (número o +N/-N), así que Invulnerable, Blindado, Escudo mágico y
+  Espinas frente a golpes quedan como recordatorio manual (en el
+  Mantenimiento siguen bloqueando veneno y sangrado).
 
 ## Formato de datos
 

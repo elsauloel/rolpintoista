@@ -62,6 +62,8 @@ main{flex:1;display:flex;min-height:0}
   max-width:calc(100% - 24px);background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);padding:8px 12px;
   font-family:"Space Mono",monospace;font-size:12px;box-shadow:0 10px 24px -8px rgba(0,0,0,.7)
 }
+#ruta-confirmar.excede{border-color:var(--danger)}
+#ruta-confirmar.excede #ruta-texto{color:#F0A39C}
 
 aside{
   width:330px;flex:none;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line);min-height:0
@@ -544,12 +546,18 @@ function dibujar(){
   // de movimientos recientes (se desvanecen).
   let animando = false;
   const ahora = Date.now();
-  const dibujarEstela = (celdas, alfa) => {
+  // pagables: casilleros que alcanzan los Nitros; los de más van en rojo.
+  const dibujarEstela = (celdas, alfa, pagables = Infinity) => {
     if(celdas.length < 2) return;
-    ctx.beginPath();
-    celdas.slice(1).forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
-    ctx.fillStyle = `rgba(224,164,88,${0.2 * alfa})`; ctx.fill();
-    ctx.strokeStyle = `rgba(224,164,88,${0.75 * alfa})`; ctx.lineWidth = 2 / z; ctx.stroke();
+    const casillas = (color, lista) => {
+      if(!lista.length) return;
+      ctx.beginPath();
+      lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+      ctx.fillStyle = `rgba(${color},${0.2 * alfa})`; ctx.fill();
+      ctx.strokeStyle = `rgba(${color},${0.75 * alfa})`; ctx.lineWidth = 2 / z; ctx.stroke();
+    };
+    casillas('224,164,88', celdas.slice(1, pagables + 1));
+    casillas('214,69,69', celdas.slice(pagables + 1));
     ctx.beginPath();
     celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
     ctx.strokeStyle = `rgba(237,227,210,${0.85 * alfa})`; ctx.lineWidth = 4 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
@@ -565,8 +573,8 @@ function dibujar(){
     dibujarEstela(e.celdas, Math.min(1, resta / 1200));
     animando = true;
   });
-  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1);
-  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1);
+  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente));
+  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo));
 
   // Tokens.
   disposicion = calcularDisposicion();
@@ -753,8 +761,16 @@ lienzo.addEventListener('pointermove', e => {
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
 
+// Casilleros que alcanzan a pagarse con los Nitros disponibles (Infinity si
+// el token se mueve sin costo). Los que siguen se dibujan en rojo.
+function pasosPagables(costo){
+  if(!costo) return Infinity;
+  return Math.max(0, Math.floor(costo.disponibles / costo.porCasillero));
+}
+
 // La ruta sigue al token casilla por casilla. Volver sobre una casilla ya
-// recorrida borra la estela desde ahí; si se acaban los Nitros, se corta.
+// recorrida borra la estela desde ahí. Pasarse de los Nitros se permite
+// (quedan en negativo), pero avisa y la estela sigue en rojo.
 function extenderRuta(a, casilla){
   const ruta = a.ruta;
   const i = ruta.findIndex(c => mismoHex(c, casilla));
@@ -762,14 +778,12 @@ function extenderRuta(a, casilla){
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
-    // ruta.length casilleros recorridos si se agrega esta (la primera es el origen).
-    if(a.costo && ruta.length * a.costo.porCasillero > a.costo.disponibles){
-      if(!a.avisado) toast(`No te alcanzan los No2 para seguir (te quedan ${fmt(a.costo.disponibles)})`);
-      a.avisado = true;
-      break;
-    }
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
+  }
+  if(a.costo && ruta.length - 1 > pasosPagables(a.costo) && !a.avisado){
+    toast(`⚠ Te estás pasando de tus No2 (te quedan ${fmt(a.costo.disponibles)})`);
+    a.avisado = true;
   }
 }
 
@@ -858,8 +872,11 @@ function mostrarConfirmacionRuta(){
   const p = rutaPendiente;
   if(!p) return;
   const costo = p.pasos * p.porCasillero;
+  const exceso = costo - Math.max(0, p.disponibles);
   $('#ruta-texto').textContent = `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
-    (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '');
+    (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') +
+    (exceso > 0 ? ` · ⚠ te pasás por ${fmt(exceso)}` : '');
+  $('#ruta-confirmar').classList.toggle('excede', exceso > 0);
   $('#ruta-confirmar').hidden = false;
   $('#ruta-si').focus();
 }
@@ -870,10 +887,9 @@ function cancelarRuta(){
   pedirDibujo();
 }
 
-const NITROS_INSUFICIENTES = 'nitros-insuficientes';
-
 // Descuenta los Nitros en la ficha (parte "general" + resumen), igual que
-// cambiarVidaPj con la vida. Devuelve los que quedan.
+// cambiarVidaPj con la vida. Puede quedar en negativo (moverse de más se
+// permite, avisando). Devuelve los que quedan.
 async function gastarNitros(fichaId, costo){
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -884,7 +900,6 @@ async function gastarNitros(fichaId, costo){
     const datos = JSON.parse(parte.data().json || '{}');
     const r = ficha.data().resumen || {};
     const actual = datos.nitros === null || datos.nitros === undefined ? num(r.nitros) : num(datos.nitros);
-    if(costo > actual) throw new Error(NITROS_INSUFICIENTES);
     datos.nitros = actual - costo;
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
@@ -904,12 +919,10 @@ async function confirmarRuta(){
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
-    toast(`−${fmt(costo)} No2 · te quedan ${fmt(quedan)}`);
+    toast(`−${fmt(costo)} No2 · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
   }catch(err){
     console.error('No se pudo mover gastando Nitros:', err);
-    toast(err.message === NITROS_INSUFICIENTES
-      ? 'No te alcanzan los No2 (la ficha tiene menos de los que se veían)'
-      : err.code === 'permission-denied' ? 'No podés gastar los Nitros de esa ficha' : 'No se pudo mover — mirá la consola');
+    toast(err.code === 'permission-denied' ? 'No podés gastar los Nitros de esa ficha' : 'No se pudo mover — mirá la consola');
     cancelarRuta();
   }
 }

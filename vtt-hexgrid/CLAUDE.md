@@ -29,7 +29,8 @@ nuevo de Rol Pintoísta. Paso 2 de
   los saltos del mouse se completan en línea recta). Los otros tokens no
   bloquean. Se guarda en `ruta` del token y todos ven la estela
   `ESTELA_MS` (4 s). Un PJ vinculado a su ficha (no invocación) gasta
-  Nitros: la ruta se corta cuando no alcanzan (`resumen.nitros`,
+  Nitros: pasarse se permite (quedan en negativo), pero avisa y los
+  casilleros de más se pintan en rojo (`resumen.nitros`,
   `resumen.costoMover`: 2 con Rengo, 0 con Inmovilizado), al soltar pide
   Confirmar/Cancelar (`rutaPendiente`) y `gastarNitros` descuenta en la
   ficha con una transacción. Sin las reglas nuevas publicadas, se mueve

@@ -191,7 +191,7 @@ aside{
 
 <div id="botonera-capa" hidden>
   <iframe id="botonera-marco" title="Botonera" src="about:blank"></iframe>
-  <div id="botonera-cargando" hidden>Abriendo la Botonera… <button type="button" class="btn" id="botonera-cargando-x">Cancelar</button></div>
+  <div id="botonera-cargando" hidden><span id="botonera-cargando-texto">Abriendo la Botonera…</span> <button type="button" class="btn" id="botonera-cargando-x">Cancelar</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1724,6 +1724,10 @@ function renderPanel(forzar){
     ? `<a class="btn" href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(fichaDeToken)}" target="_blank" rel="noopener" style="text-decoration:none" title="Abrir la ficha en una pestaña nueva">📄 Ficha</a>`
     : '';
   // Tu propio personaje (no sus invocaciones): la Botonera de la ficha, ahí mismo.
+  // GM, creep vinculado: la ventana de Acciones de gm-tools, ahí mismo.
+  const botonAcciones = soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId)
+    ? '<button type="button" class="btn" id="token-acciones" title="Abrir las Acciones del creep (las de gm-tools) sin salir del mapa">⚔ Acciones</button>'
+    : '';
   const botonBotonera = fichaDeToken && !(v && v.invocacion) && !soyGM && v && v.duenoUid === fbUsuario.uid
     ? `<button type="button" class="btn" id="token-botonera" title="Abrir la Botonera de la ficha sin salir del mapa">⚡ Botonera</button>`
     : '';
@@ -1735,7 +1739,7 @@ function renderPanel(forzar){
       `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
       (t.tipo === 'pj' ? `<div class="dato" style="color:var(--muted)">de ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
       htmlEstadoToken(t) +
-      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar</button>' : ''}${botonFicha}${botonBotonera}</div>` : '') +
+      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar token</button>' : ''}${botonAcciones}${botonFicha}${botonBotonera}</div>` : '') +
       (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
     panel.querySelectorAll('[data-vital]').forEach(input => {
       input.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); aplicarVital(input); } if(e.key === 'Escape') { input.blur(); renderPanel(true); } };
@@ -1743,13 +1747,14 @@ function renderPanel(forzar){
     });
     if($('#token-editar')) $('#token-editar').onclick = () => { editandoToken = true; renderPanel(true); };
     if($('#token-botonera')) $('#token-botonera').onclick = () => abrirBotonera(fichaDeToken);
+    if($('#token-acciones')) $('#token-acciones').onclick = () => abrirAcciones(t.fichaId);
     return;
   }
 
   // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
   let color = t.color;
   panel.innerHTML =
-    `<h2>Editar ${titulo.toLowerCase()}</h2>` +
+    `<h2>Editar token · ${titulo.toLowerCase()}</h2>` +
     (editable
       ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
         `<label class="etiqueta">Nombre (si no está vinculado)</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
@@ -1812,19 +1817,38 @@ $('#btn-nuevo').onclick = () => {
    Botonera. El iframe queda cargado mientras sea el mismo personaje, así
    volver a abrirla es instantáneo. Lo que se haga ahí se guarda en la
    ficha como siempre y se ve en el token. */
-let botonera = {fichaId: '', lista: false};
+// La misma capa sirve para las Acciones de un creep (gm-tools con
+// ?modo=acciones, solo GM). herramienta: 'ficha' | 'gm'.
+let botonera = {herramienta: '', fichaId: '', lista: false};
 
 function abrirBotonera(fichaId){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
-  if(botonera.fichaId === fichaId && botonera.lista){
+  if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
     marco.contentWindow.postMessage({tipo: 'abrir-botonera'}, location.origin);
     return;
   }
-  botonera = {fichaId, lista: false};
+  botonera = {herramienta: 'ficha', fichaId, lista: false};
+  $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
   marco.src = `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`;
+}
+
+function abrirAcciones(creepId){
+  const capa = $('#botonera-capa');
+  const marco = $('#botonera-marco');
+  capa.hidden = false;
+  // gm-tools ya cargado: solo cambia de creep (instantáneo).
+  if(botonera.herramienta === 'gm' && botonera.lista){
+    botonera.fichaId = creepId;
+    marco.contentWindow.postMessage({tipo: 'abrir-acciones', creep: creepId}, location.origin);
+    return;
+  }
+  botonera = {herramienta: 'gm', fichaId: creepId, lista: false};
+  $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
+  $('#botonera-cargando').hidden = false;
+  marco.src = `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`;
 }
 
 function cerrarBotonera(){
@@ -1834,11 +1858,11 @@ function cerrarBotonera(){
 
 window.addEventListener('message', e => {
   if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
-  if(e.data.tipo === 'botonera-lista'){ botonera.lista = true; $('#botonera-cargando').hidden = true; }
-  if(e.data.tipo === 'botonera-cerrada') cerrarBotonera();
+  if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){ botonera.lista = true; $('#botonera-cargando').hidden = true; }
+  if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
 });
 
-$('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
+$('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herramienta: '', fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
 
 /* ---------- Mesa (tiradas compartidas) ---------- */
 

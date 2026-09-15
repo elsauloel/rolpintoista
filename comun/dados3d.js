@@ -176,7 +176,7 @@ function dadosAnimarTirada(t){
   // Ficha o gm-tools abiertas dentro del mapa (Botonera, Mantenimiento en
   // segundo plano): no animan, ya lo hace el mapa.
   const html = document.documentElement.classList;
-  if(html.contains('modo-botonera') || html.contains('modo-mantenimiento')) return;
+  if(html.contains('modo-botonera') || html.contains('modo-mantenimiento') || html.contains('modo-acciones')) return;
   const notacion = dadosNotacion(t.formula, t.rolls);
   if(!notacion) return;
   if(dados.cola.length >= 4) dados.cola.shift();  // si se acumulan, se saltean las más viejas

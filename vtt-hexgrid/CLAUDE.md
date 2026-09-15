@@ -62,6 +62,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
+  `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
+  Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,
+  `abrir-acciones`). El botón de edición del panel se llama "✎ Editar token".
 - **⚡ Botonera** (solo en tu propio personaje): abre la ficha en un iframe
   a pantalla completa con `?modo=botonera`, que muestra solo la Botonera.
   Se hablan con `postMessage` (`botonera-lista`, `botonera-cerrada`,

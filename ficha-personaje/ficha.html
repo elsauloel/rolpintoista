@@ -117,17 +117,17 @@ a{color:var(--brass)}
 .counter.calc{border-color:rgba(201,133,69,.45);cursor:help}
 #c-job{cursor:pointer}
 #c-job:hover{border-color:var(--copper)}
-.bonos-nums{display:flex;align-items:baseline;gap:5px}
-.bonos-input{
+.sp-nums{display:flex;align-items:baseline;gap:5px}
+.sp-input{
   font-family:"Space Mono",monospace;font-size:17px;font-weight:700;color:var(--brass);
   background:none;border:none;padding:0;width:38px;min-width:0
 }
-.bonos-max{
+.sp-max{
   font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);background:none;border:none;
   padding:0;cursor:pointer;text-decoration:underline;text-decoration-style:dotted
 }
-.bonos-max:hover{color:var(--brass)}
-.counter.calc.penal .bonos-input{color:var(--danger)}
+.sp-max:hover{color:var(--brass)}
+.counter.calc.penal .sp-input{color:var(--danger)}
 .counter.calc.penal .val{color:var(--danger)}
 .counter .sub{font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted);margin-top:1px}
 .counter .sub.over{color:var(--danger)}
@@ -310,7 +310,7 @@ a{color:var(--brass)}
   font-family:"Space Mono",monospace;font-size:11px;
 }
 .breakdown .row{display:flex;justify-content:space-between;gap:12px;padding:2px 0;color:var(--muted)}
-#bonos-breakdown:not(:empty){margin-top:10px}
+#sp-breakdown:not(:empty){margin-top:10px}
 .breakdown .row b{color:var(--paper);font-weight:700}
 .breakdown .fx{display:flex;gap:6px;align-items:center;margin-top:7px}
 .breakdown .fx input{font-family:"Space Mono",monospace;font-size:11px}
@@ -348,20 +348,22 @@ a{color:var(--brass)}
 .tag.cat{border-color:#6FA8D8;color:#8FC0E8}
 .tag.price.buy{border-color:var(--danger);color:#E8938C}
 .tag.price.sell{border-color:var(--absenta);color:var(--absenta)}
-.acciones-box{
+.nitros-box{
   border:1px solid var(--copper);background:var(--panel);padding:12px 14px;
   display:flex;flex-direction:column;justify-content:center;align-self:stretch;min-width:120px
 }
-.acciones-label{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.acciones-nums{font-family:"Space Mono",monospace;font-size:26px;font-weight:700;color:var(--brass);margin-top:4px;display:flex;align-items:baseline;gap:6px}
-.acciones-max{font-size:14px;color:var(--muted)}
-.acciones-input{
+.nitros-label{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.nitros-nums{font-family:"Space Mono",monospace;font-size:26px;font-weight:700;color:var(--brass);margin-top:4px;display:flex;align-items:baseline;gap:6px}
+.nitros-max{font-size:14px;color:var(--muted)}
+.nitros-input{
   font-family:"Space Mono",monospace;font-size:26px;font-weight:700;color:var(--brass);
   background:none;border:none;padding:0;width:52px;min-width:0
 }
-.acciones-box.agotadas .acciones-input{color:var(--danger)}
-.acciones-box.agotadas{border-color:var(--danger)}
-.acciones-box.agotadas .acciones-nums{color:var(--danger)}
+.nitros-box.agotadas .nitros-input{color:var(--danger)}
+.nitros-box.agotadas{border-color:var(--danger)}
+.nitros-box.agotadas .nitros-nums{color:var(--danger)}
+/* Marca de valor sin confirmar de la Iteración 2 (ver IT2 en el script). */
+.it2-pendiente{color:var(--brass);cursor:help;font-size:.95em}
 
 .unit-stepper{
   display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line-soft)
@@ -1101,9 +1103,9 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
         <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
       </div>
-      <div class="acciones-box" id="acciones-box" title="Se resetea a 3 al pasar el turno">
-        <span class="acciones-label">Acciones</span>
-        <div class="acciones-nums"><input type="number" id="f-acciones" class="acciones-input" value="3"><span class="acciones-max">/ <span id="v-acciones-max">3</span></span></div>
+      <div class="nitros-box" id="nitros-box" title="Nitros: se gastan al moverse, atacar, usar habilidades y consumir. Se recargan al máximo (substat No2) en cada Mantenimiento">
+        <span class="nitros-label">No2</span>
+        <div class="nitros-nums"><input type="number" id="f-nitros" class="nitros-input" value="0"><span class="nitros-max">/ <span id="v-nitros-max">3</span></span></div>
       </div>
       <section class="card vital-card">
         <header>
@@ -1155,11 +1157,11 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         <div class="val" id="v-job">0</div>
         <div class="sub" id="v-job-sub"></div>
       </div>
-      <div class="counter calc" id="c-bonos">
-        <label>Bonos</label>
-        <div class="bonos-nums">
-          <input type="number" id="f-bonos" class="bonos-input" value="0">
-          <button type="button" class="bonos-max" id="v-bonos-natural-btn" data-stat="bonos" title="Ver detalle">/ 0</button>
+      <div class="counter calc" id="c-sp">
+        <label>SP</label>
+        <div class="sp-nums">
+          <input type="number" id="f-sp" class="sp-input" value="0">
+          <button type="button" class="sp-max" id="v-sp-natural-btn" data-stat="sp" title="Ver detalle">/ 0</button>
         </div>
       </div>
       <div class="counter"><label>WildCards</label><input id="f-wld"></div>
@@ -1178,7 +1180,7 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
         </div>
       </div>
     </div>
-    <div id="bonos-breakdown"></div>
+    <div id="sp-breakdown"></div>
   </div>
 
   <div class="cols">
@@ -1497,10 +1499,11 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <div class="body" style="display:flex;flex-direction:column;gap:12px">
       <div class="hint" id="costox-nombre" style="font-size:14px;color:var(--paper);font-family:'Fraunces',serif;font-weight:700"></div>
       <div class="f2">
-        <div class="f"><label>Bonos a gastar</label><input type="number" id="f-costox-bonos" value="0" min="0"></div>
-        <div class="f"><label>Acciones a gastar</label><input type="number" id="f-costox-acciones" value="1" min="0"></div>
+        <div class="f"><label>SP a gastar</label><input type="number" id="f-costox-sp" value="0" min="0"></div>
+        <div class="f"><label>Nitros a gastar</label><input type="number" id="f-costox-nitros" value="1" min="0"></div>
       </div>
       <div class="hint">Tenés <span id="costox-disponibles"></span> disponibles ahora mismo.</div>
+      <div class="hint" id="costox-limite"></div>
     </div>
     <footer>
       <button class="btn ghost" id="costox-cancel">Cancelar</button>
@@ -1521,8 +1524,8 @@ body:has(#scrim-view.open):has(#scrim-resultado-dado.open) #scrim-resultado-dado
     <header>
       <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
         <h3>Botonera</h3>
-        <span class="botonera-badge" id="botonera-badge-acciones">Acciones 0/0</span>
-        <span class="botonera-badge" id="botonera-badge-bonos">Bonos 0/0</span>
+        <span class="botonera-badge" id="botonera-badge-nitros">No2 0/0</span>
+        <span class="botonera-badge" id="botonera-badge-sp">SP 0/0</span>
       </div>
       <button class="iconbtn" id="botonera-x">Cerrar</button>
     </header>
@@ -1734,7 +1737,7 @@ const GRUPOS = [
   {id:'agl', label:'Agi', full:'Agilidad', color:'#8FB84F', derived:[
     {id:'eva', label:'Eva', full:'Evasión'},
     {id:'ini', label:'Iniciativa', full:'Iniciativa'},
-    {id:'mov', label:'Mov', full:'Movimiento'}]},
+    {id:'nitros', label:'No2', full:'Nitros'}]},
   {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
     {id:'rng', label:'Rng', full:'Rango'},
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
@@ -1743,12 +1746,11 @@ const GRUPOS = [
   {id:'int', label:'Int', full:'Inteligencia', color:'#9B7BD4', derived:[
     {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
     {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
-    {id:'bonos', label:'Bonos', full:'Bonos'},
+    {id:'sp', label:'SP', full:'Special Power'},
     {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
 ];
 const EXTRA = [
   {id:'def', label:'Defensa', full:'Defensa'},
-  {id:'accionesmax', label:'Acciones máx.', full:'Acciones máximas por turno'},
   {id:'tipo1', label:'Tipo 2', full:'Resistencia a crítico — armas Tipo 2 (d2)'},
   {id:'tipo2', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
   {id:'tipo3', label:'Tipo 6', full:'Resistencia a crítico — armas Tipo 6 (d6)'},
@@ -1759,6 +1761,85 @@ const EXTRA = [
 const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
 
 const DADOS_ARMA = [2, 4, 6, 8, 10];
+
+/* =========================================================
+   ITERACIÓN 2 — Nitros (No2) y SP
+   Nitros reemplaza a Acciones y a Movimiento: su máximo es el substat
+   No2 (fórmula base agl + mods) y se recarga en cada Mantenimiento.
+   SP reemplaza a Bonos: se gasta con habilidades y NO se recarga al
+   pasar turno (solo con recargas, consumibles, descanso o a mano).
+
+   Todo lo marcado PLACEHOLDER está sin confirmar: se ajusta acá y en la
+   pantalla aparece con ⚠.
+   ========================================================= */
+const IT2 = {
+  // Costos confirmados.
+  nitrosMover: 1,               // por casillero
+  nitrosConsumirCinturon: 1,
+  nitrosConsumirMochila: 2,
+  nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
+  // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
+  // pasan a dar "+N × esto" de SP.
+  spPorBono: 1,
+  // PLACEHOLDER: Tipo con el que se cobra un ataque sin arma equipada.
+  tipoSinArma: 4,
+  // PLACEHOLDER: el primer ataque del turno cuesta Tipo ÷ 2; así se
+  // redondea si el Tipo es impar.
+  redondeoPrimerAtaque: Math.ceil,
+  // PLACEHOLDER: Rengo cobra esto por casillero; Inmovilizado no deja moverse.
+  nitrosMoverRengo: 2,
+  inmovilizadoBloqueaMover: true,
+  // PLACEHOLDER: tope de X en costos variables. null = solo frena lo
+  // disponible. Si se confirma, poner una función: c => c.final.int
+  limiteXNitros: null,
+  limiteXSp: null,
+  // PLACEHOLDER: penalidad por peso de más. Hoy no resta nada (antes
+  // restaba de Bonos); se puede sumar desde Fórmulas, ej. int*3 - sobrecarga.
+  penalidadSobrecargaDefinida: false,
+};
+const IT2_PENDIENTE = txt => `<span class="it2-pendiente" title="Sin confirmar (Iteración 2): ${esc(txt)}">⚠</span>`;
+const STATS_VIEJOS_IT2 = {bonos:'sp', mov:'nitros', accionesmax:'nitros'};
+
+function migrarModsIt2(mods){
+  (Array.isArray(mods) ? mods : []).forEach(m => {
+    if(!m || !STATS_VIEJOS_IT2[m.stat]) return;
+    if(m.stat === 'bonos') m.val = num(m.val) * IT2.spPorBono;
+    m.stat = STATS_VIEJOS_IT2[m.stat];
+  });
+}
+
+// Ítems, habilidades y estados guardados con los campos viejos. Se puede
+// correr varias veces sobre lo mismo sin cambiar nada.
+function migrarObjIt2(o){
+  if(!o || typeof o !== 'object') return;
+  migrarModsIt2(o.mods);
+  migrarModsIt2(o.efectoMods);
+  [['curabonosPct', 'curaspPct'], ['accionesCosto', 'nitrosCosto'], ['forzarAccionesMax', 'forzarNitros']].forEach(([viejo, nuevo]) => {
+    if(o[viejo] === undefined) return;
+    if(o[nuevo] === undefined) o[nuevo] = o[viejo];
+    delete o[viejo];
+  });
+}
+
+function migrarEstadoIt2(st){
+  const f = st.formulas || (st.formulas = {});
+  ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
+  ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'int*3' : 'agl'; });
+  Object.keys(f).forEach(k => {
+    if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
+  });
+  // bonosGastados solo existe en fichas viejas, así que manda aunque el
+  // merge con DEFAULT ya haya puesto spGastado en 0.
+  if(st.bonosGastados !== undefined){
+    st.spGastado = num(st.bonosGastados);
+    delete st.bonosGastados;
+  }
+  if(st.spGastado === undefined) st.spGastado = 0;
+  delete st.acciones;  // los Nitros arrancan llenos (ver renderAll)
+  if(st.ataquesTurno === undefined) st.ataquesTurno = 0;
+  ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
+    .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjIt2));
+}
 
 const CATEGORIAS = [
   {id:'', label:'— elegir categoría —'},
@@ -1843,22 +1924,25 @@ const DEFAULT = {
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
   attrs:{con:1, fue:1, agl:1, des:1, int:1},
-  hp:5, turno:1, log:[], bonosGastados:0, acciones:3,
+  // spGastado: SP usado desde la última recarga. nitros: los que quedan en
+  // el turno (null = arrancan llenos). ataquesTurno: para cobrar el primer
+  // ataque del turno a mitad de precio.
+  hp:5, turno:1, log:[], spGastado:0, nitros:null, ataquesTurno:0,
   muerto:{activo:false, turnos:5, definitivo:false},
   caps:{mochila:20, cinturon:5},
   armadura:{nota:''},
   formulas:{
     resmg:'con', rescc:'con', hpmax:'con*5',
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
-    eva:'agl', ini:'agl', mov:'agl',
+    eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
-    pdgmg:'int', resm:'int', bonos:'ceil(int/2) - sobrecarga', rangocasteo:'int',
-    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', accionesmax:'3', capcinturon:'0'
+    pdgmg:'int', resm:'int', sp:'int*3', rangocasteo:'int',
+    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0'
   },
   inventario:[],
   cinturon:[],
   habilidades:[
-    {id:'movimiento', nombre:'Movimiento', costo:'', categoria:'', job:false, origen:'Acción base', imagen:'', detalle:'Desplazarse por el mapa.'}
+    {id:'movimiento', nombre:'Movimiento', costo:'', categoria:'', job:false, origen:'Acción base', imagen:'', detalle:'Desplazarse por el mapa: 1 Nitro por casillero.'}
   ],
   pasivas:[],
   sociales:[],
@@ -2419,6 +2503,10 @@ let openStat = null;
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
 const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+// El catálogo embebido todavía viene con Bonos/Mov/Acciones (se regenera
+// desde datos/catalogo.json): se pasa a SP/Nitros al abrir la ficha.
+migrarEstadoIt2(DEFAULT);
+migrarEstadoIt2(S);
 
 function fileToDataURL(file, maxDim=480, quality=0.85){
   return new Promise((resolve, reject) => {
@@ -2494,7 +2582,7 @@ function compute(){
   const ctx = {
     ...attrFinal,
     nivel:num(S.meta.nivel), job:jobBudget().total,
-    sobrecarga:0, bon:0,
+    sobrecarga:0,
     floor:Math.floor, ceil:Math.ceil, round:Math.round,
     min:Math.min, max:Math.max, abs:Math.abs
   };
@@ -2505,7 +2593,6 @@ function compute(){
   const base = {};
   for(let pass=0; pass<4; pass++){
     ctx.sobrecarga = Math.max(0, pesoEquipado - (ctx.crgmax||0));
-    ctx.bon = ctx.bonos || 0;
     STAT_LIST.forEach(s => {
       const v = evalFormula(S.formulas[s.id], ctx);
       base[s.id] = Number.isNaN(v) ? NaN : v;
@@ -2520,9 +2607,9 @@ function compute(){
   // Efectos activos que fuerzan/alteran un stat más allá de un modificador sumable.
   const efectosActivos = (S.efectos || []).filter(e => e.activo !== false);
   const forzados = efectosActivos
-    .filter(e => e.forzarAccionesMax !== '' && e.forzarAccionesMax !== null && e.forzarAccionesMax !== undefined)
-    .map(e => num(e.forzarAccionesMax));
-  if(forzados.length) final.accionesmax = Math.min(...forzados);
+    .filter(e => e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
+    .map(e => num(e.forzarNitros));
+  if(forzados.length) final.nitros = Math.min(...forzados);  // Stun, Exhausto
   if(efectosActivos.some(e => e.mitadPdgEva)){
     if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
     if(!Number.isNaN(final.eva)) final.eva = Math.floor(final.eva / 2);
@@ -2531,11 +2618,8 @@ function compute(){
     if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
     if(!Number.isNaN(final.parry)) final.parry = Math.floor(final.parry / 2);
   }
-  if(efectosActivos.some(e => e.inmovilizado)){
-    if(!Number.isNaN(final.mov)) final.mov = 0;
-  }else if(efectosActivos.some(e => e.rengo)){
-    if(!Number.isNaN(final.mov)) final.mov = Math.floor(final.mov / 2);
-  }
+  // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
+  // Nitros, así que actúan al moverse (ver costoMoverCasillero).
   const armaduraArruinada = efectosActivos.some(e => e.armaduraArruinada);
   const armaduraRota = efectosActivos.some(e => e.armaduraRota);
   if(armaduraArruinada){
@@ -2932,24 +3016,33 @@ function renderVitals(){
   $('#cap-cinturon-bonus-txt').textContent = bonusCinturon ? ` (+${fmt(bonusCinturon)} del cinturón equipado)` : '';
   $('#cap-equipo-t').textContent = fmt(crg);
 
-  const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
-  const gastado = num(S.bonosGastados);
-  const bonos = bonosBase - gastado;
-  const fBonos = $('#f-bonos');
-  if(document.activeElement !== fBonos) fBonos.value = fmt(bonos);
-  $('#v-bonos-natural-btn').textContent = `/ ${fmt(bonosBase)}`;
-  $('#c-bonos').classList.toggle('penal', c.sobrecarga > 0 || bonos < 0);
-  $('#c-bonos').title = c.sobrecarga > 0
-    ? `Inteligencia ${fmt(c.final.int)} / 2 = ${fmt(Math.ceil(c.final.int/2))}, menos ${fmt(c.sobrecarga)} de peso excedido, menos ${fmt(gastado)} gastados este turno`
-    : `Inteligencia / 2 redondeado hacia arriba${gastado ? `, menos ${fmt(gastado)} gastados este turno` : ''}`;
-  $('#bonos-breakdown').innerHTML = openStat === 'bonos'
-    ? breakdown('bonos', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
-        <div class="row"><span>Gastado este turno (Ejecutar)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
-        <div class="row tot"><span>Disponibles</span><b>${fmt(bonos)}</b></div>
+  // SP: se gasta con habilidades y no se recarga al pasar turno.
+  const spMax = spMaximo(c);
+  const gastado = num(S.spGastado);
+  const sp = spMax - gastado;
+  const fSp = $('#f-sp');
+  if(document.activeElement !== fSp) fSp.value = fmt(sp);
+  $('#v-sp-natural-btn').textContent = `/ ${fmt(spMax)}`;
+  $('#c-sp').classList.toggle('penal', sp < 0);
+  $('#c-sp').title = `Special Power (${S.formulas.sp || 'int*3'}): se gasta al usar habilidades y no se recarga al pasar turno — solo con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
+  $('#sp-breakdown').innerHTML = openStat === 'sp'
+    ? breakdown('sp', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
+        <div class="row"><span>Gastado (desde la última recarga)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
+        <div class="row tot"><span>Disponibles</span><b>${fmt(sp)}</b></div>
       </div>` : '')
     : '';
-  $('#equipo-over').textContent = c.sobrecarga > 0
-    ? `Te pasás por ${fmt(c.sobrecarga)}. Bonos −${fmt(c.sobrecarga)}.` : '';
+  $('#equipo-over').innerHTML = c.sobrecarga > 0
+    ? `Te pasás por ${fmt(c.sobrecarga)}.${IT2.penalidadSobrecargaDefinida ? '' : ` ${IT2_PENDIENTE('la penalidad por sobrecarga todavía no está definida (antes restaba de Bonos)')}`}` : '';
+}
+
+function spMaximo(c){
+  c = c || compute();
+  return Number.isNaN(c.final.sp) ? 0 : c.final.sp;
+}
+
+function nitrosMaximo(c){
+  c = c || compute();
+  return Number.isNaN(c.final.nitros) ? 0 : c.final.nitros;
 }
 
 function setCap(key, used, total){
@@ -3105,14 +3198,17 @@ function tirarExtraDeItem(it){
   return !!r;
 }
 
-function restaurarBonosDeConsumo(it){
-  const pct = num(it.curabonosPct);
+function restaurarSpDeConsumo(it){
+  const pct = num(it.curaspPct);
   if(pct <= 0) return 0;
-  const c = compute();
-  const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
-  const restaurar = Math.ceil(bonosBase * Math.min(pct, 100) / 100);
-  S.bonosGastados = Math.max(0, num(S.bonosGastados) - restaurar);
+  const restaurar = Math.ceil(spMaximo() * Math.min(pct, 100) / 100);
+  S.spGastado = Math.max(0, num(S.spGastado) - restaurar);
   return restaurar;
+}
+
+// Nitros que cuesta consumir un ítem según de dónde sale.
+function costoConsumirNitros(key){
+  return key === 'cinturon' ? IT2.nitrosConsumirCinturon : IT2.nitrosConsumirMochila;
 }
 
 function consumeButton(i, key){
@@ -3124,11 +3220,10 @@ function consumeButton(i, key){
     </button>
     <span class="hint">En la mochila no se activa solo — usalo a mano para el caso de un aliado a distancia cero.</span>`;
   }
-  const costoAcciones = key === 'cinturon' ? 1 : 2;
   const partes = [];
   if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
-  if(num(i.curabonosPct) > 0) partes.push(`${fmt(num(i.curabonosPct))}% Bonos`);
-  partes.push(`-${costoAcciones} Acci${costoAcciones===1?'ón':'ones'}`);
+  if(num(i.curaspPct) > 0) partes.push(`${fmt(num(i.curaspPct))}% SP`);
+  partes.push(`-${costoConsumirNitros(key)} No2`);
   return `<button class="consume-btn" data-consume="${i.id}" ${num(i.unidades)<=0?'disabled':''}>
     Consumir <span class="consume-fx">(${partes.join(' · ')})</span>
   </button>`;
@@ -3249,7 +3344,7 @@ function renderDadosHistorial(){
 /* ---------- Tirar dados a partir del valor de un stat ---------- */
 
 const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
-const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'bonos', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'mov', 'rng', 'crit', 'rangocasteo', 'def', 'accionesmax', 'capcinturon'];
+const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'sp', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
 
 function combosDeSuma(n, k, minIdx){
   if(k === 0) return n === 0 ? [[]] : [];
@@ -3545,9 +3640,8 @@ const LISTS = {
     row:i => {
       const noEspameable = i.categoria === 'No espameable';
       const yaUsada = noEspameable && i.usadaEsteTurno === true;
-      const esVariable = esCostoVariable(i.costo);
-      const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
-      const bloqueada = sinAcciones;
+      const sinNitros = sinNitrosPara(i);
+      const bloqueada = sinNitros;
       return `<div class="item${i.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="ihead">
         ${thumb(i)}
@@ -3556,7 +3650,7 @@ const LISTS = {
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
       </div>
-      <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar${yaUsada?' · ya usada este turno':(sinAcciones?' · sin acciones':'')}</button>
+      <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>Ejecutar${yaUsada?' · ya usada este turno':(sinNitros?' · sin nitros':'')}</button>
       </div>`;
     }
   },
@@ -3687,9 +3781,8 @@ function renderTodasHabilidades(){
   grid.innerHTML = `<div class="habs-grid">${S.habilidades.map(i => {
     const noEspameable = i.categoria === 'No espameable';
     const yaUsada = noEspameable && i.usadaEsteTurno === true;
-    const esVariable = esCostoVariable(i.costo);
-    const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
-    const bloqueada = sinAcciones;
+    const sinNitros = sinNitrosPara(i);
+    const bloqueada = sinNitros;
     return `<div class="habs-grid-item${i.nombre==='Movimiento'?' item-movimiento':''}">
       <div class="habs-grid-nombre">${esc(i.nombre)}</div>
       <div class="habs-grid-btns">
@@ -3705,11 +3798,9 @@ function renderBotonera(){
   const c = compute();
   let html = '';
 
-  const accionesmax = Number.isNaN(c.final.accionesmax) ? 0 : c.final.accionesmax;
-  $('#botonera-badge-acciones').textContent = `Acciones ${fmt(num(S.acciones))}/${fmt(accionesmax)}`;
-  const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
-  const bonosDisponibles = bonosBase - num(S.bonosGastados);
-  $('#botonera-badge-bonos').textContent = `Bonos ${fmt(bonosDisponibles)}/${fmt(bonosBase)}`;
+  $('#botonera-badge-nitros').textContent = `No2 ${fmt(num(S.nitros))}/${fmt(nitrosMaximo(c))}`;
+  const spMax = spMaximo(c);
+  $('#botonera-badge-sp').textContent = `SP ${fmt(spMax - num(S.spGastado))}/${fmt(spMax)}`;
 
   // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva,
   // Parry, Bloqueo) no hace falta repetirlos acá. Los 5 principales (Con,
@@ -3719,7 +3810,6 @@ function renderBotonera(){
     ...ATTR_LIST,
     ...STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
   ];
-  const sinAccPdg = num(S.acciones) < 1;
   const fCombate = formulasCombate();
 
   html += `<div class="botonera-grid botonera-grid-even">
@@ -3727,7 +3817,7 @@ function renderBotonera(){
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
       <div class="botonera-combate-wrap">
         <div class="botonera-combate-grid">
-          <button type="button" class="botonera-tile" data-botoneraaccion="atacar" ${sinAccPdg?'disabled':''} title="Atacar (PdG) · cuesta 1 acción">
+          <button type="button" class="botonera-tile" data-botoneraaccion="atacar" title="Atacar (PdG) · ${esc(costoAtaqueTxt())}">
             <span class="bt-label">Atacar (PdG)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.pdg)}</span>
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
@@ -3782,14 +3872,13 @@ function renderBotonera(){
         ${S.habilidades.length ? S.habilidades.map(i => {
           const noEspameable = i.categoria === 'No espameable';
           const yaUsada = noEspameable && i.usadaEsteTurno === true;
-          const esVariable = esCostoVariable(i.costo);
-          const sinAcciones = !esVariable && num(S.acciones) < num(i.accionesCosto ?? 1);
+          const sinNitros = sinNitrosPara(i);
           return `<div class="cat-row${i.nombre==='Movimiento'?' item-movimiento':''}">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
             <span class="hab-accion">
-              <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinAcciones?'disabled':''} style="width:auto">Ejecutar</button>
+              <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinNitros?'disabled':''} style="width:auto">Ejecutar</button>
               ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
             </span>
           </div>`;
@@ -3878,6 +3967,9 @@ function renderPortrait(){
 }
 
 function renderAll(){
+  // Cualquier ficha que llegue (archivo, mesa, otra ventana) pasa por acá.
+  migrarEstadoIt2(S);
+  if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
   ['raza','clase','subclase','nivel','exp','dde','wld'].forEach(k => $('#f-'+k).value = S.meta[k]);
   renderPortrait();
@@ -3894,7 +3986,7 @@ function renderAll(){
   renderArmadura();
   Object.keys(LISTS).forEach(renderList);
   renderTurno();
-  renderAcciones();
+  renderNitros();
   renderVitals();
   renderJob();
   renderExp();
@@ -3916,7 +4008,7 @@ function configEquipoEstadoDe(it){
 // mecánica real del preset "Afortunado".
 const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'inmovilizado', 'rengo', 'armaduraRota', 'armaduraArruinada', 'escudoMagico', 'forzarAccionesMax'];
+  'lisiado', 'inmovilizado', 'rengo', 'armaduraRota', 'armaduraArruinada', 'escudoMagico', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
   const p = EFECTOS_PRESET.find(x => x.nombre === (nombrePreset || '').trim());
   if(!p) return {};
@@ -3960,7 +4052,7 @@ function sincronizarEstadosDeEquipo(){
 
 function refresh(){
   sincronizarEstadosDeEquipo();
-  renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); renderAcciones();
+  renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); renderNitros();
   renderList('efectos');
 }
 
@@ -4016,16 +4108,15 @@ document.addEventListener('input', e => {
     if(row){ row[t.dataset.lk] = t.dataset.lk === 'cantidad' ? num(t.value) : t.value; }
     return;
   }
-  if(t.id === 'f-bonos'){
-    const c = compute();
-    const bonosBase = Number.isNaN(c.final.bonos) ? 0 : c.final.bonos;
-    S.bonosGastados = bonosBase - num(t.value);
+  if(t.id === 'f-sp'){
+    // Editar el número a mano es la forma de recargar SP (descanso, etc.).
+    S.spGastado = spMaximo() - num(t.value);
     renderVitals();
     return;
   }
-  if(t.id === 'f-acciones'){
-    S.acciones = num(t.value);
-    renderAcciones();
+  if(t.id === 'f-nitros'){
+    S.nitros = num(t.value);
+    renderNitros();
     renderList('habilidades');
     return;
   }
@@ -4411,6 +4502,12 @@ document.addEventListener('click', e => {
     if(it) tirarDanoDeArma(it);
     return;
   }
+  if(b.dataset.atacararma){
+    const it = S.inventario.find(x=>x.id===b.dataset.atacararma);
+    $('#scrim-elegir-arma').classList.remove('open');
+    if(it) atacarConArma(it);
+    return;
+  }
   if(b.dataset.dadorapido){
     tirarRapido(num(b.dataset.dadorapido));
     return;
@@ -4551,12 +4648,12 @@ document.addEventListener('click', e => {
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
     if(it && num(it.unidades) > 0){
-      const costoAcciones = key === 'cinturon' ? 1 : 2;
-      if(costoAcciones > num(S.acciones)){
-        toast(`No te quedan Acciones suficientes — consumir ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'} cuesta ${costoAcciones}`);
+      const costoNitros = costoConsumirNitros(key);
+      if(costoNitros > num(S.nitros)){
+        toast(`No te alcanzan los Nitros — consumir ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'} cuesta ${costoNitros}`);
         return;
       }
-      S.acciones = num(S.acciones) - costoAcciones;
+      S.nitros = num(S.nitros) - costoNitros;
 
       const cargaMax = Math.max(1, num(it.cargaMax) || 1);
       let carga = num(it.cargaActual ?? cargaMax);
@@ -4581,16 +4678,16 @@ document.addEventListener('click', e => {
       }
       const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
-      const bonosRestaurados = restaurarBonosDeConsumo(it);
+      const spRestaurado = restaurarSpDeConsumo(it);
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura() : 0;
       if(key === 'inventario') renderInventario(); else renderList('cinturon');
       if(efecto || reparados) renderList('efectos');
       renderVitals();
-      renderAcciones();
+      renderNitros();
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
-      if(bonosRestaurados) partes.push(`+${fmt(bonosRestaurados)} Bonos`);
-      partes.push(`-${costoAcciones} Acci${costoAcciones===1?'ón':'ones'}`);
+      if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
+      partes.push(`-${costoNitros} No2`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
@@ -4724,8 +4821,8 @@ function aplicarFicha(data){
       if(!next.habilidades.some(h => h.id === 'movimiento')){
         next.habilidades = [structuredClone(fresh.habilidades[0]), ...next.habilidades];
       }
-      if(next.bonosGastados === undefined) next.bonosGastados = 0;
-      if(next.acciones === undefined) next.acciones = 3;
+      // Iteración 2 (Bonos → SP, Acciones/Mov → Nitros): ver migrarEstadoIt2,
+      // que corre en renderAll.
       S = next;
       openStat = null;
       renderAll();
@@ -5132,15 +5229,15 @@ function toast(msg){
    ========================================================= */
 
 const SCHEMA = {
-  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
-  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
-  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curabonosPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
-  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','accionesCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
+  inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
+  cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
+  catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
-  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarAccionesMax','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
+  efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
 };
-const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo', accionesCosto:'velocidad (acciones)', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
+const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
   stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
   job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
@@ -5148,13 +5245,13 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
   danoAmplificado:'Daño amplificado (dados extra sin sumar peso)', armaDeRango:'Arma de rango (el botón de Daño Arma no suma el stat Dmg)',
   manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoDetalle:'Detalle del estado',
-  curabonosPct:'% de Bonos al consumir (0-100, redondea hacia arriba)',
+  curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
-  forzarAccionesMax:'Forzar Acciones máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
+  forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
   escudoMagico:'Escudo mágico — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','accionesCosto','efectoTurnos','efectoHpTurno','curabonosPct','cargaMax','cargaActual','forzarAccionesMax','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
@@ -5166,14 +5263,16 @@ const EFECTOS_PRESET = [
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:3, mods:[{stat:'accionesmax', val:-1}],
-    detalle:'-1 a las Acciones máximas del turno.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:3, forzarAccionesMax:1, esCC:true,
-    detalle:'Como mucho 1 Acción este turno, sin importar el máximo normal.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:2, forzarAccionesMax:0, esCC:true,
-    detalle:'Sin Acciones este turno.'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:3, mods:[{stat:'accionesmax', val:1}],
-    detalle:'+1 a las Acciones máximas del turno.'},
+  // PLACEHOLDER (Iteración 2): Cansado, Exhausto, Stun, Hypeado, Inmovilizado
+  // y Rengo pasaron de Acciones/Movimiento a Nitros 1 a 1, sin recalibrar.
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, mods:[{stat:'nitros', val:-1}],
+    detalle:'-1 a los Nitros máximos. ⚠ Valor provisorio (antes −1 Acción).'},
+  {nombre:'Exhausto', polaridad:'debuff', turnos:3, forzarNitros:1, esCC:true,
+    detalle:'Como mucho 1 Nitro por turno, sin importar el máximo normal. ⚠ Valor provisorio (antes 1 Acción).'},
+  {nombre:'Stun', polaridad:'debuff', turnos:2, forzarNitros:0, esCC:true,
+    detalle:'Sin Nitros este turno.'},
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, mods:[{stat:'nitros', val:1}],
+    detalle:'+1 a los Nitros máximos. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', turnos:0, permanente:true, armaduraRota:true,
     detalle:'Corta a la mitad (redondeado hacia abajo) el valor total de Defensa y Resistencia a crítico del personaje. Permanente — se quita con Oleo reparador.'},
   {nombre:'Armadura arruinada', polaridad:'debuff', turnos:0, permanente:true, armaduraArruinada:true,
@@ -5185,9 +5284,9 @@ const EFECTOS_PRESET = [
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true,
-    detalle:'El Movimiento queda en 0 mientras dure.'},
+    detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true,
-    detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
+    detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
@@ -6104,11 +6203,11 @@ function openEditor(key, id, equipadoPreset){
   const sc = SCHEMA[key];
   const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
-    activo:true, stacks:1, costo:'', accionesCosto:1, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
+    activo:true, stacks:1, costo:'', nitrosCosto:IT2.nitrosHabilidad, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:6, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
-    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curabonosPct:0, cargaMax:1, cargaActual:1,
-    forzarAccionesMax:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'',
+    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
+    forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item)};
@@ -6190,8 +6289,8 @@ function drawEditor(){
   const resto = cortos.filter(c => {
     if(c==='nombre') return false;
     if(c==='curahp') return false;
-    if(['efectoNombre','efectoTurnos','efectoHpTurno','curabonosPct'].includes(c)) return false;
-    if(c==='forzarAccionesMax') return false;
+    if(['efectoNombre','efectoTurnos','efectoHpTurno','curaspPct'].includes(c)) return false;
+    if(c==='forzarNitros') return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
     if(key === 'habilidades' && c === 'tiradaExtra') return false;
@@ -6232,9 +6331,9 @@ function drawEditor(){
     html += `<div class="f"><label>${CAMPO_LABEL.curahp}</label>
       <input data-c="curahp" type="number" step="any" value="${esc(draft.curahp??0)}"></div>`;
   }
-  if(sc.campos.includes('curabonosPct') && draft.consumible){
-    html += `<div class="f"><label>${CAMPO_LABEL.curabonosPct}</label>
-      <input data-c="curabonosPct" type="number" step="any" min="0" max="100" value="${esc(draft.curabonosPct??0)}"></div>`;
+  if(sc.campos.includes('curaspPct') && draft.consumible){
+    html += `<div class="f"><label>${CAMPO_LABEL.curaspPct}</label>
+      <input data-c="curaspPct" type="number" step="any" min="0" max="100" value="${esc(draft.curaspPct??0)}"></div>`;
   }
   if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')){
     const personalizadosIt = S.efectosPersonalizados || [];
@@ -6391,7 +6490,7 @@ $('#modal-body').addEventListener('click', e => {
     const preset = {
       nombre: d.nombre, imagen: d.imagen || '', turnos: d.turnos, stacks: d.stacks,
       hpturno: d.hpturno, stacksturno: d.stacksturno, permanente: !!d.permanente,
-      forzarAccionesMax: d.forzarAccionesMax, mitadPdgEva: !!d.mitadPdgEva,
+      forzarNitros: d.forzarNitros, mitadPdgEva: !!d.mitadPdgEva,
       armaduraRota: !!d.armaduraRota, armaduraArruinada: !!d.armaduraArruinada,
       mods: structuredClone(d.mods || []), detalle: d.detalle || '',
     };
@@ -6439,7 +6538,7 @@ function itemComoEntradaDeCatalogo(draft){
     } : {}),
     precioCompra: num(draft.precioCompra),
     unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
-    consumible: !!draft.consumible, curahp: num(draft.curahp), curabonosPct: num(draft.curabonosPct),
+    consumible: !!draft.consumible, curahp: num(draft.curahp), curaspPct: num(draft.curaspPct),
     efectoNombre: draft.efectoNombre || '', efectoTurnos: num(draft.efectoTurnos),
     efectoHpTurno: num(draft.efectoHpTurno), efectoPermanente: !!draft.efectoPermanente,
     efectoDetalle: draft.efectoDetalle || '', efectoMods: structuredClone(draft.efectoMods || []),
@@ -6546,7 +6645,7 @@ function openFormulas(){
       <span style="font-family:'Space Mono',monospace;font-size:12px;text-align:right;color:${Number.isNaN(c.base[s.id])?'var(--danger)':'var(--brass)'}">${Number.isNaN(c.base[s.id])?'error':fmt(c.base[s.id])}</span>
     </div>`;
   $('#modal-body').innerHTML = `
-    <div class="hint">Escribí cómo se calcula cada stat. Variables: <b style="color:var(--brass)">con fue agl des int nivel job bon sobrecarga</b>, y el id de cualquier otro stat. <b style="color:var(--brass)">sobrecarga</b> es cuánto peso equipado te pasás de Crg.Max (0 si estás en regla). Funciones: floor() ceil() round() min() max().<br>Ejemplos: <b>con*5</b> · <b>ceil(int/2) - sobrecarga</b> · <b>ini+des</b></div>
+    <div class="hint">Escribí cómo se calcula cada stat. Variables: <b style="color:var(--brass)">con fue agl des int nivel job sobrecarga</b>, y el id de cualquier otro stat. <b style="color:var(--brass)">sobrecarga</b> es cuánto peso equipado te pasás de Crg.Max (0 si estás en regla). Funciones: floor() ceil() round() min() max().<br>Ejemplos: <b>con*5</b> · <b>int*3 - sobrecarga</b> · <b>ini+des</b></div>
     ${GRUPOS.map(g => `<div><div class="hint" style="color:${g.color};margin:8px 0 4px">${g.full}</div>${g.derived.map(fila).join('')}</div>`).join('')}
     <div><div class="hint" style="margin:8px 0 4px">Otros</div>${EXTRA.map(fila).join('')}</div>`;
   $('#modal-save').style.display = 'none';
@@ -6576,32 +6675,114 @@ function renderTurno(){
   $('#maint-log').innerHTML = (S.log || []).join('<br>');
 }
 
-function renderAcciones(){
-  const box = $('#acciones-box');
+function renderNitros(){
+  const box = $('#nitros-box');
   if(!box) return;
-  const fAcciones = $('#f-acciones');
-  if(document.activeElement !== fAcciones) fAcciones.value = fmt(num(S.acciones));
-  box.classList.toggle('agotadas', num(S.acciones) <= 0);
-  const max = compute().final.accionesmax;
-  $('#v-acciones-max').textContent = Number.isNaN(max) ? '?' : fmt(max);
+  const fNitros = $('#f-nitros');
+  if(document.activeElement !== fNitros) fNitros.value = fmt(num(S.nitros));
+  $('#btn-atacar-pdg').title = `Cuesta Nitros · ${costoAtaqueTxt()}`;
+  box.classList.toggle('agotadas', num(S.nitros) <= 0);
+  const max = compute().final.nitros;
+  $('#v-nitros-max').textContent = Number.isNaN(max) ? '?' : fmt(max);
   if($('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
-function parseCostoBonos(costo){
+// Número del costo en SP de una habilidad ("2 SP"; las viejas dicen "1 bono").
+function parseCostoSp(costo){
   if(!costo) return 0;
   const m = String(costo).match(/(\d+(\.\d+)?)/);
   return m ? num(m[1]) : 0;
 }
 
+function costoNitrosHab(h){
+  return num(h.nitrosCosto ?? IT2.nitrosHabilidad);
+}
+
+/* ---------- Movimiento: 1 Nitro por casillero ---------- */
+
+function estadoActivo(flag){
+  return (S.efectos || []).some(e => e.activo !== false && e[flag]);
+}
+
+function costoMoverCasillero(){
+  return estadoActivo('rengo') ? IT2.nitrosMoverRengo : IT2.nitrosMover;
+}
+
+function sinNitrosPara(h){
+  if(h.id === 'movimiento') return num(S.nitros) < costoMoverCasillero();
+  return !esCostoVariable(h.costo) && num(S.nitros) < costoNitrosHab(h);
+}
+
+function moverCasilleros(){
+  if(IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado')){
+    toast('Inmovilizado: no te podés mover ⚠ (regla provisoria)');
+    return;
+  }
+  const rengo = estadoActivo('rengo');
+  const porCasillero = costoMoverCasillero();
+  const alcanza = Math.floor(num(S.nitros) / porCasillero);
+  if(alcanza < 1){ toast(`No te alcanzan los Nitros para moverte (cada casillero cuesta ${porCasillero})`); return; }
+  const txt = prompt(`¿Cuántos casilleros te movés?\n\nCada uno cuesta ${porCasillero} No2${rengo ? ' (Rengo — ⚠ valor provisorio)' : ''}. Te alcanza para ${alcanza}.`, '1');
+  if(txt === null) return;
+  const n = Math.floor(num(txt));
+  if(n < 1){ toast('Poné cuántos casilleros (1 o más)'); return; }
+  if(n > alcanza){ toast(`No te alcanzan los Nitros: ${n} casilleros cuestan ${n * porCasillero} y tenés ${fmt(num(S.nitros))}`); return; }
+  S.nitros = num(S.nitros) - n * porCasillero;
+  renderList('habilidades');
+  renderNitros();
+  toast(`Movimiento: ${n} casillero${n === 1 ? '' : 's'} · -${fmt(n * porCasillero)} No2`);
+}
+
+/* ---------- Atacar: Tipo ÷ 2 el primer ataque del turno, Tipo completo los demás ---------- */
+
+function costoAtaqueNitros(arma){
+  const tipo = arma ? (num(arma.tipoDado) || 6) : IT2.tipoSinArma;
+  return num(S.ataquesTurno) === 0 ? IT2.redondeoPrimerAtaque(tipo / 2) : tipo;
+}
+
+function costoAtaqueTxt(){
+  const armas = armasEquipadasConDano();
+  const cual = num(S.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
+  if(!armas.length) return `sin arma: ${costoAtaqueNitros(null)} No2 ⚠ provisorio · ${cual}`;
+  return `${armas.map(a => `${a.item.nombre}: ${costoAtaqueNitros(a.item)} No2`).join(' · ')} · ${cual}`;
+}
+
+function atacarConArma(arma){
+  const costo = costoAtaqueNitros(arma);
+  if(costo > num(S.nitros)){
+    toast(`No te alcanzan los Nitros — este ataque cuesta ${costo} y tenés ${fmt(num(S.nitros))}`);
+    return;
+  }
+  const primero = num(S.ataquesTurno) === 0;
+  S.nitros = num(S.nitros) - costo;
+  S.ataquesTurno = num(S.ataquesTurno) + 1;
+  renderNitros();
+  tirarValorStat('PdG', compute().final.pdg, 'pdg');
+  const tipo = arma ? (num(arma.tipoDado) || 6) : IT2.tipoSinArma;
+  const impar = primero && tipo % 2 !== 0;
+  toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${S.ataquesTurno} del turno`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
+}
+
+function atacar(){
+  const armas = armasEquipadasConDano();
+  if(armas.length <= 1){ atacarConArma(armas.length ? armas[0].item : null); return; }
+  $('#elegir-arma-lista').innerHTML = armas.map(a => `
+    <button class="btn" data-atacararma="${a.item.id}" style="width:100%">
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${fmt(costoAtaqueNitros(a.item))} No2
+    </button>`).join('');
+  $('#scrim-elegir-arma').classList.add('open');
+}
+
 let pendingEjecucion = null;
 
 /* Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta.
-   El costo en bonos es texto libre ("1 bono", "X bonos"), así que se
-   muestra tal cual lo escribió el jugador. */
+   El costo en SP es texto libre ("2 SP", "X SP"), así que se muestra tal
+   cual lo escribió el jugador. */
 function costoHabilidadTxt(h){
+  if(h.id === 'movimiento') return `${fmt(costoMoverCasillero())} No2 por casillero`;
   const partes = [];
-  const acc = num(h.accionesCosto ?? 1);
-  if(acc) partes.push(`${fmt(acc)} ${acc === 1 ? 'acción' : 'acciones'}`);
+  const nitros = costoNitrosHab(h);
+  if(nitros) partes.push(`${fmt(nitros)} No2`);
   const costo = String(h.costo || '').trim();
   if(costo) partes.push(costo);
   return partes.join(' · ');
@@ -6611,40 +6792,51 @@ function esCostoVariable(costo){
   return /x/i.test(String(costo||''));
 }
 
+// Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
+function limiteCostoX(cual){
+  const f = cual === 'sp' ? IT2.limiteXSp : IT2.limiteXNitros;
+  return typeof f === 'function' ? f(compute()) : null;
+}
+
 function ejecutarHabilidad(id){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
+  if(it.id === 'movimiento'){ moverCasilleros(); return; }
   if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
     if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
   }
   if(esCostoVariable(it.costo)){
     pendingEjecucion = id;
     $('#costox-nombre').textContent = it.nombre;
-    $('#f-costox-bonos').value = 0;
-    $('#f-costox-acciones').value = Math.min(num(S.acciones), num(it.accionesCosto ?? 1));
-    $('#costox-disponibles').textContent = `${fmt(num(S.acciones))} Acciones`;
+    $('#f-costox-sp').value = 0;
+    $('#f-costox-nitros').value = Math.min(num(S.nitros), costoNitrosHab(it));
+    $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
+    const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
+    $('#costox-limite').innerHTML = (limN === null || limS === null)
+      ? `${IT2_PENDIENTE('el tope de X todavía no está confirmado')} Tope de X sin definir: por ahora solo te frena lo que tengas.`
+      : '';
     $('#scrim-costox').classList.add('open');
     return;
   }
-  const costoAcciones = num(it.accionesCosto ?? 1);
-  if(costoAcciones > num(S.acciones)){
-    toast('No te quedan acciones este turno');
+  const costoNitros = costoNitrosHab(it);
+  if(costoNitros > num(S.nitros)){
+    toast(`No te alcanzan los Nitros — ${it.nombre} cuesta ${fmt(costoNitros)}`);
     return;
   }
-  const costoBonos = parseCostoBonos(it.costo);
-  S.acciones = num(S.acciones) - costoAcciones;
-  S.bonosGastados = num(S.bonosGastados) + costoBonos;
+  const costoSp = parseCostoSp(it.costo);
+  S.nitros = num(S.nitros) - costoNitros;
+  S.spGastado = num(S.spGastado) + costoSp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
   renderList('habilidades');
   if(efecto) renderList('efectos');
-  renderAcciones();
+  renderNitros();
   renderVitals();
   if(popupHabilidadActivo(it)) openViewer('habilidades', id);
   const partes = [`ejecutada`];
-  if(costoBonos) partes.push(`-${fmt(costoBonos)} Bonos`);
-  partes.push(costoAcciones ? `-${fmt(costoAcciones)} Acci${costoAcciones===1?'ón':'ones'}` : 'sin costo de Acciones');
+  if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
+  partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
 }
@@ -6652,18 +6844,21 @@ function ejecutarHabilidad(id){
 function confirmarCostoVariable(){
   const it = S.habilidades.find(h => h.id === pendingEjecucion);
   if(!it) return;
-  const bonos = num($('#f-costox-bonos').value);
-  const acciones = num($('#f-costox-acciones').value);
-  if(acciones > num(S.acciones)){
-    toast(`No hay suficientes Acciones — tenés ${fmt(num(S.acciones))}`);
-    return;
-  }
-  if(bonos < 0 || acciones < 0){
+  const sp = num($('#f-costox-sp').value);
+  const nitros = num($('#f-costox-nitros').value);
+  if(sp < 0 || nitros < 0){
     toast('Los valores no pueden ser negativos');
     return;
   }
-  S.acciones = Math.max(0, num(S.acciones) - acciones);
-  S.bonosGastados = num(S.bonosGastados) + bonos;
+  if(nitros > num(S.nitros)){
+    toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
+    return;
+  }
+  const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
+  if(limN !== null && nitros > limN){ toast(`Como mucho ${fmt(limN)} Nitros en X`); return; }
+  if(limS !== null && sp > limS){ toast(`Como mucho ${fmt(limS)} SP en X`); return; }
+  S.nitros = Math.max(0, num(S.nitros) - nitros);
+  S.spGastado = num(S.spGastado) + sp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   tirarExtraDeItem(it);
@@ -6671,10 +6866,10 @@ function confirmarCostoVariable(){
   pendingEjecucion = null;
   renderList('habilidades');
   if(efecto) renderList('efectos');
-  renderAcciones();
+  renderNitros();
   renderVitals();
   if(popupHabilidadActivo(it)) openViewer('habilidades', it.id);
-  const partes = [`ejecutada`, `-${fmt(bonos)} Bonos`, `-${fmt(acciones)} Acciones`];
+  const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
 }
@@ -6751,8 +6946,10 @@ function mantenimiento(){
   }
 
   S.turno = (S.turno || 1) + 1;
-  S.bonosGastados = 0;
-  S.acciones = compute().final.accionesmax;
+  // Nitros se recargan al máximo y el primer ataque vuelve a costar la
+  // mitad. El SP NO se recarga acá (Iteración 2).
+  S.nitros = nitrosMaximo();
+  S.ataquesTurno = 0;
   S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
 
   let invocacionesVencidas = 0;
@@ -6773,13 +6970,13 @@ function mantenimiento(){
   }
 
   log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
-  log.push('Bonos y Acciones se reiniciaron.');
+  log.push(`Nitros recargados a ${fmt(num(S.nitros))}. El SP no se recarga al pasar turno.`);
   S.log = log;
 
   renderTurno();
   renderList('efectos');
   renderList('habilidades');
-  renderAcciones();
+  renderNitros();
   renderInvocaciones();
   refresh();
   if(S.hp === 0) toast('Te quedaste en 0 de HP');
@@ -6878,12 +7075,7 @@ $('#f-dados-formula').addEventListener('keydown', e => { if(e.key === 'Enter'){ 
 $('#scrim-dados').addEventListener('mousedown', e => { if(e.target.id==='scrim-dados') $('#scrim-dados').classList.remove('open'); });
 $('#resultado-dado-x').onclick = () => $('#scrim-resultado-dado').classList.remove('open');
 $('#scrim-resultado-dado').addEventListener('mousedown', e => { if(e.target.id==='scrim-resultado-dado') $('#scrim-resultado-dado').classList.remove('open'); });
-$('#btn-atacar-pdg').onclick = () => {
-  if(num(S.acciones) < 1){ toast('No te quedan Acciones para atacar'); return; }
-  S.acciones = num(S.acciones) - 1;
-  renderAcciones();
-  tirarValorStat('PdG', compute().final.pdg, 'pdg');
-};
+$('#btn-atacar-pdg').onclick = atacar;
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva, 'eva');
 $('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry, 'parry');
@@ -6991,11 +7183,11 @@ function fichaNueva(){
   S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
   S.attrs = {con:1, fue:1, agl:1, des:1, int:1};
-  S.hp = 0; S.turno = 1; S.log = []; S.bonosGastados = 0; S.acciones = 3;
+  S.hp = 0; S.turno = 1; S.log = []; S.spGastado = 0; S.ataquesTurno = 0;
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
   S.habilidades = [structuredClone(DEFAULT.habilidades[0])];
-  S.acciones = compute().final.accionesmax;
+  S.nitros = nitrosMaximo();
   { const hpmax = compute().final.hpmax; S.hp = Number.isNaN(hpmax) ? 0 : hpmax; }  // arranca con la vida llena
   openStat = null;
   renderAll();
@@ -7008,7 +7200,7 @@ $('#btn-mantenimiento').onclick = () => mantenimiento();
 $('#btn-mantenimiento-flotante').onclick = () => mantenimiento();
 $('#btn-reset').onclick = () => crearPersonajeNuevo();
 $('#btn-turno-reset').onclick = () => {
-  if(!confirm('Esto vuelve el contador de turno a 1. No toca Bonos, Acciones ni los estados alterados. ¿Seguís?')) return;
+  if(!confirm('Esto vuelve el contador de turno a 1. No toca SP, Nitros ni los estados alterados. ¿Seguís?')) return;
   S.turno = 1;
   S.log = ['<b style="color:var(--brass)">Turno 1</b>', 'El contador de turno se reinició manualmente.'];
   renderTurno();
@@ -7192,7 +7384,7 @@ async function mesaIniciar(){
    FICHA EN VIVO (Firebase)
    El personaje abierto se guarda solo en campanas/<campaña>/fichas/<id>:
    el documento principal tiene dueño, nombre, un resumen público (HP,
-   Bonos, estados) y una miniatura del retrato para el token del mapa;
+   SP, estados) y una miniatura del retrato para el token del mapa;
    el contenido va repartido en fichas/<id>/partes/<parte> (general,
    inventario, efectos…) para escribir solo lo que cambió, y espaciado
    por el tope diario de escrituras del plan gratis.
@@ -7206,7 +7398,7 @@ async function mesaIniciar(){
    ========================================================= */
 
 const PARTES_FICHA = {
-  general: ['meta', 'attrs', 'hp', 'turno', 'bonosGastados', 'acciones', 'muerto', 'caps', 'armadura', 'formulas', 'loot'],
+  general: ['meta', 'attrs', 'hp', 'turno', 'spGastado', 'nitros', 'ataquesTurno', 'muerto', 'caps', 'armadura', 'formulas', 'loot'],
   notas: ['bitacora', 'bitacoraActiva', 'log'],
   inventario: ['inventario'],
   cinturon: ['cinturon'],
@@ -7289,13 +7481,13 @@ function fichaAplicarParte(parte, datos){
 function fichaResumen(){
   const c = compute();
   const n = v => (typeof v === 'number' && !Number.isNaN(v)) ? v : num(v);
-  const bonosMax = n(c.final.bonos);
+  const spMax = n(c.final.sp);
   return {
     nivel: num(S.meta.nivel),
     hp: num(S.hp),
     hpMax: n(c.final.hpmax),
-    bonos: bonosMax - num(S.bonosGastados),
-    bonosMax,
+    sp: spMax - num(S.spGastado),
+    spMax,
     muerto: !!(S.muerto && S.muerto.activo),
     estados: (S.efectos || [])
       .filter(e => e && e.activo !== false && e.nombre)

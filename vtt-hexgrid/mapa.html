@@ -292,8 +292,20 @@ function estadoDe(t){
   const hp = r.hpPct !== undefined
     ? entre01(num(r.hpPct) / 100)
     : (num(r.hpMax) > 0 ? entre01(num(r.hp) / num(r.hpMax)) : 0);
-  const sp = t.tipo === 'pj' && num(r.bonosMax) > 0 ? entre01(num(r.bonos) / num(r.bonosMax)) : null;
+  const {sp: spActual, spMax} = spDeResumen(r);
+  const sp = t.tipo === 'pj' && spMax > 0 ? entre01(spActual / spMax) : null;
   return {hp, sp, muerto: !!r.muerto, dormida: !!r.dormida, estados: Array.isArray(r.estados) ? r.estados : []};
+}
+// SP de una ficha. Las fichas guardadas antes de la Iteración 2 publican
+// bonos/bonosMax en vez de sp/spMax (hasta que su dueño las vuelva a abrir).
+function spDeResumen(r){
+  const nuevo = r.spMax !== undefined;
+  return {
+    sp: num(nuevo ? r.sp : r.bonos),
+    spMax: num(nuevo ? r.spMax : r.bonosMax),
+    campoGastado: nuevo ? 'spGastado' : 'bonosGastados',
+    campoResumen: nuevo ? 'resumen.sp' : 'resumen.bonos',
+  };
 }
 
 const imagenesCache = new Map();  // data URL -> Image
@@ -954,7 +966,7 @@ function htmlEstadoToken(t){
   if(v.invocacion) html += `<div class="dato" style="color:var(--muted)">Invocación de ${esc(v.deQuien || '?')}${est.dormida ? ' · no invocada' : ''}</div>`;
   if(t.tipo === 'pj'){
     html += vital('hp', 'Vida', Math.max(0, num(r.hp)), num(r.hpMax), est.hp, HP_COLOR);
-    if(est.sp !== null) html += vital('sp', 'SP', num(r.bonos), num(r.bonosMax), est.sp, SP_COLOR);
+    if(est.sp !== null) html += vital('sp', 'SP', spDeResumen(r).sp, spDeResumen(r).spMax, est.sp, SP_COLOR);
   }else{
     // Creep: números solo para el GM (los lee de la parte privada).
     const nums = soyGM && creepPrivado.id === t.fichaId && creepPrivado.hp !== null;
@@ -1054,13 +1066,13 @@ async function cambiarVidaPj(t, clave, texto){
       datos.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
       cambios['resumen.hp'] = datos.hp;
     }else{
-      // SP = Bonos disponibles = máximo - gastados (igual que en la ficha).
-      const bonosMax = num(r.bonosMax);
-      const nuevo = leerValorVital(texto, bonosMax - num(datos.bonosGastados));
+      // SP disponible = máximo - gastado (igual que en la ficha).
+      const {spMax, campoGastado, campoResumen} = spDeResumen(r);
+      const nuevo = leerValorVital(texto, spMax - num(datos[campoGastado]));
       if(nuevo === null) throw new Error(ERROR_TIPEO);
-      const sp = Math.min(bonosMax, nuevo);
-      datos.bonosGastados = bonosMax - sp;
-      cambios['resumen.bonos'] = sp;
+      const sp = Math.min(spMax, nuevo);
+      datos[campoGastado] = spMax - sp;
+      cambios[campoResumen] = sp;
     }
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, cambios);

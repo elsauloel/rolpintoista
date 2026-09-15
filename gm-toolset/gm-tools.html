@@ -3820,7 +3820,10 @@ function tarjetaDeFicha(doc){
   const r = d.resumen || {};
   return {
     nombre: d.nombre || 'Sin nombre', nivel: num(r.nivel), imagen: d.miniatura || '',
-    hp: num(r.hp), hpMax: num(r.hpMax), bonos: num(r.bonos), bonosMax: num(r.bonosMax),
+    // La barra de SP usa bonos/bonosMax; las fichas de la Iteración 2
+    // publican sp/spMax (las viejas, bonos/bonosMax).
+    hp: num(r.hp), hpMax: num(r.hpMax),
+    bonos: num(r.spMax !== undefined ? r.sp : r.bonos), bonosMax: num(r.spMax !== undefined ? r.spMax : r.bonosMax),
     muerto: !!r.muerto, estados: r.estados || [], actualizado: tableroFechaIso(d.actualizado),
   };
 }

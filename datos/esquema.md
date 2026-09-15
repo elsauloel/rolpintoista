@@ -68,6 +68,13 @@ importador lo descarta): `con`, `fue`, `agl`, `des`, `int`, `def`, `dmg`,
 `resm`, `bonos`, `rangocasteo`, `rescc`, `hpmax`, `crgmax`, `accionesmax`,
 `tipo1`..`tipo5` (resistencia a crítico por tipo de dado de arma).
 
+**Iteración 2 (pendiente en el catálogo):** Bonos pasó a SP y Acciones +
+Movimiento a Nitros. El catálogo todavía usa los nombres viejos; la ficha
+los convierte en memoria al abrirse (`migrarEstadoIt2`): `bonos` → `sp`
+(× `IT2.spPorBono`), `mov` y `accionesmax` → `nitros`, `curabonosPct` →
+`curaspPct`, `accionesCosto` → `nitrosCosto`, `forzarAccionesMax` →
+`forzarNitros`. Los creeps de gm-tools siguen con el esquema viejo.
+
 **Qué recorta cada consumidor:**
 - `ficha-personaje/ficha.html` — copia completa, con imagen.
 - `gm-toolset/vendor-generator.html` — igual, sin imagen (pesa demasiado

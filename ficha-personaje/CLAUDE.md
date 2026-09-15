@@ -30,6 +30,18 @@ más cambia sesión a sesión.
   y su propia tonalidad de borde (`.card--<nombre>`) para reconocerlas
   colapsadas. La Botonera (modal de acciones rápidas) tiene el mismo
   patrón en sus propias cajas internas.
+- **Iteración 2 — Nitros (No2) y SP** (bloque `IT2` al lado de
+  `DADOS_ARMA`): Acciones + Movimiento se fundieron en Nitros (substat
+  `nitros` de Agilidad, fórmula `agl`; `S.nitros` es lo que queda en el
+  turno, se recarga en `mantenimiento()`). Bonos pasó a SP (substat `sp`
+  de Inteligencia, fórmula `int*3`; `S.spGastado`, **no** se recarga al
+  pasar turno). Costos: mover 1/casillero (`moverCasilleros`), consumir
+  cinturón 1 / mochila 2, habilidad `nitrosCosto` (1 por defecto), atacar
+  Tipo ÷ 2 el primer ataque del turno y Tipo completo después
+  (`atacar`/`costoAtaqueNitros`, `S.ataquesTurno`). Lo no confirmado está
+  en `IT2` marcado PLACEHOLDER y se ve con ⚠ (`IT2_PENDIENTE`). Las fichas
+  y el catálogo viejos se convierten al abrir (`migrarEstadoIt2`, corre en
+  `renderAll`). Las invocaciones siguen con sus propias Acciones.
 - **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
   Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
   `esVeneno`, `esSangrado`). `aplicarDanioEntrante()` es donde

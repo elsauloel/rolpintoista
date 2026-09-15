@@ -60,9 +60,11 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`.
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
-  hpMax, bonos, bonosMax, muerto, estados[{nombre, turnos, permanente,
+  hpMax, sp, spMax, muerto, estados[{nombre, turnos, permanente,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},
-  miniatura, creado, actualizado}`. Una por personaje
+  miniatura, creado, actualizado}`. Las fichas guardadas antes de la
+  Iteración 2 publican `bonos`/`bonosMax` hasta que se vuelven a abrir (el
+  mapa y gm-tools leen los dos). Una por personaje
   (`ficha-personaje/ficha.html`, bloque "FICHA EN VIVO"). El contenido va
   en `fichas/{id}/partes/{parte}` — `{json, actualizado}`, con `parte` en
   `general`, `notas`, `inventario`, `cinturon`, `habilidades`, `efectos`,

@@ -14,7 +14,7 @@ su casa:
 - Tokens: cada jugador mueve los suyos, el GM mueve los de los creeps.
   Todos ven los movimientos al instante.
 - Cada token conectado a su ficha: barra de vida, barra de SP (hoy
-  "Bonos" en la ficha, puede renombrarse) e íconos de estados alterados.
+  "Bonos" en la ficha, ya renombrado en la Iteración 2) e íconos de estados alterados.
 - Chat de tiradas compartido desde los botones de ficha y gm-tools.
 - Fichas y herramienta del GM en vivo: nada de "Subir datos"/"Bajar datos".
 

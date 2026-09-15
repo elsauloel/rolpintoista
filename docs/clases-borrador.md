@@ -42,7 +42,7 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 |---|---|---|
 | Spammeable | Se puede usar varias veces por turno | La ficha ya tiene Espameable / No espameable: ¿las que no dicen nada son No espameables? |
 | Flash | Se usa fuera de tu turno / como reacción | ¿Sigue existiendo? ¿Tiene costo distinto? |
-| Causa fatiga | Penalidad después de usarla | No existe mecánica de fatiga hoy |
+| Causa fatiga | Penalidad después de usarla | **Pendiente: el usuario lo define con el grupo.** Las skills se cierran igual, con "Causa fatiga" tal cual |
 | En flor de 1 | Área: los 6 hexágonos alrededor | Confirmar |
 | XdT4, dT8… | Dados del tipo indicado (d4, d8) | ¿"T" = Tipo de arma? |
 | PG | Probabilidad de golpe (hoy PdG) | Confirmar |
@@ -82,8 +82,10 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
    tirada.
    ⚖ A definir en mesa: ¿se puede usar en todas las tiradas que quieras
    dentro del mismo turno, o una sola vez por turno?
-3. **Sacadito** — Acciones: Ataque. Bonos: 3.
-   1+1d4 auto-ataques consecutivos. Causa fatiga.
+3. ✅ **Sacadito** — **No2:** ataque (todos los golpes juntos cuestan los
+   Nitros de un solo ataque, lo que corresponda al usarla; cuenta como un
+   ataque del turno). **SP:** 3. Tira 1d4 y hace 1 + ese resultado ataques
+   seguidos; cada uno tira PdG y daño. **Causa fatiga.**
 4. **Cañón vasco** — Acciones: 1 / Ataque. Bonos: X ≤ Fue.
    Salta X casillas a X altura. Tira FUE para hacer esa cantidad de daño
    sónico en flor de 1. Tiene +X daño para atacar a un objetivo al caer.

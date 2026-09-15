@@ -154,6 +154,7 @@ aside{
     <span class="perilla"></span><span id="modo-texto">Narrativo</span>
   </button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+  <button type="button" class="btn" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)" hidden>⟳ Mantenimiento</button>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
@@ -424,6 +425,85 @@ function renderModo(){
   b.disabled = !soyGM;
   b.title = soyGM ? `Pasar a modo ${combate ? 'narrativo' : 'combate'}` : 'Modo del mapa (lo cambia el GM)';
 }
+
+/* ---------- Mantenimiento del GM ----------
+   El GM toca "⟳ Mantenimiento": sube campanas/<partida>/mapa/mantenimiento.
+   numero. Cada ficha y gm-tools aplican su propio mantenimiento (con la
+   lógica de siempre) una sola vez por número, aunque estén cerradas: se
+   ponen al día al abrirse. Además, para que se note enseguida, cada mapa
+   corre en segundo plano (iframe oculto, uno por vez) las fichas de su
+   dueño y, en el del GM, gm-tools. Si alguna ya lo aplicó, no pasa nada. */
+let mantenimientoNumero = null;
+const mantenimientoCola = [];
+let mantenimientoMarco = null;
+
+function escucharMantenimiento(){
+  fbDb.doc(fbRutaCampana('mapa/mantenimiento')).onSnapshot(doc => {
+    const numero = doc.exists ? Math.round(num(doc.data().numero)) : 0;
+    const antes = mantenimientoNumero;
+    mantenimientoNumero = numero;
+    if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
+    toast(`⟳ Mantenimiento: pasó el turno`);
+    const base = '../';
+    if(soyGM){
+      mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
+    }else{
+      fichasPub.forEach((f, id) => {
+        if(f.duenoUid === fbUsuario.uid) mantenimientoEncolar(`${base}ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento#${encodeURIComponent(id)}`);
+      });
+    }
+  }, err => console.error('Error escuchando el mantenimiento:', err));
+}
+
+function mantenimientoEncolar(url){
+  if(!mantenimientoCola.includes(url)) mantenimientoCola.push(url);
+  mantenimientoSiguiente();
+}
+
+function mantenimientoSiguiente(){
+  if(mantenimientoMarco || !mantenimientoCola.length) return;
+  const marco = document.createElement('iframe');
+  marco.title = 'Mantenimiento en segundo plano';
+  marco.style.cssText = 'position:absolute;width:1px;height:1px;border:0;left:-9999px;top:0;visibility:hidden';
+  marco.src = mantenimientoCola.shift();
+  mantenimientoMarco = marco;
+  // Por si la herramienta nunca avisa (sin conexión, etc.), se cierra sola.
+  marco.cierre = setTimeout(mantenimientoCerrarMarco, 45000);
+  document.body.appendChild(marco);
+}
+
+function mantenimientoCerrarMarco(){
+  if(!mantenimientoMarco) return;
+  clearTimeout(mantenimientoMarco.cierre);
+  mantenimientoMarco.remove();
+  mantenimientoMarco = null;
+  mantenimientoSiguiente();
+}
+
+window.addEventListener('message', e => {
+  if(e.origin !== location.origin || !e.data || !mantenimientoMarco || e.source !== mantenimientoMarco.contentWindow) return;
+  if(e.data.tipo === 'mantenimiento-listo') mantenimientoCerrarMarco();
+});
+
+$('#btn-mantenimiento').onclick = async () => {
+  if(!soyGM) return;
+  if(!confirm('¿Pasar el turno para toda la mesa?\n\nSe aplica el Mantenimiento a todas las fichas y a los creeps: turnos de los estados, efectos por turno y recarga de No2.')) return;
+  const btn = $('#btn-mantenimiento');
+  btn.disabled = true;
+  try{
+    const ref = fbDb.doc(fbRutaCampana('mapa/mantenimiento'));
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
+      tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    });
+  }catch(err){
+    console.error('No se pudo pasar el turno:', err);
+    toast(err.code === 'permission-denied' ? 'Solo el GM puede pasar el turno' : 'No se pudo pasar el turno — mirá la consola');
+  }finally{
+    btn.disabled = false;
+  }
+};
 
 function escucharModo(){
   fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
@@ -1471,6 +1551,7 @@ function renderPanel(forzar){
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
   $('#btn-fondo').hidden = !soyGM;
+  $('#btn-mantenimiento').hidden = !soyGM;
 
   if(panelFondo && soyGM){
     const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
@@ -1807,6 +1888,7 @@ function arrancarEnVivo(){
   escucharVinculables();
   escucharFondo();
   escucharModo();
+  escucharMantenimiento();
   escucharTokens();
   mesaEscuchar();
   renderPanel(true);

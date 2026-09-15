@@ -132,6 +132,24 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se
 puede borrar desde la consola.
 
+## Mantenimiento del GM
+
+El GM pasa el turno para toda la mesa con "⟳ Mantenimiento" en el mapa (o
+"Mantenimiento · toda la mesa" en gm-tools). Eso sube
+`campanas/{id}/mapa/mantenimiento` = `{numero, cuando}`. El GM no puede
+escribir las fichas, así que cada una aplica su propio `mantenimiento()`
+(la lógica de siempre) una vez por número que le falte, hasta 10 seguidos:
+- **Ficha**: `fichas/{id}/partes/mantenimiento` = `{json: número aplicado}`,
+  tomado en una transacción (si hay varias pestañas, aplica una sola).
+  Una ficha sin ese documento arranca desde el número actual.
+- **Creeps**: `gm/mantenimiento` = `{aplicado}`, igual, desde gm-tools.
+- Para que se note enseguida aunque la ficha o gm-tools estén cerradas,
+  el mapa de cada jugador corre sus fichas en un iframe oculto
+  (`ficha.html?modo=mantenimiento#id`, uno por vez) y el del GM corre
+  `gm-tools.html?modo=mantenimiento`. Avisan `mantenimiento-listo` por
+  `postMessage` cuando guardaron. Si nadie las abre, se ponen al día al
+  abrirse. La ficha ya no tiene botón de Mantenimiento.
+
 ## Respaldo de la partida
 
 Firebase gratis no hace copias de seguridad. Cualquiera baja un respaldo:

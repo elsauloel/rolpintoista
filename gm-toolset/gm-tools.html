@@ -570,7 +570,7 @@ input[type=file]{display:none}
     </div>
     <div class="hero-acciones">
       <div class="hero-fila">
-        <button class="btn maint" id="btn-mant">Mantenimiento · todos los creeps</button>
+        <button class="btn maint" id="btn-mant" title="Pasa el turno para toda la mesa: fichas de los jugadores y creeps">Mantenimiento · toda la mesa</button>
         <button class="btn ghost" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
         <button class="btn ghost" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
         <button class="btn" id="btn-dados">Dados</button>
@@ -1023,6 +1023,9 @@ input[type=file]{display:none}
 <script src="../comun/sesion.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
+<script>
+if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
+</script>
 <script>
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
@@ -3698,7 +3701,10 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-mant'){
-    mantenimiento();  // los creeps se guardan solos en la mesa
+    // Conectado como GM: pasa el turno para toda la mesa (fichas y creeps).
+    // Sin conexión: solo los creeps de esta pestaña, como antes.
+    if(gmVivo.activo && gmVivo.listo) mantenimientoGlobal();
+    else mantenimiento();
     return;
   }
   if(b.id === 'btn-reset'){
@@ -5144,6 +5150,8 @@ function gmMarcarGuardado(sc, orden, firma){
 async function gmProcesarSnapshot(snap){
   const g = gmVivo;
   if(!g.listo){
+    // En segundo plano (iframe del mapa) no se sube el creep en blanco del arranque.
+    if(snap.empty && document.documentElement.classList.contains("modo-mantenimiento")) S.creeps = [];
     if(!snap.empty){
       const docs = snap.docs.slice().sort((a, b) => num(a.data().orden) - num(b.data().orden));
       const creeps = await Promise.all(docs.map(gmLeerCreep));
@@ -5169,6 +5177,7 @@ async function gmProcesarSnapshot(snap){
     }catch(err){ console.error('No se pudo leer el turno:', err); }
     g.listo = true;
     gmEstadoAlDia();
+    gmMantenimientoRevisar();
     return;
   }
 
@@ -5225,7 +5234,77 @@ function gmAlEntrar(){
   mesaEscuchar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
-  if(gmVivo.activo) gmEscuchar();
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); }
+}
+
+/* ---------- Mantenimiento del GM ----------
+   Mismo mecanismo que la ficha: la señal es campanas/<partida>/mapa/
+   mantenimiento.numero (la sube el GM desde el mapa o desde el botón de
+   acá) y gm/mantenimiento = {aplicado} guarda hasta qué número se aplicó a
+   los creeps, tomado en una transacción para no aplicarlo dos veces. */
+const MANTENIMIENTO_MAX_SEGUIDOS = 10;
+const MODO_MANTENIMIENTO = document.documentElement.classList.contains('modo-mantenimiento');
+let gmMantenimientoSenal = null;
+let gmMantenimientoRevisando = false;
+let gmMantenimientoOtraVez = false;
+
+function gmMantenimientoEscuchar(){
+  fbDb.doc(fbRutaCampana('mapa/mantenimiento')).onSnapshot(doc => {
+    gmMantenimientoSenal = doc.exists ? Math.round(num(doc.data().numero)) : 0;
+    gmMantenimientoRevisar();
+  }, err => console.error('Error escuchando el mantenimiento:', err));
+}
+
+async function mantenimientoGlobal(){
+  try{
+    const ref = fbDb.doc(fbRutaCampana('mapa/mantenimiento'));
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
+      tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    });
+  }catch(err){
+    console.error('No se pudo pasar el turno para la mesa:', err);
+    toast('No se pudo pasar el turno para la mesa — mirá la consola');
+  }
+}
+
+function gmAvisarMapa(tipo){
+  if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
+}
+
+async function gmMantenimientoRevisar(){
+  const g = gmVivo;
+  if(gmMantenimientoSenal === null || !g.activo || !g.listo) return;
+  if(gmMantenimientoRevisando){ gmMantenimientoOtraVez = true; return; }
+  gmMantenimientoRevisando = true;
+  try{
+    const objetivo = gmMantenimientoSenal;
+    const ref = fbDb.doc(fbRutaCampana('gm/mantenimiento'));
+    const veces = await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      const hecho = doc.exists ? Math.round(num(doc.data().aplicado)) : null;
+      if(hecho !== null && hecho >= objetivo) return 0;
+      tx.set(ref, {aplicado: objetivo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+      return hecho === null ? 0 : Math.min(MANTENIMIENTO_MAX_SEGUIDOS, objetivo - hecho);
+    });
+    for(let i = 0; i < veces; i++) mantenimiento();
+    if(MODO_MANTENIMIENTO){
+      // En segundo plano (iframe del mapa): avisar cuando los creeps ya se guardaron.
+      const inicio = Date.now();
+      const revisar = () => {
+        if(gmHayPendiente() && Date.now() - inicio < 20000){ gmGuardarTick(true); setTimeout(revisar, 400); return; }
+        gmAvisarMapa('mantenimiento-listo');
+      };
+      setTimeout(revisar, 300);
+    }
+  }catch(err){
+    console.error('No se pudo aplicar el mantenimiento a los creeps:', err);
+    if(MODO_MANTENIMIENTO) gmAvisarMapa('mantenimiento-listo');
+  }finally{
+    gmMantenimientoRevisando = false;
+    if(gmMantenimientoOtraVez){ gmMantenimientoOtraVez = false; gmMantenimientoRevisar(); }
+  }
 }
 
 mesaIniciar();

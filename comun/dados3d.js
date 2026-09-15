@@ -173,8 +173,10 @@ async function dadosSiguiente(){
 // Punto de entrada: una tirada de la Mesa ({formula, rolls}).
 function dadosAnimarTirada(t){
   if(!t || !dadosActivos() || document.hidden) return;
-  // La ficha abierta dentro del mapa (Botonera) no anima: ya lo hace el mapa.
-  if(document.documentElement.classList.contains('modo-botonera')) return;
+  // Ficha o gm-tools abiertas dentro del mapa (Botonera, Mantenimiento en
+  // segundo plano): no animan, ya lo hace el mapa.
+  const html = document.documentElement.classList;
+  if(html.contains('modo-botonera') || html.contains('modo-mantenimiento')) return;
   const notacion = dadosNotacion(t.formula, t.rolls);
   if(!notacion) return;
   if(dados.cola.length >= 4) dados.cola.shift();  // si se acumulan, se saltean las más viejas

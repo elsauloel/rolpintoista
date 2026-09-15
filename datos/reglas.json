@@ -1,15 +1,305 @@
 {
-  "titulo": "Manual del jugador — Piratas en el espacio",
-  "actualizado": "",
+  "titulo": "Manual de Usuario — Rol Pintoísta",
+  "actualizado": "2026-09-15T00:56:32Z",
   "capitulos": [
     {
-      "id": "como-se-usa-este-manual",
-      "titulo": "Cómo se usa este manual",
+      "id": "portada",
+      "titulo": "Portada",
       "secciones": [
         {
-          "id": "ejemplo",
-          "titulo": "Sección de ejemplo (borrar cuando haya contenido real)",
-          "contenido": "Este manual todavía no tiene reglas cargadas — arrancó vacío a propósito.\n\nCada capítulo es un tema grande (Combate, Habilidades, Creación de personaje, etc.) y cada sección es una página dentro de ese tema. El contenido de esta sección soporta párrafos separados por una línea en blanco, y líneas que empiezan con \"- \" se muestran como lista.\n\n- Para agregar contenido real: abrí manual.html, tocá \"Editar\", agregá capítulos y secciones desde ahí.\n- No hace falta tocar el HTML para sumar reglas nuevas — todo el texto vive en este mismo archivo (datos/reglas.json).\n- Guardá con \"Guardar\" (baja el .json) o \"Subir datos\" (lo publica en GitHub, mismo token que usan las otras herramientas)."
+          "id": "portada",
+          "titulo": "Portada",
+          "contenido": "> **Estado del documento:** en desarrollo activo. Se va completando de a poco, sección por sección, a partir de lo que vaya aportando Saulo.\n> **Última actualización:** 2026-09-04"
+        }
+      ]
+    },
+    {
+      "id": "historial-de-iteraciones",
+      "titulo": "Historial de iteraciones",
+      "secciones": [
+        {
+          "id": "historial-de-iteraciones",
+          "titulo": "Historial de iteraciones",
+          "contenido": "- **Iteración 2 (actual, desde 2026-09-04):** se reemplaza **Bonos** por **Special Power (SP)**, y se retoma el concepto de **Nitros (No2)**. La versión anterior queda congelada en `manual-usuario-rol-pintoista-v1-archivo.md`.\n- **Iteración 1 (hasta 2026-09-04):** primera pasada del manual, con Bonos y Acciones como recursos de turno."
+        }
+      ]
+    },
+    {
+      "id": "como-esta-organizado-este-documento",
+      "titulo": "Cómo está organizado este documento",
+      "secciones": [
+        {
+          "id": "como-esta-organizado-este-documento",
+          "titulo": "Cómo está organizado este documento",
+          "contenido": "Cada sección tiene una etiqueta de estado:\n\n- ✅ **Confirmado** — contenido validado, listo para pasar al tool online.\n- 🟡 **Borrador** — hay contenido pero puede cambiar.\n- 🔲 **Pendiente** — sección creada como placeholder, todavía sin contenido.\n\nEsto es heredado de la misma convención que venimos usando en el resto de los documentos del proyecto (marco de diseño, catálogo), para que el estado de todo el trabajo se pueda ver de un vistazo.\n\nCada encabezado (`##`, `###`) va a funcionar como entrada indexable cuando esto se convierta en el buscador del tool online, así que conviene mantenerlos cortos y descriptivos, y evitar reordenarlos una vez que haya contenido cargado (rompe anclas / referencias cruzadas)."
+        }
+      ]
+    },
+    {
+      "id": "0-indice-propuesto",
+      "titulo": "0. Índice propuesto",
+      "secciones": [
+        {
+          "id": "0-indice-propuesto",
+          "titulo": "0. Índice propuesto",
+          "contenido": "1. Introducción y filosofía del sistema\n2. Glosario\n3. Creación de personaje\n4. Atributos y estadísticas\n5. Mecánica de tiradas\n6. Combate\n7. Estados alterados\n8. Equipo y ranuras (slots)\n9. Rareza de los ítems\n10. Economía (DDE)\n11. Apéndices / tablas de referencia rápida\n12. Profesiones y habilidades (Jobs)\n\n*(Este índice es un punto de partida a partir de lo que ya sabemos del sistema — decime si querés reordenar, fusionar o agregar secciones antes de que empecemos a cargar contenido en serio.)*"
+        }
+      ]
+    },
+    {
+      "id": "1-introduccion-y-filosofia-del-sistema-borrador",
+      "titulo": "1. Introducción y filosofía del sistema — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "general",
+          "titulo": "General",
+          "contenido": "*(Adaptado de la \"Visual & Creative Bible\" — pensada originalmente para prompts de imagen, pero define el espíritu narrativo del universo. Falta que Saulo confirme si esto capta el tono completo o si hay matices de mesa/jugabilidad para sumar.)*"
+        },
+        {
+          "id": "filosofia-central",
+          "titulo": "Filosofía central",
+          "contenido": "Rol Pintoísta es un universo donde lo absurdo es lo normal. Fantasía medieval, cyberpunk, steampunk, ópera espacial, folklore y magia conviven de forma natural en la misma mesa. No hay una única estética, un único período histórico ni una única tecnología dominante — hay una única forma de estar todos representados bajo la misma lógica interna."
+        },
+        {
+          "id": "diversidad",
+          "titulo": "Diversidad",
+          "contenido": "Cada civilización, cultura o facción puede tener su propia tecnología, religión, ornamentación, simbolismo, oficios y materiales propios. La diversidad no es la excepción: es la norma esperada del setting."
+        },
+        {
+          "id": "magia-y-tecnologia",
+          "titulo": "Magia y tecnología",
+          "contenido": "Magia y tecnología tienen el mismo estatus narrativo y mecánico. Ninguna es \"más válida\" que la otra, y pueden combinarse sin fricción (un rifle rúnico, una armadura biotecnológica encantada, etc.)."
+        },
+        {
+          "id": "principio-de-absurdidad",
+          "titulo": "Principio de absurdidad",
+          "contenido": "Las combinaciones inesperadas definen a Rol Pintoísta. Pero absurdo no es sinónimo de azar: cada elemento disparatado tiene que sostenerse con lógica interna propia. Es la misma lógica que ya usamos en el catálogo de ítems — una gorra de policía federal, ojotas hawaianas o una tapa de tacho de basura como escudo conviven con ítems \"serios\", todos bajo la misma fórmula de diseño."
+        },
+        {
+          "id": "frase-guia",
+          "titulo": "Frase guía",
+          "contenido": "Rol Pintoísta no tiene una estética dominante. Tiene una mirada propia. Cualquier objeto, criatura o personaje, sin importar su origen, pertenece al mismo universo si respeta ese principio fundamental: absurdidad y coherencia interna coexisten con naturalidad.\n\n> **Nota abierta:** la bible también define un estilo visual muy puntual para generación de arte (pintura semirealista, sin fotorealismo/anime, iluminación cálida cinemática, composición centrada, etc.). No lo traje a esta sección porque es una guía de producción de arte, no una regla de juego — pero si el manual va a terminar incluyendo ilustraciones de ítems, tiene sentido un apéndice de estilo visual aparte más adelante. Lo dejo para cuando llegue esa etapa, salvo que prefieras adelantarlo."
+        }
+      ]
+    },
+    {
+      "id": "2-glosario-borrador",
+      "titulo": "2. Glosario — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "2-glosario-borrador",
+          "titulo": "2. Glosario — 🟡 Borrador",
+          "contenido": "Vocabulario confirmado que ya usamos en el resto del proyecto y que conviene tener centralizado acá para el buscador.\n\n| Término | Significado |\n|---|---|\n| **DDE** | Moneda del sistema. Unidad de precio de todos los ítems del catálogo. |\n| **Tier / Rareza** | Común · Buena Calidad · Raro · Excepcional · Legendario. |\n| **Tipo (de arma)** | ✅ *Confirmado — Iteración 2.* Un solo concepto — **\"Tipo de dado\" y \"Tipo de daño\" son la misma cosa** (se unifican, ya no son dos clasificaciones separadas). Escala corrida un escalón hacia arriba: **Tipo 4** (perforante) · **Tipo 6** (cortante) · **Tipo 8** (cortante pesado / contundente liviano) · **Tipo 10** (contundente pesado) · **Tipo 12** (explosivo — tier excepcional). El dado que tira el arma coincide con su Tipo (Tipo 4 = 1d4, Tipo 6 = 1d6, etc.). Tipo 2 queda deprecado — el piso ahora es Tipo 4. |\n| **Clasificación estructural** | 🔄 *Actualizado.* Sistema binario: **Blanda** (flexible) vs. **Rígida** (dura). Ahora aplica **únicamente al slot de Armadura (torso)** — ahí sí se pueden equipar una de cada tipo en simultáneo. El resto de las piezas de equipo (casco, guantes, piernas, botas) ya **no tienen distinción de material**: son categoría plana, un solo ítem por slot. |\n| **Ranuras (slots) de equipo** | `arma_1m`, `arma_2m`, `escudo_1m`, `escudo_2m`, `armadura_blanda`, `armadura_rigida`, `casco`, `guantes`, `piernas`, `botas`, `consumibles`, `anillos`, `otros`. ⚠️ *Los tipos `casco`/`guantes`/`piernas`/`botas` quedan sin sufijo blando/rígido tras el cambio — el catálogo (`catalogo.xlsx`) todavía tiene los tipos viejos separados (`casco_blando`/`casco_rigido`, etc.) y va a necesitar consolidarse para que coincida.* |\n| **Peso (armas)** | En armas define además la cantidad de dados que tira (ej. peso 3 con dado d6 = 3d6). |\n| **Dado según valor de stat** | El valor de un stat define el dado que se tira (caras del dado = valor del stat). Impares: dado anterior +1 (ej. Evasión 5 = 1d4+1). Ver Sección 5. *(Esta regla es aparte de la del Tipo de arma — usa un set de dados distinto, que sí incluye d2.)*\n\n*(Faltan términos de mecánica de juego propiamente dicha — atributos, estados, tiradas — que se van a ir sumando a medida que definamos esas secciones.)*"
+        }
+      ]
+    },
+    {
+      "id": "3-creacion-de-personaje-borrador",
+      "titulo": "3. Creación de personaje — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "en-que-consiste",
+          "titulo": "En qué consiste",
+          "contenido": "Crear un personaje en Rol Pintoísta consiste en repartir dos pools de puntos independientes entre sí:\n\n- **Puntos de atributo**, entre los cinco stats primarios (Fuerza, Constitución, Inteligencia, Destreza, Agilidad).\n- **Puntos de Job**, para adquirir habilidades activas o pasivas ligadas a la profesión del personaje.\n\nAmbos pools se vuelven a recibir en cada subida de nivel, así que crear personaje es, en el fondo, el mismo proceso que \"subir de nivel 0 a 1\" — solo que con un pool inicial más grande.\n\n*(Pendiente: si hay pasos adicionales al momento de crear personaje además de repartir estos dos pools — elegir profesión, trasfondo/historia, nombre, etc. — o si esos pasos son puramente narrativos y no tienen una mecánica asociada todavía.)*"
+        },
+        {
+          "id": "distribucion-de-puntos-de-atributo",
+          "titulo": "Distribución de puntos de atributo",
+          "contenido": "Al crear un personaje se distribuyen puntos entre los cinco atributos primarios (ver el detalle de cada uno en la Sección 4).\n\n- **Nivel 1:** se arranca con **33 puntos** para repartir.\n- **Mínimo por atributo:** ningún stat puede quedar en menos de **3**.\n- **Al subir de nivel:** se ganan **3 puntos de stat** adicionales por nivel.\n\n> **Preguntas abiertas:**\n> - ¿Hay un máximo por atributo al crear personaje en nivel 1?\n> - ¿El costo de subir un atributo es siempre 1 punto = 1 stat, o hay costo creciente a medida que el atributo es más alto?\n> - Los 3 puntos por nivel, ¿se pueden repartir libremente entre los cinco atributos, o hay restricciones (ej. no más de 1 punto por atributo por nivel)?"
+        },
+        {
+          "id": "puntos-de-job",
+          "titulo": "Puntos de Job",
+          "contenido": "Recurso separado de los puntos de atributo. Se usan para intercambiar por **habilidades activas** o **habilidades pasivas**, ligadas a la profesión/job del personaje.\n\n- **Nivel 1:** se arranca con **3 puntos de Job**.\n- **Al subir de nivel:** se ganan **3 puntos de Job** adicionales por nivel.\n\n*(El detalle de qué habilidades existen y qué cuesta cada una va a vivir en la futura Sección 12, \"Profesiones y habilidades\", en paralelo al trabajo de diseño del sistema de profesiones que venimos armando aparte.)*\n\n> **Preguntas abiertas:**\n> - ¿Las habilidades tienen costos distintos entre sí (1 punto, 2 puntos, etc.) o todas cuestan lo mismo?\n> - ¿Hay requisitos de nivel o de otra habilidad previa para desbloquear una habilidad (árbol de habilidades), o es compra libre mientras haya puntos?\n> - ¿Los puntos de Job están atados a una sola profesión o se puede invertir en habilidades de más de una?"
+        }
+      ]
+    },
+    {
+      "id": "4-atributos-y-estadisticas-borrador",
+      "titulo": "4. Atributos y estadísticas — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "como-funcionan-los-stats-derivados",
+          "titulo": "Cómo funcionan los stats derivados",
+          "contenido": "De cada atributo principal se desprenden **stats secundarios (derivados)**. Todos son variables: pueden verse modificadas por efectos de habilidad, de equipables o de consumibles — no son un número fijo e inamovible una vez calculado."
+        },
+        {
+          "id": "fuerza-fue",
+          "titulo": "Fuerza (FUE)",
+          "contenido": "**Deriva:**\n- **Carga Máxima (crgmax):** cuánto se puede llevar equipado sin penalidad (ver Sección 8).\n- **Daño (dmg):** se suma al dado de daño del arma al conectar un golpe (ver Sección 6).\n- **Bloqueo:** entra en juego como segunda tirada tras un Parry exitoso del defensor (ver \"Defensa cuerpo a cuerpo\" en Sección 6) — mecánica exacta todavía a confirmar."
+        },
+        {
+          "id": "constitucion-con",
+          "titulo": "Constitución (CON)",
+          "contenido": "**Deriva:**\n- **HP Máximo (hpmax):** **fórmula confirmada — HP Máximo = Constitución × 5.**\n- **Resistencia Mágica (resmg)**\n- **Resistencia a Crowd Control / CC (resm)**"
+        },
+        {
+          "id": "inteligencia-int",
+          "titulo": "Inteligencia (INT)",
+          "contenido": "**Deriva:**\n- **PdGMg (Probabilidad de Golpe Mágico):** equivalente mágico de PdG — probablemente lo que se tira para conectar un hechizo, en paralelo a como PdG conecta un golpe físico.\n- **Resistencia Mental**\n- **SP (Special Power)** *(antes \"Bonos\" — reemplazado en la Iteración 2)*: recurso que se usa para castear habilidades. ✅ **Confirmado — deriva de Inteligencia: SP = Inteligencia × 3.** Funciona como un **mana clásico de JRPG**: se va consumiendo a lo largo de la pelea.\n\n✅ **Confirmado:** el SP **no se resetea en la fase de mantenimiento**. Solo se recarga por:\n- Habilidades, efectos, o consumibles de recarga/regeneración.\n- Descanso.\n- **Rango de Casteo (rangocasteo):** alcance de los hechizos.\n\n> 🔸 **En pausa — pendiente de definición.** Resistencia Mágica, Resistencia a CC y Resistencia Mental todavía están en terreno ambiguo entre sí (incluyendo si \"Res.M\" en `claude/arquetipos-profesiones-skills.md` corresponde a una, a otra, o a ambas). Se amplía esta nota cuando esté terminado de definir — no hace falta seguir insistiendo con preguntas sobre esto hasta entonces."
+        },
+        {
+          "id": "destreza-des",
+          "titulo": "Destreza (DES)",
+          "contenido": "**Deriva:**\n- **Rango (rng):** alcance de los ataques a distancia.\n- **PdG (Probabilidad de Golpe):** lo tira el atacante para conectar un golpe (ver Sección 6).\n- **Crítico (%):** chance de sacar golpe crítico.\n- **Parry:** alternativa a Evasión para defenderse en cuerpo a cuerpo — se tira contra el PdG del atacante (PdG vs. Parry — ver \"Defensa cuerpo a cuerpo\" en Sección 6)."
+        },
+        {
+          "id": "agilidad-agl",
+          "titulo": "Agilidad (AGL)",
+          "contenido": "**Deriva:**\n- **Evasión (eva):** lo tira el defensor para esquivar un ataque (ver Sección 6).\n- **Iniciativa (ini):** se tira al iniciar el combate y define el orden de acciones (ver Sección 6).\n- **Movimiento (mov):** ✅ **Confirmado: absorbido por Nitros.** Ya no existe como substat separado — mover un casillero se paga directo con Nitros (ver Sección 6).\n- **Nitros (No2)** — 🟡 *Iteración 2.* ✅ **Confirmado — stat secundario igual a Agilidad: Nitros = Agilidad**, pero puede verse modificado por efectos de equipo, consumible o habilidad. Recurso que reemplaza a las Acciones fijas (ver Sección 6): es lo que paga tanto el movimiento como las acciones de combate. Detalle completo de costos en la Sección 6, \"Nitros\"."
+        },
+        {
+          "id": "stats-sin-atributo-padre-confirmado-todavia",
+          "titulo": "Stats sin atributo padre confirmado todavía",
+          "contenido": "- **Defensa (Def):** ✅ función confirmada. Generalmente la otorgan objetos equipables, pero también puede venir de habilidades u otros efectos — no es exclusiva del equipo. **Cómo funciona:** al recibir daño físico, se resta el valor de Defensa al valor del daño recibido; la diferencia es lo que se descuenta de HP (ver Sección 6). **Los golpes críticos ignoran la Defensa por completo** — pasa el daño íntegro, sin restar nada. Se reduce con el efecto de arma \"Romper armadura\" (ver Sección 6).\n- **Resistencia a crítico** (por tipo de daño: 2, 4, 6, 8, 10). *(En pausa — ver nota abajo.)*\n- **Wellness**\n\n> 🔸 **En pausa — pendiente de definición.** El sistema de golpes críticos en general (cómo se determina un crítico más allá del %, qué efecto tiene al conectar, y cómo funciona Resistencia a crítico por tipo de daño) todavía está en terreno ambiguo. Se amplía cuando esté terminado de definir — no hace falta seguir insistiendo con preguntas sobre esto hasta entonces.\n\n> **Preguntas abiertas:**\n> - ¿Cada derivado tiene una fórmula propia como la de HP Máximo (CON × 5), o varía caso por caso?\n> - La segunda tirada del Parry (\"bloque vs. bloqueo\") — ¿es literalmente Bloqueo del atacante contra Bloqueo del defensor? (ver nota en Sección 6)\n> - ¿De qué atributo deriva Wellness?\n> - ¿Defensa tiene además una base de personaje (ej. algo de Constitución), o es puramente la suma de lo que aportan equipo/habilidades/efectos?"
+        }
+      ]
+    },
+    {
+      "id": "5-mecanica-de-tiradas-borrador",
+      "titulo": "5. Mecánica de tiradas — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "como-se-tira-un-stat",
+          "titulo": "Cómo se tira un stat",
+          "contenido": "El **valor del stat define qué dado se tira**: la cantidad de caras del dado es igual al valor del stat. Esto aplica a las tiradas de probabilidad y, en general, a cualquier tirada derivada de un stat (no a las tiradas de daño de arma, que dependen del tipo de dado del arma — ver Glosario).\n\nEjemplo: Evasión 4 → se tira **1d4**.\n\n**Set de dados usado:** el clásico de rol — d2 (excepcional, no es común pero se usa), d4, d6, d8, d10, d12, d20, d100.\n\n**Valores impares:** se usa el dado inmediatamente anterior y se suma **+1**.\n\nEjemplo: Evasión 5 → se tira **1d4+1**.\n\nTabla de referencia para valores bajos (recordar el piso de 3 por atributo de la Sección 3):\n\n| Valor del stat | Tirada |\n|---|---|\n| 2 | 1d2 |\n| 3 | 1d2+1 |\n| 4 | 1d4 |\n| 5 | 1d4+1 |\n| 6 | 1d6 |\n| 7 | 1d6+1 |\n| 8 | 1d8 |\n| 9 | 1d8+1 |\n| 10 | 1d10 |\n| 11 | 1d10+1 |\n| 12 | 1d12 |\n| 13 | 1d12+1 |\n\n**Valores altos:** el set de dados clásico salta de d12 a d20, y de d20 a d100 — para esos huecos hacen falta combinaciones de más de un dado. Regla general: **si hay varias combinaciones posibles, se prioriza la que use menos dados**.\n\n> **Preguntas abiertas:**\n> - ¿Cuál es la combinación exacta para valores entre 14 y 19 (el hueco entre d12 y d20)?\n> - ¿Y para valores entre 21 y 99 (el hueco entre d20 y d100)?\n> - ¿Qué pasa con un stat en 0 o negativo (por una penalidad, ej. sobrepeso)? ¿Se tira 1d2-1, se redondea a un mínimo, o directamente no hay tirada?"
+        },
+        {
+          "id": "tirada-enfrentada-patron-base",
+          "titulo": "Tirada enfrentada (patrón base)",
+          "contenido": "El patrón que ya vimos en ataque cuerpo a cuerpo (Sección 6) sugiere una mecánica base de **tirada enfrentada**: una parte tira a favor de una acción, la otra tira en contra para resistirla/evitarla, y se comparan los resultados (cada uno con el dado que le toca según su stat, según la tabla de arriba).\n\n*(Pendiente confirmar si esto es EL patrón universal de resolución del sistema —ataque, defensa, resistencias, etc. todos comparando dos tiradas— o si es específico del combate cuerpo a cuerpo y hay otros patrones para otras situaciones, como tiradas contra una dificultad fija.)*\n\n> **Preguntas abiertas:**\n> - ¿Cómo se determina el resultado de la comparación (el mayor gana, hay que superar por un margen, se usan grados de éxito)?\n> - ¿Este mismo patrón aplica fuera de combate (tiradas sociales, de exploración, etc.)?"
+        },
+        {
+          "id": "wildcards",
+          "titulo": "Wildcards",
+          "contenido": "Recurso renovable que se recarga al descansar bien. Por default, el personaje carga **1 Wildcard por día**.\n\nSe puede gastar en cualquier momento para repetir (rerollear) una tirada.\n\n*(Nota: mecánicamente es similar a lo que ya hace el consumible \"Moneda Re-Roll\" del catálogo — a diferencia de ese ítem, el Wildcard es un recurso base del personaje, no algo que haya que comprar o craftear.)*\n\n> **Preguntas abiertas para cuando sigamos con esto:**\n> - ¿\"Descansar bien\" tiene una definición formal en el sistema (ej. descanso largo vs. corto), o por ahora queda a criterio narrativo?\n> - ¿Se pueden acumular Wildcards no usados de un día a otro, o se pierden si no se gastan (use it or lose it)?\n> - ¿Hay algo que suba el default de 1 por día (profesión, rasgo, ítem)?\n> - Al rerollear, ¿se toma automáticamente el segundo resultado, o el jugador elige el mejor de los dos?\n> - ¿Se puede usar el Wildcard sobre tiradas ajenas (de otro jugador o del GM) o solo sobre las propias?"
+        }
+      ]
+    },
+    {
+      "id": "6-combate-borrador",
+      "titulo": "6. Combate — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "ataque-cuerpo-a-cuerpo-clasico",
+          "titulo": "Ataque cuerpo a cuerpo (clásico)",
+          "contenido": "Secuencia del ataque melee estándar:\n\n1. El **atacante** tira **Probabilidad de Golpe** (PdG).\n2. El **defensor** elige cómo defenderse (ver \"Defensa cuerpo a cuerpo\" más abajo): **Evasión** o **Parry**.\n3. Si el ataque conecta (el atacante gana la tirada enfrentada — ver Sección 5), el atacante tira el **dado de daño de su arma** (según tipo de dado y peso, ver Glosario) y le suma su stat secundario **Daño** (dmg).\n4. Al resultado del paso anterior se le resta la **Defensa (Def)** del objetivo (ver Sección 4). La diferencia es lo que se descuenta de su **HP**.\n5. **Excepción:** si el golpe fue **crítico**, se ignora la Defensa por completo — el daño pasa íntegro.\n\n> ⚠️ **Nota de nomenclatura:** \"Defensa cuerpo a cuerpo\" (la elección Evasión/Parry, subsección de abajo) y \"Defensa (Def)\" (el stat que resta al daño) son dos cosas distintas que comparten nombre — los mantengo diferenciados en el manual para que no se confundan.\n\n> **Preguntas abiertas:**\n> - ¿\"Exitoso/conectar\" significa que el resultado del atacante fue mayor al del defensor, o hay algún otro criterio (margen, umbral)?\n> - ¿Esta secuencia es la misma para ataques a distancia? (Ahora que sabemos que Destreza deriva tanto PdG como Rango, es probable que PdG se use igual para golpear a distancia y que Rango solo defina el alcance — pero falta confirmarlo.)\n> - Con daño Tipo 10/12 (explosivo) o ataques a más de un objetivo, ¿cambia algo de esta secuencia base?\n> - Si Defensa es mayor o igual al daño (diferencia 0 o negativa), ¿no se pierde HP, o hay un mínimo de daño que siempre pasa (ej. 1)?"
+        },
+        {
+          "id": "defensa-cuerpo-a-cuerpo-evasion-o-parry",
+          "titulo": "Defensa cuerpo a cuerpo: Evasión o Parry",
+          "contenido": "Cuando un personaje es atacado en cuerpo a cuerpo, el **defensor elige** entre dos formas de defenderse:\n\n1. **Esquivar por completo:** tira **Evasión** contra el PdG del atacante (PdG vs. Evasión).\n2. **Parry con su arma:** tira **Parry** contra el PdG del atacante (PdG vs. Parry).\n\n**Si elige Parry y gana esa tirada,** se dispara una **segunda tirada**: *\"bloque vs. bloqueo\"*. Si el defensor gana esta segunda tirada, el golpe queda **completamente anulado** — no se lleva adelante.\n\n> ⚠️ **A confirmar textualmente:** anoté la segunda tirada como la dijiste, \"bloque vs. bloqueo\" — ¿es el **Bloqueo del atacante contra el Bloqueo del defensor** (mismo stat de los dos lados), o \"bloque\" se refiere a otra cosa (ej. el arma/escudo del atacante forzando la parada)?\n\n> **Preguntas abiertas:**\n> - Si el defensor gana el Parry pero **pierde** la segunda tirada de Bloqueo: ¿el golpe pasa igual con daño completo, con daño reducido, o hay otro efecto intermedio?\n> - Si el defensor **pierde** la tirada de Parry directamente (el atacante gana PdG vs. Parry): ¿se pasa derecho a tirar daño, igual que si hubiera perdido por Evasión?\n> - ¿Elegir Evasión o Parry es una decisión libre en cada ataque, o depende del equipo (ej. Parry requiere tener un arma equipada, no se puede a mano limpia)?\n> - ¿Este mismo esquema (Evasión vs. Parry) aplica a ataques a distancia, o Parry es exclusivo de cuerpo a cuerpo?\n> - ¿Escudos (equipo `escudo_1m`/`escudo_2m`) participan de esta secuencia sumando a Parry, a Bloqueo, o a ninguno de los dos?"
+        },
+        {
+          "id": "estructura-del-turno",
+          "titulo": "Estructura del turno",
+          "contenido": "**Inicio de combate — Iniciativa:**\n\nAl iniciar el combate, todos los personajes tiran **Iniciativa** (uno de los stats secundarios — ver Sección 4). El resultado define el **orden de acciones**, que puede quedar intercalado libremente entre aliados y enemigos (no se agrupa por bando: el orden es individual, personaje por personaje).\n\n**Ronda:**\n\n1. Los personajes actúan en el orden que dio la Iniciativa.\n2. Al llegar al **último personaje** de ese orden, se pasa a la **fase de mantenimiento**.\n3. Terminado el mantenimiento, el ciclo **vuelve a empezar** desde el primero del orden.\n\n**Fase de mantenimiento:**\n\nEs **igual para todos** — personajes jugadores, aliados y enemigos por igual. No es un mecanismo exclusivo de los PJs. Es donde se contabilizan, entre otras cosas:\n\n- Reinicio de recursos de carga fija (⚠️ **desactualizado tras la Iteración 2** — Acciones ya no existe, fue reemplazada por Nitros; falta confirmar si Nitros resetea acá, ver Sección 6. **SP confirmado que NO resetea acá** — ver Sección 4).\n- **Regeneración** (ticks de curación a lo largo del tiempo).\n- **Veneno** (ticks de daño a lo largo del tiempo).\n- **Duración de estados alterados** (se descuentan los turnos restantes de cada estado — ver Sección 7).\n\n> **Preguntas abiertas:**\n> - ¿La Iniciativa se vuelve a tirar en cada ronda nueva, o se tira una sola vez al principio del combate y el orden queda fijo para todo el encuentro?\n> - ¿Cómo se resuelve un empate de Iniciativa entre dos personajes?\n> - ¿Qué otras fases tiene el turno de cada personaje además de su acción (ej. fase de movimiento separada de la fase de acción)?\n> - En \"se contabilizan los turnos de los estados alterados\": ¿el descuento pasa en el mantenimiento general, o cada estado se descuenta en el momento en que le toca actuar a ESE personaje puntual?"
+        },
+        {
+          "id": "nitros-no2-borrador-iteracion-2-reemplaza-a-acciones",
+          "titulo": "Nitros (No2) — 🟡 Borrador (Iteración 2 — reemplaza a Acciones)",
+          "contenido": "> 🗄️ **Superado:** la regla de \"3 Acciones fijas por turno\" de la Iteración 1 **ya no existe**. La cantidad de acciones y el movimiento ahora se pagan con **Nitros**, un stat derivado de Agilidad (ver Sección 4).\n\n**Costos confirmados:**\n\n| Actividad | Costo |\n|---|---|\n| Mover 1 casillero | 1 Nitro |\n| Consumir un ítem equipado en el cinturón | 1 Nitro |\n| Ejecutar una acción/habilidad — **default** | 1 Nitro |\n| Ejecutar una acción/habilidad — **casos especiales** | Algunas cuestan más de 1, y algunas tienen costo **variable (X)** — definido por cada habilidad puntual |\n| Atacar — **primer ataque** | Tipo del arma ÷ 2 |\n| Atacar — **segundo ataque en adelante** | Tipo del arma (completo) |\n\n✅ **Confirmado:** \"Tipo de dado\" y \"Tipo de daño\" son la misma cosa — un solo valor por arma (ver Glosario). Además, la escala de Tipos se corrió un escalón hacia arriba: el piso ya no es Tipo 2, ahora es **Tipo 4** (4, 6, 8, 10, 12).\n\n**Ejemplo con arma de Tipo 4** *(el tipo más bajo posible ahora)*: primer ataque = 2 Nitros. Segundo ataque = 4 Nitros. Tercer ataque = 4 Nitros. Y así en adelante, siempre a costo completo desde el segundo ataque.\n\n**Ejemplo con arma de Tipo 8:** primer ataque = 4 Nitros. Segundo ataque en adelante = 8 Nitros cada uno.\n\n> 🆕 **Nota de cruce con otro archivo:** \"Nitros\"/\"No2\" ya aparece en `claude/arquetipos-profesiones-skills.md`, en dos cartas de detalle del Debuffer — *\"Maldición extenuante\"* (\"Incrementa en 1 los nitros de todas las acciones. Debe pagar 1 nitro para moverse cada 2 casillas\") y *\"Maldición tormentosa\"* (\"Por cada acción recibe daño igual a No2 -1\"). Ese mismo archivo también usa **\"SP\"** como costo en las categorías Shooter y Debuffer, mientras que Support/Warrior/Asalto/Tanque/Mago usan **\"Bonos\"** — una dualidad que ya estaba sin resolver ahí. Esta Iteración 2 (SP + Nitros) probablemente sea justo lo que la termina de unificar; conviene revisar ese archivo en paralelo cuando Nitros quede del todo definido, para que los costos de las skills por profesión terminen consistentes con la terminología nueva.\n\n✅ **Confirmado:** consumir un ítem desde la mochila cuesta **2 Nitros** (se mantiene la proporción del doble respecto al cinturón). Los Nitros **sí se reinician en la fase de mantenimiento**. El \"primer ataque más barato\" **se recalcula cada turno nuevo** — cada turno volvés a tener un primer golpe a mitad de precio. **Nitros = Agilidad, pero puede modificarse por efectos de equipo, consumible o habilidad** (igual que pasaba con las Acciones). **No hay piso ni techo absoluto** — el rango queda completamente abierto, solo limitado por Agilidad y sus modificadores.\n\n> **Preguntas abiertas:**\n> - Con el patrón confirmado (default 1, algunas más, algunas con costo variable X), ¿ese \"X\" se limita por algún stat como pasaba con Bonos en el archivo de arquetipos (ej. \"Bonos: X ≤ INT\"), o es un valor libre a definir por habilidad sin techo?"
+        },
+        {
+          "id": "efectos-de-arma-romper-armadura",
+          "titulo": "Efectos de arma: \"Romper armadura\"",
+          "contenido": "Algunas armas (en general hachas) tienen el efecto **\"Romper armadura\"**, con una probabilidad propia de activarse por golpe (el catálogo ya tiene ejemplos: Pico de guerra y Rompemalla con 50%, Machete con 50%).\n\nCada vez que se activa, **baja en 1 la Defensa otorgada por el equipo** del objetivo afectado.\n\nLa reducción **persiste** hasta que el objetivo la repare, mediante:\n- Una **habilidad**, o\n- Un **ítem**: el consumible **Óleo reparador** (ya existe en el catálogo — Común, 25 DDE, \"Repara armadura\").\n\n> **Preguntas abiertas:**\n> - ¿La reducción es acumulable sin límite (puede llegar a Defensa 0 o negativa), o hay un piso?\n> - ¿El Óleo reparador repara toda la Defensa perdida de una sola vez, o solo 1 punto por uso?\n> - ¿Qué habilidad(es) de profesión pueden reparar esto?\n> - Notá que en el catálogo, \"Romper armadura\" ya aparece en Pico de guerra, Machete y Rompemalla — ninguna es un hacha propiamente dicha. ¿Las hachas todavía no están cargadas en el catálogo, o el efecto no es exclusivo de hachas como pensabas?"
+        }
+      ]
+    },
+    {
+      "id": "7-estados-alterados-borrador",
+      "titulo": "7. Estados alterados — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "general",
+          "titulo": "General",
+          "contenido": "Ejemplos ya confirmados por el catálogo de consumibles: Veneno, Regeneración (poción), Muerte, Polilla revoloteando (estado especial con carga de uso)."
+        },
+        {
+          "id": "muerte",
+          "titulo": "Muerte",
+          "contenido": "Cuando el **HP** de un personaje llega a **0**, entra en estado de **Muerto**.\n\n- Tiene una ventana de **5 mantenimientos** (ver Sección 6) para ser revivido.\n- Dentro de esa ventana, se puede revivir con **objetos o efectos**.\n- Si pasan los 5 mantenimientos sin revivir, el personaje muere **definitivamente (\"permadeath\")**.\n\n> **Preguntas abiertas:**\n> - Mientras está \"Muerto\" pero todavía revivible, ¿el personaje puede actuar de alguna forma, o queda completamente fuera de juego hasta que lo revivan o se cumpla el permadeath?\n> - ¿Revivir devuelve un HP específico (ej. 1 HP, HP máximo, la mitad), o depende del objeto/efecto usado?\n> - ¿Los 5 mantenimientos cuentan desde que el HP llega a 0, o desde el mantenimiento inmediatamente siguiente?\n> - ¿La regla es la misma si el HP llega a 0 fuera de combate (ej. por veneno sin que haya una pelea activa), o ahí cambia algo al no haber fases de mantenimiento regulares?"
+        }
+      ]
+    },
+    {
+      "id": "8-equipo-y-ranuras-slots-borrador",
+      "titulo": "8. Equipo y ranuras (slots) — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "armas-y-escudos",
+          "titulo": "Armas y escudos",
+          "contenido": "- Armas: `arma_1m` (una mano), `arma_2m` (dos manos)\n- Escudos: `escudo_1m`, `escudo_2m`"
+        },
+        {
+          "id": "armadura-y-accesorios-cantidad-de-items-equipables-por-slot",
+          "titulo": "Armadura y accesorios — cantidad de ítems equipables por slot",
+          "contenido": "| Slot | Ítems equipables |\n|---|---|\n| Cabeza (casco) | 1 — categoría plana, sin distinción de material |\n| Manos (guantes) | 1 — categoría plana, sin distinción de material |\n| Torso (armadura) | 1 armadura blanda **+** 1 armadura rígida (simultáneas) |\n| Piernas | 1 — categoría plana, sin distinción de material |\n| Pies (botas) | 1 — categoría plana, sin distinción de material |\n| Anillos mágicos | 1 por mano (2 en total) |\n\n🔄 **Actualizado:** la distinción Blanda/Rígida ahora es **exclusiva del slot de Armadura (torso)** — ahí sí se pueden equipar las dos a la vez, una de cada tipo. **Cabeza, Manos, Piernas y Pies dejaron de tener distinción de material**: son categoría plana, un solo ítem por slot, sin blando ni rígido.\n\n> ⚠️ **Nota de catálogo:** `catalogo.xlsx` todavía tiene tipos separados para estos slots (`casco_blando`/`casco_rigido`, `guantes_blandos`/`guantes_rigidos`, `piernas_blandas`/`piernas_rigidas`, `botas_blandas`/`botas_rigidas`). Con este cambio, esos pares se consolidan en un solo tipo por slot (`casco`, `guantes`, `piernas`, `botas`) — el catálogo real va a necesitar una pasada de actualización para reflejarlo."
+        },
+        {
+          "id": "consumibles-y-cinturon",
+          "titulo": "Consumibles y cinturón",
+          "contenido": "Los consumibles se pueden llevar equipados en el **cinturón**:\n\n- **Capacidad default:** 5 slots.\n- Se pueden **comprar cinturones** que amplíen esa cantidad.\n\n**Costo en Nitros al usar un consumible** *(actualizado en la Iteración 2 — antes era en Acciones):*\n\n| Origen | Costo |\n|---|---|\n| Equipado en el cinturón | 1 Nitro |\n| Sacado de la mochila | 2 Nitros (el doble) |\n\n*(Ver el detalle completo del sistema de Nitros — que ahora paga movimiento, ataques y consumibles — en la Sección 6.)*"
+        },
+        {
+          "id": "otros",
+          "titulo": "Otros",
+          "contenido": "- Otros *(categoría catch-all del catálogo, sin mecánica propia documentada todavía)*\n\n> **Preguntas abiertas:**\n> - ¿Los anillos mágicos tienen alguna restricción de mano (ej. si sos zurdo/diestro importa) o es indistinto cuál anillo va en cuál mano?\n> - ¿Los cinturones que amplían capacidad son ítems de una ranura propia, o modifican directamente el valor default de 5?\n> - ¿\"Otros\" tiene algún límite de cantidad equipada, o es de capacidad libre?"
+        },
+        {
+          "id": "carga-maxima-y-sobrepeso",
+          "titulo": "Carga máxima y sobrepeso",
+          "contenido": "La **Fuerza** determina la **Carga máxima**: cuánto equipo se puede tener equipado sin penalidad.\n\nSolo cuenta el peso de lo **equipado** (lo que ocupa una ranura). Los objetos que están en la mochila, sin equipar, no suman a la Carga máxima.\n\nCada objeto equipado tiene un **peso** que se va sumando. Si el total supera la Carga máxima, por **cada punto de peso que te pasás**, se resta **1 punto** a la cantidad máxima de **SP** *(antes Bonos)* disponible (ver Sección 4).\n\n> **Preguntas abiertas:**\n> - ¿Existe algún piso — es decir, se puede llegar a 0 SP por sobrepeso y quedarse sin poder castear habilidades, o hay un mínimo garantizado?\n> - ¿La penalidad de sobrepeso afecta solo a SP, o también pega en Movimiento u otro stat?\n> - Ahora que SP ya no resetea necesariamente por ronda (ver Sección 4), ¿esta penalidad resta del máximo total del combate, o se recalcula cada vez que cambia el equipo?\n> - ¿Cuál es la fórmula puntual de FUE → Carga máxima (ej. Carga máxima = FUE × algo, o una tabla)?"
+        }
+      ]
+    },
+    {
+      "id": "9-rareza-de-los-items-pendiente",
+      "titulo": "9. Rareza de los ítems — 🔲 Pendiente",
+      "secciones": [
+        {
+          "id": "9-rareza-de-los-items-pendiente",
+          "titulo": "9. Rareza de los ítems — 🔲 Pendiente",
+          "contenido": "Cinco tiers confirmados (Común, Buena Calidad, Raro, Excepcional, Legendario). Falta documentar qué implica cada tier para el jugador (no el DDE de diseño interno, sino qué puede esperar encontrar)."
+        }
+      ]
+    },
+    {
+      "id": "10-economia-dde-pendiente",
+      "titulo": "10. Economía (DDE) — 🔲 Pendiente",
+      "secciones": [
+        {
+          "id": "10-economia-dde-pendiente",
+          "titulo": "10. Economía (DDE) — 🔲 Pendiente",
+          "contenido": "*(Ojo: esta sección es la cara \"jugador\" de la economía — cómo se gana y gasta DDE en mesa. La fórmula de pricing interna vive en `marco-diseno-rol-pintoista.md` y es material de diseño, no de manual de usuario, salvo que quieras exponer parte de esa lógica.)*"
+        }
+      ]
+    },
+    {
+      "id": "11-apendices-tablas-de-referencia-rapida-pendiente",
+      "titulo": "11. Apéndices / tablas de referencia rápida — 🔲 Pendiente",
+      "secciones": [
+        {
+          "id": "11-apendices-tablas-de-referencia-rapida-pendiente",
+          "titulo": "11. Apéndices / tablas de referencia rápida — 🔲 Pendiente",
+          "contenido": ""
+        }
+      ]
+    },
+    {
+      "id": "12-profesiones-y-habilidades-jobs-borrador",
+      "titulo": "12. Profesiones y habilidades (Jobs) — 🟡 Borrador",
+      "secciones": [
+        {
+          "id": "general",
+          "titulo": "General",
+          "contenido": "*(Se conecta con el sistema de profesiones/clases que estamos diseñando aparte. Acá van a vivir: la lista de profesiones, las habilidades activas y pasivas de cada una, y qué cuesta desbloquear cada una en puntos de Job — ver Sección 3.)*"
+        },
+        {
+          "id": "origen-de-las-habilidades",
+          "titulo": "Origen de las habilidades",
+          "contenido": "Los puntos de Job se pueden gastar en dos tipos de habilidad:\n\n- **Habilidades inventadas:** creadas a medida (por el jugador y/o el GM) para ese personaje puntual.\n- **Habilidades de pool:** elegidas de un pool de habilidades ya asignadas a **profesiones clásicas** predefinidas.\n\n> **Preguntas abiertas:**\n> - ¿Una habilidad \"inventada\" tiene el mismo costo en puntos de Job que una del pool, o el GM le pone un costo caso por caso?\n> - ¿Un personaje puede mezclar habilidades inventadas con habilidades de pool, o tiene que elegir un camino?\n> - ¿Elegir habilidades del pool obliga a \"declarar\" una profesión clásica, o se puede picotear habilidades de distintas profesiones sin comprometerse a una?\n> - Esto se conecta con las preguntas que ya teníamos pendientes sobre el sistema de profesiones (mecánica de las habilidades — efectos de estado, tiradas de daño, o mixto — y si el desbloqueo es por nivel o fijo). ¿Seguimos por ahí la próxima vez que carguemos esta sección?"
         }
       ]
     }

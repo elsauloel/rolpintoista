@@ -7,12 +7,12 @@ consulten sin depender de que alguien se acuerde de explicarlo de nuevo.
 
 ## Estado actual
 
-**En construcción, sin contenido real todavía.** `manual.html` y
-`../datos/reglas.json` están listos y funcionan, pero `reglas.json` solo
-tiene un capítulo de ejemplo ("Cómo se usa este manual") que explica el
-patrón de edición — no hay reglas de la campaña cargadas. El contenido se
-va a ir sumando de a poco, capítulo por capítulo, sin tener que tocar el
-HTML cada vez.
+**Work in progress con contenido real.** `../datos/reglas.json` tiene
+cargado el borrador del manual de Rol Pintoísta tal cual lo redacta el
+usuario (incluye marcas ✅/🟡/🔲 y preguntas abiertas, a propósito). La
+fuente es un `.md` que el usuario mantiene fuera del repo
+(`Desktop\borrar\manual-usuario-rol-pintoista.md`); se reimporta con el
+botón "Importar .md…" de la página (reemplaza todo el manual).
 
 ## Lógica principal
 
@@ -23,11 +23,20 @@ y secciones, y una textarea por sección. No tiene lógica de juego —a
 diferencia de la ficha o gm-tools, no calcula nada, solo muestra y edita
 texto.
 
-El renderizado del contenido (`cuerpoHtml()`) es texto plano con dos
-convenciones: línea en blanco = párrafo nuevo, línea que empieza con
-`"- "` = ítem de lista. No es Markdown completo a propósito, para no tener
-que sumar una librería externa a una herramienta que debe seguir siendo
-un único archivo standalone.
+El renderizado del contenido (`cuerpoHtml()`) es un Markdown simplificado
+hecho a mano (sin librerías): párrafos, listas `- ` y `1. `, tablas
+`| a | b |`, citas `> `, títulos `###`, `---`, `**negrita**`, `*cursiva*`
+y `` `código` ``. Solo lo que usa el documento del manual.
+
+`markdownAManual()` convierte un `.md` entero: `#` = título del manual,
+`##` = capítulo, `###` = sección; el texto antes del primer `###` de un
+capítulo va a una sección "General" (o con el nombre del capítulo si no
+hay otras).
+
+Al abrirse por http (sitio web / servidor local) lee primero
+`../datos/reglas.json` de al lado; con doble clic (file://) se cae a
+GitHub como antes. Ojo: "Subir datos" y "Traer última versión" siguen
+apuntando a la rama `main` del sistema viejo.
 
 ## Formato de datos
 

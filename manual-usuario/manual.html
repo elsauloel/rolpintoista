@@ -89,6 +89,19 @@ main.contenido .cuerpo p{margin:0 0 14px}
 main.contenido .cuerpo ul{margin:0 0 14px;padding-left:22px}
 main.contenido .cuerpo li{margin-bottom:4px}
 main.contenido .cuerpo .vacia{color:var(--muted);font-style:italic}
+main.contenido .cuerpo ol{margin:0 0 14px;padding-left:24px}
+main.contenido .cuerpo strong{color:var(--brass);font-weight:700}
+main.contenido .cuerpo code{font-family:"Space Mono",monospace;font-size:12.5px;background:var(--panel2);border:1px solid var(--line-soft);padding:1px 5px;border-radius:var(--r)}
+main.contenido .cuerpo h3{font-size:18px;margin:22px 0 10px;color:var(--brass)}
+main.contenido .cuerpo h4{font-size:16px;margin:18px 0 8px}
+main.contenido .cuerpo hr{border:none;border-top:1px solid var(--line-soft);margin:22px 0}
+main.contenido .cuerpo blockquote{margin:0 0 14px;padding:10px 14px;border-left:3px solid var(--copper);background:rgba(201,133,69,.07);border-radius:0 var(--r) var(--r) 0}
+main.contenido .cuerpo blockquote > :last-child{margin-bottom:0}
+main.contenido .cuerpo .tabla-scroll{overflow-x:auto;margin:0 0 16px}
+main.contenido .cuerpo table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
+main.contenido .cuerpo th,main.contenido .cuerpo td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+main.contenido .cuerpo th{background:var(--panel2);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
+main.contenido .cuerpo tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 
 .edicion-caja{border:1px solid var(--line);background:var(--panel2);border-radius:var(--r);padding:14px;margin-top:10px;display:flex;flex-direction:column;gap:10px}
 .edicion-caja .f{display:flex;flex-direction:column;gap:5px}
@@ -113,13 +126,15 @@ main.contenido .editor-seccion{display:none}
 
 <header>
   <div>
-    <h1>📖 Manual del jugador</h1>
+    <h1>📖 <span id="titulo-manual">Manual del jugador</span></h1>
     <div class="estado" id="estado">Sin cargar todavía.</div>
   </div>
   <div class="acciones">
     <button class="iconbtn" id="btn-traer" title="Traer la última versión publicada">⬇ Traer última versión</button>
     <button class="iconbtn" id="btn-cargar-archivo" title="Cargar un reglas.json local">Cargar archivo…</button>
     <input type="file" id="input-archivo" accept="application/json" style="display:none">
+    <button class="iconbtn" id="btn-importar-md" title="Reemplazar el manual con un documento .md (## = capítulo, ### = sección)">Importar .md…</button>
+    <input type="file" id="input-md" accept=".md,.txt,text/markdown,text/plain" style="display:none">
     <button class="iconbtn" id="btn-guardar" title="Descargar el estado actual como reglas.json">Guardar</button>
     <button class="btn" id="btn-subir" title="Publicar en GitHub (datos/reglas.json)">Subir datos</button>
     <button class="btn" id="btn-editar" title="Activar/desactivar modo edición">✏ Editar</button>
@@ -172,18 +187,120 @@ function estado(msg, clase){
   el.className = 'estado' + (clase ? ' ' + clase : '');
 }
 
-/* ---------- Render: texto plano con párrafos y listas "- " ---------- */
+/* ---------- Render: Markdown simplificado, hecho a mano (sin librerías) ----------
+   Soporta lo que usa el documento del manual: párrafos, listas "- " y "1. ",
+   tablas "| a | b |", citas "> ", títulos "### ", separador "---",
+   **negrita**, *cursiva* y `código`. */
+function inlineHtml(s){
+  const codigos = [];
+  let h = esc(s).replace(/`([^`]+)`/g, (_, c) => { codigos.push(c); return ` ${codigos.length - 1} `; });
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+       .replace(/(^|[^*\w])\*(?!\s)([^*]+?)\*(?!\w)/g, '$1<em>$2</em>');
+  return h.replace(/ (\d+) /g, (_, i) => `<code>${codigos[i]}</code>`);
+}
+function tipoLinea(l){
+  const s = l.trim();
+  if(!s) return 'blanco';
+  if(/^#{1,6}\s/.test(s)) return 'titulo';
+  if(/^(-{3,}|\*{3,})$/.test(s)) return 'hr';
+  if(s.startsWith('>')) return 'cita';
+  if(s.startsWith('|')) return 'tabla';
+  if(/^[-*]\s/.test(s)) return 'ul';
+  if(/^\d+[.)]\s/.test(s)) return 'ol';
+  return 'p';
+}
+function celdas(l){
+  let s = l.trim();
+  if(s.startsWith('|')) s = s.slice(1);
+  if(s.endsWith('|')) s = s.slice(0, -1);
+  return s.split('|').map(c => c.trim());
+}
+function tablaHtml(filas){
+  const esSeparador = l => /^\|?[\s:|-]+$/.test(l) && l.includes('-');
+  let cabecera = null;
+  if(filas.length > 1 && esSeparador(filas[1])){ cabecera = celdas(filas[0]); filas = filas.slice(2); }
+  filas = filas.filter(l => !esSeparador(l));
+  const th = cabecera ? `<thead><tr>${cabecera.map(c => `<th>${inlineHtml(c)}</th>`).join('')}</tr></thead>` : '';
+  const tb = filas.map(l => `<tr>${celdas(l).map(c => `<td>${inlineHtml(c)}</td>`).join('')}</tr>`).join('');
+  return `<div class="tabla-scroll"><table>${th}<tbody>${tb}</tbody></table></div>`;
+}
+function bloquesHtml(lineas){
+  const out = [];
+  let i = 0;
+  while(i < lineas.length){
+    const tipo = tipoLinea(lineas[i]);
+    if(tipo === 'blanco'){ i++; continue; }
+    if(tipo === 'hr'){ out.push('<hr>'); i++; continue; }
+    if(tipo === 'titulo'){
+      const m = lineas[i].trim().match(/^(#+)\s+(.*)$/);
+      const n = Math.min(4, Math.max(3, m[1].length));
+      out.push(`<h${n}>${inlineHtml(m[2])}</h${n}>`);
+      i++; continue;
+    }
+    const grupo = [];
+    while(i < lineas.length && tipoLinea(lineas[i]) === tipo){ grupo.push(lineas[i].trim()); i++; }
+    if(tipo === 'cita') out.push(`<blockquote>${bloquesHtml(grupo.map(l => l.replace(/^>\s?/, '')))}</blockquote>`);
+    else if(tipo === 'tabla') out.push(tablaHtml(grupo));
+    else if(tipo === 'ul') out.push(`<ul>${grupo.map(l => `<li>${inlineHtml(l.replace(/^[-*]\s+/, ''))}</li>`).join('')}</ul>`);
+    else if(tipo === 'ol'){
+      const inicio = parseInt(grupo[0], 10);
+      out.push(`<ol${inicio !== 1 ? ` start="${inicio}"` : ''}>${grupo.map(l => `<li>${inlineHtml(l.replace(/^\d+[.)]\s+/, ''))}</li>`).join('')}</ol>`);
+    }
+    else out.push(`<p>${grupo.map(inlineHtml).join('<br>')}</p>`);
+  }
+  return out.join('');
+}
 function cuerpoHtml(texto){
   const t = (texto || '').trim();
   if(!t) return `<p class="vacia">Todavía no hay contenido en esta sección.</p>`;
-  const bloques = t.split(/\n{2,}/);
-  return bloques.map(b => {
-    const lineas = b.split('\n').map(l => l.trim()).filter(Boolean);
-    if(lineas.length && lineas.every(l => l.startsWith('- '))){
-      return `<ul>${lineas.map(l => `<li>${esc(l.slice(2))}</li>`).join('')}</ul>`;
-    }
-    return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`;
-  }).join('');
+  return bloquesHtml(t.split('\n'));
+}
+
+/* ---------- Importar un documento .md entero ----------
+   "# " = título del manual, "## " = capítulo, "### " = sección.
+   Lo que queda antes del primer "### " de un capítulo va a una sección
+   "General" (o con el nombre del capítulo, si no tiene otras). */
+function slug(s){
+  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || uid();
+}
+function markdownAManual(md){
+  const limpiar = s => s.replace(/\*\*?|`/g, '').trim();
+  let titulo = '';
+  const caps = [];
+  let cap = null, sec = null;
+  for(const l of md.replace(/\r\n?/g, '\n').split('\n')){
+    let m;
+    if(!titulo && !cap && (m = l.match(/^#\s+(.+)/))){ titulo = limpiar(m[1]); continue; }
+    if((m = l.match(/^##\s+(.+)/))){ cap = {titulo: limpiar(m[1]), secciones: []}; caps.push(cap); sec = null; continue; }
+    if(!cap){ cap = {titulo: 'Portada', secciones: []}; caps.push(cap); }
+    if((m = l.match(/^###\s+(.+)/))){ sec = {titulo: limpiar(m[1]), lineas: []}; cap.secciones.push(sec); continue; }
+    if(!sec){ sec = {titulo: null, lineas: []}; cap.secciones.push(sec); }
+    sec.lineas.push(l);
+  }
+  const capitulos = caps.map(c => {
+    const secs = c.secciones.map(s => {
+      const lineas = s.lineas.slice();
+      const sobra = l => !l.trim() || tipoLinea(l) === 'hr';
+      while(lineas.length && sobra(lineas[0])) lineas.shift();
+      while(lineas.length && sobra(lineas[lineas.length - 1])) lineas.pop();
+      return {titulo: s.titulo, contenido: lineas.join('\n')};
+    }).filter(s => s.titulo !== null || s.contenido);
+    if(!secs.length) secs.push({titulo: null, contenido: ''});
+    const usados = new Set();
+    return {
+      id: slug(c.titulo),
+      titulo: c.titulo,
+      secciones: secs.map(s => {
+        const t = s.titulo ?? (secs.length === 1 ? c.titulo : 'General');
+        let id = slug(t), n = 2;
+        while(usados.has(id)) id = slug(t) + '-' + n++;
+        usados.add(id);
+        return {id, titulo: t, contenido: s.contenido};
+      }),
+    };
+  });
+  return {titulo: titulo || 'Manual del jugador', actualizado: new Date().toISOString(), capitulos};
 }
 
 /* ---------- Índice (sidebar) ---------- */
@@ -237,7 +354,7 @@ function renderContenido(){
     <div class="editor-seccion">
       <div class="edicion-caja">
         <div class="f"><label>Título de la sección</label><input type="text" data-editar="titulo" value="${esc(sec.titulo)}"></div>
-        <div class="f"><label>Contenido (línea en blanco = párrafo nuevo, "- " al inicio = ítem de lista)</label>
+        <div class="f"><label>Contenido — línea en blanco = párrafo nuevo · "- " = lista · "| a | b |" = tabla · "> " = cita · **negrita** · *cursiva*</label>
           <textarea data-editar="contenido" rows="14">${esc(sec.contenido)}</textarea>
         </div>
         <div class="fila">
@@ -349,6 +466,8 @@ $('#btn-editar').onclick = () => setModoEdicion(!editando);
 function aplicarDatos(datos, origen){
   M = Object.assign({titulo: 'Manual del jugador', actualizado: '', capitulos: []}, datos);
   seleccion = null;
+  $('#titulo-manual').textContent = M.titulo;
+  document.title = M.titulo;
   renderToc();
   renderContenido();
   estado(origen, 'ok');
@@ -377,6 +496,17 @@ $('#input-archivo').onchange = async e => {
     toast('Ese archivo no es un JSON válido');
   }
   e.target.value = '';
+};
+
+$('#btn-importar-md').onclick = () => $('#input-md').click();
+$('#input-md').onchange = async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  if(M.capitulos.length && !confirm(`Esto reemplaza todo el manual con el contenido de "${file.name}". ¿Seguir?`)) return;
+  const datos = markdownAManual(await file.text());
+  aplicarDatos(datos, `Importado desde ${file.name} — acordate de Guardar o Subir datos`);
+  toast(`Importados ${datos.capitulos.length} capítulos`);
 };
 
 /* ---------- GitHub: mismo patrón de token que las otras herramientas ---------- */
@@ -510,9 +640,24 @@ $('#btn-token').onclick = async () => {
 
 /* ---------- Arranque: trae la última versión sola; si falla, se queda
    con el esqueleto vacío para no bloquear la edición offline. ---------- */
+async function cargarDelSitio(){
+  // Servido por http (sitio web o servidor local): el reglas.json que viaja
+  // junto a esta página. Abierto con doble clic (file://) esto falla y se
+  // cae a GitHub como siempre.
+  if(!location.protocol.startsWith('http')) return false;
+  try{
+    const resp = await fetch('../datos/reglas.json', {cache: 'no-store'});
+    if(!resp.ok) return false;
+    aplicarDatos(await resp.json(), 'Manual cargado ✓');
+    return true;
+  }catch(err){
+    return false;
+  }
+}
+
 renderToc();
 renderContenido();
-traerUltimaVersion(true);
+cargarDelSitio().then(ok => { if(!ok) traerUltimaVersion(true); });
 </script>
 </body>
 </html>

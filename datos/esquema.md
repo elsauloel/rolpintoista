@@ -177,6 +177,5 @@ de texto, no datos de partida):
 }
 ```
 
-`contenido` es texto plano: línea en blanco separa párrafos, una línea que
-empieza con `"- "` se renderiza como ítem de lista. Ver
-`manual-usuario/CLAUDE.md`.
+`contenido` es Markdown simplificado (párrafos, listas, tablas, citas,
+negrita/cursiva). Ver `manual-usuario/CLAUDE.md`.

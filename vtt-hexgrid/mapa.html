@@ -127,6 +127,13 @@ aside{
 .mesa-tirada.ultima{background:#2E6B57}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
 .mesa-quien{color:var(--brass);font-weight:700}
+/* Color del nombre según quién tira (ver mesaClaseQuien). */
+.mesa-quien.mesa-q-propia{color:var(--brass)}
+.mesa-quien.mesa-q-aliado{color:#8EE6A8}
+.mesa-quien.mesa-q-creep{color:#FF7E7E}
+.mesa-quien.mesa-q-neutra{color:#F4EFE8}
+.mesa-quien.mesa-q-turno{color:#C9A8F5}
+.mesa-tirada.mesa-sistema.mesa-turno{border-left-color:#C9A8F5}
 .mesa-usuario{color:var(--muted)}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
@@ -1931,6 +1938,16 @@ async function mesaPublicar(origen, r){
   }
 }
 
+// Color del nombre en la Mesa: dorado las propias, verde las de aliados,
+// rojo las de creeps (desde gm-tools con un creep), blanco las neutras
+// (tiradas libres sin personaje de otros) y lila el pase de turno.
+function mesaClaseQuien(t){
+  if(t.desde === 'mantenimiento') return 'mesa-q-turno';
+  if(t.desde === 'gm' && t.quien) return 'mesa-q-creep';
+  if(fbUsuario && t.uid === fbUsuario.uid) return 'mesa-q-propia';
+  return t.quien ? 'mesa-q-aliado' : 'mesa-q-neutra';
+}
+
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
@@ -1945,11 +1962,11 @@ function mesaRender(docs){
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
     if(t.desde === 'mantenimiento' || t.desde === 'recordatorio'){
       const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-sistema' + (nueva ? ' nueva' : '');
+      div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
       const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
       div.innerHTML = t.desde === 'mantenimiento'
-        ? `<span class="mesa-quien">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno${esc(hora)}</div>`
-        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
+        ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno${esc(hora)}</div>`
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
@@ -1963,7 +1980,7 @@ function mesaRender(docs){
     div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
+      `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
       `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(hora)}</div>`;
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);

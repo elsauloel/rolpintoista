@@ -141,6 +141,11 @@ a.btn{text-decoration:none;display:inline-block}
 .reporte-estado.escapo{color:var(--muted);border:1px solid var(--line)}
 .reporte-xp{font-family:"Space Mono",monospace;font-weight:700;color:var(--brass);flex:none;min-width:70px;text-align:right}
 .reporte-total{margin-top:8px;text-align:right;font-size:14px;color:var(--paper)}
+/* Creep que escapó con su XP fuera del total: se ve apagado y tachado. */
+.reporte-fila.no-cuenta{opacity:.5}
+.reporte-fila.no-cuenta .reporte-xp{text-decoration:line-through;color:var(--muted)}
+.reporte-contar-escapados{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:10px;font-size:12.5px;color:var(--muted);cursor:pointer}
+.reporte-contar-escapados input{width:auto;flex:none;cursor:pointer}
 .reporte-dividir{margin-top:10px;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
 .reporte-dividir input{width:56px;text-align:center;flex:none}
 .reporte-xp-por-jugador{color:var(--paper)}
@@ -4529,33 +4534,39 @@ function precioDeItemLoot(nombre){
   return it ? num(it.precioCompra) : null;
 }
 
+// XP que da un creep que escapó, sobre la que daría derrotado.
+const XP_ESCAPO_PCT = 0.2;
+
 // Asume que todo creep con HP <= 0 fue derrotado por el grupo (XP y loot
-// completos) y que todo creep con vida escapó/sobrevivió (mitad de XP,
-// sin loot) — según las reglas pedidas para esta primera versión.
-function generarReporteCombate(){
+// completos) y que todo creep con vida escapó (20% de la XP, sin loot).
+// Con contarEscapados en false, los que escaparon no suman al total.
+function generarReporteCombate(contarEscapados){
   const filas = S.creeps.map(sc => {
     const derrotado = num(sc.hp) <= 0;
     const xpBase = xpBasePorNivel(sc.nivel);
-    const xp = derrotado ? xpBase : Math.round(xpBase * 0.5);
-    return {sc, derrotado, xp, loot: derrotado ? lootDeCreep(sc) : []};
+    const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
+    const cuenta = derrotado || contarEscapados;
+    return {sc, derrotado, xp, cuenta, loot: derrotado ? lootDeCreep(sc) : []};
   });
-  const xpTotal = filas.reduce((a,f) => a + f.xp, 0);
+  const xpTotal = filas.reduce((a,f) => a + (f.cuenta ? f.xp : 0), 0);
   return {filas, xpTotal};
 }
 
 let xpCantidadJugadores = 3;
+let xpContarEscapados = true;
 
 function renderReporteCombate(){
-  const {filas, xpTotal} = generarReporteCombate();
+  const {filas, xpTotal} = generarReporteCombate(xpContarEscapados);
   if(!filas.length){
     $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps cargados — nada que resumir.</div>`;
     return;
   }
+  const hayEscapados = filas.some(f => !f.derrotado);
   const filasHtml = filas.map(f => `
-    <div class="reporte-fila">
+    <div class="reporte-fila${f.cuenta ? '' : ' no-cuenta'}">
       <span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
       <span class="reporte-estado ${f.derrotado?'derrotado':'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span>
-      <span class="reporte-xp">+${fmt(f.xp)} XP</span>
+      <span class="reporte-xp" title="${f.cuenta ? '' : 'No se cuenta en el total'}">+${fmt(f.xp)} XP</span>
     </div>`).join('');
 
   const conLoot = filas.filter(f => f.derrotado && f.loot.length);
@@ -4576,6 +4587,10 @@ function renderReporteCombate(){
     <div>
       <div class="reporte-seccion-titulo">Experiencia obtenida</div>
       <div class="reporte-lista">${filasHtml}</div>
+      ${hayEscapados ? `<label class="reporte-contar-escapados">
+        <input type="checkbox" id="finalizar-combate-contar-escapados" ${xpContarEscapados ? 'checked' : ''}>
+        Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)
+      </label>` : ''}
       <div class="reporte-total">Total del grupo: <b>${fmt(xpTotal)} XP</b></div>
       <div class="reporte-dividir">
         Dividir entre <input type="number" id="finalizar-combate-jugadores" min="1" step="1" value="${xpCantidadJugadores}">
@@ -4592,6 +4607,11 @@ function renderReporteCombate(){
     const n = Math.max(1, Math.round(num(e.target.value)) || 1);
     xpCantidadJugadores = n;
     $('#finalizar-combate-xp-por-jugador').textContent = fmt(Math.round(xpTotal / n));
+  });
+  const contar = $('#finalizar-combate-contar-escapados');
+  if(contar) contar.addEventListener('change', e => {
+    xpContarEscapados = e.target.checked;
+    renderReporteCombate();
   });
 }
 

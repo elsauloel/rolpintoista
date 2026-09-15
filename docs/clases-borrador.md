@@ -78,9 +78,10 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 1. ✅ **Turboimpacto** (Pegar fuerte) — **No2:** ataque. **SP:** X (máx.
    3). **Espameable.** Ataque con +X dados de daño del Tipo del arma.
 2. ✅ **Arte de la guerra** — **Flash.** **SP:** 1. +2 a una sola tirada
-   de PdG o de Parry.
-   ⚖ A definir en mesa: ¿se puede usar varias veces sobre la misma tirada
-   (con 3 SP, +6), una vez por tirada, o una vez por turno?
+   de PdG o de Parry. No se puede usar más de una vez sobre la misma
+   tirada.
+   ⚖ A definir en mesa: ¿se puede usar en todas las tiradas que quieras
+   dentro del mismo turno, o una sola vez por turno?
 3. **Sacadito** — Acciones: Ataque. Bonos: 3.
    1+1d4 auto-ataques consecutivos. Causa fatiga.
 4. **Cañón vasco** — Acciones: 1 / Ataque. Bonos: X ≤ Fue.

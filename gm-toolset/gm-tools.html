@@ -3446,8 +3446,8 @@ function verCreep(id){
         ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
       </div>
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
-      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
       ${seccion('Habilidades', habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>')}
+      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;

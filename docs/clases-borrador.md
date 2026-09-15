@@ -62,11 +62,11 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 
 ## Warrior ⏳
 
-1. **Arte de la guerra** [2] — +2 fijo a una tirada de PG, Parry, Bloqueo
-   o Daño.
-   *(En la versión descartada se había decidido: Flash, 1 SP, +2 a una
-   sola tirada de PdG o Parry, no más de una vez por tirada; ⚖ a definir
-   si se puede usar en varias tiradas del mismo turno.)*
+1. ✅ **Arte de la guerra** — **Flash (a confirmar).** **SP:** 2. +2 a una
+   sola tirada de PdG, Parry, Bloqueo o Daño. No se puede usar más de una
+   vez sobre la misma tirada.
+   ⚖ A definir en mesa: ¿se puede usar en todas las tiradas que quieras
+   dentro del mismo turno, o una sola vez por turno?
 2. **Amplificar daño** [X] — Amplifica en X el daño de un ataque. X no
    puede ser mayor a 3.
 3. **Sacadito** [3] — Recibe 10 Nitros que puede utilizar en ataques

@@ -1892,14 +1892,25 @@ function aportesModCreep(sc, statId){
 }
 const conSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
 
-// De dónde sale el Ataque (PdG): Destreza y lo que la sube, mods directos
-// de PdG y Lisiado (mismo cálculo que creepStatValor).
+// Ataque = daño del arma + Fuerza (Dmg), el mismo que tira "Daño Arma".
+function ataqueCreepTxt(sc){
+  return danoTxt(sc, creepStatValor(sc, 'dmg'));
+}
+
+// De dónde sale el Ataque: dados y fijo del arma, Fuerza y lo que la sube,
+// mods directos de Dmg. Un arma de rango no suma Fuerza (ver danoTxt).
 function ataqueOrigenTxt(sc){
-  const L = [`Destreza base: ${fmt(num(sc.des))}`];
-  aportesModCreep(sc, 'des').forEach(a => L.push(`${conSigno(a.val)} Destreza por ${a.nombre}`));
-  aportesModCreep(sc, 'pdg').forEach(a => L.push(`${conSigno(a.val)} PdG por ${a.nombre}`));
-  if((sc.estados||[]).some(e => e.activo !== false && e.lisiado)) L.push('Lisiado: a la mitad');
-  L.push(`= ${fmt(creepStatValor(sc, 'pdg'))}`);
+  const dados = Math.max(1, num(sc.armaPeso)||1) + Math.max(0, num(sc.armaAmplificado));
+  const L = [`${dados}d${num(sc.armaTipo)||6} por ${sc.armaNombre || 'el arma'}`];
+  if(num(sc.armaFijo)) L.push(`${conSigno(num(sc.armaFijo))} fijo del arma`);
+  if(sc.armaDeRango){
+    L.push('Arma de rango: no suma Fuerza');
+  }else{
+    L.push(`${conSigno(num(sc.fue))} Fuerza base`);
+    aportesModCreep(sc, 'fue').forEach(a => L.push(`${conSigno(a.val)} Fuerza por ${a.nombre}`));
+    aportesModCreep(sc, 'dmg').forEach(a => L.push(`${conSigno(a.val)} Daño por ${a.nombre}`));
+  }
+  L.push(`= ${ataqueCreepTxt(sc)}`);
   return L.join('\n');
 }
 
@@ -2462,7 +2473,7 @@ function cardHtml(sc){
       </div>
 
       <div class="row3" style="grid-template-columns:1fr 1fr">
-        <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque (PdG)</label><div class="valor-fijo">${fmt(creepStatValor(sc, 'pdg'))}</div></div>
+        <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque</label><div class="valor-fijo">${esc(ataqueCreepTxt(sc))}</div></div>
         <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
       </div>
 

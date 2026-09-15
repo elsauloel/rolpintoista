@@ -59,6 +59,10 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
   peso" = +X dados; "dT8" = dados de Tipo 8.
 - **Espameable**: se puede repetir en el turno; el límite lo ponen los
   Nitros.
+- **Acciones → Nitros**: "Acciones: N" del PDF pasa a costar N No2.
+- **Flash** = no cuesta Nitros y se puede usar durante el turno de
+  cualquier jugador. "Acciones: 0" es siempre Flash, lo diga o no (ej.
+  Estoicismo).
 - **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
   corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
   completo después) y cuenta como ataque del turno.

@@ -7627,9 +7627,16 @@ async function abrirPersonajes(){
       const nivel = x.resumen && x.resumen.nivel ? ` · Lv ${fmt(num(x.resumen.nivel))}` : '';
       const dueno = propia ? '' : ` — ${nombres.get(x.duenoUid) || '¿?'}`;
       b.textContent = `${x.nombre || 'Sin nombre'}${nivel}${dueno}${abierto ? ' (abierto)' : ''}`;
+      if(!propia && !abierto) b.title = 'Se abre en una pestaña nueva, en solo lectura';
       b.onclick = async () => {
         $('#scrim-personajes').classList.remove('open');
-        if(!abierto) await fichaAbrir(x.id);
+        if(abierto) return;
+        // La ficha de otro jugador va en otra pestaña, así no se pierde la propia.
+        if(!propia){
+          window.open(`ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(x.id)}`, '_blank', 'noopener');
+          return;
+        }
+        await fichaAbrir(x.id);
       };
       wrap.appendChild(b);
       if(propia){

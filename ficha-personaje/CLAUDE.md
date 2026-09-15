@@ -34,8 +34,10 @@ más cambia sesión a sesión.
   `DADOS_ARMA`): Acciones + Movimiento se fundieron en Nitros (substat
   `nitros` de Agilidad, fórmula `agl`; `S.nitros` es lo que queda en el
   turno, se recarga en `mantenimiento()`). Bonos pasó a SP (substat `sp`
-  de Inteligencia, fórmula `int*3`; `S.spGastado`, **no** se recarga al
-  pasar turno). Costos: mover 1/casillero (`moverCasilleros`), consumir
+  de Inteligencia, fórmula `int*3`; `S.spGastado`, **no** se recarga entero
+  al pasar turno: `mantenimiento()` resta de `spGastado` el substat
+  `spregen` "SP Regen", fórmula `floor(int/2)` + mods de equipo/estados/
+  habilidades, sin pasar del máximo). Costos: mover 1/casillero (`moverCasilleros`), consumir
   cinturón 1 / mochila 2, habilidad `nitrosCosto` (1 por defecto), atacar
   Tipo ÷ 2 el primer ataque del turno y Tipo completo después
   (`atacar`/`costoAtaqueNitros`, `S.ataquesTurno`). Lo no confirmado está

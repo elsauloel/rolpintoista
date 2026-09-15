@@ -1668,6 +1668,7 @@ const GRUPOS = [
     {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
     {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
     {id:'sp', label:'SP', full:'Special Power'},
+    {id:'spregen', label:'SP Regen', full:'Regeneración de SP por turno'},
     {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
 ];
 const EXTRA = [
@@ -1687,8 +1688,10 @@ const DADOS_ARMA = [2, 4, 6, 8, 10];
    ITERACIÓN 2 — Nitros (No2) y SP
    Nitros reemplaza a Acciones y a Movimiento: su máximo es el substat
    No2 (fórmula base agl + mods) y se recarga en cada Mantenimiento.
-   SP reemplaza a Bonos: se gasta con habilidades y NO se recarga al
-   pasar turno (solo con recargas, consumibles, descanso o a mano).
+   SP reemplaza a Bonos: se gasta con habilidades y NO se recarga entero al
+   pasar turno: cada Mantenimiento recupera SP Regen (substat de Int,
+   fórmula base floor(int/2) + mods), sin pasar del máximo. El resto, con
+   recargas, consumibles, descanso o a mano.
 
    Todo lo marcado PLACEHOLDER está sin confirmar: se ajusta acá y en la
    pantalla aparece con ⚠.
@@ -1746,6 +1749,8 @@ function migrarEstadoIt2(st){
   const f = st.formulas || (st.formulas = {});
   ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
   ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'int*3' : 'agl'; });
+  // SP Regen (regla nueva): las fichas de antes arrancan con la fórmula base.
+  if(f.spregen === undefined) f.spregen = 'floor(int/2)';
   Object.keys(f).forEach(k => {
     if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
   });
@@ -1859,7 +1864,7 @@ const DEFAULT = {
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
-    pdgmg:'int', resm:'int', sp:'int*3', rangocasteo:'int',
+    pdgmg:'int', resm:'int', sp:'int*3', spregen:'floor(int/2)', rangocasteo:'int',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0'
   },
   inventario:[],
@@ -2937,7 +2942,7 @@ function renderVitals(){
   $('#cap-cinturon-bonus-txt').textContent = bonusCinturon ? ` (+${fmt(bonusCinturon)} del cinturón equipado)` : '';
   $('#cap-equipo-t').textContent = fmt(crg);
 
-  // SP: se gasta con habilidades y no se recarga al pasar turno.
+  // SP: se gasta con habilidades; al pasar turno recupera SP Regen.
   const spMax = spMaximo(c);
   const gastado = num(S.spGastado);
   const sp = spMax - gastado;
@@ -2949,7 +2954,7 @@ function renderVitals(){
   $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
   $('#v-sp-natural-btn').textContent = `/ ${fmt(spMax)}`;
   $('#c-sp').classList.toggle('penal', sp < 0);
-  $('#c-sp').title = `Special Power (${S.formulas.sp || 'int*3'}): se gasta al usar habilidades y no se recarga al pasar turno — solo con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
+  $('#c-sp').title = `Special Power (${S.formulas.sp || 'int*3'}): se gasta al usar habilidades; al pasar turno recupera SP Regen (${fmt(Number.isNaN(c.final.spregen) ? 0 : c.final.spregen)}). El resto, con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
   $('#sp-breakdown').innerHTML = openStat === 'sp'
     ? breakdown('sp', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
         <div class="row"><span>Gastado (desde la última recarga)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
@@ -3261,7 +3266,7 @@ function renderHistorialSesion(){
 /* ---------- Tirar dados a partir del valor de un stat ---------- */
 
 const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
-const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'sp', 'tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
+const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
 
 function combosDeSuma(n, k, minIdx){
   if(k === 0) return n === 0 ? [[]] : [];
@@ -6647,7 +6652,11 @@ function mantenimiento(){
 
   S.turno = (S.turno || 1) + 1;
   // Nitros se recargan al máximo y el primer ataque vuelve a costar la
-  // mitad. El SP NO se recarga acá (Iteración 2).
+  // mitad. El SP no se recarga entero: recupera SP Regen, sin pasar del
+  // máximo (si ya estaba por encima, no se toca).
+  const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
+  const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
+  if(spRecuperado) S.spGastado = num(S.spGastado) - spRecuperado;
   S.nitros = nitrosMaximo();
   S.ataquesTurno = 0;
   S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
@@ -6670,7 +6679,7 @@ function mantenimiento(){
   }
 
   log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
-  log.push(`Nitros recargados a ${fmt(num(S.nitros))}. El SP no se recarga al pasar turno.`);
+  log.push(`Nitros recargados a ${fmt(num(S.nitros))}. SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).`);
   S.log = log;
 
   renderTurno();

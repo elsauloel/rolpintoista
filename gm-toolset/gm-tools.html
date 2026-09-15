@@ -577,8 +577,10 @@ input[type=file]{display:none}
 #mesa.colapsada #mesa-grilla{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
+.mesa-tirada.ultima{background:#2E6B57}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
 .mesa-quien{color:var(--brass);font-weight:700}
+.mesa-usuario{color:var(--muted)}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
 .mesa-vacia{color:var(--muted);font-size:11px}
@@ -2791,9 +2793,9 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   return es;
 }
 
-function tirarExtraDeHab(h){
+function tirarExtraDeHab(h, sc){
   const r = tirarDados(h.tiradaExtra);
-  if(r) registrarTirada(h.nombre || 'Habilidad', r);
+  if(r) registrarTirada(`${sc ? sc.nombre + ' · ' : ''}${h.nombre || 'Habilidad'}`, r);
 }
 
 let equipandoCreepId = null;
@@ -3779,7 +3781,7 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
-    if(h.tiradaExtra) tirarExtraDeHab(h);
+    if(h.tiradaExtra) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
@@ -4821,8 +4823,12 @@ const MESA_MAX = 30;
 
 let mesaIdsVistos = null;
 
-// En gm-tools el origen ya trae el nombre del creep; se muestra el jugador (GM).
-function mesaQuien(){ return ''; }
+// En gm-tools el origen llega como "<creep> · <qué tiró>": el creep pasa a
+// ser quien tira (en color en la Mesa) y el origen queda con el resto.
+function mesaQuien(origen){
+  const sc = S.creeps.find(c => c.nombre && String(origen || '').startsWith(c.nombre + ' · '));
+  return sc ? sc.nombre : '';
+}
 
 function mesaEstado(texto){
   $('#mesa-estado').textContent = texto;
@@ -4834,8 +4840,8 @@ async function mesaPublicar(origen, r){
     await fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid,
       jugador: fbMiembro.nombre,
-      quien: mesaQuien(),
-      origen: String(origen || ''),
+      quien: mesaQuien(origen),
+      origen: mesaQuien(origen) ? String(origen).slice(mesaQuien(origen).length + 3) : String(origen || ''),
       formula: String(r.formula || ''),
       rolls: (r.rolls || []).slice(0, 100),
       mod: num(r.mod),
@@ -4853,6 +4859,9 @@ function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
+  // La última tirada (no las líneas del sistema) va con fondo verde.
+  const ultima = docs.find(d => !['mantenimiento', 'recordatorio'].includes(d.data().desde));
+  const ultimaId = ultima ? ultima.id : null;
   let hayAjena = false;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
@@ -4866,21 +4875,22 @@ function mesaRender(docs){
       const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno${esc(hora)}</div>`
-        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span> 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
+        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
     }
     const quien = t.quien || t.jugador || '?';
-    const jugador = t.quien && t.jugador && t.quien !== t.jugador ? ` · ${t.jugador}` : '';
+    // Personaje o creep en color y, entre paréntesis, quién lo maneja.
+    const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
     const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
     const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
     const div = document.createElement('div');
-    div.className = 'mesa-tirada' + (nueva ? ' nueva' : '');
+    div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien">${esc(quien)}</span> ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(jugador)}${esc(hora)}</div>`;
+      `<span class="mesa-quien">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(hora)}</div>`;
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

@@ -69,7 +69,9 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   rolls[], mod, total, desde: 'ficha'|'gm', cuando}`. Una por tirada. La
   publica `registrarTirada()` (ficha.html y gm-tools.html, vía
   `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
-  edita; el GM puede borrarlas. El bloque "MESA" está copiado igual en las
+  edita; el GM puede borrarlas. `quien` es el personaje (ficha) o el creep
+  (gm-tools lo separa del origen "<creep> · <qué tiró>"); la Mesa lo muestra
+  en color con `(jugador)` al lado, y la última tirada con fondo verde. El bloque "MESA" está copiado igual en las
   dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`.

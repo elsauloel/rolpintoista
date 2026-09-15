@@ -1028,8 +1028,10 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 #mesa.colapsada #mesa-grilla{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
+.mesa-tirada.ultima{background:#2E6B57}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
 .mesa-quien{color:var(--brass);font-weight:700}
+.mesa-usuario{color:var(--muted)}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
 .mesa-vacia{color:var(--muted);font-size:11px}
@@ -6955,6 +6957,9 @@ function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
+  // La última tirada (no las líneas del sistema) va con fondo verde.
+  const ultima = docs.find(d => !['mantenimiento', 'recordatorio'].includes(d.data().desde));
+  const ultimaId = ultima ? ultima.id : null;
   let hayAjena = false;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
@@ -6968,21 +6973,22 @@ function mesaRender(docs){
       const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno${esc(hora)}</div>`
-        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span> 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
+        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
     }
     const quien = t.quien || t.jugador || '?';
-    const jugador = t.quien && t.jugador && t.quien !== t.jugador ? ` · ${t.jugador}` : '';
+    // Personaje o creep en color y, entre paréntesis, quién lo maneja.
+    const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
     const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
     const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
     const div = document.createElement('div');
-    div.className = 'mesa-tirada' + (nueva ? ' nueva' : '');
+    div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien">${esc(quien)}</span> ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(jugador)}${esc(hora)}</div>`;
+      `<span class="mesa-quien">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}${esc(hora)}</div>`;
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

@@ -412,6 +412,9 @@ input[type=file]{display:none}
    ya es un scrim — tiene que quedar encima (mismo criterio que
    #scrim-ver-item). */
 #scrim-presets-creep{z-index:85}
+#scrim-editar-creep{z-index:79}
+.editar-creep-modal{max-width:620px;border-top:none;background:none}
+.editar-creep-modal .card{box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
 .preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .preset-grupo:first-child{margin-top:0}
 .preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
@@ -610,6 +613,13 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Edición del creep: la ficha completa en una ventana. Va antes que las
+     demás ventanas (y una capa más abajo) porque desde acá se abren los
+     editores de habilidad, arma, estado y equipo, que tienen que quedar encima. -->
+<div class="scrim" id="scrim-editar-creep">
+  <div class="modal editar-creep-modal" id="editar-creep-body"></div>
+</div>
 
 <div class="scrim" id="scrim-acciones-creep">
   <div class="modal acciones-modal">
@@ -1756,8 +1766,7 @@ function nuevoCreep(){
     crit:[0,0,0,0,0],
     habilidades:[],
     estados:[],
-    notas:'',
-    compacto:true
+    notas:''
   };
 }
 
@@ -2142,6 +2151,7 @@ function normalizarCreep(sc){
   });
   if(sc.nitros === undefined || sc.nitros === null) sc.nitros = creepNitrosMax(sc);
   if(sc.ataquesTurno === undefined) sc.ataquesTurno = 0;
+  delete sc.compacto;  // la tarjeta ya no se despliega: se edita en una ventana
   return sc;
 }
 
@@ -2150,9 +2160,43 @@ function renderAll(){
   const grid = $('#grid');
   $('#empty').style.display = S.creeps.length ? 'none' : 'block';
   S.creeps.forEach(normalizarCreep);
-  grid.innerHTML = S.creeps.map(sc => cardHtml(sc)).join('');
+  grid.innerHTML = S.creeps.map(sc => cardCompactoHtml(sc)).join('');
+  if($('#scrim-editar-creep').classList.contains('open')) renderEditarCreep();
   if($('#scrim-acciones-creep').classList.contains('open')) renderAccionesCreep();
   renderTablero();  // si está abierto, refleja los cambios de los creeps
+}
+
+/* ---------- Editar creep: la ficha completa en una ventana ---------- */
+let editandoCreepId = null;
+
+function renderEditarCreep(){
+  const sc = S.creeps.find(s => s.id === editandoCreepId);
+  if(!sc){ cerrarEditarCreep(); return; }
+  // Redibujar no tiene que mover la ventana ni sacar el foco de lo que se escribe.
+  const scrim = $('#scrim-editar-creep');
+  const scroll = scrim.scrollTop;
+  const activo = document.activeElement;
+  const cuerpo = $('#editar-creep-body');
+  const clave = activo && cuerpo.contains(activo) ? [...activo.attributes].filter(a => a.name.startsWith('data-')).map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join('') : '';
+  cuerpo.innerHTML = cardHtml(sc);
+  scrim.scrollTop = scroll;
+  if(clave){
+    const nuevo = cuerpo.querySelector(clave);
+    if(nuevo) nuevo.focus();
+  }
+}
+
+function abrirEditarCreep(scId){
+  editandoCreepId = scId;
+  renderEditarCreep();
+  $('#scrim-editar-creep').scrollTop = 0;
+  $('#scrim-editar-creep').classList.add('open');
+}
+
+function cerrarEditarCreep(){
+  editandoCreepId = null;
+  $('#scrim-editar-creep').classList.remove('open');
+  $('#editar-creep-body').innerHTML = '';
 }
 
 let accionesCreepId = null;
@@ -2284,8 +2328,7 @@ function abrirVerHabAccion(scId, habId){
   $('#scrim-ver-hab').classList.add('open');
 }
 
-const SVG_OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
-const SVG_OJO_CERRADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+const SVG_LAPIZ = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
 function muertoBadgeHtml(sc){
   if(num(sc.hp) > 0) return '';
@@ -2307,12 +2350,10 @@ function formulasCombateCreep(sc){
 }
 
 function cardHtml(sc){
-  if(sc.compacto) return cardCompactoHtml(sc);
   const fCombate = formulasCombateCreep(sc);
   return `
   <div class="card${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
-      <button type="button" class="eyebtn" data-vermodo="${sc.id}" title="Vista rápida">${SVG_OJO_ABIERTO}</button>
       <input class="name" data-f="nombre" data-id="${sc.id}" value="${esc(sc.nombre)}">
       <div class="mini-f" style="width:44px">
         <label class="lv-label">Lv</label>
@@ -2320,6 +2361,7 @@ function cardHtml(sc){
       </div>
       <button class="verbtn" data-dup="${sc.id}" title="Duplicar este creep">Duplicar</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
+      <button type="button" class="iconbtn" data-cerrareditar="1" title="Cerrar (Esc)">Cerrar</button>
     </div>
     ${muertoBadgeHtml(sc)}
     <div class="imgwrap">
@@ -2442,7 +2484,7 @@ function cardCompactoHtml(sc){
   return `
   <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
-      <button type="button" class="eyebtn" data-vermodo="${sc.id}" title="Ver ficha completa">${SVG_OJO_CERRADO}</button>
+      <button type="button" class="eyebtn" data-editarcreep="${sc.id}" title="Editar creep">${SVG_LAPIZ}</button>
       <span class="name-compacto">${esc(sc.nombre)}</span>
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
       <button class="verbtn" data-ver="${sc.id}">Ver</button>
@@ -3452,11 +3494,8 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.ver){ verCreep(b.dataset.ver); return; }
-  if(b.dataset.vermodo){
-    const sc = S.creeps.find(s=>s.id===b.dataset.vermodo);
-    if(sc){ sc.compacto = !sc.compacto; renderAll(); }
-    return;
-  }
+  if(b.dataset.editarcreep){ abrirEditarCreep(b.dataset.editarcreep); return; }
+  if(b.dataset.cerrareditar){ cerrarEditarCreep(); return; }
   if(b.dataset.img){
     document.querySelector(`[data-imginput="${b.dataset.img}"]`)?.click();
     return;
@@ -4432,14 +4471,19 @@ $('#recordatorio-cerrar').onclick = () => $('#scrim-recordatorio').classList.rem
 $('#scrim-recordatorio').addEventListener('mousedown', e => { if(e.target.id==='scrim-recordatorio') $('#scrim-recordatorio').classList.remove('open'); });
 // El recordatorio de traer la última versión no se abre en la versión nueva (ver arriba).
 
-// Cerrar cualquier popup con la tecla Escape.
+// Escape cierra solo la ventana de más arriba (la de editar un creep puede
+// tener abierta encima la de una habilidad, un estado, etc.).
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
-  document.querySelectorAll('.scrim.open').forEach(scrim => {
-    const closeBtn = scrim.querySelector('[id$="-x"]');
-    if(closeBtn) closeBtn.click(); else scrim.classList.remove('open');
-  });
+  const abiertos = [...document.querySelectorAll('.scrim.open')];
+  if(!abiertos.length) return;
+  const capa = s => num(getComputedStyle(s).zIndex);
+  const arriba = abiertos.reduce((a, s) => capa(s) >= capa(a) ? s : a);
+  if(arriba.id === 'scrim-editar-creep'){ cerrarEditarCreep(); return; }
+  const closeBtn = arriba.querySelector('[id$="-x"]');
+  if(closeBtn) closeBtn.click(); else arriba.classList.remove('open');
 });
+$('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cerrarEditarCreep(); });
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
 $('#dados-x').onclick = () => $('#scrim-dados').classList.remove('open');

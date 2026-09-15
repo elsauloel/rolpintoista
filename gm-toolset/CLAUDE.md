@@ -43,6 +43,12 @@ En desarrollo activo, las dos.
   habilidad Movimiento). Los creeps viejos se convierten solos en
   `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se
   saca siempre).
+- **Tarjetas y edición**: la grilla muestra siempre la tarjeta compacta
+  (`cardCompactoHtml`). El lápiz abre la ficha completa (`cardHtml`) en la
+  ventana `#scrim-editar-creep` (`abrirEditarCreep`/`renderEditarCreep`,
+  que se redibuja en cada `renderAll` conservando scroll y foco). Esa
+  ventana va una capa debajo (z-index 79) de las que se abren desde ella;
+  Escape cierra solo la de más arriba.
 - "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
   sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)

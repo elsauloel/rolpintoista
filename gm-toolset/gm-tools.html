@@ -1913,6 +1913,28 @@ function defensaOrigenTxt(sc){
   return L.join('\n');
 }
 
+// De dónde sale una resistencia a crítico (i = 0..4 → Tipo 2..10): lo que
+// da cada pieza de equipo (se suma a sc.crit al equiparla), el resto cargado
+// a mano, y si la armadura está rota o arruinada (ver creepCritEfectivo).
+function critOrigenTxt(sc, i){
+  const stat = 'tipo' + (i + 1);
+  const L = [];
+  let deItems = 0;
+  (sc.equipo||[]).forEach(it => {
+    const v = (it.mods||[]).filter(m => m.stat === stat).reduce((a, m) => a + num(m.val), 0);
+    if(!v) return;
+    deItems += v;
+    L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
+  });
+  const resto = num(sc.crit[i]) - deItems;
+  if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+  const {arruinada, rota} = creepEstadosArmadura(sc);
+  if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
+  if(rota) L.push('Armadura rota: a la mitad');
+  L.push(`= ${conSigno(creepCritEfectivo(sc, i))}`);
+  return L.join('\n');
+}
+
 function creepArmaduraOrigenTxt(sc){
   const activos = (sc.estados||[]).filter(e => e.activo !== false && (e.armaduraRota || e.armaduraArruinada));
   const nombres = activos.map(e => e.nombre || '(sin nombre)').join(', ');
@@ -3310,7 +3332,7 @@ function verCreep(id){
   const seccion = (titulo, contenido) => `<div class="vc-seccion"><div class="sect-label">${esc(titulo)}</div>${contenido}</div>`;
 
   const critLabels = ['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'];
-  const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, conSigno(creepCritEfectivo(sc, i))) : '').join('');
+  const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, conSigno(creepCritEfectivo(sc, i)), critOrigenTxt(sc, i)) : '').join('');
 
   const habilidades = sc.habilidades.map(h => {
     const partes = [];

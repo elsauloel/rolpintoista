@@ -4,7 +4,7 @@
 
 `ficha.html` — la ficha de personaje interactiva. Un único archivo HTML
 standalone (~1.3 MB, ~6700 líneas de JS) con todo: atributos, combate,
-inventario, catálogo de compra, habilidades, bitácora, tablero de combate.
+inventario, catálogo de compra, habilidades, bitácora.
 
 ## Estado actual
 
@@ -56,9 +56,9 @@ más cambia sesión a sesión.
   👥 Personajes lista los de la mesa; los de otros jugadores se abren en
   solo lectura. El personaje abierto se recuerda en el `#id` de la URL y en
   `localStorage` (`ficha-actual`). Ya no hay Subir/Bajar datos.
-- **Tablero en vivo**: mientras está abierto escucha `fichas` y `creeps`
-  (lo público) y se redibuja solo; de los creeps muestra la barra de vida
-  sin números.
+- **Sin Tablero**: el botón 📋 Tablero se quitó de la ficha porque las
+  barras y estados de todos ya se ven en los tokens del mapa
+  (`vtt-hexgrid/mapa.html`). gm-tools conserva el suyo.
 - **Todavía vía GitHub**: Vendedor (`datos/tienda-publica.json`) y
   "Agregar al catálogo".
 - **Exporta/importa localmente**: el personaje completo a un `.json`
@@ -70,8 +70,7 @@ más cambia sesión a sesión.
 
 - `datos/` — todo el estado de partida (personajes, tablero) y el
   catálogo (indirectamente, vía el pipeline de `herramientas/`).
-- `gm-toolset/gm-tools.html` — comparten el formato de tarjeta de tablero
-  y el de efecto/estado (duplicados en el código de cada uno, no
+- `gm-toolset/gm-tools.html` — comparten el formato de efecto/estado (duplicados en el código de cada uno, no
   importados).
 - `gestor.html` (en la raíz) — lo actualiza a él y viceversa (el botón
   "Actualizar gestor" de la ficha trae la última versión de `gestor.html`).

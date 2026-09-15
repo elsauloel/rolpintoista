@@ -3805,9 +3805,8 @@ async function ghLeerJson(ruta){
 
 /* ---------- Tablero en vivo (Firebase) ----------
    Mientras el Tablero está abierto escucha las fichas de los jugadores
-   (y, en la ficha, lo público de los creeps) y se redibuja solo. Al
-   cerrarlo deja de escuchar. Mismo bloque en ficha.html y gm-tools.html,
-   salvo de dónde salen los creeps. */
+   y se redibuja solo. Al cerrarlo deja de escuchar. (La ficha tenía una
+   copia de este Tablero; se quitó porque lo mismo se ve en el mapa.) */
 
 let tableroCortes = [];
 const tableroDatos = {fichas: null, creeps: null};

@@ -507,7 +507,10 @@ input[type=file]{display:none}
 .vc-cuerpo{padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line)}
 .vc-seccion{display:flex;flex-direction:column;gap:6px;padding-top:10px}
 .vc-cajas{display:grid;gap:6px}
-.vc-3{grid-template-columns:repeat(3,1fr)}
+.vc-2{grid-template-columns:repeat(2,1fr)}
+.vc-nivel{font-family:"Space Mono",monospace;font-size:11px;font-weight:400;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px;vertical-align:middle;margin-left:6px}
+.vc-equipos{display:flex;flex-direction:column;gap:6px}
+.vc-equipo{border:1px solid var(--line-soft);background:var(--panel2);padding:7px 9px}
 .vc-5{grid-template-columns:repeat(5,1fr)}
 .vc-auto{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 .vc-caja{
@@ -3405,17 +3408,32 @@ function verCreep(id){
     return `<span class="vc-chip vc-estado-${es.polaridad || 'otro'} con-tip" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</span>`;
   }).join('');
 
+  // Todo lo equipado: el arma y cada pieza de armadura, con su número destacado.
+  const equipado = (nombre, tipo, valor, detalle) => `<div class="vc-equipo">
+      <div class="equipo-item-top">
+        <span class="equipado-nombre">${esc(nombre)}</span>
+        <span class="valor-caja">${valor}</span>
+      </div>
+      <div class="equipo-item-meta">${esc(tipo)}</div>
+      ${detalle ? `<div class="arma-detalle">${esc(detalle)}</div>` : ''}
+    </div>`;
+  const equipo = [
+    equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(danoTxt(sc)), sc.armaDetalle),
+    ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem || '', `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
+  ].join('');
+
   $('#view-title-header').textContent = sc.nombre || 'Creep';
   $('#view-body').innerHTML = `
     <div class="view-wrap">
       <div class="view-image-wrap">${sc.imagen ? `<img src="${esc(sc.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
       <div class="view-info">
-        <div class="view-title">${esc(sc.nombre)}</div>
-        <div class="vc-cajas vc-3">
-          ${caja('Nivel', fmt(num(sc.nivel)))}
+        <div class="view-title">${esc(sc.nombre)} <span class="vc-nivel">Lv ${fmt(num(sc.nivel))}</span></div>
+        <div class="vc-cajas vc-2">
           ${caja('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`)}
           ${caja('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`)}
         </div>
+        <div class="sect-label" style="margin-top:12px">Estados alterados</div>
+        ${estados ? `<div class="vc-chips" style="margin-top:6px">${estados}</div>` : '<div class="hint" style="margin-top:4px">Sin estados.</div>'}
       </div>
     </div>
     <div class="vc-cuerpo">
@@ -3423,13 +3441,13 @@ function verCreep(id){
         const mod = creepModTotal(sc, a);
         return `<div class="attr-col">${caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${conSigno(mod)} por ${origenesModCreep(sc, a).join(', ')}` : '')}${derivadosHtml(sc, a)}</div>`;
       }).join('')}</div>`)}
-      ${seccion('Daño y defensa', `<div class="vc-cajas vc-auto">
+      ${seccion('Daño y defensa', `<div class="vc-cajas vc-2">
         ${caja('Daño', ataqueCreepTxt(sc), ataqueOrigenTxt(sc))}
         ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
-        ${crits}
-      </div>`)}
+      </div>
+      ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
+      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
       ${seccion('Habilidades', habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>')}
-      ${seccion('Estados alterados', estados ? `<div class="vc-chips">${estados}</div>` : '<div class="hint">Sin estados.</div>')}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;

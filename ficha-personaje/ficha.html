@@ -57,7 +57,7 @@ select option{background:#1A1418}
 button{cursor:pointer;background:none;border:none;padding:0}
 a{color:var(--brass)}
 
-.wrap{max-width:1440px;margin:0 auto;padding:28px 20px 90px}
+.wrap{max-width:1440px;margin:0 auto;padding:28px 20px 40px}
 
 /* ---------- Encabezado ---------- */
 .hero{
@@ -165,7 +165,7 @@ a{color:var(--brass)}
 /* ---------- Barra de vida ---------- */
 .vitals-sticky{
   position:sticky;top:0;z-index:30;background:var(--ink);
-  padding-top:14px;padding-bottom:14px;margin:0 -20px;padding-left:20px;padding-right:20px;
+  padding-top:10px;padding-bottom:14px;margin:0 -20px;padding-left:20px;padding-right:20px;
   border-bottom:1px solid var(--line);box-shadow:0 8px 16px -8px rgba(0,0,0,.5);
 }
 .vitals{display:grid;grid-template-columns:1.6fr auto 1.6fr;gap:14px;align-items:start}
@@ -954,33 +954,31 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .reminder-item .rname::before{content:"◆";font-size:11px}
 .reminder-item .rdetail{font-size:12.5px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
 
-/* ---------- Barra inferior ---------- */
-.dock{
-  position:fixed;left:0;right:0;bottom:0;z-index:40;
-  background:rgba(15,12,14,.93);backdrop-filter:blur(8px);border-top:1px solid var(--line);
-  padding:9px 20px;display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap
-}
-.dock .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto}
-@media(max-width:700px){.dock .note{display:none}}
+/* ---------- Barra superior (arriba de los vitales, fija al scrollear) ---------- */
+.accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
+.accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
+.accesos .iconbtn{text-decoration:none}
+.accesos-sep{width:1px;align-self:stretch;background:var(--line);margin:0 3px}
+@media(max-width:700px){.accesos .note{flex-basis:100%;margin-right:0}}
 
-/* Tonalidades distintas por botón del dock, para reconocerlos de un
+/* Tonalidades distintas por botón, para reconocerlos de un
    vistazo sin tener que leer el texto (mismo criterio que .btn.aleatorio). */
-.dock .btn.dk-historial{background:rgba(46,107,87,.18);border-color:var(--bottle);color:#8FCDBB}
-.dock .btn.dk-historial:hover{background:var(--bottle);color:#08150F}
-.dock .btn.dk-vendedor{background:rgba(224,164,88,.18);border-color:var(--brass);color:#F3D9AE}
-.dock .btn.dk-vendedor:hover{background:var(--brass);color:#1E1305}
-.dock .btn.dk-personajes{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE}
-.dock .btn.dk-personajes:hover{background:#9B7BD4;color:#1B0F1F}
+.accesos .iconbtn.dk-historial{background:rgba(46,107,87,.18);border-color:var(--bottle);color:#8FCDBB}
+.accesos .iconbtn.dk-historial:hover{background:var(--bottle);color:#08150F}
+.accesos .iconbtn.dk-vendedor{background:rgba(224,164,88,.18);border-color:var(--brass);color:#F3D9AE}
+.accesos .iconbtn.dk-vendedor:hover{background:var(--brass);color:#1E1305}
+.accesos .iconbtn.dk-personajes{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE}
+.accesos .iconbtn.dk-personajes:hover{background:#9B7BD4;color:#1B0F1F}
+.accesos .iconbtn.dk-reset{border-color:var(--wine);color:var(--danger)}
+.accesos .iconbtn.dk-reset:hover{background:var(--wine);color:var(--paper)}
+.accesos .iconbtn.dk-guardar{background:rgba(201,133,69,.2);border-color:var(--copper);color:var(--brass)}
+.accesos .iconbtn.dk-guardar:hover{background:var(--copper);color:#180F08}
 .btn.dk-actualizar{background:rgba(154,134,126,.16);border-color:var(--muted);color:#D8CCC4}
 .btn.dk-actualizar:hover{background:var(--muted);color:#1B1512}
 
-/* Accesos directos arriba a la derecha: al mapa y al inicio de la partida. */
-.accesos{position:fixed;top:10px;right:10px;z-index:45;display:flex;gap:7px}
-.accesos .iconbtn{text-decoration:none}
-
 
 .toast{
-  position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(12px);
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);
   background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
   font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:95
 }
@@ -989,12 +987,12 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
   body{background:#fff;color:#000}
-  .dock,.iconbtn,.mini,.accesos{display:none}
+  .iconbtn,.mini,.accesos{display:none}
   .card,.attr,.item{border-color:#999}
 }
 /* ---------- Mesa: tiradas compartidas en vivo (Firebase) ---------- */
 #mesa{
-  position:fixed;right:16px;bottom:72px;z-index:45;width:310px;max-width:calc(100vw - 32px);
+  position:fixed;right:16px;bottom:16px;z-index:45;width:310px;max-width:calc(100vw - 32px);
   /* Relleno más claro y recuadro crema para que no se pierda contra el
      fondo de la herramienta. Los textos grises se aclaran para leerse. */
   --muted:#D2C4BA;
@@ -1037,9 +1035,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-entrar{margin-top:8px;align-self:flex-start}
 /* ---------- Ficha en vivo: estado de guardado y cartel de solo lectura ---------- */
-.dock .note[data-estado="ok"]{color:var(--absenta)}
-.dock .note[data-estado="error"]{color:var(--danger)}
-.dock .note[data-estado="lectura"]{color:var(--brass)}
+.accesos .note[data-estado="ok"]{color:var(--absenta)}
+.accesos .note[data-estado="error"]{color:var(--danger)}
+.accesos .note[data-estado="lectura"]{color:var(--brass)}
 #ficha-lectura{
   position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:46;max-width:calc(100vw - 24px);
   background:var(--wine);color:var(--paper);border:1px solid var(--brass);border-radius:var(--r);
@@ -1060,8 +1058,22 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <body>
 <div class="wrap">
 
-  <!-- VITALES -->
+  <!-- VITALES (con la barra de botones arriba) -->
   <div class="vitals-sticky">
+    <!-- BARRA SUPERIOR: estado de guardado, acciones de la ficha y accesos directos (el href lo completa el script con la partida) -->
+    <nav class="accesos">
+      <span class="note" id="guardado-estado">Sin personaje abierto: los cambios no se guardan.</span>
+      <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Crear un personaje nuevo en la mesa">＋ Personaje nuevo</button>
+      <button type="button" class="iconbtn dk-historial" id="btn-historial">🕘 Historial</button>
+      <button type="button" class="iconbtn dk-vendedor" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar">🏪 Vendedor</button>
+      <button type="button" class="iconbtn dk-personajes" id="btn-personajes">👥 Personajes</button>
+      <button type="button" class="iconbtn dk-guardar" id="btn-guardar" title="Bajar una copia de respaldo de la ficha a un archivo .json">💾 Guardar copia</button>
+      <input type="file" id="file-input" accept=".json" hidden>
+      <span class="accesos-sep"></span>
+      <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
+      <button type="button" class="iconbtn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)">💾</button>
+      <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
+    </nav>
     <div class="vitals">
       <div class="vital">
         <div class="top">
@@ -1298,24 +1310,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <div class="inv-grid" id="inv-grid"></div>
     </div>
   </section>
-</div>
-
-<!-- ACCESOS DIRECTOS (el href lo completa el script con la partida) -->
-<nav class="accesos">
-  <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
-  <button type="button" class="iconbtn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)">💾</button>
-  <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
-</nav>
-
-<!-- DOCK -->
-<div class="dock">
-  <span class="note" id="guardado-estado">Sin personaje abierto: los cambios no se guardan.</span>
-  <button class="btn del" id="btn-reset" title="Crear un personaje nuevo en la mesa">＋ Personaje nuevo</button>
-  <button class="btn dk-historial" id="btn-historial">🕘 Historial</button>
-  <button class="btn dk-vendedor" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar">🏪 Vendedor</button>
-  <button class="btn dk-personajes" id="btn-personajes">👥 Personajes</button>
-  <button class="btn primary" id="btn-guardar" title="Bajar una copia de respaldo de la ficha a un archivo .json">💾 Guardar copia</button>
-  <input type="file" id="file-input" accept=".json" hidden>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -7290,7 +7284,7 @@ function fichaMiniatura(dataUrl){
   });
 }
 
-/* ---------- Estado visible (dock y cartel de solo lectura) ---------- */
+/* ---------- Estado visible (barra superior y cartel de solo lectura) ---------- */
 
 function fichaEstado(texto, tipo){
   const el = $('#guardado-estado');

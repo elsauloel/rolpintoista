@@ -116,6 +116,12 @@ su casa:
 movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),
 publicar en una web, pasar catálogo/tienda/manual a Firebase.
 
+**Hecho aparte (2026-09-15):** respaldo de la partida para el GM (un .json
+que se recarga con "Cargar archivo" en ficha y gm-tools); imagen de fondo
+del mapa separada de su posición. **Siguiente:** dados 3D en el mapa
+(animación con el resultado real de cada tirada, sin escrituras extra;
+con opción de apagarla y tope de dados).
+
 ## Pendientes chicos
 
 - En `miembros` quedan documentos repetidos de pruebas en incógnito

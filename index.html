@@ -215,6 +215,10 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
             <span class="titulo">🏪 Generador de tiendas</span>
             <span class="desc">Arma el stock de un vendedor para que los jugadores compren.</span>
           </a>
+          <button type="button" class="tarjeta" id="btn-respaldo">
+            <span class="titulo">💾 Respaldo de la partida</span>
+            <span class="desc" id="respaldo-estado">Baja un archivo con todo: personajes, creeps, tokens, mapa y tiradas. Guardalo cada tanto.</span>
+          </button>
         </div>
       </div>
       <h2>Referencia</h2>
@@ -490,6 +494,116 @@ $('#form-unirse').onsubmit = async e => {
 };
 
 $('#btn-volver').onclick = () => verPartidas();
+
+/* ---------- Respaldo de la partida (GM) ----------
+   Firebase gratis no hace copias de seguridad: el GM baja un .json con
+   toda la partida. Cada personaje va armado igual que "Guardar copia" de
+   la ficha y los creeps igual que gm-creeps.json, así el mismo archivo se
+   puede volver a cargar con "Cargar archivo" en la ficha (elegís qué
+   personaje) o en gm-tools (todos los creeps). */
+
+const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+
+// Fechas de Firestore a texto, en cualquier profundidad.
+function planoParaJson(v){
+  if(v instanceof firebase.firestore.Timestamp) return v.toDate().toISOString();
+  if(Array.isArray(v)) return v.map(planoParaJson);
+  if(v && typeof v === 'object'){
+    const o = {};
+    Object.keys(v).forEach(k => { o[k] = planoParaJson(v[k]); });
+    return o;
+  }
+  return v;
+}
+
+async function armarRespaldo(){
+  const base = fbDb.doc(fbRutaCampana());
+  const docs = async ref => (await ref.get()).docs;
+  const plano = d => ({id: d.id, ...d.data()});
+  const [partida, miembros, fichasDocs, creepsDocs, tokens, mapa, gm, tiradas] = await Promise.all([
+    base.get(),
+    docs(base.collection('miembros')), docs(base.collection('fichas')), docs(base.collection('creeps')),
+    docs(base.collection('tokens')), docs(base.collection('mapa')), docs(base.collection('gm')),
+    docs(base.collection('tiradas')),
+  ]);
+  const nombres = Object.fromEntries(miembros.map(m => [m.id, m.data().nombre]));
+
+  // Personajes: se juntan sus partes como las arma la ficha al abrirse.
+  const fichas = await Promise.all(fichasDocs.map(async d => {
+    const partes = await docs(d.ref.collection('partes'));
+    const ficha = {};
+    let retrato = '';
+    let imgInvocaciones = {};
+    partes.forEach(p => {
+      let v;
+      try{ v = JSON.parse(p.data().json || ''); }catch(e){ return; }
+      if(p.id === 'retrato') retrato = typeof v === 'string' ? v : '';
+      else if(p.id === 'imgInvocaciones') imgInvocaciones = v && typeof v === 'object' ? v : {};
+      else if(v && typeof v === 'object') Object.assign(ficha, v);
+    });
+    ficha.meta = {...(ficha.meta || {}), imagen: retrato};
+    (ficha.invocaciones || []).forEach(inv => { if(inv && imgInvocaciones[inv.id]) inv.imagen = imgInvocaciones[inv.id]; });
+    const md = d.data();
+    return {id: d.id, nombre: md.nombre || '', duenoUid: md.duenoUid || '', dueno: nombres[md.duenoUid] || '', ficha};
+  }));
+
+  // Creeps completos, con su imagen, en el orden de gm-tools.
+  const creeps = await Promise.all(creepsDocs.map(async d => {
+    const [f, i] = await Promise.all([
+      d.ref.collection('privado').doc('ficha').get(),
+      d.ref.collection('privado').doc('imagen').get(),
+    ]);
+    let sc = {};
+    try{ sc = f.exists ? JSON.parse(f.data().json || '{}') : {}; }catch(e){}
+    return {orden: num(d.data().orden), creep: {...sc, id: d.id, nombre: sc.nombre || d.data().nombre, imagen: i.exists ? (i.data().dato || '') : ''}};
+  }));
+  creeps.sort((a, b) => a.orden - b.orden);
+  const estadoGm = gm.find(d => d.id === 'estado');
+
+  return planoParaJson({
+    tipo: 'respaldo-partida',
+    version: 1,
+    creado: new Date().toISOString(),
+    partida: {id: FB_CAMPANA, ...partida.data()},
+    miembros: miembros.map(plano),
+    fichas,
+    gmCreeps: {turno: estadoGm ? num(estadoGm.data().turno) : 1, creeps: creeps.map(c => c.creep)},
+    tokens: tokens.map(plano),
+    mapa: mapa.map(plano),
+    tiradas: tiradas.map(plano),
+  });
+}
+
+$('#btn-respaldo').onclick = async () => {
+  const btn = $('#btn-respaldo');
+  const estado = $('#respaldo-estado');
+  const textoOriginal = estado.textContent;
+  btn.disabled = true;
+  estado.textContent = 'Juntando todo…';
+  try{
+    const respaldo = await armarRespaldo();
+    const fecha = new Date();
+    const p2 = n => String(n).padStart(2, '0');
+    const slug = String(fbPartida && fbPartida.nombre || 'partida').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'partida';
+    const nombre = `respaldo-${slug}-${fecha.getFullYear()}-${p2(fecha.getMonth() + 1)}-${p2(fecha.getDate())}.json`;
+    const blob = new Blob([JSON.stringify(respaldo)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    estado.textContent = `Listo: ${nombre} (${respaldo.fichas.length} personaje(s), ${respaldo.gmCreeps.creeps.length} creep(s)).`;
+  }catch(err){
+    console.error('No se pudo armar el respaldo:', err);
+    estado.textContent = textoError(err);
+    setTimeout(() => { estado.textContent = textoOriginal; }, 8000);
+  }finally{
+    btn.disabled = false;
+  }
+};
 
 /* ---------- Arranque ---------- */
 

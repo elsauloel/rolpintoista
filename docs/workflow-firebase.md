@@ -87,9 +87,14 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   aliados, comerciantes…) también son creeps.
 - `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
   gm-tools. Solo el GM.
-- `campanas/{id}/mapa/fondo` — `{dato, x, y, ancho, actualizado}`. Imagen de
-  fondo del mapa (data URL achicada a < 900 KB), con su posición y ancho en
-  unidades del mapa. La ven todos; solo el GM la escribe.
+- `campanas/{id}/mapa/fondo` — `{x, y, ancho, actualizado}`: posición y ancho
+  del fondo del mapa, en unidades del mapa. `campanas/{id}/mapa/fondoImagen`
+  — `{dato, actualizado}`: la imagen (data URL achicada a < 900 KB). Van
+  separadas para que acomodar el fondo no haga descargar la imagen a
+  todos. Los fondos cargados antes tenían `dato` dentro de `mapa/fondo`: se
+  siguen leyendo y se limpian al cargar otra imagen.
+- `campanas/{id}/mapa/modo` — `{modo: 'narrativo'|'combate'}`. Lo cambia el
+  GM. Todos los `mapa/*` los ven todos y solo los escribe el GM.
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
   'pj'|'creep', duenoUid, col, fila, creado, fichaId?, ruta?}`. `ruta` es el
   recorrido del último movimiento, `[col, fila, col, fila…]` (hasta 100
@@ -107,6 +112,20 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se
 puede borrar desde la consola.
+
+## Respaldo de la partida
+
+Firebase gratis no hace copias de seguridad. En la página de la partida,
+el GM tiene **💾 Respaldo de la partida**, que baja
+`respaldo-<partida>-<fecha>.json` con `{tipo: 'respaldo-partida', version,
+creado, partida, miembros, fichas[{id, nombre, duenoUid, dueno, ficha}],
+gmCreeps{turno, creeps}, tokens, mapa, tiradas}` (fechas en texto ISO).
+`ficha` tiene la forma de "Guardar copia" de la ficha (con retrato e
+imágenes de invocaciones) y `gmCreeps` la de `gm-creeps.json` (con
+imágenes). Para recuperar: en la ficha, "Cargar archivo" con el respaldo
+pregunta qué personaje cargar; en gm-tools, "Cargar archivo" toma todos
+los creeps. Tokens, mapa y tiradas quedan en el archivo pero no tienen
+todavía un botón para restaurarlos.
 
 ## Tareas de mantenimiento (en la consola)
 

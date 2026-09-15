@@ -7517,6 +7517,17 @@ async function crearPersonajeNuevo(datos){
 }
 
 function fichaCargarArchivo(data){
+  // Respaldo de toda la partida (lo baja el GM desde el inicio): se elige
+  // cuál de sus personajes cargar.
+  if(data && data.tipo === 'respaldo-partida'){
+    const lista = Array.isArray(data.fichas) ? data.fichas.filter(f => f && f.ficha) : [];
+    if(!lista.length){ toast('Ese respaldo no tiene personajes'); return; }
+    const opciones = lista.map((f, i) => `${i + 1}. ${f.nombre || 'Sin nombre'}${f.dueno ? ` (de ${f.dueno})` : ''}`).join('\n');
+    const eleccion = prompt(`Es un respaldo de toda la partida. ¿Qué personaje querés cargar?\n\n${opciones}\n\nEscribí el número:`);
+    const n = parseInt(eleccion, 10);
+    if(!n || n < 1 || n > lista.length) return;
+    data = lista[n - 1].ficha;
+  }
   if(fichaVivo){
     if(fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cargarle un archivo'); return; }
     aplicarFicha(data);  // se guarda solo en la mesa

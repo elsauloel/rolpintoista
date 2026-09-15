@@ -313,6 +313,11 @@ let creepPrivado = {id: '', hp: null, hpMax: null, cortar: null};
 const fichasPub = new Map();  // fichaId -> {nombre, duenoUid, resumen, miniatura}
 const creepsPub = new Map();  // creepId -> {nombre, orden, resumen, miniatura}
 let fondo = null;             // {dato, x, y, ancho} en unidades del mapa
+// El fondo va en dos documentos: mapa/fondo (posición y ancho, cambia al
+// acomodarlo) y mapa/fondoImagen (la imagen, pesada, cambia solo al
+// cargar otra). Así mover el fondo no hace descargar la imagen a todos.
+let fondoPos = null;          // {x, y, ancho, dato?} (dato: fondos de antes de separar)
+let fondoImagen = '';
 let moverFondo = false;       // GM: arrastrar mueve el fondo en vez de la vista
 let arrastreFondo = null;     // {inicioX, inicioY, x, y}
 
@@ -1106,14 +1111,32 @@ function escucharVinculables(){
   escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura']);
 }
 
+function componerFondo(){
+  const dato = fondoImagen || (fondoPos && fondoPos.dato) || '';
+  if(!dato){ fondo = null; return; }
+  const p = fondoPos || {};
+  fondo = {
+    dato,
+    x: p.x !== undefined ? num(p.x) : -ANCHO_CASILLA / 2,
+    y: p.y !== undefined ? num(p.y) : -HEX,
+    ancho: num(p.ancho) || ANCHO_CASILLA * 20,
+  };
+}
+
 function escucharFondo(){
   fbDb.doc(fbRutaCampana('mapa/fondo')).onSnapshot(doc => {
     if(arrastreFondo) return;
-    const d = doc.exists ? doc.data() : null;
-    fondo = d && d.dato ? {dato: d.dato, x: num(d.x), y: num(d.y), ancho: num(d.ancho) || ANCHO_CASILLA * 20} : null;
+    fondoPos = doc.exists ? doc.data() : null;
+    componerFondo();
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando el fondo del mapa:', err));
+  fbDb.doc(fbRutaCampana('mapa/fondoImagen')).onSnapshot(doc => {
+    fondoImagen = doc.exists ? String(doc.data().dato || '') : '';
+    componerFondo();
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando la imagen de fondo:', err));
 }
 
 async function guardarFondo(cambios){
@@ -1164,8 +1187,13 @@ $('#fondo-archivo').onchange = async ev => {
   try{
     const dato = await prepararImagenFondo(file);
     // Si no había fondo, arranca con la esquina en la casilla 0,0 y 20 casillas de ancho.
-    const base = fondo ? {} : {x: -ANCHO_CASILLA / 2, y: -HEX, ancho: ANCHO_CASILLA * 20};
-    await guardarFondo({dato, ...base});
+    const base = fondo ? {x: fondo.x, y: fondo.y, ancho: fondo.ancho} : {x: -ANCHO_CASILLA / 2, y: -HEX, ancho: ANCHO_CASILLA * 20};
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const lote = fbDb.batch();
+    lote.set(fbDb.doc(fbRutaCampana('mapa/fondoImagen')), {dato, actualizado: ts});
+    // La posición en su propio documento (y sin la imagen, si era un fondo de antes).
+    lote.set(fbDb.doc(fbRutaCampana('mapa/fondo')), {...base, dato: firebase.firestore.FieldValue.delete(), actualizado: ts}, {merge: true});
+    await lote.commit();
     toast('Fondo cargado');
   }catch(err){
     console.error('No se pudo cargar el fondo:', err);
@@ -1457,7 +1485,13 @@ function renderPanel(forzar){
     $('#fondo-cerrar').onclick = () => { panelFondo = false; moverFondo = false; renderPanel(true); pedirDibujo(); };
     if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
       if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
-      try{ await fbDb.doc(fbRutaCampana('mapa/fondo')).delete(); moverFondo = false; }
+      try{
+        const lote = fbDb.batch();
+        lote.delete(fbDb.doc(fbRutaCampana('mapa/fondo')));
+        lote.delete(fbDb.doc(fbRutaCampana('mapa/fondoImagen')));
+        await lote.commit();
+        moverFondo = false;
+      }
       catch(err){ console.error(err); toast('No se pudo quitar el fondo'); }
     };
     if($('#fondo-ancho-ok')) $('#fondo-ancho-ok').onclick = () => {

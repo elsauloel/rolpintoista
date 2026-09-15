@@ -314,8 +314,9 @@ let paneo = null;             // {inicioX, inicioY, x, y}
 let creando = false;
 let panelFondo = false;       // GM: panel de la imagen de fondo abierto
 let editandoToken = false;    // panel del token en modo "Editar"
-// GM: HP y HP máx. del creep seleccionado (de su parte privada, que solo lee el GM).
-let creepPrivado = {id: '', hp: null, hpMax: null, cortar: null};
+// GM: creep completo (parte privada, que solo lee el GM) de cada creep con
+// token en el mapa: vida con números y No2 para cobrar al moverlo.
+const creepsPriv = new Map();  // creepId -> {sc (null mientras carga), cortar}
 
 // Lo público de fichas y creeps, para vincularlos a los tokens.
 const fichasPub = new Map();  // fichaId -> {nombre, duenoUid, resumen, miniatura}
@@ -557,16 +558,29 @@ $('#modo-switch').onclick = async () => {
   }
 };
 
-// Nitros que cuesta mover este token: solo los PJ vinculados a su ficha
-// (no las invocaciones, ni creeps, ni NPC). null = se mueve sin costo, como
-// también una ficha que todavía no publicó sus Nitros (abrila una vez).
+// Nitros que cuesta mover este token: los PJ vinculados a su ficha y los
+// creeps vinculados (no las invocaciones ni los NPC). null = se mueve sin
+// costo, como también una ficha o creep que todavía no tiene No2 (abrila
+// una vez, o abrí gm-tools).
 function costoMoverDe(t){
   if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
+  if(t && t.tipo === 'creep') return costoMoverCreep(t);
   if(!t || t.tipo !== 'pj' || !t.fichaId || t.fichaId.includes(SEP_INVOCACION)) return null;
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
   return {porCasillero: num(r.costoMover), disponibles: num(r.nitros)};
+}
+
+// Mismas reglas que la ficha publica en resumen.costoMover: 1 por
+// casillero, 2 con Rengo, 0 (no se mueve) con Inmovilizado.
+function costoMoverCreep(t){
+  if(!soyGM || !t.fichaId) return null;
+  const sc = creepPrivadoDe(t.fichaId);
+  if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
+  const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
+  const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
+  return {porCasillero, disponibles: num(sc.nitros)};
 }
 
 function puedoMover(t){
@@ -1098,6 +1112,14 @@ async function gastarNitros(fichaId, costo){
   });
 }
 
+// Lo mismo sobre la parte privada del creep (lo hace el GM).
+function gastarNitrosCreep(creepId, costo){
+  return modificarCreep(creepId, sc => {
+    sc.nitros = num(sc.nitros) - costo;
+    return sc.nitros;
+  });
+}
+
 async function confirmarRuta(){
   const p = rutaPendiente;
   if(!p) return;
@@ -1106,11 +1128,14 @@ async function confirmarRuta(){
   if(!t){ cancelarRuta(); return; }
   const costo = p.pasos * p.porCasillero;
   try{
-    const quedan = await gastarNitros(t.fichaId, costo);
+    const esCreep = t.tipo === 'creep';
+    const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
-    toast(`−${fmt(costo)} No2 · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
+    toast(esCreep
+      ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
+      : `−${fmt(costo)} No2 · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
   }catch(err){
     console.error('No se pudo mover gastando Nitros:', err);
     toast(err.code === 'permission-denied' ? 'No podés gastar los Nitros de esa ficha' : 'No se pudo mover — mirá la consola');
@@ -1405,8 +1430,9 @@ function htmlEstadoToken(t){
     if(est.sp !== null) html += vital('sp', 'SP', spDeResumen(r).sp, spDeResumen(r).spMax, est.sp, SP_COLOR);
   }else{
     // Creep: números solo para el GM (los lee de la parte privada).
-    const nums = soyGM && creepPrivado.id === t.fichaId && creepPrivado.hp !== null;
-    html += vital('hp', 'Vida', nums ? creepPrivado.hp : null, nums ? creepPrivado.hpMax : null, est.hp, HP_COLOR);
+    const sc = soyGM ? creepPrivadoDe(t.fichaId) : null;
+    html += vital('hp', 'Vida', sc ? num(sc.hp) : null, sc ? num(sc.hpMax) : null, est.hp, HP_COLOR);
+    if(sc && sc.nitros !== undefined && sc.nitros !== null) html += `<div class="dato">No2: ${fmt(num(sc.nitros))}</div>`;
   }
   if(puede) html += '<p class="ayuda" style="margin-top:4px">Escribí el valor o +5 / -3 y apretá Enter. Se guarda también en la ficha.</p>';
   if(est.muerto) html += `<div class="dato" style="color:${HP_COLOR}">${t.tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>`;
@@ -1452,17 +1478,17 @@ function hashGm(s){
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
-async function cambiarVidaCreep(creepId, texto){
+// Cambia el creep completo (parte privada) en una transacción y pone al día
+// su resumen público y la firma. Devuelve lo que devuelva cambiar(sc).
+async function modificarCreep(creepId, cambiar){
   const base = fbDb.doc(fbRutaCampana(`creeps/${creepId}`));
   const privRef = base.collection('privado').doc('ficha');
-  await fbDb.runTransaction(async tx => {
+  return fbDb.runTransaction(async tx => {
     const [priv, pub] = await Promise.all([tx.get(privRef), tx.get(base)]);
     if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
     const sc = JSON.parse(priv.data().json || '{}');
+    const resultado = cambiar(sc);
     const hpMax = num(sc.hpMax);
-    const nuevo = leerValorVital(texto, num(sc.hp));
-    if(nuevo === null) throw new Error(ERROR_TIPEO);
-    sc.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
     const json = JSON.stringify(sc);
     // La firma es hash(creep)-hash(imagen); la imagen no cambia.
     const firmaVieja = String(pub.data().firma || '');
@@ -1474,6 +1500,16 @@ async function cambiarVidaCreep(creepId, texto){
       firma: hashGm(json) + '-' + parteImagen,
       actualizado: firebase.firestore.FieldValue.serverTimestamp(),
     });
+    return resultado;
+  });
+}
+
+async function cambiarVidaCreep(creepId, texto){
+  await modificarCreep(creepId, sc => {
+    const hpMax = num(sc.hpMax);
+    const nuevo = leerValorVital(texto, num(sc.hp));
+    if(nuevo === null) throw new Error(ERROR_TIPEO);
+    sc.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
   });
 }
 
@@ -1534,29 +1570,40 @@ async function aplicarVital(input){
   }
 }
 
-// GM: mientras un creep está seleccionado, escucha su parte privada para
-// mostrar la vida con números.
-function actualizarEscuchaCreep(){
-  const t = seleccion ? tokens.get(seleccion) : null;
-  const querido = soyGM && t && t.tipo === 'creep' && t.fichaId ? t.fichaId : '';
-  if(creepPrivado.id === querido) return;
-  if(creepPrivado.cortar) creepPrivado.cortar();
-  creepPrivado = {id: querido, hp: null, hpMax: null, cortar: null};
-  if(!querido) return;
-  creepPrivado.cortar = fbDb.doc(fbRutaCampana(`creeps/${querido}/privado/ficha`)).onSnapshot(doc => {
-    if(creepPrivado.id !== querido) return;
-    let sc = {};
-    try{ sc = doc.exists ? JSON.parse(doc.data().json || '{}') : {}; }catch(e){}
-    creepPrivado.hp = doc.exists ? num(sc.hp) : null;
-    creepPrivado.hpMax = doc.exists ? num(sc.hpMax) : null;
-    renderPanel();
-  }, err => console.error('Error leyendo el creep:', err));
+function creepPrivadoDe(creepId){
+  const e = creepsPriv.get(creepId);
+  return e ? e.sc : null;
+}
+
+// GM: escucha la parte privada de cada creep que tiene token en el mapa
+// (vida con números y No2 para cobrar al moverlo). Deja de escuchar los
+// que ya no están.
+function actualizarEscuchasCreeps(){
+  const queridos = new Set(soyGM && fbDb
+    ? [...tokens.values()].filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId)
+    : []);
+  creepsPriv.forEach((e, id) => {
+    if(queridos.has(id)) return;
+    e.cortar();
+    creepsPriv.delete(id);
+  });
+  queridos.forEach(id => {
+    if(creepsPriv.has(id)) return;
+    const e = {sc: null, cortar: null};
+    creepsPriv.set(id, e);
+    e.cortar = fbDb.doc(fbRutaCampana(`creeps/${id}/privado/ficha`)).onSnapshot(doc => {
+      let sc = null;
+      try{ sc = doc.exists ? JSON.parse(doc.data().json || '{}') : null; }catch(err){}
+      e.sc = sc;
+      renderPanel();
+    }, err => console.error('Error leyendo el creep:', err));
+  });
 }
 
 function renderPanel(forzar){
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
-  actualizarEscuchaCreep();
+  actualizarEscuchasCreeps();
   const clave = JSON.stringify([creando, panelFondo, seleccion, editandoToken]);
   const v = t ? vinculo(t) : null;
   const opciones = (creando || t) ? [
@@ -1568,7 +1615,7 @@ function renderPanel(forzar){
     v && [v.nombre, v.resumen],
     opciones, soyGM, [...miembros.entries()], !!fbMiembro,
     panelFondo && fondo && [fondo.ancho, !!fondo.dato], moverFondo,
-    creepPrivado.id && [creepPrivado.hp, creepPrivado.hpMax],
+    t && t.tipo === 'creep' && (s => s && [s.hp, s.hpMax, s.nitros])(creepPrivadoDe(t.fichaId)),
   ]);
   if(!forzar){
     if(firma === firmaPanel) return;

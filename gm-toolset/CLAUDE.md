@@ -38,9 +38,11 @@ En desarrollo activo, las dos.
   `forzarNitros` de Stun/Exhausto (`creepNitrosMax`). `sc.nitros` es lo que
   queda y se recarga en `mantenimiento()`. El botón ⚡ Acciones cobra: atacar
   Tipo ÷ 2 el primer ataque del turno y Tipo completo después
-  (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD,
-  Movimiento 1 por casillero (2 con Rengo, bloqueado con Inmovilizado).
-  Los creeps viejos se convierten solos en `normalizarCreep`.
+  (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD.
+  Moverse lo cobra el mapa al arrastrar el token del creep (ya no hay
+  habilidad Movimiento). Los creeps viejos se convierten solos en
+  `normalizarCreep` (Acciones → No2, se quita Movimiento una vez:
+  `sc.sinMovimiento`).
 - "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
   sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)

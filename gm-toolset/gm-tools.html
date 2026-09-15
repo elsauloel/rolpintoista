@@ -234,11 +234,6 @@ input[type=file]{display:none}
 
 .hab-list{display:flex;flex-direction:column;gap:6px}
 .hab{border:1px solid var(--line-soft);background:var(--panel2);padding:6px 7px}
-/* Movimiento: siempre con un fondo distinguible del resto de las habilidades */
-.item-movimiento{
-  background:rgba(91,141,190,.28)!important;border-color:#5B8DBE!important;
-  box-shadow:inset 3px 0 0 #5B8DBE!important
-}
 .hab-compacta{padding:5px 7px}
 .hab-compacta .hab-bottom{margin-top:5px}
 .hab-top{display:flex;gap:5px;align-items:center}
@@ -1734,14 +1729,12 @@ function nuevoCreep(){
   return {
     id: uid(), nombre:'Creep nuevo', imagen:'', nivel:1, color: COLORES[Math.floor(Math.random()*COLORES.length)],
     hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
-    nitros:1, ataquesTurno:0,  // No2 máx. = Agilidad + mods (creepNitrosMax)
+    ataquesTurno:0,  // sc.nitros lo pone normalizarCreep: arranca en el máximo (creepNitrosMax)
     con:1, fue:1, agl:1, des:1, int:1,
     armaTipo:6, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
     defensa:0, armaduraTipo:'', equipo:[],
     crit:[0,0,0,0,0],
-    habilidades:[
-      {id:uid(), nombre:'Movimiento', detalle:'', cd:0, cdActual:0}
-    ],
+    habilidades:[],
     estados:[],
     notas:'',
     compacto:true
@@ -2053,10 +2046,10 @@ function actualizarBadgePresupuesto(sc, card){
    ========================================================= */
 const IT2_CREEP = {
   nitrosHabilidad: 1,            // costo por defecto de una habilidad
-  nitrosMover: 1,                // Movimiento: por casillero
-  nitrosMoverRengo: 2,
   redondeoPrimerAtaque: Math.ceil,
 };
+// Moverse no está acá: lo cobra el mapa al arrastrar el token del creep
+// (1 No2 por casillero, 2 con Rengo, nada con Inmovilizado).
 
 function creepNitrosMax(sc){
   let v = num(sc.agl) + creepModTotal(sc, 'agl')
@@ -2069,13 +2062,7 @@ function creepNitrosMax(sc){
   return Math.max(0, v);
 }
 
-function creepEstadoActivo(sc, flag){
-  return (sc.estados || []).some(e => e.activo !== false && e[flag]);
-}
-
-// Movimiento es un casillero por ejecución: Rengo lo cobra doble.
 function costoNitrosHabCreep(sc, h){
-  if(h.nombre === 'Movimiento') return creepEstadoActivo(sc, 'rengo') ? IT2_CREEP.nitrosMoverRengo : IT2_CREEP.nitrosMover;
   return num(h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad);
 }
 
@@ -2088,7 +2075,6 @@ function costoAtaqueCreep(sc){
 // Por qué no se puede ejecutar una habilidad ahora ('' = se puede).
 function bloqueoHabCreep(sc, h){
   if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
-  if(h.nombre === 'Movimiento' && creepEstadoActivo(sc, 'inmovilizado')) return 'Inmovilizado';
   if(num(sc.nitros) < costoNitrosHabCreep(sc, h)) return 'Sin No2';
   return '';
 }
@@ -2115,6 +2101,7 @@ function normalizarCreep(sc){
   if(sc.acc !== undefined || sc.accMax !== undefined){
     delete sc.acc;
     delete sc.accMax;
+    delete sc.nitros;  // arranca lleno (abajo), aunque la carga haya traído un valor por defecto
     sc.estados.forEach(es => {
       const m = ESTADOS_NITROS_MIGRAR[es.nombre];
       if(!m) return;
@@ -2123,6 +2110,12 @@ function normalizarCreep(sc){
       if(m.mods) es.mods = [...(es.mods || []), ...structuredClone(m.mods)];
       if(m.forzarNitros !== undefined) es.forzarNitros = m.forzarNitros;
     });
+  }
+  // La habilidad Movimiento de siempre se quitó: moverse se cobra desde el
+  // mapa. Una sola vez, así no se borra una habilidad nueva con ese nombre.
+  if(!sc.sinMovimiento){
+    sc.habilidades = sc.habilidades.filter(h => h && h.nombre !== 'Movimiento');
+    sc.sinMovimiento = true;
   }
   sc.habilidades.forEach(h => {
     if(h.accionesCosto === undefined) return;
@@ -2229,7 +2222,7 @@ function renderAccionesCreep(){
   $('#acciones-creep-badge').textContent = `No2 ${fmt(num(sc.nitros))}/${fmt(creepNitrosMax(sc))}`;
 
   const filaHab = f => `
-    <div class="accion-row${f.nombre==='Movimiento'?' item-movimiento':''}">
+    <div class="accion-row">
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
@@ -3366,21 +3359,6 @@ function habHtml(sc, h){
   const bloqueado = !!bloqueo;
   const costo = costoNitrosHabCreep(sc, h);
   const estadoTxt = bloqueo || `Disponible · ${costo ? `${fmt(costo)} No2` : 'sin costo'}`;
-  const esMovimiento = h.nombre === 'Movimiento';
-
-  if(esMovimiento){
-    return `<div class="hab hab-compacta item-movimiento" data-habid="${h.id}">
-      <div class="hab-top">
-        <input class="hn" data-habf="nombre" data-scid="${scId}" data-habid="${h.id}" value="${esc(h.nombre)}" placeholder="Nombre">
-        <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
-        <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
-      </div>
-      <div class="hab-bottom">
-        <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
-        <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
-      </div>
-    </div>`;
-  }
 
   return `<div class="hab" data-habid="${h.id}">
     <div class="hab-top">
@@ -4157,7 +4135,6 @@ function creepDesdeIA(data){
     nombre: (data.nombre || base.nombre).toString(),
     nivel: num(data.nivel) || 1,
     hp: hpMax, hpMax,
-    nitros: Math.max(0, num(data.agl)),
     spd: num(data.spd) || 5,
     con, fue: num(data.fue), agl: num(data.agl), des: num(data.des), int: num(data.int),
     armaTipo: DADOS_ARMA.includes(num(data.armaTipo)) ? num(data.armaTipo) : 6,
@@ -4174,7 +4151,6 @@ function creepDesdeIA(data){
   });
   const habilidades = Array.isArray(data.habilidades) ? data.habilidades : [];
   creep.habilidades = [
-    {id:uid(), nombre:'Movimiento', detalle:'', cd:0, cdActual:0},
     ...habilidades.map(h => ({id:uid(), nombre:(h.nombre||'').toString(), detalle:(h.detalle||'').toString(), cd:num(h.cd), cdActual:0})),
   ];
   creep.estados = [];
@@ -4673,11 +4649,7 @@ $('#file-input').onchange = ev => {
         return;
       }
       S = { turno: num(data.turno)||1, creeps: data.creeps.map(sc => {
-        const merged = Object.assign(nuevoCreep(), sc);
-        if(!merged.habilidades.some(h => h.nombre === 'Movimiento')){
-          merged.habilidades = [{id:uid(), nombre:'Movimiento', detalle:'', cd:0, cdActual:0}, ...merged.habilidades];
-        }
-        return merged;
+        return Object.assign(nuevoCreep(), sc);
       }) };
       renderAll();
       toast('Cargado');
@@ -5118,9 +5090,6 @@ async function gmLeerCreep(doc){
   const sc = Object.assign(nuevoCreep(), datos, {id: doc.id});
   sc.imagen = imagen.exists ? String(imagen.data().dato || '') : '';
   if(!ficha.exists){ sc.nombre = doc.data().nombre || sc.nombre; }
-  if(!sc.habilidades.some(h => h.nombre === 'Movimiento')){
-    sc.habilidades = [{id: uid(), nombre: 'Movimiento', detalle: '', cd: 0, cdActual: 0}, ...sc.habilidades];
-  }
   return sc;
 }
 

@@ -41,6 +41,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   Confirmar/Cancelar (`rutaPendiente`) y `gastarNitros` descuenta en la
   ficha con una transacción. Sin las reglas nuevas publicadas, se mueve
   igual pero sin estela para los demás.
+- **Creeps gastan No2 al moverse** (solo el GM): el mapa escucha la parte
+  privada de cada creep con token (`creepsPriv`, `actualizarEscuchasCreeps`)
+  y cobra con las mismas reglas (`costoMoverCreep`: 1 por casillero, 2 con
+  Rengo, 0 con Inmovilizado). `gastarNitrosCreep` descuenta `sc.nitros`
+  vía `modificarCreep` (transacción sobre `privado/ficha` + resumen +
+  firma, la misma que usa `cambiarVidaCreep`). El panel del creep le
+  muestra al GM sus No2.
 - Panel del costado: crear token (jugador: siempre PJ propio; GM: creep/NPC
   o PJ). Al seleccionar un token se ven nombre, vida/SP y estados; "✎ Editar"
   abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa". Los PJ (y sus

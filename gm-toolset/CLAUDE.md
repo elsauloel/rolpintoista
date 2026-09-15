@@ -47,7 +47,8 @@ En desarrollo activo, las dos.
   (Inicio, Mapa, Tablero, Historial, Reiniciar combate, Catálogo, Respaldo
   partida, Cargar respaldo); la cabecera deja Mantenimiento, + Creep,
   + Creep con IA, Vendedor y Finalizar Combate. Sin botón Dados (la tirada
-  libre está en la Mesa) ni token de GitHub. "Cargar respaldo" usa
+  libre está en la Mesa), token de GitHub ni Guardar copia (lo cubre
+  Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
 - **Tarjetas y edición**: la grilla muestra siempre la tarjeta compacta
   (`cardCompactoHtml`). El lápiz abre la ficha completa (`cardHtml`) en la
@@ -55,8 +56,8 @@ En desarrollo activo, las dos.
   que se redibuja en cada `renderAll` conservando scroll y foco). Esa
   ventana va una capa debajo (z-index 79) de las que se abren desde ella;
   Escape cierra solo la de más arriba.
-- "Guardar copia" baja `gm-creeps.json` (respaldo completo, **nunca** se
-  sube al repo); "Cargar archivo" reemplaza todos los creeps de la mesa.
+- "Cargar respaldo" reemplaza todos los creeps de la mesa por los del
+  archivo (con confirmación).
 - El panel Tablero (mismo diseño que en la ficha, código duplicado)
   arma tarjetas con los creeps abiertos (con números) + las fichas de los
   jugadores en vivo desde Firebase.

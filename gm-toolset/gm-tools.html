@@ -645,7 +645,6 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 
   <div class="toolbar">
     <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
-    <button class="btn" id="btn-save-todo" title="Bajar una copia de respaldo de todos los creeps (gm-creeps.json)">Guardar copia</button>
   </div>
 
   <div id="empty" class="empty-state" style="display:none">Sin creeps todavía. Tocá "+ Creep" para agregar el primero.</div>
@@ -3752,7 +3751,6 @@ document.addEventListener('click', e => {
     $('#scrim-finalizar-combate').classList.add('open');
     return;
   }
-  if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
   if(b.id === 'btn-respaldo-partida'){
     if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede armar el respaldo'); return; }
     b.disabled = true;
@@ -4454,20 +4452,6 @@ function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2400);
   registrarEvento(msg);
-}
-
-function descargar(nombreArchivo, objeto){
-  const blob = new Blob([JSON.stringify(objeto, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = nombreArchivo;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function guardarTodo(){
-  descargar('gm-creeps.json', S);
-  toast('Guardado: tu respaldo completo (gm-creeps.json)');
 }
 
 document.addEventListener('change', async e => {

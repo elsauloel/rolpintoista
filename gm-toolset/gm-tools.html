@@ -550,6 +550,7 @@ input[type=file]{display:none}
 #mesa-tirar input{flex:1;min-width:0}
 #mesa.colapsada #mesa-tirar{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
+.mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
 .mesa-quien{color:var(--brass);font-weight:700}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
@@ -4776,6 +4777,18 @@ function mesaRender(docs){
     const t = d.data({serverTimestamps: 'estimate'});
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && t.uid !== fbUsuario.uid) hayAjena = true;
+    // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
+    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema' + (nueva ? ' nueva' : '');
+      const hora = t.cuando ? ` · ${horaTxt(t.cuando.toDate())}` : '';
+      div.innerHTML = t.desde === 'mantenimiento'
+        ? `<span class="mesa-quien">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno${esc(hora)}</div>`
+        : `<span class="mesa-quien">${esc(t.quien || t.jugador || '?')}</span> 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}${esc(hora)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
     const quien = t.quien || t.jugador || '?';
     const jugador = t.quien && t.jugador && t.quien !== t.jugador ? ` · ${t.jugador}` : '';
     const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
@@ -5263,6 +5276,13 @@ async function mantenimientoGlobal(){
       const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
       tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
     });
+    // Línea en la Mesa para todos: "Mantenimiento · Turno N".
+    const turno = num(S.turno) + 1;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `Mantenimiento · Turno ${turno}`, formula: '', rolls: [], mod: 0, total: turno,
+      desde: 'mantenimiento', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo anunciar el pase de turno en la Mesa:', err));
   }catch(err){
     console.error('No se pudo pasar el turno para la mesa:', err);
     toast('No se pudo pasar el turno para la mesa — mirá la consola');

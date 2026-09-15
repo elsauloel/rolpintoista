@@ -200,6 +200,18 @@ input[type=file]{display:none}
 
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .row5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+/* Stats secundarios debajo de cada atributo (editor y vista del creep). */
+.attr-col{display:flex;flex-direction:column;gap:4px;min-width:0}
+.derivados{display:flex;flex-direction:column;gap:3px}
+.derivado{
+  display:flex;justify-content:space-between;align-items:baseline;gap:4px;padding:2px 6px;
+  border:1px dashed var(--line-soft);border-radius:var(--r);background:rgba(0,0,0,.18);cursor:help;
+  font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted)
+}
+.derivado span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.derivado b{color:var(--paper);font-size:11px}
+.derivado:hover{border-color:var(--copper)}
+.attr-col:nth-child(n+4) .con-tip:hover::after{left:auto;right:0}
 .mini-f label{display:block;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 .mini-f input{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;text-align:center;padding:4px 2px;color:var(--brass)}
 
@@ -1855,6 +1867,51 @@ function creepCritEfectivo(sc, i){
   if(rota) v = Math.floor(v / 2);
   return v;
 }
+/* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
+   su atributo (fórmula base = el atributo) + mods (ver creepStatValor).
+   Hp.Max y No2 ya se ven arriba; Crg.Max y SP no aplican a los creeps. */
+const CREEP_DERIVADOS_POR_ATTR = {
+  con: [['resmg', 'Res.Mg'], ['rescc', 'Res.CC']],
+  fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
+  agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
+  des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crit'], ['parry', 'Parry']],
+  int: [['pdgmg', 'PdG.Mg'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
+};
+const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', int:'Inteligencia'};
+
+// De dónde sale un stat secundario: su atributo y lo que lo modifica.
+function statOrigenTxt(sc, statId, label){
+  const attr = CREEP_STAT_LOOKUP[statId].attr;
+  const L = [`${ATTR_NOMBRE[attr]} base: ${fmt(num(sc[attr]))}`];
+  aportesModCreep(sc, attr).forEach(a => L.push(`${conSigno(a.val)} ${ATTR_NOMBRE[attr]} por ${a.nombre}`));
+  aportesModCreep(sc, statId).forEach(a => L.push(`${conSigno(a.val)} ${label} por ${a.nombre}`));
+  if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) L.push('Lisiado: a la mitad');
+  L.push(`= ${fmt(creepStatValor(sc, statId))}`);
+  return L.join('\n');
+}
+
+function creepEstadoActivo(sc, flag){
+  return (sc.estados || []).some(e => e.activo !== false && e[flag]);
+}
+
+function derivadosHtml(sc, attr){
+  return `<div class="derivados">${CREEP_DERIVADOS_POR_ATTR[attr].map(([id, label]) => `
+    <div class="derivado con-tip" data-deriv="${id}" data-tip="${esc(statOrigenTxt(sc, id, label))}">
+      <span>${label}</span><b>${fmt(creepStatValor(sc, id))}</b>
+    </div>`).join('')}</div>`;
+}
+
+// Al tipear un atributo no se redibuja la tarjeta: se refrescan sus secundarios acá.
+function actualizarDerivadosEnDOM(sc, card){
+  if(!card) return;
+  card.querySelectorAll('[data-deriv]').forEach(el => {
+    const id = el.dataset.deriv;
+    const par = Object.values(CREEP_DERIVADOS_POR_ATTR).flat().find(([x]) => x === id);
+    el.querySelector('b').textContent = fmt(creepStatValor(sc, id));
+    el.dataset.tip = statOrigenTxt(sc, id, par ? par[1] : id);
+  });
+}
+
 // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor.
 function aportesModCreep(sc, statId){
   const out = [];
@@ -2485,8 +2542,8 @@ function cardHtml(sc){
           <span>Atributos</span>
           <span class="attr-budget-badge" style="${attrBudgetStyle(sc)}">${attrBudgetTxt(sc)}</span>
         </div>
-        <div class="row5" style="margin-top:4px">
-          ${ATTR_IDS.map(a => attrCellHtml(sc, a)).join('')}
+        <div class="row5 attr-cols" style="margin-top:4px">
+          ${ATTR_IDS.map(a => `<div class="attr-col">${attrCellHtml(sc, a)}${derivadosHtml(sc, a)}</div>`).join('')}
         </div>
       </div>
 
@@ -3364,7 +3421,7 @@ function verCreep(id){
     <div class="vc-cuerpo">
       ${seccion('Atributos', `<div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
         const mod = creepModTotal(sc, a);
-        return caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${conSigno(mod)} por ${origenesModCreep(sc, a).join(', ')}` : '');
+        return `<div class="attr-col">${caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${conSigno(mod)} por ${origenesModCreep(sc, a).join(', ')}` : '')}${derivadosHtml(sc, a)}</div>`;
       }).join('')}</div>`)}
       ${seccion('Daño y defensa', `<div class="vc-cajas vc-auto">
         ${caja('Daño', ataqueCreepTxt(sc), ataqueOrigenTxt(sc))}
@@ -3556,6 +3613,7 @@ document.addEventListener('input', e => {
       actualizarVitalesEnDOM(sc, card);
     }
     actualizarBadgePresupuesto(sc, card);
+    actualizarDerivadosEnDOM(sc, card);
     return;
   }
   if(t.dataset.f !== undefined && t.dataset.id){

@@ -50,6 +50,10 @@ En desarrollo activo, las dos.
   libre está en la Mesa), token de GitHub ni Guardar copia (lo cubre
   Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
+- **Stats secundarios** (`CREEP_DERIVADOS_POR_ATTR`, `derivadosHtml`): los
+  mismos que un PJ salvo Hp.Max/No2 (ya se ven arriba) y Crg.Max/SP (no
+  aplican), debajo de cada atributo en el editor y en Ver, con el origen al
+  pasar el mouse (`statOrigenTxt`). Se calculan con `creepStatValor`.
 - **Tarjetas y edición**: la grilla muestra siempre la tarjeta compacta
   (`cardCompactoHtml`). El lápiz abre la ficha completa (`cardHtml`) en la
   ventana `#scrim-editar-creep` (`abrirEditarCreep`/`renderEditarCreep`,

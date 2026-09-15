@@ -75,8 +75,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .dano-critico-check input{width:auto!important;padding:0!important;border:none!important;background:none!important}
 /* Misma disposición que la caja Combate de la ficha: Esquivar ocupa las
    dos filas de la izquierda, Parry y Bloqueo se apilan a la derecha. */
-.creep-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
-.creep-combate-grid [data-esquivarcreep]{grid-row:span 2}
 .tablero-sello{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
 .tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
 .tablero-grupo:first-child{margin-top:0}
@@ -2350,7 +2348,6 @@ function formulasCombateCreep(sc){
 }
 
 function cardHtml(sc){
-  const fCombate = formulasCombateCreep(sc);
   return `
   <div class="card${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
@@ -2395,16 +2392,6 @@ function cardHtml(sc){
         <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
       </div>
 
-      <div>
-        <div class="sect-label">Combate</div>
-        <div class="creep-combate-grid">
-          <button type="button" class="addhab" data-atacarcreep="${sc.id}">🎲 Atacar (PdG)${fCombate.pdg ? ` · ${fCombate.pdg}` : ''}</button>
-          <button type="button" class="addhab" data-daniocreep="${sc.id}">🎲 Daño Arma · ${esc(danoTxt(sc, creepStatValor(sc, 'dmg')))}</button>
-          <button type="button" class="addhab" data-esquivarcreep="${sc.id}">🎲 Esquivar${fCombate.eva ? ` · ${fCombate.eva}` : ''}</button>
-          <button type="button" class="addhab" data-parrycreep="${sc.id}">🎲 Parry${fCombate.parry ? ` · ${fCombate.parry}` : ''}</button>
-          <button type="button" class="addhab" data-bloqueocreep="${sc.id}">🎲 Bloqueo${fCombate.bloqueo ? ` · ${fCombate.bloqueo}` : ''}</button>
-        </div>
-      </div>
 
       <div>
         <div class="sect-label" style="display:flex;justify-content:space-between;align-items:center">

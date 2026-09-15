@@ -58,6 +58,13 @@ header .estado.err{color:var(--danger)}
 header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 .layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
+/* En pantalla ancha, índice y contenido scrollean cada uno por su lado */
+@media(min-width:761px){
+  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  header{flex:none}
+  .layout{flex:1;min-height:0}
+  nav.toc,main.contenido{min-height:0}
+}
 @media(max-width:760px){.layout{grid-template-columns:1fr}}
 
 nav.toc{border-right:1px solid var(--line);padding:16px 10px;overflow-y:auto}
@@ -80,7 +87,8 @@ nav.toc .seccion-btn.activa{background:var(--panel2);border-left-color:var(--cop
 nav.toc .vacio{color:var(--muted);font-size:12px;padding:4px 8px}
 nav.toc .toc-edit-row{display:flex;gap:6px;padding:8px}
 
-main.contenido{padding:26px 34px;max-width:760px;overflow-y:auto}
+main.contenido{padding:26px 34px;overflow-y:auto}
+main.contenido > *{max-width:692px}
 main.contenido .sin-seleccion{color:var(--muted);margin-top:40px;text-align:center}
 main.contenido .cap-eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin-bottom:6px}
 main.contenido h2{font-size:26px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
@@ -112,6 +120,7 @@ main.contenido .cuerpo tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 main.contenido .editor-seccion{display:none}
 .modo-edicion main.contenido .editor-seccion{display:block}
 .modo-edicion .solo-lectura{display:none}
+body:not(.modo-edicion) .solo-edicion{display:none}
 #btn-editar.activo{background:var(--wine);border-color:var(--wine);color:var(--paper)}
 
 .toast{
@@ -130,15 +139,11 @@ main.contenido .editor-seccion{display:none}
     <div class="estado" id="estado">Sin cargar todavía.</div>
   </div>
   <div class="acciones">
-    <button class="iconbtn" id="btn-traer" title="Traer la última versión publicada">⬇ Traer última versión</button>
-    <button class="iconbtn" id="btn-cargar-archivo" title="Cargar un reglas.json local">Cargar archivo…</button>
-    <input type="file" id="input-archivo" accept="application/json" style="display:none">
-    <button class="iconbtn" id="btn-importar-md" title="Reemplazar el manual con un documento .md (## = capítulo, ### = sección)">Importar .md…</button>
+    <button class="iconbtn solo-edicion" id="btn-importar-md" title="Reemplazar TODO el manual con un documento .md (## = capítulo, ### = sección)">Importar .md…</button>
     <input type="file" id="input-md" accept=".md,.txt,text/markdown,text/plain" style="display:none">
-    <button class="iconbtn" id="btn-guardar" title="Descargar el estado actual como reglas.json">Guardar</button>
-    <button class="btn" id="btn-subir" title="Publicar en GitHub (datos/reglas.json)">Subir datos</button>
+    <button class="iconbtn solo-edicion" id="btn-guardar" title="Bajar una copia de respaldo del manual (reglas.json)">Descargar copia</button>
+    <button class="btn primary solo-edicion" id="btn-subir" title="Publicar en el sitio web (datos/reglas.json)">Publicar cambios</button>
     <button class="btn" id="btn-editar" title="Activar/desactivar modo edición">✏ Editar</button>
-    <button class="iconbtn" id="btn-token" title="Cambiar el token de GitHub">Token</button>
   </div>
 </header>
 
@@ -162,7 +167,7 @@ main.contenido .editor-seccion{display:none}
    ========================================================= */
 
 const GH_REPO = 'elsauloel/rolpintoista';
-const GH_BRANCH = 'main';
+const GH_BRANCH = 'nueva-version';   // la rama que publica el sitio web
 const ARCHIVO_REGLAS = 'datos/reglas.json';
 
 const $ = s => document.querySelector(s);
@@ -484,20 +489,6 @@ $('#btn-guardar').onclick = () => {
   toast('Descargado: reglas.json');
 };
 
-$('#btn-cargar-archivo').onclick = () => $('#input-archivo').click();
-$('#input-archivo').onchange = async e => {
-  const file = e.target.files[0];
-  if(!file) return;
-  try{
-    const datos = JSON.parse(await file.text());
-    aplicarDatos(datos, `Cargado desde ${file.name}`);
-    toast('Manual cargado desde archivo local');
-  }catch(err){
-    toast('Ese archivo no es un JSON válido');
-  }
-  e.target.value = '';
-};
-
 $('#btn-importar-md').onclick = () => $('#input-md').click();
 $('#input-md').onchange = async e => {
   const file = e.target.files[0];
@@ -505,7 +496,7 @@ $('#input-md').onchange = async e => {
   if(!file) return;
   if(M.capitulos.length && !confirm(`Esto reemplaza todo el manual con el contenido de "${file.name}". ¿Seguir?`)) return;
   const datos = markdownAManual(await file.text());
-  aplicarDatos(datos, `Importado desde ${file.name} — acordate de Guardar o Subir datos`);
+  aplicarDatos(datos, `Importado desde ${file.name} — acordate de Publicar cambios`);
   toast(`Importados ${datos.capitulos.length} capítulos`);
 };
 
@@ -609,33 +600,27 @@ async function traerUltimaVersion(silencioso){
     estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
   }
 }
-$('#btn-traer').onclick = () => traerUltimaVersion(false);
-
 $('#btn-subir').onclick = async () => {
   const btn = $('#btn-subir');
   const token = await ghToken(false);
-  if(!token){ toast('Sin token no se puede subir'); return; }
+  if(!token){ toast('Sin token de GitHub no se puede publicar'); return; }
   btn.disabled = true;
-  toast('Subiendo a GitHub…');
+  toast('Publicando…');
   try{
     M.actualizado = new Date().toISOString();
-    await ghSubir(ARCHIVO_REGLAS, JSON.stringify(M, null, 2), token, 'Actualizar manual del jugador');
-    toast('Manual publicado en GitHub ✓');
+    await ghSubir(ARCHIVO_REGLAS, JSON.stringify(M, null, 2), token, 'Manual: actualizar contenido');
+    toast('Publicado ✓ — el sitio web se actualiza en un par de minutos');
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá Subir datos de nuevo');
+      toast('El token no sirve o venció — tocá Publicar cambios de nuevo');
     }else{
-      console.error('Error subiendo el manual:', err);
-      toast('No se pudo subir — revisá la consola');
+      console.error('Error publicando el manual:', err);
+      toast('No se pudo publicar — revisá la consola');
     }
   }finally{
     btn.disabled = false;
   }
-};
-
-$('#btn-token').onclick = async () => {
-  if(await ghToken(true)) toast('Token actualizado.');
 };
 
 /* ---------- Arranque: trae la última versión sola; si falla, se queda

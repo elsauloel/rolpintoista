@@ -35,17 +35,26 @@ hay otras).
 
 Al abrirse por http (sitio web / servidor local) lee primero
 `../datos/reglas.json` de al lado; con doble clic (file://) se cae a
-GitHub como antes. Ojo: "Subir datos" y "Traer última versión" siguen
-apuntando a la rama `main` del sistema viejo.
+GitHub (rama `nueva-version`).
+
+Botonera: en lectura solo se ve "✏ Editar". En modo edición aparecen
+"Importar .md…", "Descargar copia" (baja `reglas.json` de respaldo) y
+"Publicar cambios", que sube `datos/reglas.json` a la rama `nueva-version`
+por la API de GitHub (pide el token solo si no hay uno o venció) — y con
+eso se actualiza el sitio web. Ojo: después de publicar desde la página,
+la copia local del repo queda atrás; hacer `git pull` antes de tocar
+`reglas.json` a mano.
+
+En pantalla ancha el índice y el contenido scrollean por separado (el
+body ocupa exactamente la altura de la ventana); en celular scrollea la
+página entera como siempre.
 
 ## Formato de datos
 
 Consume y produce `../datos/reglas.json` — ver
 [`../datos/esquema.md`](../datos/esquema.md), sección "Manual del jugador".
-Mismo patrón de Guardar (descarga el `.json`) / Cargar archivo / Subir
-datos / Traer última versión (sincroniza con GitHub, mismo token
-guardado en `localStorage` que usan las demás herramientas) que el resto
-de la campaña.
+El token de GitHub se guarda en `localStorage` (`gh-token`), mismo que
+usaban las demás herramientas.
 
 ## Dependencias con otras carpetas
 

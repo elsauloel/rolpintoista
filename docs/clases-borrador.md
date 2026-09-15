@@ -65,6 +65,10 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
   Estoicismo). Se declara cuando el que tiene el turno anuncia una
   acción, **antes** de que tire los dados (nunca después de ver el
   resultado).
+- **A definir en mesa**: si una duda no se cierra en la revisión, la skill
+  lleva una nota "⚖ A definir en mesa" que tiene que verse en su tarjeta
+  para todos, así se decide entre todxs la próxima vez que aparezca en
+  una partida.
 - **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
   corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
   completo después) y cuenta como ataque del turno.
@@ -73,8 +77,10 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 
 1. ✅ **Turboimpacto** (Pegar fuerte) — **No2:** ataque. **SP:** X (máx.
    3). **Espameable.** Ataque con +X dados de daño del Tipo del arma.
-2. **Arte de la guerra** — Acciones: 0. Bonos: 1.
-   Flash. +2 fijo a cualquier tirada de DES en combate.
+2. ✅ **Arte de la guerra** — **Flash.** **SP:** 1. +2 a una sola tirada
+   de PdG o de Parry.
+   ⚖ A definir en mesa: ¿se puede usar varias veces sobre la misma tirada
+   (con 3 SP, +6), una vez por tirada, o una vez por turno?
 3. **Sacadito** — Acciones: Ataque. Bonos: 3.
    1+1d4 auto-ataques consecutivos. Causa fatiga.
 4. **Cañón vasco** — Acciones: 1 / Ataque. Bonos: X ≤ Fue.

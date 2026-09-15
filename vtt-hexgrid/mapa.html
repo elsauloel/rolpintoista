@@ -155,6 +155,7 @@ aside{
     <span class="perilla"></span><span id="modo-texto">Narrativo</span>
   </button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+  <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <button type="button" class="btn" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)" hidden>⟳ Mantenimiento</button>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
@@ -425,6 +426,19 @@ function renderModo(){
   $('#modo-texto').textContent = combate ? 'Combate' : 'Narrativo';
   b.disabled = !soyGM;
   b.title = soyGM ? `Pasar a modo ${combate ? 'narrativo' : 'combate'}` : 'Modo del mapa (lo cambia el GM)';
+  renderLinkHerramienta();
+}
+
+// Acceso directo en otra pestaña: el GM a gm-tools, el jugador a su ficha
+// (abre la última que usó en esta partida, o la lista de personajes).
+function renderLinkHerramienta(){
+  const a = $('#link-herramienta');
+  if(!fbMiembro || !FB_CAMPANA){ a.hidden = true; return; }
+  const partida = '?partida=' + encodeURIComponent(FB_CAMPANA);
+  a.href = soyGM ? '../gm-toolset/gm-tools.html' + partida : '../ficha-personaje/ficha.html' + partida;
+  a.textContent = soyGM ? '⚔ GM Tools' : '📜 Mi ficha';
+  a.title = soyGM ? 'Abrir GM Tools en una pestaña nueva' : 'Abrir tu ficha en una pestaña nueva';
+  a.hidden = false;
 }
 
 /* ---------- Mantenimiento del GM ----------

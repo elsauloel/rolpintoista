@@ -56,6 +56,12 @@ main{flex:1;display:flex;min-height:0}
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;color:var(--muted)
 }
 #aviso-mapa .btn{margin-top:10px}
+/* Confirmar un movimiento que gasta Nitros. */
+#ruta-confirmar{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100% - 24px);background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);padding:8px 12px;
+  font-family:"Space Mono",monospace;font-size:12px;box-shadow:0 10px 24px -8px rgba(0,0,0,.7)
+}
 
 aside{
   width:330px;flex:none;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line);min-height:0
@@ -131,6 +137,11 @@ aside{
   <div id="lienzo-caja">
     <canvas id="lienzo"></canvas>
     <div id="aviso-mapa" hidden></div>
+    <div id="ruta-confirmar" hidden>
+      <span id="ruta-texto"></span>
+      <button type="button" class="btn primary" id="ruta-si">Confirmar</button>
+      <button type="button" class="btn" id="ruta-no">Cancelar</button>
+    </div>
   </div>
   <aside>
     <div class="seccion" id="panel-token"></div>
@@ -210,6 +221,36 @@ function mundoAHex(x, y){
   return { col: rq + (rr - (rr & 1)) / 2, fila: rr };
 }
 
+// Rutas: para medir distancias y trazar líneas se pasa a coordenadas
+// "cúbicas" (q, r, s), las mismas que usa mundoAHex.
+function hexACubo(c){
+  const q = c.col - (c.fila - (c.fila & 1)) / 2;
+  return {q, r: c.fila, s: -q - c.fila};
+}
+function mismoHex(a, b){ return a.col === b.col && a.fila === b.fila; }
+function distanciaHex(a, b){
+  const A = hexACubo(a), B = hexACubo(b);
+  return (Math.abs(A.q - B.q) + Math.abs(A.r - B.r) + Math.abs(A.s - B.s)) / 2;
+}
+// Casillas en línea recta desde a (sin incluirla) hasta b, una al lado de la
+// otra. Sirve cuando el mouse salta varias casillas de golpe.
+function lineaHex(a, b){
+  const n = distanciaHex(a, b);
+  const A = hexACubo(a), B = hexACubo(b);
+  const res = [];
+  for(let i = 1; i <= n; i++){
+    const t = i / n;
+    const q = A.q + (B.q - A.q) * t + 1e-6, r = A.r + (B.r - A.r) * t + 1e-6, s = -q - r;
+    let rq = Math.round(q), rr = Math.round(r);
+    const rs = Math.round(s);
+    const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
+    if(dq > dr && dq > ds) rq = -rr - rs;
+    else if(dr > ds) rr = -rq - rs;
+    res.push({col: rq + (rr - (rr & 1)) / 2, fila: rr});
+  }
+  return res;
+}
+
 /* ---------- Estado ---------- */
 
 const lienzo = $('#lienzo');
@@ -223,9 +264,14 @@ let disposicion = [];         // [{id, x, y, radio}] del último dibujo, en orde
 const miembros = new Map();   // uid -> {nombre, gm}
 let soyGM = false;
 let seleccion = null;
-let arrastre = null;          // {id, x, y, inicioX, inicioY, movio}
+let arrastre = null;          // {id, x, y, inicioX, inicioY, movio, ruta, costo}
+// Movimiento soltado que gasta Nitros, esperando Confirmar/Cancelar.
+let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero, disponibles}
+// Estelas que se ven unos segundos después de mover (las de todos).
+const estelas = new Map();    // tokenId -> {celdas, hasta}
+const ESTELA_MS = 4000;
+const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
 let paneo = null;             // {inicioX, inicioY, x, y}
-let hexDestino = null;
 let creando = false;
 let panelFondo = false;       // GM: panel de la imagen de fondo abierto
 let editandoToken = false;    // panel del token en modo "Editar"
@@ -319,6 +365,17 @@ function imagenLista(url){
     imagenesCache.set(url, img);
   }
   return img.complete && img.naturalWidth ? img : null;
+}
+
+// Nitros que cuesta mover este token: solo los PJ vinculados a su ficha
+// (no las invocaciones, ni creeps, ni NPC). null = se mueve sin costo, como
+// también una ficha que todavía no publicó sus Nitros (abrila una vez).
+function costoMoverDe(t){
+  if(!t || t.tipo !== 'pj' || !t.fichaId || t.fichaId.includes(SEP_INVOCACION)) return null;
+  const f = fichasPub.get(t.fichaId);
+  const r = f && f.resumen;
+  if(!r || r.costoMover === undefined) return null;
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros)};
 }
 
 function puedoMover(t){
@@ -419,6 +476,7 @@ function calcularDisposicion(){
   const grupos = new Map();
   orden.forEach(o => {
     if(arrastre && arrastre.id === o.id) return;
+    if(rutaPendiente && rutaPendiente.id === o.id) return;
     const k = o.t.col + ',' + o.t.fila;
     if(!grupos.has(k)) grupos.set(k, []);
     grupos.get(k).push(o);
@@ -435,6 +493,12 @@ function calcularDisposicion(){
     });
   });
   if(arrastre && tokens.has(arrastre.id)) res.push({id: arrastre.id, x: arrastre.x, y: arrastre.y, radio: HEX * 0.68, solo: true, arrastrado: true});
+  // Esperando confirmación: el token queda en el destino de la ruta.
+  if(rutaPendiente && tokens.has(rutaPendiente.id)){
+    const fin = rutaPendiente.celdas[rutaPendiente.celdas.length - 1];
+    const c = hexCentro(fin.col, fin.fila);
+    res.push({id: rutaPendiente.id, x: c.x, y: c.y, radio: HEX * 0.68, solo: true});
+  }
   return res;
 }
 
@@ -476,16 +540,36 @@ function dibujar(){
   ctx.beginPath(); trazarHex(0, 0);
   ctx.strokeStyle = 'rgba(224,164,88,.45)'; ctx.lineWidth = 2 / z; ctx.stroke();
 
-  if(arrastre && arrastre.movio && hexDestino){
-    const p = hexCentro(hexDestino.col, hexDestino.fila);
-    ctx.beginPath(); trazarHex(p.x, p.y);
-    ctx.fillStyle = 'rgba(224,164,88,.18)'; ctx.fill();
-    ctx.strokeStyle = '#E0A458'; ctx.lineWidth = 2 / z; ctx.stroke();
-  }
+  // Estelas: la ruta que se está dibujando, la que espera confirmación y las
+  // de movimientos recientes (se desvanecen).
+  let animando = false;
+  const ahora = Date.now();
+  const dibujarEstela = (celdas, alfa) => {
+    if(celdas.length < 2) return;
+    ctx.beginPath();
+    celdas.slice(1).forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    ctx.fillStyle = `rgba(224,164,88,${0.2 * alfa})`; ctx.fill();
+    ctx.strokeStyle = `rgba(224,164,88,${0.75 * alfa})`; ctx.lineWidth = 2 / z; ctx.stroke();
+    ctx.beginPath();
+    celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
+    ctx.strokeStyle = `rgba(237,227,210,${0.85 * alfa})`; ctx.lineWidth = 4 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+    celdas.slice(1).forEach(c => {
+      const p = hexCentro(c.col, c.fila);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 5 / z, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(237,227,210,${alfa})`; ctx.fill();
+    });
+  };
+  estelas.forEach((e, id) => {
+    const resta = e.hasta - ahora;
+    if(resta <= 0){ estelas.delete(id); return; }
+    dibujarEstela(e.celdas, Math.min(1, resta / 1200));
+    animando = true;
+  });
+  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1);
+  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1);
 
   // Tokens.
   disposicion = calcularDisposicion();
-  let animando = false;
   const etiquetas = HEX * z >= 22;
   disposicion.forEach(d => {
     const t = tokens.get(d.id);
@@ -616,10 +700,18 @@ lienzo.addEventListener('pointerdown', e => {
     seleccionar(id);
     const t = tokens.get(id);
     if(puedoMover(t)){
-      const v = visibles.get(id) || hexCentro(t.col, t.fila);
-      arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false};
-      lienzo.style.cursor = 'grabbing';
-      return;
+      const costo = costoMoverDe(t);
+      if(rutaPendiente){
+        toast('Primero confirmá o cancelá el movimiento que quedó marcado');
+      }else if(costo && costo.porCasillero <= 0){
+        toast('No te podés mover ahora (Inmovilizado)');
+      }else{
+        const v = visibles.get(id) || hexCentro(t.col, t.fila);
+        arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false,
+          ruta: [{col: t.col, fila: t.fila}], costo, avisado: false};
+        lienzo.style.cursor = 'grabbing';
+        return;
+      }
     }
   }else{
     seleccionar(null);
@@ -640,7 +732,7 @@ lienzo.addEventListener('pointermove', e => {
     arrastre.movio = true;
     const m = pantallaAMundo(px, py);
     arrastre.x = m.x + arrastre.dx; arrastre.y = m.y + arrastre.dy;
-    hexDestino = mundoAHex(arrastre.x, arrastre.y);
+    extenderRuta(arrastre, mundoAHex(arrastre.x, arrastre.y));
     pedirDibujo();
     return;
   }
@@ -661,16 +753,42 @@ lienzo.addEventListener('pointermove', e => {
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
 
+// La ruta sigue al token casilla por casilla. Volver sobre una casilla ya
+// recorrida borra la estela desde ahí; si se acaban los Nitros, se corta.
+function extenderRuta(a, casilla){
+  const ruta = a.ruta;
+  const i = ruta.findIndex(c => mismoHex(c, casilla));
+  if(i >= 0){ ruta.length = i + 1; return; }
+  for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
+    const j = ruta.findIndex(x => mismoHex(x, c));
+    if(j >= 0){ ruta.length = j + 1; continue; }
+    // ruta.length casilleros recorridos si se agrega esta (la primera es el origen).
+    if(a.costo && ruta.length * a.costo.porCasillero > a.costo.disponibles){
+      if(!a.avisado) toast(`No te alcanzan los No2 para seguir (te quedan ${fmt(a.costo.disponibles)})`);
+      a.avisado = true;
+      break;
+    }
+    if(ruta.length >= RUTA_MAX_CELDAS) break;
+    ruta.push(c);
+  }
+}
+
 function soltar(){
   if(arrastre){
     const a = arrastre;
     arrastre = null;
     const t = tokens.get(a.id);
-    if(a.movio && t && hexDestino && (hexDestino.col !== t.col || hexDestino.fila !== t.fila)){
+    const pasos = a.ruta.length - 1;
+    if(a.movio && t && pasos > 0){
       visibles.set(a.id, {x: a.x, y: a.y});
-      moverToken(a.id, hexDestino.col, hexDestino.fila);
+      if(a.costo){
+        rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles};
+        mostrarConfirmacionRuta();
+      }else{
+        const fin = a.ruta[pasos];
+        moverToken(a.id, fin.col, fin.fila, a.ruta);
+      }
     }
-    hexDestino = null;
     pedirDibujo();
   }
   if(paneo){ paneo = null; guardarVista(); }
@@ -696,6 +814,8 @@ $('#btn-centrar').onclick = centrarEnMios;
 
 document.addEventListener('keydown', e => {
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
+  if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
+  if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(e.key === 'Escape') seleccionar(null);
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
 });
@@ -704,19 +824,97 @@ document.addEventListener('keydown', e => {
 
 function coleccionTokens(){ return fbDb.collection(fbRutaCampana('tokens')); }
 
-async function moverToken(id, col, fila){
+// La ruta viaja con el movimiento como [col, fila, col, fila…] para que
+// los demás vean la estela unos segundos.
+async function moverToken(id, col, fila, celdas){
   const t = tokens.get(id);
   if(!t) return;
   // Se mueve ya en pantalla; si Firebase lo rechaza, vuelve solo a su lugar.
   t.col = col; t.fila = fila;
+  const ruta = (celdas || []).slice(-RUTA_MAX_CELDAS).flatMap(c => [c.col, c.fila]);
+  if(celdas && celdas.length > 1){
+    t.rutaJson = JSON.stringify(ruta);
+    estelas.set(id, {celdas: celdas.slice(), hasta: Date.now() + ESTELA_MS});
+  }
   renderPanel();
+  pedirDibujo();
+  const doc = coleccionTokens().doc(id);
   try{
-    await coleccionTokens().doc(id).update({col, fila});
+    await doc.update(ruta.length > 2 ? {col, fila, ruta} : {col, fila});
   }catch(err){
+    // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
+    // igual, solo que los demás no ven la estela.
+    if(err.code === 'permission-denied' && ruta.length > 2){
+      try{ await doc.update({col, fila}); return; }catch(e){ err = e; }
+    }
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
   }
 }
+
+/* ---------- Mover gastando Nitros ---------- */
+
+function mostrarConfirmacionRuta(){
+  const p = rutaPendiente;
+  if(!p) return;
+  const costo = p.pasos * p.porCasillero;
+  $('#ruta-texto').textContent = `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
+    (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '');
+  $('#ruta-confirmar').hidden = false;
+  $('#ruta-si').focus();
+}
+
+function cancelarRuta(){
+  rutaPendiente = null;
+  $('#ruta-confirmar').hidden = true;
+  pedirDibujo();
+}
+
+const NITROS_INSUFICIENTES = 'nitros-insuficientes';
+
+// Descuenta los Nitros en la ficha (parte "general" + resumen), igual que
+// cambiarVidaPj con la vida. Devuelve los que quedan.
+async function gastarNitros(fichaId, costo){
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  return fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    const actual = datos.nitros === null || datos.nitros === undefined ? num(r.nitros) : num(datos.nitros);
+    if(costo > actual) throw new Error(NITROS_INSUFICIENTES);
+    datos.nitros = actual - costo;
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
+    return datos.nitros;
+  });
+}
+
+async function confirmarRuta(){
+  const p = rutaPendiente;
+  if(!p) return;
+  const t = tokens.get(p.id);
+  $('#ruta-confirmar').hidden = true;
+  if(!t){ cancelarRuta(); return; }
+  const costo = p.pasos * p.porCasillero;
+  try{
+    const quedan = await gastarNitros(t.fichaId, costo);
+    rutaPendiente = null;
+    const fin = p.celdas[p.celdas.length - 1];
+    await moverToken(p.id, fin.col, fin.fila, p.celdas);
+    toast(`−${fmt(costo)} No2 · te quedan ${fmt(quedan)}`);
+  }catch(err){
+    console.error('No se pudo mover gastando Nitros:', err);
+    toast(err.message === NITROS_INSUFICIENTES
+      ? 'No te alcanzan los No2 (la ficha tiene menos de los que se veían)'
+      : err.code === 'permission-denied' ? 'No podés gastar los Nitros de esa ficha' : 'No se pudo mover — mirá la consola');
+    cancelarRuta();
+  }
+}
+$('#ruta-si').onclick = confirmarRuta;
+$('#ruta-no').onclick = cancelarRuta;
 
 async function crearToken(datos){
   const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
@@ -772,7 +970,17 @@ function escucharTokens(){
         return;
       }
       const d = ch.doc.data({serverTimestamps: 'estimate'});
+      // Ruta nueva de otro (la propia ya se mostró al mover): estela unos segundos.
+      const previo = tokens.get(ch.doc.id);
+      const ruta = Array.isArray(d.ruta) ? d.ruta.map(v => Math.round(num(v))) : [];
+      const rutaJson = JSON.stringify(ruta);
+      if(ch.type === 'modified' && ruta.length > 2 && previo && previo.rutaJson !== rutaJson){
+        const celdas = [];
+        for(let i = 0; i + 1 < ruta.length; i += 2) celdas.push({col: ruta[i], fila: ruta[i + 1]});
+        estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
+      }
       tokens.set(ch.doc.id, {
+        rutaJson,
         nombre: String(d.nombre || '?'),
         color: d.color,
         tipo: d.tipo === 'creep' ? 'creep' : 'pj',
@@ -1213,7 +1421,7 @@ function renderPanel(forzar){
   if(!t){
     panel.innerHTML =
       '<h2>Token</h2>' +
-      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos. ' +
+      '<p class="ayuda">Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero (tus personajes gastan No2 al confirmar). ' +
       'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.</p>' +
       '<div class="leyenda">' +
         `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +

@@ -7187,6 +7187,11 @@ function fichaResumen(){
     hpMax: n(c.final.hpmax),
     sp: spMax - num(S.spGastado),
     spMax,
+    // Para mover el token desde el mapa: Nitros que quedan y cuánto cuesta
+    // cada casillero (0 = no se puede mover, ej. Inmovilizado).
+    nitros: S.nitros === null || S.nitros === undefined ? n(c.final.nitros) : num(S.nitros),
+    nitrosMax: n(c.final.nitros),
+    costoMover: IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado') ? 0 : costoMoverCasillero(),
     muerto: !!(S.muerto && S.muerto.activo),
     estados: (S.efectos || [])
       .filter(e => e && e.activo !== false && e.nombre)

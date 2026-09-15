@@ -60,7 +60,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`.
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
-  hpMax, sp, spMax, muerto, estados[{nombre, turnos, permanente,
+  hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},
   miniatura, creado, actualizado}`. Las fichas guardadas antes de la
   Iteración 2 publican `bonos`/`bonosMax` hasta que se vuelven a abrir (el
@@ -91,14 +91,18 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   fondo del mapa (data URL achicada a < 900 KB), con su posición y ancho en
   unidades del mapa. La ven todos; solo el GM la escribe.
 - `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
-  'pj'|'creep', duenoUid, col, fila, creado, fichaId?}`. `fichaId` vincula
+  'pj'|'creep', duenoUid, col, fila, creado, fichaId?, ruta?}`. `ruta` es el
+  recorrido del último movimiento, `[col, fila, col, fila…]` (hasta 100
+  casillas): los demás lo ven como estela unos segundos. `fichaId` vincula
   el token a una ficha (pj), a una invocación de una ficha
   (`<fichaId>~<idInvocación>`, tipo pj) o a un creep: el mapa toma de ahí nombre,
   miniatura, barras (vida roja; SP azul, solo PJ) y estados. Tokens del mapa de
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
   solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
   de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`
-  al soltar.
+  (+ `ruta`) al soltar. Un PJ vinculado a su ficha gasta Nitros: el mapa pide
+  confirmar y descuenta `nitros` en `partes/general` + `resumen.nitros` en
+  una transacción.
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

@@ -24,6 +24,16 @@ nuevo de Rol Pintoísta. Paso 2 de
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.
+- **Ruta y estela** (`extenderRuta`, `lineaHex`): al arrastrar, la ruta
+  sigue al token casilla por casilla (volver sobre una casilla la recorta;
+  los saltos del mouse se completan en línea recta). Los otros tokens no
+  bloquean. Se guarda en `ruta` del token y todos ven la estela
+  `ESTELA_MS` (4 s). Un PJ vinculado a su ficha (no invocación) gasta
+  Nitros: la ruta se corta cuando no alcanzan (`resumen.nitros`,
+  `resumen.costoMover`: 2 con Rengo, 0 con Inmovilizado), al soltar pide
+  Confirmar/Cancelar (`rutaPendiente`) y `gastarNitros` descuenta en la
+  ficha con una transacción. Sin las reglas nuevas publicadas, se mueve
+  igual pero sin estela para los demás.
 - Panel del costado: crear token (jugador: siempre PJ propio; GM: creep/NPC
   o PJ). Al seleccionar un token se ven nombre, vida/SP y estados; "✎ Editar"
   abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa". Los PJ (y sus

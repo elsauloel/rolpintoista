@@ -53,10 +53,20 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 | True damage / Holy / wicked / sónico | Tipos de daño | No hay tipos de daño en la ficha |
 | Stacks de veneno | El preset Veneno de la ficha | ¿Cuánto hace cada stack? |
 
+## Cerrado en la revisión
+
+- **Peso** del arma = cantidad de dados de daño; **Tipo** = caras. "+X al
+  peso" = +X dados; "dT8" = dados de Tipo 8.
+- **Espameable**: se puede repetir en el turno; el límite lo ponen los
+  Nitros.
+- **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
+  corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
+  completo después) y cuenta como ataque del turno.
+
 ## Warrior ⏳
 
-1. **Turboimpacto** (Pegar fuerte) — Acciones: Ataque. Bonos: X ≤ 3.
-   Spammeable. +X al peso del ataque.
+1. ✅ **Turboimpacto** (Pegar fuerte) — **No2:** ataque. **SP:** X (máx.
+   3). **Espameable.** Ataque con +X dados de daño del Tipo del arma.
 2. **Arte de la guerra** — Acciones: 0. Bonos: 1.
    Flash. +2 fijo a cualquier tirada de DES en combate.
 3. **Sacadito** — Acciones: Ataque. Bonos: 3.

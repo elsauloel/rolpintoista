@@ -115,17 +115,21 @@ puede borrar desde la consola.
 
 ## Respaldo de la partida
 
-Firebase gratis no hace copias de seguridad. En la página de la partida,
-el GM tiene **💾 Respaldo de la partida**, que baja
+Firebase gratis no hace copias de seguridad. Cualquiera baja un respaldo:
+el jugador con el botón 💾 de la ficha (arriba, junto a 🗺 Mapa) y el GM
+con "💾 Respaldo partida" en gm-tools. El código está en
+[`../comun/respaldo.js`](../comun/respaldo.js). Baja
 `respaldo-<partida>-<fecha>.json` con `{tipo: 'respaldo-partida', version,
-creado, partida, miembros, fichas[{id, nombre, duenoUid, dueno, ficha}],
-gmCreeps{turno, creeps}, tokens, mapa, tiradas}` (fechas en texto ISO).
-`ficha` tiene la forma de "Guardar copia" de la ficha (con retrato e
-imágenes de invocaciones) y `gmCreeps` la de `gm-creeps.json` (con
-imágenes). Para recuperar: en la ficha, "Cargar archivo" con el respaldo
-pregunta qué personaje cargar; en gm-tools, "Cargar archivo" toma todos
-los creeps. Tokens, mapa y tiradas quedan en el archivo pero no tienen
-todavía un botón para restaurarlos.
+creado, hechoPor{nombre, gm}, partida, miembros, fichas[{id, nombre,
+duenoUid, dueno, ficha}], creepsPublicos, tokens, mapa, tiradas}` y, solo
+si lo baja el GM, `gmCreeps{turno, creeps}` (los jugadores no pueden leer
+los creeps completos). Fechas en texto ISO. `ficha` tiene la forma de
+"Guardar copia" de la ficha (con retrato e imágenes de invocaciones) y
+`gmCreeps` la de `gm-creeps.json`. Para recuperar: en la ficha, "Cargar
+archivo" con el respaldo pregunta qué personaje cargar; en gm-tools,
+"Cargar archivo" toma los creeps (solo de un respaldo del GM). Tokens,
+mapa y tiradas quedan en el archivo pero todavía no tienen botón para
+restaurarlos.
 
 ## Tareas de mantenimiento (en la consola)
 

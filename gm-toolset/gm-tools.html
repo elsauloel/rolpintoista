@@ -587,6 +587,7 @@ input[type=file]{display:none}
     <span class="note" id="gm-guardado-estado">Sin entrar a la mesa: los creeps no se guardan.</span>
     <button class="btn ghost" id="btn-load" title="Reemplazar los creeps por los de un archivo gm-creeps.json">Cargar archivo</button>
     <button class="btn" id="btn-save-todo" title="Bajar una copia de respaldo de todos los creeps (gm-creeps.json)">Guardar copia</button>
+    <button class="btn" id="btn-respaldo-partida" title="Bajar un respaldo de toda la partida: personajes, creeps, tokens, mapa y tiradas">💾 Respaldo partida</button>
     <button class="btn ghost" id="btn-token">Cambiar token GitHub</button>
     <input type="file" id="file-input" accept=".json">
   </div>
@@ -1017,6 +1018,7 @@ input[type=file]{display:none}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/respaldo.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
@@ -3619,6 +3621,16 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-save-todo'){ guardarTodo(); return; }
+  if(b.id === 'btn-respaldo-partida'){
+    if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede armar el respaldo'); return; }
+    b.disabled = true;
+    toast('Armando el respaldo de la partida…');
+    fbBajarRespaldo().then(toast).catch(err => {
+      console.error('No se pudo armar el respaldo:', err);
+      toast('No se pudo armar el respaldo — mirá la consola');
+    }).finally(() => { b.disabled = false; });
+    return;
+  }
   if(b.id === 'btn-load'){
     if(gmVivo.listo && !confirm('Cargar un archivo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
     $('#file-input').click();
@@ -4580,7 +4592,10 @@ $('#file-input').onchange = ev => {
     try{
       let data = JSON.parse(r.result);
       // Respaldo de toda la partida (lo baja el GM desde el inicio): se usan sus creeps.
-      if(data && data.tipo === 'respaldo-partida') data = data.gmCreeps || {};
+      if(data && data.tipo === 'respaldo-partida'){
+        if(!data.gmCreeps){ toast('Ese respaldo lo bajó un jugador: no trae los creeps completos (solo el GM puede)'); return; }
+        data = data.gmCreeps;
+      }
       if(!Array.isArray(data.creeps)) throw new Error('formato inválido');
       if(data.turno === undefined && data.actualizado !== undefined){
         toast('Ese archivo es creeps-publico.json (la vista recortada para jugadores) — cargá gm-creeps.json, que es el que tiene todos tus datos');

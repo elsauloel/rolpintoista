@@ -1311,6 +1311,7 @@ if(new URLSearchParams(location.search).get('modo') === 'botonera') document.doc
 <!-- ACCESOS DIRECTOS (el href lo completa el script con la partida) -->
 <nav class="accesos">
   <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
+  <button type="button" class="iconbtn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)">💾</button>
   <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
 </nav>
 
@@ -1662,6 +1663,7 @@ if(new URLSearchParams(location.search).get('modo') === 'botonera') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/respaldo.js"></script>
 <script>
 /* =========================================================
    MODELO
@@ -4883,6 +4885,15 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
 if(typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA){
   $('#acceso-mapa').href = '../vtt-hexgrid/mapa.html?partida=' + encodeURIComponent(FB_CAMPANA);
   $('#acceso-inicio').href = fbUrlInicio(FB_CAMPANA);
+  $('#acceso-respaldo').onclick = async () => {
+    const btn = $('#acceso-respaldo');
+    if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede armar el respaldo'); return; }
+    btn.disabled = true;
+    toast('Armando el respaldo de la partida…');
+    try{ toast(await fbBajarRespaldo()); }
+    catch(err){ console.error('No se pudo armar el respaldo:', err); toast('No se pudo armar el respaldo — mirá la consola'); }
+    finally{ btn.disabled = false; }
+  };
 }
 
 // Cerrar cualquier popup con la tecla Escape.

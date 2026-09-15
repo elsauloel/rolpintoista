@@ -216,6 +216,14 @@ input[type=file]{display:none}
 .arma-dano{font-family:"Space Mono",monospace;font-size:13px;color:var(--brass);font-weight:700}
 .arma-detalle{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
 .equipado-nombre{flex:1;min-width:0;font-weight:700;font-size:13px;color:var(--paper)}
+/* Número destacado del equipo (daño del arma, Defensa de la armadura), con
+   el mismo recuadro que los campos numéricos. */
+.valor-caja{
+  flex:none;background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);padding:3px 10px;
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);white-space:nowrap
+}
+.valor-caja small{font-size:9px;letter-spacing:.08em;color:var(--muted);margin-right:5px;font-weight:400}
+.equipo-item-top{display:flex;align-items:center;gap:8px}
 /* Separa los bloques del editor del creep (Equipados, Habilidades). */
 .editar-separador{
   display:flex;align-items:center;gap:10px;margin:10px 0 0;
@@ -2416,7 +2424,7 @@ function cardHtml(sc){
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
             <span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
-            <span class="arma-dano">${danoTxt(sc)}</span>
+            <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
           <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div>
@@ -2429,11 +2437,14 @@ function cardHtml(sc){
           ${sc.equipo.length ? sc.equipo.map(it => `
             <div class="equipo-item">
               <div class="equipo-item-info">
-                <div class="equipo-item-nombre">${esc(it.nombre)}</div>
-                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.def?` · Defensa +${fmt(it.def)}`:''}</div>
+                <div class="equipo-item-top">
+                  <span class="equipado-nombre">${esc(it.nombre)}</span>
+                  <span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(num(it.def))}</span>
+                  <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
+                </div>
+                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}</div>
                 ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
               </div>
-              <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
             </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
         </div>
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>

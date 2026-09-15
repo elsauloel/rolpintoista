@@ -1731,18 +1731,25 @@ function renderPanel(forzar){
   }
 
   if(!t){
+    const item = (color, texto) => `<span><i style="border-color:${color}"></i>${texto}</span>`;
+    // El GM no suele tener tokens de personaje propios: el dorado solo
+    // aparece en su leyenda si tiene alguno.
+    const gmConPropios = soyGM && [...tokens.values()].some(x => claseToken(x) === 'propio');
+    const ayuda = soyGM
+      ? 'Tocá un token para ver de quién es. Vos movés los creeps y los NPC arrastrándolos; los personajes los mueve cada jugador. ' +
+        'En modo combate los creeps gastan sus No2 al moverse (si se pasan, te pide confirmar); los NPC se mueven sin costo. Con el switch de arriba pasás de modo narrativo a combate para toda la mesa. '
+      : 'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ';
+    const leyenda = soyGM
+      ? (gmConPropios ? item(BORDE.propio, 'Tuyos') : '') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC') + item(BORDE.jugador, 'Jugadores')
+      : item(BORDE.propio, 'Tuyos') + item(BORDE.jugador, 'Otros jugadores') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC');
     panel.innerHTML =
       // La ayuda queda escondida detrás del (?): aparece al pasar el cursor
       // (o al tocarlo en pantallas táctiles).
       '<h2 class="con-ayuda">Token <span class="ayuda-icono" tabindex="0" aria-label="Ayuda">?' +
         '<span class="ayuda-globo" role="tooltip">' +
-          'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ' +
+          ayuda +
           'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.' +
-          '<span class="leyenda">' +
-            `<span><i style="border-color:${BORDE.propio}"></i>Tuyos</span>` +
-            `<span><i style="border-color:${BORDE.jugador}"></i>Otros jugadores</span>` +
-            `<span><i style="border-color:${BORDE.creep}"></i>Creeps</span>` +
-            `<span><i style="border-color:${BORDE.npc}"></i>NPC</span>` +
+          '<span class="leyenda">' + leyenda +
           '</span>' +
         '</span>' +
       '</span></h2>';

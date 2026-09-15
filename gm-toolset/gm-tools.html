@@ -489,6 +489,33 @@ input[type=file]{display:none}
 .view-detalle .view-label{display:block;color:var(--copper);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
 /* Texto de color del ítem: se lee como una cita, no como una regla. */
 .view-narrativa{font-style:italic;color:#B9A796}
+/* Ver creep: secciones con recuadros; habilidades y estados muestran su
+   descripción al pasar el mouse (.con-tip). */
+#scrim-view .modal{max-width:680px}
+.vc-cuerpo{padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line)}
+.vc-seccion{display:flex;flex-direction:column;gap:6px;padding-top:10px}
+.vc-cajas{display:grid;gap:6px}
+.vc-3{grid-template-columns:repeat(3,1fr)}
+.vc-5{grid-template-columns:repeat(5,1fr)}
+.vc-auto{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+.vc-caja{
+  background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);padding:6px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0
+}
+.vc-caja.con-tip{cursor:help;border-style:dashed}
+.vc-caja.con-tip:hover{border-color:var(--copper)}
+.vc-caja-label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.vc-caja-valor{font-family:"Space Mono",monospace;font-size:14px;font-weight:700;color:var(--brass);white-space:nowrap}
+.vc-chips{display:flex;flex-wrap:wrap;gap:6px}
+.vc-chip{
+  font-family:"Space Mono",monospace;font-size:11px;border:1px dashed var(--line);border-radius:99px;
+  padding:4px 10px;color:var(--paper);background:var(--panel2);cursor:help
+}
+.vc-chip:hover{border-color:var(--copper);color:var(--brass)}
+.vc-estado-buff{border-color:rgba(62,155,91,.7)}
+.vc-estado-debuff{border-color:rgba(142,63,176,.8)}
+.vc-seccion .con-tip:hover::after{max-width:320px;width:max-content}
+@media(max-width:560px){.vc-5{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:480px){.view-wrap{flex-direction:column}.view-image-wrap{width:100%;border-right:none;border-bottom:1px solid var(--line)}}
 /* El catálogo para equipar creeps ya es un scrim (#scrim-equipar-creep) y
    el "Ver" se abre desde adentro sin cerrarlo — tiene que quedar encima. */
@@ -3277,21 +3304,27 @@ function verCreep(id){
   const sc = S.creeps.find(x => x.id === id);
   if(!sc) return;
 
-  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
-  const L = [];
-  L.push(linea('Nivel', fmt(num(sc.nivel))));
-  L.push(linea('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`));
-  L.push(linea('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`));
-  const defBase = num(sc.defensa), defEf = creepDefensaEfectiva(sc);
-  L.push(linea('Defensa', defEf !== defBase ? `${fmt(defEf)} (base ${fmt(defBase)}, reducida por estado)` : fmt(defBase)));
-  if(sc.armaduraTipo) L.push(linea('Armadura', sc.armaduraTipo));
-  L.push(linea('Atributos', `Con ${fmt(num(sc.con))} · Fue ${fmt(num(sc.fue))} · Agi ${fmt(num(sc.agl))} · Des ${fmt(num(sc.des))} · Int ${fmt(num(sc.int))}`));
-  L.push(linea('Daño de arma', danoTxt(sc)));
+  // Recuadro con título chico y valor destacado; tip = texto al pasar el mouse.
+  const caja = (label, valor, tip) => `<div class="vc-caja${tip ? ' con-tip' : ''}"${tip ? ` data-tip="${esc(tip)}"` : ''}>
+      <span class="vc-caja-label">${esc(label)}</span><span class="vc-caja-valor">${esc(valor)}</span></div>`;
+  const seccion = (titulo, contenido) => `<div class="vc-seccion"><div class="sect-label">${esc(titulo)}</div>${contenido}</div>`;
+
   const critLabels = ['Tipo 2','Tipo 4','Tipo 6','Tipo 8','Tipo 10'];
-  const critTxt = sc.crit.map((v,i) => v ? `${critLabels[i]} ${v>0?'+':''}${fmt(v)}` : '').filter(Boolean).join(', ');
-  if(critTxt) L.push(linea('Resistencia a críticos', critTxt));
-  if(sc.habilidades.length) L.push(linea('Habilidades', sc.habilidades.map(h=>h.nombre||'(sin nombre)').join(', ')));
-  if(sc.estados.length) L.push(linea('Estados', sc.estados.map(es=>`${es.nombre} (${fmt(num(es.turnos))}t)`).join(', ')));
+  const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, conSigno(creepCritEfectivo(sc, i))) : '').join('');
+
+  const habilidades = sc.habilidades.map(h => {
+    const partes = [];
+    const costo = costoNitrosHabCreep(sc, h);
+    partes.push(costo ? `${fmt(costo)} No2` : 'Sin costo');
+    if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
+    const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}`;
+    return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
+  }).join('');
+
+  const estados = sc.estados.map(es => {
+    const dura = es.permanente ? 'permanente' : `${fmt(num(es.turnos))}t`;
+    return `<span class="vc-chip vc-estado-${es.polaridad || 'otro'} con-tip" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</span>`;
+  }).join('');
 
   $('#view-title-header').textContent = sc.nombre || 'Creep';
   $('#view-body').innerHTML = `
@@ -3299,8 +3332,25 @@ function verCreep(id){
       <div class="view-image-wrap">${sc.imagen ? `<img src="${esc(sc.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
       <div class="view-info">
         <div class="view-title">${esc(sc.nombre)}</div>
-        <div class="view-lines">${L.filter(Boolean).join('')}</div>
+        <div class="vc-cajas vc-3">
+          ${caja('Nivel', fmt(num(sc.nivel)))}
+          ${caja('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`)}
+          ${caja('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`)}
+        </div>
       </div>
+    </div>
+    <div class="vc-cuerpo">
+      ${seccion('Atributos', `<div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
+        const mod = creepModTotal(sc, a);
+        return caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${conSigno(mod)} por ${origenesModCreep(sc, a).join(', ')}` : '');
+      }).join('')}</div>`)}
+      ${seccion('Daño y defensa', `<div class="vc-cajas vc-auto">
+        ${caja('Daño', ataqueCreepTxt(sc), ataqueOrigenTxt(sc))}
+        ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
+        ${crits}
+      </div>`)}
+      ${seccion('Habilidades', habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>')}
+      ${seccion('Estados alterados', estados ? `<div class="vc-chips">${estados}</div>` : '<div class="hint">Sin estados.</div>')}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;

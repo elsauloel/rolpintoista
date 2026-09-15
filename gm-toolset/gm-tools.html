@@ -2392,9 +2392,7 @@ function cardHtml(sc){
       </div>
 
       <div class="row3">
-        <div class="mini-f"><label>Vel.</label><input type="number" data-f="spd" data-id="${sc.id}" value="${sc.spd}"></div>
         <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
-        <div class="mini-f"><label>Armadura</label><input data-f="armaduraTipo" data-id="${sc.id}" value="${esc(sc.armaduraTipo)}" placeholder="tipo/-"></div>
       </div>
 
       <div>
@@ -3250,7 +3248,6 @@ function verCreep(id){
   L.push(linea('Nivel', fmt(num(sc.nivel))));
   L.push(linea('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`));
   L.push(linea('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`));
-  L.push(linea('Velocidad', fmt(num(sc.spd))));
   const defBase = num(sc.defensa), defEf = creepDefensaEfectiva(sc);
   L.push(linea('Defensa', defEf !== defBase ? `${fmt(defEf)} (base ${fmt(defBase)}, reducida por estado)` : fmt(defBase)));
   if(sc.armaduraTipo) L.push(linea('Armadura', sc.armaduraTipo));

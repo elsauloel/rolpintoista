@@ -208,6 +208,18 @@ input[type=file]{display:none}
 .mod-origen-btn.mod-plus{color:var(--absenta)}
 .mod-origen-btn.mod-minus{color:var(--danger)}
 .mod-origen-btn.efectivo-badge{color:var(--wine)}
+/* Ataque y Defensa del editor del creep: al pasar el mouse se ve de dónde sale el valor. */
+.con-tip{position:relative}
+.con-tip:hover::after{
+  content:attr(data-tip);position:absolute;left:0;top:calc(100% + 4px);z-index:5;min-width:100%;max-width:280px;
+  background:#0F0C0E;border:1px solid var(--copper);border-radius:var(--r);padding:6px 9px;
+  font-family:"Space Mono",monospace;font-size:10.5px;line-height:1.5;color:var(--paper);white-space:pre-line;
+  text-transform:none;letter-spacing:0;pointer-events:none;box-shadow:0 8px 18px -6px rgba(0,0,0,.7)
+}
+.valor-fijo{
+  background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);padding:4px 2px;
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;text-align:center;color:var(--brass);cursor:help
+}
 
 .sect-label{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);margin-top:2px}
 
@@ -1863,6 +1875,53 @@ function creepCritEfectivo(sc, i){
   if(rota) v = Math.floor(v / 2);
   return v;
 }
+// Cada fuente (equipo o estado activo) que le suma a un stat, con su valor.
+function aportesModCreep(sc, statId){
+  const out = [];
+  (sc.equipo||[]).forEach(it => {
+    const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
+    if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v});
+  });
+  (sc.estados||[]).forEach(es => {
+    if(es.activo === false) return;
+    const stacks = Math.max(1, num(es.stacks)||1);
+    const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
+    if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
+  });
+  return out;
+}
+const conSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
+
+// De dónde sale el Ataque (PdG): Destreza y lo que la sube, mods directos
+// de PdG y Lisiado (mismo cálculo que creepStatValor).
+function ataqueOrigenTxt(sc){
+  const L = [`Destreza base: ${fmt(num(sc.des))}`];
+  aportesModCreep(sc, 'des').forEach(a => L.push(`${conSigno(a.val)} Destreza por ${a.nombre}`));
+  aportesModCreep(sc, 'pdg').forEach(a => L.push(`${conSigno(a.val)} PdG por ${a.nombre}`));
+  if((sc.estados||[]).some(e => e.activo !== false && e.lisiado)) L.push('Lisiado: a la mitad');
+  L.push(`= ${fmt(creepStatValor(sc, 'pdg'))}`);
+  return L.join('\n');
+}
+
+// De dónde sale la Defensa: lo que da cada pieza de armadura, el resto
+// cargado a mano, y si la armadura está rota o arruinada.
+function defensaOrigenTxt(sc){
+  const L = [];
+  let deItems = 0;
+  (sc.equipo||[]).forEach(it => {
+    if(!num(it.def)) return;
+    deItems += num(it.def);
+    L.push(`${conSigno(num(it.def))} por ${it.nombre || '(sin nombre)'}`);
+  });
+  const resto = num(sc.defensa) - deItems;
+  if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+  const {arruinada, rota} = creepEstadosArmadura(sc);
+  if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
+  if(rota) L.push('Armadura rota: a la mitad');
+  L.push(`= ${fmt(creepDefensaEfectiva(sc))}`);
+  return L.join('\n');
+}
+
 function creepArmaduraOrigenTxt(sc){
   const activos = (sc.estados||[]).filter(e => e.activo !== false && (e.armaduraRota || e.armaduraArruinada));
   const nombres = activos.map(e => e.nombre || '(sin nombre)').join(', ');
@@ -2402,8 +2461,9 @@ function cardHtml(sc){
         </div>
       </div>
 
-      <div class="row3">
-        <div class="mini-f"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
+      <div class="row3" style="grid-template-columns:1fr 1fr">
+        <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque (PdG)</label><div class="valor-fijo">${fmt(creepStatValor(sc, 'pdg'))}</div></div>
+        <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
       </div>
 
 

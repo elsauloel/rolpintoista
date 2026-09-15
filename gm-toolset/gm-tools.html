@@ -536,6 +536,9 @@ input[type=file]{display:none}
 #mesa.arrastrando #mesa-cabecera{cursor:grabbing}
 #mesa.colapsada #mesa-cabecera{border-bottom:none}
 #mesa.aviso #mesa-cabecera{background:var(--wine)}
+.dados3d-boton{background:none;border:none;padding:0 2px;font-size:14px;cursor:pointer;line-height:1}
+.dados3d-config{color:var(--muted);text-decoration:none;font-size:12px}
+.dados3d-config:hover{color:var(--brass)}
 #mesa-cabecera .fb-inicio{color:var(--muted);text-decoration:none;font-size:13px;padding:0 2px}
 #mesa-cabecera .fb-inicio:hover{color:var(--brass)}
 #mesa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
@@ -1019,6 +1022,7 @@ input[type=file]{display:none}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/respaldo.js"></script>
+<script src="../comun/dados3d.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
@@ -4669,6 +4673,7 @@ async function mesaPublicar(origen, r){
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
+  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   let hayAjena = false;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
@@ -4689,6 +4694,10 @@ function mesaRender(docs){
     cuerpo.appendChild(div);
   });
   mesaIdsVistos = new Set(docs.map(d => d.id));
+  // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
+  if(!primeraVez && typeof dadosAnimarTirada === 'function'){
+    docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
+  }
   if(hayAjena && $('#mesa').classList.contains('colapsada')) $('#mesa').classList.add('aviso');
 }
 
@@ -4711,12 +4720,13 @@ async function mesaIniciar(){
   mesa.id = 'mesa';
   mesa.innerHTML =
     '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
-      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">🎲 Mesa</span><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
+      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + '<a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙</a><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-cuerpo"></div>' +
     '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>';
   document.body.appendChild(mesa);
   const cabecera = $('#mesa-cabecera');
+  dadosConectarBoton(mesa);
 
   // Tirada libre por fórmula, igual que en el mapa: se publica en la Mesa
   // y queda en el historial de la sesión.
@@ -4751,7 +4761,7 @@ async function mesaIniciar(){
 
   let arrastre = null, recienMovida = false;
   cabecera.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.target.closest('.fb-inicio')) return;
+    if(e.button !== 0 || e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config')) return;
     const r = mesa.getBoundingClientRect();
     arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
     cabecera.setPointerCapture(e.pointerId);
@@ -4790,7 +4800,7 @@ async function mesaIniciar(){
   aplicarColapso(colapsada);
   cabecera.onclick = e => {
     if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
-    if(!e.target.closest('.fb-inicio')) aplicarColapso(!mesa.classList.contains('colapsada'));
+    if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config')) aplicarColapso(!mesa.classList.contains('colapsada'));
   };
 
   // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.

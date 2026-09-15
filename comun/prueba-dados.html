@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prueba de dados 3D — Rol Pintoísta</title>
+<title>Tus dados — Rol Pintoísta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* Página de prueba para elegir cómo se ven y suenan los dados 3D antes de
-   sumarlos a mapa, ficha y gm-tools. No usa Firebase ni guarda nada en la
-   partida: lo elegido queda en este navegador (localStorage). Librería:
-   dice-box-threejs (MIT), desde jsDelivr, con sus texturas y sonidos. */
+/* Configuración de los dados 3D de este navegador: lo que se elige acá es
+   lo que se ve en mapa, ficha y gm-tools (localStorage 'dados3d', ver
+   comun/dados3d.js). No usa Firebase ni guarda nada en la partida. */
 :root{
   --ink:#0F0C0E; --panel:#1A1418; --line:#3B2E34; --copper:#C98545; --brass:#E0A458;
   --paper:#EDE3D2; --muted:#9A867E; --r:3px;
@@ -57,8 +56,9 @@ input[type=color]{width:44px;height:30px;border:1px solid var(--line);background
 </head>
 <body>
 <aside>
-  <h1>🎲 Dados 3D</h1>
-  <p class="sub">Página de prueba: elegí colores, material y sonido. No se guarda nada en la partida.</p>
+  <h1>🎲 Tus dados</h1>
+  <p class="sub">Elegí cómo se ven y suenan los dados. Se usa en el mapa, la ficha y gm-tools de este navegador (los demás ven los suyos).</p>
+  <button type="button" class="btn chico" id="por-defecto">Volver al estilo de la mesa</button>
 
   <label class="check"><input type="checkbox" id="animacion" checked> Animación de dados activada</label>
 
@@ -118,9 +118,9 @@ input[type=color]{width:44px;height:30px;border:1px solid var(--line);background
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/dist/dice-box-threejs.umd.js"></script>
+<script src="dados3d.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-const RECURSOS = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/public/';
 const DiceBox = (() => { const m = window['dice-box-threejs']; return m && m.default ? m.default : m; })();
 
 // Juegos de colores de la librería que tienen sentido para el juego.
@@ -144,23 +144,22 @@ $('#textura').innerHTML = TEXTURAS.map(([v, t]) => `<option value="${v}">${t}</o
 $('#rapidos').innerHTML = ['1d2', '1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '3d6', '2d20+5', '1d20+1d8+2']
   .map(f => `<button type="button" class="btn chico" data-f="${f}">${f}</button>`).join('');
 
-/* ---------- Preferencias (quedan en este navegador) ---------- */
-const CAMPOS = ['animacion', 'colorset', 'color-fondo', 'color-numero', 'color-borde', 'textura', 'material', 'tamano', 'fuerza', 'sombras', 'sonido', 'superficie', 'volumen'];
-function leerPrefs(){
-  try{
-    const p = JSON.parse(localStorage.getItem('dados3d-prueba') || '{}');
-    CAMPOS.forEach(id => {
-      if(p[id] === undefined) return;
-      const el = $('#' + id);
-      if(el.type === 'checkbox') el.checked = !!p[id]; else el.value = p[id];
-    });
-  }catch(e){}
+/* ---------- Preferencias (compartidas con las herramientas) ---------- */
+const CAMPOS = Object.keys(DADOS_DEFECTO);
+function ponerEnPantalla(p){
+  CAMPOS.forEach(id => {
+    const el = $('#' + id);
+    if(!el || p[id] === undefined) return;
+    if(el.type === 'checkbox') el.checked = !!p[id]; else el.value = p[id];
+  });
 }
-function guardarPrefs(){
+function leerPantalla(){
   const p = {};
-  CAMPOS.forEach(id => { const el = $('#' + id); p[id] = el.type === 'checkbox' ? el.checked : el.value; });
-  try{ localStorage.setItem('dados3d-prueba', JSON.stringify(p)); }catch(e){}
+  CAMPOS.forEach(id => { const el = $('#' + id); if(el) p[id] = el.type === 'checkbox' ? el.checked : el.value; });
+  return p;
 }
+function leerPrefs(){ ponerEnPantalla(dadosPrefs()); }
+function guardarPrefs(){ dadosGuardarPrefs(leerPantalla()); }
 
 /* ---------- Caja de dados ----------
    Se vuelve a armar cuando cambia algo del aspecto o del sonido (la
@@ -168,30 +167,7 @@ function guardarPrefs(){
 let caja = null;
 let armando = null;
 
-function config(){
-  const personal = $('#colorset').value === 'personalizado';
-  const material = $('#material').value;
-  const c = {
-    assetPath: RECURSOS,
-    sounds: $('#sonido').checked,
-    volume: Number($('#volumen').value),
-    shadows: $('#sombras').checked,
-    theme_surface: $('#superficie').value,
-    theme_material: material,
-    baseScale: Number($('#tamano').value),
-    strength: Number($('#fuerza').value),
-    gravity_multiplier: 400,
-    light_intensity: 0.8,
-  };
-  if(personal){
-    // El nombre identifica la combinación: la librería guarda cada juego por nombre.
-    const fondo = $('#color-fondo').value, numero = $('#color-numero').value, borde = $('#color-borde').value, textura = $('#textura').value;
-    c.theme_customColorset = {name: `rp-${fondo}-${numero}-${borde}-${textura}-${material}`, foreground: numero, background: fondo, outline: borde, texture: textura, material};
-  }else{
-    c.theme_colorset = $('#colorset').value;
-  }
-  return c;
-}
+function config(){ return dadosConfigLibreria(leerPantalla()); }
 
 async function armarCaja(){
   $('#personalizado').hidden = $('#colorset').value !== 'personalizado';
@@ -279,6 +255,7 @@ $('#rapidos').onclick = e => { const b = e.target.closest('[data-f]'); if(b){ $(
   $('#volumen-v').textContent = $('#volumen').value + '%';
 }));
 window.addEventListener('resize', rearmar);
+$('#por-defecto').onclick = () => { ponerEnPantalla(DADOS_DEFECTO); armarCaja(); };
 
 if(!DiceBox){
   $('#aviso').textContent = 'No se pudo cargar la librería de dados (¿sin internet?).';

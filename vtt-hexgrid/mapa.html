@@ -112,7 +112,11 @@ aside{
 .chip{font-size:11px;padding:1px 7px;border:1px solid;border-left-width:4px;border-radius:var(--r);background:rgba(0,0,0,.25)}
 
 #mesa{flex:1;display:flex;flex-direction:column;min-height:0;font-family:"Space Mono",monospace;font-size:12px}
-#mesa h2{padding:12px 14px 0;margin:0}
+#mesa h2{padding:12px 14px 0;margin:0;display:flex;align-items:center;gap:8px}
+.dados3d-boton{background:none;border:none;padding:0 2px;font-size:14px;cursor:pointer;line-height:1}
+.dados3d-config{color:var(--muted);text-decoration:none;font-size:12px}
+.dados3d-config:hover{color:var(--brass)}
+
 #mesa-cuerpo{flex:1;overflow-y:auto;padding:8px 14px;display:flex;flex-direction:column;gap:5px}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:var(--line-soft);transition:background 1.2s}
 .mesa-tirada.nueva{background:var(--wine);transition:none}
@@ -172,7 +176,7 @@ aside{
   <aside>
     <div class="seccion" id="panel-token"></div>
     <div id="mesa">
-      <h2>🎲 Mesa</h2>
+      <h2><span>Mesa</span><span id="mesa-dados"></span><a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙ dados</a></h2>
       <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
       <form id="mesa-tirar">
         <input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off">
@@ -193,6 +197,7 @@ aside{
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/dados3d.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1739,6 +1744,7 @@ async function mesaPublicar(origen, r){
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
+  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
     const t = d.data({serverTimestamps: 'estimate'});
@@ -1757,6 +1763,10 @@ function mesaRender(docs){
     cuerpo.appendChild(div);
   });
   mesaIdsVistos = new Set(docs.map(d => d.id));
+  // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
+  if(!primeraVez && typeof dadosAnimarTirada === 'function'){
+    docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
+  }
 }
 
 function mesaEscuchar(){
@@ -1768,6 +1778,9 @@ function mesaEscuchar(){
       $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudieron leer las tiradas — mirá la consola.</div>';
     });
 }
+
+$('#mesa-dados').innerHTML = dadosBotonHtml();
+dadosConectarBoton($('#mesa-dados'));
 
 $('#mesa-tirar').onsubmit = e => {
   e.preventDefault();

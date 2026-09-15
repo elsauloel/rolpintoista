@@ -75,6 +75,12 @@ nuevo de Rol Pintoísta. Paso 2 de
 Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
 la interfaz: el GM **no** mueve tokens de PJ (solo reasigna el dueño).
 
+- **Dados 3D** (`../comun/dados3d.js`, también en gm-tools): cada tirada
+  nueva de la Mesa rueda encima del mapa y cae en el resultado real. En la
+  cabecera de la Mesa, 🎲 prende o apaga la animación y "⚙ dados" abre
+  `../comun/prueba-dados.html` para elegir el estilo (por navegador, en
+  `localStorage` 'dados3d'). No escribe nada en Firebase.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; ocultar tokens; tiradas desde el token.

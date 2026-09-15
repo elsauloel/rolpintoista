@@ -35,6 +35,18 @@ que verse en vivo entre jugadores.
    partida, o creás una nueva (quedás como su GM).
    Arriba, "✎ Mi nombre" permite cambiar el nombre en cada partida donde
    estás (y, si sos el GM, también el `gmNombre` de la partida).
+   Al pie de la página de la partida:
+   - **GM, "⚙ Partida"**: jugadores con sus personajes y botón Sacar
+     (borra su `miembros/{uid}`; puede volver a unirse); "Pasar un
+     personaje a otro jugador" (cambia `duenoUid` de la ficha y de sus
+     tokens de PJ, incluidas las invocaciones `<fichaId>~…`; los personajes
+     de quien se fue aparecen "sin jugador"); renombrar; y borrar la
+     partida (ofrece bajar el respaldo y pide escribir el nombre). Borrar
+     recorre cada colección (fichas/partes, creeps/privado, tokens,
+     tiradas, mapa, gm, tienda, tiendas, miembros) y al final borra la
+     partida y el miembro del GM. Si se corta, se vuelve a tocar.
+   - **Jugador, "Irme de esta partida"**: borra su miembro; sus personajes
+     quedan a nombre de su cuenta.
 3. Página de la partida: links a las herramientas con `?partida=<id>`
    (GM Tools y el generador de tiendas solo para el GM; la ficha para
    jugadores, y para el GM en solo lectura).
@@ -85,7 +97,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   parte es el JSON de esas claves de `S`; las imágenes embebidas de ítems,
   habilidades, etc. se guardan vacías a propósito. `miniatura` es el
   retrato achicado a 96 px para el token del mapa. Todos los miembros leen
-  todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools) y solo puede cambiar `duenoUid`. La ficha
+  todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools); solo puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
   muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se
@@ -186,10 +198,10 @@ restaurarlos.
   (solo la primera opción, no "vínculo de correo electrónico").
 - **Dominios autorizados**: Authentication → Configuración → Dominios
   autorizados → `elsauloel.github.io`.
-- **Sacar a alguien de una partida**: borrar su documento en
-  `campanas/{id}/miembros` (más adelante, desde la página de la partida).
-- **Borrar una partida entera**: en Firestore, sobre el documento de la
-  partida, "Eliminar documento" marcando también las subcolecciones.
+- **Sacar a alguien o borrar una partida**: desde "⚙ Partida" en la página
+  de la partida (ver arriba). Por consola sigue funcionando: borrar su
+  documento en `campanas/{id}/miembros`, o "Eliminar documento" sobre la
+  partida marcando también las subcolecciones.
 
 ## Cómo probar
 

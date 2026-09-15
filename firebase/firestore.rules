@@ -104,7 +104,8 @@ service cloud.firestore {
       // actualizado}; contenido en partes/{parte}: {json, actualizado}.
       // Son solo de jugadores: todos los miembros las ven; solo el dueño las
       // crea, modifica y borra. El GM no crea ni edita fichas (lo suyo va en
-      // gm-tools); solo puede reasignar el dueño.
+      // gm-tools); solo puede reasignar el dueño y borrarlas (lo usa "Borrar
+      // la partida" en el inicio).
       match /fichas/{f} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
@@ -125,13 +126,14 @@ service cloud.firestore {
             || (esGM(c)
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid']))
           );
-        allow delete: if esMiembro(c) && resource.data.duenoUid == request.auth.uid;
+        allow delete: if esMiembro(c) && (resource.data.duenoUid == request.auth.uid || esGM(c));
 
         match /partes/{p} {
           allow read: if esMiembro(c);
           allow write: if esMiembro(c)
             && get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid
             && !esGM(c);
+          allow delete: if esGM(c);
         }
       }
 

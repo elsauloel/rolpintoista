@@ -91,6 +91,19 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
 .fila-nombre .partida small{display:block;color:var(--muted);font-size:11.5px}
 .fila-nombre input{padding:7px 9px;font-size:14px}
 @media(max-width:560px){.fila-nombre{grid-template-columns:1fr auto}.fila-nombre .partida{grid-column:1 / -1}}
+.btn.peligro{border-color:var(--wine);color:var(--danger)}
+.btn.peligro:hover:not(:disabled){border-color:var(--danger);background:rgba(212,87,78,.12)}
+.caja.peligro{border-color:var(--wine)}
+select{
+  background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r);color:var(--paper);padding:6px 8px;font-family:inherit;font-size:13.5px;max-width:100%
+}
+select option{background:var(--panel)}
+.miembro{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.miembro:last-child{border-bottom:none}
+.miembro .quien{flex:1;min-width:180px}
+.miembro .quien small{display:block;color:var(--muted);font-size:12.5px}
+.miembro.huerfano .quien{color:var(--brass)}
+.subtitulo{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 2px}
 .nota{margin-top:30px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:13.5px}
 </style>
 </head>
@@ -238,6 +251,56 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
           <span class="tag">En construcción</span>
         </a>
       </div>
+
+      <!-- Manejo de la partida: solo el GM -->
+      <div data-solo="gm">
+        <h2>⚙ Partida</h2>
+        <div class="caja">
+          <b>Jugadores</b>
+          <div id="gestion-jugadores"></div>
+          <div id="gestion-personajes"></div>
+          <div class="error" id="gestion-error"></div>
+        </div>
+
+        <div class="caja" style="margin-top:12px">
+          <form id="form-renombrar">
+            <label for="in-renombrar" style="margin-top:0"><b style="color:var(--paper);font-size:15px">Nombre de la partida</b></label>
+            <div class="fila" style="margin-top:4px;flex-wrap:nowrap">
+              <input id="in-renombrar" maxlength="60" required>
+              <button type="submit" class="btn">Guardar</button>
+            </div>
+            <div class="error" id="renombrar-error"></div>
+          </form>
+        </div>
+
+        <div class="caja peligro" style="margin-top:12px">
+          <b>Borrar la partida</b>
+          <p class="vacio" style="margin:6px 0 0">Borra todo para todos: personajes, creeps, mapa, tokens, tiradas y tiendas. No se puede deshacer.</p>
+          <div class="fila"><button type="button" class="btn peligro" id="btn-borrar-partida">Borrar la partida…</button></div>
+          <div id="borrar-confirmar" hidden>
+            <p style="margin:16px 0 0">1. Si querés guardar algo, bajá antes el respaldo:</p>
+            <div class="fila" style="margin-top:6px"><button type="button" class="btn" id="btn-respaldo">💾 Bajar respaldo</button><span class="vacio" id="respaldo-estado"></span></div>
+            <label for="in-borrar-nombre">2. Escribí el nombre de la partida (<b id="borrar-nombre"></b>) para confirmar:</label>
+            <input id="in-borrar-nombre" autocomplete="off">
+            <div class="fila">
+              <button type="button" class="btn peligro" id="btn-borrar-definitivo" disabled>Borrar para siempre</button>
+              <button type="button" class="btn" id="btn-borrar-cancelar">Cancelar</button>
+            </div>
+            <div class="vacio" id="borrar-estado" style="margin-top:10px"></div>
+            <div class="error" id="borrar-error"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Irse: solo jugadores -->
+      <div data-solo="jugador">
+        <h2>Tu lugar en la partida</h2>
+        <div class="caja">
+          <p class="vacio" style="margin:0">Si te vas, tus personajes quedan en la partida. Si volvés a unirte con esta misma cuenta, siguen siendo tuyos.</p>
+          <div class="fila"><button type="button" class="btn peligro" id="btn-irme">Irme de esta partida</button></div>
+          <div class="error" id="irme-error"></div>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -246,6 +309,7 @@ a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--c
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="comun/sesion.js"></script>
+<script src="comun/respaldo.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
@@ -548,7 +612,234 @@ async function irAPartida(id){
     el.hidden = el.dataset.solo === 'gm' ? !miembro.gm : !!miembro.gm;
   });
   $('#herramientas').hidden = false;
+  if(miembro.gm){
+    $('#in-renombrar').value = p.nombre;
+    cerrarBorrar();
+    cargarGestion();
+  }
 }
+
+/* ---------- Manejo de la partida (GM) ----------
+   Jugadores con sus personajes, sacar a alguien, pasar un personaje a otro
+   jugador, renombrar y borrar la partida. Sacar no bloquea: el que sale
+   puede volver a unirse, y sus personajes (que quedan) vuelven a ser suyos
+   porque siguen a nombre de su cuenta. */
+
+let gestion = {miembros: [], fichas: []};
+const fechaMs = t => t && t.toMillis ? t.toMillis() : 0;
+const fechaTxt = t => t && t.toDate ? t.toDate().toLocaleDateString('es-AR', {day: 'numeric', month: 'short', year: 'numeric'}) : '';
+
+async function cargarGestion(){
+  $('#gestion-error').textContent = '';
+  $('#gestion-jugadores').innerHTML = '<p class="vacio">Cargando jugadores…</p>';
+  $('#gestion-personajes').innerHTML = '';
+  try{
+    const [m, f] = await Promise.all([
+      fbDb.collection(fbRutaCampana('miembros')).get(),
+      fbDb.collection(fbRutaCampana('fichas')).get(),
+    ]);
+    gestion.miembros = m.docs.map(d => ({uid: d.id, ...d.data()}))
+      .sort((a, b) => (!!b.gm - !!a.gm) || fechaMs(a.creado) - fechaMs(b.creado));
+    gestion.fichas = f.docs.map(d => ({id: d.id, ...d.data()}))
+      .sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'));
+    renderGestion();
+  }catch(err){
+    console.error('No se pudieron leer los jugadores:', err);
+    $('#gestion-jugadores').innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+  }
+}
+
+function renderGestion(){
+  const {miembros, fichas} = gestion;
+  const nombreFicha = f => esc(f.nombre || 'Sin nombre') + (f.resumen && f.resumen.nivel ? ` <small style="display:inline">· Lv ${esc(f.resumen.nivel)}</small>` : '');
+  $('#gestion-jugadores').innerHTML = miembros.map(m => {
+    const suyos = fichas.filter(f => f.duenoUid === m.uid).map(f => esc(f.nombre || 'Sin nombre'));
+    const detalle = m.gm ? 'GM' : (suyos.length ? `Personajes: ${suyos.join(', ')}` : 'Sin personajes');
+    const entro = fechaTxt(m.creado);
+    return `<div class="miembro">
+      <span class="quien">${esc(m.nombre)}${m.uid === fbUsuario.uid ? ' (vos)' : ''}<small>${detalle}${entro ? ` · entró el ${esc(entro)}` : ''}</small></span>
+      ${m.gm ? '<span class="tag gm">GM</span>' : `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`}
+    </div>`;
+  }).join('') || '<p class="vacio">No hay nadie.</p>';
+  $('#gestion-jugadores').querySelectorAll('[data-sacar]').forEach(b => b.onclick = () => sacarJugador(b.dataset.sacar, b));
+
+  // Pasar personajes: sirve cuando alguien cambió de cuenta o se fue.
+  const jugadores = miembros.filter(m => !m.gm);
+  if(!fichas.length){
+    $('#gestion-personajes').innerHTML = '';
+    return;
+  }
+  $('#gestion-personajes').innerHTML = '<div class="subtitulo">Pasar un personaje a otro jugador</div>' + fichas.map(f => {
+    const tieneJugador = jugadores.some(j => j.uid === f.duenoUid);
+    const opciones = (tieneJugador ? '' : '<option value="" selected>— sin jugador (se fue) —</option>') +
+      jugadores.map(j => `<option value="${esc(j.uid)}"${j.uid === f.duenoUid ? ' selected' : ''}>${esc(j.nombre)}</option>`).join('');
+    return `<div class="miembro${tieneJugador ? '' : ' huerfano'}">
+      <span class="quien">${nombreFicha(f)}</span>
+      <select data-ficha="${esc(f.id)}" aria-label="Jugador de ${esc(f.nombre || 'este personaje')}"${jugadores.length ? '' : ' disabled'}>${opciones}</select>
+    </div>`;
+  }).join('');
+  $('#gestion-personajes').querySelectorAll('select[data-ficha]').forEach(s => s.onchange = () => pasarPersonaje(s));
+}
+
+async function sacarJugador(uid, boton){
+  const m = gestion.miembros.find(x => x.uid === uid);
+  if(!m) return;
+  if(!confirm(`¿Sacar a ${m.nombre} de la partida?\n\nSus personajes quedan y los podés pasar a otro jugador. Puede volver a unirse; si lo hace con la misma cuenta, sus personajes vuelven a ser suyos.`)) return;
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${uid}`)).delete();
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo sacar al jugador:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+
+// Cambia el dueño de la ficha y de sus tokens (el del personaje y los de sus
+// invocaciones, "<fichaId>~<idInvocación>"), para que el nuevo jugador los mueva.
+async function pasarPersonaje(select){
+  const f = gestion.fichas.find(x => x.id === select.dataset.ficha);
+  const nuevo = gestion.miembros.find(x => x.uid === select.value);
+  if(!f || !nuevo){ renderGestion(); return; }
+  if(!confirm(`¿Pasarle ${f.nombre || 'este personaje'} a ${nuevo.nombre}?\n\nVa a poder editar la ficha y mover sus tokens en el mapa.`)){ renderGestion(); return; }
+  $('#gestion-error').textContent = '';
+  select.disabled = true;
+  try{
+    const tokens = await fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get();
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(fbRutaCampana(`fichas/${f.id}`)), {duenoUid: nuevo.uid});
+    tokens.docs
+      .filter(t => { const v = t.data().fichaId || ''; return v === f.id || v.startsWith(f.id + '~'); })
+      .forEach(t => lote.update(t.ref, {duenoUid: nuevo.uid}));
+    await lote.commit();
+    f.duenoUid = nuevo.uid;
+  }catch(err){
+    console.error('No se pudo pasar el personaje:', err);
+    $('#gestion-error').textContent = textoError(err);
+  }
+  renderGestion();
+}
+
+$('#form-renombrar').onsubmit = async e => {
+  e.preventDefault();
+  const nombre = $('#in-renombrar').value.trim().slice(0, 60);
+  const boton = $('#form-renombrar button');
+  $('#renombrar-error').textContent = '';
+  if(!nombre || !fbPartida || nombre === fbPartida.nombre) return;
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana()).update({nombre});
+    fbPartida.nombre = nombre;
+    $('#partida-nombre').textContent = nombre;
+    $('#borrar-nombre').textContent = nombre;
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+  }catch(err){
+    console.error('No se pudo renombrar la partida:', err);
+    $('#renombrar-error').textContent = textoError(err);
+  }finally{
+    boton.disabled = false;
+  }
+};
+
+/* Borrar la partida: Firebase no borra "la carpeta entera" desde el
+   navegador, así que se borra cada documento. Primero lo de adentro, al
+   final la partida y el miembro del GM (sin él, las reglas ya no lo dejan
+   borrar nada). Si se corta a mitad de camino, se puede volver a tocar. */
+
+function cerrarBorrar(){
+  $('#borrar-confirmar').hidden = true;
+  $('#btn-borrar-partida').hidden = false;
+  $('#in-borrar-nombre').value = '';
+  $('#btn-borrar-definitivo').disabled = true;
+  ['#borrar-estado', '#borrar-error', '#respaldo-estado'].forEach(s => { $(s).textContent = ''; });
+}
+
+$('#btn-borrar-partida').onclick = () => {
+  $('#borrar-nombre').textContent = fbPartida.nombre;
+  $('#borrar-confirmar').hidden = false;
+  $('#btn-borrar-partida').hidden = true;
+};
+$('#btn-borrar-cancelar').onclick = cerrarBorrar;
+$('#in-borrar-nombre').oninput = () => {
+  $('#btn-borrar-definitivo').disabled = $('#in-borrar-nombre').value.trim() !== String(fbPartida.nombre).trim();
+};
+
+$('#btn-respaldo').onclick = async () => {
+  const b = $('#btn-respaldo');
+  b.disabled = true;
+  $('#respaldo-estado').textContent = 'Armando el respaldo…';
+  try{
+    $('#respaldo-estado').textContent = await fbBajarRespaldo();
+  }catch(err){
+    console.error('No se pudo bajar el respaldo:', err);
+    $('#respaldo-estado').textContent = textoError(err);
+  }finally{
+    b.disabled = false;
+  }
+};
+
+async function borrarDocumentos(refs){
+  for(let i = 0; i < refs.length; i += 400){
+    const lote = fbDb.batch();
+    refs.slice(i, i + 400).forEach(r => lote.delete(r));
+    await lote.commit();
+  }
+}
+
+$('#btn-borrar-definitivo').onclick = async () => {
+  if(!confirm(`Última confirmación: ¿borrar "${fbPartida.nombre}" para siempre?`)) return;
+  const base = fbDb.doc(fbRutaCampana());
+  const estado = t => { $('#borrar-estado').textContent = t; };
+  const botones = ['#btn-borrar-definitivo', '#btn-borrar-cancelar', '#btn-respaldo'];
+  botones.forEach(s => { $(s).disabled = true; });
+  $('#borrar-error').textContent = '';
+  try{
+    // Colecciones con subcolecciones: primero los hijos.
+    for(const [col, sub, texto] of [['fichas', 'partes', 'personajes'], ['creeps', 'privado', 'creeps']]){
+      estado(`Borrando ${texto}…`);
+      const snap = await base.collection(col).get();
+      for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));
+      await borrarDocumentos(snap.docs.map(d => d.ref));
+    }
+    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas']]){
+      estado(`Borrando ${texto}…`);
+      await borrarDocumentos((await base.collection(col).get()).docs.map(d => d.ref));
+    }
+    estado('Borrando jugadores…');
+    const miembros = await base.collection('miembros').get();
+    await borrarDocumentos(miembros.docs.filter(d => d.id !== fbUsuario.uid).map(d => d.ref));
+    await base.delete();
+    await base.collection('miembros').doc(fbUsuario.uid).delete();
+    fbRecordarPartida('');
+    await verPartidas();
+  }catch(err){
+    console.error('No se pudo borrar la partida:', err);
+    estado('');
+    $('#borrar-error').textContent = textoError(err) + ' Podés volver a intentarlo: sigue desde donde quedó.';
+    botones.forEach(s => { $(s).disabled = false; });
+  }
+};
+
+/* ---------- Irse de la partida (jugador) ---------- */
+
+$('#btn-irme').onclick = async () => {
+  if(!confirm(`¿Irte de "${fbPartida.nombre}"?\n\nTus personajes quedan en la partida. Si volvés a unirte con esta cuenta, siguen siendo tuyos.`)) return;
+  $('#irme-error').textContent = '';
+  $('#btn-irme').disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).delete();
+    fbRecordarPartida('');
+    await verPartidas();
+  }catch(err){
+    console.error('No se pudo salir de la partida:', err);
+    $('#irme-error').textContent = textoError(err);
+  }finally{
+    $('#btn-irme').disabled = false;
+  }
+};
 
 $('#form-unirse').onsubmit = async e => {
   e.preventDefault();

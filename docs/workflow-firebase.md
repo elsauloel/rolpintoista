@@ -61,6 +61,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`.
+  **Historial solo de la sesión** ([`../comun/mesa-historial.js`](../comun/mesa-historial.js),
+  en las tres herramientas): el GM ve 🗑 en la cabecera de la Mesa, que
+  borra todas las tiradas de la partida; y cada vez que el GM entra a
+  cualquiera de las tres se borran solas las de más de 48 h (como mucho
+  una vez por hora por navegador). Para guardar una sesión, bajar antes el
+  respaldo 💾.
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},

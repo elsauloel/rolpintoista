@@ -81,7 +81,9 @@ nuevo de Rol Pintoísta. Paso 2 de
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.
 - Mesa al costado: mismas tiradas en vivo que ficha y gm-tools, más una
-  "tirada libre" por fórmula (`desde: 'mapa'`).
+  "tirada libre" por fórmula (`desde: 'mapa'`). El GM ve 🗑 para borrar el
+  historial y al entrar se limpian las de más de 48 h
+  (`../comun/mesa-historial.js`, igual que en ficha y gm-tools).
 
 Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
 la interfaz: el GM **no** mueve tokens de PJ (solo reasigna el dueño).

@@ -69,6 +69,9 @@ su casa:
     cada creep solo el token, la barra de vida y los estados.
   - El daño recibido lo aplica el dueño en su propia ficha.
   - Tiradas del GM: visibles para todos (tiradas secretas, más adelante).
+  - **Historial de tiradas solo de la sesión**: el GM lo borra a mano (🗑
+    en la Mesa) y se borra solo lo de más de 48 h cuando el GM entra a
+    una herramienta (no hay servidor que lo haga a hora fija).
   - **Vida de los creeps**: los jugadores solo ven cuán llena está la barra
     (se publica el porcentaje, no los números). Los creeps no tienen SP.
   - Barras: **vida roja, SP azul** (en tokens y Tablero).
@@ -108,7 +111,7 @@ su casa:
 | 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
 | 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
 | 4 | Cuentas y partidas: login con Google o email confirmado, inicio con la lista de partidas, crear (GM) o unirse (jugador), herramientas por partida (`?partida=`), sesión compartida en `comun/sesion.js` | Hecho, falta probar |
-| 4c | Manejo de la partida para el GM: ver jugadores, sacar a alguien, renombrar o borrar la partida | Pendiente |
+| 4c | Manejo de la partida para el GM: ver jugadores (con sus personajes), sacar a alguien, renombrar o borrar la partida (escribiendo el nombre, ofreciendo antes el respaldo); "Irme de esta partida" para jugadores. Decidido: los personajes del que se va quedan y el GM los reasigna; sacar no bloquea volver a unirse; borrar es de verdad (hay que cambiar reglas para que el GM borre fichas); el GM no se va ni pasa el rol | Pendiente, siguiente |
 | 5 | Tienda en vivo: el GM arma la tienda en el generador (se guarda sola), rerolea ítems sueltos, la publica o la cierra; guarda tiendas con nombre (una por lugar) para reabrirlas, modificarlas o regenerarlas; los jugadores la abren con 🏪 Vendedor en la ficha. Se van el token y los botones de GitHub del generador | Hecho, falta probar (y pegar las reglas nuevas en la consola) |
 
 **Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde

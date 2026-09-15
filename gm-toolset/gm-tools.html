@@ -531,6 +531,9 @@ input[type=file]{display:none}
 .dados3d-boton{background:none;border:none;padding:0 2px;font-size:14px;cursor:pointer;line-height:1}
 .dados3d-config{color:var(--muted);text-decoration:none;font-size:12px}
 .dados3d-config:hover{color:var(--brass)}
+.mesa-borrar{background:none;border:0;padding:0 2px;cursor:pointer;font-size:12px;opacity:.6}
+.mesa-borrar:hover{opacity:1}
+.mesa-borrar:disabled{cursor:wait;opacity:.3}
 #mesa-cabecera .fb-inicio{color:var(--muted);text-decoration:none;font-size:13px;padding:0 2px}
 #mesa-cabecera .fb-inicio:hover{color:var(--brass)}
 #mesa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
@@ -1013,6 +1016,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="../comun/sesion.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
+<script src="../comun/mesa-historial.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
@@ -4780,7 +4784,7 @@ async function mesaIniciar(){
   mesa.id = 'mesa';
   mesa.innerHTML =
     '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
-      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + '<a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙</a><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
+      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + '<a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙</a>' + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-cuerpo"></div>' +
     '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>';
@@ -4821,7 +4825,7 @@ async function mesaIniciar(){
 
   let arrastre = null, recienMovida = false;
   cabecera.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config')) return;
+    if(e.button !== 0 || e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) return;
     const r = mesa.getBoundingClientRect();
     arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
     cabecera.setPointerCapture(e.pointerId);
@@ -4860,7 +4864,7 @@ async function mesaIniciar(){
   aplicarColapso(colapsada);
   cabecera.onclick = e => {
     if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
-    if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config')) aplicarColapso(!mesa.classList.contains('colapsada'));
+    if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) aplicarColapso(!mesa.classList.contains('colapsada'));
   };
 
   // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
@@ -5194,6 +5198,7 @@ function gmEscuchar(){
 // Se llama cuando ya se entró a la mesa.
 function gmAlEntrar(){
   mesaEscuchar();
+  mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
   if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); }

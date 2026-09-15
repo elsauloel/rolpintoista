@@ -306,11 +306,6 @@ a{color:var(--brass)}
 /* ---------- Listas ---------- */
 .item{border:1px solid var(--line-soft);background:var(--panel2);padding:9px 11px;margin-bottom:8px;position:relative}
 .item:last-child{margin-bottom:0}
-/* Movimiento: siempre con un fondo distinguible del resto de las habilidades.
-   !important porque .cat-row/.habs-grid-item declaran su propio background
-   más abajo en la hoja de estilos y, a igual especificidad, ganarían por
-   orden de aparición. */
-.item-movimiento{background:rgba(91,141,190,.14)!important;border-color:rgba(91,141,190,.5)!important}
 .item .ihead{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
 .item .iname{font-weight:700;font-size:13.5px;line-height:1.3}
 .item .idesc{font-size:12px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
@@ -1775,6 +1770,8 @@ function migrarEstadoIt2(st){
   if(st.spGastado === undefined) st.spGastado = 0;
   delete st.acciones;  // los Nitros arrancan llenos (ver renderAll)
   if(st.ataquesTurno === undefined) st.ataquesTurno = 0;
+  // La habilidad base "Movimiento" se quitó: moverse se cobra desde el mapa.
+  if(Array.isArray(st.habilidades)) st.habilidades = st.habilidades.filter(h => !h || h.id !== 'movimiento');
   ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
     .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjIt2));
 }
@@ -1879,9 +1876,7 @@ const DEFAULT = {
   },
   inventario:[],
   cinturon:[],
-  habilidades:[
-    {id:'movimiento', nombre:'Movimiento', costo:'', categoria:'', job:false, origen:'Acción base', imagen:'', detalle:'Desplazarse por el mapa: 1 Nitro por casillero.'}
-  ],
+  habilidades:[],
   pasivas:[],
   sociales:[],
   efectos:[],
@@ -3127,9 +3122,9 @@ function aplicarEfectoDeConsumo(it){
 // Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y muestra
 // el popup de resultado, igual que un ataque o un chequeo manual.
 // El pop up de la tarjeta al ejecutar se puede prender/apagar por habilidad
-// desde la botonera. Movimiento arranca apagado por ser de uso constante.
+// desde la botonera.
 function popupHabilidadActivo(h){
-  return h.popupAlEjecutar ?? (h.nombre !== 'Movimiento');
+  return h.popupAlEjecutar ?? true;
 }
 
 function tirarExtraDeItem(it){
@@ -3557,7 +3552,7 @@ const LISTS = {
       const yaUsada = noEspameable && i.usadaEsteTurno === true;
       const sinNitros = sinNitrosPara(i);
       const bloqueada = sinNitros;
-      return `<div class="item${i.nombre==='Movimiento'?' item-movimiento':''}">
+      return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''} ${i.categoria?`<span class="tag cat">${esc(i.categoria)}</span>`:''}</div>
@@ -3698,7 +3693,7 @@ function renderTodasHabilidades(){
     const yaUsada = noEspameable && i.usadaEsteTurno === true;
     const sinNitros = sinNitrosPara(i);
     const bloqueada = sinNitros;
-    return `<div class="habs-grid-item${i.nombre==='Movimiento'?' item-movimiento':''}">
+    return `<div class="habs-grid-item">
       <div class="habs-grid-nombre">${esc(i.nombre)}</div>
       <div class="habs-grid-btns">
         <button class="mini" data-view="habilidades:${i.id}">Ver</button>
@@ -3788,7 +3783,7 @@ function renderBotonera(){
           const noEspameable = i.categoria === 'No espameable';
           const yaUsada = noEspameable && i.usadaEsteTurno === true;
           const sinNitros = sinNitrosPara(i);
-          return `<div class="cat-row${i.nombre==='Movimiento'?' item-movimiento':''}">
+          return `<div class="cat-row">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
@@ -4652,9 +4647,6 @@ function aplicarFicha(data){
         ];
       }
       if(!next.bitacora.some(p => p.id === next.bitacoraActiva)) next.bitacoraActiva = next.bitacora[0].id;
-      if(!next.habilidades.some(h => h.id === 'movimiento')){
-        next.habilidades = [structuredClone(fresh.habilidades[0]), ...next.habilidades];
-      }
       // Iteración 2 (Bonos → SP, Acciones/Mov → Nitros): ver migrarEstadoIt2,
       // que corre en renderAll.
       S = next;
@@ -6399,7 +6391,8 @@ function costoNitrosHab(h){
   return num(h.nitrosCosto ?? IT2.nitrosHabilidad);
 }
 
-/* ---------- Movimiento: 1 Nitro por casillero ---------- */
+/* ---------- Moverse: los Nitros se gastan desde el mapa (arrastrando el token);
+   la ficha solo publica cuánto cuesta cada casillero (ver fichaResumen) ---------- */
 
 function estadoActivo(flag){
   return (S.efectos || []).some(e => e.activo !== false && e[flag]);
@@ -6410,28 +6403,7 @@ function costoMoverCasillero(){
 }
 
 function sinNitrosPara(h){
-  if(h.id === 'movimiento') return num(S.nitros) < costoMoverCasillero();
   return !esCostoVariable(h.costo) && num(S.nitros) < costoNitrosHab(h);
-}
-
-function moverCasilleros(){
-  if(IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado')){
-    toast('Inmovilizado: no te podés mover ⚠ (regla provisoria)');
-    return;
-  }
-  const rengo = estadoActivo('rengo');
-  const porCasillero = costoMoverCasillero();
-  const alcanza = Math.floor(num(S.nitros) / porCasillero);
-  if(alcanza < 1){ toast(`No te alcanzan los Nitros para moverte (cada casillero cuesta ${porCasillero})`); return; }
-  const txt = prompt(`¿Cuántos casilleros te movés?\n\nCada uno cuesta ${porCasillero} No2${rengo ? ' (Rengo — ⚠ valor provisorio)' : ''}. Te alcanza para ${alcanza}.`, '1');
-  if(txt === null) return;
-  const n = Math.floor(num(txt));
-  if(n < 1){ toast('Poné cuántos casilleros (1 o más)'); return; }
-  if(n > alcanza){ toast(`No te alcanzan los Nitros: ${n} casilleros cuestan ${n * porCasillero} y tenés ${fmt(num(S.nitros))}`); return; }
-  S.nitros = num(S.nitros) - n * porCasillero;
-  renderList('habilidades');
-  renderNitros();
-  toast(`Movimiento: ${n} casillero${n === 1 ? '' : 's'} · -${fmt(n * porCasillero)} No2`);
 }
 
 /* ---------- Atacar: Tipo ÷ 2 el primer ataque del turno, Tipo completo los demás ---------- */
@@ -6480,7 +6452,6 @@ let pendingEjecucion = null;
    El costo en SP es texto libre ("2 SP", "X SP"), así que se muestra tal
    cual lo escribió el jugador. */
 function costoHabilidadTxt(h){
-  if(h.id === 'movimiento') return `${fmt(costoMoverCasillero())} No2 por casillero`;
   const partes = [];
   const nitros = costoNitrosHab(h);
   if(nitros) partes.push(`${fmt(nitros)} No2`);
@@ -6502,7 +6473,6 @@ function limiteCostoX(cual){
 function ejecutarHabilidad(id){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
-  if(it.id === 'movimiento'){ moverCasilleros(); return; }
   if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
     if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
   }
@@ -6876,7 +6846,6 @@ function fichaNueva(){
   S.hp = 0; S.turno = 1; S.log = []; S.spGastado = 0; S.ataquesTurno = 0;
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
-  S.habilidades = [structuredClone(DEFAULT.habilidades[0])];
   S.nitros = nitrosMaximo();
   { const hpmax = compute().final.hpmax; S.hp = Number.isNaN(hpmax) ? 0 : hpmax; }  // arranca con la vida llena
   openStat = null;

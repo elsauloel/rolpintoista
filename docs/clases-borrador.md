@@ -71,9 +71,13 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
    dentro del mismo turno, o una sola vez por turno?
 2. ✅ **Amplificar daño** — **No2:** ataque. **SP:** X (máx. 3).
    **Espameable.** Ataque con +X dados de daño del Tipo del arma.
-3. **Sacadito** [3] — Recibe 10 Nitros que puede utilizar en ataques
-   consecutivos iguales. Acumulable con otros skills con la condición de
-   que todos los ataques sean idénticos.
+3. ⏸ **Sacadito** [3] **(a definir)** — Recibe 10 Nitros que puede
+   utilizar en ataques consecutivos iguales. Acumulable con otros skills
+   con la condición de que todos los ataques sean idénticos.
+   Dudas abiertas: ¿los Nitros que sobran se pierden al terminar el turno
+   o al hacer algo que no sea atacar? ¿"Iguales" = misma arma, mismo
+   objetivo o ambas? Combinado con otra skill (ej. Amplificar daño), ¿todos
+   los ataques la llevan y el SP se paga por ataque o una vez?
 4. **Cañón Vasco** [2 + X] — X no puede ser mayor a FUE. Salta X casillas
    a X altura. Si aterriza en un enemigo, lo empuja 1 casillero. Al caer,
    hace X + FUE (tira) daño de onda expansiva en área. Puede atacar a un

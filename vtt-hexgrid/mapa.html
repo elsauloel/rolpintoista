@@ -107,6 +107,8 @@ aside{
 }
 .ayuda{color:var(--muted);font-size:12.5px;margin:0}
 .con-ayuda{display:flex;align-items:center;gap:8px;margin-bottom:0!important}
+.barra-token{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10px}
+.barra-token .chico-barra{justify-self:end;padding:5px 10px;font-size:10.5px}
 .ayuda-icono{
   position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
   border:1px solid var(--line);color:var(--muted);font-size:10.5px;cursor:help;letter-spacing:0;outline:none
@@ -230,7 +232,7 @@ aside{
     </div>
     <div class="seccion" id="panel-token"></div>
     <div id="mesa">
-      <h2><span>Mesa</span><span id="mesa-dados"></span><a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙ dados</a><span id="mesa-historial"></span></h2>
+      <h2><span>Mesa</span><span id="mesa-dados"></span><span id="mesa-historial"></span></h2>
       <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
       <form id="mesa-tirar">
         <input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off">
@@ -1797,6 +1799,9 @@ function renderPanel(forzar){
     panel.innerHTML =
       // La ayuda queda escondida detrás del (?): aparece al pasar el cursor
       // (o al tocarlo en pantallas táctiles).
+      // Barra partida en dos: a la izquierda Token (?), a la derecha la
+      // configuración de los dados 3D.
+      '<div class="barra-token">' +
       '<h2 class="con-ayuda">Token <span class="ayuda-icono" tabindex="0" aria-label="Ayuda">?' +
         '<span class="ayuda-globo" role="tooltip">' +
           ayuda +
@@ -1804,7 +1809,9 @@ function renderPanel(forzar){
           '<span class="leyenda">' + leyenda +
           '</span>' +
         '</span>' +
-      '</span></h2>';
+      '</span></h2>' +
+      '<a class="btn chico-barra" href="../comun/prueba-dados.html" target="_blank" rel="noopener" style="text-decoration:none" title="Elegir cómo se ven y suenan tus dados 3D">Config 🎲</a>' +
+      '</div>';
     return;
   }
 

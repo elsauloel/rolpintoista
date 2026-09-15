@@ -2111,12 +2111,10 @@ function normalizarCreep(sc){
       if(m.forzarNitros !== undefined) es.forzarNitros = m.forzarNitros;
     });
   }
-  // La habilidad Movimiento de siempre se quitó: moverse se cobra desde el
-  // mapa. Una sola vez, así no se borra una habilidad nueva con ese nombre.
-  if(!sc.sinMovimiento){
-    sc.habilidades = sc.habilidades.filter(h => h && h.nombre !== 'Movimiento');
-    sc.sinMovimiento = true;
-  }
+  // La habilidad Movimiento se quitó: moverse se cobra desde el mapa. Se
+  // saca siempre, por si una pestaña con la versión vieja la vuelve a meter.
+  sc.habilidades = sc.habilidades.filter(h => h && h.nombre !== 'Movimiento');
+  delete sc.sinMovimiento;
   sc.habilidades.forEach(h => {
     if(h.accionesCosto === undefined) return;
     if(h.nitrosCosto === undefined) h.nitrosCosto = h.accionesCosto;

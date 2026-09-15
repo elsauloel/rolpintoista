@@ -36,7 +36,9 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
   Nitros.
 - **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
   corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
-  completo después) y cuenta como ataque del turno.
+  completo después) y cuenta como ataque del turno. En la ficha se usa con
+  **Ejecutar**, y hace lo mismo que el botón Atacar (cobra los Nitros y
+  tira PdG) más el efecto de la skill.
 - **A definir en mesa**: si una duda no se cierra en la revisión, la skill
   lleva una nota "⚖ A definir en mesa" que tiene que verse en su tarjeta
   para todos, así se decide entre todxs la próxima vez que aparezca en
@@ -67,8 +69,8 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
    vez sobre la misma tirada.
    ⚖ A definir en mesa: ¿se puede usar en todas las tiradas que quieras
    dentro del mismo turno, o una sola vez por turno?
-2. **Amplificar daño** [X] — Amplifica en X el daño de un ataque. X no
-   puede ser mayor a 3.
+2. ✅ **Amplificar daño** — **No2:** ataque. **SP:** X (máx. 3).
+   **Espameable.** Ataque con +X dados de daño del Tipo del arma.
 3. **Sacadito** [3] — Recibe 10 Nitros que puede utilizar en ataques
    consecutivos iguales. Acumulable con otros skills con la condición de
    que todos los ataques sean idénticos.

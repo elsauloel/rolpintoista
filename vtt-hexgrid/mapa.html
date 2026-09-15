@@ -63,6 +63,23 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #modo-switch[data-modo="combate"] .perilla::after{left:18px}
 #modo-switch:disabled{opacity:1;cursor:default}
 .zoom .btn{padding:7px 10px}
+/* Mantenimiento (GM), arriba de todo en la barra lateral: verde para que se note. */
+.btn-mant{width:100%;background:rgba(46,107,87,.25);border-color:#3E9B5B;color:#CFE6D8;font-weight:700;padding:9px 12px}
+.btn-mant:hover{background:#2E6B57;border-color:#3E9B5B;color:#EAF3E6}
+/* Personajes: lista desplegable de las fichas de la partida. */
+.btn-personajes{background:rgba(63,111,176,.2);border-color:#3F6FB0;color:#B9D2EA}
+.btn-personajes:hover,.btn-personajes[aria-expanded="true"]{background:#3F6FB0;border-color:#5B8DBE;color:#F2F6FB}
+.desplegable{position:relative}
+.desplegable-lista{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid #3F6FB0;border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:5px
+}
+.desplegable-lista a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);color:var(--paper);text-decoration:none}
+.desplegable-lista a:hover{background:rgba(63,111,176,.25)}
+.desplegable-lista .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+.desplegable-lista .pj-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desplegable-lista .pj-dueno{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.desplegable-vacio{padding:8px 10px;color:var(--muted);font-size:12px}
 
 main{flex:1;display:flex;min-height:0}
 #lienzo-caja{flex:1;position:relative;min-width:0;min-height:0}
@@ -183,7 +200,10 @@ aside{
   </button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
-  <button type="button" class="btn" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)" hidden>⟳ Mantenimiento</button>
+  <div class="desplegable" id="personajes-caja" hidden>
+    <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
+    <div class="desplegable-lista" id="personajes-lista" hidden></div>
+  </div>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
@@ -205,6 +225,9 @@ aside{
     </div>
   </div>
   <aside>
+    <div class="seccion" id="caja-mantenimiento" hidden>
+      <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
+    </div>
     <div class="seccion" id="panel-token"></div>
     <div id="mesa">
       <h2><span>Mesa</span><span id="mesa-dados"></span><a class="dados3d-config" href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados">⚙ dados</a><span id="mesa-historial"></span></h2>
@@ -541,6 +564,34 @@ async function publicarPaseDeTurno(turno){
     });
   }catch(err){ console.error('No se pudo anunciar el pase de turno en la Mesa:', err); }
 }
+
+/* ---------- Personajes: lista de las fichas de la partida ----------
+   Cada una abre en una pestaña nueva (las de otros jugadores, en solo lectura). */
+function renderListaPersonajes(){
+  const lista = [...fichasPub.entries()].sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+  $('#personajes-lista').innerHTML = lista.length
+    ? lista.map(([id, f]) => {
+        const dueno = miembros.get(f.duenoUid);
+        const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : `<span class="pj-mini"></span>`;
+        return `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
+          `${mini}<span class="pj-nombre">${esc(f.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</a>`;
+      }).join('')
+    : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
+}
+
+function abrirListaPersonajes(abrir){
+  $('#personajes-lista').hidden = !abrir;
+  $('#btn-personajes').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  if(abrir) renderListaPersonajes();
+}
+
+$('#btn-personajes').onclick = () => abrirListaPersonajes($('#personajes-lista').hidden);
+// Se cierra al elegir una ficha, al tocar afuera o con Escape.
+$('#personajes-lista').addEventListener('click', e => { if(e.target.closest('a')) abrirListaPersonajes(false); });
+document.addEventListener('pointerdown', e => {
+  if(!$('#personajes-lista').hidden && !e.target.closest('#personajes-caja')) abrirListaPersonajes(false);
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#personajes-lista').hidden) abrirListaPersonajes(false); });
 
 $('#btn-mantenimiento').onclick = async () => {
   if(!soyGM) return;
@@ -1657,7 +1708,8 @@ function renderPanel(forzar){
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
   $('#btn-fondo').hidden = !soyGM;
-  $('#btn-mantenimiento').hidden = !soyGM;
+  $('#caja-mantenimiento').hidden = !soyGM;
+  $('#personajes-caja').hidden = !fbMiembro;
 
   if(panelFondo && soyGM){
     const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;

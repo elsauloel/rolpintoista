@@ -66,6 +66,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,
   `abrir-acciones`). El botón de edición del panel se llama "✎ Editar token".
+- **👥 Personajes** (cabecera, azul, todos los miembros): despliega las
+  fichas de la partida (`fichasPub`, `renderListaPersonajes`); cada una abre
+  `ficha.html?partida=…#<fichaId>` en otra pestaña. **⟳ Mantenimiento**
+  (solo GM) va en verde arriba de todo en la barra lateral
+  (`#caja-mantenimiento`).
 - **⚡ Botonera** (solo en tu propio personaje): abre la ficha en un iframe
   a pantalla completa con `?modo=botonera`, que muestra solo la Botonera.
   Se hablan con `postMessage` (`botonera-lista`, `botonera-cerrada`,

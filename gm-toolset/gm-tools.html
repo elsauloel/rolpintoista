@@ -528,7 +528,9 @@ input[type=file]{display:none}
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
   box-shadow:0 10px 24px -8px rgba(0,0,0,.6);font-family:"Space Mono",monospace;font-size:12px;color:var(--paper)
 }
-#mesa-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;user-select:none;border-bottom:1px solid var(--line-soft)}
+#mesa-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line-soft)}
+#mesa.arrastrando{opacity:.85}
+#mesa.arrastrando #mesa-cabecera{cursor:grabbing}
 #mesa.colapsada #mesa-cabecera{border-bottom:none}
 #mesa.aviso #mesa-cabecera{background:var(--wine)}
 #mesa-cabecera .fb-inicio{color:var(--muted);text-decoration:none;font-size:13px;padding:0 2px}
@@ -4683,29 +4685,77 @@ async function mesaIniciar(){
   const mesa = document.createElement('div');
   mesa.id = 'mesa';
   mesa.innerHTML =
-    '<div id="mesa-cabecera" title="Achicar o agrandar">' +
+    '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
       fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">🎲 Mesa</span><span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-cuerpo"></div>';
   document.body.appendChild(mesa);
-  // Si la herramienta tiene barra fija abajo (el dock de la ficha), la
-  // cajita se acomoda justo encima, aunque la barra ocupe dos renglones.
+  const cabecera = $('#mesa-cabecera');
+
+  // Posición: la cajita se arrastra desde la cabecera y el lugar queda
+  // guardado en este navegador. Mientras nunca se la movió, va abajo a la
+  // derecha, justo encima del dock si la herramienta tiene uno (aunque la
+  // barra ocupe dos renglones). Nunca queda afuera de la pantalla.
   const dock = document.querySelector('.dock');
-  if(dock){
-    const acomodar = () => { mesa.style.bottom = (dock.offsetHeight + 12) + 'px'; };
-    acomodar();
-    window.addEventListener('resize', acomodar);
-  }
+  let posicion = null;
+  try{ posicion = JSON.parse(localStorage.getItem('mesa-posicion') || 'null'); }catch(e){}
+  const encuadrar = () => {
+    if(!posicion){
+      mesa.style.left = mesa.style.top = mesa.style.right = '';
+      mesa.style.bottom = dock ? (dock.offsetHeight + 12) + 'px' : '';
+      return;
+    }
+    const x = Math.max(0, Math.min(posicion.x, window.innerWidth - mesa.offsetWidth));
+    const y = Math.max(0, Math.min(posicion.y, window.innerHeight - mesa.offsetHeight));
+    mesa.style.left = x + 'px';
+    mesa.style.top = y + 'px';
+    mesa.style.right = mesa.style.bottom = 'auto';
+  };
+  window.addEventListener('resize', encuadrar);
+
+  let arrastre = null, recienMovida = false;
+  cabecera.addEventListener('pointerdown', e => {
+    if(e.button !== 0 || e.target.closest('.fb-inicio')) return;
+    const r = mesa.getBoundingClientRect();
+    arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
+    cabecera.setPointerCapture(e.pointerId);
+  });
+  cabecera.addEventListener('pointermove', e => {
+    if(!arrastre) return;
+    const dx = e.clientX - arrastre.px, dy = e.clientY - arrastre.py;
+    if(!arrastre.movio && Math.abs(dx) + Math.abs(dy) < 5) return;  // un clic con pulso tembloroso no es arrastre
+    arrastre.movio = true;
+    mesa.classList.add('arrastrando');
+    posicion = {x: arrastre.x + dx, y: arrastre.y + dy};
+    encuadrar();
+  });
+  const soltar = () => {
+    if(!arrastre) return;
+    recienMovida = arrastre.movio;
+    arrastre = null;
+    mesa.classList.remove('arrastrando');
+    if(recienMovida){
+      posicion = {x: parseFloat(mesa.style.left), y: parseFloat(mesa.style.top)};
+      try{ localStorage.setItem('mesa-posicion', JSON.stringify(posicion)); }catch(e){}
+    }
+  };
+  cabecera.addEventListener('pointerup', soltar);
+  cabecera.addEventListener('pointercancel', soltar);
+
   const aplicarColapso = colapsada => {
     mesa.classList.toggle('colapsada', colapsada);
     if(!colapsada) mesa.classList.remove('aviso');
     $('#mesa-flecha').textContent = colapsada ? '▸' : '▾';
     try{ localStorage.setItem('mesa-colapsada', colapsada ? '1' : ''); }catch(e){}
+    encuadrar();
   };
   let colapsada = false;
   try{ colapsada = localStorage.getItem('mesa-colapsada') === '1'; }catch(e){}
   aplicarColapso(colapsada);
-  $('#mesa-cabecera').onclick = e => { if(!e.target.closest('.fb-inicio')) aplicarColapso(!mesa.classList.contains('colapsada')); };
+  cabecera.onclick = e => {
+    if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
+    if(!e.target.closest('.fb-inicio')) aplicarColapso(!mesa.classList.contains('colapsada'));
+  };
 
   // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
   const entrada = await fbEntrarAPartida();

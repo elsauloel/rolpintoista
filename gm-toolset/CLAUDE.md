@@ -59,7 +59,7 @@ En desarrollo activo, las dos.
 - **Habilidades de creeps paso a paso** (`PASOS_HAB_CREEP`, `hcMostrarPaso`,
   `#scrim-hab-creep`): "+ Habilidad" y el ✎ abren el mismo asistente que la
   ficha, adaptado: qué es → costo (No2, cooldown, otro costo) → tirada
-  (fórmula) → estado (preset o a mano) → resumen. La habilidad nueva recién
+  (stat del creep con `creepStatValor` y/o fórmula; `habCreepTira`, `tirarExtraDeHab`) → estado (preset o a mano) → resumen. La habilidad nueva recién
   se agrega al creep al guardar.
 - **Stats secundarios** (`CREEP_DERIVADOS_POR_ATTR`, `derivadosHtml`): los
   mismos que un PJ salvo Hp.Max/No2 (ya se ven arriba) y Crg.Max/SP (no

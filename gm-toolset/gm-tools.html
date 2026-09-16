@@ -948,7 +948,8 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
         <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). "Otro costo" es un recordatorio libre: vida, un objeto, etc.</div>
       </div>
       <div class="hc-paso" data-hc-paso="2">
-        <div class="f"><label>Fórmula de dados</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3 · vacío = no tira" data-hc-enter="1"></div>
+        <div class="f"><label>Tirar un stat del creep</label><select id="hc-tirada-stat"></select></div>
+        <div class="f" style="margin-top:8px"><label>Fórmula de dados (opcional)</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3" data-hc-enter="1"></div>
       </div>
       <div class="hc-paso" data-hc-paso="3">
         <div class="f"><label>Elegir de la lista</label><select id="hc-efecto-preset"></select></div>
@@ -2572,6 +2573,7 @@ function lupaHtmlCreep(clave){
     if(num(h0.cd) > 0) h += lupaFila('Cooldown', `${fmt(num(h0.cd))} turno(s)${num(h0.cdActual) > 0 ? ` · faltan ${fmt(num(h0.cdActual))}` : ''}`);
     h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), n > num(sc.nitros) ? 'lupa-falta' : '');
     let out = lupaSeccion('Costo', h);
+    if(h0.tiradaStat && CREEP_STAT_LOOKUP[h0.tiradaStat]) out += lupaSeccion("Tirada del stat", lupaFila(esc(CREEP_STAT_LOOKUP[h0.tiradaStat].label), fmt(creepStatValor(sc, h0.tiradaStat))));
     if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
     return {titulo: `${sc.nombre} · ${h0.nombre || 'Habilidad'}`, html: out};
   }
@@ -3111,9 +3113,20 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   return es;
 }
 
+// Tirada de una habilidad del creep: el stat vinculado (con su valor del
+// momento) y/o la fórmula. Se pueden tener las dos.
+function habCreepTira(h){
+  return !!(h && (String(h.tiradaExtra || "").trim() || (h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat])));
+}
 function tirarExtraDeHab(h, sc){
-  const r = tirarDados(h.tiradaExtra);
-  if(r) registrarTirada(`${sc ? sc.nombre + ' · ' : ''}${h.nombre || 'Habilidad'}`, r);
+  const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
+  if(h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat] && sc){
+    tirarValorStat(`${prefijo} · ${CREEP_STAT_LOOKUP[h.tiradaStat].label}`, creepStatValor(sc, h.tiradaStat), sc, h.tiradaStat);
+  }
+  if(String(h.tiradaExtra || "").trim()){
+    const r = tirarDados(h.tiradaExtra);
+    if(r) registrarTirada(prefijo, r);
+  }
 }
 
 let equipandoCreepId = null;
@@ -3570,7 +3583,7 @@ const PASOS_HAB_CREEP = [
   {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto la puede usar?',
    ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
   {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
-   ayuda: 'Escribí la fórmula (daño, curación, lo que sea). Si no tira, dejala vacía y seguí.'},
+   ayuda: "Podés vincularla a un stat del creep (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna."},
   {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
    ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
   {corto: 'Listo', titulo: 'Revisá cómo quedó',
@@ -3605,6 +3618,20 @@ function hcMostrarPaso(n){
   if(primero) setTimeout(() => primero.focus(), 30);
 }
 
+// Stats que un creep puede tirar en una habilidad: los 5 atributos y los
+// secundarios con tirada (los mismos que ofrece la ficha).
+const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "resm"];
+function hcStatLabel(id){
+  const d = id ? CREEP_STAT_LOOKUP[id] : null;
+  return d ? (ATTR_NOMBRE[id] || d.label) : "";
+}
+function hcOpcionesStat(elegido){
+  const op = id => `<option value="${id}" ${elegido === id ? "selected" : ""}>${esc(hcStatLabel(id))}</option>`;
+  return '<option value="">— no tira un stat —</option>' +
+    `<optgroup label="Principales">${["con", "fue", "agl", "des", "int"].map(op).join("")}</optgroup>` +
+    `<optgroup label="Secundarios">${HC_STATS_SECUNDARIOS.filter(id => CREEP_STAT_LOOKUP[id]).map(op).join("")}</optgroup>`;
+}
+
 function hcResumenHtml(){
   const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${esc(valor)}</b></div>`;
   const detalle = $('#hc-detalle').value.trim();
@@ -3616,7 +3643,7 @@ function hcResumenHtml(){
     ${fila('No2', fmt(Math.max(0, num($('#hc-acciones').value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
     ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
-    ${fila('Tirada', $('#hc-tirada').value.trim() || 'no tira')}
+    ${fila("Tirada", [hcStatLabel($("#hc-tirada-stat").value), $("#hc-tirada").value.trim()].filter(Boolean).join(" + ") || "no tira")}
     ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
 }
 
@@ -3634,6 +3661,7 @@ function abrirEditorHabCreep(scId, habId){
   $('#hc-cd').value = h.cd || 0;
   $('#hc-detalle').value = h.detalle || '';
   $('#hc-tirada').value = h.tiradaExtra || '';
+  $("#hc-tirada-stat").innerHTML = hcOpcionesStat(h.tiradaStat || "");
   $('#hc-efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEstadosPresetHtml() + optgroupsEstadosPersonalizadosHtml();
   $('#hc-efecto-nombre').value = h.efectoNombre || '';
   $('#hc-efecto-turnos').value = h.efectoTurnos || 0;
@@ -3663,6 +3691,7 @@ function guardarEditorHabCreep(){
   h.cd = Math.max(0, num($('#hc-cd').value) || 0);
   h.detalle = $('#hc-detalle').value;
   h.tiradaExtra = $('#hc-tirada').value.trim();
+  h.tiradaStat = $("#hc-tirada-stat").value;
   h.efectoNombre = $('#hc-efecto-nombre').value.trim();
   h.efectoTurnos = Math.max(0, num($('#hc-efecto-turnos').value) || 0);
   h.efectoStacks = Math.max(1, num($('#hc-efecto-stacks').value) || 1);
@@ -4228,9 +4257,9 @@ document.addEventListener('click', e => {
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
-    if(String(h.tiradaExtra || "").trim()) mesaConTexto((h && h.detalle) || "");
+    if(habCreepTira(h)) mesaConTexto((h && h.detalle) || "");
     else mesaPublicarHabilidadCreep(sc, h);
-    if(h.tiradaExtra) tirarExtraDeHab(h, sc);
+    if(habCreepTira(h)) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);

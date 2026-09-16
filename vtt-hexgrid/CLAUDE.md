@@ -48,12 +48,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   vía `modificarCreep` (transacción sobre `privado/ficha` + resumen +
   firma, la misma que usa `cambiarVidaCreep`). El panel del creep le
   muestra al GM sus No2.
-- Panel del costado: crear token (jugador: siempre PJ propio; GM: creep/NPC
-  o PJ). Al seleccionar un token se ven nombre, vida/SP y estados; "✎ Editar"
-  abre vínculo, nombre, color, dueño (GM) y "Sacar del mapa". Los PJ (y sus
-  invocaciones) vinculados tienen "📄 Ficha", que abre la ficha en otra
-  pestaña (`ficha.html?partida=…#<fichaId>`; la de otro jugador, en solo
-  lectura, sin pasar a ser "la tuya" en ese navegador).
+- Panel del costado: solo Mantenimiento (GM), "Token (?)" con la ayuda y la
+  leyenda de colores, y el botón de configuración de los dados 3D. Los datos
+  del token van en el HUD flotante (no se repiten acá). "✎ Editar token"
+  está en el globo del ⚙ del HUD: abre en el panel el vínculo, nombre,
+  color, dueño (GM) y "Sacar del mapa" (`editandoToken`).
 - **Vida y SP desde el mapa** (`cambiarVidaPj`, `cambiarVidaCreep`): el
   dueño de un PJ (o invocación) y el GM en sus creeps escriben un valor o
   +N/-N. Se guarda en una transacción sobre la parte de la ficha

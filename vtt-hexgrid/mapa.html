@@ -1843,44 +1843,6 @@ function opcionesVinculo(tipo, elegido){
 
 // Barras y estados en el panel. De los PJ se ven los números (su ficha es
 // visible para todos); de los creeps, solo cuán llena está la barra.
-function htmlEstadoToken(t){
-  const v = vinculo(t);
-  const est = estadoDe(t);
-  if(!v || !est) return t.fichaId ? '<p class="ayuda" style="margin-top:6px">La ficha vinculada ya no existe.</p>' : '';
-  const r = v.resumen || {};
-  const puede = puedoCambiarVida(t);
-  // Una vital: título, número (o campo para cambiarlo) y barra.
-  const vital = (clave, titulo, valor, maximo, llenado, color) => {
-    let numeros = '';
-    if(valor !== null){
-      numeros = puede
-        ? `<input class="vital-in" data-vital="${clave}" inputmode="decimal" value="${fmt(valor)}" title="Escribí el valor, o +5 / -3 para sumar o restar, y apretá Enter"><span class="vital-max">/ ${fmt(maximo)}</span>`
-        : `<span class="vital-num">${fmt(valor)} / ${fmt(maximo)}</span>`;
-    }
-    return `<div class="vital"><div class="vital-cab"><span class="vital-titulo">${titulo}</span>${numeros}</div>` +
-      `<div class="barra"><i style="width:${Math.round(llenado * 100)}%;background:${color}"></i></div></div>`;
-  };
-  let html = '<div class="estado-token">';
-  if(v.invocacion) html += `<div class="dato" style="color:var(--muted)">Invocación de ${esc(v.deQuien || '?')}${est.dormida ? ' · no invocada' : ''}</div>`;
-  if(t.tipo === 'pj'){
-    html += vital('hp', 'Vida', Math.max(0, num(r.hp)), num(r.hpMax), est.hp, HP_COLOR);
-    if(est.sp !== null) html += vital('sp', 'SP', spDeResumen(r).sp, spDeResumen(r).spMax, est.sp, SP_COLOR);
-  }else{
-    // Creep: números solo para el GM (los lee de la parte privada).
-    const sc = soyGM ? creepPrivadoDe(t.fichaId) : null;
-    html += vital('hp', 'Vida', sc ? num(sc.hp) : null, sc ? num(sc.hpMax) : null, est.hp, HP_COLOR);
-    if(sc && sc.nitros !== undefined && sc.nitros !== null) html += `<div class="dato">No2: ${fmt(num(sc.nitros))}</div>`;
-  }
-  if(puede) html += '<p class="ayuda" style="margin-top:4px">Escribí el valor o +5 / -3 y apretá Enter. Se guarda también en la ficha.</p>';
-  if(est.muerto) html += `<div class="dato" style="color:${HP_COLOR}">${t.tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>`;
-  if(est.estados.length){
-    html += '<div class="chips">' + est.estados.map(e =>
-      `<span class="chip" style="border-color:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']}">${esc(e.nombre)}${e.permanente || !num(e.turnos) ? '' : ` · ${fmt(num(e.turnos))}t`}</span>`
-    ).join('') + '</div>';
-  }
-  return html + '</div>';
-}
-
 // Vida y SP desde el mapa, guardados en la ficha o en el creep, así los ve
 // cambiados la ficha, gm-tools, el tablero y los demás. Los PJ los cambia
 // su dueño; los creeps, el GM (lo imponen las reglas).
@@ -1992,25 +1954,6 @@ async function cambiarVidaPj(t, clave, texto){
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, cambios);
   });
-}
-
-async function aplicarVital(input){
-  const t = seleccion ? tokens.get(seleccion) : null;
-  if(!puedoCambiarVida(t)) return;
-  const texto = input.value;
-  input.disabled = true;
-  try{
-    if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
-    else await cambiarVidaPj(t, input.dataset.vital, texto);
-  }catch(err){
-    console.error('No se pudo cambiar la vida:', err);
-    toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
-      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
-  }finally{
-    input.disabled = false;
-    input.blur();
-    renderPanel(true);
-  }
 }
 
 function creepPrivadoDe(creepId){
@@ -2144,7 +2087,9 @@ function renderPanel(forzar){
     return;
   }
 
-  if(!t){
+  // Los datos del token se ven en los controles flotantes (HUD): el panel
+  // del costado queda solo con Token (?) y la configuración de los dados.
+  if(!t || !editandoToken){
     const item = (color, texto) => `<span><i style="border-color:${color}"></i>${texto}</span>`;
     // El GM no suele tener tokens de personaje propios: el dorado solo
     // aparece en su leyenda si tiene alguno.
@@ -2177,40 +2122,6 @@ function renderPanel(forzar){
 
   const editable = puedoMover(t);
   const titulo = t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje');
-  const puedeEditar = editable || soyGM;
-  // Personajes (y sus invocaciones) vinculados a una ficha: botón para
-  // abrirla en otra pestaña. La de otro jugador se abre en solo lectura.
-  const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
-  const botonFicha = fichaDeToken
-    ? `<a class="btn" href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(fichaDeToken)}" target="_blank" rel="noopener" style="text-decoration:none" title="Abrir la ficha en una pestaña nueva">📄 Ficha</a>`
-    : '';
-  // Tu propio personaje (no sus invocaciones): la Botonera de la ficha, ahí mismo.
-  // GM, creep vinculado: la ventana de Acciones de gm-tools, ahí mismo.
-  const botonAcciones = soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId)
-    ? '<button type="button" class="btn" id="token-acciones" title="Abrir las Acciones del creep (las de gm-tools) sin salir del mapa">⚔ Acciones</button>'
-    : '';
-  const botonBotonera = fichaDeToken && !(v && v.invocacion) && !soyGM && v && v.duenoUid === fbUsuario.uid
-    ? `<button type="button" class="btn" id="token-botonera" title="Abrir la Botonera de la ficha sin salir del mapa">⚡ Botonera</button>`
-    : '';
-
-  // Vista normal: nombre, vida/SP (editables si corresponde), estados.
-  if(!editandoToken || !puedeEditar){
-    panel.innerHTML =
-      `<h2>${titulo}</h2>` +
-      `<div class="dato"><b>${esc(nombreDe(t))}</b></div>` +
-      (t.tipo === 'pj' ? `<div class="dato" style="color:var(--muted)">de ${esc(nombreMiembro(t.duenoUid))}${t.duenoUid === fbUsuario.uid ? ' (vos)' : ''}</div>` : '') +
-      htmlEstadoToken(t) +
-      ((puedeEditar || botonFicha) ? `<div class="fila">${puedeEditar ? '<button type="button" class="btn" id="token-editar">✎ Editar token</button>' : ''}${botonAcciones}${botonFicha}${botonBotonera}</div>` : '') +
-      (!editable ? `<p class="ayuda" style="margin-top:8px">${t.tipo === 'creep' ? (t.fichaId ? 'Los creeps los mueve el GM.' : 'Los NPC los mueve el GM.') : 'Este personaje lo mueve su dueño.'}</p>` : '');
-    panel.querySelectorAll('[data-vital]').forEach(input => {
-      input.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); aplicarVital(input); } if(e.key === 'Escape') { input.blur(); renderPanel(true); } };
-      input.onfocus = () => input.select();
-    });
-    if($('#token-editar')) $('#token-editar').onclick = () => { editandoToken = true; renderPanel(true); };
-    if($('#token-botonera')) $('#token-botonera').onclick = () => abrirBotonera(fichaDeToken);
-    if($('#token-acciones')) $('#token-acciones').onclick = () => abrirAcciones(t.fichaId);
-    return;
-  }
 
   // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
   let color = t.color;
@@ -2328,12 +2239,12 @@ function hudHtml(t){
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
-    (puedoMover(t) ? icono('ajustes', '⚙', 'Barras y aura del token', hudGlobo === 'ajustes') : '') +
+    ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
     '</div>';
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
-  if(hudGlobo === 'ajustes' && puedoMover(t)) globo = hudAjustesHtml(t);
+  if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t);
   return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
 }
 
@@ -2359,17 +2270,23 @@ function hudEstadosHtml(t, estados, puede){
 function hudAjustesHtml(t){
   const barras = barrasDe(t);
   const aura = t.aura || {};
+  const puede = puedoMover(t);
   const check = (clave, texto, si) =>
     `<div class="hud-campo"><label>${texto}</label><input type="checkbox" data-hud-barra="${clave}"${si ? ' checked' : ''}></div>`;
   // Los tokens sin ficha ni creep (NPC, objetos) pueden llevar su propia
   // imagen; los vinculados usan la miniatura de su ficha o creep.
-  const imagenHtml = vinculo(t) ? '' :
+  const imagenHtml = (!puede || vinculo(t)) ? '' :
     '<h3 style="margin-top:12px">Imagen del token</h3>' +
     (t.imagen ? `<div style="text-align:center;margin-bottom:6px"><img src="${esc(t.imagen)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid ${esc(t.color || '#9A867E')}"></div>` : '') +
     '<div class="fila">' +
       `<button type="button" class="hud-mini" data-hud-imagen="1">${t.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
       (t.imagen ? '<button type="button" class="hud-mini peligro" data-hud-imagen-no="1">Quitar</button>' : '') +
     '</div>';
+  // Nombre, color, vínculo y dueño se editan en el panel del costado.
+  const editarHtml = (puede || soyGM)
+    ? '<div class="fila" style="margin-top:10px"><button type="button" class="hud-mini" data-hud-editar="1">✎ Editar token</button></div>'
+    : '';
+  if(!puede) return '<div class="hud-globo"><h3>Token</h3>' + editarHtml + '</div>';
   return '<div class="hud-globo"><h3>Barras del token</h3>' +
     check('hp', 'Vida (roja)', barras.hp) +
     check('sp', 'SP (azul)', barras.sp) +
@@ -2382,6 +2299,7 @@ function hudAjustesHtml(t){
       (aura.radio ? '<button type="button" class="hud-mini peligro" data-hud-aura-no="1">Quitar</button>' : '') +
     '</div>' +
     imagenHtml +
+    editarHtml +
     '<p class="ayuda" style="margin-top:6px">El radio va en casilleros. Las barras se guardan solas. La ven todos.</p>' +
     '</div>';
 }
@@ -2484,7 +2402,9 @@ function hudConectar(t){
     barras[c.dataset.hudBarra] = c.checked;
     editarToken(seleccion, {barras});
   });
-  const botonImagen = hud.querySelector('[data-hud-imagen]');
+  const botonEditar = hud.querySelector("[data-hud-editar]");
+  if(botonEditar) botonEditar.onclick = () => { editandoToken = true; hudCerrar(); renderPanel(true); pedirDibujo(); };
+  const botonImagen = hud.querySelector("[data-hud-imagen]");
   if(botonImagen) botonImagen.onclick = () => elegirImagenToken(seleccion);
   const quitarImagen = hud.querySelector('[data-hud-imagen-no]');
   if(quitarImagen) quitarImagen.onclick = () => editarToken(seleccion, {imagen: firebase.firestore.FieldValue.delete()});

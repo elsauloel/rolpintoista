@@ -268,7 +268,7 @@ aside{
   font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:95
 }
 /* Con el cartel de movimiento a la vista, los avisos suben para no taparlo. */
-body.con-ruta .toast{bottom:84px}
+body.con-ruta .toast{bottom:auto;top:74px}
 #botonera-capa{position:fixed;inset:0;z-index:90}
 #botonera-marco{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color-scheme:normal}
 #botonera-cargando{
@@ -315,8 +315,7 @@ body.con-ruta .toast{bottom:84px}
     <div id="hud" hidden></div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
-      <button type="button" class="btn primary" id="ruta-si">Confirmar</button>
-      <button type="button" class="btn" id="ruta-no">Cancelar</button>
+      <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>
@@ -1284,7 +1283,7 @@ lienzo.addEventListener('pointerdown', e => {
     if(puedoMover(t)){
       const costo = costoMoverDe(t);
       if(rutaPendiente){
-        resaltarRutaConfirmar();
+        // Ese clic confirmó el movimiento marcado: no empieza otro arrastre.
       }else if(costo && costo.porCasillero <= 0){
         toast('No te podés mover ahora (Inmovilizado)');
       }else{
@@ -1359,7 +1358,7 @@ function extenderRuta(a, casilla){
     ruta.push(c);
   }
   if(a.costo && ruta.length - 1 > pasosPagables(a.costo) && !a.avisado){
-    toast(`⚠ Te estás pasando de tus No2 (te quedan ${fmt(a.costo.disponibles)})`);
+    // Sin aviso verde: la estela en rojo y el cartel ya lo muestran.
     a.avisado = true;
   }
 }
@@ -1454,7 +1453,7 @@ function resaltarRutaConfirmar(){
   caja.classList.remove('atencion');
   void caja.offsetWidth;  // reinicia la animación
   caja.classList.add('atencion');
-  $('#ruta-si').focus();
+  $('#ruta-no').focus();
 }
 
 function mostrarConfirmacionRuta(){
@@ -1464,11 +1463,11 @@ function mostrarConfirmacionRuta(){
   const exceso = costo - Math.max(0, p.disponibles);
   $('#ruta-texto').textContent = `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
     (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') +
-    (exceso > 0 ? ` · ⚠ te pasás por ${fmt(exceso)}` : '');
+    (exceso > 0 ? ` · ⚠ te pasás por ${fmt(exceso)}` : '') +
+    ' · clic afuera para confirmar';
   $('#ruta-confirmar').classList.toggle('excede', exceso > 0);
   $('#ruta-confirmar').hidden = false;
   document.body.classList.add('con-ruta');
-  $('#ruta-si').focus();
 }
 
 function cancelarRuta(){
@@ -1508,7 +1507,8 @@ function gastarNitrosCreep(creepId, costo){
 
 async function confirmarRuta(){
   const p = rutaPendiente;
-  if(!p) return;
+  if(!p || p.confirmando) return;  // un solo cobro aunque lleguen dos clics
+  p.confirmando = true;
   const t = tokens.get(p.id);
   $('#ruta-confirmar').hidden = true;
   document.body.classList.remove('con-ruta');
@@ -1529,8 +1529,12 @@ async function confirmarRuta(){
     cancelarRuta();
   }
 }
-$('#ruta-si').onclick = confirmarRuta;
 $('#ruta-no').onclick = cancelarRuta;
+// Con un movimiento marcado, un clic en cualquier otro lado lo confirma.
+document.addEventListener('pointerdown', e => {
+  if(!rutaPendiente || e.target.closest('#ruta-confirmar')) return;
+  confirmarRuta();
+}, true);
 
 async function crearToken(datos){
   const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
@@ -1685,7 +1689,7 @@ async function guardarFondo(cambios){
 }
 
 // Achica la imagen hasta que entre en un documento de Firebase (tope 1 MB).
-// Imagen propia de un token que no est� vinculado a una ficha ni a un creep
+// Imagen propia de un token que no está vinculado a una ficha ni a un creep
 // (NPC, objetos, etc.). Se achica a un cuadrado chico para que entre en el
 // documento del token.
 const TOKEN_IMG_PX = 96;
@@ -2361,7 +2365,7 @@ function hudAcomodarAnillo(radioToken){
 
 // El panel que se abre (estados o ajustes) va debajo del anillo, pero
 // siempre dentro del mapa: si no entra abajo se dibuja arriba, se corre al
-// costado para no salirse y, si es m�s alto que la pantalla, tiene scroll.
+// costado para no salirse y, si es más alto que la pantalla, tiene scroll.
 function hudAcomodarGlobo(globos, r){
   const caja = $('#lienzo-caja').getBoundingClientRect();
   const hud = $('#hud').getBoundingClientRect();

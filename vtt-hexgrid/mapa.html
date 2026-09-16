@@ -149,6 +149,7 @@ aside{
   pointer-events:auto;margin-top:8px;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
   border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
 }
+#hud .hud-globo-acciones{margin-top:8px;display:flex;justify-content:flex-end}
 #hud .hud-globo h3{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
 #hud .hud-estado{display:flex;align-items:center;gap:6px;padding:4px 0;border-top:1px solid var(--line-soft)}
 #hud .hud-estado:first-of-type{border-top:none}
@@ -2094,7 +2095,11 @@ function hudHtml(t){
 }
 
 function hudEstadosHtml(t, estados, puede){
-  if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span></div>';
+  // El + abre el selector de estados de la ficha (o de gm-tools en creeps),
+  // dentro del mapa, con sus presets y su mecánica.
+  const agregar = puede && puedeAgregarEstado(t)
+    ? '<div class="hud-globo-acciones"><button type="button" class="hud-mini" data-hud-estado-nuevo="1">+ Estado</button></div>' : '';
+  if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
   return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
     const turnos = e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—');
     return `<div class="hud-estado">
@@ -2105,7 +2110,7 @@ function hudEstadosHtml(t, estados, puede){
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
     '</div>';
-  }).join('') + (puede ? '<p class="ayuda" style="margin-top:8px">Para agregar estados, usá la ficha o gm-tools.</p>' : '') + '</div>';
+  }).join('') + agregar + '</div>';
 }
 
 function hudAjustesHtml(t){
@@ -2173,6 +2178,8 @@ function hudConectar(t){
     hudEditando = '';
     pedirDibujo();
   });
+  const nuevoEstado = hud.querySelector('[data-hud-estado-nuevo]');
+  if(nuevoEstado) nuevoEstado.onclick = () => abrirEstadoNuevo(t);
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
   hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
     const [i, delta] = b.dataset.hudTurnos.split(':');
@@ -2243,6 +2250,19 @@ async function cambiarNitros(t, texto){
   });
 }
 
+// Las invocaciones no tienen estados propios: no se les puede agregar.
+function puedeAgregarEstado(t){
+  if(!t || !t.fichaId) return false;
+  return t.tipo === 'creep' ? soyGM : !t.fichaId.includes(SEP_INVOCACION);
+}
+
+// Abre el selector de estados de la herramienta que corresponde.
+function abrirEstadoNuevo(t){
+  if(!puedeAgregarEstado(t)) return;
+  if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'abrir-estados', creep: t.fichaId});
+  else abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-estados'});
+}
+
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
 async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);
@@ -2292,31 +2312,31 @@ async function hudEstadoCambiar(t, indice, accion, delta){
 // ?modo=acciones, solo GM). herramienta: 'ficha' | 'gm'.
 let botonera = {herramienta: '', fichaId: '', lista: false};
 
-function abrirBotonera(fichaId){
+function abrirBotonera(fichaId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
-    marco.contentWindow.postMessage({tipo: 'abrir-botonera'}, location.origin);
+    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera'}, location.origin);
     return;
   }
-  botonera = {herramienta: 'ficha', fichaId, lista: false};
+  botonera = {herramienta: 'ficha', fichaId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
   marco.src = `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`;
 }
 
-function abrirAcciones(creepId){
+function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
   // gm-tools ya cargado: solo cambia de creep (instantáneo).
   if(botonera.herramienta === 'gm' && botonera.lista){
     botonera.fichaId = creepId;
-    marco.contentWindow.postMessage({tipo: 'abrir-acciones', creep: creepId}, location.origin);
+    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-acciones', creep: creepId}, location.origin);
     return;
   }
-  botonera = {herramienta: 'gm', fichaId: creepId, lista: false};
+  botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
   $('#botonera-cargando').hidden = false;
   marco.src = `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`;
@@ -2329,7 +2349,15 @@ function cerrarBotonera(){
 
 window.addEventListener('message', e => {
   if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
-  if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){ botonera.lista = true; $('#botonera-cargando').hidden = true; }
+  if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){
+    botonera.lista = true;
+    $('#botonera-cargando').hidden = true;
+    // Lo que se pidió mientras cargaba (por ejemplo, agregar un estado).
+    if(botonera.pendiente){
+      $('#botonera-marco').contentWindow.postMessage(botonera.pendiente, location.origin);
+      botonera.pendiente = null;
+    }
+  }
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
 });
 

@@ -5570,6 +5570,16 @@ function gmAvisarMapa(tipo){
    que se haga se guarda solo, como siempre. */
 const MODO_ACCIONES = document.documentElement.classList.contains('modo-acciones');
 
+function estadosModoAbrir(creepId){
+  if(!S.creeps.some(sc => sc.id === creepId)){
+    toast('Ese creep ya no está en gm-tools');
+    gmAvisarMapa('acciones-cerrada');
+    return;
+  }
+  abrirPresetsEstadoCreep(creepId);
+  gmAvisarMapa('acciones-lista');
+}
+
 function accionesModoAbrir(creepId){
   if(!S.creeps.some(sc => sc.id === creepId)){
     toast('Ese creep ya no está en gm-tools');
@@ -5588,6 +5598,8 @@ if(MODO_ACCIONES){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
+    // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".
+    if(e.data.tipo === 'abrir-estados' && gmVivo.listo) estadosModoAbrir(e.data.creep);
   });
 }
 

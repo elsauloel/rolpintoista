@@ -7768,6 +7768,8 @@ if(MODO_BOTONERA){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir();
+    // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado".
+    if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){ abrirPresetsEfecto('directo'); botoneraAvisarMapa('botonera-lista'); }
   });
 }
 

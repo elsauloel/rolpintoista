@@ -458,13 +458,12 @@ input[type=file]{display:none}
 .chip-estado-wrap{display:inline-flex;align-items:center;gap:3px}
 .chip-estado-wrap.abierto .chip-estado{border-color:var(--copper);color:var(--brass)}
 .chip-accion{
-  width:20px;height:20px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;
-  font-size:11px;line-height:1;border:1px solid var(--line);background:var(--panel2)
+  width:22px;height:22px;border-radius:var(--r);flex:none;display:inline-flex;align-items:center;justify-content:center;
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;line-height:1;
+  border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--paper)
 }
-.chip-quitar{color:var(--danger);border-color:rgba(212,87,78,.6)}
-.chip-quitar:hover{background:var(--danger);color:#fff}
-.chip-editar{color:var(--muted)}
-.chip-editar:hover{border-color:var(--copper);color:var(--brass)}
+.chip-accion:hover{border-color:var(--copper);color:var(--brass)}
+.chip-quitar:hover{background:var(--danger);border-color:var(--danger);color:#fff}
 .chip-estado.con-tip:hover::after{max-width:260px;width:max-content;white-space:pre-line}
 .chip-estado-vacio{color:var(--muted);border-style:dashed;cursor:default}
 .chip-estado-vacio:hover{border-color:var(--line);color:var(--muted)}
@@ -2685,8 +2684,10 @@ function cardCompactoHtml(sc){
     const dura = es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;
     return `<span class="chip-estado-wrap${abierto ? ' abierto' : ''}">
       <button type="button" class="chip-estado con-tip" data-toggleestado="${clave}" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</button>
-      ${abierto ? `<button type="button" class="chip-accion chip-quitar" data-rmestado="${clave}" title="Quitar el estado">✕</button>
-      <button type="button" class="chip-accion chip-editar" data-editarestado="${clave}" title="Editar el estado">⚙</button>` : ''}
+      ${abierto ? `${es.permanente ? '' : `<button type="button" class="chip-accion" data-turnoestado="${clave}:-1" title="Un turno menos">−</button>
+      <button type="button" class="chip-accion" data-turnoestado="${clave}:1" title="Un turno más">+</button>`}
+      <button type="button" class="chip-accion chip-quitar" data-rmestado="${clave}" title="Quitar el estado">✕</button>
+      <button type="button" class="chip-accion" data-editarestado="${clave}" title="Editar el estado">⚙</button>` : ''}
     </span>`;
   }).join('')
     || `<span class="chip-estado chip-estado-vacio">Sin estados</span>`;
@@ -3734,12 +3735,24 @@ document.addEventListener('input', e => {
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.
-  if(estadoChipAbierto && !(b && b.dataset.toggleestado)) cerrarChipEstado(b);
+  if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado))) cerrarChipEstado(b);
   if(!b) return;
 
   if(b.dataset.toggleestado){
     estadoChipAbierto = estadoChipAbierto === b.dataset.toggleestado ? null : b.dataset.toggleestado;
     renderAll();
+    return;
+  }
+  if(b.dataset.turnoestado){
+    // Suma o resta un turno y deja los botones a la vista para seguir ajustando.
+    const [scId, esId, d] = b.dataset.turnoestado.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      es.turnos = Math.max(0, num(es.turnos) + num(d));
+      estadoChipAbierto = `${scId}:${esId}`;
+      renderAll();
+    }
     return;
   }
 
@@ -5683,6 +5696,14 @@ if(MODO_ACCIONES){
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
     // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".
     if(e.data.tipo === 'abrir-estados' && gmVivo.listo) estadosModoAbrir(e.data.creep);
+    // El ⚙ de un estado en el mapa: se abre su editor (se busca por nombre).
+    if(e.data.tipo === 'editar-estado' && gmVivo.listo){
+      const sc = S.creeps.find(x => x.id === e.data.creep);
+      const es = sc && (sc.estados || []).find(x => x && x.nombre === e.data.nombre);
+      if(!es){ toast('No encontré ese estado en el creep'); gmAvisarMapa('acciones-cerrada'); return; }
+      abrirEditorEstadoCreep(sc.id, es.id);
+      gmAvisarMapa('acciones-lista');
+    }
   });
 }
 

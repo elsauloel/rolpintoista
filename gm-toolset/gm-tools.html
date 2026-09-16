@@ -1986,13 +1986,13 @@ function aportesModCreep(sc, statId){
   const out = [];
   (sc.equipo||[]).forEach(it => {
     const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
-    if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v});
+    if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v, tipo: 'equipado'});
   });
   (sc.estados||[]).forEach(es => {
     if(es.activo === false) return;
     const stacks = Math.max(1, num(es.stacks)||1);
     const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
-    if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
+    if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v, tipo: 'estado alterado'});
   });
   return out;
 }
@@ -2480,8 +2480,8 @@ function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
   const d = CREEP_STAT_LOOKUP[statId];
   const attr = d.attr;
   let h = lupaFila(`${ATTR_NOMBRE[attr]} base`, fmt(num(sc[attr])));
-  aportesModCreep(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
-  if(statId !== attr) aportesModCreep(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(d.label)})</span>`, lupaSigno(a.val)); });
+  aportesModCreep(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
+  if(statId !== attr) aportesModCreep(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
   if(!aportesModCreep(sc, attr).length && (statId === attr || !aportesModCreep(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
   if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
   const valor = creepStatValor(sc, statId);

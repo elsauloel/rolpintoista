@@ -2518,18 +2518,16 @@ function fileToDataURL(file, maxDim=480, quality=0.85){
 
 function collectMods(){
   const out = {};
-  const push = (m, origen) => {
+  // tipo: de dónde viene (lo muestra la 🔍); itemId: para el PdG propio de cada arma.
+  const push = (m, origen, tipo, itemId) => {
     if(!m || !m.stat) return;
-    (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen});
+    (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen, tipo, itemId});
   };
-  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => {
-    push(m, i.nombre);
-    if(m && m.stat) out[m.stat][out[m.stat].length - 1].itemId = i.id;  // para el PdG propio de cada arma
-  }));
-  S.pasivas.forEach(p => (p.mods||[]).forEach(m => push(m, p.nombre)));
+  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id)));
+  S.pasivas.forEach(p => (p.mods||[]).forEach(m => push(m, p.nombre, 'pasiva')));
   S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
     const stacks = Math.max(1, num(e.stacks) || 1);
-    push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''));
+    push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''), 'estado alterado');
   }));
   return out;
 }
@@ -6549,7 +6547,7 @@ function lupaDesgloseVars(vars, c, nivel, vistos){
       ? fila(`${esc(STAT_FULL[v])} (valor propio)`, fmt(num(S.attrs[v])))
       : fila(`${esc(STAT_LABEL[v])} base <code>${esc(S.formulas[v] || '0')}</code>`, Number.isNaN(c.base[v]) ? '?' : fmt(c.base[v]));
     h += sub;
-    mods.forEach(m => { h += fila(`${esc(m.origen)} <span class="lupa-gris">(${esc(STAT_LABEL[v])})</span>`, lupaSigno(m.val)); });
+    mods.forEach(m => { h += fila(`${esc(m.origen)} <span class="lupa-gris">(${esc(m.tipo || '')} · ${esc(STAT_LABEL[v])})</span>`, lupaSigno(m.val)); });
   });
   return h;
 }
@@ -6571,7 +6569,7 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   let h = lupaBase(id, c);
   (c.mods[id] || []).forEach(m => {
     const fuera = excluidos.includes(m);
-    h += lupaFila(`${esc(m.origen)} <span class="lupa-gris">(${esc(STAT_LABEL[id] || id)})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
+    h += lupaFila(`${esc(m.origen)} <span class="lupa-gris">(${esc(m.tipo || '')})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
   });
   if(!(c.mods[id] || []).length) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
   const activos = (S.efectos || []).filter(e => e.activo !== false);

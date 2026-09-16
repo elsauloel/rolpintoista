@@ -219,6 +219,21 @@ input[type=file]{display:none}
 .card .cbody{padding:10px 11px;display:flex;flex-direction:column;gap:9px}
 
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+/* Editor de habilidades de creeps paso a paso (igual que en la ficha) */
+.pasos-hab{display:flex;flex-wrap:wrap;gap:5px}
+.paso-chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;padding:3px 8px;border:1px solid var(--line);border-radius:99px;color:var(--muted);background:none;cursor:pointer}
+.paso-chip.hecho{color:var(--paper)}
+.paso-chip.activo{color:#180F08;background:var(--copper);border-color:var(--copper);font-weight:700}
+.paso-chip:disabled{opacity:.4;cursor:not-allowed}
+.paso-titulo{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--paper);margin:2px 0 4px}
+.paso-ayuda{color:var(--muted);font-size:12.5px;margin:0;line-height:1.45}
+#scrim-hab-creep [hidden]{display:none!important}
+.paso-nav{display:flex;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.resumen-hab{border:1px solid var(--line);background:var(--panel2);padding:10px 12px;border-radius:var(--r)}
+.resumen-nombre{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:var(--brass)}
+.resumen-desc{font-size:13px;margin:4px 0 8px;white-space:pre-wrap}
+.resumen-fila{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;border-top:1px solid var(--line-soft)}
+.resumen-fila span{color:var(--muted)}
 .row5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 /* Stats secundarios debajo de cada atributo (editor y vista del creep). */
 .attr-col{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -911,28 +926,49 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 </div>
 
 <div class="scrim" id="scrim-hab-creep">
-  <div class="modal" style="max-width:420px">
-    <header><h3>Habilidad</h3><button class="iconbtn" id="habcreep-x">Cerrar</button></header>
+  <div class="modal" style="max-width:460px">
+    <header><h3 id="hc-titulo-modal">Habilidad</h3><button class="iconbtn" id="habcreep-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <div class="f"><label>Nombre</label><input type="text" id="hc-nombre"></div>
-      <div class="row3">
-        <div class="mini-f"><label>Costo (texto libre)</label><input type="text" id="hc-costo" placeholder="ej. 1 bono"></div>
-        <div class="mini-f"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1"></div>
-        <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0"></div>
+      <!-- Paso a paso: cada bloque .hc-paso es un paso (ver PASOS_HAB_CREEP). -->
+      <div class="pasos-hab" id="hc-pasos"></div>
+      <div>
+        <div class="paso-titulo" id="hc-paso-titulo"></div>
+        <p class="paso-ayuda" id="hc-paso-ayuda"></p>
       </div>
-      <div class="f"><label>Detalle</label><textarea id="hc-detalle"></textarea></div>
-      <div class="f"><label>Tirada de dados automática (opcional, ej. 1d20+5)</label><input type="text" id="hc-tirada"></div>
-      <div class="hint" style="margin-top:4px">Estado alterado automático al ejecutar (opcional)</div>
-      <div class="f"><label>Preset</label><select id="hc-efecto-preset"></select></div>
-      <div class="f"><label>Nombre del estado</label><input type="text" id="hc-efecto-nombre" placeholder="ej. Espinas"></div>
-      <div class="row3">
-        <div class="mini-f"><label>Turnos</label><input type="number" id="hc-efecto-turnos" min="0" value="0"></div>
-        <div class="mini-f"><label>Stacks</label><input type="number" id="hc-efecto-stacks" min="1" value="1"></div>
-        <div class="mini-f"><label>HP por turno</label><input type="number" id="hc-efecto-hpturno" value="0"></div>
+      <div class="hc-paso" data-hc-paso="0">
+        <div class="f"><label>Nombre</label><input type="text" id="hc-nombre" placeholder="ej. Mordida venenosa" data-hc-enter="1"></div>
+        <div class="f" style="margin-top:8px"><label>Descripción</label><textarea id="hc-detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
       </div>
-      <div class="f"><label>Detalle del estado (opcional)</label><input type="text" id="hc-efecto-detalle"></div>
-      <input type="hidden" id="hc-efecto-polaridad" value="otro">
-      <input type="hidden" id="hc-efecto-mods" value="[]">
+      <div class="hc-paso" data-hc-paso="1">
+        <div class="row3">
+          <div class="mini-f"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1" data-hc-enter="1"></div>
+          <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0" data-hc-enter="1"></div>
+          <div class="mini-f"><label>Otro costo</label><input type="text" id="hc-costo" placeholder="opcional" data-hc-enter="1"></div>
+        </div>
+        <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). "Otro costo" es un recordatorio libre: vida, un objeto, etc.</div>
+      </div>
+      <div class="hc-paso" data-hc-paso="2">
+        <div class="f"><label>Fórmula de dados</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3 · vacío = no tira" data-hc-enter="1"></div>
+      </div>
+      <div class="hc-paso" data-hc-paso="3">
+        <div class="f"><label>Elegir de la lista</label><select id="hc-efecto-preset"></select></div>
+        <div class="f" style="margin-top:8px"><label>Nombre del estado</label><input type="text" id="hc-efecto-nombre" placeholder="vacío = no aplica ninguno"></div>
+        <div class="row3" style="margin-top:8px">
+          <div class="mini-f"><label>Turnos</label><input type="number" id="hc-efecto-turnos" min="0" value="0"></div>
+          <div class="mini-f"><label>Stacks</label><input type="number" id="hc-efecto-stacks" min="1" value="1"></div>
+          <div class="mini-f"><label>HP por turno</label><input type="number" id="hc-efecto-hpturno" value="0"></div>
+        </div>
+        <div class="f" style="margin-top:8px"><label>Descripción del estado (opcional)</label><input type="text" id="hc-efecto-detalle"></div>
+        <input type="hidden" id="hc-efecto-polaridad" value="otro">
+        <input type="hidden" id="hc-efecto-mods" value="[]">
+      </div>
+      <div class="hc-paso" data-hc-paso="4">
+        <div class="resumen-hab" id="hc-resumen"></div>
+      </div>
+      <div class="paso-nav">
+        <button type="button" class="btn ghost" id="hc-atras">← Atrás</button>
+        <button type="button" class="btn primary" id="hc-siguiente">Siguiente →</button>
+      </div>
     </div>
     <footer>
       <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
@@ -3523,13 +3559,75 @@ async function agregarItemCustomAlCatalogo(){
   }
 }
 
-let editingHabCreep = null;
+let editingHabCreep = null;   // {scId, habId (null = nueva), paso}
+
+/* Habilidades de creeps: editor paso a paso, como el de la ficha pero con
+   lo que tiene un creep (sin SP ni Job; con cooldown y "otro costo"). Al
+   crear, Guardar aparece en el último paso; al editar, siempre. */
+const PASOS_HAB_CREEP = [
+  {corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
+   ayuda: 'Esta descripción se lee en la Mesa cada vez que el creep la usa.'},
+  {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto la puede usar?',
+   ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
+  {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
+   ayuda: 'Escribí la fórmula (daño, curación, lo que sea). Si no tira, dejala vacía y seguí.'},
+  {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
+   ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
+  {corto: 'Listo', titulo: 'Revisá cómo quedó',
+   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+];
+
+function hcMostrarPaso(n){
+  if(!editingHabCreep) return;
+  const total = PASOS_HAB_CREEP.length;
+  const destino = Math.max(0, Math.min(total - 1, n));
+  if(destino > 0 && !$('#hc-nombre').value.trim()){
+    toast('Primero ponele un nombre');
+    editingHabCreep.paso = 0;
+  }else{
+    editingHabCreep.paso = destino;
+  }
+  const paso = editingHabCreep.paso;
+  const nueva = !editingHabCreep.habId;
+  const conNombre = !!$('#hc-nombre').value.trim();
+  $('#hc-pasos').innerHTML = PASOS_HAB_CREEP.map((p, i) => {
+    const bloqueado = nueva && i > paso && !conNombre;
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hc-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  }).join('');
+  $('#hc-paso-titulo').textContent = PASOS_HAB_CREEP[paso].titulo;
+  $('#hc-paso-ayuda').textContent = PASOS_HAB_CREEP[paso].ayuda;
+  document.querySelectorAll('#scrim-hab-creep .hc-paso').forEach(el => { el.hidden = num(el.dataset.hcPaso) !== paso; });
+  $('#hc-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
+  $('#hc-siguiente').hidden = paso === total - 1;
+  $('#habcreep-guardar').hidden = nueva && paso !== total - 1;
+  if(paso === total - 1) $('#hc-resumen').innerHTML = hcResumenHtml();
+  const primero = document.querySelector(`#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] input:not([type=hidden]),#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] select,#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] textarea`);
+  if(primero) setTimeout(() => primero.focus(), 30);
+}
+
+function hcResumenHtml(){
+  const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${esc(valor)}</b></div>`;
+  const detalle = $('#hc-detalle').value.trim();
+  const estado = $('#hc-efecto-nombre').value.trim();
+  const turnos = num($('#hc-efecto-turnos').value);
+  const cd = num($('#hc-cd').value);
+  return `<div class="resumen-nombre">${esc($('#hc-nombre').value.trim() || '(sin nombre)')}</div>
+    <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${fila('No2', fmt(Math.max(0, num($('#hc-acciones').value))))}
+    ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
+    ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
+    ${fila('Tirada', $('#hc-tirada').value.trim() || 'no tira')}
+    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
+}
 
 function abrirEditorHabCreep(scId, habId){
   const sc = S.creeps.find(s => s.id === scId);
-  const h = sc && sc.habilidades.find(x => x.id === habId);
+  if(!sc) return;
+  // habId vacío = habilidad nueva (se agrega al guardar).
+  const h = habId ? sc.habilidades.find(x => x.id === habId) : {};
   if(!h) return;
-  editingHabCreep = {scId, habId};
+  editingHabCreep = {scId, habId: habId || null, paso: 0};
+  $('#hc-titulo-modal').textContent = habId ? `Editar habilidad · ${sc.nombre || 'creep'}` : `Nueva habilidad · ${sc.nombre || 'creep'}`;
   $('#hc-nombre').value = h.nombre || '';
   $('#hc-costo').value = h.costo || '';
   $('#hc-acciones').value = h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad;
@@ -3545,13 +3643,20 @@ function abrirEditorHabCreep(scId, habId){
   $('#hc-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(h.efectoMods || []);
   $('#scrim-hab-creep').classList.add('open');
+  hcMostrarPaso(0);
 }
 
 function guardarEditorHabCreep(){
   if(!editingHabCreep) return;
   const sc = S.creeps.find(s => s.id === editingHabCreep.scId);
-  const h = sc && sc.habilidades.find(x => x.id === editingHabCreep.habId);
-  if(!h){ editingHabCreep = null; return; }
+  if(!sc){ editingHabCreep = null; return; }
+  let h = editingHabCreep.habId ? sc.habilidades.find(x => x.id === editingHabCreep.habId) : null;
+  if(editingHabCreep.habId && !h){ editingHabCreep = null; return; }
+  if(!$('#hc-nombre').value.trim()){ hcMostrarPaso(0); return; }
+  if(!h){
+    h = {id: uid(), cdActual: 0};
+    sc.habilidades.push(h);
+  }
   h.nombre = $('#hc-nombre').value.trim() || 'Sin nombre';
   h.costo = $('#hc-costo').value;
   h.nitrosCosto = Math.max(0, num($('#hc-acciones').value) || 0);
@@ -4066,8 +4171,7 @@ document.addEventListener('click', e => {
   if(b.dataset.addhab){
     const sc = S.creeps.find(s=>s.id===b.dataset.addhab);
     if(sc){
-      sc.habilidades.push({id:uid(), nombre:'', detalle:'', cd:0, cdActual:0});
-      renderAll();
+      abrirEditorHabCreep(sc.id, null);  // paso a paso; se agrega al guardar
     }
     return;
   }
@@ -4982,6 +5086,20 @@ $('#item-aleatorio-gm-x').onclick = () => $('#scrim-item-aleatorio-gm').classLis
 $('#item-aleatorio-gm-cerrar').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');
 $('#scrim-item-aleatorio-gm').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-aleatorio-gm') $('#scrim-item-aleatorio-gm').classList.remove('open'); });
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
+$('#hc-pasos').addEventListener('click', e => {
+  const chip = e.target.closest('[data-hc-ir]');
+  if(chip && editingHabCreep) hcMostrarPaso(num(chip.dataset.hcIr));
+});
+$('#hc-siguiente').onclick = () => { if(editingHabCreep) hcMostrarPaso(editingHabCreep.paso + 1); };
+$('#hc-atras').onclick = () => { if(editingHabCreep) hcMostrarPaso(editingHabCreep.paso - 1); };
+// Enter en un campo de una línea: al paso siguiente.
+$('#scrim-hab-creep').addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || !editingHabCreep || !e.target.matches('[data-hc-enter]')) return;
+  e.preventDefault();
+  if(editingHabCreep.paso < PASOS_HAB_CREEP.length - 1) hcMostrarPaso(editingHabCreep.paso + 1);
+});
+// El nombre habilita (o no) los pasos de adelante.
+$('#hc-nombre').addEventListener('input', () => { if(editingHabCreep && !editingHabCreep.habId) hcMostrarPaso(editingHabCreep.paso); });
 $('#hc-efecto-preset').addEventListener('change', e => {
   if(!e.target.value) return;
   const [tipo, idx] = e.target.value.split(':');

@@ -5260,6 +5260,8 @@ function creepPublico(sc, orden){
           turnos: num(es.turnos),
           permanente: !!es.permanente,
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
+          // Para el globito del mapa al pasar el mouse por el estado.
+          detalle: String(es.detalle || '').slice(0, 300),
         })),
     },
   };

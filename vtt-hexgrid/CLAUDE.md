@@ -73,7 +73,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   (`mapa-iniciativa-plegada`).
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
-  (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
+  (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
   token, ⚡ Botonera (PJ propio) o Acciones (creep del GM). Vida/SP/No2 se
   guardan en la ficha o en la parte privada del creep; barras y aura, en el
   propio token (`barras {hp,sp,no2}`, `aura {radio, color}`). Un token sin ficha ni creep

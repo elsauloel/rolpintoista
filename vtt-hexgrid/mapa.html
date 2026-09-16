@@ -129,6 +129,16 @@ aside{
 }
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
+/* Descripción del estado al pasar el mouse, dentro del globo de estados. */
+#hud .hud-estado{position:relative}
+#hud .hud-estado .nom.con-tip{cursor:help;text-decoration:underline dotted var(--muted)}
+#hud .hud-estado .estado-tip{
+  display:none;position:absolute;left:0;bottom:calc(100% + 6px);z-index:30;width:230px;max-width:60vw;
+  background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);padding:8px 10px;
+  font-size:11.5px;line-height:1.45;color:var(--paper);box-shadow:0 8px 22px rgba(0,0,0,.65);pointer-events:none;white-space:normal
+}
+#hud .hud-estado .estado-tip b{display:block;color:var(--brass);margin-bottom:3px}
+#hud .hud-estado .nom:hover + .estado-tip,#hud .hud-estado .nom:focus + .estado-tip{display:block}
 /* Tablero de iniciativa (estilo Roll20): flotante, semitransparente y
    plegable. Solo se ve en modo combate. */
 #iniciativa{
@@ -2255,10 +2265,12 @@ function hudEstadosHtml(t, estados, puede){
     ? '<div class="hud-globo-acciones"><button type="button" class="hud-mini" data-hud-estado-nuevo="1">+ Estado</button></div>' : '';
   if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
   return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
-    const turnos = e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—');
+    const turnos = e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—");
+    const det = String(e.detalle || "").trim();
     return `<div class="hud-estado">
       <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
-      <span class="nom" title="${esc(e.detalle || e.nombre)}">${esc(e.nombre)}</span>
+      <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>
+      ${det ? `<span class="estado-tip"><b>${esc(e.nombre)}</b>${esc(det)}</span>` : ""}
       <span class="turnos">${turnos}</span>` +
       (puede && !e.permanente ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +

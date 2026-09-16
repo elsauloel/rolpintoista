@@ -86,7 +86,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   arriba) que despliega D4…D100 × 1–6; cada clic es una "Tirada libre"
   común (no escribe nada distinto).
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
-  hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente,
+  hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente, detalle,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},
   miniatura, creado, actualizado}`. Las fichas guardadas antes de la
   Iteración 2 publican `bonos`/`bonosMax` hasta que se vuelven a abrir (el

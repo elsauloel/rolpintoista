@@ -7260,6 +7260,8 @@ function fichaResumen(){
         turnos: num(e.turnos),
         permanente: !!e.permanente,
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+        // Para el globito del mapa al pasar el mouse por el estado.
+        detalle: String(e.detalle || '').slice(0, 300),
       })),
     invocaciones: (S.invocaciones || [])
       .filter(inv => inv && inv.id)

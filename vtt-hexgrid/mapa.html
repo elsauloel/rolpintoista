@@ -129,16 +129,17 @@ aside{
 }
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
-/* Descripción del estado al pasar el mouse, dentro del globo de estados. */
-#hud .hud-estado{position:relative}
+/* Descripción del estado al pasar el mouse. Va con position:fixed y la
+   ubica hudTipUbicar, porque el globo de estados tiene scroll propio y si
+   no la recortaría. */
 #hud .hud-estado .nom.con-tip{cursor:help;text-decoration:underline dotted var(--muted)}
 #hud .hud-estado .estado-tip{
-  display:none;position:absolute;left:0;bottom:calc(100% + 6px);z-index:30;width:230px;max-width:60vw;
+  display:none;position:fixed;left:0;top:0;z-index:40;width:250px;max-width:70vw;
   background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);padding:8px 10px;
   font-size:11.5px;line-height:1.45;color:var(--paper);box-shadow:0 8px 22px rgba(0,0,0,.65);pointer-events:none;white-space:normal
 }
 #hud .hud-estado .estado-tip b{display:block;color:var(--brass);margin-bottom:3px}
-#hud .hud-estado .nom:hover + .estado-tip,#hud .hud-estado .nom:focus + .estado-tip{display:block}
+#hud .hud-estado .estado-tip.visible{display:block}
 /* Tablero de iniciativa (estilo Roll20): flotante, semitransparente y
    plegable. Solo se ve en modo combate. */
 #iniciativa{
@@ -2404,6 +2405,32 @@ function hudConectar(t){
   });
   const nuevoEstado = hud.querySelector('[data-hud-estado-nuevo]');
   if(nuevoEstado) nuevoEstado.onclick = () => abrirEstadoNuevo(t);
+  // Descripción del estado: se muestra al pasar el mouse (o con Tab) y se
+  // ubica a mano, para que no la recorte el scroll del globo ni el borde
+  // del mapa.
+  hud.querySelectorAll('.hud-estado .nom.con-tip').forEach(nom => {
+    const tip = nom.parentElement.querySelector('.estado-tip');
+    if(!tip) return;
+    const mostrar = () => {
+      tip.classList.add('visible');
+      const caja = $('#lienzo-caja').getBoundingClientRect();
+      const r = nom.getBoundingClientRect();
+      const margen = 8;
+      const ancho = tip.offsetWidth, alto = tip.offsetHeight;
+      let x = r.left;
+      x = Math.max(caja.left + margen, Math.min(x, caja.right - ancho - margen));
+      let y = r.top - alto - 6;                       // arriba del renglón
+      if(y < caja.top + margen) y = r.bottom + 6;     // no entra: abajo
+      y = Math.max(caja.top + margen, Math.min(y, caja.bottom - alto - margen));
+      tip.style.left = Math.round(x) + 'px';
+      tip.style.top = Math.round(y) + 'px';
+    };
+    const esconder = () => tip.classList.remove('visible');
+    nom.onmouseenter = mostrar;
+    nom.onfocus = mostrar;
+    nom.onmouseleave = esconder;
+    nom.onblur = esconder;
+  });
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
   hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
     const [i, delta] = b.dataset.hudTurnos.split(':');

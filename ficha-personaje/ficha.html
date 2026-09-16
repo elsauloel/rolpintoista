@@ -964,6 +964,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 
 /* ---------- Barra superior (arriba de los vitales, fija al scrollear) ---------- */
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
+.accesos{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
+#menu-sitio-boton,#menu-sitio{z-index:49!important} /* debajo de las ventanas (z 50) */
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
 .accesos .partida{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:var(--brass);white-space:nowrap}
 .accesos .partida:empty{display:none}
@@ -1655,6 +1657,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>

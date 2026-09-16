@@ -42,6 +42,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(22px,3vw,32px);margin:0;letter-spacing:-.01em}
 .hero .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px}
 .hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero > div:first-child{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
 
 .btn{
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
@@ -372,6 +373,7 @@ input[type=checkbox]{width:auto}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/menu-sitio.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

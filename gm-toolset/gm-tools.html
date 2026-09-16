@@ -46,6 +46,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .hero-titulo{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 /* Barra superior: accesos y herramientas con botones chicos (mismo diseño que la ficha). */
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+.accesos{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
 .accesos .iconbtn{text-decoration:none}
 .accesos-sep{width:1px;align-self:stretch;background:var(--line);margin:0 3px}
 .accesos .iconbtn.dk-tablero{background:rgba(91,141,190,.16);border-color:#5B8DBE;color:#B9D2EA}
@@ -1118,6 +1119,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>

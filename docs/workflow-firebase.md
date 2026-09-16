@@ -33,6 +33,12 @@ que verse en vivo entre jugadores.
 2. Lista de partidas: todas las del sitio (grupo cerrado de amigos). Se
    entra a una donde ya estás, te unís a otra eligiendo tu nombre en esa
    partida, o creás una nueva (quedás como su GM).
+   **Menú del sitio** ([`../comun/menu-sitio.js`](../comun/menu-sitio.js)): botón ☰ fijo arriba a
+   la izquierda en el inicio y en todas las herramientas. Abre las ramas del
+   sitio: Partidas (y las tuyas), la partida abierta con Mapa, personajes
+   (propios y de los demás; el GM, GM Tools y Generador de tiendas),
+   Manual y Cerrar sesión. Lee partidas y fichas al abrirse (caché 1 min);
+   no aparece en los iframes del mapa.
    Arriba, "✎ Mi nombre" permite cambiar el nombre en cada partida donde
    estás (y, si sos el GM, también el `gmNombre` de la partida).
    Al pie de la página de la partida:

@@ -2281,6 +2281,7 @@ function hudEstadosHtml(t, estados, puede){
       (puede && !e.permanente ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
+      (puede && puedeAgregarEstado(t) ? `<button type="button" class="hud-mini" data-hud-estado-editar="${i}" title="Editar este estado">⚙</button>` : '') +
     '</div>';
   }).join('') + agregar + '</div>';
 }
@@ -2436,6 +2437,11 @@ function hudConectar(t){
     nom.onmouseleave = esconder;
     nom.onblur = esconder;
   });
+  hud.querySelectorAll('[data-hud-estado-editar]').forEach(b => b.onclick = () => {
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(b.dataset.hudEstadoEditar)];
+    if(e) abrirEditarEstado(t, e.nombre);
+  });
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
   hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
     const [i, delta] = b.dataset.hudTurnos.split(':');
@@ -2530,6 +2536,14 @@ function abrirEstadoNuevo(t){
   if(!puedeAgregarEstado(t)) return;
   if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'abrir-estados', creep: t.fichaId});
   else abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-estados'});
+}
+
+// ⚙ de un estado: abre su editor en la ficha o en gm-tools (se busca por
+// nombre, porque el resumen no guarda el id del estado).
+function abrirEditarEstado(t, nombre){
+  if(!puedeAgregarEstado(t)) return;
+  if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'editar-estado', creep: t.fichaId, nombre});
+  else abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'editar-estado', nombre});
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.

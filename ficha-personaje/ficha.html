@@ -8008,6 +8008,13 @@ if(MODO_BOTONERA){
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir();
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado".
     if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){ abrirPresetsEfecto('directo'); botoneraAvisarMapa('botonera-lista'); }
+    // El ⚙ de un estado en el mapa: se abre su editor (se busca por nombre).
+    if(e.data.tipo === 'editar-estado' && fichaVivo && fichaVivo.cargada){
+      const ef = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === e.data.nombre);
+      if(!ef){ toast('No encontré ese estado en la ficha'); botoneraAvisarMapa('botonera-cerrada'); return; }
+      openEditor('efectos', ef.id);
+      botoneraAvisarMapa('botonera-lista');
+    }
   });
 }
 

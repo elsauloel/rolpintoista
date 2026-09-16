@@ -4393,6 +4393,12 @@ document.addEventListener('click', e => {
     if(it) tirarDanoDeArma(it);
     return;
   }
+  if(b.dataset.habarma){
+    const [habId, armaId] = b.dataset.habarma.split(":");
+    $("#scrim-elegir-arma").classList.remove("open");
+    ejecutarHabilidad(habId, armaId);
+    return;
+  }
   if(b.dataset.atacararma){
     const it = S.inventario.find(x=>x.id===b.dataset.atacararma);
     $('#scrim-elegir-arma').classList.remove('open');
@@ -6082,9 +6088,19 @@ function drawEditorHabilidad(){
       <div class="f"><label>Descripción</label><textarea data-c="detalle" rows="4" placeholder="ej. Un golpe preciso que ignora la mitad de la Defensa del rival.">${esc(draft.detalle)}</textarea></div>`;
   }
   if(paso === 1){
-    html += `<div class="f2">
-        <div class="f"><label>SP que gasta</label><input data-c="costo" value="${esc(draft.costo ?? '')}" placeholder="ej. 3 · o X si varía" data-hab-enter="1"></div>
-        <div class="f"><label>Nitros (No2) que gasta</label><input data-c="nitrosCosto" value="${esc(draft.nitrosCosto ?? IT2.nitrosHabilidad)}" placeholder="ej. 1 · o X si varía" data-hab-enter="1"></div>
+    // Nitros: un número fijo, X (se elige al usarla) o lo que cueste un
+    // ataque con el arma que se elija al ejecutarla.
+    const modo = nitrosAtaque(draft) ? 'ataque' : (nitrosVariable(draft) ? 'x' : 'num');
+    const opcion = (valor, texto) => `<button type="button" class="opcion-btn ${modo === valor ? 'activa' : ''}" data-nitros-modo="${valor}">${texto}</button>`;
+    html += `<div class="f"><label>SP que gasta</label><input data-c="costo" value="${esc(draft.costo ?? '')}" placeholder="ej. 3 · o X si varía" data-hab-enter="1"></div>
+      <div class="f"><label>Nitros (No2) que gasta</label>
+        <div class="opcion-fila">
+          ${opcion('num', 'Un número')}${opcion('x', 'X (lo elijo al usarla)')}${opcion('ataque', 'Lo mismo que un ataque')}
+        </div>
+        ${modo === 'num' ? `<input data-c="nitrosCosto" type="number" step="1" min="0" value="${esc(num(draft.nitrosCosto ?? IT2.nitrosHabilidad))}" data-hab-enter="1" style="margin-top:6px;max-width:120px">` : ''}
+        <div class="hint" style="margin-top:5px">${modo === 'ataque'
+          ? `Para habilidades que incluyen un ataque: cuesta lo mismo que atacar con el arma que elijas al ejecutarla (Tipo ÷ 2 el primer ataque del turno con esa arma, Tipo completo después) y cuenta como ese ataque. Hoy: ${esc(costoAtaqueTxt())}.`
+          : modo === 'x' ? 'Al ejecutarla te pregunta cuántos Nitros gastar.' : 'Siempre gasta esa cantidad.'}</div>
       </div>
       <div class="f"><label>¿Se puede usar más de una vez por turno?</label>
         <div class="opcion-fila">
@@ -6124,7 +6140,7 @@ function drawEditorHabilidad(){
       <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
       <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
       ${fila('SP', esc(costoSp || 'no gasta'))}
-      ${fila("No2", esCostoVariable(draft.nitrosCosto) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
+      ${fila("No2", nitrosAtaque(draft) ? "como un ataque (elegís el arma al usarla)" : nitrosVariable(draft) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
       ${fila('Uso', esc(draft.categoria || 'Sin categoría'))}
       ${fila('Tirada', esc(tirada || 'no tira'))}
       ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}
@@ -6158,6 +6174,14 @@ function habilidadIrAPaso(n){
 
 $('#modal-body').addEventListener('click', e => {
   if(!editing || editing.key !== 'habilidades') return;
+  const modoNitros = e.target.closest("[data-nitros-modo]");
+  if(modoNitros){
+    const m = modoNitros.dataset.nitrosModo;
+    const d = editing.draft;
+    d.nitrosCosto = m === "ataque" ? "ATAQUE" : m === "x" ? "X" : ((nitrosAtaque(d) || nitrosVariable(d)) ? IT2.nitrosHabilidad : num(d.nitrosCosto ?? IT2.nitrosHabilidad));
+    drawEditor();
+    return;
+  }
   const chip = e.target.closest('[data-hab-paso]');
   if(chip){ habilidadIrAPaso(num(chip.dataset.habPaso)); return; }
   if(e.target.closest('[data-hab-siguiente]')){ habilidadIrAPaso((editing.paso || 0) + 1); return; }
@@ -6624,11 +6648,13 @@ function parseCostoSp(costo){
 
 // Costo variable (X) en SP o en Nitros: se elige al ejecutar.
 function spVariable(h){ return esCostoVariable(h && h.costo); }
-function nitrosVariable(h){ return esCostoVariable(h && h.nitrosCosto); }
+function nitrosVariable(h){ return esCostoVariable(h && h.nitrosCosto) && !nitrosAtaque(h); }
+function nitrosAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
 function habCostoVariable(h){ return spVariable(h) || nitrosVariable(h); }
 
 // Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
-function costoNitrosHab(h){
+function costoNitrosHab(h, arma){
+  if(nitrosAtaque(h)) return arma === undefined ? costoAtaqueMinimo() : costoAtaqueNitros(arma);
   if(nitrosVariable(h)) return 0;
   return num(h.nitrosCosto ?? IT2.nitrosHabilidad);
 }
@@ -6837,7 +6863,8 @@ function lupaHtml(clave){
     if(habCostoVariable(h0)) costo += lupaFila(`Costo variable (X en ${[spVariable(h0) ? "SP" : "", nitrosVariable(h0) ? "No2" : ""].filter(Boolean).join(" y ")})`, "elegís al ejecutar");
     else{
       const n = costoNitrosHab(h0);
-      costo += lupaFila(h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '' ? `Nitros (por defecto, ${fmt(IT2.nitrosHabilidad)})` : 'Nitros de la habilidad', `${fmt(n)} No2`);
+      if(nitrosAtaque(h0)) armasParaHabilidad().forEach(o => { costo += lupaFila(`Como un ataque con ${o.arma ? esc(o.arma.nombre) : "sin arma"} <span class="lupa-gris">(${ataquesConArma(o.arma) ? "Tipo completo" : "primer ataque, Tipo ÷ 2"})</span>`, `${fmt(costoAtaqueNitros(o.arma))} No2`); });
+      else costo += lupaFila(h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '' ? `Nitros (por defecto, ${fmt(IT2.nitrosHabilidad)})` : 'Nitros de la habilidad', `${fmt(n)} No2`);
       const sp = parseCostoSp(h0.costo);
       if(sp) costo += lupaFila(`SP <span class="lupa-gris">(${esc(h0.costo)})</span>`, `${fmt(sp)} SP`);
     }
@@ -6919,7 +6946,8 @@ let pendingEjecucion = null;
 function costoHabilidadTxt(h){
   const partes = [];
   const nitros = costoNitrosHab(h);
-  if(nitrosVariable(h)) partes.push("X No2");
+  if(nitrosAtaque(h)) partes.push(costoAtaqueHabTxt());
+  else if(nitrosVariable(h)) partes.push("X No2");
   else if(nitros) partes.push(`${fmt(nitros)} No2`);
   const costo = String(h.costo || '').trim();
   if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
@@ -6936,22 +6964,58 @@ function limiteCostoX(cual){
   return typeof f === 'function' ? f(compute()) : null;
 }
 
-function ejecutarHabilidad(id){
+// Habilidades con costo de Nitros "ATAQUE": cuestan lo mismo que un ataque
+// con el arma que se elige al ejecutarlas y cuentan como ese ataque.
+let pendingArmaHab = undefined;   // arma elegida para la habilidad en curso (null = sin arma)
+
+function armasParaHabilidad(){
+  const armas = armasEquipadasConDano();
+  return armas.length ? armas.map(a => ({arma: a.item, mano: a.mano})) : [{arma: null, mano: null}];
+}
+
+// Lo mínimo que puede costar (para saber si alcanza) y el texto para mostrar.
+function costoAtaqueMinimo(){
+  return Math.min(...armasParaHabilidad().map(o => costoAtaqueNitros(o.arma)));
+}
+function costoAtaqueHabTxt(){
+  const opciones = armasParaHabilidad();
+  if(opciones.length === 1) return `${fmt(costoAtaqueNitros(opciones[0].arma))} No2 (ataque${opciones[0].arma ? ` con ${opciones[0].arma.nombre}` : ' sin arma'})`;
+  return `ataque: ${opciones.map(o => `${o.arma.nombre} ${fmt(costoAtaqueNitros(o.arma))}`).join(' / ')} No2`;
+}
+
+function ejecutarHabilidad(id, armaId){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
-  if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
+  if(it.categoria === 'No espameable' && it.usadaEsteTurno === true && armaId === undefined){
     if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
   }
+  // Con costo de ataque: primero se elige el arma (si hay más de una).
+  let arma = null;
+  if(nitrosAtaque(it)){
+    const opciones = armasParaHabilidad();
+    if(armaId === undefined && opciones.length > 1){
+      $('#elegir-arma-lista').innerHTML =
+        `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +
+        opciones.map(o => `
+        <button class="btn" data-habarma="${esc(it.id)}:${esc(o.arma.id)}" style="width:100%">
+          ${o.mano ? `Mano ${o.mano}: ` : ''}${esc(o.arma.nombre)} — ${fmt(costoAtaqueNitros(o.arma))} No2${ataquesConArma(o.arma) ? '' : ' (primer ataque)'}${costoAtaqueNitros(o.arma) > num(S.nitros) ? ' · no te alcanza' : ''}
+        </button>`).join('');
+      $('#scrim-elegir-arma').classList.add('open');
+      return;
+    }
+    arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
+  }
+  pendingArmaHab = nitrosAtaque(it) ? arma : undefined;
   if(habCostoVariable(it)){
     pendingEjecucion = id;
-    $("#costox-nombre").textContent = it.nombre;
+    $("#costox-nombre").textContent = it.nombre + (nitrosAtaque(it) ? ` · con ${arma ? arma.nombre : 'sin arma'}` : '');
     // Lo que es X se elige; lo fijo se muestra y no se puede cambiar.
     const campoSp = $("#f-costox-sp"), campoNitros = $("#f-costox-nitros");
     campoSp.value = spVariable(it) ? 0 : parseCostoSp(it.costo);
     campoSp.disabled = !spVariable(it);
-    campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it);
+    campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it, arma);
     campoNitros.disabled = !nitrosVariable(it);
-    if(nitrosVariable(it) && costoNitrosHab(it) === 0 && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
+    if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
     $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
     const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
     $('#costox-limite').innerHTML = (limN === null || limS === null)
@@ -6960,14 +7024,15 @@ function ejecutarHabilidad(id){
     $('#scrim-costox').classList.add('open');
     return;
   }
-  const costoNitros = costoNitrosHab(it);
+  const costoNitros = costoNitrosHab(it, arma);
   if(costoNitros > num(S.nitros)){
-    toast(`No te alcanzan los Nitros — ${it.nombre} cuesta ${fmt(costoNitros)}`);
+    toast(`No te alcanzan los Nitros — ${it.nombre} cuesta ${fmt(costoNitros)}${nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`);
     return;
   }
   const costoSp = parseCostoSp(it.costo);
   S.nitros = num(S.nitros) - costoNitros;
   S.spGastado = num(S.spGastado) + costoSp;
+  const ataque = registrarAtaqueDeHabilidad(it, arma);
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
@@ -6979,8 +7044,19 @@ function ejecutarHabilidad(id){
   const partes = [`ejecutada`];
   if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
   partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
+  if(ataque) partes.push(ataque);
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
+}
+
+// Si la habilidad cuesta como un ataque, cuenta como ese ataque del arma
+// (el próximo ataque con esa arma ya paga Tipo completo). Devuelve el texto.
+function registrarAtaqueDeHabilidad(it, arma){
+  if(!nitrosAtaque(it)) return '';
+  const primero = ataquesConArma(arma) === 0;
+  S.ataquesTurno = num(S.ataquesTurno) + 1;
+  S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(arma) + 1};
+  return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
 }
 
 function confirmarCostoVariable(){
@@ -7001,6 +7077,8 @@ function confirmarCostoVariable(){
   if(limS !== null && sp > limS){ toast(`Como mucho ${fmt(limS)} SP en X`); return; }
   S.nitros = Math.max(0, num(S.nitros) - nitros);
   S.spGastado = num(S.spGastado) + sp;
+  const ataque = registrarAtaqueDeHabilidad(it, pendingArmaHab === undefined ? null : pendingArmaHab);
+  pendingArmaHab = undefined;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
@@ -7012,6 +7090,7 @@ function confirmarCostoVariable(){
   renderNitros();
   renderVitals();
   const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
+  if(ataque) partes.push(ataque);
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
 }

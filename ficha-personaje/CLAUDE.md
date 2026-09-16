@@ -55,7 +55,7 @@ más cambia sesión a sesión.
   dados y el costo en No2/SP con su motivo. No tira nada.
 - **Editor de habilidades paso a paso** (`PASOS_HABILIDAD`, `drawEditorHabilidad`):
   `drawEditor` deriva ahí para `habilidades`. Pasos: qué es (nombre y
-  descripción) → costo (SP y No2, cada uno puede ser X: `spVariable`/`nitrosVariable`, se eligen en `#scrim-costox` y lo fijo queda bloqueado; categoría) → tirada (stat y/o fórmula) →
+  descripción) → costo (SP y No2; No2 puede ser un número, X o "ATAQUE" = lo que cuesta atacar con el arma elegida al ejecutar, `nitrosAtaque`/`registrarAtaqueDeHabilidad`, y cuenta como ese ataque; cada uno puede ser X: `spVariable`/`nitrosVariable`, se eligen en `#scrim-costox` y lo fijo queda bloqueado; categoría) → tirada (stat y/o fórmula) →
   estado alterado (`htmlEstadoAlUsar`, compartido con los consumibles) →
   origen (Job o de dónde salió, imagen) → resumen. Al crear, Guardar aparece
   en el último paso; al editar, siempre, y los pasos se pueden saltar.

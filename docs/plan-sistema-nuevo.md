@@ -127,6 +127,26 @@ del mapa separada de su posición. **Siguiente:** dados 3D en el mapa
 (animación con el resultado real de cada tirada, sin escrituras extra;
 con opción de apagarla y tope de dados).
 
+## Antes de abrirlo al público
+
+Hoy el sistema es para jugar **entre amigos de confianza**: nadie va a
+tocar el código ni la base para hacer trampa. Por eso algunas decisiones
+se toman de forma relajada para avanzar con el diseño. **Si algún día se
+decide lanzarlo al público, hay que revisar esta lista antes** (y cada
+decisión relajada nueva se agrega acá al tomarla).
+
+| Decisión relajada hoy | Qué habría que resolver para el público |
+|---|---|
+| Los dados se tiran en el navegador de cada uno | Un servidor que tire (o que verifique las tiradas); hoy cualquiera podría publicar el resultado que quiera |
+| Cualquier cuenta ve todas las partidas y se une con un clic | Partidas privadas: invitación, código o aprobación del GM |
+| "Sacar" a alguien no le impide volver a unirse | Lista de bloqueados o partida cerrada a nuevos jugadores |
+| El GM puede borrar las fichas de los jugadores (lo usa "Borrar la partida") | Limitarlo a ese caso, o que las fichas no se borren sin el dueño |
+| El dueño del proyecto de Firebase ve todo desde la consola (incluido lo oculto: vida de creeps, sigilo, tiradas secretas) | Separar el rol de administrador del de GM |
+| Plan Spark gratis, sin límites por usuario (partidas, tiradas, escrituras) | Plan pago y topes/controles contra abuso |
+| El borrado de tiradas viejas corre cuando el GM entra a una herramienta | Borrado del lado del servidor (TTL o función programada) |
+| Lo que cada uno escribe en su ficha (vida, SP, No2, stats) no se valida | Validar en el servidor lo que afecta a los demás |
+| **Sigilo** (en diseño): el bando contrario no ve el token, pero el resto de la info (ficha, tiradas) queda a decidir | Revisar que ningún dato filtre la posición o las acciones del que está en sigilo |
+
 ## Pendientes chicos
 
 - En `miembros` quedan documentos repetidos de pruebas en incógnito

@@ -75,6 +75,12 @@ más cambia sesión a sesión.
   el mapa en un iframe. Oculta todo menos las ventanitas (`.scrim`) con
   fondo transparente, abre la Botonera al cargar el personaje y le avisa
   al mapa cuando no queda ninguna ventanita abierta.
+- **Bitácora de la partida** (bloque "BITÁCORA DE LA PARTIDA"): compartida en
+  `campanas/{id}/bitacora/{página}/entradas/{id}`, no en la ficha (el viejo
+  `S.bitacora` quedó sin uso). Páginas que cualquiera crea y renombra;
+  entradas en el color de su autor (`bitacoraColor(uid)`) con
+  "(autor · fecha · editado por X fecha)". Cualquiera corrige; borra el autor
+  (o quien creó la página) o el GM. Funciona también en solo lectura.
 - **Sin Tablero**: el botón 📋 Tablero se quitó de la ficha porque las
   barras y estados de todos ya se ven en los tokens del mapa
   (`vtt-hexgrid/mapa.html`). gm-tools conserva el suyo.

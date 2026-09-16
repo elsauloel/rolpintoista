@@ -43,7 +43,17 @@ async function fbArmarRespaldo(){
     base.collection('tienda').doc('publicada').get(),
     esGM ? base.collection('tienda').doc('borrador').get() : Promise.resolve(null),
   ]);
-  const tiendasGuardadas = esGM ? await docs(base.collection('tiendas')) : [];
+  const tiendasGuardadas = esGM ? await docs(base.collection("tiendas")) : [];
+  // Bitácora compartida: cada página con sus entradas en orden.
+  // (Si las reglas todavía no la conocen, el respaldo sale igual, sin ella.)
+  let bitacora = [];
+  try{
+    const bitacoraPaginas = await docs(base.collection("bitacora").orderBy("creado"));
+    bitacora = await Promise.all(bitacoraPaginas.map(async p => ({
+      ...plano(p),
+      entradas: (await docs(p.ref.collection("entradas").orderBy("creado"))).map(plano),
+    })));
+  }catch(e){ console.warn("Respaldo sin bitácora:", e); }
   // Tienda del vendedor: el json tal cual lo guarda el generador de tiendas.
   const tiendaJson = d => {
     if(!d || !d.exists) return null;
@@ -82,6 +92,7 @@ async function fbArmarRespaldo(){
     tokens: tokens.map(plano),
     mapa: mapa.map(plano),
     tiradas: tiradas.map(plano),
+    bitacora,
     tienda: {
       publicada: tiendaJson(tiendaPublicada),
       ...(esGM ? {borrador: tiendaJson(tiendaBorrador), guardadas: tiendasGuardadas.map(d => ({id: d.id, nombre: d.data().nombre, tienda: tiendaJson(d)}))} : {}),

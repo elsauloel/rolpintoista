@@ -86,6 +86,38 @@ service cloud.firestore {
 
       // Tiradas de dados compartidas (cajita "Mesa" de ficha y gm-tools).
       // Cada uno publica solo a su nombre; nadie las edita; el GM puede borrar.
+      // Bitácora compartida de la partida (ficha-personaje/ficha.html): páginas
+      // y entradas. Todos los miembros leen, suman y corrigen; borrar, el autor
+      // (o quien creó la página) o el GM.
+      match /bitacora/{p} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'creado', 'creadoUid', 'creadoPor'])
+          && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 40
+          && request.resource.data.creadoUid == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre'])
+          && request.resource.data.nombre is string && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 40;
+        allow delete: if esMiembro(c) && (resource.data.creadoUid == request.auth.uid || esGM(c));
+
+        match /entradas/{e} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && request.resource.data.keys().hasOnly(['texto', 'uid', 'autor', 'creado'])
+            && request.resource.data.texto is string && request.resource.data.texto.size() <= 4000
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.creado == request.time;
+          allow update: if esMiembro(c)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['texto', 'editado', 'editadoUid', 'editadoPor'])
+            && request.resource.data.texto is string && request.resource.data.texto.size() <= 4000
+            && request.resource.data.editadoUid == request.auth.uid
+            && request.resource.data.editado == request.time;
+          allow delete: if esMiembro(c) && (resource.data.uid == request.auth.uid || esGM(c));
+        }
+      }
+
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)

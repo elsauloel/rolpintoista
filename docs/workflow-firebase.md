@@ -113,6 +113,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   solo lo lee el GM. `firma` es un hash del contenido para que otra pestaña
   del GM note el cambio. Solo el GM escribe. Los "personajes del GM" (PNJ
   aliados, comerciantes…) también son creeps.
+- `campanas/{id}/bitacora/{página}` — `{nombre, creado, creadoUid, creadoPor}` y
+  `bitacora/{página}/entradas/{auto}` — `{texto, uid, autor, creado, editado?,
+  editadoUid?, editadoPor?}`. Bitácora compartida de la partida (la ficha).
+  Todos leen, suman páginas y entradas, y corrigen cualquier entrada; borra
+  el autor (o quien creó la página) o el GM. Va en el respaldo y se borra con
+  la partida.
 - `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
   gm-tools. Solo el GM.
 - `campanas/{id}/tienda/borrador` y `campanas/{id}/tienda/publicada` —

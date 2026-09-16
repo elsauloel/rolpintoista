@@ -122,6 +122,38 @@ aside{
 }
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
+/* Controles flotantes sobre el token seleccionado (estilo Roll20) */
+#hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20;transform:translate(-50%,0)}
+#hud .hud-fila{display:flex;gap:7px;justify-content:center;pointer-events:auto}
+#hud .hud-circulo{
+  width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.92);color:var(--paper);
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.5)
+}
+#hud .hud-circulo:hover{filter:brightness(1.25)}
+#hud .hud-circulo.icono{font-size:15px;border-color:var(--line);color:var(--paper)}
+#hud .hud-circulo.icono.abierto{border-color:var(--brass);color:var(--brass)}
+#hud .hud-circulo:disabled{cursor:default;opacity:.85}
+#hud input.hud-in{
+  width:56px;height:36px;border-radius:18px;border:2.5px solid;background:rgba(15,12,14,.96);color:var(--paper);
+  font-family:"Space Mono",monospace;font-size:13px;text-align:center;padding:0 6px
+}
+#hud .hud-globo{
+  pointer-events:auto;margin-top:8px;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
+}
+#hud .hud-globo h3{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+#hud .hud-estado{display:flex;align-items:center;gap:6px;padding:4px 0;border-top:1px solid var(--line-soft)}
+#hud .hud-estado:first-of-type{border-top:none}
+#hud .hud-estado .nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hud .hud-estado .turnos{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);min-width:26px;text-align:right}
+#hud .hud-mini{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);font-size:11px;padding:1px 6px;cursor:pointer}
+#hud .hud-mini:hover{border-color:var(--copper)}
+#hud .hud-mini.peligro:hover{border-color:var(--danger);color:var(--danger)}
+#hud .hud-campo{display:flex;align-items:center;gap:6px;margin-top:6px}
+#hud .hud-campo label{flex:1;color:var(--muted)}
+#hud .hud-campo input[type=number]{width:62px;padding:4px 6px}
+#hud .hud-campo input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);background:none;border-radius:var(--r)}
 .fila{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
 /* Los botones del panel del token entran aunque sean tres: más compactos
    y, si no entran, pasan al renglón de abajo. */
@@ -223,6 +255,7 @@ aside{
   <div id="lienzo-caja">
     <canvas id="lienzo"></canvas>
     <div id="aviso-mapa" hidden></div>
+    <div id="hud" hidden></div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
       <button type="button" class="btn primary" id="ruta-si">Confirmar</button>
@@ -402,6 +435,7 @@ function claseToken(t){
   return fbUsuario && t.duenoUid === fbUsuario.uid ? 'propio' : 'jugador';
 }
 const SP_COLOR = '#3F86E0';
+const NO2_COLOR = '#3E9B5B';
 const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
 const ANCHO_CASILLA = HEX * SQ3;
 
@@ -443,7 +477,10 @@ function estadoDe(t){
     : (num(r.hpMax) > 0 ? entre01(num(r.hp) / num(r.hpMax)) : 0);
   const {sp: spActual, spMax} = spDeResumen(r);
   const sp = t.tipo === 'pj' && spMax > 0 ? entre01(spActual / spMax) : null;
-  return {hp, sp, muerto: !!r.muerto, dormida: !!r.dormida, estados: Array.isArray(r.estados) ? r.estados : []};
+  // No2: de los PJ sale del resumen; de los creeps, de su parte privada (GM).
+  const n = valoresNo2(t);
+  const no2 = n && n.max > 0 ? entre01(n.valor / n.max) : null;
+  return {hp, sp, no2, muerto: !!r.muerto, dormida: !!r.dormida, estados: Array.isArray(r.estados) ? r.estados : []};
 }
 // SP de una ficha. Las fichas guardadas antes de la Iteración 2 publican
 // bonos/bonosMax en vez de sp/spMax (hasta que su dueño las vuelva a abrir).
@@ -455,6 +492,37 @@ function spDeResumen(r){
     campoGastado: nuevo ? 'spGastado' : 'bonosGastados',
     campoResumen: nuevo ? 'resumen.sp' : 'resumen.bonos',
   };
+}
+
+// Aura y barras que guarda cada token (las elige su dueño en el engranaje).
+function auraDe(t){
+  const a = t && t.aura;
+  const radio = a ? num(a.radio) : 0;
+  if(!(radio > 0)) return null;
+  return {radio: Math.min(30, radio), color: /^#[0-9a-fA-F]{6}$/.test(a.color || '') ? a.color : '#E0A458'};
+}
+function barrasDe(t){
+  const b = (t && t.barras) || {};
+  return {hp: b.hp !== false, sp: b.sp !== false, no2: b.no2 === true};
+}
+function colorConAlfa(hex, alfa){
+  const n = parseInt(String(hex).slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alfa})`;
+}
+
+// No2 del token: {valor, max} o null si no se conocen.
+function valoresNo2(t){
+  if(!t) return null;
+  if(t.tipo === 'creep'){
+    const sc = creepPrivadoDe(t.fichaId);
+    if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
+    return {valor: num(sc.nitros), max: Math.max(num(sc.nitros), num(sc.nitrosMax) || num(sc.agl) || 0)};
+  }
+  if(t.fichaId && t.fichaId.includes(SEP_INVOCACION)) return null;
+  const f = fichasPub.get(t.fichaId);
+  const r = f && f.resumen;
+  if(!r || r.nitros === undefined) return null;
+  return {valor: num(r.nitros), max: num(r.nitrosMax) || num(r.nitros)};
 }
 
 const imagenesCache = new Map();  // data URL -> Image
@@ -865,6 +933,19 @@ function dibujar(){
   if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente));
   if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo));
 
+  // Auras: una superficie de color semitransparente alrededor del token.
+  tokens.forEach((t, id) => {
+    const aura = auraDe(t);
+    if(!aura) return;
+    const dib = disposicion.find(d => d.id === id);
+    const vis = visibles.get(id);
+    const c = vis || (dib ? {x: dib.x, y: dib.y} : hexCentro(t.col, t.fila));
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, aura.radio * ANCHO_CASILLA, 0, 2 * Math.PI);
+    ctx.fillStyle = colorConAlfa(aura.color, 0.18); ctx.fill();
+    ctx.strokeStyle = colorConAlfa(aura.color, 0.5); ctx.lineWidth = 2 / z; ctx.stroke();
+  });
+
   // Tokens.
   disposicion = calcularDisposicion();
   const etiquetas = HEX * z >= 22;
@@ -935,8 +1016,10 @@ function dibujar(){
         ctx.fillRect(x - bw / 2, debajo, bw * valor, bh);
         debajo += bh + 2 / z;
       };
-      barra(est.hp, HP_COLOR);
-      if(est.sp !== null) barra(est.sp, SP_COLOR);
+      const barras = barrasDe(t);
+      if(barras.hp) barra(est.hp, HP_COLOR);
+      if(barras.sp && est.sp !== null) barra(est.sp, SP_COLOR);
+      if(barras.no2 && est.no2 !== null) barra(est.no2, NO2_COLOR);
     }
 
     // Estados: circulitos con la inicial sobre el borde de arriba del token
@@ -973,6 +1056,7 @@ function dibujar(){
       ctx.fillText(texto, x, ty);
     }
   });
+  hudUbicar();
   return animando;
 }
 
@@ -1445,7 +1529,7 @@ let firmaPanel = '';
 
 function seleccionar(id){
   if(seleccion === id && !creando) return;
-  if(seleccion !== id) editandoToken = false;
+  if(seleccion !== id){ editandoToken = false; hudCerrar(); }
   seleccion = id;
   if(id) creando = false;
   renderPanel();
@@ -1583,6 +1667,12 @@ async function modificarCreep(creepId, cambiar){
     tx.update(base, {
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
       'resumen.muerto': sc.hp <= 0,
+      'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
+        .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
+        .map(e => ({
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+          polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+        })),
       firma: hashGm(json) + '-' + parteImagen,
       actualizado: firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -1915,6 +2005,244 @@ $('#btn-nuevo').onclick = () => {
   creando = true; seleccion = null; panelFondo = false; moverFondo = false;
   renderPanel(true); pedirDibujo();
 };
+
+/* ---------- Controles flotantes del token (HUD) ----------
+   Al seleccionar un token aparecen encima, como en Roll20: tres círculos
+   con Vida (rojo), SP (azul) y No2 (verde) que se pueden editar con un
+   clic, un botón de estados alterados, el engranaje (barras y aura) y el
+   rayo (Botonera de la ficha o Acciones del creep). Todo se guarda donde
+   corresponde: la ficha, el creep o el propio token. */
+
+let hudGlobo = '';      // '' | 'estados' | 'ajustes'
+let hudEditando = '';   // 'hp' | 'sp' | 'no2'
+
+function hudCerrar(){
+  hudGlobo = '';
+  hudEditando = '';
+}
+
+// Valores que se muestran en los círculos.
+function hudDatos(t){
+  const v = vinculo(t);
+  const r = (v && v.resumen) || {};
+  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  const n = valoresNo2(t);
+  const invocacion = !!(v && v.invocacion);
+  const secreto = t.tipo === 'creep' && !soyGM;  // los jugadores no ven números de creeps
+  const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : num(r.hp));
+  const {sp, spMax} = spDeResumen(r);
+  return {
+    hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
+    sp: (t.tipo === 'pj' && !invocacion && spMax > 0) ? sp : null,
+    no2: secreto ? null : (n ? n.valor : null),
+    estados: (v && v.resumen && v.resumen.estados) || [],
+  };
+}
+
+function hudHtml(t){
+  const d = hudDatos(t);
+  const puede = puedoCambiarVida(t);
+  const circulo = (clave, valor, color) => {
+    if(valor === null || valor === undefined) return '';
+    if(hudEditando === clave && puede){
+      return `<input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">`;
+    }
+    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${puede ? 'Clic para cambiar' : 'Solo lo cambia su dueño'}">${fmt(valor)}</button>`;
+  };
+  const icono = (clave, simbolo, titulo, activo) =>
+    `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;
+
+  const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+  const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid && !t.fichaId.includes(SEP_INVOCACION);
+  const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
+
+  let html = '<div class="hud-fila">' +
+    circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
+    icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+    (puedoMover(t) ? icono('ajustes', '⚙', 'Barras y aura del token', hudGlobo === 'ajustes') : '') +
+    (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
+    '</div>';
+  if(hudGlobo === 'estados') html += hudEstadosHtml(t, d.estados, puede);
+  if(hudGlobo === 'ajustes' && puedoMover(t)) html += hudAjustesHtml(t);
+  return html;
+}
+
+function hudEstadosHtml(t, estados, puede){
+  if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span></div>';
+  return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
+    const turnos = e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—');
+    return `<div class="hud-estado">
+      <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
+      <span class="nom" title="${esc(e.detalle || e.nombre)}">${esc(e.nombre)}</span>
+      <span class="turnos">${turnos}</span>` +
+      (puede && !e.permanente ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
+        <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
+      (puede ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
+    '</div>';
+  }).join('') + (puede ? '<p class="ayuda" style="margin-top:8px">Para agregar estados, usá la ficha o gm-tools.</p>' : '') + '</div>';
+}
+
+function hudAjustesHtml(t){
+  const barras = barrasDe(t);
+  const aura = t.aura || {};
+  const check = (clave, texto, si) =>
+    `<div class="hud-campo"><label>${texto}</label><input type="checkbox" data-hud-barra="${clave}"${si ? ' checked' : ''}></div>`;
+  return '<div class="hud-globo"><h3>Barras del token</h3>' +
+    check('hp', 'Vida (roja)', barras.hp) +
+    check('sp', 'SP (azul)', barras.sp) +
+    check('no2', 'No2 (verde)', barras.no2) +
+    '<h3 style="margin-top:12px">Aura</h3>' +
+    `<div class="hud-campo"><label>Radio (casilleros)</label><input type="number" min="0" max="30" step="0.5" value="${fmt(num(aura.radio))}" data-hud-aura="radio"></div>` +
+    `<div class="hud-campo"><label>Color</label><input type="color" value="${/^#[0-9a-fA-F]{6}$/.test(aura.color || '') ? aura.color : '#E0A458'}" data-hud-aura="color"></div>` +
+    '<p class="ayuda" style="margin-top:6px">Radio 0 = sin aura. La ven todos.</p>' +
+    '</div>';
+}
+
+// Dibuja el HUD y lo acomoda sobre el token seleccionado.
+function hudUbicar(){
+  const hud = $('#hud');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !fbMiembro || creando || panelFondo){ hud.hidden = true; return; }
+  const d = disposicion.find(x => x.id === seleccion);
+  const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
+  const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
+  const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
+  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, soyGM]);
+  if(hud.dataset.firma !== firma){
+    hud.dataset.firma = firma;
+    hud.innerHTML = hudHtml(t);
+    hudConectar(t);
+  }
+  hud.hidden = false;
+  hud.style.left = Math.round(px) + 'px';
+  hud.style.top = Math.round(py - radio - 46) + 'px';
+}
+
+function hudConectar(t){
+  const hud = $('#hud');
+  hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
+    hudEditando = b.dataset.hudValor; hudGlobo = ''; pedirDibujo();
+    setTimeout(() => { const i = hud.querySelector('[data-hud-in]'); if(i) i.focus(); }, 30);
+  });
+  const campo = hud.querySelector('[data-hud-in]');
+  if(campo){
+    campo.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicar(campo.dataset.hudIn, campo.value); }
+      if(e.key === 'Escape'){ hudEditando = ''; pedirDibujo(); }
+    };
+    campo.onblur = () => { hudEditando = ''; pedirDibujo(); };
+  }
+  hud.querySelectorAll('[data-hud-boton]').forEach(b => b.onclick = () => {
+    const clave = b.dataset.hudBoton;
+    if(clave === 'rayo'){
+      const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+      if(fichaDeToken) abrirBotonera(fichaDeToken); else abrirAcciones(t.fichaId);
+      return;
+    }
+    hudGlobo = hudGlobo === clave ? '' : clave;
+    hudEditando = '';
+    pedirDibujo();
+  });
+  hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
+  hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
+    const [i, delta] = b.dataset.hudTurnos.split(':');
+    hudEstadoCambiar(t, num(i), 'turnos', num(delta));
+  });
+  hud.querySelectorAll('[data-hud-barra]').forEach(c => c.onchange = () => {
+    const barras = {...barrasDe(t)};
+    barras[c.dataset.hudBarra] = c.checked;
+    editarToken(seleccion, {barras});
+  });
+  hud.querySelectorAll('[data-hud-aura]').forEach(c => c.onchange = () => {
+    const radio = num(hud.querySelector('[data-hud-aura="radio"]').value);
+    const color = hud.querySelector('[data-hud-aura="color"]').value;
+    editarToken(seleccion, {aura: radio > 0 ? {radio: Math.min(30, radio), color} : firebase.firestore.FieldValue.delete()});
+  });
+}
+
+async function hudAplicar(clave, texto){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !puedoCambiarVida(t) || !String(texto).trim()){ hudEditando = ''; pedirDibujo(); return; }
+  try{
+    if(clave === 'no2') await cambiarNitros(t, texto);
+    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
+    else await cambiarVidaPj(t, clave, texto);
+  }catch(err){
+    console.error('No se pudo cambiar el valor:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
+  }finally{
+    hudEditando = '';
+    pedirDibujo();
+  }
+}
+
+// No2 desde el HUD (los PJ en su ficha, los creeps en su parte privada).
+async function cambiarNitros(t, texto){
+  if(t.tipo === 'creep'){
+    await modificarCreep(t.fichaId, sc => {
+      const nuevo = leerValorVital(texto, num(sc.nitros));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      sc.nitros = Math.max(0, nuevo);
+    });
+    return;
+  }
+  const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    const actual = datos.nitros === null || datos.nitros === undefined ? num(r.nitros) : num(datos.nitros);
+    const nuevo = leerValorVital(texto, actual);
+    if(nuevo === null) throw new Error(ERROR_TIPEO);
+    datos.nitros = Math.max(0, nuevo);
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
+  });
+}
+
+// Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
+async function hudEstadoCambiar(t, indice, accion, delta){
+  const v = vinculo(t);
+  const lista = (v && v.resumen && v.resumen.estados) || [];
+  const objetivo = lista[indice];
+  if(!objetivo || !puedoCambiarVida(t)) return;
+  const tocar = arr => {
+    const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
+    if(i < 0) throw new Error('Ese estado ya no está');
+    if(accion === 'quitar') arr.splice(i, 1);
+    else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
+    return arr;
+  };
+  try{
+    if(t.tipo === 'creep'){
+      await modificarCreep(t.fichaId, sc => { sc.estados = tocar(Array.isArray(sc.estados) ? sc.estados : []); });
+    }else{
+      const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId.split(SEP_INVOCACION)[0]}`));
+      const parteRef = base.collection('partes').doc('efectos');
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+      await fbDb.runTransaction(async tx => {
+        const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+        if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+        const datos = JSON.parse(parte.data().json || '{}');
+        datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
+        const resumen = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+          polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+          detalle: String(e.detalle || '').slice(0, 200),
+        }));
+        tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+        tx.update(base, {'resumen.estados': resumen, actualizado: ts});
+      });
+    }
+  }catch(err){
+    console.error('No se pudo cambiar el estado:', err);
+    toast(err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo cambiar el estado: ' + err.message);
+  }
+}
 
 /* ---------- Botonera de la ficha, dentro del mapa ----------
    Carga la ficha en un iframe (?modo=botonera), que muestra solo la

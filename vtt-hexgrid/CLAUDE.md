@@ -62,6 +62,12 @@ nuevo de Rol Pintoísta. Paso 2 de
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
+  `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
+  (verde), ◎ estados alterados (ver, ±turnos, sacar), ⚙ barras y aura del
+  token, ⚡ Botonera (PJ propio) o Acciones (creep del GM). Vida/SP/No2 se
+  guardan en la ficha o en la parte privada del creep; barras y aura, en el
+  propio token (`barras {hp,sp,no2}`, `aura {radio, color}`).
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

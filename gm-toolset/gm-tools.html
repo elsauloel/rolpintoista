@@ -359,6 +359,29 @@ input[type=file]{display:none}
   font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.2
 }
 .botonera-tile .bt-value{font-family:"Space Mono",monospace;font-size:18px;font-weight:700;color:var(--brass)}
+.botonera-tile{position:relative}
+.botonera-tile.bt-sin-nitros{opacity:.55}
+.botonera-tile.bt-sin-nitros .bt-label{color:var(--danger)}
+/* 🔍 de las Acciones: desglose de cada tirada (lupaHtmlCreep), igual que en la ficha */
+.bt-lupa{position:absolute;top:2px;right:2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}
+.bt-lupa:hover,.bt-lupa:focus-visible{opacity:1;background:rgba(224,164,88,.18);outline:none}
+.bt-lupa.mini{position:static;width:auto;height:auto;padding:3px 6px;border:1px solid var(--line-soft);font-size:11px;flex:none}
+#lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
+  background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
+  padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
+#lupa-pop .lupa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass);margin-bottom:6px}
+#lupa-pop .lupa-sec{margin-top:8px}
+#lupa-pop .lupa-sec-t{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--line-soft);padding-bottom:2px;margin-bottom:3px}
+#lupa-pop .lupa-fila{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+#lupa-pop .lupa-fila b{font-family:"Space Mono",monospace;white-space:nowrap;color:var(--paper)}
+#lupa-pop .lupa-total{border-top:1px dashed var(--line);margin-top:3px;padding-top:4px}
+#lupa-pop .lupa-total b{color:var(--brass)}
+#lupa-pop .lupa-tachado span:first-child,#lupa-pop .lupa-tachado b{opacity:.55;text-decoration:line-through}
+#lupa-pop .lupa-falta b{color:var(--danger)}
+#lupa-pop .lupa-gris{color:var(--muted)}
+#lupa-pop .lupa-nota{color:var(--muted);font-size:11.5px;margin-top:3px}
 .botonera-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px;align-content:start}
 .acciones-badge{
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);
@@ -2432,6 +2455,130 @@ function creepStatValor(sc, statId){
   return v;
 }
 
+/* ---------- Lupa de las Acciones del creep (igual que la Botonera de la ficha) ----------
+   Cada botón trae un 🔍 (data-lupacreep="creepId|tipo|clave") que abre
+   #lupa-pop con el desglose: atributo base, modificadores y de dónde vienen,
+   cómo se reparte en dados y el costo en No2 con su motivo. */
+
+const lupaFila = (txt, val, cls = '') => `<div class="lupa-fila ${cls}"><span>${txt}</span><b>${val}</b></div>`;
+const lupaNota = txt => `<div class="lupa-nota">${txt}</div>`;
+const lupaSeccion = (titulo, html) => `<div class="lupa-sec"><div class="lupa-sec-t">${titulo}</div>${html}</div>`;
+const lupaSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
+
+function lupaTiradaCreep(valor){
+  const n = Math.round(num(valor));
+  const f = formulaParaValor(n);
+  if(!f) return lupaSeccion('Tirada', lupaNota(`Con ${fmt(n)} no se puede tirar: hace falta al menos 1.`));
+  let nota;
+  if(f.combo.length === 1 && f.combo[0] === n && !DADOS_REALES.includes(n)) nota = `Valor chico: se tira un dado de ${fmt(n)} caras.`;
+  else if(f.mod) nota = `Impar: se reparte ${fmt(n - 1)} en dados reales y se suma +1.`;
+  else nota = `Se reparte ${fmt(n)} en la menor cantidad de dados reales, lo más parejos posible.`;
+  return lupaSeccion('Tirada', lupaFila(`${fmt(n)} →`, esc(f.formula)) + lupaNota(nota));
+}
+
+function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
+  const d = CREEP_STAT_LOOKUP[statId];
+  const attr = d.attr;
+  let h = lupaFila(`${ATTR_NOMBRE[attr]} base`, fmt(num(sc[attr])));
+  aportesModCreep(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
+  if(statId !== attr) aportesModCreep(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(d.label)})</span>`, lupaSigno(a.val)); });
+  if(!aportesModCreep(sc, attr).length && (statId === attr || !aportesModCreep(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
+  if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
+  const valor = creepStatValor(sc, statId);
+  h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
+  let out = lupaSeccion('De dónde sale', h);
+  if(sinTirada) return out;
+  out += lupaTiradaCreep(valor);
+  const afortunado = ['pdg', 'parry', 'eva'].includes(statId) && (sc.estados || []).find(e => e.activo !== false && e.afortunado);
+  if(afortunado) out += lupaNota(`Ventaja por ${esc(afortunado.nombre)}: se tira dos veces y queda la mejor.`);
+  return out;
+}
+
+function lupaHtmlCreep(clave){
+  const [scId, tipo, ref] = clave.split('|');
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return {titulo: '', html: ''};
+  const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
+  if(tipo === 'stat') return {titulo: `${sc.nombre} · ${CREEP_STAT_LOOKUP[ref].label}`, html: lupaStatCreep(sc, ref) + sinCosto};
+  if(tipo === 'atacar'){
+    const tipoArma = num(sc.armaTipo) || 6;
+    const hechos = num(sc.ataquesTurno);
+    const costo = costoAtaqueCreep(sc);
+    let h = lupaFila(`Tipo del arma${sc.armaNombre ? ` (${esc(sc.armaNombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
+    h += lupaFila('Ataques este turno', fmt(hechos));
+    h += hechos === 0
+      ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
+      : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
+    h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), costo > num(sc.nitros) ? 'lupa-falta' : '');
+    h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
+    return {titulo: `${sc.nombre} · Atacar`, html: lupaStatCreep(sc, 'pdg') + lupaSeccion('Costo', h)};
+  }
+  if(tipo === 'danio'){
+    const dmg = creepStatValor(sc, 'dmg');
+    let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(sc.armaPeso) || 1)));
+    if(num(sc.armaAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(sc.armaAmplificado)));
+    h += lupaFila('Tipo (caras del dado)', `d${fmt(num(sc.armaTipo) || 6)}`);
+    if(num(sc.armaFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(sc.armaFijo)));
+    h += sc.armaDeRango
+      ? lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado')
+      : lupaFila('Dmg (de Fuerza)', lupaSigno(dmg));
+    h += lupaFila('Daño', esc(danoTxt(sc, dmg)), 'lupa-total');
+    let out = lupaSeccion('De dónde sale', h);
+    if(!sc.armaDeRango) out += lupaStatCreep(sc, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
+    return {titulo: `${sc.nombre} · Daño${sc.armaNombre ? ` (${sc.armaNombre})` : ''}`, html: out + sinCosto};
+  }
+  if(tipo === 'hab'){
+    const h0 = (sc.habilidades || []).find(x => x.id === ref);
+    if(!h0) return {titulo: '', html: ''};
+    const n = costoNitrosHabCreep(sc, h0);
+    const porDefecto = h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '';
+    let h = lupaFila(porDefecto ? `No2 (por defecto, ${fmt(IT2_CREEP.nitrosHabilidad)})` : 'No2 de la habilidad', `${fmt(n)} No2`, 'lupa-total');
+    if(num(h0.cd) > 0) h += lupaFila('Cooldown', `${fmt(num(h0.cd))} turno(s)${num(h0.cdActual) > 0 ? ` · faltan ${fmt(num(h0.cdActual))}` : ''}`);
+    h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), n > num(sc.nitros) ? 'lupa-falta' : '');
+    let out = lupaSeccion('Costo', h);
+    if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
+    return {titulo: `${sc.nombre} · ${h0.nombre || 'Habilidad'}`, html: out};
+  }
+  return {titulo: '', html: ''};
+}
+
+function lupaBotonCreep(clave, extraCls = ''){
+  return `<span class="bt-lupa ${extraCls}" role="button" tabindex="0" data-lupacreep="${esc(clave)}" title="Cómo se calcula">🔍</span>`;
+}
+
+function cerrarLupa(){
+  const p = $('#lupa-pop');
+  if(p) p.remove();
+}
+
+function abrirLupa(el){
+  const clave = el.dataset.lupacreep;
+  const abierta = $('#lupa-pop');
+  if(abierta && abierta.dataset.clave === clave){ cerrarLupa(); return; }
+  cerrarLupa();
+  const {titulo, html} = lupaHtmlCreep(clave);
+  const p = document.createElement('div');
+  p.id = 'lupa-pop';
+  p.dataset.clave = clave;
+  p.innerHTML = `<div class="lupa-titulo">🔍 ${esc(titulo)}</div>${html}`;
+  document.body.appendChild(p);
+  const r = el.getBoundingClientRect(), m = 8;
+  const w = p.offsetWidth, hgt = p.offsetHeight;
+  let top = r.bottom + 4;
+  if(top + hgt > innerHeight - m) top = Math.max(m, r.top - hgt - 4);
+  p.style.top = top + 'px';
+  p.style.left = Math.max(m, Math.min(r.right - w, innerWidth - w - m)) + 'px';
+}
+
+document.addEventListener('pointerdown', e => {
+  const p = $('#lupa-pop');
+  if(p && !p.contains(e.target) && !e.target.closest('[data-lupacreep]')) cerrarLupa();
+}, true);
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && $('#lupa-pop')){ cerrarLupa(); e.stopImmediatePropagation(); e.preventDefault(); }
+  else if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-lupacreep]')){ e.preventDefault(); abrirLupa(e.target.closest('[data-lupacreep]')); }
+}, true);
+
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
   if(!sc) return;
@@ -2441,20 +2588,23 @@ function renderAccionesCreep(){
 
   const tilesStats = CREEP_STATS_TIRADA_IDS.map(id => CREEP_STAT_LOOKUP[id]).map(d => `
     <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
+      ${lupaBotonCreep(`${sc.id}|stat|${d.id}`)}
       <span class="bt-label">${esc(d.label)}</span>
       <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
     </button>`).join('');
 
   const fc = formulasCombateCreep(sc);
   const combate = [
-    {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, disabled: sinNitrosAtaque, motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
-    {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), disabled:false, motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
-    {nombre:'Esquivar', dado: fc.eva, disabled:false, motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
-    {nombre:'Parry', dado: fc.parry, disabled:false, motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
-    {nombre:'Bloqueo', dado: fc.bloqueo, disabled:false, motivo:'Sin costo', attr:`data-bloqueocreep="${sc.id}"`},
+    // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
+    {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
+    {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), lupa:'danio', motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
+    {nombre:'Esquivar', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
+    {nombre:'Parry', dado: fc.parry, lupa:'stat|parry', motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
+    {nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:'Sin costo', attr:`data-bloqueocreep="${sc.id}"`},
   ];
   const tilesCombate = combate.map(f => `
-    <button type="button" class="botonera-tile" ${f.attr} ${f.disabled?'disabled':''} title="${esc(f.motivo)}">
+    <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}" ${f.attr} title="${esc(f.motivo)}">
+      ${lupaBotonCreep(`${sc.id}|${f.lupa}`)}
       <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>
     </button>`).join('');
 
@@ -2475,6 +2625,7 @@ function renderAccionesCreep(){
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
+      ${lupaBotonCreep(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
     </div>`;
 
@@ -3735,6 +3886,9 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('click', e => {
+  // 🔍 dentro de un botón de las Acciones: solo muestra el desglose, no tira.
+  const lupa = e.target.closest('[data-lupacreep]');
+  if(lupa){ e.preventDefault(); abrirLupa(lupa); return; }
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.
   if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado))) cerrarChipEstado(b);

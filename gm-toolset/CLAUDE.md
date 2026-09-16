@@ -39,6 +39,10 @@ En desarrollo activo, las dos.
   queda y se recarga en `mantenimiento()`. El botón ⚡ Acciones cobra: atacar
   Tipo ÷ 2 el primer ataque del turno y Tipo completo después
   (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD.
+  **🔍 Lupa en las Acciones** (`lupaHtmlCreep`, `data-lupacreep`, `#lupa-pop`):
+  cada botón muestra el desglose de la tirada (atributo, mods con origen,
+  Lisiado, dados) y su costo en No2; Atacar sin No2 no se deshabilita (avisa
+  al tocarlo) para que la 🔍 siga abriendo. Los creeps tienen una sola arma.
   Moverse lo cobra el mapa al arrastrar el token del creep (ya no hay
   habilidad Movimiento). Los creeps viejos se convierten solos en
   `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se

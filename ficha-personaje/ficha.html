@@ -785,6 +785,29 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .botonera-tile .bt-value.mod-minus{color:var(--danger)}
 .botonera-tile .bt-mod{font-family:"Space Mono",monospace;font-size:8.5px;color:var(--muted)}
 .botonera-tile .bt-value-formula{font-size:13px;line-height:1.25;word-break:break-word}
+.botonera-tile{position:relative}
+.botonera-tile.bt-sin-nitros .bt-mod{color:var(--danger)}
+/* 🔍 de la Botonera: desglose de cada tirada (lupaHtml) */
+.bt-lupa{position:absolute;top:2px;right:2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}
+.bt-lupa:hover,.bt-lupa:focus-visible{opacity:1;background:rgba(224,164,88,.18);outline:none}
+.bt-lupa.mini{position:static;width:auto;height:auto;padding:3px 6px;border:1px solid var(--line-soft);font-size:11px;flex:none}
+#lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
+  background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
+  padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
+#lupa-pop .lupa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass);margin-bottom:6px}
+#lupa-pop .lupa-sec{margin-top:8px}
+#lupa-pop .lupa-sec-t{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--line-soft);padding-bottom:2px;margin-bottom:3px}
+#lupa-pop .lupa-fila{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+#lupa-pop .lupa-fila b{font-family:"Space Mono",monospace;white-space:nowrap;color:var(--paper)}
+#lupa-pop .lupa-total{border-top:1px dashed var(--line);margin-top:3px;padding-top:4px}
+#lupa-pop .lupa-total b{color:var(--brass)}
+#lupa-pop .lupa-tachado span:first-child,#lupa-pop .lupa-tachado b{opacity:.55;text-decoration:line-through}
+#lupa-pop .lupa-falta b{color:var(--danger)}
+#lupa-pop .lupa-gris{color:var(--muted)}
+#lupa-pop .lupa-nota{color:var(--muted);font-size:11.5px;margin-top:3px}
+#lupa-pop code{font-family:"Space Mono",monospace;font-size:11px;color:var(--brass)}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
 .armbox .dl{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .armbox .dv{font-family:"Space Mono",monospace;font-size:24px;font-weight:700;color:var(--brass)}
@@ -1785,6 +1808,7 @@ function migrarEstadoIt2(st){
   if(st.spGastado === undefined) st.spGastado = 0;
   delete st.acciones;  // los Nitros arrancan llenos (ver renderAll)
   if(st.ataquesTurno === undefined) st.ataquesTurno = 0;
+  if(!st.ataquesArma || typeof st.ataquesArma !== 'object') st.ataquesArma = {};
   // La habilidad base "Movimiento" se quitó: moverse se cobra desde el mapa.
   if(Array.isArray(st.habilidades)) st.habilidades = st.habilidades.filter(h => !h || h.id !== 'movimiento');
   ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
@@ -1877,7 +1901,9 @@ const DEFAULT = {
   // spGastado: SP usado desde la última recarga. nitros: los que quedan en
   // el turno (null = arrancan llenos). ataquesTurno: para cobrar el primer
   // ataque del turno a mitad de precio.
-  hp:5, turno:1, log:[], spGastado:0, nitros:null, ataquesTurno:0,
+  // ataquesArma: ataques de cada arma en el turno ({idArma|'sin-arma': n});
+  // el primero con cada arma cuesta la mitad.
+  hp:5, turno:1, log:[], spGastado:0, nitros:null, ataquesTurno:0, ataquesArma:{},
   muerto:{activo:false, turnos:5, definitivo:false},
   caps:{mochila:20, cinturon:5},
   armadura:{nota:''},
@@ -2494,7 +2520,10 @@ function collectMods(){
     if(!m || !m.stat) return;
     (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen});
   };
-  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre)));
+  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => {
+    push(m, i.nombre);
+    if(m && m.stat) out[m.stat][out[m.stat].length - 1].itemId = i.id;  // para el PdG propio de cada arma
+  }));
   S.pasivas.forEach(p => (p.mods||[]).forEach(m => push(m, p.nombre)));
   S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
     const stacks = Math.max(1, num(e.stacks) || 1);
@@ -3732,27 +3761,43 @@ function renderBotonera(){
     ...STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
   ];
   const fCombate = formulasCombate();
+  // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
+  const armasBotonera = armasEquipadasConDano();
 
   html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
       <div class="botonera-combate-wrap">
         <div class="botonera-combate-grid">
-          <button type="button" class="botonera-tile" data-botoneraaccion="atacar" title="Atacar (PdG) · ${esc(costoAtaqueTxt())}">
-            <span class="bt-label">Atacar (PdG)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.pdg)}</span>
+          ${(armasBotonera.length ? armasBotonera : [null]).map(a => {
+            const arma = a && a.item;
+            const nombre = armasBotonera.length > 1 ? ` · ${esc(arma.nombre)}` : '';
+            const fPdg = formulaParaValor(pdgParaArma(arma, c).valor);
+            const costo = costoAtaqueNitros(arma);
+            const sinNitros = costo > num(S.nitros);
+            return `
+          <button type="button" class="botonera-tile${sinNitros ? ' bt-sin-nitros' : ''}" data-botoneraaccion="atacar" data-arma="${arma ? arma.id : ''}" title="Atacar${arma ? ` con ${esc(arma.nombre)}` : ''} · ${fmt(costo)} No2">
+            ${lupaBotonHtml(`atacar:${arma ? arma.id : ''}`)}
+            <span class="bt-label">Atacar (PdG)${nombre}</span><span class="bt-value bt-value-formula">🎲 ${esc(fPdg ? fPdg.formula : '')}</span>
+            <span class="bt-mod">${fmt(costo)} No2${ataquesConArma(arma) ? '' : ' · 1.º ataque'}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="danio" title="Daño Arma">
-            <span class="bt-label">Daño Arma</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.danio)}</span>
-          </button>
+          <button type="button" class="botonera-tile" data-botoneraaccion="danio" data-arma="${arma ? arma.id : ''}" title="Daño${arma ? ` · ${esc(arma.nombre)}` : ''}" ${arma ? '' : 'disabled'}>
+            ${arma ? lupaBotonHtml(`danio:${arma.id}`) : ''}
+            <span class="bt-label">Daño${nombre || ' Arma'}</span><span class="bt-value bt-value-formula">🎲 ${esc(arma ? armaDanoTxt(arma, c.final.dmg) : 'sin arma equipada')}</span>
+          </button>`;
+          }).join('')}
         </div>
         <div class="botonera-combate-grid botonera-combate-bottom">
           <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
+            ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
+            ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
+            ${lupaBotonHtml('stat:bloqueo')}
             <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
           </button>
         </div>
@@ -3769,6 +3814,7 @@ function renderBotonera(){
           const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
           return `
           <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
+            ${lupaBotonHtml(`stat:${s.id}`)}
             <span class="bt-label">${esc(s.label)}</span>
             <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
             ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
@@ -3783,6 +3829,7 @@ function renderBotonera(){
   const filaConsumible = (i, key) => `<div class="cat-row">
     <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
     <button class="mini" data-view="${key}:${i.id}">Ver</button>
+    ${lupaBotonHtml(`cons:${key}:${i.id}`, 'mini')}
     ${consumeButton(i, key)}
   </div>`;
 
@@ -3797,6 +3844,7 @@ function renderBotonera(){
           return `<div class="cat-row">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
+            ${lupaBotonHtml(`hab:${i.id}`, 'mini')}
             <span class="hab-accion">
               <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinNitros?'disabled':''} style="width:auto">Ejecutar</button>
               ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
@@ -4131,6 +4179,9 @@ function aplicarColapsados(){
 }
 
 document.addEventListener('click', e => {
+  // 🔍 dentro de un botón de la Botonera: solo muestra el desglose, no tira.
+  const lupa = e.target.closest('[data-lupa]');
+  if(lupa){ e.preventDefault(); abrirLupa(lupa); return; }
   const b = e.target.closest('button');
 
   if(b && b.dataset.colapsar){ toggleColapsable(b); return; }
@@ -4171,6 +4222,13 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.botoneraaccion){
+    // Atacar y Daño de la Botonera vienen con su arma (uno por arma).
+    if(b.dataset.arma !== undefined && ['atacar', 'danio'].includes(b.dataset.botoneraaccion)){
+      const arma = S.inventario.find(x => x.id === b.dataset.arma) || null;
+      if(b.dataset.botoneraaccion === 'atacar') atacarConArma(arma);
+      else if(arma) tirarDanoDeArma(arma);
+      return;
+    }
     if(b.dataset.botoneraaccion === 'atacar') $('#btn-atacar-pdg').click();
     if(b.dataset.botoneraaccion === 'danio') $('#btn-danio-arma').click();
     if(b.dataset.botoneraaccion === 'esquivar') $('#btn-esquivar').click();
@@ -6400,18 +6458,36 @@ function sinNitrosPara(h){
   return !esCostoVariable(h.costo) && num(S.nitros) < costoNitrosHab(h);
 }
 
-/* ---------- Atacar: Tipo ÷ 2 el primer ataque del turno, Tipo completo los demás ---------- */
+/* ---------- Atacar: cada arma paga Tipo ÷ 2 su primer ataque del turno y Tipo completo los demás ---------- */
+
+const claveAtaque = arma => arma ? arma.id : 'sin-arma';
+const tipoAtaque = arma => arma ? (num(arma.tipoDado) || 6) : IT2.tipoSinArma;
+const ataquesConArma = arma => num((S.ataquesArma || {})[claveAtaque(arma)]);
 
 function costoAtaqueNitros(arma){
-  const tipo = arma ? (num(arma.tipoDado) || 6) : IT2.tipoSinArma;
-  return num(S.ataquesTurno) === 0 ? IT2.redondeoPrimerAtaque(tipo / 2) : tipo;
+  const tipo = tipoAtaque(arma);
+  return ataquesConArma(arma) === 0 ? IT2.redondeoPrimerAtaque(tipo / 2) : tipo;
 }
 
 function costoAtaqueTxt(){
   const armas = armasEquipadasConDano();
-  const cual = num(S.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
-  if(!armas.length) return `sin arma: ${costoAtaqueNitros(null)} No2 ⚠ provisorio · ${cual}`;
-  return `${armas.map(a => `${a.item.nombre}: ${costoAtaqueNitros(a.item)} No2`).join(' · ')} · ${cual}`;
+  if(!armas.length) return `sin arma: ${costoAtaqueNitros(null)} No2 ⚠ provisorio`;
+  return armas.map(a => `${a.item.nombre}: ${costoAtaqueNitros(a.item)} No2 (${ataquesConArma(a.item) ? 'Tipo completo' : 'primer ataque, Tipo ÷ 2'})`).join(' · ');
+}
+
+const esArmaEnMano = id => S.inventario.some(i => i.id === id && i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
+
+// PdG al atacar con un arma: no cuentan los modificadores de PdG que vienen
+// de otra arma equipada (cada arma aporta el suyo solo cuando ataca).
+function pdgParaArma(arma, c){
+  c = c || compute();
+  const excluidos = (c.mods.pdg || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(m.itemId));
+  if(!excluidos.length || Number.isNaN(c.final.pdg)) return {valor: c.final.pdg, excluidos: []};
+  let v = c.base.pdg + c.modTotal.pdg - excluidos.reduce((a, m) => a + m.val, 0);
+  const activos = (S.efectos || []).filter(e => e.activo !== false);
+  if(activos.some(e => e.mitadPdgEva)) v = Math.floor(v / 2);
+  if(activos.some(e => e.lisiado)) v = Math.floor(v / 2);
+  return {valor: v, excluidos};
 }
 
 function atacarConArma(arma){
@@ -6420,15 +6496,184 @@ function atacarConArma(arma){
     toast(`No te alcanzan los Nitros — este ataque cuesta ${costo} y tenés ${fmt(num(S.nitros))}`);
     return;
   }
-  const primero = num(S.ataquesTurno) === 0;
+  const primero = ataquesConArma(arma) === 0;
   S.nitros = num(S.nitros) - costo;
   S.ataquesTurno = num(S.ataquesTurno) + 1;
+  S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(arma) + 1};
   renderNitros();
-  tirarValorStat('PdG', compute().final.pdg, 'pdg');
-  const tipo = arma ? (num(arma.tipoDado) || 6) : IT2.tipoSinArma;
+  tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', pdgParaArma(arma).valor, 'pdg');
+  const tipo = tipoAtaque(arma);
   const impar = primero && tipo % 2 !== 0;
-  toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${S.ataquesTurno} del turno`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
+  toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque con esta arma' : `ataque ${ataquesConArma(arma)} con esta arma`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
 }
+
+/* ---------- Lupa de la Botonera: cómo se calcula cada tirada y cuánto cuesta ----------
+   Cada botón de la Botonera trae un 🔍 (data-lupa="tipo:clave") que abre
+   #lupa-pop con el desglose: de qué stat sale, sus modificadores y de dónde
+   vienen, cómo se reparte en dados y el costo en Nitros/SP con su motivo. */
+
+const lupaFila = (txt, val, cls = '') => `<div class="lupa-fila ${cls}"><span>${txt}</span><b>${val}</b></div>`;
+const lupaNota = txt => `<div class="lupa-nota">${txt}</div>`;
+const lupaSeccion = (titulo, html) => `<div class="lupa-sec"><div class="lupa-sec-t">${titulo}</div>${html}</div>`;
+const lupaSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
+
+function lupaBase(id, c){
+  if(ES_ATTR(id)) return lupaFila('Valor propio', fmt(num(S.attrs[id])));
+  const f = String(S.formulas[id] || '0');
+  const vars = [...new Set(f.match(/[a-z]+/gi) || [])].filter(v => ATTR_LIST.some(a => a.id === v) || STAT_LIST.some(s => s.id === v));
+  const detalle = vars.map(v => `${STAT_LABEL[v] || v} ${fmt(Number.isNaN(c.final[v]) ? 0 : c.final[v])}`).join(', ');
+  return lupaFila(`Base: <code>${esc(f)}</code>${detalle ? ` <span class="lupa-gris">(${esc(detalle)})</span>` : ''}`,
+    Number.isNaN(c.base[id]) ? '?' : fmt(c.base[id]));
+}
+
+function lupaTirada(valor){
+  const n = Math.round(num(valor));
+  const f = formulaParaValor(n);
+  if(!f) return lupaSeccion('Tirada', lupaNota(`Con ${fmt(n)} no se puede tirar: hace falta al menos 1.`));
+  let nota;
+  if(f.combo.length === 1 && f.combo[0] === n && !DADOS_REALES.includes(n)) nota = `Valor chico: se tira un dado de ${fmt(n)} caras.`;
+  else if(f.mod) nota = `Impar: se reparte ${fmt(n - 1)} en dados reales y se suma +1.`;
+  else nota = `Se reparte ${fmt(n)} en la menor cantidad de dados reales, lo más parejos posible.`;
+  return lupaSeccion('Tirada', lupaFila(`${fmt(n)} →`, esc(f.formula)) + lupaNota(nota));
+}
+
+// Stat completo: base, modificadores con su origen y efectos que lo alteran.
+function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
+  valor = valor ?? c.final[id];
+  let h = lupaBase(id, c);
+  (c.mods[id] || []).forEach(m => {
+    const fuera = excluidos.includes(m);
+    h += lupaFila(`${esc(m.origen)}${fuera ? ' <span class="lupa-gris">— no cuenta: es de la otra arma</span>' : ''}`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
+  });
+  if(!(c.mods[id] || []).length) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
+  const activos = (S.efectos || []).filter(e => e.activo !== false);
+  const mitad = [];
+  if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
+  if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
+  mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(la mitad, para abajo)</span>`, '÷ 2'); });
+  if(id === 'nitros') activos.filter(e => e.forzarNitros !== '' && e.forzarNitros != null).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(tope)</span>`, fmt(num(e.forzarNitros))); });
+  h += lupaFila(`${esc(STAT_LABEL[id] || id)} · ${esc(STAT_FULL[id] || '')}`, Number.isNaN(valor) ? '?' : fmt(valor), 'lupa-total');
+  let out = lupaSeccion('De dónde sale', h);
+  if(sinTirada) return out;
+  const afortunado = ['pdg', 'parry', 'eva'].includes(id) && activos.find(e => e.afortunado);
+  out += lupaTirada(valor);
+  if(afortunado) out += lupaNota(`Ventaja por ${esc(afortunado.nombre)}: se tira dos veces y queda la mejor.`);
+  return out;
+}
+
+function lupaCostoAtaque(arma){
+  const tipo = tipoAtaque(arma);
+  const hechos = ataquesConArma(arma);
+  const costo = costoAtaqueNitros(arma);
+  let h = lupaFila(arma ? `Tipo del arma (d${fmt(tipo)})` : `Sin arma: Tipo provisorio ${IT2_PENDIENTE('Tipo de un ataque sin arma')}`, fmt(tipo));
+  h += lupaFila(`Ataques con ${arma ? 'esta arma' : 'las manos'} este turno`, fmt(hechos));
+  h += hechos === 0
+    ? lupaFila(`Primer ataque con ${arma ? 'esta arma' : 'las manos'}: Tipo ÷ 2${tipo % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
+    : lupaFila('Ya atacó con ella: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
+  h += lupaFila('Nitros disponibles', fmt(num(S.nitros)), costo > num(S.nitros) ? 'lupa-falta' : '');
+  h += lupaNota('Cada arma tiene su propio primer ataque a mitad de precio. Se reinicia en el Mantenimiento.');
+  return lupaSeccion('Costo', h);
+}
+
+function lupaHtml(clave){
+  const c = compute();
+  const [tipo, ...resto] = clave.split(':');
+  const ref = resto.join(':');
+  const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
+  if(tipo === 'stat'){
+    return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(ref, c) + sinCosto};
+  }
+  if(tipo === 'atacar'){
+    const arma = S.inventario.find(i => i.id === ref) || null;
+    const pdg = pdgParaArma(arma, c);
+    return {titulo: `Atacar${arma ? ` con ${arma.nombre}` : ' sin arma'}`, html: lupaStat('pdg', c, pdg) + lupaCostoAtaque(arma)};
+  }
+  if(tipo === 'danio'){
+    const arma = S.inventario.find(i => i.id === ref);
+    if(!arma) return {titulo: 'Daño', html: lupaNota('No tenés un arma con daño equipada.')};
+    const dmg = Number.isNaN(c.final.dmg) ? 0 : c.final.dmg;
+    let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(arma.peso) || 1)));
+    if(num(arma.danoAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(arma.danoAmplificado)));
+    h += lupaFila('Tipo (caras del dado)', `d${fmt(num(arma.tipoDado) || 6)}`);
+    if(num(arma.danoFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(arma.danoFijo)));
+    h += arma.armaDeRango
+      ? lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado')
+      : lupaFila('Dmg (de Fuerza)', lupaSigno(dmg));
+    h += lupaFila('Daño', esc(armaDanoTxt(arma, dmg)), 'lupa-total');
+    let out = lupaSeccion('De dónde sale', h);
+    if(!arma.armaDeRango) out += lupaStat('dmg', c, {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
+    return {titulo: `Daño · ${arma.nombre}`, html: out + sinCosto};
+  }
+  if(tipo === 'hab'){
+    const h0 = S.habilidades.find(x => x.id === ref);
+    if(!h0) return {titulo: 'Habilidad', html: ''};
+    let costo = '';
+    if(esCostoVariable(h0.costo)) costo += lupaFila(`Costo variable (<code>${esc(h0.costo)}</code>)`, 'elegís al ejecutar');
+    else{
+      const n = costoNitrosHab(h0);
+      costo += lupaFila(h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '' ? `Nitros (por defecto, ${fmt(IT2.nitrosHabilidad)})` : 'Nitros de la habilidad', `${fmt(n)} No2`);
+      const sp = parseCostoSp(h0.costo);
+      if(sp) costo += lupaFila(`SP <span class="lupa-gris">(${esc(h0.costo)})</span>`, `${fmt(sp)} SP`);
+    }
+    if(h0.categoria === 'No espameable') costo += lupaNota(`No espameable: una vez por turno${h0.usadaEsteTurno ? ' (ya se usó)' : ''}.`);
+    costo += lupaFila('Disponibles', `${fmt(num(S.nitros))} No2 · ${fmt(spMaximo(c) - num(S.spGastado))} SP`);
+    let out = lupaSeccion('Costo', costo);
+    const stat = h0.tiradaStat;
+    if(stat && c.final[stat] !== undefined) out += lupaSeccion(`Tira ${esc(STAT_LABEL[stat] || stat)}`, lupaStat(stat, c));
+    if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada extra', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
+    return {titulo: h0.nombre, html: out};
+  }
+  if(tipo === 'cons'){
+    const [lista, id] = [resto[0], resto[1]];
+    const it = (S[lista] || []).find(x => x.id === id);
+    if(!it) return {titulo: 'Consumible', html: ''};
+    let h = lupaFila(`Consumir desde ${lista === 'cinturon' ? 'el cinturón' : 'la mochila'}`, `${fmt(costoConsumirNitros(lista))} No2`, 'lupa-total');
+    h += lupaNota(`Del cinturón cuesta ${fmt(IT2.nitrosConsumirCinturon)} No2; de la mochila, ${fmt(IT2.nitrosConsumirMochila)}.`);
+    let ef = '';
+    if(it.curahp) ef += lupaFila('Vida', `${lupaSigno(num(it.curahp))} HP`);
+    if(num(it.curaspPct) > 0) ef += lupaFila('SP', `${fmt(num(it.curaspPct))}% del máximo`);
+    if(it.efectoNombre) ef += lupaFila('Estado', esc(it.efectoNombre));
+    return {titulo: it.nombre, html: lupaSeccion('Costo', h) + (ef ? lupaSeccion('Efecto', ef) : '')};
+  }
+  return {titulo: '', html: ''};
+}
+
+function lupaBotonHtml(clave, extraCls = ''){
+  return `<span class="bt-lupa ${extraCls}" role="button" tabindex="0" data-lupa="${esc(clave)}" title="Cómo se calcula">🔍</span>`;
+}
+
+function cerrarLupa(){
+  const p = $('#lupa-pop');
+  if(p) p.remove();
+}
+
+function abrirLupa(el){
+  const clave = el.dataset.lupa;
+  const abierta = $('#lupa-pop');
+  if(abierta && abierta.dataset.clave === clave){ cerrarLupa(); return; }
+  cerrarLupa();
+  const {titulo, html} = lupaHtml(clave);
+  const p = document.createElement('div');
+  p.id = 'lupa-pop';
+  p.dataset.clave = clave;
+  p.innerHTML = `<div class="lupa-titulo">🔍 ${esc(titulo)}</div>${html}`;
+  document.body.appendChild(p);
+  const r = el.getBoundingClientRect(), m = 8;
+  const w = p.offsetWidth, hgt = p.offsetHeight;
+  let top = r.bottom + 4;
+  if(top + hgt > innerHeight - m) top = Math.max(m, r.top - hgt - 4);
+  p.style.top = top + 'px';
+  p.style.left = Math.max(m, Math.min(r.right - w, innerWidth - w - m)) + 'px';
+}
+
+document.addEventListener('pointerdown', e => {
+  const p = $('#lupa-pop');
+  if(p && !p.contains(e.target) && !e.target.closest('[data-lupa]')) cerrarLupa();
+}, true);
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && $('#lupa-pop')){ cerrarLupa(); e.stopImmediatePropagation(); e.preventDefault(); }
+  else if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-lupa]')){ e.preventDefault(); abrirLupa(e.target.closest('[data-lupa]')); }
+}, true);
 
 function atacar(){
   const armas = armasEquipadasConDano();
@@ -6619,6 +6864,7 @@ function mantenimiento(){
   if(spRecuperado) S.spGastado = num(S.spGastado) - spRecuperado;
   S.nitros = nitrosMaximo();
   S.ataquesTurno = 0;
+  S.ataquesArma = {};
   S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
 
   let invocacionesVencidas = 0;
@@ -6878,7 +7124,7 @@ function fichaNueva(){
   S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
   S.attrs = {con:1, fue:1, agl:1, des:1, int:1};
-  S.hp = 0; S.turno = 1; S.log = []; S.spGastado = 0; S.ataquesTurno = 0;
+  S.hp = 0; S.turno = 1; S.log = []; S.spGastado = 0; S.ataquesTurno = 0; S.ataquesArma = {};
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);
   S.nitros = nitrosMaximo();
@@ -7155,7 +7401,7 @@ async function mesaIniciar(){
    ========================================================= */
 
 const PARTES_FICHA = {
-  general: ['meta', 'attrs', 'hp', 'turno', 'spGastado', 'nitros', 'ataquesTurno', 'muerto', 'caps', 'armadura', 'formulas', 'loot'],
+  general: ['meta', 'attrs', 'hp', 'turno', 'spGastado', 'nitros', 'ataquesTurno', 'ataquesArma', 'muerto', 'caps', 'armadura', 'formulas', 'loot'],
   notas: ['bitacora', 'bitacoraActiva', 'log'],
   inventario: ['inventario'],
   cinturon: ['cinturon'],

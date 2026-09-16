@@ -5696,6 +5696,8 @@ if(MODO_ACCIONES){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
+    // Escape apretado en el mapa: se hace como si se apretara acá.
+    if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".
     if(e.data.tipo === 'abrir-estados' && gmVivo.listo) estadosModoAbrir(e.data.creep);
     // El ⚙ de un estado en el mapa: se abre su editor (se busca por nombre).

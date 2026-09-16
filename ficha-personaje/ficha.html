@@ -8009,6 +8009,8 @@ if(MODO_BOTONERA){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir();
+    // Escape apretado en el mapa: se hace como si se apretara acá.
+    if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado".
     if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){ abrirPresetsEfecto('directo'); botoneraAvisarMapa('botonera-lista'); }
     // El ⚙ de un estado en el mapa: se abre su editor (se busca por nombre).

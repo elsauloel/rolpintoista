@@ -1407,6 +1407,12 @@ $('#btn-alejar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 0.8);
 $('#btn-centrar').onclick = centrarEnMios;
 
 document.addEventListener('keydown', e => {
+  // Con la Botonera o las Acciones abiertas, el teclado es de esa ventana:
+  // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
+  if(!$('#botonera-capa').hidden){
+    if(e.key === 'Escape') escapeABotonera();
+    return;
+  }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
@@ -2603,6 +2609,7 @@ function abrirBotonera(fichaId, mensaje){
   capa.hidden = false;
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
     marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera'}, location.origin);
+    enfocarBotonera();
     return;
   }
   botonera = {herramienta: 'ficha', fichaId, lista: false, pendiente: mensaje || null};
@@ -2619,12 +2626,27 @@ function abrirAcciones(creepId, mensaje){
   if(botonera.herramienta === 'gm' && botonera.lista){
     botonera.fichaId = creepId;
     marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-acciones', creep: creepId}, location.origin);
+    enfocarBotonera();
     return;
   }
   botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
   $('#botonera-cargando').hidden = false;
   marco.src = `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`;
+}
+
+// El foco pasa a la ventana del iframe, así sus teclas (Escape) le llegan directo.
+function enfocarBotonera(){
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  try{ $('#botonera-marco').contentWindow.focus(); }catch(e){}
+}
+
+function escapeABotonera(){
+  if(!botonera.lista){
+    $('#botonera-cargando-x').click();
+    return;
+  }
+  $('#botonera-marco').contentWindow.postMessage({tipo: 'tecla-escape'}, location.origin);
 }
 
 function cerrarBotonera(){
@@ -2637,6 +2659,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){
     botonera.lista = true;
     $('#botonera-cargando').hidden = true;
+    enfocarBotonera();
     // Lo que se pidió mientras cargaba (por ejemplo, agregar un estado).
     if(botonera.pendiente){
       $('#botonera-marco').contentWindow.postMessage(botonera.pendiente, location.origin);

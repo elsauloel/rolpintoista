@@ -6537,8 +6537,9 @@ function ejecutarHabilidad(id){
   S.spGastado = num(S.spGastado) + costoSp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
+  mesaPublicarHabilidad(it.nombre, it.detalle);
   tirarExtraDeItem(it);
-  renderList('habilidades');
+  renderList("habilidades");
   if(efecto) renderList('efectos');
   renderNitros();
   renderVitals();
@@ -6570,8 +6571,9 @@ function confirmarCostoVariable(){
   S.spGastado = num(S.spGastado) + sp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
+  mesaPublicarHabilidad(it.nombre, it.detalle);
   tirarExtraDeItem(it);
-  $('#scrim-costox').classList.remove('open');
+  $("#scrim-costox").classList.remove("open");
   pendingEjecucion = null;
   renderList('habilidades');
   if(efecto) renderList('efectos');
@@ -6699,6 +6701,19 @@ function mantenimiento(){
   // En segundo plano (desde el mapa) el cartel no se ve: los recordatorios
   // van a la Mesa, a nombre del personaje.
   if(avisos.length && typeof MODO_MANTENIMIENTO !== 'undefined' && MODO_MANTENIMIENTO) publicarRecordatorios(avisos);
+}
+
+// Al ejecutar una habilidad, su descripción va a la Mesa aunque no tire
+// dados, así todos leen qué hace.
+function mesaPublicarHabilidad(nombre, detalle){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: mesaQuien(),
+    origen: String(nombre || 'Habilidad').slice(0, 80),
+    formula: String(detalle || '').slice(0, 300),
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
 }
 
 function publicarRecordatorios(avisos){
@@ -6991,12 +7006,12 @@ function mesaRender(docs){
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && t.uid !== fbUsuario.uid) hayAjena = true;
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
-    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio'){
+    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
       const div = document.createElement('div');
       div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

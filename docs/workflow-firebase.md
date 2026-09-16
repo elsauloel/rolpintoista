@@ -74,7 +74,8 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   en color con `(jugador)` al lado, y la última tirada con fondo verde. El bloque "MESA" está copiado igual en las
   dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
-  tiradas libres con `desde: 'mapa'`.
+  tiradas libres con `desde: 'mapa'`. Ejecutar una habilidad publica su
+  descripción con `desde: 'habilidad'` (línea ⚡, sin números), tire dados o no.
   **Historial solo de la sesión** ([`../comun/mesa-historial.js`](../comun/mesa-historial.js),
   en las tres herramientas): el GM ve 🗑 en la cabecera de la Mesa, que
   borra todas las tiradas de la partida; y cada vez que el GM entra a

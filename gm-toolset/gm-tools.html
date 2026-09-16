@@ -3906,6 +3906,7 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
+    mesaPublicarHabilidadCreep(sc, h);
     if(h.tiradaExtra) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
@@ -4992,6 +4993,19 @@ let mesaIdsVistos = null;
 
 // En gm-tools el origen llega como "<creep> · <qué tiró>": el creep pasa a
 // ser quien tira (en color en la Mesa) y el origen queda con el resto.
+// Al ejecutar una habilidad de un creep, su descripción va a la Mesa aunque
+// no tire dados, así los jugadores leen qué hace.
+function mesaPublicarHabilidadCreep(sc, h){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String((sc && sc.nombre) || '').slice(0, 60),
+    origen: String((h && h.nombre) || 'Habilidad').slice(0, 80),
+    formula: String((h && (h.detalle || h.descripcion)) || '').slice(0, 300),
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
+}
+
 function mesaQuien(origen){
   const sc = S.creeps.find(c => c.nombre && String(origen || '').startsWith(c.nombre + ' · '));
   return sc ? sc.nombre : '';
@@ -5046,12 +5060,12 @@ function mesaRender(docs){
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && t.uid !== fbUsuario.uid) hayAjena = true;
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
-    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio'){
+    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
       const div = document.createElement('div');
       div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

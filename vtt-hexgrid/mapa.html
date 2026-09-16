@@ -2680,12 +2680,12 @@ function mesaRender(docs){
     const t = d.data({serverTimestamps: 'estimate'});
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
-    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio'){
+    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
       const div = document.createElement('div');
       div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} 🔔 ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

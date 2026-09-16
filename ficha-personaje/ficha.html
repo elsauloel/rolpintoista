@@ -806,6 +806,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 #lupa-pop .lupa-tachado span:first-child,#lupa-pop .lupa-tachado b{opacity:.55;text-decoration:line-through}
 #lupa-pop .lupa-falta b{color:var(--danger)}
 #lupa-pop .lupa-gris{color:var(--muted)}
+#lupa-pop .lupa-sub{padding-left:14px;font-size:11.5px;color:var(--muted)}
+#lupa-pop .lupa-sub b{color:var(--muted)}
 #lupa-pop .lupa-nota{color:var(--muted);font-size:11.5px;margin-top:3px}
 #lupa-pop code{font-family:"Space Mono",monospace;font-size:11px;color:var(--brass)}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}
@@ -6524,8 +6526,32 @@ function lupaBase(id, c){
   const f = String(S.formulas[id] || '0');
   const vars = [...new Set(f.match(/[a-z]+/gi) || [])].filter(v => ATTR_LIST.some(a => a.id === v) || STAT_LIST.some(s => s.id === v));
   const detalle = vars.map(v => `${STAT_LABEL[v] || v} ${fmt(Number.isNaN(c.final[v]) ? 0 : c.final[v])}`).join(', ');
-  return lupaFila(`Base: <code>${esc(f)}</code>${detalle ? ` <span class="lupa-gris">(${esc(detalle)})</span>` : ''}`,
+  let h = lupaFila(`Base: <code>${esc(f)}</code>${detalle ? ` <span class="lupa-gris">(${esc(detalle)})</span>` : ''}`,
     Number.isNaN(c.base[id]) ? '?' : fmt(c.base[id]));
+  return h + lupaDesgloseVars(vars, c, 1, new Set([id]));
+}
+
+const lupaVarsDe = id => [...new Set(String(S.formulas[id] || '0').match(/[a-z]+/gi) || [])]
+  .filter(v => ATTR_LIST.some(a => a.id === v) || STAT_LIST.some(s => s.id === v));
+
+// Abre, nivel por nivel, cada valor de la fórmula que tenga algo sumado
+// (equipo, estados, pasivas): la base del stat ya lo trae incluido.
+function lupaDesgloseVars(vars, c, nivel, vistos){
+  let h = '';
+  const pad = `style="padding-left:${14 * nivel}px"`;
+  const fila = (txt, val) => `<div class="lupa-fila lupa-sub" ${pad}><span>${txt}</span><b>${val}</b></div>`;
+  vars.forEach(v => {
+    if(vistos.has(v)) return;
+    const mods = c.mods[v] || [];
+    const sub = ES_ATTR(v) ? '' : lupaDesgloseVars(lupaVarsDe(v), c, nivel + 1, new Set([...vistos, v]));
+    if(!mods.length && !sub) return;
+    h += ES_ATTR(v)
+      ? fila(`${esc(STAT_FULL[v])} (valor propio)`, fmt(num(S.attrs[v])))
+      : fila(`${esc(STAT_LABEL[v])} base <code>${esc(S.formulas[v] || '0')}</code>`, Number.isNaN(c.base[v]) ? '?' : fmt(c.base[v]));
+    h += sub;
+    mods.forEach(m => { h += fila(`${esc(m.origen)} <span class="lupa-gris">(${esc(STAT_LABEL[v])})</span>`, lupaSigno(m.val)); });
+  });
+  return h;
 }
 
 function lupaTirada(valor){
@@ -6545,9 +6571,9 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   let h = lupaBase(id, c);
   (c.mods[id] || []).forEach(m => {
     const fuera = excluidos.includes(m);
-    h += lupaFila(`${esc(m.origen)}${fuera ? ' <span class="lupa-gris">— no cuenta: es de la otra arma</span>' : ''}`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
+    h += lupaFila(`${esc(m.origen)} <span class="lupa-gris">(${esc(STAT_LABEL[id] || id)})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
   });
-  if(!(c.mods[id] || []).length) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
+  if(!(c.mods[id] || []).length) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
   const activos = (S.efectos || []).filter(e => e.activo !== false);
   const mitad = [];
   if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));

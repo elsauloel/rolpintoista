@@ -257,6 +257,7 @@ aside{
 .mesa-usuario{color:var(--muted)}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
+.mesa-texto{color:var(--paper);font-size:11.5px;margin-top:2px}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-tirar{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
 
@@ -2700,7 +2701,7 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !['mantenimiento', 'recordatorio'].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
@@ -2712,7 +2713,9 @@ function mesaRender(docs){
       div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
       div.innerHTML = t.desde === 'mantenimiento'
         ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.desde === "habilidad"
+            ? `<div class="mesa-texto">${t.formula ? esc(t.formula) : "(esta habilidad no tiene descripción cargada)"}</div>`
+            : (t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : "")}`;
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

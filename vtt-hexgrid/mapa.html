@@ -129,6 +129,36 @@ aside{
 }
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
+/* Tablero de iniciativa (estilo Roll20): flotante, semitransparente y
+   plegable. Solo se ve en modo combate. */
+#iniciativa{
+  position:absolute;left:12px;top:12px;z-index:22;width:230px;max-width:calc(100% - 24px);
+  background:rgba(26,20,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;overflow:hidden
+}
+#iniciativa:hover{background:rgba(26,20,24,.95)}
+#iniciativa-cab{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;user-select:none;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--brass);border-bottom:1px solid var(--line-soft)
+}
+#iniciativa.plegado #iniciativa-cab{border-bottom:none}
+#iniciativa-ronda{margin-left:auto;color:var(--muted);font-size:10.5px}
+#iniciativa .ini-plegar{color:var(--muted);font-size:13px;line-height:1;padding:0 2px;cursor:pointer}
+#iniciativa.plegado #iniciativa-cuerpo{display:none}
+#iniciativa-lista{max-height:46vh;overflow-y:auto}
+.ini-fila{display:flex;align-items:center;gap:7px;padding:4px 10px;border-top:1px solid var(--line-soft)}
+.ini-fila:first-child{border-top:none}
+.ini-fila.activo{background:rgba(46,107,87,.55)}
+.ini-ficha{width:26px;height:26px;border-radius:50%;flex:none;border:2px solid;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;overflow:hidden;background:var(--panel)}
+.ini-ficha img{width:100%;height:100%;object-fit:cover}
+.ini-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ini-valor{font-family:"Space Mono",monospace;font-weight:700;font-size:14px;min-width:26px;text-align:right}
+.ini-fila input.ini-valor{width:46px;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:var(--r);padding:2px 4px;color:var(--paper)}
+.ini-quitar{color:var(--muted);font-size:12px;line-height:1;padding:0 2px;cursor:pointer}
+.ini-quitar:hover{color:var(--danger)}
+#iniciativa-pie{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border-top:1px solid var(--line-soft)}
+#iniciativa-pie .btn{font-size:10px;padding:5px 8px}
+#iniciativa-vacio{padding:8px 10px;color:var(--muted)}
 /* Controles flotantes sobre el token seleccionado (estilo Roll20) */
 #hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20}
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
@@ -275,6 +305,18 @@ body.con-ruta .toast{bottom:84px}
       <span id="ruta-texto"></span>
       <button type="button" class="btn primary" id="ruta-si">Confirmar</button>
       <button type="button" class="btn" id="ruta-no">Cancelar</button>
+    </div>
+    <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
+    <div id="iniciativa" hidden>
+      <div id="iniciativa-cab">
+        <span id="iniciativa-titulo">⚔ Orden de turnos</span>
+        <span id="iniciativa-ronda"></span>
+        <button type="button" class="ini-plegar" id="iniciativa-plegar" title="Achicar o agrandar">—</button>
+      </div>
+      <div id="iniciativa-cuerpo">
+        <div id="iniciativa-lista"></div>
+        <div id="iniciativa-pie"></div>
+      </div>
     </div>
   </div>
   <aside>
@@ -704,6 +746,137 @@ $('#btn-mantenimiento').onclick = async () => {
   }
 };
 
+/* ---------- Tablero de iniciativa (orden de turnos) ----------
+   campanas/<partida>/mapa/iniciativa = {orden: [{id, valor}], turno, ronda}.
+   Lo arma y lo cambia el GM (las reglas solo lo dejan escribir a él); todos
+   lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
+   plegable, como el "Turn Order" de Roll20. */
+
+let iniciativa = {orden: [], turno: 0, ronda: 1};
+let iniciativaPlegada = false;
+try{ iniciativaPlegada = localStorage.getItem('mapa-iniciativa-plegada') === '1'; }catch(e){}
+
+function escucharIniciativa(){
+  fbDb.doc(fbRutaCampana('mapa/iniciativa')).onSnapshot(doc => {
+    const d = doc.exists ? doc.data() : {};
+    iniciativa = {
+      orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor)})).filter(o => o.id),
+      turno: Math.max(0, Math.round(num(d.turno))),
+      ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
+    };
+    renderIniciativa();
+  }, err => console.error('Error escuchando la iniciativa:', err));
+}
+
+async function guardarIniciativa(cambios){
+  if(!soyGM) return;
+  const datos = {
+    orden: iniciativa.orden.map(o => ({id: o.id, valor: num(o.valor)})),
+    turno: iniciativa.turno,
+    ronda: iniciativa.ronda,
+    ...cambios,
+    actualizado: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    await fbDb.doc(fbRutaCampana('mapa/iniciativa')).set(datos);
+  }catch(err){
+    console.error('No se pudo guardar la iniciativa:', err);
+    toast(err.code === 'permission-denied' ? 'Solo el GM cambia el orden de turnos' : 'No se pudo guardar el orden de turnos');
+  }
+}
+
+// De mayor a menor; con el mismo valor queda el orden en que estaban.
+function ordenarIniciativa(lista){
+  return lista.map((o, i) => ({o, i})).sort((a, b) => (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
+}
+
+function iniciativaPonerTodos(){
+  const previos = new Map(iniciativa.orden.map(o => [o.id, o.valor]));
+  const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id))}));
+  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => ({id: o.id, valor: o.valor})), turno: 0});
+}
+
+function iniciativaSiguiente(){
+  if(!iniciativa.orden.length) return;
+  const siguiente = iniciativa.turno + 1;
+  if(siguiente >= iniciativa.orden.length) guardarIniciativa({turno: 0, ronda: iniciativa.ronda + 1});
+  else guardarIniciativa({turno: siguiente});
+}
+
+function renderIniciativa(){
+  const caja = $('#iniciativa');
+  if(!caja) return;
+  // Solo en combate: en narrativo no hay orden de turnos.
+  if(modoMapa !== 'combate' || !fbMiembro){ caja.hidden = true; return; }
+  caja.hidden = false;
+  caja.classList.toggle('plegado', iniciativaPlegada);
+  $('#iniciativa-plegar').textContent = iniciativaPlegada ? '+' : '—';
+  $('#iniciativa-ronda').textContent = iniciativa.orden.length ? `Ronda ${fmt(iniciativa.ronda)}` : '';
+  const lista = $('#iniciativa-lista');
+  if(!iniciativa.orden.length){
+    lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
+  }else{
+    lista.innerHTML = iniciativa.orden.map((o, i) => {
+      const t = tokens.get(o.id);
+      const nombre = t ? nombreDe(t) : '(token borrado)';
+      const v = t ? vinculo(t) : null;
+      const mini = (v && v.miniatura) || (t && t.imagen) || '';
+      const color = (t && t.color) || '#9A867E';
+      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
+        <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
+        <span class="ini-nombre">${esc(nombre)}</span>` +
+        (soyGM
+          ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">
+             <button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>`
+          : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
+      '</div>';
+    }).join('');
+  }
+  $('#iniciativa-pie').innerHTML = soyGM
+    ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +
+      '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
+      '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>' +
+      '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>'
+    : '';
+  conectarIniciativa();
+}
+
+function conectarIniciativa(){
+  const caja = $('#iniciativa');
+  caja.querySelectorAll('[data-ini-fila]').forEach(f => f.onclick = e => {
+    if(e.target.closest('input,button')) return;
+    seleccionar(f.dataset.iniFila);
+    const t = tokens.get(f.dataset.iniFila);
+    if(t) centrarEn(hexCentro(t.col, t.fila).x, hexCentro(t.col, t.fila).y);
+  });
+  caja.querySelectorAll('[data-ini-valor]').forEach(inp => {
+    inp.onchange = () => {
+      const orden = iniciativa.orden.map(o => o.id === inp.dataset.iniValor ? {id: o.id, valor: num(inp.value)} : o);
+      guardarIniciativa({orden});
+    };
+    inp.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); inp.blur(); } };
+  });
+  caja.querySelectorAll('[data-ini-quitar]').forEach(b => b.onclick = () => {
+    const orden = iniciativa.orden.filter(o => o.id !== b.dataset.iniQuitar);
+    guardarIniciativa({orden, turno: Math.min(iniciativa.turno, Math.max(0, orden.length - 1))});
+  });
+  const traer = $('#ini-traer');
+  if(traer) traer.onclick = iniciativaPonerTodos;
+  const ordenar = $('#ini-ordenar');
+  if(ordenar) ordenar.onclick = () => guardarIniciativa({orden: ordenarIniciativa(iniciativa.orden), turno: 0});
+  const siguiente = $('#ini-siguiente');
+  if(siguiente) siguiente.onclick = iniciativaSiguiente;
+  const limpiar = $('#ini-limpiar');
+  if(limpiar) limpiar.onclick = () => { if(confirm('¿Vaciar el orden de turnos?')) guardarIniciativa({orden: [], turno: 0, ronda: 1}); };
+}
+
+$('#iniciativa-cab').onclick = e => {
+  if(e.target.closest('input')) return;
+  iniciativaPlegada = !iniciativaPlegada;
+  try{ localStorage.setItem('mapa-iniciativa-plegada', iniciativaPlegada ? '1' : ''); }catch(e2){}
+  renderIniciativa();
+};
+
 function escucharModo(){
   fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
     const nuevo = doc.exists && doc.data().modo === 'combate' ? 'combate' : 'narrativo';
@@ -711,6 +884,7 @@ function escucharModo(){
     escucharModo.listo = true;
     modoMapa = nuevo;
     renderModo();
+    renderIniciativa();
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando el modo del mapa:', err));
@@ -1430,6 +1604,7 @@ function escucharTokens(){
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
       });
     });
+    renderIniciativa();
     const primeraVez = !escucharTokens.listo;
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
@@ -2644,6 +2819,7 @@ function arrancarEnVivo(){
   escucharVinculables();
   escucharFondo();
   escucharModo();
+  escucharIniciativa();
   escucharMantenimiento();
   escucharTokens();
   mesaEscuchar();

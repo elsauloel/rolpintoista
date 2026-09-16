@@ -62,6 +62,16 @@ nuevo de Rol Pintoísta. Paso 2 de
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
+  izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20), visible
+  **solo en modo combate**. Vive en `campanas/{id}/mapa/iniciativa`
+  (`{orden: [{id, valor}], turno, ronda}`): lo escribe solo el GM (reglas de
+  `mapa/{doc}`) y lo ven todos. El GM tiene "Traer tokens" (suma todos los
+  del mapa conservando valores), carga la tirada de cada uno, "Ordenar"
+  (de mayor a menor, empates en el orden previo), "▶ Siguiente" (avanza y
+  suma una ronda al dar la vuelta) y "Limpiar". Tocar una fila selecciona y
+  centra ese token. Plegado por navegador en `localStorage`
+  (`mapa-iniciativa-plegada`).
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del

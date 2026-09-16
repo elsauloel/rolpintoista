@@ -181,10 +181,12 @@ service cloud.firestore {
       // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.
       // fichaId (opcional): la ficha (pj) o el creep al que está vinculado.
       function tokenValido(d) {
-        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras'])
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen'])
           && (!('fichaId' in d) || (d.fichaId is string && d.fichaId.size() <= 64))
           // Ruta del último movimiento, [col, fila, col, fila…], para la estela.
           && (!('ruta' in d) || (d.ruta is list && d.ruta.size() <= 200))
+          // Imagen propia del token (solo los que no están vinculados).
+          && (!('imagen' in d) || (d.imagen is string && d.imagen.size() <= 60000))
           && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 40
           && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
           && d.tipo in ['pj', 'creep']

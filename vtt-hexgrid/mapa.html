@@ -134,7 +134,7 @@ aside{
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
 #hud .hud-anillo{position:absolute;left:0;top:0}
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
-#hud .hud-globos{position:absolute;left:0;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+#hud .hud-globos{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
 #hud .hud-circulo{
   width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.92);color:var(--paper);
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
@@ -257,6 +257,7 @@ body.con-ruta .toast{bottom:84px}
   </div>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
+  <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
   <div class="zoom">
@@ -980,7 +981,7 @@ function dibujar(){
     const vin = vinculo(t);
     const est = estadoDe(t);
     const nombre = nombreDe(t);
-    const mini = vin ? imagenLista(vin.miniatura) : null;
+    const mini = vin ? imagenLista(vin.miniatura) : imagenLista(t.imagen);
 
     ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
     ctx.fillStyle = t.color || '#9A867E'; ctx.fill();
@@ -1423,6 +1424,10 @@ function escucharTokens(){
         col: Math.round(num(d.col)),
         fila: Math.round(num(d.fila)),
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : 0,
+        // Ojo: lo que no se copie acá se pierde al volver de Firebase.
+        aura: d.aura && typeof d.aura === 'object' ? d.aura : null,
+        barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
+        imagen: typeof d.imagen === 'string' ? d.imagen : '',
       });
     });
     const primeraVez = !escucharTokens.listo;
@@ -1493,6 +1498,58 @@ async function guardarFondo(cambios){
 }
 
 // Achica la imagen hasta que entre en un documento de Firebase (tope 1 MB).
+// Imagen propia de un token que no est� vinculado a una ficha ni a un creep
+// (NPC, objetos, etc.). Se achica a un cuadrado chico para que entre en el
+// documento del token.
+const TOKEN_IMG_PX = 96;
+const TOKEN_IMG_MAX = 60000;   // tope que aceptan las reglas
+function prepararImagenToken(file){
+  return new Promise((res, rej) => {
+    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('bad-image'));
+      img.onload = () => {
+        let lado = TOKEN_IMG_PX, calidad = 0.85, dato = '';
+        for(let i = 0; i < 6; i++){
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = lado;
+          const c = canvas.getContext('2d');
+          c.fillStyle = '#17121A'; c.fillRect(0, 0, lado, lado);
+          // Recorte cuadrado centrado, como la miniatura de la ficha.
+          const corte = Math.min(img.naturalWidth, img.naturalHeight);
+          c.drawImage(img, (img.naturalWidth - corte) / 2, (img.naturalHeight - corte) / 2, corte, corte, 0, 0, lado, lado);
+          dato = canvas.toDataURL('image/jpeg', calidad);
+          if(dato.length < TOKEN_IMG_MAX) break;
+          calidad = Math.max(0.5, calidad - 0.1); lado = Math.round(lado * 0.85);
+        }
+        dato.length < TOKEN_IMG_MAX ? res(dato) : rej(new Error('muy-grande'));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+async function elegirImagenToken(id){
+  const entrada = $('#token-imagen-archivo');
+  entrada.onchange = async ev => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if(!file) return;
+    try{
+      const dato = await prepararImagenToken(file);
+      await editarToken(id, {imagen: dato});
+    }catch(err){
+      console.error('No se pudo preparar la imagen del token:', err);
+      toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+    }
+  };
+  entrada.click();
+}
+
 function prepararImagenFondo(file){
   return new Promise((res, rej) => {
     if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
@@ -2129,6 +2186,15 @@ function hudAjustesHtml(t){
   const aura = t.aura || {};
   const check = (clave, texto, si) =>
     `<div class="hud-campo"><label>${texto}</label><input type="checkbox" data-hud-barra="${clave}"${si ? ' checked' : ''}></div>`;
+  // Los tokens sin ficha ni creep (NPC, objetos) pueden llevar su propia
+  // imagen; los vinculados usan la miniatura de su ficha o creep.
+  const imagenHtml = vinculo(t) ? '' :
+    '<h3 style="margin-top:12px">Imagen del token</h3>' +
+    (t.imagen ? `<div style="text-align:center;margin-bottom:6px"><img src="${esc(t.imagen)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid ${esc(t.color || '#9A867E')}"></div>` : '') +
+    '<div class="fila">' +
+      `<button type="button" class="hud-mini" data-hud-imagen="1">${t.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
+      (t.imagen ? '<button type="button" class="hud-mini peligro" data-hud-imagen-no="1">Quitar</button>' : '') +
+    '</div>';
   return '<div class="hud-globo"><h3>Barras del token</h3>' +
     check('hp', 'Vida (roja)', barras.hp) +
     check('sp', 'SP (azul)', barras.sp) +
@@ -2140,6 +2206,7 @@ function hudAjustesHtml(t){
       '<button type="button" class="hud-mini" data-hud-aura-ok="1">Guardar aura</button>' +
       (aura.radio ? '<button type="button" class="hud-mini peligro" data-hud-aura-no="1">Quitar</button>' : '') +
     '</div>' +
+    imagenHtml +
     '<p class="ayuda" style="margin-top:6px">El radio va en casilleros. Las barras se guardan solas. La ven todos.</p>' +
     '</div>';
 }
@@ -2153,7 +2220,7 @@ function hudUbicar(){
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
-  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, soyGM]);
+  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM]);
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);
@@ -2182,7 +2249,26 @@ function hudAcomodarAnillo(radioToken){
     b.style.top = Math.round(Math.sin(ang) * r) + 'px';
   });
   const globos = hud.querySelector('.hud-globos');
-  if(globos) globos.style.top = Math.round(r + 24) + 'px';
+  if(globos) hudAcomodarGlobo(globos, r);
+}
+
+// El panel que se abre (estados o ajustes) va debajo del anillo, pero
+// siempre dentro del mapa: si no entra abajo se dibuja arriba, se corre al
+// costado para no salirse y, si es m�s alto que la pantalla, tiene scroll.
+function hudAcomodarGlobo(globos, r){
+  const caja = $('#lienzo-caja').getBoundingClientRect();
+  const hud = $('#hud').getBoundingClientRect();
+  const px = hud.left - caja.left, py = hud.top - caja.top;   // centro del token
+  const margen = 8;
+  globos.style.maxHeight = Math.max(120, caja.height - margen * 2) + 'px';
+  const w = globos.offsetWidth, h = globos.offsetHeight;
+  let x = px - w / 2;
+  x = Math.max(margen, Math.min(x, caja.width - w - margen));
+  let y = py + r + 24;
+  if(y + h > caja.height - margen) y = py - r - 24 - h;        // no entra abajo: va arriba
+  y = Math.max(margen, Math.min(y, caja.height - h - margen));
+  globos.style.left = Math.round(x - px) + 'px';
+  globos.style.top = Math.round(y - py) + 'px';
 }
 
 function hudConectar(t){
@@ -2223,6 +2309,10 @@ function hudConectar(t){
     barras[c.dataset.hudBarra] = c.checked;
     editarToken(seleccion, {barras});
   });
+  const botonImagen = hud.querySelector('[data-hud-imagen]');
+  if(botonImagen) botonImagen.onclick = () => elegirImagenToken(seleccion);
+  const quitarImagen = hud.querySelector('[data-hud-imagen-no]');
+  if(quitarImagen) quitarImagen.onclick = () => editarToken(seleccion, {imagen: firebase.firestore.FieldValue.delete()});
   const guardarAura = () => {
     const radio = num(hud.querySelector('[data-hud-aura="radio"]').value);
     const color = hud.querySelector('[data-hud-aura="color"]').value;

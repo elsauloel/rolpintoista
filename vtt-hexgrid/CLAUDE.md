@@ -67,7 +67,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
   token, ⚡ Botonera (PJ propio) o Acciones (creep del GM). Vida/SP/No2 se
   guardan en la ficha o en la parte privada del creep; barras y aura, en el
-  propio token (`barras {hp,sp,no2}`, `aura {radio, color}`).
+  propio token (`barras {hp,sp,no2}`, `aura {radio, color}`). Un token sin ficha ni creep
+  vinculado puede llevar su propia `imagen` (cuadrada, 96 px, < 60 KB;
+  `prepararImagenToken`), que se elige en ese mismo panel. El panel se
+  acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
+  `escucharTokens` no copie del documento se pierde al volver de Firebase.
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

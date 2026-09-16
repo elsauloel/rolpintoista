@@ -872,9 +872,6 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 .scrim.open{display:block}
 .modal{max-width:520px;margin:4vh auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel);}
-.pop-check{display:flex;align-items:center;gap:4px;flex:none;cursor:pointer;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.pop-check:hover{color:var(--copper)}
-.pop-check input{width:auto;flex:none;margin:0;accent-color:var(--copper);cursor:pointer}
 .modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}
 .modal header h3{margin:0;font-family:"Fraunces",serif;font-size:17px;font-weight:600}
 .modal .body{padding:15px;display:flex;flex-direction:column;gap:11px}
@@ -3119,11 +3116,6 @@ function aplicarEfectoDeConsumo(it){
 
 // Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y
 // la publica en la Mesa, igual que un ataque o un chequeo manual.
-// El pop up de la tarjeta al ejecutar se puede prender/apagar por habilidad
-// desde la botonera.
-function popupHabilidadActivo(h){
-  return h.popupAlEjecutar ?? true;
-}
 
 // Stats secundarios que se pueden tirar (los que tienen 🎲 en Atributos).
 function STATS_CON_TIRADA(){
@@ -3784,7 +3776,6 @@ function renderBotonera(){
           const sinNitros = sinNitrosPara(i);
           return `<div class="cat-row">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
-            <label class="pop-check" title="Mostrar la tarjeta de la habilidad al ejecutarla"><input type="checkbox" data-pophab="${i.id}" ${popupHabilidadActivo(i)?'checked':''}>Tarjeta</label>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
             <span class="hab-accion">
               <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinNitros?'disabled':''} style="width:auto">Ejecutar</button>
@@ -6388,12 +6379,6 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('change', e => {
-  const cb = e.target.closest('[data-pophab]');
-  if(!cb) return;
-  const h = S.habilidades.find(x => x.id === cb.dataset.pophab);
-  if(h) h.popupAlEjecutar = cb.checked;
-});
 document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
@@ -6544,7 +6529,6 @@ function ejecutarHabilidad(id){
   if(efecto) renderList('efectos');
   renderNitros();
   renderVitals();
-  if(popupHabilidadActivo(it)) openViewer('habilidades', id);
   const partes = [`ejecutada`];
   if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
   partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
@@ -6580,7 +6564,6 @@ function confirmarCostoVariable(){
   if(efecto) renderList('efectos');
   renderNitros();
   renderVitals();
-  if(popupHabilidadActivo(it)) openViewer('habilidades', it.id);
   const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);

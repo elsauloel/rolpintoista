@@ -53,6 +53,12 @@ más cambia sesión a sesión.
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en
   dados y el costo en No2/SP con su motivo. No tira nada.
+- **Editor de habilidades paso a paso** (`PASOS_HABILIDAD`, `drawEditorHabilidad`):
+  `drawEditor` deriva ahí para `habilidades`. Pasos: qué es (nombre y
+  descripción) → costo (SP, No2, categoría) → tirada (stat y/o fórmula) →
+  estado alterado (`htmlEstadoAlUsar`, compartido con los consumibles) →
+  origen (Job o de dónde salió, imagen) → resumen. Al crear, Guardar aparece
+  en el último paso; al editar, siempre, y los pasos se pueden saltar.
 - **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
   Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
   `esVeneno`, `esSangrado`). Ya no hay "Daño entrante": el HP se edita a

@@ -377,6 +377,20 @@ a{color:var(--brass)}
 .catalogo-dde-badge b{color:var(--brass);font-size:13px}
 .cat-meta .precio-lista{text-decoration:line-through;color:var(--muted);margin-right:5px}
 .preset-abrir{width:100%;text-align:left}
+/* Editor de habilidades paso a paso */
+.pasos-hab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.paso-chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;padding:3px 8px;border:1px solid var(--line);border-radius:99px;color:var(--muted);background:none;cursor:pointer}
+.paso-chip.hecho{color:var(--paper);border-color:var(--line)}
+.paso-chip.activo{color:#180F08;background:var(--copper);border-color:var(--copper);font-weight:700}
+.paso-chip:disabled{opacity:.4;cursor:not-allowed}
+.paso-titulo{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--paper);margin:2px 0 4px}
+.paso-ayuda{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.45}
+.paso-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.resumen-hab{border:1px solid var(--line);background:var(--panel2);padding:10px 12px;border-radius:var(--r)}
+.resumen-nombre{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:var(--brass)}
+.resumen-desc{font-size:13px;margin:4px 0 8px;white-space:pre-wrap}
+.resumen-fila{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;border-top:1px solid var(--line-soft)}
+.resumen-fila span{color:var(--muted)}
 .opcion-fila{display:flex;flex-wrap:wrap;gap:6px}
 .opcion-btn{
   font-family:"Space Mono",monospace;font-size:10.5px;border:1px solid var(--line);
@@ -6007,7 +6021,8 @@ function openEditor(key, id, equipadoPreset){
     forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
-  editing = {key, id, draft: structuredClone(item)};
+  editing = {key, id, draft: structuredClone(item), paso: 0};
+  $("#modal-save").style.display = "";
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
   $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
@@ -6027,8 +6042,176 @@ function campoImagenHtml(draft){
     <input type="file" id="itempick-input" accept="image/*" hidden>
   </div>`;
 }
+/* ---------- Habilidades: editor paso a paso ----------
+   Crear o editar una habilidad va en pasos cortos, cada uno con una
+   pregunta que guía al jugador. Al crear, "Guardar" aparece en el último
+   paso; al editar, está siempre (y se puede saltar a cualquier paso). */
+const PASOS_HABILIDAD = [
+  {corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
+   ayuda: 'Contalo como lo leería la mesa: esta descripción aparece en la Mesa cada vez que la uses.'},
+  {corto: 'Costo', titulo: '¿Cuánto cuesta usarla?',
+   ayuda: 'El SP se gasta y no vuelve al pasar turno; los Nitros (No2) se recargan en cada Mantenimiento. SP vacío = no gasta; X = lo elegís al usarla.'},
+  {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
+   ayuda: 'Podés vincularla a un stat (se tira con su valor del momento, con los modificadores activos), escribir una fórmula, las dos cosas o ninguna.'},
+  {corto: 'Estado', titulo: '¿Aplica un estado alterado?',
+   ayuda: 'Por ejemplo un buff sobre vos o un recordatorio. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
+  {corto: 'Origen', titulo: '¿Cómo la conseguiste?',
+   ayuda: 'Las que se compran con puntos de Job descuentan de tu Job disponible.'},
+  {corto: 'Listo', titulo: 'Revisá cómo quedó',
+   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+];
+
+function drawEditorHabilidad(){
+  const {draft} = editing;
+  const total = PASOS_HABILIDAD.length;
+  const paso = Math.max(0, Math.min(total - 1, editing.paso || 0));
+  editing.paso = paso;
+  const info = PASOS_HABILIDAD[paso];
+  const nuevo = !editing.id;
+  const etiqueta = (texto, extra) => `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${texto}</span>${extra || ''}`;
+
+  let html = `<div class="pasos-hab">${PASOS_HABILIDAD.map((p, i) => {
+    // Al crear, no se puede saltar adelante sin nombre.
+    const bloqueado = nuevo && i > paso && !(draft.nombre || '').trim();
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hab-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  }).join('')}</div>`;
+  html += `<div class="paso-titulo">${info.titulo}</div><p class="paso-ayuda">${info.ayuda}</p>`;
+
+  if(paso === 0){
+    html += `<div class="f"><label>Nombre</label><input data-c="nombre" value="${esc(draft.nombre)}" placeholder="ej. Golpe certero" data-hab-enter="1"></div>
+      <div class="f"><label>Descripción</label><textarea data-c="detalle" rows="4" placeholder="ej. Un golpe preciso que ignora la mitad de la Defensa del rival.">${esc(draft.detalle)}</textarea></div>`;
+  }
+  if(paso === 1){
+    html += `<div class="f2">
+        <div class="f"><label>SP que gasta</label><input data-c="costo" value="${esc(draft.costo ?? '')}" placeholder="ej. 3 · o X si varía" data-hab-enter="1"></div>
+        <div class="f"><label>Nitros (No2) que gasta</label><input data-c="nitrosCosto" type="number" step="1" min="0" value="${esc(draft.nitrosCosto ?? IT2.nitrosHabilidad)}" data-hab-enter="1"></div>
+      </div>
+      <div class="f"><label>¿Se puede usar más de una vez por turno?</label>
+        <div class="opcion-fila">
+          ${CATEGORIAS_HABILIDAD.map(c => `<button type="button" class="opcion-btn ${draft.categoria === c ? 'activa' : ''}" data-cat-hab="${esc(c)}">${esc(c || 'Sin categoría')}</button>`).join('')}
+        </div>
+        <div class="hint" style="margin-top:5px">"No espameable": una vez por turno (si la repetís, la ficha te pregunta). "Espameable": todas las que te alcancen.</div>
+      </div>`;
+  }
+  if(paso === 2){
+    const opcionStat = s => `<option value="${s.id}" ${draft.tiradaStat === s.id ? 'selected' : ''}>${esc(s.label)} · ${esc(s.full)}</option>`;
+    html += `<div class="f"><label>Tirar un stat</label>
+        <select data-c="tiradaStat">
+          <option value="">— no tira un stat —</option>
+          <optgroup label="Principales">${ATTR_LIST.map(opcionStat).join('')}</optgroup>
+          <optgroup label="Secundarios">${STATS_CON_TIRADA().map(opcionStat).join('')}</optgroup>
+        </select></div>
+      <div class="f"><label>Fórmula de dados (opcional)</label><input data-c="tiradaExtra" value="${esc(draft.tiradaExtra ?? '')}" placeholder="ej. 2d6+3 o 1d20" data-hab-enter="1"></div>`;
+  }
+  if(paso === 3){
+    html += htmlEstadoAlUsar('habilidades', draft);
+  }
+  if(paso === 4){
+    const conJob = draft.job !== false;
+    html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" data-c="job" ${conJob ? 'checked' : ''} style="width:auto" data-hab-redibujar="1">
+        ${etiqueta('La compré con puntos de Job')}
+      </label>` +
+      (conJob ? '' : `<div class="f"><label>¿De dónde salió?</label><input data-c="origen" value="${esc(draft.origen ?? '')}" placeholder="ej. Regalo de un hechicero, raza, objeto…" data-hab-enter="1"></div>`) +
+      campoImagenHtml(draft);
+  }
+  if(paso === 5){
+    const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${valor}</b></div>`;
+    const costoSp = String(draft.costo ?? '').trim();
+    const tirada = [draft.tiradaStat ? `${STAT_LABEL[draft.tiradaStat] || draft.tiradaStat}` : '', String(draft.tiradaExtra || '').trim()].filter(Boolean).join(' + ');
+    const estado = String(draft.efectoNombre || '').trim();
+    html += `<div class="resumen-hab">
+      <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
+      <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+      ${fila('SP', esc(costoSp || 'no gasta'))}
+      ${fila('No2', fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
+      ${fila('Uso', esc(draft.categoria || 'Sin categoría'))}
+      ${fila('Tirada', esc(tirada || 'no tira'))}
+      ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}
+      ${fila('Origen', esc(draft.job !== false ? 'Puntos de Job' : (draft.origen || 'otro')))}
+    </div>`;
+  }
+
+  html += `<div class="paso-nav">
+    ${paso > 0 ? '<button type="button" class="btn ghost" data-hab-atras="1">← Atrás</button>' : '<span></span>'}
+    ${paso < total - 1 ? '<button type="button" class="btn primary" data-hab-siguiente="1">Siguiente →</button>' : ''}
+  </div>`;
+  $('#modal-body').innerHTML = html;
+  // Al crear, "Guardar" recién en el último paso; al editar, siempre.
+  $('#modal-save').style.display = (!nuevo || paso === total - 1) ? '' : 'none';
+}
+
+function habilidadIrAPaso(n){
+  if(!editing || editing.key !== 'habilidades') return;
+  const destino = Math.max(0, Math.min(PASOS_HABILIDAD.length - 1, n));
+  if(destino > 0 && !(editing.draft.nombre || '').trim()){
+    toast('Primero ponele un nombre');
+    editing.paso = 0;
+    drawEditor();
+    $('#modal-body').querySelector('[data-c="nombre"]')?.focus();
+    return;
+  }
+  editing.paso = destino;
+  drawEditor();
+  $('#modal-body').querySelector('input:not([type=checkbox]),textarea,select')?.focus();
+}
+
+$('#modal-body').addEventListener('click', e => {
+  if(!editing || editing.key !== 'habilidades') return;
+  const chip = e.target.closest('[data-hab-paso]');
+  if(chip){ habilidadIrAPaso(num(chip.dataset.habPaso)); return; }
+  if(e.target.closest('[data-hab-siguiente]')){ habilidadIrAPaso((editing.paso || 0) + 1); return; }
+  if(e.target.closest('[data-hab-atras]')){ habilidadIrAPaso((editing.paso || 0) - 1); return; }
+});
+$('#modal-body').addEventListener('keydown', e => {
+  if(!editing || editing.key !== 'habilidades') return;
+  if(e.key === 'Enter' && e.target.matches('[data-hab-enter]')){
+    e.preventDefault();
+    e.target.dispatchEvent(new Event('change', {bubbles: true}));
+    if((editing.paso || 0) < PASOS_HABILIDAD.length - 1) habilidadIrAPaso((editing.paso || 0) + 1);
+  }
+});
+$('#modal-body').addEventListener('change', e => {
+  // Después de que handleModalFieldChange actualice el borrador.
+  if(editing && editing.key === "habilidades" && e.target.matches("[data-hab-redibujar]")) setTimeout(drawEditor, 0);
+});
+
+// Sección "Estado alterado al usar" (consumibles y habilidades).
+function htmlEstadoAlUsar(key, draft){
+  let html = '';
+    const personalizadosIt = S.efectosPersonalizados || [];
+    html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
+      <button type="button" class="btn preset-abrir" id="item-efecto-preset-abrir">Elegir de la lista · ${fmt(EFECTOS_PRESET.length + personalizadosIt.length)} estados</button>
+      <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}" style="margin-top:6px"></div>
+      <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" data-c="efectoPermanente" ${draft.efectoPermanente?'checked':''} style="width:auto">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence (queda hasta usarlo o borrarlo a mano)</span>
+      </label>
+      ${!draft.efectoPermanente ? `<div class="f2">
+        <div class="f"><label>${CAMPO_LABEL.efectoTurnos}</label><input data-c="efectoTurnos" type="number" step="any" value="${esc(draft.efectoTurnos??0)}"></div>
+        <div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>
+      </div>` : `<div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>`}
+      <div class="f"><label>${CAMPO_LABEL.efectoDetalle}</label><textarea data-c="efectoDetalle" rows="2" placeholder="Qué hace el estado, tal como lo va a leer el jugador. Si lo dejás vacío se usa el detalle del ítem.">${esc(draft.efectoDetalle??'')}</textarea></div>
+      <div class="f"><label>Modificadores del estado (opcional)</label>
+        <div id="efectomods">${(draft.efectoMods||[]).map((m,i)=>`
+        <div class="modrow">
+          <select data-em="${i}" data-emk="stat">
+            <option value="">— elegir stat —</option>
+            ${statOptions(m.stat)}
+          </select>
+          <input data-em="${i}" data-emk="val" type="number" step="any" value="${esc(m.val)}">
+          <button class="mini" data-rmefectomod="${i}">×</button>
+        </div>`).join('')}</div>
+        <button type="button" class="iconbtn iconbtn-add" id="addefectomod">+ Modificador del estado</button>
+        <div class="hint" style="margin-top:6px">Se suman al stat mientras ese estado esté activo (p.ej. +2 Fuerza durante los turnos que dure).</div>
+      </div>
+      <div class="hint" style="margin:-4px 0 8px">Si le ponés nombre, al consumir este ítem se activa (o refresca) ese estado en Estados alterados. Con "No vence" tildado, el estado queda ahí hasta que lo borres vos manualmente.</div>`;
+  return html;
+}
+
 function drawEditor(){
   const {key, draft} = editing;
+  if(key === "habilidades"){ drawEditorHabilidad(); return; }
   const sc = SCHEMA[key];
   const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada','armaDeRango'];
   const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
@@ -6144,35 +6327,7 @@ function drawEditor(){
     html += `<div class="f"><label>${CAMPO_LABEL.curaspPct}</label>
       <input data-c="curaspPct" type="number" step="any" min="0" max="100" value="${esc(draft.curaspPct??0)}"></div>`;
   }
-  if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')){
-    const personalizadosIt = S.efectosPersonalizados || [];
-    html += `<div class="f"><label>Estado alterado al ${key === 'habilidades' ? 'ejecutar' : 'consumir'} (opcional)</label>
-      <button type="button" class="btn preset-abrir" id="item-efecto-preset-abrir">Elegir de la lista · ${fmt(EFECTOS_PRESET.length + personalizadosIt.length)} estados</button>
-      <input data-c="efectoNombre" placeholder="${key === 'habilidades' ? 'ej. Espinas' : 'ej. Regeneración (poción)'}" value="${esc(draft.efectoNombre??'')}" style="margin-top:6px"></div>
-      <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" data-c="efectoPermanente" ${draft.efectoPermanente?'checked':''} style="width:auto">
-        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence (queda hasta usarlo o borrarlo a mano)</span>
-      </label>
-      ${!draft.efectoPermanente ? `<div class="f2">
-        <div class="f"><label>${CAMPO_LABEL.efectoTurnos}</label><input data-c="efectoTurnos" type="number" step="any" value="${esc(draft.efectoTurnos??0)}"></div>
-        <div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>
-      </div>` : `<div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>`}
-      <div class="f"><label>${CAMPO_LABEL.efectoDetalle}</label><textarea data-c="efectoDetalle" rows="2" placeholder="Qué hace el estado, tal como lo va a leer el jugador. Si lo dejás vacío se usa el detalle del ítem.">${esc(draft.efectoDetalle??'')}</textarea></div>
-      <div class="f"><label>Modificadores del estado (opcional)</label>
-        <div id="efectomods">${(draft.efectoMods||[]).map((m,i)=>`
-        <div class="modrow">
-          <select data-em="${i}" data-emk="stat">
-            <option value="">— elegir stat —</option>
-            ${statOptions(m.stat)}
-          </select>
-          <input data-em="${i}" data-emk="val" type="number" step="any" value="${esc(m.val)}">
-          <button class="mini" data-rmefectomod="${i}">×</button>
-        </div>`).join('')}</div>
-        <button type="button" class="iconbtn iconbtn-add" id="addefectomod">+ Modificador del estado</button>
-        <div class="hint" style="margin-top:6px">Se suman al stat mientras ese estado esté activo (p.ej. +2 Fuerza durante los turnos que dure).</div>
-      </div>
-      <div class="hint" style="margin:-4px 0 8px">Si le ponés nombre, al consumir este ítem se activa (o refresca) ese estado en Estados alterados. Con "No vence" tildado, el estado queda ahí hasta que lo borres vos manualmente.</div>`;
-  }
+  if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')) html += htmlEstadoAlUsar(key, draft);
   if(esArma && (sc.campos.includes('tipoDado') || sc.campos.includes('danoFijo'))){
     html += `<div class="f2">
       <div class="f"><label>${CAMPO_LABEL.tipoDado}</label>

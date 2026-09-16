@@ -6179,6 +6179,10 @@ $('#modal-body').addEventListener('click', e => {
     const m = modoNitros.dataset.nitrosModo;
     const d = editing.draft;
     d.nitrosCosto = m === "ataque" ? "ATAQUE" : m === "x" ? "X" : ((nitrosAtaque(d) || nitrosVariable(d)) ? IT2.nitrosHabilidad : num(d.nitrosCosto ?? IT2.nitrosHabilidad));
+    // Costo de ataque: la tirada por defecto es PdG (si no eligió otra). Si
+    // después cambia de opción, se saca el PdG que se había puesto solo.
+    if(m === "ataque" && !d.tiradaStat){ d.tiradaStat = "pdg"; editing.pdgAuto = true; }
+    else if(m !== "ataque" && editing.pdgAuto && d.tiradaStat === "pdg"){ d.tiradaStat = ""; editing.pdgAuto = false; }
     drawEditor();
     return;
   }
@@ -6438,6 +6442,7 @@ function handleModalFieldChange(e){
     editing.draft[c] = t.type === "checkbox" ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===""?"":num(t.value)) : t.value);
     // Nitros de una habilidad: un número o X (lo elegís al usarla).
     if(c === "nitrosCosto") editing.draft[c] = esCostoVariable(t.value) ? "X" : (t.value.trim() === "" ? "" : num(t.value));
+    if(c === "tiradaStat") editing.pdgAuto = false;  // lo eligió a mano
     if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ drawEditor(); return; }
     if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');

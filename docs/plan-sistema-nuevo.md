@@ -127,6 +127,36 @@ del mapa separada de su posición. **Siguiente:** dados 3D en el mapa
 (animación con el resultado real de cada tirada, sin escrituras extra;
 con opción de apagarla y tope de dados).
 
+## Sigilo (en diseño)
+
+Un personaje o un creep entra en sigilo desde el mapa.
+
+**Quién ve qué:**
+
+| Token en sigilo | Lo ven | No lo ve |
+|---|---|---|
+| Personaje | su dueño y los demás jugadores (semitransparente) | el GM |
+| Creep | el GM (semitransparente) | los jugadores |
+
+Ocultarlo de verdad: la posición (y la estela) del que está en sigilo no
+le llega al otro bando (ver "Antes de abrirlo al público"). Reemplaza al
+pendiente "GM oculta tokens".
+
+**Reglas decididas:**
+- **Sigilo es una habilidad estándar**: se tiene por la clase u otros
+  mecanismos y aparece en el campo de habilidades con su texto.
+- **Entrar cuesta 1 No2** *(a revisar)*.
+- **Se rompe** al entrar en el campo de visión de un personaje/creep del
+  otro bando, o al realizar una acción hostil.
+
+**Falta definir:**
+- Posicionamiento en el mapa y **campo de visión** (necesario para la
+  regla de ruptura).
+- Si se detecta de otra forma (tirada de percepción, etc.).
+- Costo de moverse en sigilo, "última posición conocida".
+- Qué pasa con la ficha, las tiradas en la Mesa y los estados del que está
+  en sigilo.
+
 ## Antes de abrirlo al público
 
 Hoy el sistema es para jugar **entre amigos de confianza**: nadie va a

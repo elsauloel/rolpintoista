@@ -957,6 +957,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 /* ---------- Barra superior (arriba de los vitales, fija al scrollear) ---------- */
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
+.accesos .partida{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:var(--brass);white-space:nowrap}
+.accesos .partida:empty{display:none}
+.accesos .partida .gm{color:var(--muted);font-weight:400}
 .accesos .iconbtn{text-decoration:none}
 .accesos-sep{width:1px;align-self:stretch;background:var(--line);margin:0 3px}
 @media(max-width:700px){.accesos .note{flex-basis:100%;margin-right:0}}
@@ -1069,6 +1072,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <div class="vitals-sticky">
     <!-- BARRA SUPERIOR: estado de guardado, acciones de la ficha y accesos directos (el href lo completa el script con la partida) -->
     <nav class="accesos">
+      <span class="partida" id="barra-partida" title="Partida abierta y quién es el GM"></span>
       <span class="note" id="guardado-estado">Sin personaje abierto: los cambios no se guardan.</span>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Crear un personaje nuevo en la mesa">＋ Personaje nuevo</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial">🕘 Historial</button>
@@ -7725,6 +7729,8 @@ async function borrarPersonaje(id, nombre){
 // Se llama cuando ya se entró a la mesa: arranca las tiradas y abre el
 // último personaje de esta pestaña (o de este navegador).
 async function fbAlEntrar(){
+  // Nombre de la partida y su GM, arriba a la izquierda.
+  $('#barra-partida').innerHTML = `${esc(fbPartida.nombre || 'Partida')} <span class="gm">(GM: ${esc(fbPartida.gmNombre || '?')})</span>`;
   mesaEscuchar();
   mesaHistorialAlEntrar();
   mantenimientoEscuchar();

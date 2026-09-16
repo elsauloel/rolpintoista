@@ -122,7 +122,10 @@ aside{
 }
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
-.fila{display:flex;gap:8px;align-items:center;margin-top:8px}
+.fila{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+/* Los botones del panel del token entran aunque sean tres: más compactos
+   y, si no entran, pasan al renglón de abajo. */
+#panel-token .fila .btn{padding:6px 9px;font-size:10.5px;letter-spacing:.06em}
 .etiqueta{font-size:11.5px;color:var(--muted);margin:8px 0 3px;display:block}
 .colores{display:flex;flex-wrap:wrap;gap:5px}
 .color{width:24px;height:24px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}

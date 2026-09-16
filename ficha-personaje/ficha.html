@@ -819,6 +819,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .bt-lupa.en-boton{position:static;width:auto;height:auto;padding:1px 4px;opacity:.75}
 /* Sin recursos: se ve apagado pero sigue abriendo la 🔍 (un botón disabled no recibe clics) */
 .ejecutar-btn.sin-recursos{opacity:.45;background:rgba(0,0,0,.2);color:var(--muted)}
+.consume-btn.con-lupa{display:inline-flex;align-items:center;gap:6px}
+.consume-btn.sin-recursos{opacity:.45}
 #lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
   background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
   padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
@@ -3229,7 +3231,8 @@ function costoConsumirNitros(key){
   return key === 'cinturon' ? IT2.nitrosConsumirCinturon : IT2.nitrosConsumirMochila;
 }
 
-function consumeButton(i, key){
+// conLupa: en la Botonera la 🔍 va dentro del botón (sin "disabled", que no deja abrirla).
+function consumeButton(i, key, conLupa){
   if(!i.consumible) return '';
   if(i.nombre === 'Ankh de Reencarnación'){
     if(key === 'cinturon') return `<span class="hint">Se activa solo al llegar tu HP a 0</span>`;
@@ -3242,8 +3245,14 @@ function consumeButton(i, key){
   if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
   if(num(i.curaspPct) > 0) partes.push(`${fmt(num(i.curaspPct))}% SP`);
   partes.push(`-${costoConsumirNitros(key)} No2`);
-  return `<button class="consume-btn" data-consume="${i.id}" ${num(i.unidades)<=0?'disabled':''}>
-    Consumir <span class="consume-fx">(${partes.join(' · ')})</span>
+  const agotado = num(i.unidades) <= 0;
+  if(conLupa){
+    return `<button class="consume-btn con-lupa${agotado ? " sin-recursos" : ""}" data-consume="${i.id}"${agotado ? ' aria-disabled="true"' : ""}>
+      Consumir <span class="consume-fx">(${partes.join(" · ")})</span>${lupaBotonHtml(`cons:${key}:${i.id}`, "en-boton")}
+    </button>`;
+  }
+  return `<button class="consume-btn" data-consume="${i.id}" ${agotado?"disabled":""}>
+    Consumir <span class="consume-fx">(${partes.join(" · ")})</span>
   </button>`;
 }
 
@@ -3873,8 +3882,7 @@ function renderBotonera(){
   const filaConsumible = (i, key) => `<div class="cat-row">
     <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
     <button class="mini" data-view="${key}:${i.id}">Ver</button>
-    ${lupaBotonHtml(`cons:${key}:${i.id}`, 'mini')}
-    ${consumeButton(i, key)}
+    ${consumeButton(i, key, true)}
   </div>`;
 
   html += `<div class="botonera-grid botonera-grid-even">
@@ -6941,6 +6949,8 @@ function lupaHtml(clave){
     const it = (S[lista] || []).find(x => x.id === id);
     if(!it) return {titulo: 'Consumible', html: ''};
     let h = lupaFila(`Consumir desde ${lista === 'cinturon' ? 'el cinturón' : 'la mochila'}`, `${fmt(costoConsumirNitros(lista))} No2`, 'lupa-total');
+    h += lupaFila("No2 que tenés", fmt(num(S.nitros)), costoConsumirNitros(lista) > num(S.nitros) ? "lupa-falta" : "");
+    h += lupaFila("Unidades", fmt(num(it.unidades)), num(it.unidades) <= 0 ? "lupa-falta" : "");
     h += lupaNota(`Del cinturón cuesta ${fmt(IT2.nitrosConsumirCinturon)} No2; de la mochila, ${fmt(IT2.nitrosConsumirMochila)}.`);
     let ef = '';
     if(it.curahp) ef += lupaFila('Vida', `${lupaSigno(num(it.curahp))} HP`);

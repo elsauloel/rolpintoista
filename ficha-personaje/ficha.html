@@ -6220,7 +6220,7 @@ function htmlEstadoAlUsar(key, draft){
         <div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>
       </div>` : `<div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>`}
       <div class="f"><label>${CAMPO_LABEL.efectoDetalle}</label><textarea data-c="efectoDetalle" rows="2" placeholder="Qué hace el estado, tal como lo va a leer el jugador. Si lo dejás vacío se usa el detalle del ítem.">${esc(draft.efectoDetalle??'')}</textarea></div>
-      <div class="f"><label>Modificadores del estado (opcional)</label>
+      <div class="f"><label>Modificadores de atributo (opcional)</label>
         <div id="efectomods">${(draft.efectoMods||[]).map((m,i)=>`
         <div class="modrow">
           <select data-em="${i}" data-emk="stat">
@@ -6230,8 +6230,8 @@ function htmlEstadoAlUsar(key, draft){
           <input data-em="${i}" data-emk="val" type="number" step="any" value="${esc(m.val)}">
           <button class="mini" data-rmefectomod="${i}">×</button>
         </div>`).join('')}</div>
-        <button type="button" class="iconbtn iconbtn-add" id="addefectomod">+ Modificador del estado</button>
-        <div class="hint" style="margin-top:6px">Se suman al stat mientras ese estado esté activo (p.ej. +2 Fuerza durante los turnos que dure).</div>
+        <button type="button" class="iconbtn iconbtn-add" id="addefectomod">+ Modificador de atributo</button>
+        <div class="hint" style="margin-top:6px">Cada modificador suma o resta a un atributo mientras el estado esté activo: uno principal (Fuerza, Destreza, Agilidad…) o uno secundario (PdG, Evasión, Defensa, No2, SP…). Ej.: +2 Fuerza durante los turnos que dure, o −1 PdG.</div>
       </div>
       <div class="hint" style="margin:-4px 0 8px">Si le ponés nombre, al consumir este ítem se activa (o refresca) ese estado en Estados alterados. Con "No vence" tildado, el estado queda ahí hasta que lo borres vos manualmente.</div>`;
   return html;

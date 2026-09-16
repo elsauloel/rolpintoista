@@ -709,7 +709,7 @@ input[type=file]{display:none}
    mapa y muestra solo la ventana de Acciones del creep (y las que se abren
    desde ahí), con fondo transparente. */
 html.modo-acciones, html.modo-acciones body{background:transparent!important;min-height:0}
-html.modo-acciones body > :not(.scrim):not(.toast){display:none!important}
+html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'acciones') document.documentElement.classList.add('modo-acciones');
@@ -3887,7 +3887,9 @@ document.addEventListener('input', e => {
 
 document.addEventListener('click', e => {
   // 🔍 dentro de un botón de las Acciones: solo muestra el desglose, no tira.
-  const lupa = e.target.closest('[data-lupacreep]');
+  // (Algunos navegadores reportan el clic sobre el botón y no sobre la 🔍: se mira también el punto tocado.)
+  const enPunto = e.clientX || e.clientY ? document.elementFromPoint(e.clientX, e.clientY) : null;
+  const lupa = e.target.closest('[data-lupacreep]') || (enPunto && enPunto.closest('[data-lupacreep]'));
   if(lupa){ e.preventDefault(); abrirLupa(lupa); return; }
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.

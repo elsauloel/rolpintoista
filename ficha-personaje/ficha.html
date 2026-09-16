@@ -1092,7 +1092,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 /* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast){display:none!important}
+html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
@@ -4180,7 +4180,9 @@ function aplicarColapsados(){
 
 document.addEventListener('click', e => {
   // 🔍 dentro de un botón de la Botonera: solo muestra el desglose, no tira.
-  const lupa = e.target.closest('[data-lupa]');
+  // (Algunos navegadores reportan el clic sobre el botón y no sobre la 🔍: se mira también el punto tocado.)
+  const enPunto = e.clientX || e.clientY ? document.elementFromPoint(e.clientX, e.clientY) : null;
+  const lupa = e.target.closest('[data-lupa]') || (enPunto && enPunto.closest('[data-lupa]'));
   if(lupa){ e.preventDefault(); abrirLupa(lupa); return; }
   const b = e.target.closest('button');
 

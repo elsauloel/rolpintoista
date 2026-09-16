@@ -3072,7 +3072,8 @@ function jobTag(i){
       ? `<span class="tag origen">${esc(i.origen)}</span>`
       : `<span class="tag origen">fuera de Job</span>`;
   }
-  return `<span class="tag job">Job</span>`;
+  const costo = jobCostoDe(i);
+  return `<span class="tag job">${costo === 1 ? "Job" : `Job ${fmt(costo)}`}</span>`;
 }
 
 function modTags(mods){
@@ -3920,10 +3921,17 @@ function renderLootEspecial(){
     </div>`).join('') : `<div class="loot-esp-empty">Sin tipos agregados.</div>`;
 }
 
+// Puntos de Job que costó (1 si no dice otra cosa).
+function jobCostoDe(x){
+  if(!x || x.job === false) return 0;
+  const n = num(x.jobCosto);
+  return x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
+}
+
 function jobBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
   const total = 3 + 3 * (nivel - 1);
-  const gastado = [...S.habilidades, ...S.pasivas].filter(x => x.job !== false).length;
+  const gastado = [...S.habilidades, ...S.pasivas].reduce((a, x) => a + jobCostoDe(x), 0);
   return {total, gastado, resto: total - gastado};
 }
 
@@ -3934,7 +3942,7 @@ function renderJob(){
   $('#v-job').textContent = fmt(jb.resto);
   $('#v-job-sub').textContent = `${jb.gastado} usados de ${jb.total}`;
   box.title = jb.resto < 0
-    ? `Te pasaste por ${Math.abs(jb.resto)}: ${jb.gastado} habilidades/pasivas con Job contra ${jb.total} disponibles.`
+    ? `Te pasaste por ${Math.abs(jb.resto)}: ${jb.gastado} puntos gastados en habilidades/pasivas contra ${jb.total} disponibles.`
     : `${jb.total} puntos (3 base + 2 por nivel) − ${jb.gastado} usados = ${jb.resto} disponibles.`;
 }
 
@@ -3947,7 +3955,7 @@ function abrirJobLista(){
     ...S.pasivas.filter(x => x.job !== false).map(x => ({...x, tipo:'pasivas'})),
   ];
   $('#job-lista').innerHTML = con.length
-    ? con.map(x => `<button type="button" class="btn ghost" data-jobver="${x.tipo}:${x.id}" style="width:100%;text-align:left">${esc(x.nombre)} <span class="hint" style="float:right">${x.tipo === 'habilidades' ? 'Habilidad' : 'Pasiva'}</span></button>`).join('')
+    ? con.map(x => `<button type="button" class="btn ghost" data-jobver="${x.tipo}:${x.id}" style="width:100%;text-align:left">${esc(x.nombre)} <span class="hint" style="float:right">${x.tipo === "habilidades" ? "Habilidad" : "Pasiva"} · ${fmt(jobCostoDe(x))} Job</span></button>`).join('')
     : `<div class="hint">Todavía no gastaste puntos de Job en nada.</div>`;
   $('#scrim-job').classList.add('open');
 }
@@ -5031,14 +5039,14 @@ const SCHEMA = {
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
-  pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','origen','detalle'], mods:true},
+  pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','origen','detalle'], mods:true},
   sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
 };
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
   stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
-  job:'Adquirida con puntos de Job', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
+  job:'Adquirida con puntos de Job', jobCosto:'Puntos de Job que costó (si fue con Job)', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
   categoria:'Categoría', unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
   danoAmplificado:'Daño amplificado (dados extra sin sumar peso)', armaDeRango:'Arma de rango (el botón de Daño Arma no suma el stat Dmg)',
@@ -5050,7 +5058,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
-const CAMPO_NUM = ['peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
@@ -5333,8 +5341,8 @@ function openViewer(key, id){
   if(key === 'habilidades'){
     if(it.costo) L.push(linea('Costo', it.costo));
     if(it.categoria) L.push(linea('Categoría', it.categoria));
-    L.push(linea('Adquirida con Job', it.job !== false ? 'Sí' : 'No'));
-    if(it.job === false && it.origen) L.push(linea('Origen', it.origen));
+    L.push(linea("Adquirida con Job", it.job !== false ? `Sí · ${fmt(jobCostoDe(it))} punto${jobCostoDe(it) === 1 ? "" : "s"}` : "No"));
+    if(it.job === false && it.origen) L.push(linea("Origen", it.origen));
   }
 
   if(key === 'pasivas'){
@@ -6126,9 +6134,10 @@ function drawEditorHabilidad(){
     const conJob = draft.job !== false;
     html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" data-c="job" ${conJob ? 'checked' : ''} style="width:auto" data-hab-redibujar="1">
-        ${etiqueta('La compré con puntos de Job')}
+        ${etiqueta("La compré con puntos de Job")}
       </label>` +
-      (conJob ? '' : `<div class="f"><label>¿De dónde salió?</label><input data-c="origen" value="${esc(draft.origen ?? '')}" placeholder="ej. Regalo de un hechicero, raza, objeto…" data-hab-enter="1"></div>`) +
+      (conJob ? `<div class="f"><label>¿Cuántos puntos de Job te costó?</label><input data-c="jobCosto" type="number" step="1" min="0" value="${fmt(jobCostoDe(draft))}" data-hab-enter="1" style="max-width:120px">
+        <div class="hint" style="margin-top:5px">Casi siempre 1; algunas habilidades pueden costar más. Te quedan ${fmt(jobBudget().resto)} de Job${editing.id ? " (contando esta)" : ""}.</div></div>` : `<div class="f"><label>¿De dónde salió?</label><input data-c="origen" value="${esc(draft.origen ?? '')}" placeholder="ej. Regalo de un hechicero, raza, objeto…" data-hab-enter="1"></div>`) +
       campoImagenHtml(draft);
   }
   if(paso === 5){
@@ -6144,7 +6153,7 @@ function drawEditorHabilidad(){
       ${fila('Uso', esc(draft.categoria || 'Sin categoría'))}
       ${fila('Tirada', esc(tirada || 'no tira'))}
       ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}
-      ${fila('Origen', esc(draft.job !== false ? 'Puntos de Job' : (draft.origen || 'otro')))}
+      ${fila("Origen", esc(draft.job !== false ? `Puntos de Job (${fmt(jobCostoDe(draft))})` : (draft.origen || "otro")))}
     </div>`;
   }
 

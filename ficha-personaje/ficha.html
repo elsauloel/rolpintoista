@@ -6050,7 +6050,7 @@ const PASOS_HABILIDAD = [
   {corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
    ayuda: 'Contalo como lo leería la mesa: esta descripción aparece en la Mesa cada vez que la uses.'},
   {corto: 'Costo', titulo: '¿Cuánto cuesta usarla?',
-   ayuda: 'El SP se gasta y no vuelve al pasar turno; los Nitros (No2) se recargan en cada Mantenimiento. SP vacío = no gasta; X = lo elegís al usarla.'},
+   ayuda: 'El SP se gasta y no vuelve al pasar turno; los Nitros (No2) se recargan en cada Mantenimiento. SP vacío = no gasta. En SP y en No2, X = lo elegís al usarla.'},
   {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
    ayuda: 'Podés vincularla a un stat (se tira con su valor del momento, con los modificadores activos), escribir una fórmula, las dos cosas o ninguna.'},
   {corto: 'Estado', titulo: '¿Aplica un estado alterado?',
@@ -6084,7 +6084,7 @@ function drawEditorHabilidad(){
   if(paso === 1){
     html += `<div class="f2">
         <div class="f"><label>SP que gasta</label><input data-c="costo" value="${esc(draft.costo ?? '')}" placeholder="ej. 3 · o X si varía" data-hab-enter="1"></div>
-        <div class="f"><label>Nitros (No2) que gasta</label><input data-c="nitrosCosto" type="number" step="1" min="0" value="${esc(draft.nitrosCosto ?? IT2.nitrosHabilidad)}" data-hab-enter="1"></div>
+        <div class="f"><label>Nitros (No2) que gasta</label><input data-c="nitrosCosto" value="${esc(draft.nitrosCosto ?? IT2.nitrosHabilidad)}" placeholder="ej. 1 · o X si varía" data-hab-enter="1"></div>
       </div>
       <div class="f"><label>¿Se puede usar más de una vez por turno?</label>
         <div class="opcion-fila">
@@ -6124,7 +6124,7 @@ function drawEditorHabilidad(){
       <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
       <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
       ${fila('SP', esc(costoSp || 'no gasta'))}
-      ${fila('No2', fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
+      ${fila("No2", esCostoVariable(draft.nitrosCosto) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
       ${fila('Uso', esc(draft.categoria || 'Sin categoría'))}
       ${fila('Tirada', esc(tirada || 'no tira'))}
       ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}
@@ -6411,7 +6411,9 @@ function handleModalFieldChange(e){
   const t = e.target;
   if(t.dataset.c){
     const c = t.dataset.c;
-    editing.draft[c] = t.type === 'checkbox' ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===''?'':num(t.value)) : t.value);
+    editing.draft[c] = t.type === "checkbox" ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===""?"":num(t.value)) : t.value);
+    // Nitros de una habilidad: un número o X (lo elegís al usarla).
+    if(c === "nitrosCosto") editing.draft[c] = esCostoVariable(t.value) ? "X" : (t.value.trim() === "" ? "" : num(t.value));
     if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ drawEditor(); return; }
     if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');
@@ -6620,7 +6622,14 @@ function parseCostoSp(costo){
   return m ? num(m[1]) : 0;
 }
 
+// Costo variable (X) en SP o en Nitros: se elige al ejecutar.
+function spVariable(h){ return esCostoVariable(h && h.costo); }
+function nitrosVariable(h){ return esCostoVariable(h && h.nitrosCosto); }
+function habCostoVariable(h){ return spVariable(h) || nitrosVariable(h); }
+
+// Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
 function costoNitrosHab(h){
+  if(nitrosVariable(h)) return 0;
   return num(h.nitrosCosto ?? IT2.nitrosHabilidad);
 }
 
@@ -6636,7 +6645,8 @@ function costoMoverCasillero(){
 }
 
 function sinNitrosPara(h){
-  return !esCostoVariable(h.costo) && num(S.nitros) < costoNitrosHab(h);
+  if(nitrosVariable(h)) return false;
+  return num(S.nitros) < costoNitrosHab(h);
 }
 
 /* ---------- Atacar: cada arma paga Tipo ÷ 2 su primer ataque del turno y Tipo completo los demás ---------- */
@@ -6824,7 +6834,7 @@ function lupaHtml(clave){
     const h0 = S.habilidades.find(x => x.id === ref);
     if(!h0) return {titulo: 'Habilidad', html: ''};
     let costo = '';
-    if(esCostoVariable(h0.costo)) costo += lupaFila(`Costo variable (<code>${esc(h0.costo)}</code>)`, 'elegís al ejecutar');
+    if(habCostoVariable(h0)) costo += lupaFila(`Costo variable (X en ${[spVariable(h0) ? "SP" : "", nitrosVariable(h0) ? "No2" : ""].filter(Boolean).join(" y ")})`, "elegís al ejecutar");
     else{
       const n = costoNitrosHab(h0);
       costo += lupaFila(h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '' ? `Nitros (por defecto, ${fmt(IT2.nitrosHabilidad)})` : 'Nitros de la habilidad', `${fmt(n)} No2`);
@@ -6909,9 +6919,10 @@ let pendingEjecucion = null;
 function costoHabilidadTxt(h){
   const partes = [];
   const nitros = costoNitrosHab(h);
-  if(nitros) partes.push(`${fmt(nitros)} No2`);
+  if(nitrosVariable(h)) partes.push("X No2");
+  else if(nitros) partes.push(`${fmt(nitros)} No2`);
   const costo = String(h.costo || '').trim();
-  if(costo) partes.push(costo);
+  if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
   return partes.join(' · ');
 }
 
@@ -6931,11 +6942,16 @@ function ejecutarHabilidad(id){
   if(it.categoria === 'No espameable' && it.usadaEsteTurno === true){
     if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
   }
-  if(esCostoVariable(it.costo)){
+  if(habCostoVariable(it)){
     pendingEjecucion = id;
-    $('#costox-nombre').textContent = it.nombre;
-    $('#f-costox-sp').value = 0;
-    $('#f-costox-nitros').value = Math.min(num(S.nitros), costoNitrosHab(it));
+    $("#costox-nombre").textContent = it.nombre;
+    // Lo que es X se elige; lo fijo se muestra y no se puede cambiar.
+    const campoSp = $("#f-costox-sp"), campoNitros = $("#f-costox-nitros");
+    campoSp.value = spVariable(it) ? 0 : parseCostoSp(it.costo);
+    campoSp.disabled = !spVariable(it);
+    campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it);
+    campoNitros.disabled = !nitrosVariable(it);
+    if(nitrosVariable(it) && costoNitrosHab(it) === 0 && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
     $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
     const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
     $('#costox-limite').innerHTML = (limN === null || limS === null)

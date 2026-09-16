@@ -178,12 +178,14 @@ aside{
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
 #hud .hud-globos{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
 #hud .hud-circulo{
-  width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.92);color:var(--paper);
+  width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.5);color:var(--paper);
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.5)
+  cursor:pointer;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.9);
+  transition:background .12s
 }
-#hud .hud-circulo:hover{filter:brightness(1.25)}
-#hud .hud-circulo.icono{font-size:15px;border-color:var(--line);color:var(--paper)}
+/* Translúcidos para ver el mapa debajo; al pasar el mouse, más firmes. */
+#hud .hud-circulo:hover{background:rgba(15,12,14,.9);filter:brightness(1.15)}
+#hud .hud-circulo.icono{font-size:15px;border-color:rgba(237,227,210,.4);color:var(--paper)}
 #hud .hud-circulo.icono.abierto{border-color:var(--brass);color:var(--brass)}
 #hud .hud-circulo:disabled{cursor:default;opacity:.85}
 #hud input.hud-in{
@@ -1299,9 +1301,9 @@ function dibujar(){
     }
 
     // Estados: circulitos con la inicial sobre el borde de arriba del token
-    // (verde = beneficio, violeta = perjuicio). Con varios en la misma
-    // casilla, solo los del seleccionado.
-    if(est && est.estados.length && (d.solo || seleccion === d.id)){
+    // (verde = beneficio, violeta = perjuicio). Solo en el seleccionado: sin
+    // seleccionar, el mapa muestra nada más que el token y sus barras.
+    if(est && est.estados.length && seleccion === d.id){
       const max = 5;
       const lista = est.estados.slice(0, max);
       const r = Math.max(5 / z, rad * 0.24);
@@ -1319,14 +1321,14 @@ function dibujar(){
       });
     }
 
-    // Con varios en la misma casilla, el nombre solo del seleccionado.
-    if(etiquetas && (d.solo || seleccion === d.id)){
+    // El nombre, solo del seleccionado, sobre un fondo translúcido.
+    if(etiquetas && seleccion === d.id){
       const tam = 11 / z;
       ctx.font = `500 ${tam}px "Space Grotesk", system-ui, sans-serif`;
       const texto = nombre.length > 18 ? nombre.slice(0, 17) + '…' : nombre;
       const w = ctx.measureText(texto).width + 8 / z;
       const ty = debajo + 7 / z;
-      ctx.fillStyle = 'rgba(15,12,14,.8)';
+      ctx.fillStyle = 'rgba(15,12,14,.45)';
       ctx.fillRect(x - w / 2, ty - tam * 0.7, w, tam * 1.4);
       ctx.fillStyle = '#EDE3D2';
       ctx.fillText(texto, x, ty);

@@ -455,6 +455,17 @@ input[type=file]{display:none}
   border-radius:99px;padding:3px 9px;color:var(--paper);background:var(--panel2);cursor:pointer
 }
 .chip-estado:hover{border-color:var(--copper);color:var(--brass)}
+.chip-estado-wrap{display:inline-flex;align-items:center;gap:3px}
+.chip-estado-wrap.abierto .chip-estado{border-color:var(--copper);color:var(--brass)}
+.chip-accion{
+  width:20px;height:20px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;line-height:1;border:1px solid var(--line);background:var(--panel2)
+}
+.chip-quitar{color:var(--danger);border-color:rgba(212,87,78,.6)}
+.chip-quitar:hover{background:var(--danger);color:#fff}
+.chip-editar{color:var(--muted)}
+.chip-editar:hover{border-color:var(--copper);color:var(--brass)}
+.chip-estado.con-tip:hover::after{max-width:260px;width:max-content;white-space:pre-line}
 .chip-estado-vacio{color:var(--muted);border-style:dashed;cursor:default}
 .chip-estado-vacio:hover{border-color:var(--line);color:var(--muted)}
 .chip-add{border-style:dashed;border-color:var(--copper);color:var(--brass);background:rgba(201,133,69,.14);font-weight:700}
@@ -2650,8 +2661,34 @@ function cardHtml(sc){
   </div>`;
 }
 
+let estadoChipAbierto = null;  // 'scId:esId' del estado con los botones a la vista
+
+// Esconde los botones del estado abierto sin redibujar (para no sacarle el
+// foco a un campo que se esté por usar). Si el clic fue en uno de esos
+// botones, se quitan después de que su propia acción lo lea.
+function cerrarChipEstado(boton){
+  estadoChipAbierto = null;
+  const limpiar = () => document.querySelectorAll('.chip-estado-wrap.abierto').forEach(w => {
+    w.classList.remove('abierto');
+    w.querySelectorAll('.chip-accion').forEach(x => x.remove());
+  });
+  if(boton && boton.classList.contains('chip-accion')) setTimeout(limpiar, 0);
+  else limpiar();
+}
+
 function cardCompactoHtml(sc){
-  const chips = sc.estados.map(es => `<button type="button" class="chip-estado" data-verestadocreep="${sc.id}:${es.id}">${esc(es.nombre || '(sin nombre)')} · ${fmt(num(es.turnos))}t</button>`).join('')
+  // Cada estado: la descripción al pasar el mouse; al tocarlo, botones para
+  // quitarlo (×) o editarlo (⚙).
+  const chips = sc.estados.map(es => {
+    const clave = `${sc.id}:${es.id}`;
+    const abierto = estadoChipAbierto === clave;
+    const dura = es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;
+    return `<span class="chip-estado-wrap${abierto ? ' abierto' : ''}">
+      <button type="button" class="chip-estado con-tip" data-toggleestado="${clave}" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</button>
+      ${abierto ? `<button type="button" class="chip-accion chip-quitar" data-rmestado="${clave}" title="Quitar el estado">✕</button>
+      <button type="button" class="chip-accion chip-editar" data-editarestado="${clave}" title="Editar el estado">⚙</button>` : ''}
+    </span>`;
+  }).join('')
     || `<span class="chip-estado chip-estado-vacio">Sin estados</span>`;
   return `
   <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
@@ -3696,7 +3733,15 @@ document.addEventListener('input', e => {
 
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
+  // Tocar en cualquier otro lado esconde los botones del estado abierto.
+  if(estadoChipAbierto && !(b && b.dataset.toggleestado)) cerrarChipEstado(b);
   if(!b) return;
+
+  if(b.dataset.toggleestado){
+    estadoChipAbierto = estadoChipAbierto === b.dataset.toggleestado ? null : b.dataset.toggleestado;
+    renderAll();
+    return;
+  }
 
   if(b.id === 'btn-add'){
     S.creeps.push(nuevoCreep());

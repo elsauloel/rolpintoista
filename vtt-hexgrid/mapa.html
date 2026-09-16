@@ -2603,10 +2603,43 @@ async function hudEstadoCambiar(t, indice, accion, delta){
 // ?modo=acciones, solo GM). herramienta: 'ficha' | 'gm'.
 let botonera = {herramienta: '', fichaId: '', lista: false};
 
+// En pantallas anchas la capa tapa solo la mitad izquierda del mapa; en la
+// otra mitad se sigue viendo el mapa, centrado en el token de esa ventana.
+function botoneraEnMitad(){ return window.innerWidth > 760; }
+
+function ubicarBotoneraCapa(){
+  const capa = $('#botonera-capa');
+  if(capa.hidden) return;
+  if(!botoneraEnMitad()){ capa.removeAttribute('style'); return; }
+  const r = $('#lienzo-caja').getBoundingClientRect();
+  Object.assign(capa.style, {
+    left: r.left + 'px', top: r.top + 'px', right: 'auto', bottom: 'auto',
+    width: Math.round(r.width / 2) + 'px', height: r.height + 'px',
+  });
+}
+window.addEventListener('resize', ubicarBotoneraCapa);
+
+function centrarTokenDeBotonera(herramienta, id){
+  const es = t => !!(t && t.fichaId && (herramienta === 'gm'
+    ? t.tipo === 'creep' && t.fichaId === id
+    : t.tipo === 'pj' && t.fichaId.split(SEP_INVOCACION)[0] === id));
+  const lista = [...tokens.values()];
+  const sel = seleccion ? tokens.get(seleccion) : null;
+  const t = es(sel) ? sel : (lista.find(x => es(x) && !x.fichaId.includes(SEP_INVOCACION)) || lista.find(es));
+  if(!t) return;
+  const c = hexCentro(t.col, t.fila);
+  const centroLibre = botoneraEnMitad() ? anchoPx * 0.75 : anchoPx / 2;
+  vista.x = centroLibre - c.x * vista.zoom;
+  vista.y = altoPx / 2 - c.y * vista.zoom;
+  guardarVista(); pedirDibujo();
+}
+
 function abrirBotonera(fichaId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
+  ubicarBotoneraCapa();
+  centrarTokenDeBotonera('ficha', fichaId);
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
     marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera'}, location.origin);
     enfocarBotonera();
@@ -2622,6 +2655,8 @@ function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
+  ubicarBotoneraCapa();
+  centrarTokenDeBotonera('gm', creepId);
   // gm-tools ya cargado: solo cambia de creep (instantáneo).
   if(botonera.herramienta === 'gm' && botonera.lista){
     botonera.fichaId = creepId;

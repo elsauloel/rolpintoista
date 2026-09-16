@@ -6383,7 +6383,8 @@ function drawEditor(){
     html += `<div class="f"><label>Detalle</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
 
   if(sc.mods){
-    html += `<div class="f"><label>Modificadores</label>
+    const esEstado = key === "efectos";
+    html += `<div class="f"><label>${esEstado ? "Modificadores de atributo (opcional)" : "Modificadores"}</label>
       <div id="mods">${(draft.mods||[]).map((m,i)=>{
         if(esDefensivo && (m.stat === 'def' || TIPOS_IDS.includes(m.stat))) return '';
         return `
@@ -6396,8 +6397,10 @@ function drawEditor(){
           <button class="mini" data-rmmod="${i}">×</button>
         </div>`;
       }).join('')}</div>
-      <button class="iconbtn iconbtn-add" id="addmod">+ Modificador</button>
-      <div class="hint" style="margin-top:6px">Se suman al stat mientras el ítem esté equipado o el efecto activo.</div>
+      <button class="iconbtn iconbtn-add" id="addmod">${esEstado ? "+ Modificador de atributo" : "+ Modificador"}</button>
+      <div class="hint" style="margin-top:6px">${esEstado
+        ? "Cada modificador suma o resta a un atributo mientras el estado esté activo: uno principal (Fuerza, Destreza, Agilidad…) o uno secundario (PdG, Evasión, Defensa, No2, SP…). Ej.: +2 Fuerza durante los turnos que dure, o −1 PdG."
+        : "Se suman al stat mientras el ítem esté equipado o el efecto activo."}</div>
     </div>`;
   }
   if(sc.campos.includes('tipoItem') && !draft.consumible){

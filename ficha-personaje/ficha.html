@@ -6523,7 +6523,7 @@ function ejecutarHabilidad(id){
   S.spGastado = num(S.spGastado) + costoSp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
-  mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle);
+  anunciarHabilidad(it);
   tirarExtraDeItem(it);
   renderList("habilidades");
   if(efecto) renderList('efectos');
@@ -6556,7 +6556,7 @@ function confirmarCostoVariable(){
   S.spGastado = num(S.spGastado) + sp;
   if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
-  mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle);
+  anunciarHabilidad(it);
   tirarExtraDeItem(it);
   $("#scrim-costox").classList.remove("open");
   pendingEjecucion = null;
@@ -6688,7 +6688,18 @@ function mantenimiento(){
 }
 
 // Al ejecutar una habilidad, su descripción va a la Mesa aunque no tire
-// dados, así todos leen qué hace.
+// dados, así todos leen qué hace. Si tira, viaja con la tirada (una sola
+// línea); si no, va en su propia línea.
+function habilidadTira(h){
+  return !!(h && (String(h.tiradaExtra || "").trim() || h.tiradaStat));
+}
+
+function anunciarHabilidad(h){
+  const detalle = (h && (h.detalle || h.efectoDetalle)) || "";
+  if(habilidadTira(h)) mesaConTexto(detalle);
+  else mesaPublicarHabilidad(h.nombre, detalle);
+}
+
 function mesaPublicarHabilidad(nombre, detalle){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -6945,26 +6956,42 @@ function mesaEstado(texto){
   $('#mesa-estado').textContent = texto;
 }
 
+// Descripción de la habilidad que se está ejecutando: viaja con su tirada,
+// para que sea una sola línea en la Mesa y no dos.
+let mesaTextoPendiente = '';
+function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
+
 async function mesaPublicar(origen, r){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
+  const texto = mesaTextoPendiente;
+  mesaTextoPendiente = '';
+  const doc = {
+    uid: fbUsuario.uid,
+    jugador: fbMiembro.nombre,
+    quien: mesaQuien(),
+    origen: String(origen || ''),
+    formula: String(r.formula || ''),
+    rolls: (r.rolls || []).slice(0, 100),
+    mod: num(r.mod),
+    total: num(r.total),
+    desde: MESA_DESDE,
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  };
   try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid,
-      jugador: fbMiembro.nombre,
-      quien: mesaQuien(),
-      origen: String(origen || ''),
-      formula: String(r.formula || ''),
-      rolls: (r.rolls || []).slice(0, 100),
-      mod: num(r.mod),
-      total: num(r.total),
-      desde: MESA_DESDE,
-      cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    await fbDb.collection(fbRutaCampana('tiradas')).add(texto ? {...doc, texto} : doc);
   }catch(err){
+    // Reglas viejas (no conocen "texto"): se publica la tirada igual.
+    if(texto && err.code === 'permission-denied'){
+      try{
+        await fbDb.collection(fbRutaCampana('tiradas')).add({...doc, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+        return;
+      }catch(e2){ err = e2; }
+    }
     console.error('No se pudo publicar la tirada en la mesa:', err);
     toast('La tirada no se pudo compartir con la mesa');
   }
 }
+
 
 // Color del nombre en la Mesa: dorado las propias, verde las de aliados,
 // rojo las de creeps (desde gm-tools con un creep), blanco las neutras
@@ -7011,7 +7038,8 @@ function mesaRender(docs){
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
       `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`;
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

@@ -2729,7 +2729,8 @@ function mesaRender(docs){
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
       `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`;
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

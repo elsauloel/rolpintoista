@@ -3907,7 +3907,9 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
-    mesaPublicarHabilidadCreep(sc, h);
+    // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
+    if(String(h.tiradaExtra || "").trim()) mesaConTexto((h && h.detalle) || "");
+    else mesaPublicarHabilidadCreep(sc, h);
     if(h.tiradaExtra) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
@@ -5016,26 +5018,42 @@ function mesaEstado(texto){
   $('#mesa-estado').textContent = texto;
 }
 
+// Descripción de la habilidad que se está ejecutando: viaja con su tirada,
+// para que sea una sola línea en la Mesa y no dos.
+let mesaTextoPendiente = '';
+function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
+
 async function mesaPublicar(origen, r){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
+  const texto = mesaTextoPendiente;
+  mesaTextoPendiente = '';
+  const doc = {
+    uid: fbUsuario.uid,
+    jugador: fbMiembro.nombre,
+    quien: mesaQuien(),
+    origen: String(origen || ''),
+    formula: String(r.formula || ''),
+    rolls: (r.rolls || []).slice(0, 100),
+    mod: num(r.mod),
+    total: num(r.total),
+    desde: MESA_DESDE,
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  };
   try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid,
-      jugador: fbMiembro.nombre,
-      quien: mesaQuien(origen),
-      origen: mesaQuien(origen) ? String(origen).slice(mesaQuien(origen).length + 3) : String(origen || ''),
-      formula: String(r.formula || ''),
-      rolls: (r.rolls || []).slice(0, 100),
-      mod: num(r.mod),
-      total: num(r.total),
-      desde: MESA_DESDE,
-      cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    await fbDb.collection(fbRutaCampana('tiradas')).add(texto ? {...doc, texto} : doc);
   }catch(err){
+    // Reglas viejas (no conocen "texto"): se publica la tirada igual.
+    if(texto && err.code === 'permission-denied'){
+      try{
+        await fbDb.collection(fbRutaCampana('tiradas')).add({...doc, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+        return;
+      }catch(e2){ err = e2; }
+    }
     console.error('No se pudo publicar la tirada en la mesa:', err);
     toast('La tirada no se pudo compartir con la mesa');
   }
 }
+
 
 // Color del nombre en la Mesa: dorado las propias, verde las de aliados,
 // rojo las de creeps (desde gm-tools con un creep), blanco las neutras
@@ -5082,7 +5100,8 @@ function mesaRender(docs){
     div.innerHTML =
       `<span class="mesa-total">${fmt(num(t.total))}</span>` +
       `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`;
+      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

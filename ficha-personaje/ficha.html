@@ -769,6 +769,14 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 /* Esquivar alto a la izquierda; Parry y Bloqueo apilados a la derecha,
    igual que en la caja Combate de la ficha. */
 .botonera-combate-bottom [data-botoneraaccion="esquivar"]{grid-row:span 2}
+/* Defensa y Resistencia a críticos: solo para ver (con su 🔍), no se tiran. */
+.botonera-defensa{display:grid;grid-template-columns:minmax(70px,1fr) 4fr;gap:6px;align-items:stretch}
+.botonera-tile.bt-info{cursor:default;justify-content:center}
+.botonera-tile.bt-info:hover{border-color:var(--line-soft)}
+.botonera-crit{display:flex;flex-direction:column;gap:4px;min-width:0}
+.botonera-crit-t{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.botonera-crit-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;flex:1}
+@media(max-width:420px){.botonera-defensa{grid-template-columns:1fr}}
 @media(max-width:420px){.botonera-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .botonera-tile{
   border:1px solid var(--line-soft);background:var(--panel2);padding:7px 4px;text-align:center;cursor:pointer;
@@ -3801,6 +3809,22 @@ function renderBotonera(){
             <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
           </button>
         </div>
+        <div class="botonera-defensa botonera-combate-bottom">
+          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
+            ${lupaBotonHtml('defensa:def')}
+            <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}</span>
+          </div>
+          <div class="botonera-crit">
+            <div class="botonera-crit-t">Resistencia a críticos</div>
+            <div class="botonera-crit-grid">
+              ${TIPOS_IDS.map(id => `
+              <div class="botonera-tile bt-info" title="${esc(STAT_FULL[id])} (no se tira)">
+                ${lupaBotonHtml(`defensa:${id}`)}
+                <span class="bt-label">${esc(STAT_LABEL[id])}</span><span class="bt-value">${Number.isNaN(c.final[id]) ? '?' : fmt(c.final[id])}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="botonera-caja">
@@ -6577,8 +6601,16 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
   if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
   mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(la mitad, para abajo)</span>`, '÷ 2'); });
+  // Defensa y Res. a crítico: estados que arruinan o rompen la armadura (mismo orden que compute).
+  if(['def', ...TIPOS_IDS].includes(id)){
+    const arruina = activos.find(e => e.armaduraArruinada);
+    if(arruina) h += lupaFila(`${esc(arruina.nombre)} <span class="lupa-gris">(estado alterado · anula lo que da la armadura)</span>`, lupaSigno(-aporteSlot('armadura', id)));
+    activos.filter(e => e.armaduraRota).slice(0, 1).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(estado alterado · la mitad, para abajo)</span>`, '÷ 2'); });
+  }
   if(id === 'nitros') activos.filter(e => e.forzarNitros !== '' && e.forzarNitros != null).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(tope)</span>`, fmt(num(e.forzarNitros))); });
-  h += lupaFila(`${esc(STAT_LABEL[id] || id)} · ${esc(STAT_FULL[id] || '')}`, Number.isNaN(valor) ? '?' : fmt(valor), 'lupa-total');
+  const nombreTotal = !STAT_FULL[id] || STAT_FULL[id] === STAT_LABEL[id] ? (STAT_LABEL[id] || id)
+    : TIPOS_IDS.includes(id) ? `Res. a crítico ${STAT_LABEL[id]}` : `${STAT_LABEL[id]} · ${STAT_FULL[id]}`;
+  h += lupaFila(esc(nombreTotal), Number.isNaN(valor) ? '?' : fmt(valor), 'lupa-total');
   let out = lupaSeccion('De dónde sale', h);
   if(sinTirada) return out;
   const afortunado = ['pdg', 'parry', 'eva'].includes(id) && activos.find(e => e.afortunado);
@@ -6608,6 +6640,9 @@ function lupaHtml(clave){
   const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
   if(tipo === 'stat'){
     return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(ref, c) + sinCosto};
+  }
+  if(tipo === 'defensa'){
+    return {titulo: STAT_FULL[ref] || ref, html: lupaStat(ref, c, {sinTirada: true}) + lupaNota('Valor fijo: no se tira.')};
   }
   if(tipo === 'atacar'){
     const arma = S.inventario.find(i => i.id === ref) || null;

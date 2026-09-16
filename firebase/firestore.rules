@@ -242,8 +242,10 @@ service cloud.firestore {
               && resource.data.duenoUid == request.auth.uid
               && request.resource.data.duenoUid == resource.data.duenoUid)
             || (resource.data.tipo == 'creep' && esGM(c))
+            // El GM reasigna el dueño de un PJ o lo lleva a otra casilla
+            // (mover libre, sin estela).
             || (resource.data.tipo == 'pj' && esGM(c)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta']))
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));

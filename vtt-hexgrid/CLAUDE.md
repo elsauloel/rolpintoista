@@ -81,6 +81,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   `prepararImagenToken`), que se elige en ese mismo panel. El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
+- **🦶 Mover libre** (`moverLibre`, `moverTokenLibre`): botón del HUD que
+  lleva el token a otra casilla sin reglas (sin No2, sin estela, ignora
+  Inmovilizado): se arrastra el token o se toca la casilla destino; Esc
+  cancela. Lo ve el dueño en su PJ y el GM en cualquier token. Borra `ruta`
+  del documento; las reglas dejan al GM tocar `col`, `fila` y `ruta` de un PJ.
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

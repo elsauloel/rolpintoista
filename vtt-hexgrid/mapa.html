@@ -464,7 +464,10 @@ let disposicion = [];         // [{id, x, y, radio}] del último dibujo, en orde
 const miembros = new Map();   // uid -> {nombre, gm}
 let soyGM = false;
 let seleccion = null;
-let arrastre = null;          // {id, x, y, inicioX, inicioY, movio, ruta, costo}
+let arrastre = null;          // {id, x, y, inicioX, inicioY, movio, ruta, costo, libre}
+// Mover libre (🦶): id del token que se lleva a otra casilla sin reglas
+// (sin Nitros, sin estela, sin Inmovilizado). El dueño en su PJ, el GM en todos.
+let moverLibre = null;
 // Movimiento soltado que gasta Nitros, esperando Confirmar/Cancelar.
 let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero, disponibles}
 // Estelas que se ven unos segundos después de mover (las de todos).
@@ -943,6 +946,16 @@ function puedoMover(t){
   if(!t || !fbUsuario) return false;
   return t.tipo === 'creep' ? soyGM : t.duenoUid === fbUsuario.uid;
 }
+function puedoMoverLibre(t){
+  if(!t || !fbUsuario) return false;
+  return soyGM || (t.tipo === 'pj' && t.duenoUid === fbUsuario.uid);
+}
+function activarMoverLibre(id){
+  moverLibre = moverLibre === id ? null : id;
+  if(moverLibre) toast('Mover libre: arrastrá el token o tocá la casilla de destino (Esc cancela)');
+  lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
+  pedirDibujo();
+}
 function puedoBorrar(t){
   return !!t && !!fbUsuario && (t.duenoUid === fbUsuario.uid || soyGM);
 }
@@ -1279,6 +1292,21 @@ lienzo.addEventListener('pointerdown', e => {
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
   lienzo.setPointerCapture(e.pointerId);
+  const libre = moverLibre && tokens.get(moverLibre);
+  if(libre && !rutaPendiente){
+    if(id === moverLibre){
+      // Arrastrar el token: sin ruta ni costo.
+      const v = visibles.get(id) || hexCentro(libre.col, libre.fila);
+      arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false,
+        ruta: [{col: libre.col, fila: libre.fila}], costo: null, avisado: false, libre: true};
+      lienzo.style.cursor = 'grabbing';
+      return;
+    }
+    // Tocar otra casilla: el token aparece ahí.
+    const destino = mundoAHex(m.x, m.y);
+    moverTokenLibre(moverLibre, destino.col, destino.fila);
+    return;
+  }
   if(id){
     seleccionar(id);
     const t = tokens.get(id);
@@ -1318,7 +1346,7 @@ lienzo.addEventListener('pointermove', e => {
     arrastre.movio = true;
     const m = pantallaAMundo(px, py);
     arrastre.x = m.x + arrastre.dx; arrastre.y = m.y + arrastre.dy;
-    extenderRuta(arrastre, mundoAHex(arrastre.x, arrastre.y));
+    if(!arrastre.libre) extenderRuta(arrastre, mundoAHex(arrastre.x, arrastre.y));
     pedirDibujo();
     return;
   }
@@ -1336,6 +1364,7 @@ lienzo.addEventListener('pointermove', e => {
   }
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
+  if(moverLibre){ lienzo.style.cursor = id === moverLibre ? 'grab' : 'crosshair'; return; }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
 
@@ -1371,7 +1400,13 @@ function soltar(){
     arrastre = null;
     const t = tokens.get(a.id);
     const pasos = a.ruta.length - 1;
-    if(a.movio && t && pasos > 0){
+    if(a.libre){
+      const fin = mundoAHex(a.x, a.y);
+      if(a.movio && t && !mismoHex(fin, t)){
+        visibles.set(a.id, {x: a.x, y: a.y});
+        moverTokenLibre(a.id, fin.col, fin.fila);
+      }
+    }else if(a.movio && t && pasos > 0){
       visibles.set(a.id, {x: a.x, y: a.y});
       if(a.costo){
         rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles};
@@ -1391,7 +1426,7 @@ function soltar(){
     arrastreFondo = null;
     if(movido) guardarFondo({x: fondo.x, y: fondo.y});
   }
-  lienzo.style.cursor = 'default';
+  lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
 }
 lienzo.addEventListener('pointerup', soltar);
 lienzo.addEventListener('pointercancel', soltar);
@@ -1416,6 +1451,7 @@ document.addEventListener('keydown', e => {
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
+  if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
   if(e.key === 'Escape') seleccionar(null);
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
 });
@@ -1449,6 +1485,32 @@ async function moverToken(id, col, fila, celdas){
     }
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
+  }
+}
+
+// Mover libre: solo la casilla nueva. Se borra la ruta guardada para que
+// nadie vea estela.
+async function moverTokenLibre(id, col, fila){
+  const t = tokens.get(id);
+  moverLibre = null;
+  lienzo.style.cursor = 'default';
+  if(!t) return;
+  if(t.col === col && t.fila === fila){ pedirDibujo(); return; }
+  const antes = {col: t.col, fila: t.fila, rutaJson: t.rutaJson};
+  t.col = col; t.fila = fila; t.rutaJson = '[]';
+  estelas.delete(id);
+  renderPanel();
+  pedirDibujo();
+  try{
+    await coleccionTokens().doc(id).update({col, fila, ruta: firebase.firestore.FieldValue.delete()});
+  }catch(err){
+    console.error('No se pudo mover el token:', err);
+    Object.assign(t, antes);
+    visibles.delete(id);
+    pedirDibujo();
+    toast(err.code === 'permission-denied'
+      ? (soyGM && t.tipo === 'pj' ? 'No se pudo: faltan publicar las reglas nuevas de Firebase' : 'No podés mover ese token')
+      : 'No se pudo mover el token');
   }
 }
 
@@ -1820,7 +1882,7 @@ let firmaPanel = '';
 
 function seleccionar(id){
   if(seleccion === id && !creando) return;
-  if(seleccion !== id){ editandoToken = false; hudCerrar(); }
+  if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
   seleccion = id;
   if(id) creando = false;
   renderPanel();
@@ -2264,6 +2326,7 @@ function hudHtml(t){
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
+    (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre: llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
     '</div>';
   let globo = '';
@@ -2408,6 +2471,7 @@ function hudConectar(t){
   hud.querySelectorAll('[data-hud-boton]').forEach(b => b.onclick = () => {
     const clave = b.dataset.hudBoton;
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
+    if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       if(fichaDeToken) abrirBotonera(fichaDeToken); else abrirAcciones(t.fichaId);

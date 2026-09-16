@@ -149,9 +149,26 @@ pendiente "GM oculta tokens".
 - **Se rompe** al entrar en el campo de visión de un personaje/creep del
   otro bando, o al realizar una acción hostil.
 
+**Orientación y campo de visión (decidido, en discusión):**
+- Cada token mira hacia **uno de los lados** de su hexágono (nunca a un
+  vértice): 6 direcciones. Con la grilla actual ("de punta arriba") son
+  derecha, izquierda y las 4 diagonales; no hay "arriba" puro *(a
+  confirmar si se deja así o se gira la grilla)*.
+- Se gira con un **palito ocre con una bolita** que sale del token hacia
+  donde mira: se arrastra la bolita. **Girar no cuesta No2** *(a debatir)*.
+- **Cono de visión**: filas de 1, 2, 3 y 4 hexágonos hacia el frente (10
+  en total); cada fila, medio hexágono más adelante y uno más ancha.
+- **Zona de alerta**: los hexágonos pegados al cono y los que rodean al
+  token, **salvo el de atrás**.
+- Sigilo frente a un enemigo: pasar o pararse **en su cono** rompe el
+  sigilo solo; pasar o pararse **en su zona de alerta** provoca una
+  **tirada de detección** (no es automática).
+
 **Falta definir:**
-- Posicionamiento en el mapa y **campo de visión** (necesario para la
-  regla de ruptura).
+- Si al moverse el token queda mirando hacia donde caminó.
+- Qué tapa la vista (obstáculos) y cómo se marcan en el mapa.
+- La tirada de detección: qué stats, quién tira, una por hexágono o una
+  por movimiento.
 - Si se detecta de otra forma (tirada de percepción, etc.).
 - Costo de moverse en sigilo, "última posición conocida".
 - Qué pasa con la ficha, las tiradas en la Mesa y los estados del que está

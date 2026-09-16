@@ -44,14 +44,15 @@ más cambia sesión a sesión.
   primer ataque** (`S.ataquesArma` = {idArma: n}, se vacía en el Mantenimiento) y
   el PdG de cada arma no suma los mods de PdG de la otra (`pdgParaArma`; los
   mods de equipo traen `itemId` desde `collectMods`). En la Botonera, con dos
-  armas, Atacar y Daño se desdoblan (uno por arma, `data-arma`).
+  armas, Atacar y Daño se desdoblan (uno por arma, `data-arma`). Lo no
+  confirmado está en `IT2` marcado PLACEHOLDER y se ve con ⚠
+  (`IT2_PENDIENTE`). Las fichas y el catálogo viejos se convierten al abrir
+  (`migrarEstadoIt2`, corre en `renderAll`). Las invocaciones siguen con sus
+  propias Acciones.
 - **🔍 Lupa de la Botonera** (`lupaHtml`, `abrirLupa`, `#lupa-pop`): cada botón
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en
-  dados y el costo en No2/SP con su motivo. No tira nada. Lo no confirmado está
-  en `IT2` marcado PLACEHOLDER y se ve con ⚠ (`IT2_PENDIENTE`). Las fichas
-  y el catálogo viejos se convierten al abrir (`migrarEstadoIt2`, corre en
-  `renderAll`). Las invocaciones siguen con sus propias Acciones.
+  dados y el costo en No2/SP con su motivo. No tira nada.
 - **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
   Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
   `esVeneno`, `esSangrado`). Ya no hay "Daño entrante": el HP se edita a

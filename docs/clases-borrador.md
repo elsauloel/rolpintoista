@@ -78,10 +78,12 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
    o al hacer algo que no sea atacar? ¿"Iguales" = misma arma, mismo
    objetivo o ambas? Combinado con otra skill (ej. Amplificar daño), ¿todos
    los ataques la llevan y el SP se paga por ataque o una vez?
-4. **Cañón Vasco** [2 + X] — X no puede ser mayor a FUE. Salta X casillas
-   a X altura. Si aterriza en un enemigo, lo empuja 1 casillero. Al caer,
-   hace X + FUE (tira) daño de onda expansiva en área. Puede atacar a un
-   objetivo al caer con +X al daño.
+4. ✅ **Cañón Vasco** — **No2:** 1 (salto y onda). **SP:** 2 + X (X hasta
+   Fue). Salta X casillas; si cae sobre un enemigo, lo empuja 1 casillero.
+   Al caer, los enemigos adyacentes (flor de 1, no afecta aliados) reciben
+   X + una tirada de Fuerza de daño de onda expansiva; se defienden con
+   Constitución (a confirmar). Puede además atacar a un objetivo al caer
+   (pagando ese ataque) con +X de daño fijo.
 5. **Carga** [X] — Se desplaza X casilleros en línea recta, gastando los
    No2 correspondientes. Al finalizar el recorrido, ataca con +X al daño
    y a la PG.

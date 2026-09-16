@@ -130,8 +130,11 @@ aside{
 .ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
 .ayuda-globo .leyenda{margin-top:8px}
 /* Controles flotantes sobre el token seleccionado (estilo Roll20) */
-#hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20;transform:translate(-50%,0)}
-#hud .hud-fila{display:flex;gap:7px;justify-content:center;pointer-events:auto}
+#hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20}
+/* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
+#hud .hud-anillo{position:absolute;left:0;top:0}
+#hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
+#hud .hud-globos{position:absolute;left:0;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
 #hud .hud-circulo{
   width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.92);color:var(--paper);
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
@@ -146,7 +149,7 @@ aside{
   font-family:"Space Mono",monospace;font-size:13px;text-align:center;padding:0 6px
 }
 #hud .hud-globo{
-  pointer-events:auto;margin-top:8px;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
+  pointer-events:auto;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
   border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
 }
 #hud .hud-globo-acciones{margin-top:8px;display:flex;justify-content:flex-end}
@@ -1371,7 +1374,12 @@ async function editarToken(id, cambios){
     toast('Token guardado');
   }catch(err){
     console.error('No se pudo guardar el token:', err);
-    toast('No se pudo guardar' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+    // Barras y aura son campos nuevos del token: si las reglas publicadas en
+    // Firebase son viejas, Firestore rechaza la escritura entera.
+    const nuevos = Object.keys(cambios || {}).some(k => k === 'barras' || k === 'aura');
+    toast(err.code !== 'permission-denied' ? 'No se pudo guardar'
+      : nuevos ? 'No se pudo guardar: faltan publicar las reglas nuevas de Firestore (consola → Firestore → Reglas)'
+      : 'No se pudo guardar (sin permiso)');
   }
 }
 
@@ -2083,15 +2091,18 @@ function hudHtml(t){
   const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid && !t.fichaId.includes(SEP_INVOCACION);
   const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
 
-  let html = '<div class="hud-fila">' +
+  // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
+  let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+    (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     (puedoMover(t) ? icono('ajustes', '⚙', 'Barras y aura del token', hudGlobo === 'ajustes') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
     '</div>';
-  if(hudGlobo === 'estados') html += hudEstadosHtml(t, d.estados, puede);
-  if(hudGlobo === 'ajustes' && puedoMover(t)) html += hudAjustesHtml(t);
-  return html;
+  let globo = '';
+  if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
+  if(hudGlobo === 'ajustes' && puedoMover(t)) globo = hudAjustesHtml(t);
+  return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
 }
 
 function hudEstadosHtml(t, estados, puede){
@@ -2150,7 +2161,28 @@ function hudUbicar(){
   }
   hud.hidden = false;
   hud.style.left = Math.round(px) + 'px';
-  hud.style.top = Math.round(py - radio - 46) + 'px';
+  hud.style.top = Math.round(py) + 'px';
+  hudAcomodarAnillo(radio);
+}
+
+// Reparte los botones en ronda alrededor del token, dejando un hueco abajo
+// (ahí van las barras y el nombre). El radio crece con el zoom y con la
+// cantidad de botones, para que no se pisen.
+function hudAcomodarAnillo(radioToken){
+  const hud = $('#hud');
+  const botones = [...hud.querySelectorAll('.hud-anillo > *')];
+  if(!botones.length) return;
+  const ARCO = 300;              // grados que ocupa la ronda (60 libres abajo)
+  const paso = botones.length > 1 ? ARCO / (botones.length - 1) : 0;
+  const minRadio = botones.length > 1 ? 21 / Math.sin(Math.min(Math.PI / 2, paso * Math.PI / 360)) : 0;
+  const r = Math.max(radioToken + 34, minRadio, 52);
+  botones.forEach((b, i) => {
+    const ang = (-90 - ARCO / 2 + paso * i) * Math.PI / 180;
+    b.style.left = Math.round(Math.cos(ang) * r) + 'px';
+    b.style.top = Math.round(Math.sin(ang) * r) + 'px';
+  });
+  const globos = hud.querySelector('.hud-globos');
+  if(globos) globos.style.top = Math.round(r + 24) + 'px';
 }
 
 function hudConectar(t){
@@ -2169,6 +2201,7 @@ function hudConectar(t){
   }
   hud.querySelectorAll('[data-hud-boton]').forEach(b => b.onclick = () => {
     const clave = b.dataset.hudBoton;
+    if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       if(fichaDeToken) abrirBotonera(fichaDeToken); else abrirAcciones(t.fichaId);
@@ -2257,6 +2290,13 @@ function puedeAgregarEstado(t){
 }
 
 // Abre el selector de estados de la herramienta que corresponde.
+function abrirFichaDeToken(t){
+  const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+  if(!fichaId) return;
+  const url = '../ficha-personaje/ficha.html?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaId);
+  window.open(url, '_blank', 'noopener');
+}
+
 function abrirEstadoNuevo(t){
   if(!puedeAgregarEstado(t)) return;
   if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'abrir-estados', creep: t.fichaId});

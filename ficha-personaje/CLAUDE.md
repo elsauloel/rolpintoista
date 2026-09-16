@@ -52,7 +52,10 @@ más cambia sesión a sesión.
 - **🔍 Lupa de la Botonera** (`lupaHtml`, `abrirLupa`, `#lupa-pop`): cada botón
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en
-  dados y el costo en No2/SP con su motivo. No tira nada.
+  dados y el costo en No2/SP con su motivo. No tira nada. En las habilidades la 🔍 va dentro del botón Ejecutar (`habx:`) y muestra
+  solo cuánto cuesta, cuánto hay de ese recurso y qué tira ("PdG = 1d6+1");
+  sin No2 el botón queda apagado con `.sin-recursos` (no `disabled`, para que
+  la 🔍 siga abriendo).
 - **Editor de habilidades paso a paso** (`PASOS_HABILIDAD`, `drawEditorHabilidad`):
   `drawEditor` deriva ahí para `habilidades`. Pasos: qué es (nombre y
   descripción) → costo (SP y No2; No2 puede ser un número, X o "ATAQUE" = lo que cuesta atacar con el arma elegida al ejecutar, `nitrosAtaque`/`registrarAtaqueDeHabilidad`, y cuenta como ese ataque; cada uno puede ser X: `spVariable`/`nitrosVariable`, se eligen en `#scrim-costox` y lo fijo queda bloqueado; categoría) → tirada (stat y/o fórmula) →

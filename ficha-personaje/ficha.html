@@ -814,6 +814,11 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
   font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}
 .bt-lupa:hover,.bt-lupa:focus-visible{opacity:1;background:rgba(224,164,88,.18);outline:none}
 .bt-lupa.mini{position:static;width:auto;height:auto;padding:3px 6px;border:1px solid var(--line-soft);font-size:11px;flex:none}
+/* 🔍 dentro del botón Ejecutar de las habilidades */
+.ejecutar-btn.con-lupa{display:inline-flex;align-items:center;gap:6px}
+.bt-lupa.en-boton{position:static;width:auto;height:auto;padding:1px 4px;opacity:.75}
+/* Sin recursos: se ve apagado pero sigue abriendo la 🔍 (un botón disabled no recibe clics) */
+.ejecutar-btn.sin-recursos{opacity:.45;background:rgba(0,0,0,.2);color:var(--muted)}
 #lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
   background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
   padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
@@ -3883,9 +3888,8 @@ function renderBotonera(){
           return `<div class="cat-row">
             <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
             <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-            ${lupaBotonHtml(`hab:${i.id}`, 'mini')}
             <span class="hab-accion">
-              <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${sinNitros?'disabled':''} style="width:auto">Ejecutar</button>
+              <button class="ejecutar-btn con-lupa${yaUsada?" usada":""}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los Nitros"':""} style="width:auto">Ejecutar${lupaBotonHtml(`habx:${i.id}`, "en-boton")}</button>
               ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
             </span>
           </div>`;
@@ -6872,6 +6876,45 @@ function lupaHtml(clave){
     let out = lupaSeccion('De dónde sale', h);
     if(!arma.armaDeRango) out += lupaStat('dmg', c, {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
     return {titulo: `Daño · ${arma.nombre}`, html: out + sinCosto};
+  }
+  // Lupa del botón Ejecutar (Botonera): solo cuánto cuesta, cuánto hay de
+  // eso y qué tira. Sin el desglose del origen de la tirada.
+  if(tipo === 'habx'){
+    const h0 = S.habilidades.find(x => x.id === ref);
+    if(!h0) return {titulo: 'Habilidad', html: ''};
+    let costo = '';
+    let usaNitros = false, usaSp = false;
+    if(nitrosAtaque(h0)){
+      usaNitros = true;
+      armasParaHabilidad().forEach(o => {
+        costo += lupaFila(`No2 · como un ataque ${o.arma ? `con ${esc(o.arma.nombre)}` : 'sin arma'}`, `${fmt(costoAtaqueNitros(o.arma))}`);
+      });
+    }else if(nitrosVariable(h0)){
+      usaNitros = true;
+      costo += lupaFila('No2', 'X (lo elegís al usarla)');
+    }else if(costoNitrosHab(h0)){
+      usaNitros = true;
+      costo += lupaFila('No2', fmt(costoNitrosHab(h0)));
+    }
+    if(spVariable(h0)){ usaSp = true; costo += lupaFila('SP', 'X (lo elegís al usarla)'); }
+    else if(parseCostoSp(h0.costo)){ usaSp = true; costo += lupaFila('SP', fmt(parseCostoSp(h0.costo))); }
+    if(!costo) costo = lupaFila('Costo', 'gratis');
+    if(h0.categoria === 'No espameable') costo += lupaNota(`Una vez por turno${h0.usadaEsteTurno ? ' (ya la usaste este turno)' : ''}.`);
+    let disp = '';
+    if(usaNitros) disp += lupaFila('No2', fmt(num(S.nitros)), costoNitrosHab(h0) > num(S.nitros) ? 'lupa-falta' : '');
+    if(usaSp){
+      const spDisp = spMaximo(c) - num(S.spGastado);
+      disp += lupaFila('SP', fmt(spDisp), parseCostoSp(h0.costo) > spDisp ? 'lupa-falta' : '');
+    }
+    let tirada = '';
+    const stat = h0.tiradaStat;
+    if(stat && c.final[stat] !== undefined){
+      const f = formulaParaValor(c.final[stat]);
+      tirada += lupaFila(esc(STAT_LABEL[stat] || stat), f ? `= ${esc(f.formula)}` : `${fmt(num(c.final[stat]))} (no se puede tirar)`);
+    }
+    if((h0.tiradaExtra || '').trim()) tirada += lupaFila('Fórmula', esc(h0.tiradaExtra));
+    if(!tirada) tirada = lupaFila('Tirada', 'no tira dados');
+    return {titulo: h0.nombre, html: lupaSeccion('Cuesta', costo) + (disp ? lupaSeccion('Tenés', disp) : '') + lupaSeccion('Tira', tirada)};
   }
   if(tipo === 'hab'){
     const h0 = S.habilidades.find(x => x.id === ref);

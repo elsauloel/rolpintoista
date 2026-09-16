@@ -570,9 +570,14 @@ function spDeResumen(r){
 // Aura y barras que guarda cada token (las elige su dueño en el engranaje).
 function auraDe(t){
   const a = t && t.aura;
-  const radio = a ? num(a.radio) : 0;
+  // Radio en casilleros enteros; forma 'hex' (sigue la grilla) o 'circulo'.
+  const radio = a ? Math.min(30, Math.round(num(a.radio))) : 0;
   if(!(radio > 0)) return null;
-  return {radio: Math.min(30, radio), color: /^#[0-9a-fA-F]{6}$/.test(a.color || '') ? a.color : '#E0A458'};
+  return {
+    radio,
+    forma: a.forma === 'circulo' ? 'circulo' : 'hex',
+    color: /^#[0-9a-fA-F]{6}$/.test(a.color || '') ? a.color : '#E0A458',
+  };
 }
 function barrasDe(t){
   const b = (t && t.barras) || {};
@@ -1036,6 +1041,39 @@ function pedirDibujo(){
   });
 }
 
+// Aura que sigue la grilla: todas las casillas a `radio` pasos o menos del
+// token, pintadas juntas, con el borde solo por fuera.
+function dibujarAuraHex(centro, aura, z){
+  const C = hexACubo(centro);
+  const R = aura.radio;
+  const borde = [];
+  ctx.beginPath();
+  for(let dq = -R; dq <= R; dq++){
+    for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++){
+      const r = C.r + dr, q = C.q + dq;
+      const col = q + (r - (r & 1)) / 2;
+      const h = hexCentro(col, r);
+      trazarHex(h.x, h.y);
+      if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) === R) borde.push({h, dq, dr});
+    }
+  }
+  ctx.fillStyle = colorConAlfa(aura.color, 0.18); ctx.fill();
+  // Lado i del hexágono (de la esquina i a la i+1): el vecino de ese lado
+  // está en la dirección 60·i grados, que en cubo es VECINO_LADO[i].
+  const VECINO_LADO = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
+  ctx.beginPath();
+  borde.forEach(({h, dq, dr}) => {
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      const nq = dq + vq, nr = dr + vr;
+      if(Math.max(Math.abs(nq), Math.abs(nr), Math.abs(nq + nr)) <= R) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+      ctx.moveTo(h.x + a[0], h.y + a[1]);
+      ctx.lineTo(h.x + b[0], h.y + b[1]);
+    });
+  });
+  ctx.strokeStyle = colorConAlfa(aura.color, 0.6); ctx.lineWidth = 2 / z; ctx.stroke();
+}
+
 function trazarHex(cx, cy){
   ctx.moveTo(cx + ESQUINAS[0][0], cy + ESQUINAS[0][1]);
   for(let i = 1; i < 6; i++) ctx.lineTo(cx + ESQUINAS[i][0], cy + ESQUINAS[i][1]);
@@ -1155,6 +1193,10 @@ function dibujar(){
     const dib = disposicion.find(d => d.id === id);
     const vis = visibles.get(id);
     const c = vis || (dib ? {x: dib.x, y: dib.y} : hexCentro(t.col, t.fila));
+    if(aura.forma === 'hex'){
+      dibujarAuraHex(vis ? mundoAHex(vis.x, vis.y) : {col: t.col, fila: t.fila}, aura, z);
+      return;
+    }
     ctx.beginPath();
     ctx.arc(c.x, c.y, aura.radio * ANCHO_CASILLA, 0, 2 * Math.PI);
     ctx.fillStyle = colorConAlfa(aura.color, 0.18); ctx.fill();
@@ -2382,7 +2424,11 @@ function hudAjustesHtml(t){
     check('sp', 'SP (azul)', barras.sp) +
     check('no2', 'No2 (verde)', barras.no2) +
     '<h3 style="margin-top:12px">Aura</h3>' +
-    `<div class="hud-campo"><label>Radio (casilleros)</label><input type="number" min="0" max="30" step="0.5" value="${fmt(num(aura.radio))}" data-hud-aura="radio"></div>` +
+    `<div class="hud-campo"><label>Radio (casilleros)</label><input type="number" min="0" max="30" step="1" inputmode="numeric" value="${Math.round(num(aura.radio))}" data-hud-aura="radio"></div>` +
+    `<div class="hud-campo"><label>Forma</label><select data-hud-aura="forma">` +
+      `<option value="hex"${aura.forma === 'circulo' ? '' : ' selected'}>Hexágonos</option>` +
+      `<option value="circulo"${aura.forma === 'circulo' ? ' selected' : ''}>Círculo</option>` +
+    `</select></div>` +
     `<div class="hud-campo"><label>Color</label><input type="color" value="${/^#[0-9a-fA-F]{6}$/.test(aura.color || '') ? aura.color : '#E0A458'}" data-hud-aura="color"></div>` +
     '<div class="fila" style="margin-top:10px">' +
       '<button type="button" class="hud-mini" data-hud-aura-ok="1">Guardar aura</button>' +
@@ -2390,7 +2436,7 @@ function hudAjustesHtml(t){
     '</div>' +
     imagenHtml +
     editarHtml +
-    '<p class="ayuda" style="margin-top:6px">El radio va en casilleros. Las barras se guardan solas. La ven todos.</p>' +
+    '<p class="ayuda" style="margin-top:6px">El radio va en casilleros enteros (1 = su casilla y las 6 de alrededor; 0 = sin aura). Las barras se guardan solas. La ven todos.</p>' +
     '</div>';
 }
 
@@ -2425,7 +2471,10 @@ function hudAcomodarAnillo(radioToken){
   const ARCO = 300;              // grados que ocupa la ronda (60 libres abajo)
   const paso = botones.length > 1 ? ARCO / (botones.length - 1) : 0;
   const minRadio = botones.length > 1 ? 21 / Math.sin(Math.min(Math.PI / 2, paso * Math.PI / 360)) : 0;
-  const r = Math.max(radioToken + 34, minRadio, 52);
+  // Como en Roll20: la ronda va por fuera de las casillas vecinas (un casillero
+  // y medio), así se ve lo que hay alrededor del token.
+  const afuera = Math.min(ANCHO_CASILLA * vista.zoom * 1.5 + 6, 200);
+  const r = Math.max(radioToken + 34, afuera, minRadio, 52);
   botones.forEach((b, i) => {
     const ang = (-90 - ARCO / 2 + paso * i) * Math.PI / 180;
     b.style.left = Math.round(Math.cos(ang) * r) + 'px';
@@ -2531,11 +2580,17 @@ function hudConectar(t){
   const quitarImagen = hud.querySelector('[data-hud-imagen-no]');
   if(quitarImagen) quitarImagen.onclick = () => editarToken(seleccion, {imagen: firebase.firestore.FieldValue.delete()});
   const guardarAura = () => {
-    const radio = num(hud.querySelector('[data-hud-aura="radio"]').value);
+    const radio = Math.min(30, Math.max(0, Math.round(num(hud.querySelector('[data-hud-aura="radio"]').value))));
     const color = hud.querySelector('[data-hud-aura="color"]').value;
-    editarToken(seleccion, {aura: radio > 0 ? {radio: Math.min(30, radio), color} : firebase.firestore.FieldValue.delete()});
+    const forma = hud.querySelector('[data-hud-aura="forma"]').value === 'circulo' ? 'circulo' : 'hex';
+    editarToken(seleccion, {aura: radio > 0 ? {radio, forma, color} : firebase.firestore.FieldValue.delete()});
   };
   const campoRadio = hud.querySelector('[data-hud-aura="radio"]');
+  // Solo números naturales: se descartan comas, puntos y signos al tipear.
+  if(campoRadio) campoRadio.oninput = () => {
+    const limpio = campoRadio.value.replace(/[^0-9]/g, '');
+    if(limpio !== campoRadio.value) campoRadio.value = limpio;
+  };
   if(campoRadio) campoRadio.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); guardarAura(); } };
   const ok = hud.querySelector('[data-hud-aura-ok]');
   if(ok) ok.onclick = guardarAura;

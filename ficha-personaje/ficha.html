@@ -1711,7 +1711,7 @@ const DADOS_ARMA = [2, 4, 6, 8, 10];
    No2 (fórmula base agl + mods) y se recarga en cada Mantenimiento.
    SP reemplaza a Bonos: se gasta con habilidades y NO se recarga entero al
    pasar turno: cada Mantenimiento recupera SP Regen (substat de Int,
-   fórmula base floor(int/2) + mods), sin pasar del máximo. El resto, con
+   base 0 + mods de habilidades, equipo o estados), sin pasar del máximo. El resto, con
    recargas, consumibles, descanso o a mano.
 
    Todo lo marcado PLACEHOLDER está sin confirmar: se ajusta acá y en la
@@ -1770,8 +1770,9 @@ function migrarEstadoIt2(st){
   const f = st.formulas || (st.formulas = {});
   ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
   ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'int*3' : 'agl'; });
-  // SP Regen (regla nueva): las fichas de antes arrancan con la fórmula base.
-  if(f.spregen === undefined) f.spregen = 'floor(int/2)';
+  // SP Regen: base 0 (solo lo dan habilidades, equipo o estados). Las fichas
+  // que quedaron con la base vieja (floor(int/2)) vuelven a 0.
+  if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = '0';
   Object.keys(f).forEach(k => {
     if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
   });
@@ -1885,7 +1886,7 @@ const DEFAULT = {
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
-    pdgmg:'int', resm:'int', sp:'int*3', spregen:'floor(int/2)', rangocasteo:'int',
+    pdgmg:'int', resm:'int', sp:'int*3', spregen:'0', rangocasteo:'int',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0'
   },
   inventario:[],
@@ -6638,7 +6639,7 @@ function mantenimiento(){
   }
 
   log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
-  log.push(`Nitros recargados a ${fmt(num(S.nitros))}. SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).`);
+  log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
   S.log = log;
 
   renderTurno();

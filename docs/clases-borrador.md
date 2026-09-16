@@ -84,9 +84,9 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
    X + una tirada de Fuerza de daño de onda expansiva; se defienden con
    Constitución (a confirmar). Puede además atacar a un objetivo al caer
    (pagando ese ataque) con +X de daño fijo.
-5. **Carga** [X] — Se desplaza X casilleros en línea recta, gastando los
-   No2 correspondientes. Al finalizar el recorrido, ataca con +X al daño
-   y a la PG.
+5. ✅ **Carga** — **No2:** X (1 por casillero) + los del ataque del final.
+   **SP:** X, sin tope (a confirmar si X tiene tope). Avanza X casilleros en
+   línea recta y al final ataca con +X de daño fijo y +X a la PdG.
 6. **Estoicismo** [2] — NO2: (0). Flash. +2 Def por cada enemigo
    adyacente. +1 Res.Crit *.
 7. **Remolino** [3] — Ataque que daña a todos los objetivos adyacentes.

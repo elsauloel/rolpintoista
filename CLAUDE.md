@@ -1,11 +1,11 @@
-# Piratas en el espacio — herramientas de campaña
+# Rol Pintoísta — herramientas de campaña (rama `nueva-version`)
 
-> **Rama `nueva-version` (carpeta `rol-nueva-version`): sistema nuevo de
-> Rol Pintoísta en vivo con Firebase.** Antes de tocar nada acá, leer
-> [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (decisiones y
-> estado) y [`docs/workflow-firebase.md`](docs/workflow-firebase.md). Lo
-> que sigue en este archivo describe la versión con sync por GitHub y se
-> va a ir actualizando a medida que avance la migración.
+> Esta rama (carpeta `rol-nueva-version`) es el sistema nuevo: herramientas
+> de campaña en vivo con Firebase. **Antes de tocar código acá**, leer
+> [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (qué se
+> decidió y en qué estado está cada paso) y
+> [`docs/workflow-firebase.md`](docs/workflow-firebase.md) (cómo está
+> armado Firebase: estructura de datos, permisos, cómo se prueba).
 >
 > **Preguntas de diseño abiertas → [`docs/preguntas-abiertas.md`](docs/preguntas-abiertas.md).**
 > Regla para todas las conversaciones: cada pregunta de diseño o regla que
@@ -13,29 +13,52 @@
 > con número, contexto y fecha; al decidirla se aplica, se documenta y se
 > marca ✅ ahí. Antes de preguntarle algo de diseño al usuario, mirar si ya
 > está en esa lista.
+>
+> El repo tiene otra rama, `main`: la versión vieja de la campaña "Piratas
+> en el espacio", con sincronización manual por GitHub en vez de Firebase.
+> Queda congelada como archivo histórico — no se migran sus personajes ni
+> sus datos, y no hace falta convivir con ella.
 
-Conjunto de herramientas HTML standalone para una campaña de rol homebrew.
-No hay backend ni base de datos: cada herramienta es un único archivo
-`.html` que se abre haciendo doble clic (o arrastrándolo a una pestaña del
-navegador), y el estado de la partida vive en archivos `.json` — ya sea
-local, en descargas/cargas manuales, o sincronizado con este repo de
-GitHub vía la API de contenidos (con un token personal guardado en
-`localStorage`, nunca en el repo).
+Conjunto de herramientas HTML standalone para jugar Rol Pintoísta en vivo,
+cada uno desde su casa: mapa de hexágonos con tokens, fichas de personaje,
+panel de combate del GM, generador de tiendas. Un "Roll20 propio" con solo
+lo que el grupo usa.
 
 ## Stack
 
-- **HTML/CSS/JS puro**, sin build step, sin dependencias externas más que
-  Google Fonts. Cada archivo `.html` es una app completa y autocontenida.
-- **Guardado/carga en JSON**: cada herramienta puede descargar su estado a
-  un `.json`, cargar uno local, y (la mayoría) sincronizarlo con GitHub
-  directamente desde el navegador — mismo patrón de token en las tres.
-- **Python** (`herramientas/`) solo para mantener el catálogo de ítems
-  sincronizado entre Excel, el editor HTML y las tres apps de juego. No
-  es parte del runtime de ninguna herramienta.
-- **Sin CORS entre archivos locales**: por eso todo lo que una herramienta
-  necesita en vivo de otra (personajes, catálogo, tablero, tienda) se lee
-  vía la API de GitHub (`https://api.github.com/repos/.../contents/...`),
-  no leyendo el archivo del disco directamente.
+- **HTML/CSS/JS puro, sin build step.** Cada herramienta (`ficha.html`,
+  `gm-tools.html`, `vendor-generator.html`, `mapa.html`, `index.html`) es
+  una página completa y se abre con doble clic o por el sitio publicado;
+  lo que comparten entre sí vive en `comun/` y se suma con
+  `<script src="../comun/archivo.js">` — **nunca se copia adentro del
+  HTML** (ver [`comun/CLAUDE.md`](comun/CLAUDE.md)).
+- **Firebase (Firestore) es el backend en vivo**: cuentas, partidas,
+  fichas, creeps, mapa, tokens, tiradas, tienda y bitácora se leen y
+  escriben ahí en tiempo real, sin "Subir datos"/"Bajar datos". SDK
+  *compat* cargado por `<script>` desde `gstatic.com`. Ver
+  [`docs/workflow-firebase.md`](docs/workflow-firebase.md) para la
+  estructura completa y [`firebase/firestore.rules`](firebase/firestore.rules)
+  para los permisos (hay que pegarlos a mano en la consola cada vez que
+  cambian).
+- **El catálogo de ítems es la excepción**: sigue viviendo en
+  `datos/catalogo.json` y sincronizándose por **GitHub** (API de
+  contenidos, con un token personal en `localStorage`, nunca en el repo),
+  siempre contra la rama **`main`** — es infraestructura compartida entre
+  campañas, no estado de una partida puntual. Ver
+  [`docs/workflow-github.md`](docs/workflow-github.md) y
+  [`datos/CLAUDE.md`](datos/CLAUDE.md).
+- **Python** (`herramientas/`) mantiene ese catálogo sincronizado entre
+  Excel, el editor HTML y las herramientas de juego. No es parte del
+  runtime de ninguna herramienta.
+- **`gestor.html`** (raíz) actualiza el *código* de las herramientas desde
+  GitHub — nunca datos de partida — usando la File System Access API
+  sobre la carpeta que elige el usuario, y apunta a la rama `main`. En
+  `nueva-version`, **"Traer última versión" está desactivado a propósito**
+  en la ficha y en gm-tools (traería la versión vieja y pisaría esta
+  carpeta).
+- **Sitio publicado**: la rama `nueva-version` se publica sola en GitHub
+  Pages, en `https://elsauloel.github.io/rolpintoista/` — cada push se
+  publica en 1–2 minutos, así que solo se sube lo ya probado.
 
 ## Convenciones de nombres
 
@@ -43,63 +66,61 @@ GitHub vía la API de contenidos (con un token personal guardado en
   palabra (`ficha-personaje/`, `gm-toolset/`, `manual-usuario/`,
   `vtt-hexgrid/`).
 - Dentro del JS de cada herramienta: identificadores y comentarios en
-  español, `camelCase` para variables/funciones (`aplicarDatos`,
-  `ghSubir`, `renderLista`). Los nombres de conceptos del juego (PdG,
-  Bloqueo, Res.Mt) se usan tal cual, sin traducir a inglés.
+  español, `camelCase` para variables/funciones (`aplicarFicha`,
+  `renderBotonera`, `mesaPublicar`). Los nombres de conceptos del juego
+  (PdG, Bloqueo, Res.Mt, No2) se usan tal cual, sin traducir a inglés.
 - IDs de ítems de catálogo: `cat-<slug>` para los originales, `new-<slug>`
   para los agregados por el importador cuando no traían id.
-- Rutas de sincronización con GitHub (los strings que ven `ghSubir`/
-  `ghLeerJson`) son siempre relativas a la raíz del repo, no al archivo
-  HTML que las usa — por eso no cambian aunque una herramienta se mueva de
-  carpeta.
+- Rutas de sincronización con GitHub del catálogo (los strings que ven
+  `ghSubir`/`ghLeerJson`) son siempre relativas a la raíz del repo, no al
+  archivo HTML que las usa.
 
 ## Qué hay en cada carpeta
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
-| [`ficha-personaje/`](ficha-personaje/CLAUDE.md) | Ficha de personaje interactiva (`ficha.html`) | En desarrollo activo |
-| [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas | En desarrollo activo |
-| [`datos/`](datos/CLAUDE.md) | JSONs de la partida (personajes, tablero, catálogo) + el editor de catálogo | En uso activo |
-| [`manual-usuario/`](manual-usuario/CLAUDE.md) | Manual de reglas de la campaña | **En construcción, sin contenido todavía** — solo el esqueleto |
+| [`ficha-personaje/`](ficha-personaje/CLAUDE.md) | Ficha de personaje interactiva (`ficha.html`), en vivo con Firebase | En desarrollo activo |
+| [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas, en vivo con Firebase | En desarrollo activo |
 | [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa de hexágonos en vivo con tokens (`mapa.html`, Firebase) | En desarrollo activo |
-| [`docs/`](docs/CLAUDE.md) | Workflow de GitHub/Gestor, notas generales | Con contenido básico |
-| `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Fuera del alcance de esta reorganización de carpetas — ver `herramientas/LEEME.md` |
+| [`comun/`](comun/CLAUDE.md) | Código JS compartido entre las herramientas (sesión, menú, Mesa, dados, lupa, asistente de ítems…) | En uso activo |
+| [`datos/`](datos/CLAUDE.md) | Catálogo de ítems (`catalogo.json`, sincronizado por GitHub contra `main`) + su editor | En uso activo |
+| [`manual-usuario/`](manual-usuario/CLAUDE.md) | Manual de reglas de la campaña | En construcción, cargándose de a poco |
+| [`docs/`](docs/CLAUDE.md) | Plan del sistema nuevo, workflow de Firebase/GitHub, preguntas de diseño abiertas | Con contenido activo |
+| `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |
-| `gestor.html` (raíz) | Actualiza las herramientas desde GitHub o publica cambios locales | Se queda en la raíz a propósito: usa la File System Access API sobre la carpeta elegida por el usuario, y necesita encontrar `gestor.html` mismo como ancla |
+| `firebase/` | `firestore.rules`, la copia versionada de los permisos | En uso activo |
+| `gestor.html` (raíz) | Actualiza el código de las herramientas desde `main` | Legado — no toca datos de partida en `nueva-version` |
 
-Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/esquema.md).
+Esquema de datos de Firebase: [`docs/workflow-firebase.md`](docs/workflow-firebase.md).
+Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.md).
 
 ## Cosas que hay que saber antes de tocar código acá
 
-- **"Traer última versión" (en `gestor.html`; en la rama `nueva-version` la ficha ya no lo tiene)
-  sobreescribe el archivo local sin avisar si hay cambios sin commitear.**
-  Ya pasó una vez que esto pisó trabajo en curso. Regla operativa: commitear
-  y pushear cada bloque de cambios apenas queda probado, no dejar trabajo
-  grande sin subir.
-- Las rutas de sincronización con GitHub embebidas en cada HTML
-  (`personajes/...`, `tablero/...`, `creeps-publico.json`,
-  `tienda-publica.json`) son independientes de dónde vive el archivo HTML
-  en el repo — apuntan a `datos/...` porque ahí es donde están los datos
-  ahora, no porque el HTML esté cerca.
-- Los efectos de arma que se aplican al personaje **golpeado** (Rompe
-  armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma (desde
-  2026-09-17): al tirar el Daño se **recuerdan** resaltados en la Mesa y,
-  si tienen porcentaje, se **tiran** en un pop-up (`comun/efectos-golpe.js`).
-  Aplicarlos sobre el rival sigue siendo manual, a propósito: no hay que
-  automatizar el estado en el objetivo salvo que se pida.
+- **Subir el trabajo apenas queda probado.** No hay "Traer última
+  versión" que pueda pisar nada en esta carpeta (está desactivado), pero
+  cada push a `nueva-version` se publica solo en GitHub Pages — no dejar
+  trabajo grande sin subir ni a medio probar en el sitio público.
 - **Código compartido en `comun/`** (se carga con `<script src>` en cada
   herramienta; no copiarlo adentro de los HTML): `sesion.js` (cuenta y
   partida), `menu-sitio.js` (☰), `mesa.js` (Mesa de tiradas),
   `tiradas.js` (fórmulas de dados), `lupa.js` (cuadro 🔍),
   `mesa-historial.js`, `grilla-dados.js`, `dados3d.js`, `respaldo.js`,
   `efectos-golpe.js`, `asistente-item.js`. Si algo se repite en dos
-  herramientas, va ahí.
+  herramientas, va ahí — ver [`comun/CLAUDE.md`](comun/CLAUDE.md).
 - Crear o editar ítems (menos consumibles) en la ficha, gm-tools, el
   generador de tiendas y el editor de catálogo pasa por un solo asistente
   paso a paso compartido: `comun/asistente-item.js`.
-- `ficha-personaje/ficha.html` pesa ~700 KB, casi todo el catálogo
-  embebido. **Mientras dure el desarrollo, el catálogo va sin imágenes**
-  (decidido 2026-09-17, se borraron las 41 que había para alivianar el
-  proyecto): no cargar imágenes de ítems ni volver a ponerlas. La función
-  de cargar imagen sigue en las herramientas, a propósito. Para tocar el
-  catálogo está `datos/catalogo.json` + `datos/catalogo-editor.html`.
+- Los efectos de arma que se aplican al personaje **golpeado** (Rompe
+  armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma: al tirar
+  el Daño se **recuerdan** resaltados en la Mesa y, si tienen porcentaje,
+  se **tiran** en un pop-up (`comun/efectos-golpe.js`). Aplicarlos sobre el
+  rival sigue siendo manual, a propósito: no hay que automatizar el estado
+  en el objetivo salvo que se pida.
+- **El catálogo va sin imágenes mientras dura el desarrollo** (decidido
+  2026-09-17): no cargar imágenes de ítems ni volver a ponerlas. La
+  función de cargar imagen sigue en las herramientas, a propósito. Para
+  tocar el catálogo está `datos/catalogo.json` + `datos/catalogo-editor.html`
+  — nunca a mano.
+- **Solo compu, no celular** (decidido 2026-09-17): no adaptar ni probar
+  nada para pantallas de celular salvo que se pida explícitamente — ver
+  [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md).

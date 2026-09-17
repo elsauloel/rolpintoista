@@ -3,7 +3,7 @@
 ## Qué es
 
 `ficha.html` — la ficha de personaje interactiva. Un único archivo HTML
-standalone (~700 KB, ~9000 líneas) con todo: atributos, combate,
+standalone (~650 KB, ~8500 líneas) con todo: atributos, combate,
 inventario, catálogo de compra, habilidades, bitácora.
 
 ## Estado actual
@@ -143,10 +143,20 @@ más cambia sesión a sesión.
 
 ## Dependencias con otras carpetas
 
-- `datos/` — todo el estado de partida (personajes, tablero) y el
-  catálogo (indirectamente, vía el pipeline de `herramientas/`).
-- `gm-toolset/gm-tools.html` — comparten el formato de efecto/estado (duplicados en el código de cada uno, no
-  importados).
-- `vtt-hexgrid/mapa.html` e `index.html` — accesos directos arriba a la
-  derecha (🗺 Mapa, ⌂ Inicio), con `?partida=` de la partida abierta. El
-  menú ⚙ Ajustes (Cambiar token, Actualizar gestor) se quitó.
+- `comun/` — `sesion.js` (cuenta y partida), `menu-sitio.js` (☰),
+  `mesa.js`/`tiradas.js`/`lupa.js` (Mesa, dados y 🔍, compartidos con
+  gm-tools y el mapa; acá la ficha solo define `MESA_DESDE`, `mesaQuien()`
+  y el contenido de la lupa), `mesa-historial.js`, `grilla-dados.js`,
+  `dados3d.js`, `respaldo.js`, `efectos-golpe.js` y `asistente-item.js` —
+  ver [`../comun/CLAUDE.md`](../comun/CLAUDE.md).
+- `datos/` — el catálogo de ítems (indirectamente, vía el pipeline de
+  `herramientas/`); el estado de partida (personajes, mapa, tokens) ya no
+  vive acá, está en Firebase (ver
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)).
+- `gm-toolset/gm-tools.html` — mismo formato de tarjeta de estado/efecto,
+  pero cada uno con su propia lista de presets (`EFECTOS_PRESET` acá,
+  `ESTADOS_PRESET_GM` en gm-tools) — duplicado a propósito, no importado.
+- `vtt-hexgrid/mapa.html` — el menú ☰ (`comun/menu-sitio.js`) es la
+  navegación principal entre partida, mapa y fichas; el mapa además carga
+  la ficha adentro en un iframe (`?modo=botonera`) para la Botonera de
+  cada jugador.

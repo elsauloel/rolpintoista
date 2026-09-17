@@ -270,6 +270,19 @@ aside{
 #hud .hud-chip .muestra{width:10px;height:10px;border-radius:50%;border:2px solid var(--chip);flex:none}
 #hud .hud-chip:has(input:checked) .muestra{background:var(--chip)}
 #hud .hud-chip:has(input:focus-visible){outline:2px solid var(--brass)}
+/* Caja "actual / máximo" debajo de cada barra. */
+#hud .hud-recursos{display:flex;gap:6px;margin-top:6px}
+#hud .hud-recurso{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;
+  border:1px solid var(--line);border-radius:var(--r);padding:4px 2px;
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted)
+}
+#hud .hud-recurso.vacio{border-style:dashed;justify-content:center}
+#hud .hud-recurso-actual{
+  width:34px;min-width:0;background:none;border:none;color:var(--paper);font:inherit;text-align:right;padding:0
+}
+#hud .hud-recurso-actual:focus{outline:none;color:var(--brass)}
+#hud .hud-recurso-max{color:var(--muted);flex:none}
 #hud .hud-rejilla{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:8px;align-items:center}
 #hud .hud-rejilla label{color:var(--muted)}
 #hud .hud-rejilla input[type=number],#hud .hud-rejilla select{width:100%;min-width:0;padding:4px 6px;font-size:12px;height:28px}
@@ -2430,10 +2443,11 @@ function hudDatos(t){
   const secreto = t.tipo === 'creep' && !soyGM;  // los jugadores no ven números de creeps
   const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : num(r.hp));
   const {sp, spMax} = spDeResumen(r);
+  const conSp = t.tipo === 'pj' && !invocacion && spMax > 0;
   return {
     hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
-    sp: (t.tipo === 'pj' && !invocacion && spMax > 0) ? sp : null,
-    no2: secreto ? null : (n ? n.valor : null),
+    sp: conSp ? sp : null, spMax: conSp ? spMax : null,
+    no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
     estados: (v && v.resumen && v.resumen.estados) || [],
   };
 }
@@ -2466,7 +2480,7 @@ function hudHtml(t){
     '</div>';
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
-  if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t);
+  if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t, d);
   return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
 }
 
@@ -2492,13 +2506,23 @@ function hudEstadosHtml(t, estados, puede){
   }).join('') + agregar + '</div>';
 }
 
-function hudAjustesHtml(t){
+function hudAjustesHtml(t, d){
   const barras = barrasDe(t);
   const aura = t.aura || {};
   const puede = puedoMover(t);
   const check = (clave, texto, color, si) =>
     `<label class="hud-chip" style="--chip:${color}" title="Mostrar la barra de ${texto} debajo del token">` +
     `<input type="checkbox" data-hud-barra="${clave}"${si ? ' checked' : ''}><span class="muestra"></span>${texto}</label>`;
+  // Caja "actual / máximo" debajo de cada barra: el actual se edita ahí
+  // mismo (mismo mecanismo que tocar el círculo del anillo); el máximo es
+  // de lectura, sale de la ficha (fórmula) o del creep.
+  const recurso = (clave, valor, maximo) => {
+    if(valor === null || valor === undefined) return '<div class="hud-recurso vacio">—</div>';
+    return `<div class="hud-recurso">` +
+      `<input type="text" inputmode="decimal" class="hud-recurso-actual" data-hud-recurso="${clave}" value="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">` +
+      `<span class="hud-recurso-max">/ ${maximo === null || maximo === undefined ? '—' : fmt(maximo)}</span>` +
+    '</div>';
+  };
   const seccion = (titulo, cuerpo) => `<div class="hud-seccion"><h3>${titulo}</h3>${cuerpo}</div>`;
   // Los tokens sin ficha ni creep (NPC, objetos) pueden llevar su propia
   // imagen; los vinculados usan la miniatura de su ficha o creep.
@@ -2521,6 +2545,11 @@ function hudAjustesHtml(t){
         check('hp', 'Vida', HP_COLOR, barras.hp) +
         check('sp', 'SP', SP_COLOR, barras.sp) +
         check('no2', 'No2', NO2_COLOR, barras.no2) +
+      '</div>' +
+      '<div class="hud-recursos">' +
+        recurso('hp', d.hp, d.hpMax) +
+        recurso('sp', d.sp, d.spMax) +
+        recurso('no2', d.no2, d.no2Max) +
       '</div>') +
     seccion('Aura',
       '<div class="hud-rejilla">' +
@@ -2684,6 +2713,15 @@ function hudConectar(t){
     const barras = {...barrasDe(t)};
     barras[c.dataset.hudBarra] = c.checked;
     editarToken(seleccion, {barras});
+  });
+  // Caja "actual / máximo": Enter guarda (mismo camino que el círculo del
+  // anillo), Escape o perder el foco sin guardar vuelve al valor de antes.
+  hud.querySelectorAll('[data-hud-recurso]').forEach(inp => {
+    inp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicar(inp.dataset.hudRecurso, inp.value); }
+      if(e.key === 'Escape'){ inp.value = inp.defaultValue; inp.blur(); }
+    };
+    inp.onblur = () => { inp.value = inp.defaultValue; };
   });
   const botonEditar = hud.querySelector("[data-hud-editar]");
   if(botonEditar) botonEditar.onclick = () => { editandoToken = true; hudCerrar(); renderPanel(true); pedirDibujo(); };

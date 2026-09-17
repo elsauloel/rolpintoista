@@ -773,6 +773,13 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .botonera-combate-bottom{margin-top:2px;padding-top:8px;border-top:1px dashed var(--line-soft)}
 .botonera-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;align-content:start}
 .botonera-list-grid .cat-row{margin-bottom:0}
+/* Filas de habilidades y consumibles de la Botonera: info a la izquierda, botones alineados a la derecha */
+.botonera-list-grid .cat-row.bot-fila{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;padding:10px 12px}
+.bot-fila-info{flex:1;min-width:0}
+.bot-fila-info .cat-nombre{overflow-wrap:anywhere}
+.bot-fila-costo{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+.bot-fila-btns{display:flex;align-items:center;gap:6px;flex:none}
+.bot-fila-btns .ejecutar-btn,.bot-fila-btns .consume-btn{width:auto;margin-top:0;padding:6px 10px;white-space:nowrap}
 .botonera-list-subhead{
   grid-column:1/-1;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);margin-top:6px;padding-bottom:3px;border-bottom:1px dashed var(--line-soft)
@@ -3879,10 +3886,12 @@ function renderBotonera(){
 
   const consumiblesCinturon = S.cinturon.filter(i => i.consumible);
   const consumiblesMochila = S.inventario.filter(i => i.consumible);
-  const filaConsumible = (i, key) => `<div class="cat-row">
-    <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
-    <button class="mini" data-view="${key}:${i.id}">Ver</button>
-    ${consumeButton(i, key, true)}
+  const filaConsumible = (i, key) => `<div class="cat-row bot-fila">
+    <div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+    <div class="bot-fila-btns">
+      <button class="mini" data-view="${key}:${i.id}">Ver</button>
+      ${consumeButton(i, key, true)}
+    </div>
   </div>`;
 
   html += `<div class="botonera-grid botonera-grid-even">
@@ -3893,13 +3902,16 @@ function renderBotonera(){
           const noEspameable = i.categoria === 'No espameable';
           const yaUsada = noEspameable && i.usadaEsteTurno === true;
           const sinNitros = sinNitrosPara(i);
-          return `<div class="cat-row">
-            <div class="cat-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
-            <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-            <span class="hab-accion">
-              <button class="ejecutar-btn con-lupa${yaUsada?" usada":""}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los Nitros"':""} style="width:auto">Ejecutar${lupaBotonHtml(`habx:${i.id}`, "en-boton")}</button>
-              ${costoHabilidadTxt(i) ? `<span class="hab-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</span>` : ''}
-            </span>
+          // Nombre y costo a la izquierda; Ver y Ejecutar siempre juntos a la derecha.
+          return `<div class="cat-row bot-fila">
+            <div class="bot-fila-info">
+              <div class="cat-nombre">${esc(i.nombre)}</div>
+              ${costoHabilidadTxt(i) ? `<div class="bot-fila-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</div>` : ''}
+            </div>
+            <div class="bot-fila-btns">
+              <button class="mini" data-view="habilidades:${i.id}">Ver</button>
+              <button class="ejecutar-btn con-lupa${yaUsada?" usada":""}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los Nitros"':""}>Ejecutar${lupaBotonHtml(`habx:${i.id}`, "en-boton")}</button>
+            </div>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
       </div>

@@ -75,3 +75,7 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P35. Accesos repetidos.** Con el menú ☰ quedaron duplicados "⌂ Inicio", "🗺 Mapa", "⚔ GM Tools", "⌂ Partida" en las barras de cada herramienta. ¿Se sacan o quedan como atajo? *(2026-09-16)*
 - 🔲 **P36. Defensa de los creeps en las Acciones.** La Botonera de los personajes muestra Defensa y Resistencia a críticos con su 🔍. ¿Se suma lo mismo en las Acciones de los creeps? *(2026-09-17)*
 - 🔲 **P37. Versión para celular.** Decidido: por ahora solo compu. Se retoma solo si se pide. *(2026-09-17)*
+- 🔲 **P38. Caja de herramientas del mapa: quién usa qué.** La barra de la izquierda la ven todos. ¿Lápiz, Formas y Terreno son para todos o algunas solo del GM? *(2026-09-17)*
+- 🔲 **P39. Lápiz.** ¿Los trazos los ven todos y quedan guardados, o se borran solos al rato? ¿Colores y grosor? ¿Quién los borra? *(2026-09-17)*
+- 🔲 **P40. Formas hexagonales.** ¿Qué objetos son (paredes, cajas, obstáculos)? ¿Bloquean el movimiento o la vista, o son solo dibujo? *(2026-09-17)*
+- 🔲 **P41. Terreno (arena movediza, veneno, arena tóxica…).** ¿Qué hace cada uno al pisarlo o al quedarse (daño, No2 extra, estado alterado)? ¿Se aplica solo o es un recordatorio para el GM? *(2026-09-17)*

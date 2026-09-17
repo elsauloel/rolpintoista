@@ -86,6 +86,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   Inmovilizado): se arrastra el token o se toca la casilla destino; Esc
   cancela. Lo ve el dueño en su PJ y el GM en cualquier token. Borra `ruta`
   del documento; las reglas dejan al GM tocar `col`, `fila` y `ruta` de un PJ.
+- **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
+  barra vertical escondida a la izquierda del mapa; la pestaña del borde la
+  abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
+  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Lápiz, Formas
+  y Terreno figuran como "Pronto" hasta diseñarlas (una herramienta lista
+  lleva `lista: true` y se activa en `herramientaActiva`). Preguntas en
+  `docs/preguntas-abiertas.md` (P38–P41).
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

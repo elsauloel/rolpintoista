@@ -227,6 +227,13 @@ aside{
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
 #hud .hud-anillo{position:absolute;left:0;top:0}
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
+#hud .hud-rotar{
+  position:absolute;transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;
+  width:22px;height:22px;border-radius:50%;background:var(--frente,#4FA8E0);color:#fff;
+  border:2px solid rgba(15,12,14,.65);box-shadow:0 2px 8px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;font-size:12px;cursor:grab
+}
+#hud .hud-rotar:active{cursor:grabbing}
 #hud .hud-globos{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
 #hud .hud-circulo{
   width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.5);color:var(--paper);
@@ -506,32 +513,37 @@ function estado(texto){ $('#estado').textContent = texto; }
 const HEX = 40;                 // radio del hexágono, en unidades del mapa
 const SQ3 = Math.sqrt(3);
 const ZOOM_MIN = 0.25, ZOOM_MAX = 3;
+// Hexágonos "de lado arriba" (un lado horizontal, no una punta): así el
+// frente por defecto (mirando abajo, como vienen casi todas las
+// ilustraciones de token) queda alineado a un lado del hexágono, no a un
+// vértice. Girado 30° contra la grilla vieja de punta arriba.
 const ESQUINAS = Array.from({length: 6}, (_, i) => {
-  const a = Math.PI / 180 * (60 * i - 30);
+  const a = Math.PI / 180 * (60 * i);
   return [HEX * Math.cos(a), HEX * Math.sin(a)];
 });
 
 function hexCentro(col, fila){
-  return { x: HEX * SQ3 * (col + 0.5 * (fila & 1)), y: HEX * 1.5 * fila };
+  return { x: HEX * 1.5 * col, y: HEX * SQ3 * (fila + 0.5 * (col & 1)) };
 }
 
 function mundoAHex(x, y){
-  const q = (SQ3 / 3 * x - y / 3) / HEX;
-  const r = (2 / 3 * y) / HEX;
+  const q = (2 / 3 * x) / HEX;
+  const r = (SQ3 / 3 * y - x / 3) / HEX;
   const s = -q - r;
   let rq = Math.round(q), rr = Math.round(r);
   const rs = Math.round(s);
   const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
   if(dq > dr && dq > ds) rq = -rr - rs;
   else if(dr > ds) rr = -rq - rs;
-  return { col: rq + (rr - (rr & 1)) / 2, fila: rr };
+  return { col: rq, fila: rr + (rq - (rq & 1)) / 2 };
 }
 
 // Rutas: para medir distancias y trazar líneas se pasa a coordenadas
 // "cúbicas" (q, r, s), las mismas que usa mundoAHex.
 function hexACubo(c){
-  const q = c.col - (c.fila - (c.fila & 1)) / 2;
-  return {q, r: c.fila, s: -q - c.fila};
+  const q = c.col;
+  const r = c.fila - (c.col - (c.col & 1)) / 2;
+  return {q, r, s: -q - r};
 }
 function mismoHex(a, b){ return a.col === b.col && a.fila === b.fila; }
 function distanciaHex(a, b){
@@ -574,6 +586,9 @@ let arrastre = null;          // {id, x, y, inicioX, inicioY, movio, ruta, costo
 // Mover libre (🦶): id del token que se lleva a otra casilla sin reglas
 // (sin Nitros, sin estela, sin Inmovilizado). El dueño en su PJ, el GM en todos.
 let moverLibre = null;
+// Arrastre del handle de rotación: {id, radio} (radio del token en pantalla,
+// fijo durante el arrastre; el centro sale de #hud, que ya está ahí).
+let rotando = null;
 // Movimiento soltado que gasta Nitros, esperando Confirmar/Cancelar.
 let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero, disponibles}
 // Estelas que se ven unos segundos después de mover (las de todos).
@@ -615,8 +630,9 @@ function claseToken(t){
 }
 const SP_COLOR = '#3F86E0';
 const NO2_COLOR = '#3E9B5B';
+const FRENTE_COLOR = '#4FA8E0';  // marca el lado que mira el token (rotación)
 const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
-const ANCHO_CASILLA = HEX * SQ3;
+const ANCHO_CASILLA = HEX * 1.5;  // ancho de una casilla (hex de lado arriba)
 
 // Ficha, invocación o creep al que está vinculado el token (si sigue
 // existiendo). Las invocaciones van como "<fichaId>~<idInvocación>" y
@@ -1186,6 +1202,18 @@ function trazarHex(cx, cy){
   ctx.closePath();
 }
 
+// Vértices de un hexágono centrado en (cx,cy) con radio r (para los tokens,
+// que pueden ser más chicos que una casilla cuando comparten lugar).
+function verticesHex(cx, cy, r){
+  const k = r / HEX;
+  return ESQUINAS.map(([ex, ey]) => [cx + ex * k, cy + ey * k]);
+}
+function trazarPuntos(pts){
+  ctx.beginPath();
+  pts.forEach(([px, py], i) => { if(i) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
+  ctx.closePath();
+}
+
 // Dónde va cada token: si varios comparten casilla, se acomodan en ronda.
 function calcularDisposicion(){
   const orden = [...tokens.entries()]
@@ -1237,8 +1265,8 @@ function dibujar(){
 
   // Grilla: solo las casillas que se ven.
   const a = pantallaAMundo(0, 0), b = pantallaAMundo(anchoPx, altoPx);
-  const filaMin = Math.floor(a.y / (1.5 * HEX)) - 1, filaMax = Math.ceil(b.y / (1.5 * HEX)) + 1;
-  const colMin = Math.floor(a.x / (SQ3 * HEX)) - 1, colMax = Math.ceil(b.x / (SQ3 * HEX)) + 1;
+  const filaMin = Math.floor(a.y / (SQ3 * HEX)) - 1, filaMax = Math.ceil(b.y / (SQ3 * HEX)) + 1;
+  const colMin = Math.floor(a.x / (1.5 * HEX)) - 1, colMax = Math.ceil(b.x / (1.5 * HEX)) + 1;
   ctx.beginPath();
   for(let f = filaMin; f <= filaMax; f++){
     for(let c = colMin; c <= colMax; c++){
@@ -1322,8 +1350,11 @@ function dibujar(){
       else{ v.x = d.x; v.y = d.y; }
     }
     const x = v.x, y = v.y, rad = d.radio;
+    // Hexágono del token: mismo tamaño y orientación que la casilla de la
+    // grilla (fijo — no rota con el frente), para que calce con el mapa.
+    const puntos = verticesHex(x, y, rad);
 
-    ctx.beginPath(); ctx.arc(x + 2 / z, y + 3 / z, rad, 0, 2 * Math.PI);
+    trazarPuntos(verticesHex(x + 2 / z, y + 3 / z, rad));
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
 
     const vin = vinculo(t);
@@ -1331,26 +1362,39 @@ function dibujar(){
     const nombre = nombreDe(t);
     const mini = vin ? imagenLista(vin.miniatura) : imagenLista(t.imagen);
 
-    ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
+    trazarPuntos(puntos);
     ctx.fillStyle = t.color || '#9A867E'; ctx.fill();
     if(mini){
       ctx.save();
-      ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI); ctx.clip();
-      ctx.drawImage(mini, x - rad, y - rad, rad * 2, rad * 2);
+      trazarPuntos(puntos); ctx.clip();
+      // La ilustración mira "abajo" con rotación 0 (así vienen casi todas);
+      // rotar el token solo gira la imagen adentro del hexágono fijo.
+      ctx.translate(x, y);
+      ctx.rotate(num(t.rotacion || 0) * Math.PI / 180);
+      ctx.drawImage(mini, -rad, -rad, rad * 2, rad * 2);
       ctx.restore();
     }
     if(est && (est.muerto || est.dormida)){
-      ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
+      trazarPuntos(puntos);
       ctx.fillStyle = 'rgba(15,12,14,.62)'; ctx.fill();
     }
-    ctx.beginPath(); ctx.arc(x, y, rad, 0, 2 * Math.PI);
     // Borde: dorado tuyos, verde otros jugadores, rojo creeps, gris NPC.
+    trazarPuntos(puntos);
     ctx.lineWidth = Math.max(2.5 / z, rad * 0.13);
     ctx.strokeStyle = BORDE[claseToken(t)];
     ctx.stroke();
+    // Frente: el lado que mira la ilustración (abajo con rotación 0) se
+    // resalta en celeste, para ubicarlo de un vistazo sin seleccionar el
+    // token. El lado 1 del hexágono (ver ESQUINAS) es "abajo".
+    {
+      const frenteI = (Math.round(num(t.rotacion || 0) / 60) + 1) % 6;
+      const [fx1, fy1] = puntos[frenteI], [fx2, fy2] = puntos[(frenteI + 1) % 6];
+      ctx.beginPath(); ctx.moveTo(fx1, fy1); ctx.lineTo(fx2, fy2);
+      ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = Math.max(3 / z, rad * 0.16); ctx.lineCap = 'round'; ctx.stroke();
+    }
 
     if(seleccion === d.id){
-      ctx.beginPath(); ctx.arc(x, y, rad + 5 / z, 0, 2 * Math.PI);
+      trazarPuntos(verticesHex(x, y, rad + 5 / z));
       ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
     }
 
@@ -1369,7 +1413,9 @@ function dibujar(){
     }
 
     // Barras: vida (roja) y, en los PJ, SP (azul), justo debajo del token.
-    let debajo = y + rad + 3 / z;
+    // (rad*sqrt3/2: el hexágono de lado arriba no llega a "rad" de alto.)
+    const bordeV = rad * SQ3 / 2;
+    let debajo = y + bordeV + 3 / z;
     if(est){
       const bw = rad * 1.8, bh = Math.max(3 / z, rad * 0.13);
       const barra = (valor, color) => {
@@ -1394,7 +1440,7 @@ function dibujar(){
       const r = Math.max(5 / z, rad * 0.24);
       lista.forEach((e, i) => {
         const ang = -Math.PI / 2 + (i - (lista.length - 1) / 2) * 0.62;
-        const ex = x + rad * Math.cos(ang), ey = y + rad * Math.sin(ang);
+        const ex = x + bordeV * Math.cos(ang), ey = y + bordeV * Math.sin(ang);
         const resto = i === max - 1 && est.estados.length > max;
         ctx.beginPath(); ctx.arc(ex, ey, r, 0, 2 * Math.PI);
         ctx.fillStyle = resto ? '#3B2E34' : (ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']);
@@ -1836,6 +1882,7 @@ function escucharTokens(){
         aura: d.aura && typeof d.aura === 'object' ? d.aura : null,
         barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
+        rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
       });
     });
     renderIniciativa();
@@ -2477,7 +2524,8 @@ function hudHtml(t){
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre: llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
-    '</div>';
+    '</div>' +
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
   if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t, d);
@@ -2592,6 +2640,20 @@ function hudUbicar(){
   hud.style.left = Math.round(px) + 'px';
   hud.style.top = Math.round(py) + 'px';
   hudAcomodarAnillo(radio);
+  hudAcomodarRotar(t, radio);
+}
+
+// Ubica el handle de rotación en el lado del frente, un poco más afuera
+// que el anillo. Se llama sola (sin depender de la firma) para que se
+// mueva en cada cuadro, tanto al arrastrarlo como cuando llega un cambio
+// de otra pantalla.
+function hudAcomodarRotar(t, radioToken){
+  const handle = $('#hud').querySelector('.hud-rotar');
+  if(!handle) return;
+  const ang = (90 + num(t.rotacion || 0)) * Math.PI / 180;
+  const r = radioToken + 28;
+  handle.style.left = Math.round(Math.cos(ang) * r) + 'px';
+  handle.style.top = Math.round(Math.sin(ang) * r) + 'px';
 }
 
 // Reparte los botones en ronda alrededor del token, dejando un hueco abajo
@@ -2723,6 +2785,36 @@ function hudConectar(t){
     };
     inp.onblur = () => { inp.value = inp.defaultValue; };
   });
+  const handleRotar = hud.querySelector('[data-hud-rotar]');
+  if(handleRotar) handleRotar.onpointerdown = e => {
+    e.preventDefault();
+    handleRotar.setPointerCapture(e.pointerId);
+    const centro = handleRotar.parentElement.getBoundingClientRect();
+    const d = disposicion.find(x => x.id === seleccion);
+    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom};
+  };
+  if(handleRotar) handleRotar.onpointermove = e => {
+    if(!rotando || rotando.id !== seleccion) return;
+    const dx = e.clientX - rotando.cx, dy = e.clientY - rotando.cy;
+    if(Math.hypot(dx, dy) < 6) return;
+    // 0° = frente abajo, sentido horario (mismo criterio que rota la imagen).
+    let ang = Math.atan2(-dx, dy) * 180 / Math.PI;
+    ang = (((Math.round(ang / 60) * 60) % 360) + 360) % 360;
+    const tok = tokens.get(rotando.id);
+    if(tok && tok.rotacion !== ang){
+      tok.rotacion = ang;
+      hudAcomodarRotar(tok, rotando.radio);
+      pedirDibujo();
+    }
+  };
+  if(handleRotar) handleRotar.onpointerup = e => {
+    if(!rotando) return;
+    const id = rotando.id;
+    const tok = tokens.get(id);
+    rotando = null;
+    handleRotar.releasePointerCapture(e.pointerId);
+    if(tok) editarToken(id, {rotacion: num(tok.rotacion || 0)});
+  };
   const botonEditar = hud.querySelector("[data-hud-editar]");
   if(botonEditar) botonEditar.onclick = () => { editandoToken = true; hudCerrar(); renderPanel(true); pedirDibujo(); };
   const botonImagen = hud.querySelector("[data-hud-imagen]");

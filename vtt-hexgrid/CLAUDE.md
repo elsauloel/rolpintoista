@@ -10,16 +10,33 @@ nuevo de Rol Pintoísta. Paso 2 de
 
 `mapa.html`: un solo archivo, se abre con doble clic.
 
-- Grilla de hexágonos "de punta arriba", sin bordes (se desplaza y hace
-  zoom libremente). Filas impares corridas medio hexágono; cada token guarda
-  su casilla como `{col, fila}`. La vista (desplazamiento y zoom) se
-  recuerda por navegador en `localStorage` (`mapa-vista`).
+- Grilla de hexágonos "de lado arriba" (un lado horizontal, no una punta;
+  `ESQUINAS`, `hexCentro`, `mundoAHex`, `hexACubo` — girada 30° contra la
+  vieja grilla "de punta arriba" para que el frente por defecto, mirando
+  abajo, caiga en un lado y no en un vértice; ver más abajo), sin bordes (se
+  desplaza y hace zoom libremente). Columnas impares corridas medio
+  hexágono; cada token guarda su casilla como `{col, fila}`. La vista
+  (desplazamiento y zoom) se recuerda por navegador en `localStorage`
+  (`mapa-vista`).
 - Dibujado en un `<canvas>`, solo las casillas visibles.
 - Tokens en Firestore `campanas/{id}/tokens` (esquema en
-  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)): círculo de
-  color con la inicial y el nombre debajo. Borde (`BORDE`/`claseToken()`):
-  dorado = tuyos, verde = personajes de otros jugadores, rojo = vinculados a
-  un creep de gm-tools, gris = NPC (token del GM sin creep vinculado).
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)): hexágono
+  del mismo tamaño y orientación que la casilla (calza con la grilla; no
+  rota con el frente), con la ilustración adentro (o la inicial) y el
+  nombre debajo. Borde (`BORDE`/`claseToken()`): dorado = tuyos, verde =
+  personajes de otros jugadores, rojo = vinculados a un creep de gm-tools,
+  gris = NPC (token del GM sin creep vinculado).
+- **Frente y rotación** (`rotacion` en grados: 0/60/120/180/240/300, 0 =
+  abajo, que es como vienen casi todas las ilustraciones de token): el lado
+  que mira la ilustración se resalta en celeste (`FRENTE_COLOR`, distinto
+  de dorado/verde/rojo/gris para no confundirse con el dueño). Se rota
+  arrastrando el handle celeste ↻ del HUD (aparece al lado del anillo,
+  mismo permiso que 🦶 Mover libre — el dueño en su PJ, el GM en cualquier
+  token); el arrastre snapea a esas 6 direcciones, que son las 6 casillas
+  vecinas del hexágono (`hudAcomodarRotar`, `rotando`). Por ahora es solo
+  visual — todavía no hay cono de visión ni sigilo que lo use (ver
+  "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`); cuando se
+  construya, el lado opuesto al frente es el punto ciego.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

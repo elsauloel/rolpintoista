@@ -249,10 +249,7 @@ service cloud.firestore {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
           && tokenValido(request.resource.data)
-          // El dueño se crea el suyo; el GM además puede crear el de
-          // cualquier jugador (asegurarTokensPersonajes, para que cada
-          // mapa nuevo salga con el token de cada personaje puesto).
-          && (request.resource.data.duenoUid == request.auth.uid || esGM(c))
+          && request.resource.data.duenoUid == request.auth.uid
           && request.resource.data.creado == request.time
           && (request.resource.data.tipo == 'pj' || esGM(c))
           && (!('oculto' in request.resource.data) || esGM(c));
@@ -299,7 +296,7 @@ service cloud.firestore {
           allow read: if esMiembro(c);
           allow create: if esMiembro(c)
             && tokenValido(request.resource.data)
-            && (request.resource.data.duenoUid == request.auth.uid || esGM(c))
+            && request.resource.data.duenoUid == request.auth.uid
             && request.resource.data.creado == request.time
             && (request.resource.data.tipo == 'pj' || esGM(c))
             && (!('oculto' in request.resource.data) || esGM(c));

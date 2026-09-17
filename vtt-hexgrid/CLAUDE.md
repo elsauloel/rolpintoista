@@ -176,17 +176,6 @@ nuevo de Rol Pintoísta. Paso 2 de
   distinto del publicado. Sin límite de mapas guardados; se renombran y se
   borran (salvo el primero, `MAPA_PRINCIPAL`, que sigue siendo el que
   había antes de esta función — no se le movió ningún dato).
-  **Cada mapa siempre tiene el token de cada personaje** (`asegurarTokensPersonajes`,
-  llamado al recibir tokens o fichas): si a este mapa le falta el de
-  alguno (recién creado, o un personaje que se sumó después), se crea
-  solo en `col:0, fila:0`, vinculado a su ficha — lo hace el GM (para
-  cualquiera) o el propio dueño (para el suyo), el primero de los dos que
-  tenga el mapa delante. Con id fijo (`pj-<fichaId>`) y una transacción,
-  para que dos pantallas no lo creen dos veces a la vez. No pasa con los
-  creeps: esos los pone el GM a mano en cada escenario. Si se saca a mano
-  el token de un personaje, vuelve a aparecer solo la próxima vez que algo
-  dispare el chequeo — es a propósito, para que ningún mapa se quede sin
-  el suyo.
 - Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.

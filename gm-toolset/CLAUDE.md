@@ -47,6 +47,14 @@ En desarrollo activo, las dos.
   habilidad Movimiento). Los creeps viejos se convierten solos en
   `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se
   saca siempre).
+- **Escala de Tipos +2**: Tipos de arma 4/6/8/10/12 (`DADOS_ARMA`, default
+  8); `crit[0..4]` y `tipo1..tipo5` son la resistencia a Tipo 4..12. Un
+  creep sin `escalaTipos: 2` es de antes y `normalizarCreep` lo corre +2
+  una vez (`migrarCreepTipos`: `armaTipo`, equipo y textos). `nuevoCreep()`
+  trae la marca, así que los creeps guardados se vuelcan sobre
+  `creepBaseGuardado()` (sin marca) para no heredarla. En
+  vendor-generator.html, `migrarItemTipos` hace lo mismo con los ítems
+  creados a mano que vienen en `itemsDatos`.
 - **Botones**: barra superior `.accesos` con botones chicos, como la ficha
   (Inicio, Mapa, Tablero, Historial, Reiniciar combate, Catálogo, Respaldo
   partida, Cargar respaldo); la cabecera deja Mantenimiento, + Creep,

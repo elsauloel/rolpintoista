@@ -18,8 +18,8 @@ ETIQ = {
     'Estado que aplica (preset)':'efectoPreset',
     'Turnos del estado':'efectoTurnos','HP por turno':'efectoHpTurno',
     'Estado permanente':'efectoPermanente','Detalle del estado':'efectoDetalle',
-    'Defensa':'mod_def','Res.Crít Tipo 2':'mod_tipo1','Res.Crít Tipo 4':'mod_tipo2',
-    'Res.Crít Tipo 6':'mod_tipo3','Res.Crít Tipo 8':'mod_tipo4','Res.Crít Tipo 10':'mod_tipo5',
+    'Defensa':'mod_def','Res.Crít Tipo 4':'mod_tipo1','Res.Crít Tipo 6':'mod_tipo2',
+    'Res.Crít Tipo 8':'mod_tipo3','Res.Crít Tipo 10':'mod_tipo4','Res.Crít Tipo 12':'mod_tipo5',
     'Movimiento':'mod_mov','Bonos':'mod_bonos','Evasión':'mod_eva','Iniciativa':'mod_ini',
     'PdG':'mod_pdg','Crítico %':'mod_crit','Parry':'mod_parry','Fuerza':'mod_fue',
     'Constitución':'mod_con','Res. mental':'mod_resm','Res. mágica':'mod_resmg','Res. CC':'mod_rescc',
@@ -51,6 +51,14 @@ def leer():
         ws = wb[hoja]
         filas = list(ws.iter_rows(values_only=True))
         if not filas: continue
+        # Los Tipos de arma pasaron de 2..10 a 4..12 y las columnas de
+        # resistencia se renombraron: en una planilla vieja "Res.Crít Tipo 4"
+        # significa otra cosa. Se frena antes de importar nada mezclado.
+        if 'Res.Crít Tipo 2' in filas[0]:
+            raise SystemExit(
+                f"La planilla {XLSX} usa la escala vieja de Tipos de arma (2 a 10), "
+                f"pestaña {hoja}. Regenerala con generar_excel.py y pasá tus cambios a mano, "
+                "o sumale 2 al Tipo de cada arma y renombrá las columnas Res.Crít Tipo N a N+2.")
         # "Column 38", "Column 39"... son columnas fantasma que Excel deja al
         # extender una tabla: no las anuncia como columna nueva del usuario.
         desconocidas = [c for c in filas[0]

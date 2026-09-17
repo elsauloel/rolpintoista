@@ -26,7 +26,7 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 - **SP**: 1 Int = 3 SP. Va a tener una regeneración base por turno según
   Int (en definición). Los costos se revisan cuando esté definida.
 - **Peso** del arma = cantidad de dados de daño; **Tipo** = caras.
-  "T2 P1" = Tipo 2, Peso 1 (1d2). **Amplificar** el daño = dados de más
+  "T4 P1" = Tipo 4, Peso 1 (1d4). **Amplificar** el daño = dados de más
   (en la ficha, `danoAmplificado` ya suma dados).
 - **Flash** = no cuesta Nitros y se puede usar durante el turno de
   cualquier jugador. Se declara cuando el que tiene el turno anuncia una
@@ -165,7 +165,7 @@ Estados que define la clase:
 
 Salvo Carga Elemental, todas son **Hechizo (PG: Int · Daño: Esp)**.
 
-1. **Chispazo** [1] — NO2: (3). Dispara un proyectil T2 P1 que ignora
+1. **Chispazo** [1] — NO2: (3). Dispara un proyectil T4 P1 que ignora
    armadura.
 2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
    tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
@@ -173,13 +173,13 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Int · Daño: Esp)**.
 3. **Orbe arcano** [4] — NO2: (5). Dispara un orbe arcano que hace daño en
    área tipo 5. Amplifica el daño en 4. Área: flor de 1.
 4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
-   proyectiles arcanos T2 P1 en flor de 2. Caen aleatoriamente sobre todos
+   proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos
    los objetivos posibles. Esquivable solo con dodge roll.
 5. **Ráfaga arcana** [2] — NO2: (3). Dispara una ráfaga arcana que hace
    daño en área tipo 3. Área: cono de 3 al frente.
 6. **Toque mágico** [3] — NO2: (4). Requiere un toque físico con la mano o
    el arma, usando PG contra Evasión. No se puede bloquear. A distancia
-   melé, hace 3d T4 + ESP de daño mágico.
+   melé, hace 3d T6 + ESP de daño mágico.
 7. **Carga Elemental** [X] — Modifica un skill de daño mágico para que
    tenga propiedades elementales. Cada nivel en este skill otorga nuevos
    elementos. X es la mitad del coste del skill. Elementos: **Fuego** +50%

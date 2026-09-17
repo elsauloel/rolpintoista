@@ -49,6 +49,16 @@ más cambia sesión a sesión.
   (`IT2_PENDIENTE`). Las fichas y el catálogo viejos se convierten al abrir
   (`migrarEstadoIt2`, corre en `renderAll`). Las invocaciones siguen con sus
   propias Acciones.
+- **Escala de Tipos +2** (bloque al lado de `migrarEstadoIt2`): los Tipos de
+  arma son 4/6/8/10/12 (`DADOS_ARMA`; default 8; sin arma sigue en
+  `IT2.tipoSinArma` = 4). Los stats `tipo1..tipo5` son ahora la resistencia
+  a Tipo 4..12 (solo cambió la etiqueta). Una ficha sin `escalaTipos: 2` es
+  de antes: `aplicarFicha` la corre +2 una sola vez (`migrarEstadoTipos`:
+  `tipoDado`, `armaTipo` de invocaciones y los textos) y
+  `tiposGuardarJunto` hace que `fichaGuardarTick` guarde todas las partes
+  en el mismo lote (si la marca, que va en "otros", llegara sin los ítems,
+  la próxima carga los correría otra vez). Los ítems del GM en la tienda
+  (`itemsDatos`) llevan la marca cada uno.
 - **🔍 Lupa de la Botonera** (`lupaHtml`, `abrirLupa`, `#lupa-pop`): cada botón
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en

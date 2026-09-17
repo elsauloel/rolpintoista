@@ -25,7 +25,7 @@ para la lógica de corrección/escritura.
   "precioCompra": 90,
 
   // Solo si tipoItem empieza con "arma_":
-  "tipoDado": 4,                  // 2, 4, 6, 8 o 10
+  "tipoDado": 6,                  // 4, 6, 8, 10 o 12 (antes 2..10: ver escalaTipos)
   "danoFijo": 0,
   "danoAmplificado": 0,           // dados extra sin sumar peso (2 + amplificado = dados totales)
   "armaDeRango": false,           // si true, el botón Daño Arma no le suma el stat Dmg
@@ -66,7 +66,16 @@ cada una (ver `SLOT_DEFS` en ficha.html).
 importador lo descarta): `con`, `fue`, `agl`, `des`, `int`, `def`, `dmg`,
 `bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `pdgmg`,
 `resm`, `bonos`, `rangocasteo`, `rescc`, `hpmax`, `crgmax`, `accionesmax`,
-`tipo1`..`tipo5` (resistencia a crítico por tipo de dado de arma).
+`tipo1`..`tipo5` (resistencia a crítico contra armas Tipo 4, 6, 8, 10 y 12; los ids
+quedaron de cuando la escala era 2..10).
+
+**Escala de Tipos (+2):** los Tipos de arma pasaron de 2/4/6/8/10 a
+4/6/8/10/12 (`datos/catalogo.json` ya está convertido). Las fichas y los
+creeps llevan `escalaTipos: 2`; los que no la tienen son de antes y se
+convierten solos al abrirlos (`migrarEstadoTipos` en la ficha,
+`migrarCreepTipos` en gm-tools): `tipoDado`/`armaTipo` +2 y los números de
+"resistencia a críticos tipo N" / "T2 P1" en los textos. Los ítems creados
+a mano en una tienda llevan la marca cada uno.
 
 **Iteración 2 (pendiente en el catálogo):** Bonos pasó a SP y Acciones +
 Movimiento a Nitros. El catálogo todavía usa los nombres viejos; la ficha

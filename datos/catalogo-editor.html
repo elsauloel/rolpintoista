@@ -222,7 +222,7 @@ const uid = () => Math.random().toString(36).slice(2, 8);
 const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 
 const TIERS = ['A definir', 'Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
-const DADOS_ARMA = [2, 4, 6, 8, 10];
+const DADOS_ARMA = [4, 6, 8, 10, 12];
 const CATEGORIAS = [
   {id:'', label:'— elegir categoría —'},
   {id:'arma_1m', label:'Arma de una mano', arma:true},
@@ -255,8 +255,8 @@ const STATS = [
   {id:'pdgmg', label:'PdG mágico'}, {id:'resm', label:'Res. mental'}, {id:'resmg', label:'Res. mágica'}, {id:'bonos', label:'Bonos'},
   {id:'rangocasteo', label:'Rango casteo'}, {id:'rescc', label:'Res. CC'},
   {id:'hpmax', label:'HP máx.'}, {id:'crgmax', label:'Carga máx.'}, {id:'accionesmax', label:'Acciones máx.'},
-  {id:'tipo1', label:'Res.Crít Tipo 2'}, {id:'tipo2', label:'Res.Crít Tipo 4'}, {id:'tipo3', label:'Res.Crít Tipo 6'},
-  {id:'tipo4', label:'Res.Crít Tipo 8'}, {id:'tipo5', label:'Res.Crít Tipo 10'},
+  {id:'tipo1', label:'Res.Crít Tipo 4'}, {id:'tipo2', label:'Res.Crít Tipo 6'}, {id:'tipo3', label:'Res.Crít Tipo 8'},
+  {id:'tipo4', label:'Res.Crít Tipo 10'}, {id:'tipo5', label:'Res.Crít Tipo 12'},
   {id:'capcinturon', label:'Ranuras cinturón'},
 ];
 const STAT_LABEL = Object.fromEntries(STATS.map(s => [s.id, s.label]));
@@ -385,7 +385,7 @@ function verItem(id){
   if(item.tier) L.push(linea('Tier', item.tier));
   if(esArma){
     const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
-    L.push(linea('Daño', `${dados}d${num(item.tipoDado) || 6}${num(item.danoFijo) ? ` +${num(item.danoFijo)}` : ''}`));
+    L.push(linea('Daño', `${dados}d${num(item.tipoDado) || 8}${num(item.danoFijo) ? ` +${num(item.danoFijo)}` : ''}`));
   }
   L.push(linea('Peso', num(item.peso)));
   L.push(linea('Precio', `${num(item.precioCompra)} DDE`));
@@ -430,7 +430,7 @@ $('#scrim-ver').addEventListener('mousedown', e => { if(e.target.id === 'scrim-v
 function defaultsItem(){
   return {
     id: '', nombre: '', tier: 'Común', imagen: '', tipoItem: '', peso: 0, ranuras: 0,
-    tipoDado: 6, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
+    tipoDado: 8, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
     precioCompra: 0, unidades: 1, cargaMax: 0, consumible: false, legacy: false,
     curahp: 0, curabonosPct: 0,
     efectoNombre: '', efectoTurnos: 0, efectoHpTurno: 0, efectoPermanente: false, efectoDetalle: '', efectoMods: [],
@@ -559,7 +559,7 @@ function actualizarDanoHint(){
   const d = editing.draft;
   const dados = Math.max(1, num(d.peso) || 1) + Math.max(0, num(d.danoAmplificado));
   const hint = $('#editor-dano-hint');
-  if(hint) hint.textContent = `Daño: ${dados}d${num(d.tipoDado) || 6}${num(d.danoFijo) ? ` + ${num(d.danoFijo)}` : ''} (peso × dado${num(d.danoAmplificado) ? ` + ${num(d.danoAmplificado)} por daño amplificado` : ''})`;
+  if(hint) hint.textContent = `Daño: ${dados}d${num(d.tipoDado) || 8}${num(d.danoFijo) ? ` + ${num(d.danoFijo)}` : ''} (peso × dado${num(d.danoAmplificado) ? ` + ${num(d.danoAmplificado)} por daño amplificado` : ''})`;
 }
 
 document.addEventListener('input', e => {
@@ -655,8 +655,32 @@ $('#f-tipo').addEventListener('change', e => { filtro.tipo = e.target.value; ren
 $('#f-tier').addEventListener('change', e => { filtro.tier = e.target.value; renderLista(); });
 
 /* ---------- Carga / guardado local ---------- */
+// Los Tipos de arma pasaron de 2/4/6/8/10 a 4/6/8/10/12. Un catálogo con
+// algún arma Tipo 2 es de antes del cambio (ahora el piso es 4).
+const RE_TIPOS_LISTA = /(?<![Áá]rea )(\b(?:[Tt]ipos?|[Cc]r[ií]tic[oa]s?|[Cc]rit)\s+(?:de\s+)?)((?:10|[2468])\b(?:\s*(?:,|y)\s*(?:10|[2468])\b)*)(?!\s*%)/g;
+
+function catalogoEscalaVieja(items){
+  return items.some(it => it && String(it.tipoItem || '').startsWith('arma_') && num(it.tipoDado) === 2);
+}
+
+function correrTiposCatalogo(items){
+  items.forEach(it => {
+    if(num(it.tipoDado) > 0) it.tipoDado = num(it.tipoDado) + 2;
+    Object.keys(it).forEach(k => {
+      if(k === 'imagen' || k === 'id' || typeof it[k] !== 'string') return;
+      it[k] = it[k].replace(RE_TIPOS_LISTA, (m, pre, lista) => pre + lista.replace(/\d+/g, n => +n + 2));
+    });
+  });
+}
+
 function aplicarDatos(datos, origen){
   CATALOGO = Array.isArray(datos) ? datos : [];
+  if(catalogoEscalaVieja(CATALOGO)){
+    if(confirm('Este catálogo usa la escala vieja de Tipos de arma (2, 4, 6, 8, 10).\n\n¿Pasarlo a la nueva (4, 6, 8, 10, 12)? Suma 2 al Tipo de cada arma y a los números de "resistencia a críticos tipo N" en los textos.\n\nSi elegís Cancelar, queda como está.')){
+      correrTiposCatalogo(CATALOGO);
+      origen += ' · pasado a la escala nueva de Tipos';
+    }
+  }
   renderLista();
   estado(`${origen} — ${CATALOGO.length} ítems`, 'ok');
 }

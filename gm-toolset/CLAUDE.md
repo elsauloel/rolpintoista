@@ -70,8 +70,12 @@ hay trabajo reciente o en curso de otra conversación (ver
   Mantenimiento, + Creep, + Creep con IA y Finalizar Combate. Ya no hay
   botón Inicio (lo reemplaza el menú ☰, `../comun/menu-sitio.js`).
   Personajes (`renderListaPersonajes`) lee `fichas` y `miembros` al abrir
-  la lista y abre cada ficha en otra pestaña. Sin botón Dados (la tirada
-  libre está en la Mesa), token de GitHub ni Guardar copia (lo cubre
+  la lista y abre cada ficha en otra pestaña; cada fila tiene un ✕ para
+  que el GM borre ese personaje (`borrarPersonajeGM`: confirmar + escribir
+  el nombre, borra la ficha con sus partes y los tokens que la usan — ver
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Sin
+  botón Dados (la tirada libre está en la Mesa), token de GitHub ni
+  Guardar copia (lo cubre
   Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin

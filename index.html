@@ -678,9 +678,11 @@ function renderGestion(){
     return `<div class="miembro${tieneJugador ? '' : ' huerfano'}">
       <span class="quien">${nombreFicha(f)}</span>
       <select data-ficha="${esc(f.id)}" aria-label="Jugador de ${esc(f.nombre || 'este personaje')}"${jugadores.length ? '' : ' disabled'}>${opciones}</select>
+      <button type="button" class="btn chico peligro" data-borrar-ficha="${esc(f.id)}">Borrar</button>
     </div>`;
   }).join('');
   $('#gestion-personajes').querySelectorAll('select[data-ficha]').forEach(s => s.onchange = () => pasarPersonaje(s));
+  $('#gestion-personajes').querySelectorAll('[data-borrar-ficha]').forEach(b => b.onclick = () => borrarPersonajeGM(b.dataset.borrarFicha, b));
 }
 
 async function sacarJugador(uid, boton){
@@ -722,6 +724,46 @@ async function pasarPersonaje(select){
     $('#gestion-error').textContent = textoError(err);
   }
   renderGestion();
+}
+
+// Borra la ficha (con sus partes) y los tokens que la usan (el suyo y los de
+// sus invocaciones, "<fichaId>~<idInvocación>"). Mismo criterio que "Borrar
+// personaje" de la ficha, pero el GM puede hacerlo con la de cualquiera.
+async function borrarPersonajeGM(id, boton){
+  const f = gestion.fichas.find(x => x.id === id);
+  if(!f) return;
+  const nombre = f.nombre || 'Sin nombre';
+  const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
+                `Si el jugador lo quiere conservar, avisale antes de borrarlo (podés bajar un respaldo de toda la partida desde gm-tools, "💾 Respaldo partida").\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
+    $('#gestion-error').textContent = 'El nombre no coincide — no se borró nada';
+    return;
+  }
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    const base = fbDb.doc(fbRutaCampana(`fichas/${id}`));
+    const [partes, tokens] = await Promise.all([
+      base.collection('partes').get(),
+      fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get(),
+    ]);
+    const lote = fbDb.batch();
+    partes.docs.forEach(d => lote.delete(d.ref));
+    tokens.docs
+      .filter(t => { const v = t.data().fichaId || ''; return v === id || v.startsWith(id + '~'); })
+      .forEach(t => lote.delete(t.ref));
+    lote.delete(base);
+    await lote.commit();
+    gestion.fichas = gestion.fichas.filter(x => x.id !== id);
+    renderGestion();
+  }catch(err){
+    console.error('No se pudo borrar el personaje:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
 }
 
 $('#form-renombrar').onsubmit = async e => {

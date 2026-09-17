@@ -124,8 +124,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   desde la caché de 10 minutos de GitHub Pages.
 - **👥 Personajes** (cabecera, azul, todos los miembros): despliega las
   fichas de la partida (`fichasPub`, `renderListaPersonajes`); cada una abre
-  `ficha.html?partida=…#<fichaId>` en otra pestaña. **⟳ Mantenimiento**
-  (solo GM) va en verde arriba de todo en la barra lateral
+  `ficha.html?partida=…#<fichaId>` en otra pestaña. El GM además ve un ✕
+  por fila para borrar ese personaje (`borrarPersonajeGM`: confirmar +
+  escribir el nombre, borra la ficha con sus partes y los tokens que la
+  usan — ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)).
+  **⟳ Mantenimiento** (solo GM) va en verde arriba de todo en la barra lateral
   (`#caja-mantenimiento`).
 - **⚡ Botonera** (solo en tu propio personaje): abre la ficha en un iframe
   a pantalla completa con `?modo=botonera`, que muestra solo la Botonera.

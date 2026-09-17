@@ -46,13 +46,24 @@ que verse en vivo entre jugadores.
      (borra su `miembros/{uid}`; puede volver a unirse); "Pasar un
      personaje a otro jugador" (cambia `duenoUid` de la ficha y de sus
      tokens de PJ, incluidas las invocaciones `<fichaId>~…`; los personajes
-     de quien se fue aparecen "sin jugador"); renombrar; y borrar la
-     partida (ofrece bajar el respaldo y pide escribir el nombre). Borrar
-     recorre cada colección (fichas/partes, creeps/privado, tokens,
-     tiradas, mapa, gm, tienda, tiendas, miembros) y al final borra la
-     partida y el miembro del GM. Si se corta, se vuelve a tocar.
+     de quien se fue aparecen "sin jugador") con un botón **Borrar** al
+     lado de cada uno; renombrar; y borrar la partida (ofrece bajar el
+     respaldo y pide escribir el nombre). Borrar recorre cada colección
+     (fichas/partes, creeps/privado, tokens, tiradas, mapa, gm, tienda,
+     tiendas, miembros) y al final borra la partida y el miembro del GM.
+     Si se corta, se vuelve a tocar.
    - **Jugador, "Irme de esta partida"**: borra su miembro; sus personajes
      quedan a nombre de su cuenta.
+   - **Borrar un personaje puntual** (`borrarPersonajeGM`, misma lógica
+     duplicada en `index.html`, `gm-toolset/gm-tools.html` y
+     `vtt-hexgrid/mapa.html`): confirmar + escribir el nombre exacto, borra
+     `fichas/{id}` con sus `partes` y los tokens que la usan (el propio y
+     los de sus invocaciones `<fichaId>~…`). El GM lo tiene en "⚙ Partida"
+     (junto al selector de "Pasar un personaje") y en el desplegable
+     "👥 Personajes" del mapa y de gm-tools (botón ✕ junto a cada uno, solo
+     visible para el GM). El jugador sigue teniendo su propio "Borrar
+     personaje" (✕ en "👥 Personajes" de la ficha), pero solo sobre los
+     suyos — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md).
 3. Página de la partida: links a las herramientas con `?partida=<id>`
    (GM Tools y el generador de tiendas solo para el GM; la ficha para
    jugadores, y para el GM en solo lectura).

@@ -80,6 +80,14 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 .desplegable-lista .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
 .desplegable-lista .pj-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desplegable-lista .pj-dueno{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.desplegable-lista .pj-fila{display:flex;align-items:center;gap:2px}
+.desplegable-lista .pj-fila a{flex:1;min-width:0}
+.desplegable-lista .pj-borrar{
+  flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);
+  background:none;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;margin-right:2px
+}
+.desplegable-lista .pj-borrar:hover{background:var(--danger);border-color:var(--danger);color:#fff}
 .desplegable-vacio{padding:8px 10px;color:var(--muted);font-size:12px}
 
 main{flex:1;display:flex;min-height:0}
@@ -839,17 +847,62 @@ async function publicarPaseDeTurno(turno){
 }
 
 /* ---------- Personajes: lista de las fichas de la partida ----------
-   Cada una abre en una pestaña nueva (las de otros jugadores, en solo lectura). */
+   Cada una abre en una pestaña nueva (las de otros jugadores, en solo lectura).
+   El GM además tiene un ✕ para borrar cualquiera. */
 function renderListaPersonajes(){
   const lista = [...fichasPub.entries()].sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
   $('#personajes-lista').innerHTML = lista.length
     ? lista.map(([id, f]) => {
         const dueno = miembros.get(f.duenoUid);
         const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : `<span class="pj-mini"></span>`;
-        return `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
+        const enlace = `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
           `${mini}<span class="pj-nombre">${esc(f.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</a>`;
+        if(!soyGM) return enlace;
+        return `<div class="pj-fila">${enlace}<button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
       }).join('')
     : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
+  $('#personajes-lista').querySelectorAll('[data-borrar-personaje]').forEach(b => {
+    b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
+  });
+}
+
+// Mismo criterio que "Borrar personaje" de la ficha (confirmar + escribir el
+// nombre), pero acá el GM puede borrar la de cualquier jugador; de paso saca
+// los tokens que la usan (el suyo y los de sus invocaciones).
+async function borrarPersonajeGM(id, nombre, boton){
+  const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
+                `Si el jugador lo quiere conservar, avisale antes (podés bajar un respaldo con "💾 Respaldo partida" desde gm-tools).\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
+    toast('El nombre no coincide — no se borró nada');
+    return;
+  }
+  boton.disabled = true;
+  try{
+    const base = fbDb.doc(fbRutaCampana(`fichas/${id}`));
+    const [partes, tokensSnap] = await Promise.all([
+      base.collection('partes').get(),
+      fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get(),
+    ]);
+    const lote = fbDb.batch();
+    partes.docs.forEach(d => lote.delete(d.ref));
+    tokensSnap.docs
+      .filter(t => { const v = t.data().fichaId || ''; return v === id || v.startsWith(id + '~'); })
+      .forEach(t => lote.delete(t.ref));
+    lote.delete(base);
+    await lote.commit();
+    fichasPub.delete(id);
+    toast(`${nombre} borrado de la partida`);
+    renderListaPersonajes();
+    renderPanel();
+    pedirDibujo();
+  }catch(err){
+    console.error('No se pudo borrar el personaje:', err);
+    toast('No se pudo borrar el personaje — revisá la consola');
+    boton.disabled = false;
+  }
 }
 
 function abrirListaPersonajes(abrir){

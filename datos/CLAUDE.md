@@ -31,6 +31,10 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   campaña. Después de editar, hay que correr `importar_json.py` para que
   los cambios lleguen a `ficha.html`/`gm-tools.html`/`vendor-generator.html`
   — el editor no lo hace solo (es HTML puro, no puede ejecutar Python).
+  Las armas (nuevas con "+ Nueva arma", al editar una, o al elegir una
+  categoría de arma en un ítem nuevo) se editan con el asistente paso a
+  paso compartido `comun/asistente-arma.js` (`abrirArma`); su resumen deja
+  pasar al formulario completo.
 - **`personajes/`** — personajes jugables (`*.json`), sus backups
   fechados (`backups/`) y retratos (`retratos/`, solo para referencia —
   los retratos reales viajan embebidos en base64 dentro del JSON del

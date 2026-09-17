@@ -6406,6 +6406,18 @@ function armaDanoPreviewHtml(d){
       : ` Al tirar se suma tu Dmg (hoy ${fmt(dmg)})${dmg ? `: entre ${fmt(min + dmg)} y ${fmt(max + dmg)}` : ''}.`);
 }
 
+// Textos con cuentas que se actualizan mientras se escribe (sin redibujar,
+// que se comería el clic en "Siguiente").
+function armaCargaHtml(d){
+  const pesoEquipado = S.inventario.filter(i => i.equipado && i.id !== d.id).reduce((a, i) => a + num(i.peso), 0);
+  const crg = num(compute().final.crgmax);
+  const conEsta = pesoEquipado + num(d.peso);
+  return `Equipada, suma <b>${fmt(num(d.peso))}</b> a tu carga: quedarías en <b>${fmt(conEsta)} de ${fmt(crg)}</b> (Carga máx.)${conEsta > crg ? ' — <b>te pasás</b>: lo que sobra cuenta como sobrecarga.' : '.'} En la mochila no pesa: ocupa ranuras.`;
+}
+function armaPrecioHtml(d){
+  return `En una tienda se compra a <b>${fmt(num(d.precioCompra))}</b> DDE y se vende a la mitad: <b>${fmt(precioVentaDe(d))}</b>.`;
+}
+
 // Sección "Estado alterado al equipar" (ítems no consumibles y armas).
 function htmlEstadoAlEquipar(draft){
   const tieneEstadoEquipo = (draft.equipoEstadoNombre || '').trim() || editing.estadoEquipoAbierto;
@@ -6498,17 +6510,14 @@ function drawEditorArma(){
   }
 
   if(paso === 3){
-    const pesoEquipado = S.inventario.filter(i => i.equipado && i.id !== draft.id).reduce((a, i) => a + num(i.peso), 0);
-    const crg = num(c.final.crgmax);
-    const conEsta = pesoEquipado + num(draft.peso);
     html += `<div class="f2">
-        <div class="f"><label>Peso (= dados de daño)</label><input data-c="peso" type="number" step="1" min="1" value="${esc(draft.peso ?? 1)}" data-hab-enter="1" data-hab-redibujar="1"></div>
+        <div class="f"><label>Peso (= dados de daño)</label><input data-c="peso" type="number" step="1" min="1" value="${esc(draft.peso ?? 1)}" data-hab-enter="1"></div>
         <div class="f"><label>Daño fijo</label><input data-c="danoFijo" type="number" step="1" value="${esc(draft.danoFijo ?? 0)}" data-hab-enter="1"></div>
         <div class="f"><label>Daño amplificado</label><input data-c="danoAmplificado" type="number" step="1" min="0" value="${esc(draft.danoAmplificado ?? 0)}" data-hab-enter="1"></div>
       </div>`
       + efecto(`<span id="arma-dano-prev">${armaDanoPreviewHtml(draft)}</span>`)
       + `<div class="hint" style="margin:-4px 0 8px"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`
-      + (enInventario ? efecto(`Equipada, suma <b>${fmt(num(draft.peso))}</b> a tu carga: quedarías en <b>${fmt(conEsta)} de ${fmt(crg)}</b> (Carga máx.)${conEsta > crg ? ' — <b>te pasás</b>: lo que sobra cuenta como sobrecarga.' : '.'} En la mochila no pesa: ocupa ranuras.`) : '');
+      + (enInventario ? efecto(`<span id="arma-carga">${armaCargaHtml(draft)}</span>`) : '');
   }
 
   if(paso === 4){
@@ -6538,8 +6547,8 @@ function drawEditorArma(){
   }
 
   if(paso === 6){
-    html += `<div class="f"><label>Precio de compra (DDE)</label><input data-c="precioCompra" type="number" step="1" min="0" value="${esc(draft.precioCompra ?? 0)}" data-hab-enter="1" data-hab-redibujar="1" style="max-width:140px"></div>`
-      + efecto(`En una tienda se compra a <b>${fmt(num(draft.precioCompra))}</b> DDE y se vende a la mitad: <b>${fmt(precioVentaDe(draft))}</b>.`);
+    html += `<div class="f"><label>Precio de compra (DDE)</label><input data-c="precioCompra" type="number" step="1" min="0" value="${esc(draft.precioCompra ?? 0)}" data-hab-enter="1" style="max-width:140px"></div>`
+      + efecto(`<span id="arma-precio">${armaPrecioHtml(draft)}</span>`);
     if(enInventario){
       html += `<div class="f"><label>¿Dónde la tenés?</label><div class="opcion-fila">
           ${opcion('data-arma-equipada', '1', !!draft.equipado, 'Equipada')}${opcion('data-arma-equipada', '0', !draft.equipado, 'En la mochila')}
@@ -6795,12 +6804,17 @@ function handleModalFieldChange(e){
     // Nitros de una habilidad: un número o X (lo elegís al usarla).
     if(c === "nitrosCosto") editing.draft[c] = esCostoVariable(t.value) ? "X" : (t.value.trim() === "" ? "" : num(t.value));
     if(c === "tiradaStat") editing.pdgAuto = false;  // lo eligió a mano
+    // Con nombre ya se puede saltar a cualquier paso del asistente.
+    if(c === 'nombre' && pasosDelEditor()) document.querySelectorAll('#modal-body [data-hab-paso]').forEach(b => { b.disabled = !t.value.trim() && num(b.dataset.habPaso) > (editing.paso || 0); });
+    if(c === 'precioCompra' && document.getElementById('arma-precio')) document.getElementById('arma-precio').innerHTML = armaPrecioHtml(editing.draft);
     if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ drawEditor(); return; }
     if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');
       const da = num(editing.draft.danoAmplificado);
       const prev = document.getElementById('arma-dano-prev');
       if(prev) prev.innerHTML = armaDanoPreviewHtml(editing.draft);
+      const carga = document.getElementById('arma-carga');
+      if(carga && c === 'peso') carga.innerHTML = armaCargaHtml(editing.draft);
       if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||8}${da?` + ${da} dado${da>1?'s':''} por daño amplificado`:''}, más el fijo)`;
     }
   }

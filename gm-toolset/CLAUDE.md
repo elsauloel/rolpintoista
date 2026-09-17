@@ -72,6 +72,15 @@ En desarrollo activo, las dos.
   defecto; cooldown, otro costo) → tirada
   (stat del creep con `creepStatValor` y/o fórmula; `habCreepTira`, `tirarExtraDeHab`) → estado (preset o a mano) → resumen. La habilidad nueva recién
   se agrega al creep al guardar.
+- **Armas paso a paso** (`comun/asistente-arma.js`, `AsistenteArma.abrir`):
+  el ✎ del arma de un creep (`abrirEditorArmaCreep`) y "⚔ Es un arma" del
+  Ítem custom (`abrirArmaCustomGM`: elige creep, tier y precio; "Crear y
+  equipar" y/o "📦 Agregar al catálogo" vía `publicarEnCatalogoGM`) usan el
+  asistente compartido, con los números del creep (`portadorCreep`: No2,
+  Dmg, Rango). El Ítem custom ya no ofrece categorías de arma. Los bonos
+  del arma van en `sc.armaMods` y cuentan en `creepModTotal` junto con el
+  equipo (`fuentesEquipoCreep`); equipar un arma del catálogo también los
+  copia.
 - **Stats secundarios** (`CREEP_DERIVADOS_POR_ATTR`, `derivadosHtml`): los
   mismos que un PJ salvo Hp.Max/No2 (ya se ven arriba) y Crg.Max/SP (no
   aplican), debajo de cada atributo en el editor y en Ver, con el origen al
@@ -94,6 +103,10 @@ En desarrollo activo, las dos.
   (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero).
   Alquimista tiene un piso de 40% de ítems "legacy", con el tamaño
   topeado si no hay suficientes legacy disponibles para sostenerlo.
+- "+ Crear arma" (y elegir una categoría de arma en "+ Crear ítem nuevo")
+  abre el asistente compartido `comun/asistente-arma.js` (`abrirArmaNueva`),
+  con tier, descripción narrativa, precio (con el ajuste de la tienda) y
+  ranuras; guarda con `agregarItemCreado`, lo mismo que el formulario.
 - "🎲 Otro" en cada tarjeta (`rerollItem()`) cambia ese ítem por otro del
   mismo rubro que no esté en la tienda, tirando la rareza con la tabla del
   tamaño (en una tienda personalizada, misma rareza). El stock fijo no se

@@ -1094,51 +1094,17 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
   </div>
 </div>
 
-<div class="scrim" id="scrim-arma-creep">
-  <div class="modal" style="max-width:380px">
-    <header><h3>Arma</h3><button class="iconbtn" id="armacreep-x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <div class="f"><label>Nombre</label><input type="text" id="ac-nombre" placeholder="ej. Hacha de mano"></div>
-      <div class="row3">
-        <div class="mini-f"><label>Tipo (dado)</label>
-          <select id="ac-tipo"></select>
-        </div>
-        <div class="mini-f"><label>Peso (cant.)</label><input type="number" id="ac-peso" min="1" value="1"></div>
-        <div class="mini-f"><label>Daño fijo</label><input type="number" id="ac-fijo" value="0"></div>
-      </div>
-      <div class="row3">
-        <div class="mini-f"><label>Daño amplificado</label><input type="number" id="ac-amplificado" min="0" value="0"></div>
-        <label class="mini-f" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding-top:18px">
-          <input type="checkbox" id="ac-derango" style="width:auto"><span>Arma de rango</span></label>
-      </div>
-      <div class="f"><label>Detalle</label><textarea id="ac-detalle"></textarea></div>
-    </div>
-    <footer>
-      <button class="btn ghost" id="armacreep-cancel">Cancelar</button>
-      <button class="btn primary" id="armacreep-guardar">Guardar</button>
-    </footer>
-  </div>
-</div>
 
 <div class="scrim" id="scrim-item-custom-gm">
   <div class="modal" style="max-width:460px">
     <header><h3>Ítem custom</h3><button class="iconbtn" id="itemcustomgm-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <button type="button" class="btn" id="icg-es-arma" style="width:100%">⚔ Es un arma: armarla paso a paso</button>
       <div class="f"><label>Equipar a</label><select id="icg-creep"></select></div>
       <div class="f"><label>Nombre</label><input type="text" id="icg-nombre" placeholder="ej. Hacha oxidada del pantano"></div>
       <div class="row3" style="grid-template-columns:1fr 1fr">
         <div class="mini-f"><label>Tipo de ítem</label><select id="icg-tipo"></select></div>
         <div class="mini-f"><label>Tier</label><select id="icg-tier"></select></div>
-      </div>
-      <div id="icg-campos-arma" class="row3">
-        <div class="mini-f"><label>Tipo (dado)</label><select id="icg-dado"></select></div>
-        <div class="mini-f"><label>Peso (cant.)</label><input type="number" id="icg-peso" min="1" value="1"></div>
-        <div class="mini-f"><label>Daño fijo</label><input type="number" id="icg-fijo" value="0"></div>
-      </div>
-      <div id="icg-campos-arma2" class="row3">
-        <div class="mini-f"><label>Daño amplificado</label><input type="number" id="icg-amplificado" min="0" value="0"></div>
-        <label class="mini-f" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding-top:18px">
-          <input type="checkbox" id="icg-derango" style="width:auto"><span>Arma de rango</span></label>
       </div>
       <div id="icg-campos-equipo" class="row3" style="grid-template-columns:1fr 1fr">
         <div class="mini-f"><label>Peso</label><input type="number" id="icg-peso2" min="0" value="0"></div>
@@ -1200,6 +1166,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
+<script src="../comun/asistente-arma.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
@@ -1938,6 +1905,7 @@ function nuevoCreep(){
     ataquesTurno:0,  // sc.nitros lo pone normalizarCreep: arranca en el máximo (creepNitrosMax)
     con:1, fue:1, agl:1, des:1, int:1,
     armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
+    armaMods:[], armaManos:'arma_1m',
     defensa:0, armaduraTipo:'', equipo:[],
     crit:[0,0,0,0,0],
     habilidades:[],
@@ -1984,13 +1952,19 @@ function danoTxt(sc, extra){
   return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
 }
 
+// Lo que el creep tiene puesto y da bonos: su equipo y su arma (sc.armaMods).
+function fuentesEquipoCreep(sc){
+  const arma = (sc.armaMods || []).length ? [{nombre: sc.armaNombre || 'Arma', mods: sc.armaMods}] : [];
+  return [...(sc.equipo || []), ...arma];
+}
+
 // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
 // puesto o de estados activos — mismo criterio que collectMods()+modTotal
 // en ficha.html, para que un ítem con "bloqueo +N" o un estado que suba
 // Fuerza afecten al creep de verdad y no solo la Res. a crítico.
 function creepModTotal(sc, statId){
   let total = 0;
-  (sc.equipo||[]).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+  fuentesEquipoCreep(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
   (sc.estados||[]).forEach(es => {
     if(es.activo === false) return;
     const stacks = Math.max(1, num(es.stacks)||1);
@@ -2076,7 +2050,7 @@ function actualizarDerivadosEnDOM(sc, card){
 // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor.
 function aportesModCreep(sc, statId){
   const out = [];
-  (sc.equipo||[]).forEach(it => {
+  fuentesEquipoCreep(sc).forEach(it => {
     const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
     if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v, tipo: 'equipado'});
   });
@@ -2162,7 +2136,7 @@ function creepArmaduraOrigenTxt(sc){
 // Nombres de los estados activos que aportan un mod a ese stat, para
 // poder mostrar "de dónde sale" al tocar el indicador +/-.
 function origenesModCreep(sc, statId){
-  const deEquipo = (sc.equipo||[])
+  const deEquipo = fuentesEquipoCreep(sc)
     .filter(it => (it.mods||[]).some(m => m.stat === statId))
     .map(it => it.nombre || '(sin nombre)');
   const deEstados = (sc.estados||[])
@@ -2437,6 +2411,7 @@ function normalizarCreep(sc){
   sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
   sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
   sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
+  sc.armaMods = Array.isArray(sc.armaMods) ? sc.armaMods : [];
   migrarCreepTipos(sc);
   // Acciones → No2.
   if(sc.acc !== undefined || sc.accMax !== undefined){
@@ -3489,6 +3464,8 @@ function equiparItemEnCreep(idx){
     sc.armaDeRango = !!item.armaDeRango;
     sc.armaNombre = item.nombre;
     sc.armaDetalle = item.detalle || '';
+    sc.armaMods = structuredClone(item.mods || []);
+    sc.armaManos = item.tipoItem;
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
   $('#scrim-equipar-creep').classList.remove('open');
@@ -3499,8 +3476,8 @@ function equiparItemEnCreep(idx){
 // Ítem custom para creeps: mismo espíritu que "Crear ítem nuevo" en
 // ficha.html, pero como acá el equipo va directo sobre el creep (no hay
 // un inventario aparte), se crea y se equipa en el mismo paso.
+// Las armas no están: se arman con el asistente (botón "Es un arma").
 const TIPOITEM_OPCIONES_GM = [
-  {v:'arma_1m', l:'Arma (1 mano)'}, {v:'arma_2m', l:'Arma (2 manos)'},
   {v:'escudo_1m', l:'Escudo (1 mano)'}, {v:'escudo_2m', l:'Escudo (2 manos)'},
   {v:'armadura_blanda', l:'Armadura blanda'}, {v:'armadura_rigida', l:'Armadura rígida'},
   {v:'cabeza', l:'Cabeza'}, {v:'manos', l:'Manos'},
@@ -3520,13 +3497,6 @@ function renderIcgMods(){
     </div>`).join('');
 }
 
-function actualizarCamposIcg(){
-  const esArma = $('#icg-tipo').value.startsWith('arma_');
-  $('#icg-campos-arma').style.display = esArma ? '' : 'none';
-  $('#icg-campos-arma2').style.display = esArma ? '' : 'none';
-  $('#icg-campos-equipo').style.display = esArma ? 'none' : '';
-}
-
 function abrirItemCustomGM(){
   icgMods = [];
   $('#icg-creep').innerHTML = S.creeps.map(sc => `<option value="${sc.id}" ${sc.id===equipandoCreepId?'selected':''}>${esc(sc.nombre)}</option>`).join('') || '<option value="">— no hay creeps —</option>';
@@ -3536,12 +3506,8 @@ function abrirItemCustomGM(){
   // quede marcado como pendiente de curar en vez de "Común" en falso.
   $('#icg-tier').innerHTML = Object.keys(TIER_COLOR).map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
   $('#icg-tier').value = 'A definir';
-  $('#icg-dado').innerHTML = DADOS_ARMA.map(d=>`<option value="${d}">d${d}</option>`).join('');
-  $('#icg-peso').value = 1; $('#icg-fijo').value = 0;
-  $('#icg-amplificado').value = 0; $('#icg-derango').checked = false;
   $('#icg-peso2').value = 0; $('#icg-def').value = 0;
   $('#icg-detalle').value = '';
-  actualizarCamposIcg();
   renderIcgMods();
   $('#scrim-item-custom-gm').classList.add('open');
 }
@@ -3555,23 +3521,13 @@ function guardarItemCustomGM(){
   const tipoItem = $('#icg-tipo').value;
   const detalle = $('#icg-detalle').value;
   const mods = structuredClone(icgMods.filter(m => m.stat));
-  if(tipoItem.startsWith('arma_')){
-    sc.armaTipo = num($('#icg-dado').value) || 8;
-    sc.armaPeso = Math.max(1, num($('#icg-peso').value) || 1);
-    sc.armaFijo = num($('#icg-fijo').value) || 0;
-    sc.armaAmplificado = Math.max(0, num($('#icg-amplificado').value) || 0);
-    sc.armaDeRango = $('#icg-derango').checked;
-    sc.armaNombre = nombre;
-    sc.armaDetalle = detalle;
-  }else{
-    const def = num($('#icg-def').value) || 0;
-    sc.defensa = num(sc.defensa) + def;
-    aplicarModsEquipo(sc, mods, 1);
-    sc.equipo = sc.equipo || [];
-    sc.equipo.push({id: uid(), nombre, tipoItem, def, mods, detalle});
-    actualizarArmaduraTipo(sc);
-    if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
-  }
+  const def = num($('#icg-def').value) || 0;
+  sc.defensa = num(sc.defensa) + def;
+  aplicarModsEquipo(sc, mods, 1);
+  sc.equipo = sc.equipo || [];
+  sc.equipo.push({id: uid(), nombre, tipoItem, def, mods, detalle});
+  actualizarArmaduraTipo(sc);
+  if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
   toast(`${sc.nombre} equipado con ${nombre}`);
   registrarEvento(`✎ Ítem custom: ${sc.nombre} equipado con ${nombre}`);
   $('#scrim-item-custom-gm').classList.remove('open');
@@ -3589,15 +3545,10 @@ function slugItemCatalogo(s){
 function icgComoEntradaDeCatalogo(){
   const nombre = $('#icg-nombre').value.trim();
   const tipoItem = $('#icg-tipo').value;
-  const esArma = tipoItem.startsWith('arma_');
   return {
     id: 'new-' + slugItemCatalogo(nombre),
     nombre, tier: $('#icg-tier').value || 'A definir', imagen: '',
-    tipoItem, peso: num(esArma ? $('#icg-peso').value : $('#icg-peso2').value) || 0, ranuras: 1,
-    ...(esArma ? {
-      tipoDado: num($('#icg-dado').value) || 8, danoFijo: num($('#icg-fijo').value),
-      danoAmplificado: num($('#icg-amplificado').value), armaDeRango: $('#icg-derango').checked,
-    } : {}),
+    tipoItem, peso: num($('#icg-peso2').value) || 0, ranuras: 1,
     precioCompra: 0, unidades: 1, cargaMax: 0, consumible: false, curahp: 0,
     mods: structuredClone(icgMods.filter(m => m.stat)),
     detalle: $('#icg-detalle').value || '',
@@ -3613,14 +3564,17 @@ async function agregarItemCustomAlCatalogo(){
     `cualquier jugador lo compre desde su ficha. No hace falta elegir un creep para esto: se publica igual, ` +
     `equipes o no a alguien.\n\n¿Seguís?`;
   if(!confirm(aviso)) return;
+  await publicarEnCatalogoGM(icgComoEntradaDeCatalogo(), $('#icg-catalogo'));
+}
+
+// Sube una entrada nueva a datos/catalogo.json (Ítem custom y asistente de armas).
+async function publicarEnCatalogoGM(nuevo, btn){
   const token = await ghToken(false);
   if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }
-  const btn = $('#icg-catalogo');
   btn.disabled = true;
   toast('Publicando en el catálogo…');
   try{
     const actual = (await ghLeerJson('datos/catalogo.json').catch(() => null)) || [];
-    const nuevo = icgComoEntradaDeCatalogo();
     actual.push(nuevo);
     await ghSubir('datos/catalogo.json', await aBase64(JSON.stringify(actual, null, 2)), token, `Catálogo: agregar "${nuevo.nombre}" (desde gm-tools)`);
     toast(`"${nuevo.nombre}" publicado en el catálogo ✓ — falta correr importar_json.py para que llegue a las 3 herramientas`);
@@ -3784,37 +3738,102 @@ function guardarEditorHabCreep(){
   toast(`${h.nombre} guardada`);
 }
 
-let editingArmaCreep = null;
+/* ---------- Armas de creeps: asistente paso a paso (comun/asistente-arma.js) ----------
+   El ✎ del arma de un creep y "Es un arma" del Ítem custom abren el mismo
+   asistente, con los números del creep (No2, Dmg, Rango) en cada paso. */
+function portadorCreep(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return null;
+  return {nombre: sc.nombre, nitros: creepNitrosMax(sc), dmg: creepStatValor(sc, 'dmg'), rango: creepStatValor(sc, 'rng')};
+}
+
+function cfgArmaGM(){
+  return {
+    contexto: 'creep',
+    stats: CREEP_DERIVED_STATS.map(s => ({id: s.id, label: s.label})),
+    portador: portadorCreep,
+    ejemplos: t => CATALOGO_EQUIPO.filter(it => String(it.tipoItem || '').startsWith('arma_') && num(it.tipoDado) === t).map(it => it.nombre),
+  };
+}
+
+function armaDeCreepComoDraft(sc){
+  return {
+    nombre: sc.armaNombre || '', tipoItem: sc.armaManos || 'arma_1m', tipoDado: num(sc.armaTipo) || 8,
+    peso: Math.max(1, num(sc.armaPeso) || 1), danoFijo: num(sc.armaFijo), danoAmplificado: num(sc.armaAmplificado),
+    armaDeRango: !!sc.armaDeRango, mods: structuredClone(sc.armaMods || []), detalle: sc.armaDetalle || '',
+  };
+}
+
+function ponerArmaEnCreep(sc, d){
+  sc.armaNombre = d.nombre;
+  sc.armaManos = d.tipoItem;
+  sc.armaTipo = num(d.tipoDado) || 8;
+  sc.armaPeso = Math.max(1, num(d.peso) || 1);
+  sc.armaFijo = num(d.danoFijo);
+  sc.armaAmplificado = Math.max(0, num(d.danoAmplificado));
+  sc.armaDeRango = !!d.armaDeRango;
+  sc.armaMods = structuredClone(d.mods || []);
+  sc.armaDetalle = d.detalle || '';
+}
 
 function abrirEditorArmaCreep(scId){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
-  editingArmaCreep = scId;
-  $('#ac-nombre').value = sc.armaNombre || '';
-  $('#ac-tipo').innerHTML = DADOS_ARMA.map(d=>`<option value="${d}" ${num(sc.armaTipo)===d?'selected':''}>d${d}</option>`).join('');
-  $('#ac-peso').value = sc.armaPeso;
-  $('#ac-fijo').value = sc.armaFijo;
-  $('#ac-amplificado').value = num(sc.armaAmplificado);
-  $('#ac-derango').checked = !!sc.armaDeRango;
-  $('#ac-detalle').value = sc.armaDetalle || '';
-  $('#scrim-arma-creep').classList.add('open');
+  AsistenteArma.abrir({...cfgArmaGM(),
+    titulo: `Arma de ${sc.nombre}`,
+    nuevo: false,
+    draft: armaDeCreepComoDraft(sc),
+    destinos: null,
+    portador: () => portadorCreep(scId),
+    onGuardar: d => {
+      const actual = S.creeps.find(s => s.id === scId);
+      if(!actual){ toast('Ese creep ya no está'); return true; }
+      ponerArmaEnCreep(actual, d);
+      renderAll();
+      toast('Arma actualizada');
+      return true;
+    },
+  });
 }
 
-function guardarEditorArmaCreep(){
-  if(!editingArmaCreep) return;
-  const sc = S.creeps.find(s => s.id === editingArmaCreep);
-  if(!sc){ editingArmaCreep = null; return; }
-  sc.armaNombre = $('#ac-nombre').value.trim();
-  sc.armaTipo = num($('#ac-tipo').value) || 8;
-  sc.armaPeso = Math.max(1, num($('#ac-peso').value) || 1);
-  sc.armaFijo = num($('#ac-fijo').value) || 0;
-  sc.armaAmplificado = Math.max(0, num($('#ac-amplificado').value) || 0);
-  sc.armaDeRango = $('#ac-derango').checked;
-  sc.armaDetalle = $('#ac-detalle').value;
-  editingArmaCreep = null;
-  $('#scrim-arma-creep').classList.remove('open');
-  renderAll();
-  toast('Arma actualizada');
+// Arma nueva hecha por el GM: se equipa a un creep y/o se publica en el catálogo.
+function abrirArmaCustomGM(inicial){
+  const ini = inicial || {};
+  const opciones = [{v: '', l: '— ninguno (solo para el catálogo) —'}, ...S.creeps.map(sc => ({v: sc.id, l: sc.nombre}))];
+  const valor = S.creeps.some(sc => sc.id === ini.scId) ? ini.scId : (S.creeps.some(sc => sc.id === equipandoCreepId) ? equipandoCreepId : '');
+  AsistenteArma.abrir({...cfgArmaGM(),
+    titulo: 'Arma nueva',
+    nuevo: true,
+    draft: {nombre: ini.nombre || '', tier: ini.tier || 'A definir'},
+    destinos: {label: 'Equipar a', opciones, valor},
+    tiers: Object.keys(TIER_COLOR),
+    conPrecio: true,
+    conRanuras: true,
+    textoGuardar: 'Crear y equipar',
+    botones: [{
+      texto: '📦 Agregar al catálogo',
+      titulo: 'Publica esta arma en el catálogo del fabricante, para que cualquiera la pueda comprar',
+      accion: async (d, boton) => {
+        if(!confirm(`Esto publica "${d.nombre}" en el catálogo del fabricante — va a quedar disponible para que cualquier jugador la compre desde su ficha. Se publica igual, la equipes o no a un creep.\n\n¿Seguís?`)) return;
+        await publicarEnCatalogoGM({
+          id: 'new-' + slugItemCatalogo(d.nombre), nombre: d.nombre, tier: d.tier || 'A definir', imagen: '',
+          tipoItem: d.tipoItem, peso: d.peso, ranuras: num(d.ranuras), precioCompra: num(d.precioCompra),
+          tipoDado: d.tipoDado, danoFijo: num(d.danoFijo), danoAmplificado: num(d.danoAmplificado), armaDeRango: !!d.armaDeRango,
+          unidades: 1, cargaMax: 0, consumible: false, curahp: 0, escalaTipos: ESCALA_TIPOS,
+          mods: d.mods, detalle: d.detalle || '',
+        }, boton);
+      },
+    }],
+    onGuardar: (d, scId) => {
+      const sc = S.creeps.find(s => s.id === scId);
+      if(!sc){ toast('Elegí a qué creep equiparla (paso 1), o publicala con "Agregar al catálogo"'); return false; }
+      ponerArmaEnCreep(sc, d);
+      toast(`${sc.nombre} equipado con ${d.nombre}`);
+      registrarEvento(`✎ Arma custom: ${sc.nombre} equipado con ${d.nombre}`);
+      renderAll();
+      return true;
+    },
+  });
 }
 
 function verCreep(id){
@@ -5236,10 +5255,6 @@ $('#hc-efecto-preset').addEventListener('change', e => {
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-creep'){ editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); } });
-$('#armacreep-guardar').onclick = guardarEditorArmaCreep;
-$('#armacreep-cancel').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
-$('#armacreep-x').onclick = () => { editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); };
-$('#scrim-arma-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-arma-creep'){ editingArmaCreep = null; $('#scrim-arma-creep').classList.remove('open'); } });
 $('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); };
 $('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
 $('#verhab-x').onclick = () => $('#scrim-ver-hab').classList.remove('open');
@@ -5313,7 +5328,13 @@ $('#itemcustomgm-cancel').onclick = () => $('#scrim-item-custom-gm').classList.r
 $('#scrim-item-custom-gm').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-custom-gm') $('#scrim-item-custom-gm').classList.remove('open'); });
 $('#itemcustomgm-guardar').onclick = guardarItemCustomGM;
 $('#icg-catalogo').onclick = agregarItemCustomAlCatalogo;
-$('#icg-tipo').addEventListener('change', actualizarCamposIcg);
+$('#icg-es-arma').onclick = () => {
+  const nombre = $('#icg-nombre').value.trim();
+  const scId = $('#icg-creep').value;
+  const tier = $('#icg-tier').value;
+  $('#scrim-item-custom-gm').classList.remove('open');
+  abrirArmaCustomGM({nombre, scId, tier});
+};
 $('#icg-addmod').onclick = () => { icgMods.push({stat:'def', val:0}); renderIcgMods(); };
 $('#icg-mods-lista').addEventListener('change', e => {
   if(e.target.dataset.icgmodstat !== undefined) icgMods[+e.target.dataset.icgmodstat].stat = e.target.value;

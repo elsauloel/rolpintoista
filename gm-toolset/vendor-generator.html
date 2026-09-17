@@ -304,6 +304,7 @@ input[type=checkbox]{width:auto}
       </div>
       <button type="button" class="ajuste-preset" id="btn-orden-dir">↑ Menor a mayor</button>
       <button type="button" class="btn" id="btn-agregar-items">+ Agregar ítems</button>
+      <button type="button" class="btn" id="btn-arma-nueva">+ Crear arma</button>
       <button type="button" class="btn" id="btn-item-nuevo">+ Crear ítem nuevo</button>
     </div>
     <div id="preview-lista"></div>
@@ -374,6 +375,7 @@ input[type=checkbox]{width:auto}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/menu-sitio.js"></script>
+<script src="../comun/asistente-arma.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1682,6 +1684,11 @@ function crearItemNuevo(){
   const d = itemNuevoDraft;
   if(!d.nombre.trim()){ toast('Poné un nombre antes de crear el ítem'); return; }
   if(!d.tipoItem){ toast('Elegí una categoría antes de crear el ítem'); return; }
+  agregarItemCreado(d);
+  $('#scrim-item-nuevo').classList.remove('open');
+}
+
+function agregarItemCreado(d){
   let id = 'new-' + slugItemNuevo(d.nombre);
   if(CATALOGO.some(it => it.id === id)) id += '-' + Math.random().toString(36).slice(2, 6);
   const nuevo = {
@@ -1695,8 +1702,30 @@ function crearItemNuevo(){
   };
   CATALOGO.push(nuevo);
   agregarItem(nuevo.id);
-  $('#scrim-item-nuevo').classList.remove('open');
   toast(`"${nuevo.nombre}" creado y agregado a la tienda`);
+}
+
+/* Armas: asistente paso a paso (comun/asistente-arma.js), con los textos
+   pensados para lo que ve el jugador en la tienda. */
+function abrirArmaNueva(inicial){
+  if(!tiendaActual){ toast('Primero generá una tienda'); return; }
+  const ini = inicial || {};
+  AsistenteArma.abrir({
+    contexto: 'tienda',
+    nuevo: true,
+    titulo: 'Arma nueva para la tienda',
+    draft: {...ini, tipoItem: ES_ARMA(ini.tipoItem) ? ini.tipoItem : 'arma_1m'},
+    paso: (ini.nombre || '').trim() ? 1 : 0,
+    stats: MOD_TARGETS.map(s => ({id: s.id, label: s.label})),
+    tiers: TIERS,
+    conNarrativa: true,
+    conPrecio: true,
+    conRanuras: true,
+    precioTxt: d => ajusteActual() ? `En esta tienda, con el ajuste de ${ajusteActual() > 0 ? '+' : ''}${ajusteActual()}%, se vende a <b>${precioAjustado(d)}</b> DDE.` : '',
+    ejemplos: t => CATALOGO.filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
+    textoGuardar: 'Crear y agregar a la tienda',
+    onGuardar: d => { agregarItemCreado({...defaultsItemNuevo(), ...d}); return true; },
+  });
 }
 
 function renderAgregarLista(){
@@ -2199,12 +2228,24 @@ $('#btn-personalizada').addEventListener('click', crearTiendaPersonalizada);
 $('#btn-cerrar-tienda').addEventListener('click', cerrarTienda);
 $('#btn-agregar-items').addEventListener('click', abrirAgregar);
 $('#btn-item-nuevo').addEventListener('click', abrirItemNuevo);
+$('#btn-arma-nueva').addEventListener('click', () => abrirArmaNueva());
 $('#itemnuevo-x').addEventListener('click', () => $('#scrim-item-nuevo').classList.remove('open'));
 $('#itemnuevo-cancelar').addEventListener('click', () => $('#scrim-item-nuevo').classList.remove('open'));
 $('#scrim-item-nuevo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-item-nuevo') $('#scrim-item-nuevo').classList.remove('open'); });
 $('#itemnuevo-crear').addEventListener('click', crearItemNuevo);
 $('#itemnuevo-body').addEventListener('change', e => {
-  if(e.target.id === 'itemnuevo-tipo'){ leerCamposItemNuevo(); drawItemNuevo(); }
+  if(e.target.id === 'itemnuevo-tipo'){
+    leerCamposItemNuevo();
+    // Elegir una categoría de arma pasa al asistente, con lo que ya se cargó.
+    if(ES_ARMA(itemNuevoDraft.tipoItem)){
+      const d = itemNuevoDraft;
+      $('#scrim-item-nuevo').classList.remove('open');
+      abrirArmaNueva({nombre: d.nombre, tier: d.tier, tipoItem: d.tipoItem, peso: Math.max(1, num(d.peso)), ranuras: d.ranuras,
+        precioCompra: d.precioCompra, detalle: d.detalle, descripcionNarrativa: d.descripcionNarrativa, mods: d.mods});
+      return;
+    }
+    drawItemNuevo();
+  }
 });
 $('#itemnuevo-body').addEventListener('click', e => {
   if(!itemNuevoDraft) return;

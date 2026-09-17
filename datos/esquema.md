@@ -150,7 +150,10 @@ completa — es el único lugar que no se desactualiza solo.
 
 Estructuralmente análogo al personaje pero más simple: `attrs` planos
 (con/fue/agl/des/int), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
-`armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo),
+`armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo;
+`armaNombre`/`armaDetalle`; `armaMods` = bonos del arma, que suman igual que
+los del equipo; `armaManos` = `arma_1m`/`arma_2m`, solo para cuando se
+publica al catálogo),
 `equipo` (ítems tomados del catálogo), `estados` (ver arriba),
 `habilidades`. No se persiste como archivo individual — vive en el
 `gm-creeps.json` que baja "Guardar todo" (nunca se sube al repo) y en el

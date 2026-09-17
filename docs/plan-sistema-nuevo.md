@@ -78,6 +78,11 @@ su casa:
 - **Fichas en vivo, guardadas por partes** (recursos, estados, inventario,
   atributos…), con escrituras espaciadas (~1 s) por el tope diario del
   plan gratis.
+- **Solo compu, no celular** (decidido 2026-09-17): no se adapta ni se
+  prueba nada para pantallas de celular, ni en programación ni en diseño.
+  Queda como pendiente: si el usuario lo pide más adelante, se trabaja
+  aparte (hoy no está bien resuelto). Lo que ya existe para pantallas
+  angostas se deja como está, pero no se sigue sumando.
 - **Dados en el navegador de cada uno** (sin servidor que tire): aceptado
   entre amigos.
 - **Sitio web con GitHub Pages** (gratis, repo público): se publica la rama
@@ -117,7 +122,7 @@ su casa:
 **Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde
 `nueva-version`, activo desde el 14/9/2026).
 
-**Más adelante:** GM oculta tokens/tiradas, tiradas secretas, alcance y
+**Más adelante:** versión para celular (solo si se pide), GM oculta tokens/tiradas, tiradas secretas, alcance y
 movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),
 publicar en una web, pasar catálogo/tienda/manual a Firebase.
 

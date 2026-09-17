@@ -392,6 +392,15 @@ a{color:var(--brass)}
 .resumen-fila{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;border-top:1px solid var(--line-soft)}
 .resumen-fila span{color:var(--muted)}
 .opcion-fila{display:flex;flex-wrap:wrap;gap:6px}
+.tipo-arma-lista{display:flex;flex-direction:column;gap:6px}
+.tipo-arma-btn{display:grid;grid-template-columns:52px 1fr;gap:2px 10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--panel2);padding:7px 10px;border-radius:var(--r);color:var(--paper);cursor:pointer}
+.tipo-arma-btn:hover{border-color:var(--copper)}
+.tipo-arma-btn.activa{border-color:var(--copper);background:rgba(201,133,69,.18)}
+.tipo-arma-btn b{grid-row:span 2;font-family:"Fraunces",serif;font-size:20px;color:var(--brass);text-align:center}
+.tipo-arma-btn span{font-size:12.5px;font-weight:700}
+.tipo-arma-btn small{font-size:11px;color:var(--muted);line-height:1.35}
+.arma-efecto{border-left:3px solid var(--copper);background:var(--panel2);padding:7px 10px;font-size:12.5px;line-height:1.45;margin:0 0 10px;border-radius:0 var(--r) var(--r) 0}
+.arma-efecto b{color:var(--brass)}
 .opcion-btn{
   font-family:"Space Mono",monospace;font-size:10.5px;border:1px solid var(--line);
   background:var(--panel2);padding:6px 11px;color:var(--muted);border-radius:var(--r)
@@ -960,7 +969,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .itempick-empty small{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .itempick:hover .itempick-empty{color:var(--brass)}
 .item-thumb{width:40px;height:40px;object-fit:cover;border-radius:var(--r);border:1px solid var(--line-soft);flex:none}
-.modal footer{display:flex;justify-content:space-between;gap:9px;padding:12px 15px;border-top:1px solid var(--line)}
+.modal footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:9px;padding:12px 15px;border-top:1px solid var(--line)}
 .btn{
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
   padding:8px 14px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper)
@@ -1407,6 +1416,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <header><h3>Agregar ítem</h3><button class="iconbtn" id="chooser-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:9px">
       <button class="btn primary" id="chooser-fabricante" style="width:100%">Catálogo del fabricante</button>
+      <button class="btn" id="chooser-arma" style="width:100%">Crear arma nueva (paso a paso)</button>
       <button class="btn" id="chooser-nuevo" style="width:100%">Crear ítem nuevo</button>
     </div>
   </div>
@@ -4377,6 +4387,11 @@ document.addEventListener('click', e => {
     else openEditor('inventario', null, chooserPreset);
     return;
   }
+  if(b.id === 'chooser-arma'){
+    $('#scrim-chooser').classList.remove('open');
+    openEditor('inventario', null, chooserPreset, {arma: true});
+    return;
+  }
   if(b.id === 'chooser-fabricante'){
     $('#scrim-chooser').classList.remove('open');
     $('#catalogo-buscar').value = '';
@@ -5282,6 +5297,13 @@ function aplicarTipoItem(id){
   $('#scrim-tipoitem').classList.remove('open');
   if(!editing) return;
   editing.draft.tipoItem = id;
+  // Un ítem nuevo que pasa a ser arma sigue en el asistente de armas.
+  if(!editing.id && !editing.asistente && ES_ARMA(id) && (editing.key === 'inventario' || editing.key === 'catalogo')){
+    editing.asistente = 'arma';
+    if(!num(editing.draft.peso)) editing.draft.peso = 1;
+    $('#modal-title').textContent = 'Nueva arma';
+    editing.paso = (editing.draft.nombre || '').trim() ? 1 : 0;
+  }
   drawEditor();
 }
 
@@ -5507,6 +5529,7 @@ let chooserTarget = 'inventario';
 function abrirChooser(target, equipadoPreset){
   chooserTarget = target;
   chooserPreset = equipadoPreset;
+  $('#chooser-arma').style.display = target === 'cinturon' ? 'none' : '';
   $('#scrim-chooser').classList.add('open');
 }
 
@@ -6096,7 +6119,7 @@ function comprarCarrito(){
 }
 
 
-function openEditor(key, id, equipadoPreset){
+function openEditor(key, id, equipadoPreset, opciones){
   const sc = SCHEMA[key];
   const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
@@ -6108,8 +6131,13 @@ function openEditor(key, id, equipadoPreset){
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
   editing = {key, id, draft: structuredClone(item), paso: 0};
+  // Armas (nuevas desde "Crear arma" o cualquiera ya guardada): asistente paso a paso.
+  if((key === 'inventario' || key === 'catalogo') && ((opciones && opciones.arma) || (id && ES_ARMA(item.tipoItem)))){
+    editing.asistente = 'arma';
+    if(!id){ editing.draft.tipoItem = 'arma_1m'; editing.draft.tipoDado = 8; editing.draft.peso = 1; }
+  }
   $("#modal-save").style.display = "";
-  $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
+  $('#modal-title').textContent = editing.asistente === 'arma' ? (id ? 'Editar arma' : 'Nueva arma') : (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
   $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
   $('#modal-activar').style.display = key === 'efectos' ? '' : 'none';
@@ -6238,9 +6266,18 @@ function drawEditorHabilidad(){
   $('#modal-save').style.display = (!nuevo || paso === total - 1) ? '' : 'none';
 }
 
+// Pasos del asistente abierto (habilidad o arma), o null si es el formulario común.
+function pasosDelEditor(){
+  if(!editing) return null;
+  if(editing.key === 'habilidades') return PASOS_HABILIDAD;
+  if(editing.asistente === 'arma') return PASOS_ARMA;
+  return null;
+}
+
 function habilidadIrAPaso(n){
-  if(!editing || editing.key !== 'habilidades') return;
-  const destino = Math.max(0, Math.min(PASOS_HABILIDAD.length - 1, n));
+  const pasos = pasosDelEditor();
+  if(!pasos) return;
+  const destino = Math.max(0, Math.min(pasos.length - 1, n));
   if(destino > 0 && !(editing.draft.nombre || '').trim()){
     toast('Primero ponele un nombre');
     editing.paso = 0;
@@ -6254,7 +6291,7 @@ function habilidadIrAPaso(n){
 }
 
 $('#modal-body').addEventListener('click', e => {
-  if(!editing || editing.key !== 'habilidades') return;
+  if(!pasosDelEditor()) return;
   const modoNitros = e.target.closest("[data-nitros-modo]");
   if(modoNitros){
     const m = modoNitros.dataset.nitrosModo;
@@ -6273,16 +6310,17 @@ $('#modal-body').addEventListener('click', e => {
   if(e.target.closest('[data-hab-atras]')){ habilidadIrAPaso((editing.paso || 0) - 1); return; }
 });
 $('#modal-body').addEventListener('keydown', e => {
-  if(!editing || editing.key !== 'habilidades') return;
+  const pasos = pasosDelEditor();
+  if(!pasos) return;
   if(e.key === 'Enter' && e.target.matches('[data-hab-enter]')){
     e.preventDefault();
     e.target.dispatchEvent(new Event('change', {bubbles: true}));
-    if((editing.paso || 0) < PASOS_HABILIDAD.length - 1) habilidadIrAPaso((editing.paso || 0) + 1);
+    if((editing.paso || 0) < pasos.length - 1) habilidadIrAPaso((editing.paso || 0) + 1);
   }
 });
 $('#modal-body').addEventListener('change', e => {
   // Después de que handleModalFieldChange actualice el borrador.
-  if(editing && editing.key === "habilidades" && e.target.matches("[data-hab-redibujar]")) setTimeout(drawEditor, 0);
+  if(pasosDelEditor() && e.target.matches("[data-hab-redibujar]")) setTimeout(drawEditor, 0);
 });
 
 // Sección "Estado alterado al usar" (consumibles y habilidades).
@@ -6318,9 +6356,251 @@ function htmlEstadoAlUsar(key, draft){
   return html;
 }
 
+/* ---------- Armas: editor paso a paso ----------
+   Crear o editar un arma (Mochila/Equipo o catálogo) va en pasos, como las
+   habilidades, y cada paso explica qué implica lo que se elige, con los
+   números de este personaje. Reusa la navegación de habilidadIrAPaso. */
+const PASOS_ARMA = [
+  {corto: 'Nombre', titulo: '¿Cómo se llama el arma?',
+   ayuda: 'Es el nombre que aparece en tu Equipo, en la Botonera ("Atacar · …") y en la Mesa cada vez que atacás o tirás daño con ella.'},
+  {corto: 'Tipo', titulo: '¿De qué Tipo es?',
+   ayuda: 'El Tipo decide tres cosas a la vez: <b>el dado de daño</b> (Tipo 6 = cada dado es un d6), <b>cuántos Nitros cuesta atacar</b> (el primer ataque del turno con esta arma cuesta la mitad del Tipo; los siguientes, el Tipo entero) y <b>contra qué resistencia a críticos choca</b> (el rival se protege con su "Res. crítico Tipo N"). Más Tipo = más daño por golpe, pero menos golpes por turno.'},
+  {corto: 'Empuñadura', titulo: '¿Cómo se empuña y a qué distancia pega?',
+   ayuda: 'Las manos que ocupa definen qué más podés llevar al mismo tiempo; la distancia define si el daño suma tu Dmg (que sale de la Fuerza).'},
+  {corto: 'Peso y daño', titulo: '¿Cuánto pesa y cuánto daño hace?',
+   ayuda: 'El <b>Peso</b> es a la vez la cantidad de dados de daño y lo que carga el personaje: un arma pesada pega más fuerte, pero ocupa más de tu Carga máxima mientras la tengas equipada.'},
+  {corto: 'Bonos', titulo: '¿Mejora algún stat mientras la llevás?',
+   ayuda: 'Cada bono suma (o resta, con negativo) a ese stat mientras el arma esté equipada. Si no tiene ninguno, seguí.'},
+  {corto: 'Efectos', titulo: '¿Tiene algún efecto especial?',
+   ayuda: 'Lo que hace además del daño. Si no tiene nada especial, dejalo vacío y seguí.'},
+  {corto: 'Precio', titulo: '¿Cuánto vale y dónde la guardás?',
+   ayuda: 'El precio sirve para comprarla y venderla en las tiendas.'},
+  {corto: 'Listo', titulo: 'Revisá cómo quedó',
+   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+];
+
+// Qué representa cada Tipo (del manual) y ejemplos para orientarse.
+const TIPOS_ARMA_INFO = {
+  4: {nombre: 'Perforante', ejemplo: 'dagas, estoques, lanzas livianas'},
+  6: {nombre: 'Cortante', ejemplo: 'espadas, cimitarras, hachas de mano'},
+  8: {nombre: 'Cortante pesado o contundente liviano', ejemplo: 'hachas de guerra, mazas, bastones'},
+  10: {nombre: 'Contundente pesado', ejemplo: 'martillos de guerra, mazas de dos manos'},
+  12: {nombre: 'Explosivo / armas modernas', ejemplo: 'lanzallamas, explosivos (tier Excepcional)'},
+};
+
+// Cuántos ataques con esta arma entran en un turno con los Nitros máximos.
+function ataquesPorTurno(tipo, nitros){
+  const primero = IT2.redondeoPrimerAtaque(tipo / 2);
+  if(nitros < primero) return 0;
+  return 1 + Math.floor((nitros - primero) / tipo);
+}
+
+function armaDanoPreviewHtml(d){
+  const dados = Math.max(1, num(d.peso) || 1) + Math.max(0, num(d.danoAmplificado));
+  const caras = num(d.tipoDado) || 8, fijo = num(d.danoFijo);
+  const min = dados + fijo, max = dados * caras + fijo;
+  const prom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
+  const dmg = d.armaDeRango ? 0 : num(compute().final.dmg);
+  return `Tira <b>${esc(armaDanoTxt(d))}</b>: entre ${fmt(min)} y ${fmt(max)}, ${fmt(prom)} en promedio.`
+    + (d.armaDeRango ? ' Es de rango: no suma tu Dmg.'
+      : ` Al tirar se suma tu Dmg (hoy ${fmt(dmg)})${dmg ? `: entre ${fmt(min + dmg)} y ${fmt(max + dmg)}` : ''}.`);
+}
+
+// Sección "Estado alterado al equipar" (ítems no consumibles y armas).
+function htmlEstadoAlEquipar(draft){
+  const tieneEstadoEquipo = (draft.equipoEstadoNombre || '').trim() || editing.estadoEquipoAbierto;
+  return `<div class="f">
+      <label>Estado alterado al equipar</label>
+      ${tieneEstadoEquipo ? `
+        <input data-c="equipoEstadoNombre" placeholder="ej. Regeneración" value="${esc(draft.equipoEstadoNombre??'')}">
+        <div class="f"><label>HP por turno (mientras esté puesto)</label><input data-c="equipoEstadoHpTurno" type="number" step="any" value="${esc(draft.equipoEstadoHpTurno??0)}" style="margin-top:6px"></div>
+        <textarea data-c="equipoEstadoDetalle" rows="2" placeholder="Qué hace el estado. Si lo dejás vacío se usa el detalle del ítem." style="margin-top:6px">${esc(draft.equipoEstadoDetalle??'')}</textarea>
+        <button type="button" class="mini" id="rmestadoequipo" style="margin-top:6px">Quitar estado alterado</button>
+        <div class="hint" style="margin-top:6px">Se activa solo al equipar el ítem y se va al sacártelo — no cuenta turnos, dura lo que dure puesto.</div>
+      ` : `<button type="button" class="iconbtn iconbtn-add" id="addestadoequipo">+ Estado alterado</button>`}
+    </div>`;
+}
+
+// Bonos que el asistente pone en su propio paso (no en la lista de Bonos).
+const MODS_ARMA_APARTE = ['rng'];
+
+function drawEditorArma(){
+  const {key, draft} = editing;
+  const total = PASOS_ARMA.length;
+  const paso = Math.max(0, Math.min(total - 1, editing.paso || 0));
+  editing.paso = paso;
+  const info = PASOS_ARMA[paso];
+  const nuevo = !editing.id;
+  const enInventario = key === 'inventario';
+  const c = compute();
+  const tipo = num(draft.tipoDado) || 8;
+  const primerAtaque = t => fmt(IT2.redondeoPrimerAtaque(t / 2));
+  const efecto = txt => `<div class="arma-efecto">${txt}</div>`;
+  const opcion = (attr, valor, activo, texto) => `<button type="button" class="opcion-btn ${activo ? 'activa' : ''}" ${attr}="${valor}">${texto}</button>`;
+
+  let html = `<div class="pasos-hab">${PASOS_ARMA.map((p, i) => {
+    const bloqueado = nuevo && i > paso && !(draft.nombre || '').trim();
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hab-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  }).join('')}</div>`;
+  html += `<div class="paso-titulo">${info.titulo}</div><p class="paso-ayuda">${info.ayuda}</p>`;
+
+  if(paso === 0){
+    html += `<div class="f"><label>Nombre</label><input data-c="nombre" value="${esc(draft.nombre)}" placeholder="ej. Espada del faro" data-hab-enter="1"></div>`
+      + campoImagenHtml(draft)
+      + `<div class="hint">La imagen es opcional: se ve en el Equipo y en el catálogo.</div>`;
+  }
+
+  if(paso === 1){
+    const nitros = num(nitrosMaximo(c));
+    const n = ataquesPorTurno(tipo, nitros);
+    const deEseTipo = (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === tipo).map(it => it.nombre);
+    html += `<div class="tipo-arma-lista">${DADOS_ARMA.map(t => {
+      const i = TIPOS_ARMA_INFO[t] || {nombre: '', ejemplo: ''};
+      return `<button type="button" class="tipo-arma-btn ${tipo === t ? 'activa' : ''}" data-arma-tipo="${t}">
+        <b>${t}</b><span>${esc(i.nombre)} · d${t}</span>
+        <small>${esc(i.ejemplo)} · atacar: ${primerAtaque(t)} No2 el primero, ${t} los siguientes</small>
+      </button>`;
+    }).join('')}</div>`
+      + efecto(`Con <b>Tipo ${tipo}</b>: cada dado de daño es un <b>d${tipo}</b>. Atacar cuesta <b>${primerAtaque(tipo)} No2</b> el primer golpe del turno con esta arma y <b>${tipo} No2</b> cada golpe siguiente.
+        Con tus ${fmt(nitros)} No2 máximos te entran <b>${n} ataque${n === 1 ? '' : 's'} por turno</b> con ella (si no gastás Nitros en otra cosa).
+        Un golpe crítico con esta arma choca contra la <b>Res. crítico Tipo ${tipo}</b> del rival.`)
+      + (deEseTipo.length ? `<div class="hint">En el catálogo, Tipo ${tipo}: ${esc(deEseTipo.slice(0, 6).join(', '))}${deEseTipo.length > 6 ? '…' : ''}</div>` : '');
+  }
+
+  if(paso === 2){
+    const dosManos = draft.tipoItem === 'arma_2m';
+    const slot = SLOT_DEFS.find(sd => sd.id === 'manos_arma');
+    const usado = enInventario ? (computeSlots().find(s => s.id === 'manos_arma')?.usado || 0) : 0;
+    html += `<div class="f"><label>Manos</label><div class="opcion-fila">
+        ${opcion('data-arma-manos', 'arma_1m', !dosManos, 'Una mano')}${opcion('data-arma-manos', 'arma_2m', dosManos, 'Dos manos')}
+      </div></div>`
+      + efecto(dosManos
+        ? 'Ocupa <b>las dos manos</b>: mientras la tengas equipada no podés llevar escudo ni otra arma.'
+        : 'Ocupa <b>una mano</b>: la otra queda libre para un escudo o una segunda arma. Con dos armas, cada una paga su propio primer ataque del turno (a mitad de precio) y el PdG que da cada una solo cuenta cuando atacás con ella.')
+      + (enInventario && slot ? `<div class="hint" style="margin:-4px 0 8px">Manos ocupadas hoy: ${fmt(usado)} de ${fmt(slot.max)}${editing.id && draft.equipado ? ' (contando esta)' : ''}.</div>` : '');
+    if(!dosManos && enInventario){
+      html += `<div class="f"><label>${CAMPO_LABEL.manoPreferida}</label>
+        <select data-c="manoPreferida">
+          <option value="" ${!draft.manoPreferida ? 'selected' : ''}>Automática</option>
+          <option value="1" ${String(draft.manoPreferida) === '1' ? 'selected' : ''}>Mano 1</option>
+          <option value="2" ${String(draft.manoPreferida) === '2' ? 'selected' : ''}>Mano 2</option>
+        </select>
+        <div class="hint" style="margin-top:5px">Solo ordena en qué mano se muestra dentro de "Efectos de equipo" cuando llevás dos cosas.</div></div>`;
+    }
+    html += `<div class="f"><label>Distancia</label><div class="opcion-fila">
+        ${opcion('data-arma-rango', '0', !draft.armaDeRango, 'Cuerpo a cuerpo')}${opcion('data-arma-rango', '1', !!draft.armaDeRango, 'A distancia')}
+      </div></div>`
+      + efecto(draft.armaDeRango
+        ? 'Es <b>de rango</b> (arco, pistola, lanzallamas…): el botón Daño arma <b>no suma tu Dmg</b>. El daño es solo el del arma.'
+        : `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma tu <b>Dmg</b> (sale de la Fuerza; hoy ${fmt(num(c.final.dmg))}).`)
+      + `<div class="f"><label>Alcance extra (+ Rango)</label><input data-defmod="rng" type="number" step="1" value="${getModVal(draft, 'rng')}" data-hab-enter="1" style="max-width:120px">
+        <div class="hint" style="margin-top:5px">Casilleros de más a los que llega mientras la tenés equipada (una lanza o un látigo suelen dar +1). Hoy tu Rango es ${fmt(num(c.final.rng))}.</div></div>`;
+  }
+
+  if(paso === 3){
+    const pesoEquipado = S.inventario.filter(i => i.equipado && i.id !== draft.id).reduce((a, i) => a + num(i.peso), 0);
+    const crg = num(c.final.crgmax);
+    const conEsta = pesoEquipado + num(draft.peso);
+    html += `<div class="f2">
+        <div class="f"><label>Peso (= dados de daño)</label><input data-c="peso" type="number" step="1" min="1" value="${esc(draft.peso ?? 1)}" data-hab-enter="1" data-hab-redibujar="1"></div>
+        <div class="f"><label>Daño fijo</label><input data-c="danoFijo" type="number" step="1" value="${esc(draft.danoFijo ?? 0)}" data-hab-enter="1"></div>
+        <div class="f"><label>Daño amplificado</label><input data-c="danoAmplificado" type="number" step="1" min="0" value="${esc(draft.danoAmplificado ?? 0)}" data-hab-enter="1"></div>
+      </div>`
+      + efecto(`<span id="arma-dano-prev">${armaDanoPreviewHtml(draft)}</span>`)
+      + `<div class="hint" style="margin:-4px 0 8px"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`
+      + (enInventario ? efecto(`Equipada, suma <b>${fmt(num(draft.peso))}</b> a tu carga: quedarías en <b>${fmt(conEsta)} de ${fmt(crg)}</b> (Carga máx.)${conEsta > crg ? ' — <b>te pasás</b>: lo que sobra cuenta como sobrecarga.' : '.'} En la mochila no pesa: ocupa ranuras.`) : '');
+  }
+
+  if(paso === 4){
+    const rapidos = [['pdg', 'PdG'], ['crit', 'Crítico'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']];
+    html += `<div class="f"><label>Bonos</label>
+      <div id="mods">${(draft.mods || []).map((m, i) => MODS_ARMA_APARTE.includes(m.stat) ? '' : `
+        <div class="modrow">
+          <select data-m="${i}" data-mk="stat"><option value="">— elegir stat —</option>${statOptions(m.stat)}</select>
+          <input data-m="${i}" data-mk="val" type="number" step="any" value="${esc(m.val)}">
+          <button class="mini" data-rmmod="${i}">×</button>
+        </div>`).join('')}</div>
+      <div class="opcion-fila" style="margin-top:6px">
+        ${rapidos.map(([id, txt]) => `<button type="button" class="opcion-btn" data-arma-mod="${id}">+ ${txt}</button>`).join('')}
+        <button type="button" class="opcion-btn" id="addmod">+ Otro stat</button>
+      </div></div>`
+      + efecto(`<b>PdG</b>: probabilidad de golpe; solo cuenta cuando atacás con esta arma (no se suma a la otra mano).
+        <br><b>Crítico</b>: más chance de que el golpe sea crítico (un crítico ignora la Defensa del rival).
+        <br><b>Parry</b>: ayuda a desviar golpes. <b>Bloqueo</b>: frena daño. <b>Dmg</b>: suma al daño de todos tus golpes cuerpo a cuerpo.
+        <br>Los demás (Fuerza, Evasión, SP…) se suman igual mientras la llevás.`);
+  }
+
+  if(paso === 5){
+    html += `<div class="f"><label>Qué hace además del daño</label><textarea data-c="detalle" rows="3" placeholder="ej. Sangrado al golpear. Ignora 1 de resistencia al crítico.">${esc(draft.detalle)}</textarea></div>`
+      + efecto('Los efectos <b>sobre el rival al golpear</b> (Sangrado, Veneno, Rompe armadura, ignorar resistencia al crítico…) la ficha <b>no los aplica sola</b>: quedan escritos acá y se aplican a mano sobre el rival cuando pega. Este texto se ve al mirar el arma.')
+      + htmlEstadoAlEquipar(draft)
+      + `<div class="hint">El estado al equipar sí es automático: se activa sobre vos al ponértela (ej. una espada que regenera 2 HP por turno mientras la llevás).</div>`;
+  }
+
+  if(paso === 6){
+    html += `<div class="f"><label>Precio de compra (DDE)</label><input data-c="precioCompra" type="number" step="1" min="0" value="${esc(draft.precioCompra ?? 0)}" data-hab-enter="1" data-hab-redibujar="1" style="max-width:140px"></div>`
+      + efecto(`En una tienda se compra a <b>${fmt(num(draft.precioCompra))}</b> DDE y se vende a la mitad: <b>${fmt(precioVentaDe(draft))}</b>.`);
+    if(enInventario){
+      html += `<div class="f"><label>¿Dónde la tenés?</label><div class="opcion-fila">
+          ${opcion('data-arma-equipada', '1', !!draft.equipado, 'Equipada')}${opcion('data-arma-equipada', '0', !draft.equipado, 'En la mochila')}
+        </div></div>`
+        + (draft.equipado
+          ? efecto('<b>Equipada</b>: aparece en la Botonera para atacar, sus bonos cuentan y pesa en tu carga.')
+          : `<div class="f"><label>Ranuras que ocupa en la mochila</label><input data-c="ranuras" type="number" step="1" min="0" value="${esc(draft.ranuras ?? 1)}" data-hab-enter="1" style="max-width:120px"></div>`
+            + efecto('<b>En la mochila</b>: no suma bonos ni se puede atacar con ella hasta equiparla, pero ocupa ranuras de la mochila en vez de peso.'));
+    }
+  }
+
+  if(paso === 7){
+    const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${valor}</b></div>`;
+    const bonos = (draft.mods || []).filter(m => m.stat && num(m.val)).map(m => `${STAT_LABEL[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))}`).join(', ');
+    const estadoEq = String(draft.equipoEstadoNombre || '').trim();
+    html += `<div class="resumen-hab">
+      <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
+      ${fila('Tipo', esc(`Tipo ${tipo} · ${(TIPOS_ARMA_INFO[tipo] || {}).nombre || ''}`))}
+      ${fila('Empuñadura', draft.tipoItem === 'arma_2m' ? 'dos manos' : 'una mano')}
+      ${fila('Distancia', draft.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')}
+      ${fila('Daño', esc(armaDanoTxt(draft)))}
+      ${fila('Atacar', `${primerAtaque(tipo)} No2 el primero, ${tipo} los siguientes`)}
+      ${fila('Peso', fmt(num(draft.peso)))}
+      ${fila('Bonos', esc(bonos || 'ninguno'))}
+      ${fila('Efectos', esc(String(draft.detalle || '').trim() || 'ninguno'))}
+      ${fila('Al equipar', esc(estadoEq || 'ningún estado'))}
+      ${fila('Precio', `${fmt(num(draft.precioCompra))} DDE (venta ${fmt(precioVentaDe(draft))})`)}
+      ${enInventario ? fila('Dónde', draft.equipado ? 'equipada' : `mochila (${fmt(num(draft.ranuras))} ranura${num(draft.ranuras) === 1 ? '' : 's'})`) : ''}
+    </div>
+    <button type="button" class="mini" data-arma-formulario="1" style="margin-top:10px">Ver en el formulario completo</button>
+    <div class="hint" style="margin-top:5px">El formulario completo muestra todos los campos juntos (sirve, por ejemplo, para pasarla a otra categoría).</div>`;
+  }
+
+  html += `<div class="paso-nav">
+    ${paso > 0 ? '<button type="button" class="btn ghost" data-hab-atras="1">← Atrás</button>' : '<span></span>'}
+    ${paso < total - 1 ? '<button type="button" class="btn primary" data-hab-siguiente="1">Siguiente →</button>' : ''}
+  </div>`;
+  $('#modal-body').innerHTML = html;
+  // Al crear, "Guardar" recién en el último paso; al editar, siempre.
+  $('#modal-save').style.display = (!nuevo || paso === total - 1) ? '' : 'none';
+}
+
+$('#modal-body').addEventListener('click', e => {
+  if(!editing || editing.asistente !== 'arma') return;
+  const b = e.target.closest('[data-arma-tipo],[data-arma-manos],[data-arma-rango],[data-arma-equipada],[data-arma-mod],[data-arma-formulario]');
+  if(!b) return;
+  const d = editing.draft;
+  if(b.dataset.armaTipo) d.tipoDado = num(b.dataset.armaTipo);
+  if(b.dataset.armaManos){ d.tipoItem = b.dataset.armaManos; if(d.tipoItem === 'arma_2m') d.manoPreferida = ''; }
+  if(b.dataset.armaRango) d.armaDeRango = b.dataset.armaRango === '1';
+  if(b.dataset.armaEquipada) d.equipado = b.dataset.armaEquipada === '1';
+  if(b.dataset.armaMod){ d.mods = d.mods || []; d.mods.push({stat: b.dataset.armaMod, val: 1}); }
+  if(b.dataset.armaFormulario) editing.asistente = null;
+  drawEditor();
+});
+
 function drawEditor(){
   const {key, draft} = editing;
   if(key === "habilidades"){ drawEditorHabilidad(); return; }
+  if(editing.asistente === 'arma'){ drawEditorArma(); return; }
+  $('#modal-save').style.display = '';
   const sc = SCHEMA[key];
   const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada','armaDeRango'];
   const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
@@ -6484,19 +6764,7 @@ function drawEditor(){
         : "Se suman al stat mientras el ítem esté equipado o el efecto activo."}</div>
     </div>`;
   }
-  if(sc.campos.includes('tipoItem') && !draft.consumible){
-    const tieneEstadoEquipo = (draft.equipoEstadoNombre || '').trim() || editing.estadoEquipoAbierto;
-    html += `<div class="f">
-      <label>Estado alterado al equipar</label>
-      ${tieneEstadoEquipo ? `
-        <input data-c="equipoEstadoNombre" placeholder="ej. Regeneración" value="${esc(draft.equipoEstadoNombre??'')}">
-        <div class="f"><label>HP por turno (mientras esté puesto)</label><input data-c="equipoEstadoHpTurno" type="number" step="any" value="${esc(draft.equipoEstadoHpTurno??0)}" style="margin-top:6px"></div>
-        <textarea data-c="equipoEstadoDetalle" rows="2" placeholder="Qué hace el estado. Si lo dejás vacío se usa el detalle del ítem." style="margin-top:6px">${esc(draft.equipoEstadoDetalle??'')}</textarea>
-        <button type="button" class="mini" id="rmestadoequipo" style="margin-top:6px">Quitar estado alterado</button>
-        <div class="hint" style="margin-top:6px">Se activa solo al equipar el ítem y se va al sacártelo — no cuenta turnos, dura lo que dure puesto.</div>
-      ` : `<button type="button" class="iconbtn iconbtn-add" id="addestadoequipo">+ Estado alterado</button>`}
-    </div>`;
-  }
+  if(sc.campos.includes('tipoItem') && !draft.consumible) html += htmlEstadoAlEquipar(draft);
   if((key === 'habilidades' || key === 'efectos') && sc.campos.includes('imagen')){
     html += campoImagenHtml(draft);
   }
@@ -6531,6 +6799,8 @@ function handleModalFieldChange(e){
     if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');
       const da = num(editing.draft.danoAmplificado);
+      const prev = document.getElementById('arma-dano-prev');
+      if(prev) prev.innerHTML = armaDanoPreviewHtml(editing.draft);
       if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||8}${da?` + ${da} dado${da>1?'s':''} por daño amplificado`:''}, más el fijo)`;
     }
   }

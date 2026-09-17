@@ -722,8 +722,12 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
   <div class="hero">
     <!-- BARRA SUPERIOR: accesos y herramientas, con botones chicos como en la ficha (los href los completa el script con la partida) -->
     <nav class="accesos">
-      <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
       <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
+      <a class="iconbtn" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva">🏪 Vendedor</a>
+      <div class="desplegable" id="personajes-caja">
+        <button type="button" class="iconbtn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
+        <div class="desplegable-lista" id="personajes-lista" hidden></div>
+      </div>
       <span class="accesos-sep"></span>
       <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
@@ -737,7 +741,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
     </nav>
     <div class="hero-titulo">
       <div>
-        <div class="eyebrow">GM Tools</div>
+        <div class="eyebrow" id="gm-identidad">⚔ GM Tools</div>
         <h1>Creeps en combate</h1>
       </div>
       <span class="turno-badge" id="turno-badge">Turno 1</span>
@@ -746,11 +750,6 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
       <button class="btn maint" id="btn-mant" title="Pasa el turno para toda la mesa: fichas de los jugadores y creeps">Mantenimiento · toda la mesa</button>
       <button class="btn primary" id="btn-add">+ Creep</button>
       <button class="btn" id="btn-ia">+ Creep con IA</button>
-      <a class="btn ghost" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva">🏪 Vendedor</a>
-      <div class="desplegable" id="personajes-caja">
-        <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
-        <div class="desplegable-lista" id="personajes-lista" hidden></div>
-      </div>
       <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
     </div>
   </div>
@@ -1095,6 +1094,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
@@ -4853,7 +4853,7 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#person
 // Accesos de la barra de arriba: abren la misma partida que esta pestaña.
 if(typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA){
   $('#acceso-mapa').href = '../vtt-hexgrid/mapa.html?partida=' + encodeURIComponent(FB_CAMPANA);
-  $('#acceso-inicio').href = fbUrlInicio(FB_CAMPANA);
+  $('#acceso-vendedor').href = 'vendor-generator.html?partida=' + encodeURIComponent(FB_CAMPANA);
 }
 $('#view-x').onclick = () => $('#scrim-view').classList.remove('open');
 $('#scrim-view').addEventListener('mousedown', e => { if(e.target.id==='scrim-view') $('#scrim-view').classList.remove('open'); });
@@ -5462,6 +5462,7 @@ function gmEscuchar(){
 
 // Se llama cuando ya se entró a la mesa.
 function gmAlEntrar(){
+  $('#gm-identidad').textContent = '⚔ GM Tools · ' + barraTexto();
   mesaEscuchar();
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;

@@ -31,6 +31,13 @@ versión parecida en más de una, es candidato a juntar.
   Manual, Cerrar sesión). Lee partidas y fichas de Firebase con caché de
   1 minuto; no aparece dentro de los iframes del mapa (Botonera,
   Acciones, Mantenimiento).
+- **`barra.js`** — `barraTexto(personaje, usuario)`: arma el texto de
+  identidad de la cabecera de cada herramienta ("Partida · Usuario", o
+  "Partida · Personaje (Usuario)" — la ficha es la única que pasa
+  personaje). Es solo el texto; cada herramienta lo mete en su propio
+  layout (el mapa lo usa tal cual en `#estado`; ficha, gm-tools y el
+  generador de tiendas le agregan su propio nombre de herramienta
+  delante). Depende de `sesion.js` (`fbPartida`, `fbMiembro`).
 - **`mesa.js`** — la cajita "Mesa" de tiradas compartidas: publicar
   (`mesaPublicar`), dibujar (`mesaRender`), escuchar en vivo
   (`mesaEscuchar`) y, en la ficha/gm-tools, armar la cajita flotante

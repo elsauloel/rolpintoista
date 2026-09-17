@@ -358,7 +358,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
 </head>
 <body>
 <header>
-  <a id="link-inicio" class="btn" href="../index.html" title="Volver al inicio de la partida">⌂</a>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
   <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
@@ -441,6 +440,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
@@ -2005,7 +2005,7 @@ function escucharMiembros(){
     const yo = miembros.get(fbUsuario.uid);
     if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
     renderModo();
-    estado(`${fbPartida.nombre} · ${fbMiembro.nombre}${soyGM ? ' (GM)' : ''}`);
+    estado(barraTexto());
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando miembros:', err));
@@ -3021,7 +3021,7 @@ function mostrarAviso(html, boton){
 
 function arrancarEnVivo(){
   $('#aviso-mapa').hidden = true;
-  estado(`${fbPartida.nombre} · ${fbMiembro.nombre}`);
+  estado(barraTexto());
   soyGM = fbMiembro.gm === true;
   escucharMiembros();
   escucharVinculables();
@@ -3049,7 +3049,6 @@ async function iniciar(){
     $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Sin conexión.</div>';
     return;
   }
-  $('#link-inicio').href = fbUrlInicio(FB_CAMPANA);
   arrancarEnVivo();
 }
 

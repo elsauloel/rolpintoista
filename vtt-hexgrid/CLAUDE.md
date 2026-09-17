@@ -20,6 +20,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   color con la inicial y el nombre debajo. Borde (`BORDE`/`claseToken()`):
   dorado = tuyos, verde = personajes de otros jugadores, rojo = vinculados a
   un creep de gm-tools, gris = NPC (token del GM sin creep vinculado).
+- **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
+  personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
+  botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que
+  copian las otras tres herramientas.
 - **Modo narrativo / combate** (switch en la cabecera, `modoMapa`, doc
   `campanas/{id}/mapa/modo` = `{modo}`): lo cambia el GM y lo ven todos.
   Narrativo (verde): la estela se ve pero mover no gasta No2

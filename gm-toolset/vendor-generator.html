@@ -226,13 +226,13 @@ input[type=checkbox]{width:auto}
 
   <div class="hero">
     <div>
-      <div class="eyebrow">Rol Pintoísta</div>
+      <div class="eyebrow" id="tienda-identidad">🏪 Generador de tiendas</div>
       <h1>Generador de Tiendas</h1>
     </div>
     <div class="hero-right">
       <span class="hint" id="fb-estado">Conectando con la partida…</span>
+      <a class="btn ghost" id="link-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
       <a class="btn ghost" id="link-gmtools" href="gm-tools.html">⚔ GM Tools</a>
-      <a class="btn ghost" id="link-partida" href="../index.html">⌂ Partida</a>
     </div>
   </div>
 
@@ -373,6 +373,7 @@ input[type=checkbox]{width:auto}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/asistente-item.js"></script>
@@ -2177,7 +2178,7 @@ async function iniciarTiendaEnVivo(){
   }
   const partida = encodeURIComponent(FB_CAMPANA);
   $('#link-gmtools').href = `gm-tools.html?partida=${partida}`;
-  $('#link-partida').href = fbUrlInicio(FB_CAMPANA);
+  $('#link-mapa').href = `../vtt-hexgrid/mapa.html?partida=${partida}`;
   if(!fbMiembro.gm){
     const bloqueo = document.createElement('div');
     bloqueo.className = 'bloqueo';
@@ -2197,7 +2198,7 @@ async function iniciarTiendaEnVivo(){
     return;
   }
   tiendaFb.listo = true;
-  fbEstado(`${fbPartida.nombre} · GM`);
+  $('#tienda-identidad').textContent = '🏪 Generador de tiendas · ' + barraTexto();
   sincronizarControles();
   renderPreview();
   renderBotones();

@@ -60,14 +60,20 @@ hay trabajo reciente o en curso de otra conversación (ver
   vendor-generator.html, `migrarItemTipos` hace lo mismo con los ítems
   creados a mano que vienen en `itemsDatos`.
 - **Botones**: barra superior `.accesos` con botones chicos, como la ficha
-  (Inicio, Mapa, Tablero, Historial, Reiniciar combate, Catálogo, Respaldo
-  partida, Cargar respaldo); la cabecera deja Mantenimiento, + Creep,
-  + Creep con IA, Vendedor, 👥 Personajes y Finalizar Combate.
+  (Mapa, Vendedor, 👥 Personajes, Tablero, Historial, Reiniciar combate,
+  Catálogo, Respaldo partida, Cargar respaldo); la cabecera deja
+  Mantenimiento, + Creep, + Creep con IA y Finalizar Combate. Ya no hay
+  botón Inicio (lo reemplaza el menú ☰, `../comun/menu-sitio.js`).
   Personajes (`renderListaPersonajes`) lee `fichas` y `miembros` al abrir
   la lista y abre cada ficha en otra pestaña. Sin botón Dados (la tirada
   libre está en la Mesa), token de GitHub ni Guardar copia (lo cubre
   Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
+- **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
+  personaje acá): la etiqueta `#gm-identidad` ("⚔ GM Tools · Partida ·
+  Usuario · GM") reemplaza al "GM Tools" fijo de antes, se actualiza en
+  `gmAlEntrar()`. El link a Vendedor ahora sí lleva `?partida=` (antes no
+  la llevaba).
 - **Habilidades de creeps paso a paso** (`PASOS_HAB_CREEP`, `hcMostrarPaso`,
   `#scrim-hab-creep`): "+ Habilidad" y el ✎ abren el mismo asistente que la
   ficha, adaptado: qué es → costo (No2: un número o `nitrosCosto: "ATAQUE"`,
@@ -105,6 +111,10 @@ hay trabajo reciente o en curso de otra conversación (ver
   jugadores en vivo desde Firebase.
 
 ### vendor-generator.html
+- **Barra superior unificada** (`../comun/barra.js`): `#tienda-identidad`
+  ("🏪 Generador de tiendas · Partida · Usuario · GM") reemplaza al
+  "Rol Pintoísta" fijo de antes. A la derecha, links a 🗺 Mapa y ⚔ GM
+  Tools (ya no hay "⌂ Partida", lo reemplaza el menú ☰).
 - `generarTienda(tamano, categoria)` sortea el stock según los pesos de
   rareza de cada tamaño (`TAMANOS`) y el reparto por categoría
   (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero).

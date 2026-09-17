@@ -66,6 +66,17 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   solo `MESA_DESDE`, `mesaQuien()` y `mesaIniciar(fbAlEntrar)`), las
   fórmulas de dados (`../comun/tiradas.js`) y el cuadro de la 🔍
   (`../comun/lupa.js`). No volver a copiarlos acá.
+- **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`):
+  igual estructura en las cuatro herramientas — ☰, nombre de la
+  herramienta, partida, y acá además el personaje ("Personaje (Usuario)").
+  `fichaIdentidadRender()` arma el texto de `#barra-partida`: sin
+  personaje abierto usa `barraTexto()` sola; con uno, le pasa el nombre
+  del personaje y, si es de otro (solo lectura), el nombre de su dueño
+  (`fichaIdentidadUsuario`, cacheado por `fichaMostrarLectura` para no
+  reconsultar Firebase en cada tecla). Se llama al abrir/soltar un
+  personaje, al cambiar de dueño y en cada `renderAll()` (por si se
+  renombra el personaje abierto). Ya no hay botón "⌂ Inicio": lo
+  reemplaza el menú ☰.
 - **🔍 Lupa de la Botonera** (contenido: `lupaContenido` → `lupaHtml`; cuadro en `../comun/lupa.js`): cada botón
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en

@@ -1016,7 +1016,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
 .accesos .partida{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:var(--brass);white-space:nowrap}
 .accesos .partida:empty{display:none}
-.accesos .partida .gm{color:var(--muted);font-weight:400}
+.accesos .partida .sec{color:var(--muted);font-weight:400}
 .accesos .iconbtn{text-decoration:none}
 .accesos-sep{width:1px;align-self:stretch;background:var(--line);margin:0 3px}
 @media(max-width:700px){.accesos .note{flex-basis:100%;margin-right:0}}
@@ -1141,7 +1141,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <span class="accesos-sep"></span>
       <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
       <button type="button" class="iconbtn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)">💾</button>
-      <a class="iconbtn" id="acceso-inicio" href="../index.html" title="Volver al inicio de la partida">⌂ Inicio</a>
     </nav>
     <div class="vitals">
       <div class="vital">
@@ -1688,6 +1687,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
@@ -3932,6 +3932,7 @@ function renderAll(){
   migrarEstadoIt2(S);
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
+  fichaIdentidadRender();  // por si cambió el nombre del personaje
   ['raza','clase','subclase','nivel','exp','dde','wld'].forEach(k => $('#f-'+k).value = S.meta[k]);
   renderPortrait();
   $('#f-loot-normal').value = S.loot.normal;
@@ -4824,11 +4825,10 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }
 
-// Accesos directos: llevan la partida en la dirección, así el mapa y el
-// inicio abren la misma partida que esta ficha.
+// Acceso directo: lleva la partida en la dirección, así el mapa abre la
+// misma partida que esta ficha.
 if(typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA){
   $('#acceso-mapa').href = '../vtt-hexgrid/mapa.html?partida=' + encodeURIComponent(FB_CAMPANA);
-  $('#acceso-inicio').href = fbUrlInicio(FB_CAMPANA);
   $('#acceso-respaldo').onclick = async () => {
     const btn = $('#acceso-respaldo');
     if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede armar el respaldo'); return; }
@@ -7470,6 +7470,7 @@ $('#btn-turno-reset').onclick = () => {
   toast('Turno reiniciado a 1');
 };
 
+let fichaVivo = null;  // adelantado: renderAll() ya lo usa para la identidad de la barra
 renderAll();
 aplicarColapsados();
 /* =========================================================
@@ -7516,8 +7517,6 @@ const GUARDAR_QUIETO_MS = 1200;  // se escribe cuando una parte deja de cambiar 
 const GUARDAR_MAX_MS = 5000;     // …o, si no para de cambiar (tipeando), como mucho cada tanto
 const MINIATURA_PX = 96;
 const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
-
-let fichaVivo = null;
 
 // Las imágenes embebidas (data:...) no se guardan, salvo el retrato, que
 // va en su propia parte.
@@ -7680,20 +7679,42 @@ function fichaEstadoAlDia(){
   fichaEstado(`✓ Guardado en la mesa · ${fichaNombre()}`, 'ok');
 }
 
+// Usuario a mostrar en la barra junto al personaje abierto: el dueño, si es
+// de otro (se busca una sola vez por apertura, no en cada render), o vos.
+// fichaIdentidadRender() usa este valor cacheado para no repetir la
+// consulta a Firebase en cada tecla (p.ej. al cambiarle el nombre).
+let fichaIdentidadUsuario = '';
+
+function fichaIdentidadRender(){
+  const f = fichaVivo;
+  $('#barra-partida').innerHTML = f && f.cargada
+    ? `<b>📜 Ficha</b> <span class="sec">${barraTexto(esc(fichaNombre()), fichaIdentidadUsuario ? esc(fichaIdentidadUsuario) : undefined)}</span>`
+    : `<b>📜 Ficha</b> <span class="sec">${esc(barraTexto())}</span>`;
+}
+
 async function fichaMostrarLectura(){
   let cartel = $('#ficha-lectura');
   const f = fichaVivo;
-  if(!f || !f.soloLectura){ if(cartel) cartel.remove(); return; }
+  if(!f || !f.soloLectura){
+    if(cartel) cartel.remove();
+    fichaIdentidadUsuario = '';
+    fichaIdentidadRender();
+    return;
+  }
   if(!cartel){
     cartel = document.createElement('div');
     cartel.id = 'ficha-lectura';
     document.body.appendChild(cartel);
   }
   cartel.textContent = 'Solo lectura: este personaje no es tuyo, los cambios que hagas acá no se guardan.';
+  fichaIdentidadUsuario = '';  // se corrige abajo apenas se sepa el dueño; mientras, muestra tu nombre
+  fichaIdentidadRender();
   try{
     const m = await fbDb.doc(fbRutaCampana(`miembros/${f.duenoUid}`)).get();
     if(m.exists && fichaVivo === f && f.soloLectura){
       cartel.textContent = `Solo lectura: personaje de ${m.data().nombre}. Los cambios que hagas acá no se guardan.`;
+      fichaIdentidadUsuario = m.data().nombre;
+      fichaIdentidadRender();
     }
   }catch(e){}
 }
@@ -8324,8 +8345,7 @@ bitacoraRender();  // estado inicial: sin conexión hasta entrar a la partida
 // último personaje de esta pestaña (o de este navegador).
 async function fbAlEntrar(){
   bitacoraEscuchar();
-  // Nombre de la partida y su GM, arriba a la izquierda.
-  $('#barra-partida').innerHTML = `${esc(fbPartida.nombre || 'Partida')} <span class="gm">(GM: ${esc(fbPartida.gmNombre || '?')})</span>`;
+  fichaIdentidadRender();
   mesaEscuchar();
   mesaHistorialAlEntrar();
   mantenimientoEscuchar();

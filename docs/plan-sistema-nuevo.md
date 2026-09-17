@@ -25,8 +25,13 @@ su casa:
   `main`, sync por GitHub) y queda como archivo histórico. **No se migran
   sus personajes ni sus datos** y no hace falta convivir con ella.
 - Trabajo en la carpeta `rol-nueva-version` (git worktree, rama
-  `nueva-version`). Ahí el recordatorio "Traer última versión" está
-  desactivado porque traería `main`.
+  `nueva-version`). **La plataforma vieja (sync de datos de partida por
+  GitHub) ya no se usa ni hace falta preservarla**: no quedan botones ni
+  código de "Traer última versión"/Subir/Bajar datos para personajes,
+  tablero, tienda o creeps — todo eso es Firebase. Lo único que sigue por
+  GitHub es el catálogo de ítems (compartido entre campañas, siempre
+  contra `main`) y `gestor.html` (actualiza el *código* de las
+  herramientas, no datos).
 - Sin backend propio ni build step: cada herramienta sigue siendo un
   `.html` que se abre con doble clic. Firebase (proyecto `rol-pintoista`,
   plan Spark gratis, sin tarjeta) es el backend en vivo.
@@ -94,15 +99,17 @@ su casa:
   por la web y abrir con doble clic son identidades distintas en Firebase:
   al pasar a la web cada uno vuelve a entrar con el código (el GM se
   remarca en la consola y reasigna los personajes si hace falta). La ficha
-  ya no tiene el menú ⚙ Ajustes (Cambiar token, Actualizar gestor): en su
-  lugar hay accesos directos al mapa y al inicio. Abrir con doble clic sigue
-  funcionando.
-- **Botones de GitHub se eliminan** (no solo se desactivan) en el mismo
-  paso en que Firebase los reemplaza. "Traer última versión"/`gestor.html`
-  actualizan código, no datos: solo se van si se decide publicar las
-  herramientas en una web (decisión pendiente; habilitaría también
-  "Acceder con Google"). "Guardar ficha"/"Cargar archivo" local: se
-  conserva como respaldo.
+  ya no tiene el menú ⚙ Ajustes (Cambiar token, Actualizar gestor): la
+  navegación es el menú ☰ (`comun/menu-sitio.js`). Abrir con doble clic
+  sigue funcionando.
+- **Botones y código de GitHub para datos de partida: eliminados**, no
+  solo desactivados (2026-09-17) — el modal "Antes de arrancar…" con
+  "Traer última versión" nunca se abría en `nueva-version`, así que se
+  sacó entero de la ficha y gm-tools, junto con las funciones que solo
+  servían para eso. `gestor.html` sigue existiendo para actualizar el
+  *código* de las herramientas desde `main`, y el catálogo sigue
+  publicándose por GitHub (ver `docs/workflow-github.md`) — eso no cambia.
+  "Guardar ficha"/"Cargar archivo" local se conserva como respaldo.
 
 ## Pasos
 

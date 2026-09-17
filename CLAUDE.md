@@ -52,10 +52,11 @@ lo que el grupo usa.
   runtime de ninguna herramienta.
 - **`gestor.html`** (raíz) actualiza el *código* de las herramientas desde
   GitHub — nunca datos de partida — usando la File System Access API
-  sobre la carpeta que elige el usuario, y apunta a la rama `main`. En
-  `nueva-version`, **"Traer última versión" está desactivado a propósito**
-  en la ficha y en gm-tools (traería la versión vieja y pisaría esta
-  carpeta).
+  sobre la carpeta que elige el usuario, y apunta a la rama `main`. La
+  plataforma vieja de sync de datos por GitHub (Subir/Bajar datos, Traer
+  última versión de personajes/tablero/tienda) ya no se usa: en
+  `nueva-version` ese código y esas pantallas se sacaron por completo de
+  la ficha y de gm-tools, no solo se desactivaron.
 - **Sitio publicado**: la rama `nueva-version` se publica sola en GitHub
   Pages, en `https://elsauloel.github.io/rolpintoista/` — cada push se
   publica en 1–2 minutos, así que solo se sube lo ya probado.
@@ -97,9 +98,10 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
 ## Cosas que hay que saber antes de tocar código acá
 
 - **Subir el trabajo apenas queda probado.** No hay "Traer última
-  versión" que pueda pisar nada en esta carpeta (está desactivado), pero
-  cada push a `nueva-version` se publica solo en GitHub Pages — no dejar
-  trabajo grande sin subir ni a medio probar en el sitio público.
+  versión" que pueda pisar nada en esta carpeta (ni el botón ni el código
+  existen), pero cada push a `nueva-version` se publica solo en GitHub
+  Pages — no dejar trabajo grande sin subir ni a medio probar en el sitio
+  público.
 - **Código compartido en `comun/`** (se carga con `<script src>` en cada
   herramienta; no copiarlo adentro de los HTML): `sesion.js` (cuenta y
   partida), `menu-sitio.js` (☰), `mesa.js` (Mesa de tiradas),

@@ -317,6 +317,11 @@ aside{
 .color.elegido{border-color:var(--paper)}
 .dato{font-size:12.5px;margin-top:4px}
 .dato b{color:var(--brass);font-weight:500}
+.mapa-fila{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px}
+.mapa-fila.viendo{border-color:var(--brass)}
+.mapa-nombre{font-size:13px}
+.mapa-nombre b{color:var(--brass);font-weight:500;font-size:11px}
+.mapa-fila .fila .btn{padding:4px 8px;font-size:10.5px}
 .estado-token{margin:8px 0 4px}
 .vital{margin-top:8px}
 .vital-cab{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
@@ -388,6 +393,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <header>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
+  <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span></button>
   <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
     <span class="perilla"></span><span id="modo-texto">Narrativo</span>
   </button>
@@ -622,6 +628,180 @@ let fondoPos = null;          // {x, y, ancho, dato?} (dato: fondos de antes de 
 let fondoImagen = '';
 let moverFondo = false;       // GM: arrastrar mueve el fondo en vez de la vista
 let arrastreFondo = null;     // {inicioX, inicioY, x, y}
+let panelMapas = false;       // GM: panel de mapas guardados abierto
+
+/* ---------- Varios mapas guardados ----------
+   campanas/<partida>/mapas/{id} = {nombre, creado}: la lista de mapas que
+   el GM tiene armados. El de siempre (antes de esto) sigue viviendo donde
+   ya vivía (mapa/fondo, mapa/modo, mapa/iniciativa, tokens/*) bajo el id
+   especial MAPA_PRINCIPAL, así no hace falta mover ni un dato para que
+   esto funcione. Los mapas nuevos van en mapas/{id}/estado/{doc} y
+   mapas/{id}/tokens/{auto}.
+   campanas/<partida>/mapa/activo = {mapaId}: cuál ven los jugadores. El
+   GM puede estar mirando (y armando) uno distinto — mapaEligiendoGM, por
+   navegador — mientras los jugadores siguen viendo el activo. */
+const MAPA_PRINCIPAL = '_principal';
+let mapaActivo = MAPA_PRINCIPAL;      // el que ven los jugadores
+let mapaEligiendoGM = null;           // el que el GM eligió mirar (null: sigue al activo)
+let mapaMostrado = MAPA_PRINCIPAL;    // el que está cargado ahora en esta pantalla
+let mapaEscuchado = null;             // el que tiene los onSnapshot activos ahora
+const mapasLista = new Map();         // id -> {nombre, creadoMs}
+try{ mapaEligiendoGM = localStorage.getItem('mapa-viendo') || null; }catch(e){}
+
+function nombreMapa(id){
+  const m = mapasLista.get(id);
+  if(m) return m.nombre;
+  return id === MAPA_PRINCIPAL ? 'Mapa 1' : 'Mapa';
+}
+// Ruta de un documento del mapa que está mostrado ahora (fondo, fondoImagen,
+// modo, iniciativa): en el principal, donde siempre vivieron; en los demás,
+// adentro de su propio mapas/{id}/estado/.
+function rutaMapaEstado(doc){
+  return mapaMostrado === MAPA_PRINCIPAL ? `mapa/${doc}` : `mapas/${mapaMostrado}/estado/${doc}`;
+}
+
+// Los onSnapshot del mapa mostrado (fondo, modo, iniciativa, tokens), para
+// poder cortarlos al cambiar de mapa y no quedarse escuchando el anterior.
+let cortarFondo1 = null, cortarFondo2 = null, cortarModo = null, cortarIniciativa = null, cortarTokensListener = null;
+function cortarEscuchasMapa(){
+  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener].forEach(f => f && f());
+  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = null;
+}
+
+// Cambia qué mapa está cargado: corta lo anterior, limpia lo que se venía
+// mostrando (para no ver un instante datos del mapa viejo) y arranca de
+// nuevo fondo/modo/iniciativa/tokens contra el nuevo.
+function cambiarMapaMostrado(nuevoId){
+  if(nuevoId === mapaEscuchado) return;
+  cortarEscuchasMapa();
+  mapaMostrado = nuevoId;
+  mapaEscuchado = nuevoId;
+  tokens.clear(); visibles.clear(); estelas.clear();
+  if(seleccion) seleccionar(null);
+  fondoPos = null; fondoImagen = ''; componerFondo();
+  modoMapa = 'narrativo';
+  iniciativa = {orden: [], turno: 0, ronda: 1};
+  escucharFondo();
+  escucharModo();
+  escucharIniciativa();
+  escucharTokens();
+  actualizarBotonMapas();
+  renderModo();
+  renderIniciativa();
+  renderPanel(true);
+  pedirDibujo();
+}
+
+// El GM puede estar mirando (y armando) un mapa distinto del que está en
+// juego; los jugadores siempre siguen al que está en juego.
+function recalcularMapaMostrado(){
+  const propio = soyGM && mapaEligiendoGM
+    && (mapaEligiendoGM === MAPA_PRINCIPAL || mapasLista.has(mapaEligiendoGM));
+  cambiarMapaMostrado(propio ? mapaEligiendoGM : mapaActivo);
+}
+
+function escucharMapaActivo(){
+  fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {
+    mapaActivo = (doc.exists && doc.data().mapaId) || MAPA_PRINCIPAL;
+    recalcularMapaMostrado();
+  }, err => console.error('Error escuchando el mapa activo:', err));
+}
+
+// La lista de mapas guardados (metadatos: nombre y fecha). El mapa
+// principal también tiene su entrada acá (se crea sola la primera vez que
+// hace falta), para poder renombrarlo igual que a los demás.
+function escucharMapas(){
+  fbDb.collection(fbRutaCampana('mapas')).onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ mapasLista.delete(ch.doc.id); return; }
+      const d = ch.doc.data();
+      mapasLista.set(ch.doc.id, {
+        nombre: String(d.nombre || 'Mapa').slice(0, 40),
+        creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : 0,
+      });
+    });
+    if(soyGM && !mapasLista.has(MAPA_PRINCIPAL)){
+      fbDb.doc(fbRutaCampana(`mapas/${MAPA_PRINCIPAL}`))
+        .set({nombre: 'Mapa 1', creado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true})
+        .catch(err => console.error('No se pudo preparar el mapa principal:', err));
+    }
+    recalcularMapaMostrado();
+    actualizarBotonMapas();
+    if(panelMapas) renderPanel(true);
+  }, err => console.error('Error escuchando la lista de mapas:', err));
+}
+
+function actualizarBotonMapas(){
+  const boton = $('#btn-mapas');
+  if(!boton) return;
+  boton.hidden = !fbMiembro;
+  boton.disabled = !soyGM;
+  $('#mapas-nombre').textContent = nombreMapa(mapaMostrado);
+  boton.classList.toggle('primary', soyGM && mapaMostrado !== mapaActivo);
+  boton.title = !soyGM ? 'Mapa que armó el GM'
+    : mapaMostrado === mapaActivo ? 'Mapas guardados'
+    : `Mapas guardados — estás armando este; los jugadores ven "${nombreMapa(mapaActivo)}"`;
+}
+
+async function crearMapa(){
+  const nombre = (prompt('Nombre del mapa nuevo:', `Mapa ${mapasLista.size + 1}`) || '').trim().slice(0, 40);
+  if(!nombre) return;
+  try{
+    const ref = await fbDb.collection(fbRutaCampana('mapas')).add({nombre, creado: firebase.firestore.FieldValue.serverTimestamp()});
+    mapaEligiendoGM = ref.id;
+    try{ localStorage.setItem('mapa-viendo', ref.id); }catch(e){}
+    recalcularMapaMostrado();
+  }catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); }
+}
+
+async function renombrarMapa(id){
+  const actual = nombreMapa(id);
+  const nombre = (prompt('Nuevo nombre del mapa:', actual) || '').trim().slice(0, 40);
+  if(!nombre || nombre === actual) return;
+  try{ await fbDb.doc(fbRutaCampana(`mapas/${id}`)).set({nombre}, {merge: true}); renderPanel(true); }
+  catch(err){ console.error('No se pudo renombrar el mapa:', err); toast('No se pudo renombrar el mapa'); }
+}
+
+// Ver un mapa (solo en esta pantalla) vs. publicarlo (lo que pasan a ver
+// todos los jugadores).
+function verMapa(id){
+  mapaEligiendoGM = id;
+  try{ localStorage.setItem('mapa-viendo', id); }catch(e){}
+  recalcularMapaMostrado();
+}
+
+async function publicarMapa(id){
+  try{
+    await fbDb.doc(fbRutaCampana('mapa/activo')).set({mapaId: id, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    toast(`Los jugadores ahora ven "${nombreMapa(id)}"`);
+  }catch(err){ console.error('No se pudo publicar el mapa:', err); toast('No se pudo publicar el mapa'); }
+}
+
+async function borrarMapa(id){
+  if(id === MAPA_PRINCIPAL){ toast('El primer mapa no se puede borrar'); return; }
+  const nombre = nombreMapa(id);
+  if(!confirm(`¿Borrar el mapa "${nombre}" y todos sus tokens? No se puede deshacer.`)) return;
+  const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }
+  try{
+    const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
+    const [tokensDocs, estadoDocs] = await Promise.all([base.collection('tokens').get(), base.collection('estado').get()]);
+    const refs = [...tokensDocs.docs, ...estadoDocs.docs].map(d => d.ref).concat([base]);
+    for(let i = 0; i < refs.length; i += 450){
+      const lote = fbDb.batch();
+      refs.slice(i, i + 450).forEach(r => lote.delete(r));
+      await lote.commit();
+    }
+    if(mapaActivo === id) await publicarMapa(MAPA_PRINCIPAL);
+    if(mapaEligiendoGM === id){
+      mapaEligiendoGM = null;
+      try{ localStorage.removeItem('mapa-viendo'); }catch(e){}
+      recalcularMapaMostrado();
+    }
+    toast(`"${nombre}" borrado`);
+  }catch(err){ console.error('No se pudo borrar el mapa:', err); toast('No se pudo borrar el mapa'); }
+}
 
 const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256', '#D4574E', '#E0C35A', '#4FA3A0', '#9A867E'];
 const HP_COLOR = '#D64545';
@@ -971,7 +1151,7 @@ let iniciativaPlegada = false;
 try{ iniciativaPlegada = localStorage.getItem('mapa-iniciativa-plegada') === '1'; }catch(e){}
 
 function escucharIniciativa(){
-  fbDb.doc(fbRutaCampana('mapa/iniciativa')).onSnapshot(doc => {
+  cortarIniciativa = fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
     iniciativa = {
       orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor)})).filter(o => o.id),
@@ -999,7 +1179,7 @@ async function guardarIniciativa(cambios){
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
   try{
-    await fbDb.doc(fbRutaCampana('mapa/iniciativa')).set(datos);
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
   }catch(err){
     console.error('No se pudo guardar la iniciativa:', err);
     toast(err.code === 'permission-denied' ? 'No podés cambiar eso del orden de turnos' : 'No se pudo guardar el orden de turnos');
@@ -1117,7 +1297,8 @@ $('#iniciativa-cab').onclick = e => {
 };
 
 function escucharModo(){
-  fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
+  escucharModo.listo = false;
+  cortarModo = fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).onSnapshot(doc => {
     const nuevo = doc.exists && doc.data().modo === 'combate' ? 'combate' : 'narrativo';
     if(nuevo !== modoMapa && escucharModo.listo) toast(nuevo === 'combate' ? '⚔ Modo combate: moverse gasta No2' : '🌿 Modo narrativo: moverse no gasta No2');
     escucharModo.listo = true;
@@ -1133,7 +1314,7 @@ $('#modo-switch').onclick = async () => {
   if(!soyGM) return;
   const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
   try{
-    await fbDb.doc(fbRutaCampana('mapa/modo')).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){
     console.error('No se pudo cambiar el modo:', err);
     toast('No se pudo cambiar el modo del mapa');
@@ -1756,7 +1937,11 @@ document.addEventListener('keydown', e => {
 
 /* ---------- Tokens en Firestore ---------- */
 
-function coleccionTokens(){ return fbDb.collection(fbRutaCampana('tokens')); }
+function coleccionTokens(){
+  return mapaMostrado === MAPA_PRINCIPAL
+    ? fbDb.collection(fbRutaCampana('tokens'))
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/tokens`));
+}
 
 // La ruta viaja con el movimiento como [col, fila, col, fila…] para que
 // los demás vean la estela unos segundos.
@@ -1956,7 +2141,8 @@ async function borrarToken(id){
 }
 
 function escucharTokens(){
-  coleccionTokens().onSnapshot(snap => {
+  escucharTokens.listo = false;
+  cortarTokensListener = coleccionTokens().onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
       if(ch.type === 'removed'){
         tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
@@ -2035,14 +2221,14 @@ function componerFondo(){
 }
 
 function escucharFondo(){
-  fbDb.doc(fbRutaCampana('mapa/fondo')).onSnapshot(doc => {
+  cortarFondo1 = fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))).onSnapshot(doc => {
     if(arrastreFondo) return;
     fondoPos = doc.exists ? doc.data() : null;
     componerFondo();
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando el fondo del mapa:', err));
-  fbDb.doc(fbRutaCampana('mapa/fondoImagen')).onSnapshot(doc => {
+  cortarFondo2 = fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))).onSnapshot(doc => {
     fondoImagen = doc.exists ? String(doc.data().dato || '') : '';
     componerFondo();
     renderPanel();
@@ -2052,7 +2238,7 @@ function escucharFondo(){
 
 async function guardarFondo(cambios){
   try{
-    await fbDb.doc(fbRutaCampana('mapa/fondo')).set({...cambios, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))).set({...cambios, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
   }catch(err){
     console.error('No se pudo guardar el fondo:', err);
     toast(err.code === 'permission-denied' ? 'Solo el GM puede cambiar el fondo' : 'No se pudo guardar el fondo');
@@ -2377,7 +2563,7 @@ function renderPanel(forzar){
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
   actualizarEscuchasCreeps();
-  const clave = JSON.stringify([creando, panelFondo, seleccion, editandoToken]);
+  const clave = JSON.stringify([creando, panelFondo, panelMapas, seleccion, editandoToken]);
   const v = t ? vinculo(t) : null;
   const opciones = (creando || t) ? [
     [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre + JSON.stringify(((f.resumen && f.resumen.invocaciones) || []).map(i => [i.id, i.nombre]))),
@@ -2402,6 +2588,36 @@ function renderPanel(forzar){
   $('#btn-fondo').hidden = !soyGM;
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
+  actualizarBotonMapas();
+
+  if(panelMapas && soyGM){
+    const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
+      .sort((a, b) => mapasLista.get(a).creadoMs - mapasLista.get(b).creadoMs)]
+      .map(id => {
+        const viendo = id === mapaMostrado, activo = id === mapaActivo;
+        return `<div class="mapa-fila${viendo ? ' viendo' : ''}">
+          <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
+          <div class="fila" style="margin-top:4px">
+            ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
+            ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}
+            <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
+            ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
+          </div>
+        </div>`;
+      }).join('');
+    panel.innerHTML =
+      '<h2>Mapas</h2>' +
+      '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
+      filas +
+      '<div class="fila" style="margin-top:10px"><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button><button type="button" class="btn" id="mapas-cerrar">Cerrar</button></div>';
+    panel.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
+    panel.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
+    panel.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
+    panel.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
+    $('#mapa-nuevo').onclick = crearMapa;
+    $('#mapas-cerrar').onclick = () => { panelMapas = false; renderPanel(true); };
+    return;
+  }
 
   if(panelFondo && soyGM){
     const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
@@ -2423,8 +2639,8 @@ function renderPanel(forzar){
       if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
       try{
         const lote = fbDb.batch();
-        lote.delete(fbDb.doc(fbRutaCampana('mapa/fondo')));
-        lote.delete(fbDb.doc(fbRutaCampana('mapa/fondoImagen')));
+        lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))));
+        lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))));
         await lote.commit();
         moverFondo = false;
       }
@@ -2595,15 +2811,23 @@ function renderPanel(forzar){
 $('#btn-fondo').onclick = () => {
   if(!soyGM) return;
   panelFondo = !panelFondo;
-  if(panelFondo){ creando = false; seleccion = null; }
+  if(panelFondo){ creando = false; panelMapas = false; seleccion = null; }
   else moverFondo = false;
+  renderPanel(true);
+  pedirDibujo();
+};
+
+$('#btn-mapas').onclick = () => {
+  if(!soyGM) return;
+  panelMapas = !panelMapas;
+  if(panelMapas){ creando = false; panelFondo = false; moverFondo = false; seleccion = null; }
   renderPanel(true);
   pedirDibujo();
 };
 
 $('#btn-nuevo').onclick = () => {
   if(!fbMiembro) return;
-  creando = true; seleccion = null; panelFondo = false; moverFondo = false;
+  creando = true; seleccion = null; panelFondo = false; panelMapas = false; moverFondo = false;
   renderPanel(true); pedirDibujo();
 };
 
@@ -2768,7 +2992,7 @@ function hudAjustesHtml(t, d){
 function hudUbicar(){
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
-  if(!t || !fbMiembro || creando || panelFondo){ hud.hidden = true; return; }
+  if(!t || !fbMiembro || creando || panelFondo || panelMapas){ hud.hidden = true; return; }
   const d = disposicion.find(x => x.id === seleccion);
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
@@ -3299,13 +3523,14 @@ function arrancarEnVivo(){
   soyGM = fbMiembro.gm === true;
   escucharMiembros();
   escucharVinculables();
-  escucharFondo();
-  escucharModo();
-  escucharIniciativa();
   escucharMantenimiento();
-  escucharTokens();
+  // Estos dos disparan cambiarMapaMostrado (y con eso, fondo/modo/
+  // iniciativa/tokens del mapa que corresponda).
+  escucharMapas();
+  escucharMapaActivo();
   mesaEscuchar();
   mesaHistorialAlEntrar();
+  actualizarBotonMapas();
   renderPanel(true);
 }
 

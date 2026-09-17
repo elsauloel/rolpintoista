@@ -201,20 +201,26 @@ service cloud.firestore {
         allow read, write: if esGM(c);
       }
 
-      // Imagen de fondo del mapa, modo, iniciativa: {dato, x, y, ancho,
-      // actualizado} / {orden, turno, ronda, actualizado}. La ven todos.
-      // El GM escribe cualquier documento; en mapa/iniciativa, además,
-      // cualquier miembro puede tocar los valores del orden (algo se lo
-      // cambió a mitad de combate) mientras no toque turno/ronda ni
-      // agregue o saque filas — eso lo sigue manejando solo el GM.
+      // Cambiar solo los valores del orden de turnos (no turno/ronda ni
+      // agregar o sacar filas, eso sigue siendo del GM): lo puede hacer
+      // cualquier miembro, porque algo se lo cambió a mitad de combate.
+      // La usan mapa/iniciativa y mapas/{mapaId}/estado/iniciativa por igual.
+      function iniciativaPropia(antes, despues) {
+        return despues.turno == antes.turno && despues.ronda == antes.ronda
+          && despues.orden is list && antes.orden is list
+          && despues.orden.size() == antes.orden.size();
+      }
+
+      // Imagen de fondo del mapa (mapa/fondo, mapa/fondoImagen), modo
+      // (mapa/modo), iniciativa (mapa/iniciativa) y cuál mapa ven los
+      // jugadores (mapa/activo, ver mapas/{mapaId} más abajo). Se ven
+      // todos; el GM escribe cualquier documento, y en iniciativa además
+      // cualquier miembro (ver iniciativaPropia).
       match /mapa/{doc} {
         allow read: if esMiembro(c);
         allow write: if esGM(c)
           || (doc == 'iniciativa' && esMiembro(c) && resource != null
-            && request.resource.data.turno == resource.data.turno
-            && request.resource.data.ronda == resource.data.ronda
-            && request.resource.data.orden is list
-            && request.resource.data.orden.size() == resource.data.orden.size());
+            && iniciativaPropia(resource.data, request.resource.data));
       }
 
       // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y
@@ -265,6 +271,51 @@ service cloud.firestore {
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
+      }
+
+      // Mapas guardados además del de siempre (que sigue en mapa/* y
+      // tokens/* de acá arriba): {nombre, creado}. Solo el GM los crea,
+      // renombra o borra (el borrado de verdad, incluidas sus
+      // subcolecciones, lo hace el cliente antes de borrar este doc). Su
+      // fondo/modo/iniciativa y sus tokens son un espejo de mapa/* y
+      // tokens/{id}, un nivel más adentro.
+      match /mapas/{mapaId} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'creado'])
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0 && request.resource.data.nombre.size() <= 40;
+
+        match /estado/{doc} {
+          allow read: if esMiembro(c);
+          allow write: if esGM(c)
+            || (doc == 'iniciativa' && esMiembro(c) && resource != null
+              && iniciativaPropia(resource.data, request.resource.data));
+        }
+        match /tokens/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && tokenValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time
+            && (request.resource.data.tipo == 'pj' || esGM(c))
+            && (!('oculto' in request.resource.data) || esGM(c));
+          allow update: if esMiembro(c)
+            && tokenValido(request.resource.data)
+            && request.resource.data.tipo == resource.data.tipo
+            && request.resource.data.creado == resource.data.creado
+            && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['oculto']) || esGM(c))
+            && (
+              (resource.data.tipo == 'pj'
+                && resource.data.duenoUid == request.auth.uid
+                && request.resource.data.duenoUid == resource.data.duenoUid)
+              || (resource.data.tipo == 'creep' && esGM(c))
+              || (resource.data.tipo == 'pj' && esGM(c)
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto']))
+            );
+          allow delete: if esMiembro(c)
+            && (resource.data.duenoUid == request.auth.uid || esGM(c));
+        }
       }
     }
   }

@@ -4893,15 +4893,22 @@ async function borrarPersonajeGM(id, nombre, boton){
   boton.disabled = true;
   try{
     const base = fbDb.doc(fbRutaCampana(`fichas/${id}`));
-    const [partes, tokens] = await Promise.all([
+    // El mapa de siempre tiene sus tokens en tokens/*; los mapas guardados
+    // aparte (vtt-hexgrid/mapa.html, "🗺 Mapas") los tienen cada uno en
+    // mapas/{mapaId}/tokens/*, así que hay que barrer todos.
+    const [partes, tokensPrincipal, mapasDocs] = await Promise.all([
       base.collection('partes').get(),
       fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get(),
+      fbDb.collection(fbRutaCampana('mapas')).get(),
     ]);
+    const tokensExtra = await Promise.all(mapasDocs.docs.map(m =>
+      fbDb.collection(fbRutaCampana(`mapas/${m.id}/tokens`)).where('tipo', '==', 'pj').get()
+    ));
+    const esDelPersonaje = t => { const v = t.data().fichaId || ''; return v === id || v.startsWith(id + '~'); };
     const lote = fbDb.batch();
     partes.docs.forEach(d => lote.delete(d.ref));
-    tokens.docs
-      .filter(t => { const v = t.data().fichaId || ''; return v === id || v.startsWith(id + '~'); })
-      .forEach(t => lote.delete(t.ref));
+    tokensPrincipal.docs.filter(esDelPersonaje).forEach(t => lote.delete(t.ref));
+    tokensExtra.forEach(snap => snap.docs.filter(esDelPersonaje).forEach(t => lote.delete(t.ref)));
     lote.delete(base);
     await lote.commit();
     toast(`${nombre} borrado de la partida`);

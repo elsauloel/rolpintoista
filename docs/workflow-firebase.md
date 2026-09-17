@@ -178,6 +178,26 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   (+ `ruta`) al soltar. Un PJ vinculado a su ficha gasta Nitros: el mapa pide
   confirmar y descuenta `nitros` en `partes/general` + `resumen.nitros` en
   una transacción.
+- `campanas/{id}/mapa/activo` — `{mapaId, actualizado}`: cuál de los mapas
+  guardados ven los jugadores ahora mismo. Ausente = el de siempre
+  (`MAPA_PRINCIPAL`, ver abajo). Todos lo ven, solo el GM lo cambia
+  ("Publicar" en el panel "🗺 Mapas").
+- `campanas/{id}/mapas/{mapaId}` — `{nombre, creado}`: metadatos de cada
+  mapa guardado además del de siempre. El GM los crea, renombra y borra
+  desde "🗺 Mapas" en `vtt-hexgrid/mapa.html`. El mapa de siempre (el único
+  que había antes de esto) sigue viviendo tal cual en `mapa/*` y
+  `tokens/*` de más arriba, con el id especial `MAPA_PRINCIPAL`
+  (`'_principal'`) — no se movió ni un dato para agregar esta función; su
+  entrada en `mapas/{id}` es solo metadato (nombre), para poder
+  renombrarlo igual que a los demás. Cada mapa nuevo tiene, un nivel
+  adentro:
+  - `mapas/{mapaId}/estado/{fondo|fondoImagen|modo|iniciativa}` — mismo
+    esquema que `mapa/*`.
+  - `mapas/{mapaId}/tokens/{auto}` — mismo esquema que `tokens/{auto}`.
+  El GM puede estar mirando (y armando) un mapa distinto del que está
+  publicado; los jugadores siempre ven el publicado. Borrar un mapa borra
+  sus `estado/*` y `tokens/*` primero (Firestore no lo hace solo) y, si
+  era el publicado o el que el GM estaba mirando, vuelve al principal.
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

@@ -161,6 +161,21 @@ nuevo de Rol Pintoísta. Paso 2 de
   ver "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`) — un
   jugador que mire la base de datos directamente podría ver el token
   igual, las reglas no lo esconden a ese nivel.
+- **🗺 Varios mapas guardados** (botón de la cabecera, con el nombre del
+  mapa que se está mostrando; solo el GM puede abrirlo y hacer algo,
+  jugadores lo ven pero deshabilitado): el GM arma de antemano escenarios
+  con su propio fondo, sus tokens, su modo narrativo/combate y su orden de
+  turnos (`MAPA_PRINCIPAL`, `mapaActivo`, `mapaMostrado`,
+  `mapaEligiendoGM`, `mapasLista`, `cambiarMapaMostrado`,
+  `recalcularMapaMostrado` — esquema completo en
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)). "Ver"
+  cambia lo que el GM está mirando (y armando) en su propia pantalla;
+  "Publicar" cambia lo que ven los jugadores — pueden ser mapas distintos
+  a la vez, así el GM arma el escenario 2 sin que nadie lo vea todavía. El
+  botón de la cabecera se resalta cuando el GM está viendo un mapa
+  distinto del publicado. Sin límite de mapas guardados; se renombran y se
+  borran (salvo el primero, `MAPA_PRINCIPAL`, que sigue siendo el que
+  había antes de esta función — no se le movió ningún dato).
 - Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.

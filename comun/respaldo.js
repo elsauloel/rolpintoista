@@ -44,6 +44,18 @@ async function fbArmarRespaldo(){
     esGM ? base.collection('tienda').doc('borrador').get() : Promise.resolve(null),
   ]);
   const tiendasGuardadas = esGM ? await docs(base.collection("tiendas")) : [];
+  // Mapas guardados aparte del de siempre (vtt-hexgrid/mapa.html, "🗺
+  // Mapas"): cada uno con su fondo/modo/iniciativa y sus tokens.
+  // (Si las reglas todavía no conocen "mapas", el respaldo sale igual, sin ellos.)
+  let mapasExtra = [];
+  try{
+    const mapasDocs = await docs(base.collection("mapas"));
+    mapasExtra = await Promise.all(mapasDocs.map(async m => ({
+      ...plano(m),
+      estado: (await docs(m.ref.collection("estado"))).map(plano),
+      tokens: (await docs(m.ref.collection("tokens"))).map(plano),
+    })));
+  }catch(e){ console.warn("Respaldo sin los mapas guardados aparte:", e); }
   // Bitácora compartida: cada página con sus entradas en orden.
   // (Si las reglas todavía no la conocen, el respaldo sale igual, sin ella.)
   let bitacora = [];
@@ -91,6 +103,7 @@ async function fbArmarRespaldo(){
     creepsPublicos: creepsDocs.map(plano),
     tokens: tokens.map(plano),
     mapa: mapa.map(plano),
+    mapasExtra,
     tiradas: tiradas.map(plano),
     bitacora,
     tienda: {

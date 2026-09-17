@@ -72,7 +72,8 @@ hay trabajo reciente o en curso de otra conversación (ver
   Personajes (`renderListaPersonajes`) lee `fichas` y `miembros` al abrir
   la lista y abre cada ficha en otra pestaña; cada fila tiene un ✕ para
   que el GM borre ese personaje (`borrarPersonajeGM`: confirmar + escribir
-  el nombre, borra la ficha con sus partes y los tokens que la usan — ver
+  el nombre, borra la ficha con sus partes y los tokens que la usan, tanto
+  en el mapa de siempre como en cualquier otro mapa guardado — ver
   [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Sin
   botón Dados (la tirada libre está en la Mesa), token de GitHub ni
   Guardar copia (lo cubre

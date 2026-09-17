@@ -6,6 +6,13 @@
 > estado) y [`docs/workflow-firebase.md`](docs/workflow-firebase.md). Lo
 > que sigue en este archivo describe la versión con sync por GitHub y se
 > va a ir actualizando a medida que avance la migración.
+>
+> **Preguntas de diseño abiertas → [`docs/preguntas-abiertas.md`](docs/preguntas-abiertas.md).**
+> Regla para todas las conversaciones: cada pregunta de diseño o regla que
+> quede sin decidir (y cada `PLACEHOLDER` nuevo en el código) se agrega ahí,
+> con número, contexto y fecha; al decidirla se aplica, se documenta y se
+> marca ✅ ahí. Antes de preguntarle algo de diseño al usuario, mirar si ya
+> está en esa lista.
 
 Conjunto de herramientas HTML standalone para una campaña de rol homebrew.
 No hay backend ni base de datos: cada herramienta es un único archivo

@@ -9,6 +9,11 @@ todas por igual, y cualquier otra nota de workflow que no encaje en el
 
 ## Estado actual
 
+[`preguntas-abiertas.md`](preguntas-abiertas.md) junta todas las preguntas
+de diseño sin decidir (regla general: toda pregunta abierta se anota ahí).
+[`plan-sistema-nuevo.md`](plan-sistema-nuevo.md) tiene las decisiones y el estado del
+sistema nuevo; [`workflow-firebase.md`](workflow-firebase.md), cómo está armado Firebase.
+
 Con contenido básico: [`workflow-github.md`](workflow-github.md) documenta
 el patrón de sincronización (token, `gestor.html`, API de contenidos) que
 comparten `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`,

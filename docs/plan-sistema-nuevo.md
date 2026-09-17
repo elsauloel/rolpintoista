@@ -169,7 +169,8 @@ pendiente "GM oculta tokens".
   sigilo solo; pasar o pararse **en su zona de alerta** provoca una
   **tirada de detección** (no es automática).
 
-**Falta definir:**
+**Falta definir** (las preguntas completas, numeradas, están en
+[`preguntas-abiertas.md`](preguntas-abiertas.md)):
 - Si al moverse el token queda mirando hacia donde caminó.
 - Qué tapa la vista (obstáculos) y cómo se marcan en el mapa.
 - La tirada de detección: qué stats, quién tira, una por hexágono o una

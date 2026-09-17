@@ -1918,6 +1918,7 @@ async function crearToken(datos){
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if(datos.fichaId) doc.fichaId = datos.fichaId;
+    if(datos.imagen) doc.imagen = datos.imagen;
     const ref = await coleccionTokens().add(doc);
     creando = false;
     seleccionar(ref.id);
@@ -2442,6 +2443,7 @@ function renderPanel(forzar){
 
   if(creando){
     let color = COLORES[Math.floor(Math.random() * COLORES.length)];
+    let imagenNueva = '';   // solo para tokens sin vincular (NPC, objetos)
     const tipoInicial = soyGM ? 'creep' : 'pj';
     panel.innerHTML =
       '<h2>Nuevo token</h2>' +
@@ -2449,22 +2451,57 @@ function renderPanel(forzar){
         '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde gris.</p>' : '') +
       `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '')}</select>` +
       '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
+      '<div id="nuevo-imagen"></div>' +
       '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
       '<div class="fila"><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button></div>' +
       '<p class="ayuda" style="margin-top:8px">Vinculado, el token toma el nombre, la imagen, las barras y los estados de su ficha. Aparece en el centro de lo que estás viendo.</p>';
-    conectarColores(panel, c => color = c);
+    // Imagen propia: solo tiene sentido sin vincular (vinculado, la toma de
+    // la ficha o el creep). Se guarda ya achicada, lista para crear el token.
+    const imagenNuevaHtml = () => {
+      if($('#nuevo-vinculo').value) return '';
+      return '<label class="etiqueta">Imagen (opcional)</label>' +
+        '<div class="fila" style="margin-top:0;align-items:center">' +
+          (imagenNueva ? `<img src="${esc(imagenNueva)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${esc(color)}">` : '') +
+          `<button type="button" class="btn" id="nuevo-imagen-elegir">${imagenNueva ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
+          (imagenNueva ? '<button type="button" class="btn peligro" id="nuevo-imagen-quitar">Quitar</button>' : '') +
+        '</div>';
+    };
+    const actualizarImagenNueva = () => {
+      $('#nuevo-imagen').innerHTML = imagenNuevaHtml();
+      const elegir = $('#nuevo-imagen-elegir');
+      if(elegir) elegir.onclick = () => {
+        const entrada = $('#token-imagen-archivo');
+        entrada.onchange = async ev => {
+          const file = ev.target.files[0];
+          ev.target.value = '';
+          if(!file) return;
+          try{ imagenNueva = await prepararImagenToken(file); actualizarImagenNueva(); }
+          catch(err){
+            console.error('No se pudo preparar la imagen del token:', err);
+            toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+          }
+        };
+        entrada.click();
+      };
+      const quitar = $('#nuevo-imagen-quitar');
+      if(quitar) quitar.onclick = () => { imagenNueva = ''; actualizarImagenNueva(); };
+    };
+    actualizarImagenNueva();
+    conectarColores(panel, c => { color = c; actualizarImagenNueva(); });
     const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
     const alVincular = () => {
       const id = $('#nuevo-vinculo').value;
       const vv = id ? vinculo({tipo: tipoActual(), fichaId: id}) : null;
       if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
+      actualizarImagenNueva();
     };
     $('#nuevo-vinculo').onchange = alVincular;
-    if(soyGM) $('#nuevo-tipo').onchange = () => { $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), ''); };
+    if(soyGM) $('#nuevo-tipo').onchange = () => { $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), ''); actualizarImagenNueva(); };
     const crear = () => {
       const nombre = $('#nuevo-nombre').value.trim();
       if(!nombre){ $('#nuevo-nombre').focus(); return; }
-      crearToken({nombre, color, tipo: tipoActual(), fichaId: $('#nuevo-vinculo').value});
+      const fichaId = $('#nuevo-vinculo').value;
+      crearToken({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva});
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };

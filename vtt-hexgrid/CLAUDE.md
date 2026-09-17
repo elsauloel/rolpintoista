@@ -105,7 +105,9 @@ nuevo de Rol Pintoísta. Paso 2 de
   guardan en la ficha o en la parte privada del creep; barras y aura, en el
   propio token (`barras {hp,sp,no2}`, `aura {radio, forma, color}`: radio en casilleros enteros, forma `hex` (casillas a ≤ radio pasos, `dibujarAuraHex`; por defecto) o `circulo`). La ronda de botones va por fuera de las casillas vecinas (1,5 casilleros, tope 200 px). Un token sin ficha ni creep
   vinculado puede llevar su propia `imagen` (cuadrada, 96 px, < 60 KB;
-  `prepararImagenToken`), que se elige en ese mismo panel. El panel se
+  `prepararImagenToken`), que se elige en ese mismo panel o ya al crearlo
+  (panel "Nuevo token": el selector de imagen aparece sin vincular, se
+  esconde al elegir un vínculo). El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
 - **🦶 Mover libre** (`moverLibre`, `moverTokenLibre`): botón del HUD que

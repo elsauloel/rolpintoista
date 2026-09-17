@@ -961,10 +961,13 @@ function renderIniciativa(){
   }else{
     lista.innerHTML = iniciativa.orden.map((o, i) => {
       const t = tokens.get(o.id);
-      const nombre = t ? nombreDe(t) : '(token borrado)';
-      const v = t ? vinculo(t) : null;
-      const mini = (v && v.miniatura) || (t && t.imagen) || '';
-      const color = (t && t.color) || '#9A867E';
+      // El GM puede meter en el orden un token oculto; a los demás no se les
+      // dice cuál es (ni nombre ni imagen), pero el turno sigue en la lista.
+      const escondido = !!(t && t.oculto && !soyGM);
+      const nombre = escondido ? '???' : (t ? nombreDe(t) : '(token borrado)');
+      const v = (t && !escondido) ? vinculo(t) : null;
+      const mini = escondido ? '' : ((v && v.miniatura) || (t && t.imagen) || '');
+      const color = escondido ? '#3B2E34' : ((t && t.color) || '#9A867E');
       return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${esc(nombre)}</span>` +
@@ -1216,7 +1219,10 @@ function trazarPuntos(pts){
 
 // Dónde va cada token: si varios comparten casilla, se acomodan en ronda.
 function calcularDisposicion(){
+  // Tokens ocultos (solo el GM los prepara y los muestra cuando corresponde):
+  // a los jugadores ni se les dibujan ni se pueden tocar.
   const orden = [...tokens.entries()]
+    .filter(([, t]) => soyGM || !t.oculto)
     .map(([id, t]) => ({id, t}))
     .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
   const grupos = new Map();
@@ -1322,6 +1328,7 @@ function dibujar(){
 
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {
+    if(t.oculto && !soyGM) return;
     const aura = auraDe(t);
     if(!aura) return;
     const dib = disposicion.find(d => d.id === id);
@@ -1353,6 +1360,9 @@ function dibujar(){
     // Hexágono del token: mismo tamaño y orientación que la casilla de la
     // grilla (fijo — no rota con el frente), para que calce con el mapa.
     const puntos = verticesHex(x, y, rad);
+    // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
+    // más transparente para acordarse de que los jugadores no lo ven.
+    if(t.oculto) ctx.globalAlpha = 0.5;
 
     trazarPuntos(verticesHex(x + 2 / z, y + 3 / z, rad));
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
@@ -1464,6 +1474,7 @@ function dibujar(){
       ctx.fillStyle = '#EDE3D2';
       ctx.fillText(texto, x, ty);
     }
+    ctx.globalAlpha = 1;
   });
   hudUbicar();
   return animando;
@@ -1831,7 +1842,7 @@ async function editarToken(id, cambios){
     console.error('No se pudo guardar el token:', err);
     // Barras y aura son campos nuevos del token: si las reglas publicadas en
     // Firebase son viejas, Firestore rechaza la escritura entera.
-    const nuevos = Object.keys(cambios || {}).some(k => k === 'barras' || k === 'aura');
+    const nuevos = Object.keys(cambios || {}).some(k => k === 'barras' || k === 'aura' || k === 'rotacion' || k === 'oculto');
     toast(err.code !== 'permission-denied' ? 'No se pudo guardar'
       : nuevos ? 'No se pudo guardar: faltan publicar las reglas nuevas de Firestore (consola → Firestore → Reglas)'
       : 'No se pudo guardar (sin permiso)');
@@ -1883,6 +1894,7 @@ function escucharTokens(){
         barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
         rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
+        oculto: d.oculto === true,
       });
     });
     renderIniciativa();
@@ -2523,6 +2535,7 @@ function hudHtml(t){
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre: llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
+    (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
@@ -2630,7 +2643,7 @@ function hudUbicar(){
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
-  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM]);
+  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto]);
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);
@@ -2724,6 +2737,7 @@ function hudConectar(t){
     const clave = b.dataset.hudBoton;
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
+    if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto}); return; }
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       if(fichaDeToken) abrirBotonera(fichaDeToken); else abrirAcciones(t.fichaId);

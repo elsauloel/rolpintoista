@@ -213,12 +213,14 @@ service cloud.firestore {
       // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.
       // fichaId (opcional): la ficha (pj) o el creep al que está vinculado.
       function tokenValido(d) {
-        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion'])
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto'])
           && (!('fichaId' in d) || (d.fichaId is string && d.fichaId.size() <= 64))
           // Ruta del último movimiento, [col, fila, col, fila…], para la estela.
           && (!('ruta' in d) || (d.ruta is list && d.ruta.size() <= 200))
           // Frente del token: 0 (abajo), 60, 120, 180, 240 o 300 grados.
           && (!('rotacion' in d) || (d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0))
+          // Oculto a los jugadores: solo lo pone o quita el GM (más abajo).
+          && (!('oculto' in d) || d.oculto is bool)
           // Imagen propia del token (solo los que no están vinculados).
           && (!('imagen' in d) || (d.imagen is string && d.imagen.size() <= 60000))
           && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 40
@@ -234,20 +236,23 @@ service cloud.firestore {
           && tokenValido(request.resource.data)
           && request.resource.data.duenoUid == request.auth.uid
           && request.resource.data.creado == request.time
-          && (request.resource.data.tipo == 'pj' || esGM(c));
+          && (request.resource.data.tipo == 'pj' || esGM(c))
+          && (!('oculto' in request.resource.data) || esGM(c));
         allow update: if esMiembro(c)
           && tokenValido(request.resource.data)
           && request.resource.data.tipo == resource.data.tipo
           && request.resource.data.creado == resource.data.creado
+          // Ocultar o mostrar un token lo decide solo el GM.
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['oculto']) || esGM(c))
           && (
             (resource.data.tipo == 'pj'
               && resource.data.duenoUid == request.auth.uid
               && request.resource.data.duenoUid == resource.data.duenoUid)
             || (resource.data.tipo == 'creep' && esGM(c))
             // El GM reasigna el dueño de un PJ, lo lleva a otra casilla
-            // (mover libre, sin estela) o le cambia el frente.
+            // (mover libre, sin estela), le cambia el frente o lo oculta.
             || (resource.data.tipo == 'pj' && esGM(c)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto']))
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));

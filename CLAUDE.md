@@ -87,6 +87,13 @@ Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/e
   si tienen porcentaje, se **tiran** en un pop-up (`comun/efectos-golpe.js`).
   Aplicarlos sobre el rival sigue siendo manual, a propósito: no hay que
   automatizar el estado en el objetivo salvo que se pida.
+- **Código compartido en `comun/`** (se carga con `<script src>` en cada
+  herramienta; no copiarlo adentro de los HTML): `sesion.js` (cuenta y
+  partida), `menu-sitio.js` (☰), `mesa.js` (Mesa de tiradas),
+  `tiradas.js` (fórmulas de dados), `lupa.js` (cuadro 🔍),
+  `mesa-historial.js`, `grilla-dados.js`, `dados3d.js`, `respaldo.js`,
+  `efectos-golpe.js`, `asistente-item.js`. Si algo se repite en dos
+  herramientas, va ahí.
 - Crear o editar ítems (menos consumibles) en la ficha, gm-tools, el
   generador de tiendas y el editor de catálogo pasa por un solo asistente
   paso a paso compartido: `comun/asistente-item.js`.

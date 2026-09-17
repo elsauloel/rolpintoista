@@ -85,7 +85,9 @@ Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/e
   armadura, Sangrado como texto de arma, etc.) son intencionalmente
   manuales — no hay sistema de "efecto al golpear sobre el rival" y no es
   un hueco a rellenar salvo que se pida construir eso específicamente.
-- `ficha-personaje/ficha.html` pesa ~1.3 MB, la mayoría son imágenes del
-  catálogo embebidas en base64. Es liviano para el navegador; lo único que
-  vuelve pesado es tocarlo a mano — para eso está `datos/catalogo.json` +
-  `datos/catalogo-editor.html`.
+- `ficha-personaje/ficha.html` pesa ~700 KB, casi todo el catálogo
+  embebido. **Mientras dure el desarrollo, el catálogo va sin imágenes**
+  (decidido 2026-09-17, se borraron las 41 que había para alivianar el
+  proyecto): no cargar imágenes de ítems ni volver a ponerlas. La función
+  de cargar imagen sigue en las herramientas, a propósito. Para tocar el
+  catálogo está `datos/catalogo.json` + `datos/catalogo-editor.html`.

@@ -3,7 +3,7 @@
 ## Qué es
 
 `ficha.html` — la ficha de personaje interactiva. Un único archivo HTML
-standalone (~1.3 MB, ~6700 líneas de JS) con todo: atributos, combate,
+standalone (~700 KB, ~9000 líneas) con todo: atributos, combate,
 inventario, catálogo de compra, habilidades, bitácora.
 
 ## Estado actual

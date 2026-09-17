@@ -2180,6 +2180,25 @@ function actualizarVitalesEnDOM(sc, card){
   if(inHpMax) inHpMax.value = fmt(sc.hpMax);
 }
 
+// Nitros: mismo criterio que actualizarHpMaxPorCon (si estaba lleno, el
+// nuevo máximo por Agilidad también queda lleno; si no, solo se recorta
+// si se pasa) — pero acá no hay un "sc.nitrosMax" guardado, así que el
+// "antes" se toma llamando a creepNitrosMax() antes de tocar sc.agl.
+function actualizarNo2PorAgl(sc, antes){
+  if(sc.nitros === null || sc.nitros === undefined) return;  // todavía no se solidificó: arranca lleno solo
+  const nuevoMax = creepNitrosMax(sc);
+  sc.nitros = antes.full ? nuevoMax : Math.min(num(sc.nitros), nuevoMax);
+}
+function actualizarNo2EnDOM(sc, card){
+  if(!card) return;
+  const inNo2 = card.querySelector('[data-f="nitros"]');
+  if(inNo2){
+    inNo2.value = fmt(num(sc.nitros));
+    const max = inNo2.closest('.vn');
+    if(max) max.querySelector('.vmax').textContent = '/ ' + fmt(creepNitrosMax(sc));
+  }
+}
+
 function attrBudgetCreep(sc){
   const nivel = Math.max(1, num(sc.nivel) || 1);
   const total = 33 + 3 * (nivel - 1);
@@ -3846,11 +3865,19 @@ document.addEventListener('input', e => {
     const sc = S.creeps.find(s=>s.id===t.dataset.id);
     if(!sc) return;
     const mod = num(t.dataset.attrmod);
+    // No2 depende de Agilidad: el "antes" hay que tomarlo previo a cambiar
+    // el atributo (no hay un sc.nitrosMax guardado, a diferencia del HP).
+    const agl = t.dataset.attr === 'agl' && sc.nitros !== null && sc.nitros !== undefined
+      ? {full: num(sc.nitros) >= creepNitrosMax(sc)} : null;
     sc[t.dataset.attr] = num(t.value) - mod;
     const card = t.closest('.card');
     if(t.dataset.attr === 'con'){
       actualizarHpMaxPorCon(sc);
       actualizarVitalesEnDOM(sc, card);
+    }
+    if(agl){
+      actualizarNo2PorAgl(sc, agl);
+      actualizarNo2EnDOM(sc, card);
     }
     actualizarBadgePresupuesto(sc, card);
     actualizarDerivadosEnDOM(sc, card);

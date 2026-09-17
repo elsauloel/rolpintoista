@@ -51,6 +51,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   habilidad Movimiento). Los creeps viejos se convierten solos en
   `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se
   saca siempre).
+- **No2 sigue a la Agilidad** (`actualizarNo2PorAgl`, mismo criterio que
+  `actualizarHpMaxPorCon` para Con→Hp): al cambiar Agilidad en el editor de
+  un creep, si No2 estaba lleno sube con el nuevo máximo; si no, solo se
+  recorta si ahora pasa el nuevo (menor) máximo. Si `sc.nitros` todavía es
+  `null` (no solidificado) no se toca, sigue el máximo solo.
 - **Escala de Tipos +2**: Tipos de arma 4/6/8/10/12 (`DADOS_ARMA`, default
   8); `crit[0..4]` y `tipo1..tipo5` son la resistencia a Tipo 4..12. Un
   creep sin `escalaTipos: 2` es de antes y `normalizarCreep` lo corre +2

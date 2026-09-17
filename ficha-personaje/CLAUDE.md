@@ -62,6 +62,14 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   en el mismo lote (si la marca, que va en "otros", llegara sin los ítems,
   la próxima carga los correría otra vez). Los ítems del GM en la tienda
   (`itemsDatos`) llevan la marca cada uno.
+- **Los recursos siguen a su atributo** (handler de `data-attr` en el input
+  de Atributos): al cambiar Con o Agi, Hp y Nitros recalculan su máximo con
+  `compute()` antes/después y, si el recurso estaba lleno, sube con el
+  nuevo máximo; si no estaba lleno, solo se recorta si ahora pasa el nuevo
+  (menor) máximo — nunca se cura de más. Nitros respeta además el estado
+  "todavía null" (no solidificado, sigue el máximo solo): mientras no se
+  haya solidificado, este handler no lo toca. Mismo criterio que ya usaban
+  invocaciones y creeps.
 - **Compartido con gm-tools y el mapa**: la Mesa (`../comun/mesa.js`; acá
   solo `MESA_DESDE`, `mesaQuien()` y `mesaIniciar(fbAlEntrar)`), las
   fórmulas de dados (`../comun/tiradas.js`) y el cuadro de la 🔍

@@ -564,7 +564,7 @@ function lineaHex(a, b){
     const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
     if(dq > dr && dq > ds) rq = -rr - rs;
     else if(dr > ds) rr = -rq - rs;
-    res.push({col: rq + (rr - (rr & 1)) / 2, fila: rr});
+    res.push({col: rq, fila: rr + (rq - (rq & 1)) / 2});
   }
   return res;
 }

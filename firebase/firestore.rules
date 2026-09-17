@@ -201,11 +201,20 @@ service cloud.firestore {
         allow read, write: if esGM(c);
       }
 
-      // Imagen de fondo del mapa: {dato, x, y, ancho, actualizado}. La ven
-      // todos; solo el GM la pone, la mueve o la quita.
+      // Imagen de fondo del mapa, modo, iniciativa: {dato, x, y, ancho,
+      // actualizado} / {orden, turno, ronda, actualizado}. La ven todos.
+      // El GM escribe cualquier documento; en mapa/iniciativa, además,
+      // cualquier miembro puede tocar los valores del orden (algo se lo
+      // cambió a mitad de combate) mientras no toque turno/ronda ni
+      // agregue o saque filas — eso lo sigue manejando solo el GM.
       match /mapa/{doc} {
         allow read: if esMiembro(c);
-        allow write: if esGM(c);
+        allow write: if esGM(c)
+          || (doc == 'iniciativa' && esMiembro(c) && resource != null
+            && request.resource.data.turno == resource.data.turno
+            && request.resource.data.ronda == resource.data.ronda
+            && request.resource.data.orden is list
+            && request.resource.data.orden.size() == resource.data.orden.size());
       }
 
       // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y

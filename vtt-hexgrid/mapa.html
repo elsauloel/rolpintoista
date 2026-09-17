@@ -835,6 +835,24 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'mantenimiento-listo') mantenimientoCerrarMarco();
 });
 
+// Línea en la Mesa para todos cuando alguien cambia a mano un valor del
+// orden de turnos (el GM en cualquiera, cada jugador en el propio): algo
+// se lo cambió a mitad de combate y conviene que quede anotado.
+async function publicarCambioIniciativa(id, antes, ahora){
+  const t = tokens.get(id);
+  const nombre = t ? nombreDe(t) : '(token borrado)';
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `Orden de turnos · ${nombre}: ${fmt(antes)} → ${fmt(ahora)}`,
+      formula: '', rolls: [], mod: 0, total: ahora,
+      // 'recordatorio': la misma línea con 🔔 que ya usan otros avisos del
+      // sistema, para no mostrar una fórmula/tirada vacía.
+      desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo anunciar el cambio de iniciativa en la Mesa:', err); }
+}
+
 // Línea en la Mesa para todos: "Mantenimiento · Turno N".
 async function publicarPaseDeTurno(turno){
   try{
@@ -964,8 +982,15 @@ function escucharIniciativa(){
   }, err => console.error('Error escuchando la iniciativa:', err));
 }
 
+// Además del GM (cualquier fila), cada jugador puede tocar el valor de la
+// fila de su propio personaje (algo lo cambió a mitad de combate): las
+// reglas dejan escribir mapa/iniciativa a cualquier miembro siempre que
+// no toque turno/ronda ni agregue o saque filas — eso sigue siendo del GM.
+function puedeEditarIniciativa(t){
+  return soyGM || !!(t && t.tipo === 'pj' && fbUsuario && t.duenoUid === fbUsuario.uid);
+}
+
 async function guardarIniciativa(cambios){
-  if(!soyGM) return;
   const datos = {
     orden: iniciativa.orden.map(o => ({id: o.id, valor: num(o.valor)})),
     turno: iniciativa.turno,
@@ -977,7 +1002,7 @@ async function guardarIniciativa(cambios){
     await fbDb.doc(fbRutaCampana('mapa/iniciativa')).set(datos);
   }catch(err){
     console.error('No se pudo guardar la iniciativa:', err);
-    toast(err.code === 'permission-denied' ? 'Solo el GM cambia el orden de turnos' : 'No se pudo guardar el orden de turnos');
+    toast(err.code === 'permission-denied' ? 'No podés cambiar eso del orden de turnos' : 'No se pudo guardar el orden de turnos');
   }
 }
 
@@ -1021,13 +1046,17 @@ function renderIniciativa(){
       const v = (t && !escondido) ? vinculo(t) : null;
       const mini = escondido ? '' : ((v && v.miniatura) || (t && t.imagen) || '');
       const color = escondido ? '#3B2E34' : ((t && t.color) || '#9A867E');
+      // El valor lo edita el GM (cualquier fila) o el dueño (la propia): algo
+      // pudo habérselo cambiado a mitad de combate. Sacar de la lista sigue
+      // siendo solo del GM.
+      const puede = !escondido && puedeEditarIniciativa(t);
       return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${esc(nombre)}</span>` +
-        (soyGM
-          ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">
-             <button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>`
+        (puede
+          ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
+        (soyGM ? `<button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
       '</div>';
     }).join('');
   }
@@ -1050,8 +1079,13 @@ function conectarIniciativa(){
   });
   caja.querySelectorAll('[data-ini-valor]').forEach(inp => {
     inp.onchange = () => {
-      const orden = iniciativa.orden.map(o => o.id === inp.dataset.iniValor ? {id: o.id, valor: num(inp.value)} : o);
+      const id = inp.dataset.iniValor;
+      const anterior = iniciativa.orden.find(o => o.id === id);
+      const nuevo = num(inp.value);
+      if(!anterior || anterior.valor === nuevo) return;
+      const orden = iniciativa.orden.map(o => o.id === id ? {id, valor: nuevo} : o);
       guardarIniciativa({orden});
+      publicarCambioIniciativa(id, anterior.valor, nuevo);
     };
     inp.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); inp.blur(); } };
   });

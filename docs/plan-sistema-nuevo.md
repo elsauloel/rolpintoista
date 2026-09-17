@@ -162,12 +162,14 @@ pendiente "GM oculta tokens".
   otro bando, o al realizar una acción hostil.
 
 **Orientación y campo de visión (decidido, en discusión):**
-- Cada token mira hacia **uno de los lados** de su hexágono (nunca a un
-  vértice): 6 direcciones. Con la grilla actual ("de punta arriba") son
-  derecha, izquierda y las 4 diagonales; no hay "arriba" puro *(a
-  confirmar si se deja así o se gira la grilla)*.
-- Se gira con un **palito ocre con una bolita** que sale del token hacia
-  donde mira: se arrastra la bolita. **Girar no cuesta No2** *(a debatir)*.
+- ✅ **Hecho en el mapa**: la grilla se giró a "de lado arriba" y cada
+  token es un hexágono que calza con su casilla y mira hacia **uno de los
+  6 lados** (nunca a un vértice); por defecto mira abajo, como casi toda
+  ilustración de token. Se gira arrastrando un handle celeste que sale del
+  token (no un palito ocre — el color se eligió para no confundirse con
+  dorado/verde/rojo/gris, que ya dicen de quién es el token); **girar no
+  cuesta No2**. Ver `vtt-hexgrid/CLAUDE.md`. Falta todo lo de abajo (cono
+  de visión, zona de alerta, sigilo de verdad).
 - **Cono de visión**: filas de 1, 2, 3 y 4 hexágonos hacia el frente (10
   en total); cada fila, medio hexágono más adelante y uno más ancha.
 - **Zona de alerta**: los hexágonos pegados al cono y los que rodean al
@@ -206,6 +208,8 @@ decisión relajada nueva se agrega acá al tomarla).
 | El borrado de tiradas viejas corre cuando el GM entra a una herramienta | Borrado del lado del servidor (TTL o función programada) |
 | Lo que cada uno escribe en su ficha (vida, SP, No2, stats) no se valida | Validar en el servidor lo que afecta a los demás |
 | **Sigilo** (en diseño): el bando contrario no ve el token, pero el resto de la info (ficha, tiradas) queda a decidir | Revisar que ningún dato filtre la posición o las acciones del que está en sigilo |
+| **Ocultar tokens** (GM, ya en el mapa): un jugador que mire la base de datos directamente podría ver igual el token oculto — el filtro es del lado del cliente, no de las reglas | Mover los tokens ocultos a una subcolección que solo lea el GM |
+| **Orden de turnos**: cualquier miembro puede reescribir el `orden` entero de `mapa/iniciativa` (no solo el valor de su propia fila) — las reglas no pueden revisar un elemento suelto de una lista | Partir `orden` en un documento por token, para que las reglas sí puedan limitar cada uno a su dueño |
 
 ## Pendientes chicos
 

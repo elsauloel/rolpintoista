@@ -85,12 +85,18 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
   izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20), visible
   **solo en modo combate**. Vive en `campanas/{id}/mapa/iniciativa`
-  (`{orden: [{id, valor}], turno, ronda}`): lo escribe solo el GM (reglas de
-  `mapa/{doc}`) y lo ven todos. El GM tiene "Traer tokens" (suma todos los
-  del mapa conservando valores), carga la tirada de cada uno, "Ordenar"
-  (de mayor a menor, empates en el orden previo), "▶ Siguiente" (avanza y
-  suma una ronda al dar la vuelta) y "Limpiar". Tocar una fila selecciona y
-  centra ese token. Plegado por navegador en `localStorage`
+  (`{orden: [{id, valor}], turno, ronda}`): lo ven todos. El GM tiene
+  "Traer tokens" (suma todos los del mapa conservando valores), carga la
+  tirada de cada uno, "Ordenar" (de mayor a menor, empates en el orden
+  previo), "▶ Siguiente" (avanza y suma una ronda al dar la vuelta) y
+  "Limpiar" — eso sigue siendo solo del GM. **El valor de cada fila** (algo
+  puede cambiarlo a mitad de combate) lo edita el GM en cualquier fila, o
+  cada jugador en la propia (`puedeEditarIniciativa`; reglas de
+  `mapa/{doc}`: cualquier miembro puede escribir `mapa/iniciativa` mientras
+  no toque `turno`/`ronda` ni el largo de `orden` — eso lo sigue rechazando
+  la regla salvo que sea el GM). Cada cambio de valor se anuncia en la Mesa
+  (`publicarCambioIniciativa`, `desde: 'recordatorio'`). Tocar una fila
+  selecciona y centra ese token. Plegado por navegador en `localStorage`
   (`mapa-iniciativa-plegada`).
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2

@@ -220,6 +220,13 @@ input[type=file]{display:none}
 
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 /* Editor de habilidades de creeps paso a paso (igual que en la ficha) */
+.opcion-fila{display:flex;flex-wrap:wrap;gap:6px}
+.opcion-btn{
+  font-family:"Space Mono",monospace;font-size:10.5px;border:1px solid var(--line);
+  background:var(--panel2);padding:6px 11px;color:var(--muted);border-radius:var(--r)
+}
+.opcion-btn:hover{border-color:var(--copper);color:var(--paper)}
+.opcion-btn.activa{border-color:var(--copper);background:rgba(201,133,69,.18);color:var(--paper);font-weight:700}
 .pasos-hab{display:flex;flex-wrap:wrap;gap:5px}
 .paso-chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;padding:3px 8px;border:1px solid var(--line);border-radius:99px;color:var(--muted);background:none;cursor:pointer}
 .paso-chip.hecho{color:var(--paper)}
@@ -940,8 +947,16 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
         <div class="f" style="margin-top:8px"><label>Descripción</label><textarea id="hc-detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
       </div>
       <div class="hc-paso" data-hc-paso="1">
+        <div class="f" style="margin-bottom:8px"><label>No2 que gasta</label>
+          <div class="opcion-fila">
+            <button type="button" class="opcion-btn" data-hc-nitros-modo="num">Un número</button>
+            <button type="button" class="opcion-btn" data-hc-nitros-modo="ataque">Lo mismo que un ataque</button>
+          </div>
+          <div class="hint" id="hc-ataque-ayuda" style="margin-top:5px"></div>
+        </div>
+        <input type="hidden" id="hc-nitros-modo" value="num">
         <div class="row3">
-          <div class="mini-f"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1" data-hc-enter="1"></div>
+          <div class="mini-f" id="hc-acciones-caja"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1" data-hc-enter="1"></div>
           <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0" data-hc-enter="1"></div>
           <div class="mini-f"><label>Otro costo</label><input type="text" id="hc-costo" placeholder="opcional" data-hc-enter="1"></div>
         </div>
@@ -2339,8 +2354,17 @@ function creepNitrosMax(sc){
   return Math.max(0, v);
 }
 
+// Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
+// ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
+function habCreepAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
 function costoNitrosHabCreep(sc, h){
+  if(habCreepAtaque(h)) return costoAtaqueCreep(sc);
   return num(h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad);
+}
+function costoHabCreepTxt(sc, h){
+  const n = costoNitrosHabCreep(sc, h);
+  if(habCreepAtaque(h)) return `${fmt(n)} No2 (como un ataque)`;
+  return n ? `${fmt(n)} No2` : "sin costo";
 }
 
 // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
@@ -2570,7 +2594,7 @@ function lupaHtmlCreep(clave){
     if(!h0) return {titulo: '', html: ''};
     const n = costoNitrosHabCreep(sc, h0);
     const porDefecto = h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '';
-    let h = lupaFila(porDefecto ? `No2 (por defecto, ${fmt(IT2_CREEP.nitrosHabilidad)})` : 'No2 de la habilidad', `${fmt(n)} No2`, 'lupa-total');
+    let h = lupaFila(habCreepAtaque(h0) ? `No2 · como un ataque <span class="lupa-gris">(${num(sc.ataquesTurno) ? "Tipo completo" : "primer ataque, Tipo ÷ 2"})</span>` : porDefecto ? `No2 (por defecto, ${fmt(IT2_CREEP.nitrosHabilidad)})` : "No2 de la habilidad", `${fmt(n)} No2`, "lupa-total");
     if(num(h0.cd) > 0) h += lupaFila('Cooldown', `${fmt(num(h0.cd))} turno(s)${num(h0.cdActual) > 0 ? ` · faltan ${fmt(num(h0.cdActual))}` : ''}`);
     h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), n > num(sc.nitros) ? 'lupa-falta' : '');
     let out = lupaSeccion('Costo', h);
@@ -2650,7 +2674,7 @@ function renderAccionesCreep(){
   const filasHab = sc.habilidades.map(h => {
     const bloqueo = bloqueoHabCreep(sc, h);
     const costo = costoNitrosHabCreep(sc, h);
-    const partes = [costo ? `${fmt(costo)} No2` : 'Sin costo'];
+    const partes = [costoHabCreepTxt(sc, h)];
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
     const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
     return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
@@ -2696,7 +2720,7 @@ function abrirVerHabAccion(scId, habId){
   const h = sc && sc.habilidades.find(x => x.id === habId);
   if(!h) return;
   const costo = costoNitrosHabCreep(sc, h);
-  const costoTxt = costo ? `${fmt(costo)} No2` : 'Sin costo';
+  const costoTxt = costoHabCreepTxt(sc, h);
   const cdTxt = num(h.cd) > 0 ? `${fmt(num(h.cd))} turno(s) de cooldown` : 'Sin cooldown';
   $('#verhab-nombre').textContent = h.nombre || 'Sin nombre';
   $('#verhab-body').innerHTML = `
@@ -3584,12 +3608,23 @@ const PASOS_HAB_CREEP = [
   {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto la puede usar?',
    ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
   {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
-   ayuda: "Podés vincularla a un stat del creep (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna."},
+   ayuda: "Podés vincularla a un stat del creep (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna. Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG."},
   {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
    ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
   {corto: 'Listo', titulo: 'Revisá cómo quedó',
    ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
 ];
+
+// Modo de costo de Nitros: número o "lo mismo que un ataque" (con su arma).
+function hcAplicarModoNitros(){
+  const modo = $("#hc-nitros-modo").value;
+  document.querySelectorAll("[data-hc-nitros-modo]").forEach(b => b.classList.toggle("activa", b.dataset.hcNitrosModo === modo));
+  $("#hc-acciones-caja").style.visibility = modo === "ataque" ? "hidden" : "visible";
+  const sc = editingHabCreep && S.creeps.find(s => s.id === editingHabCreep.scId);
+  $("#hc-ataque-ayuda").textContent = modo === "ataque"
+    ? `Cuesta lo mismo que un ataque con su arma (Tipo ÷ 2 el primero del turno, Tipo completo después) y cuenta como ese ataque.${sc ? ` Hoy: ${fmt(costoAtaqueCreep(sc))} No2.` : ""}`
+    : "Siempre gasta esa cantidad.";
+}
 
 function hcMostrarPaso(n){
   if(!editingHabCreep) return;
@@ -3641,7 +3676,7 @@ function hcResumenHtml(){
   const cd = num($('#hc-cd').value);
   return `<div class="resumen-nombre">${esc($('#hc-nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
-    ${fila('No2', fmt(Math.max(0, num($('#hc-acciones').value))))}
+    ${fila("No2", $("#hc-nitros-modo").value === "ataque" ? "como un ataque" : fmt(Math.max(0, num($("#hc-acciones").value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
     ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
     ${fila("Tirada", [hcStatLabel($("#hc-tirada-stat").value), $("#hc-tirada").value.trim()].filter(Boolean).join(" + ") || "no tira")}
@@ -3658,7 +3693,9 @@ function abrirEditorHabCreep(scId, habId){
   $('#hc-titulo-modal').textContent = habId ? `Editar habilidad · ${sc.nombre || 'creep'}` : `Nueva habilidad · ${sc.nombre || 'creep'}`;
   $('#hc-nombre').value = h.nombre || '';
   $('#hc-costo').value = h.costo || '';
-  $('#hc-acciones').value = h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad;
+  $("#hc-nitros-modo").value = habCreepAtaque(h) ? "ataque" : "num";
+  $("#hc-acciones").value = habCreepAtaque(h) ? IT2_CREEP.nitrosHabilidad : (h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad);
+  editingHabCreepPdgAuto = false;
   $('#hc-cd').value = h.cd || 0;
   $('#hc-detalle').value = h.detalle || '';
   $('#hc-tirada').value = h.tiradaExtra || '';
@@ -3671,6 +3708,7 @@ function abrirEditorHabCreep(scId, habId){
   $('#hc-efecto-detalle').value = h.efectoDetalle || '';
   $('#hc-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(h.efectoMods || []);
+  hcAplicarModoNitros();
   $('#scrim-hab-creep').classList.add('open');
   hcMostrarPaso(0);
 }
@@ -3688,7 +3726,7 @@ function guardarEditorHabCreep(){
   }
   h.nombre = $('#hc-nombre').value.trim() || 'Sin nombre';
   h.costo = $('#hc-costo').value;
-  h.nitrosCosto = Math.max(0, num($('#hc-acciones').value) || 0);
+  h.nitrosCosto = $("#hc-nitros-modo").value === "ataque" ? "ATAQUE" : Math.max(0, num($("#hc-acciones").value) || 0);
   h.cd = Math.max(0, num($('#hc-cd').value) || 0);
   h.detalle = $('#hc-detalle').value;
   h.tiradaExtra = $('#hc-tirada').value.trim();
@@ -3754,7 +3792,7 @@ function verCreep(id){
   const habilidades = sc.habilidades.map(h => {
     const partes = [];
     const costo = costoNitrosHabCreep(sc, h);
-    partes.push(costo ? `${fmt(costo)} No2` : 'Sin costo');
+    partes.push(costoHabCreepTxt(sc, h));
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
     const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}`;
     return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
@@ -3953,7 +3991,7 @@ function habHtml(sc, h){
   const bloqueo = bloqueoHabCreep(sc, h);
   const bloqueado = !!bloqueo;
   const costo = costoNitrosHabCreep(sc, h);
-  const estadoTxt = bloqueo || `Disponible · ${costo ? `${fmt(costo)} No2` : 'sin costo'}`;
+  const estadoTxt = bloqueo || `Disponible · ${costoHabCreepTxt(sc, h)}`;
 
   return `<div class="hab" data-habid="${h.id}">
     <div class="hab-top">
@@ -4254,6 +4292,7 @@ document.addEventListener('click', e => {
     const costo = costoNitrosHabCreep(sc, h);
     sc.nitros = num(sc.nitros) - costo;
     h.cdActual = num(h.cd);
+    if(habCreepAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
@@ -5120,6 +5159,17 @@ $('#hc-pasos').addEventListener('click', e => {
   const chip = e.target.closest('[data-hc-ir]');
   if(chip && editingHabCreep) hcMostrarPaso(num(chip.dataset.hcIr));
 });
+let editingHabCreepPdgAuto = false;
+document.querySelectorAll("[data-hc-nitros-modo]").forEach(b => b.onclick = () => {
+  const modo = b.dataset.hcNitrosModo;
+  $("#hc-nitros-modo").value = modo;
+  // Con costo de ataque, la tirada por defecto es PdG (si no eligió otra).
+  const sel = $("#hc-tirada-stat");
+  if(modo === "ataque" && !sel.value){ sel.value = "pdg"; editingHabCreepPdgAuto = true; }
+  else if(modo !== "ataque" && editingHabCreepPdgAuto && sel.value === "pdg"){ sel.value = ""; editingHabCreepPdgAuto = false; }
+  hcAplicarModoNitros();
+});
+$("#hc-tirada-stat").addEventListener("change", () => { editingHabCreepPdgAuto = false; });
 $('#hc-siguiente').onclick = () => { if(editingHabCreep) hcMostrarPaso(editingHabCreep.paso + 1); };
 $('#hc-atras').onclick = () => { if(editingHabCreep) hcMostrarPaso(editingHabCreep.paso - 1); };
 // Enter en un campo de una línea: al paso siguiente.

@@ -58,7 +58,10 @@ En desarrollo activo, las dos.
   `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
 - **Habilidades de creeps paso a paso** (`PASOS_HAB_CREEP`, `hcMostrarPaso`,
   `#scrim-hab-creep`): "+ Habilidad" y el ✎ abren el mismo asistente que la
-  ficha, adaptado: qué es → costo (No2, cooldown, otro costo) → tirada
+  ficha, adaptado: qué es → costo (No2: un número o `nitrosCosto: "ATAQUE"`,
+  lo mismo que un ataque del creep — `habCreepAtaque`, `costoHabCreepTxt` —,
+  que cuenta como ese ataque en `sc.ataquesTurno` y deja PdG como tirada por
+  defecto; cooldown, otro costo) → tirada
   (stat del creep con `creepStatValor` y/o fórmula; `habCreepTira`, `tirarExtraDeHab`) → estado (preset o a mano) → resumen. La habilidad nueva recién
   se agrega al creep al guardar.
 - **Stats secundarios** (`CREEP_DERIVADOS_POR_ATTR`, `derivadosHtml`): los

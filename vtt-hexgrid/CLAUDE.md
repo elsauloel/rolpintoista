@@ -151,9 +151,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   para armar creeps/tokens antes de que entren en la partida y mostrarlos
   cuando corresponda. Un token oculto no aparece para los jugadores (ni se
   dibuja ni se puede tocar, `calcularDisposicion`/aura filtran por
-  `soyGM`); el GM lo sigue viendo, más transparente para acordarse. En el
-  orden de turnos, si el GM mete un token oculto, a los demás les aparece
-  el turno pero con nombre "???" (`renderIniciativa`). Es solo una
+  `soyGM`); el GM lo sigue viendo, más transparente para acordarse y con
+  🙈 antes del nombre en el orden de turnos, que a los jugadores
+  directamente no les muestra esa fila (`renderIniciativa`; el turno pasa
+  igual cuando le toca, solo que no se nota que estuvo ahí). Es solo una
   comodidad para preparar la mesa, no un sistema de sigilo (eso es aparte,
   ver "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`) — un
   jugador que mire la base de datos directamente podría ver el token

@@ -1034,25 +1034,31 @@ function renderIniciativa(){
   $('#iniciativa-plegar').textContent = iniciativaPlegada ? '+' : '—';
   $('#iniciativa-ronda').textContent = iniciativa.orden.length ? `Ronda ${fmt(iniciativa.ronda)}` : '';
   const lista = $('#iniciativa-lista');
-  if(!iniciativa.orden.length){
+  // Un token oculto ni siquiera aparece en la lista para los jugadores (el
+  // turno pasa igual cuando le toca, pero no se nota que estuvo ahí).
+  const visibles = iniciativa.orden.map((o, i) => ({o, i})).filter(({o}) => {
+    const t = tokens.get(o.id);
+    return soyGM || !(t && t.oculto);
+  });
+  if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
   }else{
-    lista.innerHTML = iniciativa.orden.map((o, i) => {
+    lista.innerHTML = visibles.map(({o, i}) => {
       const t = tokens.get(o.id);
-      // El GM puede meter en el orden un token oculto; a los demás no se les
-      // dice cuál es (ni nombre ni imagen), pero el turno sigue en la lista.
-      const escondido = !!(t && t.oculto && !soyGM);
-      const nombre = escondido ? '???' : (t ? nombreDe(t) : '(token borrado)');
-      const v = (t && !escondido) ? vinculo(t) : null;
-      const mini = escondido ? '' : ((v && v.miniatura) || (t && t.imagen) || '');
-      const color = escondido ? '#3B2E34' : ((t && t.color) || '#9A867E');
+      const nombre = t ? nombreDe(t) : '(token borrado)';
+      const v = t ? vinculo(t) : null;
+      const mini = (v && v.miniatura) || (t && t.imagen) || '';
+      const color = (t && t.color) || '#9A867E';
+      // Al GM se le marca con 🙈 para acordarse de que ese no lo ven los
+      // jugadores, aunque él sí lo vea en su propia lista.
+      const oculto = !!(t && t.oculto);
       // El valor lo edita el GM (cualquier fila) o el dueño (la propia): algo
       // pudo habérselo cambiado a mitad de combate. Sacar de la lista sigue
       // siendo solo del GM.
-      const puede = !escondido && puedeEditarIniciativa(t);
+      const puede = puedeEditarIniciativa(t);
       return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${esc(nombre)}</span>` +
+        <span class="ini-nombre">${oculto ? '🙈 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +

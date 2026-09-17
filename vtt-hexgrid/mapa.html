@@ -2181,6 +2181,7 @@ function escucharTokens(){
     const primeraVez = !escucharTokens.listo;
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
+    asegurarTokensPersonajes();
     renderPanel();
     pedirDibujo();
   }, err => {
@@ -2189,10 +2190,46 @@ function escucharTokens(){
   });
 }
 
+// Cada mapa siempre tiene el token de cada personaje: si a este mapa le
+// falta el de alguno (mapa recién creado, o un personaje que se sumó
+// después), se crea solo, vinculado a su ficha — lo hace el GM (para
+// cualquiera) o el propio dueño (para el suyo), el primero de los dos que
+// tenga el mapa delante. Un id fijo por ficha + transacción evita que dos
+// pantallas lo creen dos veces a la vez.
+let asegurandoTokens = false;
+async function asegurarTokensPersonajes(){
+  if(asegurandoTokens || !fbUsuario || !fbMiembro) return;
+  const existentes = new Set([...tokens.values()]
+    .filter(t => t.tipo === 'pj')
+    .map(t => t.fichaId.split(SEP_INVOCACION)[0]));
+  const faltantes = [...fichasPub.entries()].filter(([id, f]) =>
+    id && !existentes.has(id) && (soyGM || f.duenoUid === fbUsuario.uid));
+  if(!faltantes.length) return;
+  asegurandoTokens = true;
+  try{
+    for(const [id, f] of faltantes){
+      const ref = coleccionTokens().doc(`pj-${id}`);
+      try{
+        await fbDb.runTransaction(async tx => {
+          const doc = await tx.get(ref);
+          if(doc.exists) return;
+          tx.set(ref, {
+            nombre: String(f.nombre || 'Personaje').slice(0, 40),
+            color: COLORES[Math.floor(Math.random() * COLORES.length)],
+            tipo: 'pj', duenoUid: f.duenoUid, fichaId: id,
+            col: 0, fila: 0,
+            creado: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        });
+      }catch(err){ console.error('No se pudo crear el token del personaje:', err); }
+    }
+  }finally{ asegurandoTokens = false; }
+}
+
 // Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
 // las barras, estados e imagen de los tokens vinculados.
 function escucharVinculables(){
-  const escuchar = (coleccion, mapa, campos) => fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
+  const escuchar = (coleccion, mapa, campos, alCambiar) => fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
       if(ch.type === 'removed'){ mapa.delete(ch.doc.id); return; }
       const d = ch.doc.data();
@@ -2203,8 +2240,9 @@ function escucharVinculables(){
     });
     renderPanel();
     pedirDibujo();
+    if(alCambiar) alCambiar();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
-  escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
+  escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura'], asegurarTokensPersonajes);
   escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura']);
 }
 

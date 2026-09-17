@@ -97,6 +97,15 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
 
 ## Cosas que hay que saber antes de tocar código acá
 
+- **Evitar dos conversaciones tocando el mismo archivo grande a la vez**
+  (sobre todo `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`,
+  los que más cambian). Antes de un cambio grande ahí: `git status` y
+  `git log --oneline -5` para ver si hay trabajo de otra conversación en
+  curso o recién subido, y avisar si el archivo cambió de abajo mientras
+  se estaba editando (el propio Edit ya avisa "el archivo había sido
+  modificado" — no ignorarlo, releer y seguir desde ese estado). Subir en
+  bloques chicos (ver el punto siguiente) para que la ventana de choque
+  entre conversaciones sea corta.
 - **Subir el trabajo apenas queda probado.** No hay "Traer última
   versión" que pueda pisar nada en esta carpeta (ni el botón ni el código
   existen), pero cada push a `nueva-version` se publica solo en GitHub

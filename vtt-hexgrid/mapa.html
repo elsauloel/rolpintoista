@@ -468,6 +468,17 @@ function toast(msg){
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
+// El sitio publicado (GitHub Pages) cachea cada archivo hasta 10 minutos:
+// sin esto, un iframe podía quedar con la ficha o gm-tools de antes de la
+// última actualización. Agrega un parámetro que cambia siempre, así el
+// navegador pide la versión real en vez de la que tenía guardada — va
+// antes del # si la URL trae uno (después del # no viaja al servidor).
+function sinCache(url){
+  const [base, hash] = url.split('#');
+  const sep = base.includes('?') ? '&' : '?';
+  return base + sep + '_v=' + Date.now() + (hash !== undefined ? '#' + hash : '');
+}
+
 
 /* ---------- Firebase (mismo bloque fb* que ficha y gm-tools) ---------- */
 
@@ -767,7 +778,7 @@ function mantenimientoSiguiente(){
   const marco = document.createElement('iframe');
   marco.title = 'Mantenimiento en segundo plano';
   marco.style.cssText = 'position:absolute;width:1px;height:1px;border:0;left:-9999px;top:0;visibility:hidden';
-  marco.src = mantenimientoCola.shift();
+  marco.src = sinCache(mantenimientoCola.shift());
   mantenimientoMarco = marco;
   // Por si la herramienta nunca avisa (sin conexión, etc.), se cierra sola.
   marco.cierre = setTimeout(mantenimientoCerrarMarco, 45000);
@@ -2868,7 +2879,7 @@ function abrirBotonera(fichaId, mensaje){
   botonera = {herramienta: 'ficha', fichaId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
-  marco.src = `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`;
+  marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`);
 }
 
 function abrirAcciones(creepId, mensaje){
@@ -2887,7 +2898,7 @@ function abrirAcciones(creepId, mensaje){
   botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
   $('#botonera-cargando').hidden = false;
-  marco.src = `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`;
+  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`);
 }
 
 // El foco pasa a la ventana del iframe, así sus teclas (Escape) le llegan directo.

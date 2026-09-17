@@ -188,7 +188,11 @@ escribir las fichas, así que cada una aplica su propio `mantenimiento()`
   (`ficha.html?modo=mantenimiento#id`, uno por vez) y el del GM corre
   `gm-tools.html?modo=mantenimiento`. Avisan `mantenimiento-listo` por
   `postMessage` cuando guardaron. Si nadie las abre, se ponen al día al
-  abrirse. La ficha ya no tiene botón de Mantenimiento.
+  abrirse. La ficha ya no tiene botón de Mantenimiento. Estos iframes (y
+  los de Botonera y Acciones) cargan siempre con `sinCache()`: el sitio
+  publicado cachea cada archivo hasta 10 minutos, y sin esto un iframe
+  podía quedar con la ficha o gm-tools de antes de la última actualización
+  mientras dura la sesión.
 
 ## Respaldo de la partida
 

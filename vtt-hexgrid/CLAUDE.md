@@ -97,6 +97,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,
   `abrir-acciones`). El botón de edición del panel se llama "✎ Editar token".
+  Como la Botonera y el Mantenimiento en segundo plano, este iframe carga
+  con `sinCache()` (agrega `_v=Date.now()` a la URL, antes del `#` si trae
+  uno) para que el sitio publicado no sirva una ficha o gm-tools vieja
+  desde la caché de 10 minutos de GitHub Pages.
 - **👥 Personajes** (cabecera, azul, todos los miembros): despliega las
   fichas de la partida (`fichasPub`, `renderListaPersonajes`); cada una abre
   `ficha.html?partida=…#<fichaId>` en otra pestaña. **⟳ Mantenimiento**

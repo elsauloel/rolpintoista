@@ -9,7 +9,10 @@ inventario, catálogo de compra, habilidades, bitácora.
 ## Estado actual
 
 En desarrollo activo, es la herramienta principal del proyecto y la que
-más cambia sesión a sesión.
+más cambia sesión a sesión. Por eso mismo, es la que más riesgo tiene de
+que dos conversaciones la editen a la vez — antes de un cambio grande acá,
+`git status`/`git log` para ver si hay trabajo reciente o en curso (ver
+[`../CLAUDE.md`](../CLAUDE.md)).
 
 ## Lógica principal
 

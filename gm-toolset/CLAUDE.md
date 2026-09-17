@@ -15,7 +15,10 @@ abren uno al otro, solo comparten catálogo y algunos formatos de datos).
 
 ## Estado actual
 
-En desarrollo activo, las dos.
+En desarrollo activo, las dos — `gm-tools.html` es de los archivos que más
+cambia; antes de un cambio grande ahí, `git status`/`git log` para ver si
+hay trabajo reciente o en curso de otra conversación (ver
+[`../CLAUDE.md`](../CLAUDE.md)).
 
 ## Lógica principal
 

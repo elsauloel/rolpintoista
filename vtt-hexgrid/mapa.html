@@ -445,6 +445,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
+<script src="../comun/efectos-golpe.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -3045,12 +3046,21 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
     const t = d.data({serverTimestamps: 'estimate'});
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
+    // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
+    if(EfectosGolpe.esLineaMesa(t)){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
+      div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
     if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
       const div = document.createElement('div');

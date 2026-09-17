@@ -10,7 +10,7 @@ import json
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-from catalogo_comun import CATALOGO_JSON
+from catalogo_comun import CATALOGO_JSON, efectos_a_texto
 
 
 items = json.load(open(CATALOGO_JSON, encoding="utf-8"))
@@ -38,7 +38,7 @@ OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',
                            'efectoNombre','efectoPreset','efectoTurnos','efectoHpTurno','efectoPermanente','efectoDetalle','efectoMods_extra'],
-    'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+    'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango','efectosGolpe_txt'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
                    ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
@@ -59,6 +59,7 @@ ETIQUETAS = {
     'efectoNombre':'Estado que aplica','efectoPreset':'Estado que aplica (preset)','efectoTurnos':'Turnos del estado',
     'efectoHpTurno':'HP por turno','efectoPermanente':'Estado permanente','efectoDetalle':'Detalle del estado',
     'efectoMods_extra':'Modificadores del estado',
+    'efectosGolpe_txt':'Efectos al golpear',
     'equipoEstadoNombre':'Estado al equipar','equipoEstadoHpTurno':'HP por turno equipado',
     'equipoEstadoDetalle':'Detalle del estado equipado',
     'equipoEstadoPreset':'Estado al equipar (preset)',
@@ -86,6 +87,8 @@ def valor(it, col):
         propios = {c[4:] for c in COLUMNAS[categoria(it)] if c.startswith('mod_')}
         extra = [f"{m['stat']}:{m['val']}" for m in it.get('mods', []) if m['stat'] not in propios]
         return '; '.join(extra)
+    if col == 'efectosGolpe_txt':
+        return efectos_a_texto(it.get('efectosGolpe'))
     if col == 'efectoMods_extra':
         return '; '.join(f"{m['stat']}:{m['val']}" for m in it.get('efectoMods', []))
     if col.startswith('mod_'):
@@ -147,6 +150,7 @@ filas = [
     ('Peso', 'En las armas es además la cantidad de dados que tira: peso 3 con dado d6 = 3d6.'),
     ('Tipo de dado', 'El número del dado del arma: 4, 6, 8, 10 o 12.'),
     ('Daño fijo', 'Se suma al resultado de los dados.'),
+    ('Efectos al golpear', 'Lo que el arma hace al pegar, separado por punto y coma. Cada uno: nombre, probabilidad como éxitos/caras (1/2 = 50%, 1/4 = 25%; sin nada = siempre), una tirada extra opcional y, después de dos puntos, qué hace. Ej: Envenenar 1/2: Veneno de 4 stacks; Rompe armadura; Quemadura 1d6'),
     ('', ''),
     ('Columnas de modificadores', 'Cada una suma (o resta, con negativo) a ese stat mientras el ítem esté equipado. Vacío = no lo toca.'),
     ('Otros modificadores', 'Para un stat que no tiene columna propia en esa pestaña. Formato: stat:valor; stat:valor — por ejemplo  mov:1; bonos:2'),

@@ -82,9 +82,14 @@ Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/e
   en el repo — apuntan a `datos/...` porque ahí es donde están los datos
   ahora, no porque el HTML esté cerca.
 - Los efectos de arma que se aplican al personaje **golpeado** (Rompe
-  armadura, Sangrado como texto de arma, etc.) son intencionalmente
-  manuales — no hay sistema de "efecto al golpear sobre el rival" y no es
-  un hueco a rellenar salvo que se pida construir eso específicamente.
+  armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma (desde
+  2026-09-17): al tirar el Daño se **recuerdan** resaltados en la Mesa y,
+  si tienen porcentaje, se **tiran** en un pop-up (`comun/efectos-golpe.js`).
+  Aplicarlos sobre el rival sigue siendo manual, a propósito: no hay que
+  automatizar el estado en el objetivo salvo que se pida.
+- Crear o editar ítems (menos consumibles) en la ficha, gm-tools, el
+  generador de tiendas y el editor de catálogo pasa por un solo asistente
+  paso a paso compartido: `comun/asistente-item.js`.
 - `ficha-personaje/ficha.html` pesa ~700 KB, casi todo el catálogo
   embebido. **Mientras dure el desarrollo, el catálogo va sin imágenes**
   (decidido 2026-09-17, se borraron las 41 que había para alivianar el

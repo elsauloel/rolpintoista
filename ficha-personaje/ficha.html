@@ -1416,7 +1416,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <header><h3>Agregar ítem</h3><button class="iconbtn" id="chooser-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:9px">
       <button class="btn primary" id="chooser-fabricante" style="width:100%">Catálogo del fabricante</button>
-      <button class="btn" id="chooser-arma" style="width:100%">Crear arma nueva (paso a paso)</button>
       <button class="btn" id="chooser-nuevo" style="width:100%">Crear ítem nuevo</button>
     </div>
   </div>
@@ -1733,6 +1732,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
+<script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/asistente-item.js"></script>
 <script>
 /* =========================================================
    MODELO
@@ -2160,7 +2161,7 @@ const DEFAULT = {
     {id:'new-sifon-de-soda-antiguo-a-presion', nombre:'Sifón de soda', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:10, unidades:1, consumible:true, curahp:10, mods:[], detalle:'', descripcionNarrativa:'Sifón de vidrio azul con la etiqueta despegada. Nadie recuerda quién lo cargó.'},
     {id:'new-vendas', nombre:'Vendas', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:25, unidades:1, consumible:true, legacy:true, curahp:0, mods:[], detalle:'Cura lisiado y sangrado', descripcionNarrativa:'Tiras de lienzo hervido, enrolladas prolijas. Aprietan donde tienen que apretar.'},
     {id:'new-aguijon-de-esgrima', nombre:'Aguijón de esgrima', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}, {stat:'parry', val:2}], detalle:'parry +2, pdg +1', descripcionNarrativa:'Hoja finísima con guarda de canasto. De escuela, no de campo.'},
-    {id:'new-aguijon-de-manticora', nombre:'Aguijón de mantícora', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:1100, consumible:false, curahp:0, mods:[{stat:'crit', val:2}, {stat:'dmg', val:2}], detalle:'critico +2, dza +2, aplica veneno severo', descripcionNarrativa:'Todavía está vivo de alguna manera. Se mueve apenas cuando huele sangre.'},
+    {id:'new-aguijon-de-manticora', nombre:'Aguijón de mantícora', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Envenenar', caras:1, exitos:1, dado:'', detalle:'Veneno severo.'}], precioCompra:1100, consumible:false, curahp:0, mods:[{stat:'crit', val:2}, {stat:'dmg', val:2}], detalle:'critico +2, dza +2, aplica veneno severo', descripcionNarrativa:'Todavía está vivo de alguna manera. Se mueve apenas cuando huele sangre.'},
     {id:'new-baston-de-monje', nombre:'Bastón de monje', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Madera lustrada por décadas de manos. No tiene un solo adorno.'},
     {id:'new-bate-de-baseball', nombre:'Bate de Baseball', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Aluminio abollado con el logo casi borrado. Alguien lo usó para otra cosa antes.'},
     {id:'new-baculo-shao-lin', nombre:'Báculo Shao Lin', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:1, precioCompra:800, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:1}, {stat:'rng', val:1}], detalle:'parry+2, bloqueo +1, alcance +1', descripcionNarrativa:'Madera de hierro pulida por generaciones de manos. No tiene filo y no lo necesita.'},
@@ -2169,83 +2170,83 @@ const DEFAULT = {
     {id:'new-cachiporra', nombre:'Cachiporra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:'', descripcionNarrativa:'Cuero cosido sobre plomo. Discreta, fácil de esconder bajo el saco.'},
     {id:'new-cimitarra', nombre:'Cimitarra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:69, consumible:false, curahp:0, mods:[{stat:'parry', val:1}], detalle:'parry +1', descripcionNarrativa:'Curva ancha de acero barato. Corta bien mientras el filo aguante.'},
     {id:'new-cimitarra-de-guardia', nombre:'Cimitarra de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'parry', val:2}], detalle:'Parry +2', descripcionNarrativa:'Curva prolija, bien balanceada. Reglamentaria de cuerpo de guardia.'},
-    {id:'new-colmillo-dientes-de-sable', nombre:'Colmillo dientes de sable', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:1, precioCompra:900, consumible:false, curahp:0, mods:[], detalle:'Deja sangrando x2hp', descripcionNarrativa:'Colmillo fósil montado en cuero. Sigue sabiendo lo que tiene que hacer.'},
-    {id:'new-cuchilla-de-carnicero', nombre:'Cuchilla de carnicero', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura', descripcionNarrativa:'Ancha y pesada como una puerta. No corta: separa.'},
+    {id:'new-colmillo-dientes-de-sable', nombre:'Colmillo dientes de sable', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:1, efectosGolpe:[{nombre:'Sangrado', caras:1, exitos:1, dado:'', detalle:'Sangrado de 2 HP por turno.'}], precioCompra:900, consumible:false, curahp:0, mods:[], detalle:'Deja sangrando x2hp', descripcionNarrativa:'Colmillo fósil montado en cuero. Sigue sabiendo lo que tiene que hacer.'},
+    {id:'new-cuchilla-de-carnicero', nombre:'Cuchilla de carnicero', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura', descripcionNarrativa:'Ancha y pesada como una puerta. No corta: separa.'},
     {id:'new-cuchillo-de-cazador', nombre:'Cuchillo de cazador', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Hoja corta con muescas para desollar. Huele a lo último que abrió.'},
     {id:'new-daga', nombre:'Daga', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:1, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'La daga de siempre. Todos empiezan con una.'},
     {id:'new-daga-de-capitan', nombre:'Daga de Capitán', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'pdg +1', descripcionNarrativa:'Empuñadura con el escudo de la compañía. Se entrega con el rango.'},
-    {id:'new-daga-de-guardia', nombre:'Daga de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:1, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 punto de resistencia al crítico', descripcionNarrativa:'Punta triangular, hecha para meterse entre las placas.'},
+    {id:'new-daga-de-guardia', nombre:'Daga de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:1, efectosGolpe:[{nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Ignora 1 punto de resistencia al crítico', descripcionNarrativa:'Punta triangular, hecha para meterse entre las placas.'},
     {id:'cat-espada-ancha', nombre:'Espada ancha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:1, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Hoja gruesa y pareja, sin gracia ninguna. Cumple.'},
     {id:'new-espada-bastarda', nombre:'Espada bastarda', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:1, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'parry', val:1}, {stat:'bloqueo', val:1}], detalle:'parry+1, bloqueo+1', descripcionNarrativa:'Se usa con una o con dos manos. Nunca termina de decidirse.'},
     {id:'cat-espada-corta', nombre:'Espada corta', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:30, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Liviana y manejable. La primera que le dan a cualquiera.'},
     {id:'new-espada-corta-de-instruccion', nombre:'Espada corta de instrucción', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Filo redondeado a propósito. Sirve para aprender y para pegar igual.'},
-    {id:'new-espada-corta-oxidada', nombre:'Espada corta oxidada', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'envenena x 50% de chances', descripcionNarrativa:'El óxido comió la hoja hasta dejarla porosa. Lo que entra ahí no sale limpio.'},
-    {id:'new-espada-de-nosferatu', nombre:'Espada de Nosferatu', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:2, precioCompra:1300, consumible:false, curahp:0, mods:[], detalle:'50% de chances de ignorar armadura. Drena hp igual al daño ejercido', descripcionNarrativa:'Hoja negra que no refleja nada. Lo que saca no vuelve al que lo perdió.'},
+    {id:'new-espada-corta-oxidada', nombre:'Espada corta oxidada', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Envenenar', caras:2, exitos:1, dado:'', detalle:'Aplicale Veneno al objetivo.'}], precioCompra:70, consumible:false, curahp:0, mods:[], detalle:'envenena x 50% de chances', descripcionNarrativa:'El óxido comió la hoja hasta dejarla porosa. Lo que entra ahí no sale limpio.'},
+    {id:'new-espada-de-nosferatu', nombre:'Espada de Nosferatu', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:2, efectosGolpe:[{nombre:'Ignora armadura', caras:2, exitos:1, dado:'', detalle:'Si entra, el golpe ignora la Defensa del objetivo.'}, {nombre:'Drena vida', caras:1, exitos:1, dado:'', detalle:'Te curás tanto HP como el daño que hiciste.'}], precioCompra:1300, consumible:false, curahp:0, mods:[], detalle:'50% de chances de ignorar armadura. Drena hp igual al daño ejercido', descripcionNarrativa:'Hoja negra que no refleja nada. Lo que saca no vuelve al que lo perdió.'},
     {id:'cat-espada-larga', nombre:'Espada larga', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}], detalle:'pdg +2', descripcionNarrativa:'Un palmo más larga que la corta, y eso cambia todo.'},
-    {id:'new-espada-larga-de-dorne', nombre:'Espada larga de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}], detalle:'pdg+2, envenena', descripcionNarrativa:'Acero del desierto, con la hoja tratada con algo que nadie quiere tocar.'},
+    {id:'new-espada-larga-de-dorne', nombre:'Espada larga de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Envenenar', caras:1, exitos:1, dado:'', detalle:'Aplicale Veneno al objetivo.'}], precioCompra:500, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}], detalle:'pdg+2, envenena', descripcionNarrativa:'Acero del desierto, con la hoja tratada con algo que nadie quiere tocar.'},
     {id:'new-espadon', nombre:'Espadón', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:6, danoFijo:0, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3', descripcionNarrativa:'Enorme, con parrierdaga sobre la hoja. Se usa casi como una lanza corta.'},
     {id:'new-estilete-de-competencia', nombre:'Estilete de competencia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'crit', val:1}], detalle:'Crítico +1', descripcionNarrativa:'Fabricado para duelo reglado. Fino hasta lo absurdo.'},
     {id:'new-estileto-comun', nombre:'Estileto común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'crit', val:1}], detalle:'crítico +1', descripcionNarrativa:'Punta finísima y nada más. Está hecho para un solo tipo de trabajo.'},
     {id:'cat-estoque', nombre:'Estoque', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'Modificador: +1 a iniciativa', descripcionNarrativa:'Todo punta, nada de filo. Llega antes que el resto.'},
-    {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:2, precioCompra:80, consumible:false, curahp:0, mods:[], detalle:'Ingora 2 de resistencia al crítico', descripcionNarrativa:'Punta buscadora de juntas, hecha por alguien que sabía dónde están.'},
-    {id:'new-facon-de-martin-fierro', nombre:'Facón de Martín Fierro', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:4, tipoDado:4, danoFijo:0, precioCompra:0, consumible:false, curahp:0, mods:[{stat:'crit', val:4}], detalle:'Crítico +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.', descripcionNarrativa:'El facón es la medida del hombre y el juez de los agravios.'},
-    {id:'new-falchion', nombre:'Falchion', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'Ingora 1 de resistencia al crítico', descripcionNarrativa:'Hoja ancha de un solo filo. Pesa hacia adelante y por eso abre.'},
-    {id:'new-flamberge', nombre:'Flamberge', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:2, precioCompra:550, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'sangrado, +1 pdg', descripcionNarrativa:'Hoja ondulada que corta en varios puntos a la vez. Las heridas no cierran solas.'},
-    {id:'new-garra-de-fafner', nombre:'Garra de Fafner', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:1100, consumible:false, curahp:0, mods:[], detalle:'Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.', descripcionNarrativa:'Garra de dragón montada en hueso. Aprende del enemigo golpe a golpe.'},
+    {id:'new-estoque-de-duelista', nombre:'Estoque de duelista', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:4, danoFijo:2, efectosGolpe:[{nombre:'Ignora 2 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 2 menos de resistencia.'}], precioCompra:80, consumible:false, curahp:0, mods:[], detalle:'Ingora 2 de resistencia al crítico', descripcionNarrativa:'Punta buscadora de juntas, hecha por alguien que sabía dónde están.'},
+    {id:'new-facon-de-martin-fierro', nombre:'Facón de Martín Fierro', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:4, tipoDado:4, danoFijo:0, efectosGolpe:[{nombre:'Sangrado', caras:1, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}, {nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}, {nombre:'Primera sangre', caras:1, exitos:1, dado:'', detalle:'El primer golpe a cada enemigo es doble crítico garantizado.'}], precioCompra:0, consumible:false, curahp:0, mods:[{stat:'crit', val:4}], detalle:'Crítico +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.', descripcionNarrativa:'El facón es la medida del hombre y el juez de los agravios.'},
+    {id:'new-falchion', nombre:'Falchion', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'Ingora 1 de resistencia al crítico', descripcionNarrativa:'Hoja ancha de un solo filo. Pesa hacia adelante y por eso abre.'},
+    {id:'new-flamberge', nombre:'Flamberge', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:2, efectosGolpe:[{nombre:'Sangrado', caras:1, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}], precioCompra:550, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'sangrado, +1 pdg', descripcionNarrativa:'Hoja ondulada que corta en varios puntos a la vez. Las heridas no cierran solas.'},
+    {id:'new-garra-de-fafner', nombre:'Garra de Fafner', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, efectosGolpe:[{nombre:'Ignora armadura', caras:1, exitos:1, dado:'', detalle:'El golpe ignora la Defensa del objetivo.'}, {nombre:'Golpes seguidos', caras:1, exitos:1, dado:'', detalle:'Cada golpe seguido al mismo enemigo suma +1 al daño fijo.'}], precioCompra:1100, consumible:false, curahp:0, mods:[], detalle:'Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.', descripcionNarrativa:'Garra de dragón montada en hueso. Aprende del enemigo golpe a golpe.'},
     {id:'cat-maza', nombre:'Garrote', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Un palo con una punta más gorda que la otra. No hace falta explicar más.'},
     {id:'new-gladius', nombre:'Gladius', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:400, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:2}], detalle:'parry +2, bloqueo +2', descripcionNarrativa:'Corto, ancho y romano. Diseñado para la formación cerrada.'},
-    {id:'cat-hacha', nombre:'Hacha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'Hacha de leña reconvertida. Nadie le cambió el mango todavía.'},
-    {id:'new-hacha-con-pico', nombre:'Hacha con pico', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'ignora 1 de resistencia al crítico', descripcionNarrativa:'Filo de un lado, pico del otro. Dos formas de resolver el mismo problema.'},
-    {id:'new-hacha-danesa', nombre:'Hacha danesa', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1. Rompe armadura.', descripcionNarrativa:'Asta larga y hoja delgada. Vikinga, veloz y letal.'},
-    {id:'new-hacha-de-durin', nombre:'Hacha de Durin', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:1200, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura. +2 a la fuerza. deja lisiado', descripcionNarrativa:'Forjada bajo la montaña por manos que ya no están. Sigue esperando su turno.'},
-    {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'Rompe armadura. +1 al bloqueo', descripcionNarrativa:'Cabeza ancha con refuerzo en el mango. Se puede parar un golpe con ella.'},
-    {id:'new-hacha-de-constructor', nombre:'Hacha de constructor', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura', descripcionNarrativa:'Cabeza chata de un lado para clavar estacas. Sirve igual para lo otro.'},
-    {id:'new-hacha-de-doble-filo', nombre:'Hacha de doble filo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'Simétrica y equilibrada. No hay lado malo para pegar.'},
-    {id:'cat-hacha-de-mano', nombre:'Hacha de doble filo', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Ignora 1 resistencia al crítico', descripcionNarrativa:'Simétrica, más pesada y mejor templada que la común.'},
+    {id:'cat-hacha', nombre:'Hacha', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'Hacha de leña reconvertida. Nadie le cambió el mango todavía.'},
+    {id:'new-hacha-con-pico', nombre:'Hacha con pico', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], precioCompra:110, consumible:false, curahp:0, mods:[], detalle:'ignora 1 de resistencia al crítico', descripcionNarrativa:'Filo de un lado, pico del otro. Dos formas de resolver el mismo problema.'},
+    {id:'new-hacha-danesa', nombre:'Hacha danesa', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:130, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1. Rompe armadura.', descripcionNarrativa:'Asta larga y hoja delgada. Vikinga, veloz y letal.'},
+    {id:'new-hacha-de-durin', nombre:'Hacha de Durin', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:8, danoFijo:1, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}, {nombre:'Lisiado', caras:1, exitos:1, dado:'', detalle:'Aplicale Lisiado al objetivo.'}], precioCompra:1200, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura. +2 a la fuerza. deja lisiado', descripcionNarrativa:'Forjada bajo la montaña por manos que ya no están. Sigue esperando su turno.'},
+    {id:'cat-hacha-de-batalla', nombre:'Hacha de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:110, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'Rompe armadura. +1 al bloqueo', descripcionNarrativa:'Cabeza ancha con refuerzo en el mango. Se puede parar un golpe con ella.'},
+    {id:'new-hacha-de-constructor', nombre:'Hacha de constructor', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura', descripcionNarrativa:'Cabeza chata de un lado para clavar estacas. Sirve igual para lo otro.'},
+    {id:'new-hacha-de-doble-filo', nombre:'Hacha de doble filo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:1, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'Simétrica y equilibrada. No hay lado malo para pegar.'},
+    {id:'cat-hacha-de-mano', nombre:'Hacha de doble filo', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}, {nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], precioCompra:120, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Ignora 1 resistencia al crítico', descripcionNarrativa:'Simétrica, más pesada y mejor templada que la común.'},
     {id:'new-hacha-de-guardia-real', nombre:'Hacha de guardia real', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:500, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3', descripcionNarrativa:'Ceremonial de apariencia, brutal en la práctica. Nadie se confunde dos veces.'},
     {id:'new-hacha-de-guerra-ligera', nombre:'Hacha de guerra ligera', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:1, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Aligerada a costa de masa. Se maneja rápido.'},
-    {id:'new-hacha-de-guerra-pesada', nombre:'Hacha de guerra pesada', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura', descripcionNarrativa:'Tanto peso adelante que el golpe no se puede frenar a mitad de camino.'},
+    {id:'new-hacha-de-guerra-pesada', nombre:'Hacha de guerra pesada', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}], precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Arruina armadura', descripcionNarrativa:'Tanto peso adelante que el golpe no se puede frenar a mitad de camino.'},
     {id:'new-hacha-de-lenador', nombre:'Hacha de leñador', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Mango largo, cabeza pesada. Pensada para árboles, usada para otra cosa.'},
-    {id:'new-hacha-de-madera-mistica', nombre:'Hacha de madera mística', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:600, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Drena 50% del daño.', descripcionNarrativa:'Sin una sola pieza de metal. Toma algo del que corta y se lo da al que la lleva.'},
-    {id:'new-hacha-dentada', nombre:'Hacha dentada', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, precioCompra:115, consumible:false, curahp:0, mods:[], detalle:'50% de dejar sangrando', descripcionNarrativa:'El filo tiene dientes de sierra. Lo que abre no cierra fácil.'},
-    {id:'new-hacha-filo-de-diamante', nombre:'Hacha filo de diamante', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:450, consumible:false, curahp:0, mods:[], detalle:'Crítico aumentado. Arruina armadura.', descripcionNarrativa:'El filo tiene incrustaciones que muerden el acero como si fuera madera.'},
-    {id:'new-hacha-oxidada', nombre:'Hacha oxidada', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'50% de chances de envenenar', descripcionNarrativa:'Herrumbrada hasta el mango. Cada corte que hace se infecta.'},
+    {id:'new-hacha-de-madera-mistica', nombre:'Hacha de madera mística', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}, {nombre:'Drena vida', caras:1, exitos:1, dado:'', detalle:'Te curás la mitad del daño que hiciste.'}], precioCompra:600, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Drena 50% del daño.', descripcionNarrativa:'Sin una sola pieza de metal. Toma algo del que corta y se lo da al que la lleva.'},
+    {id:'new-hacha-dentada', nombre:'Hacha dentada', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Sangrado', caras:2, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}], precioCompra:115, consumible:false, curahp:0, mods:[], detalle:'50% de dejar sangrando', descripcionNarrativa:'El filo tiene dientes de sierra. Lo que abre no cierra fácil.'},
+    {id:'new-hacha-filo-de-diamante', nombre:'Hacha filo de diamante', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}], precioCompra:450, consumible:false, curahp:0, mods:[], detalle:'Crítico aumentado. Arruina armadura.', descripcionNarrativa:'El filo tiene incrustaciones que muerden el acero como si fuera madera.'},
+    {id:'new-hacha-oxidada', nombre:'Hacha oxidada', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, efectosGolpe:[{nombre:'Envenenar', caras:2, exitos:1, dado:'', detalle:'Aplicale Veneno al objetivo.'}], precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'50% de chances de envenenar', descripcionNarrativa:'Herrumbrada hasta el mango. Cada corte que hace se infecta.'},
     {id:'new-hachuela', nombre:'Hachuela', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Corta y de una mano. Cabe en el cinturón sin molestar.'},
     {id:'new-horquilla', nombre:'Horquilla', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Herramienta de campo con tres dientes. Alcanza más lejos de lo que uno cree.'},
-    {id:'new-hoz', nombre:'Hoz', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'sangrado 50%', descripcionNarrativa:'Curva y filosa por dentro. Engancha antes de cortar.'},
+    {id:'new-hoz', nombre:'Hoz', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Sangrado', caras:2, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}], precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'sangrado 50%', descripcionNarrativa:'Curva y filosa por dentro. Engancha antes de cortar.'},
     {id:'new-katana', nombre:'Katana', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'pdg', val:2}, {stat:'crit', val:1}], detalle:'pdg+2, crítico +1', descripcionNarrativa:'Curva perfecta, filo obsesivo. Alguien le dedicó una vida a esta hoja.'},
     {id:'new-lanza-corta', nombre:'Lanza corta', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Asta de fresno y punta de hierro. La primera línea de cualquier milicia.'},
     {id:'new-lanza-militar', nombre:'Lanza militar', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:2, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Asta reglamentaria de dos metros. Formación cerrada, punta al frente.'},
-    {id:'new-lanzallamas', nombre:'Lanzallamas', tier:'Raro', imagen:'', tipoItem:'arma_2m', peso:4, ranuras:1, tipoDado:12, danoFijo:0, armaDeRango:true, precioCompra:2000, consumible:false, curahp:0, mods:[], detalle:'Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.', descripcionNarrativa:'Tanque de presión con boquilla ennegrecida. Silba antes de escupir fuego.'},
-    {id:'new-lucero-del-alba', nombre:'Lucero del alba', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Ignora 1 de res al crítico, alcance +1', descripcionNarrativa:'Bola con púas al final de un asta. Feo de mirar, peor de recibir.'},
-    {id:'new-machete', nombre:'Machete', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'romper armadura 50%', descripcionNarrativa:'Hoja ancha para abrirse paso en el monte. También abre otras cosas.'},
+    {id:'new-lanzallamas', nombre:'Lanzallamas', tier:'Raro', imagen:'', tipoItem:'arma_2m', peso:4, ranuras:1, tipoDado:12, danoFijo:0, armaDeRango:true, efectosGolpe:[{nombre:'Prende fuego', caras:1, exitos:1, dado:'1d8', detalle:'Prende fuego al objetivo: 1d8 por cada stack de fuego.'}], precioCompra:2000, consumible:false, curahp:0, mods:[], detalle:'Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.', descripcionNarrativa:'Tanque de presión con boquilla ennegrecida. Silba antes de escupir fuego.'},
+    {id:'new-lucero-del-alba', nombre:'Lucero del alba', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, efectosGolpe:[{nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], precioCompra:150, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Ignora 1 de res al crítico, alcance +1', descripcionNarrativa:'Bola con púas al final de un asta. Feo de mirar, peor de recibir.'},
+    {id:'new-machete', nombre:'Machete', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:2, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:60, consumible:false, curahp:0, mods:[], detalle:'romper armadura 50%', descripcionNarrativa:'Hoja ancha para abrirse paso en el monte. También abre otras cosas.'},
     {id:'new-mandoble', nombre:'Mandoble', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:1}], detalle:'Parry+2, bloqueo+1', descripcionNarrativa:'Empuñadura larga para dos manos. Se pelea con todo el cuerpo.'},
     {id:'cat-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:10, danoFijo:1, precioCompra:160, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'Alcance +1.', descripcionNarrativa:'Cadena entre el mango y la cabeza. Impredecible incluso para el que lo usa.'},
     {id:'new-mangual', nombre:'Mangual', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Versión pesada, de dos cabezas. Una vez que arranca, no se frena.'},
     {id:'cat-martillo', nombre:'Martillo', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Cabeza de acero macizo, mango de nogal. Sin vueltas.'},
-    {id:'new-martillo-de-vulcano', nombre:'Martillo de Vulcano', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:5, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:1600, consumible:false, curahp:0, mods:[], detalle:'Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado', descripcionNarrativa:'Cada impacto libera lo que el dios dejó adentro. Conviene mirar para atrás del objetivo.'},
+    {id:'new-martillo-de-vulcano', nombre:'Martillo de Vulcano', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:5, ranuras:0, tipoDado:10, danoFijo:0, efectosGolpe:[{nombre:'Explosión', caras:1, exitos:1, dado:'', detalle:'Daño explosivo en un cono de 3 hex detrás del objetivo.'}], precioCompra:1600, consumible:false, curahp:0, mods:[], detalle:'Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado', descripcionNarrativa:'Cada impacto libera lo que el dios dejó adentro. Conviene mirar para atrás del objetivo.'},
     {id:'new-martillo-de-bola', nombre:'Martillo de bola', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:115, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1', descripcionNarrativa:'De herrería, con la cabeza redonda gastada de tanto golpear.'},
     {id:'new-martillo-de-cabeza-plana', nombre:'Martillo de cabeza plana', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:135, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:2}], detalle:'bloqueo +2', descripcionNarrativa:'Superficie ancha para golpear y para frenar golpes.'},
     {id:'new-martillo-de-cantero', nombre:'Martillo de cantero', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Mango largo para trabajar piedra a distancia prudente.'},
-    {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:10, danoFijo:1, precioCompra:850, consumible:false, curahp:0, mods:[], detalle:'Deja en pajaritos', descripcionNarrativa:'Runas grabadas en la cabeza. El golpe deja zumbando la cabeza del otro.'},
+    {id:'new-martillo-de-guerra-runico', nombre:'Martillo de guerra rúnico', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:10, danoFijo:1, efectosGolpe:[{nombre:'Pajaritos', caras:1, exitos:1, dado:'', detalle:'El objetivo queda aturdido (pajaritos).'}], precioCompra:850, consumible:false, curahp:0, mods:[], detalle:'Deja en pajaritos', descripcionNarrativa:'Runas grabadas en la cabeza. El golpe deja zumbando la cabeza del otro.'},
     {id:'new-martillo-de-sargento', nombre:'Martillo de sargento', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'crit', val:10}, {stat:'parry', val:1}], detalle:'', descripcionNarrativa:'Cabeza enorme y mango corto. Autoridad hecha herramienta.'},
     {id:'new-martillo-ergonomico', nombre:'Martillo ergonómico', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'bloqueo +3', descripcionNarrativa:'Mango moldeado a la mano. Un lujo raro en una herramienta de guerra.'},
     {id:'new-maza', nombre:'Maza', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:10, danoFijo:0, danoAmplificado:1, precioCompra:50, consumible:false, curahp:0, mods:[], detalle:'Daño amplificado.', descripcionNarrativa:'Cabeza de hierro maciza sobre un mango corto. Sin gracia, sin adornos, sin fallar.'},
     {id:'new-maza-de-acero', nombre:'Maza de acero', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:160, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'Bloqueo +3', descripcionNarrativa:'Bridas de acero soldadas a un núcleo macizo. Abolla lo que toca.'},
     {id:'new-maza-de-guardia', nombre:'Maza de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:3, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Pesada, con bridas verticales. De cuerpo de guardia de ciudad.'},
     {id:'new-maza-de-hierro', nombre:'Maza de hierro', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1', descripcionNarrativa:'Barra maciza con la punta engrosada. Simple y definitiva.'},
-    {id:'new-maza-de-vibranium', nombre:'Maza de vibranium', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:10, danoFijo:2, precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'La mitad del daño ignora armadura. bloqueo +3', descripcionNarrativa:'Absorbe el impacto y lo devuelve del otro lado de la armadura.'},
+    {id:'new-maza-de-vibranium', nombre:'Maza de vibranium', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:10, danoFijo:2, efectosGolpe:[{nombre:'Media armadura', caras:1, exitos:1, dado:'', detalle:'La mitad del daño ignora la Defensa del objetivo.'}], precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:3}], detalle:'La mitad del daño ignora armadura. bloqueo +3', descripcionNarrativa:'Absorbe el impacto y lo devuelve del otro lado de la armadura.'},
     {id:'new-pica-hielos', nombre:'Pica Hielos', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Punzón fino con mango de madera. Nadie pregunta por qué lo llevás.'},
-    {id:'new-pico-de-guerra', nombre:'Pico de guerra', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1, 50% de romper armadura', descripcionNarrativa:'Punta larga y estrecha. Busca las juntas de la armadura.'},
-    {id:'new-punal-aserrado', nombre:'Puñal aserrado', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'El lomo tiene dientes. Sale peor de lo que entró.'},
-    {id:'new-punal-de-dorne', nombre:'Puñal de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:2, precioCompra:850, consumible:false, curahp:0, mods:[], detalle:'Veneno stock 4', descripcionNarrativa:'Viene con su propio frasquito. Nunca sale de viaje sin cargar.'},
+    {id:'new-pico-de-guerra', nombre:'Pico de guerra', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:2, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:90, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1, 50% de romper armadura', descripcionNarrativa:'Punta larga y estrecha. Busca las juntas de la armadura.'},
+    {id:'new-punal-aserrado', nombre:'Puñal aserrado', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:100, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura.', descripcionNarrativa:'El lomo tiene dientes. Sale peor de lo que entró.'},
+    {id:'new-punal-de-dorne', nombre:'Puñal de Dorne', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:4, danoFijo:2, efectosGolpe:[{nombre:'Envenenar', caras:1, exitos:1, dado:'', detalle:'Veneno de 4 stacks.'}], precioCompra:850, consumible:false, curahp:0, mods:[], detalle:'Veneno stock 4', descripcionNarrativa:'Viene con su propio frasquito. Nunca sale de viaje sin cargar.'},
     {id:'new-reflejo-de-acero', nombre:'Reflejo de Acero', tier:'Legendario', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:3, precioCompra:1400, consumible:false, curahp:0, mods:[{stat:'parry', val:3}, {stat:'bloqueo', val:2}], detalle:'Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones', descripcionNarrativa:'Se mueve sola un instante antes que la mano. Nadie sabe si eso es bueno.'},
-    {id:'new-rompefilas', nombre:'Rompefilas', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:900, consumible:false, curahp:0, mods:[], detalle:'Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia', descripcionNarrativa:'Cabeza enorme montada en asta corta. Está hecho para abrir formaciones a la fuerza.'},
-    {id:'cat-rompemalla', nombre:'Rompemalla', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'50% chance de Romper armadura.', descripcionNarrativa:'Punta cuadrada que separa los anillos en vez de cortarlos.'},
+    {id:'new-rompefilas', nombre:'Rompefilas', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:4, ranuras:0, tipoDado:10, danoFijo:0, efectosGolpe:[{nombre:'Empuje', caras:1, exitos:1, dado:'', detalle:'Lo empuja 2 casilleros (FUE vs CON). Si choca contra algo, daño directo igual a la diferencia.'}], precioCompra:900, consumible:false, curahp:0, mods:[], detalle:'Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia', descripcionNarrativa:'Cabeza enorme montada en asta corta. Está hecho para abrir formaciones a la fuerza.'},
+    {id:'cat-rompemalla', nombre:'Rompemalla', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, efectosGolpe:[{nombre:'Rompe armadura', caras:2, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], precioCompra:75, consumible:false, curahp:0, mods:[], detalle:'50% chance de Romper armadura.', descripcionNarrativa:'Punta cuadrada que separa los anillos en vez de cortarlos.'},
     {id:'new-sable-comun', nombre:'Sable común', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'ini', val:1}], detalle:'iniciativa +1', descripcionNarrativa:'Curvo, liviano y rápido de sacar. De caballería barata.'},
     {id:'new-sable-de-caballeria', nombre:'Sable de caballería', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}, {stat:'parry', val:1}], detalle:'pdg +1, parry +1', descripcionNarrativa:'Curvo y liviano, pensado para pegar al galope.'},
     {id:'new-sable-militar', nombre:'Sable militar', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'pdg +1', descripcionNarrativa:'Reglamentario, con vaina de cuero rígido. Miles iguales a este.'},
-    {id:'new-sagaris', nombre:'Sagaris', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:1, precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Sangrado.', descripcionNarrativa:'Hacha de estepa con pico posterior. Antigua y todavía imbatible.'},
+    {id:'new-sagaris', nombre:'Sagaris', tier:'Raro', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:8, danoFijo:1, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}, {nombre:'Sangrado', caras:1, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}], precioCompra:130, consumible:false, curahp:0, mods:[], detalle:'Rompe armadura. Sangrado.', descripcionNarrativa:'Hacha de estepa con pico posterior. Antigua y todavía imbatible.'},
     {id:'new-tomahawk', nombre:'Tomahawk', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:8, danoFijo:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'rng', val:1}], detalle:'alcance +1', descripcionNarrativa:'Se puede tirar. Casi siempre vuelve alguien a buscarlo.'},
     {id:'new-garrote-de-hueso', nombre:'garrote de hueso', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}], detalle:'bloqueo +1', descripcionNarrativa:'Fémur de algo grande, endurecido y atado con tiento.'},
     {id:'new-broquel-de-acero', nombre:'Broquel de acero', tier:'Raro', imagen:'', tipoItem:'escudo_1m', peso:2, ranuras:0, precioCompra:120, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'parry', val:3}], detalle:'Parry +3, resistencia a críticos tipo 4 y 6', descripcionNarrativa:'Acero templado, pulido a espejo. Devuelve la luz a los ojos del otro.'},
@@ -2944,6 +2945,7 @@ function tirarDanoDeArma(it){
   const r = tirarDados(armaDanoTxt(it, dmg));
   if(!r) return;
   registrarTirada(it.nombre, r);
+  efectosAlPegar(it);
 }
 
 function pedirArmaYTirar(){
@@ -4387,11 +4389,6 @@ document.addEventListener('click', e => {
     else openEditor('inventario', null, chooserPreset);
     return;
   }
-  if(b.id === 'chooser-arma'){
-    $('#scrim-chooser').classList.remove('open');
-    openEditor('inventario', null, chooserPreset, {arma: true});
-    return;
-  }
   if(b.id === 'chooser-fabricante'){
     $('#scrim-chooser').classList.remove('open');
     $('#catalogo-buscar').value = '';
@@ -5297,12 +5294,12 @@ function aplicarTipoItem(id){
   $('#scrim-tipoitem').classList.remove('open');
   if(!editing) return;
   editing.draft.tipoItem = id;
-  // Un ítem nuevo que pasa a ser arma sigue en el asistente de armas.
-  if(!editing.id && !editing.asistente && ES_ARMA(id) && (editing.key === 'inventario' || editing.key === 'catalogo')){
-    editing.asistente = 'arma';
-    if(!num(editing.draft.peso)) editing.draft.peso = 1;
-    $('#modal-title').textContent = 'Nueva arma';
-    editing.paso = (editing.draft.nombre || '').trim() ? 1 : 0;
+  // Un ítem nuevo que deja de ser consumible sigue en el asistente de ítems.
+  if(!editing.id && id !== 'consumibles' && (editing.key === 'inventario' || editing.key === 'catalogo')){
+    const {key, draft} = editing;
+    closeModal();
+    abrirAsistenteItem(key, null, {draft});
+    return;
   }
   drawEditor();
 }
@@ -5409,6 +5406,7 @@ function openViewer(key, id){
   if(key === 'inventario' || key === 'cinturon' || key === 'catalogo'){
     if(it.tipoItem) L.push(linea('Categoría', CATEGORIA_LABEL[it.tipoItem] || it.tipoItem));
     if(ES_ARMA(it.tipoItem)) L.push(linea('Tipo', fmt(num(it.tipoDado) || 8)));
+    if(ES_ARMA(it.tipoItem) && EfectosGolpe.lista(it.efectosGolpe).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(it.efectosGolpe)));
     L.push(linea('Peso', fmt(num(it.peso))));
     if(ES_ARMA(it.tipoItem)) L.push(linea('Daño', armaDanoTxt(it)));
     const defVal = defValorDe(it);
@@ -5529,7 +5527,6 @@ let chooserTarget = 'inventario';
 function abrirChooser(target, equipadoPreset){
   chooserTarget = target;
   chooserPreset = equipadoPreset;
-  $('#chooser-arma').style.display = target === 'cinturon' ? 'none' : '';
   $('#scrim-chooser').classList.add('open');
 }
 
@@ -6129,15 +6126,16 @@ function openEditor(key, id, equipadoPreset, opciones){
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
     forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
-  const item = id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
-  editing = {key, id, draft: structuredClone(item), paso: 0};
-  // Armas (nuevas desde "Crear arma" o cualquiera ya guardada): asistente paso a paso.
-  if((key === 'inventario' || key === 'catalogo') && ((opciones && opciones.arma) || (id && ES_ARMA(item.tipoItem)))){
-    editing.asistente = 'arma';
-    if(!id){ editing.draft.tipoItem = 'arma_1m'; editing.draft.tipoDado = 8; editing.draft.peso = 1; }
+  const op = opciones || {};
+  const item = op.draft ? Object.assign({}, defaults, op.draft) : id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
+  // Ítems de inventario y catálogo (menos consumibles): asistente paso a paso.
+  if(!op.formulario && (key === 'inventario' || key === 'catalogo') && item.tipoItem !== 'consumibles'){
+    abrirAsistenteItem(key, id, {equipadoPreset, draft: op.draft});
+    return;
   }
+  editing = {key, id, draft: structuredClone(item), paso: 0};
   $("#modal-save").style.display = "";
-  $('#modal-title').textContent = editing.asistente === 'arma' ? (id ? 'Editar arma' : 'Nueva arma') : (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
+  $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
   $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
   $('#modal-activar').style.display = key === 'efectos' ? '' : 'none';
@@ -6266,12 +6264,9 @@ function drawEditorHabilidad(){
   $('#modal-save').style.display = (!nuevo || paso === total - 1) ? '' : 'none';
 }
 
-// Pasos del asistente abierto (habilidad o arma), o null si es el formulario común.
+// Pasos del asistente abierto (habilidades), o null si es el formulario común.
 function pasosDelEditor(){
-  if(!editing) return null;
-  if(editing.key === 'habilidades') return PASOS_HABILIDAD;
-  if(editing.asistente === 'arma') return PASOS_ARMA;
-  return null;
+  return editing && editing.key === 'habilidades' ? PASOS_HABILIDAD : null;
 }
 
 function habilidadIrAPaso(n){
@@ -6356,66 +6351,94 @@ function htmlEstadoAlUsar(key, draft){
   return html;
 }
 
-/* ---------- Armas: editor paso a paso ----------
-   Crear o editar un arma (Mochila/Equipo o catálogo) va en pasos, como las
-   habilidades, y cada paso explica qué implica lo que se elige, con los
-   números de este personaje. Reusa la navegación de habilidadIrAPaso. */
-const PASOS_ARMA = [
-  {corto: 'Nombre', titulo: '¿Cómo se llama el arma?',
-   ayuda: 'Es el nombre que aparece en tu Equipo, en la Botonera ("Atacar · …") y en la Mesa cada vez que atacás o tirás daño con ella.'},
-  {corto: 'Tipo', titulo: '¿De qué Tipo es?',
-   ayuda: 'El Tipo decide tres cosas a la vez: <b>el dado de daño</b> (Tipo 6 = cada dado es un d6), <b>cuántos Nitros cuesta atacar</b> (el primer ataque del turno con esta arma cuesta la mitad del Tipo; los siguientes, el Tipo entero) y <b>contra qué resistencia a críticos choca</b> (el rival se protege con su "Res. crítico Tipo N"). Más Tipo = más daño por golpe, pero menos golpes por turno.'},
-  {corto: 'Empuñadura', titulo: '¿Cómo se empuña y a qué distancia pega?',
-   ayuda: 'Las manos que ocupa definen qué más podés llevar al mismo tiempo; la distancia define si el daño suma tu Dmg (que sale de la Fuerza).'},
-  {corto: 'Peso y daño', titulo: '¿Cuánto pesa y cuánto daño hace?',
-   ayuda: 'El <b>Peso</b> es a la vez la cantidad de dados de daño y lo que carga el personaje: un arma pesada pega más fuerte, pero ocupa más de tu Carga máxima mientras la tengas equipada.'},
-  {corto: 'Bonos', titulo: '¿Mejora algún stat mientras la llevás?',
-   ayuda: 'Cada bono suma (o resta, con negativo) a ese stat mientras el arma esté equipada. Si no tiene ninguno, seguí.'},
-  {corto: 'Efectos', titulo: '¿Tiene algún efecto especial?',
-   ayuda: 'Lo que hace además del daño. Si no tiene nada especial, dejalo vacío y seguí.'},
-  {corto: 'Precio', titulo: '¿Cuánto vale y dónde la guardás?',
-   ayuda: 'El precio sirve para comprarla y venderla en las tiendas.'},
-  {corto: 'Listo', titulo: 'Revisá cómo quedó',
-   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
-];
-
-// Qué representa cada Tipo (del manual) y ejemplos para orientarse.
-const TIPOS_ARMA_INFO = {
-  4: {nombre: 'Perforante', ejemplo: 'dagas, estoques, lanzas livianas'},
-  6: {nombre: 'Cortante', ejemplo: 'espadas, cimitarras, hachas de mano'},
-  8: {nombre: 'Cortante pesado o contundente liviano', ejemplo: 'hachas de guerra, mazas, bastones'},
-  10: {nombre: 'Contundente pesado', ejemplo: 'martillos de guerra, mazas de dos manos'},
-  12: {nombre: 'Explosivo / armas modernas', ejemplo: 'lanzallamas, explosivos (tier Excepcional)'},
-};
-
-// Cuántos ataques con esta arma entran en un turno con los Nitros máximos.
-function ataquesPorTurno(tipo, nitros){
-  const primero = IT2.redondeoPrimerAtaque(tipo / 2);
-  if(nitros < primero) return 0;
-  return 1 + Math.floor((nitros - primero) / tipo);
+/* ---------- Ítems: asistente paso a paso (comun/asistente-item.js) ----------
+   Crear o editar cualquier ítem de inventario o del catálogo (menos
+   consumibles) va por el asistente compartido, con los números de este
+   personaje. El resumen deja volver al formulario común. */
+function portadorFicha(idItem){
+  const c = compute();
+  const usado = computeSlots().find(sl => sl.id === 'manos_arma');
+  return {
+    nombre: S.meta.nombre || 'vos', nitros: num(nitrosMaximo(c)), dmg: num(c.final.dmg), rango: num(c.final.rng), def: num(c.final.def),
+    cargaUsada: S.inventario.filter(i => i.equipado && i.id !== idItem).reduce((a, i) => a + num(i.peso), 0),
+    cargaMax: num(c.final.crgmax),
+    manosUsadas: usado ? usado.usado : 0,
+  };
 }
 
-function armaDanoPreviewHtml(d){
-  const dados = Math.max(1, num(d.peso) || 1) + Math.max(0, num(d.danoAmplificado));
-  const caras = num(d.tipoDado) || 8, fijo = num(d.danoFijo);
-  const min = dados + fijo, max = dados * caras + fijo;
-  const prom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
-  const dmg = d.armaDeRango ? 0 : num(compute().final.dmg);
-  return `Tira <b>${esc(armaDanoTxt(d))}</b>: entre ${fmt(min)} y ${fmt(max)}, ${fmt(prom)} en promedio.`
-    + (d.armaDeRango ? ' Es de rango: no suma tu Dmg.'
-      : ` Al tirar se suma tu Dmg (hoy ${fmt(dmg)})${dmg ? `: entre ${fmt(min + dmg)} y ${fmt(max + dmg)}` : ''}.`);
+function abrirAsistenteItem(key, id, op){
+  op = op || {};
+  const original = id ? S[key].find(x => x.id === id) : null;
+  const base = structuredClone(op.draft || original || {
+    id: uid(), nombre: '', tipoItem: '', peso: 0, ranuras: 1, detalle: '', mods: [], imagen: '',
+    equipado: op.equipadoPreset !== undefined ? op.equipadoPreset : true, activo: true, unidades: 1, consumible: false,
+    precioCompra: 0, tipoDado: 8, danoFijo: 0, danoAmplificado: 0, armaDeRango: false, manoPreferida: '', efectosGolpe: [],
+    equipoEstadoNombre: '', equipoEstadoHpTurno: 0, equipoEstadoDetalle: '',
+  });
+  if(!base.id) base.id = uid();
+  const enInventario = key === 'inventario';
+  AsistenteItem.abrir({
+    contexto: 'ficha',
+    nuevo: !original,
+    titulo: original ? `Editar ${original.nombre}` : key === 'catalogo' ? 'Ítem nuevo del catálogo' : 'Ítem nuevo',
+    draft: base,
+    stats: MOD_TARGETS.map(x => ({id: x.id, label: x.label})),
+    portador: () => portadorFicha(base.id),
+    ejemplos: (tipoItem, t) => (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
+    conImagen: true,
+    imagenADatos: file => fileToDataURL(file, 480, 0.85),
+    conEstadoEquipar: true,
+    conPrecio: true,
+    conLugar: enInventario,
+    conRanuras: !enInventario,
+    conMano: enInventario,
+    textoGuardar: original ? 'Guardar' : 'Crear',
+    botones: [
+      ...(enInventario ? [{texto: '📦 Agregar al catálogo', accion: (d, boton) => publicarEnCatalogoDesdeFicha({...base, ...d}, boton)}] : []),
+      ...(original ? [{texto: 'Eliminar', accion: () => {
+        if(!confirm(`¿Eliminar "${original.nombre}"? No se puede deshacer.`)) return;
+        S[key] = S[key].filter(x => x.id !== id);
+        AsistenteItem.cerrar();
+        despuesDeEditarItem(key);
+      }}] : []),
+    ],
+    onFormulario: d => openEditor(key, id, undefined, {formulario: true, draft: {...base, ...d}}),
+    onConsumible: d => openEditor(key, id, undefined, {formulario: true, draft: {...base, ...d, tipoItem: 'consumibles', consumible: true}}),
+    onGuardar: d => {
+      const item = {...base, ...d, consumible: false};
+      if(!ES_ARMA(item.tipoItem)) ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'efectosGolpe'].forEach(k => delete item[k]);
+      const i = S[key].findIndex(x => x.id === item.id);
+      if(i >= 0) S[key][i] = item; else S[key].push(item);
+      despuesDeEditarItem(key);
+      toast(`${item.nombre} ${original ? 'guardado' : 'creado'}`);
+      return true;
+    },
+  });
 }
 
-// Textos con cuentas que se actualizan mientras se escribe (sin redibujar,
-// que se comería el clic en "Siguiente").
-function armaCargaHtml(d){
-  const pesoEquipado = S.inventario.filter(i => i.equipado && i.id !== d.id).reduce((a, i) => a + num(i.peso), 0);
-  const crg = num(compute().final.crgmax);
-  const conEsta = pesoEquipado + num(d.peso);
-  return `Equipada, suma <b>${fmt(num(d.peso))}</b> a tu carga: quedarías en <b>${fmt(conEsta)} de ${fmt(crg)}</b> (Carga máx.)${conEsta > crg ? ' — <b>te pasás</b>: lo que sobra cuenta como sobrecarga.' : '.'} En la mochila no pesa: ocupa ranuras.`;
+function despuesDeEditarItem(key){
+  if(key === 'inventario') renderInventario();
+  else if(key === 'catalogo'){ $('#catalogo-buscar').value = ''; renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+  refresh();
 }
-function armaPrecioHtml(d){
-  return `En una tienda se compra a <b>${fmt(num(d.precioCompra))}</b> DDE y se vende a la mitad: <b>${fmt(precioVentaDe(d))}</b>.`;
+
+// Daño de un arma con efectos al golpear: recordatorio resaltado en la Mesa
+// y, si alguno depende de la suerte, el pop-up para tirarlo.
+function efectosAlPegar(arma){
+  EfectosGolpe.alPegar({
+    arma: arma.nombre,
+    efectos: arma.efectosGolpe,
+    publicar: linea => {
+      registrarEvento(`⚠ ${linea.origen}: ${linea.formula.replace(/\n/g, ' · ')}`);
+      if(!fbDb || !fbUsuario || !fbMiembro) return;
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: mesaQuien(),
+        origen: linea.origen.slice(0, 120), formula: linea.formula.slice(0, 900),
+        rolls: linea.rolls.slice(0, 100), mod: 0, total: 0, desde: 'efecto',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('No se pudieron publicar los efectos en la Mesa:', err));
+    },
+  });
 }
 
 // Sección "Estado alterado al equipar" (ítems no consumibles y armas).
@@ -6433,182 +6456,9 @@ function htmlEstadoAlEquipar(draft){
     </div>`;
 }
 
-// Bonos que el asistente pone en su propio paso (no en la lista de Bonos).
-const MODS_ARMA_APARTE = ['rng'];
-
-function drawEditorArma(){
-  const {key, draft} = editing;
-  const total = PASOS_ARMA.length;
-  const paso = Math.max(0, Math.min(total - 1, editing.paso || 0));
-  editing.paso = paso;
-  const info = PASOS_ARMA[paso];
-  const nuevo = !editing.id;
-  const enInventario = key === 'inventario';
-  const c = compute();
-  const tipo = num(draft.tipoDado) || 8;
-  const primerAtaque = t => fmt(IT2.redondeoPrimerAtaque(t / 2));
-  const efecto = txt => `<div class="arma-efecto">${txt}</div>`;
-  const opcion = (attr, valor, activo, texto) => `<button type="button" class="opcion-btn ${activo ? 'activa' : ''}" ${attr}="${valor}">${texto}</button>`;
-
-  let html = `<div class="pasos-hab">${PASOS_ARMA.map((p, i) => {
-    const bloqueado = nuevo && i > paso && !(draft.nombre || '').trim();
-    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hab-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
-  }).join('')}</div>`;
-  html += `<div class="paso-titulo">${info.titulo}</div><p class="paso-ayuda">${info.ayuda}</p>`;
-
-  if(paso === 0){
-    html += `<div class="f"><label>Nombre</label><input data-c="nombre" value="${esc(draft.nombre)}" placeholder="ej. Espada del faro" data-hab-enter="1"></div>`
-      + campoImagenHtml(draft)
-      + `<div class="hint">La imagen es opcional: se ve en el Equipo y en el catálogo.</div>`;
-  }
-
-  if(paso === 1){
-    const nitros = num(nitrosMaximo(c));
-    const n = ataquesPorTurno(tipo, nitros);
-    const deEseTipo = (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === tipo).map(it => it.nombre);
-    html += `<div class="tipo-arma-lista">${DADOS_ARMA.map(t => {
-      const i = TIPOS_ARMA_INFO[t] || {nombre: '', ejemplo: ''};
-      return `<button type="button" class="tipo-arma-btn ${tipo === t ? 'activa' : ''}" data-arma-tipo="${t}">
-        <b>${t}</b><span>${esc(i.nombre)} · d${t}</span>
-        <small>${esc(i.ejemplo)} · atacar: ${primerAtaque(t)} No2 el primero, ${t} los siguientes</small>
-      </button>`;
-    }).join('')}</div>`
-      + efecto(`Con <b>Tipo ${tipo}</b>: cada dado de daño es un <b>d${tipo}</b>. Atacar cuesta <b>${primerAtaque(tipo)} No2</b> el primer golpe del turno con esta arma y <b>${tipo} No2</b> cada golpe siguiente.
-        Con tus ${fmt(nitros)} No2 máximos te entran <b>${n} ataque${n === 1 ? '' : 's'} por turno</b> con ella (si no gastás Nitros en otra cosa).
-        Un golpe crítico con esta arma choca contra la <b>Res. crítico Tipo ${tipo}</b> del rival.`)
-      + (deEseTipo.length ? `<div class="hint">En el catálogo, Tipo ${tipo}: ${esc(deEseTipo.slice(0, 6).join(', '))}${deEseTipo.length > 6 ? '…' : ''}</div>` : '');
-  }
-
-  if(paso === 2){
-    const dosManos = draft.tipoItem === 'arma_2m';
-    const slot = SLOT_DEFS.find(sd => sd.id === 'manos_arma');
-    const usado = enInventario ? (computeSlots().find(s => s.id === 'manos_arma')?.usado || 0) : 0;
-    html += `<div class="f"><label>Manos</label><div class="opcion-fila">
-        ${opcion('data-arma-manos', 'arma_1m', !dosManos, 'Una mano')}${opcion('data-arma-manos', 'arma_2m', dosManos, 'Dos manos')}
-      </div></div>`
-      + efecto(dosManos
-        ? 'Ocupa <b>las dos manos</b>: mientras la tengas equipada no podés llevar escudo ni otra arma.'
-        : 'Ocupa <b>una mano</b>: la otra queda libre para un escudo o una segunda arma. Con dos armas, cada una paga su propio primer ataque del turno (a mitad de precio) y el PdG que da cada una solo cuenta cuando atacás con ella.')
-      + (enInventario && slot ? `<div class="hint" style="margin:-4px 0 8px">Manos ocupadas hoy: ${fmt(usado)} de ${fmt(slot.max)}${editing.id && draft.equipado ? ' (contando esta)' : ''}.</div>` : '');
-    if(!dosManos && enInventario){
-      html += `<div class="f"><label>${CAMPO_LABEL.manoPreferida}</label>
-        <select data-c="manoPreferida">
-          <option value="" ${!draft.manoPreferida ? 'selected' : ''}>Automática</option>
-          <option value="1" ${String(draft.manoPreferida) === '1' ? 'selected' : ''}>Mano 1</option>
-          <option value="2" ${String(draft.manoPreferida) === '2' ? 'selected' : ''}>Mano 2</option>
-        </select>
-        <div class="hint" style="margin-top:5px">Solo ordena en qué mano se muestra dentro de "Efectos de equipo" cuando llevás dos cosas.</div></div>`;
-    }
-    html += `<div class="f"><label>Distancia</label><div class="opcion-fila">
-        ${opcion('data-arma-rango', '0', !draft.armaDeRango, 'Cuerpo a cuerpo')}${opcion('data-arma-rango', '1', !!draft.armaDeRango, 'A distancia')}
-      </div></div>`
-      + efecto(draft.armaDeRango
-        ? 'Es <b>de rango</b> (arco, pistola, lanzallamas…): el botón Daño arma <b>no suma tu Dmg</b>. El daño es solo el del arma.'
-        : `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma tu <b>Dmg</b> (sale de la Fuerza; hoy ${fmt(num(c.final.dmg))}).`)
-      + `<div class="f"><label>Alcance extra (+ Rango)</label><input data-defmod="rng" type="number" step="1" value="${getModVal(draft, 'rng')}" data-hab-enter="1" style="max-width:120px">
-        <div class="hint" style="margin-top:5px">Casilleros de más a los que llega mientras la tenés equipada (una lanza o un látigo suelen dar +1). Hoy tu Rango es ${fmt(num(c.final.rng))}.</div></div>`;
-  }
-
-  if(paso === 3){
-    html += `<div class="f2">
-        <div class="f"><label>Peso (= dados de daño)</label><input data-c="peso" type="number" step="1" min="1" value="${esc(draft.peso ?? 1)}" data-hab-enter="1"></div>
-        <div class="f"><label>Daño fijo</label><input data-c="danoFijo" type="number" step="1" value="${esc(draft.danoFijo ?? 0)}" data-hab-enter="1"></div>
-        <div class="f"><label>Daño amplificado</label><input data-c="danoAmplificado" type="number" step="1" min="0" value="${esc(draft.danoAmplificado ?? 0)}" data-hab-enter="1"></div>
-      </div>`
-      + efecto(`<span id="arma-dano-prev">${armaDanoPreviewHtml(draft)}</span>`)
-      + `<div class="hint" style="margin:-4px 0 8px"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`
-      + (enInventario ? efecto(`<span id="arma-carga">${armaCargaHtml(draft)}</span>`) : '');
-  }
-
-  if(paso === 4){
-    const rapidos = [['pdg', 'PdG'], ['crit', 'Crítico'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']];
-    html += `<div class="f"><label>Bonos</label>
-      <div id="mods">${(draft.mods || []).map((m, i) => MODS_ARMA_APARTE.includes(m.stat) ? '' : `
-        <div class="modrow">
-          <select data-m="${i}" data-mk="stat"><option value="">— elegir stat —</option>${statOptions(m.stat)}</select>
-          <input data-m="${i}" data-mk="val" type="number" step="any" value="${esc(m.val)}">
-          <button class="mini" data-rmmod="${i}">×</button>
-        </div>`).join('')}</div>
-      <div class="opcion-fila" style="margin-top:6px">
-        ${rapidos.map(([id, txt]) => `<button type="button" class="opcion-btn" data-arma-mod="${id}">+ ${txt}</button>`).join('')}
-        <button type="button" class="opcion-btn" id="addmod">+ Otro stat</button>
-      </div></div>`
-      + efecto(`<b>PdG</b>: probabilidad de golpe; solo cuenta cuando atacás con esta arma (no se suma a la otra mano).
-        <br><b>Crítico</b>: más chance de que el golpe sea crítico (un crítico ignora la Defensa del rival).
-        <br><b>Parry</b>: ayuda a desviar golpes. <b>Bloqueo</b>: frena daño. <b>Dmg</b>: suma al daño de todos tus golpes cuerpo a cuerpo.
-        <br>Los demás (Fuerza, Evasión, SP…) se suman igual mientras la llevás.`);
-  }
-
-  if(paso === 5){
-    html += `<div class="f"><label>Qué hace además del daño</label><textarea data-c="detalle" rows="3" placeholder="ej. Sangrado al golpear. Ignora 1 de resistencia al crítico.">${esc(draft.detalle)}</textarea></div>`
-      + efecto('Los efectos <b>sobre el rival al golpear</b> (Sangrado, Veneno, Rompe armadura, ignorar resistencia al crítico…) la ficha <b>no los aplica sola</b>: quedan escritos acá y se aplican a mano sobre el rival cuando pega. Este texto se ve al mirar el arma.')
-      + htmlEstadoAlEquipar(draft)
-      + `<div class="hint">El estado al equipar sí es automático: se activa sobre vos al ponértela (ej. una espada que regenera 2 HP por turno mientras la llevás).</div>`;
-  }
-
-  if(paso === 6){
-    html += `<div class="f"><label>Precio de compra (DDE)</label><input data-c="precioCompra" type="number" step="1" min="0" value="${esc(draft.precioCompra ?? 0)}" data-hab-enter="1" style="max-width:140px"></div>`
-      + efecto(`<span id="arma-precio">${armaPrecioHtml(draft)}</span>`);
-    if(enInventario){
-      html += `<div class="f"><label>¿Dónde la tenés?</label><div class="opcion-fila">
-          ${opcion('data-arma-equipada', '1', !!draft.equipado, 'Equipada')}${opcion('data-arma-equipada', '0', !draft.equipado, 'En la mochila')}
-        </div></div>`
-        + (draft.equipado
-          ? efecto('<b>Equipada</b>: aparece en la Botonera para atacar, sus bonos cuentan y pesa en tu carga.')
-          : `<div class="f"><label>Ranuras que ocupa en la mochila</label><input data-c="ranuras" type="number" step="1" min="0" value="${esc(draft.ranuras ?? 1)}" data-hab-enter="1" style="max-width:120px"></div>`
-            + efecto('<b>En la mochila</b>: no suma bonos ni se puede atacar con ella hasta equiparla, pero ocupa ranuras de la mochila en vez de peso.'));
-    }
-  }
-
-  if(paso === 7){
-    const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${valor}</b></div>`;
-    const bonos = (draft.mods || []).filter(m => m.stat && num(m.val)).map(m => `${STAT_LABEL[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))}`).join(', ');
-    const estadoEq = String(draft.equipoEstadoNombre || '').trim();
-    html += `<div class="resumen-hab">
-      <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
-      ${fila('Tipo', esc(`Tipo ${tipo} · ${(TIPOS_ARMA_INFO[tipo] || {}).nombre || ''}`))}
-      ${fila('Empuñadura', draft.tipoItem === 'arma_2m' ? 'dos manos' : 'una mano')}
-      ${fila('Distancia', draft.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')}
-      ${fila('Daño', esc(armaDanoTxt(draft)))}
-      ${fila('Atacar', `${primerAtaque(tipo)} No2 el primero, ${tipo} los siguientes`)}
-      ${fila('Peso', fmt(num(draft.peso)))}
-      ${fila('Bonos', esc(bonos || 'ninguno'))}
-      ${fila('Efectos', esc(String(draft.detalle || '').trim() || 'ninguno'))}
-      ${fila('Al equipar', esc(estadoEq || 'ningún estado'))}
-      ${fila('Precio', `${fmt(num(draft.precioCompra))} DDE (venta ${fmt(precioVentaDe(draft))})`)}
-      ${enInventario ? fila('Dónde', draft.equipado ? 'equipada' : `mochila (${fmt(num(draft.ranuras))} ranura${num(draft.ranuras) === 1 ? '' : 's'})`) : ''}
-    </div>
-    <button type="button" class="mini" data-arma-formulario="1" style="margin-top:10px">Ver en el formulario completo</button>
-    <div class="hint" style="margin-top:5px">El formulario completo muestra todos los campos juntos (sirve, por ejemplo, para pasarla a otra categoría).</div>`;
-  }
-
-  html += `<div class="paso-nav">
-    ${paso > 0 ? '<button type="button" class="btn ghost" data-hab-atras="1">← Atrás</button>' : '<span></span>'}
-    ${paso < total - 1 ? '<button type="button" class="btn primary" data-hab-siguiente="1">Siguiente →</button>' : ''}
-  </div>`;
-  $('#modal-body').innerHTML = html;
-  // Al crear, "Guardar" recién en el último paso; al editar, siempre.
-  $('#modal-save').style.display = (!nuevo || paso === total - 1) ? '' : 'none';
-}
-
-$('#modal-body').addEventListener('click', e => {
-  if(!editing || editing.asistente !== 'arma') return;
-  const b = e.target.closest('[data-arma-tipo],[data-arma-manos],[data-arma-rango],[data-arma-equipada],[data-arma-mod],[data-arma-formulario]');
-  if(!b) return;
-  const d = editing.draft;
-  if(b.dataset.armaTipo) d.tipoDado = num(b.dataset.armaTipo);
-  if(b.dataset.armaManos){ d.tipoItem = b.dataset.armaManos; if(d.tipoItem === 'arma_2m') d.manoPreferida = ''; }
-  if(b.dataset.armaRango) d.armaDeRango = b.dataset.armaRango === '1';
-  if(b.dataset.armaEquipada) d.equipado = b.dataset.armaEquipada === '1';
-  if(b.dataset.armaMod){ d.mods = d.mods || []; d.mods.push({stat: b.dataset.armaMod, val: 1}); }
-  if(b.dataset.armaFormulario) editing.asistente = null;
-  drawEditor();
-});
-
 function drawEditor(){
   const {key, draft} = editing;
   if(key === "habilidades"){ drawEditorHabilidad(); return; }
-  if(editing.asistente === 'arma'){ drawEditorArma(); return; }
   $('#modal-save').style.display = '';
   const sc = SCHEMA[key];
   const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaduraArruinada','armaDeRango'];
@@ -6806,15 +6656,10 @@ function handleModalFieldChange(e){
     if(c === "tiradaStat") editing.pdgAuto = false;  // lo eligió a mano
     // Con nombre ya se puede saltar a cualquier paso del asistente.
     if(c === 'nombre' && pasosDelEditor()) document.querySelectorAll('#modal-body [data-hab-paso]').forEach(b => { b.disabled = !t.value.trim() && num(b.dataset.habPaso) > (editing.paso || 0); });
-    if(c === 'precioCompra' && document.getElementById('arma-precio')) document.getElementById('arma-precio').innerHTML = armaPrecioHtml(editing.draft);
     if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ drawEditor(); return; }
     if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
       const hint = document.getElementById('dano-hint');
       const da = num(editing.draft.danoAmplificado);
-      const prev = document.getElementById('arma-dano-prev');
-      if(prev) prev.innerHTML = armaDanoPreviewHtml(editing.draft);
-      const carga = document.getElementById('arma-carga');
-      if(carga && c === 'peso') carga.innerHTML = armaCargaHtml(editing.draft);
       if(hint) hint.textContent = `Daño: ${armaDanoTxt(editing.draft)} (peso × d${num(editing.draft.tipoDado)||8}${da?` + ${da} dado${da>1?'s':''} por daño amplificado`:''}, más el fijo)`;
     }
   }
@@ -6898,6 +6743,7 @@ function itemComoEntradaDeCatalogo(draft){
     ...(ES_ARMA(draft.tipoItem) ? {
       tipoDado: num(draft.tipoDado) || 8, danoFijo: num(draft.danoFijo),
       danoAmplificado: num(draft.danoAmplificado), armaDeRango: !!draft.armaDeRango,
+      efectosGolpe: structuredClone(draft.efectosGolpe || []),
     } : {}),
     precioCompra: num(draft.precioCompra),
     unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
@@ -6913,7 +6759,10 @@ function itemComoEntradaDeCatalogo(draft){
 }
 
 async function agregarAlCatalogoDelFabricante(){
-  const {draft} = editing;
+  await publicarEnCatalogoDesdeFicha(editing.draft, $('#modal-catalogo'));
+}
+
+async function publicarEnCatalogoDesdeFicha(draft, btn){
   if(!draft.nombre.trim()){ toast('Poné un nombre antes de agregarlo al catálogo'); return; }
   if(!draft.tipoItem){ toast('Elegí una categoría antes de agregarlo al catálogo'); return; }
   const aviso = `Esto publica "${draft.nombre}" en el catálogo del fabricante — va a quedar disponible para que ` +
@@ -6922,7 +6771,6 @@ async function agregarAlCatalogoDelFabricante(){
   if(!confirm(aviso)) return;
   const token = await ghToken(false);
   if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }
-  const btn = $('#modal-catalogo');
   btn.disabled = true;
   toast('Publicando en el catálogo…');
   try{
@@ -7949,7 +7797,7 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   let hayAjena = false;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
@@ -7957,6 +7805,15 @@ function mesaRender(docs){
     const t = d.data({serverTimestamps: 'estimate'});
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && t.uid !== fbUsuario.uid) hayAjena = true;
+    // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
+    if(EfectosGolpe.esLineaMesa(t)){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
+      div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
     // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
     if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
       const div = document.createElement('div');

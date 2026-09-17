@@ -27,6 +27,7 @@ def _cubierto(r):
     if it.get('mods'): return True
     if it.get('danoAmplificado'): return True
     if (it.get('equipoEstadoNombre') or '').strip(): return True
+    if it.get('efectosGolpe'): return True  # recordatorio y tirada al pegar
     return False
 _pend = [r for r in _rev if r['it']['nombre'] not in _YA and not _cubierto(r)]
 

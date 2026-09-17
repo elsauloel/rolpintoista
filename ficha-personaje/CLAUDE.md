@@ -72,19 +72,20 @@ más cambia sesión a sesión.
   estado alterado (`htmlEstadoAlUsar`, compartido con los consumibles) →
   origen (Job con cuántos puntos costó — `jobCosto`, 1 por defecto, lo suma `jobBudget` vía `jobCostoDe` —, o de dónde salió; imagen) → resumen. Al crear, Guardar aparece
   en el último paso; al editar, siempre, y los pasos se pueden saltar.
-- **Editor de armas paso a paso** (`PASOS_ARMA`, `drawEditorArma`): se usa
-  con `editing.asistente = 'arma'`, que pone `openEditor` para "Crear arma
-  nueva" (botón del selector de Agregar ítem, no en el cinturón), para
-  cualquier arma ya guardada (inventario o catálogo) y `aplicarTipoItem`
-  cuando un ítem nuevo pasa a una categoría de arma. Pasos: nombre → Tipo
-  (dado, Nitros por ataque y ataques por turno con los No2 del personaje,
-  resistencia a críticos que enfrenta; `TIPOS_ARMA_INFO`) → empuñadura
-  (una/dos manos, mano, distancia = `armaDeRango`, alcance = mod `rng`) →
-  peso y daño (`armaDanoPreviewHtml`, carga) → bonos → efectos (texto
-  manual + `htmlEstadoAlEquipar`) → precio y dónde → resumen, con salida al
-  formulario completo. Cada paso muestra en `.arma-efecto` qué implica lo
-  elegido. La navegación es la de habilidades (`habilidadIrAPaso`,
-  `pasosDelEditor`).
+- **Ítems paso a paso** (`abrirAsistenteItem`, asistente compartido
+  `comun/asistente-item.js`): `openEditor` manda ahí todo ítem de
+  inventario o catálogo que no sea consumible (nuevo o existente). Paso 1:
+  categoría, nombre y descripción en palabras; después solo lo práctico
+  según la categoría (armas: Tipo, empuñadura, peso y daño, bonos, efectos
+  al golpear; defensa: Defensa y resistencias a crítico; todos: bonos,
+  estado al equipar, precio/lugar) y resumen. Los números del personaje
+  salen de `portadorFicha`. Elegir "Consumible" o "formulario completo"
+  vuelve a `openEditor` con `{formulario: true, draft}`; el cinturón usa
+  siempre el formulario.
+- **Efectos al golpear** (`efectosAlPegar`, `comun/efectos-golpe.js`):
+  `tirarDanoDeArma` los dispara después del daño. Sin tiradas, va directo
+  a la Mesa una línea resaltada (`desde: 'efecto'`); con porcentaje, abre el
+  pop-up para tirar (50% = 1d2, 25% = 1d4…) y publica al cerrarlo.
 - **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
   Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
   `esVeneno`, `esSangrado`). Ya no hay "Daño entrante": el HP se edita a

@@ -88,6 +88,14 @@ def corregir(items):
                 correcciones.append(f"{et}: modificador '{s}' no existe, se descarta")
         it['mods'] = limpios
 
+        # Efectos al golpear: solo en armas, y con la forma de siempre.
+        if (it.get('tipoItem') or '').startswith('arma_'):
+            efs = normalizar_efectos(it.get('efectosGolpe'))
+            if efs: it['efectosGolpe'] = efs
+            else: it.pop('efectosGolpe', None)
+        elif it.pop('efectosGolpe', None):
+            correcciones.append(f"{et}: efectos al golpear en algo que no es arma, se descartan")
+
         if not it.get('id'):
             base = 'new-' + slug(it['nombre'])
             iid, n = base, 2
@@ -139,6 +147,67 @@ def esc_js(s):
     return str(s or '').replace('\\', '\\\\').replace("'", "\\'").replace('\n', ' ').strip()
 
 
+def normalizar_efectos(efs):
+    """Efectos al golpear de un arma (ver comun/efectos-golpe.js):
+    [{nombre, caras, exitos, dado, detalle}]; los que no tienen nombre se van."""
+    out = []
+    for ef in (efs or []):
+        if not isinstance(ef, dict):
+            continue
+        nombre = str(ef.get('nombre') or '').strip()
+        if not nombre:
+            continue
+        try: caras = max(1, int(ef.get('caras') or 1))
+        except (TypeError, ValueError): caras = 1
+        try: exitos = min(caras, max(1, int(ef.get('exitos') or 1)))
+        except (TypeError, ValueError): exitos = 1
+        out.append({'nombre': nombre, 'caras': caras, 'exitos': exitos,
+                    'dado': str(ef.get('dado') or '').strip(),
+                    'detalle': str(ef.get('detalle') or '').strip()})
+    return out
+
+
+def efectos_a_texto(efs):
+    """Para el Excel: "Envenenar 1/2; Rompe armadura; Quemadura 1d6: arde"."""
+    partes = []
+    for ef in normalizar_efectos(efs):
+        cab = [ef['nombre']]
+        if ef['caras'] > 1 and ef['exitos'] < ef['caras']:
+            cab.append('%d/%d' % (ef['exitos'], ef['caras']))
+        if ef['dado']:
+            cab.append(ef['dado'])
+        partes.append(' '.join(cab) + (': ' + ef['detalle'] if ef['detalle'] else ''))
+    return '; '.join(partes)
+
+
+def efectos_desde_texto(txt):
+    """Lo inverso de efectos_a_texto."""
+    out = []
+    for parte in str(txt or '').split(';'):
+        parte = parte.strip()
+        if not parte:
+            continue
+        cab, _, detalle = parte.partition(':')
+        prob = re.search(r'\b(\d+)\s*/\s*(\d+)\b', cab)
+        dado = re.search(r'\b\d*d\d+(?:[+-]\d+)?\b', cab)
+        nombre = cab
+        for m in (prob, dado):
+            if m:
+                nombre = nombre.replace(m.group(0), ' ')
+        out.append({'nombre': ' '.join(nombre.split()),
+                    'caras': int(prob.group(2)) if prob else 1,
+                    'exitos': int(prob.group(1)) if prob else 1,
+                    'dado': dado.group(0) if dado else '',
+                    'detalle': detalle.strip()})
+    return normalizar_efectos(out)
+
+
+def efectos_js(efs):
+    return '[' + ', '.join("{nombre:'%s', caras:%d, exitos:%d, dado:'%s', detalle:'%s'}" % (
+        esc_js(ef['nombre']), ef['caras'], ef['exitos'], esc_js(ef['dado']), esc_js(ef['detalle']))
+        for ef in normalizar_efectos(efs)) + ']'
+
+
 def mods_js(mods):
     return '[' + ', '.join("{stat:'%s', val:%s}" % (m['stat'], m['val']) for m in (mods or [])) + ']'
 
@@ -162,6 +231,8 @@ def item_js(it, con_imagen=True):
             partes.append("danoAmplificado:%s" % it['danoAmplificado'])
         if it.get('armaDeRango'):
             partes.append("armaDeRango:true")
+        if es_arma and normalizar_efectos(it.get('efectosGolpe')):
+            partes.append("efectosGolpe:%s" % efectos_js(it['efectosGolpe']))
     partes.append("precioCompra:%s" % it.get('precioCompra', 0))
     if es_cons:
         partes.append("unidades:%s" % (it.get('unidades') or 1))
@@ -217,6 +288,8 @@ def item_gm(it, con_imagen=True):
         partes.append("danoAmplificado:%s" % it['danoAmplificado'])
     if es_arma and it.get('armaDeRango'):
         partes.append("armaDeRango:true")
+    if es_arma and normalizar_efectos(it.get('efectosGolpe')):
+        partes.append("efectosGolpe:%s" % efectos_js(it['efectosGolpe']))
     if it['tipoItem'] == 'consumibles':
         partes.append("consumible:true")
         if it.get('curahp'): partes.append("curahp:%s" % it['curahp'])

@@ -151,7 +151,6 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     <input type="file" id="input-archivo" accept="application/json" style="display:none">
     <button class="iconbtn" id="btn-guardar">Guardar</button>
     <button class="btn" id="btn-subir">Subir datos</button>
-    <button class="btn" id="btn-nueva-arma">+ Nueva arma</button>
     <button class="btn primary" id="btn-nuevo">+ Nuevo ítem</button>
     <button class="iconbtn" id="btn-token">Token</button>
   </div>
@@ -203,7 +202,8 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 <div class="toast" id="toast"></div>
 
-<script src="../comun/asistente-arma.js"></script>
+<script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/asistente-item.js"></script>
 <script>
 /* =========================================================
    Editor de catálogo — HTML standalone, sin dependencias.
@@ -388,6 +388,7 @@ function verItem(id){
   if(esArma){
     const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
     L.push(linea('Daño', `${dados}d${num(item.tipoDado) || 8}${num(item.danoFijo) ? ` +${num(item.danoFijo)}` : ''}`));
+    if(EfectosGolpe.lista(item.efectosGolpe).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
   }
   L.push(linea('Peso', num(item.peso)));
   L.push(linea('Precio', `${num(item.precioCompra)} DDE`));
@@ -441,19 +442,21 @@ function defaultsItem(){
   };
 }
 
-/* ---------- Armas: asistente paso a paso (comun/asistente-arma.js) ----------
-   Las armas (nuevas o ya cargadas) se editan en pasos que explican qué
-   implica cada campo para quien la compre. El resumen deja pasar al
-   formulario completo (legacy, categoría, etc.). */
-function abrirArma(id, inicial){
+/* ---------- Ítems: asistente paso a paso (comun/asistente-item.js) ----------
+   Todo lo que no es consumible (nuevo o ya cargado) se edita en pasos que
+   explican qué implica cada campo para quien lo compre. El resumen deja
+   pasar al formulario completo (legacy, etc.); los consumibles van directo
+   al formulario. */
+function abrirAsistente(id, inicial){
   const original = id ? CATALOGO.find(it => it.id === id) : null;
   const base = Object.assign(defaultsItem(), original ? structuredClone(original) : {}, inicial || {});
-  AsistenteArma.abrir({
+  if(!original && !(inicial && inicial.tipoItem)) base.peso = 0;
+  AsistenteItem.abrir({
     contexto: 'catalogo',
     nuevo: !original,
-    titulo: original ? `Editar ${original.nombre}` : 'Nueva arma',
+    titulo: original ? `Editar ${original.nombre}` : 'Ítem nuevo',
     draft: base,
-    paso: !original && (base.nombre || '').trim() ? 1 : 0,
+    paso: 0,
     stats: STATS.map(s => ({id: s.id, label: s.label})),
     tiers: TIERS,
     conNarrativa: true,
@@ -462,25 +465,29 @@ function abrirArma(id, inicial){
     conRanuras: true,
     conEstadoEquipar: true,
     conPresetEstado: true,
-    ejemplos: t => CATALOGO.filter(it => esArmaTipo(it.tipoItem) && num(it.tipoDado) === t && it.id !== id).map(it => it.nombre),
-    textoGuardar: 'Guardar arma',
-    botones: original ? [{texto: 'Borrar arma', accion: () => {
+    ejemplos: (tipoItem, t) => CATALOGO.filter(it => esArmaTipo(it.tipoItem) && num(it.tipoDado) === t && it.id !== id).map(it => it.nombre),
+    textoGuardar: 'Guardar ítem',
+    botones: original ? [{texto: 'Borrar ítem', accion: () => {
       if(!confirm(`¿Borrar "${original.nombre}" del catálogo?`)) return;
       CATALOGO = CATALOGO.filter(x => x.id !== id);
-      AsistenteArma.cerrar();
+      AsistenteItem.cerrar();
       renderLista();
       toast('Ítem borrado');
     }}] : [],
     onFormulario: d => abrirEditor(id, Object.assign(base, d)),
+    onConsumible: d => abrirEditor(id, Object.assign(base, d, {consumible: true})),
     onGuardar: d => {
       const item = Object.assign(base, d);
+      if(!esArmaTipo(item.tipoItem)){
+        ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'efectosGolpe'].forEach(k => delete item[k]);
+      }
       if(!item.id) item.id = 'new-' + slug(item.nombre);
       item.consumible = false;
       item.efectoMods = (item.efectoMods || []).filter(m => m.stat);
       const idx = CATALOGO.findIndex(it => it.id === id);
       if(idx >= 0) CATALOGO[idx] = item; else CATALOGO.push(item);
       renderLista();
-      toast('Arma guardada (acordate de bajar/subir el JSON para persistirla)');
+      toast('Ítem guardado (acordate de bajar/subir el JSON para persistirlo)');
       return true;
     },
   });
@@ -489,7 +496,7 @@ function abrirArma(id, inicial){
 // borrador: si viene del asistente ("formulario completo"), se sigue con eso.
 function abrirEditor(id, borrador){
   const original = id ? CATALOGO.find(it => it.id === id) : null;
-  if(!borrador && esArmaTipo((original || {}).tipoItem)){ abrirArma(id); return; }
+  if(!borrador && (!original || !esConsumibleTipo(original.tipoItem))){ abrirAsistente(id); return; }
   editing = {id, draft: borrador || Object.assign(defaultsItem(), original ? structuredClone(original) : {})};
   $('#modal-titulo').textContent = original ? 'Editar ítem' : 'Nuevo ítem';
   $('#modal-borrar').style.display = original ? '' : 'none';
@@ -621,10 +628,10 @@ document.addEventListener('input', e => {
     d[campo] = t.type === 'checkbox' ? t.checked : (numericos.includes(campo) ? num(t.value) : t.value);
     if(campo === 'tipoItem'){
       // Un ítem nuevo que pasa a ser arma sigue en el asistente, con lo ya cargado.
-      if(!editing.id && esArmaTipo(d.tipoItem)){
+      if(!editing.id && d.tipoItem && !esConsumibleTipo(d.tipoItem)){
         const borrador = structuredClone(d);
         cerrarEditor();
-        abrirArma(null, borrador);
+        abrirAsistente(null, borrador);
         return;
       }
       d.consumible = esConsumibleTipo(d.tipoItem);
@@ -698,7 +705,6 @@ function borrarItemActual(){
 }
 
 $('#btn-nuevo').onclick = () => abrirEditor(null);
-$('#btn-nueva-arma').onclick = () => abrirArma(null);
 $('#modal-x').onclick = cerrarEditor;
 $('#modal-cancelar').onclick = cerrarEditor;
 $('#modal-guardar').onclick = guardarItemActual;

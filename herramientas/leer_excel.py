@@ -7,6 +7,7 @@ from rutas import FICHA, GM, VENDOR, XLSX, SP
 # contra el codigo antes de aplicar nada.
 import re
 from openpyxl import load_workbook
+from catalogo_comun import efectos_desde_texto
 
 
 ETIQ = {
@@ -29,6 +30,7 @@ ETIQ = {
     'Detalle del estado equipado':'equipoEstadoDetalle','Estado al equipar (preset)':'equipoEstadoPreset',
     'Descripción narrativa':'descripcionNarrativa',
     'Modificadores del estado':'efectoMods_extra',
+    'Efectos al golpear':'efectosGolpe_txt',
     'Legacy':'legacy',
     'Otros modificadores':'mods_extra','Tiene imagen':'tiene_imagen',
 }
@@ -83,6 +85,9 @@ def leer():
                                 if s: it['mods'].append({'stat': s, 'val': num(val)})
                             elif par.strip():
                                 avisos.append(f"{hoja} fila {nfila}: no entiendo {par.strip()!r} en Otros modificadores")
+                    continue
+                if k == 'efectosGolpe_txt':
+                    it['efectosGolpe'] = efectos_desde_texto(v)
                     continue
                 if k == 'efectoMods_extra':
                     if v:

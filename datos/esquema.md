@@ -29,6 +29,10 @@ para la lógica de corrección/escritura.
   "danoFijo": 0,
   "danoAmplificado": 0,           // dados extra sin sumar peso (2 + amplificado = dados totales)
   "armaDeRango": false,           // si true, el botón Daño Arma no le suma el stat Dmg
+  "efectosGolpe": [               // opcional: se recuerdan (y tiran) al tirar el Daño
+    {"nombre": "Envenenar", "caras": 2, "exitos": 1,   // exitos en 1d(caras); caras 1 = siempre
+     "dado": "", "detalle": "Aplicale Veneno al objetivo."}  // dado: tirada extra si entra
+  ],
 
   // Solo si tipoItem === "consumibles":
   "consumible": true,
@@ -152,7 +156,7 @@ Estructuralmente análogo al personaje pero más simple: `attrs` planos
 (con/fue/agl/des/int), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
 `armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo;
 `armaNombre`/`armaDetalle`; `armaMods` = bonos del arma, que suman igual que
-los del equipo; `armaManos` = `arma_1m`/`arma_2m`, solo para cuando se
+los del equipo; `armaEfectos` = efectos al golpear, como `efectosGolpe`; `armaManos` = `arma_1m`/`arma_2m`, solo para cuando se
 publica al catálogo),
 `equipo` (ítems tomados del catálogo), `estados` (ver arriba),
 `habilidades`. No se persiste como archivo individual — vive en el

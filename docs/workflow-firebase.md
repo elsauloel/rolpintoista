@@ -77,8 +77,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
   edita; el GM puede borrarlas. `quien` es el personaje (ficha) o el creep
   (gm-tools lo separa del origen "<creep> · <qué tiró>"); la Mesa lo muestra
-  en color con `(jugador)` al lado, y la última tirada con fondo verde. El bloque "MESA" está copiado igual en las
-  dos herramientas (solo cambian `MESA_DESDE` y `mesaQuien()`).
+  en color con `(jugador)` al lado, y la última tirada con fondo verde. La Mesa vive en
+  [`../comun/mesa.js`](../comun/mesa.js) (publicar, dibujar, escuchar y la
+  cajita flotante) y las fórmulas de dados en [`../comun/tiradas.js`](../comun/tiradas.js);
+  cada herramienta solo define `MESA_DESDE` y `mesaQuien(origen)`.
   El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
   tiradas libres con `desde: 'mapa'`. Ejecutar una habilidad publica su
   descripción: si tira dados va en la misma tirada (campo `texto`), y si no

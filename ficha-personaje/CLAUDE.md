@@ -59,7 +59,11 @@ más cambia sesión a sesión.
   en el mismo lote (si la marca, que va en "otros", llegara sin los ítems,
   la próxima carga los correría otra vez). Los ítems del GM en la tienda
   (`itemsDatos`) llevan la marca cada uno.
-- **🔍 Lupa de la Botonera** (`lupaHtml`, `abrirLupa`, `#lupa-pop`): cada botón
+- **Compartido con gm-tools y el mapa**: la Mesa (`../comun/mesa.js`; acá
+  solo `MESA_DESDE`, `mesaQuien()` y `mesaIniciar(fbAlEntrar)`), las
+  fórmulas de dados (`../comun/tiradas.js`) y el cuadro de la 🔍
+  (`../comun/lupa.js`). No volver a copiarlos acá.
+- **🔍 Lupa de la Botonera** (contenido: `lupaContenido` → `lupaHtml`; cuadro en `../comun/lupa.js`): cada botón
   (combate, stats, habilidades, consumibles) trae un 🔍 (`data-lupa`) que muestra
   de qué stat sale la tirada, sus modificadores con origen, cómo se reparte en
   dados y el costo en No2/SP con su motivo. No tira nada. En las habilidades la 🔍 va dentro del botón Ejecutar (`habx:`) y muestra

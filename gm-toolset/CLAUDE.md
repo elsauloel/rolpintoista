@@ -39,7 +39,8 @@ En desarrollo activo, las dos.
   queda y se recarga en `mantenimiento()`. El botón ⚡ Acciones cobra: atacar
   Tipo ÷ 2 el primer ataque del turno y Tipo completo después
   (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD.
-  **🔍 Lupa en las Acciones** (`lupaHtmlCreep`, `data-lupacreep`, `#lupa-pop`):
+  **🔍 Lupa en las Acciones** (cuadro y estilos en `../comun/lupa.js`; acá
+  solo el contenido: `lupaContenido` → `lupaHtmlCreep`, claves `data-lupa="creep|tipo|ref"`):
   cada botón muestra el desglose de la tirada (atributo, mods con origen,
   Lisiado, dados) y su costo en No2; Atacar sin No2 no se deshabilita (avisa
   al tocarlo) para que la 🔍 siga abriendo. Los creeps tienen una sola arma.

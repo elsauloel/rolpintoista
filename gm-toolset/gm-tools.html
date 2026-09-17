@@ -384,26 +384,6 @@ input[type=file]{display:none}
 .botonera-tile{position:relative}
 .botonera-tile.bt-sin-nitros{opacity:.55}
 .botonera-tile.bt-sin-nitros .bt-label{color:var(--danger)}
-/* 🔍 de las Acciones: desglose de cada tirada (lupaHtmlCreep), igual que en la ficha */
-.bt-lupa{position:absolute;top:2px;right:2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;
-  font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}
-.bt-lupa:hover,.bt-lupa:focus-visible{opacity:1;background:rgba(224,164,88,.18);outline:none}
-.bt-lupa.mini{position:static;width:auto;height:auto;padding:3px 6px;border:1px solid var(--line-soft);font-size:11px;flex:none}
-#lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
-  background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
-  padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
-#lupa-pop .lupa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass);margin-bottom:6px}
-#lupa-pop .lupa-sec{margin-top:8px}
-#lupa-pop .lupa-sec-t{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
-  border-bottom:1px solid var(--line-soft);padding-bottom:2px;margin-bottom:3px}
-#lupa-pop .lupa-fila{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
-#lupa-pop .lupa-fila b{font-family:"Space Mono",monospace;white-space:nowrap;color:var(--paper)}
-#lupa-pop .lupa-total{border-top:1px dashed var(--line);margin-top:3px;padding-top:4px}
-#lupa-pop .lupa-total b{color:var(--brass)}
-#lupa-pop .lupa-tachado span:first-child,#lupa-pop .lupa-tachado b{opacity:.55;text-decoration:line-through}
-#lupa-pop .lupa-falta b{color:var(--danger)}
-#lupa-pop .lupa-gris{color:var(--muted)}
-#lupa-pop .lupa-nota{color:var(--muted);font-size:11.5px;margin-top:3px}
 .botonera-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px;align-content:start}
 .acciones-badge{
   font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);
@@ -1137,6 +1117,9 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="../comun/mesa-historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/tiradas.js"></script>
+<script src="../comun/mesa.js"></script>
+<script src="../comun/lupa.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -1149,45 +1132,9 @@ const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
 const esc = s => String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
 /* =========================================================
-   DADOS (portado de ficha.html)
+   DADOS (fórmulas en comun/tiradas.js)
    ========================================================= */
 
-function parseDados(formula){
-  const limpio = String(formula || '').trim().toLowerCase().replace(/\s+/g, '');
-  if(!limpio) return null;
-  const dadoRe = /(\d*)d(\d+)/g;
-  const dados = [];
-  let m;
-  while((m = dadoRe.exec(limpio))){
-    const n = m[1] ? parseInt(m[1], 10) : 1;
-    const caras = parseInt(m[2], 10);
-    if(n < 1 || n > 100 || caras < 2) return null;
-    dados.push({n, caras});
-  }
-  const sinDados = limpio.replace(/\d*d\d+/g, '');
-  let mod = 0;
-  const modRe = /([+-]\d+)/g;
-  let mm;
-  while((mm = modRe.exec(sinDados))) mod += parseInt(mm[1], 10);
-  if(!dados.length && !mod) return null;
-  if(/[^+\-0-9]/.test(sinDados.replace(/[+-]\d+/g, ''))) return null;
-  return {dados, mod};
-}
-
-function tirarDados(formula){
-  const p = parseDados(formula);
-  if(!p) return null;
-  const rolls = [];
-  p.dados.forEach(d => { for(let i = 0; i < d.n; i++) rolls.push(1 + Math.floor(Math.random() * d.caras)); });
-  const suma = rolls.reduce((a, b) => a + b, 0);
-  const formulaTxt = p.dados.map(d => `${d.n}d${d.caras}`).join('+') + (p.mod ? (p.mod > 0 ? `+${p.mod}` : `${p.mod}`) : '');
-  return { formula: formulaTxt || `${p.mod}`, rolls, mod: p.mod, total: suma + p.mod };
-}
-
-function horaTxt(fecha){
-  const p = n => String(n).padStart(2, '0');
-  return `${p(fecha.getHours())}:${p(fecha.getMinutes())}:${p(fecha.getSeconds())}`;
-}
 
 // Toda tirada va a la Mesa (la tirada libre por fórmula también está ahí).
 function registrarTirada(origen, r){
@@ -1216,47 +1163,6 @@ function renderHistorialSesion(){
 
 /* ---------- Descomponer un valor de stat en dados reales (portado de ficha.html) ---------- */
 
-const DADOS_REALES = [4, 6, 8, 10, 12, 20, 100];
-
-function combosDeSuma(n, k, minIdx){
-  if(k === 0) return n === 0 ? [[]] : [];
-  const out = [];
-  for(let i = minIdx; i < DADOS_REALES.length; i++){
-    const d = DADOS_REALES[i];
-    if(d > n) break;
-    combosDeSuma(n - d, k - 1, i).forEach(resto => out.push([d, ...resto]));
-  }
-  return out;
-}
-
-function mejorComboDados(n){
-  for(let k = 1; k <= 6; k++){
-    const combos = combosDeSuma(n, k, 0);
-    if(combos.length){
-      combos.sort((a, b) => (Math.max(...a) - Math.min(...a)) - (Math.max(...b) - Math.min(...b)));
-      return combos[0];
-    }
-  }
-  return null;
-}
-
-function formulaParaValor(valor){
-  const n = Math.round(num(valor));
-  if(n <= 0) return null;
-  let base = n, mod = 0;
-  if(base % 2 !== 0){ base -= 1; mod = 1; }
-  const combo = base > 0 ? mejorComboDados(base) : null;
-  if(!combo){
-    // No se arma con dados reales (valores chicos como 1, 2 o 3): se tira
-    // un dado "inexistente" del tamaño exacto del stat, ej. 1d3.
-    return {combo: [n], mod: 0, formula: `1d${n}`};
-  }
-  const counts = {};
-  combo.forEach(d => counts[d] = (counts[d] || 0) + 1);
-  const formula = Object.keys(counts).map(Number).sort((a, b) => a - b)
-    .map(d => `${counts[d]}d${d}`).join('+') + (mod ? `+${mod}` : '');
-  return {combo, mod, formula};
-}
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
 // con el total más alto. sc+statId son opcionales — solo importan para
@@ -2505,25 +2411,10 @@ function creepStatValor(sc, statId){
 }
 
 /* ---------- Lupa de las Acciones del creep (igual que la Botonera de la ficha) ----------
-   Cada botón trae un 🔍 (data-lupacreep="creepId|tipo|clave") que abre
+   Cada botón trae un 🔍 (data-lupa="creepId|tipo|clave") que abre
    #lupa-pop con el desglose: atributo base, modificadores y de dónde vienen,
    cómo se reparte en dados y el costo en No2 con su motivo. */
 
-const lupaFila = (txt, val, cls = '') => `<div class="lupa-fila ${cls}"><span>${txt}</span><b>${val}</b></div>`;
-const lupaNota = txt => `<div class="lupa-nota">${txt}</div>`;
-const lupaSeccion = (titulo, html) => `<div class="lupa-sec"><div class="lupa-sec-t">${titulo}</div>${html}</div>`;
-const lupaSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
-
-function lupaTiradaCreep(valor){
-  const n = Math.round(num(valor));
-  const f = formulaParaValor(n);
-  if(!f) return lupaSeccion('Tirada', lupaNota(`Con ${fmt(n)} no se puede tirar: hace falta al menos 1.`));
-  let nota;
-  if(f.combo.length === 1 && f.combo[0] === n && !DADOS_REALES.includes(n)) nota = `Valor chico: se tira un dado de ${fmt(n)} caras.`;
-  else if(f.mod) nota = `Impar: se reparte ${fmt(n - 1)} en dados reales y se suma +1.`;
-  else nota = `Se reparte ${fmt(n)} en la menor cantidad de dados reales, lo más parejos posible.`;
-  return lupaSeccion('Tirada', lupaFila(`${fmt(n)} →`, esc(f.formula)) + lupaNota(nota));
-}
 
 function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
   const d = CREEP_STAT_LOOKUP[statId];
@@ -2537,11 +2428,14 @@ function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
   h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
   let out = lupaSeccion('De dónde sale', h);
   if(sinTirada) return out;
-  out += lupaTiradaCreep(valor);
+  out += lupaTirada(valor);
   const afortunado = ['pdg', 'parry', 'eva'].includes(statId) && (sc.estados || []).find(e => e.activo !== false && e.afortunado);
   if(afortunado) out += lupaNota(`Ventaja por ${esc(afortunado.nombre)}: se tira dos veces y queda la mejor.`);
   return out;
 }
+
+// Contenido de la 🔍 (comun/lupa.js lo pide con lupaContenido).
+function lupaContenido(clave){ return lupaHtmlCreep(clave); }
 
 function lupaHtmlCreep(clave){
   const [scId, tipo, ref] = clave.split('|');
@@ -2592,42 +2486,6 @@ function lupaHtmlCreep(clave){
   return {titulo: '', html: ''};
 }
 
-function lupaBotonCreep(clave, extraCls = ''){
-  return `<span class="bt-lupa ${extraCls}" role="button" tabindex="0" data-lupacreep="${esc(clave)}" title="Cómo se calcula">🔍</span>`;
-}
-
-function cerrarLupa(){
-  const p = $('#lupa-pop');
-  if(p) p.remove();
-}
-
-function abrirLupa(el){
-  const clave = el.dataset.lupacreep;
-  const abierta = $('#lupa-pop');
-  if(abierta && abierta.dataset.clave === clave){ cerrarLupa(); return; }
-  cerrarLupa();
-  const {titulo, html} = lupaHtmlCreep(clave);
-  const p = document.createElement('div');
-  p.id = 'lupa-pop';
-  p.dataset.clave = clave;
-  p.innerHTML = `<div class="lupa-titulo">🔍 ${esc(titulo)}</div>${html}`;
-  document.body.appendChild(p);
-  const r = el.getBoundingClientRect(), m = 8;
-  const w = p.offsetWidth, hgt = p.offsetHeight;
-  let top = r.bottom + 4;
-  if(top + hgt > innerHeight - m) top = Math.max(m, r.top - hgt - 4);
-  p.style.top = top + 'px';
-  p.style.left = Math.max(m, Math.min(r.right - w, innerWidth - w - m)) + 'px';
-}
-
-document.addEventListener('pointerdown', e => {
-  const p = $('#lupa-pop');
-  if(p && !p.contains(e.target) && !e.target.closest('[data-lupacreep]')) cerrarLupa();
-}, true);
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape' && $('#lupa-pop')){ cerrarLupa(); e.stopImmediatePropagation(); e.preventDefault(); }
-  else if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-lupacreep]')){ e.preventDefault(); abrirLupa(e.target.closest('[data-lupacreep]')); }
-}, true);
 
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
@@ -2638,7 +2496,7 @@ function renderAccionesCreep(){
 
   const tilesStats = CREEP_STATS_TIRADA_IDS.map(id => CREEP_STAT_LOOKUP[id]).map(d => `
     <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
-      ${lupaBotonCreep(`${sc.id}|stat|${d.id}`)}
+      ${lupaBotonHtml(`${sc.id}|stat|${d.id}`)}
       <span class="bt-label">${esc(d.label)}</span>
       <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
     </button>`).join('');
@@ -2654,7 +2512,7 @@ function renderAccionesCreep(){
   ];
   const tilesCombate = combate.map(f => `
     <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}" ${f.attr} title="${esc(f.motivo)}">
-      ${lupaBotonCreep(`${sc.id}|${f.lupa}`)}
+      ${lupaBotonHtml(`${sc.id}|${f.lupa}`)}
       <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>
     </button>`).join('');
 
@@ -2675,7 +2533,7 @@ function renderAccionesCreep(){
       <div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
-      ${lupaBotonCreep(`${sc.id}|hab|${f.id}`, 'mini')}
+      ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
     </div>`;
 
@@ -4044,11 +3902,6 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('click', e => {
-  // 🔍 dentro de un botón de las Acciones: solo muestra el desglose, no tira.
-  // (Algunos navegadores reportan el clic sobre el botón y no sobre la 🔍: se mira también el punto tocado.)
-  const enPunto = e.clientX || e.clientY ? document.elementFromPoint(e.clientX, e.clientY) : null;
-  const lupa = e.target.closest('[data-lupacreep]') || (enPunto && enPunto.closest('[data-lupacreep]'));
-  if(lupa){ e.preventDefault(); abrirLupa(lupa); return; }
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.
   if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado))) cerrarChipEstado(b);
@@ -5358,23 +5211,13 @@ $('#file-input').onchange = ev => {
 S.creeps.push(nuevoCreep());
 renderAll();
 /* =========================================================
-   MESA — tiradas compartidas en vivo (Firebase)
-   Todas las tiradas pasan por registrarTirada(), que además las
-   publica en campanas/<campaña>/tiradas; la cajita "Mesa" muestra
-   las últimas de todos al instante. La cuenta y la partida salen de
-   comun/sesion.js; sin internet las tiradas funcionan igual, solo que
-   no se comparten. Este bloque está copiado igual en
-   ficha.html y gm-tools.html (salvo MESA_DESDE y mesaQuien) — ver
-   docs/workflow-firebase.md.
+   MESA — tiradas compartidas en vivo: comun/mesa.js
+   Acá solo va lo propio de esta herramienta: MESA_DESDE, mesaQuien()
+   (quién tira) y lo que publica cosas que no son tiradas.
    ========================================================= */
 
 const MESA_DESDE = 'gm';
-const MESA_MAX = 30;
 
-let mesaIdsVistos = null;
-
-// En gm-tools el origen llega como "<creep> · <qué tiró>": el creep pasa a
-// ser quien tira (en color en la Mesa) y el origen queda con el resto.
 // Al ejecutar una habilidad de un creep, su descripción va a la Mesa aunque
 // no tire dados, así los jugadores leen qué hace.
 function mesaPublicarHabilidadCreep(sc, h){
@@ -5388,234 +5231,13 @@ function mesaPublicarHabilidadCreep(sc, h){
   }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
 }
 
+// En gm-tools el origen llega como "<creep> · <qué tiró>": el creep pasa a
+// ser quien tira (en color en la Mesa) y comun/mesa.js le saca ese prefijo al origen.
 function mesaQuien(origen){
   const sc = S.creeps.find(c => c.nombre && String(origen || '').startsWith(c.nombre + ' · '));
   return sc ? sc.nombre : '';
 }
 
-function mesaEstado(texto){
-  $('#mesa-estado').textContent = texto;
-}
-
-// Descripción de la habilidad que se está ejecutando: viaja con su tirada,
-// para que sea una sola línea en la Mesa y no dos.
-let mesaTextoPendiente = '';
-function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
-
-async function mesaPublicar(origen, r){
-  if(!fbDb || !fbUsuario || !fbMiembro) return;
-  const texto = mesaTextoPendiente;
-  mesaTextoPendiente = '';
-  const doc = {
-    uid: fbUsuario.uid,
-    jugador: fbMiembro.nombre,
-    quien: mesaQuien(),
-    origen: String(origen || ''),
-    formula: String(r.formula || ''),
-    rolls: (r.rolls || []).slice(0, 100),
-    mod: num(r.mod),
-    total: num(r.total),
-    desde: MESA_DESDE,
-    cuando: firebase.firestore.FieldValue.serverTimestamp(),
-  };
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add(texto ? {...doc, texto} : doc);
-  }catch(err){
-    // Reglas viejas (no conocen "texto"): se publica la tirada igual.
-    if(texto && err.code === 'permission-denied'){
-      try{
-        await fbDb.collection(fbRutaCampana('tiradas')).add({...doc, cuando: firebase.firestore.FieldValue.serverTimestamp()});
-        return;
-      }catch(e2){ err = e2; }
-    }
-    console.error('No se pudo publicar la tirada en la mesa:', err);
-    toast('La tirada no se pudo compartir con la mesa');
-  }
-}
-
-
-// Color del nombre en la Mesa: dorado las propias, verde las de aliados,
-// rojo las de creeps (desde gm-tools con un creep), blanco las neutras
-// (tiradas libres sin personaje de otros) y lila el pase de turno.
-function mesaClaseQuien(t){
-  if(t.desde === 'mantenimiento') return 'mesa-q-turno';
-  if(t.desde === 'gm' && t.quien) return 'mesa-q-creep';
-  if(fbUsuario && t.uid === fbUsuario.uid) return 'mesa-q-propia';
-  return t.quien ? 'mesa-q-aliado' : 'mesa-q-neutra';
-}
-
-function mesaRender(docs){
-  const cuerpo = $('#mesa-cuerpo');
-  const primeraVez = mesaIdsVistos === null;
-  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
-  // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
-  const ultimaId = ultima ? ultima.id : null;
-  let hayAjena = false;
-  cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
-  docs.forEach(d => {
-    const t = d.data({serverTimestamps: 'estimate'});
-    const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
-    if(nueva && t.uid !== fbUsuario.uid) hayAjena = true;
-    // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
-    if(EfectosGolpe.esLineaMesa(t)){
-      const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
-      div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
-      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-      cuerpo.appendChild(div);
-      return;
-    }
-    // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
-    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
-      const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
-      div.innerHTML = t.desde === 'mantenimiento'
-        ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.desde === "habilidad"
-            ? `<div class="mesa-texto">${t.formula ? esc(t.formula) : "(esta habilidad no tiene descripción cargada)"}</div>`
-            : (t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : "")}`;
-      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-      cuerpo.appendChild(div);
-      return;
-    }
-    const quien = t.quien || t.jugador || '?';
-    // Personaje o creep en color y, entre paréntesis, quién lo maneja.
-    const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
-    const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
-    const div = document.createElement('div');
-    div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
-    div.innerHTML =
-      `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
-      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
-    if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-    cuerpo.appendChild(div);
-  });
-  mesaIdsVistos = new Set(docs.map(d => d.id));
-  // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
-  if(!primeraVez && typeof dadosAnimarTirada === 'function'){
-    docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
-  }
-  if(hayAjena && $('#mesa').classList.contains('colapsada')) $('#mesa').classList.add('aviso');
-}
-
-function mesaEscuchar(){
-  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
-  fbDb.collection(fbRutaCampana('tiradas'))
-    .orderBy('cuando', 'desc').limit(MESA_MAX)
-    .onSnapshot(snap => {
-      mesaEstado(`${fbPartida.nombre} · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
-      mesaRender(snap.docs);
-    }, err => {
-      console.error('Error escuchando la mesa:', err);
-      mesaEstado('desconectada');
-      $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudieron leer las tiradas — mirá la consola.</div>';
-    });
-}
-
-async function mesaIniciar(){
-  const mesa = document.createElement('div');
-  mesa.id = 'mesa';
-  mesa.innerHTML =
-    '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
-      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
-    '</div>' +
-    '<div id="mesa-cuerpo"></div>' +
-    '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>' +
-    '<div id="mesa-grilla"><button type="button" class="btn" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button></div>';
-  document.body.appendChild(mesa);
-  const cabecera = $('#mesa-cabecera');
-  dadosConectarBoton(mesa);
-  // Grilla de dados al costado de la cajita (comun/grilla-dados.js).
-  grillaConectar($('#mesa-grilla button'), {ancla: mesa, alTirar: f => registrarTirada('Tirada libre', tirarDados(f))});
-
-  // Tirada libre por fórmula, igual que en el mapa: se publica en la Mesa
-  // y queda en el historial de la sesión.
-  $('#mesa-tirar').onsubmit = e => {
-    e.preventDefault();
-    const r = tirarDados($('#mesa-formula').value);
-    if(!r){ toast('Fórmula no válida — ej: 2d6+3'); return; }
-    registrarTirada('Tirada libre', r);
-    $('#mesa-formula').value = '';
-  };
-
-  // Posición: la cajita se arrastra desde la cabecera y el lugar queda
-  // guardado en este navegador. Mientras nunca se la movió, va abajo a la
-  // derecha, justo encima del dock si la herramienta tiene uno (aunque la
-  // barra ocupe dos renglones). Nunca queda afuera de la pantalla.
-  const dock = document.querySelector('.dock');
-  let posicion = null;
-  try{ posicion = JSON.parse(localStorage.getItem('mesa-posicion') || 'null'); }catch(e){}
-  const encuadrar = () => {
-    if(!posicion){
-      mesa.style.left = mesa.style.top = mesa.style.right = '';
-      mesa.style.bottom = dock ? (dock.offsetHeight + 12) + 'px' : '';
-      return;
-    }
-    const x = Math.max(0, Math.min(posicion.x, window.innerWidth - mesa.offsetWidth));
-    const y = Math.max(0, Math.min(posicion.y, window.innerHeight - mesa.offsetHeight));
-    mesa.style.left = x + 'px';
-    mesa.style.top = y + 'px';
-    mesa.style.right = mesa.style.bottom = 'auto';
-  };
-  window.addEventListener('resize', encuadrar);
-
-  let arrastre = null, recienMovida = false;
-  cabecera.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) return;
-    const r = mesa.getBoundingClientRect();
-    arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
-    cabecera.setPointerCapture(e.pointerId);
-  });
-  cabecera.addEventListener('pointermove', e => {
-    if(!arrastre) return;
-    const dx = e.clientX - arrastre.px, dy = e.clientY - arrastre.py;
-    if(!arrastre.movio && Math.abs(dx) + Math.abs(dy) < 5) return;  // un clic con pulso tembloroso no es arrastre
-    arrastre.movio = true;
-    mesa.classList.add('arrastrando');
-    posicion = {x: arrastre.x + dx, y: arrastre.y + dy};
-    encuadrar();
-  });
-  const soltar = () => {
-    if(!arrastre) return;
-    recienMovida = arrastre.movio;
-    arrastre = null;
-    mesa.classList.remove('arrastrando');
-    if(recienMovida){
-      posicion = {x: parseFloat(mesa.style.left), y: parseFloat(mesa.style.top)};
-      try{ localStorage.setItem('mesa-posicion', JSON.stringify(posicion)); }catch(e){}
-    }
-  };
-  cabecera.addEventListener('pointerup', soltar);
-  cabecera.addEventListener('pointercancel', soltar);
-
-  const aplicarColapso = colapsada => {
-    mesa.classList.toggle('colapsada', colapsada);
-    if(!colapsada) mesa.classList.remove('aviso');
-    $('#mesa-flecha').textContent = colapsada ? '▸' : '▾';
-    try{ localStorage.setItem('mesa-colapsada', colapsada ? '1' : ''); }catch(e){}
-    encuadrar();
-  };
-  let colapsada = false;
-  try{ colapsada = localStorage.getItem('mesa-colapsada') === '1'; }catch(e){}
-  aplicarColapso(colapsada);
-  cabecera.onclick = e => {
-    if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
-    if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) aplicarColapso(!mesa.classList.contains('colapsada'));
-  };
-
-  // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
-  const entrada = await fbEntrarAPartida();
-  if(entrada === 'redirigiendo') return;
-  if(entrada !== 'ok'){
-    mesaEstado('sin internet');
-    $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudo cargar Firebase. Las tiradas siguen funcionando, pero no se comparten.</div>';
-    return;
-  }
-  gmAlEntrar();
-}
 
 /* =========================================================
    CREEPS EN VIVO (Firebase)
@@ -6073,7 +5695,7 @@ async function gmMantenimientoRevisar(){
   }
 }
 
-mesaIniciar();
+mesaIniciar(gmAlEntrar);
 </script>
 </body>
 </html>

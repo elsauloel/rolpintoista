@@ -143,4 +143,7 @@ Alcance y movimiento; niebla; ocultar tokens; tiradas desde el token.
 - `../firebase/firestore.rules` — reglas de `tokens` y `tiradas`.
 - `../comun/sesion.js` — cuenta y partida (`?partida=<id>`); sin sesión o
   sin ser miembro vuelve al inicio (`../index.html`). El botón ⌂ vuelve a
-  la partida. La Mesa de tiradas está copiada de la ficha y gm-tools.
+  la partida.
+- `../comun/mesa.js` y `../comun/tiradas.js` — la Mesa y las fórmulas de
+  dados, compartidas con la ficha y gm-tools (el mapa define
+  `MESA_DESDE = 'mapa'` y `mesaQuien()`, y tiene su propio HTML de Mesa).

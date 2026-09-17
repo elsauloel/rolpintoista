@@ -446,6 +446,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/mesa-historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/tiradas.js"></script>
+<script src="../comun/mesa.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -466,10 +468,6 @@ function toast(msg){
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-function horaTxt(fecha){
-  const p = n => String(n).padStart(2, '0');
-  return `${p(fecha.getHours())}:${p(fecha.getMinutes())}:${p(fecha.getSeconds())}`;
-}
 
 /* ---------- Firebase (mismo bloque fb* que ficha y gm-tools) ---------- */
 
@@ -2973,137 +2971,19 @@ $('#toolkit-lista').addEventListener('click', e => {
 });
 renderToolkit();
 
-/* ---------- Mesa (tiradas compartidas) ---------- */
+/* ---------- Mesa (tiradas compartidas): comun/mesa.js ---------- */
 
-const MESA_MAX = 30;
-let mesaIdsVistos = null;
+const MESA_DESDE = 'mapa';
+const MESA_AVISAR_SIN_SESION = true;
+// Las tiradas del mapa salen a nombre del usuario.
+function mesaQuien(){ return ''; }
 
-function parseDados(formula){
-  const limpio = String(formula || '').trim().toLowerCase().replace(/\s+/g, '');
-  if(!limpio) return null;
-  const dadoRe = /(\d*)d(\d+)/g;
-  const dados = [];
-  let m;
-  while((m = dadoRe.exec(limpio))){
-    const n = m[1] ? parseInt(m[1], 10) : 1;
-    const caras = parseInt(m[2], 10);
-    if(n < 1 || n > 100 || caras < 2) return null;
-    dados.push({n, caras});
-  }
-  const sinDados = limpio.replace(/\d*d\d+/g, '');
-  let mod = 0;
-  const modRe = /([+-]\d+)/g;
-  let mm;
-  while((mm = modRe.exec(sinDados))) mod += parseInt(mm[1], 10);
-  if(!dados.length && !mod) return null;
-  if(/[^+\-0-9]/.test(sinDados.replace(/[+-]\d+/g, ''))) return null;
-  return {dados, mod};
-}
 
-function tirarDados(formula){
-  const p = parseDados(formula);
-  if(!p) return null;
-  const rolls = [];
-  p.dados.forEach(d => { for(let i = 0; i < d.n; i++) rolls.push(1 + Math.floor(Math.random() * d.caras)); });
-  const suma = rolls.reduce((a, b) => a + b, 0);
-  const formulaTxt = p.dados.map(d => `${d.n}d${d.caras}`).join('+') + (p.mod ? (p.mod > 0 ? `+${p.mod}` : `${p.mod}`) : '');
-  return { formula: formulaTxt || `${p.mod}`, rolls, mod: p.mod, total: suma + p.mod };
-}
 
-async function mesaPublicar(origen, r){
-  if(!fbDb || !fbUsuario || !fbMiembro){ toast('Entrá a la mesa para tirar'); return; }
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid,
-      jugador: fbMiembro.nombre,
-      quien: '',
-      origen: String(origen || ''),
-      formula: String(r.formula || ''),
-      rolls: (r.rolls || []).slice(0, 100),
-      mod: num(r.mod),
-      total: num(r.total),
-      desde: 'mapa',
-      cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  }catch(err){
-    console.error('No se pudo publicar la tirada en la mesa:', err);
-    toast('La tirada no se pudo compartir con la mesa');
-  }
-}
 
-// Color del nombre en la Mesa: dorado las propias, verde las de aliados,
-// rojo las de creeps (desde gm-tools con un creep), blanco las neutras
-// (tiradas libres sin personaje de otros) y lila el pase de turno.
-function mesaClaseQuien(t){
-  if(t.desde === 'mantenimiento') return 'mesa-q-turno';
-  if(t.desde === 'gm' && t.quien) return 'mesa-q-creep';
-  if(fbUsuario && t.uid === fbUsuario.uid) return 'mesa-q-propia';
-  return t.quien ? 'mesa-q-aliado' : 'mesa-q-neutra';
-}
 
-function mesaRender(docs){
-  const cuerpo = $('#mesa-cuerpo');
-  const primeraVez = mesaIdsVistos === null;
-  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
-  // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
-  const ultimaId = ultima ? ultima.id : null;
-  cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
-  docs.forEach(d => {
-    const t = d.data({serverTimestamps: 'estimate'});
-    const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
-    // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
-    if(EfectosGolpe.esLineaMesa(t)){
-      const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
-      div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
-      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-      cuerpo.appendChild(div);
-      return;
-    }
-    // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
-    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
-      const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
-      div.innerHTML = t.desde === 'mantenimiento'
-        ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
-        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.desde === "habilidad"
-            ? `<div class="mesa-texto">${t.formula ? esc(t.formula) : "(esta habilidad no tiene descripción cargada)"}</div>`
-            : (t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : "")}`;
-      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-      cuerpo.appendChild(div);
-      return;
-    }
-    const quien = t.quien || t.jugador || '?';
-    // Personaje o creep en color y, entre paréntesis, quién lo maneja.
-    const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
-    const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
-    const div = document.createElement('div');
-    div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
-    div.innerHTML =
-      `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
-      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
-    if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
-    cuerpo.appendChild(div);
-  });
-  mesaIdsVistos = new Set(docs.map(d => d.id));
-  // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
-  if(!primeraVez && typeof dadosAnimarTirada === 'function'){
-    docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
-  }
-}
 
-function mesaEscuchar(){
-  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
-  fbDb.collection(fbRutaCampana('tiradas'))
-    .orderBy('cuando', 'desc').limit(MESA_MAX)
-    .onSnapshot(snap => mesaRender(snap.docs), err => {
-      console.error('Error escuchando la mesa:', err);
-      $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudieron leer las tiradas — mirá la consola.</div>';
-    });
-}
+
 
 $('#mesa-dados').innerHTML = dadosBotonHtml();
 dadosConectarBoton($('#mesa-dados'));

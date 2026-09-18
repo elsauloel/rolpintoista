@@ -220,7 +220,7 @@ nuevo de Rol Pintoísta. Paso 2 de
     frenen: se arrastra casillero por casillero (`extenderRuta` con
     `marcador: true`; volver sobre una casilla recorta) y se dibuja con
     `dibujarRutaHex` en el color elegido. Mismo tilde: sin tildar se borra
-    solo (`ESTELA_MS`); tildado ("Trayectoria fija") queda atado a la
+    solo (`TRAZO_MS`); tildado ("Trayectoria fija") queda atado a la
     grilla. Vive en la misma colección `trazos` con `hex: true` y `puntos`
     = `[col,fila,col,fila,…]` (tope `RUTA_MAX_CELDAS`); en memoria se lee
     como `celdas`. Un fijo se selecciona (clic sobre cualquiera de sus

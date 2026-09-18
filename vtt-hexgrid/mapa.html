@@ -790,6 +790,7 @@ let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero
 // Estelas que se ven unos segundos después de mover (las de todos).
 const estelas = new Map();    // tokenId -> {celdas, hasta}
 const ESTELA_MS = 4000;
+const TRAZO_MS = 3000;  // cuánto dura un trazo temporal del lápiz (la estela de los tokens usa ESTELA_MS)
 const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
 // Ping (clic derecho en el mapa, sin herramienta que lo use — libre para
 // esto): un anillo que se expande y se apaga solo, para todos.
@@ -2174,7 +2175,7 @@ function dibujar(){
   // de irse); los permanentes quedan fijos hasta que alguien los mueva o
   // los borre.
   trazos.forEach((t, id) => {
-    const alfa = t.permanente ? 1 : Math.max(0, Math.min(1, (t.creadoMs + ESTELA_MS - ahora) / 800));
+    const alfa = t.permanente ? 1 : Math.max(0, Math.min(1, (t.creadoMs + TRAZO_MS - ahora) / 800));
     if(!t.permanente && alfa <= 0) return;
     if(t.hex){
       dibujarRutaHex(t.celdas, t.color, alfa, id === trazoSeleccionado);
@@ -3141,7 +3142,7 @@ function escucharTrazos(){
       // (cualquiera que la vea programa el borrado; si el que la dibujó se
       // fue, no queda huérfana).
       if(d.permanente !== true){
-        const restan = ESTELA_MS - (Date.now() - (d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now()));
+        const restan = TRAZO_MS - (Date.now() - (d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now()));
         setTimeout(() => { coleccionTrazos().doc(ch.doc.id).delete().catch(() => {}); }, Math.max(0, restan));
       }
     });

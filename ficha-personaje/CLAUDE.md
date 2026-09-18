@@ -196,6 +196,23 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   👥 Personajes lista los de la mesa; los de otros jugadores se abren en
   solo lectura. El personaje abierto se recuerda en el `#id` de la URL y en
   `localStorage` (`ficha-actual`). Ya no hay Subir/Bajar datos.
+- **Foto del personaje** (`S.meta.imagen`, botón "portrait-box"/cuadro
+  "Foto del personaje"): el retrato completo, tal cual se sube (achicado
+  a 480px con `fileToDataURL`, sin recortar — se ve entero con
+  `object-fit:contain`). De ahí sale **la miniatura cuadrada que usa el
+  token del personaje en el mapa** (`fichas/{id}.miniatura`, lo que lee
+  `vtt-hexgrid/mapa.html` como `vin.miniatura`): al subir una foto nueva
+  se abre de una `comun/recorte-imagen.js` para elegir con zoom y
+  arrastre qué parte se ve (`elegirRecorteRetrato`, guarda en
+  `S.meta.miniatura`); "Editar recorte del token" en el cuadro de la foto
+  vuelve a abrir ese mismo recorte sobre la foto ya puesta, sin tener que
+  resubirla. Si `S.meta.miniatura` está vacío (fichas viejas, o se
+  canceló el recorte al subir), `fichaMiniaturaActual()` cae en el
+  recorte automático de siempre (centro de la foto, `fichaMiniatura`) —
+  mismo mecanismo que usan las invocaciones (`fichaMiniaturaInvocacion`),
+  que por ahora no tienen el recorte manual. La parte `retrato` guarda
+  `{imagen, miniatura}` juntos (`fichaPartesActuales`/`fichaLeerParte`,
+  compatible con fichas viejas donde era solo el string de la imagen).
 - **Modo botonera** (`?modo=botonera`, bloque al final del script): lo usa
   el mapa en un iframe. Oculta todo menos las ventanitas (`.scrim`) con
   fondo transparente, abre la Botonera al cargar el personaje y le avisa

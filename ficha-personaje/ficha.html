@@ -946,6 +946,18 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 .scrim.open{display:block}
 .modal{max-width:520px;margin:4vh auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel);}
+
+/* Recorte de imagen (comun/recorte-imagen.js): elegir qué parte de la
+   foto se ve antes de guardarla como miniatura del personaje (el token
+   del mapa usa esta miniatura). Por encima de cualquier .scrim (z 50). */
+.recorte-scrim{position:fixed;inset:0;background:rgba(15,12,14,.75);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px}
+.recorte-caja{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:0 12px 28px rgba(0,0,0,.6);max-width:calc(100vw - 32px);max-height:calc(100vh - 32px);overflow-y:auto}
+.recorte-titulo{margin:0;font-weight:700;color:var(--paper)}
+.recorte-visor{position:relative;overflow:hidden;border-radius:var(--r);border:2px solid var(--copper);background:#000;cursor:grab;touch-action:none;max-width:100%}
+.recorte-visor:active{cursor:grabbing}
+.recorte-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
+.recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
+.recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
 #scrim-hab-inv [hidden]{display:none!important}
 .modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}
 .modal header h3{margin:0;font-family:"Fraunces",serif;font-size:17px;font-weight:600}
@@ -1714,6 +1726,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     </div>
     <footer>
       <button class="btn del" id="portrait-view-del">Eliminar</button>
+      <button class="btn" id="portrait-view-recorte">Editar recorte del token</button>
       <button class="btn primary" id="portrait-view-change">Cambiar</button>
     </footer>
   </div>
@@ -1836,6 +1849,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/asistente-item.js"></script>
+<script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
    MODELO
@@ -2126,7 +2140,7 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, imagen:''},
+        nivel:1, exp:0, dde:0, imagen:'', miniatura:''},
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
@@ -5245,12 +5259,18 @@ document.addEventListener('click', e => {
     }
     return;
   }
-  if(b.id === 'portrait-rm'){ S.meta.imagen = ''; renderPortrait(); return; }
+  if(b.id === 'portrait-rm'){ S.meta.imagen = ''; S.meta.miniatura = ''; renderPortrait(); return; }
   if(b.id === 'portrait-view-x'){ $('#scrim-portrait').classList.remove('open'); return; }
   if(b.id === 'portrait-view-change'){ $('#scrim-portrait').classList.remove('open'); $('#portrait-input').click(); return; }
+  if(b.id === 'portrait-view-recorte'){
+    if(!S.meta.imagen) return;
+    elegirRecorteRetrato(S.meta.imagen);
+    return;
+  }
   if(b.id === 'portrait-view-del'){
     if(!confirm('¿Eliminar la foto del personaje?')) return;
     S.meta.imagen = '';
+    S.meta.miniatura = '';
     renderPortrait();
     $('#scrim-portrait').classList.remove('open');
     return;
@@ -5628,13 +5648,25 @@ function cargarArchivoLocal(){
   if(!confirm(aviso)) return;
   $('#file-input').click();
 }
+// Deja elegir qué parte de `fuente` (File recién subido, o el retrato ya
+// guardado para "Editar recorte") se ve en el token del mapa — si se
+// cancela, no cambia nada (miniatura vacía = se recorta el centro solo).
+async function elegirRecorteRetrato(fuente){
+  try{
+    S.meta.miniatura = await recortarImagen(fuente, {lado: MINIATURA_PX, tope: MINIATURA_MAX});
+  }catch(err){
+    if(err.message !== 'cancelado') toast('No se pudo recortar esa imagen');
+  }
+}
 $('#portrait-input').onchange = async ev => {
   const file = ev.target.files[0];
   ev.target.value = '';
   if(!file) return;
   try{
     S.meta.imagen = await fileToDataURL(file, 480, 0.85);
+    S.meta.miniatura = '';
     renderPortrait();
+    await elegirRecorteRetrato(file);
   }catch(err){
     toast('No se pudo cargar esa imagen');
   }
@@ -8586,7 +8618,7 @@ function fichaNueva(){
   S = structuredClone(DEFAULT);
   S.formulas = formulas;
   S.caps = caps;
-  S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, imagen:''};
+  S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, imagen:'', miniatura:''};
   S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
   S.attrs = {con:1, fue:1, agl:1, des:1, esp:1};
@@ -8666,6 +8698,7 @@ const CATALOGO_IDS = new Set(DEFAULT.catalogo.map(c => c.id));
 const GUARDAR_QUIETO_MS = 1200;  // se escribe cuando una parte deja de cambiar este rato…
 const GUARDAR_MAX_MS = 5000;     // …o, si no para de cambiar (tipeando), como mucho cada tanto
 const MINIATURA_PX = 96;
+const MINIATURA_MAX = 60000;   // tope que aceptan las reglas
 const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
 
 // Las imágenes embebidas (data:...) no se guardan, salvo el retrato, que
@@ -8678,7 +8711,7 @@ function fichaPartesActuales(){
   const res = {};
   Object.entries(PARTES_FICHA).forEach(([parte, claves]) => {
     const o = {};
-    claves.forEach(k => { o[k] = k === 'meta' ? {...S.meta, imagen: ''} : S[k]; });
+    claves.forEach(k => { o[k] = k === 'meta' ? {...S.meta, imagen: '', miniatura: ''} : S[k]; });
     res[parte] = fichaSerializar(o);
   });
   const otros = {};
@@ -8687,7 +8720,7 @@ function fichaPartesActuales(){
   // Del catálogo solo viaja lo que no está en el catálogo compartido
   // (ítems agregados a mano en esta ficha), igual que en aplicarFicha().
   res.catalogo = fichaSerializar({catalogo: (S.catalogo || []).filter(i => !CATALOGO_IDS.has(i.id))});
-  res.retrato = JSON.stringify(S.meta.imagen || '');
+  res.retrato = JSON.stringify({imagen: S.meta.imagen || '', miniatura: S.meta.miniatura || ''});
   res.imgInvocaciones = JSON.stringify(fichaImagenesInvocaciones());
   return res;
 }
@@ -8709,20 +8742,23 @@ function fichaPonerImagenesInvocaciones(mapa){
 function fichaLeerParte(parte, json){
   let datos;
   try{ datos = JSON.parse(json); }catch(e){ return {}; }
-  if(parte === 'retrato') return {retrato: typeof datos === 'string' ? datos : ''};
+  if(parte === 'retrato'){
+    if(typeof datos === 'string') return {retrato: datos, retratoMiniatura: ''};
+    return {retrato: (datos && datos.imagen) || '', retratoMiniatura: (datos && datos.miniatura) || ''};
+  }
   if(parte === 'imgInvocaciones') return {imgInvocaciones: datos && typeof datos === 'object' ? datos : {}};
   return datos && typeof datos === 'object' ? datos : {};
 }
 
 function fichaAplicarParte(parte, datos){
-  if(parte === 'retrato'){ S.meta.imagen = datos.retrato || ''; return; }
+  if(parte === 'retrato'){ S.meta.imagen = datos.retrato || ''; S.meta.miniatura = datos.retratoMiniatura || ''; return; }
   if(parte === 'imgInvocaciones'){ fichaPonerImagenesInvocaciones(datos.imgInvocaciones); return; }
   if(parte === 'catalogo'){
     const propios = Array.isArray(datos.catalogo) ? datos.catalogo : [];
     S.catalogo = (S.catalogo || []).filter(i => CATALOGO_IDS.has(i.id)).concat(propios);
     return;
   }
-  if(datos.meta) datos.meta.imagen = S.meta.imagen;
+  if(datos.meta){ datos.meta.imagen = S.meta.imagen; datos.meta.miniatura = S.meta.miniatura; }
   Object.keys(datos).forEach(k => { S[k] = datos[k]; });
   if(parte === 'invocaciones' && fichaVivo){
     let mapa = {};
@@ -8802,6 +8838,13 @@ function fichaMiniaturaInvocacion(imagen){
 
 function fichaNombre(){
   return String(S.meta.nombre || '').trim().slice(0, 60) || 'Sin nombre';
+}
+
+// La miniatura del personaje (token del mapa): si el jugador ya eligió a
+// mano qué parte se ve (comun/recorte-imagen.js, S.meta.miniatura), se
+// usa esa; si no, se recorta el centro del retrato como antes.
+async function fichaMiniaturaActual(){
+  return S.meta.miniatura || await fichaMiniatura(S.meta.imagen);
 }
 
 // Retrato achicado para el token del mapa (unos pocos KB).
@@ -8923,7 +8966,7 @@ async function fichaGuardarTick(forzar){
   const resumenJson = JSON.stringify([nombre, resumen]);
   if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
   const retrato = listas.find(([parte]) => parte === 'retrato');
-  if(retrato) cambios.miniatura = await fichaMiniatura(S.meta.imagen);
+  if(retrato) cambios.miniatura = await fichaMiniaturaActual();
   if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
 
   try{
@@ -9019,18 +9062,19 @@ function fichaEscuchar(f){
       if(fichaVivo !== f) return;
       if(!f.cargada){
         const datos = {};
-        let retrato = '';
+        let retrato = '', retratoMiniatura = '';
         let imgInvocaciones = {};
         snap.docs.forEach(d => {
           const json = String(d.data().json || '');
           f.ultimo[d.id] = json;
           const leido = fichaLeerParte(d.id, json);
-          if(d.id === 'retrato') retrato = leido.retrato;
+          if(d.id === 'retrato'){ retrato = leido.retrato; retratoMiniatura = leido.retratoMiniatura; }
           else if(d.id === 'imgInvocaciones') imgInvocaciones = leido.imgInvocaciones;
           else Object.assign(datos, leido);
         });
         if(!datos.meta) datos.meta = {};
         datos.meta.imagen = retrato;
+        datos.meta.miniatura = retratoMiniatura;
         aplicarFicha(datos);
         fichaPonerImagenesInvocaciones(imgInvocaciones);
         renderInvocaciones();
@@ -9118,7 +9162,7 @@ async function crearPersonajeNuevo(datos){
       duenoUid: fbUsuario.uid,
       nombre: fichaNombre(),
       resumen: fichaResumen(),
-      miniatura: await fichaMiniatura(S.meta.imagen),
+      miniatura: await fichaMiniaturaActual(),
       creado: ts,
       actualizado: ts,
     });

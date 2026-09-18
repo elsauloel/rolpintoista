@@ -4,10 +4,12 @@
    arrastrar y hacer zoom para elegir el recorte, en vez de cortar
    siempre el centro nomás.
 
-   recortarImagen(file, {lado, tope}) devuelve una promesa con el data
+   recortarImagen(fuente, {lado, tope}) devuelve una promesa con el data
    URL final (jpeg, tratando de quedar bajo `tope` bytes) o rechaza con
    Error('cancelado') si el usuario cierra el cuadro sin elegir, o
-   Error('no-image')/Error('bad-image') si el archivo no sirve.
+   Error('no-image')/Error('bad-image') si la fuente no sirve. `fuente`
+   es un File (recién elegido en un <input type=file>) o, para volver a
+   recortar algo ya guardado, directamente un data URL (string).
 
    Como lupa.js: este archivo arma el marcado y la lógica, pero el CSS
    de .recorte-scrim/.recorte-caja/etc. va en cada herramienta que lo
@@ -17,20 +19,22 @@
 const RECORTE_VISOR_PX = 320;
 const RECORTE_ZOOM_MAX = 4;
 
-function recortarImagen(file, opciones){
+function recortarImagen(fuente, opciones){
   const lado = (opciones && opciones.lado) || 96;
   const tope = (opciones && opciones.tope) || 60000;
   return new Promise((res, rej) => {
-    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
-    const lector = new FileReader();
-    lector.onerror = () => rej(lector.error);
-    lector.onload = () => {
+    const cargarDesde = src => {
       const img = new Image();
       img.onerror = () => rej(new Error('bad-image'));
       img.onload = () => abrirRecorte(img, lado, tope, res, rej);
-      img.src = lector.result;
+      img.src = src;
     };
-    lector.readAsDataURL(file);
+    if(typeof fuente === 'string'){ cargarDesde(fuente); return; }
+    if(!fuente.type || !fuente.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => cargarDesde(lector.result);
+    lector.readAsDataURL(fuente);
   });
 }
 

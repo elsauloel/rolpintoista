@@ -102,16 +102,18 @@ versión parecida en más de una, es candidato a juntar.
   "Rango vs. Alcance" en el Glosario del manual (`datos/reglas.json`).
 - **`prueba-dados.html`** — página aparte (no un script) para elegir estilo
   y sonido de los dados 3D; el ⚙ de la Mesa la abre en una pestaña.
-- **`recorte-imagen.js`** (`recortarImagen(file, {lado, tope})`) — antes de
-  guardar una imagen chica y cuadrada (por ahora solo la de un token en
-  `vtt-hexgrid/mapa.html`), abre un cuadro para arrastrar y hacer zoom
-  (rueda del mouse o una barra) y elegir qué parte de la foto se ve, en
-  vez de recortar siempre el centro. Devuelve una promesa con el data URL
-  final (jpeg, tratando de quedar bajo `tope` bytes) o rechaza con
-  `Error('cancelado')` si se cierra sin elegir. Como `lupa.js`: el
-  marcado y la lógica van acá, el CSS (`.recorte-scrim`/`.recorte-caja`/
-  etc., con las variables de color de cada herramienta) en cada HTML que
-  lo use.
+- **`recorte-imagen.js`** (`recortarImagen(fuente, {lado, tope})`) — antes
+  de guardar una imagen chica y cuadrada (el token de un NPC en
+  `vtt-hexgrid/mapa.html`, la miniatura del token de un personaje en
+  `ficha-personaje/ficha.html`), abre un cuadro para arrastrar y hacer
+  zoom (rueda del mouse o una barra) y elegir qué parte de la foto se ve,
+  en vez de recortar siempre el centro. `fuente` es un `File` recién
+  elegido o, para volver a recortar algo ya guardado, directamente un
+  data URL. Devuelve una promesa con el data URL final (jpeg, tratando
+  de quedar bajo `tope` bytes) o rechaza con `Error('cancelado')` si se
+  cierra sin elegir. Como `lupa.js`: el marcado y la lógica van acá, el
+  CSS (`.recorte-scrim`/`.recorte-caja`/etc., con las variables de color
+  de cada herramienta) en cada HTML que lo use.
 
 ## Dependencias con otras carpetas
 

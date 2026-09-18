@@ -120,11 +120,15 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   en `fichas/{id}/partes/{parte}` — `{json, actualizado}`, con `parte` en
   `general`, `notas`, `inventario`, `cinturon`, `habilidades`, `efectos`,
   `invocaciones`, `imgInvocaciones` (imagen de cada invocación, por id), `otros`, `catalogo` (solo ítems propios que no están en
-  el catálogo compartido) y `retrato` (la imagen de la cabecera). Cada
-  parte es el JSON de esas claves de `S`; las imágenes embebidas de ítems,
-  habilidades, etc. se guardan vacías a propósito. `miniatura` es el
-  retrato achicado a 96 px para el token del mapa. Todos los miembros leen
-  todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools); solo puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
+  el catálogo compartido) y `retrato` (`{imagen, miniatura}`: la foto
+  completa de la cabecera y, si el jugador ya eligió con zoom qué parte
+  se ve, la miniatura recortada a mano con `comun/recorte-imagen.js` —
+  ver `ficha-personaje/CLAUDE.md`). Cada parte es el JSON de esas claves
+  de `S`; las imágenes embebidas de ítems, habilidades, etc. se guardan
+  vacías a propósito. `miniatura` (documento principal, no la parte) es
+  el retrato a 96px para el token del mapa: la elegida a mano si existe,
+  si no el centro del retrato recortado automático como antes. Todos los
+  miembros leen todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools); solo puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
   muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se

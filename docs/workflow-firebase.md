@@ -108,8 +108,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   común (no escribe nada distinto).
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente, detalle,
-  polaridad}], invocaciones[{id, nombre, hp, hpMax, activa, miniatura}]},
-  miniatura, creado, actualizado}`. Las fichas guardadas antes de la
+  polaridad}], invocaciones[{id, nombre, hp, hpMax, nitros, nitrosMax,
+  activa, miniatura, estados[{nombre, turnos, permanente, detalle,
+  polaridad}]}]}, miniatura, creado, actualizado}`. Una invocación tiene
+  las mismas funciones que un creep de gm-tools (No2, arma, habilidades
+  paso a paso, estados) pero la maneja su dueño — ver
+  [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md). Las fichas guardadas antes de la
   Iteración 2 publican `bonos`/`bonosMax` hasta que se vuelven a abrir (el
   mapa y gm-tools leen los dos). Una por personaje
   (`ficha-personaje/ficha.html`, bloque "FICHA EN VIVO"). El contenido va

@@ -88,7 +88,12 @@ versión parecida en más de una, es candidato a juntar.
   bonos) → estado al equipar, precio/lugar → resumen. Lo usan
   `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`,
   `gm-toolset/vendor-generator.html` y `datos/catalogo-editor.html`, cada
-  una pasándole sus propios números de personaje/creep vía `cfg`.
+  una pasándole sus propios números de personaje/creep vía `cfg`. En
+  "Empuñadura", **Rango** (arma de rango: su propia mecánica, no suma Dmg)
+  y **Alcance** (arma cuerpo a cuerpo: bono para pegar a más de un
+  casillero sin dejar de sumar Dmg) comparten el mismo mod (`rng`), pero se
+  etiquetan y explican distinto según `armaDeRango` — no son lo mismo, ver
+  "Rango vs. Alcance" en el Glosario del manual (`datos/reglas.json`).
 - **`prueba-dados.html`** — página aparte (no un script) para elegir estilo
   y sonido de los dados 3D; el ⚙ de la Mesa la abre en una pestaña.
 

@@ -349,10 +349,18 @@ const AsistenteItem = (() => {
       if(cfg.conMano && !dos) h += campoMano(d);
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
       h += efecto(d.armaDeRango
-        ? `Es <b>de rango</b> (arco, pistola, lanzallamas…): el daño <b>no suma el Dmg</b>. Es solo el del arma.`
+        ? `Es <b>de rango</b> (arco, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`
         : `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`);
-      h += campo('Alcance extra (+ Rango)', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
-        `Casilleros de más a los que llega (una lanza o un látigo suelen dar +1).${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
+      // Mismo mod ('rng'), pero se explica distinto: en un arma de rango es su
+      // propia distancia de disparo; en una cuerpo a cuerpo es el Alcance
+      // (deja pegar a más de un casillero sin dejar de sumar el Dmg).
+      if(d.armaDeRango){
+        h += campo('Rango del disparo (+ Rango)', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
+          `Hasta dónde llega el disparo, además de lo que ya da la Destreza.${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
+      }else{
+        h += campo('Alcance (+ Rango)', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
+          `Sin esto, un arma cuerpo a cuerpo solo golpea al casillero de al lado. Cada +1 la deja atacar un casillero más lejos <b>sin dejar de ser cuerpo a cuerpo</b> (sigue sumando el Dmg) — una lanza o un látigo suelen dar +1.${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
+      }
     }
 
     if(paso.id === 'dano'){
@@ -492,7 +500,7 @@ const AsistenteItem = (() => {
         ${cfg.tiers ? fila('Tier', e(d.tier)) : ''}
         ${g === 'arma' ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
-          + (modVal(d, 'rng') ? fila('Alcance', `+${f(modVal(d, 'rng'))}`) : '')
+          + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
         ${g === 'defensa' ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
         ${fila('Bonos', e(bonos || 'ninguno'))}

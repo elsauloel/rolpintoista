@@ -50,8 +50,8 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   armas, Atacar y Daño se desdoblan (uno por arma, `data-arma`). Lo no
   confirmado está en `IT2` marcado PLACEHOLDER y se ve con ⚠
   (`IT2_PENDIENTE`). Las fichas y el catálogo viejos se convierten al abrir
-  (`migrarEstadoIt2`, corre en `renderAll`). Las invocaciones siguen con sus
-  propias Acciones.
+  (`migrarEstadoIt2`, corre en `renderAll`). Las invocaciones tienen su
+  propio No2 (ver "Invocaciones" más abajo).
 - **El atributo Inteligencia se renombró a Especial** (id `int` → `esp`,
   2026-09-18): mismo stat de siempre (SP, PdG.Mg, Res.Mt, Rango de Casteo),
   solo cambió el nombre — para liberarlo y reusarlo en otra cosa. Fichas,
@@ -60,12 +60,31 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   `migrarCreepEspecial`/`migrarObjEspecial` en gm-tools — mismo criterio que
   `migrarEstadoIt2`: corre en cada `renderAll`, no hace nada si ya está
   migrado).
-- **Inteligencia (el nombre nuevo)**: no es de los cinco atributos que se
-  reparten — se calcula sola (`inteligenciaValor`): 6 al crear el
-  personaje, +3 por nivel. Ocupa en la ficha el lugar donde antes estaba
-  el contador "WildCards" (que se sacó del todo, no quedó en ningún lado).
-  Por ahora solo se muestra (`renderInteligencia`); todavía no tiene
-  mecánica de juego cableada — eso viene después.
+- **Inteligencia (el nombre nuevo) — presupuesto para habilidades
+  sociales**: no es de los cinco atributos que se reparten — se calcula
+  sola (`inteligenciaValor`): 6 al crear el personaje, +3 por nivel. Ocupa
+  en la ficha el lugar donde antes estaba el contador "WildCards" (que se
+  sacó del todo). Funciona como el presupuesto de Job (`jobBudget`): el
+  total no baja, `inteligenciaBudget()` resta lo ya invertido
+  (`resto = total - gastado`); el contador (`#c-inteligencia`) muestra el
+  `resto` y, al pasar el mouse, en qué habilidad social se invirtió cada
+  punto (`renderInteligencia`).
+- **Habilidades sociales con nivel**: cada una tiene `puntosInt`
+  (Inteligencia invertida) y `nivelExtra` (subidas por sacar una tirada
+  máxima, sin costo) — `nivel = puntosInt + nivelExtra`
+  (`nivelSocial`), dado = nivel × 2 caras (`dadoCarasSocial`; nivel 0 =
+  sin dado). La tirada es siempre `1d(nivel×2) + Inteligencia` —el total,
+  no lo que queda por invertir— (`formulaSocial`, `tirarSocial`); ya no
+  se escribe un dado a mano (se sacó `dado` de `SCHEMA.sociales.campos`).
+  El botón "+ Nivel" de cada una (`abrirNivelSocial`, modal
+  `#scrim-nivel-social`) ofrece "por Inteligencia" (elegís cuántos puntos,
+  se descuentan del presupuesto — `nivelarSocialPorInteligencia`) o "por
+  tirada máxima" (+1 nivel gratis — `nivelarSocialPorTiradaMaxima`). Con
+  nivel están también en la Botonera (`filaSocialBotonera`, con su 🔍
+  `social:<id>`): en modo combate van al final, en modo narrativo arriba
+  de todo (`modoMapa`, escuchado en vivo de `mapa/modo` con
+  `modoMapaEscuchar` — mismo dato que usa el mapa para su switch
+  narrativo/combate).
 - **Escala de Tipos +2** (bloque al lado de `migrarEstadoIt2`): los Tipos de
   arma son 4/6/8/10/12 (`DADOS_ARMA`; default 8; sin arma sigue en
   `IT2.tipoSinArma` = 4). Los stats `tipo1..tipo5` son ahora la resistencia

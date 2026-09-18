@@ -1236,6 +1236,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <div class="counter calc" id="c-inteligencia" title="Se calcula sola: 6 al crear el personaje, +3 por nivel">
         <label>Inteligencia</label>
         <div class="val" id="v-inteligencia">6</div>
+        <div class="sub" id="v-inteligencia-sub"></div>
       </div>
       <div class="counter loot">
         <label>Loot</label>
@@ -1428,6 +1429,24 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <div class="modal" style="max-width:380px">
     <header><h3>Puntos de Job</h3><button class="iconbtn" id="job-x">Cerrar</button></header>
     <div class="body" id="job-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-nivel-social">
+  <div class="modal" style="max-width:360px">
+    <header><h3 id="nivelsocial-titulo">Subir de nivel</h3><button class="iconbtn" id="nivelsocial-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="hint" id="nivelsocial-info"></div>
+      <button type="button" class="btn" id="nivelsocial-tiradamax">🎲 Por tirada máxima · +1 nivel, sin gastar Inteligencia</button>
+      <div class="f">
+        <label>Por Inteligencia</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="f-nivelsocial-puntos" min="1" value="1" style="max-width:80px">
+          <button type="button" class="btn primary" id="nivelsocial-confirmar" style="flex:1">Invertir y subir nivel</button>
+        </div>
+        <div class="hint" id="nivelsocial-disponible" style="margin-top:6px"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4470,9 +4489,9 @@ const LISTS = {
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.dado?`<span class="tag cost">${esc(i.dado)}</span>`:''}</div>
+        <div><div class="iname">${esc(i.nombre)} <span class="tag cost" title="${esc(tiradaSocialTxt(i))}">${esc(nivelSocialTxt(i))}</span></div>
           <div class="idesc">${esc(i.detalle)}</div></div>
-        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button><button class="mini" data-tirarsocial="${i.id}">Dado</button></div>
+        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button><button class="mini" data-nivelsocial="${i.id}">+ Nivel</button><button class="mini" data-tirarsocial="${i.id}">Dado</button></div>
       </div></div>`
   },
   efectos:{
@@ -4523,7 +4542,7 @@ function renderList(key){
   }
   el.innerHTML = arr.length ? arr.map(LISTS[key].row).join('') : `<div class="empty">${LISTS[key].empty}</div>`;
   if(key === 'habilidades' && $('#scrim-todas-habilidades').classList.contains('open')) renderTodasHabilidades();
-  if(['habilidades','inventario','mochila','equipo','cinturon'].includes(key) && $('#scrim-botonera').classList.contains('open')) renderBotonera();
+  if(['habilidades','inventario','mochila','equipo','cinturon','sociales'].includes(key) && $('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
 /* Globito con la descripción del estado, al pasar el cursor. Uno solo
@@ -4595,6 +4614,21 @@ function renderTodasHabilidades(){
   }).join('')}</div>`;
 }
 
+// Fila de una habilidad social en la Botonera: nivel/dado a la izquierda,
+// Ejecutar (con su 🔍) a la derecha — mismo patrón que las de combate.
+function filaSocialBotonera(i){
+  return `<div class="cat-row bot-fila">
+    <div class="bot-fila-info">
+      <div class="cat-nombre">${esc(i.nombre)}</div>
+      <div class="bot-fila-costo" title="${esc(tiradaSocialTxt(i))}">${esc(nivelSocialTxt(i))}</div>
+    </div>
+    <div class="bot-fila-btns">
+      <button class="mini" data-view="sociales:${i.id}">Ver</button>
+      <button class="ejecutar-btn con-lupa" data-tirarsocial="${i.id}">Ejecutar${lupaBotonHtml(`social:${i.id}`, "en-boton")}</button>
+    </div>
+  </div>`;
+}
+
 function renderBotonera(){
   const c = compute();
   let html = '';
@@ -4602,6 +4636,17 @@ function renderBotonera(){
   $('#botonera-badge-nitros').textContent = `No2 ${fmt(num(S.nitros))}/${fmt(nitrosMaximo(c))}`;
   const spMax = spMaximo(c);
   $('#botonera-badge-sp').textContent = `SP ${fmt(spMax - num(S.spGastado))}/${fmt(spMax)}`;
+
+  // Habilidades sociales: arriba de todo en modo narrativo, al final (con
+  // el resto de las habilidades) en modo combate — según lo que publique
+  // el mapa (modoMapa; 'combate' si todavía no se sabe).
+  const socialesHtml = `<div class="botonera-caja">
+    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-sociales" title="Contraer/expandir">👁</button><span>Habilidades sociales</span></div>
+    <div class="botonera-list-grid">
+      ${S.sociales.length ? S.sociales.map(filaSocialBotonera).join('') : `<div class="hint">Sin habilidades sociales cargadas.</div>`}
+    </div>
+  </div>`;
+  if(modoMapa === 'narrativo') html += socialesHtml;
 
   // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva,
   // Parry, Bloqueo) no hace falta repetirlos acá. Los 5 principales (Con,
@@ -4738,6 +4783,8 @@ function renderBotonera(){
     </div>
   </div>`;
 
+  if(modoMapa !== 'narrativo') html += socialesHtml;
+
   $('#botonera-body').innerHTML = html;
   aplicarColapsados();
 }
@@ -4762,13 +4809,89 @@ function jobCostoDe(x){
 // Inteligencia (el nuevo significado, reintroducido 2026-09-18 tras liberar
 // el nombre al renombrar el atributo viejo a Especial): no es un atributo
 // que se reparte, se calcula sola — 6 al crear el personaje, +3 por nivel.
+// Se "invierte" en habilidades sociales (ver más abajo): el total no baja,
+// es un presupuesto igual que el de Job (jobBudget) — lo gastado queda
+// funcionando, "resto" es lo que falta repartir.
 function inteligenciaValor(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
   return 6 + 3 * (nivel - 1);
 }
-
+function inteligenciaBudget(){
+  const total = inteligenciaValor();
+  const gastado = S.sociales.reduce((a, x) => a + Math.max(0, num(x.puntosInt)), 0);
+  return {total, gastado, resto: total - gastado};
+}
 function renderInteligencia(){
-  $('#v-inteligencia').textContent = fmt(inteligenciaValor());
+  const b = inteligenciaBudget();
+  $('#v-inteligencia').textContent = fmt(b.resto);
+  $('#v-inteligencia-sub').textContent = `${fmt(b.gastado)} invertidos de ${fmt(b.total)}`;
+  const invertidos = S.sociales.filter(x => num(x.puntosInt) > 0);
+  const detalle = invertidos.length
+    ? invertidos.map(x => `· ${x.nombre}: ${fmt(num(x.puntosInt))}`).join('\n')
+    : 'Sin puntos invertidos todavía.';
+  $('#c-inteligencia').title = `${fmt(b.total)} en total (6 al crear, +3 por nivel) − ${fmt(b.gastado)} invertidos = ${fmt(b.resto)} sin usar.\n\n${detalle}`;
+}
+
+/* ---------- Habilidades sociales: nivel por Inteligencia invertida o por
+   tirada máxima, dado = nivel × 2 caras, tirada = 1dNivel×2 + Inteligencia
+   (el total, no lo que queda por invertir). Sin nivel, tira solo Inteligencia. ---------- */
+function nivelSocial(i){ return Math.max(0, num(i.puntosInt)) + Math.max(0, num(i.nivelExtra)); }
+function dadoCarasSocial(i){ return nivelSocial(i) * 2; }
+function nivelSocialTxt(i){
+  const n = nivelSocial(i);
+  const caras = dadoCarasSocial(i);
+  return `Nivel ${fmt(n)}${caras ? ` · d${fmt(caras)}` : ''}`;
+}
+function formulaSocial(i){
+  const caras = dadoCarasSocial(i);
+  const inte = inteligenciaValor();
+  return caras > 0 ? `1d${caras}+${inte}` : `+${inte}`;
+}
+function tiradaSocialTxt(i){
+  const caras = dadoCarasSocial(i);
+  return `Tira ${caras ? `1d${caras} + ` : ''}Inteligencia (${fmt(inteligenciaValor())})`;
+}
+function tirarSocial(i){
+  const r = tirarDados(formulaSocial(i));
+  if(!r) return;
+  registrarTirada(i.nombre, r);
+}
+
+let nivelSocialId = null;
+function abrirNivelSocial(id){
+  const i = S.sociales.find(x => x.id === id);
+  if(!i) return;
+  nivelSocialId = id;
+  const b = inteligenciaBudget();
+  $('#nivelsocial-titulo').textContent = `Subir de nivel · ${i.nombre}`;
+  $('#nivelsocial-info').textContent = `${nivelSocialTxt(i)} — ${i.puntosInt ? `${fmt(num(i.puntosInt))} de Inteligencia` : 'sin Inteligencia invertida'}${i.nivelExtra ? ` + ${fmt(num(i.nivelExtra))} por tirada máxima` : ''}.`;
+  $('#f-nivelsocial-puntos').value = Math.min(Math.max(1, b.resto), 1) || 1;
+  $('#f-nivelsocial-puntos').max = Math.max(1, b.resto);
+  $('#nivelsocial-disponible').textContent = `Tenés ${fmt(b.resto)} de Inteligencia sin invertir (de ${fmt(b.total)} en total).`;
+  $('#nivelsocial-confirmar').disabled = b.resto <= 0;
+  $('#scrim-nivel-social').classList.add('open');
+}
+function nivelarSocialPorTiradaMaxima(){
+  const i = S.sociales.find(x => x.id === nivelSocialId);
+  if(!i) return;
+  i.nivelExtra = Math.max(0, num(i.nivelExtra)) + 1;
+  $('#scrim-nivel-social').classList.remove('open');
+  renderList('sociales'); renderInteligencia();
+  toast(`${i.nombre}: ${nivelSocialTxt(i)} (tirada máxima)`);
+}
+function nivelarSocialPorInteligencia(){
+  const i = S.sociales.find(x => x.id === nivelSocialId);
+  if(!i) return;
+  const n = Math.max(1, num($('#f-nivelsocial-puntos').value) || 1);
+  const b = inteligenciaBudget();
+  if(n > b.resto){ toast(`Solo te quedan ${fmt(b.resto)} de Inteligencia sin invertir`); return; }
+  i.puntosInt = Math.max(0, num(i.puntosInt)) + n;
+  $('#scrim-nivel-social').classList.remove('open');
+  renderList('sociales'); renderInteligencia();
+  toast(`${i.nombre}: ${nivelSocialTxt(i)} (+${fmt(n)} de Inteligencia)`);
+}
+function renderBotoneraSiAbierta(){
+  if($('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
 function jobBudget(){
@@ -5219,12 +5342,10 @@ document.addEventListener('click', e => {
   if(b.dataset.tirarsocial){
     const i = S.sociales.find(x=>x.id===b.dataset.tirarsocial);
     if(!i) return;
-    if(!i.dado || !i.dado.trim()){ toast(`${i.nombre}: no tiene un dado configurado — editalo para ponerle uno (ej. 1d20+3)`); return; }
-    const r = tirarDados(i.dado);
-    if(!r){ toast(`${i.nombre}: "${i.dado}" no es una fórmula de dados válida`); return; }
-    registrarTirada(i.nombre, r);
+    tirarSocial(i);
     return;
   }
+  if(b.dataset.nivelsocial){ abrirNivelSocial(b.dataset.nivelsocial); return; }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
     let it = S.inventario.find(x=>x.id===id);
@@ -5851,7 +5972,8 @@ const SCHEMA = {
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','origen','detalle'], mods:true},
-  sociales: {titulo:'Social', campos:['nombre','imagen','dado','detalle'], mods:false},
+  // El dado ya no se escribe a mano: sale del nivel (botón "+ Nivel" en la lista).
+  sociales: {titulo:'Social', campos:['nombre','imagen','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
 };
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
@@ -6188,7 +6310,10 @@ function openViewer(key, id){
   }
 
   if(key === 'sociales'){
-    if(it.dado) L.push(linea('Dado', it.dado));
+    L.push(linea('Nivel', nivelSocialTxt(it)));
+    L.push(linea('Tirada', tiradaSocialTxt(it)));
+    if(num(it.puntosInt)) L.push(linea('De Inteligencia', fmt(num(it.puntosInt))));
+    if(num(it.nivelExtra)) L.push(linea('De tirada máxima', fmt(num(it.nivelExtra))));
   }
 
   if(key === 'efectos'){
@@ -7848,6 +7973,18 @@ function lupaHtml(clave){
     if(!arma.armaDeRango) out += lupaStat('dmg', c, {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
     return {titulo: `Daño · ${arma.nombre}`, html: out + sinCosto};
   }
+  if(tipo === 'social'){
+    const it = S.sociales.find(x => x.id === ref);
+    if(!it) return {titulo: 'Habilidad social', html: ''};
+    const caras = dadoCarasSocial(it);
+    let h = lupaFila('Nivel', fmt(nivelSocial(it)));
+    if(num(it.puntosInt)) h += lupaFila('· de Inteligencia invertida', fmt(num(it.puntosInt)));
+    if(num(it.nivelExtra)) h += lupaFila('· de tirada máxima', fmt(num(it.nivelExtra)));
+    h += lupaFila('Dado (nivel × 2 caras)', caras ? `d${fmt(caras)}` : 'ninguno todavía');
+    h += lupaFila('Inteligencia (total, no lo que queda por invertir)', fmt(inteligenciaValor()));
+    h += lupaFila('Tirada', esc(formulaSocial(it)), 'lupa-total');
+    return {titulo: it.nombre, html: lupaSeccion('De dónde sale', h) + sinCosto};
+  }
   // Lupa del botón Ejecutar (Botonera): solo cuánto cuesta, cuánto hay de
   // eso y qué tira. Sin el desglose del origen de la tirada.
   if(tipo === 'habx'){
@@ -8345,6 +8482,10 @@ $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='s
 $('#c-job').addEventListener('click', abrirJobLista);
 $('#job-x').onclick = () => $('#scrim-job').classList.remove('open');
 $('#scrim-job').addEventListener('mousedown', e => { if(e.target.id==='scrim-job') $('#scrim-job').classList.remove('open'); });
+$('#nivelsocial-tiradamax').onclick = nivelarSocialPorTiradaMaxima;
+$('#nivelsocial-confirmar').onclick = nivelarSocialPorInteligencia;
+$('#nivelsocial-x').onclick = () => { nivelSocialId = null; $('#scrim-nivel-social').classList.remove('open'); };
+$('#scrim-nivel-social').addEventListener('mousedown', e => { if(e.target.id==='scrim-nivel-social'){ nivelSocialId = null; $('#scrim-nivel-social').classList.remove('open'); } });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 $('#catalogo-filtro').addEventListener('change', renderCatalogoModal);
@@ -9366,6 +9507,7 @@ async function fbAlEntrar(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   mantenimientoEscuchar();
+  modoMapaEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;
@@ -9462,6 +9604,18 @@ function mantenimientoEscuchar(){
     mantenimientoSenal = doc.exists ? Math.round(num(doc.data().numero)) : 0;
     mantenimientoRevisar();
   }, err => console.error('Error escuchando el mantenimiento del GM:', err));
+}
+
+// Modo del mapa (narrativo/combate, lo cambia el GM): la Botonera reordena
+// las habilidades sociales según esto — arriba de todo en narrativo, al
+// final (con el resto de las habilidades) en combate. 'combate' por
+// defecto hasta que se sepa el modo real (ver vtt-hexgrid/CLAUDE.md).
+let modoMapa = 'combate';
+function modoMapaEscuchar(){
+  fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
+    modoMapa = (doc.exists && doc.data().modo === 'narrativo') ? 'narrativo' : 'combate';
+    renderBotoneraSiAbierta();
+  }, err => console.error('Error escuchando el modo del mapa:', err));
 }
 
 async function mantenimientoRevisar(){

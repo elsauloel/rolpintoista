@@ -47,7 +47,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   (`costoMoverDe` devuelve null). Combate (rojo): mover gasta No2 y la
   confirmación solo aparece si el movimiento se pasa de los No2 que quedan;
   si alcanzan, se descuenta directo.
-  Varios en la misma casilla se acomodan en ronda.
+  Varios en la misma casilla se acomodan en ronda. La ficha también
+  escucha este mismo doc (`modoMapaEscuchar`, su propio `modoMapa`) para
+  reordenar la Botonera: habilidades sociales al final en combate, arriba
+  de todo en narrativo — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md).
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.

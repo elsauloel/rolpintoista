@@ -143,7 +143,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   tantas veces como haga falta, sin No2, sin estela, ignorando
   Inmovilizado, y el modo sigue prendido después de cada movimiento — ya
   no hay que volver a tocar 🦶 para el siguiente. Lo apaga el mismo
-  botón (toggle), Esc, o cambiar la selección a otro token. Lo ve el
+  botón (toggle), Esc, clic derecho en el mapa (en vez del ping), o cambiar la selección a otro token. Lo ve el
   dueño en su PJ y el GM en cualquier token. Borra `ruta` del documento;
   las reglas dejan al GM tocar `col`, `fila` y `ruta` de un PJ.
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):

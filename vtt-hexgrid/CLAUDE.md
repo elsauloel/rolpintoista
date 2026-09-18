@@ -145,13 +145,44 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
   barra vertical escondida a la izquierda del mapa; la pestaña del borde la
   abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
-  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Lápiz, Formas
-  y Terreno figuran como "Pronto" hasta diseñarlas (una herramienta lista
+  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Formas y
+  Terreno figuran como "Pronto" hasta diseñarlas (una herramienta lista
   lleva `lista: true` y se activa en `herramientaActiva`). Preguntas en
-  `docs/preguntas-abiertas.md` (P38–P41). **📖 Bitácora** es la excepción:
-  no es un modo de dibujo, así que su clic no toca `herramientaActiva` —
-  abre o cierra del todo `#bitacora-flotante` (`abrirBitacoraFlotante`,
-  recordado en `localStorage` `mapa-bitacora-abierta`).
+  `docs/preguntas-abiertas.md` (P38–P41, P40–P41 siguen abiertas para
+  Formas/Terreno). **📖 Bitácora** es la excepción: no es un modo de
+  dibujo, así que su clic no toca `herramientaActiva` — abre o cierra del
+  todo `#bitacora-flotante` (`abrirBitacoraFlotante`, recordado en
+  `localStorage` `mapa-bitacora-abierta`).
+- **✏️ Lápiz** (cualquier miembro): dibuja a mano sobre el lienzo mientras
+  `herramientaActiva === 'lapiz'` (arrastrar el mouse/dedo con el botón
+  primario). El trazo se suaviza y se achica con **Douglas-Peucker**
+  (`simplificarTrazo`, tolerancia `2.5/zoom`, en unidades del mapa — saca
+  puntos de más sin cambiar la forma, así el temblor del pulso no queda)
+  y se dibuja con curvas cuadráticas por los puntos medios (`trazarSuave`,
+  no polígono recto). Vive en `campanas/{id}/trazos` (o
+  `mapas/{id}/trazos` — mismo patrón de mapa principal/guardado que
+  tokens) como `{puntos:[x1,y1,…] relativos a origen, origen:{x,y},
+  rotacion, color, grosor, permanente, duenoUid, creado}`.
+  - **Por defecto (`lapizPermanente=false`)**: es una estela más — se ve
+    `ESTELA_MS` (4 s) y se borra sola. El que la ve programa su propio
+    borrado al llegar el snapshot (`escucharTrazos`); las reglas dejan
+    borrar un trazo no permanente a cualquier miembro, así no importa si
+    el que la dibujó ya se fue.
+  - **"Dibujo permanente" tildado**: queda como un objeto que se
+    selecciona (clic sobre la línea, `trazoEn`, hit-test contra cada
+    segmento en el sistema propio del trazo — deshace traslación y
+    rotación), se arrastra para moverlo (traslada `origen`) y se rota
+    con un handle celeste a `HEX*0.9` de su centro
+    (`trazoManijaMundo`/`rotandoTrazo`, mismo criterio 0°=abajo/sentido
+    horario que el de los tokens, pero rotación libre, sin encajar en 60°).
+    Delete/Backspace lo borra. Lo mueven, rotan o borran su dueño o el GM
+    (`puedeManipularTrazo`); cualquiera lo ve.
+  - Color (paleta `COLORES`) y el tilde de permanente están en un panel
+    que se despliega bajo el botón ✏️ del toolkit mientras está activo,
+    se recuerdan por navegador (`lapiz-color`, `lapiz-permanente`).
+  - `trazoSeleccionado` y la selección de token (`seleccion`) son
+    mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
+    entre sí).
 - **Bitácora flotante** (`#bitacora-flotante`): mismo dato y mismos
   permisos que la de la ficha (`campanas/{id}/bitacora/{página}` +
   `entradas/{id}`, todos leen, cualquiera suma/corrige, borra el autor o

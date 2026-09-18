@@ -280,6 +280,36 @@ service cloud.firestore {
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
 
+      // Lápiz del mapa (vtt-hexgrid/mapa.html, caja de herramientas):
+      // {puntos: [x1,y1,x2,y2,…] ya suavizado, origen:{x,y}, rotacion,
+      // color, grosor, permanente, duenoUid, creado}. Cualquiera dibuja
+      // el suyo; temporal (permanente: false) se borra solo a los pocos
+      // segundos — lo borra quien lo ve, así que cualquiera puede borrar
+      // uno ajeno con esa marca (nunca uno permanente ajeno). Mover/rotar
+      // uno permanente (solo origen/rotacion) o borrarlo: su dueño o el GM.
+      function trazoValido(d) {
+        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'duenoUid', 'creado'])
+          && d.puntos is list && d.puntos.size() >= 4 && d.puntos.size() <= 400 && d.puntos.size() % 2 == 0
+          && d.origen is map && d.origen.x is number && d.origen.y is number
+          && d.rotacion is number
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.grosor is number && d.grosor > 0 && d.grosor <= 40
+          && d.permanente is bool
+          && d.duenoUid is string;
+      }
+      match /trazos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && trazoValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && (resource.data.duenoUid == request.auth.uid || esGM(c))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+        allow delete: if esMiembro(c)
+          && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
+      }
+
       // Mapas guardados además del de siempre (que sigue en mapa/* y
       // tokens/* de acá arriba): {nombre, creado}. Solo el GM los crea,
       // renombra o borra (el borrado de verdad, incluidas sus
@@ -326,6 +356,18 @@ service cloud.firestore {
             );
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
+        }
+        match /trazos/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && trazoValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time;
+          allow update: if esMiembro(c)
+            && (resource.data.duenoUid == request.auth.uid || esGM(c))
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+          allow delete: if esMiembro(c)
+            && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
         }
       }
     }

@@ -196,6 +196,12 @@ aside{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:0 4px
 }
+#toolkit .tk-lapiz-opciones{padding:0 8px 10px}
+.tk-lapiz-colores{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.tk-color{width:20px;height:20px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);cursor:pointer}
+.tk-color.elegido{border-color:var(--paper)}
+.tk-lapiz-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--paper);cursor:pointer}
+.tk-lapiz-ayuda{margin:5px 0 0;font-size:10.5px;color:var(--muted);line-height:1.35}
 #toolkit-pie{margin-top:auto;padding:10px 14px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--muted);line-height:1.4}
 /* Bitácora flotante (mismo patrón que la Mesa arrastrable de la ficha):
    se arrastra desde la cabecera, un clic la achica o la agranda, y ✕ la
@@ -727,7 +733,25 @@ let fondoPos = null;          // {x, y, ancho, dato?} (dato: fondos de antes de 
 let fondoImagen = '';
 let moverFondo = false;       // GM: arrastrar mueve el fondo en vez de la vista
 let arrastreFondo = null;     // {inicioX, inicioY, x, y}
+let arrastreTrazo = null;     // {id, dx, dy, inicioX, inicioY, movio}: arrastra un trazo permanente
+let rotandoTrazo = null;      // {id, cx, cy} (cx,cy: centro en pantalla, fijo durante el arrastre)
 let panelMapas = false;       // GM: panel de mapas guardados abierto
+
+/* ---------- Lápiz (caja de herramientas) ----------
+   campanas/<partida>/trazos/{auto} (o mapas/{id}/trazos/{auto}): {puntos:
+   [x1,y1,x2,y2,…] ya suavizado y simplificado, origen:{x,y}, rotacion,
+   color, grosor, permanente, duenoUid, creado}. Por defecto la línea es
+   una estela más: se ve un rato (ESTELA_MS) y se borra sola, para todos.
+   "Permanente" la deja como un objeto que se puede mover y rotar (lo
+   arrastra y lo gira su dueño o el GM), no se borra sola. */
+const trazos = new Map();     // id -> {puntos, origen, rotacion, color, grosor, permanente, duenoUid, creadoMs}
+let trazoSeleccionado = null;
+let dibujando = null;         // {puntos: [{x,y}]} mientras se arrastra el lápiz
+let cortarTrazosListener = null;
+let lapizColor = '#E0A458';
+let lapizPermanente = false;
+try{ lapizColor = localStorage.getItem('lapiz-color') || lapizColor; }catch(e){}
+try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(e){}
 
 /* ---------- Varios mapas guardados ----------
    campanas/<partida>/mapas/{id} = {nombre, creado}: la lista de mapas que
@@ -763,8 +787,8 @@ function rutaMapaEstado(doc){
 // poder cortarlos al cambiar de mapa y no quedarse escuchando el anterior.
 let cortarFondo1 = null, cortarFondo2 = null, cortarModo = null, cortarIniciativa = null, cortarTokensListener = null;
 function cortarEscuchasMapa(){
-  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener].forEach(f => f && f());
-  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = null;
+  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener].forEach(f => f && f());
+  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = null;
 }
 
 // Cambia qué mapa está cargado: corta lo anterior, limpia lo que se venía
@@ -777,6 +801,7 @@ function cambiarMapaMostrado(nuevoId){
   mapaEscuchado = nuevoId;
   tokens.clear(); visibles.clear(); estelas.clear();
   if(seleccion) seleccionar(null);
+  trazos.clear(); trazoSeleccionado = null;
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';
   iniciativa = {orden: [], turno: 0, ronda: 1};
@@ -784,6 +809,7 @@ function cambiarMapaMostrado(nuevoId){
   escucharModo();
   escucharIniciativa();
   escucharTokens();
+  escucharTrazos();
   actualizarBotonMapas();
   renderModo();
   renderIniciativa();
@@ -879,14 +905,16 @@ async function publicarMapa(id){
 async function borrarMapa(id){
   if(id === MAPA_PRINCIPAL){ toast('El primer mapa no se puede borrar'); return; }
   const nombre = nombreMapa(id);
-  if(!confirm(`¿Borrar el mapa "${nombre}" y todos sus tokens? No se puede deshacer.`)) return;
+  if(!confirm(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`)) return;
   const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }
   try{
     const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
-    const [tokensDocs, estadoDocs] = await Promise.all([base.collection('tokens').get(), base.collection('estado').get()]);
-    const refs = [...tokensDocs.docs, ...estadoDocs.docs].map(d => d.ref).concat([base]);
+    const [tokensDocs, estadoDocs, trazosDocs] = await Promise.all([
+      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(),
+    ]);
+    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs].map(d => d.ref).concat([base]);
     for(let i = 0; i < refs.length; i += 450){
       const lote = fbDb.batch();
       refs.slice(i, i + 450).forEach(r => lote.delete(r));
@@ -1859,6 +1887,53 @@ function dibujar(){
     }
     ctx.globalAlpha = 1;
   });
+
+  // Trazos del lápiz: los temporales se ven un rato y se desvanecen sobre
+  // el final (los borra el que los ve, por eso conviene que se note antes
+  // de irse); los permanentes quedan fijos hasta que alguien los mueva o
+  // los borre.
+  trazos.forEach((t, id) => {
+    const alfa = t.permanente ? 1 : Math.max(0, Math.min(1, (t.creadoMs + ESTELA_MS - ahora) / 800));
+    if(!t.permanente && alfa <= 0) return;
+    ctx.save();
+    ctx.translate(t.origen.x, t.origen.y);
+    ctx.rotate(t.rotacion * Math.PI / 180);
+    ctx.beginPath();
+    trazarSuave(ctx, t.puntos);
+    ctx.globalAlpha = alfa;
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = t.grosor / z;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    if(id === trazoSeleccionado){
+      ctx.setLineDash([6 / z, 5 / z]);
+      ctx.strokeStyle = 'rgba(237,227,210,.85)';
+      ctx.lineWidth = 1.5 / z;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+    if(id === trazoSeleccionado && puedeManipularTrazo(t)){
+      const h = trazoManijaMundo(t);
+      ctx.beginPath(); ctx.moveTo(t.origen.x, t.origen.y); ctx.lineTo(h.x, h.y);
+      ctx.strokeStyle = 'rgba(79,168,224,.7)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+      ctx.beginPath(); ctx.arc(h.x, h.y, 9 / z, 0, 2 * Math.PI);
+      ctx.fillStyle = '#4FA8E0'; ctx.fill();
+      ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+    }
+    if(!t.permanente) animando = true;
+  });
+  // El trazo que se está dibujando ahora mismo, en vivo.
+  if(dibujando && dibujando.puntos.length > 1){
+    ctx.beginPath();
+    trazarSuave(ctx, simplificarTrazo(dibujando.puntos, 1.5 / z));
+    ctx.strokeStyle = lapizColor;
+    ctx.lineWidth = 4 / z;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
   hudUbicar();
   return animando;
 }
@@ -1913,10 +1988,41 @@ lienzo.addEventListener('pointerdown', e => {
       }
     }
   }else{
+    // Handle de rotación del trazo ya seleccionado (si se puede manipular).
+    if(trazoSeleccionado && trazos.has(trazoSeleccionado)){
+      const ts = trazos.get(trazoSeleccionado);
+      if(puedeManipularTrazo(ts)){
+        const h = trazoManijaMundo(ts);
+        if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
+          rotandoTrazo = {id: trazoSeleccionado};
+          lienzo.style.cursor = 'grabbing';
+          return;
+        }
+      }
+    }
+    // Un trazo permanente ahí: seleccionarlo y, si se puede, arrastrarlo.
+    const idTrazo = trazoEn(m.x, m.y);
+    if(idTrazo){
+      trazoSeleccionar(idTrazo);
+      const t = trazos.get(idTrazo);
+      if(puedeManipularTrazo(t)){
+        arrastreTrazo = {id: idTrazo, dx: m.x - t.origen.x, dy: m.y - t.origen.y, inicioX: px, inicioY: py, movio: false};
+        lienzo.style.cursor = 'grabbing';
+      }
+      return;
+    }
+    // Lápiz activo: empieza un trazo nuevo a mano alzada.
+    if(herramientaActiva === 'lapiz'){
+      trazoSeleccionar(null);
+      dibujando = {puntos: [m]};
+      lienzo.style.cursor = 'crosshair';
+      return;
+    }
     // Con el engranaje abierto, el primer clic en el mapa solo lo cierra:
     // así no se pierde lo que se estaba por guardar.
     if(hudGlobo){ hudCerrar(); renderPanel(); pedirDibujo(); return; }
     seleccionar(null);
+    trazoSeleccionar(null);
     if(moverFondo && soyGM && fondo){
       arrastreFondo = {inicioX: px, inicioY: py, x: fondo.x, y: fondo.y};
       lienzo.style.cursor = 'move';
@@ -1929,6 +2035,30 @@ lienzo.addEventListener('pointerdown', e => {
 
 lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
+  if(dibujando){
+    dibujando.puntos.push(pantallaAMundo(px, py));
+    pedirDibujo();
+    return;
+  }
+  if(arrastreTrazo){
+    if(!arrastreTrazo.movio && Math.hypot(px - arrastreTrazo.inicioX, py - arrastreTrazo.inicioY) < 4) return;
+    arrastreTrazo.movio = true;
+    const m = pantallaAMundo(px, py);
+    const t = trazos.get(arrastreTrazo.id);
+    if(t){ t.origen.x = m.x - arrastreTrazo.dx; t.origen.y = m.y - arrastreTrazo.dy; }
+    pedirDibujo();
+    return;
+  }
+  if(rotandoTrazo){
+    const t = trazos.get(rotandoTrazo.id);
+    if(t){
+      const m = pantallaAMundo(px, py);
+      const dx = m.x - t.origen.x, dy = m.y - t.origen.y;
+      if(Math.hypot(dx, dy) > 4 / vista.zoom) t.rotacion = (Math.atan2(-dx, dy) * 180 / Math.PI + 360) % 360;
+    }
+    pedirDibujo();
+    return;
+  }
   if(arrastre){
     if(!arrastre.movio && Math.hypot(px - arrastre.inicioX, py - arrastre.inicioY) < 4) return;
     arrastre.movio = true;
@@ -1953,6 +2083,15 @@ lienzo.addEventListener('pointermove', e => {
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
   if(moverLibre){ lienzo.style.cursor = id === moverLibre ? 'grab' : 'crosshair'; return; }
+  if(!id){
+    if(trazoSeleccionado && trazos.has(trazoSeleccionado) && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
+      const h = trazoManijaMundo(trazos.get(trazoSeleccionado));
+      if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
+    }
+    const idTrazo = trazoEn(m.x, m.y);
+    if(idTrazo){ lienzo.style.cursor = puedeManipularTrazo(trazos.get(idTrazo)) ? 'grab' : 'pointer'; return; }
+    if(herramientaActiva === 'lapiz'){ lienzo.style.cursor = 'crosshair'; return; }
+  }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
 
@@ -1983,6 +2122,26 @@ function extenderRuta(a, casilla){
 }
 
 function soltar(){
+  if(dibujando){
+    const puntos = dibujando.puntos;
+    dibujando = null;
+    if(puntos.length > 1) guardarTrazo(puntos, lapizPermanente);
+    pedirDibujo();
+  }
+  if(arrastreTrazo){
+    const a = arrastreTrazo;
+    arrastreTrazo = null;
+    const t = trazos.get(a.id);
+    if(a.movio && t) moverTrazo(a.id, {origen: {x: t.origen.x, y: t.origen.y}});
+    pedirDibujo();
+  }
+  if(rotandoTrazo){
+    const a = rotandoTrazo;
+    rotandoTrazo = null;
+    const t = trazos.get(a.id);
+    if(t) moverTrazo(a.id, {rotacion: t.rotacion});
+    pedirDibujo();
+  }
   if(arrastre){
     const a = arrastre;
     arrastre = null;
@@ -2040,8 +2199,12 @@ document.addEventListener('keydown', e => {
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
-  if(e.key === 'Escape') seleccionar(null);
+  if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); }
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
+  if((e.key === 'Delete' || e.key === 'Backspace') && trazoSeleccionado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
+    borrarTrazo(trazoSeleccionado);
+    trazoSeleccionar(null);
+  }
 });
 
 /* ---------- Tokens en Firestore ---------- */
@@ -2050,6 +2213,159 @@ function coleccionTokens(){
   return mapaMostrado === MAPA_PRINCIPAL
     ? fbDb.collection(fbRutaCampana('tokens'))
     : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/tokens`));
+}
+function coleccionTrazos(){
+  return mapaMostrado === MAPA_PRINCIPAL
+    ? fbDb.collection(fbRutaCampana('trazos'))
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/trazos`));
+}
+
+function puedeManipularTrazo(t){
+  return !!(t && fbUsuario && (soyGM || t.duenoUid === fbUsuario.uid));
+}
+
+// Simplifica una línea a mano alzada (Douglas-Peucker): sacar puntos que
+// no cambian casi nada el dibujo, tanto para que no pese como para limar
+// el temblor del pulso. tolerancia en unidades del mapa.
+function simplificarTrazo(puntos, tolerancia){
+  if(puntos.length <= 2) return puntos;
+  const distanciaSegmento = (p, a, b) => {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const largo2 = dx * dx + dy * dy;
+    if(!largo2) return Math.hypot(p.x - a.x, p.y - a.y);
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / largo2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+  };
+  const recursivo = (pts) => {
+    if(pts.length <= 2) return pts;
+    let peorD = 0, peorI = 0;
+    for(let i = 1; i < pts.length - 1; i++){
+      const d = distanciaSegmento(pts[i], pts[0], pts[pts.length - 1]);
+      if(d > peorD){ peorD = d; peorI = i; }
+    }
+    if(peorD <= tolerancia) return [pts[0], pts[pts.length - 1]];
+    const izq = recursivo(pts.slice(0, peorI + 1));
+    const der = recursivo(pts.slice(peorI));
+    return izq.slice(0, -1).concat(der);
+  };
+  return recursivo(puntos);
+}
+
+// Línea suave entre puntos ya simplificados: una curva cuadrática por los
+// puntos medios, para que no se note el trazo "poligonal".
+function trazarSuave(ctx2, puntos){
+  if(puntos.length < 2){
+    if(puntos.length === 1){ ctx2.moveTo(puntos[0].x, puntos[0].y); ctx2.lineTo(puntos[0].x, puntos[0].y); }
+    return;
+  }
+  ctx2.moveTo(puntos[0].x, puntos[0].y);
+  if(puntos.length === 2){ ctx2.lineTo(puntos[1].x, puntos[1].y); return; }
+  for(let i = 1; i < puntos.length - 1; i++){
+    const p = puntos[i], sig = puntos[i + 1];
+    const mx = (p.x + sig.x) / 2, my = (p.y + sig.y) / 2;
+    ctx2.quadraticCurveTo(p.x, p.y, mx, my);
+  }
+  ctx2.lineTo(puntos[puntos.length - 1].x, puntos[puntos.length - 1].y);
+}
+
+function escucharTrazos(){
+  let primeraVez = true;
+  cortarTrazosListener = coleccionTrazos().onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ trazos.delete(ch.doc.id); if(trazoSeleccionado === ch.doc.id) trazoSeleccionado = null; return; }
+      const d = ch.doc.data({serverTimestamps: 'estimate'});
+      const puntosCrudos = Array.isArray(d.puntos) ? d.puntos : [];
+      const puntos = [];
+      for(let i = 0; i + 1 < puntosCrudos.length; i += 2) puntos.push({x: num(puntosCrudos[i]), y: num(puntosCrudos[i + 1])});
+      trazos.set(ch.doc.id, {
+        puntos,
+        origen: {x: num(d.origen && d.origen.x), y: num(d.origen && d.origen.y)},
+        rotacion: num(d.rotacion),
+        color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#E0A458',
+        grosor: num(d.grosor) || 4,
+        permanente: d.permanente === true,
+        duenoUid: d.duenoUid,
+        creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(),
+      });
+      // Temporal (estela): se borra sola a los pocos segundos, para todos
+      // (cualquiera que la vea programa el borrado; si el que la dibujó se
+      // fue, no queda huérfana).
+      if(d.permanente !== true){
+        const restan = ESTELA_MS - (Date.now() - (d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now()));
+        setTimeout(() => { coleccionTrazos().doc(ch.doc.id).delete().catch(() => {}); }, Math.max(0, restan));
+      }
+    });
+    pedirDibujo();
+  }, err => console.error('Error escuchando los trazos:', err));
+}
+
+// Guarda un trazo nuevo ya simplificado, relativo a su propio centro (para
+// poder moverlo/rotarlo entero después si es permanente).
+async function guardarTrazo(puntosMundo, permanente){
+  if(!fbUsuario || puntosMundo.length < 2) return;
+  const tolerancia = 2.5 / vista.zoom;
+  const suaves = simplificarTrazo(puntosMundo, tolerancia);
+  const xs = suaves.map(p => p.x), ys = suaves.map(p => p.y);
+  const origen = {x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2};
+  const puntos = [];
+  suaves.forEach(p => { puntos.push(p.x - origen.x, p.y - origen.y); });
+  try{
+    await coleccionTrazos().add({
+      puntos, origen, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo guardar el trazo:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo dibujar');
+  }
+}
+
+async function moverTrazo(id, cambios){
+  try{ await coleccionTrazos().doc(id).update(cambios); }
+  catch(err){ console.error('No se pudo mover el trazo:', err); toast('No se pudo mover el dibujo'); }
+}
+
+async function borrarTrazo(id){
+  try{ await coleccionTrazos().doc(id).delete(); }
+  catch(err){ console.error('No se pudo borrar el trazo:', err); toast('No se pudo borrar el dibujo'); }
+}
+
+// El trazo más cercano al punto (dentro de un margen), el de más arriba
+// primero. Solo entre los permanentes: los temporales no se manipulan.
+// Dónde va el handle para rotar el trazo seleccionado: a una distancia
+// fija de su centro, en la dirección que ya tiene (0° = abajo, sentido
+// horario — mismo criterio que el handle de rotación de los tokens).
+function trazoManijaMundo(t){
+  const rad = t.rotacion * Math.PI / 180;
+  const r = HEX * 0.9;
+  return {x: t.origen.x - r * Math.sin(rad), y: t.origen.y + r * Math.cos(rad)};
+}
+
+function trazoEn(x, y){
+  const margen = 8 / vista.zoom;
+  const distanciaSegmento = (px, py, ax, ay, bx, by) => {
+    const dx = bx - ax, dy = by - ay;
+    const largo2 = dx * dx + dy * dy;
+    if(!largo2) return Math.hypot(px - ax, py - ay);
+    let t = ((px - ax) * dx + (py - ay) * dy) / largo2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+  };
+  const lista = [...trazos.entries()].filter(([, t]) => t.permanente).reverse();
+  for(const [id, t] of lista){
+    const ang = -t.rotacion * Math.PI / 180;
+    const cos = Math.cos(ang), sin = Math.sin(ang);
+    // Al punto, en el sistema propio del trazo (deshace traslación + rotación).
+    const lx = (x - t.origen.x) * cos - (y - t.origen.y) * sin;
+    const ly = (x - t.origen.x) * sin + (y - t.origen.y) * cos;
+    for(let i = 0; i + 1 < t.puntos.length; i++){
+      if(distanciaSegmento(lx, ly, t.puntos[i].x, t.puntos[i].y, t.puntos[i + 1].x, t.puntos[i + 1].y) <= margen + t.grosor / 2){
+        return id;
+      }
+    }
+  }
+  return null;
 }
 
 // La ruta viaja con el movimiento como [col, fila, col, fila…] para que
@@ -2480,8 +2796,15 @@ function seleccionar(id){
   if(seleccion === id && !creando) return;
   if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
   seleccion = id;
-  if(id) creando = false;
+  if(id){ creando = false; trazoSeleccionado = null; }
   renderPanel();
+  pedirDibujo();
+}
+
+function trazoSeleccionar(id){
+  if(trazoSeleccionado === id) return;
+  trazoSeleccionado = id;
+  if(id && seleccion) seleccionar(null);
   pedirDibujo();
 }
 
@@ -3624,7 +3947,7 @@ $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herram
 let bitacoraFlotanteAbierta = false;
 
 const HERRAMIENTAS = [
-  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa'},
+  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
   {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos con forma de hexágono'},
   {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Arena movediza, veneno, arena tóxica…'},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
@@ -3642,12 +3965,17 @@ function renderToolkit(){
   pestana.title = toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas';
   $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => {
     const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
+    const opciones = (h.id === 'lapiz' && activa) ? `<div class="tk-lapiz-opciones">
+        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === lapizColor ? ' elegido' : ''}" data-lapiz-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+        <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> Dibujo permanente</label>
+        <p class="tk-lapiz-ayuda">${lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.'}</p>
+      </div>` : '';
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
       <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}</span>
       <span class="tk-detalle">${esc(h.detalle)}</span>
-    </button></li>`;
+    </button>${opciones}</li>`;
   }).join('');
 }
 
@@ -3659,6 +3987,13 @@ function abrirToolkit(abrir){
 
 $('#toolkit-pestana').onclick = () => abrirToolkit(!toolkitAbierto);
 $('#toolkit-lista').addEventListener('click', e => {
+  const color = e.target.closest('[data-lapiz-color]');
+  if(color){
+    lapizColor = color.dataset.lapizColor;
+    try{ localStorage.setItem('lapiz-color', lapizColor); }catch(err){}
+    renderToolkit();
+    return;
+  }
   const b = e.target.closest('[data-herramienta]');
   if(!b) return;
   const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
@@ -3666,6 +4001,12 @@ $('#toolkit-lista').addEventListener('click', e => {
   if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
   if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
   herramientaActiva = herramientaActiva === h.id ? '' : h.id;
+  renderToolkit();
+});
+$('#toolkit-lista').addEventListener('change', e => {
+  if(e.target.id !== 'lapiz-permanente-check') return;
+  lapizPermanente = e.target.checked;
+  try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}
   renderToolkit();
 });
 renderToolkit();

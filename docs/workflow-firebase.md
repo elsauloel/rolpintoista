@@ -198,10 +198,21 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   - `mapas/{mapaId}/estado/{fondo|fondoImagen|modo|iniciativa}` — mismo
     esquema que `mapa/*`.
   - `mapas/{mapaId}/tokens/{auto}` — mismo esquema que `tokens/{auto}`.
+  - `mapas/{mapaId}/trazos/{auto}` — mismo esquema que `trazos/{auto}`.
   El GM puede estar mirando (y armando) un mapa distinto del que está
   publicado; los jugadores siempre ven el publicado. Borrar un mapa borra
-  sus `estado/*` y `tokens/*` primero (Firestore no lo hace solo) y, si
-  era el publicado o el que el GM estaba mirando, vuelve al principal.
+  sus `estado/*`, `tokens/*` y `trazos/*` primero (Firestore no lo hace
+  solo) y, si era el publicado o el que el GM estaba mirando, vuelve al
+  principal.
+- `campanas/{id}/trazos/{auto}` — `{puntos: [x1,y1,x2,y2,…] (ya suavizado
+  y simplificado, relativos a origen), origen: {x,y}, rotacion, color,
+  grosor, permanente, duenoUid, creado}`. El lápiz del mapa
+  (`vtt-hexgrid/mapa.html`, caja de herramientas ✏️). Cualquiera dibuja el
+  suyo. `permanente: false` (default): se ve `ESTELA_MS` (4 s) y se borra
+  sola — cualquiera puede borrar uno así, no solo su dueño, para que no
+  quede huérfano si el que lo dibujó se desconectó. `permanente: true`:
+  queda como un objeto que se mueve (`origen`) y se rota (`rotacion`,
+  libre, no a los 60°) — eso, y borrarlo del todo, solo su dueño o el GM.
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

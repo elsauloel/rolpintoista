@@ -9361,9 +9361,11 @@ if(MODO_BOTONERA){
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"
-    // (el de la invocación, si la Botonera abierta es la de una).
+    // (el de la invocación que traiga el mensaje, o el propio si no trae ninguna).
     if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){
-      if(modoBotoneraInv) abrirPresetsEfectoInv(modoBotoneraInv);
+      const inv = e.data.inv || '';
+      modoBotoneraInv = inv;
+      if(inv) abrirPresetsEfectoInv(inv);
       else abrirPresetsEfecto('directo');
       botoneraAvisarMapa('botonera-lista');
     }
@@ -9371,7 +9373,9 @@ if(MODO_BOTONERA){
     // Las invocaciones no tienen editor de estado individual — se maneja
     // desde su propia Botonera (quitarlo con ×), así que solo se reabre.
     if(e.data.tipo === 'editar-estado' && fichaVivo && fichaVivo.cargada){
-      if(modoBotoneraInv){ botoneraAvisarMapa('botonera-lista'); return; }
+      const inv = e.data.inv || '';
+      modoBotoneraInv = inv;
+      if(inv){ abrirBotoneraInv(inv); botoneraAvisarMapa('botonera-lista'); return; }
       const ef = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === e.data.nombre);
       if(!ef){ toast('No encontré ese estado en la ficha'); botoneraAvisarMapa('botonera-cerrada'); return; }
       openEditor('efectos', ef.id);

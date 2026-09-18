@@ -101,7 +101,15 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
-  token, ⚡ Botonera (PJ propio) o Acciones (creep del GM). Vida/SP/No2 se
+  token, ⚡ Botonera (PJ propio o su invocación) o Acciones (creep del GM).
+  Las invocaciones ya tienen las mismas funciones que un creep (No2,
+  estados, habilidades — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md)):
+  su dueño ve el mismo ⚡ que en su propio personaje (`propio` en
+  `hudHtml` ya no excluye tokens de invocación) y abre la Botonera de esa
+  invocación puntual (`abrirBotonera(fichaId, mensaje, invId)`, que suma
+  `&inv=<id>` a la URL del iframe o lo manda por `postMessage` si ya
+  estaba cargado — `ficha-personaje/ficha.html` lo lee con
+  `modoBotoneraInv`). Vida/SP/No2 se
   guardan en la ficha o en la parte privada del creep; barras y aura, en el
   propio token (`barras {hp,sp,no2}`, `aura {radio, forma, color}`: radio en casilleros enteros, forma `hex` (casillas a ≤ radio pasos, `dibujarAuraHex`; por defecto) o `circulo`). La ronda de botones va por fuera de las casillas vecinas (1,5 casilleros, tope 200 px). Un token sin ficha ni creep
   vinculado puede llevar su propia `imagen` (cuadrada, 96 px, < 60 KB;
@@ -148,9 +156,9 @@ nuevo de Rol Pintoísta. Paso 2 de
   Se hablan con `postMessage` (`botonera-lista`, `botonera-cerrada`,
   `abrir-botonera`); el iframe queda cargado para reabrir al instante.
 - Token vinculado (`fichaId`): usa el nombre y la miniatura de la ficha,
-  la invocación (`<fichaId>~<idInvocación>`, sale del resumen de la ficha;
-  solo barra de vida, apagada si no está invocada) o el creep, y dibuja debajo la barra de vida (roja) y, en PJ, la de SP
-  (azul); arriba, circulitos con la inicial de cada estado (verde
+  la invocación (`<fichaId>~<idInvocación>`, sale del resumen de la ficha —
+  vida, No2 y estados, apagada si no está invocada) o el creep, y dibuja debajo la barra de vida (roja), en PJ la de SP
+  (azul), y en cualquiera la de No2 (verde, si su dueño la prende); arriba, circulitos con la inicial de cada estado (verde
   beneficio, violeta perjuicio). Caído/derrotado: oscurecido con una ✕.
   Lee `fichas` y `creeps` (solo lo público). De los creeps solo llega el
   porcentaje de vida.

@@ -852,7 +852,11 @@ function vinculo(t){
     miniatura: inv.miniatura || '',
     deQuien: ficha.nombre,
     invocacion: true,
-    resumen: {hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false, estados: []},
+    resumen: {
+      hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false,
+      nitros: inv.nitros, nitrosMax: inv.nitrosMax,
+      estados: Array.isArray(inv.estados) ? inv.estados : [],
+    },
   };
 }
 function nombreDe(t){
@@ -917,7 +921,13 @@ function valoresNo2(t){
     if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
     return {valor: num(sc.nitros), max: Math.max(num(sc.nitros), num(sc.nitrosMax) || num(sc.agl) || 0)};
   }
-  if(t.fichaId && t.fichaId.includes(SEP_INVOCACION)) return null;
+  if(t.fichaId && t.fichaId.includes(SEP_INVOCACION)){
+    // Invocación: sale del resumen de la ficha de su dueño, junto con el resto.
+    const v = vinculo(t);
+    const r = v && v.resumen;
+    if(!r || r.nitros === undefined) return null;
+    return {valor: num(r.nitros), max: num(r.nitrosMax) || num(r.nitros)};
+  }
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.nitros === undefined) return null;
@@ -2890,7 +2900,9 @@ function hudHtml(t){
     `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;
 
   const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
-  const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid && !t.fichaId.includes(SEP_INVOCACION);
+  // Una invocación la maneja el mismo dueño que su personaje: mismo ⚡
+  // (Botonera propia) que un PJ, ya no queda afuera.
+  const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid;
   const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
 
   // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
@@ -3118,7 +3130,8 @@ function hudConectar(t){
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto}); return; }
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
-      if(fichaDeToken) abrirBotonera(fichaDeToken); else abrirAcciones(t.fichaId);
+      const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+      if(fichaDeToken) abrirBotonera(fichaDeToken, undefined, invDeToken); else abrirAcciones(t.fichaId);
       return;
     }
     hudGlobo = hudGlobo === clave ? '' : clave;
@@ -3279,10 +3292,9 @@ async function cambiarNitros(t, texto){
   });
 }
 
-// Las invocaciones no tienen estados propios: no se les puede agregar.
 function puedeAgregarEstado(t){
   if(!t || !t.fichaId) return false;
-  return t.tipo === 'creep' ? soyGM : !t.fichaId.includes(SEP_INVOCACION);
+  return t.tipo === 'creep' ? soyGM : true;
 }
 
 // Abre el selector de estados de la herramienta que corresponde.
@@ -3296,15 +3308,23 @@ function abrirFichaDeToken(t){
 function abrirEstadoNuevo(t){
   if(!puedeAgregarEstado(t)) return;
   if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'abrir-estados', creep: t.fichaId});
-  else abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-estados'});
+  else{
+    const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+    abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-estados', inv: invId}, invId);
+  }
 }
 
 // ⚙ de un estado: abre su editor en la ficha o en gm-tools (se busca por
-// nombre, porque el resumen no guarda el id del estado).
+// nombre, porque el resumen no guarda el id del estado). Las invocaciones
+// no tienen editor individual de estado: solo reabre su Botonera (el
+// estado se saca con × ahí mismo).
 function abrirEditarEstado(t, nombre){
   if(!puedeAgregarEstado(t)) return;
   if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'editar-estado', creep: t.fichaId, nombre});
-  else abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'editar-estado', nombre});
+  else{
+    const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+    abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'editar-estado', nombre, inv: invId}, invId);
+  }
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
@@ -3324,21 +3344,36 @@ async function hudEstadoCambiar(t, indice, accion, delta){
     if(t.tipo === 'creep'){
       await modificarCreep(t.fichaId, sc => { sc.estados = tocar(Array.isArray(sc.estados) ? sc.estados : []); });
     }else{
-      const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId.split(SEP_INVOCACION)[0]}`));
-      const parteRef = base.collection('partes').doc('efectos');
+      const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+      const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+      const parteRef = base.collection('partes').doc(invId ? 'invocaciones' : 'efectos');
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       await fbDb.runTransaction(async tx => {
         const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
         if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
         const datos = JSON.parse(parte.data().json || '{}');
-        datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
-        const resumen = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
-          polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
-          detalle: String(e.detalle || '').slice(0, 200),
-        }));
+        const cambios = {actualizado: ts};
+        if(invId){
+          const r = ficha.data().resumen || {};
+          const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+          if(!inv) throw new Error('La invocación ya no existe');
+          inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
+          const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+            detalle: String(e.detalle || '').slice(0, 200),
+          }));
+          cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, estados: resumenEstados} : i);
+        }else{
+          datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
+          cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+            detalle: String(e.detalle || '').slice(0, 200),
+          }));
+        }
         tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
-        tx.update(base, {'resumen.estados': resumen, actualizado: ts});
+        tx.update(base, cambios);
       });
     }
   }catch(err){
@@ -3387,21 +3422,25 @@ function centrarTokenDeBotonera(herramienta, id){
   guardarVista(); pedirDibujo();
 }
 
-function abrirBotonera(fichaId, mensaje){
+// invId: si viene, abre la Botonera de esa invocación del personaje en vez
+// de la propia (mismo iframe: la ficha ya sabe mostrar una u otra).
+function abrirBotonera(fichaId, mensaje, invId){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
   ubicarBotoneraCapa();
   centrarTokenDeBotonera('ficha', fichaId);
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
-    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera'}, location.origin);
+    botonera.invId = invId || '';
+    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera', inv: invId || ''}, location.origin);
     enfocarBotonera();
     return;
   }
-  botonera = {herramienta: 'ficha', fichaId, lista: false, pendiente: mensaje || null};
+  botonera = {herramienta: 'ficha', fichaId, invId: invId || '', lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
-  marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(fichaId)}`);
+  const inv = invId ? `&inv=${encodeURIComponent(invId)}` : '';
+  marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera${inv}#${encodeURIComponent(fichaId)}`);
 }
 
 function abrirAcciones(creepId, mensaje){

@@ -67,6 +67,19 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .elem-edit-visor:active{cursor:grabbing}
 .elem-edit-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
 
+/* Ventanita propia de la herramienta activa (Lápiz/Terreno/Formas): antes
+   las opciones se desplegaban adentro de la barra lateral, una debajo de
+   la otra sin límite. A la derecha de la barra (abierta o no), sin tapar
+   #elem-edit del otro lado. */
+#herramienta-flotante{
+  position:fixed;top:70px;left:236px;z-index:90;width:250px;max-width:calc(100vw - 32px);
+  max-height:calc(100vh - 90px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:2px
+}
+.herr-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);margin-bottom:6px}
+.herr-cab button{font-size:16px;color:var(--muted);line-height:1}
+.herr-cab button:hover{color:var(--paper)}
+
 header{
   display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
 }
@@ -218,7 +231,6 @@ aside{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:0 4px
 }
-#toolkit .tk-lapiz-opciones{padding:0 8px 10px}
 .tk-lapiz-colores{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
 .tk-color{width:20px;height:20px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);cursor:pointer}
 .tk-color.elegido{border-color:var(--paper)}
@@ -529,6 +541,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
     </div>
     <div id="elem-edit" hidden></div>
+    <div id="herramienta-flotante" hidden></div>
     <!-- Caja de herramientas: escondida a la izquierda, se abre con la pestaña -->
     <div id="toolkit">
       <nav id="toolkit-panel" aria-label="Herramientas del mapa">
@@ -825,31 +838,25 @@ let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->
 let editandoElemento = null;   // {id, original:{...}} mientras el panel ⚙️ está abierto — ver abrirEditorElemento
 let cortarElementosListener = null;
 const TAMANO_ELEMENTO_MAX = 30;  // tope del radio (Flor) o largo (Línea); ver el tope de celdas en las reglas
-let terrenoTipo = 'flor';      // 'flor' | 'linea' | 'libre'
-let terrenoTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
-let terrenoColor = '#3F6FB0';
-let terrenoAlfa = 45;
-let terrenoImagen = '';       // data URL de la textura elegida; no se recuerda entre sesiones
-try{ terrenoTipo = localStorage.getItem('terreno-tipo') || terrenoTipo; }catch(e){}
-try{ terrenoTamano = parseInt(localStorage.getItem('terreno-tamano'), 10) || terrenoTamano; }catch(e){}
-try{ terrenoColor = localStorage.getItem('terreno-color') || terrenoColor; }catch(e){}
-try{ terrenoAlfa = parseInt(localStorage.getItem('terreno-alfa'), 10) || terrenoAlfa; }catch(e){}
-// Formas: mismo mecanismo que Terreno, pero solido:true (bloquea
-// casillero y trayectoria — ver elementoSolidoEn). "Invisible" es solo
-// del GM: un sólido que solo él ve el contorno, pensado para marcar
-// sobre el fondo del mapa qué partes ya dibujadas no se pueden pisar,
-// sin que el jugador vea un dibujo de más encima.
-let formaTipo = 'flor';
-let formaTamano = 1;
-let formaColor = '#8A8A8A';
-let formaAlfa = 70;
-let formaInvisible = false;
-let formaImagen = '';         // data URL de la textura elegida; no se recuerda entre sesiones
-try{ formaTipo = localStorage.getItem('forma-tipo') || formaTipo; }catch(e){}
-try{ formaTamano = parseInt(localStorage.getItem('forma-tamano'), 10) || formaTamano; }catch(e){}
-try{ formaColor = localStorage.getItem('forma-color') || formaColor; }catch(e){}
-try{ formaAlfa = parseInt(localStorage.getItem('forma-alfa'), 10) || formaAlfa; }catch(e){}
-try{ formaInvisible = localStorage.getItem('forma-invisible') === '1'; }catch(e){}
+// Terreno y Formas quedaron unificadas en una sola herramienta (decidido
+// 2026-09-19): "Sólido" es un tilde más del mismo panel, no una
+// herramienta aparte. "Invisible" es solo del GM y solo tiene sentido
+// junto con Sólido: un sólido que solo él ve el contorno, pensado para
+// marcar sobre el fondo del mapa qué partes ya dibujadas no se pueden
+// pisar, sin que el jugador vea un dibujo de más encima.
+let elemTipo = 'flor';      // 'flor' | 'linea' | 'libre'
+let elemTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
+let elemColor = '#3F6FB0';
+let elemAlfa = 45;
+let elemSolido = false;
+let elemInvisible = false;
+let elemImagen = '';        // data URL de la textura elegida; no se recuerda entre sesiones
+try{ elemTipo = localStorage.getItem('elem-tipo') || elemTipo; }catch(e){}
+try{ elemTamano = parseInt(localStorage.getItem('elem-tamano'), 10) || elemTamano; }catch(e){}
+try{ elemColor = localStorage.getItem('elem-color') || elemColor; }catch(e){}
+try{ elemAlfa = parseInt(localStorage.getItem('elem-alfa'), 10) || elemAlfa; }catch(e){}
+try{ elemSolido = localStorage.getItem('elem-solido') === '1'; }catch(e){}
+try{ elemInvisible = localStorage.getItem('elem-invisible') === '1'; }catch(e){}
 
 /* ---------- Varios mapas guardados ----------
    campanas/<partida>/mapas/{id} = {nombre, creado}: la lista de mapas que
@@ -1909,7 +1916,7 @@ function dibujar(){
   if(dibujandoElemento){
     const c0 = hexACubo(dibujandoElemento.origen);
     const celdas = [...dibujandoElemento.celdas.values()].map(({dq, dr}) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
-    const colorPreview = dibujandoElemento.forma ? formaColor : terrenoColor;
+    const colorPreview = elemColor;
     trazarCeldas(celdas);
     ctx.fillStyle = colorConAlfa(colorPreview, 0.35);
     ctx.fill();
@@ -2186,6 +2193,10 @@ function tokenEn(x, y){
 lienzo.addEventListener('contextmenu', e => e.preventDefault());
 lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
+    // Con una herramienta de dibujo activa, el clic derecho es "salir de
+    // acá" (no ping) — es la forma más práctica de volver al cursor
+    // normal sin ir a buscar el botón de la barra lateral.
+    if(herramientaActiva){ desactivarHerramienta(); return; }
     const {px, py} = posEvento(e);
     const m = pantallaAMundo(px, py);
     guardarPing(m.x, m.y);
@@ -2304,16 +2315,14 @@ lienzo.addEventListener('pointerdown', e => {
       }
       return;
     }
-    // Terreno o Formas activo: crea un elemento nuevo (flor de un clic;
+    // Terreno/Formas activo: crea un elemento nuevo (flor de un clic;
     // línea/libre se arman arrastrando, ver pointermove/soltar).
-    if(herramientaActiva === 'terreno' || herramientaActiva === 'formas'){
-      const esForma = herramientaActiva === 'formas';
-      const tipo = esForma ? formaTipo : terrenoTipo;
+    if(herramientaActiva === 'elemento'){
       elementoSeleccionar(null);
-      if(tipo === 'flor'){
-        guardarElemento('flor', casillaClic, celdasFlor(esForma ? formaTamano : terrenoTamano), esForma);
+      if(elemTipo === 'flor'){
+        guardarElemento('flor', casillaClic, celdasFlor(elemTamano));
       }else{
-        dibujandoElemento = {tipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]]), forma: esForma};
+        dibujandoElemento = {tipo: elemTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
         lienzo.style.cursor = 'crosshair';
       }
       return;
@@ -2346,7 +2355,7 @@ lienzo.addEventListener('pointermove', e => {
     const casilla = mundoAHex(m.x, m.y);
     const c0 = hexACubo(dibujandoElemento.origen), c1 = hexACubo(casilla);
     if(dibujandoElemento.tipo === 'linea'){
-      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, dibujandoElemento.forma ? formaTamano : terrenoTamano);
+      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, elemTamano);
       dibujandoElemento.celdas = new Map(celdas.map(c => [`${c.dq},${c.dr}`, c]));
     }else{
       dibujandoElemento.celdas.set(`${c1.q - c0.q},${c1.r - c0.r}`, {dq: c1.q - c0.q, dr: c1.r - c0.r});
@@ -2444,7 +2453,7 @@ lienzo.addEventListener('pointermove', e => {
       lienzo.style.cursor = elHover.fijado ? 'default' : (puedeManipularElemento(elHover) ? 'grab' : 'pointer');
       return;
     }
-    if(herramientaActiva === 'lapiz' || herramientaActiva === 'terreno' || herramientaActiva === 'formas'){ lienzo.style.cursor = 'crosshair'; return; }
+    if(herramientaActiva === 'lapiz' || herramientaActiva === 'elemento'){ lienzo.style.cursor = 'crosshair'; return; }
   }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
@@ -2499,7 +2508,7 @@ function soltar(){
   if(dibujandoElemento){
     const d = dibujandoElemento;
     dibujandoElemento = null;
-    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()], d.forma);
+    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
     pedirDibujo();
   }
   if(arrastreElemento){
@@ -2577,6 +2586,7 @@ document.addEventListener('keydown', e => {
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
+  if(herramientaActiva && e.key === 'Escape'){ desactivarHerramienta(); return; }
   if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); elementoSeleccionar(null); }
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
   if((e.key === 'Delete' || e.key === 'Backspace') && trazoSeleccionado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
@@ -2734,19 +2744,17 @@ function escucharElementos(){
   }, err => console.error('Error escuchando los elementos del mapa:', err));
 }
 
-async function guardarElemento(tipo, origen, celdasSet, esForma){
+async function guardarElemento(tipo, origen, celdasSet){
   if(!fbUsuario) return;
   const celdas = [];
   celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
   if(!celdas.length) return;
-  const invisible = !!(esForma && soyGM && formaInvisible);
-  const imagen = (esForma ? formaImagen : terrenoImagen) || '';
+  const invisible = !!(elemSolido && soyGM && elemInvisible);
   try{
     await coleccionElementos().add({
       tipo, origen, celdas, rotacion: 0,
-      color: esForma ? formaColor : terrenoColor,
-      alfa: esForma ? formaAlfa : terrenoAlfa,
-      solido: !!esForma, invisible, imagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
+      color: elemColor, alfa: elemAlfa,
+      solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -4694,27 +4702,35 @@ $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herram
 // exista cuando el toolkit se dibuja por primera vez.
 let bitacoraFlotanteAbierta = false;
 
-// Imagen de fondo (opcional) para el próximo elemento de Terreno/Formas
-// que se cree — el picker de "Elegir imagen"/"Cambiar"/"Quitar" bajo el
-// panel de cada herramienta, compartido entre las dos (prefijo
-// 'terreno'|'forma' elige qué variable tocar).
-function imagenElementoOpcionHtml(prefijo, imagen){
+// Imagen de fondo (opcional) para el próximo elemento (Terreno/Formas
+// unificadas) que se cree — el picker de "Elegir imagen"/"Cambiar"/
+// "Quitar" bajo el panel de la herramienta.
+function imagenElementoOpcionHtml(imagen){
   return `<label class="etiqueta">Imagen de fondo (opcional)</label>
     <div class="fila" style="margin-top:0;align-items:center">
       ${imagen ? `<img src="${imagen}" alt="" style="width:32px;height:32px;border-radius:4px;object-fit:cover;border:1px solid var(--line)">` : ''}
-      <button type="button" class="btn" data-elemento-imagen="${prefijo}">${imagen ? 'Cambiar' : 'Elegir imagen'}</button>
-      ${imagen ? `<button type="button" class="btn peligro" data-elemento-imagen-quitar="${prefijo}">Quitar</button>` : ''}
+      <button type="button" class="btn" data-elemento-imagen="1">${imagen ? 'Cambiar' : 'Elegir imagen'}</button>
+      ${imagen ? `<button type="button" class="btn peligro" data-elemento-imagen-quitar="1">Quitar</button>` : ''}
     </div>`;
 }
 
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
-  {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos sólidos: bloquean el paso y la trayectoria', lista: true},
-  {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Nubes, charcos, fuego… transitables, con color y transparencia', lista: true},
+  {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
 ];
 let herramientaActiva = '';
+// Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho
+// en el mapa, Esc, la ✕ de su ventanita, o tocar el mismo botón de nuevo.
+function desactivarHerramienta(){
+  if(!herramientaActiva) return;
+  herramientaActiva = '';
+  dibujando = null;
+  dibujandoElemento = null;
+  lienzo.style.cursor = 'default';
+  renderToolkit();
+}
 let toolkitAbierto = false;
 try{ toolkitAbierto = localStorage.getItem('mapa-toolkit-abierto') === '1'; }catch(e){}
 
@@ -4726,49 +4742,54 @@ function renderToolkit(){
   pestana.title = toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas';
   $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => {
     const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
-    const opciones = (h.id === 'lapiz' && activa) ? `<div class="tk-lapiz-opciones">
-        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === lapizColor ? ' elegido' : ''}" data-lapiz-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
-        <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> Dibujo permanente</label>
-        <p class="tk-lapiz-ayuda">${lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.'}</p>
-      </div>` : (h.id === 'terreno' && activa) ? `<div class="tk-lapiz-opciones">
-        <label class="etiqueta" style="margin-top:0">Forma</label>
-        <select id="terreno-tipo-select">
-          <option value="flor"${terrenoTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
-          <option value="linea"${terrenoTipo === 'linea' ? ' selected' : ''}>Línea</option>
-          <option value="libre"${terrenoTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
-        </select>
-        ${terrenoTipo !== 'libre' ? `<label class="etiqueta">${terrenoTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
-        <input type="number" id="terreno-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${terrenoTamano}">` : ''}
-        <label class="etiqueta">Color</label>
-        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === terrenoColor ? ' elegido' : ''}" data-terreno-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
-        <label class="etiqueta">Transparencia</label>
-        <input type="range" id="terreno-alfa-slider" min="10" max="100" step="5" value="${terrenoAlfa}">
-        ${imagenElementoOpcionHtml('terreno', terrenoImagen)}
-        <p class="tk-lapiz-ayuda">${terrenoTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : terrenoTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Transitable — no bloquea el paso (eso es "Formas").</p>
-      </div>` : (h.id === 'formas' && activa) ? `<div class="tk-lapiz-opciones">
-        <label class="etiqueta" style="margin-top:0">Forma</label>
-        <select id="forma-tipo-select">
-          <option value="flor"${formaTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
-          <option value="linea"${formaTipo === 'linea' ? ' selected' : ''}>Línea</option>
-          <option value="libre"${formaTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
-        </select>
-        ${formaTipo !== 'libre' ? `<label class="etiqueta">${formaTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
-        <input type="number" id="forma-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${formaTamano}">` : ''}
-        <label class="etiqueta">Color</label>
-        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === formaColor ? ' elegido' : ''}" data-forma-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
-        <label class="etiqueta">Transparencia</label>
-        <input type="range" id="forma-alfa-slider" min="10" max="100" step="5" value="${formaAlfa}">
-        ${imagenElementoOpcionHtml('forma', formaImagen)}
-        ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="forma-invisible-check"${formaInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
-        <p class="tk-lapiz-ayuda">${formaTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : formaTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Sólido — bloquea ese casillero y cualquier ruta que lo cruce.${soyGM ? ' Invisible: solo vos ves el contorno (punteado violeta); sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
-      </div>` : '';
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
       <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}</span>
       <span class="tk-detalle">${esc(h.detalle)}</span>
-    </button>${opciones}</li>`;
+    </button></li>`;
   }).join('');
+  renderHerramientaFlotante();
+}
+
+// Ventanita propia de Lápiz/Terreno/Formas (la única activa a la vez):
+// antes esto se desplegaba adentro de la barra lateral, sumando un
+// bloque más cada vez que había una herramienta lista.
+function renderHerramientaFlotante(){
+  const caja = $('#herramienta-flotante');
+  if(!herramientaActiva){ caja.hidden = true; caja.innerHTML = ''; return; }
+  const datos = HERRAMIENTAS.find(h => h.id === herramientaActiva);
+  let cuerpo = '';
+  if(herramientaActiva === 'lapiz'){
+    cuerpo = `
+      <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === lapizColor ? ' elegido' : ''}" data-lapiz-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+      <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> Dibujo permanente</label>
+      <p class="tk-lapiz-ayuda">${lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.'}</p>`;
+  }else if(herramientaActiva === 'elemento'){
+    cuerpo = `
+      <label class="etiqueta" style="margin-top:0">Forma</label>
+      <select id="elem-tipo-select">
+        <option value="flor"${elemTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
+        <option value="linea"${elemTipo === 'linea' ? ' selected' : ''}>Línea</option>
+        <option value="libre"${elemTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
+      </select>
+      ${elemTipo !== 'libre' ? `<label class="etiqueta">${elemTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
+      <input type="number" id="elem-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${elemTamano}">` : ''}
+      <label class="etiqueta">Color</label>
+      <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === elemColor ? ' elegido' : ''}" data-elem-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+      <label class="etiqueta">Transparencia</label>
+      <input type="range" id="elem-alfa-slider" min="10" max="100" step="5" value="${elemAlfa}">
+      ${imagenElementoOpcionHtml(elemImagen)}
+      <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
+      ${elemSolido && soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : elemTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${elemSolido && soyGM ? ' Invisible: solo vos ves el contorno (punteado violeta); sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>`;
+  }else{
+    caja.hidden = true; caja.innerHTML = ''; return;
+  }
+  caja.hidden = false;
+  caja.innerHTML = `
+    <div class="herr-cab"><span>${datos ? datos.icono + ' ' + esc(datos.nombre) : ''}</span><button type="button" id="herr-cerrar" title="Salir de esta herramienta (Esc o clic derecho en el mapa)">✕</button></div>
+    ${cuerpo}`;
 }
 
 function abrirToolkit(abrir){
@@ -4779,39 +4800,42 @@ function abrirToolkit(abrir){
 
 $('#toolkit-pestana').onclick = () => abrirToolkit(!toolkitAbierto);
 $('#toolkit-lista').addEventListener('click', e => {
+  const b = e.target.closest('[data-herramienta]');
+  if(!b) return;
+  const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
+  if(!h) return;
+  if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
+  if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
+  if(herramientaActiva === h.id){ desactivarHerramienta(); return; }
+  herramientaActiva = h.id;
+  renderToolkit();
+});
+$('#herramienta-flotante').addEventListener('click', e => {
+  if(e.target.closest('#herr-cerrar')){ desactivarHerramienta(); return; }
   const color = e.target.closest('[data-lapiz-color]');
   if(color){
     lapizColor = color.dataset.lapizColor;
     try{ localStorage.setItem('lapiz-color', lapizColor); }catch(err){}
-    renderToolkit();
+    renderHerramientaFlotante();
     return;
   }
-  const colorTerreno = e.target.closest('[data-terreno-color]');
-  if(colorTerreno){
-    terrenoColor = colorTerreno.dataset.terrenoColor;
-    try{ localStorage.setItem('terreno-color', terrenoColor); }catch(err){}
-    renderToolkit();
-    return;
-  }
-  const colorForma = e.target.closest('[data-forma-color]');
-  if(colorForma){
-    formaColor = colorForma.dataset.formaColor;
-    try{ localStorage.setItem('forma-color', formaColor); }catch(err){}
-    renderToolkit();
+  const colorElem = e.target.closest('[data-elem-color]');
+  if(colorElem){
+    elemColor = colorElem.dataset.elemColor;
+    try{ localStorage.setItem('elem-color', elemColor); }catch(err){}
+    renderHerramientaFlotante();
     return;
   }
   const imgElegir = e.target.closest('[data-elemento-imagen]');
   if(imgElegir){
-    const prefijo = imgElegir.dataset.elementoImagen;
     const entrada = $('#elemento-imagen-archivo');
     entrada.onchange = async ev => {
       const file = ev.target.files[0];
       ev.target.value = '';
       if(!file) return;
       try{
-        const dato = await prepararImagenElemento(file);
-        if(prefijo === 'forma') formaImagen = dato; else terrenoImagen = dato;
-        renderToolkit();
+        elemImagen = await prepararImagenElemento(file);
+        renderHerramientaFlotante();
       }catch(err){
         console.error('No se pudo preparar la imagen del elemento:', err);
         toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
@@ -4822,71 +4846,48 @@ $('#toolkit-lista').addEventListener('click', e => {
   }
   const imgQuitar = e.target.closest('[data-elemento-imagen-quitar]');
   if(imgQuitar){
-    if(imgQuitar.dataset.elementoImagenQuitar === 'forma') formaImagen = ''; else terrenoImagen = '';
-    renderToolkit();
-    return;
+    elemImagen = '';
+    renderHerramientaFlotante();
   }
-  const b = e.target.closest('[data-herramienta]');
-  if(!b) return;
-  const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
-  if(!h) return;
-  if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
-  if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
-  herramientaActiva = herramientaActiva === h.id ? '' : h.id;
-  renderToolkit();
 });
-$('#toolkit-lista').addEventListener('change', e => {
+$('#herramienta-flotante').addEventListener('change', e => {
   if(e.target.id === 'lapiz-permanente-check'){
     lapizPermanente = e.target.checked;
     try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}
-    renderToolkit();
+    renderHerramientaFlotante();
     return;
   }
-  if(e.target.id === 'terreno-tipo-select'){
-    terrenoTipo = e.target.value;
-    try{ localStorage.setItem('terreno-tipo', terrenoTipo); }catch(err){}
-    renderToolkit();
+  if(e.target.id === 'elem-tipo-select'){
+    elemTipo = e.target.value;
+    try{ localStorage.setItem('elem-tipo', elemTipo); }catch(err){}
+    renderHerramientaFlotante();
     return;
   }
-  if(e.target.id === 'forma-tipo-select'){
-    formaTipo = e.target.value;
-    try{ localStorage.setItem('forma-tipo', formaTipo); }catch(err){}
-    renderToolkit();
+  if(e.target.id === 'elem-solido-check'){
+    elemSolido = e.target.checked;
+    try{ localStorage.setItem('elem-solido', elemSolido ? '1' : ''); }catch(err){}
+    renderHerramientaFlotante();
     return;
   }
-  if(e.target.id === 'forma-invisible-check'){
-    formaInvisible = e.target.checked;
-    try{ localStorage.setItem('forma-invisible', formaInvisible ? '1' : ''); }catch(err){}
+  if(e.target.id === 'elem-invisible-check'){
+    elemInvisible = e.target.checked;
+    try{ localStorage.setItem('elem-invisible', elemInvisible ? '1' : ''); }catch(err){}
     return;
   }
-  if(e.target.id === 'terreno-tamano-input'){
-    terrenoTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 1));
-    try{ localStorage.setItem('terreno-tamano', terrenoTamano); }catch(err){}
-    renderToolkit();
-    return;
-  }
-  if(e.target.id === 'forma-tamano-input'){
-    formaTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 1));
-    try{ localStorage.setItem('forma-tamano', formaTamano); }catch(err){}
-    renderToolkit();
+  if(e.target.id === 'elem-tamano-input'){
+    elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 1));
+    try{ localStorage.setItem('elem-tamano', elemTamano); }catch(err){}
+    renderHerramientaFlotante();
   }
 });
-$('#toolkit-lista').addEventListener('input', e => {
-  if(e.target.id === 'terreno-alfa-slider'){
-    terrenoAlfa = num(e.target.value);
-    try{ localStorage.setItem('terreno-alfa', terrenoAlfa); }catch(err){}
+$('#herramienta-flotante').addEventListener('input', e => {
+  if(e.target.id === 'elem-alfa-slider'){
+    elemAlfa = num(e.target.value);
+    try{ localStorage.setItem('elem-alfa', elemAlfa); }catch(err){}
   }
-  if(e.target.id === 'forma-alfa-slider'){
-    formaAlfa = num(e.target.value);
-    try{ localStorage.setItem('forma-alfa', formaAlfa); }catch(err){}
-  }
-  if(e.target.id === 'terreno-tamano-input'){
+  if(e.target.id === 'elem-tamano-input'){
     const v = Math.round(num(e.target.value));
-    if(v >= 1 && v <= TAMANO_ELEMENTO_MAX) terrenoTamano = v;
-  }
-  if(e.target.id === 'forma-tamano-input'){
-    const v = Math.round(num(e.target.value));
-    if(v >= 1 && v <= TAMANO_ELEMENTO_MAX) formaTamano = v;
+    if(v >= 1 && v <= TAMANO_ELEMENTO_MAX) elemTamano = v;
   }
 });
 renderToolkit();

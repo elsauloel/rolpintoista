@@ -149,15 +149,29 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
   barra vertical escondida a la izquierda del mapa; la pestaña del borde la
   abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
-  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Lápiz,
-  Terreno y Formas ya están armadas (una herramienta lista lleva
-  `lista: true` y se activa en `herramientaActiva`). Preguntas en
-  `docs/preguntas-abiertas.md` (P41 sigue abierta: los efectos mecánicos
-  del Terreno al pisarlo, más allá de lo visual). **📖 Bitácora** es la
-  excepción: no es un modo de dibujo, así que su clic no toca
-  `herramientaActiva` — abre o cierra del todo `#bitacora-flotante`
-  (`abrirBitacoraFlotante`, recordado en `localStorage`
-  `mapa-bitacora-abierta`).
+  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). La barra
+  solo lista los botones (icono + nombre + detalle) — Lápiz y Terreno y
+  Formas ya están armadas (una herramienta lista lleva `lista: true` y se
+  activa en `herramientaActiva`). Preguntas en `docs/preguntas-abiertas.md`
+  (P41 sigue abierta: los efectos mecánicos del Terreno al pisarlo, más
+  allá de lo visual). **📖 Bitácora** es la excepción: no es un modo de
+  dibujo, así que su clic no toca `herramientaActiva` — abre o cierra del
+  todo `#bitacora-flotante` (`abrirBitacoraFlotante`, recordado en
+  `localStorage` `mapa-bitacora-abierta`).
+  - **Ventanita propia por herramienta** (decidido 2026-09-19: antes las
+    opciones se desplegaban adentro de la barra lateral, una debajo de la
+    otra — incómodo y sin límite de alto): la herramienta activa (Lápiz o
+    Terreno y Formas — nunca las dos a la vez) muestra sus controles en
+    `#herramienta-flotante` (`renderHerramientaFlotante`), una ventanita
+    aparte a la derecha de la barra (no tapa `#elem-edit`, que vive del
+    otro lado del mapa). Tiene su propia ✕ para salir.
+  - **Salir de la herramienta activa**: la ✕ de su ventanita, tocar el
+    mismo botón de nuevo, **Esc**, o **clic derecho en el mapa**
+    (`desactivarHerramienta`) — decidido 2026-09-19, porque no quedaba
+    claro cómo volver al cursor normal sin ir a buscar el botón. Con
+    ninguna herramienta activa, el clic derecho hace otra cosa: mandar un
+    ping (ver más abajo) — nunca las dos a la vez, se decide por si
+    `herramientaActiva` tiene algo.
 - **✏️ Lápiz** (cualquier miembro): dibuja a mano sobre el lienzo mientras
   `herramientaActiva === 'lapiz'` (arrastrar el mouse/dedo con el botón
   primario). El trazo se suaviza y se achica con **Douglas-Peucker**
@@ -182,29 +196,40 @@ nuevo de Rol Pintoísta. Paso 2 de
     horario que el de los tokens, pero rotación libre, sin encajar en 60°).
     Delete/Backspace lo borra. Lo mueven, rotan o borran su dueño o el GM
     (`puedeManipularTrazo`); cualquiera lo ve.
-  - Color (paleta `COLORES`) y el tilde de permanente están en un panel
-    que se despliega bajo el botón ✏️ del toolkit mientras está activo,
-    se recuerdan por navegador (`lapiz-color`, `lapiz-permanente`).
+  - Color (paleta `COLORES`) y el tilde de permanente están en su
+    ventanita (`#herramienta-flotante`) mientras está activo, se recuerdan
+    por navegador (`lapiz-color`, `lapiz-permanente`).
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
-- **☣️ Terreno** (cualquier miembro): crea marcas de terreno transitables
-  atadas a la grilla hexagonal — nubes, humo, charcos, fuego, lo que haga
-  falta narrativamente — con color y transparencia configurables. No hay
-  base de imágenes/texturas: es un color semitransparente sobre las
-  casillas (decidido 2026-09-18: colores en vez de imágenes; queda
-  anotado en `docs/preguntas-abiertas.md` P45 para evaluar imágenes más
-  adelante). Vive en `campanas/{id}/elementos` (o `mapas/{id}/elementos`,
-  mismo patrón que tokens/trazos) como `{tipo:'flor'|'linea'|'libre',
-  origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
-  sin rotar), rotacion (0/60/…/300), color, alfa (10-100), solido (false
-  por ahora — lo usa Formas, sin construir todavía), duenoUid, creado}`.
-  - **3 formas al crear** (elegidas en el panel bajo el botón ☣️, con el
-    tipo activo en `terrenoTipo`): **Flor** (radio 1/2/3 — mismo cálculo
-    de anillos que `dibujarAuraHex`, `celdasFlor`) se crea de un solo
-    clic; **Línea** (largo 1/2/3, `celdasLinea`) y **Forma libre**
-    (`dibujandoElemento`, agrega cada casilla que el mouse pisa) se arman
-    arrastrando desde el primer clic hasta soltar.
+- **⬡ Terreno y Formas** (cualquier miembro; una sola herramienta desde
+  2026-09-19 — antes eran dos separadas, con el mismo dato y mecanismo
+  por debajo, así que quedó un solo botón con un tilde de "Sólido" en vez
+  de duplicar todo el panel): crea elementos atados a la grilla
+  hexagonal — nubes, humo, charcos, fuego, muros, cajas, lo que haga
+  falta narrativamente — transitables o sólidos según ese tilde, con
+  color o imagen y transparencia. Vive en `campanas/{id}/elementos` (o
+  `mapas/{id}/elementos`, mismo patrón que tokens/trazos) como
+  `{tipo:'flor'|'linea'|'libre', origen:{col,fila}, celdas:[dq1,dr1,…]
+  (offsets en cubo desde origen, sin rotar), rotacion (0/60/…/300),
+  color, alfa (10-100), solido, invisible, imagen, imgZoom/imgDX/imgDY,
+  fijado, duenoUid, creado}`. Estado del panel en `elemTipo`/`elemTamano`/
+  `elemColor`/`elemAlfa`/`elemSolido`/`elemInvisible`/`elemImagen`
+  (`localStorage` `elem-*`, menos la imagen que no se recuerda entre
+  sesiones a propósito).
+  - **3 formas al crear**: **Flor** (radio, mismo cálculo de anillos que
+    `dibujarAuraHex`, `celdasFlor`) se crea de un solo clic; **Línea**
+    (largo, `celdasLinea`) y **Forma libre** (`dibujandoElemento`, agrega
+    cada casilla que el mouse pisa) se arman arrastrando desde el primer
+    clic hasta soltar. El radio/largo se escribe en un
+    `<input type=number>` (`#elem-tamano-input`, `TAMANO_ELEMENTO_MAX` =
+    30, decidido 2026-09-19 sobre los botones 1/2/3 de antes — se puede
+    pedir uno mucho más grande). El `input` actualiza en vivo sin
+    recortar (para no pelear con lo que se está tipeando); el `change`
+    (al salir del campo) sí lo encaja entre 1 y 30 y lo guarda en
+    `localStorage`. El tope real de casilleros lo pone Firestore
+    (`celdas.size() <= 6000`, ver `docs/workflow-firebase.md`) — a radio
+    30 una Flor usa ~2800.
   - Una vez creado: se selecciona (clic sobre cualquiera de sus casillas,
     `elementoEn`, hit-test exacto por casillero — no por geometría como
     el trazo libre), se arrastra para reubicarlo (traslada `origen`,
@@ -217,36 +242,65 @@ nuevo de Rol Pintoísta. Paso 2 de
     mirarlo), aunque no lo pueda mover.
   - `celdasDeElemento(el)` calcula las casillas absolutas que ocupa ahora
     (origen + cada offset, rotado con `rotarCubo`) — ahí se apoya
-    selección, arrastre, hit-test y la colisión de Formas
+    selección, arrastre, hit-test y la colisión de un sólido
     (`elementoSolidoEn`, ver abajo). **`cuboACol`/`cuboAFila`** son la
-    inversa de `hexACubo` (col es
-    literalmente `q`; fila hay que reconstruirla con el mismo ajuste de
-    paridad que usa `hexACubo`, pero sobre `col`, no sobre `r`) — antes
-    de este arreglo (2026-09-18) la fórmula vieja de `cuboACol`
-    desplazaba mal las casillas rotadas o vecinas, bug que ya traía
-    `dibujarAuraHex` desde antes (las auras de radio > 0 podían quedar
-    corridas) y que se coló a Terreno al compartir la función; se
-    corrigieron los dos usos.
+    inversa de `hexACubo` (col es literalmente `q`; fila hay que
+    reconstruirla con el mismo ajuste de paridad que usa `hexACubo`, pero
+    sobre `col`, no sobre `r`) — antes de este arreglo (2026-09-18) la
+    fórmula vieja de `cuboACol` desplazaba mal las casillas rotadas o
+    vecinas, bug que ya traía `dibujarAuraHex` desde antes (las auras de
+    radio > 0 podían quedar corridas) y que se coló acá al compartir la
+    función; se corrigieron los dos usos.
   - `elementoSeleccionado` es mutuamente excluyente con `seleccion` y
     `trazoSeleccionado` (`elementoSeleccionar` limpia los otros dos).
   - Se dibuja en el piso, debajo de los tokens y encima del fondo.
-  - **Imagen de fondo** (opcional, comparte mecanismo Terreno/Formas):
-    bajo la transparencia, en el panel de cada herramienta, "Elegir
+  - **Sólido** (`elem-solido-check`): bloquea ese casillero para cualquier
+    token y cualquier ruta que lo cruce (`elementoSolidoEn(col, fila)`,
+    recorre `elementos` filtrando por `solido`) — **"avisa y bloquea"**
+    (decidido 2026-09-18, sobre pathfinding automático — ver
+    `docs/preguntas-abiertas.md` P46): al soltar un arrastre de token con
+    `pasos > 0`, si algún casillero de la ruta (menos el de partida)
+    tiene un sólido encima, no se mueve — toast avisando y listo, el
+    jugador vuelve a arrastrar a mano por otro lado. No hay rodeo
+    automático. Por ahora la colisión es contra sólidos nomás, para
+    cualquier token sea o no aliado — la colisión token-contra-token
+    (aliado/enemigo/neutral) y el "no compartir hexágono en combate"
+    quedan para cuando se sume el concepto de bando, ver "Pendiente" más
+    abajo. Sin tildar, es transitable (Terreno de siempre) sin efecto
+    mecánico todavía más allá de lo visual (P41 sigue abierta).
+    Destildarlo después de crear el elemento no se puede — es de las
+    cosas fijas al crear (junto con tipo/celdas), para eso se borra y se
+    crea uno nuevo (ver ⚙️ más abajo).
+  - **Invisible para jugadores** (checkbox que solo aparece con Sólido
+    tildado y siendo GM): pensado para marcar sobre el fondo ya dibujado
+    del mapa qué zonas son intransitables sin agregar un dibujo de más —
+    el GM ve el contorno punteado violeta (bien distinto del rojo de un
+    sólido visible), los jugadores no ven nada ahí (`elementos.forEach`
+    se la salta del todo si `el.invisible && !soyGM`), pero la colisión
+    sigue aplicando igual (`elementoSolidoEn` no mira `invisible`). Solo
+    se puede activar siendo `soyGM` (cliente: el checkbox ni aparece si
+    no; reglas: `invisible: true` exige `esGM(c)` al crear). No se puede
+    seleccionar (`elementoEn` se lo salta) si no se ve. Destildar Sólido
+    no borra el tilde de Invisible por debajo (`elemInvisible` sigue en
+    memoria), pero no importa: `guardarElemento` solo lo manda si
+    `elemSolido` también está tildado, así que nunca se filtra un
+    invisible sin sólido.
+  - Un sólido visible (no invisible) se dibuja con un borde de
+    advertencia fijo (rojo) además de su color elegido, para que se note
+    que bloquea el paso más allá de qué color tenga.
+  - **Imagen de fondo** (opcional): bajo la transparencia, "Elegir
     imagen"/"Cambiar"/"Quitar" (`imagenElementoOpcionHtml`,
-    `#elemento-imagen-archivo` compartido) sube una textura que queda
-    guardada en `terrenoImagen`/`formaImagen` (data URL, **no** se
-    recuerda entre sesiones a propósito — a diferencia de color/tipo/
-    tamaño) y se pega al próximo elemento que se cree con esa
-    herramienta. `prepararImagenElemento` la achica preservando el
-    alto/ancho (no la recorta cuadrada — no tiene sentido para una
-    figura larga como una Línea) con tope ~120 KB
+    `#elemento-imagen-archivo`) sube una textura que queda guardada en
+    `elemImagen` (data URL, **no** se recuerda entre sesiones a
+    propósito — a diferencia de color/tipo/tamaño/sólido) y se pega al
+    próximo elemento que se cree. `prepararImagenElemento` la achica
+    preservando el alto/ancho (no la recorta cuadrada — no tiene sentido
+    para una figura larga como una Línea) con tope ~120 KB
     (`ELEMENTO_IMG_LADO`/`ELEMENTO_IMG_MAX`). Al dibujar, la imagen cubre
     ("cover", `cajaCeldas` calcula la caja que envuelve todas las
     casillas) el área del elemento, clipeada a su forma real (igual que
     la imagen de un token); si no tiene imagen, sigue siendo el color
-    plano de siempre. No se puede cambiar la imagen de un elemento ya
-    creado (ídem color/alfa/tipo): para eso hay que borrarlo y crear uno
-    nuevo.
+    plano de siempre.
   - **📌 Pinear / 🔓 despinear** (botón que aparece junto a la manija de
     rotar al seleccionar un elemento que se puede manipular,
     `elementoPinMundo` — mismo radio que la manija pero siempre del lado
@@ -259,46 +313,6 @@ nuevo de Rol Pintoísta. Paso 2 de
     `fijado` sumado a los campos que se pueden tocar en un `update`).
     Pensado para "asentar" un elemento ya bien puesto y no volver a
     tocarlo por accidente al arrastrar el mapa alrededor.
-- **⬡ Formas** (cualquier miembro): mismo mecanismo que Terreno — mismo
-  dato (`elementos`), mismas 3 formas al crear (Flor/Línea/Libre), mismo
-  arrastre/rotación/borrado por dueño o GM — pero con `solido: true`:
-  bloquea ese casillero para cualquier token y cualquier ruta que lo
-  cruce (`elementoSolidoEn(col, fila)`, recorre `elementos` filtrando por
-  `solido`). Estado propio en `formaTipo`/`formaTamano`/`formaColor`/
-  `formaAlfa` (mismo patrón que `terrenoTipo`/etc, `localStorage`
-  `forma-*`) para no compartir configuración con Terreno.
-  - **Colisión, "avisa y bloquea"** (decidido 2026-09-18, sobre
-    pathfinding automático — ver `docs/preguntas-abiertas.md` P46): al
-    soltar un arrastre de token con `pasos > 0`, si algún casillero de la
-    ruta (menos el de partida) tiene un sólido encima, no se mueve —
-    toast avisando y listo, el jugador vuelve a arrastrar a mano por otro
-    lado. No hay rodeo automático. Por ahora la colisión es contra
-    Formas nomás, para cualquier token sea o no aliado — la colisión
-    token-contra-token (aliado/enemigo/neutral) y el "no compartir
-    hexágono en combate" quedan para cuando se sume el concepto de bando,
-    ver "Pendiente" más abajo.
-  - **Invisible para jugadores** (solo GM, checkbox que solo aparece
-    siendo GM): pensado para marcar sobre el fondo ya dibujado del mapa
-    qué zonas son intransitables sin agregar un dibujo de más — el GM ve
-    el contorno punteado violeta (bien distinto del rojo de un sólido
-    visible), los jugadores no ven nada ahí (`elementos.forEach` se la
-    salta del todo si `el.invisible && !soyGM`), pero la colisión sigue
-    aplicando igual (`elementoSolidoEn` no mira `invisible`). Solo se
-    puede activar siendo `soyGM` (cliente: el checkbox ni aparece si no;
-    reglas: `invisible: true` exige `esGM(c)` al crear). No se puede
-    seleccionar (`elementoEn` se lo salta) si no se ve.
-  - Un sólido visible (no invisible) se dibuja con un borde de
-    advertencia fijo (rojo) además de su color elegido, para que se note
-    que bloquea el paso más allá de qué color tenga.
-  - **Tamaño con número, no botones** (decidido 2026-09-19): el radio de
-    Flor o el largo de Línea se escribe en un `<input type=number>`
-    (`#terreno-tamano-input`/`#forma-tamano-input`, `TAMANO_ELEMENTO_MAX`
-    = 30) en vez de elegir entre 1/2/3 — se puede pedir uno mucho más
-    grande. El `input` actualiza en vivo sin recortar (para no pelear con
-    lo que se está tipeando); el `change` (al salir del campo) sí lo
-    encaja entre 1 y 30 y lo guarda en `localStorage`. El tope real de
-    casilleros lo pone Firestore (`celdas.size() <= 6000`, ver
-    `docs/workflow-firebase.md`) — a radio 30 una Flor usa ~2800.
   - **⚙️ Editar un elemento ya creado** (botón que aparece junto a rotar
     y pinear al seleccionarlo, a 90° de la manija de rotar —
     `elementoGearMundo`, `abrirEditorElemento`/`renderEditorElemento` en

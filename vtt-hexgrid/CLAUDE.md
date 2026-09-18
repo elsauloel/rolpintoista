@@ -301,6 +301,16 @@ nuevo de Rol Pintoísta. Paso 2 de
   beneficio, violeta perjuicio). Caído/derrotado: oscurecido con una ✕.
   Lee `fichas` y `creeps` (solo lo público). De los creeps solo llega el
   porcentaje de vida.
+- **Imagen propia de un token sin vincular** (NPC, objeto, etc.; `t.imagen`,
+  botón "Elegir imagen"/"Cambiar" del HUD, `elegirImagenToken`): se recorta
+  a un cuadrado chico (`TOKEN_IMG_PX` 96px, tope `TOKEN_IMG_MAX` 60 KB) con
+  `comun/recorte-imagen.js`, que antes de achicarla deja arrastrar y hacer
+  zoom para elegir qué parte de la foto se ve — no siempre el centro. Igual
+  al crear un token nuevo con imagen desde el formulario "+ Token". Dibujada
+  en el canvas, la imagen queda recortada al hexágono del token
+  (`ctx.clip()` sobre sus vértices), no a un círculo — el recuadro del
+  recorte es cuadrado nomás, alcanza para elegir la zona sin tener que
+  calcar el hexágono exacto.
 - **Ocultar tokens** (`oculto` en el token, botón 👁/🙈 del HUD, solo GM):
   para armar creeps/tokens antes de que entren en la partida y mostrarlos
   cuando corresponda. Un token oculto no aparece para los jugadores (ni se

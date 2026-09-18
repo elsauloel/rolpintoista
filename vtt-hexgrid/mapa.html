@@ -41,6 +41,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.peligro:hover{border-color:var(--danger)}
 #btn-dados.activo{border-color:var(--brass);color:var(--brass)}
 
+/* Recorte de imagen (comun/recorte-imagen.js): elegir qué parte de la
+   foto se ve antes de guardarla como imagen de un token. */
+.recorte-scrim{position:fixed;inset:0;background:rgba(15,12,14,.75);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.recorte-caja{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:0 12px 28px rgba(0,0,0,.6);max-width:calc(100vw - 32px);max-height:calc(100vh - 32px);overflow-y:auto}
+.recorte-titulo{margin:0;font-weight:700;color:var(--paper)}
+.recorte-visor{position:relative;overflow:hidden;border-radius:var(--r);border:2px solid var(--copper);background:#000;cursor:grab;touch-action:none;max-width:100%}
+.recorte-visor:active{cursor:grabbing}
+.recorte-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
+.recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
+.recorte-botones{width:100%;justify-content:flex-end;margin-top:0}
+
 header{
   display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
 }
@@ -587,6 +598,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/tiradas.js"></script>
 <script src="../comun/mesa.js"></script>
+<script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -3022,42 +3034,12 @@ async function guardarFondo(cambios){
   }
 }
 
-// Achica la imagen hasta que entre en un documento de Firebase (tope 1 MB).
 // Imagen propia de un token que no está vinculado a una ficha ni a un creep
-// (NPC, objetos, etc.). Se achica a un cuadrado chico para que entre en el
-// documento del token.
+// (NPC, objetos, etc.): un cuadrado chico para que entre en el documento
+// del token, con el recorte (elegir zoom y qué parte se ve) armado por
+// comun/recorte-imagen.js — ver también token-etiqueta y HUD.
 const TOKEN_IMG_PX = 96;
 const TOKEN_IMG_MAX = 60000;   // tope que aceptan las reglas
-function prepararImagenToken(file){
-  return new Promise((res, rej) => {
-    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
-    const lector = new FileReader();
-    lector.onerror = () => rej(lector.error);
-    lector.onload = () => {
-      const img = new Image();
-      img.onerror = () => rej(new Error('bad-image'));
-      img.onload = () => {
-        let lado = TOKEN_IMG_PX, calidad = 0.85, dato = '';
-        for(let i = 0; i < 6; i++){
-          const canvas = document.createElement('canvas');
-          canvas.width = canvas.height = lado;
-          const c = canvas.getContext('2d');
-          c.fillStyle = '#17121A'; c.fillRect(0, 0, lado, lado);
-          // Recorte cuadrado centrado, como la miniatura de la ficha.
-          const corte = Math.min(img.naturalWidth, img.naturalHeight);
-          c.drawImage(img, (img.naturalWidth - corte) / 2, (img.naturalHeight - corte) / 2, corte, corte, 0, 0, lado, lado);
-          dato = canvas.toDataURL('image/jpeg', calidad);
-          if(dato.length < TOKEN_IMG_MAX) break;
-          calidad = Math.max(0.5, calidad - 0.1); lado = Math.round(lado * 0.85);
-        }
-        dato.length < TOKEN_IMG_MAX ? res(dato) : rej(new Error('muy-grande'));
-      };
-      img.src = lector.result;
-    };
-    lector.readAsDataURL(file);
-  });
-}
-
 async function elegirImagenToken(id){
   const entrada = $('#token-imagen-archivo');
   entrada.onchange = async ev => {
@@ -3065,9 +3047,10 @@ async function elegirImagenToken(id){
     ev.target.value = '';
     if(!file) return;
     try{
-      const dato = await prepararImagenToken(file);
+      const dato = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX});
       await editarToken(id, {imagen: dato});
     }catch(err){
+      if(err.message === 'cancelado') return;
       console.error('No se pudo preparar la imagen del token:', err);
       toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
     }
@@ -3494,8 +3477,9 @@ function renderPanel(forzar){
           const file = ev.target.files[0];
           ev.target.value = '';
           if(!file) return;
-          try{ imagenNueva = await prepararImagenToken(file); actualizarImagenNueva(); }
+          try{ imagenNueva = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX}); actualizarImagenNueva(); }
           catch(err){
+            if(err.message === 'cancelado') return;
             console.error('No se pudo preparar la imagen del token:', err);
             toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
           }

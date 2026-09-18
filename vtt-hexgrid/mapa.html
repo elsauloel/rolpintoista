@@ -487,6 +487,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
+  <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
   <div class="zoom">
@@ -781,11 +782,14 @@ try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(
    campanas/<partida>/elementos/{auto} (o mapas/{id}/elementos/{auto}):
    {tipo:'flor'|'linea'|'libre', origen:{col,fila}, celdas:[dq1,dr1,…]
    (offsets en cubo desde origen, sin rotar), rotacion (0/60/…/300),
-   color, alfa (0-100), solido (false por ahora: lo usa "Formas", todavía
-   sin construir), duenoUid, creado}. Atado a la grilla: se arrastra
-   casillero por casillero y se rota de a 60°, como un token. Lo mueven,
-   rotan o borran su dueño o el GM; cualquiera lo ve. */
-const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, duenoUid}
+   color, alfa (0-100), solido, invisible, imagen (textura de fondo,
+   opcional — cubre la caja del elemento como "cover"), fijado (pineado:
+   ya no se selecciona para mover/rotar, clickear y arrastrar mueve el
+   mapa como si fuera terreno), duenoUid, creado}. Atado a la grilla: se
+   arrastra casillero por casillero y se rota de a 60°, como un token.
+   Lo mueven, rotan, pinean o borran su dueño o el GM; cualquiera lo ve
+   (salvo invisible, que solo ve el GM). */
+const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, invisible, imagen, fijado, duenoUid}
 let elementoSeleccionado = null;
 let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
 let cortarElementosListener = null;
@@ -793,6 +797,7 @@ let terrenoTipo = 'flor';      // 'flor' | 'linea' | 'libre'
 let terrenoTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
 let terrenoColor = '#3F6FB0';
 let terrenoAlfa = 45;
+let terrenoImagen = '';       // data URL de la textura elegida; no se recuerda entre sesiones
 try{ terrenoTipo = localStorage.getItem('terreno-tipo') || terrenoTipo; }catch(e){}
 try{ terrenoTamano = parseInt(localStorage.getItem('terreno-tamano'), 10) || terrenoTamano; }catch(e){}
 try{ terrenoColor = localStorage.getItem('terreno-color') || terrenoColor; }catch(e){}
@@ -807,6 +812,7 @@ let formaTamano = 1;
 let formaColor = '#8A8A8A';
 let formaAlfa = 70;
 let formaInvisible = false;
+let formaImagen = '';         // data URL de la textura elegida; no se recuerda entre sesiones
 try{ formaTipo = localStorage.getItem('forma-tipo') || formaTipo; }catch(e){}
 try{ formaTamano = parseInt(localStorage.getItem('forma-tamano'), 10) || formaTamano; }catch(e){}
 try{ formaColor = localStorage.getItem('forma-color') || formaColor; }catch(e){}
@@ -1785,9 +1791,22 @@ function dibujar(){
   elementos.forEach((el, id) => {
     if(el.invisible && !soyGM) return;  // sólido invisible: solo lo ve el GM
     const celdas = celdasDeElemento(el);
-    trazarCeldas(celdas);
-    ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
-    ctx.fill();
+    const img = el.imagen ? imagenLista(el.imagen) : null;
+    if(img){
+      ctx.save();
+      trazarCeldas(celdas); ctx.clip();
+      const caja = cajaCeldas(celdas);
+      const escala = Math.max(caja.w / img.naturalWidth, caja.h / img.naturalHeight);
+      const iw = img.naturalWidth * escala, ih = img.naturalHeight * escala;
+      const cx = caja.minX + caja.w / 2, cy = caja.minY + caja.h / 2;
+      ctx.globalAlpha = el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100;
+      ctx.drawImage(img, cx - iw / 2, cy - ih / 2, iw, ih);
+      ctx.restore();
+    }else{
+      trazarCeldas(celdas);
+      ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
+      ctx.fill();
+    }
     bordeCeldas(celdas);
     if(el.invisible){
       // Solo GM: contorno punteado violeta, para no confundirlo con un
@@ -1816,12 +1835,28 @@ function dibujar(){
       ctx.setLineDash([]);
       if(puedeManipularElemento(el)){
         const c = hexCentro(el.origen.col, el.origen.fila);
-        const h = elementoManijaMundo(el);
-        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(h.x, h.y);
-        ctx.strokeStyle = 'rgba(79,168,224,.7)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
-        ctx.beginPath(); ctx.arc(h.x, h.y, 9 / z, 0, 2 * Math.PI);
-        ctx.fillStyle = '#4FA8E0'; ctx.fill();
+        if(!el.fijado){
+          const h = elementoManijaMundo(el);
+          ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(h.x, h.y);
+          ctx.strokeStyle = 'rgba(79,168,224,.7)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+          ctx.beginPath(); ctx.arc(h.x, h.y, 9 / z, 0, 2 * Math.PI);
+          ctx.fillStyle = '#4FA8E0'; ctx.fill();
+          ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+        }
+        // Botón de pinear/despinear: rojo y candado cerrado si ya está
+        // pineado (clic para soltarlo), celeste con 📌 si no (clic para
+        // fijarlo — pineado, se comporta como el terreno de abajo).
+        const p = elementoPinMundo(el);
+        ctx.beginPath(); ctx.arc(p.x, p.y, 9 / z, 0, 2 * Math.PI);
+        ctx.fillStyle = el.fijado ? '#D8524B' : '#4FA8E0';
+        ctx.fill();
         ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `${11 / z}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.fillText(el.fijado ? '🔓' : '📌', p.x, p.y + 0.5 / z);
+        ctx.restore();
       }
     }
   });
@@ -2152,25 +2187,41 @@ lienzo.addEventListener('pointerdown', e => {
       lienzo.style.cursor = 'crosshair';
       return;
     }
-    // Handle de rotación del elemento (terreno/formas) ya seleccionado.
+    // Botón de pinear/despinear y handle de rotación del elemento
+    // (terreno/formas) ya seleccionado.
     if(elementoSeleccionado && elementos.has(elementoSeleccionado)){
       const els = elementos.get(elementoSeleccionado);
       if(puedeManipularElemento(els)){
-        const h = elementoManijaMundo(els);
-        if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
-          rotandoElemento = {id: elementoSeleccionado};
-          lienzo.style.cursor = 'grabbing';
+        const p = elementoPinMundo(els);
+        if(Math.hypot(m.x - p.x, m.y - p.y) <= 12 / vista.zoom){
+          moverElemento(elementoSeleccionado, {fijado: !els.fijado});
           return;
+        }
+        if(!els.fijado){
+          const h = elementoManijaMundo(els);
+          if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
+            rotandoElemento = {id: elementoSeleccionado};
+            lienzo.style.cursor = 'grabbing';
+            return;
+          }
         }
       }
     }
     // Un elemento (terreno/formas) en esta casilla: seleccionarlo y, si se
-    // puede, prepararlo para arrastrarlo.
+    // puede y no está pineado, prepararlo para arrastrarlo. Pineado: se
+    // comporta como el terreno de abajo — clickear y arrastrar mueve el
+    // mapa, no el elemento (para eso está el botón de despinear).
     const casillaClic = mundoAHex(m.x, m.y);
     const idElemento = elementoEn(casillaClic.col, casillaClic.fila);
     if(idElemento){
+      const elHit = elementos.get(idElemento);
       elementoSeleccionar(idElemento);
-      if(puedeManipularElemento(elementos.get(idElemento))){
+      if(elHit.fijado){
+        paneo = {inicioX: px, inicioY: py, x: vista.x, y: vista.y};
+        lienzo.style.cursor = 'grabbing';
+        return;
+      }
+      if(puedeManipularElemento(elHit)){
         arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false};
         lienzo.style.cursor = 'grabbing';
       }
@@ -2299,12 +2350,21 @@ lienzo.addEventListener('pointermove', e => {
     const idTrazo = trazoEn(m.x, m.y);
     if(idTrazo){ lienzo.style.cursor = puedeManipularTrazo(trazos.get(idTrazo)) ? 'grab' : 'pointer'; return; }
     if(elementoSeleccionado && elementos.has(elementoSeleccionado) && puedeManipularElemento(elementos.get(elementoSeleccionado))){
-      const h = elementoManijaMundo(elementos.get(elementoSeleccionado));
-      if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
+      const els = elementos.get(elementoSeleccionado);
+      const p = elementoPinMundo(els);
+      if(Math.hypot(m.x - p.x, m.y - p.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'pointer'; return; }
+      if(!els.fijado){
+        const h = elementoManijaMundo(els);
+        if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
+      }
     }
     const casilla = mundoAHex(m.x, m.y);
     const idElemento = elementoEn(casilla.col, casilla.fila);
-    if(idElemento){ lienzo.style.cursor = puedeManipularElemento(elementos.get(idElemento)) ? 'grab' : 'pointer'; return; }
+    if(idElemento){
+      const elHover = elementos.get(idElemento);
+      lienzo.style.cursor = elHover.fijado ? 'default' : (puedeManipularElemento(elHover) ? 'grab' : 'pointer');
+      return;
+    }
     if(herramientaActiva === 'lapiz' || herramientaActiva === 'terreno' || herramientaActiva === 'formas'){ lienzo.style.cursor = 'crosshair'; return; }
   }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
@@ -2499,6 +2559,26 @@ function elementoManijaMundo(el){
   const r = HEX * 1.6;
   return {x: c.x - r * Math.sin(rad), y: c.y + r * Math.cos(rad)};
 }
+// Botón de pinear/despinear: siempre del lado opuesto a la manija de
+// rotar (mismo radio, 180° más), así nunca se pisan sea cual sea la
+// rotación.
+function elementoPinMundo(el){
+  const c = hexCentro(el.origen.col, el.origen.fila);
+  const rad = (el.rotacion + 180) * Math.PI / 180;
+  const r = HEX * 1.6;
+  return {x: c.x - r * Math.sin(rad), y: c.y + r * Math.cos(rad)};
+}
+// Caja (en el mundo) que envuelve todas las casillas, para que una
+// imagen de fondo la cubra entera ("cover", sin achatarse).
+function cajaCeldas(celdas){
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  celdas.forEach(c => {
+    const h = hexCentro(c.col, c.fila);
+    minX = Math.min(minX, h.x - HEX); maxX = Math.max(maxX, h.x + HEX);
+    minY = Math.min(minY, h.y - HEX); maxY = Math.max(maxY, h.y + HEX);
+  });
+  return {minX, minY, w: maxX - minX, h: maxY - minY};
+}
 
 function escucharElementos(){
   cortarElementosListener = coleccionElementos().onSnapshot(snap => {
@@ -2517,6 +2597,8 @@ function escucharElementos(){
         alfa: Math.max(10, Math.min(100, num(d.alfa) || 45)),
         solido: d.solido === true,
         invisible: d.invisible === true,
+        imagen: typeof d.imagen === 'string' ? d.imagen : '',
+        fijado: d.fijado === true,
         duenoUid: d.duenoUid,
       });
     });
@@ -2530,12 +2612,13 @@ async function guardarElemento(tipo, origen, celdasSet, esForma){
   celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
   if(!celdas.length) return;
   const invisible = !!(esForma && soyGM && formaInvisible);
+  const imagen = (esForma ? formaImagen : terrenoImagen) || '';
   try{
     await coleccionElementos().add({
       tipo, origen, celdas, rotacion: 0,
       color: esForma ? formaColor : terrenoColor,
       alfa: esForma ? formaAlfa : terrenoAlfa,
-      solido: !!esForma, invisible,
+      solido: !!esForma, invisible, imagen, fijado: false,
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -2755,12 +2838,13 @@ async function moverToken(id, col, fila, celdas){
 }
 
 // Mover libre: solo la casilla nueva. Se borra la ruta guardada para que
-// nadie vea estela.
+// nadie vea estela. El modo queda prendido para seguir moviendo sin
+// clickear 🦶 de nuevo — lo apaga el mismo botón, Esc o cambiar de
+// selección (activarMoverLibre, Escape más abajo, seleccionar()).
 async function moverTokenLibre(id, col, fila){
   const t = tokens.get(id);
-  moverLibre = null;
-  lienzo.style.cursor = 'default';
-  if(!t) return;
+  if(!t){ moverLibre = null; lienzo.style.cursor = 'default'; return; }
+  lienzo.style.cursor = 'crosshair';
   if(t.col === col && t.fila === fila){ pedirDibujo(); return; }
   const antes = {col: t.col, fila: t.fila, rutaJson: t.rutaJson};
   t.col = col; t.fila = fila; t.rutaJson = '[]';
@@ -3075,6 +3159,39 @@ function prepararImagenFondo(file){
           lado = Math.round(lado * 0.8); calidad = Math.max(0.6, calidad - 0.05);
         }
         dato.length < 900000 ? res(dato) : rej(new Error('muy-grande'));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+// Textura de fondo de un elemento de Terreno/Formas: se achica pero no
+// se recorta (no es cuadrada, cubre la caja del elemento como "cover"
+// al dibujarla — ver cajaCeldas).
+const ELEMENTO_IMG_LADO = 1200, ELEMENTO_IMG_MAX = 120000;
+function prepararImagenElemento(file){
+  return new Promise((res, rej) => {
+    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('bad-image'));
+      img.onload = () => {
+        let lado = ELEMENTO_IMG_LADO, calidad = 0.8, dato = '';
+        for(let i = 0; i < 8; i++){
+          const escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.naturalWidth * escala);
+          canvas.height = Math.round(img.naturalHeight * escala);
+          const c = canvas.getContext('2d');
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dato = canvas.toDataURL('image/jpeg', calidad);
+          if(dato.length < ELEMENTO_IMG_MAX) break;
+          lado = Math.round(lado * 0.8); calidad = Math.max(0.55, calidad - 0.06);
+        }
+        dato.length < ELEMENTO_IMG_MAX ? res(dato) : rej(new Error('muy-grande'));
       };
       img.src = lector.result;
     };
@@ -4283,6 +4400,19 @@ $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herram
 // exista cuando el toolkit se dibuja por primera vez.
 let bitacoraFlotanteAbierta = false;
 
+// Imagen de fondo (opcional) para el próximo elemento de Terreno/Formas
+// que se cree — el picker de "Elegir imagen"/"Cambiar"/"Quitar" bajo el
+// panel de cada herramienta, compartido entre las dos (prefijo
+// 'terreno'|'forma' elige qué variable tocar).
+function imagenElementoOpcionHtml(prefijo, imagen){
+  return `<label class="etiqueta">Imagen de fondo (opcional)</label>
+    <div class="fila" style="margin-top:0;align-items:center">
+      ${imagen ? `<img src="${imagen}" alt="" style="width:32px;height:32px;border-radius:4px;object-fit:cover;border:1px solid var(--line)">` : ''}
+      <button type="button" class="btn" data-elemento-imagen="${prefijo}">${imagen ? 'Cambiar' : 'Elegir imagen'}</button>
+      ${imagen ? `<button type="button" class="btn peligro" data-elemento-imagen-quitar="${prefijo}">Quitar</button>` : ''}
+    </div>`;
+}
+
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
   {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos sólidos: bloquean el paso y la trayectoria', lista: true},
@@ -4319,6 +4449,7 @@ function renderToolkit(){
         <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === terrenoColor ? ' elegido' : ''}" data-terreno-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
         <label class="etiqueta">Transparencia</label>
         <input type="range" id="terreno-alfa-slider" min="10" max="100" step="5" value="${terrenoAlfa}">
+        ${imagenElementoOpcionHtml('terreno', terrenoImagen)}
         <p class="tk-lapiz-ayuda">${terrenoTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : terrenoTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Transitable — no bloquea el paso (eso es "Formas").</p>
       </div>` : (h.id === 'formas' && activa) ? `<div class="tk-lapiz-opciones">
         <label class="etiqueta" style="margin-top:0">Forma</label>
@@ -4333,6 +4464,7 @@ function renderToolkit(){
         <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === formaColor ? ' elegido' : ''}" data-forma-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
         <label class="etiqueta">Transparencia</label>
         <input type="range" id="forma-alfa-slider" min="10" max="100" step="5" value="${formaAlfa}">
+        ${imagenElementoOpcionHtml('forma', formaImagen)}
         ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="forma-invisible-check"${formaInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
         <p class="tk-lapiz-ayuda">${formaTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : formaTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Sólido — bloquea ese casillero y cualquier ruta que lo cruce.${soyGM ? ' Invisible: solo vos ves el contorno (punteado violeta); sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
       </div>` : '';
@@ -4385,6 +4517,32 @@ $('#toolkit-lista').addEventListener('click', e => {
   if(tamanoForma){
     formaTamano = num(tamanoForma.dataset.formaTamano);
     try{ localStorage.setItem('forma-tamano', formaTamano); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  const imgElegir = e.target.closest('[data-elemento-imagen]');
+  if(imgElegir){
+    const prefijo = imgElegir.dataset.elementoImagen;
+    const entrada = $('#elemento-imagen-archivo');
+    entrada.onchange = async ev => {
+      const file = ev.target.files[0];
+      ev.target.value = '';
+      if(!file) return;
+      try{
+        const dato = await prepararImagenElemento(file);
+        if(prefijo === 'forma') formaImagen = dato; else terrenoImagen = dato;
+        renderToolkit();
+      }catch(err){
+        console.error('No se pudo preparar la imagen del elemento:', err);
+        toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+      }
+    };
+    entrada.click();
+    return;
+  }
+  const imgQuitar = e.target.closest('[data-elemento-imagen-quitar]');
+  if(imgQuitar){
+    if(imgQuitar.dataset.elementoImagenQuitar === 'forma') formaImagen = ''; else terrenoImagen = '';
     renderToolkit();
     return;
   }

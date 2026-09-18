@@ -138,10 +138,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   NPC) — no se achica con el zoom, a diferencia del nombre que se dibuja
   en el canvas debajo del token.
 - **🦶 Mover libre** (`moverLibre`, `moverTokenLibre`): botón del HUD que
-  lleva el token a otra casilla sin reglas (sin No2, sin estela, ignora
-  Inmovilizado): se arrastra el token o se toca la casilla destino; Esc
-  cancela. Lo ve el dueño en su PJ y el GM en cualquier token. Borra `ruta`
-  del documento; las reglas dejan al GM tocar `col`, `fila` y `ruta` de un PJ.
+  prende un "modo" (no una acción de una vez — decidido 2026-09-19): con
+  el botón activo, se arrastra el token o se toca la casilla destino
+  tantas veces como haga falta, sin No2, sin estela, ignorando
+  Inmovilizado, y el modo sigue prendido después de cada movimiento — ya
+  no hay que volver a tocar 🦶 para el siguiente. Lo apaga el mismo
+  botón (toggle), Esc, o cambiar la selección a otro token. Lo ve el
+  dueño en su PJ y el GM en cualquier token. Borra `ruta` del documento;
+  las reglas dejan al GM tocar `col`, `fila` y `ruta` de un PJ.
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
   barra vertical escondida a la izquierda del mapa; la pestaña del borde la
   abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
@@ -226,6 +230,35 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `elementoSeleccionado` es mutuamente excluyente con `seleccion` y
     `trazoSeleccionado` (`elementoSeleccionar` limpia los otros dos).
   - Se dibuja en el piso, debajo de los tokens y encima del fondo.
+  - **Imagen de fondo** (opcional, comparte mecanismo Terreno/Formas):
+    bajo la transparencia, en el panel de cada herramienta, "Elegir
+    imagen"/"Cambiar"/"Quitar" (`imagenElementoOpcionHtml`,
+    `#elemento-imagen-archivo` compartido) sube una textura que queda
+    guardada en `terrenoImagen`/`formaImagen` (data URL, **no** se
+    recuerda entre sesiones a propósito — a diferencia de color/tipo/
+    tamaño) y se pega al próximo elemento que se cree con esa
+    herramienta. `prepararImagenElemento` la achica preservando el
+    alto/ancho (no la recorta cuadrada — no tiene sentido para una
+    figura larga como una Línea) con tope ~120 KB
+    (`ELEMENTO_IMG_LADO`/`ELEMENTO_IMG_MAX`). Al dibujar, la imagen cubre
+    ("cover", `cajaCeldas` calcula la caja que envuelve todas las
+    casillas) el área del elemento, clipeada a su forma real (igual que
+    la imagen de un token); si no tiene imagen, sigue siendo el color
+    plano de siempre. No se puede cambiar la imagen de un elemento ya
+    creado (ídem color/alfa/tipo): para eso hay que borrarlo y crear uno
+    nuevo.
+  - **📌 Pinear / 🔓 despinear** (botón que aparece junto a la manija de
+    rotar al seleccionar un elemento que se puede manipular,
+    `elementoPinMundo` — mismo radio que la manija pero siempre del lado
+    opuesto, así nunca se pisan): un elemento pineado (`fijado: true`)
+    pasa a comportarse como el terreno de abajo — no se puede mover ni
+    rotar (la manija ni aparece) y clickear-y-arrastrar sobre él mueve
+    el mapa (paneo) en vez de arrastrarlo. Sigue siendo seleccionable
+    con un clic (sin arrastrar) para poder despinearlo después. Lo
+    pinea/despinea su dueño o el GM, igual que mover/rotar (reglas:
+    `fijado` sumado a los campos que se pueden tocar en un `update`).
+    Pensado para "asentar" un elemento ya bien puesto y no volver a
+    tocarlo por accidente al arrastrar el mapa alrededor.
 - **⬡ Formas** (cualquier miembro): mismo mecanismo que Terreno — mismo
   dato (`elementos`), mismas 3 formas al crear (Flor/Línea/Libre), mismo
   arrastre/rotación/borrado por dueño o GM — pero con `solido: true`:

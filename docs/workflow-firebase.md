@@ -222,19 +222,25 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
 - `campanas/{id}/elementos/{auto}` — `{tipo:'flor'|'linea'|'libre',
   origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
   sin rotar), rotacion (0/60/…/300), color, alfa (10-100), solido,
-  invisible (opcional, default false), duenoUid, creado}`. Terreno y
-  Formas del mapa (caja de herramientas ☣️/⬡), atados a la grilla
-  hexagonal a diferencia del lápiz. Cualquiera crea el suyo; moverlo
-  (`origen`), rotarlo (`rotacion`, a los 60°, como un token) o borrarlo
-  del todo: su dueño o el GM. Terreno (`solido: false`) son marcas
-  transitables (color + transparencia, sin efecto mecánico todavía).
-  Formas (`solido: true`) bloquean ese casillero y cualquier trayectoria
-  que lo cruce (`elementoSolidoEn`, "avisa y bloquea": no hay rodeo
-  automático, solo se frena el arrastre) — colisión solo contra Formas
-  por ahora, la de token-contra-token según bando queda pendiente (ver
+  invisible (opcional, default false), imagen (textura de fondo,
+  opcional, string vacío si no tiene), fijado, duenoUid, creado}`.
+  Terreno y Formas del mapa (caja de herramientas ☣️/⬡), atados a la
+  grilla hexagonal a diferencia del lápiz. Cualquiera crea el suyo;
+  moverlo (`origen`), rotarlo (`rotacion`, a los 60°, como un token),
+  pinearlo/despinearlo (`fijado`) o borrarlo del todo: su dueño o el GM.
+  `color`/`alfa`/`imagen` se fijan al crearlo, no se pueden cambiar
+  después. Terreno (`solido: false`) son marcas transitables (color o
+  imagen de fondo + transparencia, sin efecto mecánico todavía). Formas
+  (`solido: true`) bloquean ese casillero y cualquier trayectoria que lo
+  cruce (`elementoSolidoEn`, "avisa y bloquea": no hay rodeo automático,
+  solo se frena el arrastre) — colisión solo contra Formas por ahora, la
+  de token-contra-token según bando queda pendiente (ver
   `vtt-hexgrid/CLAUDE.md`, sección "Pendiente"). `invisible: true` (solo
   el GM lo puede poner, reglas lo exigen) hace que solo el GM vea el
-  contorno; los jugadores no lo ven pero igual colisiona.
+  contorno; los jugadores no lo ven pero igual colisiona. `fijado: true`
+  (pineado): no se puede mover ni rotar, se comporta como el terreno de
+  abajo (clickear y arrastrar mueve el mapa, no el elemento) — sigue
+  siendo del dueño o el GM despinearlo.
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

@@ -114,11 +114,12 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
   responder la parte mecánica: ¿qué hace cada uno al pisarlo o al
   quedarse (daño, No2 extra, estado alterado)? ¿Se aplica solo o es un
   recordatorio para el GM? *(2026-09-17)*
-- 🔲 **P45. Terreno con imágenes/texturas en vez de colores.** Se eligió
-  color + transparencia (sin base de texturas) para no complicar el
-  desarrollo; queda anotado para evaluar más adelante si conviene sumar
-  imágenes (nubes, humo, fuego, etc. con aspecto real) en vez de blobs de
-  color. *(2026-09-18)*
+- ✅ **P45. Terreno con imágenes/texturas en vez de colores.** Respondido
+  y construido 2026-09-19: no hace falta elegir entre una cosa u otra —
+  Terreno y Formas dejan subir una imagen de fondo opcional (sin base
+  propia, la sube cada uno; se achica y cubre la forma del elemento) que
+  se usa en vez del color plano si está puesta, ver
+  [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md).
 - 🔲 **P46. Colisión de Formas con pathfinding automático.** Se eligió
   "avisa y bloquea" (si la ruta arrastrada cruza un sólido, se bloquea la
   confirmación y el jugador la vuelve a dibujar a mano) en vez de que el

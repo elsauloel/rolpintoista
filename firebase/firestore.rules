@@ -313,12 +313,13 @@ service cloud.firestore {
       // Terreno y Formas del mapa (vtt-hexgrid/mapa.html, caja de
       // herramientas): {tipo:'flor'|'linea'|'libre', origen:{col,fila},
       // celdas:[dq1,dr1,…] (offsets en cubo desde origen), rotacion
-      // (0/60/…/300), color, alfa, solido, invisible, duenoUid, creado}.
-      // Cualquiera crea el suyo; moverlo, rotarlo (solo esos dos campos) o
-      // borrarlo del todo: su dueño o el GM. `invisible` (solo lo ve el
+      // (0/60/…/300), color, alfa, solido, invisible, imagen (textura de
+      // fondo, opcional), fijado, duenoUid, creado}. Cualquiera crea el
+      // suyo; moverlo, rotarlo o pinearlo/despinearlo (esos tres campos)
+      // o borrarlo del todo: su dueño o el GM. `invisible` (solo lo ve el
       // GM) solo lo puede prender el GM, y solo junto con `solido`.
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'duenoUid', 'creado'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'fijado', 'duenoUid', 'creado'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 200 && d.celdas.size() % 2 == 0
@@ -327,6 +328,8 @@ service cloud.firestore {
           && d.alfa is int && d.alfa >= 10 && d.alfa <= 100
           && d.solido is bool
           && (!('invisible' in d) || (d.invisible is bool && (d.invisible == false || d.solido == true)))
+          && d.imagen is string && d.imagen.size() < 130000
+          && d.fijado is bool
           && d.duenoUid is string;
       }
       match /elementos/{id} {
@@ -338,7 +341,7 @@ service cloud.firestore {
           && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado']);
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -411,7 +414,7 @@ service cloud.firestore {
             && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado']);
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

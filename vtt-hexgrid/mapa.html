@@ -664,6 +664,22 @@ function hexACubo(c){
   const r = c.fila - (c.col - (c.col & 1)) / 2;
   return {q, r, s: -q - r};
 }
+// Vecino del lado i (de la esquina i a la i+1): está en la dirección
+// 60·i grados, en cubo (dq,dr). Compartido por el aura hexagonal y los
+// elementos de terreno/formas.
+const VECINO_LADO = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
+// Rota (dq,dr,ds) 60° (sentido horario en pantalla) "pasos" veces —
+// mismo sentido que la rotación de tokens y trazos (0° = abajo).
+function rotarCubo(dq, dr, pasos){
+  let q = dq, r = dr, s = -dq - dr;
+  for(let i = 0; i < ((pasos % 6) + 6) % 6; i++){ const nq = -r, nr = -s; s = -q; q = nq; r = nr; }
+  return {dq: q, dr: r};
+}
+// La inversa de hexACubo: col es literalmente q (así se armó hexACubo), y
+// fila hay que reconstruirla con el mismo ajuste de paridad que usa esa
+// función, solo que sobre col en vez de sobre r.
+function cuboACol(q, r){ return q; }
+function cuboAFila(q, r){ return r + (q - (q & 1)) / 2; }
 function mismoHex(a, b){ return a.col === b.col && a.fila === b.fila; }
 function distanciaHex(a, b){
   const A = hexACubo(a), B = hexACubo(b);
@@ -735,6 +751,8 @@ let moverFondo = false;       // GM: arrastrar mueve el fondo en vez de la vista
 let arrastreFondo = null;     // {inicioX, inicioY, x, y}
 let arrastreTrazo = null;     // {id, dx, dy, inicioX, inicioY, movio}: arrastra un trazo permanente
 let rotandoTrazo = null;      // {id, cx, cy} (cx,cy: centro en pantalla, fijo durante el arrastre)
+let arrastreElemento = null;  // {id, inicioX, inicioY, movio}: arrastra un elemento de terreno/formas
+let rotandoElemento = null;   // {id}
 let panelMapas = false;       // GM: panel de mapas guardados abierto
 
 /* ---------- Lápiz (caja de herramientas) ----------
@@ -752,6 +770,27 @@ let lapizColor = '#E0A458';
 let lapizPermanente = false;
 try{ lapizColor = localStorage.getItem('lapiz-color') || lapizColor; }catch(e){}
 try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(e){}
+
+/* ---------- Terreno y Formas (caja de herramientas) ----------
+   campanas/<partida>/elementos/{auto} (o mapas/{id}/elementos/{auto}):
+   {tipo:'flor'|'linea'|'libre', origen:{col,fila}, celdas:[dq1,dr1,…]
+   (offsets en cubo desde origen, sin rotar), rotacion (0/60/…/300),
+   color, alfa (0-100), solido (false por ahora: lo usa "Formas", todavía
+   sin construir), duenoUid, creado}. Atado a la grilla: se arrastra
+   casillero por casillero y se rota de a 60°, como un token. Lo mueven,
+   rotan o borran su dueño o el GM; cualquiera lo ve. */
+const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, duenoUid}
+let elementoSeleccionado = null;
+let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
+let cortarElementosListener = null;
+let terrenoTipo = 'flor';      // 'flor' | 'linea' | 'libre'
+let terrenoTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
+let terrenoColor = '#3F6FB0';
+let terrenoAlfa = 45;
+try{ terrenoTipo = localStorage.getItem('terreno-tipo') || terrenoTipo; }catch(e){}
+try{ terrenoTamano = parseInt(localStorage.getItem('terreno-tamano'), 10) || terrenoTamano; }catch(e){}
+try{ terrenoColor = localStorage.getItem('terreno-color') || terrenoColor; }catch(e){}
+try{ terrenoAlfa = parseInt(localStorage.getItem('terreno-alfa'), 10) || terrenoAlfa; }catch(e){}
 
 /* ---------- Varios mapas guardados ----------
    campanas/<partida>/mapas/{id} = {nombre, creado}: la lista de mapas que
@@ -787,8 +826,8 @@ function rutaMapaEstado(doc){
 // poder cortarlos al cambiar de mapa y no quedarse escuchando el anterior.
 let cortarFondo1 = null, cortarFondo2 = null, cortarModo = null, cortarIniciativa = null, cortarTokensListener = null;
 function cortarEscuchasMapa(){
-  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener].forEach(f => f && f());
-  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = null;
+  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener, cortarElementosListener].forEach(f => f && f());
+  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = cortarElementosListener = null;
 }
 
 // Cambia qué mapa está cargado: corta lo anterior, limpia lo que se venía
@@ -802,6 +841,7 @@ function cambiarMapaMostrado(nuevoId){
   tokens.clear(); visibles.clear(); estelas.clear();
   if(seleccion) seleccionar(null);
   trazos.clear(); trazoSeleccionado = null;
+  elementos.clear(); elementoSeleccionado = null;
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';
   iniciativa = {orden: [], turno: 0, ronda: 1};
@@ -810,6 +850,7 @@ function cambiarMapaMostrado(nuevoId){
   escucharIniciativa();
   escucharTokens();
   escucharTrazos();
+  escucharElementos();
   actualizarBotonMapas();
   renderModo();
   renderIniciativa();
@@ -911,10 +952,10 @@ async function borrarMapa(id){
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }
   try{
     const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
-    const [tokensDocs, estadoDocs, trazosDocs] = await Promise.all([
-      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(),
+    const [tokensDocs, estadoDocs, trazosDocs, elementosDocs] = await Promise.all([
+      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(), base.collection('elementos').get(),
     ]);
-    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs].map(d => d.ref).concat([base]);
+    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs].map(d => d.ref).concat([base]);
     for(let i = 0; i < refs.length; i += 450){
       const lote = fbDb.batch();
       refs.slice(i, i + 450).forEach(r => lote.delete(r));
@@ -1587,16 +1628,13 @@ function dibujarAuraHex(centro, aura, z){
   for(let dq = -R; dq <= R; dq++){
     for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++){
       const r = C.r + dr, q = C.q + dq;
-      const col = q + (r - (r & 1)) / 2;
-      const h = hexCentro(col, r);
+      const col = cuboACol(q, r);
+      const h = hexCentro(col, cuboAFila(q, r));
       trazarHex(h.x, h.y);
       if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) === R) borde.push({h, dq, dr});
     }
   }
   ctx.fillStyle = colorConAlfa(aura.color, 0.18); ctx.fill();
-  // Lado i del hexágono (de la esquina i a la i+1): el vecino de ese lado
-  // está en la dirección 60·i grados, que en cubo es VECINO_LADO[i].
-  const VECINO_LADO = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
   ctx.beginPath();
   borde.forEach(({h, dq, dr}) => {
     VECINO_LADO.forEach(([vq, vr], i) => {
@@ -1702,6 +1740,63 @@ function dibujar(){
   // Casilla de origen marcada apenas, como referencia.
   ctx.beginPath(); trazarHex(0, 0);
   ctx.strokeStyle = 'rgba(224,164,88,.45)'; ctx.lineWidth = 2 / z; ctx.stroke();
+
+  // Elementos de terreno/formas: van pegados al piso, debajo de los tokens.
+  const trazarCeldas = (celdas) => {
+    ctx.beginPath();
+    celdas.forEach(c => { const h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+  };
+  const bordeCeldas = (celdas) => {
+    const set = new Set(celdas.map(c => c.col + ',' + c.fila));
+    ctx.beginPath();
+    celdas.forEach(c => {
+      const cubo = hexACubo(c);
+      const h = hexCentro(c.col, c.fila);
+      VECINO_LADO.forEach(([vq, vr], i) => {
+        const nq = cubo.q + vq, nr = cubo.r + vr;
+        if(set.has(cuboACol(nq, nr) + ',' + cuboAFila(nq, nr))) return;
+        const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+        ctx.moveTo(h.x + a[0], h.y + a[1]);
+        ctx.lineTo(h.x + b[0], h.y + b[1]);
+      });
+    });
+  };
+  elementos.forEach((el, id) => {
+    const celdas = celdasDeElemento(el);
+    trazarCeldas(celdas);
+    ctx.fillStyle = colorConAlfa(el.color, el.alfa / 100 * 0.7);
+    ctx.fill();
+    bordeCeldas(celdas);
+    ctx.strokeStyle = colorConAlfa(el.color, Math.min(1, el.alfa / 100 + 0.25));
+    ctx.lineWidth = 2 / z;
+    ctx.stroke();
+    if(id === elementoSeleccionado){
+      ctx.setLineDash([6 / z, 5 / z]);
+      ctx.strokeStyle = 'rgba(237,227,210,.85)';
+      ctx.lineWidth = 1.5 / z;
+      bordeCeldas(celdas); ctx.stroke();
+      ctx.setLineDash([]);
+      if(puedeManipularElemento(el)){
+        const c = hexCentro(el.origen.col, el.origen.fila);
+        const h = elementoManijaMundo(el);
+        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(h.x, h.y);
+        ctx.strokeStyle = 'rgba(79,168,224,.7)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+        ctx.beginPath(); ctx.arc(h.x, h.y, 9 / z, 0, 2 * Math.PI);
+        ctx.fillStyle = '#4FA8E0'; ctx.fill();
+        ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+      }
+    }
+  });
+  // El elemento que se está armando ahora mismo (línea o forma libre).
+  if(dibujandoElemento){
+    const c0 = hexACubo(dibujandoElemento.origen);
+    const celdas = [...dibujandoElemento.celdas.values()].map(({dq, dr}) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
+    trazarCeldas(celdas);
+    ctx.fillStyle = colorConAlfa(terrenoColor, 0.35);
+    ctx.fill();
+    bordeCeldas(celdas);
+    ctx.strokeStyle = terrenoColor; ctx.lineWidth = 2 / z; ctx.stroke();
+  }
 
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
   // de movimientos recientes (se desvanecen).
@@ -2018,11 +2113,48 @@ lienzo.addEventListener('pointerdown', e => {
       lienzo.style.cursor = 'crosshair';
       return;
     }
+    // Handle de rotación del elemento (terreno/formas) ya seleccionado.
+    if(elementoSeleccionado && elementos.has(elementoSeleccionado)){
+      const els = elementos.get(elementoSeleccionado);
+      if(puedeManipularElemento(els)){
+        const h = elementoManijaMundo(els);
+        if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
+          rotandoElemento = {id: elementoSeleccionado};
+          lienzo.style.cursor = 'grabbing';
+          return;
+        }
+      }
+    }
+    // Un elemento (terreno/formas) en esta casilla: seleccionarlo y, si se
+    // puede, prepararlo para arrastrarlo.
+    const casillaClic = mundoAHex(m.x, m.y);
+    const idElemento = elementoEn(casillaClic.col, casillaClic.fila);
+    if(idElemento){
+      elementoSeleccionar(idElemento);
+      if(puedeManipularElemento(elementos.get(idElemento))){
+        arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false};
+        lienzo.style.cursor = 'grabbing';
+      }
+      return;
+    }
+    // Terreno activo: crea un elemento nuevo (flor de un clic; línea/libre
+    // se arman arrastrando, ver pointermove/soltar).
+    if(herramientaActiva === 'terreno'){
+      elementoSeleccionar(null);
+      if(terrenoTipo === 'flor'){
+        guardarElemento('flor', casillaClic, celdasFlor(terrenoTamano));
+      }else{
+        dibujandoElemento = {tipo: terrenoTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
+        lienzo.style.cursor = 'crosshair';
+      }
+      return;
+    }
     // Con el engranaje abierto, el primer clic en el mapa solo lo cierra:
     // así no se pierde lo que se estaba por guardar.
     if(hudGlobo){ hudCerrar(); renderPanel(); pedirDibujo(); return; }
     seleccionar(null);
     trazoSeleccionar(null);
+    elementoSeleccionar(null);
     if(moverFondo && soyGM && fondo){
       arrastreFondo = {inicioX: px, inicioY: py, x: fondo.x, y: fondo.y};
       lienzo.style.cursor = 'move';
@@ -2037,6 +2169,41 @@ lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
   if(dibujando){
     dibujando.puntos.push(pantallaAMundo(px, py));
+    pedirDibujo();
+    return;
+  }
+  if(dibujandoElemento){
+    const m = pantallaAMundo(px, py);
+    const casilla = mundoAHex(m.x, m.y);
+    const c0 = hexACubo(dibujandoElemento.origen), c1 = hexACubo(casilla);
+    if(dibujandoElemento.tipo === 'linea'){
+      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, terrenoTamano);
+      dibujandoElemento.celdas = new Map(celdas.map(c => [`${c.dq},${c.dr}`, c]));
+    }else{
+      dibujandoElemento.celdas.set(`${c1.q - c0.q},${c1.r - c0.r}`, {dq: c1.q - c0.q, dr: c1.r - c0.r});
+    }
+    pedirDibujo();
+    return;
+  }
+  if(arrastreElemento){
+    if(!arrastreElemento.movio && Math.hypot(px - arrastreElemento.inicioX, py - arrastreElemento.inicioY) < 4) return;
+    arrastreElemento.movio = true;
+    const els = elementos.get(arrastreElemento.id);
+    if(els){ const m = pantallaAMundo(px, py); els.origen = mundoAHex(m.x, m.y); }
+    pedirDibujo();
+    return;
+  }
+  if(rotandoElemento){
+    const els = elementos.get(rotandoElemento.id);
+    if(els){
+      const m = pantallaAMundo(px, py);
+      const c = hexCentro(els.origen.col, els.origen.fila);
+      const dx = m.x - c.x, dy = m.y - c.y;
+      if(Math.hypot(dx, dy) > 6 / vista.zoom){
+        const ang = (Math.atan2(-dx, dy) * 180 / Math.PI + 360) % 360;
+        els.rotacion = Math.round(ang / 60) * 60 % 360;
+      }
+    }
     pedirDibujo();
     return;
   }
@@ -2090,7 +2257,14 @@ lienzo.addEventListener('pointermove', e => {
     }
     const idTrazo = trazoEn(m.x, m.y);
     if(idTrazo){ lienzo.style.cursor = puedeManipularTrazo(trazos.get(idTrazo)) ? 'grab' : 'pointer'; return; }
-    if(herramientaActiva === 'lapiz'){ lienzo.style.cursor = 'crosshair'; return; }
+    if(elementoSeleccionado && elementos.has(elementoSeleccionado) && puedeManipularElemento(elementos.get(elementoSeleccionado))){
+      const h = elementoManijaMundo(elementos.get(elementoSeleccionado));
+      if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
+    }
+    const casilla = mundoAHex(m.x, m.y);
+    const idElemento = elementoEn(casilla.col, casilla.fila);
+    if(idElemento){ lienzo.style.cursor = puedeManipularElemento(elementos.get(idElemento)) ? 'grab' : 'pointer'; return; }
+    if(herramientaActiva === 'lapiz' || herramientaActiva === 'terreno'){ lienzo.style.cursor = 'crosshair'; return; }
   }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
@@ -2140,6 +2314,26 @@ function soltar(){
     rotandoTrazo = null;
     const t = trazos.get(a.id);
     if(t) moverTrazo(a.id, {rotacion: t.rotacion});
+    pedirDibujo();
+  }
+  if(dibujandoElemento){
+    const d = dibujandoElemento;
+    dibujandoElemento = null;
+    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
+    pedirDibujo();
+  }
+  if(arrastreElemento){
+    const a = arrastreElemento;
+    arrastreElemento = null;
+    const els = elementos.get(a.id);
+    if(a.movio && els) moverElemento(a.id, {origen: {col: els.origen.col, fila: els.origen.fila}});
+    pedirDibujo();
+  }
+  if(rotandoElemento){
+    const a = rotandoElemento;
+    rotandoElemento = null;
+    const els = elementos.get(a.id);
+    if(els) moverElemento(a.id, {rotacion: els.rotacion});
     pedirDibujo();
   }
   if(arrastre){
@@ -2199,11 +2393,15 @@ document.addEventListener('keydown', e => {
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
-  if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); }
+  if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); elementoSeleccionar(null); }
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
   if((e.key === 'Delete' || e.key === 'Backspace') && trazoSeleccionado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
     borrarTrazo(trazoSeleccionado);
     trazoSeleccionar(null);
+  }
+  if((e.key === 'Delete' || e.key === 'Backspace') && elementoSeleccionado && puedeManipularElemento(elementos.get(elementoSeleccionado))){
+    borrarElemento(elementoSeleccionado);
+    elementoSeleccionar(null);
   }
 });
 
@@ -2222,6 +2420,86 @@ function coleccionTrazos(){
 
 function puedeManipularTrazo(t){
   return !!(t && fbUsuario && (soyGM || t.duenoUid === fbUsuario.uid));
+}
+
+function coleccionElementos(){
+  return mapaMostrado === MAPA_PRINCIPAL
+    ? fbDb.collection(fbRutaCampana('elementos'))
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/elementos`));
+}
+function puedeManipularElemento(el){
+  return !!(el && fbUsuario && (soyGM || el.duenoUid === fbUsuario.uid));
+}
+// Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
+// rotado). {col,fila} absolutos.
+function celdasDeElemento(el){
+  return el.celdas.map(({dq, dr}) => {
+    const rot = rotarCubo(dq, dr, el.rotacion / 60);
+    const c0 = hexACubo(el.origen);
+    const q = c0.q + rot.dq, r = c0.r + rot.dr;
+    return {col: cuboACol(q, r), fila: cuboAFila(q, r)};
+  });
+}
+function elementoEn(col, fila){
+  const lista = [...elementos.entries()].reverse();
+  for(const [id, el] of lista){
+    if(celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return id;
+  }
+  return null;
+}
+// Handle para rotar (60° por paso), a un costado de la casilla origen.
+function elementoManijaMundo(el){
+  const c = hexCentro(el.origen.col, el.origen.fila);
+  const rad = el.rotacion * Math.PI / 180;
+  const r = HEX * 1.6;
+  return {x: c.x - r * Math.sin(rad), y: c.y + r * Math.cos(rad)};
+}
+
+function escucharElementos(){
+  cortarElementosListener = coleccionElementos().onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ elementos.delete(ch.doc.id); if(elementoSeleccionado === ch.doc.id) elementoSeleccionado = null; return; }
+      const d = ch.doc.data();
+      const crudo = Array.isArray(d.celdas) ? d.celdas : [];
+      const celdas = [];
+      for(let i = 0; i + 1 < crudo.length; i += 2) celdas.push({dq: num(crudo[i]), dr: num(crudo[i + 1])});
+      elementos.set(ch.doc.id, {
+        tipo: d.tipo === 'linea' || d.tipo === 'libre' ? d.tipo : 'flor',
+        origen: {col: Math.round(num(d.origen && d.origen.col)), fila: Math.round(num(d.origen && d.origen.fila))},
+        celdas,
+        rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
+        color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#3F6FB0',
+        alfa: Math.max(10, Math.min(100, num(d.alfa) || 45)),
+        solido: d.solido === true,
+        duenoUid: d.duenoUid,
+      });
+    });
+    pedirDibujo();
+  }, err => console.error('Error escuchando los elementos del mapa:', err));
+}
+
+async function guardarElemento(tipo, origen, celdasSet){
+  if(!fbUsuario) return;
+  const celdas = [];
+  celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
+  if(!celdas.length) return;
+  try{
+    await coleccionElementos().add({
+      tipo, origen, celdas, rotacion: 0, color: terrenoColor, alfa: terrenoAlfa, solido: false,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo crear el elemento:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear');
+  }
+}
+async function moverElemento(id, cambios){
+  try{ await coleccionElementos().doc(id).update(cambios); }
+  catch(err){ console.error('No se pudo mover el elemento:', err); toast('No se pudo mover'); }
+}
+async function borrarElemento(id){
+  try{ await coleccionElementos().doc(id).delete(); }
+  catch(err){ console.error('No se pudo borrar el elemento:', err); toast('No se pudo borrar'); }
 }
 
 // Simplifica una línea a mano alzada (Douglas-Peucker): sacar puntos que
@@ -2340,6 +2618,28 @@ function trazoManijaMundo(t){
   const rad = t.rotacion * Math.PI / 180;
   const r = HEX * 0.9;
   return {x: t.origen.x - r * Math.sin(rad), y: t.origen.y + r * Math.cos(rad)};
+}
+
+// Casilleros de una "flor": el centro y los que están a R pasos o menos.
+function celdasFlor(R){
+  const res = [];
+  for(let dq = -R; dq <= R; dq++){
+    for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++) res.push({dq, dr});
+  }
+  return res;
+}
+// Línea recta de N casilleros (contando el origen) en la dirección más
+// cercana a "hacia" (offset cubo aproximado, no hace falta que sea exacto).
+function celdasLinea(hacia, N){
+  let mejor = 0, mejorD = Infinity;
+  VECINO_LADO.forEach(([dq, dr], i) => {
+    const d = Math.hypot(hacia.dq - dq, hacia.dr - dr);
+    if(d < mejorD){ mejorD = d; mejor = i; }
+  });
+  const [pq, pr] = VECINO_LADO[mejor];
+  const res = [];
+  for(let i = 0; i < N; i++) res.push({dq: pq * i, dr: pr * i});
+  return res;
 }
 
 function trazoEn(x, y){
@@ -2796,7 +3096,7 @@ function seleccionar(id){
   if(seleccion === id && !creando) return;
   if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
   seleccion = id;
-  if(id){ creando = false; trazoSeleccionado = null; }
+  if(id){ creando = false; trazoSeleccionado = null; elementoSeleccionado = null; }
   renderPanel();
   pedirDibujo();
 }
@@ -2804,7 +3104,14 @@ function seleccionar(id){
 function trazoSeleccionar(id){
   if(trazoSeleccionado === id) return;
   trazoSeleccionado = id;
-  if(id && seleccion) seleccionar(null);
+  if(id){ if(seleccion) seleccionar(null); elementoSeleccionado = null; }
+  pedirDibujo();
+}
+
+function elementoSeleccionar(id){
+  if(elementoSeleccionado === id) return;
+  elementoSeleccionado = id;
+  if(id){ if(seleccion) seleccionar(null); trazoSeleccionado = null; }
   pedirDibujo();
 }
 
@@ -3949,7 +4256,7 @@ let bitacoraFlotanteAbierta = false;
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
   {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos con forma de hexágono'},
-  {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Arena movediza, veneno, arena tóxica…'},
+  {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Nubes, charcos, fuego… transitables, con color y transparencia', lista: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
 ];
@@ -3969,6 +4276,20 @@ function renderToolkit(){
         <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === lapizColor ? ' elegido' : ''}" data-lapiz-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
         <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> Dibujo permanente</label>
         <p class="tk-lapiz-ayuda">${lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.'}</p>
+      </div>` : (h.id === 'terreno' && activa) ? `<div class="tk-lapiz-opciones">
+        <label class="etiqueta" style="margin-top:0">Forma</label>
+        <select id="terreno-tipo-select">
+          <option value="flor"${terrenoTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
+          <option value="linea"${terrenoTipo === 'linea' ? ' selected' : ''}>Línea</option>
+          <option value="libre"${terrenoTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
+        </select>
+        ${terrenoTipo !== 'libre' ? `<label class="etiqueta">${terrenoTipo === 'flor' ? 'Radio' : 'Largo'}</label>
+        <div class="fila" style="margin-top:0">${[1, 2, 3].map(n => `<button type="button" class="btn${terrenoTamano === n ? ' primary' : ''}" data-terreno-tamano="${n}">${n}</button>`).join('')}</div>` : ''}
+        <label class="etiqueta">Color</label>
+        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === terrenoColor ? ' elegido' : ''}" data-terreno-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+        <label class="etiqueta">Transparencia</label>
+        <input type="range" id="terreno-alfa-slider" min="10" max="100" step="5" value="${terrenoAlfa}">
+        <p class="tk-lapiz-ayuda">${terrenoTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : terrenoTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Transitable — no bloquea el paso (eso es "Formas").</p>
       </div>` : '';
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
@@ -3994,6 +4315,20 @@ $('#toolkit-lista').addEventListener('click', e => {
     renderToolkit();
     return;
   }
+  const colorTerreno = e.target.closest('[data-terreno-color]');
+  if(colorTerreno){
+    terrenoColor = colorTerreno.dataset.terrenoColor;
+    try{ localStorage.setItem('terreno-color', terrenoColor); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  const tamano = e.target.closest('[data-terreno-tamano]');
+  if(tamano){
+    terrenoTamano = num(tamano.dataset.terrenoTamano);
+    try{ localStorage.setItem('terreno-tamano', terrenoTamano); }catch(err){}
+    renderToolkit();
+    return;
+  }
   const b = e.target.closest('[data-herramienta]');
   if(!b) return;
   const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
@@ -4004,10 +4339,23 @@ $('#toolkit-lista').addEventListener('click', e => {
   renderToolkit();
 });
 $('#toolkit-lista').addEventListener('change', e => {
-  if(e.target.id !== 'lapiz-permanente-check') return;
-  lapizPermanente = e.target.checked;
-  try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}
-  renderToolkit();
+  if(e.target.id === 'lapiz-permanente-check'){
+    lapizPermanente = e.target.checked;
+    try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  if(e.target.id === 'terreno-tipo-select'){
+    terrenoTipo = e.target.value;
+    try{ localStorage.setItem('terreno-tipo', terrenoTipo); }catch(err){}
+    renderToolkit();
+  }
+});
+$('#toolkit-lista').addEventListener('input', e => {
+  if(e.target.id === 'terreno-alfa-slider'){
+    terrenoAlfa = num(e.target.value);
+    try{ localStorage.setItem('terreno-alfa', terrenoAlfa); }catch(err){}
+  }
 });
 renderToolkit();
 

@@ -82,9 +82,37 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P36. Defensa de los creeps en las Acciones.** La Botonera de los personajes muestra Defensa y Resistencia a críticos con su 🔍. ¿Se suma lo mismo en las Acciones de los creeps? *(2026-09-17)*
 - 🔲 **P37. Versión para celular.** Decidido: por ahora solo compu. Se retoma solo si se pide. *(2026-09-17)*
 - 🔲 **P38. Caja de herramientas del mapa: quién usa qué.** La barra de la izquierda la ven todos. ¿Lápiz, Formas y Terreno son para todos o algunas solo del GM? *(2026-09-17)*
-- 🔲 **P39. Lápiz.** ¿Los trazos los ven todos y quedan guardados, o se borran solos al rato? ¿Colores y grosor? ¿Quién los borra? *(2026-09-17)*
-- 🔲 **P40. Formas hexagonales.** ¿Qué objetos son (paredes, cajas, obstáculos)? ¿Bloquean el movimiento o la vista, o son solo dibujo? *(2026-09-17)*
-- 🔲 **P41. Terreno (arena movediza, veneno, arena tóxica…).** ¿Qué hace cada uno al pisarlo o al quedarse (daño, No2 extra, estado alterado)? ¿Se aplica solo o es un recordatorio para el GM? *(2026-09-17)*
+- ✅ **P39. Lápiz.** Respondido 2026-09-18: por default el trazo se ve unos
+  segundos y se borra solo (como una estela); tildando "Dibujo
+  permanente" queda como un objeto que se mueve y rota. Colores: paleta
+  fija de 10, sin grosor configurable. Lo borra su dueño o el GM
+  (si es permanente); si no es permanente, cualquiera (para que no quede
+  huérfano). Construido en `vtt-hexgrid/mapa.html` ✏️, ver
+  [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md).
+- 🔲 **P40. Formas hexagonales.** Parcialmente respondido: son objetos
+  sólidos (bloquean casillero y trayectoria, a diferencia de Terreno que
+  es transitable); el GM además va a poder crear sólidos **invisibles
+  para los jugadores** (él ve el contorno, ellos nada) para marcar sobre
+  el fondo del mapa qué partes ya dibujadas son intransitables, sin que
+  se note un dibujo extra. Falta construir del todo. *(2026-09-17,
+  ampliado 2026-09-18)*
+- 🔲 **P41. Terreno (arena movediza, veneno, arena tóxica…).** La parte
+  visual (color + transparencia sobre la grilla, sin base de imágenes) ya
+  está construida — ver P45 y
+  [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md). Sigue sin
+  responder la parte mecánica: ¿qué hace cada uno al pisarlo o al
+  quedarse (daño, No2 extra, estado alterado)? ¿Se aplica solo o es un
+  recordatorio para el GM? *(2026-09-17)*
+- 🔲 **P45. Terreno con imágenes/texturas en vez de colores.** Se eligió
+  color + transparencia (sin base de texturas) para no complicar el
+  desarrollo; queda anotado para evaluar más adelante si conviene sumar
+  imágenes (nubes, humo, fuego, etc. con aspecto real) en vez de blobs de
+  color. *(2026-09-18)*
+- 🔲 **P46. Colisión de Formas con pathfinding automático.** Se eligió
+  "avisa y bloquea" (si la ruta arrastrada cruza un sólido, se bloquea la
+  confirmación y el jugador la vuelve a dibujar a mano) en vez de que el
+  mapa calcule solo el rodeo más corto; queda anotado para evaluar más
+  adelante si conviene sumar pathfinding automático. *(2026-09-18)*
 - 🔲 **P42. Grilla del mapa girada 30° (código).** La grilla pasó de hexágonos "de punta arriba" a "de lado arriba" para poder rotar tokens con el frente alineado a un lado (no a un vértice). Esto corre la posición en pantalla de todo lo que ya estaba puesto: el fondo (imagen del mapa) va a quedar desalineado y hay que volver a ajustarlo (arrastrar + ancho en casillas), y los tokens que ya estaban en el tablero conviene revisarlos y, si hace falta, reacomodarlos a mano. *(2026-09-17)*
 - ✅ **P44. "Esp" con dos significados en `docs/clases-borrador.md`.**
   Respondido 2026-09-18: **Special Power se abrevia siempre "SP"**, nunca

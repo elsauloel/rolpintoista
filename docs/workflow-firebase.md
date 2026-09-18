@@ -199,11 +199,13 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
     esquema que `mapa/*`.
   - `mapas/{mapaId}/tokens/{auto}` — mismo esquema que `tokens/{auto}`.
   - `mapas/{mapaId}/trazos/{auto}` — mismo esquema que `trazos/{auto}`.
+  - `mapas/{mapaId}/elementos/{auto}` — mismo esquema que
+    `elementos/{auto}`.
   El GM puede estar mirando (y armando) un mapa distinto del que está
   publicado; los jugadores siempre ven el publicado. Borrar un mapa borra
-  sus `estado/*`, `tokens/*` y `trazos/*` primero (Firestore no lo hace
-  solo) y, si era el publicado o el que el GM estaba mirando, vuelve al
-  principal.
+  sus `estado/*`, `tokens/*`, `trazos/*` y `elementos/*` primero
+  (Firestore no lo hace solo) y, si era el publicado o el que el GM
+  estaba mirando, vuelve al principal.
 - `campanas/{id}/trazos/{auto}` — `{puntos: [x1,y1,x2,y2,…] (ya suavizado
   y simplificado, relativos a origen), origen: {x,y}, rotacion, color,
   grosor, permanente, duenoUid, creado}`. El lápiz del mapa
@@ -213,6 +215,17 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   quede huérfano si el que lo dibujó se desconectó. `permanente: true`:
   queda como un objeto que se mueve (`origen`) y se rota (`rotacion`,
   libre, no a los 60°) — eso, y borrarlo del todo, solo su dueño o el GM.
+- `campanas/{id}/elementos/{auto}` — `{tipo:'flor'|'linea'|'libre',
+  origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
+  sin rotar), rotacion (0/60/…/300), color, alfa (10-100), solido
+  (false por ahora — lo usa Formas, todavía sin construir), duenoUid,
+  creado}`. Terreno y Formas del mapa (caja de herramientas ☣️/⬡),
+  atados a la grilla hexagonal a diferencia del lápiz. Cualquiera crea el
+  suyo; moverlo (`origen`), rotarlo (`rotacion`, a los 60°, como un
+  token) o borrarlo del todo: su dueño o el GM. Terreno son marcas
+  transitables (color + transparencia, sin efecto mecánico todavía);
+  Formas (sin construir) va a usar `solido: true` para bloquear casillero
+  y trayectoria.
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

@@ -145,10 +145,11 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
   barra vertical escondida a la izquierda del mapa; la pestaña del borde la
   abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
-  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Formas y
-  Terreno figuran como "Pronto" hasta diseñarlas (una herramienta lista
-  lleva `lista: true` y se activa en `herramientaActiva`). Preguntas en
-  `docs/preguntas-abiertas.md` (P38–P41, P40–P41 siguen abiertas para
+  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Formas
+  todavía figura como "Pronto" (una herramienta lista lleva `lista: true`
+  y se activa en `herramientaActiva`); Terreno ya está armada. Preguntas
+  en `docs/preguntas-abiertas.md` (P38 sigue abierta para saber si Formas
+  también es de cualquiera o solo del GM; P40–P41 para el resto de
   Formas/Terreno). **📖 Bitácora** es la excepción: no es un modo de
   dibujo, así que su clic no toca `herramientaActiva` — abre o cierra del
   todo `#bitacora-flotante` (`abrirBitacoraFlotante`, recordado en
@@ -183,6 +184,47 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
+- **☣️ Terreno** (cualquier miembro): crea marcas de terreno transitables
+  atadas a la grilla hexagonal — nubes, humo, charcos, fuego, lo que haga
+  falta narrativamente — con color y transparencia configurables. No hay
+  base de imágenes/texturas: es un color semitransparente sobre las
+  casillas (decidido 2026-09-18: colores en vez de imágenes; queda
+  anotado en `docs/preguntas-abiertas.md` P45 para evaluar imágenes más
+  adelante). Vive en `campanas/{id}/elementos` (o `mapas/{id}/elementos`,
+  mismo patrón que tokens/trazos) como `{tipo:'flor'|'linea'|'libre',
+  origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
+  sin rotar), rotacion (0/60/…/300), color, alfa (10-100), solido (false
+  por ahora — lo usa Formas, sin construir todavía), duenoUid, creado}`.
+  - **3 formas al crear** (elegidas en el panel bajo el botón ☣️, con el
+    tipo activo en `terrenoTipo`): **Flor** (radio 1/2/3 — mismo cálculo
+    de anillos que `dibujarAuraHex`, `celdasFlor`) se crea de un solo
+    clic; **Línea** (largo 1/2/3, `celdasLinea`) y **Forma libre**
+    (`dibujandoElemento`, agrega cada casilla que el mouse pisa) se arman
+    arrastrando desde el primer clic hasta soltar.
+  - Una vez creado: se selecciona (clic sobre cualquiera de sus casillas,
+    `elementoEn`, hit-test exacto por casillero — no por geometría como
+    el trazo libre), se arrastra para reubicarlo (traslada `origen`,
+    sigue atado a la grilla) y se rota de a 60° con un handle celeste a
+    `HEX*1.6` de su casillero origen (`elementoManijaMundo`/
+    `rotandoElemento`, mismo criterio 0°=abajo/sentido horario que
+    tokens y trazos, pero encajado a 60° como un token). Delete/Backspace
+    lo borra. Lo mueven, rotan o borran su dueño o el GM
+    (`puedeManipularElemento`); cualquiera lo ve y lo selecciona (para
+    mirarlo), aunque no lo pueda mover.
+  - `celdasDeElemento(el)` calcula las casillas absolutas que ocupa ahora
+    (origen + cada offset, rotado con `rotarCubo`) — ahí se apoya
+    selección, arrastre, hit-test y colisión futura de Formas.
+    **`cuboACol`/`cuboAFila`** son la inversa de `hexACubo` (col es
+    literalmente `q`; fila hay que reconstruirla con el mismo ajuste de
+    paridad que usa `hexACubo`, pero sobre `col`, no sobre `r`) — antes
+    de este arreglo (2026-09-18) la fórmula vieja de `cuboACol`
+    desplazaba mal las casillas rotadas o vecinas, bug que ya traía
+    `dibujarAuraHex` desde antes (las auras de radio > 0 podían quedar
+    corridas) y que se coló a Terreno al compartir la función; se
+    corrigieron los dos usos.
+  - `elementoSeleccionado` es mutuamente excluyente con `seleccion` y
+    `trazoSeleccionado` (`elementoSeleccionar` limpia los otros dos).
+  - Se dibuja en el piso, debajo de los tokens y encima del fondo.
 - **Bitácora flotante** (`#bitacora-flotante`): mismo dato y mismos
   permisos que la de la ficha (`campanas/{id}/bitacora/{página}` +
   `entradas/{id}`, todos leen, cualquiera suma/corrige, borra el autor o

@@ -1836,7 +1836,11 @@ function dibujar(){
     if(img){
       ctx.save();
       trazarCeldas(celdas); ctx.clip();
-      const caja = cajaCeldas(celdas);
+      // La imagen vive en el marco sin rotar y gira junto con el elemento
+      // alrededor de su casilla origen.
+      const co = hexCentro(el.origen.col, el.origen.fila);
+      ctx.translate(co.x, co.y); ctx.rotate((el.rotacion || 0) * Math.PI / 180); ctx.translate(-co.x, -co.y);
+      const caja = cajaCeldas(celdasDeElemento(el, true));
       const escala = Math.max(caja.w / img.naturalWidth, caja.h / img.naturalHeight) * (el.imgZoom || 1);
       const iw = img.naturalWidth * escala, ih = img.naturalHeight * escala;
       const cx = caja.minX + caja.w / 2 + (el.imgDX || 0), cy = caja.minY + caja.h / 2 + (el.imgDY || 0);
@@ -2658,9 +2662,9 @@ function puedeManipularElemento(el){
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
 // rotado). {col,fila} absolutos.
-function celdasDeElemento(el){
+function celdasDeElemento(el, sinRotar){
   return el.celdas.map(({dq, dr}) => {
-    const rot = rotarCubo(dq, dr, el.rotacion / 60);
+    const rot = rotarCubo(dq, dr, sinRotar ? 0 : el.rotacion / 60);
     const c0 = hexACubo(el.origen);
     const q = c0.q + rot.dq, r = c0.r + rot.dr;
     return {col: cuboACol(q, r), fila: cuboAFila(q, r)};
@@ -2848,7 +2852,7 @@ function renderEditorElemento(){
   }
   let V = null;
   if(tieneImagen && img){
-    const cajaMundo = cajaCeldas(celdasDeElemento(el));
+    const cajaMundo = cajaCeldas(celdasDeElemento(el, true));
     const dispScale = Math.min(230 / cajaMundo.w, 170 / cajaMundo.h);
     V = {w: Math.round(cajaMundo.w * dispScale), h: Math.round(cajaMundo.h * dispScale), dispScale, caja: cajaMundo};
   }

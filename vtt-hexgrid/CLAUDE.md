@@ -300,7 +300,11 @@ nuevo de Rol Pintoísta. Paso 2 de
     ("cover", `cajaCeldas` calcula la caja que envuelve todas las
     casillas) el área del elemento, clipeada a su forma real (igual que
     la imagen de un token); si no tiene imagen, sigue siendo el color
-    plano de siempre.
+    plano de siempre. **La imagen gira con el elemento** (arreglado
+    2026-09-19): se calcula sobre las casillas sin rotar
+    (`celdasDeElemento(el, true)`) y el canvas se rota alrededor de la
+    casilla origen; `imgDX`/`imgDY` están en ese marco sin rotar, y el
+    visor del ⚙️ también lo muestra sin rotar.
   - **📌 Pinear / 🔓 despinear** (botón que aparece junto a la manija de
     rotar al seleccionar un elemento que se puede manipular,
     `elementoPinMundo` — mismo radio que la manija pero siempre del lado

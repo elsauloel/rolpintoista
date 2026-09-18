@@ -4980,8 +4980,12 @@ function bitacoraRender(){
     lista.innerHTML = '<div class="bit-vacia">Sin conexión con la partida.</div>';
     return;
   }
-  // No redibujar las pestañas mientras alguien les cambia el nombre.
-  if(!tabs.contains(document.activeElement)){
+  // No redibujar las pestañas mientras alguien les cambia el nombre (pero
+  // sí después de clickear una flecha o borrar: el foco queda en ese
+  // botón, que también está adentro de #bitacora-tabs).
+  const editandoNombre = document.activeElement && document.activeElement.matches
+    && document.activeElement.matches('[data-bit-nombre]') && tabs.contains(document.activeElement);
+  if(!editandoNombre){
     const idx = bitacoraPaginas.findIndex(p => p.id === bitacoraActiva);
     const activa = idx >= 0 ? bitacoraPaginas[idx] : null;
     // Una sola pestaña a la vez (la activa) con flechas para pasar de

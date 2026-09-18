@@ -4844,16 +4844,16 @@ function nivelSocialTxt(i){
 }
 function formulaSocial(i){
   const caras = dadoCarasSocial(i);
-  const inte = inteligenciaValor();
+  const inte = inteligenciaBudget().resto;
   return caras > 0 ? `1d${caras}+${inte}` : `+${inte}`;
 }
 function tiradaSocialTxt(i){
   const caras = dadoCarasSocial(i);
-  return `Tira ${caras ? `1d${caras} + ` : ''}Inteligencia (${fmt(inteligenciaValor())})`;
+  return `Tira ${caras ? `1d${caras} + ` : ''}Inteligencia sin invertir (${fmt(inteligenciaBudget().resto)})`;
 }
 function tirarSocial(i){
   const r = tirarDados(formulaSocial(i));
-  if(!r) return;
+  if(!r){ toast(`${i.nombre}: sin nivel ni Inteligencia sin invertir — no hay nada que tirar`); return; }
   registrarTirada(i.nombre, r);
 }
 
@@ -7981,7 +7981,7 @@ function lupaHtml(clave){
     if(num(it.puntosInt)) h += lupaFila('· de Inteligencia invertida', fmt(num(it.puntosInt)));
     if(num(it.nivelExtra)) h += lupaFila('· de tirada máxima', fmt(num(it.nivelExtra)));
     h += lupaFila('Dado (nivel × 2 caras)', caras ? `d${fmt(caras)}` : 'ninguno todavía');
-    h += lupaFila('Inteligencia (total, no lo que queda por invertir)', fmt(inteligenciaValor()));
+    h += lupaFila('Inteligencia sin invertir', fmt(inteligenciaBudget().resto));
     h += lupaFila('Tirada', esc(formulaSocial(it)), 'lupa-total');
     return {titulo: it.nombre, html: lupaSeccion('De dónde sale', h) + sinCosto};
   }

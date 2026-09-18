@@ -73,9 +73,10 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   (Inteligencia invertida) y `nivelExtra` (subidas por sacar una tirada
   máxima, sin costo) — `nivel = puntosInt + nivelExtra`
   (`nivelSocial`), dado = nivel × 2 caras (`dadoCarasSocial`; nivel 0 =
-  sin dado). La tirada es siempre `1d(nivel×2) + Inteligencia` —el total,
-  no lo que queda por invertir— (`formulaSocial`, `tirarSocial`); ya no
-  se escribe un dado a mano (se sacó `dado` de `SCHEMA.sociales.campos`).
+  sin dado). La tirada es siempre `1d(nivel×2) + Inteligencia sin
+  invertir` —`inteligenciaBudget().resto`, no el total— (`formulaSocial`,
+  `tirarSocial`); ya no se escribe un dado a mano (se sacó `dado` de
+  `SCHEMA.sociales.campos`).
   El botón "+ Nivel" de cada una (`abrirNivelSocial`, modal
   `#scrim-nivel-social`) ofrece "por Inteligencia" (elegís cuántos puntos,
   se descuentan del presupuesto — `nivelarSocialPorInteligencia`) o "por

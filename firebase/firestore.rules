@@ -223,10 +223,13 @@ service cloud.firestore {
             && iniciativaPropia(resource.data, request.resource.data));
       }
 
-      // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo crea, mueve y
-      // edita solo su dueño. tipo 'creep': solo el GM. El GM además puede
-      // reasignar el dueño de un PJ (solo ese campo) y sacar cualquier token.
-      // fichaId (opcional): la ficha (pj) o el creep al que está vinculado.
+      // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo mueve y edita
+      // solo su dueño; lo crea su dueño, o el GM a nombre de otro jugador
+      // (para armar el token de cada uno de antemano en un mapa sin
+      // publicar). tipo 'creep': solo el GM, siempre a su propio nombre. El
+      // GM además puede reasignar el dueño de un PJ ya creado (solo ese
+      // campo) y sacar cualquier token. fichaId (opcional): la ficha (pj) o
+      // el creep al que está vinculado.
       function tokenValido(d) {
         return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto'])
           && (!('fichaId' in d) || (d.fichaId is string && d.fichaId.size() <= 64))
@@ -249,10 +252,14 @@ service cloud.firestore {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
           && tokenValido(request.resource.data)
-          && request.resource.data.duenoUid == request.auth.uid
           && request.resource.data.creado == request.time
-          && (request.resource.data.tipo == 'pj' || esGM(c))
-          && (!('oculto' in request.resource.data) || esGM(c));
+          && (!('oculto' in request.resource.data) || esGM(c))
+          && (
+            (request.resource.data.tipo == 'pj'
+              && (request.resource.data.duenoUid == request.auth.uid || esGM(c)))
+            || (request.resource.data.tipo == 'creep' && esGM(c)
+              && request.resource.data.duenoUid == request.auth.uid)
+          );
         allow update: if esMiembro(c)
           && tokenValido(request.resource.data)
           && request.resource.data.tipo == resource.data.tipo
@@ -296,10 +303,14 @@ service cloud.firestore {
           allow read: if esMiembro(c);
           allow create: if esMiembro(c)
             && tokenValido(request.resource.data)
-            && request.resource.data.duenoUid == request.auth.uid
             && request.resource.data.creado == request.time
-            && (request.resource.data.tipo == 'pj' || esGM(c))
-            && (!('oculto' in request.resource.data) || esGM(c));
+            && (!('oculto' in request.resource.data) || esGM(c))
+            && (
+              (request.resource.data.tipo == 'pj'
+                && (request.resource.data.duenoUid == request.auth.uid || esGM(c)))
+              || (request.resource.data.tipo == 'creep' && esGM(c)
+                && request.resource.data.duenoUid == request.auth.uid)
+            );
           allow update: if esMiembro(c)
             && tokenValido(request.resource.data)
             && request.resource.data.tipo == resource.data.tipo

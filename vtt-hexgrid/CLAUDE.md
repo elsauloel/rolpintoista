@@ -121,6 +121,17 @@ nuevo de Rol Pintoísta. Paso 2 de
   esconde al elegir un vínculo). El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
+- **El GM crea un token de "pj" a nombre de otro jugador** (panel "Nuevo
+  token", solo si `soyGM`): la lista de "Vincular a" muestra las fichas de
+  todos los jugadores (no solo las del GM, que normalmente no tiene) con
+  el dueño al lado (`opcionesVinculo(tipo, elegido, todasLasFichas)`), y
+  aparece un selector "Dueño" (`opcionesDueno`, mismo formato que "Cambiar
+  dueño" del panel de edición) que arranca en el dueño de la ficha
+  elegida y se puede cambiar a mano. Sirve para armar de antemano el token
+  de cada jugador en un mapa guardado que todavía no se publicó (ver
+  "Varios mapas guardados" más abajo) — el jugador después ya lo puede
+  mover, no hace falta reasignarlo aparte. Las reglas lo permiten: crear
+  un token "pj" con `duenoUid` de otro solo si `esGM(c)`.
 - **Cartel del token seleccionado** (`#token-etiqueta`, `actualizarEtiquetaToken`,
   llamada desde `hudUbicar`): fijo arriba a la derecha del mapa, con el
   nombre y, entre paréntesis, el dueño (el jugador, o "GM" en un creep o
@@ -225,7 +236,8 @@ nuevo de Rol Pintoísta. Paso 2 de
   al pie de la Mesa flotante y la grilla se abre al costado.
 
 Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
-la interfaz: el GM **no** mueve tokens de PJ (solo reasigna el dueño).
+la interfaz: el GM **no** mueve un token de PJ ya creado (solo reasigna el
+dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
 
 - **Dados 3D** (`../comun/dados3d.js`, también en gm-tools): cada tirada
   nueva de la Mesa rueda encima del mapa y cae en el resultado real. En la

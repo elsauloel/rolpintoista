@@ -43,7 +43,13 @@ versión parecida en más de una, es candidato a juntar.
   (`mesaEscuchar`) y, en la ficha/gm-tools, armar la cajita flotante
   arrastrable (`mesaIniciar(alEntrar)`). Cada herramienta solo define
   `MESA_DESDE` (`'ficha'|'gm'|'mapa'`) y `mesaQuien(origen)` (quién tira);
-  el mapa además define `MESA_AVISAR_SIN_SESION`. Depende de
+  el mapa además define `MESA_AVISAR_SIN_SESION`. Achicada (`.colapsada`),
+  la ficha y gm-tools muestran igual la última tirada real (no las líneas
+  de sistema) en `#mesa-resumen`, con su detalle completo — mismo
+  contenido que la fila verde de `#mesa-cuerpo` (`mesaFilaContenido`,
+  compartido entre las dos); clic ahí también agranda la cajita. El CSS de
+  `#mesa-resumen` va en cada herramienta (no en este archivo, que es solo
+  JS); el mapa no lo tiene, su Mesa no es la flotante. Depende de
   `comun/tiradas.js` (fórmulas), `comun/efectos-golpe.js` (líneas
   resaltadas) y `comun/dados3d.js`/`comun/grilla-dados.js` (botones de la
   cabecera).

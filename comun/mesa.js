@@ -80,6 +80,20 @@ function mesaClaseQuien(t){
   return t.quien ? 'mesa-q-aliado' : 'mesa-q-neutra';
 }
 
+// Contenido de una fila de tirada normal (no las líneas del sistema ni las
+// de efectos al golpear, que arman lo suyo aparte): lo usa cada fila de
+// #mesa-cuerpo y, si existe, el resumen de la última tirada (#mesa-resumen,
+// lo único que se ve con la cajita achicada — ver mesaRender más abajo).
+function mesaFilaContenido(t){
+  const quien = t.quien || t.jugador || '?';
+  const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
+  const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
+  return `<span class="mesa-total">${fmt(num(t.total))}</span>` +
+    `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
+    `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+    (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
+}
+
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
@@ -87,6 +101,16 @@ function mesaRender(docs){
   // La última tirada (no las líneas del sistema) va con fondo verde.
   const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
+  // Resumen de esa misma última tirada: solo existe en la Mesa flotante
+  // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
+  // #mesa-resumen en cada herramienta.
+  const resumen = document.getElementById('mesa-resumen');
+  if(resumen){
+    resumen.classList.toggle('con-tirada', !!ultima);
+    resumen.innerHTML = ultima
+      ? mesaFilaContenido(ultima.data({serverTimestamps: 'estimate'}))
+      : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
+  }
   let hayAjena = false;
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
@@ -115,17 +139,9 @@ function mesaRender(docs){
       cuerpo.appendChild(div);
       return;
     }
-    const quien = t.quien || t.jugador || '?';
-    // Personaje o creep en color y, entre paréntesis, quién lo maneja.
-    const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
-    const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
     const div = document.createElement('div');
     div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
-    div.innerHTML =
-      `<span class="mesa-total">${fmt(num(t.total))}</span>` +
-      `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-      `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
-      (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
+    div.innerHTML = mesaFilaContenido(t);
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });
@@ -162,6 +178,7 @@ async function mesaIniciar(alEntrar){
     '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
       fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
+    '<div id="mesa-resumen"></div>' +
     '<div id="mesa-cuerpo"></div>' +
     '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>' +
     '<div id="mesa-grilla"><button type="button" class="btn" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button></div>';
@@ -245,6 +262,8 @@ async function mesaIniciar(alEntrar){
     if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
     if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) aplicarColapso(!mesa.classList.contains('colapsada'));
   };
+  // Solo se ve con la cajita achicada (ver CSS): un clic ahí también la agranda.
+  $('#mesa-resumen').onclick = () => aplicarColapso(false);
 
   // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
   const entrada = await fbEntrarAPartida();

@@ -2206,7 +2206,7 @@ async function crearToken(datos){
       nombre: datos.nombre,
       color: datos.color,
       tipo: datos.tipo,
-      duenoUid: fbUsuario.uid,
+      duenoUid: datos.duenoUid || fbUsuario.uid,
       col: casilla.col,
       fila: casilla.fila,
       creado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2500,18 +2500,21 @@ function conectarColores(caja, alElegir){
 
 // Opciones para vincular un token: los personajes propios (jugador) o los
 // creeps (GM), según el tipo de token.
-function opcionesVinculo(tipo, elegido){
+// todasLasFichas: el GM armando el token de otro jugador ve las fichas de
+// todos (con el nombre de su dueño al lado), no solo las suyas propias.
+function opcionesVinculo(tipo, elegido, todasLasFichas){
   let lista;
   if(tipo === 'creep'){
     lista = [...creepsPub.entries()].sort((a, b) => num(a[1].orden) - num(b[1].orden));
   }else{
-    // Cada personaje propio y, debajo, sus invocaciones.
+    // Cada personaje (propio, o todos si todasLasFichas) y, debajo, sus invocaciones.
     lista = [];
     [...fichasPub.entries()]
-      .filter(([, f]) => f.duenoUid === fbUsuario.uid)
+      .filter(([, f]) => todasLasFichas || f.duenoUid === fbUsuario.uid)
       .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'))
       .forEach(([id, f]) => {
-        lista.push([id, f]);
+        const dueno = todasLasFichas ? nombreMiembro(f.duenoUid) : '';
+        lista.push([id, {...f, nombre: dueno ? `${f.nombre} — ${dueno}` : f.nombre}]);
         ((f.resumen && f.resumen.invocaciones) || []).forEach(inv => {
           lista.push([id + SEP_INVOCACION + inv.id, {nombre: `   ↳ ${inv.nombre || 'Invocación'} (invocación de ${f.nombre})`}]);
         });
@@ -2520,6 +2523,14 @@ function opcionesVinculo(tipo, elegido){
   const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
   return '<option value="">Sin vincular</option>' + lista.map(([id, v]) =>
     `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`
+  ).join('');
+}
+
+// Lista de miembros para elegir dueño de un token de tipo "pj" (igual
+// formato que el selector de "Cambiar dueño" del panel de edición).
+function opcionesDueno(elegido){
+  return [...miembros.entries()].map(([uid, m]) =>
+    `<option value="${esc(uid)}"${uid === elegido ? ' selected' : ''}>${esc(m.nombre)}${m.gm ? ' (GM)' : ''}</option>`
   ).join('');
 }
 
@@ -2774,7 +2785,8 @@ function renderPanel(forzar){
       '<h2>Nuevo token</h2>' +
       (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' +
         '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde gris.</p>' : '') +
-      `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '')}</select>` +
+      `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
+      '<div id="nuevo-dueno-caja"></div>' +
       '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
       '<div id="nuevo-imagen"></div>' +
       '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
@@ -2814,19 +2826,37 @@ function renderPanel(forzar){
     actualizarImagenNueva();
     conectarColores(panel, c => { color = c; actualizarImagenNueva(); });
     const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
+    // Dueño: solo el GM lo elige, y solo para un token de tipo "pj" — el
+    // token queda de quien se elija acá, no de quien lo crea (para poder
+    // armar el token de cada jugador de antemano en un mapa que todavía no
+    // se publicó). Arranca en el dueño de la ficha vinculada, si hay.
+    const actualizarDueno = duenoSugerido => {
+      const caja = $('#nuevo-dueno-caja');
+      if(!soyGM || tipoActual() !== 'pj'){ caja.innerHTML = ''; return; }
+      const previo = $('#nuevo-dueno') ? $('#nuevo-dueno').value : '';
+      caja.innerHTML = '<label class="etiqueta">Dueño (quién lo mueve)</label>' +
+        `<select id="nuevo-dueno">${opcionesDueno(duenoSugerido || previo)}</select>`;
+    };
+    actualizarDueno();
     const alVincular = () => {
       const id = $('#nuevo-vinculo').value;
       const vv = id ? vinculo({tipo: tipoActual(), fichaId: id}) : null;
       if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
+      actualizarDueno(vv && vv.duenoUid);
       actualizarImagenNueva();
     };
     $('#nuevo-vinculo').onchange = alVincular;
-    if(soyGM) $('#nuevo-tipo').onchange = () => { $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), ''); actualizarImagenNueva(); };
+    if(soyGM) $('#nuevo-tipo').onchange = () => {
+      $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), '', true);
+      actualizarDueno();
+      actualizarImagenNueva();
+    };
     const crear = () => {
       const nombre = $('#nuevo-nombre').value.trim();
       if(!nombre){ $('#nuevo-nombre').focus(); return; }
       const fichaId = $('#nuevo-vinculo').value;
-      crearToken({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva});
+      const duenoUid = soyGM && tipoActual() === 'pj' && $('#nuevo-dueno') ? $('#nuevo-dueno').value : undefined;
+      crearToken({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva, duenoUid});
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
@@ -2883,9 +2913,8 @@ function renderPanel(forzar){
     `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
     (soyGM && t.tipo === 'pj'
       ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de cuenta)</label>' +
-        '<div class="fila" style="margin-top:0"><select id="token-dueno">' +
-        [...miembros.entries()].map(([uid, m]) => `<option value="${esc(uid)}"${uid === t.duenoUid ? ' selected' : ''}>${esc(m.nombre)}${m.gm ? ' (GM)' : ''}</option>`).join('') +
-        '</select><button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
+        `<div class="fila" style="margin-top:0"><select id="token-dueno">${opcionesDueno(t.duenoUid)}</select>` +
+        '<button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
       : '') +
     '<div class="fila">' +
       (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +

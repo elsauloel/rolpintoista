@@ -207,9 +207,13 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
     `elementos/{auto}`.
   El GM puede estar mirando (y armando) un mapa distinto del que está
   publicado; los jugadores siempre ven el publicado. Borrar un mapa borra
-  sus `estado/*`, `tokens/*`, `trazos/*` y `elementos/*` primero
-  (Firestore no lo hace solo) y, si era el publicado o el que el GM
-  estaba mirando, vuelve al principal.
+  sus `estado/*`, `tokens/*`, `trazos/*`, `elementos/*` y `pings/*`
+  primero (Firestore no lo hace solo) y, si era el publicado o el que el
+  GM estaba mirando, vuelve al principal.
+- `campanas/{id}/pings/{auto}` — `{x, y, duenoUid, creado}`. El ping del
+  mapa (clic derecho, caja de herramientas): siempre efímero (`PING_MS`
+  1,8 s), nadie lo edita, cualquiera lo borra — el que lo ve programa su
+  propio borrado, igual que un trazo no permanente.
 - `campanas/{id}/trazos/{auto}` — `{puntos: [x1,y1,x2,y2,…] (ya suavizado
   y simplificado, relativos a origen), origen: {x,y}, rotacion, color,
   grosor, permanente, duenoUid, creado}`. El lápiz del mapa
@@ -221,15 +225,20 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   libre, no a los 60°) — eso, y borrarlo del todo, solo su dueño o el GM.
 - `campanas/{id}/elementos/{auto}` — `{tipo:'flor'|'linea'|'libre',
   origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
-  sin rotar), rotacion (0/60/…/300), color, alfa (10-100), solido,
-  invisible (opcional, default false), imagen (textura de fondo,
-  opcional, string vacío si no tiene), fijado, duenoUid, creado}`.
-  Terreno y Formas del mapa (caja de herramientas ☣️/⬡), atados a la
-  grilla hexagonal a diferencia del lápiz. Cualquiera crea el suyo;
-  moverlo (`origen`), rotarlo (`rotacion`, a los 60°, como un token),
-  pinearlo/despinearlo (`fijado`) o borrarlo del todo: su dueño o el GM.
-  `color`/`alfa`/`imagen` se fijan al crearlo, no se pueden cambiar
-  después. Terreno (`solido: false`) son marcas transitables (color o
+  sin rotar; hasta 6000 números = 3000 casilleros — antes 200, se subió
+  2026-09-19 para que el tamaño se pueda pedir bien grande), rotacion
+  (0/60/…/300), color, alfa (10-100), solido, invisible (opcional,
+  default false), imagen (textura de fondo, opcional, string vacío si no
+  tiene), imgZoom/imgDX/imgDY (cómo se acomoda esa textura dentro de la
+  forma — 1/0/0 si no se tocó), fijado, duenoUid, creado}`. Terreno y
+  Formas del mapa (caja de herramientas ☣️/⬡), atados a la grilla
+  hexagonal a diferencia del lápiz. Cualquiera crea el suyo; después, su
+  dueño o el GM lo mueven (`origen`), rotan (`rotacion`, a los 60°, como
+  un token), pinean/despinean (`fijado`) o **editan** (`color`, `alfa`,
+  `imagen` y su acomodo — panel ⚙️, ver `vtt-hexgrid/CLAUDE.md`) — o lo
+  borran del todo. `tipo`/`celdas`/`solido` no se editan, para eso se
+  borra y se crea uno nuevo. Terreno (`solido: false`) son marcas
+  transitables (color o
   imagen de fondo + transparencia, sin efecto mecánico todavía). Formas
   (`solido: true`) bloquean ese casillero y cualquier trayectoria que lo
   cruce (`elementoSolidoEn`, "avisa y bloquea": no hay rodeo automático,

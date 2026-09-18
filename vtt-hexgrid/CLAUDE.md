@@ -290,6 +290,32 @@ nuevo de Rol Pintoísta. Paso 2 de
   - Un sólido visible (no invisible) se dibuja con un borde de
     advertencia fijo (rojo) además de su color elegido, para que se note
     que bloquea el paso más allá de qué color tenga.
+  - **Tamaño con número, no botones** (decidido 2026-09-19): el radio de
+    Flor o el largo de Línea se escribe en un `<input type=number>`
+    (`#terreno-tamano-input`/`#forma-tamano-input`, `TAMANO_ELEMENTO_MAX`
+    = 30) en vez de elegir entre 1/2/3 — se puede pedir uno mucho más
+    grande. El `input` actualiza en vivo sin recortar (para no pelear con
+    lo que se está tipeando); el `change` (al salir del campo) sí lo
+    encaja entre 1 y 30 y lo guarda en `localStorage`. El tope real de
+    casilleros lo pone Firestore (`celdas.size() <= 6000`, ver
+    `docs/workflow-firebase.md`) — a radio 30 una Flor usa ~2800.
+  - **⚙️ Editar un elemento ya creado** (botón que aparece junto a rotar
+    y pinear al seleccionarlo, a 90° de la manija de rotar —
+    `elementoGearMundo`, `abrirEditorElemento`/`renderEditorElemento` en
+    `#elem-edit`, panel flotante a la derecha del mapa, sin tapar la
+    Mesa): deja cambiar color, transparencia e imagen (elegirla,
+    cambiarla, quitarla, y si tiene, arrastrarla/hacerle zoom dentro de
+    su forma — mismo mecanismo de cover que al dibujarla, con
+    `imgZoom`/`imgDX`/`imgDY` guardados en el elemento). Todo se aplica
+    **en vivo** sobre el elemento de verdad apenas se toca un control
+    (`vivo()` muta el objeto en memoria y llama `pedirDibujo()`), así se
+    ve cómo queda en el mapa de una, sin adivinar — recién se guarda de
+    verdad en Firestore al tocar "Guardar"; "Cancelar", la ✕ o Esc
+    reponen los valores de antes de abrir el editor
+    (`editandoElemento.original`). `tipo`/`celdas`/`solido` no se pueden
+    tocar ahí — para eso hay que borrar el elemento y crear uno nuevo.
+    Cambiar de elemento seleccionado, o que lo borren mientras se edita,
+    cierra el editor solo (cancelando lo que no se había guardado).
 - **Bitácora flotante** (`#bitacora-flotante`): mismo dato y mismos
   permisos que la de la ficha (`campanas/{id}/bitacora/{página}` +
   `entradas/{id}`, todos leen, cualquiera suma/corrige, borra el autor o
@@ -382,6 +408,17 @@ nuevo de Rol Pintoísta. Paso 2 de
   🎲 Dados en la barra de arriba; se despliega debajo con D4…D100 × 1–6 y
   cada clic publica la tirada en la Mesa. En ficha y gm-tools el botón está
   al pie de la Mesa flotante y la grilla se abre al costado.
+- **Ping (clic derecho en el mapa)**: un anillo que se expande y se apaga
+  solo (`PING_MS` 1,8 s), con el nombre de quién lo mandó — "miren acá",
+  para todos, sin tener que ir a buscar ningún botón (decidido
+  2026-09-19: clic derecho, no doble clic — hoy no hace nada en el
+  lienzo, así que no choca con nada; `contextmenu` se cancela ahí para
+  que no salga el menú del navegador). Anda con cualquier herramienta
+  activa, sin tocar selección ni arrastre. Vive en `campanas/{id}/pings`
+  (o `mapas/{id}/pings`, mismo patrón que trazos/elementos): `{x, y,
+  duenoUid, creado}`, siempre efímero — nadie lo edita ni lo borra a
+  mano, se borra solo (`escucharPings`, mismo mecanismo de auto-borrado
+  que un trazo no permanente).
 
 Los permisos los imponen las reglas (`../firebase/firestore.rules`), no solo
 la interfaz: el GM **no** mueve un token de PJ ya creado (solo reasigna el

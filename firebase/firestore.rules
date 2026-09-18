@@ -310,26 +310,51 @@ service cloud.firestore {
           && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
       }
 
+      // Ping del mapa (vtt-hexgrid/mapa.html, clic derecho): {x, y,
+      // duenoUid, creado}. Siempre efímero — nadie lo edita, y cualquiera
+      // lo puede borrar (se borra solo a los pocos segundos; así no queda
+      // huérfano si el que lo mandó se fue).
+      function pingValido(d) {
+        return d.keys().hasOnly(['x', 'y', 'duenoUid', 'creado'])
+          && d.x is number && d.y is number
+          && d.duenoUid is string;
+      }
+      match /pings/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && pingValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if false;
+        allow delete: if esMiembro(c);
+      }
+
       // Terreno y Formas del mapa (vtt-hexgrid/mapa.html, caja de
       // herramientas): {tipo:'flor'|'linea'|'libre', origen:{col,fila},
       // celdas:[dq1,dr1,…] (offsets en cubo desde origen), rotacion
       // (0/60/…/300), color, alfa, solido, invisible, imagen (textura de
-      // fondo, opcional), fijado, duenoUid, creado}. Cualquiera crea el
-      // suyo; moverlo, rotarlo o pinearlo/despinearlo (esos tres campos)
-      // o borrarlo del todo: su dueño o el GM. `invisible` (solo lo ve el
-      // GM) solo lo puede prender el GM, y solo junto con `solido`.
+      // fondo, opcional), imgZoom, imgDX, imgDY (cómo se acomoda esa
+      // textura), fijado, duenoUid, creado}. Cualquiera crea el suyo;
+      // después, su dueño o el GM: moverlo/rotarlo/pinearlo, y también
+      // editarlo (color, alfa, imagen y su acomodo — tipo/celdas/solido
+      // no cambian más, para eso se borra y se crea uno nuevo); borrarlo
+      // del todo también es de los dos. `invisible` (solo lo ve el GM)
+      // solo lo puede prender el GM al crear, y no se edita después.
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'fijado', 'duenoUid', 'creado'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
-          && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 200 && d.celdas.size() % 2 == 0
+          && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
           && d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0
           && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
           && d.alfa is int && d.alfa >= 10 && d.alfa <= 100
           && d.solido is bool
           && (!('invisible' in d) || (d.invisible is bool && (d.invisible == false || d.solido == true)))
-          && d.imagen is string && d.imagen.size() < 130000
-          && d.fijado is bool
+          && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
+          && (!('imgZoom' in d) || (d.imgZoom is number && d.imgZoom >= 1 && d.imgZoom <= 6))
+          && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
+          && (!('imgDY' in d) || (d.imgDY is number && d.imgDY >= -10000 && d.imgDY <= 10000))
+          && (!('fijado' in d) || d.fijado is bool)
           && d.duenoUid is string;
       }
       match /elementos/{id} {
@@ -341,7 +366,8 @@ service cloud.firestore {
           && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado']);
+          && elementoValido(request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'imagen', 'imgZoom', 'imgDX', 'imgDY']);
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -405,6 +431,15 @@ service cloud.firestore {
           allow delete: if esMiembro(c)
             && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
         }
+        match /pings/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && pingValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time;
+          allow update: if false;
+          allow delete: if esMiembro(c);
+        }
         match /elementos/{id} {
           allow read: if esMiembro(c);
           allow create: if esMiembro(c)
@@ -414,7 +449,8 @@ service cloud.firestore {
             && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado']);
+            && elementoValido(request.resource.data)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'imagen', 'imgZoom', 'imgDX', 'imgDY']);
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

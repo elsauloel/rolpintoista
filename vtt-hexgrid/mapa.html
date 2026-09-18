@@ -52,6 +52,21 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
 .recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
 
+/* Editor de un elemento de Terreno/Formas ya creado (⚙️ al seleccionarlo):
+   flotante, no tapa el mapa — los cambios se ven ahí atrás en vivo antes
+   de Guardar. */
+#elem-edit{
+  position:fixed;top:70px;right:346px;z-index:90;width:260px;max-width:calc(100vw - 362px);
+  max-height:calc(100vh - 90px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:8px
+}
+#elem-edit-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper)}
+#elem-edit-cab button{font-size:16px;color:var(--muted);line-height:1}
+#elem-edit-cab button:hover{color:var(--paper)}
+.elem-edit-visor{position:relative;overflow:hidden;border-radius:var(--r);border:2px solid var(--copper);background:#000;cursor:grab;touch-action:none;margin:0 auto}
+.elem-edit-visor:active{cursor:grabbing}
+.elem-edit-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
+
 header{
   display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
 }
@@ -506,6 +521,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <span id="ruta-texto"></span>
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
     </div>
+    <div id="elem-edit" hidden></div>
     <!-- Caja de herramientas: escondida a la izquierda, se abre con la pestaña -->
     <div id="toolkit">
       <nav id="toolkit-panel" aria-label="Herramientas del mapa">
@@ -737,6 +753,13 @@ let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero
 const estelas = new Map();    // tokenId -> {celdas, hasta}
 const ESTELA_MS = 4000;
 const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
+// Ping (clic derecho en el mapa, sin herramienta que lo use — libre para
+// esto): un anillo que se expande y se apaga solo, para todos.
+// campanas/<partida>/pings/{auto} (o mapas/{id}/pings/{auto}):
+// {x, y, duenoUid, creado}. Nadie lo borra a mano: se borra sola.
+const pings = new Map();      // id -> {x, y, duenoUid, creadoMs}
+const PING_MS = 1800;
+let cortarPingsListener = null;
 let paneo = null;             // {inicioX, inicioY, x, y}
 let creando = false;
 let panelFondo = false;       // GM: panel de la imagen de fondo abierto
@@ -789,10 +812,12 @@ try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(
    arrastra casillero por casillero y se rota de a 60°, como un token.
    Lo mueven, rotan, pinean o borran su dueño o el GM; cualquiera lo ve
    (salvo invisible, que solo ve el GM). */
-const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, invisible, imagen, fijado, duenoUid}
+const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, invisible, imagen, imgZoom, imgDX, imgDY, fijado, duenoUid}
 let elementoSeleccionado = null;
 let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
+let editandoElemento = null;   // {id, original:{...}} mientras el panel ⚙️ está abierto — ver abrirEditorElemento
 let cortarElementosListener = null;
+const TAMANO_ELEMENTO_MAX = 30;  // tope del radio (Flor) o largo (Línea); ver el tope de celdas en las reglas
 let terrenoTipo = 'flor';      // 'flor' | 'linea' | 'libre'
 let terrenoTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
 let terrenoColor = '#3F6FB0';
@@ -853,8 +878,8 @@ function rutaMapaEstado(doc){
 // poder cortarlos al cambiar de mapa y no quedarse escuchando el anterior.
 let cortarFondo1 = null, cortarFondo2 = null, cortarModo = null, cortarIniciativa = null, cortarTokensListener = null;
 function cortarEscuchasMapa(){
-  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener, cortarElementosListener].forEach(f => f && f());
-  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = cortarElementosListener = null;
+  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener, cortarElementosListener, cortarPingsListener].forEach(f => f && f());
+  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = cortarElementosListener = cortarPingsListener = null;
 }
 
 // Cambia qué mapa está cargado: corta lo anterior, limpia lo que se venía
@@ -869,6 +894,7 @@ function cambiarMapaMostrado(nuevoId){
   if(seleccion) seleccionar(null);
   trazos.clear(); trazoSeleccionado = null;
   elementos.clear(); elementoSeleccionado = null;
+  pings.clear();
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';
   iniciativa = {orden: [], turno: 0, ronda: 1};
@@ -878,6 +904,7 @@ function cambiarMapaMostrado(nuevoId){
   escucharTokens();
   escucharTrazos();
   escucharElementos();
+  escucharPings();
   actualizarBotonMapas();
   renderModo();
   renderIniciativa();
@@ -979,10 +1006,10 @@ async function borrarMapa(id){
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }
   try{
     const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
-    const [tokensDocs, estadoDocs, trazosDocs, elementosDocs] = await Promise.all([
-      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(), base.collection('elementos').get(),
+    const [tokensDocs, estadoDocs, trazosDocs, elementosDocs, pingsDocs] = await Promise.all([
+      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(), base.collection('elementos').get(), base.collection('pings').get(),
     ]);
-    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs].map(d => d.ref).concat([base]);
+    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs, ...pingsDocs.docs].map(d => d.ref).concat([base]);
     for(let i = 0; i < refs.length; i += 450){
       const lote = fbDb.batch();
       refs.slice(i, i + 450).forEach(r => lote.delete(r));
@@ -1796,9 +1823,9 @@ function dibujar(){
       ctx.save();
       trazarCeldas(celdas); ctx.clip();
       const caja = cajaCeldas(celdas);
-      const escala = Math.max(caja.w / img.naturalWidth, caja.h / img.naturalHeight);
+      const escala = Math.max(caja.w / img.naturalWidth, caja.h / img.naturalHeight) * (el.imgZoom || 1);
       const iw = img.naturalWidth * escala, ih = img.naturalHeight * escala;
-      const cx = caja.minX + caja.w / 2, cy = caja.minY + caja.h / 2;
+      const cx = caja.minX + caja.w / 2 + (el.imgDX || 0), cy = caja.minY + caja.h / 2 + (el.imgDY || 0);
       ctx.globalAlpha = el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100;
       ctx.drawImage(img, cx - iw / 2, cy - ih / 2, iw, ih);
       ctx.restore();
@@ -1856,6 +1883,17 @@ function dibujar(){
         ctx.font = `${11 / z}px "Space Grotesk", system-ui, sans-serif`;
         ctx.fillStyle = '#fff';
         ctx.fillText(el.fijado ? '🔓' : '📌', p.x, p.y + 0.5 / z);
+        ctx.restore();
+        // Botón de editar: color, transparencia, imagen y su acomodo.
+        const g = elementoGearMundo(el);
+        ctx.beginPath(); ctx.arc(g.x, g.y, 9 / z, 0, 2 * Math.PI);
+        ctx.fillStyle = '#9A867E'; ctx.fill();
+        ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `${11 / z}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.fillText('⚙️', g.x, g.y + 0.5 / z);
         ctx.restore();
       }
     }
@@ -2103,6 +2141,26 @@ function dibujar(){
     ctx.stroke();
   }
 
+  // Ping (clic derecho): un anillo que se expande y se apaga solo, con
+  // el nombre de quién lo mandó, arriba de todo lo demás.
+  pings.forEach((p, id) => {
+    const t = (Date.now() - p.creadoMs) / PING_MS;
+    if(t >= 1){ pings.delete(id); return; }
+    animando = true;
+    const radio = HEX * (0.4 + t * 2.2);
+    const alfa = 1 - t;
+    ctx.beginPath(); ctx.arc(p.x, p.y, radio, 0, 2 * Math.PI);
+    ctx.strokeStyle = `rgba(224,164,88,${alfa})`; ctx.lineWidth = 3 / z; ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0, radio - HEX * 0.5), 0, 2 * Math.PI);
+    ctx.strokeStyle = `rgba(224,164,88,${alfa * 0.6})`; ctx.lineWidth = 2 / z; ctx.stroke();
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `700 ${12 / z}px "Space Grotesk", system-ui, sans-serif`;
+    ctx.fillStyle = `rgba(237,227,210,${alfa})`;
+    ctx.fillText(nombreMiembro(p.duenoUid), p.x, p.y - radio - 10 / z);
+    ctx.restore();
+  });
+
   hudUbicar();
   return animando;
 }
@@ -2118,7 +2176,14 @@ function tokenEn(x, y){
 
 /* ---------- Mouse / dedo sobre el mapa ---------- */
 
+lienzo.addEventListener('contextmenu', e => e.preventDefault());
 lienzo.addEventListener('pointerdown', e => {
+  if(e.pointerType === 'mouse' && e.button === 2){
+    const {px, py} = posEvento(e);
+    const m = pantallaAMundo(px, py);
+    guardarPing(m.x, m.y);
+    return;
+  }
   if(e.button !== 0 && e.pointerType === 'mouse') return;
   const {px, py} = posEvento(e);
   const m = pantallaAMundo(px, py);
@@ -2187,11 +2252,16 @@ lienzo.addEventListener('pointerdown', e => {
       lienzo.style.cursor = 'crosshair';
       return;
     }
-    // Botón de pinear/despinear y handle de rotación del elemento
-    // (terreno/formas) ya seleccionado.
+    // Botón de editar, de pinear/despinear y handle de rotación del
+    // elemento (terreno/formas) ya seleccionado.
     if(elementoSeleccionado && elementos.has(elementoSeleccionado)){
       const els = elementos.get(elementoSeleccionado);
       if(puedeManipularElemento(els)){
+        const g = elementoGearMundo(els);
+        if(Math.hypot(m.x - g.x, m.y - g.y) <= 12 / vista.zoom){
+          abrirEditorElemento(elementoSeleccionado);
+          return;
+        }
         const p = elementoPinMundo(els);
         if(Math.hypot(m.x - p.x, m.y - p.y) <= 12 / vista.zoom){
           moverElemento(elementoSeleccionado, {fijado: !els.fijado});
@@ -2351,6 +2421,8 @@ lienzo.addEventListener('pointermove', e => {
     if(idTrazo){ lienzo.style.cursor = puedeManipularTrazo(trazos.get(idTrazo)) ? 'grab' : 'pointer'; return; }
     if(elementoSeleccionado && elementos.has(elementoSeleccionado) && puedeManipularElemento(elementos.get(elementoSeleccionado))){
       const els = elementos.get(elementoSeleccionado);
+      const g = elementoGearMundo(els);
+      if(Math.hypot(m.x - g.x, m.y - g.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'pointer'; return; }
       const p = elementoPinMundo(els);
       if(Math.hypot(m.x - p.x, m.y - p.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'pointer'; return; }
       if(!els.fijado){
@@ -2493,6 +2565,7 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape') escapeABotonera();
     return;
   }
+  if(editandoElemento && e.key === 'Escape'){ cerrarEditorElemento(true); return; }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
@@ -2524,6 +2597,38 @@ function coleccionTrazos(){
 
 function puedeManipularTrazo(t){
   return !!(t && fbUsuario && (soyGM || t.duenoUid === fbUsuario.uid));
+}
+
+function coleccionPings(){
+  return mapaMostrado === MAPA_PRINCIPAL
+    ? fbDb.collection(fbRutaCampana('pings'))
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/pings`));
+}
+function escucharPings(){
+  cortarPingsListener = coleccionPings().onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ pings.delete(ch.doc.id); return; }
+      const d = ch.doc.data({serverTimestamps: 'estimate'});
+      const creadoMs = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+      pings.set(ch.doc.id, {x: num(d.x), y: num(d.y), duenoUid: d.duenoUid, creadoMs});
+      const restan = PING_MS - (Date.now() - creadoMs);
+      setTimeout(() => { coleccionPings().doc(ch.doc.id).delete().catch(() => {}); }, Math.max(0, restan));
+    });
+    pedirDibujo();
+  }, err => console.error('Error escuchando los pings del mapa:', err));
+}
+// Clic derecho en el mapa: un anillo que se expande y se apaga solo, para
+// todos — "miren acá". No usa herramienta ni selección, así que anda
+// aunque haya otra cosa activa (lápiz, terreno…).
+async function guardarPing(x, y){
+  if(!fbUsuario) return;
+  try{
+    await coleccionPings().add({
+      x, y, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo mandar el ping:', err);
+  }
 }
 
 function coleccionElementos(){
@@ -2568,6 +2673,14 @@ function elementoPinMundo(el){
   const r = HEX * 1.6;
   return {x: c.x - r * Math.sin(rad), y: c.y + r * Math.cos(rad)};
 }
+// Botón de editar (⚙️): a 90° de la manija de rotar, así con las tres
+// (rotar/pinear/editar) nunca se pisan entre sí sea cual sea la rotación.
+function elementoGearMundo(el){
+  const c = hexCentro(el.origen.col, el.origen.fila);
+  const rad = (el.rotacion + 90) * Math.PI / 180;
+  const r = HEX * 1.6;
+  return {x: c.x - r * Math.sin(rad), y: c.y + r * Math.cos(rad)};
+}
 // Caja (en el mundo) que envuelve todas las casillas, para que una
 // imagen de fondo la cubra entera ("cover", sin achatarse).
 function cajaCeldas(celdas){
@@ -2583,7 +2696,12 @@ function cajaCeldas(celdas){
 function escucharElementos(){
   cortarElementosListener = coleccionElementos().onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
-      if(ch.type === 'removed'){ elementos.delete(ch.doc.id); if(elementoSeleccionado === ch.doc.id) elementoSeleccionado = null; return; }
+      if(ch.type === 'removed'){
+        elementos.delete(ch.doc.id);
+        if(elementoSeleccionado === ch.doc.id) elementoSeleccionado = null;
+        if(editandoElemento && editandoElemento.id === ch.doc.id) cerrarEditorElemento(false);
+        return;
+      }
       const d = ch.doc.data();
       const crudo = Array.isArray(d.celdas) ? d.celdas : [];
       const celdas = [];
@@ -2598,6 +2716,9 @@ function escucharElementos(){
         solido: d.solido === true,
         invisible: d.invisible === true,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
+        imgZoom: Math.max(1, Math.min(6, num(d.imgZoom) || 1)),
+        imgDX: num(d.imgDX) || 0,
+        imgDY: num(d.imgDY) || 0,
         fijado: d.fijado === true,
         duenoUid: d.duenoUid,
       });
@@ -2618,7 +2739,7 @@ async function guardarElemento(tipo, origen, celdasSet, esForma){
       tipo, origen, celdas, rotacion: 0,
       color: esForma ? formaColor : terrenoColor,
       alfa: esForma ? formaAlfa : terrenoAlfa,
-      solido: !!esForma, invisible, imagen, fijado: false,
+      solido: !!esForma, invisible, imagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -2641,6 +2762,171 @@ async function moverElemento(id, cambios){
 async function borrarElemento(id){
   try{ await coleccionElementos().doc(id).delete(); }
   catch(err){ console.error('No se pudo borrar el elemento:', err); toast('No se pudo borrar'); }
+}
+
+/* ---------- Editar un elemento ya creado (⚙️ al seleccionarlo) ----------
+   Color, transparencia e imagen (elegirla, moverla/hacerle zoom, o
+   quitarla) se aplican en vivo sobre el elemento de verdad (para que se
+   vea cómo queda en el mapa antes de decidir) y recién se guardan de
+   verdad al tocar Guardar; Cancelar (o la ✕, o Esc) los vuelve a como
+   estaban. tipo/celdas/solido no se pueden editar — para eso se borra y
+   se crea uno nuevo. */
+function cerrarEditorElemento(cancelar){
+  if(!editandoElemento) return;
+  if(cancelar){
+    const el = elementos.get(editandoElemento.id);
+    if(el) Object.assign(el, editandoElemento.original);
+  }
+  editandoElemento = null;
+  const caja = $('#elem-edit');
+  caja.hidden = true;
+  caja.innerHTML = '';
+  pedirDibujo();
+}
+
+function abrirEditorElemento(id){
+  const el = elementos.get(id);
+  if(!el || !puedeManipularElemento(el)) return;
+  if(editandoElemento) cerrarEditorElemento(true);
+  editandoElemento = {
+    id,
+    original: {color: el.color, alfa: el.alfa, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY},
+  };
+  renderEditorElemento();
+}
+
+function elegirImagenParaElemento(vivo){
+  const entrada = $('#elemento-imagen-archivo');
+  entrada.onchange = async ev => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if(!file) return;
+    try{
+      const dato = await prepararImagenElemento(file);
+      vivo({imagen: dato, imgZoom: 1, imgDX: 0, imgDY: 0});
+      renderEditorElemento();
+    }catch(err){
+      console.error('No se pudo preparar la imagen del elemento:', err);
+      toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+    }
+  };
+  entrada.click();
+}
+
+function renderEditorElemento(){
+  if(!editandoElemento) return;
+  const id = editandoElemento.id;
+  const el = elementos.get(id);
+  const caja = $('#elem-edit');
+  if(!el){ cerrarEditorElemento(false); return; }
+  caja.hidden = false;
+
+  const tieneImagen = !!el.imagen;
+  const img = tieneImagen ? imagenLista(el.imagen) : null;
+  if(tieneImagen && !img){
+    // Todavía no cargó (recién puesta en el mapa): en cuanto cargue, se
+    // vuelve a armar el panel para que aparezcan el visor y el zoom.
+    const cruda = imagenesCache.get(el.imagen);
+    if(cruda) cruda.addEventListener('load', () => {
+      if(editandoElemento && editandoElemento.id === id) renderEditorElemento();
+    }, {once: true});
+  }
+  let V = null;
+  if(tieneImagen && img){
+    const cajaMundo = cajaCeldas(celdasDeElemento(el));
+    const dispScale = Math.min(230 / cajaMundo.w, 170 / cajaMundo.h);
+    V = {w: Math.round(cajaMundo.w * dispScale), h: Math.round(cajaMundo.h * dispScale), dispScale, caja: cajaMundo};
+  }
+
+  caja.innerHTML = `
+    <div id="elem-edit-cab"><span>⚙️ Editar elemento</span><button type="button" id="elem-edit-x" title="Cerrar sin guardar">✕</button></div>
+    <label class="etiqueta" style="margin-top:0">Color</label>
+    <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === el.color ? ' elegido' : ''}" data-eled-color="${c}" style="background:${c}"></button>`).join('')}</div>
+    <label class="etiqueta">Transparencia</label>
+    <input type="range" id="elem-edit-alfa" min="10" max="100" step="5" value="${el.alfa}">
+    ${tieneImagen && V ? `
+      <label class="etiqueta">Imagen (arrastrar para mover, rueda del mouse para zoom)</label>
+      <div class="elem-edit-visor" id="elem-edit-visor" style="width:${V.w}px;height:${V.h}px"><img id="elem-edit-img" src="${el.imagen}"></div>
+      <input type="range" id="elem-edit-zoom" min="100" max="600" step="1" value="${Math.round(el.imgZoom * 100)}">
+      <div class="fila" style="margin-top:0">
+        <button type="button" class="btn" id="elem-edit-imagen-cambiar">Cambiar imagen</button>
+        <button type="button" class="btn peligro" id="elem-edit-imagen-quitar">Quitar imagen</button>
+      </div>
+    ` : `<div class="fila" style="margin-top:0"><button type="button" class="btn" id="elem-edit-imagen-elegir">Elegir imagen de fondo</button></div>`}
+    <div class="fila" style="justify-content:flex-end">
+      <button type="button" class="btn" id="elem-edit-cancelar">Cancelar</button>
+      <button type="button" class="btn primary" id="elem-edit-guardar">Guardar</button>
+    </div>`;
+
+  const vivo = cambios => { Object.assign(el, cambios); pedirDibujo(); };
+
+  caja.querySelector('#elem-edit-x').onclick = () => cerrarEditorElemento(true);
+  caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
+  caja.querySelector('#elem-edit-guardar').onclick = () => {
+    const cambios = {color: el.color, alfa: el.alfa, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY};
+    editandoElemento = null;
+    caja.hidden = true; caja.innerHTML = '';
+    moverElemento(id, cambios);
+  };
+  caja.querySelectorAll('[data-eled-color]').forEach(b => b.onclick = () => {
+    vivo({color: b.dataset.eledColor});
+    caja.querySelectorAll('[data-eled-color]').forEach(x => x.classList.toggle('elegido', x === b));
+  });
+  caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
+
+  if(tieneImagen && V){
+    const visor = caja.querySelector('#elem-edit-visor');
+    const elImg = caja.querySelector('#elem-edit-img');
+    const zoomInput = caja.querySelector('#elem-edit-zoom');
+    const aplicarImg = () => {
+      const escalaBase = Math.max(V.caja.w / img.naturalWidth, V.caja.h / img.naturalHeight);
+      const dispEscala = escalaBase * el.imgZoom * V.dispScale;
+      const iw = img.naturalWidth * dispEscala, ih = img.naturalHeight * dispEscala;
+      const cx = V.w / 2 + el.imgDX * V.dispScale, cy = V.h / 2 + el.imgDY * V.dispScale;
+      elImg.style.width = iw + 'px'; elImg.style.height = ih + 'px';
+      elImg.style.transform = `translate(${cx - iw / 2}px, ${cy - ih / 2}px)`;
+    };
+    const clamp = () => {
+      const escalaBase = Math.max(V.caja.w / img.naturalWidth, V.caja.h / img.naturalHeight);
+      const escalaMundo = escalaBase * el.imgZoom;
+      const iwMundo = img.naturalWidth * escalaMundo, ihMundo = img.naturalHeight * escalaMundo;
+      const maxDX = Math.max(0, (iwMundo - V.caja.w) / 2), maxDY = Math.max(0, (ihMundo - V.caja.h) / 2);
+      el.imgDX = Math.max(-maxDX, Math.min(maxDX, el.imgDX));
+      el.imgDY = Math.max(-maxDY, Math.min(maxDY, el.imgDY));
+    };
+    aplicarImg();
+    let arrastre = null;
+    visor.addEventListener('pointerdown', e => {
+      visor.setPointerCapture(e.pointerId);
+      arrastre = {x: e.clientX, y: e.clientY, dx: el.imgDX, dy: el.imgDY};
+    });
+    visor.addEventListener('pointermove', e => {
+      if(!arrastre) return;
+      el.imgDX = arrastre.dx + (e.clientX - arrastre.x) / V.dispScale;
+      el.imgDY = arrastre.dy + (e.clientY - arrastre.y) / V.dispScale;
+      clamp(); aplicarImg(); pedirDibujo();
+    });
+    const soltar = () => { arrastre = null; };
+    visor.addEventListener('pointerup', soltar);
+    visor.addEventListener('pointercancel', soltar);
+    const porZoom = nuevoZoom => {
+      el.imgZoom = Math.max(1, Math.min(6, nuevoZoom));
+      clamp(); aplicarImg(); pedirDibujo();
+      zoomInput.value = Math.round(el.imgZoom * 100);
+    };
+    zoomInput.addEventListener('input', () => porZoom(zoomInput.value / 100));
+    visor.addEventListener('wheel', e => {
+      e.preventDefault();
+      porZoom(el.imgZoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+    }, {passive: false});
+    caja.querySelector('#elem-edit-imagen-quitar').onclick = () => {
+      vivo({imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0});
+      renderEditorElemento();
+    };
+    caja.querySelector('#elem-edit-imagen-cambiar').onclick = () => elegirImagenParaElemento(vivo);
+  }else{
+    caja.querySelector('#elem-edit-imagen-elegir').onclick = () => elegirImagenParaElemento(vivo);
+  }
 }
 
 // Simplifica una línea a mano alzada (Douglas-Peucker): sacar puntos que
@@ -3256,6 +3542,7 @@ function trazoSeleccionar(id){
 
 function elementoSeleccionar(id){
   if(elementoSeleccionado === id) return;
+  if(editandoElemento && editandoElemento.id !== id) cerrarEditorElemento(true);
   elementoSeleccionado = id;
   if(id){ if(seleccion) seleccionar(null); trazoSeleccionado = null; }
   pedirDibujo();
@@ -4443,8 +4730,8 @@ function renderToolkit(){
           <option value="linea"${terrenoTipo === 'linea' ? ' selected' : ''}>Línea</option>
           <option value="libre"${terrenoTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
         </select>
-        ${terrenoTipo !== 'libre' ? `<label class="etiqueta">${terrenoTipo === 'flor' ? 'Radio' : 'Largo'}</label>
-        <div class="fila" style="margin-top:0">${[1, 2, 3].map(n => `<button type="button" class="btn${terrenoTamano === n ? ' primary' : ''}" data-terreno-tamano="${n}">${n}</button>`).join('')}</div>` : ''}
+        ${terrenoTipo !== 'libre' ? `<label class="etiqueta">${terrenoTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
+        <input type="number" id="terreno-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${terrenoTamano}">` : ''}
         <label class="etiqueta">Color</label>
         <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === terrenoColor ? ' elegido' : ''}" data-terreno-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
         <label class="etiqueta">Transparencia</label>
@@ -4458,8 +4745,8 @@ function renderToolkit(){
           <option value="linea"${formaTipo === 'linea' ? ' selected' : ''}>Línea</option>
           <option value="libre"${formaTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
         </select>
-        ${formaTipo !== 'libre' ? `<label class="etiqueta">${formaTipo === 'flor' ? 'Radio' : 'Largo'}</label>
-        <div class="fila" style="margin-top:0">${[1, 2, 3].map(n => `<button type="button" class="btn${formaTamano === n ? ' primary' : ''}" data-forma-tamano="${n}">${n}</button>`).join('')}</div>` : ''}
+        ${formaTipo !== 'libre' ? `<label class="etiqueta">${formaTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
+        <input type="number" id="forma-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${formaTamano}">` : ''}
         <label class="etiqueta">Color</label>
         <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === formaColor ? ' elegido' : ''}" data-forma-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
         <label class="etiqueta">Transparencia</label>
@@ -4499,24 +4786,10 @@ $('#toolkit-lista').addEventListener('click', e => {
     renderToolkit();
     return;
   }
-  const tamano = e.target.closest('[data-terreno-tamano]');
-  if(tamano){
-    terrenoTamano = num(tamano.dataset.terrenoTamano);
-    try{ localStorage.setItem('terreno-tamano', terrenoTamano); }catch(err){}
-    renderToolkit();
-    return;
-  }
   const colorForma = e.target.closest('[data-forma-color]');
   if(colorForma){
     formaColor = colorForma.dataset.formaColor;
     try{ localStorage.setItem('forma-color', formaColor); }catch(err){}
-    renderToolkit();
-    return;
-  }
-  const tamanoForma = e.target.closest('[data-forma-tamano]');
-  if(tamanoForma){
-    formaTamano = num(tamanoForma.dataset.formaTamano);
-    try{ localStorage.setItem('forma-tamano', formaTamano); }catch(err){}
     renderToolkit();
     return;
   }
@@ -4577,6 +4850,18 @@ $('#toolkit-lista').addEventListener('change', e => {
   if(e.target.id === 'forma-invisible-check'){
     formaInvisible = e.target.checked;
     try{ localStorage.setItem('forma-invisible', formaInvisible ? '1' : ''); }catch(err){}
+    return;
+  }
+  if(e.target.id === 'terreno-tamano-input'){
+    terrenoTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 1));
+    try{ localStorage.setItem('terreno-tamano', terrenoTamano); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  if(e.target.id === 'forma-tamano-input'){
+    formaTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 1));
+    try{ localStorage.setItem('forma-tamano', formaTamano); }catch(err){}
+    renderToolkit();
   }
 });
 $('#toolkit-lista').addEventListener('input', e => {
@@ -4587,6 +4872,14 @@ $('#toolkit-lista').addEventListener('input', e => {
   if(e.target.id === 'forma-alfa-slider'){
     formaAlfa = num(e.target.value);
     try{ localStorage.setItem('forma-alfa', formaAlfa); }catch(err){}
+  }
+  if(e.target.id === 'terreno-tamano-input'){
+    const v = Math.round(num(e.target.value));
+    if(v >= 1 && v <= TAMANO_ELEMENTO_MAX) terrenoTamano = v;
+  }
+  if(e.target.id === 'forma-tamano-input'){
+    const v = Math.round(num(e.target.value));
+    if(v >= 1 && v <= TAMANO_ELEMENTO_MAX) formaTamano = v;
   }
 });
 renderToolkit();

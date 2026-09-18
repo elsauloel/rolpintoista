@@ -88,7 +88,9 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P42. Grilla del mapa girada 30° (código).** La grilla pasó de hexágonos "de punta arriba" a "de lado arriba" para poder rotar tokens con el frente alineado a un lado (no a un vértice). Esto corre la posición en pantalla de todo lo que ya estaba puesto: el fondo (imagen del mapa) va a quedar desalineado y hay que volver a ajustarlo (arrastrar + ancho en casillas), y los tokens que ya estaban en el tablero conviene revisarlos y, si hace falta, reacomodarlos a mano. *(2026-09-17)*
 - ✅ **P44. "Esp" con dos significados en `docs/clases-borrador.md`.**
   Respondido 2026-09-18: **Special Power se abrevia siempre "SP"**, nunca
-  "Esp" — regla fija para todo lo que se escriba de acá en adelante (código,
-  docs, fichas de skill). No se tocó el contenido de `clases-borrador.md`:
-  esas tarjetas siguen ⏳ sin confirmar y las revisa el usuario skill por
-  skill, como dice el propio encabezado del archivo.
+  "Esp" — regla fija de acá en adelante (código, docs, fichas de skill). El
+  usuario aclaró además que ese archivo no es una referencia a preservar:
+  se adapta a las decisiones que se van tomando, no al revés. Con eso ya
+  actualicé la terminología de `clases-borrador.md` (todo "Int"/
+  "Inteligencia" pasó a "Esp"/"Especial"); la mecánica de cada skill sigue
+  ⏳ sin confirmar, eso lo sigue revisando el usuario skill por skill.

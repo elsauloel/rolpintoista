@@ -23,8 +23,8 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 
 ## Reglas generales (decididas)
 
-- **SP**: 1 Int = 3 SP. Va a tener una regeneración base por turno según
-  Int (en definición). Los costos se revisan cuando esté definida.
+- **SP**: 1 Esp = 3 SP. Va a tener una regeneración base por turno según
+  Esp (en definición). Los costos se revisan cuando esté definida.
 - **Peso** del arma = cantidad de dados de daño; **Tipo** = caras.
   "T4 P1" = Tipo 4, Peso 1 (1d4). **Amplificar** el daño = dados de más
   (en la ficha, `danoAmplificado` ya suma dados).
@@ -55,9 +55,12 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 - **Flash (SP x 2)**: Flash que cuesta el doble de SP. Choca con la regla
   de Flash en un caso: **Parry** dice "NO2: 1" y Flash.
 - **Tipo de efecto (stat del que lo usa / stat del que resiste)**:
-  Hechizo (PG: Int · Daño: Esp), Onda expansiva (Fuerza / Constitución),
+  Hechizo (PG: Esp · Daño: Esp), Onda expansiva (Fuerza / Constitución),
   Maldición (Esp / Res.M).
-- **Esp / Especial**: stat viejo que hoy no existe.
+- **Esp / Especial**: el atributo Especial de la ficha (ex Inteligencia,
+  renombrado — ver `ficha-personaje/CLAUDE.md`). Todo lo que decía "Int"/
+  "Inteligencia" en el PDF viejo pasó a "Esp"/"Especial" acá. **SP**
+  (Special Power) es otra cosa, siempre se abrevia "SP", nunca "Esp".
 - **Critical Matters**: si el ataque es crítico, el efecto cambia.
 - Sin mecánica hoy: Lento, Acumulable, crítico mejorado, true damage,
   holy, dodge roll, cooldown del arma, Percepción, stacks de veneno.
@@ -111,7 +114,7 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 3. **Tajear** [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño
    por 3 turnos. *Critical Matters:* si es crítico, cambia el efecto a 5
    de daño hasta curarse.
-4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (INT). El
+4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (ESP). El
    rango para esta tirada depende de a qué velocidad se mueva: a
    velocidad normal (1 No2 por casillero) el rango es una flor de 3; a
    velocidad lenta (2 No2 por casillero), una flor de 2.
@@ -130,7 +133,7 @@ cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
 ## Tanque ⏳
 
 Estados que define la clase:
-- **Pajaritos**: reduce a la mitad todas las tiradas de DES, INT y AGI.
+- **Pajaritos**: reduce a la mitad todas las tiradas de DES, ESP y AGI.
 - **Sentado**: -2 a la evasión. No puede atacar. En cualquier momento
   puede gastar 1 No2 para pararse.
 
@@ -155,7 +158,7 @@ Estados que define la clase:
    Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final
    de la tabla de iniciativa. Si ya era último en iniciativa, en vez de
    eso pierde el turno.
-9. **Taunt** [1] — Tira Especial + 1 contra Inteligencia para obligar a
+9. **Taunt** [1] — Tira Especial + 1 contra Especial para obligar a
    un enemigo a atacarlo hasta el final de su próximo turno.
 10. **Miti-Miti** [2] — Marca un personaje como protegido. El protegido
     comparte con el tanque la mitad del daño que recibe. Duración: 1
@@ -163,13 +166,13 @@ Estados que define la clase:
 
 ## Mago ⏳
 
-Salvo Carga Elemental, todas son **Hechizo (PG: Int · Daño: Esp)**.
+Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 
 1. **Chispazo** [1] — NO2: (3). Dispara un proyectil T4 P1 que ignora
    armadura.
 2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
    tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
-   Inteligencia.
+   Especial.
 3. **Orbe arcano** [4] — NO2: (5). Dispara un orbe arcano que hace daño en
    área tipo 5. Amplifica el daño en 4. Área: flor de 1.
 4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
@@ -190,14 +193,14 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Int · Daño: Esp)**.
    daño mágico en área de flor igual al daño absorbido. Duración: 2
    turnos.
 9. **Telekinesis** [15] — NO2: (3). Mueve y controla un objeto con la
-   mente. Puede usarse para arrebatar el arma a un enemigo con Int/Fue, y
-   usarla para atacar: atacar así usa INT como PG y ESP como daño. Paga 1
+   mente. Puede usarse para arrebatar el arma a un enemigo con Esp/Fue, y
+   usarla para atacar: atacar así usa ESP como PG y ESP como daño. Paga 1
    SP por cada No2 que use para atacar o mover el objeto. El objeto queda
    controlado el resto del turno; puede gastar 1 SP para contrarrestar con
-   INT cualquier intento de otro personaje de quitarle el control. En cada
+   ESP cualquier intento de otro personaje de quitarle el control. En cada
    mantenimiento puede pagar 1 SP para conservar el control durante el
    turno.
-10. **Control Mental** [7] — NO2: (3). Tira Int contra (Int + Res.M) de
+10. **Control Mental** [7] — NO2: (3). Tira Esp contra (Esp + Res.M) de
     otro personaje. Si gana, puede controlarlo y obligarlo a realizar
     cualquier acción que no implique dañarse a sí mismo. Paga 1 SP y 1 No2
     por cada No2 que gaste el personaje controlado. El efecto concluye

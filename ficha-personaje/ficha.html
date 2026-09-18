@@ -707,6 +707,22 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 .inv-addhab:hover{border-color:var(--copper);color:var(--brass)}
 .inv-notas{font-size:11.5px;min-height:38px}
+.inv-botones-fila{display:flex;gap:8px;margin-top:2px}
+/* ---------- Editor completo de una invocación (#scrim-editar-inv) ---------- */
+.inv-editar-separador{display:flex;align-items:center;gap:8px;margin:4px 0 -2px;color:var(--copper);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.inv-editar-separador::after{content:'';flex:1;height:1px;background:var(--line-soft)}
+.inv-derivgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.inv-derivcol{display:flex;flex-direction:column;gap:2px}
+.inv-derivattr{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:2px}
+.inv-deriv{display:flex;justify-content:space-between;gap:4px;font-size:10.5px;padding:2px 4px;border:1px solid var(--line-soft);background:var(--panel)}
+.inv-deriv b{color:var(--brass)}
+@media(max-width:420px){.inv-derivgrid{grid-template-columns:repeat(3,1fr)}}
+.inv-arma-compacta{border:1px solid var(--line-soft);background:var(--panel);padding:8px 9px}
+.inv-arma-top{display:flex;align-items:center;gap:8px}
+.inv-arma-nombre{font-weight:700;font-size:13px;flex:1;min-width:0}
+.inv-equipo-list{display:flex;flex-direction:column;gap:5px}
+.inv-equipo-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line-soft);background:var(--panel);padding:5px 8px;font-size:12px}
+.inv-equipo-nombre{flex:1;min-width:0;font-weight:700}
 
 .defres-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .defres-cell{border:1px solid var(--line-soft);background:rgba(0,0,0,.2);border-radius:var(--r);padding:6px 5px;text-align:center}
@@ -930,6 +946,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 .scrim.open{display:block}
 .modal{max-width:520px;margin:4vh auto;border:1px solid var(--line);border-top:3px solid var(--copper);background:var(--panel);}
+#scrim-hab-inv [hidden]{display:none!important}
 .modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}
 .modal header h3{margin:0;font-family:"Fraunces",serif;font-size:17px;font-weight:600}
 .modal .body{padding:15px;display:flex;flex-direction:column;gap:11px}
@@ -1507,7 +1524,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <div class="scrim" id="scrim-presets">
   <div class="modal" style="max-width:760px">
     <header>
-      <h3>Elegir estado</h3>
+      <h3 id="presets-titulo">Elegir estado</h3>
       <div style="display:flex;gap:8px">
         <button class="iconbtn iconbtn-add" id="presets-personalizado" style="display:none">Estado personalizado</button>
         <button class="iconbtn" id="presets-x">Cerrar</button>
@@ -1565,6 +1582,99 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <button class="iconbtn" id="botonera-x">Cerrar</button>
     </header>
     <div class="body" id="botonera-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-editar-inv">
+  <div class="modal" style="max-width:480px">
+    <header><h3 id="editarinv-titulo">Invocación</h3><button class="iconbtn" id="editarinv-x">Cerrar</button></header>
+    <div class="body" id="editarinv-body" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-botonera-inv">
+  <div class="modal catalogo-modal botonera-modal" style="max-width:640px">
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
+        <h3 id="botonerainv-titulo">Invocación</h3>
+        <span class="botonera-badge" id="botonerainv-badge">No2 0/0</span>
+      </div>
+      <button class="iconbtn" id="botonerainv-x">Cerrar</button>
+    </header>
+    <div class="body" id="botonerainv-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-verhabinv">
+  <div class="modal" style="max-width:420px">
+    <header><h3 id="verhabinv-nombre">Habilidad</h3><button class="iconbtn" id="verhabinv-x">Cerrar</button></header>
+    <div class="body" id="verhabinv-body"></div>
+  </div>
+</div>
+
+<!-- Habilidad de invocación: asistente paso a paso, mismos campos que el
+     de un creep en gm-tools (ids con prefijo hi-). -->
+<div class="scrim" id="scrim-hab-inv">
+  <div class="modal" style="max-width:460px">
+    <header><h3 id="hi-titulo-modal">Habilidad</h3><button class="iconbtn" id="habinv-x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <div class="pasos-hab" id="hi-pasos"></div>
+      <div>
+        <div class="paso-titulo" id="hi-paso-titulo"></div>
+        <p class="paso-ayuda" id="hi-paso-ayuda"></p>
+      </div>
+      <div class="hi-paso" data-hi-paso="0">
+        <div class="f"><label>Nombre</label><input type="text" id="hi-nombre" placeholder="ej. Mordida venenosa" data-hi-enter="1"></div>
+        <div class="f" style="margin-top:8px"><label>Descripción</label><textarea id="hi-detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
+      </div>
+      <div class="hi-paso" data-hi-paso="1">
+        <div class="f" style="margin-bottom:8px"><label>No2 que gasta</label>
+          <div class="opcion-fila">
+            <button type="button" class="opcion-btn" data-hi-nitros-modo="num">Un número</button>
+            <button type="button" class="opcion-btn" data-hi-nitros-modo="ataque">Lo mismo que un ataque</button>
+          </div>
+          <div class="hint" id="hi-ataque-ayuda" style="margin-top:5px"></div>
+        </div>
+        <input type="hidden" id="hi-nitros-modo" value="num">
+        <div class="inv-row3">
+          <div class="inv-minif" id="hi-acciones-caja"><label>No2 que gasta</label><input type="number" id="hi-acciones" min="0" value="1" data-hi-enter="1"></div>
+          <div class="inv-minif"><label>Cooldown (turnos)</label><input type="number" id="hi-cd" min="0" value="0" data-hi-enter="1"></div>
+          <div></div>
+        </div>
+        <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera).</div>
+      </div>
+      <div class="hi-paso" data-hi-paso="2">
+        <div class="f"><label>Tirar un stat de la invocación</label><select id="hi-tirada-stat"></select></div>
+        <div class="f" style="margin-top:8px"><label>Fórmula de dados (opcional)</label><input type="text" id="hi-tirada" placeholder="ej. 2d6+3" data-hi-enter="1"></div>
+      </div>
+      <div class="hi-paso" data-hi-paso="3">
+        <div class="f"><label>Elegir de la lista</label><select id="hi-efecto-preset"></select></div>
+        <div class="f" style="margin-top:8px"><label>Nombre del estado</label><input type="text" id="hi-efecto-nombre" placeholder="vacío = no aplica ninguno"></div>
+        <div class="inv-row3" style="margin-top:8px">
+          <div class="inv-minif"><label>Turnos</label><input type="number" id="hi-efecto-turnos" min="0" value="0"></div>
+          <div class="inv-minif"><label>HP por turno</label><input type="number" id="hi-efecto-hpturno" value="0"></div>
+          <div></div>
+        </div>
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
+          <input type="checkbox" id="hi-efecto-permanente" style="width:auto">
+          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence</span>
+        </label>
+        <div class="f" style="margin-top:8px"><label>Descripción del estado (opcional)</label><input type="text" id="hi-efecto-detalle"></div>
+        <input type="hidden" id="hi-efecto-polaridad" value="otro">
+        <input type="hidden" id="hi-efecto-mods" value="[]">
+      </div>
+      <div class="hi-paso" data-hi-paso="4">
+        <div class="resumen-hab" id="hi-resumen"></div>
+      </div>
+      <div class="paso-nav">
+        <button type="button" class="btn ghost" id="hi-atras">← Atrás</button>
+        <button type="button" class="btn primary" id="hi-siguiente">Siguiente →</button>
+      </div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="habinv-cancel">Cancelar</button>
+      <button class="btn primary" id="habinv-guardar">Guardar</button>
+    </footer>
   </div>
 </div>
 
@@ -3365,37 +3475,309 @@ function nuevaInvocacion(){
   return {
     id: uid(), nombre:'Invocación nueva', imagen:'', color: INV_COLORES[Math.floor(Math.random()*INV_COLORES.length)],
     activa:true, cooldown:3, cooldownActual:3,
-    hp:5, hpMax:5, acc:3, accMax:3, spd:5,  // Hp.Max = Con*5
+    hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
     con:1, fue:1, agl:1, des:1, int:1,
-    armaTipo:8, armaPeso:1, armaFijo:0,
-    defensa:0,
+    ataquesTurno:0,  // inv.nitros lo pone migrarInvocacion: arranca en el máximo
+    armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
+    armaMods:[], armaEfectos:[], armaManos:'arma_1m',
+    defensa:0, equipo:[],
     crit:[0,0,0,0,0],
-    habilidades:[]
+    habilidades:[],
+    estados:[],
+    notas:'',
   };
 }
 
-function invDanoTxt(inv){
-  const dados = Math.max(1, num(inv.armaPeso)||1);
+/* =========================================================
+   INVOCACIONES — motor de stats, igual que los creeps de gm-tools:
+   mismos Nitros (No2), la misma arma con mods de equipo y efectos al
+   golpear, los mismos estados alterados y habilidades con asistente paso
+   a paso — la maneja el jugador que invoca, no el GM. Duplicado a
+   propósito (no importado), como ya pasa entre la ficha y gm-tools con el
+   formato de efecto/estado — ver gm-toolset/CLAUDE.md.
+   ========================================================= */
+const IT2_INV = {
+  nitrosHabilidad: 1,             // costo por defecto de una habilidad
+  redondeoPrimerAtaque: Math.ceil,
+};
+const ATTR_IDS_INV = ['con','fue','agl','des','int'];
+// Stats secundarios de una invocación: los mismos que un PJ (GRUPOS),
+// salvo Hp.Max/No2 (ya se ven en las barras) y Crg.Max/SP/SP Regen (no aplican).
+const INV_STAT_EXCLUIR = ['hpmax','nitros','crgmax','sp','spregen'];
+const INV_DERIVADOS_POR_ATTR = Object.fromEntries(GRUPOS.map(g => [g.id, g.derived.filter(d => !INV_STAT_EXCLUIR.includes(d.id))]));
+const INV_STAT_ATTR = Object.fromEntries(GRUPOS.flatMap(g => g.derived.map(d => [d.id, g.id])));
+// Mismo criterio que STATS_CON_TIRADA en la Botonera de la ficha: los 5
+// atributos base + los secundarios que no tienen ya su propio botón en Combate.
+const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','int','resmg','rescc','ini','pdgmg','resm'];
+// Stats que puede tirar una habilidad (incluye PdG, Bloqueo y Parry, que
+// en la Botonera ya tienen su propio botón de Combate y por eso no están
+// en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
+const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','resm'];
+
+function invFuentesEquipo(inv){
+  const arma = (inv.armaMods || []).length ? [{nombre: inv.armaNombre || 'Arma', mods: inv.armaMods}] : [];
+  return [...(inv.equipo || []), ...arma];
+}
+function invModTotal(inv, statId){
+  let total = 0;
+  invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+  (inv.estados||[]).forEach(es => {
+    if(es.activo === false) return;
+    const stacks = Math.max(1, num(es.stacks)||1);
+    (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
+  });
+  return total;
+}
+// Cada fuente (equipo o estado activo) que le suma a un stat, con su valor
+// — para la 🔍 (de dónde sale cada tirada).
+function aportesModInv(inv, statId){
+  const out = [];
+  invFuentesEquipo(inv).forEach(it => {
+    const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
+    if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v});
+  });
+  (inv.estados||[]).forEach(es => {
+    if(es.activo === false) return;
+    const stacks = Math.max(1, num(es.stacks)||1);
+    const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
+    if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
+  });
+  return out;
+}
+function invEstadosArmadura(inv){
+  const activos = (inv.estados||[]).filter(e => e.activo !== false);
+  return {arruinada: activos.some(e => e.armaduraArruinada), rota: activos.some(e => e.armaduraRota)};
+}
+function invAporteArmadura(inv, statId){
+  return (inv.equipo||[]).filter(it => slotDe(it.tipoItem) === 'armadura')
+    .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
+}
+function invDefensaEfectiva(inv){
+  const {arruinada, rota} = invEstadosArmadura(inv);
+  let v = num(inv.defensa);
+  if(arruinada) v -= invAporteArmadura(inv, 'def');
+  if(rota) v = Math.floor(v / 2);
+  return Math.max(0, v);
+}
+function invCritEfectivo(inv, i){
+  const {arruinada, rota} = invEstadosArmadura(inv);
+  let v = num(inv.crit[i]);
+  if(arruinada) v -= invAporteArmadura(inv, 'tipo'+(i+1));
+  if(rota) v = Math.floor(v / 2);
+  return v;
+}
+function invEstadoActivo(inv, flag){
+  return (inv.estados || []).some(e => e.activo !== false && e[flag]);
+}
+function invStatValor(inv, statId){
+  const attr = INV_STAT_ATTR[statId] || statId;
+  let v = num(inv[attr]) + invModTotal(inv, attr);
+  if(statId !== attr) v += invModTotal(inv, statId);
+  if((statId === 'pdg' || statId === 'parry') && invEstadoActivo(inv, 'lisiado')) v = Math.floor(v / 2);
+  return v;
+}
+function invNitrosMax(inv){
+  let v = num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros');
+  // Stun, Exhausto (u otro estado con forzarNitros): el más bajo activo gana.
+  const forzados = (inv.estados || [])
+    .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
+    .map(e => num(e.forzarNitros));
+  if(forzados.length) v = Math.min(v, ...forzados);
+  return Math.max(0, v);
+}
+// Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
+// ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
+function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
+function costoAtaqueInv(inv){
+  const tipo = num(inv.armaTipo) || 8;
+  return num(inv.ataquesTurno) === 0 ? IT2_INV.redondeoPrimerAtaque(tipo / 2) : tipo;
+}
+function costoNitrosHabInv(inv, h){
+  if(habInvAtaque(h)) return costoAtaqueInv(inv);
+  return num(h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
+}
+function costoHabInvTxt(inv, h){
+  const n = costoNitrosHabInv(inv, h);
+  if(habInvAtaque(h)) return `${fmt(n)} No2 (como un ataque)`;
+  return n ? `${fmt(n)} No2` : 'sin costo';
+}
+function bloqueoHabInv(inv, h){
+  if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
+  if(num(inv.nitros) < costoNitrosHabInv(inv, h)) return 'Sin No2';
+  return '';
+}
+function invDanoTxt(inv, extra){
+  const dados = Math.max(1, num(inv.armaPeso)||1) + Math.max(0, num(inv.armaAmplificado));
   const tipo = num(inv.armaTipo)||8;
-  const fijo = num(inv.armaFijo);
+  const fijo = num(inv.armaFijo) + (inv.armaDeRango ? 0 : num(extra));
   return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
 }
+function invAtaqueTxt(inv){
+  return invDanoTxt(inv, invStatValor(inv, 'dmg'));
+}
+function modsAfectanHpInv(mods){
+  return (mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax');
+}
+// Recalcula hpMax = con*5 + mods de Hp.Max (con efectivo, equipo y estados
+// incluidos, igual que la ficha y los creeps). Si estaba lleno, sigue
+// lleno con el nuevo máximo; si no, solo se recorta si se pasa.
+function actualizarHpMaxPorConInv(inv){
+  const conEfectivo = num(inv.con) + invModTotal(inv, 'con');
+  const nuevoHpMax = Math.max(0, conEfectivo * 5 + invModTotal(inv, 'hpmax'));
+  const estabaFull = num(inv.hp) >= num(inv.hpMax);
+  inv.hpMax = nuevoHpMax;
+  inv.hp = estabaFull ? nuevoHpMax : Math.min(num(inv.hp), nuevoHpMax);
+}
 
+// Rellena campos que invocaciones viejas (guardadas antes de esta
+// actualización) no tienen, para que el resto del código no se tope con
+// undefined. Convierte Acciones/Movimiento (viejo) a No2, igual que ya
+// se hizo en la ficha y en los creeps con la Iteración 2.
+function migrarInvocacion(inv){
+  const crit = Array.isArray(inv.crit) ? inv.crit.map(v=>num(v)) : [];
+  while(crit.length < 5) crit.push(0);
+  inv.crit = crit.slice(0, 5);
+  inv.equipo = Array.isArray(inv.equipo) ? inv.equipo : [];
+  inv.estados = Array.isArray(inv.estados) ? inv.estados : [];
+  inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
+  inv.armaMods = Array.isArray(inv.armaMods) ? inv.armaMods : [];
+  inv.armaEfectos = Array.isArray(inv.armaEfectos) ? inv.armaEfectos : [];
+  if(inv.armaManos === undefined) inv.armaManos = 'arma_1m';
+  if(inv.armaAmplificado === undefined) inv.armaAmplificado = 0;
+  if(inv.armaDeRango === undefined) inv.armaDeRango = false;
+  if(inv.armaNombre === undefined) inv.armaNombre = '';
+  if(inv.armaDetalle === undefined) inv.armaDetalle = '';
+  if(inv.defensa === undefined) inv.defensa = 0;
+  if(inv.notas === undefined) inv.notas = '';
+  if(inv.acc !== undefined || inv.accMax !== undefined){
+    delete inv.acc; delete inv.accMax; delete inv.nitros;  // arranca lleno, abajo
+  }
+  inv.habilidades.forEach(h => {
+    if(h.nitrosCosto === undefined) h.nitrosCosto = IT2_INV.nitrosHabilidad;
+    if(h.tiradaStat === undefined) h.tiradaStat = '';
+    if(h.tiradaExtra === undefined) h.tiradaExtra = '';
+    if(h.cdActual === undefined) h.cdActual = 0;
+    if(h.efectoNombre === undefined) h.efectoNombre = '';
+  });
+  if(inv.nitros === undefined || inv.nitros === null) inv.nitros = invNitrosMax(inv);
+  if(inv.ataquesTurno === undefined) inv.ataquesTurno = 0;
+  return inv;
+}
+
+/* ---------- Ítems de una invocación (arma y armadura): asistente paso a
+   paso compartido, igual que en la ficha y en gm-tools ---------- */
+function portadorInv(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return null;
+  return {nombre: inv.nombre, nitros: invNitrosMax(inv), dmg: invStatValor(inv, 'dmg'), rango: invStatValor(inv, 'rng'), def: invDefensaEfectiva(inv)};
+}
+function cfgItemInv(){
+  return {
+    contexto: 'invocacion',
+    stats: MOD_TARGETS.filter(s => !['sp','spregen','crgmax','capcinturon'].includes(s.id)).map(s => ({id:s.id, label:s.label})),
+    ejemplos: (tipoItem, t) => (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
+  };
+}
+function armaDeInvComoDraft(inv){
+  return {
+    nombre: inv.armaNombre || '', tipoItem: inv.armaManos || 'arma_1m', tipoDado: num(inv.armaTipo) || 8,
+    peso: Math.max(1, num(inv.armaPeso) || 1), danoFijo: num(inv.armaFijo), danoAmplificado: num(inv.armaAmplificado),
+    armaDeRango: !!inv.armaDeRango, mods: structuredClone(inv.armaMods || []), detalle: inv.armaDetalle || '',
+    efectosGolpe: structuredClone(inv.armaEfectos || []),
+  };
+}
+function ponerArmaEnInv(inv, d){
+  inv.armaNombre = d.nombre;
+  inv.armaManos = d.tipoItem;
+  inv.armaTipo = num(d.tipoDado) || 8;
+  inv.armaPeso = Math.max(1, num(d.peso) || 1);
+  inv.armaFijo = num(d.danoFijo);
+  inv.armaAmplificado = Math.max(0, num(d.danoAmplificado));
+  inv.armaDeRango = !!d.armaDeRango;
+  inv.armaMods = structuredClone(d.mods || []);
+  inv.armaEfectos = structuredClone(d.efectosGolpe || []);
+  inv.armaDetalle = d.detalle || '';
+}
+function ponerEquipoEnInv(inv, d){
+  const def = (d.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+  const mods = (d.mods || []).filter(m => m.stat !== 'def');
+  inv.defensa = num(inv.defensa) + def;
+  inv.equipo = inv.equipo || [];
+  inv.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || ''});
+  if(modsAfectanHpInv(mods)) actualizarHpMaxPorConInv(inv);
+}
+function abrirEditorArmaInv(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  AsistenteItem.abrir({...cfgItemInv(),
+    titulo: `Arma de ${inv.nombre}`,
+    nuevo: false,
+    fijarCategoria: true,
+    draft: armaDeInvComoDraft(inv),
+    portador: () => portadorInv(invId),
+    onGuardar: d => {
+      const actual = S.invocaciones.find(x => x.id === invId);
+      if(!actual){ toast('Esa invocación ya no está'); return true; }
+      ponerArmaEnInv(actual, d);
+      renderInvocaciones();
+      toast('Arma actualizada');
+      return true;
+    },
+  });
+}
+function abrirItemNuevoInv(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  AsistenteItem.abrir({...cfgItemInv(),
+    titulo: `Ítem para ${inv.nombre}`,
+    nuevo: true,
+    draft: {tier: 'A definir', peso: 0},
+    portador: () => portadorInv(invId),
+    conRanuras: false,
+    textoGuardar: 'Crear y equipar',
+    onGuardar: d => {
+      const actual = S.invocaciones.find(x => x.id === invId);
+      if(!actual) return true;
+      if(String(d.tipoItem).startsWith('arma_')) ponerArmaEnInv(actual, d);
+      else ponerEquipoEnInv(actual, d);
+      toast(`${actual.nombre} equipado con ${d.nombre}`);
+      renderInvocaciones();
+      return true;
+    },
+  });
+}
+function quitarEquipoDeInv(invId, equipoId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  const it = inv.equipo.find(x => x.id === equipoId);
+  if(!it) return;
+  inv.defensa = num(inv.defensa) - num(it.def);
+  inv.equipo = inv.equipo.filter(x => x.id !== equipoId);
+  if(modsAfectanHpInv(it.mods)) actualizarHpMaxPorConInv(inv);
+  renderInvocaciones();
+}
+
+/* ---------- Tarjeta de la Botonera de Invocaciones: lo mínimo (nombre,
+   imagen, cooldown, HP, No2) queda editable ahí mismo; todo lo demás
+   (atributos, arma, armadura, habilidades, estados) va en "✎ Editar";
+   "▶ Usar" abre sus Acciones para jugarla en combate. ---------- */
 function renderInvocaciones(){
   const grid = $('#inv-grid');
   if(!grid) return;
+  S.invocaciones.forEach(migrarInvocacion);
   $('#inv-empty').style.display = S.invocaciones.length ? 'none' : 'block';
   grid.innerHTML = S.invocaciones.map(inv => invCardHtml(inv)).join('');
+  if(editandoInvId && $('#scrim-editar-inv').classList.contains('open')) renderEditarInv();
+  if(botoneraInvId && $('#scrim-botonera-inv').classList.contains('open')) renderBotoneraInv();
 }
 
 function invCardHtml(inv){
-  const sinAcc = num(inv.acc) <= 0;
   const dormida = inv.activa === false;
   return `
   <div class="inv-card ${dormida?'inv-dormida':''}" style="--accent:${inv.color}" data-invid="${inv.id}">
     <div class="inv-chead">
       <input class="inv-name" data-invf="nombre" data-invid="${inv.id}" value="${esc(inv.nombre)}">
-      <button class="mini" data-verinv="${inv.id}">Ver</button>
+      <button class="mini" data-dupinv="${inv.id}" title="Duplicar esta invocación">Duplicar</button>
       <button class="inv-xbtn" data-rminv="${inv.id}" title="Eliminar del todo">×</button>
     </div>
     ${dormida ? `<div class="inv-dormida-bar">
@@ -3410,97 +3792,543 @@ function invCardHtml(inv){
       <input type="file" class="inv-imginput" data-invimginput="${inv.id}" accept="image/*" hidden>
     </div>
     <div class="inv-cbody">
-
       <div class="inv-cooldownbox">
         <span class="cdl">Cooldown</span>
         <span class="cdn">Dura <input type="number" data-invf="cooldown" data-invid="${inv.id}" value="${inv.cooldown}" min="0" title="Cuántos turnos dura la invocación"> turnos ·</span>
         <span class="cdn">${dormida ? 'Dormida' : `Quedan <b style="color:var(--brass)">${fmt(num(inv.cooldownActual))}</b>`}</span>
       </div>
-
       <div class="inv-vitalbar">
         <div class="inv-vitalmini hp">
           <div class="vl">HP</div>
           <div class="vn"><input type="number" data-invf="hp" data-invid="${inv.id}" value="${inv.hp}"><span class="vmax">/ </span><input type="number" data-invf="hpMax" data-invid="${inv.id}" value="${inv.hpMax}" style="width:30px"></div>
         </div>
-        <div class="inv-vitalmini acc">
-          <div class="vl">Acciones</div>
-          <div class="vn"><input type="number" data-invf="acc" data-invid="${inv.id}" value="${inv.acc}"><span class="vmax">/ </span><input type="number" data-invf="accMax" data-invid="${inv.id}" value="${inv.accMax}" style="width:30px"></div>
+        <div class="inv-vitalmini acc" title="Nitros: se gastan al atacar y usar habilidades. Se recargan en cada Mantenimiento">
+          <div class="vl">No2</div>
+          <div class="vn"><input type="number" data-invf="nitros" data-invid="${inv.id}" value="${fmt(num(inv.nitros))}"><span class="vmax">/ ${fmt(invNitrosMax(inv))}</span></div>
         </div>
       </div>
-
-      <div class="inv-row3">
-        <div class="inv-minif"><label>Vel.</label><input type="number" data-invf="spd" data-invid="${inv.id}" value="${inv.spd}"></div>
-        <div class="inv-minif"><label>Defensa</label><input type="number" data-invf="defensa" data-invid="${inv.id}" value="${inv.defensa}"></div>
-        <div></div>
+      <div class="inv-botones-fila">
+        <button type="button" class="btn" data-editarinv="${inv.id}" style="flex:1">✎ Editar</button>
+        <button type="button" class="btn primary" data-usarinv="${inv.id}" style="flex:1" ${dormida?'disabled':''}>▶ Usar</button>
       </div>
-
-      <div>
-        <div class="inv-sectlabel">Atributos</div>
-        <div class="inv-row5" style="margin-top:4px">
-          <div class="inv-minif"><label>Con</label><input type="number" data-invf="con" data-invid="${inv.id}" value="${inv.con}"></div>
-          <div class="inv-minif"><label>Fue</label><input type="number" data-invf="fue" data-invid="${inv.id}" value="${inv.fue}"></div>
-          <div class="inv-minif"><label>Agi</label><input type="number" data-invf="agl" data-invid="${inv.id}" value="${inv.agl}"></div>
-          <div class="inv-minif"><label>Des</label><input type="number" data-invf="des" data-invid="${inv.id}" value="${inv.des}"></div>
-          <div class="inv-minif"><label>Int</label><input type="number" data-invf="int" data-invid="${inv.id}" value="${inv.int}"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="inv-sectlabel">Arma</div>
-        <div class="inv-armaline" style="margin-top:4px">
-          <div class="inv-minif"><label>Tipo (dado)</label>
-            <select data-invf="armaTipo" data-invid="${inv.id}">
-              ${DADOS_ARMA.map(d=>`<option value="${d}" ${num(inv.armaTipo)===d?'selected':''}>d${d}</option>`).join('')}
-            </select>
-          </div>
-          <div class="inv-minif"><label>Peso (cant.)</label><input type="number" data-invf="armaPeso" data-invid="${inv.id}" value="${inv.armaPeso}"></div>
-          <div class="inv-minif"><label>Daño fijo</label><input type="number" data-invf="armaFijo" data-invid="${inv.id}" value="${inv.armaFijo}"></div>
-          <div class="inv-danopreview">Daño: <b>${invDanoTxt(inv)}</b></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="inv-sectlabel">Res. a críticos</div>
-        <div class="inv-critgrid" style="margin-top:4px">
-          <div class="inv-critcell"><label>Tipo 4</label><input type="number" data-invcrit="0" data-invid="${inv.id}" value="${inv.crit[0]}"></div>
-          <div class="inv-critcell"><label>Tipo 6</label><input type="number" data-invcrit="1" data-invid="${inv.id}" value="${inv.crit[1]}"></div>
-          <div class="inv-critcell"><label>Tipo 8</label><input type="number" data-invcrit="2" data-invid="${inv.id}" value="${inv.crit[2]}"></div>
-          <div class="inv-critcell"><label>Tipo 10</label><input type="number" data-invcrit="3" data-invid="${inv.id}" value="${inv.crit[3]}"></div>
-          <div class="inv-critcell"><label>Tipo 12</label><input type="number" data-invcrit="4" data-invid="${inv.id}" value="${inv.crit[4]}"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="inv-sectlabel">Habilidades</div>
-        <div class="inv-hablist" style="margin-top:4px">
-          ${inv.habilidades.map(h => invHabHtml(inv.id, h, sinAcc || dormida, dormida)).join('')}
-        </div>
-        <button class="inv-addhab" data-addinvhab="${inv.id}" style="margin-top:6px">+ Habilidad</button>
-      </div>
-
     </div>
   </div>`;
 }
 
-function invHabHtml(invId, h, sinAcc, dormida){
-  const enCooldown = num(h.cdActual) > 0;
-  const bloqueada = enCooldown || sinAcc;
+function invHabHtml(inv, h){
   return `<div class="inv-hab">
     <div class="inv-habtop">
-      <input class="inv-hn" data-invhabf="nombre" data-invid="${invId}" data-habid="${h.id}" value="${esc(h.nombre)}" placeholder="Nombre">
-      <div class="inv-dur">
-        <span class="inv-durlabel">CD</span>
-        <input type="number" data-invhabf="cd" data-invid="${invId}" data-habid="${h.id}" value="${h.cd||0}" min="0" title="Turnos de reutilización. 0 = sin cooldown">
-      </div>
-      <button class="inv-rm" data-rminvhab="${invId}:${h.id}">×</button>
+      <span class="inv-hn">${esc(h.nombre || 'Sin nombre')}</span>
+      <button type="button" class="mini" data-edithabinv="${inv.id}:${h.id}" title="Editar">✎</button>
+      <button type="button" class="inv-rm" data-rmhabinv="${inv.id}:${h.id}" title="Eliminar">×</button>
     </div>
-    <textarea data-invhabf="detalle" data-invid="${invId}" data-habid="${h.id}" placeholder="Efecto...">${esc(h.detalle)}</textarea>
-    <div class="inv-habbottom">
-      <span class="inv-habestado ${bloqueada?'cd':'ok'}">${enCooldown ? `En cooldown · ${fmt(num(h.cdActual))} turno(s)` : (dormida ? 'No invocada' : (sinAcc?'Sin acciones':'Disponible'))}</span>
-      <button class="inv-ejecutar" data-ejecutarinvhab="${invId}:${h.id}" ${bloqueada?'disabled':''}>Ejecutar</button>
-    </div>
+    <div class="hint">${esc(costoHabInvTxt(inv, h))}${num(h.cd) > 0 ? ` · CD ${fmt(num(h.cd))}` : ''}</div>
+    ${h.detalle ? `<div class="hint">${esc(h.detalle)}</div>` : ''}
   </div>`;
 }
+
+function invEstadoChipHtml(inv, es){
+  const activo = es.activo !== false;
+  return `<div class="inv-hab" style="${activo?'':'opacity:.5'}">
+    <div class="inv-habtop">
+      <span class="inv-hn">${esc(es.nombre || 'Estado')}</span>
+      <span class="hint" style="flex:none">${es.permanente ? 'No vence' : (num(es.turnos) ? `${fmt(num(es.turnos))}t` : '')}</span>
+      <button type="button" class="inv-rm" data-rmestadoinv="${inv.id}:${es.id}" title="Quitar">×</button>
+    </div>
+    ${es.detalle ? `<div class="hint">${esc(es.detalle)}</div>` : ''}
+  </div>`;
+}
+
+/* ---------- Editor completo de una invocación (atributos, arma, armadura,
+   res. a críticos, habilidades, estados, notas) ---------- */
+let editandoInvId = null;
+function abrirEditarInv(invId){
+  if(!S.invocaciones.some(x => x.id === invId)) return;
+  editandoInvId = invId;
+  renderEditarInv();
+  $('#scrim-editar-inv').classList.add('open');
+}
+function cerrarEditarInv(){
+  editandoInvId = null;
+  $('#scrim-editar-inv').classList.remove('open');
+}
+// Al tipear un atributo no se redibuja todo el editor (se perdería el
+// foco): solo se refrescan los secundarios de esa columna.
+function actualizarDerivInvEnDOM(inv){
+  const body = $('#editarinv-body');
+  if(!body) return;
+  body.querySelectorAll('.inv-derivcol').forEach((col, idx) => {
+    const a = ATTR_IDS_INV[idx];
+    if(!a) return;
+    const bs = col.querySelectorAll('.inv-deriv b');
+    INV_DERIVADOS_POR_ATTR[a].forEach((d, i) => { if(bs[i]) bs[i].textContent = fmt(invStatValor(inv, d.id)); });
+  });
+}
+function renderEditarInv(){
+  const inv = S.invocaciones.find(x => x.id === editandoInvId);
+  if(!inv){ cerrarEditarInv(); return; }
+  $('#editarinv-titulo').textContent = `Editar · ${inv.nombre}`;
+  $('#editarinv-body').innerHTML = `
+    <div class="inv-sectlabel" style="margin-top:0">Atributos</div>
+    <div class="inv-row5">
+      ${ATTR_IDS_INV.map(a => `<div class="inv-minif"><label>${esc(STAT_LABEL[a])}</label><input type="number" data-invattr="${a}" data-invid="${inv.id}" value="${num(inv[a])}"></div>`).join('')}
+    </div>
+    <div class="inv-derivgrid">
+      ${ATTR_IDS_INV.map(a => `<div class="inv-derivcol"><span class="inv-derivattr">${esc(STAT_LABEL[a])}</span>${INV_DERIVADOS_POR_ATTR[a].map(d => `<div class="inv-deriv"><span>${esc(d.label)}</span><b>${fmt(invStatValor(inv, d.id))}</b></div>`).join('')}</div>`).join('')}
+    </div>
+    <div class="inv-editar-separador"><span>Arma</span></div>
+    <div class="inv-arma-compacta">
+      <div class="inv-arma-top">
+        <span class="inv-arma-nombre">${inv.armaNombre ? esc(inv.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
+        <span class="inv-danopreview"><b>${esc(invDanoTxt(inv, invStatValor(inv,'dmg')))}</b></span>
+        <button type="button" class="mini" data-editararmainv="${inv.id}">✎ Editar</button>
+      </div>
+      ${inv.armaDetalle ? `<div class="hint">${esc(inv.armaDetalle)}</div>` : ''}
+      ${(inv.armaEfectos||[]).length ? `<div class="hint"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(inv.armaEfectos))}</div>` : ''}
+    </div>
+    <div class="inv-editar-separador"><span>Defensa y armadura</span></div>
+    <div class="inv-row3">
+      <div class="inv-minif"><label>Defensa</label><input type="number" data-invf="defensa" data-invid="${inv.id}" value="${inv.defensa}"></div>
+      <div></div><div></div>
+    </div>
+    <div class="inv-equipo-list">
+      ${inv.equipo.length ? inv.equipo.map(it => `
+      <div class="inv-equipo-item">
+        <span class="inv-equipo-nombre">${esc(it.nombre)}</span>
+        <span class="hint">+${fmt(num(it.def))} DEF</span>
+        <button type="button" class="inv-rm" data-quitarequipoinv="${inv.id}:${it.id}" title="Quitar">×</button>
+      </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
+    </div>
+    <button type="button" class="inv-addhab" data-additeminv="${inv.id}" style="margin-top:6px">+ Ítem</button>
+    <div class="inv-editar-separador"><span>Resistencia a críticos</span></div>
+    <div class="inv-critgrid">
+      ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => `<div class="inv-critcell"><label>${lbl}</label><input type="number" data-invcrit="${i}" data-invid="${inv.id}" value="${inv.crit[i]}"></div>`).join('')}
+    </div>
+    <div class="inv-editar-separador"><span>Habilidades</span></div>
+    <div class="inv-hablist">
+      ${inv.habilidades.length ? inv.habilidades.map(h => invHabHtml(inv, h)).join('') : '<div class="hint">Sin habilidades.</div>'}
+    </div>
+    <button type="button" class="inv-addhab" data-addhabinv="${inv.id}" style="margin-top:6px">+ Habilidad</button>
+    <div class="inv-editar-separador"><span>Estados alterados</span></div>
+    <div class="inv-hablist">
+      ${(inv.estados||[]).length ? inv.estados.map(es => invEstadoChipHtml(inv, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
+    </div>
+    <button type="button" class="inv-addhab" data-addestadoinv="${inv.id}" style="margin-top:6px">+ Estado</button>
+    <div class="inv-editar-separador"><span>Notas</span></div>
+    <textarea class="inv-notas" data-invf="notas" data-invid="${inv.id}" placeholder="Lo que haga falta recordar de esta invocación.">${esc(inv.notas)}</textarea>
+  `;
+}
+
+/* ---------- Acciones de una invocación (Botonera): Combate, tiradas de
+   stats y habilidades — igual estructura que las Acciones de un creep en
+   gm-tools, con la 🔍 y sin costo salvo Atacar/habilidades. ---------- */
+let botoneraInvId = null;
+function abrirBotoneraInv(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv){ toast('Esa invocación ya no está'); return; }
+  if(inv.activa === false){ toast(`${inv.nombre} está dormida — tocá "Invocar" para reactivarla`); return; }
+  botoneraInvId = invId;
+  renderBotoneraInv();
+  $('#scrim-botonera-inv').classList.add('open');
+}
+function renderBotoneraInv(){
+  const inv = S.invocaciones.find(x => x.id === botoneraInvId);
+  if(!inv) return;
+  const costoAtaque = costoAtaqueInv(inv);
+  const sinNitrosAtaque = num(inv.nitros) < costoAtaque;
+  const cualAtaque = num(inv.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
+  $('#botonerainv-titulo').textContent = inv.nombre;
+  $('#botonerainv-badge').textContent = `No2 ${fmt(num(inv.nitros))}/${fmt(invNitrosMax(inv))}`;
+
+  const tilesStats = INV_STATS_TIRADA_IDS.map(id => `
+    <button type="button" class="botonera-tile" data-invtirarstat="${inv.id}:${id}" title="${esc(STAT_LABEL[id]||id)}">
+      ${lupaBotonHtml(`inv:${inv.id}:stat:${id}`)}
+      <span class="bt-label">${esc(STAT_LABEL[id]||id)}</span>
+      <span class="bt-value">${fmt(invStatValor(inv, id))}</span>
+    </button>`).join('');
+
+  const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
+  const combate = [
+    {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
+    {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
+    {nombre:'Esquivar', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
+    {nombre:'Parry', dado: f(invStatValor(inv,'parry')), clave:`inv:${inv.id}:stat:parry`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:parry"`},
+    {nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo')), clave:`inv:${inv.id}:stat:bloqueo`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:bloqueo"`},
+  ];
+  const tilesCombate = combate.map(c => `
+    <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}" ${c.attr} title="${esc(c.motivo)}">
+      ${lupaBotonHtml(c.clave)}
+      <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>
+    </button>`).join('');
+
+  const filasHab = inv.habilidades.map(h => {
+    const bloqueo = bloqueoHabInv(inv, h);
+    const motivo = [costoHabInvTxt(inv,h), num(h.cd)>0?`CD ${fmt(num(h.cd))}`:''].filter(Boolean).join(' · ');
+    return `<div class="cat-row bot-fila">
+      <div class="bot-fila-info">
+        <div class="cat-nombre">${esc(h.nombre||'Sin nombre')}</div>
+        <div class="bot-fila-costo">${esc(bloqueo || motivo)}</div>
+      </div>
+      <div class="bot-fila-btns">
+        <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
+        <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>Ejecutar${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('#botonerainv-body').innerHTML = `
+    <div class="botonera-grid botonera-grid-even">
+      <div class="botonera-caja">
+        <div class="cat-grouphead" style="margin-top:0"><span>Combate</span></div>
+        <div class="botonera-combate-grid">${tilesCombate}</div>
+      </div>
+      <div class="botonera-caja">
+        <div class="cat-grouphead" style="margin-top:0"><span>Tiradas de stats</span></div>
+        <div class="botonera-stats-grid">${tilesStats}</div>
+      </div>
+    </div>
+    <div class="botonera-caja">
+      <div class="cat-grouphead" style="margin-top:0"><span>Habilidades</span></div>
+      <div class="botonera-list-grid">${inv.habilidades.length ? filasHab : '<div class="hint">Sin habilidades cargadas.</div>'}</div>
+    </div>`;
+}
+
+function verHabInv(invId, habId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const h = inv && inv.habilidades.find(x => x.id === habId);
+  if(!inv || !h) return;
+  $('#verhabinv-nombre').textContent = h.nombre || 'Sin nombre';
+  $('#verhabinv-body').innerHTML = `<div class="hint" style="margin-bottom:10px">${esc(costoHabInvTxt(inv,h))}${num(h.cd)>0?` · ${fmt(num(h.cd))} turno(s) de cooldown`:' · sin cooldown'}</div>
+    <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado.'}</div>`;
+  $('#scrim-verhabinv').classList.add('open');
+}
+
+/* ---------- Ejecutar las acciones de una invocación: mismos costos y
+   mecánica que un creep, publicado en la Mesa a su propio nombre
+   ("Invocación · Acción", igual que gm-tools arma "Creep · Acción"). ---------- */
+function tirarValorStatInv(inv, nombre, valor){
+  const f = formulaParaValor(valor);
+  if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+  const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+  const total = rolls.reduce((a,b)=>a+b,0) + f.mod;
+  registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula, rolls, mod: f.mod, total});
+}
+function invAtacar(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  const costo = costoAtaqueInv(inv);
+  if(costo > num(inv.nitros)){
+    toast(`${inv.nombre}: no le alcanzan los Nitros — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`);
+    return;
+  }
+  const primero = num(inv.ataquesTurno) === 0;
+  inv.nitros = num(inv.nitros) - costo;
+  inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+  renderInvocaciones();
+  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'));
+  toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
+}
+function invDanio(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  const r = tirarDados(invDanoTxt(inv, invStatValor(inv, 'dmg')));
+  if(!r) return;
+  registrarTirada(`${inv.nombre} · Daño Arma`, r);
+  if((inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
+    arma: inv.armaNombre || 'el arma',
+    efectos: inv.armaEfectos,
+    publicar: linea => {
+      registrarEvento(`⚠ ${linea.origen}: ${linea.formula.replace(/\n/g,' · ')}`);
+      if(!fbDb || !fbUsuario || !fbMiembro) return;
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: inv.nombre,
+        origen: linea.origen.slice(0,120), formula: linea.formula.slice(0,900),
+        rolls: linea.rolls.slice(0,100), mod:0, total:0, desde:'efecto',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err=>console.error('No se pudieron publicar los efectos en la Mesa:', err));
+    },
+  });
+}
+function invTirarStat(invId, statId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, invStatValor(inv, statId));
+}
+function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
+function mesaPublicarHabilidadInv(inv, nombre, detalle){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: inv.nombre,
+    origen: String(nombre || 'Habilidad').slice(0, 80),
+    formula: String(detalle || '').slice(0, 300),
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad de la invocación en la Mesa:', err));
+}
+function anunciarHabilidadInv(inv, h){
+  const detalle = (h && (h.detalle || h.efectoDetalle)) || '';
+  if(habilidadInvTira(h)) mesaConTexto(detalle);
+  else mesaPublicarHabilidadInv(inv, h.nombre, detalle);
+}
+function tirarExtraDeHabInv(inv, h){
+  let tiro = false;
+  if(h.tiradaStat){
+    tirarValorStatInv(inv, `${h.nombre} · ${STAT_LABEL[h.tiradaStat]||h.tiradaStat}`, invStatValor(inv, h.tiradaStat));
+    tiro = true;
+  }
+  const formula = (h.tiradaExtra||'').trim();
+  if(formula){
+    const r = tirarDados(formula);
+    if(r){ registrarTirada(`${inv.nombre} · ${h.nombre}${tiro?' (extra)':''}`, r); tiro = true; }
+  }
+  return tiro;
+}
+function invEjecutarHab(invId, habId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const h = inv && inv.habilidades.find(x => x.id === habId);
+  if(!inv || !h) return;
+  const bloqueo = bloqueoHabInv(inv, h);
+  if(bloqueo){ toast(`${inv.nombre}: ${h.nombre||'Habilidad'} — ${bloqueo}`); return; }
+  const costo = costoNitrosHabInv(inv, h);
+  inv.nitros = num(inv.nitros) - costo;
+  if(habInvAtaque(h)) inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+  if(num(h.cd) > 0) h.cdActual = num(h.cd);
+  let efectoTxt = '';
+  if((h.efectoNombre||'').trim()){
+    const datos = {
+      id: uid(), nombre: h.efectoNombre.trim(), detalle: h.efectoDetalle||'', turnos: Math.max(0,num(h.efectoTurnos)||0),
+      hpturno: num(h.efectoHpTurno)||0, permanente: !!h.efectoPermanente, activo: true, stacks:1, stacksturno:0,
+      polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[]),
+    };
+    inv.estados = inv.estados || [];
+    inv.estados.push(datos);
+    if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
+    efectoTxt = `${datos.nombre}${datos.permanente?' (no vence)':datos.turnos?` (${fmt(datos.turnos)} turnos)`:''}`;
+  }
+  anunciarHabilidadInv(inv, h);
+  tirarExtraDeHabInv(inv, h);
+  renderInvocaciones();
+  const partes = ['ejecutada', costo?`-${fmt(costo)} No2`:'sin costo de Nitros'];
+  if(efectoTxt) partes.push(efectoTxt);
+  toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+}
+
+function duplicarInvocacion(invId){
+  const idx = S.invocaciones.findIndex(x => x.id === invId);
+  if(idx < 0) return;
+  const copia = structuredClone(S.invocaciones[idx]);
+  copia.id = uid();
+  copia.nombre = (copia.nombre || 'Invocación') + ' (copia)';
+  copia.habilidades = (copia.habilidades || []).map(h => ({...h, id: uid()}));
+  copia.estados = (copia.estados || []).map(es => ({...es, id: uid()}));
+  copia.equipo = (copia.equipo || []).map(it => ({...it, id: uid()}));
+  S.invocaciones.splice(idx + 1, 0, copia);
+  renderInvocaciones();
+  toast(`${copia.nombre} creada`);
+}
+
+/* ---------- Habilidades de una invocación: mismo asistente paso a paso
+   que un creep de gm-tools (campos fijos, no el editor genérico de la
+   ficha) — qué es, costo (No2 o "como un ataque"), tirada, estado al
+   ejecutar, resumen. ---------- */
+const PASOS_HAB_INV = [
+  {corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
+   ayuda: 'Esta descripción se lee en la Mesa cada vez que se usa.'},
+  {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto se puede usar?',
+   ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
+  {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
+   ayuda: 'Podés vincularla a un stat de la invocación (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna. Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG.'},
+  {corto: 'Estado', titulo: '¿Aplica un estado alterado?',
+   ayuda: 'Se aplica sobre la propia invocación al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
+  {corto: 'Listo', titulo: 'Revisá cómo quedó',
+   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+];
+
+let editingHabInv = null;   // {invId, habId, paso}
+let editingHabInvPdgAuto = false;
+
+function hiAplicarModoNitros(){
+  const modo = $('#hi-nitros-modo').value;
+  document.querySelectorAll('[data-hi-nitros-modo]').forEach(b => b.classList.toggle('activa', b.dataset.hiNitrosModo === modo));
+  $('#hi-acciones-caja').style.visibility = modo === 'ataque' ? 'hidden' : 'visible';
+  const inv = editingHabInv && S.invocaciones.find(x => x.id === editingHabInv.invId);
+  $('#hi-ataque-ayuda').textContent = modo === 'ataque'
+    ? `Cuesta lo mismo que un ataque con su arma (Tipo ÷ 2 el primero del turno, Tipo completo después) y cuenta como ese ataque.${inv ? ` Hoy: ${fmt(costoAtaqueInv(inv))} No2.` : ''}`
+    : 'Siempre gasta esa cantidad.';
+  if(modo === 'ataque' && !$('#hi-tirada-stat').value){ $('#hi-tirada-stat').value = 'pdg'; editingHabInvPdgAuto = true; }
+  else if(modo !== 'ataque' && editingHabInvPdgAuto){ $('#hi-tirada-stat').value = ''; editingHabInvPdgAuto = false; }
+}
+
+function hiMostrarPaso(n){
+  if(!editingHabInv) return;
+  const total = PASOS_HAB_INV.length;
+  const destino = Math.max(0, Math.min(total - 1, n));
+  if(destino > 0 && !$('#hi-nombre').value.trim()){
+    toast('Primero ponele un nombre');
+    editingHabInv.paso = 0;
+  }else{
+    editingHabInv.paso = destino;
+  }
+  const paso = editingHabInv.paso;
+  const nueva = !editingHabInv.habId;
+  const conNombre = !!$('#hi-nombre').value.trim();
+  $('#hi-pasos').innerHTML = PASOS_HAB_INV.map((p, i) => {
+    const bloqueado = nueva && i > paso && !conNombre;
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hi-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  }).join('');
+  $('#hi-paso-titulo').textContent = PASOS_HAB_INV[paso].titulo;
+  $('#hi-paso-ayuda').textContent = PASOS_HAB_INV[paso].ayuda;
+  document.querySelectorAll('#scrim-hab-inv .hi-paso').forEach(el => { el.hidden = num(el.dataset.hiPaso) !== paso; });
+  $('#hi-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
+  $('#hi-siguiente').hidden = paso === total - 1;
+  $('#habinv-guardar').hidden = nueva && paso !== total - 1;
+  if(paso === total - 1) $('#hi-resumen').innerHTML = hiResumenHtml();
+  const primero = document.querySelector(`#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] input:not([type=hidden]),#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] select,#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] textarea`);
+  if(primero) setTimeout(() => primero.focus(), 30);
+}
+
+function hiOpcionesStat(elegido){
+  const op = id => `<option value="${id}" ${elegido === id ? 'selected' : ''}>${esc(STAT_LABEL[id]||id)}</option>`;
+  return '<option value="">— no tira un stat —</option>' +
+    `<optgroup label="Principales">${ATTR_IDS_INV.map(op).join('')}</optgroup>` +
+    `<optgroup label="Secundarios">${INV_STATS_HAB.map(op).join('')}</optgroup>`;
+}
+
+function hiResumenHtml(){
+  const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${esc(valor)}</b></div>`;
+  const detalle = $('#hi-detalle').value.trim();
+  const estado = $('#hi-efecto-nombre').value.trim();
+  const turnos = num($('#hi-efecto-turnos').value);
+  const cd = num($('#hi-cd').value);
+  return `<div class="resumen-nombre">${esc($('#hi-nombre').value.trim() || '(sin nombre)')}</div>
+    <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${fila('No2', $('#hi-nitros-modo').value === 'ataque' ? 'como un ataque' : fmt(Math.max(0, num($('#hi-acciones').value))))}
+    ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd===1?'':'s'}` : 'sin cooldown')}
+    ${fila('Tirada', [STAT_LABEL[$('#hi-tirada-stat').value]||'', $('#hi-tirada').value.trim()].filter(Boolean).join(' + ') || 'no tira')}
+    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
+}
+
+function abrirEditorHabInv(invId, habId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  const h = habId ? inv.habilidades.find(x => x.id === habId) : {};
+  if(!h) return;
+  editingHabInv = {invId, habId: habId || null, paso: 0};
+  $('#hi-titulo-modal').textContent = habId ? `Editar habilidad · ${inv.nombre}` : `Nueva habilidad · ${inv.nombre}`;
+  $('#hi-nombre').value = h.nombre || '';
+  $('#hi-nitros-modo').value = habInvAtaque(h) ? 'ataque' : 'num';
+  $('#hi-acciones').value = habInvAtaque(h) ? IT2_INV.nitrosHabilidad : (h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
+  editingHabInvPdgAuto = false;
+  $('#hi-cd').value = h.cd || 0;
+  $('#hi-detalle').value = h.detalle || '';
+  $('#hi-tirada').value = h.tiradaExtra || '';
+  $('#hi-tirada-stat').innerHTML = hiOpcionesStat(h.tiradaStat || '');
+  $('#hi-efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEfectosPresetHtml();
+  $('#hi-efecto-nombre').value = h.efectoNombre || '';
+  $('#hi-efecto-turnos').value = h.efectoTurnos || 0;
+  $('#hi-efecto-hpturno').value = h.efectoHpTurno || 0;
+  $('#hi-efecto-detalle').value = h.efectoDetalle || '';
+  $('#hi-efecto-permanente').checked = !!h.efectoPermanente;
+  $('#hi-efecto-polaridad').value = h.efectoPolaridad || 'otro';
+  $('#hi-efecto-mods').value = JSON.stringify(h.efectoMods || []);
+  hiAplicarModoNitros();
+  $('#scrim-hab-inv').classList.add('open');
+  hiMostrarPaso(0);
+}
+
+function guardarEditorHabInv(){
+  if(!editingHabInv) return;
+  const inv = S.invocaciones.find(x => x.id === editingHabInv.invId);
+  if(!inv){ editingHabInv = null; return; }
+  let h = editingHabInv.habId ? inv.habilidades.find(x => x.id === editingHabInv.habId) : null;
+  if(editingHabInv.habId && !h){ editingHabInv = null; return; }
+  if(!$('#hi-nombre').value.trim()){ hiMostrarPaso(0); return; }
+  if(!h){
+    h = {id: uid(), cdActual: 0};
+    inv.habilidades.push(h);
+  }
+  h.nombre = $('#hi-nombre').value.trim() || 'Sin nombre';
+  h.nitrosCosto = $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : Math.max(0, num($('#hi-acciones').value) || 0);
+  h.cd = Math.max(0, num($('#hi-cd').value) || 0);
+  h.detalle = $('#hi-detalle').value;
+  h.tiradaExtra = $('#hi-tirada').value.trim();
+  h.tiradaStat = $('#hi-tirada-stat').value;
+  h.efectoNombre = $('#hi-efecto-nombre').value.trim();
+  h.efectoTurnos = Math.max(0, num($('#hi-efecto-turnos').value) || 0);
+  h.efectoHpTurno = num($('#hi-efecto-hpturno').value) || 0;
+  h.efectoDetalle = $('#hi-efecto-detalle').value;
+  h.efectoPermanente = $('#hi-efecto-permanente').checked;
+  h.efectoPolaridad = $('#hi-efecto-polaridad').value || 'otro';
+  try{ h.efectoMods = JSON.parse($('#hi-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }
+  editingHabInv = null;
+  $('#scrim-hab-inv').classList.remove('open');
+  renderInvocaciones();
+  toast(`${h.nombre} guardada`);
+}
+
+/* ---------- "+ Estado" de una invocación: mismo selector de presets que
+   el "+ Estado" de la ficha, targeteando inv.estados en vez de S.efectos.
+   No tiene "Editar" desde la tarjeta (a propósito, para no duplicar el
+   editor genérico) — se activa directo o se borra desde la lista. ---------- */
+let presetInvId = null;
+function abrirPresetsEfectoInv(invId){
+  presetInvId = invId;
+  abrirPresetsEfecto('inv');
+}
+function activarEfectoPresetInv(preset){
+  const inv = S.invocaciones.find(x => x.id === presetInvId);
+  if(!inv) return;
+  const {nombre, ...resto} = preset;
+  const datos = {id: uid(), nombre, ...structuredClone(resto)};
+  inv.estados = inv.estados || [];
+  inv.estados.push(datos);
+  if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
+  renderInvocaciones();
+  toast(`${inv.nombre}: ${nombre} activado`);
+}
+
+// Cableado del editor de habilidad de invocación (campos fijos, no el
+// editor genérico) — mismo patrón que gm-tools con sus habilidades de creep.
+$('#habinv-guardar').onclick = guardarEditorHabInv;
+$('#hi-pasos').addEventListener('click', e => {
+  const chip = e.target.closest('[data-hi-ir]');
+  if(chip && editingHabInv) hiMostrarPaso(num(chip.dataset.hiIr));
+});
+document.querySelectorAll('[data-hi-nitros-modo]').forEach(b => b.onclick = () => {
+  $('#hi-nitros-modo').value = b.dataset.hiNitrosModo;
+  hiAplicarModoNitros();
+});
+$('#hi-tirada-stat').addEventListener('change', () => { editingHabInvPdgAuto = false; });
+$('#hi-siguiente').onclick = () => { if(editingHabInv) hiMostrarPaso(editingHabInv.paso + 1); };
+$('#hi-atras').onclick = () => { if(editingHabInv) hiMostrarPaso(editingHabInv.paso - 1); };
+$('#scrim-hab-inv').addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || !editingHabInv || !e.target.matches('[data-hi-enter]')) return;
+  e.preventDefault();
+  if(editingHabInv.paso < PASOS_HAB_INV.length - 1) hiMostrarPaso(editingHabInv.paso + 1);
+});
+$('#hi-nombre').addEventListener('input', () => { if(editingHabInv && !editingHabInv.habId) hiMostrarPaso(editingHabInv.paso); });
+$('#hi-efecto-preset').addEventListener('change', e => {
+  if(!e.target.value) return;
+  const [tipo, idx] = e.target.value.split(':');
+  const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
+  if(!preset) return;
+  $('#hi-efecto-nombre').value = preset.nombre;
+  $('#hi-efecto-turnos').value = preset.turnos ?? 0;
+  $('#hi-efecto-hpturno').value = preset.hpturno ?? 0;
+  $('#hi-efecto-detalle').value = preset.detalle || '';
+  $('#hi-efecto-permanente').checked = !!preset.permanente;
+  $('#hi-efecto-polaridad').value = preset.polaridad || 'otro';
+  $('#hi-efecto-mods').value = JSON.stringify(preset.mods || []);
+});
+$('#habinv-cancel').onclick = () => { editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); };
+$('#habinv-x').onclick = () => { editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); };
+$('#scrim-hab-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-inv'){ editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); } });
+$('#editarinv-x').onclick = cerrarEditarInv;
+$('#scrim-editar-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-editar-inv') cerrarEditarInv(); });
+$('#botonerainv-x').onclick = () => { botoneraInvId = null; $('#scrim-botonera-inv').classList.remove('open'); };
+$('#scrim-botonera-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera-inv'){ botoneraInvId = null; $('#scrim-botonera-inv').classList.remove('open'); } });
+$('#verhabinv-x').onclick = () => $('#scrim-verhabinv').classList.remove('open');
+$('#scrim-verhabinv').addEventListener('mousedown', e => { if(e.target.id==='scrim-verhabinv') $('#scrim-verhabinv').classList.remove('open'); });
 
 function defValorDe(i){
   return (i.mods||[]).filter(m => m.stat === 'def').reduce((a,m) => a + num(m.val), 0);
@@ -4021,24 +4849,32 @@ function refresh(){
    EVENTOS
    ========================================================= */
 
-// Invocaciones: Hp.Max = Con*5, igual que en los creeps. Se recalcula al
-// terminar de editar la Constitución (no en cada tecla, para que borrar o
-// escribir "12" no pase por valores intermedios). Si estaba con la vida
-// llena queda llena; si no, solo se recorta si se pasa del nuevo máximo.
+// Invocaciones: Hp.Max = Con*5 + mods y No2 máx. = Agilidad + mods, igual
+// que en los creeps. Se recalcula al terminar de editar el atributo (no en
+// cada tecla, para que borrar o escribir "12" no pase por valores
+// intermedios). Si estaba lleno queda lleno; si no, solo se recorta si se
+// pasa. Los No2 no tienen un "máximo guardado" como el HP (se calculan
+// solos de Agilidad), así que si estaba lleno se anota al entrar al campo.
+const invNitrosFullAlFoco = new WeakMap();
+document.addEventListener('focusin', e => {
+  const t = e.target;
+  if(t.dataset.invattr !== 'agl' || !t.dataset.invid) return;
+  const inv = S.invocaciones.find(x => x.id === t.dataset.invid);
+  if(inv) invNitrosFullAlFoco.set(t, num(inv.nitros) >= invNitrosMax(inv));
+});
 document.addEventListener('change', e => {
   const t = e.target;
-  if(t.dataset.invf !== 'con' || !t.dataset.invid) return;
+  if(!t.dataset.invid || (t.dataset.invattr !== 'con' && t.dataset.invattr !== 'agl')) return;
   const inv = S.invocaciones.find(x => x.id === t.dataset.invid);
   if(!inv) return;
-  const nuevoHpMax = Math.max(0, num(inv.con) * 5);
-  const estabaFull = num(inv.hp) >= num(inv.hpMax);
-  inv.hpMax = nuevoHpMax;
-  inv.hp = estabaFull ? nuevoHpMax : Math.min(num(inv.hp), nuevoHpMax);
-  const card = t.closest('.inv-card');
-  if(card){
-    card.querySelector('[data-invf="hp"]').value = inv.hp;
-    card.querySelector('[data-invf="hpMax"]').value = inv.hpMax;
+  if(t.dataset.invattr === 'con'){
+    actualizarHpMaxPorConInv(inv);
+  }else{
+    const nuevoMax = invNitrosMax(inv);
+    const full = invNitrosFullAlFoco.get(t) !== false;
+    inv.nitros = full ? nuevoMax : Math.min(num(inv.nitros), nuevoMax);
   }
+  renderInvocaciones();
 });
 
 document.addEventListener('input', e => {
@@ -4076,26 +4912,21 @@ document.addEventListener('input', e => {
     const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
     if(!inv) return;
     const campo = t.dataset.invf;
-    const noNumericos = ['nombre'];
+    const noNumericos = ['nombre','notas'];
     inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
     if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));
-
-    if(['armaTipo','armaPeso','armaFijo'].includes(campo)){
-      const preview = t.closest('.inv-armaline')?.querySelector('.inv-danopreview b');
-      if(preview) preview.textContent = invDanoTxt(inv);
-    }
+    return;
+  }
+  if(t.dataset.invattr !== undefined && t.dataset.invid){
+    const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
+    if(!inv) return;
+    inv[t.dataset.invattr] = num(t.value);
+    actualizarDerivInvEnDOM(inv);
     return;
   }
   if(t.dataset.invcrit !== undefined && t.dataset.invid){
     const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
     if(inv) inv.crit[+t.dataset.invcrit] = num(t.value);
-    return;
-  }
-  if(t.dataset.invhabf !== undefined){
-    const inv = S.invocaciones.find(x=>x.id===t.dataset.invid);
-    const h = inv && inv.habilidades.find(x=>x.id===t.dataset.habid);
-    if(!h) return;
-    h[t.dataset.invhabf] = t.dataset.invhabf === 'cd' ? num(t.value) : t.value;
     return;
   }
   if(t.id === 'f-capcinturon'){ S.caps.cinturon = num(t.value); renderVitals(); return; }
@@ -4459,12 +5290,13 @@ document.addEventListener('click', e => {
     renderInvocaciones();
     return;
   }
+  if(b.dataset.dupinv){ duplicarInvocacion(b.dataset.dupinv); return; }
   if(b.dataset.reinvocar){
     const inv = S.invocaciones.find(x=>x.id===b.dataset.reinvocar);
     if(inv){
       inv.activa = true;
       inv.cooldownActual = num(inv.cooldown);
-      inv.acc = inv.accMax;
+      inv.nitros = invNitrosMax(inv);
       renderInvocaciones();
       toast(`${inv.nombre} invocada de nuevo`);
     }
@@ -4479,32 +5311,49 @@ document.addEventListener('click', e => {
     if(inv){ inv.imagen = ''; renderInvocaciones(); }
     return;
   }
-  if(b.dataset.verinv){
-    verInvocacion(b.dataset.verinv);
+  if(b.dataset.editarinv){ abrirEditarInv(b.dataset.editarinv); return; }
+  if(b.dataset.usarinv){ abrirBotoneraInv(b.dataset.usarinv); return; }
+  if(b.dataset.editararmainv){ abrirEditorArmaInv(b.dataset.editararmainv); return; }
+  if(b.dataset.additeminv){ abrirItemNuevoInv(b.dataset.additeminv); return; }
+  if(b.dataset.quitarequipoinv){
+    const [invId, equipoId] = b.dataset.quitarequipoinv.split(':');
+    quitarEquipoDeInv(invId, equipoId);
     return;
   }
-  if(b.dataset.addinvhab){
-    const inv = S.invocaciones.find(x=>x.id===b.dataset.addinvhab);
-    if(inv){ inv.habilidades.push({id:uid(), nombre:'', detalle:'', cd:0, cdActual:0}); renderInvocaciones(); }
+  if(b.dataset.addhabinv){ abrirEditorHabInv(b.dataset.addhabinv, null); return; }
+  if(b.dataset.edithabinv){
+    const [invId, habId] = b.dataset.edithabinv.split(':');
+    abrirEditorHabInv(invId, habId);
     return;
   }
-  if(b.dataset.rminvhab){
-    const [invId, habId] = b.dataset.rminvhab.split(':');
+  if(b.dataset.rmhabinv){
+    const [invId, habId] = b.dataset.rmhabinv.split(':');
     const inv = S.invocaciones.find(x=>x.id===invId);
-    if(inv){ inv.habilidades = inv.habilidades.filter(h=>h.id!==habId); renderInvocaciones(); }
+    if(inv && confirm('¿Eliminar esta habilidad?')){ inv.habilidades = inv.habilidades.filter(h=>h.id!==habId); renderInvocaciones(); }
     return;
   }
-  if(b.dataset.ejecutarinvhab){
-    const [invId, habId] = b.dataset.ejecutarinvhab.split(':');
+  if(b.dataset.addestadoinv){ abrirPresetsEfectoInv(b.dataset.addestadoinv); return; }
+  if(b.dataset.rmestadoinv){
+    const [invId, esId] = b.dataset.rmestadoinv.split(':');
     const inv = S.invocaciones.find(x=>x.id===invId);
-    const h = inv && inv.habilidades.find(x=>x.id===habId);
-    if(!inv || !h) return;
-    if(num(inv.acc) <= 0){ toast(`${inv.nombre}: no le quedan acciones este turno`); return; }
-    if(num(h.cdActual) > 0) return;
-    inv.acc = Math.max(0, num(inv.acc) - 1);
-    h.cdActual = num(h.cd);
-    renderInvocaciones();
-    toast(`${h.nombre||'Habilidad'} ejecutada · -1 Acción${h.cd>0?` · cooldown ${fmt(num(h.cd))} turno(s)`:''}`);
+    if(inv){ inv.estados = (inv.estados||[]).filter(e=>e.id!==esId); renderInvocaciones(); }
+    return;
+  }
+  if(b.dataset.verhabinv){
+    const [invId, habId] = b.dataset.verhabinv.split(':');
+    verHabInv(invId, habId);
+    return;
+  }
+  if(b.dataset.invatacar){ invAtacar(b.dataset.invatacar); return; }
+  if(b.dataset.invdanio){ invDanio(b.dataset.invdanio); return; }
+  if(b.dataset.invtirarstat){
+    const [invId, statId] = b.dataset.invtirarstat.split(':');
+    invTirarStat(invId, statId);
+    return;
+  }
+  if(b.dataset.ejecutarhabinv){
+    const [invId, habId] = b.dataset.ejecutarhabinv.split(':');
+    invEjecutarHab(invId, habId);
     return;
   }
   if(b.dataset.consumirankh){
@@ -5050,6 +5899,17 @@ function presetBtnHtml(p, valor, clase){
       </div>
     </div>`;
   }
+  // Las invocaciones no tienen el editor genérico de estados (sería
+  // duplicar el editor de la ficha entera): se activa directo o no.
+  if(presetDestino === 'inv'){
+    return `<div class="preset-card ${clase}">
+      ${cuerpo}
+      <div class="preset-card-btns">
+        <button type="button" class="mini" data-presetver="${esc(valor)}">Ver</button>
+        <button type="button" class="mini" data-preset="${esc(valor)}">Activar</button>
+      </div>
+    </div>`;
+  }
   return `<button type="button" class="preset-btn ${clase}" data-preset="${esc(valor)}">${cuerpo}
   </button>`;
 }
@@ -5135,7 +5995,7 @@ function abrirPresetsEfecto(destino){
   // "Directo" (el + Estado de arriba) activa el estado con un clic — no
   // tiene sentido el atajo de "empezar en blanco" acá, para eso está el
   // botón "Estado personalizado" del header, que sí abre el editor.
-  let html = presetDestino === 'directo' ? '' : `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
+  let html = (presetDestino === 'directo' || presetDestino === 'inv') ? '' : `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
   ['buff','debuff','otro'].forEach(pol => {
     const del = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
     if(!del.length) return;
@@ -5148,6 +6008,7 @@ function abrirPresetsEfecto(destino){
   }
   $('#presets-body').innerHTML = html;
   $('#presets-personalizado').style.display = presetDestino === 'directo' ? '' : 'none';
+  $('#presets-titulo').textContent = presetDestino === 'inv' ? `Estado para ${(S.invocaciones.find(x=>x.id===presetInvId)||{}).nombre||'la invocación'}` : 'Estado alterado';
   $('#scrim-presets').classList.add('open');
 }
 
@@ -5180,6 +6041,10 @@ function aplicarPresetEfecto(valor){
   if(!preset) return;
   if(presetDestino === 'directo'){
     activarEfectoPreset(preset);
+    return;
+  }
+  if(presetDestino === 'inv'){
+    activarEfectoPresetInv(preset);
     return;
   }
   if(!editing) return;
@@ -5302,42 +6167,6 @@ function openViewer(key, id){
       ? `Vender 1 (${fmt(precioVentaDe(it))} DDE)`
       : `Vender (${fmt(precioVentaDe(it))} DDE)`;
   }
-  $('#scrim-view').classList.add('open');
-}
-
-function verInvocacion(id){
-  const inv = S.invocaciones.find(x => x.id === id);
-  if(!inv) return;
-  viewing = null;
-
-  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
-  const L = [];
-  L.push(linea('Estado', inv.activa === false ? 'No invocada' : 'Invocada'));
-  L.push(linea('Cooldown', `${fmt(num(inv.cooldownActual))} / ${fmt(num(inv.cooldown))} turnos`));
-  L.push(linea('HP', `${fmt(num(inv.hp))} / ${fmt(num(inv.hpMax))}`));
-  L.push(linea('Acciones', `${fmt(num(inv.acc))} / ${fmt(num(inv.accMax))}`));
-  L.push(linea('Velocidad', fmt(num(inv.spd))));
-  L.push(linea('Defensa', fmt(num(inv.defensa))));
-  L.push(linea('Atributos', `Con ${fmt(num(inv.con))} · Fue ${fmt(num(inv.fue))} · Agi ${fmt(num(inv.agl))} · Des ${fmt(num(inv.des))} · Int ${fmt(num(inv.int))}`));
-  L.push(linea('Daño de arma', invDanoTxt(inv)));
-  const critLabels = ['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'];
-  const critTxt = inv.crit.map((v,i) => v ? `${critLabels[i]} ${v>0?'+':''}${fmt(v)}` : '').filter(Boolean).join(', ');
-  if(critTxt) L.push(linea('Resistencia a críticos', critTxt));
-  if(inv.habilidades.length) L.push(linea('Habilidades', inv.habilidades.map(h=>h.nombre||'(sin nombre)').join(', ')));
-
-  $('#view-title-header').textContent = inv.nombre || 'Invocación';
-  $('#view-body').innerHTML = `
-    <div class="view-wrap">
-      <div class="view-image-wrap">${inv.imagen ? `<img src="${esc(inv.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
-      <div class="view-info">
-        <div class="view-title">${esc(inv.nombre)}</div>
-        <div class="view-lines">${L.filter(Boolean).join('')}</div>
-      </div>
-    </div>
-  `;
-  $('#view-edit-btn').style.display = 'none';
-  $('#view-del-btn').style.display = 'none';
-  $('#view-vender-btn').style.display = 'none';
   $('#scrim-view').classList.add('open');
 }
 
@@ -6857,7 +7686,76 @@ function lupaCostoAtaque(arma){
 }
 
 // Contenido de la 🔍 (comun/lupa.js lo pide con lupaContenido).
-function lupaContenido(clave){ return lupaHtml(clave); }
+function lupaContenido(clave){
+  if(clave.startsWith('inv:')) return lupaHtmlInv(clave);
+  return lupaHtml(clave);
+}
+
+/* ---------- Lupa de la Botonera de una invocación (igual que la de un
+   creep en gm-tools): de qué stat sale, sus modificadores, cómo se
+   reparte en dados y el costo en No2. ---------- */
+function lupaStatInv(inv, statId, {sinTirada = false} = {}){
+  const attr = INV_STAT_ATTR[statId] || statId;
+  let h = lupaFila(`${STAT_LABEL[attr]} base`, fmt(num(inv[attr])));
+  aportesModInv(inv, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(STAT_LABEL[attr])})</span>`, lupaSigno(a.val)); });
+  if(statId !== attr) aportesModInv(inv, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(STAT_LABEL[statId]||statId)})</span>`, lupaSigno(a.val)); });
+  if(!aportesModInv(inv, attr).length && (statId === attr || !aportesModInv(inv, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
+  if((statId === 'pdg' || statId === 'parry') && invEstadoActivo(inv, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
+  const valor = invStatValor(inv, statId);
+  h += lupaFila(esc(STAT_LABEL[statId]||statId), fmt(valor), 'lupa-total');
+  let out = lupaSeccion('De dónde sale', h);
+  if(sinTirada) return out;
+  out += lupaTirada(valor);
+  return out;
+}
+function lupaHtmlInv(clave){
+  const [, invId, tipo, ref] = clave.split(':');
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return {titulo: '', html: ''};
+  const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
+  if(tipo === 'stat') return {titulo: `${inv.nombre} · ${STAT_LABEL[ref]||ref}`, html: lupaStatInv(inv, ref) + sinCosto};
+  if(tipo === 'atacar'){
+    const tipoArma = num(inv.armaTipo) || 8;
+    const hechos = num(inv.ataquesTurno);
+    const costo = costoAtaqueInv(inv);
+    let h = lupaFila(`Tipo del arma${inv.armaNombre ? ` (${esc(inv.armaNombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
+    h += lupaFila('Ataques este turno', fmt(hechos));
+    h += hechos === 0
+      ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
+      : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
+    h += lupaFila('No2 disponibles', fmt(num(inv.nitros)), costo > num(inv.nitros) ? 'lupa-falta' : '');
+    h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
+    return {titulo: `${inv.nombre} · Atacar`, html: lupaStatInv(inv, 'pdg') + lupaSeccion('Costo', h)};
+  }
+  if(tipo === 'danio'){
+    const dmg = invStatValor(inv, 'dmg');
+    let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(inv.armaPeso) || 1)));
+    if(num(inv.armaAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(inv.armaAmplificado)));
+    h += lupaFila('Tipo (caras del dado)', `d${fmt(num(inv.armaTipo) || 8)}`);
+    if(num(inv.armaFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(inv.armaFijo)));
+    h += inv.armaDeRango
+      ? lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado')
+      : lupaFila('Dmg (de Fuerza)', lupaSigno(dmg));
+    h += lupaFila('Daño', esc(invDanoTxt(inv, dmg)), 'lupa-total');
+    let out = lupaSeccion('De dónde sale', h);
+    if(!inv.armaDeRango) out += lupaStatInv(inv, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
+    return {titulo: `${inv.nombre} · Daño${inv.armaNombre ? ` (${inv.armaNombre})` : ''}`, html: out + sinCosto};
+  }
+  if(tipo === 'hab'){
+    const h0 = inv.habilidades.find(x => x.id === ref);
+    if(!h0) return {titulo: '', html: ''};
+    const n = costoNitrosHabInv(inv, h0);
+    const porDefecto = h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '';
+    let h = lupaFila(habInvAtaque(h0) ? `No2 · como un ataque <span class="lupa-gris">(${num(inv.ataquesTurno) ? 'Tipo completo' : 'primer ataque, Tipo ÷ 2'})</span>` : porDefecto ? `No2 (por defecto, ${fmt(IT2_INV.nitrosHabilidad)})` : 'No2 de la habilidad', `${fmt(n)} No2`, 'lupa-total');
+    if(num(h0.cd) > 0) h += lupaFila('Cooldown', `${fmt(num(h0.cd))} turno(s)${num(h0.cdActual) > 0 ? ` · faltan ${fmt(num(h0.cdActual))}` : ''}`);
+    h += lupaFila('No2 disponibles', fmt(num(inv.nitros)), n > num(inv.nitros) ? 'lupa-falta' : '');
+    let out = lupaSeccion('Costo', h);
+    if(h0.tiradaStat) out += lupaSeccion('Tirada del stat', lupaFila(esc(STAT_LABEL[h0.tiradaStat]||h0.tiradaStat), fmt(invStatValor(inv, h0.tiradaStat))));
+    if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
+    return {titulo: `${inv.nombre} · ${h0.nombre || 'Habilidad'}`, html: out};
+  }
+  return {titulo: '', html: ''};
+}
 
 function lupaHtml(clave){
   const c = compute();
@@ -7220,9 +8118,28 @@ function mantenimiento(){
 
   let invocacionesVencidas = 0;
   S.invocaciones.forEach(inv => {
+    migrarInvocacion(inv);
     if(inv.activa === false) return; // ya dormida, no se sigue procesando
-    inv.acc = inv.accMax;
+    // Nitros se recargan al máximo, igual que el propio personaje.
+    inv.nitros = invNitrosMax(inv);
+    inv.ataquesTurno = 0;
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
+    // Estados alterados de la invocación: mismo criterio que los del
+    // propio personaje (HP por turno, stacks, turnos que vencen).
+    const vencidosInv = [];
+    inv.estados.forEach(e => {
+      if(e.activo === false) return;
+      const stacks = Math.max(1, num(e.stacks) || 1);
+      const hp = num(e.hpturno) * stacks;
+      if(hp) inv.hp = num(inv.hp) + hp;
+      const ds = num(e.stacksturno);
+      if(ds){ e.stacks = Math.max(0, stacks + ds); if(e.stacks === 0) vencidosInv.push(e.id); }
+      if(!e.permanente && num(e.turnos) > 0){
+        e.turnos = num(e.turnos) - 1;
+        if(e.turnos === 0) vencidosInv.push(e.id);
+      }
+    });
+    if(vencidosInv.length) inv.estados = inv.estados.filter(e => !vencidosInv.includes(e.id));
     if(num(inv.cooldown) > 0){
       inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
       if(inv.cooldownActual === 0){
@@ -7502,7 +8419,14 @@ aplicarColapsados();
 const MESA_DESDE = 'ficha';
 
 // Quién tiró: el personaje cargado en la ficha.
-function mesaQuien(){ return ((S.meta && S.meta.nombre) || '').trim(); }
+// Si el origen viene prefijado "<invocación> · ...", la tirada es de esa
+// invocación (mismo criterio que gm-tools con sus creeps); si no, es del
+// propio personaje.
+function mesaQuien(origen){
+  const inv = S.invocaciones.find(i => i.nombre && String(origen || '').startsWith(i.nombre + ' · '));
+  if(inv) return inv.nombre;
+  return ((S.meta && S.meta.nombre) || '').trim();
+}
 
 
 /* =========================================================
@@ -7636,8 +8560,22 @@ function fichaResumen(){
         nombre: String(inv.nombre || 'Invocación').slice(0, 60),
         hp: num(inv.hp),
         hpMax: num(inv.hpMax),
+        // Nitros y estados, para que el token en el mapa muestre lo mismo
+        // que un PJ o un creep (barra de No2, estados con su detalle).
+        nitros: num(inv.nitros),
+        nitrosMax: invNitrosMax(inv),
         activa: inv.activa !== false,
         miniatura: fichaMiniaturaInvocacion(inv.imagen),
+        estados: (inv.estados || [])
+          .filter(e => e && e.activo !== false && e.nombre)
+          .slice(0, 30)
+          .map(e => ({
+            nombre: String(e.nombre).slice(0, 60),
+            turnos: num(e.turnos),
+            permanente: !!e.permanente,
+            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+            detalle: String(e.detalle || '').slice(0, 300),
+          })),
       })),
   };
 }
@@ -8383,14 +9321,31 @@ async function fbAlEntrar(){
    se le avisa al mapa para que oculte el iframe, y el mapa puede pedir
    que se vuelva a abrir sin recargar. */
 const MODO_BOTONERA = document.documentElement.classList.contains('modo-botonera');
+// ?inv=<id> (o el mensaje 'abrir-botonera' con inv): abre la Botonera de
+// esa invocación en vez de la propia — el mapa la pide igual que pide las
+// Acciones de un creep, pero acá vive adentro de la ficha de su dueño.
+let modoBotoneraInv = new URLSearchParams(location.search).get('inv') || '';
 
 function botoneraAvisarMapa(tipo){
   if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
 }
 
-function botoneraModoAbrir(){
-  renderBotonera();
-  $('#scrim-botonera').classList.add('open');
+function botoneraModoAbrir(invId){
+  const destino = invId !== undefined ? invId : modoBotoneraInv;
+  if(destino){
+    if(!S.invocaciones.some(x => x.id === destino)){
+      toast('Esa invocación ya no está');
+      modoBotoneraInv = '';
+      botoneraAvisarMapa('botonera-cerrada');
+      return;
+    }
+    modoBotoneraInv = destino;
+    abrirBotoneraInv(destino);
+  }else{
+    modoBotoneraInv = '';
+    renderBotonera();
+    $('#scrim-botonera').classList.add('open');
+  }
   botoneraAvisarMapa('botonera-lista');
 }
 
@@ -8402,13 +9357,21 @@ if(MODO_BOTONERA){
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
-    if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir();
+    if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
-    // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado".
-    if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){ abrirPresetsEfecto('directo'); botoneraAvisarMapa('botonera-lista'); }
+    // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"
+    // (el de la invocación, si la Botonera abierta es la de una).
+    if(e.data.tipo === 'abrir-estados' && fichaVivo && fichaVivo.cargada){
+      if(modoBotoneraInv) abrirPresetsEfectoInv(modoBotoneraInv);
+      else abrirPresetsEfecto('directo');
+      botoneraAvisarMapa('botonera-lista');
+    }
     // El ⚙ de un estado en el mapa: se abre su editor (se busca por nombre).
+    // Las invocaciones no tienen editor de estado individual — se maneja
+    // desde su propia Botonera (quitarlo con ×), así que solo se reabre.
     if(e.data.tipo === 'editar-estado' && fichaVivo && fichaVivo.cargada){
+      if(modoBotoneraInv){ botoneraAvisarMapa('botonera-lista'); return; }
       const ef = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === e.data.nombre);
       if(!ef){ toast('No encontré ese estado en la ficha'); botoneraAvisarMapa('botonera-cerrada'); return; }
       openEditor('efectos', ef.id);

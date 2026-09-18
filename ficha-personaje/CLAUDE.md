@@ -118,6 +118,29 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   mano (número o +N/-N), así que Invulnerable, Blindado, Escudo mágico y
   Espinas frente a golpes quedan como recordatorio manual (en el
   Mantenimiento siguen bloqueando veneno y sangrado).
+- **Invocaciones — mismas funciones que un creep de gm-tools, pero las
+  maneja el jugador que invoca** (bloque "INVOCACIONES", funciones `inv*`
+  duplicadas a propósito de las de gm-tools, no importadas — mismo
+  criterio que el formato de efecto/estado): atributos con secundarios
+  derivados (`invStatValor`, tabla `GRUPOS` reutilizada), No2 propio
+  (`invNitrosMax`, `IT2_INV`, cuesta atacar Tipo÷2/Tipo completo como un
+  PJ o un creep), arma y armadura por el asistente compartido
+  (`abrirEditorArmaInv`/`abrirItemNuevoInv`, `cfgItemInv`), resistencia a
+  críticos, estados alterados propios (mismos presets `EFECTOS_PRESET`,
+  vía `abrirPresetsEfectoInv` — sin editor genérico, se activan directo o
+  se sacan con ×) y habilidades con el mismo asistente paso a paso que un
+  creep (`PASOS_HAB_INV`/`abrirEditorHabInv`, campos fijos del modal
+  `#scrim-hab-inv`, no el editor genérico `openEditor`). Cada invocación
+  tiene su propia Botonera (`abrirBotoneraInv`, `#scrim-botonera-inv`):
+  Combate, tiradas de stats y habilidades, con su 🔍
+  (`lupaHtmlInv`/`lupaContenido`). Se abre con "▶ Usar" en la tarjeta
+  (`✎ Editar` abre el resto: atributos, arma, armadura, habilidades,
+  estados) o desde el mapa igual que la Botonera del propio personaje,
+  pasando `&inv=<id>` (`MODO_BOTONERA`/`modoBotoneraInv`). Las tiradas se
+  publican en la Mesa a nombre de la invocación (`mesaQuien` reconoce el
+  prefijo "‹invocación› · ", igual que gm-tools con sus creeps).
+  `migrarInvocacion` convierte las invocaciones viejas (Acciones/Movimiento
+  → No2, como ya se hizo con la ficha y los creeps).
 
 ## Formato de datos
 

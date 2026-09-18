@@ -127,9 +127,18 @@ hay trabajo reciente o en curso de otra conversación (ver
   Tools (ya no hay "⌂ Partida", lo reemplaza el menú ☰).
 - `generarTienda(tamano, categoria)` sortea el stock según los pesos de
   rareza de cada tamaño (`TAMANOS`) y el reparto por categoría
-  (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero).
-  Alquimista tiene un piso de 40% de ítems "legacy", con el tamaño
-  topeado si no hay suficientes legacy disponibles para sostenerlo.
+  (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero / Inicio
+  de partida). Alquimista tiene un piso de 40% de ítems "legacy", con el
+  tamaño topeado si no hay suficientes legacy disponibles para sostenerlo.
+- **Categorías con reglas fijas** (`CATEGORIA_TAMANO_FIJO`,
+  `CATEGORIA_TIER_MAX`): Inicio de partida usa el reparto de Ramos
+  generales pero con tamaño fijo en Aldea (el select se bloquea ahí,
+  `aplicarTamanoFijo`) y tope de rareza en Raro — nunca Excepcional ni
+  Legendario. El tope se aplica en el índice del catálogo
+  (`indexarCatalogo(tierMax)`, vía `dentroDeTope`) y en los pesos de
+  sorteo (`pesosConTope`), así que ni generar, ni regenerar, ni "🎲 Otro"
+  de un ítem puntual (`rerollItem`) se lo saltan — ni siquiera como último
+  recurso si el rubro/tier pedido no tiene stock.
 - "+ Crear ítem nuevo" abre el asistente compartido `comun/asistente-item.js`
   (`abrirItemNuevo`), con tier, descripción narrativa, precio (con el ajuste
   de la tienda), ranuras y estado al equipar; guarda con `agregarItemCreado`.

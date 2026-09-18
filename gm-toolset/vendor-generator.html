@@ -260,6 +260,7 @@ input[type=checkbox]{width:auto}
           <option value="ramos" selected>Ramos generales</option>
           <option value="alquimista">Alquimista</option>
           <option value="herrero">Herrero</option>
+          <option value="inicio">Inicio de partida</option>
         </select>
       </div>
       <button class="btn primary" id="btn-generar" title="Arma una tienda nueva, sin nombre propio">Generar tienda</button>
@@ -1027,8 +1028,37 @@ const REPARTO_POR_CATEGORIA = {
   ramos:      {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10},
   alquimista: {consumibles:1},
   herrero:    {armas:0.45, defensivos:0.35, escudos:0.20},
+  // Inicio de partida: mismo reparto que Ramos generales, pero con tamaño
+  // y rareza fijos (ver CATEGORIA_TAMANO_FIJO/CATEGORIA_TIER_MAX) — la
+  // tienda con la que arrancan los jugadores, sin nada Excepcional ni
+  // Legendario todavía.
+  inicio:     {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10},
 };
-const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero'};
+const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero', inicio:'Inicio de partida'};
+
+// Categorías con tamaño fijo (el GM no lo elige) y/o un tope de rareza que
+// nunca se pasa — ni al generar, ni al regenerar, ni al 🎲 Otro de un ítem
+// puntual. Por ahora, solo la de inicio de partida.
+const CATEGORIA_TAMANO_FIJO = {inicio: 'aldea'};
+const CATEGORIA_TIER_MAX = {inicio: 'Raro'};
+
+// Pesos de rareza del tamaño, pero solo hasta tierMax (si se pasa): las
+// rarezas por encima quedan con probabilidad 0, no solo achicada.
+function pesosConTope(pesos, tierMax){
+  if(!tierMax) return pesos;
+  const tope = TIERS.indexOf(tierMax);
+  const out = {};
+  TIERS.forEach((t, i) => { if(i <= tope) out[t] = pesos[t] || 0; });
+  return out;
+}
+
+// Si hay tierMax, un ítem cuenta como disponible solo si su tier es una
+// rareza real (no "A definir") dentro del tope.
+function dentroDeTope(item, tierMax){
+  if(!tierMax) return true;
+  const i = TIERS.indexOf(item.tier);
+  return i >= 0 && i <= TIERS.indexOf(tierMax);
+}
 
 // Ítems mágicos (Accesorios): chance de que aparezcan ADEMÁS de la oferta
 // habitual, ampliando la cantidad de slots de la tienda en vez de
@@ -1047,6 +1077,7 @@ const MULT_MAGICO_ALQUIMISTA = 1.5;
 // pisar a mano después, esto solo evita arrancar con el campo vacío.
 function nombreAutoTienda(tamano, categoria){
   const tamanoLabel = (TAMANOS[tamano] || {}).label || '';
+  if(categoria === 'inicio') return 'Tienda de inicio de partida';
   if(categoria === 'ramos'){
     if(tamano === 'ambulante') return 'Vendedor ambulante';
     return `Tienda de ${tamanoLabel.toLowerCase()}`;
@@ -1178,7 +1209,7 @@ function elegirDelRubro(rubro, tier, usados, porRubroTier, soloLegacy){
   return null;
 }
 
-function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy){
+function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy, tierMax){
   const delRubro = elegirDelRubro(rubro, tier, usados, porRubroTier, soloLegacy);
   if(delRubro) return delRubro;
 
@@ -1191,7 +1222,10 @@ function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy){
     const c = libres((porRubroTier[otro] || {})[tier]);
     if(c.length) return c[entero(0, c.length - 1)];
   }
-  const cualquiera = libres(CATALOGO);
+  // "Lo que haya" también respeta el tope de rareza: sin esto, una tienda
+  // con tope (inicio de partida) podía terminar ofreciendo un Legendario
+  // apenas el catálogo se quedaba sin nada del rubro y el tier pedidos.
+  const cualquiera = libres(CATALOGO.filter(it => dentroDeTope(it, tierMax)));
   return cualquiera.length ? cualquiera[entero(0, cualquiera.length - 1)] : null;
 }
 
@@ -1202,10 +1236,13 @@ function elegirAccesorioMagico(tier, usados, porRubroTier){
   return elegirDelRubro('accesorios', tier, usados, porRubroTier, false);
 }
 
-// Catálogo indexado por rubro y tier, para elegir rápido.
-function indexarCatalogo(){
+// Catálogo indexado por rubro y tier, para elegir rápido. Con tierMax, deja
+// afuera del índice directamente lo que esté por encima de esa rareza —
+// para categorías con tope de rareza, como la tienda de inicio de partida.
+function indexarCatalogo(tierMax){
   const porRubroTier = {};
   CATALOGO.forEach(it => {
+    if(!dentroDeTope(it, tierMax)) return;
     const r = rubroDe(it);
     (porRubroTier[r] = porRubroTier[r] || {});
     (porRubroTier[r][it.tier] = porRubroTier[r][it.tier] || []).push(it);
@@ -1213,9 +1250,13 @@ function indexarCatalogo(){
   return porRubroTier;
 }
 
-function generarTienda(claveTamano, categoria){
-  const cfg = TAMANOS[claveTamano];
+function generarTienda(claveTamanoElegido, categoria){
   const cat = REPARTO_POR_CATEGORIA[categoria] ? categoria : 'ramos';
+  // Algunas categorías fijan su propio tamaño (inicio de partida = Aldea
+  // siempre), sin importar lo que diga el selector.
+  const claveTamano = CATEGORIA_TAMANO_FIJO[cat] || claveTamanoElegido;
+  const tierMax = CATEGORIA_TIER_MAX[cat];
+  const cfg = {...TAMANOS[claveTamano], pesos: pesosConTope(TAMANOS[claveTamano].pesos, tierMax)};
   const usados = new Set();
 
   // 1. Stock garantizado: va siempre y no entra en el reparto de abajo.
@@ -1227,7 +1268,7 @@ function generarTienda(claveTamano, categoria){
   garantizados.forEach(it => usados.add(it.id));
 
   // 2. Catálogo indexado por rubro y tier, para elegir rápido.
-  const porRubroTier = indexarCatalogo();
+  const porRubroTier = indexarCatalogo(tierMax);
 
   // 3. Cuántos objetos y cómo se reparten entre las categorías.
   // En Alquimista, al menos 40% de TODOS los slots expuestos (contando
@@ -1264,9 +1305,9 @@ function generarTienda(claveTamano, categoria){
     for(let i = 0; i < cuantos; i++){
       const tier = tirarTier(cfg.pesos);
       const soloLegacy = i < conLegacy;
-      let item = elegirItem(rubro, tier, usados, porRubroTier, soloLegacy);
+      let item = elegirItem(rubro, tier, usados, porRubroTier, soloLegacy, tierMax);
       // Si ya no quedan esenciales sin repetir, se completa con cualquiera.
-      if(!item && soloLegacy) item = elegirItem(rubro, tier, usados, porRubroTier, false);
+      if(!item && soloLegacy) item = elegirItem(rubro, tier, usados, porRubroTier, false, tierMax);
       if(!item) break;   // se acabó el catálogo entero
       usados.add(item.id);
       elegidos.push(item);
@@ -1541,10 +1582,11 @@ function rerollItem(id){
   const viejo = CATALOGO.find(it => it.id === id);
   if(idx < 0 || !viejo) return;
   const rubro = rubroDe(viejo);
+  const tierMax = CATEGORIA_TIER_MAX[tiendaActual.categoria];
   const cfg = TAMANOS[tiendaActual.tamano];
-  const tier = cfg ? tirarTier(cfg.pesos) : viejo.tier;
+  const tier = cfg ? tirarTier(pesosConTope(cfg.pesos, tierMax)) : viejo.tier;
   const usados = new Set(tiendaActual.items);
-  const porRubroTier = indexarCatalogo();
+  const porRubroTier = indexarCatalogo(tierMax);
   const soloLegacy = rubro === 'consumibles' && !!viejo.legacy;
   const nuevo = elegirDelRubro(rubro, tier, usados, porRubroTier, soloLegacy)
     || (soloLegacy ? elegirDelRubro(rubro, tier, usados, porRubroTier, false) : null);
@@ -1740,7 +1782,11 @@ function renderAgregarLista(){
   const rubro = $('#agregar-rubro').value;
   const tier = $('#agregar-tier').value;
 
-  let candidatos = CATALOGO.filter(it => !enTienda.has(it.id));
+  // En una tienda con tope de rareza (inicio de partida), agregar a mano
+  // tampoco puede saltárselo — si no, "🎲 Otro" y regenerar lo respetan
+  // pero un Legendario agregado a propósito se quedaría igual.
+  const tierMax = CATEGORIA_TIER_MAX[tiendaActual.categoria];
+  let candidatos = CATALOGO.filter(it => !enTienda.has(it.id) && dentroDeTope(it, tierMax));
   if(rubro) candidatos = candidatos.filter(it => rubroDe(it) === rubro);
   if(tier) candidatos = candidatos.filter(it => it.tier === tier);
   if(texto) candidatos = candidatos.filter(it => it.nombre.toLowerCase().includes(texto));
@@ -1834,12 +1880,23 @@ function crearTiendaPersonalizada(){
   toast('Tienda personalizada creada — usá "+ Agregar ítems" para cargarla');
 }
 
+// Si la categoría elegida fija su propio tamaño (inicio de partida =
+// Aldea), el select de tamaño se bloquea ahí — no lo elige el GM.
+function aplicarTamanoFijo(){
+  const fijo = CATEGORIA_TAMANO_FIJO[$('#f-categoria').value];
+  const sel = $('#f-tamano');
+  sel.disabled = !!fijo;
+  if(fijo) sel.value = fijo;
+}
+
 function actualizarHint(){
-  const cfg = TAMANOS[$('#f-tamano').value];
   const categoria = $('#f-categoria').value;
+  const cfg = TAMANOS[CATEGORIA_TAMANO_FIJO[categoria] || $('#f-tamano').value];
+  const tierMax = CATEGORIA_TIER_MAX[categoria];
   $('#hint-tamano').textContent =
     `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems` +
-    (categoria === 'herrero' ? '.' : `, más los consumibles de stock fijo (Poción de HP, Poción de Bonos, Revive y Raciones).`);
+    (categoria === 'herrero' ? '.' : `, más los consumibles de stock fijo (Poción de HP, Poción de Bonos, Revive y Raciones).`) +
+    (tierMax ? ` Nunca ofrece nada mejor que ${tierMax}.` : '');
 }
 
 /* ---------- Tienda en vivo (Firebase) ----------
@@ -2165,6 +2222,7 @@ function sincronizarControles(){
   if(!tiendaActual) return;
   if(TAMANOS[tiendaActual.tamano]) $('#f-tamano').value = tiendaActual.tamano;
   if(REPARTO_POR_CATEGORIA[tiendaActual.categoria]) $('#f-categoria').value = tiendaActual.categoria;
+  aplicarTamanoFijo();
   marcarAjuste();
   actualizarHint();
 }
@@ -2218,7 +2276,7 @@ async function iniciarTiendaEnVivo(){
 /* ---------- Eventos ---------- */
 
 $('#f-tamano').addEventListener('change', actualizarHint);
-$('#f-categoria').addEventListener('change', actualizarHint);
+$('#f-categoria').addEventListener('change', () => { aplicarTamanoFijo(); actualizarHint(); });
 $('#btn-generar').addEventListener('click', () => generar(true));
 $('#btn-regenerar').addEventListener('click', () => generar(false));
 $('#btn-guardar-tienda').addEventListener('click', guardarTiendaEnLista);
@@ -2304,6 +2362,7 @@ document.addEventListener('click', e => {
   if(b.dataset.ajuste !== undefined) return aplicarAjuste(b.dataset.ajuste);
 });
 
+aplicarTamanoFijo();
 actualizarHint();
 renderOrdenControles();
 iniciarTiendaEnVivo();

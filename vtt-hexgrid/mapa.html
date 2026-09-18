@@ -174,17 +174,13 @@ aside{
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
 #toolkit-pestana{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
-  width:26px;padding:12px 0;border:1px solid var(--line);border-left:none;border-radius:0 6px 6px 0;
-  background:rgba(26,20,24,.88);color:var(--brass);cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:4px 4px 14px rgba(0,0,0,.45)
+  width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
+  background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
+  box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
 #toolkit-pestana:hover{background:var(--panel2);color:var(--paper)}
-#toolkit-pestana .flecha{font-size:12px;line-height:1;transition:transform .22s}
-#toolkit.abierto #toolkit-pestana .flecha{transform:rotate(180deg)}
-#toolkit-pestana .texto{
-  writing-mode:vertical-rl;transform:rotate(180deg);font-family:"Space Mono",monospace;
-  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase
-}
+#toolkit.abierto #toolkit-pestana{color:var(--paper);border-color:var(--copper)}
 #toolkit-cab{
   padding:12px 14px 10px;border-bottom:1px solid var(--line-soft);
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)
@@ -516,9 +512,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <ul id="toolkit-lista"></ul>
         <div id="toolkit-pie">Las herramientas se van a ir sumando de a una.</div>
       </nav>
-      <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">
-        <span class="flecha">▶</span><span class="texto">Herramientas</span>
-      </button>
+      <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">🧰</button>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>

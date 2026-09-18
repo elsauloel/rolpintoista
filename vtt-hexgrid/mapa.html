@@ -837,6 +837,7 @@ let elementoSeleccionado = null;
 let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
 let editandoElemento = null;   // {id, original:{...}} mientras el panel ⚙️ está abierto — ver abrirEditorElemento
 let cortarElementosListener = null;
+const LINEA_MAX_CELDAS = 100;    // largo máximo de una Línea arrastrada
 const TAMANO_ELEMENTO_MAX = 30;  // tope del radio (Flor) o largo (Línea); ver el tope de celdas en las reglas
 // Terreno y Formas quedaron unificadas en una sola herramienta (decidido
 // 2026-09-19): "Sólido" es un tilde más del mismo panel, no una
@@ -854,7 +855,7 @@ let elemImagen = '';        // data URL de la textura elegida; no se recuerda en
 try{ elemTipo = localStorage.getItem('elem-tipo') || elemTipo; }catch(e){}
 try{ elemTamano = parseInt(localStorage.getItem('elem-tamano'), 10) || elemTamano; }catch(e){}
 try{ elemColor = localStorage.getItem('elem-color') || elemColor; }catch(e){}
-try{ elemAlfa = parseInt(localStorage.getItem('elem-alfa'), 10) || elemAlfa; }catch(e){}
+try{ const a = parseInt(localStorage.getItem('elem-alfa'), 10); if(Number.isFinite(a)) elemAlfa = Math.max(0, Math.min(100, a)); }catch(e){}
 try{ elemSolido = localStorage.getItem('elem-solido') === '1'; }catch(e){}
 try{ elemInvisible = localStorage.getItem('elem-invisible') === '1'; }catch(e){}
 
@@ -1830,7 +1831,7 @@ function dibujar(){
     });
   };
   elementos.forEach((el, id) => {
-    if(el.invisible && !soyGM) return;  // sólido invisible: solo lo ve el GM
+    if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
     const celdas = celdasDeElemento(el);
     const img = el.imagen ? imagenLista(el.imagen) : null;
     if(img){
@@ -1854,10 +1855,19 @@ function dibujar(){
     }
     bordeCeldas(celdas);
     if(el.invisible){
-      // Solo GM: contorno punteado violeta, para no confundirlo con un
-      // sólido que también ven los jugadores.
+      // Solo GM y creador: contorno punteado violeta, para no confundirlo
+      // con un sólido que también ven los jugadores.
       ctx.setLineDash([5 / z, 4 / z]);
       ctx.strokeStyle = 'rgba(155,111,209,.85)';
+      ctx.lineWidth = 1.5 / z;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }else if(el.alfa === 0 && !el.solido && !puedeManipularElemento(el)){
+      // Transparencia 0: el resto no ve nada, ni el contorno.
+    }else if(el.alfa === 0 && !el.solido){
+      // Transparencia 0: el GM y el creador siguen viendo el contorno.
+      ctx.setLineDash([5 / z, 4 / z]);
+      ctx.strokeStyle = colorConAlfa(el.color, 0.9);
       ctx.lineWidth = 1.5 / z;
       ctx.stroke();
       ctx.setLineDash([]);
@@ -2323,12 +2333,8 @@ lienzo.addEventListener('pointerdown', e => {
     // línea/libre se arman arrastrando, ver pointermove/soltar).
     if(herramientaActiva === 'elemento'){
       elementoSeleccionar(null);
-      if(elemTipo === 'flor'){
-        guardarElemento('flor', casillaClic, celdasFlor(elemTamano));
-      }else{
-        dibujandoElemento = {tipo: elemTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
-        lienzo.style.cursor = 'crosshair';
-      }
+      dibujandoElemento = {tipo: elemTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
+      lienzo.style.cursor = 'crosshair';
       return;
     }
     // Con el engranaje abierto, el primer clic en el mapa solo lo cierra:
@@ -2358,8 +2364,17 @@ lienzo.addEventListener('pointermove', e => {
     const m = pantallaAMundo(px, py);
     const casilla = mundoAHex(m.x, m.y);
     const c0 = hexACubo(dibujandoElemento.origen), c1 = hexACubo(casilla);
-    if(dibujandoElemento.tipo === 'linea'){
-      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, elemTamano);
+    if(dibujandoElemento.tipo === 'flor'){
+      // El clic fija el centro; el radio es la distancia hasta el mouse.
+      const dq = c1.q - c0.q, dr = c1.r - c0.r;
+      const radio = Math.min(TAMANO_ELEMENTO_MAX, (Math.abs(dq) + Math.abs(dr) + Math.abs(-dq - dr)) / 2);
+      dibujandoElemento.celdas = new Map(celdasFlor(radio).map(c => [`${c.dq},${c.dr}`, c]));
+    }else if(dibujandoElemento.tipo === 'linea'){
+      // El largo lo da el arrastre: casilleros hasta donde está el mouse
+      // (contando el origen), con un tope de LINEA_MAX_CELDAS.
+      const dq = c1.q - c0.q, dr = c1.r - c0.r;
+      const largo = Math.min(LINEA_MAX_CELDAS, (Math.abs(dq) + Math.abs(dr) + Math.abs(-dq - dr)) / 2 + 1);
+      const celdas = celdasLinea({dq, dr}, largo);
       dibujandoElemento.celdas = new Map(celdas.map(c => [`${c.dq},${c.dr}`, c]));
     }else{
       dibujandoElemento.celdas.set(`${c1.q - c0.q},${c1.r - c0.r}`, {dq: c1.q - c0.q, dr: c1.r - c0.r});
@@ -2413,7 +2428,20 @@ lienzo.addEventListener('pointermove', e => {
     arrastre.movio = true;
     const m = pantallaAMundo(px, py);
     arrastre.x = m.x + arrastre.dx; arrastre.y = m.y + arrastre.dy;
-    if(!arrastre.libre) extenderRuta(arrastre, mundoAHex(arrastre.x, arrastre.y));
+    arrastre.chocado = false;
+    if(!arrastre.libre){
+      arrastre.chocado = extenderRuta(arrastre, mundoAHex(arrastre.x, arrastre.y));
+      if(arrastre.chocado){
+        // Choque: el token no sigue al mouse, apenas se "apoya" contra el
+        // obstáculo desde la última casilla libre.
+        const u = arrastre.ruta[arrastre.ruta.length - 1];
+        const cu = hexCentro(u.col, u.fila);
+        const vx = arrastre.x - cu.x, vy = arrastre.y - cu.y;
+        const largo = Math.hypot(vx, vy), tope = HEX * 0.3;
+        if(largo > tope){ arrastre.x = cu.x + vx / largo * tope; arrastre.y = cu.y + vy / largo * tope; }
+        lienzo.style.cursor = 'not-allowed';
+      }
+    }
     pedirDibujo();
     return;
   }
@@ -2472,13 +2500,17 @@ function pasosPagables(costo){
 // La ruta sigue al token casilla por casilla. Volver sobre una casilla ya
 // recorrida borra la estela desde ahí. Pasarse de los Nitros se permite
 // (quedan en negativo), pero avisa y la estela sigue en rojo.
+// Devuelve true si un elemento sólido cortó el avance: el token "se choca"
+// y se queda en la última casilla libre.
 function extenderRuta(a, casilla){
   const ruta = a.ruta;
   const i = ruta.findIndex(c => mismoHex(c, casilla));
-  if(i >= 0){ ruta.length = i + 1; return; }
+  if(i >= 0){ ruta.length = i + 1; return false; }
+  let chocado = false;
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
+    if(elementoSolidoEn(c.col, c.fila)){ chocado = true; break; }
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
@@ -2486,6 +2518,7 @@ function extenderRuta(a, casilla){
     // Sin aviso verde: la estela en rojo y el cartel ya lo muestran.
     a.avisado = true;
   }
+  return chocado;
 }
 
 function soltar(){
@@ -2544,6 +2577,7 @@ function soltar(){
       toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
       visibles.delete(a.id);
     }else if(a.movio && t && pasos > 0){
+      if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
       visibles.set(a.id, {x: a.x, y: a.y});
       if(a.costo){
         rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles};
@@ -2660,6 +2694,10 @@ function coleccionElementos(){
 function puedeManipularElemento(el){
   return !!(el && fbUsuario && (soyGM || el.duenoUid === fbUsuario.uid));
 }
+// Un elemento invisible solo lo ven el GM y su creador (el resto, nada).
+function puedeVerElemento(el){
+  return !el.invisible || puedeManipularElemento(el);
+}
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
 // rotado). {col,fila} absolutos.
 function celdasDeElemento(el, sinRotar){
@@ -2673,7 +2711,7 @@ function celdasDeElemento(el, sinRotar){
 function elementoEn(col, fila){
   const lista = [...elementos.entries()].reverse();
   for(const [id, el] of lista){
-    if(el.invisible && !soyGM) continue;  // no se puede seleccionar lo que no se ve
+    if(!puedeVerElemento(el)) continue;  // no se puede seleccionar lo que no se ve
     if(celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return id;
   }
   return null;
@@ -2733,7 +2771,7 @@ function escucharElementos(){
         celdas,
         rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
         color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#3F6FB0',
-        alfa: Math.max(10, Math.min(100, num(d.alfa) || 45)),
+        alfa: Math.max(0, Math.min(100, Number.isFinite(d.alfa) ? d.alfa : 45)),
         solido: d.solido === true,
         invisible: d.invisible === true,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
@@ -2753,7 +2791,7 @@ async function guardarElemento(tipo, origen, celdasSet){
   const celdas = [];
   celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
   if(!celdas.length) return;
-  const invisible = !!(elemSolido && soyGM && elemInvisible);
+  const invisible = !!(soyGM && elemInvisible);
   try{
     await coleccionElementos().add({
       tipo, origen, celdas, rotacion: 0,
@@ -2809,7 +2847,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {color: el.color, alfa: el.alfa, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY},
+    original: {color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY},
   };
   renderEditorElemento();
 }
@@ -2862,7 +2900,8 @@ function renderEditorElemento(){
     <label class="etiqueta" style="margin-top:0">Color</label>
     <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === el.color ? ' elegido' : ''}" data-eled-color="${c}" style="background:${c}"></button>`).join('')}</div>
     <label class="etiqueta">Transparencia</label>
-    <input type="range" id="elem-edit-alfa" min="10" max="100" step="5" value="${el.alfa}">
+    <input type="range" id="elem-edit-alfa" min="0" max="100" step="5" value="${el.alfa}">
+    ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
     ${tieneImagen && V ? `
       <label class="etiqueta">Imagen (arrastrar para mover, rueda del mouse para zoom)</label>
       <div class="elem-edit-visor" id="elem-edit-visor" style="width:${V.w}px;height:${V.h}px"><img id="elem-edit-img" src="${el.imagen}"></div>
@@ -2882,7 +2921,7 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-x').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-guardar').onclick = () => {
-    const cambios = {color: el.color, alfa: el.alfa, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY};
+    const cambios = {color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
     moverElemento(id, cambios);
@@ -2892,6 +2931,8 @@ function renderEditorElemento(){
     caja.querySelectorAll('[data-eled-color]').forEach(x => x.classList.toggle('elegido', x === b));
   });
   caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
+  const chkInvisible = caja.querySelector('#elem-edit-invisible');
+  if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
 
   if(tieneImagen && V){
     const visor = caja.querySelector('#elem-edit-visor');
@@ -4777,16 +4818,14 @@ function renderHerramientaFlotante(){
         <option value="linea"${elemTipo === 'linea' ? ' selected' : ''}>Línea</option>
         <option value="libre"${elemTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
       </select>
-      ${elemTipo !== 'libre' ? `<label class="etiqueta">${elemTipo === 'flor' ? 'Radio' : 'Largo'} (1 a ${TAMANO_ELEMENTO_MAX})</label>
-      <input type="number" id="elem-tamano-input" min="1" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${elemTamano}">` : ''}
       <label class="etiqueta">Color</label>
       <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === elemColor ? ' elegido' : ''}" data-elem-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
       <label class="etiqueta">Transparencia</label>
-      <input type="range" id="elem-alfa-slider" min="10" max="100" step="5" value="${elemAlfa}">
+      <input type="range" id="elem-alfa-slider" min="0" max="100" step="5" value="${elemAlfa}">
       ${imagenElementoOpcionHtml(elemImagen)}
       <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
-      ${elemSolido && soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
-      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : elemTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${elemSolido && soyGM ? ' Invisible: solo vos ves el contorno (punteado violeta); sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>`;
+      ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>`;
   }else{
     caja.hidden = true; caja.innerHTML = ''; return;
   }

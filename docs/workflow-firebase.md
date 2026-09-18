@@ -227,7 +227,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
   sin rotar; hasta 6000 números = 3000 casilleros — antes 200, se subió
   2026-09-19 para que el tamaño se pueda pedir bien grande), rotacion
-  (0/60/…/300), color, alfa (10-100), solido, invisible (opcional,
+  (0/60/…/300), color, alfa (0-100), solido, invisible (opcional,
   default false), imagen (textura de fondo, opcional, string vacío si no
   tiene), imgZoom/imgDX/imgDY (cómo se acomoda esa textura dentro de la
   forma — 1/0/0 si no se tocó), fijado, duenoUid, creado}`. Terreno y
@@ -245,8 +245,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   solo se frena el arrastre) — colisión solo contra Formas por ahora, la
   de token-contra-token según bando queda pendiente (ver
   `vtt-hexgrid/CLAUDE.md`, sección "Pendiente"). `invisible: true` (solo
-  el GM lo puede poner, reglas lo exigen) hace que solo el GM vea el
-  contorno; los jugadores no lo ven pero igual colisiona. `fijado: true`
+  el GM lo puede prender o apagar, al crear o después desde ⚙️, con o sin
+  Sólido; las reglas lo exigen) hace que solo el GM y el creador vean el
+  contorno; el resto no lo ve pero igual colisiona si es sólido. Con
+  `alfa` 0 el GM y el creador también siguen viendo el contorno. `fijado: true`
   (pineado): no se puede mover ni rotar, se comporta como el terreno de
   abajo (clickear y arrastrar mueve el mapa, no el elemento) — sigue
   siendo del dueño o el GM despinearlo.

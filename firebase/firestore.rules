@@ -339,7 +339,8 @@ service cloud.firestore {
       // editarlo (color, alfa, imagen y su acomodo — tipo/celdas/solido
       // no cambian más, para eso se borra y se crea uno nuevo); borrarlo
       // del todo también es de los dos. `invisible` (solo lo ve el GM)
-      // solo lo puede prender el GM al crear, y no se edita después.
+      // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
+      // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
         return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado'])
           && d.tipo in ['flor', 'linea', 'libre']
@@ -347,9 +348,9 @@ service cloud.firestore {
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
           && d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0
           && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
-          && d.alfa is int && d.alfa >= 10 && d.alfa <= 100
+          && d.alfa is int && d.alfa >= 0 && d.alfa <= 100
           && d.solido is bool
-          && (!('invisible' in d) || (d.invisible is bool && (d.invisible == false || d.solido == true)))
+          && (!('invisible' in d) || d.invisible is bool)
           && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
           && (!('imgZoom' in d) || (d.imgZoom is number && d.imgZoom >= 1 && d.imgZoom <= 6))
           && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
@@ -367,7 +368,8 @@ service cloud.firestore {
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
           && elementoValido(request.resource.data)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'imagen', 'imgZoom', 'imgDX', 'imgDY']);
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY'])
+          && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c));
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -450,7 +452,8 @@ service cloud.firestore {
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
             && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'imagen', 'imgZoom', 'imgDX', 'imgDY']);
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY'])
+            && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

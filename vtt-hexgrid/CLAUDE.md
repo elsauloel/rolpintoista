@@ -217,6 +217,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   `elemColor`/`elemAlfa`/`elemSolido`/`elemInvisible`/`elemImagen`
   (`localStorage` `elem-*`, menos la imagen que no se recuerda entre
   sesiones a propósito).
+  - **Actualización 2026-09-19 — ni la Línea ni la Flor llevan número:**
+    el tamaño lo da el arrastre y no hay campo `#elem-tamano-input`. Línea:
+    casilleros hasta donde está el mouse, en la dirección de las 6 más
+    cercana (tope `LINEA_MAX_CELDAS` = 100). Flor: el clic fija el centro
+    y el radio es la distancia hasta el mouse (tope `TAMANO_ELEMENTO_MAX`
+    = 30); un clic sin arrastrar deja una sola casilla. Lo de "radio/largo
+    en un `<input type=number>`" más abajo quedó viejo.
   - **3 formas al crear**: **Flor** (radio, mismo cálculo de anillos que
     `dibujarAuraHex`, `celdasFlor`) se crea de un solo clic; **Línea**
     (largo, `celdasLinea`) y **Forma libre** (`dibujandoElemento`, agrega
@@ -271,6 +278,22 @@ nuevo de Rol Pintoísta. Paso 2 de
     Destildarlo después de crear el elemento no se puede — es de las
     cosas fijas al crear (junto con tipo/celdas), para eso se borra y se
     crea uno nuevo (ver ⚙️ más abajo).
+  - **Actualización 2026-09-19 — el token se choca:** en vez de dejar
+    cruzar el obstáculo y cancelar recién al soltar, `extenderRuta`
+    corta el avance en la última casilla libre (devuelve `chocado`) y el
+    token se queda apoyado ahí (a lo sumo `HEX*0.3` hacia el mouse, cursor
+    "no permitido") mientras el mouse siga del otro lado; volver hacia
+    atrás lo suelta. Al soltar chocado, se mueve hasta esa casilla libre y
+    avisa con un toast. Lo de "no se mueve, toast y listo" de arriba ya no
+    aplica; queda el chequeo viejo solo como resguardo. Sigue sin haber
+    rodeo automático (P46).
+  - **Actualización 2026-09-19:** "Invisible para jugadores" ya no
+    depende de Sólido: el GM lo tilda al crear o después desde el ⚙️
+    (`elem-edit-invisible`, en vivo como el resto), y lo ven el GM **y el
+    creador** (`puedeVerElemento`), no solo el GM. La transparencia puede
+    ser 0: el GM y el creador ven el contorno punteado igual; el resto no
+    ve nada (salvo un sólido, que siempre muestra su borde rojo). Lo de
+    abajo quedó desactualizado en esos puntos.
   - **Invisible para jugadores** (checkbox que solo aparece con Sólido
     tildado y siendo GM): pensado para marcar sobre el fondo ya dibujado
     del mapa qué zonas son intransitables sin agregar un dibujo de más —

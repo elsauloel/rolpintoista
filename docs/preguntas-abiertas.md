@@ -81,7 +81,12 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P35. Accesos repetidos.** Con el menú ☰ quedaron duplicados "⌂ Inicio", "🗺 Mapa", "⚔ GM Tools", "⌂ Partida" en las barras de cada herramienta. ¿Se sacan o quedan como atajo? *(2026-09-16)*
 - 🔲 **P36. Defensa de los creeps en las Acciones.** La Botonera de los personajes muestra Defensa y Resistencia a críticos con su 🔍. ¿Se suma lo mismo en las Acciones de los creeps? *(2026-09-17)*
 - 🔲 **P37. Versión para celular.** Decidido: por ahora solo compu. Se retoma solo si se pide. *(2026-09-17)*
-- 🔲 **P38. Caja de herramientas del mapa: quién usa qué.** La barra de la izquierda la ven todos. ¿Lápiz, Formas y Terreno son para todos o algunas solo del GM? *(2026-09-17)*
+- ✅ **P38. Caja de herramientas del mapa: quién usa qué.** Respondido
+  2026-09-18: Lápiz, Terreno y Formas son de cualquier miembro por igual
+  (crear); mover/rotar/borrar lo que creó cualquiera de las tres, solo su
+  dueño o el GM. La única excepción es puntual: dentro de Formas, marcar
+  un sólido como "invisible para jugadores" es solo del GM (checkbox que
+  ni aparece si no lo es).
 - ✅ **P39. Lápiz.** Respondido 2026-09-18: por default el trazo se ve unos
   segundos y se borra solo (como una estela); tildando "Dibujo
   permanente" queda como un objeto que se mueve y rota. Colores: paleta
@@ -89,13 +94,19 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
   (si es permanente); si no es permanente, cualquiera (para que no quede
   huérfano). Construido en `vtt-hexgrid/mapa.html` ✏️, ver
   [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md).
-- 🔲 **P40. Formas hexagonales.** Parcialmente respondido: son objetos
-  sólidos (bloquean casillero y trayectoria, a diferencia de Terreno que
-  es transitable); el GM además va a poder crear sólidos **invisibles
-  para los jugadores** (él ve el contorno, ellos nada) para marcar sobre
-  el fondo del mapa qué partes ya dibujadas son intransitables, sin que
-  se note un dibujo extra. Falta construir del todo. *(2026-09-17,
-  ampliado 2026-09-18)*
+- ✅ **P40. Formas hexagonales.** Respondido y construido 2026-09-18: son
+  objetos sólidos (bloquean casillero y trayectoria contra Formas,
+  "avisa y bloquea" sin rodeo automático — ver P46), a diferencia de
+  Terreno que es transitable; el GM además puede crear sólidos
+  **invisibles para los jugadores** (él ve el contorno punteado violeta,
+  ellos nada) para marcar sobre el fondo del mapa qué partes ya dibujadas
+  son intransitables, sin que se note un dibujo extra. Ver
+  [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md). Queda pendiente
+  (sección "Pendiente" de ese mismo archivo) la colisión
+  token-contra-token: se decidió "todos los PJ aliados, creeps enemigos
+  por default, el GM puede marcar un creep aliado o neutral" — falta
+  sumarle el campo `bando` al creep y el chequeo en el mapa, más la regla
+  de que en combate nadie comparte hexágono sin importar bando.
 - 🔲 **P41. Terreno (arena movediza, veneno, arena tóxica…).** La parte
   visual (color + transparencia sobre la grilla, sin base de imágenes) ya
   está construida — ver P45 y

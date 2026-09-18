@@ -791,6 +791,21 @@ try{ terrenoTipo = localStorage.getItem('terreno-tipo') || terrenoTipo; }catch(e
 try{ terrenoTamano = parseInt(localStorage.getItem('terreno-tamano'), 10) || terrenoTamano; }catch(e){}
 try{ terrenoColor = localStorage.getItem('terreno-color') || terrenoColor; }catch(e){}
 try{ terrenoAlfa = parseInt(localStorage.getItem('terreno-alfa'), 10) || terrenoAlfa; }catch(e){}
+// Formas: mismo mecanismo que Terreno, pero solido:true (bloquea
+// casillero y trayectoria — ver elementoSolidoEn). "Invisible" es solo
+// del GM: un sólido que solo él ve el contorno, pensado para marcar
+// sobre el fondo del mapa qué partes ya dibujadas no se pueden pisar,
+// sin que el jugador vea un dibujo de más encima.
+let formaTipo = 'flor';
+let formaTamano = 1;
+let formaColor = '#8A8A8A';
+let formaAlfa = 70;
+let formaInvisible = false;
+try{ formaTipo = localStorage.getItem('forma-tipo') || formaTipo; }catch(e){}
+try{ formaTamano = parseInt(localStorage.getItem('forma-tamano'), 10) || formaTamano; }catch(e){}
+try{ formaColor = localStorage.getItem('forma-color') || formaColor; }catch(e){}
+try{ formaAlfa = parseInt(localStorage.getItem('forma-alfa'), 10) || formaAlfa; }catch(e){}
+try{ formaInvisible = localStorage.getItem('forma-invisible') === '1'; }catch(e){}
 
 /* ---------- Varios mapas guardados ----------
    campanas/<partida>/mapas/{id} = {nombre, creado}: la lista de mapas que
@@ -1762,14 +1777,31 @@ function dibujar(){
     });
   };
   elementos.forEach((el, id) => {
+    if(el.invisible && !soyGM) return;  // sólido invisible: solo lo ve el GM
     const celdas = celdasDeElemento(el);
     trazarCeldas(celdas);
-    ctx.fillStyle = colorConAlfa(el.color, el.alfa / 100 * 0.7);
+    ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
     ctx.fill();
     bordeCeldas(celdas);
-    ctx.strokeStyle = colorConAlfa(el.color, Math.min(1, el.alfa / 100 + 0.25));
-    ctx.lineWidth = 2 / z;
-    ctx.stroke();
+    if(el.invisible){
+      // Solo GM: contorno punteado violeta, para no confundirlo con un
+      // sólido que también ven los jugadores.
+      ctx.setLineDash([5 / z, 4 / z]);
+      ctx.strokeStyle = 'rgba(155,111,209,.85)';
+      ctx.lineWidth = 1.5 / z;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }else if(el.solido){
+      // Sólido visible: borde de advertencia fijo, para que se note que
+      // bloquea el paso más allá del color elegido.
+      ctx.strokeStyle = 'rgba(216,82,75,.85)';
+      ctx.lineWidth = 3 / z;
+      ctx.stroke();
+    }else{
+      ctx.strokeStyle = colorConAlfa(el.color, Math.min(1, el.alfa / 100 + 0.25));
+      ctx.lineWidth = 2 / z;
+      ctx.stroke();
+    }
     if(id === elementoSeleccionado){
       ctx.setLineDash([6 / z, 5 / z]);
       ctx.strokeStyle = 'rgba(237,227,210,.85)';
@@ -1791,11 +1823,12 @@ function dibujar(){
   if(dibujandoElemento){
     const c0 = hexACubo(dibujandoElemento.origen);
     const celdas = [...dibujandoElemento.celdas.values()].map(({dq, dr}) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
+    const colorPreview = dibujandoElemento.forma ? formaColor : terrenoColor;
     trazarCeldas(celdas);
-    ctx.fillStyle = colorConAlfa(terrenoColor, 0.35);
+    ctx.fillStyle = colorConAlfa(colorPreview, 0.35);
     ctx.fill();
     bordeCeldas(celdas);
-    ctx.strokeStyle = terrenoColor; ctx.lineWidth = 2 / z; ctx.stroke();
+    ctx.strokeStyle = colorPreview; ctx.lineWidth = 2 / z; ctx.stroke();
   }
 
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
@@ -2137,14 +2170,16 @@ lienzo.addEventListener('pointerdown', e => {
       }
       return;
     }
-    // Terreno activo: crea un elemento nuevo (flor de un clic; línea/libre
-    // se arman arrastrando, ver pointermove/soltar).
-    if(herramientaActiva === 'terreno'){
+    // Terreno o Formas activo: crea un elemento nuevo (flor de un clic;
+    // línea/libre se arman arrastrando, ver pointermove/soltar).
+    if(herramientaActiva === 'terreno' || herramientaActiva === 'formas'){
+      const esForma = herramientaActiva === 'formas';
+      const tipo = esForma ? formaTipo : terrenoTipo;
       elementoSeleccionar(null);
-      if(terrenoTipo === 'flor'){
-        guardarElemento('flor', casillaClic, celdasFlor(terrenoTamano));
+      if(tipo === 'flor'){
+        guardarElemento('flor', casillaClic, celdasFlor(esForma ? formaTamano : terrenoTamano), esForma);
       }else{
-        dibujandoElemento = {tipo: terrenoTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
+        dibujandoElemento = {tipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]]), forma: esForma};
         lienzo.style.cursor = 'crosshair';
       }
       return;
@@ -2177,7 +2212,7 @@ lienzo.addEventListener('pointermove', e => {
     const casilla = mundoAHex(m.x, m.y);
     const c0 = hexACubo(dibujandoElemento.origen), c1 = hexACubo(casilla);
     if(dibujandoElemento.tipo === 'linea'){
-      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, terrenoTamano);
+      const celdas = celdasLinea({dq: c1.q - c0.q, dr: c1.r - c0.r}, dibujandoElemento.forma ? formaTamano : terrenoTamano);
       dibujandoElemento.celdas = new Map(celdas.map(c => [`${c.dq},${c.dr}`, c]));
     }else{
       dibujandoElemento.celdas.set(`${c1.q - c0.q},${c1.r - c0.r}`, {dq: c1.q - c0.q, dr: c1.r - c0.r});
@@ -2264,7 +2299,7 @@ lienzo.addEventListener('pointermove', e => {
     const casilla = mundoAHex(m.x, m.y);
     const idElemento = elementoEn(casilla.col, casilla.fila);
     if(idElemento){ lienzo.style.cursor = puedeManipularElemento(elementos.get(idElemento)) ? 'grab' : 'pointer'; return; }
-    if(herramientaActiva === 'lapiz' || herramientaActiva === 'terreno'){ lienzo.style.cursor = 'crosshair'; return; }
+    if(herramientaActiva === 'lapiz' || herramientaActiva === 'terreno' || herramientaActiva === 'formas'){ lienzo.style.cursor = 'crosshair'; return; }
   }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });
@@ -2319,7 +2354,7 @@ function soltar(){
   if(dibujandoElemento){
     const d = dibujandoElemento;
     dibujandoElemento = null;
-    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
+    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()], d.forma);
     pedirDibujo();
   }
   if(arrastreElemento){
@@ -2347,6 +2382,9 @@ function soltar(){
         visibles.set(a.id, {x: a.x, y: a.y});
         moverTokenLibre(a.id, fin.col, fin.fila);
       }
+    }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some(c => elementoSolidoEn(c.col, c.fila))){
+      toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
+      visibles.delete(a.id);
     }else if(a.movio && t && pasos > 0){
       visibles.set(a.id, {x: a.x, y: a.y});
       if(a.costo){
@@ -2443,6 +2481,7 @@ function celdasDeElemento(el){
 function elementoEn(col, fila){
   const lista = [...elementos.entries()].reverse();
   for(const [id, el] of lista){
+    if(el.invisible && !soyGM) continue;  // no se puede seleccionar lo que no se ve
     if(celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return id;
   }
   return null;
@@ -2471,6 +2510,7 @@ function escucharElementos(){
         color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#3F6FB0',
         alfa: Math.max(10, Math.min(100, num(d.alfa) || 45)),
         solido: d.solido === true,
+        invisible: d.invisible === true,
         duenoUid: d.duenoUid,
       });
     });
@@ -2478,20 +2518,32 @@ function escucharElementos(){
   }, err => console.error('Error escuchando los elementos del mapa:', err));
 }
 
-async function guardarElemento(tipo, origen, celdasSet){
+async function guardarElemento(tipo, origen, celdasSet, esForma){
   if(!fbUsuario) return;
   const celdas = [];
   celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
   if(!celdas.length) return;
+  const invisible = !!(esForma && soyGM && formaInvisible);
   try{
     await coleccionElementos().add({
-      tipo, origen, celdas, rotacion: 0, color: terrenoColor, alfa: terrenoAlfa, solido: false,
+      tipo, origen, celdas, rotacion: 0,
+      color: esForma ? formaColor : terrenoColor,
+      alfa: esForma ? formaAlfa : terrenoAlfa,
+      solido: !!esForma, invisible,
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
     console.error('No se pudo crear el elemento:', err);
     toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear');
   }
+}
+// Si algún elemento sólido (Formas) ocupa esa casilla — cualquiera,
+// invisible o no: lo invisible solo cambia quién lo VE, no si bloquea.
+function elementoSolidoEn(col, fila){
+  for(const el of elementos.values()){
+    if(el.solido && celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return true;
+  }
+  return false;
 }
 async function moverElemento(id, cambios){
   try{ await coleccionElementos().doc(id).update(cambios); }
@@ -4255,7 +4307,7 @@ let bitacoraFlotanteAbierta = false;
 
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
-  {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos con forma de hexágono'},
+  {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos sólidos: bloquean el paso y la trayectoria', lista: true},
   {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Nubes, charcos, fuego… transitables, con color y transparencia', lista: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
@@ -4290,6 +4342,21 @@ function renderToolkit(){
         <label class="etiqueta">Transparencia</label>
         <input type="range" id="terreno-alfa-slider" min="10" max="100" step="5" value="${terrenoAlfa}">
         <p class="tk-lapiz-ayuda">${terrenoTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : terrenoTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Transitable — no bloquea el paso (eso es "Formas").</p>
+      </div>` : (h.id === 'formas' && activa) ? `<div class="tk-lapiz-opciones">
+        <label class="etiqueta" style="margin-top:0">Forma</label>
+        <select id="forma-tipo-select">
+          <option value="flor"${formaTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
+          <option value="linea"${formaTipo === 'linea' ? ' selected' : ''}>Línea</option>
+          <option value="libre"${formaTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
+        </select>
+        ${formaTipo !== 'libre' ? `<label class="etiqueta">${formaTipo === 'flor' ? 'Radio' : 'Largo'}</label>
+        <div class="fila" style="margin-top:0">${[1, 2, 3].map(n => `<button type="button" class="btn${formaTamano === n ? ' primary' : ''}" data-forma-tamano="${n}">${n}</button>`).join('')}</div>` : ''}
+        <label class="etiqueta">Color</label>
+        <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === formaColor ? ' elegido' : ''}" data-forma-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+        <label class="etiqueta">Transparencia</label>
+        <input type="range" id="forma-alfa-slider" min="10" max="100" step="5" value="${formaAlfa}">
+        ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="forma-invisible-check"${formaInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+        <p class="tk-lapiz-ayuda">${formaTipo === 'flor' ? 'Clic en el mapa: aparece centrado ahí.' : formaTipo === 'linea' ? 'Clic y arrastrá hacia el lado que apunta.' : 'Clic y arrastrá para pintar los casilleros.'} Sólido — bloquea ese casillero y cualquier ruta que lo cruce.${soyGM ? ' Invisible: solo vos ves el contorno (punteado violeta); sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
       </div>` : '';
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
@@ -4329,6 +4396,20 @@ $('#toolkit-lista').addEventListener('click', e => {
     renderToolkit();
     return;
   }
+  const colorForma = e.target.closest('[data-forma-color]');
+  if(colorForma){
+    formaColor = colorForma.dataset.formaColor;
+    try{ localStorage.setItem('forma-color', formaColor); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  const tamanoForma = e.target.closest('[data-forma-tamano]');
+  if(tamanoForma){
+    formaTamano = num(tamanoForma.dataset.formaTamano);
+    try{ localStorage.setItem('forma-tamano', formaTamano); }catch(err){}
+    renderToolkit();
+    return;
+  }
   const b = e.target.closest('[data-herramienta]');
   if(!b) return;
   const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
@@ -4349,12 +4430,27 @@ $('#toolkit-lista').addEventListener('change', e => {
     terrenoTipo = e.target.value;
     try{ localStorage.setItem('terreno-tipo', terrenoTipo); }catch(err){}
     renderToolkit();
+    return;
+  }
+  if(e.target.id === 'forma-tipo-select'){
+    formaTipo = e.target.value;
+    try{ localStorage.setItem('forma-tipo', formaTipo); }catch(err){}
+    renderToolkit();
+    return;
+  }
+  if(e.target.id === 'forma-invisible-check'){
+    formaInvisible = e.target.checked;
+    try{ localStorage.setItem('forma-invisible', formaInvisible ? '1' : ''); }catch(err){}
   }
 });
 $('#toolkit-lista').addEventListener('input', e => {
   if(e.target.id === 'terreno-alfa-slider'){
     terrenoAlfa = num(e.target.value);
     try{ localStorage.setItem('terreno-alfa', terrenoAlfa); }catch(err){}
+  }
+  if(e.target.id === 'forma-alfa-slider'){
+    formaAlfa = num(e.target.value);
+    try{ localStorage.setItem('forma-alfa', formaAlfa); }catch(err){}
   }
 });
 renderToolkit();

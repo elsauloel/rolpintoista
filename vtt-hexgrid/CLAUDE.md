@@ -145,15 +145,15 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **🧰 Caja de herramientas** (`#toolkit`, `HERRAMIENTAS`, `renderToolkit`):
   barra vertical escondida a la izquierda del mapa; la pestaña del borde la
   abre y cierra deslizándola (abierta o no se recuerda en `localStorage`
-  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Formas
-  todavía figura como "Pronto" (una herramienta lista lleva `lista: true`
-  y se activa en `herramientaActiva`); Terreno ya está armada. Preguntas
-  en `docs/preguntas-abiertas.md` (P38 sigue abierta para saber si Formas
-  también es de cualquiera o solo del GM; P40–P41 para el resto de
-  Formas/Terreno). **📖 Bitácora** es la excepción: no es un modo de
-  dibujo, así que su clic no toca `herramientaActiva` — abre o cierra del
-  todo `#bitacora-flotante` (`abrirBitacoraFlotante`, recordado en
-  `localStorage` `mapa-bitacora-abierta`).
+  `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Lápiz,
+  Terreno y Formas ya están armadas (una herramienta lista lleva
+  `lista: true` y se activa en `herramientaActiva`). Preguntas en
+  `docs/preguntas-abiertas.md` (P41 sigue abierta: los efectos mecánicos
+  del Terreno al pisarlo, más allá de lo visual). **📖 Bitácora** es la
+  excepción: no es un modo de dibujo, así que su clic no toca
+  `herramientaActiva` — abre o cierra del todo `#bitacora-flotante`
+  (`abrirBitacoraFlotante`, recordado en `localStorage`
+  `mapa-bitacora-abierta`).
 - **✏️ Lápiz** (cualquier miembro): dibuja a mano sobre el lienzo mientras
   `herramientaActiva === 'lapiz'` (arrastrar el mouse/dedo con el botón
   primario). El trazo se suaviza y se achica con **Douglas-Peucker**
@@ -213,8 +213,9 @@ nuevo de Rol Pintoísta. Paso 2 de
     mirarlo), aunque no lo pueda mover.
   - `celdasDeElemento(el)` calcula las casillas absolutas que ocupa ahora
     (origen + cada offset, rotado con `rotarCubo`) — ahí se apoya
-    selección, arrastre, hit-test y colisión futura de Formas.
-    **`cuboACol`/`cuboAFila`** son la inversa de `hexACubo` (col es
+    selección, arrastre, hit-test y la colisión de Formas
+    (`elementoSolidoEn`, ver abajo). **`cuboACol`/`cuboAFila`** son la
+    inversa de `hexACubo` (col es
     literalmente `q`; fila hay que reconstruirla con el mismo ajuste de
     paridad que usa `hexACubo`, pero sobre `col`, no sobre `r`) — antes
     de este arreglo (2026-09-18) la fórmula vieja de `cuboACol`
@@ -225,6 +226,37 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `elementoSeleccionado` es mutuamente excluyente con `seleccion` y
     `trazoSeleccionado` (`elementoSeleccionar` limpia los otros dos).
   - Se dibuja en el piso, debajo de los tokens y encima del fondo.
+- **⬡ Formas** (cualquier miembro): mismo mecanismo que Terreno — mismo
+  dato (`elementos`), mismas 3 formas al crear (Flor/Línea/Libre), mismo
+  arrastre/rotación/borrado por dueño o GM — pero con `solido: true`:
+  bloquea ese casillero para cualquier token y cualquier ruta que lo
+  cruce (`elementoSolidoEn(col, fila)`, recorre `elementos` filtrando por
+  `solido`). Estado propio en `formaTipo`/`formaTamano`/`formaColor`/
+  `formaAlfa` (mismo patrón que `terrenoTipo`/etc, `localStorage`
+  `forma-*`) para no compartir configuración con Terreno.
+  - **Colisión, "avisa y bloquea"** (decidido 2026-09-18, sobre
+    pathfinding automático — ver `docs/preguntas-abiertas.md` P46): al
+    soltar un arrastre de token con `pasos > 0`, si algún casillero de la
+    ruta (menos el de partida) tiene un sólido encima, no se mueve —
+    toast avisando y listo, el jugador vuelve a arrastrar a mano por otro
+    lado. No hay rodeo automático. Por ahora la colisión es contra
+    Formas nomás, para cualquier token sea o no aliado — la colisión
+    token-contra-token (aliado/enemigo/neutral) y el "no compartir
+    hexágono en combate" quedan para cuando se sume el concepto de bando,
+    ver "Pendiente" más abajo.
+  - **Invisible para jugadores** (solo GM, checkbox que solo aparece
+    siendo GM): pensado para marcar sobre el fondo ya dibujado del mapa
+    qué zonas son intransitables sin agregar un dibujo de más — el GM ve
+    el contorno punteado violeta (bien distinto del rojo de un sólido
+    visible), los jugadores no ven nada ahí (`elementos.forEach` se la
+    salta del todo si `el.invisible && !soyGM`), pero la colisión sigue
+    aplicando igual (`elementoSolidoEn` no mira `invisible`). Solo se
+    puede activar siendo `soyGM` (cliente: el checkbox ni aparece si no;
+    reglas: `invisible: true` exige `esGM(c)` al crear). No se puede
+    seleccionar (`elementoEn` se lo salta) si no se ve.
+  - Un sólido visible (no invisible) se dibuja con un borde de
+    advertencia fijo (rojo) además de su color elegido, para que se note
+    que bloquea el paso más allá de qué color tenga.
 - **Bitácora flotante** (`#bitacora-flotante`): mismo dato y mismos
   permisos que la de la ficha (`campanas/{id}/bitacora/{página}` +
   `entradas/{id}`, todos leen, cualquiera suma/corrige, borra el autor o
@@ -320,7 +352,18 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
 
 ## Pendiente (más adelante)
 
-Alcance y movimiento; niebla; ocultar tokens; tiradas desde el token.
+Alcance y movimiento; niebla; tiradas desde el token.
+
+**Colisión token-contra-token de Formas** (decidido 2026-09-18: "Todos
+los PJ aliados, creeps enemigos por default" — ver
+`docs/preguntas-abiertas.md` P40): falta sumar un campo `bando` al creep
+(`enemigo` default | `aliado` | `neutral`, editable por el GM en
+gm-tools.html) y, en mapa.html, el chequeo simétrico al de
+`elementoSolidoEn` pero entre tokens (un PJ colisiona con un creep salvo
+que sea `aliado`; un creep colisiona con todo lo que no sea de su mismo
+bando; `neutral` colisiona con cualquiera, incluso otro neutral) más la
+regla aparte de que, en modo combate, ningún personaje comparte
+hexágono con otro sin importar bando. Todavía no está construido.
 
 ## Dependencias con otras carpetas
 

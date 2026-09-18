@@ -313,11 +313,12 @@ service cloud.firestore {
       // Terreno y Formas del mapa (vtt-hexgrid/mapa.html, caja de
       // herramientas): {tipo:'flor'|'linea'|'libre', origen:{col,fila},
       // celdas:[dq1,dr1,…] (offsets en cubo desde origen), rotacion
-      // (0/60/…/300), color, alfa, solido, duenoUid, creado}. Cualquiera
-      // crea el suyo; moverlo, rotarlo (solo esos dos campos) o borrarlo
-      // del todo: su dueño o el GM.
+      // (0/60/…/300), color, alfa, solido, invisible, duenoUid, creado}.
+      // Cualquiera crea el suyo; moverlo, rotarlo (solo esos dos campos) o
+      // borrarlo del todo: su dueño o el GM. `invisible` (solo lo ve el
+      // GM) solo lo puede prender el GM, y solo junto con `solido`.
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'duenoUid', 'creado'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'duenoUid', 'creado'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 200 && d.celdas.size() % 2 == 0
@@ -325,6 +326,7 @@ service cloud.firestore {
           && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
           && d.alfa is int && d.alfa >= 10 && d.alfa <= 100
           && d.solido is bool
+          && (!('invisible' in d) || (d.invisible is bool && (d.invisible == false || d.solido == true)))
           && d.duenoUid is string;
       }
       match /elementos/{id} {
@@ -332,7 +334,8 @@ service cloud.firestore {
         allow create: if esMiembro(c)
           && elementoValido(request.resource.data)
           && request.resource.data.duenoUid == request.auth.uid
-          && request.resource.data.creado == request.time;
+          && request.resource.data.creado == request.time
+          && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
@@ -404,7 +407,8 @@ service cloud.firestore {
           allow create: if esMiembro(c)
             && elementoValido(request.resource.data)
             && request.resource.data.duenoUid == request.auth.uid
-            && request.resource.data.creado == request.time;
+            && request.resource.data.creado == request.time
+            && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);

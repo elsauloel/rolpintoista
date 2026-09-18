@@ -2339,9 +2339,9 @@ $('#fondo-archivo').onchange = async ev => {
     const base = fondo ? {x: fondo.x, y: fondo.y, ancho: fondo.ancho} : {x: -ANCHO_CASILLA / 2, y: -HEX, ancho: ANCHO_CASILLA * 20};
     const ts = firebase.firestore.FieldValue.serverTimestamp();
     const lote = fbDb.batch();
-    lote.set(fbDb.doc(fbRutaCampana('mapa/fondoImagen')), {dato, actualizado: ts});
+    lote.set(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))), {dato, actualizado: ts});
     // La posición en su propio documento (y sin la imagen, si era un fondo de antes).
-    lote.set(fbDb.doc(fbRutaCampana('mapa/fondo')), {...base, dato: firebase.firestore.FieldValue.delete(), actualizado: ts}, {merge: true});
+    lote.set(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))), {...base, dato: firebase.firestore.FieldValue.delete(), actualizado: ts}, {merge: true});
     await lote.commit();
     toast('Fondo cargado');
   }catch(err){

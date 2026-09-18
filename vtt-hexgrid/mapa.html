@@ -232,6 +232,16 @@ aside{
 #iniciativa-vacio{padding:8px 10px;color:var(--muted)}
 /* Controles flotantes sobre el token seleccionado (estilo Roll20) */
 #hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20}
+/* Cartel fijo arriba a la derecha con el nombre del token seleccionado y
+   su dueño: no depende del zoom, así se lee igual con la grilla chiquita. */
+#token-etiqueta{
+  position:absolute;top:12px;right:12px;z-index:23;max-width:60%;pointer-events:none;
+  background:rgba(26,20,24,.88);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.5);
+  padding:6px 12px;font-size:13px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#token-etiqueta b{color:var(--brass);font-weight:600}
+#token-etiqueta span{color:var(--muted);font-weight:400}
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
 #hud .hud-anillo{position:absolute;left:0;top:0}
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
@@ -419,6 +429,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <canvas id="lienzo"></canvas>
     <div id="aviso-mapa" hidden></div>
     <div id="hud" hidden></div>
+    <div id="token-etiqueta" hidden></div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
@@ -2988,8 +2999,21 @@ function hudAjustesHtml(t, d){
     '</div>';
 }
 
+// Cartel fijo arriba a la derecha con el nombre del token y su dueño (el
+// jugador, o "GM" en un creep/NPC): no se achica con el zoom, para
+// leerlo igual con la grilla chiquita.
+function actualizarEtiquetaToken(){
+  const el = $('#token-etiqueta');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !fbMiembro || creando || panelFondo || panelMapas){ el.hidden = true; return; }
+  const dueno = t.tipo === 'creep' ? 'GM' : nombreMiembro(t.duenoUid);
+  el.innerHTML = `<b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span>`;
+  el.hidden = false;
+}
+
 // Dibuja el HUD y lo acomoda sobre el token seleccionado.
 function hudUbicar(){
+  actualizarEtiquetaToken();
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !fbMiembro || creando || panelFondo || panelMapas){ hud.hidden = true; return; }

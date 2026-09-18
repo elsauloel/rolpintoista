@@ -110,6 +110,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   esconde al elegir un vínculo). El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
+- **Cartel del token seleccionado** (`#token-etiqueta`, `actualizarEtiquetaToken`,
+  llamada desde `hudUbicar`): fijo arriba a la derecha del mapa, con el
+  nombre y, entre paréntesis, el dueño (el jugador, o "GM" en un creep o
+  NPC) — no se achica con el zoom, a diferencia del nombre que se dibuja
+  en el canvas debajo del token.
 - **🦶 Mover libre** (`moverLibre`, `moverTokenLibre`): botón del HUD que
   lleva el token a otra casilla sin reglas (sin No2, sin estela, ignora
   Inmovilizado): se arrastra el token o se toca la casilla destino; Esc

@@ -333,6 +333,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   `bitacora-opacidad`): solo cambia el fondo de la cajita
   (`colorConAlfa(--panel, …)`, la misma función que usan las auras), el
   texto y los botones quedan siempre nítidos.
+- **Páginas de la Bitácora, de una por vez** (arreglado 2026-09-19: antes
+  se listaban todas juntas en una fila que se agrandaba sin límite a
+  medida que se sumaban páginas): en vez de una pestaña por página,
+  `#bitacora-tabs` muestra solo la activa con flechas ◀/▶ a los costados
+  (`bitacoraIrPagina(±1)`, según el orden de `bitacoraPaginas` —
+  `orderBy('creado')`) y un contador "2/4". Deshabilitadas en las puntas
+  (no da la vuelta). Renombrar (el input) y borrar (×) siguen igual,
+  ahora sobre la página activa nomás.
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

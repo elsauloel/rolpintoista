@@ -257,7 +257,14 @@ aside{
 .mini{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:var(--r);cursor:pointer;background:none}
 .mini:hover{border-color:var(--copper);color:var(--paper)}
 .mini.peligro:hover{border-color:var(--danger);color:var(--danger)}
-.bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.bitacora-tabs{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.bit-nav-flecha{
+  background:none;border:1px solid var(--line-soft);border-radius:var(--r);color:var(--paper);
+  width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px
+}
+.bit-nav-flecha:hover{border-color:var(--copper)}
+.bit-nav-flecha:disabled{opacity:.35;cursor:default}
+.bit-contador{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:none;white-space:nowrap}
 .bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;margin:9px 0}
 .bit-entrada{display:flex;gap:6px;align-items:flex-start;padding:5px 7px;border-left:3px solid;border-radius:var(--r);background:rgba(0,0,0,.18)}
 .bit-entrada .bit-texto{flex:1;min-width:0;white-space:pre-wrap;word-wrap:break-word;font-size:13px;line-height:1.45}
@@ -270,12 +277,12 @@ aside{
 .bit-vacia{color:var(--muted);font-size:12px}
 .bit-tab{
   display:flex;align-items:center;gap:4px;border:1px solid var(--line-soft);background:var(--panel2);
-  border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer
+  border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer;flex:1;min-width:0
 }
 .bit-tab.active{border-color:var(--copper);background:rgba(201,133,69,.12)}
 .bit-tab-name{
   background:none;border:none;padding:2px 2px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;
-  color:var(--paper);width:auto;min-width:0;max-width:110px
+  color:var(--paper);width:100%;min-width:0
 }
 .bit-tab.active .bit-tab-name{color:var(--brass);font-weight:700}
 .bit-tab-x{
@@ -4927,6 +4934,16 @@ function bitacoraEscuchar(){
   });
 }
 
+// Página anterior (-1) o siguiente (+1) a la activa, en el orden de
+// bitacoraPaginas (por fecha de creación). No hace nada en las puntas.
+function bitacoraIrPagina(delta){
+  const idx = bitacoraPaginas.findIndex(p => p.id === bitacoraActiva);
+  if(idx < 0) return;
+  const destino = idx + delta;
+  if(destino < 0 || destino >= bitacoraPaginas.length) return;
+  bitacoraElegir(bitacoraPaginas[destino].id);
+}
+
 function bitacoraElegir(id){
   bitacoraActiva = id;
   bitacoraEditando = '';
@@ -4965,11 +4982,20 @@ function bitacoraRender(){
   }
   // No redibujar las pestañas mientras alguien les cambia el nombre.
   if(!tabs.contains(document.activeElement)){
-    tabs.innerHTML = bitacoraPaginas.map(p => `
-      <div class="bit-tab ${p.id === bitacoraActiva ? 'active' : ''}" data-bit-pagina="${esc(p.id)}">
-        <input class="bit-tab-name" data-bit-nombre="${esc(p.id)}" value="${esc(p.nombre || 'Página')}" maxlength="40" title="Clic para abrir · editá el nombre y apretá Enter">
-        ${bitacoraPuedeBorrar(p.creadoUid) ? `<button type="button" class="bit-tab-x" data-bit-borrar-pagina="${esc(p.id)}" title="Borrar página">×</button>` : ''}
-      </div>`).join('');
+    const idx = bitacoraPaginas.findIndex(p => p.id === bitacoraActiva);
+    const activa = idx >= 0 ? bitacoraPaginas[idx] : null;
+    // Una sola pestaña a la vez (la activa) con flechas para pasar de
+    // página y un contador — antes se listaban todas juntas y la fila
+    // se agrandaba sin límite a medida que se sumaban páginas.
+    tabs.innerHTML = activa ? `
+      <button type="button" class="bit-nav-flecha" data-bit-pag-prev title="Página anterior"${idx <= 0 ? ' disabled' : ''}>◀</button>
+      <div class="bit-tab active" data-bit-pagina="${esc(activa.id)}">
+        <input class="bit-tab-name" data-bit-nombre="${esc(activa.id)}" value="${esc(activa.nombre || 'Página')}" maxlength="40" title="Editá el nombre y apretá Enter">
+        ${bitacoraPuedeBorrar(activa.creadoUid) ? `<button type="button" class="bit-tab-x" data-bit-borrar-pagina="${esc(activa.id)}" title="Borrar página">×</button>` : ''}
+      </div>
+      <button type="button" class="bit-nav-flecha" data-bit-pag-next title="Página siguiente"${idx >= bitacoraPaginas.length - 1 ? ' disabled' : ''}>▶</button>
+      <span class="bit-contador">${idx + 1}/${bitacoraPaginas.length}</span>
+    ` : '';
   }
   if(!bitacoraPaginas.length){
     lista.innerHTML = '<div class="bit-vacia">Todavía no hay páginas. Tocá "+ Página" para empezar.</div>';
@@ -5088,6 +5114,8 @@ $('#bitacora-nueva').addEventListener('keydown', e => {
 $('#bitacora-tabs').addEventListener('click', e => {
   const borrar = e.target.closest('[data-bit-borrar-pagina]');
   if(borrar){ bitacoraBorrarPagina(borrar.dataset.bitBorrarPagina); return; }
+  if(e.target.closest('[data-bit-pag-prev]')){ bitacoraIrPagina(-1); return; }
+  if(e.target.closest('[data-bit-pag-next]')){ bitacoraIrPagina(1); return; }
   const tab = e.target.closest('[data-bit-pagina]');
   if(tab && tab.dataset.bitPagina !== bitacoraActiva) bitacoraElegir(tab.dataset.bitPagina);
 });

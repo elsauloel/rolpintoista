@@ -86,11 +86,9 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P40. Formas hexagonales.** ¿Qué objetos son (paredes, cajas, obstáculos)? ¿Bloquean el movimiento o la vista, o son solo dibujo? *(2026-09-17)*
 - 🔲 **P41. Terreno (arena movediza, veneno, arena tóxica…).** ¿Qué hace cada uno al pisarlo o al quedarse (daño, No2 extra, estado alterado)? ¿Se aplica solo o es un recordatorio para el GM? *(2026-09-17)*
 - 🔲 **P42. Grilla del mapa girada 30° (código).** La grilla pasó de hexágonos "de punta arriba" a "de lado arriba" para poder rotar tokens con el frente alineado a un lado (no a un vértice). Esto corre la posición en pantalla de todo lo que ya estaba puesto: el fondo (imagen del mapa) va a quedar desalineado y hay que volver a ajustarlo (arrastrar + ancho en casillas), y los tokens que ya estaban en el tablero conviene revisarlos y, si hace falta, reacomodarlos a mano. *(2026-09-17)*
-- 🔲 **P44. "Esp" con dos significados en `docs/clases-borrador.md`.** Al
-  renombrar Inteligencia → Especial (id `int` → `esp`) quedó una posible
-  confusión: ese borrador ya usaba "Esp" como abreviatura de "Special
-  Power" (ej. "Hechizo (PG: Int · Daño: Esp)", clase Mago) — no me quedó
-  claro si esas abreviaturas narrativas ("Int", "Esp") equivalen 1 a 1 a
-  los ids del código o son shorthand propio del borrador. Revisar ese
-  archivo y, si hace falta, aclarar la notación antes de que se preste a
-  confusión con el atributo Especial nuevo. *(2026-09-18)*
+- ✅ **P44. "Esp" con dos significados en `docs/clases-borrador.md`.**
+  Respondido 2026-09-18: **Special Power se abrevia siempre "SP"**, nunca
+  "Esp" — regla fija para todo lo que se escriba de acá en adelante (código,
+  docs, fichas de skill). No se tocó el contenido de `clases-borrador.md`:
+  esas tarjetas siguen ⏳ sin confirmar y las revisa el usuario skill por
+  skill, como dice el propio encabezado del archivo.

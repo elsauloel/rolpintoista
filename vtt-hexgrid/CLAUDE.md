@@ -209,6 +209,20 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
+  - **Dos estilos** (`lapizEstilo`, `localStorage` `lapiz-estilo`, selector
+    en su ventanita, decidido 2026-09-19): **Libre** (lo de arriba) y **Por
+    casilleros**, un marcador de trayectoria como la estela de movimiento
+    de un token pero sin token, sin costo de No2 y sin que los sólidos lo
+    frenen: se arrastra casillero por casillero (`extenderRuta` con
+    `marcador: true`; volver sobre una casilla recorta) y se dibuja con
+    `dibujarRutaHex` en el color elegido. Mismo tilde: sin tildar se borra
+    solo (`ESTELA_MS`); tildado ("Trayectoria fija") queda atado a la
+    grilla. Vive en la misma colección `trazos` con `hex: true` y `puntos`
+    = `[col,fila,col,fila,…]` (tope `RUTA_MAX_CELDAS`); en memoria se lee
+    como `celdas`. Un fijo se selecciona (clic sobre cualquiera de sus
+    casillas, saliendo de la herramienta) para borrarlo con Suprimir; **no
+    se mueve ni se rota** (sigue a la grilla). Reglas: `hex` opcional, y
+    con `hex` alcanzan 2 números (una casilla).
 - **⬡ Terreno y Formas** (cualquier miembro; una sola herramienta desde
   2026-09-19 — antes eran dos separadas, con el mismo dato y mecanismo
   por debajo, así que quedó un solo botón con un tilde de "Sólido" en vez

@@ -836,6 +836,8 @@ let dibujando = null;         // {puntos: [{x,y}]} mientras se arrastra el lápi
 let cortarTrazosListener = null;
 let lapizColor = '#E0A458';
 let lapizPermanente = false;
+let lapizEstilo = 'libre';    // 'libre' (a mano alzada) | 'casillas' (marcador de trayectoria atado a la grilla)
+try{ lapizEstilo = localStorage.getItem('lapiz-estilo') === 'casillas' ? 'casillas' : 'libre'; }catch(e){}
 try{ lapizColor = localStorage.getItem('lapiz-color') || lapizColor; }catch(e){}
 try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(e){}
 
@@ -1981,6 +1983,32 @@ function dibujar(){
       ctx.fillStyle = `rgba(237,227,210,${alfa})`; ctx.fill();
     });
   };
+  // Marcador de trayectoria del lápiz por casilleros: como la estela, pero
+  // de un color elegido y con todas las casillas (incluida la de partida).
+  const dibujarRutaHex = (celdas, color, alfa, seleccionada) => {
+    if(!celdas.length) return;
+    ctx.beginPath();
+    celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    ctx.fillStyle = colorConAlfa(color, 0.25 * alfa); ctx.fill();
+    ctx.strokeStyle = colorConAlfa(color, 0.9 * alfa); ctx.lineWidth = 2 / z; ctx.stroke();
+    if(celdas.length > 1){
+      ctx.beginPath();
+      celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
+      ctx.strokeStyle = colorConAlfa(color, alfa); ctx.lineWidth = 4 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+    }
+    celdas.forEach(c => {
+      const p = hexCentro(c.col, c.fila);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 5 / z, 0, 2 * Math.PI);
+      ctx.fillStyle = colorConAlfa(color, alfa); ctx.fill();
+    });
+    if(seleccionada){
+      ctx.beginPath();
+      celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+      ctx.setLineDash([6 / z, 5 / z]);
+      ctx.strokeStyle = 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  };
   estelas.forEach((e, id) => {
     const resta = e.hasta - ahora;
     if(resta <= 0){ estelas.delete(id); return; }
@@ -2148,6 +2176,11 @@ function dibujar(){
   trazos.forEach((t, id) => {
     const alfa = t.permanente ? 1 : Math.max(0, Math.min(1, (t.creadoMs + ESTELA_MS - ahora) / 800));
     if(!t.permanente && alfa <= 0) return;
+    if(t.hex){
+      dibujarRutaHex(t.celdas, t.color, alfa, id === trazoSeleccionado);
+      if(!t.permanente) animando = true;
+      return;
+    }
     ctx.save();
     ctx.translate(t.origen.x, t.origen.y);
     ctx.rotate(t.rotacion * Math.PI / 180);
@@ -2178,7 +2211,8 @@ function dibujar(){
     if(!t.permanente) animando = true;
   });
   // El trazo que se está dibujando ahora mismo, en vivo.
-  if(dibujando && dibujando.puntos.length > 1){
+  if(dibujando && dibujando.hex) dibujarRutaHex(dibujando.celdas, lapizColor, 1);
+  else if(dibujando && dibujando.puntos.length > 1){
     ctx.beginPath();
     trazarSuave(ctx, simplificarTrazo(dibujando.puntos, 1.5 / z));
     ctx.strokeStyle = lapizColor;
@@ -2277,7 +2311,7 @@ lienzo.addEventListener('pointerdown', e => {
     // Handle de rotación del trazo ya seleccionado (si se puede manipular).
     if(trazoSeleccionado && trazos.has(trazoSeleccionado)){
       const ts = trazos.get(trazoSeleccionado);
-      if(puedeManipularTrazo(ts)){
+      if(!ts.hex && puedeManipularTrazo(ts)){
         const h = trazoManijaMundo(ts);
         if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
           rotandoTrazo = {id: trazoSeleccionado};
@@ -2287,11 +2321,15 @@ lienzo.addEventListener('pointerdown', e => {
       }
     }
     // Un trazo permanente ahí: seleccionarlo y, si se puede, arrastrarlo.
-    const idTrazo = trazoEn(m.x, m.y);
+    // Con el lápiz por casilleros activo se dibuja directo (un marcador
+    // fijo ya puesto se selecciona saliendo de la herramienta).
+    const idTrazo = (herramientaActiva === 'lapiz' && lapizEstilo === 'casillas') ? null : trazoEn(m.x, m.y);
     if(idTrazo){
       trazoSeleccionar(idTrazo);
       const t = trazos.get(idTrazo);
-      if(puedeManipularTrazo(t)){
+      // Un marcador por casilleros está atado a la grilla: se selecciona
+      // (para borrarlo) pero no se arrastra ni se rota.
+      if(!t.hex && puedeManipularTrazo(t)){
         arrastreTrazo = {id: idTrazo, dx: m.x - t.origen.x, dy: m.y - t.origen.y, inicioX: px, inicioY: py, movio: false};
         lienzo.style.cursor = 'grabbing';
       }
@@ -2300,7 +2338,9 @@ lienzo.addEventListener('pointerdown', e => {
     // Lápiz activo: empieza un trazo nuevo a mano alzada.
     if(herramientaActiva === 'lapiz'){
       trazoSeleccionar(null);
-      dibujando = {puntos: [m]};
+      dibujando = lapizEstilo === 'casillas'
+        ? {hex: true, celdas: [mundoAHex(m.x, m.y)], marcador: true}
+        : {puntos: [m]};
       lienzo.style.cursor = 'crosshair';
       return;
     }
@@ -2376,7 +2416,14 @@ lienzo.addEventListener('pointerdown', e => {
 lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
   if(dibujando){
-    dibujando.puntos.push(pantallaAMundo(px, py));
+    if(dibujando.hex){
+      // Casillero por casillero, como la estela de un token (sin costo ni
+      // obstáculos): volver sobre una casilla recorta la línea.
+      const m = pantallaAMundo(px, py);
+      extenderRuta({ruta: dibujando.celdas, costo: null, marcador: true}, mundoAHex(m.x, m.y));
+    }else{
+      dibujando.puntos.push(pantallaAMundo(px, py));
+    }
     pedirDibujo();
     return;
   }
@@ -2481,12 +2528,12 @@ lienzo.addEventListener('pointermove', e => {
   const id = tokenEn(m.x, m.y);
   if(moverLibre){ lienzo.style.cursor = id === moverLibre ? 'grab' : 'crosshair'; return; }
   if(!id){
-    if(trazoSeleccionado && trazos.has(trazoSeleccionado) && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
+    if(trazoSeleccionado && trazos.has(trazoSeleccionado) && !trazos.get(trazoSeleccionado).hex && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
       const h = trazoManijaMundo(trazos.get(trazoSeleccionado));
       if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
     }
     const idTrazo = trazoEn(m.x, m.y);
-    if(idTrazo){ lienzo.style.cursor = puedeManipularTrazo(trazos.get(idTrazo)) ? 'grab' : 'pointer'; return; }
+    if(idTrazo){ const tz = trazos.get(idTrazo); lienzo.style.cursor = !tz.hex && puedeManipularTrazo(tz) ? 'grab' : 'pointer'; return; }
     if(elementoSeleccionado && elementos.has(elementoSeleccionado) && puedeManipularElemento(elementos.get(elementoSeleccionado))){
       const els = elementos.get(elementoSeleccionado);
       const g = elementoGearMundo(els);
@@ -2530,7 +2577,7 @@ function extenderRuta(a, casilla){
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
-    if(elementoSolidoEn(c.col, c.fila)){ chocado = true; break; }
+    if(!a.marcador && elementoSolidoEn(c.col, c.fila)){ chocado = true; break; }
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
@@ -2543,9 +2590,10 @@ function extenderRuta(a, casilla){
 
 function soltar(){
   if(dibujando){
-    const puntos = dibujando.puntos;
+    const d = dibujando;
     dibujando = null;
-    if(puntos.length > 1) guardarTrazo(puntos, lapizPermanente);
+    if(d.hex) guardarTrazoHex(d.celdas, lapizPermanente);
+    else if(d.puntos.length > 1) guardarTrazo(d.puntos, lapizPermanente);
     pedirDibujo();
   }
   if(arrastreTrazo){
@@ -3063,9 +3111,16 @@ function escucharTrazos(){
       const d = ch.doc.data({serverTimestamps: 'estimate'});
       const puntosCrudos = Array.isArray(d.puntos) ? d.puntos : [];
       const puntos = [];
-      for(let i = 0; i + 1 < puntosCrudos.length; i += 2) puntos.push({x: num(puntosCrudos[i]), y: num(puntosCrudos[i + 1])});
+      const celdas = [];
+      const esHex = d.hex === true;
+      for(let i = 0; i + 1 < puntosCrudos.length; i += 2){
+        if(esHex) celdas.push({col: Math.round(num(puntosCrudos[i])), fila: Math.round(num(puntosCrudos[i + 1]))});
+        else puntos.push({x: num(puntosCrudos[i]), y: num(puntosCrudos[i + 1])});
+      }
       trazos.set(ch.doc.id, {
         puntos,
+        hex: esHex,
+        celdas,
         origen: {x: num(d.origen && d.origen.x), y: num(d.origen && d.origen.y)},
         rotacion: num(d.rotacion),
         color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#E0A458',
@@ -3103,6 +3158,24 @@ async function guardarTrazo(puntosMundo, permanente){
     });
   }catch(err){
     console.error('No se pudo guardar el trazo:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo dibujar');
+  }
+}
+
+// Marcador de trayectoria por casilleros: las casillas van en `puntos`
+// como [col,fila,col,fila,…] con `hex: true` (atado a la grilla, sin
+// origen ni rotación).
+async function guardarTrazoHex(celdas, permanente){
+  if(!fbUsuario || !celdas.length) return;
+  const puntos = [];
+  celdas.slice(0, RUTA_MAX_CELDAS).forEach(c => puntos.push(c.col, c.fila));
+  try{
+    await coleccionTrazos().add({
+      puntos, hex: true, origen: {x: 0, y: 0}, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo guardar el marcador:', err);
     toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo dibujar');
   }
 }
@@ -3162,6 +3235,11 @@ function trazoEn(x, y){
   };
   const lista = [...trazos.entries()].filter(([, t]) => t.permanente).reverse();
   for(const [id, t] of lista){
+    if(t.hex){
+      const casilla = mundoAHex(x, y);
+      if(t.celdas.some(c => mismoHex(c, casilla))) return id;
+      continue;
+    }
     const ang = -t.rotacion * Math.PI / 180;
     const cos = Math.cos(ang), sin = Math.sin(ang);
     // Al punto, en el sistema propio del trazo (deshace traslación + rotación).
@@ -4845,8 +4923,15 @@ function renderHerramientaFlotante(){
   if(herramientaActiva === 'lapiz'){
     cuerpo = `
       <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === lapizColor ? ' elegido' : ''}" data-lapiz-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
-      <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> Dibujo permanente</label>
-      <p class="tk-lapiz-ayuda">${lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.'}</p>`;
+      <label class="etiqueta" style="margin-top:0">Estilo</label>
+      <select id="lapiz-estilo-select">
+        <option value="libre"${lapizEstilo === 'libre' ? ' selected' : ''}>✏️ Libre (a mano alzada)</option>
+        <option value="casillas"${lapizEstilo === 'casillas' ? ' selected' : ''}>⬡ Por casilleros (trayectoria)</option>
+      </select>
+      <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> ${lapizEstilo === 'casillas' ? 'Trayectoria fija' : 'Dibujo permanente'}</label>
+      <p class="tk-lapiz-ayuda">${lapizEstilo === 'casillas'
+        ? (lapizPermanente ? 'Queda fija en esas casillas: se selecciona (fuera de la herramienta) y se borra con Suprimir. No se mueve.' : 'Marcá la trayectoria arrastrando casillero por casillero; se ve un par de segundos y se borra sola.')
+        : (lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.')}</p>`;
   }else if(herramientaActiva === 'elemento'){
     cuerpo = `
       <label class="etiqueta" style="margin-top:0">Forma</label>
@@ -4931,6 +5016,12 @@ $('#herramienta-flotante').addEventListener('click', e => {
   }
 });
 $('#herramienta-flotante').addEventListener('change', e => {
+  if(e.target.id === 'lapiz-estilo-select'){
+    lapizEstilo = e.target.value === 'casillas' ? 'casillas' : 'libre';
+    try{ localStorage.setItem('lapiz-estilo', lapizEstilo); }catch(err){}
+    renderHerramientaFlotante();
+    return;
+  }
   if(e.target.id === 'lapiz-permanente-check'){
     lapizPermanente = e.target.checked;
     try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}

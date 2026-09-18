@@ -53,6 +53,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
 .recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
 
+/* Ventana de "Nuevo token": centrada sobre el mapa, con el fondo oscurecido
+   (Esc o clic derecho la cierran sin crear nada). */
+#nuevo-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#nuevo-token-capa[hidden]{display:none}
+#nuevo-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+.nt-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.nt-cab button{font-size:16px;color:var(--muted);line-height:1}
+.nt-cab button:hover{color:var(--paper)}
+.nt-campo{margin-top:12px}
+.nt-campo:empty{display:none}
+.nt-campo .etiqueta{margin:0 0 4px}
+.nt-pista{font-size:11.5px;color:var(--muted);margin:5px 0 0;line-height:1.4}
+.nt-pie{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+
 /* Editor de un elemento de Terreno/Formas ya creado (⚙️ al seleccionarlo):
    flotante, no tapa el mapa — los cambios se ven ahí atrás en vivo antes
    de Guardar. */
@@ -570,6 +584,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
     </div>
     <div class="seccion" id="panel-token"></div>
+    <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
     <div id="mesa">
       <h2><span>Mesa</span><span id="mesa-dados"></span><span id="mesa-historial"></span></h2>
       <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
@@ -580,6 +595,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
     </div>
   </aside>
 </main>
+
+<div id="nuevo-token-capa" hidden><div id="nuevo-token-ventana"></div></div>
 
 <!-- Bitácora de la partida: flotante y arrastrable, como la Mesa de la
      ficha. Se abre y cierra del todo con 📖 en la caja de herramientas;
@@ -2622,6 +2639,7 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape') escapeABotonera();
     return;
   }
+  if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
   if(editandoElemento && e.key === 'Escape'){ cerrarEditorElemento(true); return; }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
@@ -3835,6 +3853,8 @@ function renderPanel(forzar){
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
   actualizarBotonMapas();
+  $('#nuevo-token-capa').hidden = !creando;
+  if(!creando) $('#nuevo-token-ventana').innerHTML = '';
 
   if(panelMapas && soyGM){
     const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
@@ -3907,17 +3927,18 @@ function renderPanel(forzar){
     let color = COLORES[Math.floor(Math.random() * COLORES.length)];
     let imagenNueva = '';   // solo para tokens sin vincular (NPC, objetos)
     const tipoInicial = soyGM ? 'creep' : 'pj';
-    panel.innerHTML =
-      '<h2>Nuevo token</h2>' +
-      (soyGM ? '<label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo movés vos)</option></select>' +
-        '<p class="ayuda" style="margin-top:4px">Vinculado a un creep de gm-tools: borde rojo. Sin vincular: NPC, borde gris.</p>' : '') +
-      `<label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
-      '<div id="nuevo-dueno-caja"></div>' +
-      '<label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio">' +
-      '<div id="nuevo-imagen"></div>' +
-      '<label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) +
-      '<div class="fila"><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button></div>' +
-      '<p class="ayuda" style="margin-top:8px">Vinculado, el token toma el nombre, la imagen, las barras y los estados de su ficha. Aparece en el centro de lo que estás viendo.</p>';
+    // Ventana propia, centrada sobre el mapa (no en la barra lateral).
+    const ventana = $('#nuevo-token-ventana');
+    ventana.innerHTML =
+      '<div class="nt-cab"><span>➕ Nuevo token</span><button type="button" id="nuevo-x" title="Cancelar (Esc o clic derecho)">✕</button></div>' +
+      (soyGM ? '<div class="nt-campo"><label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo mueve su dueño)</option></select></div>' : '') +
+      `<div class="nt-campo"><label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
+        '<p class="nt-pista">Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha' + (soyGM ? ' (creep: borde rojo). Sin vincular: NPC, borde gris.' : '.') + '</p></div>' +
+      '<div class="nt-campo" id="nuevo-dueno-caja"></div>' +
+      '<div class="nt-campo"><label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio"></div>' +
+      '<div class="nt-campo" id="nuevo-imagen"></div>' +
+      '<div class="nt-campo"><label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) + '</div>' +
+      '<div class="nt-pie"><span class="nt-pista" style="margin:0 auto 0 0">Aparece en el centro de lo que estás viendo.</span><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button></div>';
     // Imagen propia: solo tiene sentido sin vincular (vinculado, la toma de
     // la ficha o el creep). Se guarda ya achicada, lista para crear el token.
     const imagenNuevaHtml = () => {
@@ -3951,7 +3972,7 @@ function renderPanel(forzar){
       if(quitar) quitar.onclick = () => { imagenNueva = ''; actualizarImagenNueva(); };
     };
     actualizarImagenNueva();
-    conectarColores(panel, c => { color = c; actualizarImagenNueva(); });
+    conectarColores(ventana, c => { color = c; actualizarImagenNueva(); });
     const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
     // Dueño: solo el GM lo elige, y solo para un token de tipo "pj" — el
     // token queda de quien se elija acá, no de quien lo crea (para poder
@@ -3987,9 +4008,10 @@ function renderPanel(forzar){
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
-    $('#nuevo-cancelar').onclick = () => { creando = false; renderPanel(true); };
+    $('#nuevo-cancelar').onclick = cancelarNuevoToken;
+    $('#nuevo-x').onclick = cancelarNuevoToken;
     $('#nuevo-vinculo').focus();
-    return;
+    // Sin return: el costado queda con su panel de siempre.
   }
 
   // Los datos del token se ven en los controles flotantes (HUD): el panel
@@ -4089,6 +4111,18 @@ $('#btn-mapas').onclick = () => {
   renderPanel(true);
   pedirDibujo();
 };
+
+function cancelarNuevoToken(){
+  if(!creando) return;
+  creando = false;
+  renderPanel(true); pedirDibujo();
+}
+// Clic derecho fuera de un campo de texto, sobre la ventana o su fondo: cancela.
+$('#nuevo-token-capa').addEventListener('contextmenu', e => {
+  if(e.target.closest('input,textarea,select')) return;
+  e.preventDefault();
+  cancelarNuevoToken();
+});
 
 $('#btn-nuevo').onclick = () => {
   if(!fbMiembro) return;

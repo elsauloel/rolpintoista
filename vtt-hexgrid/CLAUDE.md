@@ -121,7 +121,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   esconde al elegir un vínculo). El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
-- **El GM crea un token de "pj" a nombre de otro jugador** (panel "Nuevo
+- **"+ Token" abre una ventana propia** (`#nuevo-token-capa`/
+  `#nuevo-token-ventana`, centrada con el fondo oscurecido; antes se armaba
+  en la barra lateral, decidido 2026-09-19), ordenada por campos (tipo,
+  vínculo, dueño, nombre, imagen, color) con Cancelar / Poner en el mapa
+  al pie. Se cierra sin crear con la ✕, Cancelar, **Esc** o **clic
+  derecho** (fuera de un campo de texto) — `cancelarNuevoToken`. La barra
+  lateral queda con su panel de siempre mientras tanto.
+- **El GM crea un token de "pj" a nombre de otro jugador** (ventana "Nuevo
   token", solo si `soyGM`): la lista de "Vincular a" muestra las fichas de
   todos los jugadores (no solo las del GM, que normalmente no tiene) con
   el dueño al lado (`opcionesVinculo(tipo, elegido, todasLasFichas)`), y

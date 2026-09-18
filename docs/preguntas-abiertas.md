@@ -61,6 +61,12 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P27. Conversión de Bonos viejos a SP.** Equipo, estados y catálogo que daban "+N Bonos" hoy dan "+N SP" (1 a 1, `IT2.spPorBono`). ¿Es la conversión correcta? *(código)*
 - 🔲 **P28. Estados que tocaban Acciones/Movimiento.** Cansado, Exhausto, Stun, Hypeado, Inmovilizado y Rengo pasaron a Nitros 1 a 1, sin recalibrar. ¿Qué valores llevan? *(código)*
 - 🔲 **P29. SP Regen como stat.** Hoy existe con base 0 (solo lo dan habilidades, equipo o estados). ¿Se deja así o se saca el stat? *(2026-09-16)*
+- 🔲 **P43. Mecánica de armas de dos manos.** El asistente de ítems
+  (`comun/asistente-item.js`) ya deja elegir "Arma de dos manos" (ocupa las
+  dos manos: no se puede llevar escudo ni segunda arma), pero no tiene
+  ninguna regla mecánica propia todavía (¿bonus de daño, Tipo, algo más
+  frente a una de una mano?). Queda de lado a propósito hasta nuevo aviso
+  — no tocar sin que se pida. *(2026-09-17)*
 
 ## Recompensas
 

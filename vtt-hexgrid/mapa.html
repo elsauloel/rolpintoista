@@ -2690,6 +2690,14 @@ document.addEventListener('keydown', e => {
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
   if(editandoElemento && e.key === 'Escape'){ cerrarEditorElemento(true); return; }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
+  // L o Ctrl+L: prende o apaga el Lápiz (con Ctrl+L se frena que el
+  // navegador salte a la barra de direcciones).
+  if((e.key === 'l' || e.key === 'L') && !e.altKey && !e.metaKey && fbMiembro){
+    e.preventDefault();
+    if(herramientaActiva === 'lapiz') desactivarHerramienta();
+    else{ herramientaActiva = 'lapiz'; renderToolkit(); }
+    return;
+  }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }

@@ -209,6 +209,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
+  - **Atajo: `L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
+    anda mientras se escribe en un campo). Ojo: en algunos navegadores
+    Ctrl+L no se deja interceptar y salta a la barra de direcciones; la `L`
+    sola anda siempre.
   - **Dos estilos** (`lapizEstilo`, `localStorage` `lapiz-estilo`, selector
     en su ventanita, decidido 2026-09-19): **Libre** (lo de arriba) y **Por
     casilleros**, un marcador de trayectoria como la estela de movimiento

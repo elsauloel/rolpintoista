@@ -132,13 +132,15 @@ hay trabajo reciente o en curso de otra conversación (ver
   tamaño topeado si no hay suficientes legacy disponibles para sostenerlo.
 - **Categorías con reglas fijas** (`CATEGORIA_TAMANO_FIJO`,
   `CATEGORIA_TIER_MAX`): Inicio de partida usa el reparto de Ramos
-  generales pero con tamaño fijo en Aldea (el select se bloquea ahí,
-  `aplicarTamanoFijo`) y tope de rareza en Raro — nunca Excepcional ni
-  Legendario. El tope se aplica en el índice del catálogo
-  (`indexarCatalogo(tierMax)`, vía `dentroDeTope`) y en los pesos de
-  sorteo (`pesosConTope`), así que ni generar, ni regenerar, ni "🎲 Otro"
-  de un ítem puntual (`rerollItem`) se lo saltan — ni siquiera como último
-  recurso si el rubro/tier pedido no tiene stock.
+  generales, con el tamaño elegido normalmente por el GM pero con tope de
+  rareza en Raro — nunca Excepcional ni Legendario. El tope se aplica en
+  el índice del catálogo (`indexarCatalogo(tierMax)`, vía `dentroDeTope`) y
+  en los pesos de sorteo (`pesosConTope`), así que ni generar, ni
+  regenerar, ni "🎲 Otro" de un ítem puntual (`rerollItem`), ni agregar a
+  mano desde "+ Agregar ítems" se lo saltan — ni siquiera como último
+  recurso si el rubro/tier pedido no tiene stock. `CATEGORIA_TAMANO_FIJO`
+  (bloquear el select de tamaño en un valor fijo, `aplicarTamanoFijo`)
+  queda armado pero sin ninguna categoría usándolo hoy.
 - "+ Crear ítem nuevo" abre el asistente compartido `comun/asistente-item.js`
   (`abrirItemNuevo`), con tier, descripción narrativa, precio (con el ajuste
   de la tienda), ranuras y estado al equipar; guarda con `agregarItemCreado`.

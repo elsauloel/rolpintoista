@@ -1029,17 +1029,19 @@ const REPARTO_POR_CATEGORIA = {
   alquimista: {consumibles:1},
   herrero:    {armas:0.45, defensivos:0.35, escudos:0.20},
   // Inicio de partida: mismo reparto que Ramos generales, pero con tamaño
-  // y rareza fijos (ver CATEGORIA_TAMANO_FIJO/CATEGORIA_TIER_MAX) — la
-  // tienda con la que arrancan los jugadores, sin nada Excepcional ni
-  // Legendario todavía.
+  // pero con tope de rareza (ver CATEGORIA_TIER_MAX) — la tienda con la
+  // que arrancan los jugadores, sin nada Excepcional ni Legendario
+  // todavía. El tamaño sí lo elige el GM, como en cualquier otra.
   inicio:     {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10},
 };
 const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero', inicio:'Inicio de partida'};
 
-// Categorías con tamaño fijo (el GM no lo elige) y/o un tope de rareza que
-// nunca se pasa — ni al generar, ni al regenerar, ni al 🎲 Otro de un ítem
-// puntual. Por ahora, solo la de inicio de partida.
-const CATEGORIA_TAMANO_FIJO = {inicio: 'aldea'};
+// Categorías con tamaño fijo (el GM no lo elige, ver aplicarTamanoFijo) —
+// por ahora ninguna, queda el mecanismo por si hace falta más adelante.
+const CATEGORIA_TAMANO_FIJO = {};
+// Categorías con tope de rareza: nunca ofrecen nada por encima, ni al
+// generar, ni al regenerar, ni al 🎲 Otro de un ítem puntual, ni agregando
+// a mano. Por ahora, solo la de inicio de partida.
 const CATEGORIA_TIER_MAX = {inicio: 'Raro'};
 
 // Pesos de rareza del tamaño, pero solo hasta tierMax (si se pasa): las
@@ -1077,7 +1079,10 @@ const MULT_MAGICO_ALQUIMISTA = 1.5;
 // pisar a mano después, esto solo evita arrancar con el campo vacío.
 function nombreAutoTienda(tamano, categoria){
   const tamanoLabel = (TAMANOS[tamano] || {}).label || '';
-  if(categoria === 'inicio') return 'Tienda de inicio de partida';
+  if(categoria === 'inicio'){
+    if(tamano === 'ambulante') return 'Inicio de partida ambulante';
+    return `Tienda de inicio de partida (${tamanoLabel.toLowerCase()})`;
+  }
   if(categoria === 'ramos'){
     if(tamano === 'ambulante') return 'Vendedor ambulante';
     return `Tienda de ${tamanoLabel.toLowerCase()}`;
@@ -1252,8 +1257,8 @@ function indexarCatalogo(tierMax){
 
 function generarTienda(claveTamanoElegido, categoria){
   const cat = REPARTO_POR_CATEGORIA[categoria] ? categoria : 'ramos';
-  // Algunas categorías fijan su propio tamaño (inicio de partida = Aldea
-  // siempre), sin importar lo que diga el selector.
+  // Algunas categorías podrían fijar su propio tamaño (ver
+  // CATEGORIA_TAMANO_FIJO); ninguna lo hace hoy.
   const claveTamano = CATEGORIA_TAMANO_FIJO[cat] || claveTamanoElegido;
   const tierMax = CATEGORIA_TIER_MAX[cat];
   const cfg = {...TAMANOS[claveTamano], pesos: pesosConTope(TAMANOS[claveTamano].pesos, tierMax)};

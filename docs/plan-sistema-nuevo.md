@@ -66,9 +66,9 @@ su casa:
     sus creeps y sus propios personajes (que son creeps con otro nombre:
     PNJ aliados, comerciantes…). Si el GM abre la ficha, solo mira.
   - **Stats iniciales en 1** (Con, Fue, Agi, Des, Int) para personajes,
-    creeps e invocaciones nuevos; la vida arranca llena. En creeps, Hp.Max = Con×5 + mods de
-    Hp.Max (equipo y estados), igual que en la ficha.
-    En invocaciones, Hp.Max = Con×5 (se recalcula al terminar de editar Con).
+    creeps e invocaciones nuevos; la vida arranca llena. En creeps y en
+    invocaciones, Hp.Max = Con×5 + mods de Hp.Max (equipo y estados),
+    igual que en la ficha (se recalcula al terminar de editar Con).
   - Rol visible en la cajita Mesa ("· GM" / "· jugador"). Es por navegador.
   - Fichas de creeps: solo el GM las ve y modifica. Los jugadores ven de
     cada creep solo el token, la barra de vida y los estados.

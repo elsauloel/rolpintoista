@@ -137,7 +137,23 @@ nuevo de Rol Pintoísta. Paso 2 de
   `mapa-toolkit-abierto`; abierta, corre el orden de turnos). Lápiz, Formas
   y Terreno figuran como "Pronto" hasta diseñarlas (una herramienta lista
   lleva `lista: true` y se activa en `herramientaActiva`). Preguntas en
-  `docs/preguntas-abiertas.md` (P38–P41).
+  `docs/preguntas-abiertas.md` (P38–P41). **📖 Bitácora** es la excepción:
+  no es un modo de dibujo, así que su clic no toca `herramientaActiva` —
+  abre o cierra del todo `#bitacora-flotante` (`abrirBitacoraFlotante`,
+  recordado en `localStorage` `mapa-bitacora-abierta`).
+- **Bitácora flotante** (`#bitacora-flotante`): mismo dato y mismos
+  permisos que la de la ficha (`campanas/{id}/bitacora/{página}` +
+  `entradas/{id}`, todos leen, cualquiera suma/corrige, borra el autor o
+  quien creó la página o el GM — ver
+  [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md)), pero
+  acá vive en una cajita arrastrable en vez de una tarjeta fija, con el
+  mismo patrón que `#mesa` en `comun/mesa.js`: se arrastra desde la
+  cabecera, un clic la achica o la agranda (`localStorage`
+  `bitacora-colapsada` y `bitacora-posicion`, sin el prefijo `mapa-`) y ✕
+  la cierra del todo (vuelve a abrirse con 📖 en la caja de
+  herramientas). Se conecta a Firestore recién al abrirla la
+  primera vez (`bitacoraEscuchar`, con guarda para no duplicar
+  suscripción), no de arranque como la Mesa.
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

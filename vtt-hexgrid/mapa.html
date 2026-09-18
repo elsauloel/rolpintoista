@@ -197,6 +197,55 @@ aside{
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:0 4px
 }
 #toolkit-pie{margin-top:auto;padding:10px 14px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--muted);line-height:1.4}
+/* Bitácora flotante (mismo patrón que la Mesa arrastrable de la ficha):
+   se arrastra desde la cabecera, un clic la achica o la agranda, y ✕ la
+   cierra del todo (vuelve a abrirse con 📖 en la caja de herramientas). */
+#bitacora-flotante{
+  position:fixed;right:16px;bottom:16px;z-index:46;width:340px;max-width:calc(100vw - 32px);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;color:var(--paper)
+}
+#bitacora-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line-soft)}
+#bitacora-flotante.arrastrando{opacity:.85}
+#bitacora-flotante.arrastrando #bitacora-cabecera{cursor:grabbing}
+#bitacora-flotante.colapsada #bitacora-cabecera{border-bottom:none}
+#bitacora-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
+#bitacora-estado{flex:1;text-align:right;font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bitacora-flecha{color:var(--muted);width:10px}
+#bitacora-cerrar{background:none;border:0;padding:0 2px;cursor:pointer;font-size:13px;color:var(--muted)}
+#bitacora-cerrar:hover{color:var(--danger)}
+#bitacora-cuerpo{padding:10px;max-height:min(60vh,460px);overflow-y:auto}
+#bitacora-flotante.colapsada #bitacora-cuerpo{display:none}
+#bitacora-cab-fila{margin-top:0;flex-wrap:wrap}
+.mini{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:var(--r);cursor:pointer;background:none}
+.mini:hover{border-color:var(--copper);color:var(--paper)}
+.mini.peligro:hover{border-color:var(--danger);color:var(--danger)}
+.bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;margin:9px 0}
+.bit-entrada{display:flex;gap:6px;align-items:flex-start;padding:5px 7px;border-left:3px solid;border-radius:var(--r);background:rgba(0,0,0,.18)}
+.bit-entrada .bit-texto{flex:1;min-width:0;white-space:pre-wrap;word-wrap:break-word;font-size:13px;line-height:1.45}
+.bit-entrada .bit-firma{color:var(--muted);font-size:11px;white-space:nowrap}
+.bit-entrada .bit-botones{display:flex;gap:3px;flex:none;opacity:.55}
+.bit-entrada:hover .bit-botones{opacity:1}
+.bit-entrada textarea{width:100%;min-height:60px}
+.bit-sumar{display:flex;gap:7px;align-items:stretch}
+.bit-sumar textarea{flex:1;min-height:44px;resize:vertical}
+.bit-vacia{color:var(--muted);font-size:12px}
+.bit-tab{
+  display:flex;align-items:center;gap:4px;border:1px solid var(--line-soft);background:var(--panel2);
+  border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer
+}
+.bit-tab.active{border-color:var(--copper);background:rgba(201,133,69,.12)}
+.bit-tab-name{
+  background:none;border:none;padding:2px 2px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;
+  color:var(--paper);width:auto;min-width:0;max-width:110px
+}
+.bit-tab.active .bit-tab-name{color:var(--brass);font-weight:700}
+.bit-tab-x{
+  width:16px;height:16px;border-radius:50%;color:var(--muted);font-size:11px;line-height:1;
+  display:flex;align-items:center;justify-content:center;flex:none;border:none;background:none;cursor:pointer
+}
+.bit-tab-x:hover{background:var(--danger);color:#fff}
 /* Con la caja abierta, el orden de turnos se corre para no quedar tapado. */
 #iniciativa{transition:left .22s ease}
 #lienzo-caja.toolkit-abierto #iniciativa{left:232px}
@@ -473,6 +522,29 @@ body.con-ruta .toast{bottom:auto;top:74px}
     </div>
   </aside>
 </main>
+
+<!-- Bitácora de la partida: flotante y arrastrable, como la Mesa de la
+     ficha. Se abre y cierra del todo con 📖 en la caja de herramientas;
+     una vez abierta, un clic en su cabecera la achica o la agranda. -->
+<div id="bitacora-flotante" hidden>
+  <div id="bitacora-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">
+    <span id="bitacora-titulo">📖 Bitácora</span>
+    <span id="bitacora-estado">conectando…</span>
+    <span id="bitacora-flecha"></span>
+    <button type="button" id="bitacora-cerrar" title="Cerrar del todo">✕</button>
+  </div>
+  <div id="bitacora-cuerpo">
+    <div class="fila" id="bitacora-cab-fila">
+      <div class="bitacora-tabs" id="bitacora-tabs"></div>
+      <button type="button" class="btn" id="btn-bitacora-add" title="Nueva página compartida">+ Página</button>
+    </div>
+    <div id="bitacora-entradas" class="bit-entradas"></div>
+    <div class="bit-sumar">
+      <textarea id="bitacora-nueva" rows="2" placeholder="Sumá lo que pasó: deudas, pactos, lugares, gente… (Ctrl+Enter)"></textarea>
+      <button type="button" class="btn primary" id="bitacora-sumar">Sumar</button>
+    </div>
+  </div>
+</div>
 
 <div id="botonera-capa" hidden>
   <iframe id="botonera-marco" title="Botonera" src="about:blank"></iframe>
@@ -3502,10 +3574,16 @@ $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herram
    Barra de la izquierda del mapa. Cada herramienta se diseña por separado;
    mientras tanto figuran como "Pronto". Para sumar una: agregarla a
    HERRAMIENTAS con `lista: true` y atender `herramientaActiva` en el mapa. */
+// Se usa ya en renderToolkit (más abajo): declarada acá arriba para que
+// exista cuando el toolkit se dibuja por primera vez.
+let bitacoraFlotanteAbierta = false;
+
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa'},
   {id: 'formas', icono: '⬡', nombre: 'Formas', detalle: 'Objetos con forma de hexágono'},
   {id: 'terreno', icono: '☣️', nombre: 'Terreno', detalle: 'Arena movediza, veneno, arena tóxica…'},
+  // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
+  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
 ];
 let herramientaActiva = '';
 let toolkitAbierto = false;
@@ -3517,12 +3595,15 @@ function renderToolkit(){
   const pestana = $('#toolkit-pestana');
   pestana.setAttribute('aria-expanded', toolkitAbierto ? 'true' : 'false');
   pestana.title = toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas';
-  $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => `<li>
-    <button type="button" class="tk-herramienta${herramientaActiva === h.id ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${herramientaActiva === h.id}">
+  $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => {
+    const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
+    return `<li>
+    <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
       <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}</span>
       <span class="tk-detalle">${esc(h.detalle)}</span>
-    </button></li>`).join('');
+    </button></li>`;
+  }).join('');
 }
 
 function abrirToolkit(abrir){
@@ -3537,11 +3618,323 @@ $('#toolkit-lista').addEventListener('click', e => {
   if(!b) return;
   const h = HERRAMIENTAS.find(x => x.id === b.dataset.herramienta);
   if(!h) return;
+  if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
   if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
   herramientaActiva = herramientaActiva === h.id ? '' : h.id;
   renderToolkit();
 });
 renderToolkit();
+
+/* ---------- Bitácora de la partida ----------
+   Compartida con la ficha (mismo esquema, mismos permisos): todos la
+   leen; cualquiera suma páginas y entradas y corrige cualquiera; borra el
+   autor (o quien creó la página) o el GM. Acá vive en una cajita
+   flotante y arrastrable (mismo patrón que la Mesa de la ficha), que se
+   abre y se cierra del todo con 📖 en la caja de herramientas.
+   campanas/<partida>/bitacora/<página> = {nombre, creado, creadoUid, creadoPor}
+   campanas/<partida>/bitacora/<página>/entradas/<id> =
+     {texto, uid, autor, creado, editado?, editadoUid?, editadoPor?} */
+const BITACORA_COLORES = ['#E0A458', '#8EE6A8', '#7FB3F0', '#F08FA8', '#C9A8F5', '#F2D16B', '#6FD6C8', '#F0A36F'];
+let bitacoraPaginas = [];        // [{id, nombre, creadoUid}]
+let bitacoraActiva = '';
+let bitacoraEntradas = [];       // de la página activa
+let bitacoraCorteEntradas = null;
+let bitacoraEditando = '';       // id de la entrada que se está corrigiendo
+let bitacoraConectada = false;
+
+function bitacoraColor(uid){
+  let h = 0;
+  for(const ch of String(uid || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return BITACORA_COLORES[h % BITACORA_COLORES.length];
+}
+function bitacoraFecha(ts){
+  if(!ts || !ts.toDate) return '';
+  const d = ts.toDate();
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+}
+
+function bitacoraEscuchar(){
+  if(bitacoraConectada) return;
+  bitacoraConectada = true;
+  try{ bitacoraActiva = localStorage.getItem('bitacora-activa-' + FB_CAMPANA) || ''; }catch(e){}
+  fbDb.collection(fbRutaCampana('bitacora')).orderBy('creado').onSnapshot(snap => {
+    bitacoraPaginas = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if(!bitacoraPaginas.some(p => p.id === bitacoraActiva)) bitacoraElegir(bitacoraPaginas.length ? bitacoraPaginas[0].id : '');
+    else if(!bitacoraCorteEntradas) bitacoraElegir(bitacoraActiva);
+    else bitacoraRender();
+  }, err => {
+    console.error('Error escuchando la bitácora:', err);
+    $('#bitacora-estado').textContent = 'No se pudo leer. ¿Reglas nuevas de Firestore?';
+  });
+}
+
+function bitacoraElegir(id){
+  bitacoraActiva = id;
+  bitacoraEditando = '';
+  try{ localStorage.setItem('bitacora-activa-' + FB_CAMPANA, id); }catch(e){}
+  if(bitacoraCorteEntradas){ bitacoraCorteEntradas(); bitacoraCorteEntradas = null; }
+  bitacoraEntradas = [];
+  if(id){
+    bitacoraCorteEntradas = fbDb.collection(fbRutaCampana(`bitacora/${id}/entradas`)).orderBy('creado')
+      .onSnapshot(snap => {
+        bitacoraEntradas = snap.docs.map(d => ({id: d.id, ...d.data({serverTimestamps: 'estimate'})}));
+        const lista = $('#bitacora-entradas');
+        const alFondo = lista.scrollHeight - lista.scrollTop - lista.clientHeight < 30;
+        bitacoraRender();
+        if(alFondo) lista.scrollTop = lista.scrollHeight;
+      }, err => console.error('Error escuchando las entradas de la bitácora:', err));
+  }
+  bitacoraRender();
+}
+
+function bitacoraPuedeBorrar(uidAutor){
+  return !!(fbMiembro && (soyGM || (fbUsuario && fbUsuario.uid === uidAutor)));
+}
+
+function bitacoraRender(){
+  const tabs = $('#bitacora-tabs'), lista = $('#bitacora-entradas');
+  if(!tabs || !lista) return;
+  const conectado = !!(bitacoraConectada && fbDb && fbMiembro);
+  $('#bitacora-estado').textContent = conectado ? '' : 'conectando…';
+  $('#btn-bitacora-add').disabled = !conectado;
+  $('#bitacora-sumar').disabled = !conectado || !bitacoraActiva;
+  $('#bitacora-nueva').disabled = !conectado || !bitacoraActiva;
+  if(!conectado){
+    tabs.innerHTML = '';
+    lista.innerHTML = '<div class="bit-vacia">Sin conexión con la partida.</div>';
+    return;
+  }
+  // No redibujar las pestañas mientras alguien les cambia el nombre.
+  if(!tabs.contains(document.activeElement)){
+    tabs.innerHTML = bitacoraPaginas.map(p => `
+      <div class="bit-tab ${p.id === bitacoraActiva ? 'active' : ''}" data-bit-pagina="${esc(p.id)}">
+        <input class="bit-tab-name" data-bit-nombre="${esc(p.id)}" value="${esc(p.nombre || 'Página')}" maxlength="40" title="Clic para abrir · editá el nombre y apretá Enter">
+        ${bitacoraPuedeBorrar(p.creadoUid) ? `<button type="button" class="bit-tab-x" data-bit-borrar-pagina="${esc(p.id)}" title="Borrar página">×</button>` : ''}
+      </div>`).join('');
+  }
+  if(!bitacoraPaginas.length){
+    lista.innerHTML = '<div class="bit-vacia">Todavía no hay páginas. Tocá "+ Página" para empezar.</div>';
+    return;
+  }
+  if(!bitacoraEntradas.length){
+    lista.innerHTML = '<div class="bit-vacia">Esta página está vacía: sumá lo primero abajo.</div>';
+    return;
+  }
+  // No redibujar mientras alguien corrige una entrada (se perdería lo escrito).
+  if(bitacoraEditando && lista.querySelector('textarea[data-bit-edicion]')) return;
+  lista.innerHTML = bitacoraEntradas.map(en => {
+    const color = bitacoraColor(en.uid);
+    const firma = `${esc(en.autor || '?')} · ${bitacoraFecha(en.creado)}` +
+      (en.editadoPor ? ` · editado por ${esc(en.editadoPor)} ${bitacoraFecha(en.editado)}` : '');
+    if(en.id === bitacoraEditando){
+      return `<div class="bit-entrada" style="border-left-color:${color};flex-direction:column">
+        <textarea data-bit-edicion="${esc(en.id)}">${esc(en.texto || '')}</textarea>
+        <div class="fila" style="margin-top:4px;gap:6px">
+          <button type="button" class="mini" data-bit-guardar="${esc(en.id)}">Guardar</button>
+          <button type="button" class="mini" data-bit-cancelar="1">Cancelar</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="bit-entrada" style="border-left-color:${color}">
+      <div class="bit-texto" style="color:${color}">${esc(en.texto || '')} <span class="bit-firma">(${firma})</span></div>
+      <div class="bit-botones">
+        <button type="button" class="mini" data-bit-editar="${esc(en.id)}" title="Corregir">✎</button>
+        ${bitacoraPuedeBorrar(en.uid) ? `<button type="button" class="mini peligro" data-bit-borrar="${esc(en.id)}" title="Borrar">✕</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function bitacoraNuevaPagina(){
+  if(!fbDb || !fbMiembro) return;
+  try{
+    const ref = await fbDb.collection(fbRutaCampana('bitacora')).add({
+      nombre: `Página ${bitacoraPaginas.length + 1}`,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+      creadoUid: fbUsuario.uid,
+      creadoPor: fbMiembro.nombre,
+    });
+    bitacoraElegir(ref.id);
+    setTimeout(() => { const i = document.querySelector(`[data-bit-nombre="${ref.id}"]`); if(i){ i.focus(); i.select(); } }, 300);
+  }catch(err){
+    console.error('No se pudo crear la página:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear la página');
+  }
+}
+
+async function bitacoraSumar(){
+  const campo = $('#bitacora-nueva');
+  const texto = campo.value.trim();
+  if(!texto || !bitacoraActiva || !fbDb || !fbMiembro) return;
+  campo.disabled = true;
+  try{
+    await fbDb.collection(fbRutaCampana(`bitacora/${bitacoraActiva}/entradas`)).add({
+      texto: texto.slice(0, 4000),
+      uid: fbUsuario.uid,
+      autor: fbMiembro.nombre,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    campo.value = '';
+    const lista = $('#bitacora-entradas');
+    setTimeout(() => { lista.scrollTop = lista.scrollHeight; }, 50);
+  }catch(err){
+    console.error('No se pudo sumar a la bitácora:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo sumar a la bitácora');
+  }finally{
+    campo.disabled = false;
+    campo.focus();
+  }
+}
+
+async function bitacoraGuardarEdicion(id){
+  const campo = document.querySelector(`textarea[data-bit-edicion="${id}"]`);
+  if(!campo) return;
+  const texto = campo.value.trim();
+  if(!texto){ toast('Si querés sacarla, usá ✕'); return; }
+  try{
+    await fbDb.doc(fbRutaCampana(`bitacora/${bitacoraActiva}/entradas/${id}`)).update({
+      texto: texto.slice(0, 4000),
+      editado: firebase.firestore.FieldValue.serverTimestamp(),
+      editadoUid: fbUsuario.uid,
+      editadoPor: fbMiembro.nombre,
+    });
+    bitacoraEditando = '';
+    bitacoraRender();
+  }catch(err){
+    console.error('No se pudo corregir la entrada:', err);
+    toast('No se pudo guardar la corrección');
+  }
+}
+
+async function bitacoraBorrarPagina(id){
+  const p = bitacoraPaginas.find(x => x.id === id);
+  if(!confirm(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene, para toda la mesa?`)) return;
+  try{
+    const entradas = await fbDb.collection(fbRutaCampana(`bitacora/${id}/entradas`)).get();
+    const lote = fbDb.batch();
+    entradas.docs.forEach(d => lote.delete(d.ref));
+    lote.delete(fbDb.doc(fbRutaCampana(`bitacora/${id}`)));
+    await lote.commit();
+  }catch(err){
+    console.error('No se pudo borrar la página:', err);
+    toast('No se pudo borrar la página (solo quien la creó o el GM)');
+  }
+}
+
+$('#btn-bitacora-add').onclick = bitacoraNuevaPagina;
+$('#bitacora-sumar').onclick = bitacoraSumar;
+$('#bitacora-nueva').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); bitacoraSumar(); }
+});
+$('#bitacora-tabs').addEventListener('click', e => {
+  const borrar = e.target.closest('[data-bit-borrar-pagina]');
+  if(borrar){ bitacoraBorrarPagina(borrar.dataset.bitBorrarPagina); return; }
+  const tab = e.target.closest('[data-bit-pagina]');
+  if(tab && tab.dataset.bitPagina !== bitacoraActiva) bitacoraElegir(tab.dataset.bitPagina);
+});
+$('#bitacora-tabs').addEventListener('change', e => {
+  const input = e.target.closest('[data-bit-nombre]');
+  if(!input) return;
+  const nombre = input.value.trim().slice(0, 40);
+  if(!nombre) return;
+  fbDb.doc(fbRutaCampana(`bitacora/${input.dataset.bitNombre}`)).update({nombre})
+    .catch(err => { console.error('No se pudo renombrar la página:', err); toast('No se pudo renombrar la página'); });
+});
+$('#bitacora-tabs').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.matches('[data-bit-nombre]')){ e.preventDefault(); e.target.blur(); }
+});
+$('#bitacora-entradas').addEventListener('click', e => {
+  const editar = e.target.closest('[data-bit-editar]');
+  if(editar){
+    bitacoraEditando = editar.dataset.bitEditar;
+    bitacoraRender();
+    const campo = document.querySelector(`textarea[data-bit-edicion="${bitacoraEditando}"]`);
+    if(campo){ campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }
+    return;
+  }
+  const guardar = e.target.closest('[data-bit-guardar]');
+  if(guardar){ bitacoraGuardarEdicion(guardar.dataset.bitGuardar); return; }
+  if(e.target.closest('[data-bit-cancelar]')){ bitacoraEditando = ''; bitacoraRender(); return; }
+  const borrar = e.target.closest('[data-bit-borrar]');
+  if(borrar){
+    if(!confirm('¿Borrar esta entrada de la bitácora, para toda la mesa?')) return;
+    fbDb.doc(fbRutaCampana(`bitacora/${bitacoraActiva}/entradas/${borrar.dataset.bitBorrar}`)).delete()
+      .catch(err => { console.error('No se pudo borrar la entrada:', err); toast('No se pudo borrar (solo su autor o el GM)'); });
+  }
+});
+
+/* Cajita flotante y arrastrable (mismo patrón que #mesa en la ficha). */
+{
+  const caja = $('#bitacora-flotante');
+  const cabecera = $('#bitacora-cabecera');
+  let posicion = null;
+  try{ posicion = JSON.parse(localStorage.getItem('bitacora-posicion') || 'null'); }catch(e){}
+  const encuadrar = () => {
+    if(!posicion){ caja.style.left = caja.style.top = ''; return; }
+    const x = Math.max(0, Math.min(posicion.x, window.innerWidth - caja.offsetWidth));
+    const y = Math.max(0, Math.min(posicion.y, window.innerHeight - caja.offsetHeight));
+    caja.style.left = x + 'px'; caja.style.top = y + 'px';
+    caja.style.right = caja.style.bottom = 'auto';
+  };
+  window.addEventListener('resize', () => { if(!caja.hidden) encuadrar(); });
+
+  let arrastre = null, recienMovida = false;
+  cabecera.addEventListener('pointerdown', e => {
+    if(e.button !== 0 || e.target.closest('#bitacora-cerrar')) return;
+    const r = caja.getBoundingClientRect();
+    arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
+    cabecera.setPointerCapture(e.pointerId);
+  });
+  cabecera.addEventListener('pointermove', e => {
+    if(!arrastre) return;
+    const dx = e.clientX - arrastre.px, dy = e.clientY - arrastre.py;
+    if(!arrastre.movio && Math.abs(dx) + Math.abs(dy) < 5) return;
+    arrastre.movio = true;
+    caja.classList.add('arrastrando');
+    posicion = {x: arrastre.x + dx, y: arrastre.y + dy};
+    encuadrar();
+  });
+  const soltar = () => {
+    if(!arrastre) return;
+    recienMovida = arrastre.movio;
+    arrastre = null;
+    caja.classList.remove('arrastrando');
+    if(recienMovida){
+      posicion = {x: parseFloat(caja.style.left), y: parseFloat(caja.style.top)};
+      try{ localStorage.setItem('bitacora-posicion', JSON.stringify(posicion)); }catch(e){}
+    }
+  };
+  cabecera.addEventListener('pointerup', soltar);
+  cabecera.addEventListener('pointercancel', soltar);
+
+  const aplicarColapso = colapsada => {
+    caja.classList.toggle('colapsada', colapsada);
+    $('#bitacora-flecha').textContent = colapsada ? '▸' : '▾';
+    try{ localStorage.setItem('bitacora-colapsada', colapsada ? '1' : ''); }catch(e){}
+    encuadrar();
+  };
+  cabecera.onclick = e => {
+    if(recienMovida){ recienMovida = false; return; }
+    if(e.target.closest('#bitacora-cerrar')) return;
+    aplicarColapso(!caja.classList.contains('colapsada'));
+  };
+  $('#bitacora-cerrar').onclick = () => abrirBitacoraFlotante(false);
+
+  window.abrirBitacoraFlotante = abrir => {
+    bitacoraFlotanteAbierta = abrir;
+    try{ localStorage.setItem('mapa-bitacora-abierta', abrir ? '1' : ''); }catch(e){}
+    caja.hidden = !abrir;
+    renderToolkit();
+    if(!abrir) return;
+    let colapsada = false;
+    try{ colapsada = localStorage.getItem('bitacora-colapsada') === '1'; }catch(e){}
+    aplicarColapso(colapsada);
+    if(fbDb && fbMiembro) bitacoraEscuchar();
+  };
+}
+try{
+  if(localStorage.getItem('mapa-bitacora-abierta') === '1') abrirBitacoraFlotante(true);
+}catch(e){}
 
 /* ---------- Mesa (tiradas compartidas): comun/mesa.js ---------- */
 
@@ -3594,6 +3987,8 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   actualizarBotonMapas();
+  // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
+  if(bitacoraFlotanteAbierta) bitacoraEscuchar();
   renderPanel(true);
 }
 

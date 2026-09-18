@@ -153,7 +153,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   la cierra del todo (vuelve a abrirse con 📖 en la caja de
   herramientas). Se conecta a Firestore recién al abrirla la
   primera vez (`bitacoraEscuchar`, con guarda para no duplicar
-  suscripción), no de arranque como la Mesa.
+  suscripción), no de arranque como la Mesa. **🎚️ en la cabecera** abre un
+  desplegable con la transparencia (30–100 %, `localStorage`
+  `bitacora-opacidad`): solo cambia el fondo de la cajita
+  (`colorConAlfa(--panel, …)`, la misma función que usan las auras), el
+  texto y los botones quedan siempre nítidos.
 - **⚔ Acciones** (solo GM, en un creep vinculado): la misma capa carga
   `gm-tools.html?modo=acciones&creep=<id>`, que muestra solo la ventana de
   Acciones del creep (mensajes `acciones-lista`, `acciones-cerrada`,

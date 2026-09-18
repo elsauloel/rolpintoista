@@ -202,7 +202,7 @@ aside{
    cierra del todo (vuelve a abrirse con 📖 en la caja de herramientas). */
 #bitacora-flotante{
   position:fixed;right:16px;bottom:16px;z-index:46;width:340px;max-width:calc(100vw - 32px);
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px);
   box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;color:var(--paper)
 }
 #bitacora-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line-soft)}
@@ -211,6 +211,15 @@ aside{
 #bitacora-flotante.colapsada #bitacora-cabecera{border-bottom:none}
 #bitacora-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
 #bitacora-estado{flex:1;text-align:right;font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bitacora-opacidad-btn{background:none;border:0;padding:0 2px;cursor:pointer;font-size:13px;color:var(--muted);line-height:1}
+#bitacora-opacidad-btn:hover,#bitacora-opacidad-btn[aria-expanded="true"]{color:var(--brass)}
+#bitacora-opacidad-lista{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:47;width:170px;
+  background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 24px rgba(0,0,0,.55);
+  padding:8px 10px;cursor:default
+}
+#bitacora-opacidad-lista label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+#bitacora-opacidad-lista input[type=range]{width:100%}
 #bitacora-flecha{color:var(--muted);width:10px}
 #bitacora-cerrar{background:none;border:0;padding:0 2px;cursor:pointer;font-size:13px;color:var(--muted)}
 #bitacora-cerrar:hover{color:var(--danger)}
@@ -530,6 +539,13 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <div id="bitacora-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">
     <span id="bitacora-titulo">📖 Bitácora</span>
     <span id="bitacora-estado">conectando…</span>
+    <div class="desplegable" id="bitacora-opacidad-caja">
+      <button type="button" id="bitacora-opacidad-btn" aria-expanded="false" title="Transparencia de la ventana">🎚️</button>
+      <div id="bitacora-opacidad-lista" hidden>
+        <label for="bitacora-opacidad-slider">Transparencia</label>
+        <input type="range" id="bitacora-opacidad-slider" min="30" max="100" step="5" value="100">
+      </div>
+    </div>
     <span id="bitacora-flecha"></span>
     <button type="button" id="bitacora-cerrar" title="Cerrar del todo">✕</button>
   </div>
@@ -3880,7 +3896,7 @@ $('#bitacora-entradas').addEventListener('click', e => {
 
   let arrastre = null, recienMovida = false;
   cabecera.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.target.closest('#bitacora-cerrar')) return;
+    if(e.button !== 0 || e.target.closest('#bitacora-cerrar, #bitacora-opacidad-caja')) return;
     const r = caja.getBoundingClientRect();
     arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
     cabecera.setPointerCapture(e.pointerId);
@@ -3915,10 +3931,38 @@ $('#bitacora-entradas').addEventListener('click', e => {
   };
   cabecera.onclick = e => {
     if(recienMovida){ recienMovida = false; return; }
-    if(e.target.closest('#bitacora-cerrar')) return;
+    if(e.target.closest('#bitacora-cerrar, #bitacora-opacidad-caja')) return;
     aplicarColapso(!caja.classList.contains('colapsada'));
   };
   $('#bitacora-cerrar').onclick = () => abrirBitacoraFlotante(false);
+
+  // Transparencia: se guarda por navegador y se aplica solo al fondo (el
+  // texto y los botones quedan siempre nítidos), como la aura de un token.
+  const aplicarOpacidad = pct => {
+    const hex = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim();
+    caja.style.background = colorConAlfa(hex, Math.max(30, Math.min(100, pct)) / 100);
+  };
+  let opacidad = 100;
+  try{ opacidad = parseInt(localStorage.getItem('bitacora-opacidad'), 10) || 100; }catch(e){}
+  $('#bitacora-opacidad-slider').value = opacidad;
+  aplicarOpacidad(opacidad);
+  $('#bitacora-opacidad-slider').addEventListener('input', e => {
+    const pct = num(e.target.value);
+    aplicarOpacidad(pct);
+    try{ localStorage.setItem('bitacora-opacidad', pct); }catch(e2){}
+  });
+  const opacidadCaja = $('#bitacora-opacidad-caja');
+  const opacidadBtn = $('#bitacora-opacidad-btn');
+  const opacidadLista = $('#bitacora-opacidad-lista');
+  const abrirOpacidad = abrir => {
+    opacidadLista.hidden = !abrir;
+    opacidadBtn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  };
+  opacidadBtn.onclick = () => abrirOpacidad(opacidadLista.hidden);
+  document.addEventListener('pointerdown', e => {
+    if(!opacidadLista.hidden && !e.target.closest('#bitacora-opacidad-caja')) abrirOpacidad(false);
+  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && !opacidadLista.hidden) abrirOpacidad(false); });
 
   window.abrirBitacoraFlotante = abrir => {
     bitacoraFlotanteAbierta = abrir;

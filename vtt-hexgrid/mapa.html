@@ -1857,18 +1857,18 @@ function dibujar(){
     if(el.invisible){
       // Solo GM y creador: contorno punteado violeta, para no confundirlo
       // con un sólido que también ven los jugadores.
-      ctx.setLineDash([5 / z, 4 / z]);
-      ctx.strokeStyle = 'rgba(155,111,209,.85)';
-      ctx.lineWidth = 1.5 / z;
+      ctx.setLineDash([10 / z, 6 / z]);
+      ctx.strokeStyle = 'rgba(175,130,235,1)';
+      ctx.lineWidth = 4 / z;
       ctx.stroke();
       ctx.setLineDash([]);
     }else if(el.alfa === 0 && !el.solido && !puedeManipularElemento(el)){
       // Transparencia 0: el resto no ve nada, ni el contorno.
     }else if(el.alfa === 0 && !el.solido){
       // Transparencia 0: el GM y el creador siguen viendo el contorno.
-      ctx.setLineDash([5 / z, 4 / z]);
-      ctx.strokeStyle = colorConAlfa(el.color, 0.9);
-      ctx.lineWidth = 1.5 / z;
+      ctx.setLineDash([10 / z, 6 / z]);
+      ctx.strokeStyle = colorConAlfa(el.color, 1);
+      ctx.lineWidth = 4 / z;
       ctx.stroke();
       ctx.setLineDash([]);
     }else if(el.solido){

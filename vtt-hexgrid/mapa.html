@@ -2548,7 +2548,7 @@ function soltar(){
   if(dibujandoElemento){
     const d = dibujandoElemento;
     dibujandoElemento = null;
-    if(d.celdas.size > 1 || d.tipo === 'flor') guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
+    if(d.celdas.size >= 1) guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
     pedirDibujo();
   }
   if(arrastreElemento){

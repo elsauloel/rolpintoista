@@ -56,6 +56,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   un creep, si No2 estaba lleno sube con el nuevo máximo; si no, solo se
   recorta si ahora pasa el nuevo (menor) máximo. Si `sc.nitros` todavía es
   `null` (no solidificado) no se toca, sigue el máximo solo.
+- **El atributo Inteligencia se renombró a Especial** (id `int` → `esp`,
+  2026-09-18, mismo cambio que en la ficha): sigue siendo PdG.Mg/Res.Mt/
+  Rango de Casteo de un creep, solo cambió el nombre. Creeps con datos
+  viejos se convierten solos en `normalizarCreep` (`migrarCreepEspecial`/
+  `migrarObjEspecial`, mismo criterio que `migrarCreepTipos`).
 - **Escala de Tipos +2**: Tipos de arma 4/6/8/10/12 (`DADOS_ARMA`, default
   8); `crit[0..4]` y `tipo1..tipo5` son la resistencia a Tipo 4..12. Un
   creep sin `escalaTipos: 2` es de antes y `normalizarCreep` lo corre +2

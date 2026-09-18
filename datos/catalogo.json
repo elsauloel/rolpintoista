@@ -2089,7 +2089,7 @@
     "mods": [],
     "efectoMods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       }
     ],
@@ -2100,7 +2100,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 75,
-    "detalle": "Otorga +1 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
+    "detalle": "Otorga +1 a Especial durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
     "descripcionNarrativa": "Líquido transparente que refleja cosas que no están en la habitación.",
     "legacy": false,
     "unidades": 1,
@@ -2112,7 +2112,7 @@
     "efectoTurnos": 4,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
-    "efectoDetalle": "Inteligencia +1 mientras dure (4 turnos).",
+    "efectoDetalle": "Especial +1 mientras dure (4 turnos).",
     "consumible": true,
     "imagen": ""
   },
@@ -2120,7 +2120,7 @@
     "mods": [],
     "efectoMods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       }
     ],
@@ -2131,7 +2131,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 150,
-    "detalle": "Otorga +2 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
+    "detalle": "Otorga +2 a Especial durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
     "descripcionNarrativa": "Líquido transparente que refleja cosas que no están en la habitación. La versión concentrada: pega más fuerte y se nota antes.",
     "legacy": false,
     "unidades": 1,
@@ -2151,7 +2151,7 @@
     "mods": [],
     "efectoMods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 3
       }
     ],
@@ -2162,7 +2162,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 225,
-    "detalle": "Otorga +3 a Inteligencia durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
+    "detalle": "Otorga +3 a Especial durante 4 turnos. Al consumirla se activa el estado 'Clarividencia (poción)'.",
     "descripcionNarrativa": "Líquido transparente que refleja cosas que no están en la habitación. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.",
     "legacy": false,
     "unidades": 1,
@@ -4509,7 +4509,7 @@
   {
     "mods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       },
       {
@@ -4529,7 +4529,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 200,
-    "detalle": "+2 a Inteligencia, +5 a Rango de Casteo, +2 Bonos.",
+    "detalle": "+2 a Especial, +5 a Rango de Casteo, +2 Bonos.",
     "descripcionNarrativa": "Madera oscura rematada en una gema que nunca deja de brillar del todo.",
     "tipoDado": 4,
     "danoFijo": 0,
@@ -7965,7 +7965,7 @@
   {
     "mods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       }
     ],
@@ -7977,7 +7977,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 2500,
-    "detalle": "Mientras esté equipado, otorga Inteligencia +1.",
+    "detalle": "Mientras esté equipado, otorga Especial +1.",
     "descripcionNarrativa": "Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando.",
     "tipoDado": 0,
     "danoFijo": 0,
@@ -7995,7 +7995,7 @@
   {
     "mods": [
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 3
       }
     ],
@@ -8007,7 +8007,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 9000,
-    "detalle": "Mientras esté equipado, otorga Inteligencia +3.",
+    "detalle": "Mientras esté equipado, otorga Especial +3.",
     "descripcionNarrativa": "Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando. La pieza definitiva de su línea. No hay muchas y las que hay tienen dueño.",
     "tipoDado": 0,
     "danoFijo": 0,
@@ -11641,7 +11641,7 @@
         "val": 5
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 3
       },
       {
@@ -11657,7 +11657,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 1550,
-    "detalle": "Inmunidad total a intrusión mental, así como +5 a la resistencia mágica a sí misma y aliados en un rago de 5 casilleros alrededor. +3 a inteligencia. ",
+    "detalle": "Inmunidad total a intrusión mental, así como +5 a la resistencia mágica a sí misma y aliados en un rago de 5 casilleros alrededor. +3 a especial. ",
     "descripcionNarrativa": "Tela que parece tejida con luz de luna. No se ensucia, no se arruga, no envejece.",
     "equipoEstadoNombre": "Inmune a intrusión mental (Camisón de Galadriel)",
     "equipoEstadoHpTurno": 0,
@@ -11905,7 +11905,7 @@
         "val": 1
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       }
     ],
@@ -11917,7 +11917,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Inteligencia +1",
+    "detalle": "Especial +1",
     "descripcionNarrativa": "Forro con bolsillos para tinta y plumas. Huele a papel viejo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12055,7 +12055,7 @@
         "val": 1
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -12072,7 +12072,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Inteligencia +1. Rango de casteo +2.",
+    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Especial +1. Rango de casteo +2.",
     "descripcionNarrativa": "Fibra de la serpiente madre del agua. Sigue húmeda aunque esté seca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12087,7 +12087,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -12103,7 +12103,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 150,
-    "detalle": "Inteligencia +1. Rango de casteo +1.",
+    "detalle": "Especial +1. Rango de casteo +1.",
     "descripcionNarrativa": "Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12122,7 +12122,7 @@
         "val": 1
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -12138,7 +12138,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 240,
-    "detalle": "Inteligencia +1. Bonos +1. Rango de casteo +1.",
+    "detalle": "Especial +1. Bonos +1. Rango de casteo +1.",
     "descripcionNarrativa": "Paño grueso con bolsillos internos para tinta. Ordena la cabeza.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12270,7 +12270,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       }
     ],
@@ -12282,7 +12282,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 1200,
-    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a inteligencia",
+    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a especial",
     "descripcionNarrativa": "Del otro lado de la discusión. Amplifica en vez de bloquear.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12447,7 +12447,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -12463,7 +12463,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 650,
-    "detalle": "Inteligencia +1. Evasión +2. Resistencia mágica +3.",
+    "detalle": "Especial +1. Evasión +2. Resistencia mágica +3.",
     "descripcionNarrativa": "Placas de nácar engarzadas en un armazón liviano. Cambia de color según de dónde le pegue la luz.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12552,7 +12552,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -12568,7 +12568,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 550,
-    "detalle": "Resistencia a críticos tipo 8 y 10: +1. Inteligencia +1. Evasión +2. Resistencia mental +3.",
+    "detalle": "Resistencia a críticos tipo 8 y 10: +1. Especial +1. Evasión +2. Resistencia mental +3.",
     "descripcionNarrativa": "Riesgo de que te griten \"pelado puto!\" por la calle.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14781,7 +14781,7 @@
         "val": 3
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       }
     ],
@@ -14793,7 +14793,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 1850,
-    "detalle": "inteligencia +2",
+    "detalle": "especial +2",
     "descripcionNarrativa": "Cuatro dedos y una sonrisa. Nadie hace preguntas.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15591,7 +15591,7 @@
         "val": 3
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       },
       {
@@ -15607,7 +15607,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 450,
-    "detalle": "Evasión +3. Inteligencia +2. Resistencia a cc +2",
+    "detalle": "Evasión +3. Especial +2. Resistencia a cc +2",
     "descripcionNarrativa": "Armazón de aros bajo la tela, pensado para estorbar antes que para lucir. Nadie se le acerca fácil.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15773,7 +15773,7 @@
         "val": 3
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -15793,7 +15793,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 520,
-    "detalle": "Inteligencia +1. Acciones +1. Bonos +3. Resistencia mágica +4.",
+    "detalle": "Especial +1. Acciones +1. Bonos +3. Resistencia mágica +4.",
     "descripcionNarrativa": "Colores estridentes y cuernos tallados. Da miedo de cerca, buena suerte de lejos.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16182,7 +16182,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -16199,7 +16199,7 @@
     "ranuras": 0,
     "ocultoEnCatalogo": true,
     "precioCompra": 0,
-    "detalle": "Inteligencia +1. Bonos +2. Resistencia mental +4. Refleja 50% de todo daño mágico recibido.",
+    "detalle": "Especial +1. Bonos +2. Resistencia mental +4. Refleja 50% de todo daño mágico recibido.",
     "descripcionNarrativa": "Volumen imposible, presencia inapelable. Nadie le discute nada al que la lleva.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16500,7 +16500,7 @@
         "val": -1
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -16516,7 +16516,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 190,
-    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Inteligencia +1. Rango de casteo +1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Especial +1. Rango de casteo +1. Evasión -1.",
     "descripcionNarrativa": "Runas grabadas a cincel, todavía brillan tenue cuando hay magia cerca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16594,7 +16594,7 @@
         "val": 3
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 2
       },
       {
@@ -16610,7 +16610,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 450,
-    "detalle": "Evasión +3. Inteligencia +2. Resistencia a cc +2",
+    "detalle": "Evasión +3. Especial +2. Resistencia a cc +2",
     "descripcionNarrativa": "Tela liviana como el aire, tejida con un patrón que ningún telar común puede repetir.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17301,7 +17301,7 @@
         "val": 3
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       },
       {
@@ -17317,7 +17317,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 750,
-    "detalle": "Ranuras para consumibles +3, inteligencia +1",
+    "detalle": "Ranuras para consumibles +3, especial +1",
     "descripcionNarrativa": "Paño gris con cadenas al cuello, una por cada disciplina aprendida.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17332,7 +17332,7 @@
         "val": 2
       },
       {
-        "stat": "int",
+        "stat": "esp",
         "val": 1
       }
     ],
@@ -17344,7 +17344,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 140,
-    "detalle": "Inteligencia +1.",
+    "detalle": "Especial +1.",
     "descripcionNarrativa": "Vueltas de seda de buena hebra. Liviano y cómodo para concentrarse.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

@@ -25,7 +25,7 @@ ETIQ = {
     'PdG':'mod_pdg','Crítico %':'mod_crit','Parry':'mod_parry','Fuerza':'mod_fue',
     'Constitución':'mod_con','Res. mental':'mod_resm','Res. mágica':'mod_resmg','Res. CC':'mod_rescc',
     'Rango casteo':'mod_rangocasteo','Acciones máx.':'mod_accionesmax','Bloqueo':'mod_bloqueo',
-    'Inteligencia':'mod_int','Destreza':'mod_des','Agilidad':'mod_agl',
+    'Especial':'mod_esp','Destreza':'mod_des','Agilidad':'mod_agl',
     'Estado al equipar':'equipoEstadoNombre','HP por turno equipado':'equipoEstadoHpTurno',
     'Detalle del estado equipado':'equipoEstadoDetalle','Estado al equipar (preset)':'equipoEstadoPreset',
     'Descripción narrativa':'descripcionNarrativa',

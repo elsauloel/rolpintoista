@@ -37,7 +37,7 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   `DADOS_ARMA`): Acciones + Movimiento se fundieron en Nitros (substat
   `nitros` de Agilidad, fórmula `agl`; `S.nitros` es lo que queda en el
   turno, se recarga en `mantenimiento()`). Bonos pasó a SP (substat `sp`
-  de Inteligencia, fórmula `int*3`; `S.spGastado`, **no** se recarga entero
+  de Especial, fórmula `esp*3`; `S.spGastado`, **no** se recarga entero
   al pasar turno: `mantenimiento()` resta de `spGastado` el substat
   `spregen` "SP Regen", fórmula base `0` (las fichas con la vieja `floor(int/2)` se pasan a 0) + mods de equipo/estados/
   habilidades, sin pasar del máximo). Costos: mover 1/casillero (`moverCasilleros`), consumir
@@ -52,6 +52,20 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   (`IT2_PENDIENTE`). Las fichas y el catálogo viejos se convierten al abrir
   (`migrarEstadoIt2`, corre en `renderAll`). Las invocaciones siguen con sus
   propias Acciones.
+- **El atributo Inteligencia se renombró a Especial** (id `int` → `esp`,
+  2026-09-18): mismo stat de siempre (SP, PdG.Mg, Res.Mt, Rango de Casteo),
+  solo cambió el nombre — para liberarlo y reusarlo en otra cosa. Fichas,
+  catálogo (propio y compartido) y creeps de gm-tools con datos viejos se
+  convierten solos al abrir (`migrarEstadoEspecial`/`migrarObjEspecial` acá,
+  `migrarCreepEspecial`/`migrarObjEspecial` en gm-tools — mismo criterio que
+  `migrarEstadoIt2`: corre en cada `renderAll`, no hace nada si ya está
+  migrado).
+- **Inteligencia (el nombre nuevo)**: no es de los cinco atributos que se
+  reparten — se calcula sola (`inteligenciaValor`): 6 al crear el
+  personaje, +3 por nivel. Ocupa en la ficha el lugar donde antes estaba
+  el contador "WildCards" (que se sacó del todo, no quedó en ningún lado).
+  Por ahora solo se muestra (`renderInteligencia`); todavía no tiene
+  mecánica de juego cableada — eso viene después.
 - **Escala de Tipos +2** (bloque al lado de `migrarEstadoIt2`): los Tipos de
   arma son 4/6/8/10/12 (`DADOS_ARMA`; default 8; sin arma sigue en
   `IT2.tipoSinArma` = 4). Los stats `tipo1..tipo5` son ahora la resistencia

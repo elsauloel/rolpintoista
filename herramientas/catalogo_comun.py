@@ -18,15 +18,19 @@ CATALOGO_JSON = str(pathlib.Path(RAIZ) / "datos" / "catalogo.json")
 TIERS_OK = {'común':'Común', 'buena calidad':'Buena Calidad', 'raro':'Raro',
             'excepcional':'Excepcional', 'legendario':'Legendario'}
 STATS_OK = {'def','tipo1','tipo2','tipo3','tipo4','tipo5','mov','bonos','eva','ini','pdg','crit',
-            'parry','fue','con','int','agl','des','resm','resmg','rescc','rangocasteo','accionesmax',
+            'parry','fue','con','esp','agl','des','resm','resmg','rescc','rangocasteo','accionesmax',
             'dmg','bloqueo','hpmax','crgmax','rng','pdgmg','capcinturon'}
 
 # Nombres en español completo que se usan en "Otros modificadores" (sobre
 # todo en Accesorios) y no coinciden con el id interno del stat. Sin este
 # mapeo, corregir() los descarta en silencio — pasó con casi todos los
 # anillos la primera vez que se cargó la pestaña Accesorios.
+# "Inteligencia" no es alias de nada a propósito: el stat viejo se
+# renombró a Especial (id 'esp') y el nombre va a volver más adelante con
+# un significado distinto — que quede afuera evita que alguien lo escriba
+# en un Excel o en "Otros modificadores" pensando que todavía es esto.
 ALIAS_STATS = {
-    'fuerza': 'fue', 'constitucion': 'con', 'inteligencia': 'int',
+    'fuerza': 'fue', 'constitucion': 'con', 'especial': 'esp',
     'destreza': 'des', 'agilidad': 'agl',
     'resistenciamagica': 'resmg', 'resistenciamental': 'resm', 'resistenciacc': 'rescc',
     'dano': 'dmg', 'cargamax': 'crgmax', 'evasion': 'eva', 'iniciativa': 'ini',

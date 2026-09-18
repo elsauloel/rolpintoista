@@ -67,8 +67,8 @@ const AsistenteItem = (() => {
   const RAPIDOS = {
     arma: [['pdg', 'PdG'], ['crit', 'Crítico'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
     defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento']],
-    accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['int', 'Int'], ['capcinturon', 'Ranuras de cinturón']],
-    otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['int', 'Int']],
+    accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón']],
+    otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']],
   };
   const EXPLICA_BONO = {
     pdg: 'probabilidad de golpe', crit: 'chance de crítico (un crítico ignora la Defensa del rival)',

@@ -67,7 +67,7 @@ distintos); cabeza/manos/piernas/pies fusionaron sus versiones
 cada una (ver `SLOT_DEFS` en ficha.html).
 
 **Stats válidos en `mods`/`efectoMods`** (si no está en esta lista, el
-importador lo descarta): `con`, `fue`, `agl`, `des`, `int`, `def`, `dmg`,
+importador lo descarta): `con`, `fue`, `agl`, `des`, `esp`, `def`, `dmg`,
 `bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `pdgmg`,
 `resm`, `bonos`, `rangocasteo`, `rescc`, `hpmax`, `crgmax`, `accionesmax`,
 `tipo1`..`tipo5` (resistencia a crítico contra armas Tipo 4, 6, 8, 10 y 12; los ids
@@ -142,7 +142,7 @@ creeps al vuelo, no la sube a ningún lado) producen la misma forma, que
 ## Personaje — `datos/personajes/*.json`
 
 Formato completo de `S` en `ficha-personaje/ficha.html`: `meta` (nombre,
-raza, clase, nivel...), `attrs` (con/fue/agl/des/int base), `formulas`
+raza, clase, nivel...), `attrs` (con/fue/agl/des/esp base), `formulas`
 (cómo se derivan los stats secundarios desde los atributos), `inventario`/
 `cinturon`/`equipo` (ítems propios del personaje — no confundir con el
 catálogo: estos son instancias, cada uno puede tener mods propios, estar
@@ -153,7 +153,7 @@ completa — es el único lugar que no se desactualiza solo.
 ## Creep — estado en memoria de `gm-toolset/gm-tools.html`
 
 Estructuralmente análogo al personaje pero más simple: `attrs` planos
-(con/fue/agl/des/int), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
+(con/fue/agl/des/esp), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
 `armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo;
 `armaNombre`/`armaDetalle`; `armaMods` = bonos del arma, que suman igual que
 los del equipo; `armaEfectos` = efectos al golpear, como `efectosGolpe`; `armaManos` = `arma_1m`/`arma_2m`, solo para cuando se

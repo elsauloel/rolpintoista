@@ -1233,7 +1233,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <button type="button" class="sp-max" id="v-sp-natural-btn" data-stat="sp" title="Ver detalle">/ 0</button>
         </div>
       </div>
-      <div class="counter"><label>WildCards</label><input id="f-wld"></div>
+      <div class="counter calc" id="c-inteligencia" title="Se calcula sola: 6 al crear el personaje, +3 por nivel">
+        <label>Inteligencia</label>
+        <div class="val" id="v-inteligencia">6</div>
+      </div>
       <div class="counter loot">
         <label>Loot</label>
         <div class="loot-rows">
@@ -1831,7 +1834,7 @@ const GRUPOS = [
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
     {id:'crit', label:'Crit', full:'Crítico'},
     {id:'parry', label:'Parry', full:'Parry'}]},
-  {id:'int', label:'Int', full:'Inteligencia', color:'#9B7BD4', derived:[
+  {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
     {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
     {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
     {id:'sp', label:'SP', full:'Special Power'},
@@ -1883,11 +1886,11 @@ const IT2 = {
   nitrosMoverRengo: 2,
   inmovilizadoBloqueaMover: true,
   // PLACEHOLDER: tope de X en costos variables. null = solo frena lo
-  // disponible. Si se confirma, poner una función: c => c.final.int
+  // disponible. Si se confirma, poner una función: c => c.final.esp
   limiteXNitros: null,
   limiteXSp: null,
   // PLACEHOLDER: penalidad por peso de más. Hoy no resta nada (antes
-  // restaba de Bonos); se puede sumar en la fórmula de SP (clic en el stat → fx), ej. int*3 - sobrecarga.
+  // restaba de Bonos); se puede sumar en la fórmula de SP (clic en el stat → fx), ej. esp*3 - sobrecarga.
   penalidadSobrecargaDefinida: false,
 };
 const IT2_PENDIENTE = txt => `<span class="it2-pendiente" title="Sin confirmar (Iteración 2): ${esc(txt)}">⚠</span>`;
@@ -1917,7 +1920,7 @@ function migrarObjIt2(o){
 function migrarEstadoIt2(st){
   const f = st.formulas || (st.formulas = {});
   ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
-  ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'int*3' : 'agl'; });
+  ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'esp*3' : 'agl'; });
   // SP Regen: base 0 (solo lo dan habilidades, equipo o estados). Las fichas
   // que quedaron con la base vieja (floor(int/2)) vuelven a 0.
   if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = '0';
@@ -1938,6 +1941,48 @@ function migrarEstadoIt2(st){
   if(Array.isArray(st.habilidades)) st.habilidades = st.habilidades.filter(h => !h || h.id !== 'movimiento');
   ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
     .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjIt2));
+}
+
+// El atributo Inteligencia se renombró a Especial (id 'int' -> 'esp', 2026-09-18)
+// para poder reusar el nombre "Inteligencia" después con un significado
+// distinto. Corre sobre S ya armado (ver renderAll); se puede correr varias
+// veces sin cambiar nada, porque una vez migrado no queda ningún 'int'.
+function migrarObjEspecial(o){
+  if(!o || typeof o !== 'object') return;
+  (Array.isArray(o.mods) ? o.mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+  (Array.isArray(o.efectoMods) ? o.efectoMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+  if(o.tiradaStat === 'int') o.tiradaStat = 'esp';
+  ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas'].forEach(k => {
+    if(typeof o[k] === 'string') o[k] = o[k].replace(/Inteligencia/g, 'Especial').replace(/inteligencia/g, 'especial');
+  });
+}
+
+function migrarEstadoEspecial(st){
+  if(!st || typeof st !== 'object') return;
+  if(st.attrs && typeof st.attrs === 'object' && st.attrs.int !== undefined){
+    if(st.attrs.esp === undefined) st.attrs.esp = st.attrs.int;
+    delete st.attrs.int;
+  }
+  // WildCards se sacó: ese lugar en la ficha ahora lo ocupa la Inteligencia
+  // nueva (se calcula sola, no se guarda ningún valor).
+  if(st.meta && typeof st.meta === 'object') delete st.meta.wld;
+  if(st.formulas && typeof st.formulas === 'object'){
+    Object.keys(st.formulas).forEach(k => {
+      if(typeof st.formulas[k] === 'string') st.formulas[k] = st.formulas[k].replace(/\bint\b/g, 'esp');
+    });
+  }
+  ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
+    .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjEspecial));
+  (Array.isArray(st.invocaciones) ? st.invocaciones : []).forEach(inv => {
+    if(!inv || typeof inv !== 'object') return;
+    if(inv.int !== undefined){
+      if(inv.esp === undefined) inv.esp = inv.int;
+      delete inv.int;
+    }
+    (Array.isArray(inv.armaMods) ? inv.armaMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+    (Array.isArray(inv.equipo) ? inv.equipo : []).forEach(migrarObjEspecial);
+    (Array.isArray(inv.habilidades) ? inv.habilidades : []).forEach(migrarObjEspecial);
+  });
 }
 
 /* ---------- Escala de Tipos de arma +2 ----------
@@ -2056,11 +2101,11 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, wld:'', imagen:''},
+        nivel:1, exp:0, dde:0, imagen:''},
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
-  attrs:{con:1, fue:1, agl:1, des:1, int:1},
+  attrs:{con:1, fue:1, agl:1, des:1, esp:1},
   // spGastado: SP usado desde la última recarga. nitros: los que quedan en
   // el turno (null = arrancan llenos). ataquesTurno: para cobrar el primer
   // ataque del turno a mitad de precio.
@@ -2076,7 +2121,7 @@ const DEFAULT = {
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
-    pdgmg:'int', resm:'int', sp:'int*3', spregen:'0', rangocasteo:'int',
+    pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'0', rangocasteo:'esp',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0'
   },
   inventario:[],
@@ -2159,9 +2204,9 @@ const DEFAULT = {
     {id:'cat-pocion-bonos', nombre:'Poción de Bonos', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, legacy:true, curahp:0, curabonosPct:50, mods:[], detalle:'Restaura la mitad de tu total de Bonos (redondeado hacia arriba).', descripcionNarrativa:'Amarilla y chispeante. Devuelve las ganas de seguir tirando el dado.'},
     {id:'cat-pocion-bonos-grande', nombre:'Poción de Bonos grande', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:60, unidades:1, consumible:true, legacy:true, curahp:0, curabonosPct:100, mods:[], detalle:'Restaura todos tus Bonos.', descripcionNarrativa:'Amarilla y chispeante. Devuelve las ganas de seguir tirando el dado. Frasco grande, para repartir en varias cargas.'},
     {id:'new-pocion-de-buena-fortuna', nombre:'Poción de Buena Fortuna', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:75, unidades:1, consumible:true, curahp:0, efectoNombre:'Afortunado (poción)', efectoTurnos:3, efectoDetalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor. Dura 3 turnos.', mods:[], detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor. Dura 3 turnos. Al consumirla se activa el estado \'Afortunado (poción)\'.', descripcionNarrativa:'Dorada y burbujeante. Cada burbuja que sube trae una segunda oportunidad.'},
-    {id:'new-pocion-de-clarividencia', nombre:'Poción de Clarividencia', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:75, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoDetalle:'Inteligencia +1 mientras dure (4 turnos).', efectoMods:[{stat:'int', val:1}], mods:[], detalle:'Otorga +1 a Inteligencia durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación.'},
-    {id:'new-pocion-de-clarividencia-mayor', nombre:'Poción de Clarividencia Mayor', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:150, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoMods:[{stat:'int', val:2}], mods:[], detalle:'Otorga +2 a Inteligencia durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación. La versión concentrada: pega más fuerte y se nota antes.'},
-    {id:'new-pocion-de-clarividencia-superior', nombre:'Poción de Clarividencia Superior', tier:'Excepcional', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:225, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoMods:[{stat:'int', val:3}], mods:[], detalle:'Otorga +3 a Inteligencia durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.'},
+    {id:'new-pocion-de-clarividencia', nombre:'Poción de Clarividencia', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:75, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoDetalle:'Especial +1 mientras dure (4 turnos).', efectoMods:[{stat:'esp', val:1}], mods:[], detalle:'Otorga +1 a Especial durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación.'},
+    {id:'new-pocion-de-clarividencia-mayor', nombre:'Poción de Clarividencia Mayor', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:150, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoMods:[{stat:'esp', val:2}], mods:[], detalle:'Otorga +2 a Especial durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación. La versión concentrada: pega más fuerte y se nota antes.'},
+    {id:'new-pocion-de-clarividencia-superior', nombre:'Poción de Clarividencia Superior', tier:'Excepcional', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:225, unidades:1, consumible:true, curahp:0, efectoNombre:'Clarividencia (poción)', efectoTurnos:4, efectoMods:[{stat:'esp', val:3}], mods:[], detalle:'Otorga +3 a Especial durante 4 turnos. Al consumirla se activa el estado \'Clarividencia (poción)\'.', descripcionNarrativa:'Líquido transparente que refleja cosas que no están en la habitación. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.'},
     {id:'new-pocion-de-escudo-arcano', nombre:'Poción de Escudo Arcano', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, consumible:true, curahp:0, efectoNombre:'Escudo Arcano (poción)', efectoTurnos:4, efectoDetalle:'Resistencia mágica +1 mientras dure (4 turnos).', efectoMods:[{stat:'resmg', val:1}], mods:[], detalle:'Otorga +1 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado \'Escudo Arcano (poción)\'.', descripcionNarrativa:'Azul profundo con un brillo que late. Sabe a tormenta.'},
     {id:'new-pocion-de-escudo-arcano-mayor', nombre:'Poción de Escudo Arcano mayor', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:60, unidades:1, consumible:true, curahp:0, efectoNombre:'Escudo Arcano mayor (poción)', efectoTurnos:4, efectoDetalle:'Resistencia mágica +2 mientras dure (4 turnos).', efectoMods:[{stat:'resmg', val:2}], mods:[], detalle:'Otorga +2 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado \'Escudo Arcano mayor (poción)\'.', descripcionNarrativa:'Azul profundo con un brillo que late. Sabe a tormenta. La versión concentrada: pega más fuerte y se nota antes.'},
     {id:'new-pocion-de-escudo-arcano-superior', nombre:'Poción de Escudo Arcano superior', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:90, unidades:1, consumible:true, curahp:0, efectoNombre:'Escudo Arcano superior (poción)', efectoTurnos:4, efectoDetalle:'Resistencia mágica +3 mientras dure (4 turnos).', efectoMods:[{stat:'resmg', val:3}], mods:[], detalle:'Otorga +3 a Resistencia mágica durante 4 turnos. Al consumirla se activa el estado \'Escudo Arcano superior (poción)\'.', descripcionNarrativa:'Azul profundo con un brillo que late. Sabe a tormenta. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.'},
@@ -2240,7 +2285,7 @@ const DEFAULT = {
     {id:'new-bate-de-baseball', nombre:'Bate de Baseball', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:10, danoFijo:1, precioCompra:90, consumible:false, curahp:0, mods:[], detalle:'', descripcionNarrativa:'Aluminio abollado con el logo casi borrado. Alguien lo usó para otra cosa antes.'},
     {id:'new-baculo-shao-lin', nombre:'Báculo Shao Lin', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:1, precioCompra:800, consumible:false, curahp:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:1}, {stat:'rng', val:1}], detalle:'parry+2, bloqueo +1, alcance +1', descripcionNarrativa:'Madera de hierro pulida por generaciones de manos. No tiene filo y no lo necesita.'},
     {id:'new-baculo-de-batalla', nombre:'Báculo de batalla', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:0, tipoDado:10, danoFijo:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'bloqueo', val:1}, {stat:'rng', val:1}], detalle:'alcance +1, bloqueo +1', descripcionNarrativa:'Madera dura con refuerzos de hierro en las puntas. Alcanza más de lo que parece.'},
-    {id:'new-baculo-magico', nombre:'Báculo mágico', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:200, consumible:false, curahp:0, mods:[{stat:'int', val:2}, {stat:'rangocasteo', val:5}, {stat:'bonos', val:2}], detalle:'+2 a Inteligencia, +5 a Rango de Casteo, +2 Bonos.', descripcionNarrativa:'Madera oscura rematada en una gema que nunca deja de brillar del todo.'},
+    {id:'new-baculo-magico', nombre:'Báculo mágico', tier:'Excepcional', imagen:'', tipoItem:'arma_1m', peso:2, ranuras:1, tipoDado:4, danoFijo:0, precioCompra:200, consumible:false, curahp:0, mods:[{stat:'esp', val:2}, {stat:'rangocasteo', val:5}, {stat:'bonos', val:2}], detalle:'+2 a Especial, +5 a Rango de Casteo, +2 Bonos.', descripcionNarrativa:'Madera oscura rematada en una gema que nunca deja de brillar del todo.'},
     {id:'new-cachiporra', nombre:'Cachiporra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:1, tipoDado:10, danoFijo:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'crit', val:10}], detalle:'', descripcionNarrativa:'Cuero cosido sobre plomo. Discreta, fácil de esconder bajo el saco.'},
     {id:'new-cimitarra', nombre:'Cimitarra', tier:'Común', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:69, consumible:false, curahp:0, mods:[{stat:'parry', val:1}], detalle:'parry +1', descripcionNarrativa:'Curva ancha de acero barato. Corta bien mientras el filo aguante.'},
     {id:'new-cimitarra-de-guardia', nombre:'Cimitarra de guardia', tier:'Buena Calidad', imagen:'', tipoItem:'arma_1m', peso:1, ranuras:0, tipoDado:6, danoFijo:0, precioCompra:75, consumible:false, curahp:0, mods:[{stat:'parry', val:2}], detalle:'Parry +2', descripcionNarrativa:'Curva prolija, bien balanceada. Reglamentaria de cuerpo de guardia.'},
@@ -2354,8 +2399,8 @@ const DEFAULT = {
     {id:'new-anillo-de-alforja-sin-fondo', nombre:'Anillo de Alforja sin Fondo', tier:'Común', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:1200, consumible:false, curahp:0, mods:[{stat:'crgmax', val:1}], detalle:'Mientras esté equipado, otorga Carga máxima +1.', descripcionNarrativa:'Aro simple de cuero trenzado. Lo que se cuelga de él nunca pesa.'},
     {id:'new-anillo-de-alforja-sin-fondo-mayor', nombre:'Anillo de Alforja sin Fondo mayor', tier:'Raro', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:2000, consumible:false, curahp:0, mods:[{stat:'crgmax', val:2}], detalle:'Mientras esté equipado, otorga Carga máxima +2.', descripcionNarrativa:'Aro simple de cuero trenzado. Lo que se cuelga de él nunca pesa. Este está mejor trabajado que el común, y se nota en la mano.'},
     {id:'new-anillo-de-alforja-sin-fondo-superior', nombre:'Anillo de Alforja sin Fondo superior', tier:'Legendario', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:3000, consumible:false, curahp:0, mods:[{stat:'crgmax', val:3}], detalle:'Mientras esté equipado, otorga Carga máxima +3.', descripcionNarrativa:'Aro simple de cuero trenzado. Lo que se cuelga de él nunca pesa. La pieza definitiva de su línea. No hay muchas y las que hay tienen dueño.'},
-    {id:'new-anillo-de-clarividencia', nombre:'Anillo de Clarividencia', tier:'Excepcional', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:2500, consumible:false, curahp:0, mods:[{stat:'int', val:1}], detalle:'Mientras esté equipado, otorga Inteligencia +1.', descripcionNarrativa:'Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando.'},
-    {id:'new-anillo-de-clarividencia-superior', nombre:'Anillo de Clarividencia superior', tier:'Legendario', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:9000, consumible:false, curahp:0, mods:[{stat:'int', val:3}], detalle:'Mientras esté equipado, otorga Inteligencia +3.', descripcionNarrativa:'Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando. La pieza definitiva de su línea. No hay muchas y las que hay tienen dueño.'},
+    {id:'new-anillo-de-clarividencia', nombre:'Anillo de Clarividencia', tier:'Excepcional', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:2500, consumible:false, curahp:0, mods:[{stat:'esp', val:1}], detalle:'Mientras esté equipado, otorga Especial +1.', descripcionNarrativa:'Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando.'},
+    {id:'new-anillo-de-clarividencia-superior', nombre:'Anillo de Clarividencia superior', tier:'Legendario', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:9000, consumible:false, curahp:0, mods:[{stat:'esp', val:3}], detalle:'Mientras esté equipado, otorga Especial +3.', descripcionNarrativa:'Cuarzo transparente montado en plata. De cerca se ve el reflejo de uno pensando. La pieza definitiva de su línea. No hay muchas y las que hay tienen dueño.'},
     {id:'new-anillo-de-escudo-arcano', nombre:'Anillo de Escudo Arcano', tier:'Común', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:1200, consumible:false, curahp:0, mods:[{stat:'resmg', val:1}], detalle:'Mientras esté equipado, otorga Resistencia mágica +1.', descripcionNarrativa:'Piedra azul engarzada que se enfría cuando hay magia cerca.'},
     {id:'new-anillo-de-escudo-arcano-mayor', nombre:'Anillo de Escudo Arcano mayor', tier:'Excepcional', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:2000, consumible:false, curahp:0, mods:[{stat:'resmg', val:2}], detalle:'Mientras esté equipado, otorga Resistencia mágica +2.', descripcionNarrativa:'Piedra azul engarzada que se enfría cuando hay magia cerca. Este está mejor trabajado que el común, y se nota en la mano.'},
     {id:'new-anillo-de-escudo-arcano-superior', nombre:'Anillo de Escudo Arcano superior', tier:'Legendario', imagen:'', tipoItem:'anillos', peso:0, ranuras:1, precioCompra:3000, consumible:false, curahp:0, mods:[{stat:'resmg', val:3}], detalle:'Mientras esté equipado, otorga Resistencia mágica +3.', descripcionNarrativa:'Piedra azul engarzada que se enfría cuando hay magia cerca. La pieza definitiva de su línea. No hay muchas y las que hay tienen dueño.'},
@@ -2468,7 +2513,7 @@ const DEFAULT = {
     {id:'new-camisa-de-pelo-de-unicornio', nombre:'Camisa de pelo de unicornio', tier:'Excepcional', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:900, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'resm', val:5}, {stat:'rescc', val:5}, {stat:'resmg', val:5}], detalle:'resistencia mental +5, resistencia mágica +5, resistencia a cc +5', descripcionNarrativa:'Blanca hasta lo imposible. Ninguna mancha le queda pegada.'},
     {id:'new-camiseta-de-cuero-flexible', nombre:'Camiseta de cuero flexible', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:5}], detalle:'', descripcionNarrativa:'Fina y sin refuerzos, pensada para no estorbar ningún movimiento.'},
     {id:'new-camiseta-de-lona', nombre:'Camiseta de lona', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'def', val:1}], detalle:'', descripcionNarrativa:'Lona de vela reciclada. Protege de las astillas y poco más.'},
-    {id:'new-camison-de-galadriel', nombre:'Camisón de Galadriel', tier:'Legendario', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:1550, consumible:false, curahp:0, equipoEstadoNombre:'Inmune a intrusión mental (Camisón de Galadriel)', equipoEstadoDetalle:'Mientras esté equipada, es inmune a intrusión mental. También otorga +5 a la resistencia mágica a los aliados en un rango de 5 casilleros (aura, no automatizada).', mods:[{stat:'def', val:5}, {stat:'int', val:3}, {stat:'resmg', val:5}], detalle:'Inmunidad total a intrusión mental, así como +5 a la resistencia mágica a sí misma y aliados en un rago de 5 casilleros alrededor. +3 a inteligencia.', descripcionNarrativa:'Tela que parece tejida con luz de luna. No se ensucia, no se arruga, no envejece.'},
+    {id:'new-camison-de-galadriel', nombre:'Camisón de Galadriel', tier:'Legendario', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:1550, consumible:false, curahp:0, equipoEstadoNombre:'Inmune a intrusión mental (Camisón de Galadriel)', equipoEstadoDetalle:'Mientras esté equipada, es inmune a intrusión mental. También otorga +5 a la resistencia mágica a los aliados en un rango de 5 casilleros (aura, no automatizada).', mods:[{stat:'def', val:5}, {stat:'esp', val:3}, {stat:'resmg', val:5}], detalle:'Inmunidad total a intrusión mental, así como +5 a la resistencia mágica a sí misma y aliados en un rago de 5 casilleros alrededor. +3 a especial.', descripcionNarrativa:'Tela que parece tejida con luz de luna. No se ensucia, no se arruga, no envejece.'},
     {id:'new-campera-de-cuero-de-motociclista-con-tachas', nombre:'Campera de cuero de motociclista con tachas', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:2, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo3', val:1}], detalle:'', descripcionNarrativa:'Alguien le puso las tachas a mano, torcidas y con orgullo.'},
     {id:'new-canilleras-de-arquero-de-futbol-amateur', nombre:'Canilleras de arquero de fútbol amateur', tier:'Común', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'tipo4', val:1}], detalle:'Resistencia a crítico tipo 10: +1.', descripcionNarrativa:'Plástico con el escudo de un club de barrio despegándose.'},
     {id:'ia-canilleras-de-milicia', nombre:'Canilleras de milicia', tier:'Común', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:50, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo1', val:1}], detalle:'Resistencia a críticos tipos 4: +1.', descripcionNarrativa:'Reglamentarias, incómodas y todas iguales.'},
@@ -2476,20 +2521,20 @@ const DEFAULT = {
     {id:'ia-capacete-de-hojalata', nombre:'Capacete de hojalata', tier:'Común', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo3', val:1}], detalle:'Resistencia a críticos tipo 8: +1.', descripcionNarrativa:'Hojalata martillada de fábrica mayorista. Cumple, apenas.'},
     {id:'ia-capucha-acolchada-de-sastre', nombre:'Capucha acolchada de sastre', tier:'Buena Calidad', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'rescc', val:2}], detalle:'Resistencia a CC +2', descripcionNarrativa:'Relleno de guata cosido en capas parejas. Trabajo prolijo de taller.'},
     {id:'ia-capucha-de-crin-de-chupacabras', nombre:'Capucha de crin de chupacabras', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:2}, {stat:'ini', val:1}, {stat:'resm', val:2}, {stat:'hpmax', val:20}], detalle:'Iniciativa +1. Resistencia mental +2. Hp Máximo: +20. Evasión +2', descripcionNarrativa:'Crin áspera de chupacabras trenzada a mano. Nadie se le acerca de frente.'},
-    {id:'new-capucha-de-escriba-de-gremio', nombre:'Capucha de escriba de gremio', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'int', val:1}], detalle:'Inteligencia +1', descripcionNarrativa:'Forro con bolsillos para tinta y plumas. Huele a papel viejo.'},
+    {id:'new-capucha-de-escriba-de-gremio', nombre:'Capucha de escriba de gremio', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'esp', val:1}], detalle:'Especial +1', descripcionNarrativa:'Forro con bolsillos para tinta y plumas. Huele a papel viejo.'},
     {id:'ia-capucha-de-lana-cruda', nombre:'Capucha de lana cruda', tier:'Común', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'def', val:1}], detalle:'', descripcionNarrativa:'Lana sin teñir de oveja de descarte. Pica un poco.'},
-    {id:'new-capuz-de-vidente-de-feria', nombre:'Capuz de vidente de feria', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'int', val:1}, {stat:'rangocasteo', val:1}], detalle:'Inteligencia +1. Rango de casteo +1.', descripcionNarrativa:'Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca.'},
-    {id:'ia-capuz-del-escriba-errante', nombre:'Capuz del escriba errante', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:240, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:1}, {stat:'int', val:1}, {stat:'rangocasteo', val:1}], detalle:'Inteligencia +1. Bonos +1. Rango de casteo +1.', descripcionNarrativa:'Paño grueso con bolsillos internos para tinta. Ordena la cabeza.'},
+    {id:'new-capuz-de-vidente-de-feria', nombre:'Capuz de vidente de feria', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:150, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'esp', val:1}, {stat:'rangocasteo', val:1}], detalle:'Especial +1. Rango de casteo +1.', descripcionNarrativa:'Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca.'},
+    {id:'ia-capuz-del-escriba-errante', nombre:'Capuz del escriba errante', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:240, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:1}, {stat:'esp', val:1}, {stat:'rangocasteo', val:1}], detalle:'Especial +1. Bonos +1. Rango de casteo +1.', descripcionNarrativa:'Paño grueso con bolsillos internos para tinta. Ordena la cabeza.'},
     {id:'cat-casco', nombre:'Casco', tier:'Común', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 6.', descripcionNarrativa:'El casco básico de cualquier tropa. Nadie recuerda el suyo.'},
     {id:'new-casco-cervecero-de-homero', nombre:'Casco cervecero de homero', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:3}], detalle:'Ranuras de cinturón +2', descripcionNarrativa:'Dos latas y un sorbete. Funciona mejor de lo que debería.'},
     {id:'new-casco-de-magnetto', nombre:'Casco de Magnetto', tier:'Legendario', imagen:'', tipoItem:'cabeza', peso:2, ranuras:0, precioCompra:1200, consumible:false, curahp:0, equipoEstadoNombre:'Inmune a control mental (casco)', equipoEstadoDetalle:'Mientras esté equipado, no se le puede aplicar control ni intrusión mental.', mods:[{stat:'def', val:6}, {stat:'tipo1', val:2}, {stat:'tipo2', val:2}, {stat:'tipo3', val:2}, {stat:'tipo4', val:2}, {stat:'tipo5', val:2}, {stat:'resmg', val:10}], detalle:'Inmunidad a control o intrusión mental. +2 de resistencia a todos los críticos. +10 al daño mágico. +10 a resistencia mágica.', descripcionNarrativa:'Púrpura y rojo, con la línea de la mandíbula marcada. Blinda la mente entera.'},
-    {id:'new-casco-de-xavier', nombre:'Casco de Xavier', tier:'Legendario', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:1200, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:2}, {stat:'tipo2', val:2}, {stat:'tipo3', val:2}, {stat:'tipo4', val:2}, {stat:'tipo5', val:2}, {stat:'int', val:2}], detalle:'suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a inteligencia', descripcionNarrativa:'Del otro lado de la discusión. Amplifica en vez de bloquear.'},
+    {id:'new-casco-de-xavier', nombre:'Casco de Xavier', tier:'Legendario', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:1200, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:2}, {stat:'tipo2', val:2}, {stat:'tipo3', val:2}, {stat:'tipo4', val:2}, {stat:'tipo5', val:2}, {stat:'esp', val:2}], detalle:'suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a especial', descripcionNarrativa:'Del otro lado de la discusión. Amplifica en vez de bloquear.'},
     {id:'ia-casco-de-bandas-remachadas', nombre:'Casco de bandas remachadas', tier:'Buena Calidad', imagen:'', tipoItem:'cabeza', peso:3, ranuras:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'eva', val:-1}], detalle:'Resistencia a críticos tipo 6, 8 y 10: +1. Evasión -1.', descripcionNarrativa:'Segmentos de acero en cúpula. Cobertura pareja a costa de peso.'},
     {id:'ia-casco-de-escamas-superpuestas', nombre:'Casco de escamas superpuestas', tier:'Buena Calidad', imagen:'', tipoItem:'cabeza', peso:2, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Resistencia a críticos tipos 4, 6 y 8: +1.', descripcionNarrativa:'Placas chicas remachadas sobre base de cuero. Buen trabajo de herrería.'},
-    {id:'new-casco-de-madreperla', nombre:'Casco de madreperla', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:650, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:2}, {stat:'int', val:1}, {stat:'resmg', val:3}], detalle:'Inteligencia +1. Evasión +2. Resistencia mágica +3.', descripcionNarrativa:'Placas de nácar engarzadas en un armazón liviano. Cambia de color según de dónde le pegue la luz.'},
+    {id:'new-casco-de-madreperla', nombre:'Casco de madreperla', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:650, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:2}, {stat:'esp', val:1}, {stat:'resmg', val:3}], detalle:'Especial +1. Evasión +2. Resistencia mágica +3.', descripcionNarrativa:'Placas de nácar engarzadas en un armazón liviano. Cambia de color según de dónde le pegue la luz.'},
     {id:'new-casco-de-moto-vintage-pintado-a-mano', nombre:'Casco de moto vintage pintado a mano', tier:'Común', imagen:'', tipoItem:'cabeza', peso:2, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}, {stat:'eva', val:-1}], detalle:'Reduce críticos Tipo 10. Evasión -1', descripcionNarrativa:'Llamas anaranjadas sobre fondo negro. Un trabajo de amor.'},
     {id:'ia-casco-de-obra-abollado', nombre:'Casco de obra abollado', tier:'Común', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'tipo4', val:1}, {stat:'eva', val:-1}], detalle:'Resistencia a críticos tipo 10: +1. Evasión -1.', descripcionNarrativa:'Plástico duro con la calcomanía medio despegada. No pregunten de dónde salió.'},
-    {id:'new-casco-de-paquicefalosaurio', nombre:'Casco de paquicefalosaurio', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:550, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'eva', val:2}, {stat:'int', val:1}, {stat:'resm', val:3}], detalle:'Resistencia a críticos tipo 8 y 10: +1. Inteligencia +1. Evasión +2. Resistencia mental +3.', descripcionNarrativa:'Riesgo de que te griten "pelado puto!" por la calle.'},
+    {id:'new-casco-de-paquicefalosaurio', nombre:'Casco de paquicefalosaurio', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:550, consumible:false, curahp:0, mods:[{stat:'def', val:6}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'eva', val:2}, {stat:'esp', val:1}, {stat:'resm', val:3}], detalle:'Resistencia a críticos tipo 8 y 10: +1. Especial +1. Evasión +2. Resistencia mental +3.', descripcionNarrativa:'Riesgo de que te griten "pelado puto!" por la calle.'},
     {id:'new-chaleco-de-kevlar', nombre:'Chaleco de Kevlar', tier:'Raro', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:2}, {stat:'tipo2', val:1}], detalle:'Resistencia a críticos tipo 6: +1., resistencia a críticos tipo 4: +2', descripcionNarrativa:'Fibra sintética que no pertenece a esta época y a nadie le importa.'},
     {id:'ia-cinto-de-cuero-remachado', nombre:'Cinto de cuero remachado', tier:'Común', imagen:'', tipoItem:'cinturon', peso:0, ranuras:1, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'capcinturon', val:1}], detalle:'Ranuras para consumibles +1.', descripcionNarrativa:'Remaches de bronce en toda la vuelta. Simple y resistente.'},
     {id:'new-cinturon-1', nombre:'Cinturón +1', tier:'Común', imagen:'', tipoItem:'cinturon', peso:0, ranuras:1, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'capcinturon', val:1}], detalle:'Ranuras para consumibles +1', descripcionNarrativa:'Cuero común con una hebilla de más. Alguien lo etiquetó así y quedó.'},
@@ -2544,7 +2589,7 @@ const DEFAULT = {
     {id:'ia-guanteletes-de-garra-de-lobizon', nombre:'Guanteletes de garra de lobizón', tier:'Excepcional', imagen:'', tipoItem:'manos', peso:2, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:8}, {stat:'tipo1', val:3}, {stat:'tipo2', val:2}, {stat:'tipo3', val:1}, {stat:'pdg', val:2}, {stat:'crit', val:2}], detalle:'Resistencia a críticos tipos 4: +3 Resistencia a críticos tipos 6: +2. Resistencia a críticos tipos 8: +1.  PdG +2. Crítico +2.', descripcionNarrativa:'Garras del séptimo hijo varón, montadas en acero. Se afilan solas los martes.'},
     {id:'new-guanteletes-del-herrero-real', nombre:'Guanteletes del herrero real', tier:'Raro', imagen:'', tipoItem:'manos', peso:3, ranuras:0, precioCompra:180, consumible:false, curahp:0, mods:[{stat:'def', val:8}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}], detalle:'Reduce críticos Tipo 4, 6, 8, 10 y 12.', descripcionNarrativa:'Hechos por el mejor herrero para sus propias manos.'},
     {id:'new-guantes-de-lupin', nombre:'Guantes de Lupin', tier:'Legendario', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:1850, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'des', val:2}], detalle:'destreza +2', descripcionNarrativa:'Blancos, impecables, siempre un paso adelante del que persigue.'},
-    {id:'new-guantes-de-mickey', nombre:'Guantes de Mickey', tier:'Legendario', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:1850, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'int', val:2}], detalle:'inteligencia +2', descripcionNarrativa:'Cuatro dedos y una sonrisa. Nadie hace preguntas.'},
+    {id:'new-guantes-de-mickey', nombre:'Guantes de Mickey', tier:'Legendario', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:1850, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'esp', val:2}], detalle:'especial +2', descripcionNarrativa:'Cuatro dedos y una sonrisa. Nadie hace preguntas.'},
     {id:'new-guantes-de-crupier', nombre:'Guantes de crupier', tier:'Común', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'bonos', val:2}], detalle:'Bonos +2', descripcionNarrativa:'Cuero fino, ajustado a cada dedo. Ideales para repartir cartas — o algo más.'},
     {id:'ia-guantes-de-lana-de-descarte', nombre:'Guantes de cuerina', tier:'Común', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'pdg', val:1}], detalle:'pdg +1', descripcionNarrativa:'Made in China.'},
     {id:'new-guantes-de-cuero-tachonado', nombre:'Guantes de cuero Tachonado', tier:'Buena Calidad', imagen:'', tipoItem:'manos', peso:1, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos Tipo 6 y 8.', descripcionNarrativa:'Tachas de bronce en los nudillos, puestas una por una.'},
@@ -2566,13 +2611,13 @@ const DEFAULT = {
     {id:'ia-media-armadura-de-escudero', nombre:'Media armadura de escudero', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_rigida', peso:3, ranuras:0, precioCompra:130, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Resistencia a críticos tipos 4, 6 y 8: +1.', descripcionNarrativa:'Placa en torso y hombros, malla en las juntas. Solución de compromiso honesta.'},
     {id:'new-botas-del-mensajero-veloz', nombre:'Medias de Pelo de Unicornio', tier:'Legendario', imagen:'', tipoItem:'pies', peso:0, ranuras:0, precioCompra:1450, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'mov', val:2}, {stat:'resm', val:5}, {stat:'rescc', val:5}, {stat:'resmg', val:5}], detalle:'movimiento +2, resistencia mágica +5, resistencia al cc +5, resistencia mental +5', descripcionNarrativa:'Blancas y tibias. Los pies no se cansan ni se ensucian nunca.'},
     {id:'cat-mercury-threads', nombre:'Mercury threads', tier:'Excepcional', imagen:'', tipoItem:'pies', peso:1, ranuras:0, precioCompra:600, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:1}, {stat:'rescc', val:1}, {stat:'resmg', val:1}], detalle:'bonos máximos +1 , +1 Res.M y +1 Res.CC.', descripcionNarrativa:'Hilos que se mueven como mercurio al caminar. Nadie entiende de qué están hechos.'},
-    {id:'new-mirinaque', nombre:'Miriñaque', tier:'Excepcional', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:450, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:3}, {stat:'int', val:2}, {stat:'rescc', val:2}], detalle:'Evasión +3. Inteligencia +2. Resistencia a cc +2', descripcionNarrativa:'Armazón de aros bajo la tela, pensado para estorbar antes que para lucir. Nadie se le acerca fácil.'},
+    {id:'new-mirinaque', nombre:'Miriñaque', tier:'Excepcional', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:450, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:3}, {stat:'esp', val:2}, {stat:'rescc', val:2}], detalle:'Evasión +3. Especial +2. Resistencia a cc +2', descripcionNarrativa:'Armazón de aros bajo la tela, pensado para estorbar antes que para lucir. Nadie se le acerca fácil.'},
     {id:'new-mitones-tejidos-a-mano-por-una-abuela-legendaria-del-pueblo', nombre:'Mitones de abuela', tier:'Común', imagen:'', tipoItem:'manos', peso:0, ranuras:0, precioCompra:40, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'bonos', val:1}], detalle:'', descripcionNarrativa:'Tejido con patrones florales. Muy abrigaditos.'},
     {id:'ia-mitones-de-arriero', nombre:'Mitones de arriero', tier:'Común', imagen:'', tipoItem:'manos', peso:1, ranuras:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'parry', val:1}], detalle:'Parry +1', descripcionNarrativa:'Cuero blando sin dedos, para no perder tacto con la rienda.'},
     {id:'cat-mitones-de-malla', nombre:'Mitones de malla', tier:'Buena Calidad', imagen:'', tipoItem:'manos', peso:1, ranuras:0, precioCompra:70, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos Tipo 4 y 6.', descripcionNarrativa:'Anillado sobre el dorso, dedos libres para trabajar.'},
     {id:'new-mitones-de-piel-de-owl-bear', nombre:'Mitones de piel de owl-bear', tier:'Raro', imagen:'', tipoItem:'manos', peso:2, ranuras:0, precioCompra:170, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo3', val:1}, {stat:'tipo5', val:1}], detalle:'Reducción a críticos tipos 8 y 12: +1', descripcionNarrativa:'Pelaje áspero de bestia grande. Abrigan y aguantan.'},
     {id:'ia-mocasines-del-rastreador-silencioso', nombre:'Mocasines del rastreador silencioso', tier:'Raro', imagen:'', tipoItem:'pies', peso:1, ranuras:0, precioCompra:180, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'eva', val:2}, {stat:'ini', val:1}], detalle:'Evasión +2. Iniciativa +1.', descripcionNarrativa:'Suela de cuero blando sin costura externa. No hacen ruido en ningún piso.'},
-    {id:'new-mascara-de-diablada-boliviana', nombre:'Máscara de diablada boliviana', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:520, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:3}, {stat:'int', val:1}, {stat:'accionesmax', val:1}, {stat:'resmg', val:4}], detalle:'Inteligencia +1. Acciones +1. Bonos +3. Resistencia mágica +4.', descripcionNarrativa:'Colores estridentes y cuernos tallados. Da miedo de cerca, buena suerte de lejos.'},
+    {id:'new-mascara-de-diablada-boliviana', nombre:'Máscara de diablada boliviana', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:520, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:3}, {stat:'esp', val:1}, {stat:'accionesmax', val:1}, {stat:'resmg', val:4}], detalle:'Especial +1. Acciones +1. Bonos +3. Resistencia mágica +4.', descripcionNarrativa:'Colores estridentes y cuernos tallados. Da miedo de cerca, buena suerte de lejos.'},
     {id:'new-mascara-del-espiritu-del-bosque-mononoke', nombre:'Máscara del espíritu del bosque (Mononoke)', tier:'Legendario', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:1350, consumible:false, curahp:0, mods:[{stat:'def', val:5}], detalle:'Otorga regeneración +5hp y +1 a resistencia de todos los críticos a todos los aliados en un rago de 5 alrededor', descripcionNarrativa:'Madera tallada con la calma de un bosque que todavía respira.'},
     {id:'new-mascara-samurai', nombre:'Máscara samurai', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:330, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo1', val:2}, {stat:'tipo2', val:1}, {stat:'eva', val:1}], detalle:'Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1. Evasión +1.', descripcionNarrativa:'Metal lacado con una expresión fija de furia. Intimidante incluso guardada.'},
     {id:'ia-pantalon-acolchado-de-aprendiz', nombre:'Pantalón acolchado de aprendiz', tier:'Común', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:60, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'tipo2', val:1}], detalle:'Resistencia a críticos tipos 6: +1.', descripcionNarrativa:'Relleno desparejo pero abundante. Lo que le falta de prolijo le sobra de grueso.'},
@@ -2589,9 +2634,9 @@ const DEFAULT = {
     {id:'ia-perneras-de-hueso-de-coloso-menor', nombre:'Perneras de hueso de coloso menor', tier:'Excepcional', imagen:'', tipoItem:'piernas', peso:5, ranuras:0, precioCompra:450, consumible:false, curahp:0, mods:[{stat:'def', val:15}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'mov', val:-1}], detalle:'Resistencia a críticos tipos 4, 6, 8 y 10: +1. Movimiento -1.', descripcionNarrativa:'Fémur de gigante tallado en placas. Pesa como corresponde.'},
     {id:'new-peto-de-cuero-curtido', nombre:'Peto de cuero curtido', tier:'Común', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}], detalle:'', descripcionNarrativa:'Curtido en corteza de quebracho. Duro y oscuro.'},
     {id:'new-peto-de-placas-de-aprendiz', nombre:'Peto de placas de aprendiz', tier:'Común', imagen:'', tipoItem:'armadura_rigida', peso:3, ranuras:0, precioCompra:80, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}], detalle:'Reduce críticos tipo 6 y 8', descripcionNarrativa:'Placas desparejas, remaches de más. El primer trabajo de alguien.'},
-    {id:'new-peto-runico', nombre:'Peto rúnico', tier:'Raro', imagen:'', tipoItem:'armadura_rigida', peso:3, ranuras:0, precioCompra:190, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo1', val:2}, {stat:'tipo2', val:2}, {stat:'tipo3', val:1}, {stat:'eva', val:-1}, {stat:'int', val:1}, {stat:'rangocasteo', val:1}], detalle:'Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Inteligencia +1. Rango de casteo +1. Evasión -1.', descripcionNarrativa:'Runas grabadas a cincel, todavía brillan tenue cuando hay magia cerca.'},
+    {id:'new-peto-runico', nombre:'Peto rúnico', tier:'Raro', imagen:'', tipoItem:'armadura_rigida', peso:3, ranuras:0, precioCompra:190, consumible:false, curahp:0, mods:[{stat:'def', val:7}, {stat:'tipo1', val:2}, {stat:'tipo2', val:2}, {stat:'tipo3', val:1}, {stat:'eva', val:-1}, {stat:'esp', val:1}, {stat:'rangocasteo', val:1}], detalle:'Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Especial +1. Rango de casteo +1. Evasión -1.', descripcionNarrativa:'Runas grabadas a cincel, todavía brillan tenue cuando hay magia cerca.'},
     {id:'new-polainas-de-malla', nombre:'Polainas de malla', tier:'Raro', imagen:'', tipoItem:'pies', peso:1, ranuras:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Reduce críticos tipo 4 y 6', descripcionNarrativa:'Anillado liviano que cubre del tobillo a la rodilla.'},
-    {id:'new-polainas-de-seda-valyria', nombre:'Polainas de seda valyria', tier:'Excepcional', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:450, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:3}, {stat:'int', val:2}, {stat:'rescc', val:2}], detalle:'Evasión +3. Inteligencia +2. Resistencia a cc +2', descripcionNarrativa:'Tela liviana como el aire, tejida con un patrón que ningún telar común puede repetir.'},
+    {id:'new-polainas-de-seda-valyria', nombre:'Polainas de seda valyria', tier:'Excepcional', imagen:'', tipoItem:'piernas', peso:1, ranuras:0, precioCompra:450, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'eva', val:3}, {stat:'esp', val:2}, {stat:'rescc', val:2}], detalle:'Evasión +3. Especial +2. Resistencia a cc +2', descripcionNarrativa:'Tela liviana como el aire, tejida con un patrón que ningún telar común puede repetir.'},
     {id:'ia-polainas-tachonadas-de-taller', nombre:'Polainas tachonadas de taller', tier:'Buena Calidad', imagen:'', tipoItem:'piernas', peso:2, ranuras:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}], detalle:'Resistencia a críticos tipo 4 y 6: +1.', descripcionNarrativa:'Remaches de bronce parejos en rodilla y espinilla.'},
     {id:'new-poncho-de-martin-fierro', nombre:'Poncho de Martín Fierro', tier:'Legendario', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:1750, consumible:false, curahp:0, mods:[{stat:'def', val:5}, {stat:'eva', val:4}, {stat:'agl', val:2}], detalle:'Agilidad +2. Evasión +4. Chance de reflejar maleficios (hechizos y debuffs): 50%. Efecto secreto por set completo.', descripcionNarrativa:'Poncho pesado de lana cruda, con flecos deshilachados de tanto viaje. Dicen que devuelve lo que le tiran.'},
     {id:'new-chapa-de-auto-abollada-ajustada-con-alambre', nombre:'Puerta de auto ajustada con alambre', tier:'Común', imagen:'', tipoItem:'armadura_rigida', peso:4, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}], detalle:'Reduce críticos tipo 8 y 10', descripcionNarrativa:'Todavía tiene el espejo retrovisor. Nadie se lo quiso sacar.'},
@@ -2612,8 +2657,8 @@ const DEFAULT = {
     {id:'new-soquetes-de-paso-ligero', nombre:'Soquetes de paso ligero', tier:'Buena Calidad', imagen:'', tipoItem:'pies', peso:1, ranuras:0, precioCompra:110, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'eva', val:2}], detalle:'Evasión +2', descripcionNarrativa:'Tan finos que casi no se sienten. Los pies se mueven solos.'},
     {id:'ia-tirador-de-rastra', nombre:'Tirador de rastra', tier:'Raro', imagen:'', tipoItem:'cinturon', peso:0, ranuras:3, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:1}, {stat:'capcinturon', val:3}], detalle:'Ranuras para consumibles +3.', descripcionNarrativa:'Monedas de plata cosidas al cuero.'},
     {id:'ia-tocado-de-plumas-de-pombero', nombre:'Tocado de plumas de quetzal', tier:'Excepcional', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:440, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'eva', val:2}, {stat:'ini', val:2}, {stat:'agl', val:1}], detalle:'Agilidad +1. Evasión +2. Iniciativa +2.', descripcionNarrativa:'Plumas del ave mesoamericano. Los pasos del que lo lleva no se oyen.'},
-    {id:'new-toga-de-maestre', nombre:'Toga de Maestre', tier:'Excepcional', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'int', val:1}, {stat:'capcinturon', val:3}], detalle:'Ranuras para consumibles +3, inteligencia +1', descripcionNarrativa:'Paño gris con cadenas al cuello, una por cada disciplina aprendida.'},
-    {id:'ia-turbante-de-seda-cruda', nombre:'Turbante de seda cruda', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'int', val:1}], detalle:'Inteligencia +1.', descripcionNarrativa:'Vueltas de seda de buena hebra. Liviano y cómodo para concentrarse.'},
+    {id:'new-toga-de-maestre', nombre:'Toga de Maestre', tier:'Excepcional', imagen:'', tipoItem:'armadura_blanda', peso:1, ranuras:0, precioCompra:750, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'esp', val:1}, {stat:'capcinturon', val:3}], detalle:'Ranuras para consumibles +3, especial +1', descripcionNarrativa:'Paño gris con cadenas al cuello, una por cada disciplina aprendida.'},
+    {id:'ia-turbante-de-seda-cruda', nombre:'Turbante de seda cruda', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:0, ranuras:0, precioCompra:140, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'esp', val:1}], detalle:'Especial +1.', descripcionNarrativa:'Vueltas de seda de buena hebra. Liviano y cómodo para concentrarse.'},
     {id:'new-turbante-de-seda-refinada', nombre:'Turbante de seda refinada', tier:'Raro', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:160, consumible:false, curahp:0, mods:[{stat:'def', val:3}, {stat:'bonos', val:3}, {stat:'accionesmax', val:1}], detalle:'bonos +3. Acciones máximas por turno: +1', descripcionNarrativa:'Seda fina tejida con hilos que brillan apenas los mirás de reojo.'},
     {id:'new-turbante-de-tela-reforzada', nombre:'Turbante de tela reforzada', tier:'Buena Calidad', imagen:'', tipoItem:'cabeza', peso:1, ranuras:0, precioCompra:90, consumible:false, curahp:0, mods:[{stat:'def', val:4}, {stat:'tipo4', val:1}], detalle:'Resistencia a críticos tipo 10: +1', descripcionNarrativa:'Vueltas de paño grueso con una placa escondida adentro.'},
     {id:'new-tunica-de-acolito', nombre:'Túnica de acólito', tier:'Buena Calidad', imagen:'', tipoItem:'armadura_blanda', peso:0, ranuras:0, precioCompra:100, consumible:false, curahp:0, mods:[{stat:'def', val:2}, {stat:'bonos', val:2}], detalle:'Bonos +2', descripcionNarrativa:'Tela áspera, sin adornos. La primera prenda de cualquiera que empieza a estudiar.'},
@@ -3168,7 +3213,7 @@ function renderVitals(){
   $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
   $('#v-sp-natural-btn').textContent = `/ ${fmt(spMax)}`;
   $('#c-sp').classList.toggle('penal', sp < 0);
-  $('#c-sp').title = `Special Power (${S.formulas.sp || 'int*3'}): se gasta al usar habilidades; al pasar turno recupera SP Regen (${fmt(Number.isNaN(c.final.spregen) ? 0 : c.final.spregen)}). El resto, con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
+  $('#c-sp').title = `Special Power (${S.formulas.sp || 'esp*3'}): se gasta al usar habilidades; al pasar turno recupera SP Regen (${fmt(Number.isNaN(c.final.spregen) ? 0 : c.final.spregen)}). El resto, con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
   $('#sp-breakdown').innerHTML = openStat === 'sp'
     ? breakdown('sp', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
         <div class="row"><span>Gastado (desde la última recarga)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
@@ -3476,7 +3521,7 @@ function nuevaInvocacion(){
     id: uid(), nombre:'Invocación nueva', imagen:'', color: INV_COLORES[Math.floor(Math.random()*INV_COLORES.length)],
     activa:true, cooldown:3, cooldownActual:3,
     hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
-    con:1, fue:1, agl:1, des:1, int:1,
+    con:1, fue:1, agl:1, des:1, esp:1,
     ataquesTurno:0,  // inv.nitros lo pone migrarInvocacion: arranca en el máximo
     armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
     armaMods:[], armaEfectos:[], armaManos:'arma_1m',
@@ -3500,7 +3545,7 @@ const IT2_INV = {
   nitrosHabilidad: 1,             // costo por defecto de una habilidad
   redondeoPrimerAtaque: Math.ceil,
 };
-const ATTR_IDS_INV = ['con','fue','agl','des','int'];
+const ATTR_IDS_INV = ['con','fue','agl','des','esp'];
 // Stats secundarios de una invocación: los mismos que un PJ (GRUPOS),
 // salvo Hp.Max/No2 (ya se ven en las barras) y Crg.Max/SP/SP Regen (no aplican).
 const INV_STAT_EXCLUIR = ['hpmax','nitros','crgmax','sp','spregen'];
@@ -3508,7 +3553,7 @@ const INV_DERIVADOS_POR_ATTR = Object.fromEntries(GRUPOS.map(g => [g.id, g.deriv
 const INV_STAT_ATTR = Object.fromEntries(GRUPOS.flatMap(g => g.derived.map(d => [d.id, g.id])));
 // Mismo criterio que STATS_CON_TIRADA en la Botonera de la ficha: los 5
 // atributos base + los secundarios que no tienen ya su propio botón en Combate.
-const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','int','resmg','rescc','ini','pdgmg','resm'];
+const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','esp','resmg','rescc','ini','pdgmg','resm'];
 // Stats que puede tirar una habilidad (incluye PdG, Bloqueo y Parry, que
 // en la Botonera ya tienen su propio botón de Combate y por eso no están
 // en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
@@ -4714,6 +4759,18 @@ function jobCostoDe(x){
   return x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
 }
 
+// Inteligencia (el nuevo significado, reintroducido 2026-09-18 tras liberar
+// el nombre al renombrar el atributo viejo a Especial): no es un atributo
+// que se reparte, se calcula sola — 6 al crear el personaje, +3 por nivel.
+function inteligenciaValor(){
+  const nivel = Math.max(1, num(S.meta.nivel) || 1);
+  return 6 + 3 * (nivel - 1);
+}
+
+function renderInteligencia(){
+  $('#v-inteligencia').textContent = fmt(inteligenciaValor());
+}
+
 function jobBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
   const total = 3 + 3 * (nivel - 1);
@@ -4758,10 +4815,11 @@ function renderPortrait(){
 function renderAll(){
   // Cualquier ficha que llegue (archivo, mesa, otra ventana) pasa por acá.
   migrarEstadoIt2(S);
+  migrarEstadoEspecial(S);
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
   fichaIdentidadRender();  // por si cambió el nombre del personaje
-  ['raza','clase','subclase','nivel','exp','dde','wld'].forEach(k => $('#f-'+k).value = S.meta[k]);
+  ['raza','clase','subclase','nivel','exp','dde'].forEach(k => $('#f-'+k).value = S.meta[k]);
   renderPortrait();
   $('#f-loot-normal').value = S.loot.normal;
   $('#f-loot-magico').value = S.loot.magico;
@@ -4778,6 +4836,7 @@ function renderAll(){
   renderNitros();
   renderVitals();
   renderJob();
+  renderInteligencia();
   renderExp();
   renderInvocaciones();
 }
@@ -4841,7 +4900,7 @@ function sincronizarEstadosDeEquipo(){
 
 function refresh(){
   sincronizarEstadosDeEquipo();
-  renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderExp(); renderNitros();
+  renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderInteligencia(); renderExp(); renderNitros();
   renderList('efectos');
 }
 
@@ -4880,7 +4939,7 @@ document.addEventListener('change', e => {
 document.addEventListener('input', e => {
   const t = e.target;
   if(t.id === 'f-nombre'){ S.meta.nombre = t.value; return; }
-  if(['f-raza','f-clase','f-subclase','f-wld'].includes(t.id)){
+  if(['f-raza','f-clase','f-subclase'].includes(t.id)){
     S.meta[t.id.slice(2)] = t.value;
     $('#eyebrow').textContent = [S.meta.raza,S.meta.clase,S.meta.subclase].filter(Boolean).join(' · ');
     return;
@@ -8380,10 +8439,10 @@ function fichaNueva(){
   S = structuredClone(DEFAULT);
   S.formulas = formulas;
   S.caps = caps;
-  S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, wld:'', imagen:''};
+  S.meta = {nombre:'', raza:'', clase:'', subclase:'', nivel:1, exp:0, dde:0, imagen:''};
   S.bitacora = [{id:'j1', nombre:'Página 1', texto:''}];
   S.bitacoraActiva = 'j1';
-  S.attrs = {con:1, fue:1, agl:1, des:1, int:1};
+  S.attrs = {con:1, fue:1, agl:1, des:1, esp:1};
   S.hp = 0; S.turno = 1; S.log = []; S.spGastado = 0; S.ataquesTurno = 0; S.ataquesArma = {};
   S.armadura = {nota:''};
   ['inventario','cinturon','habilidades','pasivas','sociales','efectos','invocaciones'].forEach(k => S[k] = []);

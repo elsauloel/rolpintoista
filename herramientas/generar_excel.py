@@ -32,7 +32,7 @@ def categoria(it):
 # --- Columnas por pestaña ---
 BASE = ['id','nombre','tier','tipoItem','peso','ranuras','precioCompra','detalle','descripcionNarrativa']
 CRIT = ['tipo1','tipo2','tipo3','tipo4','tipo5']
-OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','int','agl','des',
+OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','esp','agl','des',
               'resm','rescc','rangocasteo','accionesmax','dmg','potencia','hpmax','crgmax','bloqueo','rng','pdgmg']
 
 COLUMNAS = {
@@ -41,7 +41,7 @@ COLUMNAS = {
     'Armas':       BASE + ['tipoDado','danoFijo','danoAmplificado','armaDeRango','efectosGolpe_txt'] + ['mod_'+s for s in ['pdg','crit','ini','parry','fue','bloqueo']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Escudos':     BASE + ['tipoDado','mod_def'] + ['mod_'+s for s in CRIT] + ['mod_parry'] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Defensivos':  BASE + ['mod_def'] + ['mod_'+s for s in CRIT] +
-                   ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','int','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
+                   ['mod_'+s for s in ['mov','bonos','eva','ini','pdg','parry','fue','con','esp','des','agl','resm','rescc','rangocasteo','accionesmax']] + ['equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle'],
     'Accesorios':  BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def',
                            'equipoEstadoNombre','equipoEstadoHpTurno','equipoEstadoDetalle','equipoEstadoPreset'],
     'Otros':       BASE + ['tipoDado','danoFijo','unidades','cargaMax','curahp','curabonosPct','mod_def'],
@@ -71,7 +71,7 @@ ETIQUETAS = {
     'mod_mov':'Movimiento','mod_bonos':'Bonos','mod_eva':'Evasión','mod_ini':'Iniciativa',
     'mod_pdg':'PdG','mod_crit':'Crítico %','mod_parry':'Parry','mod_fue':'Fuerza','mod_con':'Constitución',
     'mod_resm':'Res. mental','mod_rescc':'Res. CC','mod_rangocasteo':'Rango casteo',
-    'mod_accionesmax':'Acciones máx.','mod_bloqueo':'Bloqueo','mod_int':'Inteligencia','mod_des':'Destreza','mod_agl':'Agilidad',
+    'mod_accionesmax':'Acciones máx.','mod_bloqueo':'Bloqueo','mod_esp':'Especial','mod_des':'Destreza','mod_agl':'Agilidad',
 }
 
 MARCA_OCULTO = 'ocultar en el catálogo'

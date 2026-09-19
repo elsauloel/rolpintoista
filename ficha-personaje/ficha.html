@@ -7067,7 +7067,7 @@ function abrirHabClase(claseId){
     <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>${costo === 1 ? ' (es de tu clase)' : ' (no es de tu clase)'}. Te quedan ${fmt(jobBudget().resto)}.</div>
     <div class="habs-grid" style="grid-template-columns:1fr">${clase.habilidades.map(h => {
       const ya = S.habilidades.some(x => claveHabClase(x) === h.id);
-      const costoTxt = costoHabilidadTxt({...h, automatizada: true});
+      const costoTxt = costoHabilidadTxt({...h, automatizada: h.automatizada !== false});
       return `<div class="habs-grid-item">
         <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(h.nombre)}</b>
         <button type="button" class="mini" data-habclase-agregar="${clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
@@ -7083,8 +7083,8 @@ function agregarHabClase(claseId, habId){
   if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
   const job = esMiClase(clase) ? 1 : 2;
   S.habilidades.push({
-    id: uid(), nombre: base.nombre, detalle: base.detalle, costo: base.costo, nitrosCosto: base.nitrosCosto,
-    automatizada: true, job: true, jobCosto: job, origen: '', imagen: '',
+    id: uid(), nombre: base.nombre, detalle: base.detalle, costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
+    automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
     habClaseId: base.id, habClase: clase.nombre,
   });
   $('#scrim-hab-clase').classList.remove('open');

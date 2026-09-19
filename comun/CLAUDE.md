@@ -134,7 +134,7 @@ versión parecida en más de una, es candidato a juntar.
   un HTML que se muestra debajo de la grilla (el mapa pone ahí el link
   "Personalización 🎲" a `prueba-dados.html`); sin `pie` no aparece nada.
 
-- **`skills-clase.js`** — `CLASES_SKILLS`: el pool de habilidades de clase
+- **`skills-clase.js`** — `CLASES_SKILLS`: el pool de habilidades de las 7 clases (las auditadas van automatizadas; el resto, con `skillSA`, solo se anuncia y su descripción empieza con "(Sin auditar)")
   ya cerradas (las 7 clases, la mayoría todavía vacía). La ficha lo ofrece en
   "+ Habilidad → De clase" (`abrirHabClase`/`agregarHabClase`) y copia la skill
   al personaje con `habClaseId` (para no duplicarla) y Job 1 si es de su clase,

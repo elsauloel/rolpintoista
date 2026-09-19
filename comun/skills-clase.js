@@ -52,7 +52,10 @@ const CLASES_SKILLS = [
     skillSA('asalto', 'Robar SP', 'SP 1. Ganás 2 SP por cada crítico obtenido.'),
   ]},
   {id: 'tanque', nombre: 'Tanque', habilidades: [
-    skillSA('tanque', 'Blindaje', 'SP 1. No2 0. Flash (SP x 2). Otorga un blindaje que absorbe 8 de daño de la próxima fuente de daño este turno. (Estados de la clase: Pajaritos = mitad de tiradas de DES, ESP y AGI; Sentado = -2 a evasión, no puede atacar, 1 No2 para pararse.)'),
+    {id: 'tanque-blindaje', nombre: 'Blindaje', costo: '1', nitrosCosto: 0,
+     efectoNombre: 'Barrera', efectoTurnos: 1,
+     efectoDetalle: 'Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal.',
+     detalle: 'Flash (SP x 2: si la usás en turno ajeno, pagá 1 SP más a mano). Solo sobre vos: absorbe 8 de daño de la próxima fuente de daño este turno; si hace más, el resto entra normal.'},
     skillSA('tanque', 'Shockwave', 'SP 4. Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Todos los adyacentes al tanque quedan en Pajaritos (mitad de tiradas de DES, ESP y AGI) hasta el final de su próximo turno.'),
     skillSA('tanque', 'Aura de espinas', 'SP 1. Devuelve 1/4 del daño del ataque como true damage hasta el comienzo del próximo turno.'),
     skillSA('tanque', 'Recuperación', 'SP 1. No2 2. Recupera 9 HP.'),

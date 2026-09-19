@@ -6115,6 +6115,8 @@ const EFECTOS_PRESET = [
     detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante. Ojo: el daño al atacante hay que cargarlo a mano en su ficha, esto solo avisa cuánto es.'},
   {nombre:'Escudo mágico', polaridad:'buff', turnos:3, escudoMagico:10,
     detalle:'Durante 3 turnos, funciona como una barra de HP secundaria de 10 puntos: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo (cantidad editable al elegir el preset).'},
+  {nombre:'Barrera', polaridad:'buff', turnos:1, escudoMagico:8,
+    detalle:'Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
@@ -7083,8 +7085,10 @@ function agregarHabClase(claseId, habId){
   if(!base) return;
   if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
   const job = HAB_JOB_CLASE;
+  // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar…).
   S.habilidades.push({
-    id: uid(), nombre: base.nombre, detalle: base.detalle, costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
+    ...structuredClone(base),
+    id: uid(), costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
     habClaseId: base.id, habClase: clase.nombre,
   });

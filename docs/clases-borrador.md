@@ -138,8 +138,11 @@ Estados que define la clase:
 - **Sentado**: -2 a la evasión. No puede atacar. En cualquier momento
   puede gastar 1 No2 para pararse.
 
-1. **Blindaje** [1] — Flash (SP x 2). NO2: (0). Otorga un blindaje que
-   absorbe 8 de daño de la próxima fuente de daño este turno.
+1. ✅ **Blindaje** — **Flash (SP x 2:** cargada con SP 1; en turno ajeno
+   se suma 1 SP a mano). **No2:** 0. **SP:** 1. Solo sobre sí mismo. Aplica
+   el estado **Barrera** (barra 🛡 de 8, como el Escudo mágico, hasta el
+   próximo Mantenimiento): absorbe 8 de la próxima fuente de daño; si hace
+   más, el resto entra normal.
 2. **Shockwave** [4] — Onda expansiva (Fuerza / Constitución). Flash (SP
    x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos
    hasta el final de su próximo turno.

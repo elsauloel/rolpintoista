@@ -261,3 +261,5 @@ equivalente que da Con (5), o sea +5 HP máx.
   Marcadas "⚠ a revisar" No2, Rng y Crit (fuertes para 1 Job). No se
   cargaron Defensa, Ranuras de cinturón ni Res.Crit (Tipo 4–12): esperan
   decisión. Falta seguir con las de 2 y 3 Job. *(2026-09-19)*
+  **Actualización 2026-09-19:** se sumaron Defensa (+1) y Ranuras de
+  cinturón (+1); las resistencias a críticos quedan afuera por ahora.

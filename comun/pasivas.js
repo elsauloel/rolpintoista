@@ -61,4 +61,9 @@ const PASIVAS_BASE = [
    detalle: '+1 Res.Mt (resistencia mental).', mods: [{stat: 'resm', val: 1}]},
   {poolId: 'largo-alcance-arcano', nombre: 'Largo alcance arcano', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
    detalle: '+1 Rango de casteo.', mods: [{stat: 'rangocasteo', val: 1}]},
+  // Otros stats (fuera de los cinco atributos).
+  {poolId: 'piel-curtida', nombre: 'Piel curtida', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Defensa.', mods: [{stat: 'def', val: 1}]},
+  {poolId: 'bolsillos-extra', nombre: 'Bolsillos extra', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
+   detalle: '+1 ranura de cinturón para consumibles.', mods: [{stat: 'capcinturon', val: 1}]},
 ];

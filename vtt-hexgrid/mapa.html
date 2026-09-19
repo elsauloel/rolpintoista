@@ -128,6 +128,14 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #btn-nuevo .ayuda-icono:hover,#btn-nuevo .ayuda-icono:focus{background:#180F08;color:var(--brass);border-color:#180F08}
 #btn-nuevo .ayuda-globo{left:-70px;text-align:left}
 #panel-token:empty{display:none}
+/* Aviso fijo mientras se coloca un token nuevo (lugar y orientación). */
+#colocando-aviso{
+  position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:26;max-width:80%;text-align:center;pointer-events:none;
+  background:rgba(26,20,24,.94);border:1px solid var(--copper);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.55);
+  padding:8px 16px;font-size:13px;color:var(--paper)
+}
+#colocando-aviso b{color:var(--brass)}
+#colocando-aviso span{color:var(--muted)}
 /* (⌨) de los atajos de teclado: a la derecha de todo de la cabecera; el globo se abre hacia la izquierda. */
 .ayuda-atajos{width:30px;height:30px;font-size:15px;flex:none}
 .ayuda-atajos .ayuda-globo{left:auto;right:0;width:340px;font-size:12px}
@@ -627,6 +635,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div id="hud" hidden></div>
     <div id="token-etiqueta" hidden></div>
     <div id="elemento-etiqueta" hidden></div>
+    <div id="colocando-aviso" hidden></div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
@@ -2871,6 +2880,42 @@ function dibujar(){
     dibujarFantasma(f.col, f.fila, t.color, z);
   });
 
+  // Vista previa del token que se está colocando (lugar y orientación).
+  if(colocando){
+    const cel = colocando.paso === 'lugar' ? colocando.hover : colocando.celda;
+    if(cel){
+      const c = hexCentro(cel.col, cel.fila), rad = HEX * 0.68;
+      const pts = verticesHex(c.x, c.y, rad);
+      const imgPrev = colocando.datos.imagen ? imagenLista(colocando.datos.imagen) : null;
+      ctx.save();
+      ctx.globalAlpha = 0.75;
+      trazarPuntos(pts);
+      ctx.fillStyle = colocando.datos.color || '#9A867E'; ctx.fill();
+      if(imgPrev){ ctx.save(); trazarPuntos(pts); ctx.clip(); ctx.translate(c.x, c.y); ctx.rotate(colocando.rotacion * Math.PI / 180); ctx.drawImage(imgPrev, -rad, -rad, rad * 2, rad * 2); ctx.restore(); }
+      trazarPuntos(pts);
+      ctx.setLineDash([6 / z, 4 / z]);
+      ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
+      ctx.setLineDash([]);
+      // Frente (celeste): el lado hacia el que mira; 0° = abajo.
+      const fi = (Math.round(colocando.rotacion / 60) + 1) % 6;
+      const [f1x, f1y] = pts[fi], [f2x, f2y] = pts[(fi + 1) % 6];
+      ctx.beginPath(); ctx.moveTo(f1x, f1y); ctx.lineTo(f2x, f2y);
+      ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = Math.max(3 / z, rad * 0.16); ctx.lineCap = 'round'; ctx.stroke();
+      if(!imgPrev){
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+        ctx.font = `700 ${rad * 0.95}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillText(inicial(colocando.datos.nombre), c.x, c.y + rad * 0.05);
+      }
+      ctx.restore();
+      // En el paso de orientación, una flecha desde el centro hacia el frente.
+      if(colocando.paso === 'orientacion'){
+        const a = (90 + colocando.rotacion) * Math.PI / 180;
+        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + Math.cos(a) * HEX * 1.35, c.y + Math.sin(a) * HEX * 1.35);
+        ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = 2 / z; ctx.setLineDash([4 / z, 4 / z]); ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+  }
+
   // Ping (clic derecho): un anillo que se expande y se apaga solo, con
   // el nombre de quién lo mandó, arriba de todo lo demás.
   pings.forEach((p, id) => {
@@ -2931,6 +2976,7 @@ function cancelarArrastreToken(){
 lienzo.addEventListener('mousedown', e => { if(e.button === 2) cancelarArrastreToken(); });
 lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
+    if(colocando){ cancelarColocacion(); return; }
     if(cancelarArrastreToken()) return;
     // Con una herramienta de dibujo activa, el clic derecho es "salir de
     // acá" (no ping) — es la forma más práctica de volver al cursor
@@ -2949,6 +2995,8 @@ lienzo.addEventListener('pointerdown', e => {
   if(e.button !== 0 && e.pointerType === 'mouse') return;
   // Un clic en el mapa consolida el borrador (y nada más: no empieza otro).
   if(borradorElemento){ consolidarBorradorElemento(); return; }
+  // Colocando un token nuevo: el clic elige la casilla y después la orientación.
+  if(colocando){ const pc = posEvento(e); colocacionClic(pc.px, pc.py); return; }
   // Pincel de niebla (GM): destapa o tapa lo que se arrastra.
   if(herramientaActiva === 'niebla' && soyGM){
     lienzo.setPointerCapture(e.pointerId);
@@ -3103,6 +3151,7 @@ lienzo.addEventListener('pointerdown', e => {
 lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
   if(pincelNiebla){ nieblaPintar(px, py); return; }
+  if(colocando){ colocacionMover(px, py); return; }
   if(dibujando){
     if(dibujando.hex){
       // Casillero por casillero, como la estela de un token (sin costo ni
@@ -3389,6 +3438,8 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && !soyGM)) escapeABotonera();
     return;
   }
+  if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
+  if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
   if(editandoElemento && e.key === 'Escape'){ cerrarEditorElemento(true); return; }
   // Borrador de Terreno/Formas: Enter lo crea y Esc lo descarta, incluso con
@@ -4182,9 +4233,70 @@ document.addEventListener('pointerdown', e => {
   confirmarRuta();
 }, true);
 
+/* ---------- Colocar un token nuevo: lugar y orientación ----------
+   "Poner en el mapa" ya no lo tira en el centro de la vista: primero se elige la
+   casilla (clic) y después hacia dónde mira (se mueve el mouse y clic). Recién ahí
+   se crea. Esc o clic derecho cancelan. Entretanto se ve una vista previa. */
+let colocando = null;   // {datos, paso: 'lugar' | 'orientacion', celda, hover, rotacion}
+
+function iniciarColocacion(datos){
+  colocando = {datos, paso: 'lugar', celda: null, hover: null, rotacion: 0};
+  creando = false;
+  renderPanel(true);
+  lienzo.style.cursor = 'crosshair';
+  pedirDibujo();
+}
+function cancelarColocacion(avisar){
+  if(!colocando) return;
+  colocando = null;
+  lienzo.style.cursor = 'default';
+  if(avisar !== false) toast('Token cancelado: no se creó');
+  pedirDibujo();
+}
+function colocacionMover(px, py){
+  const m = pantallaAMundo(px, py);
+  if(colocando.paso === 'lugar'){
+    colocando.hover = mundoAHex(m.x, m.y);
+  }else{
+    const c = hexCentro(colocando.celda.col, colocando.celda.fila);
+    const dx = m.x - c.x, dy = m.y - c.y;
+    if(Math.hypot(dx, dy) > HEX * 0.3){
+      // 0° = frente abajo, sentido horario (igual que el ↻ del HUD), a los 6 lados.
+      const ang = Math.atan2(-dx, dy) * 180 / Math.PI;
+      colocando.rotacion = (((Math.round(ang / 60) * 60) % 360) + 360) % 360;
+    }
+  }
+  pedirDibujo();
+}
+function colocacionClic(px, py){
+  const m = pantallaAMundo(px, py);
+  if(colocando.paso === 'lugar'){
+    colocando.celda = mundoAHex(m.x, m.y);
+    colocando.paso = 'orientacion';
+  }else{
+    const d = colocando;
+    colocando = null;
+    lienzo.style.cursor = 'default';
+    crearToken({...d.datos, col: d.celda.col, fila: d.celda.fila, rotacion: d.rotacion});
+  }
+  pedirDibujo();
+}
+// Cartel fijo que dice qué paso toca.
+function actualizarAvisoColocacion(){
+  const el = $('#colocando-aviso');
+  if(!colocando){ if(!el.hidden) el.hidden = true; return; }
+  const txt = colocando.paso === 'lugar'
+    ? `Poné a <b>${esc(colocando.datos.nombre)}</b>: elegí la casilla con un clic`
+    : `Ahora elegí hacia dónde mira <b>${esc(colocando.datos.nombre)}</b>: movés el mouse y clic para confirmar`;
+  const html = txt + ' <span>· Esc o clic derecho cancelan</span>';
+  if(el.dataset.html !== html){ el.dataset.html = html; el.innerHTML = html; }
+  el.hidden = false;
+}
+
 async function crearToken(datos){
   const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
-  const casilla = mundoAHex(vistaCentro.x, vistaCentro.y);
+  // Con lugar elegido (colocando) usa esa casilla y orientación; si no, el centro de la vista.
+  const casilla = Number.isFinite(datos.col) ? {col: datos.col, fila: datos.fila} : mundoAHex(vistaCentro.x, vistaCentro.y);
   try{
     const doc = {
       nombre: datos.nombre,
@@ -4197,6 +4309,7 @@ async function crearToken(datos){
     };
     if(datos.fichaId) doc.fichaId = datos.fichaId;
     if(datos.imagen) doc.imagen = datos.imagen;
+    if(Number.isFinite(datos.rotacion) && datos.rotacion !== 0) doc.rotacion = datos.rotacion;
     const ref = await coleccionTokens().add(doc);
     creando = false;
     seleccionar(ref.id);
@@ -4944,7 +5057,7 @@ function renderPanel(forzar){
       if(!nombre){ $('#nuevo-nombre').focus(); return; }
       const fichaId = $('#nuevo-vinculo').value;
       const duenoUid = soyGM && tipoActual() === 'pj' && $('#nuevo-dueno') ? $('#nuevo-dueno').value : undefined;
-      crearToken({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva, duenoUid});
+      iniciarColocacion({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva, duenoUid});
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
@@ -5256,6 +5369,7 @@ function actualizarEtiquetaToken(){
 function hudUbicar(){
   actualizarEtiquetaToken();
   actualizarEtiquetaElemento();
+  actualizarAvisoColocacion();
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !fbMiembro || creando || panelFondo || panelMapas){ hud.hidden = true; return; }

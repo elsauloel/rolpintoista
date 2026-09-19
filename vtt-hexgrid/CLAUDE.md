@@ -251,6 +251,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   al pie. Se cierra sin crear con la ✕, Cancelar, **Esc** o **clic
   derecho** (fuera de un campo de texto) — `cancelarNuevoToken`. La barra
   lateral queda con su panel de siempre mientras tanto.
+- **Elegir lugar y orientación al crear un token** (2026-09-19): "Poner en el
+  mapa" ya no lo tira en el centro de la vista. Cierra la ventana y entra en
+  `colocando` (`iniciarColocacion`): **1)** se elige la casilla con un clic
+  (vista previa del token siguiendo al mouse) y **2)** se elige hacia dónde
+  mira moviendo el mouse (queda a uno de los 6 lados, con una flecha) y un clic
+  que lo crea (`crearToken` recibe `col`, `fila` y `rotacion`). Un cartel fijo
+  (`#colocando-aviso`) dice qué paso toca; **Esc o clic derecho cancelan** y no
+  se crea nada.
 - **El GM crea un token de "pj" a nombre de otro jugador** (ventana "Nuevo
   token", solo si `soyGM`): la lista de "Vincular a" muestra las fichas de
   todos los jugadores (no solo las del GM, que normalmente no tiene) con

@@ -284,3 +284,7 @@ explícita del GM, no el estado por defecto, para no tocar una ficha sin querer.
 `firebase/firestore.rules` publicadas (el GM escribe `fichas/{id}` y
 `fichas/{id}/partes/*`). Si el dueño y el GM editan a la vez, gana el último
 que guarda cada parte (igual que con dos ventanas del mismo jugador).
+
+**Título de la pestaña** (2026-09-19): "Ficha — <personaje> · <partida>" con un
+personaje abierto, y "Ficha de personaje — <partida>" sin ninguno
+(`fichaIdentidadRender`, que se llama al abrir, soltar y renombrar).

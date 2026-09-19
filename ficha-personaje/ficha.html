@@ -8976,6 +8976,12 @@ let fichaIdentidadUsuario = '';
 
 function fichaIdentidadRender(){
   const f = fichaVivo;
+  // La pestaña dice el personaje abierto y la partida: "Ficha — Aurelio · Nombre de la partida".
+  try{
+    const partida = fbPartida && fbPartida.nombre ? fbPartida.nombre : '';
+    const nombre = f && f.cargada ? String(fichaNombre() || '').trim() : '';
+    document.title = nombre ? `Ficha — ${nombre}${partida ? ' · ' + partida : ''}` : `Ficha de personaje${partida ? ' — ' + partida : ''}`;
+  }catch(e){}
   $('#barra-partida').innerHTML = f && f.cargada
     ? `<b>📜 Ficha</b> <span class="sec">${barraTexto(esc(fichaNombre()), fichaIdentidadUsuario ? esc(fichaIdentidadUsuario) : undefined)}</span>`
     : `<b>📜 Ficha</b> <span class="sec">${esc(barraTexto())}</span>`;

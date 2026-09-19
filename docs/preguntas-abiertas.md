@@ -40,7 +40,7 @@ Diseño en curso: ver "Sigilo (en diseño)" en [`plan-sistema-nuevo.md`](plan-si
 ## Orientación y campo de visión (mapa)
 
 - 🔲 **P13. Grilla.** Hoy los hexágonos tienen la punta arriba: no se puede mirar "derecho arriba" (las 6 direcciones son derecha, izquierda y 4 diagonales). ¿Se deja así o se gira la grilla (lados planos arriba y abajo)? Propuesta: dejarla. *(2026-09-16)*
-- 🔲 **P14. Girar cuesta No2.** Hoy: no cuesta, marcado "a debatir". *(2026-09-16)*
+- ✅ **P14. Girar cuesta No2.** Respondido 2026-09-19: sí cuesta, 1 No2 por cambio de posición (detalles por confirmar: si es por cada giro de 60° o por acción de girar, si aplica también en modo narrativo, y qué quiso decir con "cada movimiento que desbloquee niebla cuesta 1 No2"). Todavía no está construido: hoy girar sigue siendo gratis.
 - 🔲 **P15. Mirada al moverse.** ¿El token queda mirando solo hacia donde caminó (y después se corrige)? *(2026-09-16)*
 - 🔲 **P16. Diagonales de atrás.** En la zona de alerta, ¿entran los dos hexágonos diagonales de atrás? Hoy sí; solo queda libre el de justo atrás. *(2026-09-16)*
 - 🔲 **P17. Obstáculos.** ¿Algo tapa la vista? Si sí, ¿cómo se marcan en el mapa (paredes, árboles, rocas)? El mapa hoy no tiene obstáculos. *(2026-09-16)*

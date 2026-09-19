@@ -167,8 +167,8 @@ pendiente "GM oculta tokens".
   6 lados** (nunca a un vértice); por defecto mira abajo, como casi toda
   ilustración de token. Se gira arrastrando un handle celeste que sale del
   token (no un palito ocre — el color se eligió para no confundirse con
-  dorado/verde/rojo/gris, que ya dicen de quién es el token); **girar no
-  cuesta No2**. Ver `vtt-hexgrid/CLAUDE.md`. Falta todo lo de abajo (cono
+  dorado/verde/rojo/gris, que ya dicen de quién es el token); **girar (decidido 2026-09-19: sí
+  cuesta No2, 1 por cambio de posición; todavía sin construir)**. Ver `vtt-hexgrid/CLAUDE.md`. Falta todo lo de abajo (cono
   de visión, zona de alerta, sigilo de verdad).
 - **Cono de visión**: filas de 1, 2, 3 y 4 hexágonos hacia el frente (10
   en total); cada fila, medio hexágono más adelante y uno más ancha.

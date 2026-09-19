@@ -174,3 +174,24 @@ esto.
   (¿municiones, cargas de un ítem, un recurso propio de una clase?). Además,
   hoy pagar HP no deja usarla si te dejaría en 0 (hay que tener más vida que
   el costo): ¿está bien, o se puede pagar con la vida entera? *(2026-09-19)*
+
+## Biblioteca de creeps y de skills (GM)
+
+Idea del usuario (2026-09-19): una base de datos de **creeps** y otra de
+**skills**, parte del juego y no de una campaña — para que cualquier GM no
+tenga que crear creeps/skills de cero en cada partida. "Crear creep nuevo"
+ofrece: elegir de la biblioteca, o crear de cero. Solo texto, sin imágenes.
+Filtros por categoría. Ejemplos de creeps: bandidos, criaturas de bosque,
+de cavernas, adefesios infernales. Ejemplos de skills: rango, melee, daño
+físico, daño mágico, tanque.
+
+- 🔲 **P56. Dónde vive la biblioteca.** ¿Firebase (colección global, se
+  edita en vivo, más simple) o archivo en el repo sincronizado por GitHub
+  como el catálogo (versionable, igual para todos)? Recomendación: ver
+  conversación 2026-09-19. *(2026-09-19)*
+- 🔲 **P57. Quién puede editarla.** ¿Solo el dueño del proyecto carga
+  entradas y cada GM las copia a su partida, o cada GM puede sumar las suyas
+  a una biblioteca personal? *(2026-09-19)*
+- 🔲 **P58. Categorías.** Definir la lista de etiquetas (creeps: ambiente,
+  tipo, rol, nivel; skills: rol, tipo de daño, alcance) y si un ítem puede
+  tener varias. *(2026-09-19)*

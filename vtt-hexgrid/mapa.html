@@ -585,15 +585,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
   </div>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
-  <div class="desplegable" id="ojo-caja" hidden>
-    <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
-    <div class="desplegable-lista" id="ojo-menu" hidden>
-      <button type="button" class="btn" id="btn-niebla" title="Prender o apagar la niebla de guerra en este mapa">🌫 Niebla: no</button>
-      <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
-      <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente.">👁 Revelar lo oculto</button>
-      <button type="button" class="btn peligro" id="btn-niebla-reiniciar" title="Volver a tapar todo lo descubierto de este mapa">↺ Restablecer niebla</button>
-    </div>
-  </div>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -601,6 +592,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <span class="ayuda-icono ayuda-atajos" id="ayuda-atajos" tabindex="0" aria-label="Atajos de teclado">⌨<span class="ayuda-globo" role="tooltip">
     <b class="atajos-titulo">Atajos de teclado</b>
     <span class="atajos">
+      <kbd>D</kbd><span>Abrir o cerrar la grilla de dados</span>
       <kbd>H</kbd><span>Abrir o cerrar la caja de herramientas</span>
       <kbd>L</kbd><span>Lápiz (prender / apagar)</span>
       <kbd>F</kbd><span>Terreno y Formas (prender / apagar)</span>
@@ -628,6 +620,15 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
         <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
       </div>
+      <div class="desplegable" id="ojo-caja" hidden>
+        <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
+        <div class="desplegable-lista" id="ojo-menu" hidden>
+          <button type="button" class="btn" id="btn-niebla" title="Prender o apagar la niebla de guerra en este mapa">🌫 Niebla: no</button>
+          <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
+          <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente.">👁 Revelar lo oculto</button>
+          <button type="button" class="btn peligro" id="btn-niebla-reiniciar" title="Volver a tapar todo lo descubierto de este mapa">↺ Restablecer niebla</button>
+        </div>
+      </div>
       <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
         <span class="perilla"></span><span id="modo-texto">Narrativo</span>
       </button>
@@ -651,7 +652,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <div id="toolkit-pie">Las herramientas se van a ir sumando de a una.</div>
       </nav>
       <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">☭</button>
-      <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad">🎲</button>
+      <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>
@@ -3466,6 +3467,12 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if(herramientaActiva === 'lapiz') desactivarHerramienta();
     else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'lapiz'; renderToolkit(); }
+    return;
+  }
+  // D: abre o cierra la grilla de dados.
+  if((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault();
+    $('#toolkit-dados').click();
     return;
   }
   // H: abre o cierra la caja de herramientas.

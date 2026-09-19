@@ -43,14 +43,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   seleccionado bajaron debajo de ellos) y **+ Token** (que después de pasar por una
   barra del costado volvió a la cabecera, con el (?) de la guía de colores adentro del botón, `#ayuda-token`; y "Personalización 🎲" de los dados pasó al pie de la grilla de dados);
   y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
-  estado, Mapas, + Token (?), GM Tools/Mi ficha, Personajes, Fondo, 👁 y Centrar (Dados pasó al borde izquierdo del mapa).
+  estado, Mapas, + Token (?), GM Tools/Mi ficha, Personajes, Fondo y Centrar (Dados pasó al borde izquierdo del mapa).
 - **⌨ Lista de atajos** (2026-09-19): un ícono a la derecha de todo de la
   cabecera (`#ayuda-atajos`) que al pasar el mouse muestra el globo con todos
-  los atajos de teclado y del mouse (H, L, F, M, B, Ctrl+B, Enter, Esc,
+  los atajos de teclado y del mouse (D, H, L, F, M, B, Ctrl+B, Enter, Esc,
   Supr; clic derecho, rueda, arrastrar). **Es texto fijo en el HTML: al
   sumar, sacar o cambiar un atajo, hay que actualizar esa lista.**
-- **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
-  la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
+- **👁 Menú del ojo (GM)** (2026-09-19; ahora entre el zoom y el switch de modo, en el grupito flotante `#flotantes-mapa`, antes en la cabecera): un botón cuadrado con el ícono 👁 en
+  ese grupo (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
   afuera o con Esc) con: **🌫 Niebla: sí/no**, **👁 Como jugador** (solo con la
   niebla prendida), **👁 Revelar lo oculto** y **↺ Restablecer niebla**
@@ -629,7 +629,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   historial y al entrar se limpian las de más de 48 h
   (`../comun/mesa-historial.js`, igual que en ficha y gm-tools).
 - **Grilla de dados** (`../comun/grilla-dados.js`, como la de Roll20): botón
-  🎲 (`#toolkit-dados`, 2026-09-19: antes era "🎲 Dados" en la cabecera) en el borde izquierdo del mapa, justo arriba de la pestaña de la caja de herramientas y del mismo tamaño y forma — lo ven jugadores y GM por igual; se despliega al costado con D4…D100 × 1–6 y
+  🎲 (`#toolkit-dados`, 2026-09-19: antes era "🎲 Dados" en la cabecera; atajo **`D`**) en el borde izquierdo del mapa, justo arriba de la pestaña de la caja de herramientas y del mismo tamaño y forma — lo ven jugadores y GM por igual; se despliega al costado con D4…D100 × 1–6 y
   cada clic publica la tirada en la Mesa. En ficha y gm-tools el botón está
   al pie de la Mesa flotante y la grilla se abre al costado.
 - **Ping (clic derecho en el mapa)**: un anillo que se expande y se apaga

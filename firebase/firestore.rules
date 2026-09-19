@@ -506,15 +506,15 @@ service cloud.firestore {
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
     match /biblioteca_{tipo}/{id} {
-      allow read: if verificado() && tipo in ['creeps', 'skills'];
-      allow create, update: if esDuenoProyecto() && tipo in ['creeps', 'skills']
+      allow read: if verificado() && tipo in ['creeps', 'skills', 'pasivas'];
+      allow create, update: if esDuenoProyecto() && tipo in ['creeps', 'skills', 'pasivas']
         && entradaBiblioteca(request.resource.data);
-      allow delete: if esDuenoProyecto() && tipo in ['creeps', 'skills'];
+      allow delete: if esDuenoProyecto() && tipo in ['creeps', 'skills', 'pasivas'];
     }
     match /propuestas_{tipo}/{id} {
-      allow read: if verificado() && tipo in ['creeps', 'skills']
+      allow read: if verificado() && tipo in ['creeps', 'skills', 'pasivas']
         && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
-      allow create: if verificado() && tipo in ['creeps', 'skills']
+      allow create: if verificado() && tipo in ['creeps', 'skills', 'pasivas']
         && entradaBiblioteca(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;

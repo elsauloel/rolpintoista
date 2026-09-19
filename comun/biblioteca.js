@@ -1,5 +1,5 @@
 /* =========================================================
-   BIBLIOTECA GLOBAL (creeps, y más adelante skills)
+   BIBLIOTECA GLOBAL (creeps, pasivas y, más adelante, skills)
    Base de datos compartida por todas las campañas, para que un GM no
    arme creeps de cero en cada partida. Solo texto, sin imágenes.
 
@@ -26,6 +26,7 @@ const Biblioteca = (() => {
 
   // Etiquetas sugeridas al guardar (cada uno puede escribir las suyas).
   const SUGERENCIAS = {
+    pasivas: ['stat', 'regeneración', 'resistencia', 'defensiva', 'ofensiva', 'utilidad', 'visión', 'situacional'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',
       'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'emboscador'],
@@ -59,11 +60,25 @@ const Biblioteca = (() => {
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
+  // Entradas incluidas en el código (opts.base): siempre están, aun sin Firebase.
+  function entradasBase(opts){
+    return (opts.base || []).map(b => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
+      descripcion: b.detalle || '', nivel: b.jobCosto, autorUid: '', autorNombre: '', datos: b, base: true}));
+  }
+
   async function cargar(tipo, forzar){
     const st = estado[tipo];
     if(!forzar && st.oficial) return;
-    st.oficial = await leer(`biblioteca_${tipo}`);
-    st.propuestas = esDueno() ? await leer(`propuestas_${tipo}`) : [];
+    const base = entradasBase(st.opts);
+    if(!hayMesa()){ st.oficial = base; st.propuestas = []; return; }
+    try{
+      st.oficial = [...base, ...await leer(`biblioteca_${tipo}`)];
+      st.propuestas = esDueno() ? await leer(`propuestas_${tipo}`) : [];
+    }catch(err){
+      if(!base.length) throw err;
+      console.error('Biblioteca:', err);
+      st.oficial = base; st.propuestas = [];
+    }
   }
 
   /* ---------- Ventana principal ---------- */
@@ -181,7 +196,7 @@ const Biblioteca = (() => {
     document.getElementById('bib-lista').innerHTML = f.length ? f.map(e => `
       <div class="bib-fila">
         <div class="info">
-          <div class="tit">${esc(e.nombre)}${e.nivel !== undefined && e.nivel !== null ? ` · Lv ${esc(e.nivel)}` : ''}</div>
+          <div class="tit">${esc(e.nombre)}${st.opts.subtitulo ? esc(st.opts.subtitulo(e)) : (e.nivel !== undefined && e.nivel !== null ? ` · Lv ${esc(e.nivel)}` : '')}</div>
           <div class="tags">${e.etiquetas.map(esc).join(' · ') || 'sin etiquetas'}${propuestas ? ` · de ${esc(e.autorNombre)}` : ''}</div>
           ${e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : ''}
         </div>
@@ -189,7 +204,7 @@ const Biblioteca = (() => {
           <button class="btn primary" data-bibacc="agregar" data-id="${esc(e.id)}">${propuestas ? 'Traer a mi mesa' : 'Agregar'}</button>
           ${esDueno() && propuestas ? `<button class="btn" data-bibacc="aprobar" data-id="${esc(e.id)}">Aprobar</button>
             <button class="btn ghost" data-bibacc="rechazar" data-id="${esc(e.id)}">Rechazar</button>` : ''}
-          ${esDueno() && !propuestas ? `<button class="btn" data-bibacc="etiquetas" data-id="${esc(e.id)}">✎ Etiquetas</button>
+          ${esDueno() && !propuestas && !e.base ? `<button class="btn" data-bibacc="etiquetas" data-id="${esc(e.id)}">✎ Etiquetas</button>
             <button class="btn ghost" data-bibacc="borrar" data-id="${esc(e.id)}">Borrar</button>` : ''}
         </div>
       </div>`).join('') : '<div class="hint">No hay nada con ese filtro.</div>';
@@ -248,7 +263,7 @@ const Biblioteca = (() => {
    * textoCrearDeCero?}. `datos` es el creep/skill (copia) sin id.
    */
   async function abrir(opts){
-    if(!hayMesa()){ aviso('Entrá primero a una partida para usar la biblioteca.'); return; }
+    if(!hayMesa() && !(opts.base && opts.base.length)){ aviso('Entrá primero a una partida para usar la biblioteca.'); return; }
     asegurarVentana();
     const tipo = opts.tipo;
     actual = tipo;

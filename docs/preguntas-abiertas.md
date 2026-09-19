@@ -244,3 +244,14 @@ equivalente que da Con (5), o sea +5 HP máx.
 - ✅ **P70. Escalones excepcionales.** Respondido 2026-09-19: la pasiva de
   Res.CC da **+2** por 1 Job (excepción a "+1"); la de campo de visión da
   **+1**. Resto de la tabla de escalones (P60) sigue pendiente.
+- ✅ **P71. "+ Pasiva" con catálogo.** Hecho 2026-09-19: "+ Pasiva" pregunta
+  "Crear de cero" o elegir del catálogo (`comun/pasivas.js` + aprobadas en
+  `biblioteca_pasivas`). Se compra varias veces (`compras`, efectos y Job
+  multiplicados; tope por pasiva = mitad del nivel redondeada hacia abajo,
+  **con mínimo 1** para que a nivel 1 se pueda comprar; confirmar). Efectos
+  automatizados: bonos a stats y regeneración de HP en el Mantenimiento
+  (`regenHp`). Cada pasiva propia tiene "📚 Proponer" (cualquier jugador) y
+  el dueño las audita desde la pestaña Propuestas. Tanda inicial: Robustez
+  (+5 Hp.Max), Reserva de poder (+3 SP), Recuperación mental (+1 SP Regen),
+  Regeneración (3 HP/turno), Voluntad de hierro (+2 Res.CC), Ojo avizor (+1
+  visión). Faltan las de 2 y 3 Job y el resto de la tabla (P60).

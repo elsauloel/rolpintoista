@@ -1867,6 +1867,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/lupa.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
+<script src="../comun/pasivas.js"></script>
+<script src="../comun/biblioteca.js"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -2794,7 +2796,10 @@ function collectMods(){
     (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen, tipo, itemId});
   };
   S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id)));
-  S.pasivas.forEach(p => (p.mods||[]).forEach(m => push(m, p.nombre, 'pasiva')));
+  S.pasivas.forEach(p => {
+    const compras = pasivaCompras(p);
+    (p.mods||[]).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));
+  });
   S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
     const stacks = Math.max(1, num(e.stacks) || 1);
     push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''), 'estado alterado');
@@ -4555,9 +4560,9 @@ const LISTS = {
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)}</div><div class="idesc">${esc(i.detalle)}</div>
+        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}</div><div class="idesc">${esc(i.detalle)}</div>
         <div class="imeta">${modTags(i.mods)}</div></div>
-        <div class="rowbtns"><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
+        <div class="rowbtns"><button class="mini" data-proponerpasiva="${i.id}" title="Mandar esta pasiva al catálogo para que el dueño la revise">📚 Proponer</button><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
       </div></div>`
   },
   sociales:{
@@ -4883,7 +4888,8 @@ function renderLootEspecial(){
 function jobCostoDe(x){
   if(!x || x.job === false) return 0;
   const n = num(x.jobCosto);
-  return x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
+  const uno = x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
+  return uno * pasivaCompras(x);
 }
 
 // Inteligencia (el nuevo significado, reintroducido 2026-09-18 tras liberar
@@ -5377,6 +5383,7 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.add === 'efectos'){ abrirPresetsEfecto('directo'); return; }
   if(b.dataset.add === 'habilidades'){ abrirHabClase(); return; }
+  if(b.dataset.add === 'pasivas'){ abrirPasivaNueva(); return; }
   if(b.dataset.add){ openEditor(b.dataset.add, null); return; }
   if(b.dataset.addInv !== undefined){ abrirChooser('inventario', b.dataset.addInv === '1'); return; }
   if(b.dataset.addChooser){ abrirChooser(b.dataset.addChooser, true); return; }
@@ -5582,6 +5589,7 @@ document.addEventListener('click', e => {
   if(b.dataset.editarinv){ abrirEditarInv(b.dataset.editarinv); return; }
   if(b.dataset.usarinv){ abrirBotoneraInv(b.dataset.usarinv); return; }
   if(b.dataset.editararmainv){ abrirEditorArmaInv(b.dataset.editararmainv); return; }
+  if(b.dataset.proponerpasiva){ proponerPasiva(b.dataset.proponerpasiva); return; }
   if(b.dataset.additeminv){ abrirItemNuevoInv(b.dataset.additeminv); return; }
   if(b.dataset.quitarequipoinv){
     const [invId, equipoId] = b.dataset.quitarequipoinv.split(':');
@@ -6069,7 +6077,7 @@ const SCHEMA = {
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
-  pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','origen','detalle'], mods:true},
+  pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','compras','regenHp','origen','detalle'], mods:true},
   // El dado ya no se escribe a mano: sale del nivel (botón "+ Nivel" en la lista).
   sociales: {titulo:'Social', campos:['nombre','imagen','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','armaduraArruinada','permanente','activo','popup','detalle'], mods:true},
@@ -6077,6 +6085,7 @@ const SCHEMA = {
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
   stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
+  compras:'Compras (los efectos y el costo en Job se multiplican; tope por pasiva: mitad del nivel)', regenHp:'HP que recupera en cada Mantenimiento (por compra)',
   job:'Adquirida con puntos de Job', jobCosto:'Puntos de Job que costó (si fue con Job)', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
   unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
@@ -6089,7 +6098,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
-const CAMPO_NUM = ['jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
@@ -7124,11 +7133,62 @@ $('#hab-clase-body').addEventListener('click', e => {
   if(b.dataset.habclaseAgregar){ const [c, h] = b.dataset.habclaseAgregar.split(':'); agregarHabClase(c, h); }
 });
 
+/* ---------- + Pasiva: catálogo (base del código + aprobadas en Firebase) o custom ----------
+   Una pasiva se compra varias veces (`compras`): sus efectos y su costo en Job se
+   multiplican. Tope por pasiva: mitad del nivel, redondeada hacia abajo (mínimo 1).
+   Efectos automatizados: mods (bonos a stats) y regenHp (Mantenimiento).
+   Las creadas de cero se pueden mandar como propuesta con "📚 Proponer". */
+const pasivaCompras = x => Math.max(1, Math.floor(num(x && x.compras)) || 1);
+const PASIVA_TOPE = () => Math.max(1, Math.floor(Math.max(1, num(S.meta.nivel) || 1) / 2));
+const claveDePasiva = d => d.poolId || ('p-' + normClase(d.nombre));
+
+function abrirPasivaNueva(){
+  Biblioteca.abrir({
+    tipo: 'pasivas', titulo: 'Pasiva nueva',
+    base: PASIVAS_BASE,
+    textoCrearDeCero: '+ Crear de cero',
+    alCrearDeCero: () => openEditor('pasivas', null),
+    alElegir: agregarPasivaDeCatalogo,
+    subtitulo: e => ` · ${fmt(num(e.datos.jobCosto) || 1)} Job`,
+  });
+}
+
+function agregarPasivaDeCatalogo(datos){
+  const clave = claveDePasiva(datos);
+  const costo = Math.max(0, num(datos.jobCosto) || 1);
+  const tope = PASIVA_TOPE();
+  const ya = S.pasivas.find(p => (p.poolId || claveDePasiva(p)) === clave);
+  if(ya){
+    if(pasivaCompras(ya) >= tope){ toast(`${ya.nombre}: ya tenés el máximo de compras (${tope}, la mitad de tu nivel)`); return; }
+    ya.compras = pasivaCompras(ya) + 1;
+    toast(`${ya.nombre} ×${ya.compras} (+${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
+  }else{
+    S.pasivas.push({
+      ...structuredClone(datos), id: uid(), poolId: clave, compras: 1,
+      mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0,
+      job: true, jobCosto: costo, origen: '', imagen: '',
+    });
+    toast(`${datos.nombre} agregada (${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
+  }
+  renderList('pasivas');
+  refresh();
+}
+
+// Manda una pasiva propia al catálogo (propuesta; el dueño la audita).
+function proponerPasiva(id){
+  const p = S.pasivas.find(x => x.id === id);
+  if(!p) return;
+  const datos = {nombre: p.nombre, detalle: p.detalle || '', jobCosto: Math.max(1, num(p.jobCosto) || 1),
+    mods: (p.mods || []).map(m => ({stat: m.stat, val: num(m.val)})), regenHp: num(p.regenHp) || 0};
+  Biblioteca.guardar({tipo: 'pasivas', datos, nombre: p.nombre, nivel: datos.jobCosto});
+}
+
 function openEditor(key, id, equipadoPreset, opciones){
   const sc = SCHEMA[key];
   const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
     activo:true, stacks:1, costo:'', nitrosCosto:IT2.nitrosHabilidad, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
+    compras:1, regenHp:0,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:8, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
@@ -8493,6 +8553,15 @@ function mantenimiento(){
       e.turnos = num(e.turnos) - 1;
       if(e.turnos === 0) vencidos.push(e.id);
       else log.push(`<b>${esc(e.nombre)}</b> quedan ${fmt(e.turnos)}`);
+    }
+  });
+
+  // Pasivas de regeneración: recuperan HP en cada Mantenimiento (por compra).
+  S.pasivas.forEach(p => {
+    const hp = num(p.regenHp) * pasivaCompras(p);
+    if(hp > 0 && num(S.hp) > 0){
+      hpDelta += hp;
+      log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(hp)} HP</span>`);
     }
   });
 

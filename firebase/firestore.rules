@@ -121,7 +121,8 @@ service cloud.firestore {
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto'])
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo'])
+          && (!('estilo' in request.resource.data) || (request.resource.data.estilo is string && request.resource.data.estilo.size() <= 300))
           && request.resource.data.uid == request.auth.uid
           && request.resource.data.total is number
           && request.resource.data.rolls is list

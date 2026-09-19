@@ -79,7 +79,7 @@ versión parecida en más de una, es candidato a juntar.
 - **`grilla-dados.js`** — la grilla de dados estilo Roll20 (D4…D100 × 1–6)
   que se abre al costado del botón "🎲 Dados"; cada clic es una tirada
   libre que se publica en la Mesa.
-- **`dados3d.js`** — animación 3D (dice-box-threejs, cargada recién con la
+- **`dados3d.js`** — (2026-09-19: las tiradas de varios jugadores se superponen —una caja por estilo, dados quietos 4,5 s— y cada tirada viaja con el estilo de dados de quien la hizo, campo `estilo` de la Mesa; el botón de prender/apagar en el mapa está en el pie de la grilla de dados, junto a "Personalización") animación 3D (dice-box-threejs, cargada recién con la
   primera tirada) que rueda sobre la herramienta cuando llega una tirada
   nueva a la Mesa. Prender/apagar y elegir estilo es por navegador
   (`localStorage`); no escribe nada en Firebase.

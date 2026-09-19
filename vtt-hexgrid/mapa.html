@@ -674,7 +674,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div class="seccion" id="panel-token"></div>
     <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
     <div id="mesa">
-      <h2><span>Mesa</span><span id="mesa-dados"></span><span id="mesa-historial"></span></h2>
+      <h2><span>Mesa</span><span id="mesa-historial"></span></h2>
       <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
       <form id="mesa-tirar">
         <input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off">
@@ -6540,14 +6540,12 @@ function mesaQuien(){ return ''; }
 
 
 
-$('#mesa-dados').innerHTML = dadosBotonHtml();
-dadosConectarBoton($('#mesa-dados'));
 $('#mesa-historial').innerHTML = mesaBorrarHtml();
 // Grilla de dados debajo del botón de la barra de arriba (comun/grilla-dados.js).
 grillaConectar($('#toolkit-dados'), {
   lado: 'costado',
-  // Debajo de la grilla: elegir cómo se ven y suenan los dados 3D.
-  pie: '<a href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados 3D">Personalización 🎲</a>',
+  // Debajo de la grilla: prender/apagar la animación y elegir cómo se ven y suenan los dados 3D.
+  pie: '<a href="../comun/prueba-dados.html" target="_blank" rel="noopener" title="Elegir cómo se ven y suenan tus dados 3D">Personalización 🎲</a>' + dadosBotonHtml().replace('class="dados3d-boton"', 'class="dados3d-boton" data-texto="1"'),
   alTirar: f => mesaPublicar('Tirada libre', tirarDados(f)),
 });
 

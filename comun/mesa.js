@@ -55,16 +55,25 @@ async function mesaPublicar(origen, r){
     desde: MESA_DESDE,
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add(texto ? {...doc, texto} : doc);
-  }catch(err){
-    // Reglas viejas (no conocen "texto"): se publica la tirada igual.
-    if(texto && err.code === 'permission-denied'){
-      try{
-        await fbDb.collection(fbRutaCampana('tiradas')).add({...doc, cuando: firebase.firestore.FieldValue.serverTimestamp()});
-        return;
-      }catch(e2){ err = e2; }
+  // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
+  const estilo = typeof dadosEstiloTxt === 'function' ? dadosEstiloTxt() : '';
+  // Reglas viejas (no conocen "estilo" o "texto"): se reintenta con menos campos, la tirada sale igual.
+  const intentos = [
+    {...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {})},
+    ...(estilo ? [{...doc, ...(texto ? {texto} : {})}] : []),
+    ...(texto ? [doc] : []),
+  ];
+  let err = null;
+  for(const d of intentos){
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({...d, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+      return;
+    }catch(e){
+      err = e;
+      if(e.code !== 'permission-denied') break;
     }
+  }
+  {
     console.error('No se pudo publicar la tirada en la mesa:', err);
     toast('La tirada no se pudo compartir con la mesa');
   }

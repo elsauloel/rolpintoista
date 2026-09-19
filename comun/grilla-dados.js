@@ -33,10 +33,10 @@ function grillaEstilos(){
 #grilla-dados .grilla-dado{text-align:left;min-width:62px;color:var(--brass,#E0A458);font-weight:700}
 #grilla-dados .grilla-dado i{font-style:normal;display:inline-block;width:18px;color:var(--muted,#9A867E);font-weight:400}
 #grilla-dados .grilla-cant{border-left:1px solid var(--line-soft,#2A2126)}
-#grilla-dados .grilla-pie{margin-top:6px;padding-top:6px;border-top:1px solid var(--line-soft,#2A2126);display:flex;justify-content:center}
-#grilla-dados .grilla-pie a{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:inherit;text-decoration:none;padding:6px 12px;border:1px solid var(--line,#3B2E34);border-radius:var(--r,3px)}
+#grilla-dados .grilla-pie{margin-top:6px;padding-top:6px;border-top:1px solid var(--line-soft,#2A2126);display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+#grilla-dados .grilla-pie a,#grilla-dados .grilla-pie button{background:none;cursor:pointer;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:inherit;text-decoration:none;padding:6px 12px;border:1px solid var(--line,#3B2E34);border-radius:var(--r,3px)}
 #grilla-dados .grilla-pie[hidden]{display:none}
-#grilla-dados .grilla-pie a:hover{border-color:var(--brass,#E0A458);color:var(--brass,#E0A458)}`;
+#grilla-dados .grilla-pie a:hover,#grilla-dados .grilla-pie button:hover{border-color:var(--brass,#E0A458);color:var(--brass,#E0A458)}`;
   document.head.appendChild(s);
 }
 
@@ -100,6 +100,7 @@ function grillaConectar(boton, {ancla, lado, alTirar, pie}){
     Object.assign(grilla, {boton, ancla: ancla || boton, lado: lado || 'costado', alTirar});
     const zonaPie = panel.querySelector('.grilla-pie');
     if(zonaPie){ zonaPie.innerHTML = pie || ''; zonaPie.hidden = !pie; }
+    if(zonaPie && typeof dadosConectarBoton === 'function') dadosConectarBoton(zonaPie);
     panel.hidden = false;
     boton.classList.add('activo');
     grillaUbicar();

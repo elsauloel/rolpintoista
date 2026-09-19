@@ -7,6 +7,8 @@
 
    - Librería: dice-box-threejs (MIT), desde jsDelivr, con sus texturas y
      sonidos. Se descarga recién con la primera tirada.
+   - Varias tiradas a la vez se superponen (una caja por estilo) y cada
+     tirada viaja con el estilo de quien la hizo (ver "Estilo que viaja").
    - Estilo y encendido/apagado: por navegador, en localStorage
      ('dados3d'). Cada uno ve todas las tiradas con su propio estilo.
    - Tiradas con más de DADOS_MAX dados, o con dados que la librería no
@@ -18,7 +20,7 @@ const DADOS_RECURSOS = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0
 const DADOS_CLAVE = 'dados3d';
 const DADOS_MAX = 12;
 const DADOS_CARAS = [2, 4, 6, 8, 10, 12, 20];
-const DADOS_QUIETOS_MS = 2200;  // cuánto quedan a la vista después de caer
+const DADOS_QUIETOS_MS = 4500;  // cuánto quedan a la vista después de caer
 
 // Estilo de la mesa por defecto (elegido en la página de prueba).
 const DADOS_DEFECTO = {
@@ -93,34 +95,83 @@ function dadosClase(){
   return m && m.default ? m.default : m;
 }
 
-/* ---------- Caja de dados sobre la herramienta ---------- */
+/* ---------- Estilo que viaja con cada tirada ----------
+   Cada uno tira con SU estilo (color, número, borde, textura y material,
+   elegidos en la página de prueba). Ese estilo se publica junto con la
+   tirada (campo `estilo` de la Mesa) para que todos vean los dados de cada
+   uno con su color, como si hubiera varios juegos de dados sobre la mesa.
+   Tamaño, fuerza, sombras y sonido siguen siendo de quien mira. */
 
-const dados = {caja: null, firma: '', capa: null, cola: [], ocupado: false, ocultarT: null};
+function dadosEstiloTxt(){
+  const p = dadosPrefs();
+  const e = p.colorset === 'personalizado'
+    ? {c: 'personalizado', f: p['color-fondo'], n: p['color-numero'], b: p['color-borde'], t: p.textura, m: p.material}
+    : {c: p.colorset};
+  return JSON.stringify(e);
+}
 
-function dadosCapa(){
-  if(dados.capa) return dados.capa;
+// Lo que llega por la red no se toma tal cual: solo colores y nombres simples.
+function dadosEstiloDe(txt){
+  const propio = dadosPrefs();
+  let e = null;
+  try{ e = typeof txt === 'string' ? JSON.parse(txt) : null; }catch(err){ e = null; }
+  if(!e || typeof e !== 'object') return propio;
+  const color = v => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v);
+  const nombre = v => typeof v === 'string' && /^[a-z0-9_-]{1,30}$/i.test(v);
+  if(e.c === 'personalizado' && color(e.f) && color(e.n) && color(e.b) && nombre(e.t) && nombre(e.m)){
+    return {...propio, colorset: 'personalizado', 'color-fondo': e.f, 'color-numero': e.n, 'color-borde': e.b, textura: e.t, material: e.m};
+  }
+  if(nombre(e.c) && e.c !== 'personalizado') return {...propio, colorset: e.c};
+  return propio;
+}
+
+/* ---------- Cajas de dados sobre la herramienta ----------
+   Una caja (canvas transparente) por cada estilo distinto, todas
+   superpuestas: las tiradas de varios jugadores conviven en pantalla y no
+   se esperan unas a otras. Dentro de un mismo estilo, los dados nuevos se
+   suman a los que ya están rodando o quietos. */
+
+const dados = {cajas: new Map(), n: 0};
+const DADOS_CAJAS_MAX = 6;       // canvas WebGL simultáneos (uno por estilo)
+const DADOS_EN_MESA_MAX = 24;    // por caja; pasado esto se limpia lo viejo
+
+function dadosCrearCapa(){
   const capa = document.createElement('div');
-  capa.id = 'dados3d-capa';
-  capa.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:96;opacity:0;transition:opacity .35s';
+  capa.id = 'dados3d-capa-' + (++dados.n);
+  capa.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:96;opacity:0;transition:opacity .5s';
   document.body.appendChild(capa);
-  dados.capa = capa;
   return capa;
 }
 
-// Arma la caja la primera vez, o de nuevo si cambió el estilo o el tamaño de la ventana.
-async function dadosCaja(){
-  const prefs = dadosPrefs();
-  const firma = JSON.stringify([prefs, innerWidth, innerHeight]);
-  if(dados.caja && dados.firma === firma) return dados.caja;
+function dadosQuitarCaja(clave){
+  const c = dados.cajas.get(clave);
+  if(!c) return;
+  clearTimeout(c.ocultarT);
+  try{ c.caja.clearDice(); }catch(e){}
+  c.capa.remove();
+  dados.cajas.delete(clave);
+}
+
+// Caja del estilo dado; se rearma si cambió el tamaño de la ventana o algún ajuste del que mira.
+async function dadosCaja(estilo){
+  const firma = JSON.stringify([estilo, innerWidth, innerHeight]);
+  const clave = JSON.stringify([estilo.colorset, estilo['color-fondo'], estilo['color-numero'], estilo['color-borde'], estilo.textura, estilo.material]);
+  const hay = dados.cajas.get(clave);
+  if(hay && hay.firma === firma) return hay;
+  if(hay) dadosQuitarCaja(clave);
   await dadosCargarLibreria();
-  const capa = dadosCapa();
-  capa.innerHTML = '';
+  // Si ya hay muchos estilos, se saca el que lleva más tiempo sin usarse.
+  while(dados.cajas.size >= DADOS_CAJAS_MAX){
+    const viejo = [...dados.cajas.entries()].sort((a, b) => a[1].uso - b[1].uso)[0];
+    dadosQuitarCaja(viejo[0]);
+  }
+  const capa = dadosCrearCapa();
   const DiceBox = dadosClase();
-  const caja = new DiceBox('#dados3d-capa', dadosConfigLibreria(prefs));
+  const caja = new DiceBox('#' + capa.id, dadosConfigLibreria(estilo));
   await caja.initialize();
-  dados.caja = caja;
-  dados.firma = firma;
-  return caja;
+  const c = {caja, capa, firma, uso: Date.now(), pendientes: 0, ocultarT: null};
+  dados.cajas.set(clave, c);
+  return c;
 }
 
 // "1d20+2d6+3" y [17, 4, 2] -> "1d20+2d6@17,4,2"; null si no se puede animar.
@@ -146,31 +197,37 @@ function dadosNotacion(formula, rolls){
   return grupos.map(g => `${g.n}d${g.caras}`).join('+') + '@' + valores.join(',');
 }
 
-async function dadosSiguiente(){
-  if(dados.ocupado) return;
-  const notacion = dados.cola.shift();
-  if(!notacion) return;
-  dados.ocupado = true;
-  clearTimeout(dados.ocultarT);
+async function dadosTirar(notacion, estilo){
+  let c = null;
   try{
-    const caja = await dadosCaja();
-    dadosCapa().style.opacity = '1';
-    await caja.roll(notacion);
-    await new Promise(r => setTimeout(r, dados.cola.length ? 600 : DADOS_QUIETOS_MS));
+    c = await dadosCaja(estilo);
+    c.pendientes++;
+    c.uso = Date.now();
+    clearTimeout(c.ocultarT);
+    c.capa.style.opacity = '1';
+    // Con la caja llena (dados viejos quietos) se limpia antes de sumar.
+    const enMesa = (c.caja.diceList || []).length;
+    if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX) c.caja.clearDice();
+    await c.caja.add(notacion);
   }catch(err){
     console.error('Dados 3D:', err);
   }finally{
-    dados.ocupado = false;
-    if(dados.cola.length){
-      dadosSiguiente();
-    }else if(dados.capa){
-      dados.capa.style.opacity = '0';
-      dados.ocultarT = setTimeout(() => { if(dados.caja && !dados.ocupado) dados.caja.clearDice(); }, 400);
+    if(c){
+      c.pendientes = Math.max(0, c.pendientes - 1);
+      c.uso = Date.now();
+      // Cuando ya no ruedan dados de este estilo, quedan a la vista un rato y se apagan.
+      if(c.pendientes === 0){
+        clearTimeout(c.ocultarT);
+        c.ocultarT = setTimeout(() => {
+          c.capa.style.opacity = '0';
+          c.ocultarT = setTimeout(() => { if(c.pendientes === 0){ try{ c.caja.clearDice(); }catch(e){} } }, 600);
+        }, DADOS_QUIETOS_MS);
+      }
     }
   }
 }
 
-// Punto de entrada: una tirada de la Mesa ({formula, rolls}).
+// Punto de entrada: una tirada de la Mesa ({formula, rolls, estilo?}).
 function dadosAnimarTirada(t){
   if(!t || !dadosActivos() || document.hidden) return;
   // Ficha o gm-tools abiertas dentro del mapa (Botonera, Mantenimiento en
@@ -179,25 +236,28 @@ function dadosAnimarTirada(t){
   if(html.contains('modo-botonera') || html.contains('modo-mantenimiento') || html.contains('modo-acciones')) return;
   const notacion = dadosNotacion(t.formula, t.rolls);
   if(!notacion) return;
-  if(dados.cola.length >= 4) dados.cola.shift();  // si se acumulan, se saltean las más viejas
-  dados.cola.push(notacion);
-  dadosSiguiente();
+  dadosTirar(notacion, dadosEstiloDe(t.estilo));
 }
+
 
 // Botón chico para prender/apagar la animación (lo usan las cajitas de Mesa).
 function dadosBotonHtml(){
   return '<button type="button" class="dados3d-boton">🎲</button>';
 }
+const dadosPintores = new Set();
+window.addEventListener('storage', ev => { if(ev.key === DADOS_CLAVE) dadosPintores.forEach(p => p()); });
+// data-texto="1": el botón lleva la palabra ("🎲 Animación: sí"), no solo el dibujito.
 function dadosConectarBoton(cont){
   (cont || document).querySelectorAll('.dados3d-boton').forEach(b => {
     const pintar = () => {
+      if(!b.isConnected){ dadosPintores.delete(pintar); return; }
       const si = dadosActivos();
-      b.textContent = si ? '🎲' : '⚀';
-      b.style.opacity = si ? '1' : '.45';
+      b.textContent = b.dataset.texto ? (si ? '🎲 Animación: sí' : '⚀ Animación: no') : (si ? '🎲' : '⚀');
+      b.style.opacity = si || b.dataset.texto ? '1' : '.45';
       b.title = si ? 'Dados 3D prendidos (clic para apagar)' : 'Dados 3D apagados (clic para prender)';
     };
     pintar();
-    b.onclick = e => { e.stopPropagation(); dadosActivar(!dadosActivos()); pintar(); };
-    window.addEventListener('storage', ev => { if(ev.key === DADOS_CLAVE) pintar(); });
+    b.onclick = e => { e.stopPropagation(); dadosActivar(!dadosActivos()); pintar(); dadosPintores.forEach(p => p()); };
+    dadosPintores.add(pintar);
   });
 }

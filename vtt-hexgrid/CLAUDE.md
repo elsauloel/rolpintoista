@@ -49,7 +49,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
   afuera o con Esc) con: **🌫 Niebla: sí/no**, **👁 Como jugador** (solo con la
   niebla prendida), **👁 Revelar lo oculto** y **↺ Restablecer niebla**
-  (`nieblaReiniciar`: vuelve a tapar todo lo descubierto, con confirmación).
+  (`nieblaReiniciar`: vuelve a tapar todo lo descubierto, con confirmación, y **borra también las marcas de "última posición vista"** de personajes y creeps en todas las pantallas).
   El botón cuadrado se resalta si la niebla está prendida o en "Como
   jugador", y va en rojo mientras se está revelando lo oculto. Reemplaza a
   los tres botones sueltos que había, para que la cabecera entre en una línea.

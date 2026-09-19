@@ -1678,7 +1678,15 @@ function escucharNiebla(){
   cortarNiebla = fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
     nieblaActiva = d.activa === true;
+    const antes = nieblaDescubierta.size;
     nieblaDescubierta = new Set(Array.isArray(d.descubiertas) ? d.descubiertas.map(Number) : []);
+    // Restablecer la niebla (todo lo descubierto se vacía): también desaparecen
+    // las marcas de "última posición vista" de personajes y creeps, en todas las pantallas.
+    if(antes > 0 && nieblaDescubierta.size === 0){
+      nieblaFantasmas.clear();
+      sigiloFantasmas.clear();
+      sigiloUltimaVista.clear();
+    }
     nieblaFirma = '';
     renderNiebla();
     pedirDibujo();

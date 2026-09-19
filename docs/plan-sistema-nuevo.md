@@ -161,6 +161,9 @@ público").
   detección automática** (el cono) de un enemigo; (2) al hacer una **acción
   hostil**: cualquier acción con efecto directo sobre un enemigo (un ataque,
   una skill individual; invocar una nube tóxica en área, no — *a debatir*).
+  **La acción hostil es una regla, pero no se puede automatizar su detección:
+  queda entre los jugadores** (quien la hace sale del sigilo a mano con el
+  botón de la Botonera; el GM saca el estado del creep).
   Cuando se lo detecta, **aparece donde lo detectaron** (P9).
 
 **Quién ve qué** (todo visual):

@@ -1528,7 +1528,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
@@ -1543,7 +1543,7 @@ function nieblaActualizar(){
   nieblaVista = vista;
   // Última posición vista de lo que no es aliado: se anota mientras se ve.
   tokens.forEach((t, id) => {
-    if(t.tipo === 'pj' || t.oculto) return;
+    if(t.tipo === 'pj' || t.oculto || enSigilo(t)) return;   // en sigilo no se sigue su rastro
     if(vista.has(nbPack(t.col, t.fila))) nieblaFantasmas.set(id, {col: t.col, fila: t.fila});
   });
   nieblaFantasmas.forEach((f, id) => {

@@ -117,8 +117,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   zona de alerta de Y → N tiradas de detección" cuando el movimiento se guarda
   (`sigiloPublicarAvisos`); la tirada es manual (en principio Destreza contra
   Especial, P3). Caminar de espaldas al rival no cuenta (su punto ciego).
-  Todavía falta: definir quién tira (P4), buscar a propósito (P6), la
-  acción hostil que rompe el sigilo (P7) y la ficha de las invocaciones.
+  Todavía falta: definir quién tira (P4), buscar a propósito (P6), y la ficha de las invocaciones (la acción hostil no se automatiza: P7).
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

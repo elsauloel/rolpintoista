@@ -482,5 +482,45 @@ service cloud.firestore {
         }
       }
     }
+
+    // Biblioteca global de creeps (comun/biblioteca.js), fuera de las
+    // campañas: sirve para cualquier partida. Solo texto. Cada entrada:
+    // {nombre, etiquetas, descripcion, nivel, json, autorUid, autorNombre,
+    // creado}. `biblioteca_<tipo>` es la oficial: la lee cualquier cuenta
+    // confirmada y solo el dueño del proyecto la escribe. `propuestas_<tipo>`
+    // es lo que manda cualquier GM con "Guardar en la biblioteca": la ven
+    // solo su autor y el dueño, que las audita y las pasa a la oficial.
+    // (Que solo los GM la vean es visual: las reglas no saben si alguien es
+    // GM de alguna partida.)
+    function esDuenoProyecto() {
+      return verificado() && request.auth.token.email == 'rolpintoista@gmail.com';
+    }
+    function entradaBiblioteca(d) {
+      return d.keys().hasOnly(['nombre', 'etiquetas', 'descripcion', 'nivel', 'json', 'autorUid', 'autorNombre', 'creado'])
+        && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 60
+        && d.etiquetas is list && d.etiquetas.size() <= 12
+        && d.descripcion is string && d.descripcion.size() <= 300
+        && d.nivel is int && d.nivel >= 0 && d.nivel <= 1000
+        && d.json is string && d.json.size() <= 200000
+        && d.autorUid is string
+        && d.autorNombre is string && d.autorNombre.size() <= 40;
+    }
+    match /biblioteca_{tipo}/{id} {
+      allow read: if verificado() && tipo in ['creeps', 'skills'];
+      allow create, update: if esDuenoProyecto() && tipo in ['creeps', 'skills']
+        && entradaBiblioteca(request.resource.data);
+      allow delete: if esDuenoProyecto() && tipo in ['creeps', 'skills'];
+    }
+    match /propuestas_{tipo}/{id} {
+      allow read: if verificado() && tipo in ['creeps', 'skills']
+        && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
+      allow create: if verificado() && tipo in ['creeps', 'skills']
+        && entradaBiblioteca(request.resource.data)
+        && request.resource.data.autorUid == request.auth.uid
+        && request.resource.data.creado == request.time;
+      allow update: if false;
+      allow delete: if esDuenoProyecto()
+        || (verificado() && resource.data.autorUid == request.auth.uid);
+    }
   }
 }

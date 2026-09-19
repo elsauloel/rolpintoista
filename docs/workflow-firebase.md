@@ -130,6 +130,18 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   si no el centro del retrato recortado automático como antes. Todos los
   miembros leen todo; el dueño escribe y **también el GM** (desde 2026-09-19, para ayudar a un jugador: botón "✎ Editar como GM" en la ficha, que por defecto la abre en solo lectura). Son fichas de jugadores: el GM no las crea (lo suyo va en gm-tools); además puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
+- `biblioteca_creeps/{id}` y `propuestas_creeps/{id}` (**fuera de las
+  campañas**, sirven para cualquier partida; `biblioteca_skills` y
+  `propuestas_skills` ya están permitidas en las reglas para más adelante) —
+  `{nombre, etiquetas[], descripcion, nivel, json, autorUid, autorNombre,
+  creado}`, solo texto (el creep sin imagen, con la vida llena). La oficial
+  la lee cualquier cuenta confirmada y **solo el dueño del proyecto**
+  (`rolpintoista@gmail.com`, por el email del token) la escribe. Las
+  propuestas las crea cualquier GM con "📚 Biblioteca" en su creep; solo las
+  ve su autor y el dueño, que las aprueba (pasan a la oficial), las trae a su
+  mesa para ajustarlas o las rechaza. Lo maneja `comun/biblioteca.js`;
+  "+ Creep" de gm-tools abre la ventana (crear de cero o elegir, con buscador
+  y etiquetas que se combinan). Que solo los GM la vean es visual.
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
   muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se
   publica el porcentaje (`hpPct`, 0–100): los jugadores ven la barra sin

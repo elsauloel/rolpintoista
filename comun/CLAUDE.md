@@ -19,6 +19,12 @@ versión parecida en más de una, es candidato a juntar.
 
 ## Contenido
 
+- **`biblioteca.js`** — biblioteca global de creeps (y luego skills): ventana
+  para elegir con buscador y etiquetas, guardar como propuesta (o directo si
+  es el dueño del proyecto) y auditar propuestas. `Biblioteca.abrir({tipo,
+  titulo, alElegir, alCrearDeCero})` y `Biblioteca.guardar({tipo, datos,
+  nombre, nivel})`; crea su propio HTML. Depende de `sesion.js`. La usa
+  `gm-tools.html`.
 - **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
   partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida
   actuales (`fbMiembro`, `fbPartida`). `fbEntrarAPartida()` es lo que cada

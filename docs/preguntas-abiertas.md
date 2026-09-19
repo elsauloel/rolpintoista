@@ -185,7 +185,7 @@ Filtros por categoría. Ejemplos de creeps: bandidos, criaturas de bosque,
 de cavernas, adefesios infernales. Ejemplos de skills: rango, melee, daño
 físico, daño mágico, tanque.
 
-- 🔲 **P56. Dónde vive la biblioteca.** ¿Firebase (colección global, se
+- ✅ **P56. Dónde vive la biblioteca.** Hecho 2026-09-19: Firebase, colecciones globales (ver workflow-firebase.md). Pregunta original: ¿Firebase (colección global, se
   edita en vivo, más simple) o archivo en el repo sincronizado por GitHub
   como el catálogo (versionable, igual para todos)? Recomendación: ver
   conversación 2026-09-19. *(2026-09-19)*
@@ -196,6 +196,6 @@ físico, daño mágico, tanque.
   dueño las audita, ajusta y etiqueta una por una, y recién ahí pasan a la
   oficial. Los jugadores comunes no ven la biblioteca. Falta confirmar si
   mandan propuestas solo los GM (sugerido) o cualquier cuenta.
-- 🔲 **P58. Categorías.** Definir la lista de etiquetas (creeps: ambiente,
+- 🔲 **P58. Categorías.** Hoy las etiquetas son libres (con sugerencias). Definir la lista de etiquetas (creeps: ambiente,
   tipo, rol, nivel; skills: rol, tipo de daño, alcance) y si un ítem puede
   tener varias. *(2026-09-19)*

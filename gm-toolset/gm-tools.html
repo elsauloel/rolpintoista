@@ -1109,6 +1109,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/biblioteca.js"></script>
 <script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
@@ -1812,6 +1813,28 @@ function nuevoCreep(){
     notas:'',
     escalaTipos: ESCALA_TIPOS,
   };
+}
+
+// Biblioteca global de creeps (comun/biblioteca.js): un creep guardado va sin
+// imagen, con la vida llena y sin estados pasajeros; al agregarlo a la mesa
+// se vuelca sobre la base (como uno cargado de Firebase) con ids nuevos.
+function guardarCreepEnBiblioteca(sc){
+  const datos = JSON.parse(creepFichaJson(sc));
+  delete datos.id;
+  datos.hp = datos.hpMax;
+  datos.nitros = null;
+  datos.ataquesTurno = 0;
+  datos.estados = (datos.estados || []).filter(es => es && es.permanente);
+  Biblioteca.guardar({tipo: 'creeps', datos, nombre: sc.nombre, nivel: sc.nivel});
+}
+
+function agregarCreepDeBiblioteca(datos){
+  const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: ''});
+  sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid()}));
+  sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
+  S.creeps.push(sc);
+  renderAll();
+  toast(`${sc.nombre} agregado a la mesa`);
 }
 
 function fileToDataURL(file, maxDim=480, quality=0.85){
@@ -2647,6 +2670,7 @@ function cardHtml(sc){
         <input class="lv" type="number" data-f="nivel" data-id="${sc.id}" value="${sc.nivel}">
       </div>
       <button class="verbtn" data-dup="${sc.id}" title="Duplicar este creep">Duplicar</button>
+      <button class="verbtn" data-bib="${sc.id}" title="Guardar este creep en la biblioteca para usarlo en cualquier partida">📚 Biblioteca</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
       <button type="button" class="iconbtn" data-cerrareditar="1" title="Cerrar (Esc)">Cerrar</button>
     </div>
@@ -3978,8 +4002,17 @@ document.addEventListener('click', e => {
   }
 
   if(b.id === 'btn-add'){
-    S.creeps.push(nuevoCreep());
-    renderAll();
+    Biblioteca.abrir({
+      tipo: 'creeps', titulo: 'Creep nuevo',
+      textoCrearDeCero: '+ Crear de cero',
+      alCrearDeCero: () => { S.creeps.push(nuevoCreep()); renderAll(); },
+      alElegir: agregarCreepDeBiblioteca,
+    });
+    return;
+  }
+  if(b.dataset.bib){
+    const sc = S.creeps.find(s => s.id === b.dataset.bib);
+    if(sc) guardarCreepEnBiblioteca(sc);
     return;
   }
   if(b.dataset.ver){ verCreep(b.dataset.ver); return; }

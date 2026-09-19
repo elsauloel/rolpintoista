@@ -28,7 +28,7 @@ Diseño en curso: ver "Sigilo (en diseño)" en [`plan-sistema-nuevo.md`](plan-si
 - 🔲 **P2. Moverse en sigilo.** ¿Cuesta lo mismo que moverse normal o más No2? *(2026-09-16)*
 - 🔲 **P3. Tirada de detección: qué se tira.** En principio **Destreza (el que se esconde) contra Especial (el que vigila)**, anotado el 2026-09-19 y "a debatir". No hace falta cerrarlo para programar el mecanismo: la tirada no es automática, la resuelve la mesa a mano.
 - 🔲 **P4. Tirada de detección: quién tira.** ¿El que está escondido, el que vigila, o los dos? *(2026-09-16)*
-- 🔲 **P5. Tirada de detección: cuántas.** ¿Una por cada hexágono de la zona de alerta que pisa, o una por movimiento? *(2026-09-16)*
+- ✅ **P5. Tirada de detección: cuántas.** Respondido 2026-09-19: **una por cada paso que da dentro de la zona de alerta** (cada casillero de la ruta que cae en la alerta cuenta como una tirada). Como la tirada es manual, el mapa solo cuenta y avisa cuántas hay que hacer.
 - 🔲 **P6. Otras formas de detectar.** ¿Se puede buscar a propósito (tirada de percepción del GM o de un jugador)? *(2026-09-16)*
 - 🔲 **P7. Qué es "acción hostil".** Rompe el sigilo: ¿atacar, lanzar una habilidad ofensiva, algo más? *(2026-09-16)*
 - 🔲 **P8. Última posición conocida.** Si alguien entra en sigilo a la vista del otro bando, ¿queda una "marca fantasma" donde se lo vio? *(2026-09-16)*

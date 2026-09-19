@@ -147,6 +147,14 @@ nuevo de Rol Pintoísta. Paso 2 de
   (`sigiloPublicarAvisos`); la tirada es manual (en principio Destreza contra
   Especial, P3). Caminar de espaldas al rival no cuenta (su punto ciego).
   **Marca de última posición** (P8): quien se esconde a la vista deja un "?" atenuado en su última posición vista por 2 turnos (`sigiloFantasmas`, `SIGILO_MARCA_TURNOS`, cuenta los Mantenimientos; solo en cada navegador). Pendiente de probar: las invocaciones.
+- **Miniatura de reserva de los tokens** (2026-09-19): si una ficha no tiene
+  `miniatura` publicada (el token se vería con la inicial), el mapa arma una
+  desde su retrato (`fichas/{id}/partes/retrato`) una vez por sesión y la usa
+  en memoria (`miniaturaDesdeRetrato`, `miniaturasLocales`); no escribe nada.
+- **📜 en un creep vinculado** (solo GM): el HUD suma un botón que abre en otra
+  pestaña **GM Tools con la ficha completa de ese creep** (`gm-tools.html?partida=…&editar=<creep>`;
+  gm-tools abre su ventana "Editar creep" al cargar). Los tokens de personaje ya
+  tenían su 📜 a la ficha.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

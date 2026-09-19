@@ -195,3 +195,6 @@ hay trabajo reciente o en curso de otra conversación (ver
 - `ficha-personaje/ficha.html` — comparte el formato de tarjeta de
   tablero y de efecto/estado con gm-tools.html (código duplicado, no
   importado); lee lo que publica vendor-generator.html.
+
+**`?editar=<creep>`** (2026-09-19): al cargar, abre la ventana "Editar creep" de ese
+creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.

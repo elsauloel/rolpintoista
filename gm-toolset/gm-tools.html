@@ -5526,6 +5526,9 @@ async function gmProcesarSnapshot(snap){
     gmEstadoAlDia();
     gmMantenimientoRevisar();
     if(MODO_ACCIONES) accionesModoAbrir(new URLSearchParams(location.search).get('creep'));
+    // ?editar=<creep>: el mapa abre la ficha completa de ese creep (botón 📜 del token).
+    const paraEditar = new URLSearchParams(location.search).get('editar');
+    if(!MODO_ACCIONES && paraEditar && S.creeps.some(s => s.id === paraEditar)) abrirEditarCreep(paraEditar);
     return;
   }
 

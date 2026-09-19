@@ -4248,6 +4248,36 @@ function escucharTokens(){
   });
 }
 
+// Si una ficha no tiene miniatura publicada (el token quedaría con la inicial), se arma
+// una desde su retrato (`fichas/{id}/partes/retrato`), una sola vez por sesión. Solo
+// se guarda en memoria: no escribe nada.
+const miniaturasLocales = new Map();   // fichaId -> data URL de 96 px
+const miniaturasPedidas = new Set();
+async function miniaturaDesdeRetrato(fichaId){
+  if(miniaturasPedidas.has(fichaId)) return;
+  miniaturasPedidas.add(fichaId);
+  try{
+    const doc = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/retrato`)).get();
+    if(!doc.exists) return;
+    const crudo = String(doc.data().json || '');
+    let src = crudo;
+    try{ const d = JSON.parse(crudo); src = typeof d === 'string' ? d : String((d && (d.miniatura || d.imagen)) || ''); }catch(e){}
+    if(!src.startsWith('data:')) return;
+    const img = new Image();
+    await new Promise((ok, ko) => { img.onload = ok; img.onerror = ko; img.src = src; });
+    const lado = Math.min(img.naturalWidth, img.naturalHeight);
+    if(!lado) return;
+    const c = document.createElement('canvas');
+    c.width = c.height = 96;
+    c.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 96, 96);
+    const mini = c.toDataURL('image/jpeg', 0.8);
+    miniaturasLocales.set(fichaId, mini);
+    const f = fichasPub.get(fichaId);
+    if(f && !f.miniatura) f.miniatura = mini;
+    pedirDibujo();
+  }catch(err){ console.warn('No se pudo armar la miniatura de la ficha ' + fichaId, err); }
+}
+
 // Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
 // las barras, estados e imagen de los tokens vinculados.
 function escucharVinculables(){
@@ -4258,6 +4288,10 @@ function escucharVinculables(){
       const o = {};
       campos.forEach(k => { o[k] = d[k]; });
       o.nombre = String(d.nombre || '?');
+      if(coleccion === 'fichas'){
+        if(!o.miniatura && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
+        if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
+      }
       mapa.set(ch.doc.id, o);
     });
     renderPanel();
@@ -5018,6 +5052,7 @@ function hudHtml(t){
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
+    (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) ? icono('ficha', '📜', 'Abrir la ficha completa del creep en GM Tools (otra pestaña)') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
@@ -5462,6 +5497,11 @@ function puedeAgregarEstado(t){
 
 // Abre el selector de estados de la herramienta que corresponde.
 function abrirFichaDeToken(t){
+  // Un creep vinculado abre su ficha completa (ventana "Editar creep") en GM Tools.
+  if(t.tipo === 'creep' && t.fichaId && soyGM){
+    window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(t.fichaId), '_blank', 'noopener');
+    return;
+  }
   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   if(!fichaId) return;
   const url = '../ficha-personaje/ficha.html?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaId);

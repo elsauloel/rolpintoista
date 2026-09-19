@@ -4288,16 +4288,31 @@ function escucharTokens(){
 // se guarda en memoria: no escribe nada.
 const miniaturasLocales = new Map();   // fichaId -> data URL de 96 px
 const miniaturasPedidas = new Set();
-async function miniaturaDesdeRetrato(fichaId){
-  if(miniaturasPedidas.has(fichaId)) return;
-  miniaturasPedidas.add(fichaId);
-  try{
-    const doc = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/retrato`)).get();
-    if(!doc.exists) return;
-    const crudo = String(doc.data().json || '');
+const miniaturasInvalidas = new Set(); // fichas cuya miniatura publicada no sirve (se usa la local)
+// Busca la foto de la ficha: en su parte "retrato" y, si no está, en "general" (fichas viejas).
+async function fotoDeFicha(fichaId){
+  const leer = async parte => {
+    const doc = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/${parte}`)).get();
+    return doc.exists ? String(doc.data().json || '') : '';
+  };
+  const crudo = await leer('retrato');
+  if(crudo){
     let src = crudo;
     try{ const d = JSON.parse(crudo); src = typeof d === 'string' ? d : String((d && (d.miniatura || d.imagen)) || ''); }catch(e){}
-    if(!src.startsWith('data:')) return;
+    if(src.startsWith('data:')) return src;
+  }
+  const general = await leer('general');
+  if(general){
+    try{ const d = JSON.parse(general); const src = String((d && d.meta && (d.meta.miniatura || d.meta.imagen)) || ''); if(src.startsWith('data:')) return src; }catch(e){}
+  }
+  return '';
+}
+async function miniaturaDesdeRetrato(fichaId, forzar){
+  if(miniaturasPedidas.has(fichaId) && !forzar) return;
+  miniaturasPedidas.add(fichaId);
+  try{
+    const src = await fotoDeFicha(fichaId);
+    if(!src){ console.warn('La ficha ' + fichaId + ' no tiene foto para armar la miniatura del token'); return; }
     const img = new Image();
     await new Promise((ok, ko) => { img.onload = ok; img.onerror = ko; img.src = src; });
     const lado = Math.min(img.naturalWidth, img.naturalHeight);
@@ -4308,9 +4323,17 @@ async function miniaturaDesdeRetrato(fichaId){
     const mini = c.toDataURL('image/jpeg', 0.8);
     miniaturasLocales.set(fichaId, mini);
     const f = fichasPub.get(fichaId);
-    if(f && !f.miniatura) f.miniatura = mini;
+    if(f && (!f.miniatura || miniaturasInvalidas.has(fichaId))) f.miniatura = mini;
     pedirDibujo();
-  }catch(err){ console.warn('No se pudo armar la miniatura de la ficha ' + fichaId, err); }
+  }catch(err){ console.warn('No se pudo armar la miniatura de la ficha ' + fichaId, err); miniaturasPedidas.delete(fichaId); }
+}
+// Una miniatura publicada que no carga (vacía, cortada o rota) se reemplaza por la del retrato.
+function verificarMiniatura(fichaId, src){
+  const rota = () => { miniaturasInvalidas.add(fichaId); miniaturaDesdeRetrato(fichaId, true); };
+  if(typeof src !== 'string' || src.length < 200 || !src.startsWith('data:image')){ rota(); return; }
+  const img = new Image();
+  img.onerror = rota;
+  img.src = src;
 }
 
 // Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
@@ -4324,8 +4347,9 @@ function escucharVinculables(){
       campos.forEach(k => { o[k] = d[k]; });
       o.nombre = String(d.nombre || '?');
       if(coleccion === 'fichas'){
-        if(!o.miniatura && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
+        if((!o.miniatura || miniaturasInvalidas.has(ch.doc.id)) && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
         if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
+        else if(!miniaturasLocales.has(ch.doc.id) && !miniaturasInvalidas.has(ch.doc.id)) verificarMiniatura(ch.doc.id, o.miniatura);
       }
       mapa.set(ch.doc.id, o);
     });

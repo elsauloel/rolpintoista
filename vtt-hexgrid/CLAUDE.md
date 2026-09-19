@@ -155,7 +155,7 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **Miniatura de reserva de los tokens** (2026-09-19): si una ficha no tiene
   `miniatura` publicada (el token se vería con la inicial), el mapa arma una
   desde su retrato (`fichas/{id}/partes/retrato`) una vez por sesión y la usa
-  en memoria (`miniaturaDesdeRetrato`, `miniaturasLocales`); no escribe nada.
+  en memoria (`miniaturaDesdeRetrato`, `miniaturasLocales`); no escribe nada. También se usa si la miniatura publicada está rota o vacía (`verificarMiniatura`), y busca la foto en la parte `retrato` y, si no, en `general` (fichas viejas).
 - **📜 en un creep vinculado** (solo GM): el HUD suma un botón que abre en otra
   pestaña **GM Tools con la ficha completa de ese creep** (`gm-tools.html?partida=…&editar=<creep>`;
   gm-tools abre su ventana "Editar creep" al cargar). Los tokens de personaje ya

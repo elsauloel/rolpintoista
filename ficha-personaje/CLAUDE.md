@@ -316,3 +316,12 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   pegado al borde izquierdo (`#dock-izq`, se abre con el mouse encima; no
   aparece dentro de los iframes del mapa). `registrarEvento` y el historial de
   sesión en memoria quedan, pero sin pantalla.
+
+- **Estados alterados sin crecer** (2026-09-19): el cuadro de estados de la
+  cabecera fija muestra los chips que entran en 2 filas (`ESTADOS_FILAS`,
+  `ajustarEstados`); si sobran, un botón "＋N · Ver todos" abre la lista completa
+  en una ventana (`#scrim-todos-estados`, mismos chips y botones).
+- **Encabezado compacto** (2026-09-19): menos alto (foto y nombre más chicos,
+  menos márgenes) y el **Loot** en una sola fila; los tipos de loot especial
+  viven en un desplegable (`#loot-esp-pop`, se abre con "Especial N ▾" o con
+  "+"), así que agregar más tipos ya no estira el encabezado.

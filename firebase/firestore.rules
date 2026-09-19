@@ -27,6 +27,13 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
     }
 
+    // Hay una oferta de traspaso del rol de GM dirigida a esta cuenta.
+    function traspasoPara(c) {
+      return verificado()
+        && exists(/databases/$(database)/documents/campanas/$(c)/traspaso/actual)
+        && get(/databases/$(database)/documents/campanas/$(c)/traspaso/actual).data.aUid == request.auth.uid;
+    }
+
     match /campanas/{c} {
       // Partida: {nombre, gmUid, gmNombre, creado}. Grupo cerrado de amigos:
       // cualquier cuenta confirmada ve todas las partidas y puede unirse.
@@ -43,13 +50,24 @@ service cloud.firestore {
         && request.resource.data.gmUid == request.auth.uid
         && request.resource.data.creado == request.time
         && getAfter(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
-      allow update: if esGM(c)
-        && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
-        && request.resource.data.gmUid == resource.data.gmUid
-        && request.resource.data.creado == resource.data.creado
-        && request.resource.data.nombre is string
-        && request.resource.data.nombre.size() > 0
-        && request.resource.data.nombre.size() <= 60;
+      allow update: if (esGM(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
+          && request.resource.data.gmUid == resource.data.gmUid
+          && request.resource.data.creado == resource.data.creado
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 60)
+        // Traspaso del rol de GM: quien acepta la oferta pasa a ser el GM (en
+        // la misma operación que su miembro pasa a gm: true y se borra la oferta).
+        || (traspasoPara(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
+          && request.resource.data.gmUid == request.auth.uid
+          && request.resource.data.nombre == resource.data.nombre
+          && request.resource.data.creado == resource.data.creado
+          && request.resource.data.gmNombre is string
+          && request.resource.data.gmNombre.size() <= 40
+          && getAfter(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true
+          && !existsAfter(/databases/$(database)/documents/campanas/$(c)/traspaso/actual));
       allow delete: if esGM(c);
 
       // Miembro: {nombre, gm, creado}, uno por cuenta en cada partida. El
@@ -72,16 +90,43 @@ service cloud.firestore {
           );
         // Cada uno cambia su nombre; el GM puede cambiar el de cualquiera.
         // Nadie cambia quién es GM.
-        allow update: if verificado()
-          && (request.auth.uid == uid || esGM(c))
-          && request.resource.data.keys().hasOnly(['nombre', 'gm', 'creado'])
-          && request.resource.data.gm == resource.data.gm
-          && request.resource.data.creado == resource.data.creado
-          && request.resource.data.nombre is string
-          && request.resource.data.nombre.size() > 0
-          && request.resource.data.nombre.size() <= 40;
+        allow update: if (verificado()
+            && (request.auth.uid == uid || esGM(c))
+            && request.resource.data.keys().hasOnly(['nombre', 'gm', 'creado'])
+            && request.resource.data.gm == resource.data.gm
+            && request.resource.data.creado == resource.data.creado
+            && request.resource.data.nombre is string
+            && request.resource.data.nombre.size() > 0
+            && request.resource.data.nombre.size() <= 40)
+          // Traspaso del rol de GM (solo cambia `gm`): quien recibe la oferta
+          // pasa a gm: true y el GM que la hizo pasa a gm: false.
+          || (traspasoPara(c)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gm'])
+            && ((request.auth.uid == uid && request.resource.data.gm == true)
+              || (get(/databases/$(database)/documents/campanas/$(c)/traspaso/actual).data.deUid == uid
+                && request.resource.data.gm == false)));
         // Irse de la partida, o que el GM saque a alguien.
         allow delete: if verificado() && (request.auth.uid == uid || esGM(c));
+      }
+
+      // Traspaso del rol de GM (index.html, "Jugadores"): una sola oferta a la
+      // vez en traspaso/actual = {aUid, aNombre, deUid, deNombre, creado}. La
+      // hace el GM para un jugador de la partida; la cancela el GM o la
+      // rechaza/acepta ese jugador (al aceptar, en la misma operación pasa a
+      // ser GM: ver campanas y miembros más arriba).
+      match /traspaso/{doc} {
+        allow read: if esMiembro(c);
+        allow create, update: if doc == 'actual' && esGM(c)
+          && request.resource.data.keys().hasOnly(['aUid', 'aNombre', 'deUid', 'deNombre', 'creado'])
+          && request.resource.data.deUid == request.auth.uid
+          && request.resource.data.aUid is string
+          && request.resource.data.aUid != request.auth.uid
+          && exists(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.resource.data.aUid))
+          && request.resource.data.aNombre is string && request.resource.data.aNombre.size() <= 40
+          && request.resource.data.deNombre is string && request.resource.data.deNombre.size() <= 40
+          && request.resource.data.creado == request.time;
+        allow delete: if esGM(c)
+          || (verificado() && resource.data.aUid == request.auth.uid);
       }
 
       // Tiradas de dados compartidas (cajita "Mesa" de ficha y gm-tools).

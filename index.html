@@ -206,6 +206,17 @@ select option{background:var(--panel)}
     <h1 id="partida-nombre"></h1>
     <p class="sub" id="partida-sub"></p>
 
+    <!-- Oferta para ser GM: le llega al jugador elegido, la primera vez que entra a la partida -->
+    <div class="caja" id="traspaso-aviso" hidden style="max-width:520px;border-color:var(--copper);margin-bottom:16px">
+      <b id="traspaso-texto"></b>
+      <p class="vacio" style="margin:6px 0 0">Si aceptás, pasás a ser el GM de la partida y el GM actual pasa a ser jugador.</p>
+      <div class="fila">
+        <button type="button" class="btn primary" id="traspaso-si">Sí, aceptar</button>
+        <button type="button" class="btn" id="traspaso-no">No</button>
+      </div>
+      <div class="error" id="traspaso-error"></div>
+    </div>
+
     <div class="caja" id="unirse" hidden style="max-width:460px">
       <b>Unirte a esta partida</b>
       <form id="form-unirse">
@@ -510,6 +521,11 @@ async function cargarPartidas(){
     try{
       const m = await fbDb.doc(`campanas/${p.id}/miembros/${fbUsuario.uid}`).get();
       p.miembro = m.exists ? m.data() : null;
+      // Oferta de GM dirigida a esta cuenta (aviso en la tarjeta de la partida).
+      if(p.miembro && !p.miembro.gm){
+        const o = await fbDb.doc(`campanas/${p.id}/traspaso/actual`).get().catch(() => null);
+        p.oferta = !!(o && o.exists && o.data().aUid === fbUsuario.uid);
+      }
     }catch(e){ p.miembro = null; }
   }));
   // Primero donde ya estás, después las demás; cada grupo por nombre.
@@ -523,7 +539,7 @@ function renderPartidas(){
       <span class="titulo">${esc(p.nombre)}</span>
       <span class="desc">GM: ${esc(p.gmNombre || '?')}${p.miembro ? ` · vos: ${esc(p.miembro.nombre)}` : ''}</span>
       ${p.miembro
-        ? (p.miembro.gm ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag jugador">Sos jugador</span>')
+        ? (p.miembro.gm ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag jugador">Sos jugador</span>') + (p.oferta ? '<span class="tag gm">ð Te ofrecen ser el GM</span>' : '')
         : '<span class="tag">Unirse</span>'}
     </button>`).join('') +
     `<button type="button" class="tarjeta nueva" id="btn-nueva-partida">
@@ -585,6 +601,7 @@ async function irAPartida(id){
   $('#partida-sub').textContent = '';
   $('#unirse').hidden = true;
   $('#herramientas').hidden = true;
+  $('#traspaso-aviso').hidden = true;
   const [doc, miembro] = await Promise.all([
     fbDb.doc(fbRutaCampana()).get().catch(() => null),
     fbLeerMiembro(),
@@ -615,10 +632,103 @@ async function irAPartida(id){
     el.hidden = el.dataset.solo === 'gm' ? !miembro.gm : !!miembro.gm;
   });
   $('#herramientas').hidden = false;
+  revisarOfertaGM(p, miembro);
   if(miembro.gm){
     $('#in-renombrar').value = p.nombre;
     cerrarBorrar();
     cargarGestion();
+  }
+}
+
+/* ---------- Traspaso del rol de GM ----------
+   Solo se hace desde acá (Jugadores → "Asignar como GM"). El GM deja una
+   oferta en campanas/<id>/traspaso/actual; el jugador la ve al entrar a la
+   partida y, si acepta, en una sola operación pasa a ser el GM (partida,
+   su miembro y el del GM anterior) y se borra la oferta. Hasta que acepta,
+   el GM sigue siendo el GM. Reglas: firebase/firestore.rules. */
+
+let ofertaGM = null;   // la oferta dirigida a esta cuenta, si hay
+
+async function revisarOfertaGM(p, miembro){
+  ofertaGM = null;
+  $('#traspaso-aviso').hidden = true;
+  $('#traspaso-error').textContent = '';
+  if(!miembro || miembro.gm) return;
+  try{
+    const d = await fbDb.doc(fbRutaCampana('traspaso/actual')).get();
+    if(!d.exists || d.data().aUid !== fbUsuario.uid) return;
+    if(d.data().deUid !== p.gmUid){                      // oferta vieja: el que la hizo ya no es GM
+      await d.ref.delete().catch(() => {});
+      return;
+    }
+    ofertaGM = d.data();
+    $('#traspaso-texto').textContent = `${ofertaGM.deNombre || 'El GM'} te quiere asignar como Game Master de "${p.nombre}". ¿Aceptás?`;
+    $('#traspaso-aviso').hidden = false;
+  }catch(err){ console.error('No se pudo revisar la oferta de GM:', err); }
+}
+
+$('#traspaso-si').onclick = async () => {
+  if(!ofertaGM) return;
+  const id = FB_CAMPANA;
+  $('#traspaso-error').textContent = '';
+  $('#traspaso-si').disabled = $('#traspaso-no').disabled = true;
+  try{
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(fbRutaCampana()), {gmUid: fbUsuario.uid, gmNombre: fbMiembro.nombre});
+    lote.update(fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)), {gm: true});
+    lote.update(fbDb.doc(fbRutaCampana(`miembros/${ofertaGM.deUid}`)), {gm: false});
+    lote.delete(fbDb.doc(fbRutaCampana('traspaso/actual')));
+    await lote.commit();
+    ofertaGM = null;
+    await irAPartida(id);   // se vuelve a cargar como GM
+  }catch(err){
+    console.error('No se pudo aceptar el rol de GM:', err);
+    $('#traspaso-error').textContent = textoError(err);
+  }finally{
+    $('#traspaso-si').disabled = $('#traspaso-no').disabled = false;
+  }
+};
+$('#traspaso-no').onclick = async () => {
+  $('#traspaso-error').textContent = '';
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).delete();
+    ofertaGM = null;
+    $('#traspaso-aviso').hidden = true;
+  }catch(err){
+    console.error('No se pudo rechazar la oferta de GM:', err);
+    $('#traspaso-error').textContent = textoError(err);
+  }
+};
+
+// GM: ofrecer el rol a un jugador (o cancelar la oferta pendiente).
+async function ofrecerGM(uid, boton){
+  const m = gestion.miembros.find(x => x.uid === uid);
+  if(!m) return;
+  if(!confirm(`¿Asignar a ${m.nombre} como Game Master?\n\nLe llega una notificación la próxima vez que entre a la partida. Hasta que la acepte, seguís siendo el GM; cuando la acepte, pasás a ser jugador.`)) return;
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).set({
+      aUid: uid, aNombre: m.nombre, deUid: fbUsuario.uid, deNombre: fbMiembro.nombre,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo ofrecer el rol de GM:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+async function cancelarOfertaGM(boton){
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).delete();
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo cancelar la oferta de GM:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
   }
 }
 
@@ -628,7 +738,7 @@ async function irAPartida(id){
    puede volver a unirse, y sus personajes (que quedan) vuelven a ser suyos
    porque siguen a nombre de su cuenta. */
 
-let gestion = {miembros: [], fichas: []};
+let gestion = {miembros: [], fichas: [], traspaso: null};
 const fechaMs = t => t && t.toMillis ? t.toMillis() : 0;
 const fechaTxt = t => t && t.toDate ? t.toDate().toLocaleDateString('es-AR', {day: 'numeric', month: 'short', year: 'numeric'}) : '';
 
@@ -637,10 +747,12 @@ async function cargarGestion(){
   $('#gestion-jugadores').innerHTML = '<p class="vacio">Cargando jugadores…</p>';
   $('#gestion-personajes').innerHTML = '';
   try{
-    const [m, f] = await Promise.all([
+    const [m, f, tr] = await Promise.all([
       fbDb.collection(fbRutaCampana('miembros')).get(),
       fbDb.collection(fbRutaCampana('fichas')).get(),
+      fbDb.doc(fbRutaCampana('traspaso/actual')).get().catch(() => null),   // sin reglas nuevas: se ignora
     ]);
+    gestion.traspaso = tr && tr.exists ? tr.data() : null;
     gestion.miembros = m.docs.map(d => ({uid: d.id, ...d.data()}))
       .sort((a, b) => (!!b.gm - !!a.gm) || fechaMs(a.creado) - fechaMs(b.creado));
     gestion.fichas = f.docs.map(d => ({id: d.id, ...d.data()}))
@@ -661,10 +773,15 @@ function renderGestion(){
     const entro = fechaTxt(m.creado);
     return `<div class="miembro">
       <span class="quien">${esc(m.nombre)}${m.uid === fbUsuario.uid ? ' (vos)' : ''}<small>${detalle}${entro ? ` · entró el ${esc(entro)}` : ''}</small></span>
-      ${m.gm ? '<span class="tag gm">GM</span>' : `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`}
+      ${m.gm ? '<span class="tag gm">GM</span>' : (gestion.traspaso && gestion.traspaso.aUid === m.uid
+        ? `<span class="tag">Oferta de GM pendiente</span><button type="button" class="btn chico" data-cancelar-gm="1">Cancelar oferta</button>`
+        : `<button type="button" class="btn chico" data-asignar-gm="${esc(m.uid)}" title="Pasarle el rol de Game Master (le llega una oferta que tiene que aceptar)">Asignar como GM</button>`)
+        + `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`}
     </div>`;
   }).join('') || '<p class="vacio">No hay nadie.</p>';
   $('#gestion-jugadores').querySelectorAll('[data-sacar]').forEach(b => b.onclick = () => sacarJugador(b.dataset.sacar, b));
+  $('#gestion-jugadores').querySelectorAll('[data-asignar-gm]').forEach(b => b.onclick = () => ofrecerGM(b.dataset.asignarGm, b));
+  $('#gestion-jugadores').querySelectorAll('[data-cancelar-gm]').forEach(b => b.onclick = () => cancelarOfertaGM(b));
 
   // Pasar personajes: sirve cuando alguien cambió de cuenta o se fue.
   const jugadores = miembros.filter(m => !m.gm);

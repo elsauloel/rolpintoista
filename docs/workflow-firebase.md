@@ -78,6 +78,13 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   cualquier cuenta confirmada; la crea cualquiera (en el mismo lote que su
   miembro con `gm: true`); solo el GM la renombra o la borra. Las que no
   tienen `gmUid` (anteriores a las cuentas) no aparecen en el inicio.
+- `campanas/{id}/traspaso/actual` — `{aUid, aNombre, deUid, deNombre, creado}`.
+  Oferta para pasarle el rol de GM a otro jugador: la crea el GM desde el
+  inicio de la partida (index.html, Jugadores → "Asignar como GM"; es la única
+  ruta). El jugador la ve al entrar y, si acepta, **en una sola operación**
+  cambia `campanas.gmUid/gmNombre`, su `miembros.gm` a true, el del GM
+  anterior a false, y se borra la oferta (las reglas lo permiten solo así).
+  Si rechaza, o el GM cancela, se borra. Una sola oferta a la vez.
 - `campanas/{id}/miembros/{uid}` — `{nombre, gm, creado}`. Uno por cuenta en
   cada partida; `nombre` es el apodo elegido al unirse. `gm: true` solo lo
   puede tener quien creó la partida; nadie cambia `gm` después. Cada uno

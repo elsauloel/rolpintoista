@@ -47,7 +47,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   a la vista). **Campo de visión por defecto** (`offsetsVision`,
   `celdasVisionDe`): radio `VISION_RADIO` = 6 menos una cuña ciega de 120°
   hacia atrás (las diagonales traseras sí se ven); gira con el frente del
-  token. Todos los tokens `pj` (no invocaciones, no ocultos) dan visión y
+  token. Todos los tokens `pj` — **incluidas las invocaciones mientras estén invocadas y vivas** (`daVision`) — salvo los ocultos, dan visión y
   cada jugador ve la **unión** de todos; los tokens `pj` se ven siempre, el
   resto solo dentro de esa unión (`tokenVisiblePorNiebla`, usado en
   `calcularDisposicion`, auras y estelas). Lo descubierto es **del grupo y

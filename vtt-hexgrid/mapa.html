@@ -1579,6 +1579,16 @@ function celdasVisionDe(t){
   return res;
 }
 
+// ¿Este token descubre niebla? Los personajes sí; sus invocaciones también,
+// mientras estén invocadas y vivas.
+function daVision(t){
+  if(t.tipo !== 'pj' || t.oculto) return false;
+  if(t.fichaId && t.fichaId.includes(SEP_INVOCACION)){
+    const e = estadoDe(t);
+    return !!e && !e.dormida && !e.muerto;
+  }
+  return true;
+}
 // Recalcula lo que se ve ahora (y las últimas posiciones vistas) cuando algo
 // se movió, y suma lo nuevo a lo descubierto. Se llama al empezar a dibujar.
 function nieblaActualizar(){
@@ -1586,12 +1596,12 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
   tokens.forEach(t => {
-    if(t.tipo !== 'pj' || t.oculto || (t.fichaId && t.fichaId.includes(SEP_INVOCACION))) return;
+    if(!daVision(t)) return;
     const suyas = soyGM || (fbUsuario && t.duenoUid === fbUsuario.uid);
     celdasVisionDe(t).forEach(k => {
       vista.add(k);

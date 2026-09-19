@@ -4,9 +4,10 @@
    mapa, ficha, gm-tools, generador de tiendas). Abre un panel para
    navegar el sitio por ramas:
 
-     Partida abierta (siempre primera) → su página, Mapa, personajes
+     Home (siempre primero) → todas las partidas
+     Partida abierta (segunda) → su página, Mapa, personajes
        (tuyos y de los demás; el GM ve los de todos), GM Tools y Generador de tiendas (solo GM)
-     Partidas (inicio) → tus otras partidas
+     Otras partidas → tus demás partidas
      Manual · Cerrar sesión
 
    Se carga después de sesion.js. Lee la cuenta y la partida de ahí
@@ -113,10 +114,12 @@ async function menuDibujar(){
   const pintar = () => {
     let h = '';
     if(conCuenta) h += `<div class="ms-cuenta">${menuEsc(fbUsuario.email || fbUsuario.displayName || '')}</div>`;
+    // Siempre primero: Home, que lleva a todas las partidas.
+    h += menuLink(menuUrl('index.html'), '⌂', 'Home', {extra: 'todas las partidas'});
     if(enPartida){
       const mias = (fichas || []).filter(f => f.duenoUid === fbUsuario.uid);
       const otras = (fichas || []).filter(f => f.duenoUid !== fbUsuario.uid);
-      h += '<div class="ms-titulo" style="padding-top:6px">Partida abierta</div>';
+      h += '<hr><div class="ms-titulo" style="padding-top:0">Partida abierta</div>';
       h += menuLink(menuUrl('index.html', FB_CAMPANA), '▾', `<span class="ms-partida">${menuEsc(fbPartida.nombre)}</span>`, {extra: esGM ? 'GM' : 'jugador'});
       h += menuLink(menuUrl('vtt-hexgrid/mapa.html', FB_CAMPANA), '⬡', 'Mapa', {clase: 'ms-rama'});
       if(esGM){
@@ -132,12 +135,14 @@ async function menuDibujar(){
       otras.forEach(f => { h += menuLink(menuUrl('ficha-personaje/ficha.html', FB_CAMPANA, f.id), '·', menuEsc(f.nombre), {clase: 'ms-rama2', extra: f.dueno}); });
       if(!fichas && !error) h += '<div class="ms-nota">Cargando personajes…</div>';
     }
-    // Después de la partida abierta: el inicio y las demás partidas.
-    if(enPartida) h += '<hr>';
-    h += menuLink(menuUrl('index.html'), '⌂', 'Partidas');
-    (partidas || []).filter(x => !enPartida || x.id !== FB_CAMPANA).forEach(x => {
-      h += menuLink(menuUrl('index.html', x.id), '▸', menuEsc(x.nombre), {clase: 'ms-rama', extra: x.gm ? 'GM' : ''});
-    });
+    // Después de la partida abierta: las demás partidas.
+    const otrasPartidas = (partidas || []).filter(x => !enPartida || x.id !== FB_CAMPANA);
+    if(otrasPartidas.length){
+      h += '<hr><div class="ms-titulo" style="padding-top:0">' + (enPartida ? 'Otras partidas' : 'Tus partidas') + '</div>';
+      otrasPartidas.forEach(x => {
+        h += menuLink(menuUrl('index.html', x.id), '▸', menuEsc(x.nombre), {clase: 'ms-rama', extra: x.gm ? 'GM' : ''});
+      });
+    }
     h += '<hr>' + menuLink(menuUrl('manual-usuario/manual.html', enPartida ? FB_CAMPANA : ''), '📖', 'Manual');
     if(error) h += `<div class="ms-nota" style="padding-left:14px;color:#D4574E">${menuEsc(error)}</div>`;
     if(conCuenta) h += '<hr><button type="button" class="ms-item" id="menu-sitio-salir"><span class="ms-ico">⎋</span><span>Cerrar sesión</span></button>';

@@ -32,7 +32,7 @@ versión parecida en más de una, es candidato a juntar.
   herramienta llama al arrancar (y, ya adentro, pone en la pestaña "Herramienta — Nombre de la partida"): si falta sesión, partida o ser miembro,
   manda sola al inicio (`fbUrlInicio`). Lo carga primero cualquier página
   que use Firebase. Ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md).
-- **`menu-sitio.js`** — el botón ☰ fijo arriba a la izquierda, igual en
+- **`menu-sitio.js`** — (orden desde 2026-09-19: ⌂ Home → la partida abierta con todo su menú → otras partidas → Manual → Cerrar sesión) el botón ☰ fijo arriba a la izquierda, igual en
   todas las páginas: abre el árbol del sitio (partida abierta primero,
   Mapa, personajes propios y ajenos, GM Tools, Generador de tiendas,
   Manual, Cerrar sesión). Lee partidas y fichas de Firebase con caché de

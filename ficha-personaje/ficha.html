@@ -526,6 +526,16 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .cat-row .cat-manage{display:flex;gap:4px;flex:none}
 .cat-manage button{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:4px 7px;border-radius:var(--r)}
 .cat-tipo{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.equipo-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.equipo-tit{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+.equipo-slot{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;margin-bottom:8px}
+.equipo-slot-cab{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.equipo-fila{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--line-soft)}
+.equipo-fila:first-of-type{border-top:0}
+.equipo-fila .item-thumb{width:34px;height:34px;object-fit:cover;flex:none}
+.equipo-info{flex:1;min-width:0}
+.equipo-vacio{padding:4px 0}
+ (max-width:760px){.equipo-cols{grid-template-columns:1fr}}
 .cat-slot-fila{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}
 .cat-slot-badge{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
@@ -1768,6 +1778,13 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <button class="btn vender" id="view-vender-btn">Vender</button>
       <button class="btn primary" id="view-edit-btn">Editar</button>
     </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-equipo">
+  <div class="modal" style="max-width:940px">
+    <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" id="equipo-x">Cerrar</button></header>
+    <div class="body" id="equipo-body"></div>
   </div>
 </div>
 
@@ -5126,6 +5143,7 @@ function refresh(){
   sincronizarEstadosDeEquipo();
   renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderInteligencia(); renderExp(); renderNitros();
   renderList('efectos');
+  if($('#scrim-equipo').classList.contains('open')) renderEquipo();
 }
 
 /* =========================================================
@@ -6620,6 +6638,65 @@ function statsComparablesDe(item){
   return out;
 }
 
+/* ---------- Equipo y mochila (panel del mapa, 🛡 en el token propio) ----------
+   Dos columnas: lo equipado, slot por slot, y lo equipable de la mochila.
+   Los botones Sacar / Equipar son los mismos data-toggle de la lista de
+   inventario (si el slot está lleno abre Reemplazar/Comparar). El mapa lo
+   pide con el mensaje 'abrir-equipo' (ver MODO_BOTONERA). */
+function equipoStatTxt(it){
+  const d = armaDanoTxt(it);
+  const df = defValorDe(it);
+  return [d ? `Daño ${d}` : '', df ? `Def ${df > 0 ? '+' : ''}${fmt(df)}` : '', `Peso ${fmt(num(it.peso))}`].filter(Boolean).join(' · ');
+}
+function equipoFilaHtml(it, boton){
+  const tierColor = TIER_COLOR[it.tier] || '';
+  return `<div class="equipo-fila">
+    ${thumb(it)}
+    <div class="equipo-info">
+      <div class="cat-nombre"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
+      <div class="cat-meta">${esc(equipoStatTxt(it))}</div>
+      <div class="imeta">${modTags(it.mods)}</div>
+    </div>
+    ${boton}
+  </div>`;
+}
+function renderEquipo(){
+  const slots = computeSlots();
+  const equipados = S.inventario.filter(i => i.equipado);
+  const izq = slots.map(sd => {
+    const puestos = equipados.filter(i => sd.cats.includes(i.tipoItem));
+    return `<div class="equipo-slot">
+      <div class="equipo-slot-cab"><span>${esc(sd.label)}</span><span class="hint">${fmt(sd.usado)} / ${fmt(sd.max)}</span></div>
+      ${puestos.length ? puestos.map(it => equipoFilaHtml(it, `<button type="button" class="mini" data-toggle="${it.id}" title="Pasarlo a la mochila">Sacar</button>`)).join('') : '<div class="hint equipo-vacio">Vacío</div>'}
+    </div>`;
+  }).join('');
+  const mochila = S.inventario.filter(i => !i.equipado && SLOT_DEFS.some(sd => sd.cats.includes(i.tipoItem)));
+  const der = SLOT_DEFS.map(sd => {
+    const items = mochila.filter(i => sd.cats.includes(i.tipoItem));
+    if(!items.length) return '';
+    return `<div class="equipo-slot">
+      <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
+      ${items.map(it => {
+        const info = slotOcupadoInfo(it);
+        return equipoFilaHtml(it, `<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+      }).join('')}
+    </div>`;
+  }).join('');
+  $('#equipo-body').innerHTML = `<div class="equipo-cols">
+    <div><h4 class="equipo-tit">Equipado</h4>${izq}</div>
+    <div><h4 class="equipo-tit">Mochila</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
+  </div>`;
+}
+function equipoModoAbrir(){
+  document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
+  modoBotoneraInv = '';
+  renderEquipo();
+  $('#scrim-equipo').classList.add('open');
+  botoneraAvisarMapa('botonera-lista');
+}
+$('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
+$('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') $('#scrim-equipo').classList.remove('open'); });
+
 /* ---------- Equipar con el slot lleno: Reemplazar o Comparar ----------
    Al tocar Equipar en un ítem de la mochila cuyo slot no tiene lugar, en
    vez de un aviso se abre este menú. Comparar usa la misma ventana que el
@@ -8025,7 +8102,7 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 
@@ -10010,6 +10087,7 @@ if(MODO_BOTONERA){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
+    if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"

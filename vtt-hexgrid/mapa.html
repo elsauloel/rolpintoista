@@ -5245,6 +5245,7 @@ function hudHtml(t){
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
+    (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
@@ -5488,6 +5489,7 @@ function hudConectar(t){
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto}); return; }
+    if(clave === 'equipo'){ abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-equipo'}); return; }
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';

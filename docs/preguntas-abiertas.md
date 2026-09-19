@@ -248,7 +248,7 @@ equivalente que da Con (5), o sea +5 HP máx.
   "Crear de cero" o elegir del catálogo (`comun/pasivas.js` + aprobadas en
   `biblioteca_pasivas`). Se compra varias veces (`compras`, efectos y Job
   multiplicados; tope por pasiva = mitad del nivel redondeada hacia abajo,
-  **con mínimo 1** para que a nivel 1 se pueda comprar; confirmar). Efectos
+  **con mínimo 1** para que a nivel 1 se pueda comprar; confirmado 2026-09-19). Efectos
   automatizados: bonos a stats y regeneración de HP en el Mantenimiento
   (`regenHp`). Cada pasiva propia tiene "📚 Proponer" (cualquier jugador) y
   el dueño las audita desde la pestaña Propuestas. Tanda inicial: Robustez

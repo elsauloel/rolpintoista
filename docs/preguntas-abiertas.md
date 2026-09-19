@@ -134,3 +134,39 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
   actualicé la terminología de `clases-borrador.md` (todo "Int"/
   "Inteligencia" pasó a "Esp"/"Especial"); la mecánica de cada skill sigue
   ⏳ sin confirmar, eso lo sigue revisando el usuario skill por skill.
+
+## Niebla de guerra (mapa)
+
+Diseño recién empezado (2026-09-19). Idea del usuario: el GM tiene un botón
+para activarla/desactivarla en cada mapa; **doble niebla** — negra (no deja
+ver ni mapa ni tokens) y gris semitransparente (deja ver el mapa ya
+descubierto pero no los tokens fuera del campo de visión); cada personaje
+tiene un campo de visión que descubre niebla frente a él; a futuro items,
+efectos, skills y estados lo amplían o reducen. Los colores naranja/azul del
+diagrama del campo de visión son del sistema de sigilo (más arriba), no de
+esto.
+
+- 🔲 **P47. Forma del campo de visión por defecto.** ¿Es el cono de 10
+  hexágonos del plan (filas de 1, 2, 3 y 4 al frente)? ¿Incluye el hexágono
+  propio y la zona de alerta (la de "los hexágonos pegados al cono y los que
+  rodean al token, salvo el de atrás"), o solo el cono? *(2026-09-19)*
+- 🔲 **P48. Quién ve por quién.** ¿Cada jugador ve solo lo que ven sus
+  propios tokens, o lo que ve cualquiera del grupo (visión compartida)?
+  *(2026-09-19)*
+- 🔲 **P49. Memoria de lo descubierto.** La niebla gris implica recordar lo
+  ya visto: ¿es por jugador o común a todo el grupo? ¿Se guarda entre
+  sesiones (en Firestore) o se reinicia al recargar? ¿El GM puede
+  reiniciarla o revelar/tapar zonas a mano? *(2026-09-19)*
+- 🔲 **P50. Qué ve el GM.** ¿Todo siempre, con la niebla apenas insinuada, o
+  con opción de "ver como jugador"? *(2026-09-19)*
+- 🔲 **P51. Creeps y niebla.** ¿La niebla es solo para jugadores (los creeps
+  no la usan)? ¿Los creeps que están dentro de la visión se ven, y los
+  demás desaparecen del mapa del jugador? *(2026-09-19)*
+- 🔲 **P52. Obstáculos.** ¿Los elementos Sólidos tapan la vista (recorta el
+  campo de visión)? Es la P17, ahora con más peso. *(2026-09-19)*
+- 🔲 **P53. Tokens vistos y luego perdidos.** Un token que estaba en el
+  campo de visión y sale de él: ¿desaparece, o queda una marca de "última
+  posición vista"? (Se cruza con la P8 de sigilo.) *(2026-09-19)*
+- 🔲 **P54. Alcance de lo oculto.** Por ahora, ¿alcanza con ocultarlo en lo
+  visual (un jugador técnico que mire la base de datos vería todo), como el
+  token "oculto"? *(2026-09-19)*

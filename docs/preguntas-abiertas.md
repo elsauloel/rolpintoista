@@ -199,3 +199,31 @@ físico, daño mágico, tanque.
 - 🔲 **P58. Categorías.** Hoy las etiquetas son libres (con sugerencias). Definir la lista de etiquetas (creeps: ambiente,
   tipo, rol, nivel; skills: rol, tipo de daño, alcance) y si un ítem puede
   tener varias. *(2026-09-19)*
+
+## Pool de habilidades pasivas
+
+Idea del usuario (2026-09-19): un pool prefabricado de pasivas que se
+eligen con puntos de Job (hoy cada pasiva ya cuesta 1 Job y da `mods`).
+Ejemplo: por 1 Job, +1 a un stat secundario; si es HP, no es +1 sino el
+equivalente que da Con (5), o sea +5 HP máx.
+
+- ✅ **P59. Escalado.** Respondido 2026-09-19: tabla de escalones. 1 Job =
+  un escalón del stat (HP máx = 5, SP = 3…). Se carga como tabla única.
+- 🔲 **P60. Valor del escalón de cada stat.** Hay que fijar la tabla
+  completa (HP 5 y SP 3 salen de las reglas; faltan No2, Crg.Max, Res.Mt,
+  PdG, etc.). *(2026-09-19)*
+- ✅ **P61. Regeneración.** Respondido 2026-09-19: valores arbitrarios por
+  ahora: **1 SP por turno y 3 HP por turno** por cada compra.
+- ✅ **P62. "FP".** Era SP.
+- ✅ **P63. Apilar.** Respondido 2026-09-19: sí, la misma pasiva se puede
+  comprar más de una vez.
+- 🔲 **P64. Tope de compras.** Respondido 2026-09-19: el tope es la **mitad
+  del nivel, redondeada hacia abajo**. Falta aclarar si es por cada pasiva
+  (ej. nivel 6 → hasta 3 copias de cada una) o en total entre todas las
+  pasivas de este tipo. *(2026-09-19)*
+- 🔲 **P65. Pasivas situacionales.** Se van viendo más adelante
+  (2026-09-19).
+- ✅ **P66. Quién las carga.** Respondido 2026-09-19: mismo esquema que la
+  biblioteca: el desarrollador carga las oficiales; **cualquier usuario,
+  también los jugadores** (no solo los GM), puede mandar propuestas. Esto
+  cierra la duda que quedaba en P57: mandan propuestas todas las cuentas.

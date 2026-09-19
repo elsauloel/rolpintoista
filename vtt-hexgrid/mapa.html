@@ -794,6 +794,7 @@ let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero
 const estelas = new Map();    // tokenId -> {celdas, hasta}
 const ESTELA_MS = 4000;
 const TRAZO_MS = 3000;  // cuánto dura un trazo temporal del lápiz (la estela de los tokens usa ESTELA_MS)
+const COSTO_GIRO_NO2 = 1;      // No2 por cada giro de 60° del token, solo en combate (decidido 2026-09-19, a debatir)
 const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
 // Ping (clic derecho en el mapa, sin herramienta que lo use — libre para
 // esto): un anillo que se expande y se apaga solo, para todos.
@@ -1270,6 +1271,81 @@ function enSigilo(t){
   const e = estadoDe(t);
   return !!(e && e.estados.some(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo'));
 }
+/* ---------- Sigilo: cono de detección y zona de alerta ----------
+   Cono (16 hexágonos azules): un rombo de 4 × 4 que arranca en el hexágono
+   de justo delante del token. Alerta (naranja y rojo): el anillo alrededor del
+   cono más los vecinos del token, salvo el de atrás. Los elementos Sólidos
+   tapan la vista: lo que queda detrás de uno no cuenta. Los tienen los
+   personajes, los creeps y las invocaciones por igual. */
+const CONO_LADO = 4;
+let solidosCache = {firma: '', set: new Set()};
+function solidosFirma(){
+  let f = '';
+  elementos.forEach((el, id) => { if(el.solido) f += `${id}:${el.origen.col},${el.origen.fila},${el.rotacion},${el.celdas.length};`; });
+  return f;
+}
+// Casillas ocupadas por elementos Sólidos (claves nbPack), recalculadas solo si cambian.
+function solidosSet(){
+  const f = solidosFirma();
+  if(f !== solidosCache.firma){
+    const s = new Set();
+    elementos.forEach(el => { if(el.solido) celdasDeElemento(el).forEach(c => s.add(nbPack(c.col, c.fila))); });
+    solidosCache = {firma: f, set: s};
+  }
+  return solidosCache.set;
+}
+// ¿Se ve `hasta` desde `desde`? No si hay un sólido en el medio (el propio
+// sólido de destino sí: se ve la pared, no lo que hay detrás).
+function lineaLibre(desde, hasta, solidos){
+  if(!solidos.size) return true;
+  const l = lineaHex(desde, hasta);
+  for(let i = 0; i < l.length - 1; i++) if(solidos.has(nbPack(l[i].col, l[i].fila))) return false;
+  return true;
+}
+// {cono:[{col,fila}], alerta:[{col,fila}]} de un token, según hacia dónde mira.
+function zonasSigilo(t){
+  const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
+  const fi = (k + 1) % 6;   // lado del frente (0° = abajo = lado 1)
+  const F = VECINO_LADO[fi], A = VECINO_LADO[(fi + 1) % 6], B = VECINO_LADO[(fi + 5) % 6], atras = VECINO_LADO[(fi + 3) % 6];
+  const c0 = hexACubo({col: t.col, fila: t.fila});
+  const solidos = solidosSet();
+  const origen = {col: t.col, fila: t.fila};
+  const pos = (q, r) => ({col: cuboACol(q, r), fila: cuboAFila(q, r)});
+  const cono = new Map();
+  for(let a = 0; a < CONO_LADO; a++){
+    for(let b = 0; b < CONO_LADO; b++){
+      const c = pos(c0.q + F[0] + a * A[0] + b * B[0], c0.r + F[1] + a * A[1] + b * B[1]);
+      cono.set(nbPack(c.col, c.fila), c);
+    }
+  }
+  const propia = nbPack(t.col, t.fila);
+  const alerta = new Map();
+  const sumarVecinos = (q, r, sinAtras) => {
+    VECINO_LADO.forEach(([dq, dr]) => {
+      if(sinAtras && dq === atras[0] && dr === atras[1]) return;
+      const c = pos(q + dq, r + dr), key = nbPack(c.col, c.fila);
+      if(key !== propia && !cono.has(key)) alerta.set(key, c);
+    });
+  };
+  cono.forEach(c => { const cu = hexACubo(c); sumarVecinos(cu.q, cu.r, false); });
+  sumarVecinos(c0.q, c0.r, true);
+  const libre = c => !solidos.has(nbPack(c.col, c.fila)) && lineaLibre(origen, c, solidos);
+  return {cono: [...cono.values()].filter(libre), alerta: [...alerta.values()].filter(libre)};
+}
+// Quien está en sigilo ve las zonas de los rivales que ve: un jugador, las de los
+// creeps; el GM con un creep en sigilo, las de los personajes.
+function zonasParaVer(){
+  const rivales = [];
+  let espectador = false;
+  if(soyGM){
+    espectador = [...tokens.values()].some(t => t.tipo === 'creep' && enSigilo(t));
+    if(espectador) tokens.forEach(t => { if(t.tipo === 'pj' && !t.oculto && tokenVisiblePorNiebla(t)) rivales.push(t); });
+  }else if(yoEnSigilo()){
+    tokens.forEach(t => { if(t.tipo === 'creep' && !t.oculto && tokenVisiblePorNiebla(t)) rivales.push(t); });
+  }
+  return rivales.map(zonasSigilo);
+}
+
 // El GM no ve a los personajes en sigilo, salvo apretando el ojo 👁: al
 // prenderlo se avisa a todos los jugadores (línea roja en la Mesa y un
 // destello con un ojo, ver `mesaAlertaOjo` en comun/mesa.js). Se apaga solo
@@ -1342,7 +1418,16 @@ function offsetsVision(k){
 function celdasVisionDe(t){
   const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
   const c0 = hexACubo({col: t.col, fila: t.fila});
-  return offsetsVision(k).map(o => { const q = c0.q + o.dq, r = c0.r + o.dr; return nbPack(cuboACol(q, r), cuboAFila(q, r)); });
+  const solidos = solidosSet();
+  const origen = {col: t.col, fila: t.fila};
+  const res = [];
+  offsetsVision(k).forEach(o => {
+    const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
+    // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
+    if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
+    res.push(nbPack(col, fila));
+  });
+  return res;
 }
 
 // Recalcula lo que se ve ahora (y las últimas posiciones vistas) cuando algo
@@ -1352,7 +1437,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo}`).join('|');
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo}`).join('|') + '#' + solidosFirma();
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
@@ -2270,6 +2355,20 @@ function dibujar(){
   });
   if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente));
   if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo));
+
+  // Sigilo: quien está en sigilo ve, semitransparentes, el cono de detección
+  // (azul) y la zona de alerta (naranja) de los rivales.
+  zonasParaVer().forEach(zn => {
+    const pintar = (lista, relleno, borde) => {
+      if(!lista.length) return;
+      ctx.beginPath();
+      lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+      ctx.fillStyle = relleno; ctx.fill();
+      ctx.strokeStyle = borde; ctx.lineWidth = 1.5 / z; ctx.stroke();
+    };
+    pintar(zn.alerta, 'rgba(224,140,60,.2)', 'rgba(224,140,60,.5)');
+    pintar(zn.cono, 'rgba(63,111,176,.26)', 'rgba(63,111,176,.6)');
+  });
 
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {
@@ -3650,16 +3749,26 @@ async function moverToken(id, col, fila, celdas){
     t.rutaJson = JSON.stringify(ruta);
     estelas.set(id, {celdas: celdas.slice(), hasta: Date.now() + ESTELA_MS});
   }
+  // Al caminar, el token queda mirando hacia donde fue (el último paso); girar
+  // a otro lado cuesta No2 (ver el handle ↻ del HUD).
+  let rot;
+  if(celdas && celdas.length > 1){
+    const pa = hexCentro(celdas[celdas.length - 2].col, celdas[celdas.length - 2].fila);
+    const pb = hexCentro(celdas[celdas.length - 1].col, celdas[celdas.length - 1].fila);
+    rot = (((Math.round(Math.atan2(-(pb.x - pa.x), pb.y - pa.y) * 180 / Math.PI / 60) * 60) % 360) + 360) % 360;
+    if(rot === num(t.rotacion || 0)) rot = undefined; else t.rotacion = rot;
+  }
+  const conRot = rot === undefined ? {} : {rotacion: rot};
   renderPanel();
   pedirDibujo();
   const doc = coleccionTokens().doc(id);
   try{
-    await doc.update(ruta.length > 2 ? {col, fila, ruta} : {col, fila});
+    await doc.update(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot});
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila}); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); return; }catch(e){ err = e; }
     }
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
@@ -4938,7 +5047,8 @@ function hudConectar(t){
     handleRotar.setPointerCapture(e.pointerId);
     const centro = handleRotar.parentElement.getBoundingClientRect();
     const d = disposicion.find(x => x.id === seleccion);
-    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom};
+    const tokIni = tokens.get(seleccion);
+    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom, inicial: num(tokIni && tokIni.rotacion || 0)};
   };
   if(handleRotar) handleRotar.onpointermove = e => {
     if(!rotando || rotando.id !== seleccion) return;
@@ -4954,13 +5064,31 @@ function hudConectar(t){
       pedirDibujo();
     }
   };
-  if(handleRotar) handleRotar.onpointerup = e => {
+  if(handleRotar) handleRotar.onpointerup = async e => {
     if(!rotando) return;
-    const id = rotando.id;
+    const id = rotando.id, inicial = rotando.inicial;
     const tok = tokens.get(id);
     rotando = null;
     handleRotar.releasePointerCapture(e.pointerId);
-    if(tok) editarToken(id, {rotacion: num(tok.rotacion || 0)});
+    if(!tok) return;
+    const fin = num(tok.rotacion || 0);
+    // Girar cuesta No2 en combate: COSTO_GIRO_NO2 por cada giro de 60° (a debatir, P14).
+    let dif = Math.abs(fin - inicial) % 360;
+    if(dif > 180) dif = 360 - dif;
+    const costo = Math.round(dif / 60) * COSTO_GIRO_NO2;
+    if(costo > 0 && costoMoverDe(tok)){
+      try{
+        const esCreep = tok.tipo === 'creep';
+        const quedan = esCreep ? await gastarNitrosCreep(tok.fichaId, costo) : await gastarNitros(tok.fichaId, costo);
+        toast(`Giro: −${fmt(costo)} No2 · ${esCreep ? 'le quedan' : 'te quedan'} ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de los No2' : ''}`);
+      }catch(err){
+        console.error('No se pudo cobrar el giro:', err);
+        tok.rotacion = inicial; pedirDibujo();
+        toast('No se pudo cobrar el giro, así que no giró');
+        return;
+      }
+    }
+    editarToken(id, {rotacion: fin});
   };
   const botonEditar = hud.querySelector("[data-hud-editar]");
   if(botonEditar) botonEditar.onclick = () => { editandoToken = true; hudCerrar(); renderPanel(true); pedirDibujo(); };

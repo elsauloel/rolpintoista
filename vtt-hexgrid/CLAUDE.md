@@ -86,9 +86,23 @@ nuevo de Rol Pintoísta. Paso 2 de
   habilidad "Sigilo" ve arriba de la Botonera `🕶 Entrar en sigilo · 1 No2`
   (`alternarSigilo`, `IT2.nitrosSigilo`, a revisar) que aplica el estado sobre
   uno mismo, y `🕶 Salir del sigilo` (gratis) — sin pasar por "+ Estado", y
-  sin aviso en la Mesa. Todavía falta: que el GM no vea la ficha del que está
-  en sigilo, el cono y la zona de alerta, la ruptura automática y el costo de
-  girar.
+  sin aviso en la Mesa. (Que el GM abra la ficha del que está en sigilo está bien: no dice dónde está.) Todavía falta:
+  la ruptura automática y el aviso de tiradas (ver el paso 3).
+- **🕶 Sigilo, paso 3: cono, alerta y girar** (2026-09-19). **Cono** de 16
+  hexágonos (`zonasSigilo`, `CONO_LADO`): rombo de 4 × 4 que arranca delante
+  del token (filas de 1, 2, 3, 4, 3, 2 y 1) y **zona de alerta**: el anillo
+  alrededor del cono más los vecinos del token salvo el de atrás. Quien
+  está en sigilo los ve dibujados semitransparentes (azul y naranja) **de los
+  rivales que ve**: un jugador, los de los creeps; el GM con un creep en
+  sigilo, los de los personajes (`zonasParaVer`). Los elementos **Sólidos
+  tapan la vista** (`solidosSet`, `lineaLibre`): lo que queda detrás de uno
+  no cuenta ni para las zonas ni para la visión de la niebla. **Al caminar el
+  token queda mirando hacia donde fue** (último paso de la ruta, gratis;
+  `moverToken`). **Girar con el handle ↻ cuesta `COSTO_GIRO_NO2` (1) por cada
+  giro de 60° y solo en combate** (a debatir), y solo a quien tiene No2
+  cuenta (PJ vinculado o creep). Todavía falta: la ruptura automática del
+  sigilo al entrar en un cono, el aviso de tiradas por pasos en la alerta y
+  que el sigilo tenga en cuenta las invocaciones.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

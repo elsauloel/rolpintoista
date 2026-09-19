@@ -2752,10 +2752,11 @@ document.addEventListener('keydown', e => {
     else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'elemento'; renderToolkit(); }
     return;
   }
-  // B: abre o cierra la bitácora flotante.
-  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
+  // B: abre la Botonera del personaje principal (solo jugadores). Se cierra
+  // con Esc, como siempre.
+  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro && !soyGM){
     e.preventDefault();
-    abrirBitacoraFlotante(!bitacoraFlotanteAbierta);
+    abrirBotoneraPrincipal();
     return;
   }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
@@ -4337,7 +4338,7 @@ function hudHtml(t){
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre: llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
-    (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera' : 'Abrir las Acciones del creep') : '') +
+    (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
   let globo = '';
@@ -4867,6 +4868,22 @@ function abrirBotonera(fichaId, mensaje, invId){
   marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera${inv}#${encodeURIComponent(fichaId)}`);
 }
 
+// Atajo B: la Botonera del personaje principal de un jugador — el primer
+// token de personaje suyo en el mapa que se ve, o, si no tiene ninguno
+// puesto, su primera ficha.
+function abrirBotoneraPrincipal(){
+  if(!fbUsuario) return;
+  let fichaId = '';
+  for(const t of tokens.values()){
+    if(t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && t.fichaId && !t.fichaId.includes(SEP_INVOCACION)){ fichaId = t.fichaId; break; }
+  }
+  if(!fichaId){
+    for(const [id, f] of fichasPub.entries()){ if(f.duenoUid === fbUsuario.uid){ fichaId = id; break; } }
+  }
+  if(!fichaId){ toast('No tenés un personaje con Botonera'); return; }
+  abrirBotonera(fichaId);
+}
+
 function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
@@ -4946,7 +4963,7 @@ const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L o Ctrl+L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'F'},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
-  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'B'},
+  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
 ];
 let herramientaActiva = '';
 // Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho

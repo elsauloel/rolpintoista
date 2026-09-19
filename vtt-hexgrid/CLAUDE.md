@@ -65,6 +65,17 @@ nuevo de Rol Pintoísta. Paso 2 de
   "Reiniciar (tapar todo)". Pendiente: obstáculos que tapen la vista (P52),
   filtrar el orden de turnos y otras listas que nombran tokens fuera de la
   visión, y ocultar de verdad (hoy es solo visual, P54).
+- **🕶 Sigilo, paso 1** (2026-09-19; diseño en `../docs/plan-sistema-nuevo.md`,
+  "Sigilo"). Por ahora solo visual y solo el estado: hay un preset de
+  estado alterado **"Sigilo"** (no vence) en la ficha (`EFECTOS_PRESET`) y en
+  gm-tools (`ESTADOS_PRESET_GM`); el mapa lo detecta por el nombre en el
+  resumen de la ficha o del creep (`enSigilo`). Un token en sigilo se dibuja
+  semitransparente; **un creep en sigilo no lo ven los jugadores**
+  (`tokenVisiblePorNiebla`); y quien tiene un personaje suyo en sigilo ve el
+  mapa con un **filtro violáceo tenue** (`yoEnSigilo`, al final de
+  `dibujar`). Todavía falta: que el GM no vea a los personajes en sigilo
+  salvo con su botón 👁 (con aviso rojo a los jugadores), el cono y la zona
+  de alerta, la ruptura automática y el costo de girar.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

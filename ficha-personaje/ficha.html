@@ -6082,6 +6082,8 @@ const EFECTOS_PRESET = [
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
     detalle:'Inmune a golpes críticos: al cargar el daño entrante, tildá "Fue crítico" y se anula solo.'},
+  {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
+    detalle:'Estás oculto: los enemigos no te ven en el mapa. Se rompe si entrás en el cono de detección de un enemigo o si hacés una acción hostil (un ataque o una skill individual sobre un enemigo). Cada paso dentro de su zona de alerta pide una tirada de detección (en principio tu Destreza contra el Especial del que vigila).'},
 ];
 
 const POLARIDAD_EFECTO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};

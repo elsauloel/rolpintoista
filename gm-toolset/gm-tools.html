@@ -2881,6 +2881,8 @@ const ESTADOS_PRESET_GM = [
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, blindado:true,
     detalle:'Inmune a golpes críticos: al cargar el daño, tildá "Crít" y se anula solo.'},
+  {nombre:'Sigilo', polaridad:'buff', permanente:true, stacks:1, hpTurno:0,
+    detalle:'Oculto: los jugadores no lo ven en el mapa. Se rompe si entra en el cono de detección de un personaje o si hace una acción hostil. Cada paso dentro de la zona de alerta de un personaje pide una tirada de detección.'},
 ];
 
 const POLARIDAD_ESTADO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};

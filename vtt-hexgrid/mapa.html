@@ -1261,9 +1261,27 @@ const nbPack = (col, fila) => (col + NB_OFF) * NB_K + (fila + NB_OFF);
 const nbUnpack = k => ({col: Math.floor(k / NB_K) - NB_OFF, fila: (k % NB_K) - NB_OFF});
 // La niebla tapa para los jugadores, y para el GM solo si eligió "Como jugador".
 function nieblaAplica(){ return nieblaActiva && (!soyGM || nieblaComoJugador); }
+// Sigilo (paso 1, todo visual): un token con el estado alterado "Sigilo"
+// se ve semitransparente; un creep en sigilo no lo ven los jugadores. (Más
+// adelante: el GM tampoco verá a los personajes en sigilo salvo con su 👁, y
+// el cono y la alerta — ver docs/plan-sistema-nuevo.md, "Sigilo".)
+function enSigilo(t){
+  const e = estadoDe(t);
+  return !!(e && e.estados.some(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo'));
+}
+// El jugador con un personaje suyo en sigilo ve el mapa con un tinte violáceo.
+function yoEnSigilo(){
+  if(soyGM || !fbUsuario) return false;
+  for(const t of tokens.values()){
+    if(t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && !(t.fichaId && t.fichaId.includes(SEP_INVOCACION)) && enSigilo(t)) return true;
+  }
+  return false;
+}
+
 // Aliados (personajes jugadores e invocaciones) se ven siempre; el resto,
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
+  if(!soyGM && t.tipo === 'creep' && enSigilo(t)) return false;   // creep en sigilo: los jugadores no lo ven
   if(!nieblaAplica() || t.tipo === 'pj') return true;
   return nieblaVista.has(nbPack(t.col, t.fila));
 }
@@ -2259,7 +2277,7 @@ function dibujar(){
     const puntos = verticesHex(x, y, rad);
     // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
     // más transparente para acordarse de que los jugadores no lo ven.
-    if(t.oculto) ctx.globalAlpha = 0.5;
+    if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
 
     trazarPuntos(verticesHex(x + 2 / z, y + 3 / z, rad));
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
@@ -2493,6 +2511,14 @@ function dibujar(){
     ctx.fillText(nombreMiembro(p.duenoUid), p.x, p.y - radio - 10 / z);
     ctx.restore();
   });
+
+  // Clima del sigilo: quien tiene un personaje en sigilo ve el mapa con un
+  // filtro violáceo tenue.
+  if(yoEnSigilo()){
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = 'rgba(112, 60, 190, 0.16)';
+    ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+  }
 
   hudUbicar();
   return animando;

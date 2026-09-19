@@ -120,6 +120,11 @@ async function fbEntrarAPartida(){
   fbMiembro = miembro;
   fbPartida = partida;
   fbRecordarPartida(FB_CAMPANA);
+  // La pestaña dice qué herramienta es y de qué partida: "Mapa — Nombre de la partida".
+  try{
+    const herramienta = document.title.split(' — ')[0].trim();
+    if(herramienta && fbPartida.nombre) document.title = `${herramienta} — ${fbPartida.nombre}`;
+  }catch(e){}
   return 'ok';
 }
 

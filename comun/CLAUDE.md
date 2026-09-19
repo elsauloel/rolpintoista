@@ -22,7 +22,7 @@ versión parecida en más de una, es candidato a juntar.
 - **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
   partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida
   actuales (`fbMiembro`, `fbPartida`). `fbEntrarAPartida()` es lo que cada
-  herramienta llama al arrancar: si falta sesión, partida o ser miembro,
+  herramienta llama al arrancar (y, ya adentro, pone en la pestaña "Herramienta — Nombre de la partida"): si falta sesión, partida o ser miembro,
   manda sola al inicio (`fbUrlInicio`). Lo carga primero cualquier página
   que use Firebase. Ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md).
 - **`menu-sitio.js`** — el botón ☰ fijo arriba a la izquierda, igual en

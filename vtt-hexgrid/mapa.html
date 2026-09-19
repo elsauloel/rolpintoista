@@ -415,6 +415,8 @@ aside{
 #hud .hud-circulo:hover{background:rgba(15,12,14,.9);filter:brightness(1.15)}
 #hud .hud-circulo.icono{font-size:15px;border-color:rgba(237,227,210,.4);color:var(--paper)}
 #hud .hud-circulo.icono.abierto{border-color:var(--brass);color:var(--brass)}
+#hud .hud-circulo.icono.libre-activo{background:#B3261E;border-color:#FF6A5F;color:#fff;box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 14px rgba(255,60,40,.6);animation:libre-pulso 1.4s ease-in-out infinite}
+@keyframes libre-pulso{50%{box-shadow:0 0 0 6px rgba(255,90,70,.15),0 0 18px rgba(255,60,40,.8)}}
 #hud .hud-circulo:disabled{cursor:default;opacity:.85}
 #hud input.hud-in{
   width:56px;height:36px;border-radius:18px;border:2.5px solid;background:rgba(15,12,14,.96);color:var(--paper);
@@ -5003,6 +5005,14 @@ function hudHtml(t){
   const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid;
   const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
 
+  // Con 🦶 Mover libre prendido el HUD se limpia: solo queda el pie, en rojo, para que
+  // se note que el modo está activo (y el ↻ para girar, que no cuesta No2).
+  const libreActivo = !!moverLibre && moverLibre === seleccion && puedoMoverLibre(t);
+  if(libreActivo){
+    return '<div class="hud-anillo">' +
+      '<button type="button" class="hud-circulo icono abierto libre-activo" data-hud-boton="libre" title="Mover libre ACTIVO: tocá para apagarlo (M, Esc o clic derecho)">🦶</button>' +
+      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Con Mover libre no gasta No2">↻</div>';
+  }
   // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
   let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +

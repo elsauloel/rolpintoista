@@ -130,7 +130,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   la iniciativa, o que llegue una tirada nueva a la Mesa que no sea un aviso
   del sistema (ataque, habilidad, tirada libre: `mesaAlAccionNueva`, avisado por
   `comun/mesa.js`); también con el próximo Mantenimiento o al cambiar de mapa.
-  **Girar no cuesta nada** con 🦶 Mover libre prendido, ni cuando el GM gira el token de un jugador (no puede tocar su ficha, así que antes fallaba con "No se pudo cobrar el giro"); en esos casos tampoco se gasta el giro gratis.
+  **Con 🦶 Mover libre prendido el HUD se limpia** (2026-09-19): solo queda el pie, en rojo y pulsando, y el ↻ (`libreActivo` en `hudHtml`); desaparecen los demás botones del anillo y los globos abiertos, para que se note que el modo está activo. **Girar no cuesta nada** con 🦶 Mover libre prendido, ni cuando el GM gira el token de un jugador (no puede tocar su ficha, así que antes fallaba con "No se pudo cobrar el giro"); en esos casos tampoco se gasta el giro gratis.
   Vive en cada navegador (recargar la página la pierde).
 - **🕶 Sigilo, paso 4: detección** (2026-09-19). **Ruptura automática**: un
   token en sigilo que queda dentro del **cono** de un rival (creep si es

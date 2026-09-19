@@ -5350,13 +5350,16 @@ function hudConectar(t){
     let dif = Math.abs(fin - inicial) % 360;
     if(dif > 180) dif = 360 - dif;
     let costo = Math.round(dif / 60) * COSTO_GIRO_NO2;
+    // Con 🦶 Mover libre prendido girar tampoco gasta No2, y el GM no cobra el giro
+    // de un personaje de un jugador (no puede tocar su ficha): ahí no se gasta ni el giro gratis.
+    const giroSinCosto = moverLibre === id || (soyGM && tok.tipo === 'pj');
     // …salvo el primero después de moverse: elegir hacia dónde queda mirando es gratis.
-    if(costo > 0 && giroLibre.has(id)){
+    if(costo > 0 && !giroSinCosto && giroLibre.has(id)){
       giroLibre.delete(id);
       costo = 0;
       toast('Elegiste hacia dónde mirás (gratis). Desde ahora, cada giro cuesta 1 No2 por giro de 60°.');
     }
-    if(costo > 0 && costoMoverDe(tok)){
+    if(costo > 0 && !giroSinCosto && costoMoverDe(tok)){
       try{
         const esCreep = tok.tipo === 'creep';
         const quedan = esCreep ? await gastarNitrosCreep(tok.fichaId, costo) : await gastarNitros(tok.fichaId, costo);

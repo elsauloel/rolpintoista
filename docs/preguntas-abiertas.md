@@ -226,3 +226,13 @@ equivalente que da Con (5), o sea +5 HP máx.
   biblioteca: el desarrollador carga las oficiales; **cualquier usuario,
   también los jugadores** (no solo los GM), puede mandar propuestas. Esto
   cierra la duda que quedaba en P57: mandan propuestas todas las cuentas.
+- ✅ **P67. Qué es una pasiva.** Aclarado 2026-09-19: una pasiva **no es un
+  bonus a un stat**: es una habilidad que se carga y tiene efectos, ligados
+  o no a stats (ej. regeneración de HP —ligada a Constitución en concepto
+  pero no es un stat—, +2 a las tiradas contra crowd control, +1 al campo
+  de visión). Regla de construcción: **si el efecto se puede automatizar,
+  se automatiza al cargar la pasiva**; si no, queda como recordatorio.
+- 🔲 **P68. Lista de efectos automatizables de las pasivas.** Ver la lista
+  propuesta en la conversación del 2026-09-19 (bonos a stats, regeneración
+  por turno, bonus a tiradas por situación, campo de visión, resistencias).
+  Falta que el usuario la revise efecto por efecto. *(2026-09-19)*

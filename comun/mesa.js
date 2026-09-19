@@ -140,7 +140,7 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "sigilo-alerta"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   // Resumen de esa misma última tirada: solo existe en la Mesa flotante
   // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
@@ -173,6 +173,16 @@ function mesaRender(docs){
       div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
       div.innerHTML = `<span class="mesa-quien">👁 ${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva){ setTimeout(() => div.classList.remove('nueva'), 1500); mesaAlertaOjo(); }
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Alerta de sigilo (un personaje en sigilo hizo algo que se sale de las reglas
+    // normales, ej. Mover libre): línea roja, sin el destello del ojo.
+    if(t.desde === 'sigilo-alerta'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
     }

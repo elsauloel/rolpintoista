@@ -689,3 +689,11 @@ hexágono con otro sin importar bando. Todavía no está construido.
   no se guardó desde entonces no la tiene y avisa); para un creep, del
   creep privado (solo GM, `creepDefensaMapa`). Las invocaciones siguen con
   el campo simple.
+
+- **Alerta roja de sigilo** (2026-09-19): si un personaje **en sigilo** entra en
+  🦶 Mover libre, o se pasa de sus No2 al moverse o girar, se publica una línea
+  roja en la Mesa (`desde: 'sigilo-alerta'`, `sigiloAlertaRoja`; se dibuja en
+  `comun/mesa.js` sin el destello del ojo) — "⚠ X (en sigilo) entró en Mover
+  libre". Solo avisa, no impide nada; sirve para que la mesa vea las reglas que
+  se salen de lo normal. Las acciones de la ficha (atacar, habilidades) ya se
+  frenan solas sin No2, así que no hacen falta.

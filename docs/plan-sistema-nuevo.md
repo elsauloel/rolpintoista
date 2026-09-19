@@ -141,57 +141,88 @@ con opción de apagarla y tope de dados).
 
 ## Sigilo (en diseño)
 
-Un personaje o un creep entra en sigilo desde el mapa.
+Un personaje o un creep entra en sigilo desde el mapa. Decisiones del
+2026-09-19 (marcadas *a debatir* cuando el usuario las dejó abiertas); el
+juego sigue en modo "entre amigos": nadie va a mirar el código para hacer
+trampa, así que **todo el ocultamiento es visual** (ver "Antes de abrirlo al
+público").
 
-**Quién ve qué:**
+**Qué es:**
+- **Es una habilidad estándar** (se tiene por clase u otros mecanismos) que
+  aplica un **estado alterado "Sigilo"** sobre uno mismo (en principio sí,
+  P12). Entrar cuesta **1 No2** *(a revisar)*; moverse en sigilo **cuesta lo
+  mismo** que moverse normal *(a debatir)*. Encaja con las habilidades
+  automatizadas de la ficha (costo + estado sobre uno mismo).
+- **Se rompe**: (1) automáticamente si el token **entra en el campo de
+  detección automática** (el cono) de un enemigo; (2) al hacer una **acción
+  hostil**: cualquier acción con efecto directo sobre un enemigo (un ataque,
+  una skill individual; invocar una nube tóxica en área, no — *a debatir*).
+  Cuando se lo detecta, **aparece donde lo detectaron** (P9).
 
-| Token en sigilo | Lo ven | No lo ve |
+**Quién ve qué** (todo visual):
+
+| En sigilo | Lo ven | No lo ve |
 |---|---|---|
 | Personaje | su dueño y los demás jugadores (semitransparente) | el GM |
 | Creep | el GM (semitransparente) | los jugadores |
 
-Ocultarlo de verdad: la posición (y la estela) del que está en sigilo no
-le llega al otro bando (ver "Antes de abrirlo al público"). Reemplaza al
-pendiente "GM oculta tokens".
+- **El GM no ve la ficha ni el token** de un personaje en sigilo, pero tiene
+  un **botón con un ojo 👁** que revela todos los ítems y personajes
+  ocultos (pronto habrá trampas). Al apretarlo tiene que haber un **aviso muy
+  evidente a los jugadores**: un mensaje en la Mesa con fondo rojo y un
+  efecto parecido al filtro rojo de cuando un personaje muere, con un
+  **ojo grande en el centro** (idea: un PNG con fondo transparente, tipo ojo
+  de Sauron) que aparece de golpe y a los 1–2 segundos se apaga con fade.
+- Las **tiradas** del que está en sigilo **se ven en la Mesa** (P11).
+- **Clima**: el jugador que entra en sigilo ve el mapa **a través de un
+  filtro violáceo tenue**.
 
-**Reglas decididas:**
-- **Sigilo es una habilidad estándar**: se tiene por la clase u otros
-  mecanismos y aparece en el campo de habilidades con su texto.
-- **Entrar cuesta 1 No2** *(a revisar)*.
-- **Se rompe** al entrar en el campo de visión de un personaje/creep del
-  otro bando, o al realizar una acción hostil.
+**Orientación y campo de visión:**
+- ✅ **Hecho en el mapa**: la grilla es "de lado arriba" y cada token es un
+  hexágono que mira hacia **uno de los 6 lados**; por defecto mira abajo.
+  Se gira arrastrando un handle celeste. **Girar cuesta No2** (decidido,
+  1 por cambio de posición; todavía sin construir, con detalles por
+  confirmar: P14).
+- **Al moverse, el token queda mirando hacia donde caminó**, salvo que gaste
+  más No2 en girarse (P15).
+- **Tienen orientación, cono, alerta y punto ciego atrás**: los personajes,
+  **los creeps y las invocaciones** por igual (P20).
+- **Cono = campo de detección automática**: los **16 hexágonos azules** del
+  diagrama de la niebla, un rombo de 4 × 4 que arranca en el hexágono de
+  justo delante del token (filas de 1, 2, 3, 4, 3, 2 y 1; 7 columnas de
+  ancho; hasta 4 hexágonos al frente por el eje).
+- **Zona de alerta** (naranja **y rojo**: los dos hexágonos rojos del
+  costado también son alerta): el anillo alrededor del cono más los vecinos
+  del token, **salvo el de atrás**.
+- Sigilo frente a un enemigo: entrar **en su cono** rompe el sigilo solo;
+  **cada paso que da dentro de su zona de alerta** provoca una **tirada de
+  detección** (P5), que es **manual**: el mapa cuenta los pasos y avisa, la
+  resuelve la mesa (en principio Destreza del que se esconde contra Especial
+  del que vigila, *a debatir*, P3).
+- **El jugador puede arrastrar el token para evaluar rutas**, pero nada se
+  efectiviza (ni se rompe el sigilo) hasta que lo suelta en una ubicación
+  (P18).
+- **Cuando alguien en sigilo ve su cono y su alerta**: apenas está en
+  sigilo se le dibujan automáticamente, semitransparentes (P19).
+- **El cono y la superficie de visión se pueden modificar** con efectos de
+  distintas fuentes (ítems, skills, estados…) (P21).
+- **Obstáculos**: se prueba que los **elementos sólidos tapen la vista**
+  (P17 y P52).
 
-**Orientación y campo de visión (decidido, en discusión):**
-- ✅ **Hecho en el mapa**: la grilla se giró a "de lado arriba" y cada
-  token es un hexágono que calza con su casilla y mira hacia **uno de los
-  6 lados** (nunca a un vértice); por defecto mira abajo, como casi toda
-  ilustración de token. Se gira arrastrando un handle celeste que sale del
-  token (no un palito ocre — el color se eligió para no confundirse con
-  dorado/verde/rojo/gris, que ya dicen de quién es el token); **girar (decidido 2026-09-19: sí
-  cuesta No2, 1 por cambio de posición; todavía sin construir)**. Ver `vtt-hexgrid/CLAUDE.md`. Falta todo lo de abajo (cono
-  de visión, zona de alerta, sigilo de verdad).
-- **Cono de visión** (cambió el 2026-09-19; antes eran filas de 1, 2, 3 y 4
-  hexágonos, 10 en total): los **16 hexágonos azules del diagrama de la
-  niebla** — un rombo de 4 × 4 que arranca en el hexágono de justo delante
-  del token (su vértice de abajo) y se abre hacia adelante: filas de 1, 2,
-  3, 4, 3, 2 y 1 hexágonos, de 7 columnas de ancho, hasta 4 hexágonos al
-  frente por el eje.
-- **Zona de alerta**: los hexágonos pegados al cono y los que rodean al
-  token, **salvo el de atrás**.
-- Sigilo frente a un enemigo: pasar o pararse **en su cono** rompe el
-  sigilo solo; pasar o pararse **en su zona de alerta** provoca una
-  **tirada de detección** (no es automática).
+**Cómo lo vamos a construir, paso a paso:**
+1. El estado "Sigilo" y quién ve qué (visual), con el filtro violáceo.
+2. El botón 👁 del GM y su aviso a los jugadores.
+3. Cono y alerta dibujados (con el frente automático al moverse, el punto
+   ciego y los sólidos que tapan la vista); también para creeps e
+   invocaciones.
+4. Ruptura automática por entrar al cono, y el aviso de tiradas por pasos
+   en la alerta.
+5. Costo de girar y "cada movimiento que desbloquee niebla" (P14).
 
-**Falta definir** (las preguntas completas, numeradas, están en
-[`preguntas-abiertas.md`](preguntas-abiertas.md)):
-- Si al moverse el token queda mirando hacia donde caminó.
-- Qué tapa la vista (obstáculos) y cómo se marcan en el mapa.
-- La tirada de detección: qué stats, quién tira, una por hexágono o una
-  por movimiento.
-- Si se detecta de otra forma (tirada de percepción, etc.).
-- Costo de moverse en sigilo, "última posición conocida".
-- Qué pasa con la ficha, las tiradas en la Mesa y los estados del que está
-  en sigilo.
+**Falta definir** (las preguntas completas están en
+[`preguntas-abiertas.md`](preguntas-abiertas.md)): quién tira la detección
+(P4), buscar a propósito (P6), si otro bando ve la posición que quedó (P8,
+"última posición vista" ya existe en la niebla), el costo de entrar (P1).
 
 ## Antes de abrirlo al público
 

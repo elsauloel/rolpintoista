@@ -25,29 +25,29 @@ Estados: 🔲 abierta · ✅ respondida (pendiente de limpiar)
 Diseño en curso: ver "Sigilo (en diseño)" en [`plan-sistema-nuevo.md`](plan-sistema-nuevo.md).
 
 - 🔲 **P1. Costo de entrar en sigilo.** Hoy: 1 No2, marcado "a revisar". ¿Se confirma? *(2026-09-16)*
-- 🔲 **P2. Moverse en sigilo.** ¿Cuesta lo mismo que moverse normal o más No2? *(2026-09-16)*
+- ✅ **P2. Moverse en sigilo.** Respondido 2026-09-19: cuesta lo mismo que moverse normal (*a debatir*).
 - 🔲 **P3. Tirada de detección: qué se tira.** En principio **Destreza (el que se esconde) contra Especial (el que vigila)**, anotado el 2026-09-19 y "a debatir". No hace falta cerrarlo para programar el mecanismo: la tirada no es automática, la resuelve la mesa a mano.
 - 🔲 **P4. Tirada de detección: quién tira.** ¿El que está escondido, el que vigila, o los dos? *(2026-09-16)*
 - ✅ **P5. Tirada de detección: cuántas.** Respondido 2026-09-19: **una por cada paso que da dentro de la zona de alerta** (cada casillero de la ruta que cae en la alerta cuenta como una tirada). Como la tirada es manual, el mapa solo cuenta y avisa cuántas hay que hacer.
 - 🔲 **P6. Otras formas de detectar.** ¿Se puede buscar a propósito (tirada de percepción del GM o de un jugador)? *(2026-09-16)*
-- 🔲 **P7. Qué es "acción hostil".** Rompe el sigilo: ¿atacar, lanzar una habilidad ofensiva, algo más? *(2026-09-16)*
+- ✅ **P7. Qué es "acción hostil".** Respondido 2026-09-19: cualquier acción con efecto directo sobre un enemigo: un ataque o una skill individual. Invocar una nube tóxica en área, no (*a debatir*).
 - 🔲 **P8. Última posición conocida.** Si alguien entra en sigilo a la vista del otro bando, ¿queda una "marca fantasma" donde se lo vio? *(2026-09-16)*
-- 🔲 **P9. Dónde aparece al ser detectado.** ¿Donde está en ese momento o donde se lo detectó durante el movimiento? *(2026-09-16)*
-- 🔲 **P10. La ficha del que está en sigilo.** ¿El GM la sigue viendo? Propuesta: sí, solo se oculta el token (la ficha no dice dónde está). *(2026-09-16)*
-- 🔲 **P11. Tiradas en la Mesa del que está en sigilo.** ¿Las ve el otro bando? ¿Se une con las "tiradas secretas" pendientes? *(2026-09-16)*
-- 🔲 **P12. Sigilo como estado alterado.** ¿Aparece como estado (tipo Veneno/Stun) en la ficha y en gm-tools, para que equipo o habilidades le den bonus? Propuesta: sí. *(2026-09-16)*
+- ✅ **P9. Dónde aparece al ser detectado.** Respondido 2026-09-19: donde lo detectaron.
+- ✅ **P10. La ficha del que está en sigilo.** Respondido 2026-09-19: el GM **no** la ve. Tiene un botón con un ojo 👁 que revela todos los ítems y personajes ocultos (pronto habrá trampas); al apretarlo, los jugadores reciben un aviso muy evidente: mensaje en la Mesa con fondo rojo y un efecto tipo filtro rojo de la muerte con un ojo grande en el centro que aparece de golpe y se apaga con fade en 1–2 s (idea: PNG de ojo de Sauron con fondo transparente, a conseguir).
+- ✅ **P11. Tiradas en la Mesa del que está en sigilo.** Respondido 2026-09-19: sus tiradas se ven en la Mesa.
+- ✅ **P12. Sigilo como estado alterado.** Respondido 2026-09-19: en principio sí.
 
 ## Orientación y campo de visión (mapa)
 
-- 🔲 **P13. Grilla.** Hoy los hexágonos tienen la punta arriba: no se puede mirar "derecho arriba" (las 6 direcciones son derecha, izquierda y 4 diagonales). ¿Se deja así o se gira la grilla (lados planos arriba y abajo)? Propuesta: dejarla. *(2026-09-16)*
+- ✅ **P13. Grilla.** Resuelto (2026-09-17): la grilla se giró a "de lado arriba" y los tokens miran a uno de los 6 lados.
 - ✅ **P14. Girar cuesta No2.** Respondido 2026-09-19: sí cuesta, 1 No2 por cambio de posición (detalles por confirmar: si es por cada giro de 60° o por acción de girar, si aplica también en modo narrativo, y qué quiso decir con "cada movimiento que desbloquee niebla cuesta 1 No2"). Todavía no está construido: hoy girar sigue siendo gratis.
-- 🔲 **P15. Mirada al moverse.** ¿El token queda mirando solo hacia donde caminó (y después se corrige)? *(2026-09-16)*
-- 🔲 **P16. Diagonales de atrás.** En la zona de alerta, ¿entran los dos hexágonos diagonales de atrás? Hoy sí; solo queda libre el de justo atrás. *(2026-09-16)*
-- 🔲 **P17. Obstáculos.** ¿Algo tapa la vista? Si sí, ¿cómo se marcan en el mapa (paredes, árboles, rocas)? El mapa hoy no tiene obstáculos. *(2026-09-16)*
-- 🔲 **P18. Automático o manual.** ¿El mapa rompe el sigilo y pide la tirada solo, o avisa y decide el GM? *(2026-09-16)*
-- 🔲 **P19. Cuándo se muestra el cono.** ¿Siempre, al seleccionar el token, o solo al que está en sigilo? Propuesta: pintado suave al seleccionar. *(2026-09-16)*
-- 🔲 **P20. Quién tiene orientación.** ¿Los creeps también? ¿Las invocaciones? *(2026-09-16)*
-- 🔲 **P21. Tamaño del cono.** Hoy 16 hexágonos (rombo de 4 × 4, ver el plan). ¿Fijo para todos, o lo cambia un stat, habilidad o equipo? *(2026-09-16)*
+- ✅ **P15. Mirada al moverse.** Respondido 2026-09-19: el token queda mirando hacia donde caminó, salvo que gaste más No2 en girarse.
+- ✅ **P16. Diagonales de atrás.** Respondido 2026-09-19: los dos hexágonos rojos del costado (las diagonales traseras del token) son parte de la zona de alerta; solo queda libre el de justo atrás.
+- ✅ **P17. Obstáculos.** Respondido 2026-09-19 (junto con la P52): se prueba que los elementos sólidos tapen la vista.
+- ✅ **P18. Automático o manual.** Respondido 2026-09-19: el mapa rompe el sigilo solo únicamente si el personaje entra en el campo de detección automática (el cono) del enemigo. El jugador puede arrastrar el token para evaluar rutas, pero la ruta no se efectiviza hasta que lo suelta en una ubicación. La tirada de detección es manual.
+- ✅ **P19. Cuándo se muestra el cono.** Respondido 2026-09-19: cuando un personaje está en sigilo, ve automáticamente el cono de detección y la zona de alerta dibujados semitransparentes.
+- ✅ **P20. Quién tiene orientación.** Respondido 2026-09-19: los creeps y las invocaciones tienen orientación, zona de detección y alerta, y punto ciego atrás, igual que los personajes.
+- ✅ **P21. Tamaño del cono.** Respondido 2026-09-19: hoy son 16 hexágonos (rombo de 4 × 4), pero el cono y la superficie de visión se pueden modificar por efectos de distintas fuentes (ítems, skills, estados…).
 
 ## Combate y reglas (Iteración 2)
 
@@ -161,8 +161,7 @@ esto.
 - 🔲 **P51. Creeps y niebla.** ¿La niebla es solo para jugadores (los creeps
   no la usan)? ¿Los creeps que están dentro de la visión se ven, y los
   demás desaparecen del mapa del jugador? *(2026-09-19)*
-- 🔲 **P52. Obstáculos (a definir, 2026-09-19).** ¿Los elementos Sólidos tapan la vista (recorta el
-  campo de visión)? Es la P17, ahora con más peso. *(2026-09-19)*
+- ✅ **P52. Obstáculos y niebla.** Respondido 2026-09-19: se prueba que los elementos Sólidos tapen la vista (misma respuesta que la P17).
 - ✅ **P53. Tokens vistos y luego perdidos.** Respondido 2026-09-19: queda una marca de "última posición vista" (hecho, anotada en memoria local de cada navegador; no se guarda entre sesiones).
 - 🔲 **P54. Alcance de lo oculto.** Por ahora, ¿alcanza con ocultarlo en lo
   visual (un jugador técnico que mire la base de datos vería todo), como el

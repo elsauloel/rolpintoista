@@ -856,6 +856,12 @@ try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(
 const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, invisible, imagen, imgZoom, imgDX, imgDY, fijado, duenoUid}
 let elementoSeleccionado = null;
 let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
+// Lo ya dibujado que espera consolidarse (mismo formato): mientras tanto se
+// ajustan color, opacidad, etc. en el panel y se ve en vivo. Se crea de
+// verdad con un clic en otro lado del mapa, Enter, "✔ Crear" o al salir de
+// la herramienta; Esc, clic derecho o "Descartar" lo tiran.
+let borradorElemento = null;
+const ID_BORRADOR = '__borrador';
 let editandoElemento = null;   // {id, original:{...}} mientras el panel ⚙️ está abierto — ver abrirEditorElemento
 let cortarElementosListener = null;
 const LINEA_MAX_CELDAS = 100;    // largo máximo de una Línea arrastrada
@@ -1851,7 +1857,19 @@ function dibujar(){
       });
     });
   };
-  elementos.forEach((el, id) => {
+  // El borrador (lo que se está dibujando o esperando consolidarse) se
+  // pinta como un elemento de verdad, con el color, la opacidad, la imagen y
+  // el resto de lo que se eligió en el panel, para ver cómo va a quedar.
+  const listaElementos = [...elementos.entries()];
+  const origenBorrador = dibujandoElemento || borradorElemento;
+  if(origenBorrador && herramientaActiva === 'elemento' && fbUsuario){
+    listaElementos.push([ID_BORRADOR, {
+      tipo: origenBorrador.tipo, origen: origenBorrador.origen, celdas: [...origenBorrador.celdas.values()], rotacion: 0,
+      color: elemColor, alfa: elemAlfa, solido: elemSolido, invisible: !!(soyGM && elemInvisible),
+      imagen: elemImagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, duenoUid: fbUsuario.uid,
+    }]);
+  }
+  listaElementos.forEach(([id, el]) => {
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
     const celdas = celdasDeElemento(el);
     const img = el.imagen ? imagenLista(el.imagen) : null;
@@ -1903,6 +1921,14 @@ function dibujar(){
       ctx.lineWidth = 2 / z;
       ctx.stroke();
     }
+    if(id === ID_BORRADOR){
+      // Todavía no está creado: contorno blanco punteado.
+      ctx.setLineDash([6 / z, 5 / z]);
+      ctx.strokeStyle = 'rgba(237,227,210,.9)';
+      ctx.lineWidth = 1.5 / z;
+      bordeCeldas(celdas); ctx.stroke();
+      ctx.setLineDash([]);
+    }
     if(id === elementoSeleccionado){
       ctx.setLineDash([6 / z, 5 / z]);
       ctx.strokeStyle = 'rgba(237,227,210,.85)';
@@ -1947,17 +1973,6 @@ function dibujar(){
       }
     }
   });
-  // El elemento que se está armando ahora mismo (línea o forma libre).
-  if(dibujandoElemento){
-    const c0 = hexACubo(dibujandoElemento.origen);
-    const celdas = [...dibujandoElemento.celdas.values()].map(({dq, dr}) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
-    const colorPreview = elemColor;
-    trazarCeldas(celdas);
-    ctx.fillStyle = colorConAlfa(colorPreview, 0.35);
-    ctx.fill();
-    bordeCeldas(celdas);
-    ctx.strokeStyle = colorPreview; ctx.lineWidth = 2 / z; ctx.stroke();
-  }
 
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
   // de movimientos recientes (se desvanecen).
@@ -2263,6 +2278,9 @@ lienzo.addEventListener('pointerdown', e => {
     // Con una herramienta de dibujo activa, el clic derecho es "salir de
     // acá" (no ping) — es la forma más práctica de volver al cursor
     // normal sin ir a buscar el botón de la barra lateral.
+    // Con un borrador de Terreno/Formas esperando, el clic derecho lo descarta
+    // (recién el siguiente sale de la herramienta).
+    if(borradorElemento){ descartarBorradorElemento(); return; }
     if(herramientaActiva){ desactivarHerramienta(); return; }
     // Lo mismo con 🦶 Mover libre: el clic derecho lo apaga.
     if(moverLibre){ activarMoverLibre(moverLibre); return; }
@@ -2272,6 +2290,8 @@ lienzo.addEventListener('pointerdown', e => {
     return;
   }
   if(e.button !== 0 && e.pointerType === 'mouse') return;
+  // Un clic en el mapa consolida el borrador (y nada más: no empieza otro).
+  if(borradorElemento){ consolidarBorradorElemento(); return; }
   const {px, py} = posEvento(e);
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
@@ -2612,9 +2632,10 @@ function soltar(){
     pedirDibujo();
   }
   if(dibujandoElemento){
+    // No se crea todavía: queda de borrador para ajustar opacidad, color, etc.
     const d = dibujandoElemento;
     dibujandoElemento = null;
-    if(d.celdas.size >= 1) guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
+    if(d.celdas.size >= 1){ borradorElemento = d; renderHerramientaFlotante(); }
     pedirDibujo();
   }
   if(arrastreElemento){
@@ -2690,13 +2711,17 @@ document.addEventListener('keydown', e => {
   }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
   if(editandoElemento && e.key === 'Escape'){ cerrarEditorElemento(true); return; }
+  // Borrador de Terreno/Formas: Enter lo crea y Esc lo descarta, incluso con
+  // el foco en un control del panel (la barra de opacidad).
+  if(borradorElemento && e.key === 'Enter'){ e.preventDefault(); consolidarBorradorElemento(); return; }
+  if(borradorElemento && e.key === 'Escape'){ descartarBorradorElemento(); return; }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
   // L o Ctrl+L: prende o apaga el Lápiz (con Ctrl+L se frena que el
   // navegador salte a la barra de direcciones).
   if((e.key === 'l' || e.key === 'L') && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
     if(herramientaActiva === 'lapiz') desactivarHerramienta();
-    else{ herramientaActiva = 'lapiz'; renderToolkit(); }
+    else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'lapiz'; renderToolkit(); }
     return;
   }
   // H: abre o cierra la caja de herramientas.
@@ -4898,8 +4923,21 @@ const HERRAMIENTAS = [
 let herramientaActiva = '';
 // Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho
 // en el mapa, Esc, la ✕ de su ventanita, o tocar el mismo botón de nuevo.
+// Borrador de Terreno/Formas (ver `borradorElemento`): crearlo de verdad o tirarlo.
+function consolidarBorradorElemento(){
+  const d = borradorElemento;
+  borradorElemento = null;
+  if(d && d.celdas.size >= 1) guardarElemento(d.tipo, d.origen, [...d.celdas.values()]);
+  renderHerramientaFlotante(); pedirDibujo();
+}
+function descartarBorradorElemento(){
+  if(!borradorElemento) return;
+  borradorElemento = null;
+  renderHerramientaFlotante(); pedirDibujo();
+}
 function desactivarHerramienta(){
   if(!herramientaActiva) return;
+  if(borradorElemento) consolidarBorradorElemento();
   herramientaActiva = '';
   dibujando = null;
   dibujandoElemento = null;
@@ -4931,6 +4969,7 @@ function renderToolkit(){
 // antes esto se desplegaba adentro de la barra lateral, sumando un
 // bloque más cada vez que había una herramienta lista.
 function renderHerramientaFlotante(){
+  pedirDibujo();  // color/imagen/sólido del panel se ven en vivo en el borrador
   const caja = $('#herramienta-flotante');
   if(!herramientaActiva){ caja.hidden = true; caja.innerHTML = ''; return; }
   const datos = HERRAMIENTAS.find(h => h.id === herramientaActiva);
@@ -4962,7 +5001,10 @@ function renderHerramientaFlotante(){
       ${imagenElementoOpcionHtml(elemImagen)}
       <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
-      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>`;
+      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
+      ${borradorElemento ? `<div class="nt-pista" style="color:var(--paper);border-top:1px solid var(--line);padding-top:8px;margin-top:8px">
+        Borrador: ajustá lo de arriba y mirá cómo queda en el mapa. Hacé clic en otro lado (o Enter) para crearlo; Esc o clic derecho lo descartan.</div>
+        <div class="fila"><button type="button" class="btn primary" id="borrador-crear">✔ Crear</button><button type="button" class="btn" id="borrador-descartar">Descartar</button></div>` : ''}`;
   }else{
     caja.hidden = true; caja.innerHTML = ''; return;
   }
@@ -4987,11 +5029,14 @@ $('#toolkit-lista').addEventListener('click', e => {
   if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
   if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
   if(herramientaActiva === h.id){ desactivarHerramienta(); return; }
+  if(borradorElemento) consolidarBorradorElemento();
   herramientaActiva = h.id;
   renderToolkit();
 });
 $('#herramienta-flotante').addEventListener('click', e => {
   if(e.target.closest('#herr-cerrar')){ desactivarHerramienta(); return; }
+  if(e.target.closest('#borrador-crear')){ consolidarBorradorElemento(); return; }
+  if(e.target.closest('#borrador-descartar')){ descartarBorradorElemento(); return; }
   const color = e.target.closest('[data-lapiz-color]');
   if(color){
     lapizColor = color.dataset.lapizColor;
@@ -5045,6 +5090,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
   }
   if(e.target.id === 'elem-tipo-select'){
     elemTipo = e.target.value;
+    borradorElemento = null;  // otra forma: el borrador de la anterior ya no aplica
     try{ localStorage.setItem('elem-tipo', elemTipo); }catch(err){}
     renderHerramientaFlotante();
     return;
@@ -5058,6 +5104,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
   if(e.target.id === 'elem-invisible-check'){
     elemInvisible = e.target.checked;
     try{ localStorage.setItem('elem-invisible', elemInvisible ? '1' : ''); }catch(err){}
+    pedirDibujo();
     return;
   }
   if(e.target.id === 'elem-tamano-input'){
@@ -5070,6 +5117,7 @@ $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-alfa-slider'){
     elemAlfa = num(e.target.value);
     try{ localStorage.setItem('elem-alfa', elemAlfa); }catch(err){}
+    pedirDibujo();  // se ve en vivo sobre el borrador
   }
   if(e.target.id === 'elem-tamano-input'){
     const v = Math.round(num(e.target.value));

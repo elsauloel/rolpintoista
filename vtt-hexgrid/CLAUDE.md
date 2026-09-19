@@ -242,6 +242,15 @@ nuevo de Rol Pintoísta. Paso 2 de
   `elemColor`/`elemAlfa`/`elemSolido`/`elemInvisible`/`elemImagen`
   (`localStorage` `elem-*`, menos la imagen que no se recuerda entre
   sesiones a propósito).
+  - **Borrador antes de crear** (2026-09-19): al soltar el dibujo, el
+    elemento no se guarda: queda como `borradorElemento`, pintado igual
+    que uno de verdad (mismo código, con `ID_BORRADOR`; color, opacidad,
+    imagen, Sólido e Invisible del panel se ven en vivo) y con contorno
+    blanco punteado. Se crea con un clic en otro lado del mapa (ese clic no
+    empieza otro dibujo), Enter, "✔ Crear", o al salir de la herramienta o
+    cambiar a otra; se tira con Esc, clic derecho (el siguiente ya sale de
+    la herramienta) o "Descartar", y al cambiar de forma en el selector.
+    `consolidarBorradorElemento`/`descartarBorradorElemento`.
   - **Actualización 2026-09-19 — ni la Línea ni la Flor llevan número:**
     el tamaño lo da el arrastre y no hay campo `#elem-tamano-input`. Línea:
     casilleros hasta donde está el mouse, en la dirección de las 6 más

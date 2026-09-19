@@ -1580,7 +1580,7 @@ function renderOjo(){
 $('#btn-ojo').onclick = async () => {
   if(!soyGM) return;
   ojoRevelando = !ojoRevelando;
-  renderOjo(); pedirDibujo();
+  renderOjo(); renderIniciativa(); pedirDibujo();
   if(!ojoRevelando){ toast('Volvés a no ver lo oculto'); return; }
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -2066,6 +2066,9 @@ function renderIniciativa(){
   // turno pasa igual cuando le toca, pero no se nota que estuvo ahí).
   const visibles = iniciativa.orden.map((o, i) => ({o, i})).filter(({o}) => {
     const t = tokens.get(o.id);
+    // Quien está en sigilo tampoco aparece para el bando rival (jugadores: los creeps; GM: los
+    // personajes, salvo con su 👁): desaparece solo mientras dure el sigilo.
+    if(t && ocultoPorSigiloParaMi(t)) return false;
     return soyGM || !(o.oculto || (t && t.oculto));   // oculto por el GM en la lista, o token oculto
   });
   if(!visibles.length){
@@ -4472,6 +4475,7 @@ function escucharVinculables(){
       }
       mapa.set(ch.doc.id, o);
     });
+    renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
     renderPanel();
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));

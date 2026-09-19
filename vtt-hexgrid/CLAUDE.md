@@ -231,6 +231,10 @@ nuevo de Rol Pintoísta. Paso 2 de
   Los jugadores no ven esa fila (el turno pasa igual cuando le toca, sin que se
   note que estuvo); el GM la ve marcada con 🙈. Hoy es solo visual: los datos
   llegan a todos, como el resto de lo oculto.
+  **Sigilo y orden de turnos** (2026-09-19): quien está en sigilo desaparece
+  solo de la lista para el bando rival mientras dure — los jugadores no ven
+  a los creeps en sigilo; el GM no ve a los personajes en sigilo salvo con su 👁
+  (`ocultoPorSigiloParaMi` en `renderIniciativa`). El turno pasa igual cuando le toca.
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del

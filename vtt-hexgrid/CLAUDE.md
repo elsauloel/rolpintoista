@@ -190,7 +190,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   tokens) como `{puntos:[x1,y1,…] relativos a origen, origen:{x,y},
   rotacion, color, grosor, permanente, duenoUid, creado}`.
   - **Por defecto (`lapizPermanente=false`)**: es una estela más — se ve
-    `ESTELA_MS` (4 s) y se borra sola. El que la ve programa su propio
+    `TRAZO_MS` (3 s) y se borra sola. El que la ve programa su propio
     borrado al llegar el snapshot (`escucharTrazos`); las reglas dejan
     borrar un trazo no permanente a cualquier miembro, así no importa si
     el que la dibujó ya se fue.
@@ -209,7 +209,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
-  - **Atajo: `L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
+  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas. **`L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
     anda mientras se escribe en un campo). Ojo: en algunos navegadores
     Ctrl+L no se deja interceptar y salta a la barra de direcciones; la `L`
     sola anda siempre.

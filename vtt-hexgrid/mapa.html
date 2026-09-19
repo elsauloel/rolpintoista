@@ -2699,6 +2699,12 @@ document.addEventListener('keydown', e => {
     else{ herramientaActiva = 'lapiz'; renderToolkit(); }
     return;
   }
+  // H: abre o cierra la caja de herramientas.
+  if((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault();
+    abrirToolkit(!toolkitAbierto);
+    return;
+  }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
@@ -4884,7 +4890,7 @@ function imagenElementoOpcionHtml(imagen){
 }
 
 const HERRAMIENTAS = [
-  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true},
+  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L o Ctrl+L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
@@ -4908,11 +4914,11 @@ function renderToolkit(){
   $('#lienzo-caja').classList.toggle('toolkit-abierto', toolkitAbierto);
   const pestana = $('#toolkit-pestana');
   pestana.setAttribute('aria-expanded', toolkitAbierto ? 'true' : 'false');
-  pestana.title = toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas';
+  pestana.title = (toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas') + ' (atajo: H)';
   $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => {
     const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
     return `<li>
-    <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}">
+    <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}"${h.atajo ? ` title="${esc(h.nombre)} — atajo de teclado: ${esc(h.atajo)}"` : ''}>
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
       <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}</span>
       <span class="tk-detalle">${esc(h.detalle)}</span>

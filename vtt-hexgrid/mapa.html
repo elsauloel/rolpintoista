@@ -1965,7 +1965,6 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#person
 
 $('#btn-mantenimiento').onclick = async () => {
   if(!soyGM) return;
-  if(!confirm('¿Pasar el turno para toda la mesa?\n\nSe aplica el Mantenimiento a todas las fichas y a los creeps: turnos de los estados, efectos por turno y recarga de No2.')) return;
   const btn = $('#btn-mantenimiento');
   btn.disabled = true;
   try{

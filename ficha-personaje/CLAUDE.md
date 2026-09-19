@@ -309,3 +309,10 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   (redundante con la Botonera): sus elementos siguen en `#combate-oculto`
   (con `hidden`) porque el código todavía los actualiza; sacarlos del todo
   pide limpiar esas referencias.
+
+- **Cabecera más compacta** (2026-09-19): se sacaron los botones **Historial** y
+  **Guardar copia** (el 💾 de la barra ya baja el respaldo; "Cargar archivo"
+  sigue por `#file-input`), y **⚡ Botonera** y **⬡ Mapa** pasaron a un dock
+  pegado al borde izquierdo (`#dock-izq`, se abre con el mouse encima; no
+  aparece dentro de los iframes del mapa). `registrarEvento` y el historial de
+  sesión en memoria quedan, pero sin pantalla.

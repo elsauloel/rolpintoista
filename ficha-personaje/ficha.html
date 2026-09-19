@@ -1054,6 +1054,16 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 
 /* ---------- Barra superior (arriba de los vitales, fija al scrollear) ---------- */
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
+.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:6px}
+.dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:44px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
+  background:var(--panel);border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;color:var(--paper);text-decoration:none;
+  cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 4px 12px rgba(0,0,0,.45);transition:width .18s,border-color .15s,background .15s}
+.dock-btn .dock-ico{font-size:19px;line-height:1;flex:none;width:18px;text-align:center}
+.dock-btn .dock-txt{white-space:nowrap}
+.dock-izq:hover .dock-btn,.dock-btn:focus-visible{width:140px}
+.dock-btn:hover{border-color:var(--copper);background:var(--panel2);color:var(--brass)}
+#btn-botonera{border-color:var(--copper)}
 .accesos{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
 #menu-sitio-boton,#menu-sitio{z-index:49!important} /* debajo de las ventanas (z 50) */
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
@@ -1066,16 +1076,12 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 
 /* Tonalidades distintas por botón, para reconocerlos de un
    vistazo sin tener que leer el texto (mismo criterio que .btn.aleatorio). */
-.accesos .iconbtn.dk-historial{background:rgba(46,107,87,.18);border-color:var(--bottle);color:#8FCDBB}
-.accesos .iconbtn.dk-historial:hover{background:var(--bottle);color:#08150F}
 .accesos .iconbtn.dk-vendedor{background:rgba(224,164,88,.18);border-color:var(--brass);color:#F3D9AE}
 .accesos .iconbtn.dk-vendedor:hover{background:var(--brass);color:#1E1305}
 .accesos .iconbtn.dk-personajes{background:rgba(155,123,212,.16);border-color:#9B7BD4;color:#C9B6EE}
 .accesos .iconbtn.dk-personajes:hover{background:#9B7BD4;color:#1B0F1F}
 .accesos .iconbtn.dk-reset{border-color:var(--wine);color:var(--danger)}
 .accesos .iconbtn.dk-reset:hover{background:var(--wine);color:var(--paper)}
-.accesos .iconbtn.dk-guardar{background:rgba(201,133,69,.2);border-color:var(--copper);color:var(--brass)}
-.accesos .iconbtn.dk-guardar:hover{background:var(--copper);color:#180F08}
 .btn.dk-actualizar{background:rgba(154,134,126,.16);border-color:var(--muted);color:#D8CCC4}
 .btn.dk-actualizar:hover{background:var(--muted);color:#1B1512}
 
@@ -1176,6 +1182,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 </script>
 </head>
 <body>
+<!-- Accesos rápidos pegados al borde izquierdo: la Botonera y el Mapa. Se abren al pasar el mouse. -->
+<aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
+  <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
+  <a class="dock-btn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva"><span class="dock-ico">⬡</span><span class="dock-txt">Mapa</span></a>
+</aside>
 <div class="wrap">
 
   <!-- VITALES (con la barra de botones arriba) -->
@@ -1185,13 +1196,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <span class="partida" id="barra-partida" title="Partida abierta y quién es el GM"></span>
       <span class="note" id="guardado-estado">Sin personaje abierto: los cambios no se guardan.</span>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Crear un personaje nuevo en la mesa">＋ Personaje nuevo</button>
-      <button type="button" class="iconbtn dk-historial" id="btn-historial">🕘 Historial</button>
       <button type="button" class="iconbtn dk-vendedor" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar">🏪 Vendedor</button>
       <button type="button" class="iconbtn dk-personajes" id="btn-personajes">👥 Personajes</button>
-      <button type="button" class="iconbtn dk-guardar" id="btn-guardar" title="Bajar una copia de respaldo de la ficha a un archivo .json">💾 Guardar copia</button>
       <input type="file" id="file-input" accept=".json" hidden>
       <span class="accesos-sep"></span>
-      <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
       <button type="button" class="iconbtn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)">💾</button>
     </nav>
     <div class="vitals">
@@ -1206,7 +1214,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <span class="nums"><input id="f-sp-vital" type="text" inputmode="decimal" title="SP disponible. Escribí un número para fijarlo, o +5 / -3 para sumar o restar y apretá Enter. No se recarga al pasar turno"><span class="max">/ <span id="v-spmax-vital">0</span></span></span>
         </div>
         <div class="bar sp"><span id="bar-sp"></span></div>
-        <button type="button" class="btn primary" id="btn-botonera" style="width:100%;margin-top:8px">⚡ Botonera</button>
       </div>
       <div class="nitros-box" id="nitros-box" title="Nitros: se gastan al moverse, atacar, usar habilidades y consumir. Se recargan al máximo (substat No2) en cada Mantenimiento">
         <span class="nitros-label">No2</span>
@@ -1761,16 +1768,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <button class="btn" id="portrait-view-recorte">Editar recorte del token</button>
       <button class="btn primary" id="portrait-view-change">Cambiar</button>
     </footer>
-  </div>
-</div>
-
-<div class="scrim" id="scrim-historial">
-  <div class="modal" style="max-width:460px">
-    <header><h3>Historial de la sesión</h3><button class="iconbtn" id="historial-x">Cerrar</button></header>
-    <div class="body">
-      <div class="hint" style="margin-bottom:8px">Tiradas y eventos recientes — vive solo en esta pestaña, no se guarda en la ficha.</div>
-      <div id="historial-body" style="display:flex;flex-direction:column;gap:4px;max-height:60vh;overflow-y:auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)"></div>
-    </div>
   </div>
 </div>
 
@@ -5768,16 +5765,6 @@ document.addEventListener('click', e => {
   }
 });
 
-$('#btn-guardar').onclick = () => {
-  const nombre = (S.meta.nombre || 'ficha').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ficha';
-  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = nombre + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('Ficha guardada');
-};
 function cargarArchivoLocal(){
   if(fbMiembro && fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
   if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cargarle un archivo'); return; }
@@ -8160,7 +8147,7 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 
@@ -8980,9 +8967,6 @@ $('#btn-botonera').onclick = () => { renderBotonera(); $('#scrim-botonera').clas
 $('#botonera-x').onclick = () => $('#scrim-botonera').classList.remove('open');
 $('#scrim-botonera').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera') $('#scrim-botonera').classList.remove('open'); });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
-$('#btn-historial').onclick = () => { renderHistorialSesion(); $('#scrim-historial').classList.add('open'); };
-$('#historial-x').onclick = () => $('#scrim-historial').classList.remove('open');
-$('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id==='scrim-historial') $('#scrim-historial').classList.remove('open'); });
 $('#btn-atacar-pdg').onclick = atacar;
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva, 'eva');

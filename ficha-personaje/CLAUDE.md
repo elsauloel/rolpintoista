@@ -300,3 +300,12 @@ de siempre, con Job 2 por defecto (`HAB_JOB_CUSTOM`). De clase → elegir clase
 y "Agregar" (`agregarHabClase`): copia la skill de `CLASES_SKILLS`
 (`comun/skills-clase.js`) al personaje, siempre con Job 1 (`HAB_JOB_CLASE`,
 sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
+
+- **Nueva disposición** (2026-09-19): bajo la cabecera va **Atributos a todo el
+  ancho** (los cinco en horizontal, `#attrs` en grilla; el cuadro de **Campo de
+  visión** quedó ahí abajo) y después **dos columnas**: Mochila, Cinturón y
+  Equipado a la izquierda; Habilidades, Pasivas, Sociales y Bitácora a la
+  derecha; al final Invocaciones. La tarjeta **Combate** se sacó de la vista
+  (redundante con la Botonera): sus elementos siguen en `#combate-oculto`
+  (con `hidden`) porque el código todavía los actualiza; sacarlos del todo
+  pide limpiar esas referencias.

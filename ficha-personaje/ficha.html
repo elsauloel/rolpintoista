@@ -188,10 +188,13 @@ a{color:var(--brass)}
 .vital .top.vital-segunda{margin-top:12px}
 
 /* ---------- Grilla principal ---------- */
-.cols{display:grid;grid-template-columns:1.05fr .95fr 1fr;gap:16px;margin-top:16px;align-items:start}
-@media(max-width:1080px){.cols{grid-template-columns:1fr 1fr}}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;align-items:start}
 @media(max-width:760px){.cols{grid-template-columns:1fr}}
 .col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card--atributos{margin-top:16px}
+#attrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:9px;align-items:start}
+#attrs .attr{margin-bottom:0}
+.vision-fila{margin-top:10px;max-width:300px}
 
 .card{border:1px solid var(--line);border-top:3px solid var(--line);background:var(--panel);}
 /* Cada contenedor del home tiene su propia tonalidad, para reconocerlo
@@ -1288,9 +1291,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <div id="sp-breakdown"></div>
   </div>
 
-  <div class="cols">
-    <!-- COLUMNA 1 -->
-    <div class="col">
       <section class="card card--atributos">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="atributos" title="Contraer/expandir">👁</button><h2>Atributos</h2></div>
@@ -1299,25 +1299,19 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <div class="body">
           <div class="ptbar" id="attr-points"></div>
           <div id="attrs"></div>
-        </div>
-      </section>
-
-      <section class="card card--bitacora">
-        <header>
-          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora de la partida</h2></div>
-          <button class="iconbtn iconbtn-add" id="btn-bitacora-add" title="Nueva página compartida">+ Página</button>
-        </header>
-        <div class="body">
-          <div class="bitacora-tabs" id="bitacora-tabs"></div>
-          <div id="bitacora-entradas" class="bit-entradas"></div>
-          <div class="bit-sumar">
-            <textarea id="bitacora-nueva" rows="2" placeholder="Sumá lo que pasó: deudas, pactos, lugares, gente… (Ctrl + Enter para sumar)"></textarea>
-            <button type="button" class="btn primary" id="bitacora-sumar">Sumar</button>
+          <div class="vision-fila">
+            <button type="button" class="armbox armbox-def" id="vision-tile" data-stat="vision" title="Radio del campo de visión, en hexágonos (base 6). Lo modifican pasivas, ítems y estados">
+              <div class="dl">Campo de visión</div>
+              <div class="dv"><span id="v-vision">6</span> <small style="font-size:11px">hex</small></div>
+            </button>
+            <div id="vision-breakdown"></div>
           </div>
-          <div class="hint" id="bitacora-estado">La bitácora es de toda la mesa: todos la leen y cualquiera suma o corrige.</div>
         </div>
       </section>
 
+  <div class="cols">
+    <!-- COLUMNA 1: inventario -->
+    <div class="col">
       <section class="card card--mochila">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="mochila" title="Contraer/expandir">👁</button><h2>Mochila</h2></div>
@@ -1327,48 +1321,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <div class="cap"><span>Ranuras usadas</span><span><b id="cap-mochila-n">0</b> / <input id="f-capmochila" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"></span></div>
           <div class="capbar" id="cap-mochila-bar"><span></span></div>
           <div id="list-mochila"></div>
-        </div>
-      </section>
-    </div>
-
-
-    <!-- COLUMNA 2 -->
-    <div class="col">
-      <section class="card card--combate">
-        <header><div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="combate" title="Contraer/expandir">👁</button><h2>COMBATE</h2></div></header>
-        <div class="body">
-          <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
-          <div id="efectos-armas"></div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button type="button" class="btn" id="btn-atacar-pdg" style="flex:1">🎲 Atacar (PdG)</button>
-            <button type="button" class="btn" id="btn-danio-arma" style="flex:1">🎲 Daño Arma</button>
-          </div>
-
-          <button type="button" class="armbox armbox-def" id="def-tile" data-stat="def" style="margin-top:12px">
-            <div class="dl">Defensa</div>
-            <div class="dv"><span id="v-def">0</span></div>
-          </button>
-          <div class="combate-defensa">
-            <button type="button" class="btn" id="btn-esquivar">🎲 Esquivar</button>
-            <button type="button" class="btn" id="btn-parry">🎲 Parry</button>
-            <button type="button" class="btn" id="btn-bloqueo">🎲 Bloqueo</button>
-          </div>
-          <div id="def-breakdown"></div>
-          <button type="button" class="armbox armbox-def" id="vision-tile" data-stat="vision" style="margin-top:8px" title="Radio del campo de visión, en hexágonos (base 6). Lo modifican pasivas, ítems y estados">
-            <div class="dl">Campo de visión</div>
-            <div class="dv"><span id="v-vision">6</span> <small style="font-size:11px">hex</small></div>
-          </button>
-          <div id="vision-breakdown"></div>
-          <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
-          <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
-          <div id="tipos-breakdown"></div>
-
-          <div class="hint" style="margin:11px 0 6px">Otros efectos de equipo</div>
-          <div id="efectos-otros"></div>
-
-          <div style="margin-top:11px">
-            <div class="f"><label>Nota</label><input id="f-armanota"></div>
-          </div>
         </div>
       </section>
 
@@ -1399,7 +1351,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       </section>
     </div>
 
-    <!-- COLUMNA 3 -->
+    <!-- COLUMNA 2: habilidades y bitácora -->
     <div class="col">
       <section class="card card--habilidades">
         <header>
@@ -1427,7 +1379,60 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         </header>
         <div class="body" id="list-sociales"></div>
       </section>
+
+      <section class="card card--bitacora">
+        <header>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora de la partida</h2></div>
+          <button class="iconbtn iconbtn-add" id="btn-bitacora-add" title="Nueva página compartida">+ Página</button>
+        </header>
+        <div class="body">
+          <div class="bitacora-tabs" id="bitacora-tabs"></div>
+          <div id="bitacora-entradas" class="bit-entradas"></div>
+          <div class="bit-sumar">
+            <textarea id="bitacora-nueva" rows="2" placeholder="Sumá lo que pasó: deudas, pactos, lugares, gente… (Ctrl + Enter para sumar)"></textarea>
+            <button type="button" class="btn primary" id="bitacora-sumar">Sumar</button>
+          </div>
+          <div class="hint" id="bitacora-estado">La bitácora es de toda la mesa: todos la leen y cualquiera suma o corrige.</div>
+        </div>
+      </section>
     </div>
+  </div>
+
+  <!-- La tarjeta de Combate se sacó de la vista (era redundante con la Botonera). Sus elementos siguen acá,
+       ocultos, porque el código de la ficha todavía los actualiza; el Campo de visión pasó a Atributos. -->
+  <div id="combate-oculto" hidden>
+      <section class="card card--combate">
+        <header><div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="combate" title="Contraer/expandir">👁</button><h2>COMBATE</h2></div></header>
+        <div class="body">
+          <div class="hint" style="margin-bottom:6px">Armas equipadas</div>
+          <div id="efectos-armas"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn" id="btn-atacar-pdg" style="flex:1">🎲 Atacar (PdG)</button>
+            <button type="button" class="btn" id="btn-danio-arma" style="flex:1">🎲 Daño Arma</button>
+          </div>
+
+          <button type="button" class="armbox armbox-def" id="def-tile" data-stat="def" style="margin-top:12px">
+            <div class="dl">Defensa</div>
+            <div class="dv"><span id="v-def">0</span></div>
+          </button>
+          <div class="combate-defensa">
+            <button type="button" class="btn" id="btn-esquivar">🎲 Esquivar</button>
+            <button type="button" class="btn" id="btn-parry">🎲 Parry</button>
+            <button type="button" class="btn" id="btn-bloqueo">🎲 Bloqueo</button>
+          </div>
+          <div id="def-breakdown"></div>
+          <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
+          <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
+          <div id="tipos-breakdown"></div>
+
+          <div class="hint" style="margin:11px 0 6px">Otros efectos de equipo</div>
+          <div id="efectos-otros"></div>
+
+          <div style="margin-top:11px">
+            <div class="f"><label>Nota</label><input id="f-armanota"></div>
+          </div>
+        </div>
+      </section>
   </div>
 
   <!-- INVOCACIONES -->

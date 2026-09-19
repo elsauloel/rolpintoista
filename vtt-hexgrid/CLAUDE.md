@@ -103,6 +103,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   cuenta (PJ vinculado o creep). Todavía falta: la ruptura automática del
   sigilo al entrar en un cono, el aviso de tiradas por pasos en la alerta y
   que el sigilo tenga en cuenta las invocaciones.
+  **Giro gratis después de moverse** (2026-09-19, en combate): al soltar un
+  movimiento el token (personaje, creep o invocación) puede **elegir hacia
+  dónde queda mirando sin gastar No2** — su primer giro con el ↻ es gratis
+  (`giroLibre`, `abrirGiroLibre`); una vez establecida esa dirección, cada giro
+  cuesta 1 No2 por giro de 60°. La ventana gratis se acaba con el próximo
+  Mantenimiento o al cambiar de mapa, y vive en cada navegador (recargar la
+  página la pierde). Si no gira, se queda mirando hacia donde caminó.
 - **🕶 Sigilo, paso 4: detección** (2026-09-19). **Ruptura automática**: un
   token en sigilo que queda dentro del **cono** de un rival (creep si es
   personaje; personaje si es creep) pierde el sigilo solo —

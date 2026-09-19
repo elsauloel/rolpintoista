@@ -810,6 +810,7 @@ const estelas = new Map();    // tokenId -> {celdas, hasta}
 const ESTELA_MS = 4000;
 const TRAZO_MS = 3000;  // cuánto dura un trazo temporal del lápiz (la estela de los tokens usa ESTELA_MS)
 const COSTO_GIRO_NO2 = 1;      // No2 por cada giro de 60° del token, solo en combate (decidido 2026-09-19, a debatir)
+const giroLibre = new Set();     // tokens que acaban de moverse en combate: su primer giro es gratis (elegir hacia dónde miran)
 const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
 // Ping (clic derecho en el mapa, sin herramienta que lo use — libre para
 // esto): un anillo que se expande y se apaga solo, para todos.
@@ -957,6 +958,7 @@ function cambiarMapaMostrado(nuevoId){
   elementos.clear(); elementoSeleccionado = null;
   pings.clear();
   nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
+  giroLibre.clear();
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';
   iniciativa = {orden: [], turno: 0, ronda: 1};
@@ -1724,6 +1726,7 @@ function escucharMantenimiento(){
     const numero = doc.exists ? Math.round(num(doc.data().numero)) : 0;
     const antes = mantenimientoNumero;
     mantenimientoNumero = numero;
+    giroLibre.clear();   // pasó el turno: se acaba el giro gratis
     pedirDibujo();   // las marcas del sigilo duran por turnos
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
@@ -3945,16 +3948,27 @@ async function moverToken(id, col, fila, celdas){
   try{
     await doc.update(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot});
     sigiloPublicarAvisos(id);
+    abrirGiroLibre(id, celdas);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); abrirGiroLibre(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
   }
+}
+
+// En combate, después de moverse el token puede elegir hacia dónde queda
+// mirando sin gastar No2 (con el handle ↻ del HUD); ese primer giro es gratis y
+// cada giro que siga cuesta. Pasa por token y se acaba con el próximo Mantenimiento.
+function abrirGiroLibre(id, celdas){
+  if(modoMapa !== 'combate' || !celdas || celdas.length < 2) return;
+  giroLibre.add(id);
+  const t = tokens.get(id);
+  if(t && seleccion === id) toast('Elegí hacia dónde mirás con el ↻: el primer giro después de moverte es gratis.');
 }
 
 // Mover libre: solo la casilla nueva. Se borra la ruta guardada para que
@@ -5281,10 +5295,16 @@ function hudConectar(t){
     handleRotar.releasePointerCapture(e.pointerId);
     if(!tok) return;
     const fin = num(tok.rotacion || 0);
-    // Girar cuesta No2 en combate: COSTO_GIRO_NO2 por cada giro de 60° (a debatir, P14).
+    // Girar cuesta No2 en combate: COSTO_GIRO_NO2 por cada giro de 60° (a debatir, P14)…
     let dif = Math.abs(fin - inicial) % 360;
     if(dif > 180) dif = 360 - dif;
-    const costo = Math.round(dif / 60) * COSTO_GIRO_NO2;
+    let costo = Math.round(dif / 60) * COSTO_GIRO_NO2;
+    // …salvo el primero después de moverse: elegir hacia dónde queda mirando es gratis.
+    if(costo > 0 && giroLibre.has(id)){
+      giroLibre.delete(id);
+      costo = 0;
+      toast('Elegiste hacia dónde mirás (gratis). Desde ahora, cada giro cuesta 1 No2 por giro de 60°.');
+    }
     if(costo > 0 && costoMoverDe(tok)){
       try{
         const esCreep = tok.tipo === 'creep';

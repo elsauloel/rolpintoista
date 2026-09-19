@@ -146,10 +146,15 @@ efectos, skills y estados lo amplían o reducen. Los colores naranja/azul del
 diagrama del campo de visión son del sistema de sigilo (más arriba), no de
 esto.
 
-- 🔲 **P47. Forma del campo de visión por defecto.** ¿Es el cono de 10
-  hexágonos del plan (filas de 1, 2, 3 y 4 al frente)? ¿Incluye el hexágono
-  propio y la zona de alerta (la de "los hexágonos pegados al cono y los que
-  rodean al token, salvo el de atrás"), o solo el cono? *(2026-09-19)*
+- ✅ **P47. Forma del campo de visión por defecto.** Respondido
+  2026-09-19 con un diagrama (token mirando hacia arriba): la visión
+  general es el **disco de radio 6 hexágonos** alrededor del token, **menos
+  una cuña de 120° hacia atrás** (punto ciego: el hexágono de atrás y los
+  que quedan entre las dos diagonales traseras; las diagonales mismas sí se
+  ven, y con ellas 5 de los 6 vecinos). Adentro van anidados el cono de
+  10 hexágonos (azul) y la zona de alerta (naranja/rojo), que son del
+  sigilo y no cambian la niebla. Medido a ojo del diagrama (radio 6, cuña
+  de 120°) — confirmar. *(2026-09-19)*
 - 🔲 **P48. Quién ve por quién.** ¿Cada jugador ve solo lo que ven sus
   propios tokens, o lo que ve cualquiera del grupo (visión compartida)?
   *(2026-09-19)*

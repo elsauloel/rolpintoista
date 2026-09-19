@@ -170,8 +170,12 @@ pendiente "GM oculta tokens".
   dorado/verde/rojo/gris, que ya dicen de quién es el token); **girar (decidido 2026-09-19: sí
   cuesta No2, 1 por cambio de posición; todavía sin construir)**. Ver `vtt-hexgrid/CLAUDE.md`. Falta todo lo de abajo (cono
   de visión, zona de alerta, sigilo de verdad).
-- **Cono de visión**: filas de 1, 2, 3 y 4 hexágonos hacia el frente (10
-  en total); cada fila, medio hexágono más adelante y uno más ancha.
+- **Cono de visión** (cambió el 2026-09-19; antes eran filas de 1, 2, 3 y 4
+  hexágonos, 10 en total): los **16 hexágonos azules del diagrama de la
+  niebla** — un rombo de 4 × 4 que arranca en el hexágono de justo delante
+  del token (su vértice de abajo) y se abre hacia adelante: filas de 1, 2,
+  3, 4, 3, 2 y 1 hexágonos, de 7 columnas de ancho, hasta 4 hexágonos al
+  frente por el eje.
 - **Zona de alerta**: los hexágonos pegados al cono y los que rodean al
   token, **salvo el de atrás**.
 - Sigilo frente a un enemigo: pasar o pararse **en su cono** rompe el

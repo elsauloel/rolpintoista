@@ -47,7 +47,7 @@ Diseño en curso: ver "Sigilo (en diseño)" en [`plan-sistema-nuevo.md`](plan-si
 - 🔲 **P18. Automático o manual.** ¿El mapa rompe el sigilo y pide la tirada solo, o avisa y decide el GM? *(2026-09-16)*
 - 🔲 **P19. Cuándo se muestra el cono.** ¿Siempre, al seleccionar el token, o solo al que está en sigilo? Propuesta: pintado suave al seleccionar. *(2026-09-16)*
 - 🔲 **P20. Quién tiene orientación.** ¿Los creeps también? ¿Las invocaciones? *(2026-09-16)*
-- 🔲 **P21. Tamaño del cono.** Hoy 4 filas (1, 2, 3 y 4 hexágonos). ¿Fijo para todos, o lo cambia un stat, habilidad o equipo? *(2026-09-16)*
+- 🔲 **P21. Tamaño del cono.** Hoy 16 hexágonos (rombo de 4 × 4, ver el plan). ¿Fijo para todos, o lo cambia un stat, habilidad o equipo? *(2026-09-16)*
 
 ## Combate y reglas (Iteración 2)
 
@@ -151,8 +151,8 @@ esto.
   general es el **disco de radio 6 hexágonos** alrededor del token, **menos
   una cuña de 120° hacia atrás** (punto ciego: el hexágono de atrás y los
   que quedan entre las dos diagonales traseras; las diagonales mismas sí se
-  ven, y con ellas 5 de los 6 vecinos). Adentro van anidados el cono de
-  10 hexágonos (azul) y la zona de alerta (naranja/rojo), que son del
+  ven, y con ellas 5 de los 6 vecinos). Adentro van anidados el
+  cono de 16 hexágonos (azul) y la zona de alerta (naranja/rojo), que son del
   sigilo y no cambian la niebla. Medido a ojo del diagrama (radio 6, cuña
   de 120°) — confirmar. *(2026-09-19)*
 - ✅ **P48. Quién ve por quién.** Respondido 2026-09-19: todos los aliados jugadores ven lo mismo (la unión de sus campos de visión).

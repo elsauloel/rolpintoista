@@ -37,6 +37,15 @@ nuevo de Rol Pintoísta. Paso 2 de
   visual — todavía no hay cono de visión ni sigilo que lo use (ver
   "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`); cuando se
   construya, el lado opuesto al frente es el punto ciego.
+- **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
+  la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
+  desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
+  afuera o con Esc) con: **🌫 Niebla: sí/no**, **👁 Como jugador** (solo con la
+  niebla prendida), **👁 Revelar lo oculto** y **↺ Restablecer niebla**
+  (`nieblaReiniciar`: vuelve a tapar todo lo descubierto, con confirmación).
+  El botón cuadrado se resalta si la niebla está prendida o en "Como
+  jugador", y va en rojo mientras se está revelando lo oculto. Reemplaza a
+  los tres botones sueltos que había, para que la cabecera entre en una línea.
 - **🌫 Niebla de guerra** (2026-09-19, primer paso; diseño en `../docs/preguntas-abiertas.md`
   P47–P54). Doc `campanas/{id}/mapa/niebla` (o `mapas/{id}/estado/niebla`) =
   `{activa, descubiertas:[celdas empaquetadas con nbPack], actualizado}`.

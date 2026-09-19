@@ -143,6 +143,13 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 }
 .desplegable-lista .pj-borrar:hover{background:var(--danger);border-color:var(--danger);color:#fff}
 .desplegable-vacio{padding:8px 10px;color:var(--muted);font-size:12px}
+/* Menú del ojo (GM): niebla, "como jugador", revelar lo oculto y restablecer, en un desplegable. */
+.btn-cuadrado{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1}
+.btn-cuadrado.activo{border-color:var(--copper);box-shadow:inset 0 0 0 1px var(--copper)}
+.btn-cuadrado.revelando{background:#8E2323;border-color:#D8524B;color:#fff}
+#ojo-menu{left:auto;right:0;min-width:220px;display:flex;flex-direction:column;gap:5px}
+#ojo-menu[hidden]{display:none}
+#ojo-menu .btn{width:100%;text-align:left;justify-content:flex-start}
 
 main{flex:1;display:flex;min-height:0}
 #lienzo-caja{flex:1;position:relative;min-width:0;min-height:0}
@@ -548,9 +555,15 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
   </div>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
-  <button type="button" class="btn" id="btn-niebla" title="Niebla de guerra (solo GM)" hidden>🌫 Niebla: no</button>
-  <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
-  <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente." hidden>👁 Revelar lo oculto</button>
+  <div class="desplegable" id="ojo-caja" hidden>
+    <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
+    <div class="desplegable-lista" id="ojo-menu" hidden>
+      <button type="button" class="btn" id="btn-niebla" title="Prender o apagar la niebla de guerra en este mapa">🌫 Niebla: no</button>
+      <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
+      <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente.">👁 Revelar lo oculto</button>
+      <button type="button" class="btn peligro" id="btn-niebla-reiniciar" title="Volver a tapar todo lo descubierto de este mapa">↺ Restablecer niebla</button>
+    </div>
+  </div>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -1504,7 +1517,7 @@ function sigiloFantasmasActualizar(){
 let ojoRevelando = false;
 function renderOjo(){
   const b = $('#btn-ojo');
-  b.hidden = !(soyGM && fbMiembro);
+  $('#btn-ojo-menu').classList.toggle('revelando', ojoRevelando);
   b.classList.toggle('primary', ojoRevelando);
   b.textContent = ojoRevelando ? '👁 Ocultar de nuevo' : '👁 Revelar lo oculto';
 }
@@ -1655,13 +1668,14 @@ function escucharNiebla(){
 
 function renderNiebla(){
   const b = $('#btn-niebla'), j = $('#btn-niebla-jugador');
-  b.hidden = !(soyGM && fbMiembro);
+  $('#ojo-caja').hidden = !(soyGM && fbMiembro);   // el menú del ojo es del GM
   b.classList.toggle('primary', nieblaActiva);
   b.textContent = nieblaActiva ? '🌫 Niebla: sí' : '🌫 Niebla: no';
   b.title = nieblaActiva ? 'Apagar la niebla de guerra en este mapa' : 'Prender la niebla de guerra en este mapa';
-  j.hidden = !(soyGM && fbMiembro && nieblaActiva);
+  j.hidden = !nieblaActiva;   // solo tiene sentido con la niebla prendida
   j.classList.toggle('primary', nieblaComoJugador);
   j.title = nieblaComoJugador ? 'Volver a verlo todo' : 'Ver el mapa como lo ven los jugadores';
+  $('#btn-ojo-menu').classList.toggle('activo', nieblaActiva || nieblaComoJugador);
 }
 $('#btn-niebla').onclick = async () => {
   if(!soyGM) return;
@@ -1669,6 +1683,18 @@ $('#btn-niebla').onclick = async () => {
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({activa: !nieblaActiva, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
   }catch(err){ console.error('No se pudo cambiar la niebla:', err); toast('No se pudo cambiar la niebla'); }
 };
+// Menú del ojo (GM): se abre hacia abajo con el botón cuadrado; se cierra al elegir algo, al tocar afuera o con Esc.
+function abrirMenuOjo(abrir){
+  $('#ojo-menu').hidden = !abrir;
+  $('#btn-ojo-menu').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+}
+$('#btn-ojo-menu').onclick = () => abrirMenuOjo($('#ojo-menu').hidden);
+$('#ojo-menu').addEventListener('click', e => { if(e.target.closest('button')) abrirMenuOjo(false); });
+document.addEventListener('pointerdown', e => {
+  if(!$('#ojo-menu').hidden && !e.target.closest('#ojo-caja')) abrirMenuOjo(false);
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#ojo-menu').hidden) abrirMenuOjo(false); });
+$('#btn-niebla-reiniciar').onclick = () => nieblaReiniciar();
 $('#btn-niebla-jugador').onclick = () => {
   nieblaComoJugador = !nieblaComoJugador;
   try{ localStorage.setItem('niebla-como-jugador', nieblaComoJugador ? '1' : ''); }catch(e){}

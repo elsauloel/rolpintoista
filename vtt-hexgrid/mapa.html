@@ -1343,6 +1343,8 @@ let nieblaFirma = '';                // para recalcular solo cuando algo se movi
 let nieblaFantasmas = new Map();     // tokenId -> {col, fila}: última posición vista
 let nieblaComoJugador = false;       // solo GM, por navegador
 let nieblaPendientes = new Set(), nieblaTimer = null;
+let nieblaSeq = 0;                    // lotes de celdas que ESTA pantalla descubrió (para Ctrl+Z)
+const nieblaLog = [];
 let cortarNiebla = null;
 try{ nieblaComoJugador = localStorage.getItem('niebla-como-jugador') === '1'; }catch(e){}
 
@@ -1702,6 +1704,8 @@ function nieblaProgramarGuardado(){
     nieblaPendientes.clear();
     if(!lista.length || !nieblaActiva) return;
     lista.forEach(k => nieblaDescubierta.add(k));   // se ve enseguida; el snapshot lo confirma
+    nieblaLog.push({seq: ++nieblaSeq, celdas: lista});
+    if(nieblaLog.length > 40) nieblaLog.shift();
     pedirDibujo();
     try{
       await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: firebase.firestore.FieldValue.arrayUnion(...lista)}, {merge: true});
@@ -3455,6 +3459,12 @@ document.addEventListener('keydown', e => {
   // el foco en un control del panel (la barra de opacidad).
   if(borradorElemento && e.key === 'Enter'){ e.preventDefault(); consolidarBorradorElemento(); return; }
   if(borradorElemento && e.key === 'Escape'){ descartarBorradorElemento(); return; }
+  // Ctrl+Z: deshace el último movimiento o giro propio (no mientras se escribe en un campo).
+  if((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && !(e.target.closest && e.target.closest('input,select,textarea,[contenteditable]'))){
+    e.preventDefault();
+    deshacerUltimoMovimiento();
+    return;
+  }
   // Ctrl+B: abre o cierra la bitácora flotante (también escribiendo en ella).
   if((e.key === 'b' || e.key === 'B') && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
     e.preventDefault();
@@ -4139,12 +4149,14 @@ async function moverTokenLibre(id, col, fila){
   lienzo.style.cursor = 'crosshair';
   if(t.col === col && t.fila === fila){ pedirDibujo(); return; }
   const antes = {col: t.col, fila: t.fila, rutaJson: t.rutaJson};
+  const seq0 = nieblaSeq, pend0 = new Set(nieblaPendientes);
   t.col = col; t.fila = fila; t.rutaJson = '[]';
   estelas.delete(id);
   renderPanel();
   pedirDibujo();
   try{
     await coleccionTokens().doc(id).update({col, fila, ruta: firebase.firestore.FieldValue.delete()});
+    deshacerRegistrar({tipo: 'libre', id, fichaId: t.fichaId, esCreep: t.tipo === 'creep', costo: 0, col: antes.col, fila: antes.fila, seq0, pend0});
   }catch(err){
     console.error('No se pudo mover el token:', err);
     Object.assign(t, antes);
@@ -4217,6 +4229,69 @@ function gastarNitrosCreep(creepId, costo){
   });
 }
 
+/* ---------- Deshacer (Ctrl+Z): solo el último movimiento o giro ----------
+   Se anota cada movimiento (casilleros con No2, mover libre) y cada giro
+   del token propio. Ctrl+Z lo vuelve a su lugar y orientación, devuelve los
+   No2 que costó y vuelve a tapar la niebla que ese paso descubrió. Un solo
+   paso hacia atrás, y no después de un Mantenimiento (los No2 ya se
+   recargaron). */
+let deshacerUltimo = null;
+
+function deshacerRegistrar(e){
+  deshacerUltimo = {...e, mant: mantenimientoNumero};
+}
+
+async function deshacerUltimoMovimiento(){
+  const u = deshacerUltimo;
+  if(!u){ toast('No hay nada para deshacer'); return; }
+  if(rutaPendiente) return;   // hay un movimiento marcado sin confirmar: primero eso
+  if(u.mant !== mantenimientoNumero){ deshacerUltimo = null; toast('Ya pasó el turno: no se puede deshacer'); return; }
+  const t = tokens.get(u.id);
+  if(!t){ deshacerUltimo = null; return; }
+  deshacerUltimo = null;
+  try{
+    if(u.costo > 0){
+      if(u.esCreep) await gastarNitrosCreep(u.fichaId, -u.costo);
+      else await gastarNitros(u.fichaId, -u.costo);
+    }
+    const doc = coleccionTokens().doc(u.id);
+    if(u.tipo === 'giro'){
+      t.rotacion = u.rotacion;
+      await doc.update({rotacion: u.rotacion});
+      if(u.gratis) giroLibre.add(u.id);   // el giro gratis de después de moverse vuelve a estar disponible
+    }else{
+      t.col = u.col; t.fila = u.fila; t.rutaJson = '[]';
+      if(u.rotacion !== undefined) t.rotacion = u.rotacion;
+      estelas.delete(u.id);
+      giroLibre.delete(u.id);
+      await doc.update({col: u.col, fila: u.fila, ...(u.rotacion !== undefined ? {rotacion: u.rotacion} : {}), ruta: firebase.firestore.FieldValue.delete()});
+    }
+    nieblaDeshacer(u.seq0, u.pend0);
+    renderPanel();
+    pedirDibujo();
+    toast(`Deshecho${u.costo > 0 ? ` · +${fmt(u.costo)} No2` : ''}`);
+  }catch(err){
+    console.error('No se pudo deshacer:', err);
+    toast(err.code === 'permission-denied' ? 'No podés deshacer eso' : 'No se pudo deshacer');
+  }
+}
+
+// Vuelve a tapar lo que se descubrió después de seq0 (lo que ese paso destapó):
+// lo que todavía estaba por guardarse se descarta y lo ya guardado se saca de
+// las celdas descubiertas del mapa.
+function nieblaDeshacer(seq0, pend0){
+  if(!nieblaActiva) return;
+  [...nieblaPendientes].forEach(k => { if(!pend0 || !pend0.has(k)) nieblaPendientes.delete(k); });
+  const sacar = new Set();
+  nieblaLog.filter(l => l.seq > seq0).forEach(l => l.celdas.forEach(k => sacar.add(k)));
+  while(nieblaLog.length && nieblaLog[nieblaLog.length - 1].seq > seq0) nieblaLog.pop();
+  nieblaFirma = '';
+  if(!sacar.size) return;
+  sacar.forEach(k => nieblaDescubierta.delete(k));
+  fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: firebase.firestore.FieldValue.arrayRemove(...sacar)}, {merge: true})
+    .catch(err => console.error('No se pudo volver a tapar la niebla:', err));
+}
+
 async function confirmarRuta(){
   const p = rutaPendiente;
   if(!p || p.confirmando) return;  // un solo cobro aunque lleguen dos clics
@@ -4226,12 +4301,14 @@ async function confirmarRuta(){
   document.body.classList.remove('con-ruta');
   if(!t){ cancelarRuta(); return; }
   const costo = p.pasos * p.porCasillero;
+  const origen = p.celdas[0], seq0 = nieblaSeq, pend0 = new Set(nieblaPendientes), rotAntes = num(t.rotacion || 0);
   try{
     const esCreep = t.tipo === 'creep';
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
+    if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep
       ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
       : `−${fmt(costo)} No2 · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
@@ -5559,7 +5636,7 @@ function hudConectar(t){
     const centro = handleRotar.parentElement.getBoundingClientRect();
     const d = disposicion.find(x => x.id === seleccion);
     const tokIni = tokens.get(seleccion);
-    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom, inicial: num(tokIni && tokIni.rotacion || 0)};
+    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom, inicial: num(tokIni && tokIni.rotacion || 0), seq0: nieblaSeq, pend0: new Set(nieblaPendientes)};
   };
   if(handleRotar) handleRotar.onpointermove = e => {
     if(!rotando || rotando.id !== seleccion) return;
@@ -5577,7 +5654,7 @@ function hudConectar(t){
   };
   if(handleRotar) handleRotar.onpointerup = async e => {
     if(!rotando) return;
-    const id = rotando.id, inicial = rotando.inicial;
+    const id = rotando.id, inicial = rotando.inicial, seq0 = rotando.seq0, pend0 = rotando.pend0;
     const tok = tokens.get(id);
     rotando = null;
     handleRotar.releasePointerCapture(e.pointerId);
@@ -5591,8 +5668,10 @@ function hudConectar(t){
     // de un personaje de un jugador (no puede tocar su ficha): ahí no se gasta ni el giro gratis.
     const giroSinCosto = moverLibre === id || (soyGM && tok.tipo === 'pj');
     // …salvo el primero después de moverse: elegir hacia dónde queda mirando es gratis.
+    let usoGratis = false, cobrado = 0;
     if(costo > 0 && !giroSinCosto && giroLibre.has(id)){
       giroLibre.delete(id);
+      usoGratis = true;
       costo = 0;
       toast('Elegiste hacia dónde mirás (gratis). Desde ahora, cada giro cuesta 1 No2 por giro de 60°.');
     }
@@ -5600,6 +5679,7 @@ function hudConectar(t){
       try{
         const esCreep = tok.tipo === 'creep';
         const quedan = esCreep ? await gastarNitrosCreep(tok.fichaId, costo) : await gastarNitros(tok.fichaId, costo);
+        cobrado = costo;
         toast(`Giro: −${fmt(costo)} No2 · ${esCreep ? 'le quedan' : 'te quedan'} ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de los No2' : ''}`);
       }catch(err){
         console.error('No se pudo cobrar el giro:', err);
@@ -5608,6 +5688,7 @@ function hudConectar(t){
         return;
       }
     }
+    if(fin !== inicial) deshacerRegistrar({tipo: 'giro', id, fichaId: tok.fichaId, esCreep: tok.tipo === 'creep', costo: cobrado, rotacion: inicial, gratis: usoGratis, seq0, pend0});
     editarToken(id, {rotacion: fin});
   };
   const botonEditar = hud.querySelector("[data-hud-editar]");

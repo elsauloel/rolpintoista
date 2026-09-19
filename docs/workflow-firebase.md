@@ -314,3 +314,13 @@ restaurarlos.
 
 Dos perfiles de Chrome (o una ventana normal y una de incógnito) con
 cuentas distintas: uno crea la partida (GM) y el otro se une (jugador).
+
+`campanas/{id}/mapa/niebla` (o `campanas/{id}/mapas/{mapaId}/estado/niebla`)
+— niebla de guerra del mapa: `{activa: bool, descubiertas: [números],
+actualizado}`. Cada número empaqueta una casilla (`(col + 100000) * 200001 +
+(fila + 100000)`); son las casillas que el grupo ya descubrió. El GM
+escribe todo (prender/apagar, reiniciar, destapar o tapar a mano); cualquier
+miembro puede sumar casillas mientras mueve su personaje (las reglas solo le
+dejan tocar `descubiertas`). Tope de 30000 casillas en las reglas (Firestore
+indexa cada elemento del arreglo: pasado de ~40000 falla). El campo de visión
+y la última posición vista se calculan en cada navegador y no se guardan.

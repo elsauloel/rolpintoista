@@ -155,23 +155,15 @@ esto.
   10 hexágonos (azul) y la zona de alerta (naranja/rojo), que son del
   sigilo y no cambian la niebla. Medido a ojo del diagrama (radio 6, cuña
   de 120°) — confirmar. *(2026-09-19)*
-- 🔲 **P48. Quién ve por quién.** ¿Cada jugador ve solo lo que ven sus
-  propios tokens, o lo que ve cualquiera del grupo (visión compartida)?
-  *(2026-09-19)*
-- 🔲 **P49. Memoria de lo descubierto.** La niebla gris implica recordar lo
-  ya visto: ¿es por jugador o común a todo el grupo? ¿Se guarda entre
-  sesiones (en Firestore) o se reinicia al recargar? ¿El GM puede
-  reiniciarla o revelar/tapar zonas a mano? *(2026-09-19)*
-- 🔲 **P50. Qué ve el GM.** ¿Todo siempre, con la niebla apenas insinuada, o
-  con opción de "ver como jugador"? *(2026-09-19)*
+- ✅ **P48. Quién ve por quién.** Respondido 2026-09-19: todos los aliados jugadores ven lo mismo (la unión de sus campos de visión).
+- ✅ **P49. Memoria de lo descubierto.** Respondido 2026-09-19: es por grupo, se guarda entre sesiones (Firestore) y el GM la puede reiniciar y destapar/tapar a mano.
+- ✅ **P50. Qué ve el GM.** Respondido 2026-09-19: todo, con la opción "Como jugador" (sin ella, la niebla apenas se le insinúa).
 - 🔲 **P51. Creeps y niebla.** ¿La niebla es solo para jugadores (los creeps
   no la usan)? ¿Los creeps que están dentro de la visión se ven, y los
   demás desaparecen del mapa del jugador? *(2026-09-19)*
-- 🔲 **P52. Obstáculos.** ¿Los elementos Sólidos tapan la vista (recorta el
+- 🔲 **P52. Obstáculos (a definir, 2026-09-19).** ¿Los elementos Sólidos tapan la vista (recorta el
   campo de visión)? Es la P17, ahora con más peso. *(2026-09-19)*
-- 🔲 **P53. Tokens vistos y luego perdidos.** Un token que estaba en el
-  campo de visión y sale de él: ¿desaparece, o queda una marca de "última
-  posición vista"? (Se cruza con la P8 de sigilo.) *(2026-09-19)*
+- ✅ **P53. Tokens vistos y luego perdidos.** Respondido 2026-09-19: queda una marca de "última posición vista" (hecho, anotada en memoria local de cada navegador; no se guarda entre sesiones).
 - 🔲 **P54. Alcance de lo oculto.** Por ahora, ¿alcanza con ocultarlo en lo
   visual (un jugador técnico que mire la base de datos vería todo), como el
   token "oculto"? *(2026-09-19)*

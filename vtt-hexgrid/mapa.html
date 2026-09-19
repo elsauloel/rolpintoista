@@ -534,6 +534,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
   </div>
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
+  <button type="button" class="btn" id="btn-niebla" title="Niebla de guerra (solo GM)" hidden>🌫 Niebla: no</button>
+  <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -920,8 +922,8 @@ function rutaMapaEstado(doc){
 // poder cortarlos al cambiar de mapa y no quedarse escuchando el anterior.
 let cortarFondo1 = null, cortarFondo2 = null, cortarModo = null, cortarIniciativa = null, cortarTokensListener = null;
 function cortarEscuchasMapa(){
-  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener, cortarElementosListener, cortarPingsListener].forEach(f => f && f());
-  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = cortarElementosListener = cortarPingsListener = null;
+  [cortarFondo1, cortarFondo2, cortarModo, cortarIniciativa, cortarTokensListener, cortarTrazosListener, cortarElementosListener, cortarPingsListener, cortarNiebla].forEach(f => f && f());
+  cortarFondo1 = cortarFondo2 = cortarModo = cortarIniciativa = cortarTokensListener = cortarTrazosListener = cortarElementosListener = cortarPingsListener = cortarNiebla = null;
 }
 
 // Cambia qué mapa está cargado: corta lo anterior, limpia lo que se venía
@@ -937,6 +939,7 @@ function cambiarMapaMostrado(nuevoId){
   trazos.clear(); trazoSeleccionado = null;
   elementos.clear(); elementoSeleccionado = null;
   pings.clear();
+  nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';
   iniciativa = {orden: [], turno: 0, ronda: 1};
@@ -947,7 +950,9 @@ function cambiarMapaMostrado(nuevoId){
   escucharTrazos();
   escucharElementos();
   escucharPings();
+  escucharNiebla();
   actualizarBotonMapas();
+  renderNiebla();
   renderModo();
   renderIniciativa();
   renderPanel(true);
@@ -1228,6 +1233,186 @@ function renderLinkHerramienta(){
   a.textContent = soyGM ? '⚔ GM Tools' : '📜 Mi ficha';
   a.title = soyGM ? 'Abrir GM Tools en una pestaña nueva' : 'Abrir tu ficha en una pestaña nueva';
   a.hidden = false;
+}
+
+/* ---------- Niebla de guerra ----------
+   Doc `mapa/niebla` (o `mapas/{id}/estado/niebla`): {activa, descubiertas:
+   [celdas empaquetadas]}. Doble niebla: NEGRA (nunca vista: no se ve ni el
+   mapa ni los tokens) y GRIS semitransparente (ya descubierta, pero fuera del
+   campo de visión de ahora: se ve el mapa, no los tokens). Todos los
+   personajes jugadores ven lo mismo (la unión de sus campos de visión) y lo
+   descubierto es del grupo y queda guardado. El GM lo ve todo, con la opción
+   de "Como jugador". Campo de visión por defecto: radio de 6 hexágonos menos
+   una cuña ciega de 120° hacia atrás (ver docs/preguntas-abiertas.md, P47). */
+const NB_OFF = 100000, NB_K = 200001;
+const VISION_RADIO = 6;
+const VISION_CUNA_CIEGA = 60;   // grados a cada lado de "atrás" que no se ven (120° en total)
+let nieblaActiva = false;
+let nieblaDescubierta = new Set();   // claves empaquetadas (col, fila)
+let nieblaVista = new Set();         // lo que ven ahora los personajes jugadores
+let nieblaFirma = '';                // para recalcular solo cuando algo se movió
+let nieblaFantasmas = new Map();     // tokenId -> {col, fila}: última posición vista
+let nieblaComoJugador = false;       // solo GM, por navegador
+let nieblaPendientes = new Set(), nieblaTimer = null;
+let cortarNiebla = null;
+try{ nieblaComoJugador = localStorage.getItem('niebla-como-jugador') === '1'; }catch(e){}
+
+const nbPack = (col, fila) => (col + NB_OFF) * NB_K + (fila + NB_OFF);
+const nbUnpack = k => ({col: Math.floor(k / NB_K) - NB_OFF, fila: (k % NB_K) - NB_OFF});
+// La niebla tapa para los jugadores, y para el GM solo si eligió "Como jugador".
+function nieblaAplica(){ return nieblaActiva && (!soyGM || nieblaComoJugador); }
+// Aliados (personajes jugadores e invocaciones) se ven siempre; el resto,
+// solo dentro del campo de visión.
+function tokenVisiblePorNiebla(t){
+  if(!nieblaAplica() || t.tipo === 'pj') return true;
+  return nieblaVista.has(nbPack(t.col, t.fila));
+}
+
+// Casillas (offsets en cubo) que ve un token según hacia dónde mira:
+// radio VISION_RADIO menos la cuña de atrás. Una por cada uno de los 6 frentes.
+const visionOffsets = [];
+function offsetsVision(k){
+  if(visionOffsets[k]) return visionOffsets[k];
+  const rot = k * 60 * Math.PI / 180;
+  const bx = Math.sin(rot), by = -Math.cos(rot);   // "atrás" (el frente es (-sin, cos); 0° = abajo)
+  const base = hexCentro(0, 0);
+  const res = [];
+  for(let dq = -VISION_RADIO; dq <= VISION_RADIO; dq++){
+    for(let dr = Math.max(-VISION_RADIO, -dq - VISION_RADIO); dr <= Math.min(VISION_RADIO, -dq + VISION_RADIO); dr++){
+      const p = hexCentro(cuboACol(dq, dr), cuboAFila(dq, dr));
+      const vx = p.x - base.x, vy = p.y - base.y, largo = Math.hypot(vx, vy);
+      if(largo > 0){
+        const ang = Math.acos(Math.max(-1, Math.min(1, (vx * bx + vy * by) / largo))) * 180 / Math.PI;
+        if(ang < VISION_CUNA_CIEGA - 1) continue;   // punto ciego (las diagonales traseras sí se ven)
+      }
+      res.push({dq, dr});
+    }
+  }
+  return (visionOffsets[k] = res);
+}
+function celdasVisionDe(t){
+  const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
+  const c0 = hexACubo({col: t.col, fila: t.fila});
+  return offsetsVision(k).map(o => { const q = c0.q + o.dq, r = c0.r + o.dr; return nbPack(cuboACol(q, r), cuboAFila(q, r)); });
+}
+
+// Recalcula lo que se ve ahora (y las últimas posiciones vistas) cuando algo
+// se movió, y suma lo nuevo a lo descubierto. Se llama al empezar a dibujar.
+function nieblaActualizar(){
+  if(!nieblaActiva){
+    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
+    return;
+  }
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo}`).join('|');
+  if(firma === nieblaFirma) return;
+  nieblaFirma = firma;
+  const vista = new Set();
+  tokens.forEach(t => {
+    if(t.tipo !== 'pj' || t.oculto || (t.fichaId && t.fichaId.includes(SEP_INVOCACION))) return;
+    const suyas = soyGM || (fbUsuario && t.duenoUid === fbUsuario.uid);
+    celdasVisionDe(t).forEach(k => {
+      vista.add(k);
+      if(suyas && !nieblaDescubierta.has(k)) nieblaPendientes.add(k);
+    });
+  });
+  nieblaVista = vista;
+  // Última posición vista de lo que no es aliado: se anota mientras se ve.
+  tokens.forEach((t, id) => {
+    if(t.tipo === 'pj' || t.oculto) return;
+    if(vista.has(nbPack(t.col, t.fila))) nieblaFantasmas.set(id, {col: t.col, fila: t.fila});
+  });
+  nieblaFantasmas.forEach((f, id) => {
+    const t = tokens.get(id);
+    // Ya no existe o quedó oculto, o esa casilla se ve y no está ahí: se olvida.
+    if(!t || t.oculto || (vista.has(nbPack(f.col, f.fila)) && !(t.col === f.col && t.fila === f.fila))) nieblaFantasmas.delete(id);
+  });
+  nieblaProgramarGuardado();
+}
+
+function nieblaProgramarGuardado(){
+  if(!nieblaPendientes.size || nieblaTimer) return;
+  nieblaTimer = setTimeout(async () => {
+    nieblaTimer = null;
+    const lista = [...nieblaPendientes].filter(k => !nieblaDescubierta.has(k));
+    nieblaPendientes.clear();
+    if(!lista.length || !nieblaActiva) return;
+    lista.forEach(k => nieblaDescubierta.add(k));   // se ve enseguida; el snapshot lo confirma
+    pedirDibujo();
+    try{
+      await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: firebase.firestore.FieldValue.arrayUnion(...lista)}, {merge: true});
+    }catch(err){
+      console.error('No se pudo guardar lo descubierto:', err);
+      toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo guardar la niebla');
+    }
+  }, 400);
+}
+
+function escucharNiebla(){
+  cortarNiebla = fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).onSnapshot(doc => {
+    const d = doc.exists ? doc.data() : {};
+    nieblaActiva = d.activa === true;
+    nieblaDescubierta = new Set(Array.isArray(d.descubiertas) ? d.descubiertas.map(Number) : []);
+    nieblaFirma = '';
+    renderNiebla();
+    pedirDibujo();
+  }, err => console.error('Error escuchando la niebla:', err));
+}
+
+function renderNiebla(){
+  const b = $('#btn-niebla'), j = $('#btn-niebla-jugador');
+  b.hidden = !(soyGM && fbMiembro);
+  b.classList.toggle('primary', nieblaActiva);
+  b.textContent = nieblaActiva ? '🌫 Niebla: sí' : '🌫 Niebla: no';
+  b.title = nieblaActiva ? 'Apagar la niebla de guerra en este mapa' : 'Prender la niebla de guerra en este mapa';
+  j.hidden = !(soyGM && fbMiembro && nieblaActiva);
+  j.classList.toggle('primary', nieblaComoJugador);
+  j.title = nieblaComoJugador ? 'Volver a verlo todo' : 'Ver el mapa como lo ven los jugadores';
+}
+$('#btn-niebla').onclick = async () => {
+  if(!soyGM) return;
+  try{
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({activa: !nieblaActiva, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+  }catch(err){ console.error('No se pudo cambiar la niebla:', err); toast('No se pudo cambiar la niebla'); }
+};
+$('#btn-niebla-jugador').onclick = () => {
+  nieblaComoJugador = !nieblaComoJugador;
+  try{ localStorage.setItem('niebla-como-jugador', nieblaComoJugador ? '1' : ''); }catch(e){}
+  renderNiebla(); pedirDibujo();
+};
+
+// GM: destapar o tapar a mano con un pincel (herramienta 🌫 de la caja de
+// herramientas) y reiniciar todo lo descubierto.
+let nieblaModo = 'destapar';   // 'destapar' | 'tapar'
+let nieblaPincelRadio = 1;
+let pincelNiebla = null;       // {celdas:Set} mientras se pinta
+function nieblaPintar(px, py){
+  const m = pantallaAMundo(px, py);
+  const c0 = hexACubo(mundoAHex(m.x, m.y));
+  const R = nieblaPincelRadio;
+  for(let dq = -R; dq <= R; dq++){
+    for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++){
+      const k = nbPack(cuboACol(c0.q + dq, c0.r + dr), cuboAFila(c0.q + dq, c0.r + dr));
+      pincelNiebla.celdas.add(k);
+      if(nieblaModo === 'destapar') nieblaDescubierta.add(k); else nieblaDescubierta.delete(k);
+    }
+  }
+  pedirDibujo();
+}
+async function nieblaGuardarPincel(){
+  const p = pincelNiebla;
+  pincelNiebla = null;
+  if(!p || !p.celdas.size) return;
+  const F = firebase.firestore.FieldValue;
+  const lista = [...p.celdas];
+  try{
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: nieblaModo === 'destapar' ? F.arrayUnion(...lista) : F.arrayRemove(...lista)}, {merge: true});
+  }catch(err){ console.error('No se pudo guardar el pincel de niebla:', err); toast('No se pudo guardar la niebla'); }
+}
+async function nieblaReiniciar(){
+  if(!soyGM || !confirm('¿Volver a tapar todo lo descubierto de este mapa?')) return;
+  try{
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: []}, {merge: true});
+  }catch(err){ console.error('No se pudo reiniciar la niebla:', err); toast('No se pudo reiniciar la niebla'); }
 }
 
 /* ---------- Mantenimiento del GM ----------
@@ -1767,7 +1952,7 @@ function calcularDisposicion(){
   // Tokens ocultos (solo el GM los prepara y los muestra cuando corresponde):
   // a los jugadores ni se les dibujan ni se pueden tocar.
   const orden = [...tokens.entries()]
-    .filter(([, t]) => soyGM || !t.oculto)
+    .filter(([, t]) => (soyGM || !t.oculto) && tokenVisiblePorNiebla(t))
     .map(([id, t]) => ({id, t}))
     .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
   const grupos = new Map();
@@ -1801,6 +1986,7 @@ function calcularDisposicion(){
 
 // Devuelve true si todavía hay algo animándose.
 function dibujar(){
+  nieblaActualizar();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0F0C0E';
   ctx.fillRect(0, 0, lienzo.width, lienzo.height);
@@ -2028,6 +2214,8 @@ function dibujar(){
   estelas.forEach((e, id) => {
     const resta = e.hasta - ahora;
     if(resta <= 0){ estelas.delete(id); return; }
+    const tEstela = tokens.get(id);
+    if(tEstela && !tokenVisiblePorNiebla(tEstela)) return;   // la estela de lo que no se ve tampoco
     dibujarEstela(e.celdas, Math.min(1, resta / 1200));
     animando = true;
   });
@@ -2037,6 +2225,7 @@ function dibujar(){
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {
     if(t.oculto && !soyGM) return;
+    if(!tokenVisiblePorNiebla(t)) return;
     const aura = auraDe(t);
     if(!aura) return;
     const dib = disposicion.find(d => d.id === id);
@@ -2237,6 +2426,54 @@ function dibujar(){
     ctx.stroke();
   }
 
+  // Niebla de guerra: encima del mapa y los tokens, debajo de los pings.
+  // Negra = nunca vista; gris = ya descubierta pero fuera de la visión de
+  // ahora. Al GM (sin "Como jugador") solo se le insinúa.
+  if(nieblaActiva){
+    const aplica = nieblaAplica();
+    const alfaNegra = aplica ? 1 : 0.4, alfaGris = aplica ? 0.6 : 0.25;
+    const margen = HEX * 2;
+    const x0 = a.x - margen, y0 = a.y - margen, x1 = b.x + margen, y1 = b.y + margen;
+    const abiertas = [], grises = [];
+    const dentro = c => { const p = hexCentro(c.col, c.fila); return p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1; };
+    nieblaDescubierta.forEach(k => { if(nieblaVista.has(k)) return; const c = nbUnpack(k); if(dentro(c)) grises.push(c); });
+    nieblaVista.forEach(k => { const c = nbUnpack(k); if(dentro(c)) abiertas.push(c); });
+    const trazarLista = lista => lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    // Negra: todo el cuadro menos las casillas descubiertas o a la vista.
+    ctx.beginPath();
+    ctx.rect(x0, y0, x1 - x0, y1 - y0);
+    trazarLista(grises); trazarLista(abiertas);
+    ctx.globalAlpha = alfaNegra;
+    ctx.fillStyle = '#000';
+    ctx.fill('evenodd');
+    // Gris: lo ya descubierto que ahora no se ve.
+    if(grises.length){
+      ctx.beginPath();
+      trazarLista(grises);
+      ctx.globalAlpha = alfaGris;
+      ctx.fillStyle = 'rgb(58,60,70)';
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // Última posición vista de lo que ya no está a la vista.
+    if(aplica){
+      nieblaFantasmas.forEach((f, id) => {
+        const t = tokens.get(id);
+        if(!t || nieblaVista.has(nbPack(t.col, t.fila))) return;
+        const c = hexCentro(f.col, f.fila);
+        trazarPuntos(verticesHex(c.x, c.y, HEX * 0.68));
+        ctx.fillStyle = colorConAlfa(t.color || '#9A867E', 0.35); ctx.fill();
+        ctx.setLineDash([5 / z, 4 / z]);
+        ctx.strokeStyle = 'rgba(237,227,210,.75)'; ctx.lineWidth = 2 / z; ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `700 ${HEX * 0.7}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(237,227,210,.85)';
+        ctx.fillText('?', c.x, c.y + HEX * 0.04);
+      });
+    }
+  }
+
   // Ping (clic derecho): un anillo que se expande y se apaga solo, con
   // el nombre de quién lo mandó, arriba de todo lo demás.
   pings.forEach((p, id) => {
@@ -2307,6 +2544,15 @@ lienzo.addEventListener('pointerdown', e => {
   if(e.button !== 0 && e.pointerType === 'mouse') return;
   // Un clic en el mapa consolida el borrador (y nada más: no empieza otro).
   if(borradorElemento){ consolidarBorradorElemento(); return; }
+  // Pincel de niebla (GM): destapa o tapa lo que se arrastra.
+  if(herramientaActiva === 'niebla' && soyGM){
+    lienzo.setPointerCapture(e.pointerId);
+    pincelNiebla = {celdas: new Set()};
+    const pe = posEvento(e);
+    nieblaPintar(pe.px, pe.py);
+    lienzo.style.cursor = 'crosshair';
+    return;
+  }
   const {px, py} = posEvento(e);
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
@@ -2451,6 +2697,7 @@ lienzo.addEventListener('pointerdown', e => {
 
 lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
+  if(pincelNiebla){ nieblaPintar(px, py); return; }
   if(dibujando){
     if(dibujando.hex){
       // Casillero por casillero, como la estela de un token (sin costo ni
@@ -2625,6 +2872,7 @@ function extenderRuta(a, casilla){
 }
 
 function soltar(){
+  if(pincelNiebla) nieblaGuardarPincel();
   if(dibujando){
     const d = dibujando;
     dibujando = null;
@@ -4002,6 +4250,7 @@ function renderPanel(forzar){
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
   $('#btn-fondo').hidden = !soyGM;
+  renderNiebla();
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
   actualizarBotonMapas();
@@ -4967,6 +5216,7 @@ function imagenElementoOpcionHtml(imagen){
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'F'},
+  {id: 'niebla', icono: '🌫', nombre: 'Niebla', detalle: 'Destapar o tapar zonas a mano, o reiniciar (GM)', lista: true, soloGM: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},
 ];
@@ -5003,7 +5253,7 @@ function renderToolkit(){
   const pestana = $('#toolkit-pestana');
   pestana.setAttribute('aria-expanded', toolkitAbierto ? 'true' : 'false');
   pestana.title = (toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas') + ' (atajo: H)';
-  $('#toolkit-lista').innerHTML = HERRAMIENTAS.map(h => {
+  $('#toolkit-lista').innerHTML = HERRAMIENTAS.filter(h => !h.soloGM || soyGM).map(h => {
     const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}"${h.atajo ? ` title="${esc(h.nombre)} — atajo de teclado: ${esc(h.atajo)}"` : ''}>
@@ -5036,6 +5286,17 @@ function renderHerramientaFlotante(){
       <p class="tk-lapiz-ayuda">${lapizEstilo === 'casillas'
         ? (lapizPermanente ? 'Queda fija en esas casillas: se selecciona (fuera de la herramienta) y se borra con Suprimir. No se mueve.' : 'Marcá la trayectoria arrastrando casillero por casillero; se ve un par de segundos y se borra sola.')
         : (lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.')}</p>`;
+  }else if(herramientaActiva === 'niebla'){
+    cuerpo = `
+      <label class="etiqueta" style="margin-top:0">Pincel</label>
+      <select id="niebla-modo-select">
+        <option value="destapar"${nieblaModo === 'destapar' ? ' selected' : ''}>Destapar</option>
+        <option value="tapar"${nieblaModo === 'tapar' ? ' selected' : ''}>Tapar</option>
+      </select>
+      <label class="etiqueta">Radio: ${nieblaPincelRadio} (1 casilla + ${nieblaPincelRadio} anillo${nieblaPincelRadio === 1 ? '' : 's'})</label>
+      <input type="range" id="niebla-radio" min="0" max="5" step="1" value="${nieblaPincelRadio}">
+      <p class="tk-lapiz-ayuda">Arrastrá sobre el mapa para ${nieblaModo === 'destapar' ? 'destapar' : 'volver a tapar'} zonas. ${nieblaActiva ? '' : 'La niebla está apagada: prendela con el botón de la cabecera.'}</p>
+      <div class="fila"><button type="button" class="btn peligro" id="niebla-reiniciar">Reiniciar (tapar todo)</button></div>`;
   }else if(herramientaActiva === 'elemento'){
     cuerpo = `
       <label class="etiqueta" style="margin-top:0">Forma</label>
@@ -5085,6 +5346,7 @@ $('#toolkit-lista').addEventListener('click', e => {
 });
 $('#herramienta-flotante').addEventListener('click', e => {
   if(e.target.closest('#herr-cerrar')){ desactivarHerramienta(); return; }
+  if(e.target.closest('#niebla-reiniciar')){ nieblaReiniciar(); return; }
   if(e.target.closest('#borrador-crear')){ consolidarBorradorElemento(); return; }
   if(e.target.closest('#borrador-descartar')){ descartarBorradorElemento(); return; }
   const color = e.target.closest('[data-lapiz-color]');
@@ -5126,6 +5388,11 @@ $('#herramienta-flotante').addEventListener('click', e => {
   }
 });
 $('#herramienta-flotante').addEventListener('change', e => {
+  if(e.target.id === 'niebla-modo-select'){
+    nieblaModo = e.target.value === 'tapar' ? 'tapar' : 'destapar';
+    renderHerramientaFlotante();
+    return;
+  }
   if(e.target.id === 'lapiz-estilo-select'){
     lapizEstilo = e.target.value === 'casillas' ? 'casillas' : 'libre';
     try{ localStorage.setItem('lapiz-estilo', lapizEstilo); }catch(err){}
@@ -5164,6 +5431,11 @@ $('#herramienta-flotante').addEventListener('change', e => {
   }
 });
 $('#herramienta-flotante').addEventListener('input', e => {
+  if(e.target.id === 'niebla-radio'){
+    nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
+    const et = e.target.previousElementSibling;
+    if(et) et.textContent = `Radio: ${nieblaPincelRadio} (1 casilla + ${nieblaPincelRadio} anillo${nieblaPincelRadio === 1 ? '' : 's'})`;
+  }
   if(e.target.id === 'elem-alfa-slider'){
     elemAlfa = num(e.target.value);
     try{ localStorage.setItem('elem-alfa', elemAlfa); }catch(err){}

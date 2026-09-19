@@ -37,6 +37,34 @@ nuevo de Rol Pintoísta. Paso 2 de
   visual — todavía no hay cono de visión ni sigilo que lo use (ver
   "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`); cuando se
   construya, el lado opuesto al frente es el punto ciego.
+- **🌫 Niebla de guerra** (2026-09-19, primer paso; diseño en `../docs/preguntas-abiertas.md`
+  P47–P54). Doc `campanas/{id}/mapa/niebla` (o `mapas/{id}/estado/niebla`) =
+  `{activa, descubiertas:[celdas empaquetadas con nbPack], actualizado}`.
+  **Doble niebla**: negra (nunca vista: no se ve ni mapa ni tokens) y gris
+  semitransparente (ya descubierta, fuera de la visión de ahora: se ve el
+  mapa, no los tokens que no sean aliados). Se dibuja en `dibujar` entre los
+  trazos y los pings (evenodd: cuadro entero menos casillas descubiertas o
+  a la vista). **Campo de visión por defecto** (`offsetsVision`,
+  `celdasVisionDe`): radio `VISION_RADIO` = 6 menos una cuña ciega de 120°
+  hacia atrás (las diagonales traseras sí se ven); gira con el frente del
+  token. Todos los tokens `pj` (no invocaciones, no ocultos) dan visión y
+  cada jugador ve la **unión** de todos; los tokens `pj` se ven siempre, el
+  resto solo dentro de esa unión (`tokenVisiblePorNiebla`, usado en
+  `calcularDisposicion`, auras y estelas). Lo descubierto es **del grupo y
+  persiste**: `nieblaActualizar` (al empezar a dibujar, solo si algo se
+  movió) anota las casillas nuevas de los tokens que cada uno puede mover
+  (el GM, todas) y `nieblaProgramarGuardado` las sube con `arrayUnion`
+  (400 ms de espera). **Última posición vista**: `nieblaFantasmas`, una
+  marca "?" atenuada donde se vio por última vez a un token no aliado que
+  salió de la visión (solo en memoria de cada navegador). **GM**: botón
+  `🌫 Niebla: sí/no` en la cabecera (prende/apaga por mapa) y, con la niebla
+  prendida, `👁 Como jugador` (por navegador, `niebla-como-jugador`); sin él,
+  la niebla se le insinúa (negra al 40 %, gris al 25 %). Herramienta
+  `🌫 Niebla` (solo GM) en la caja de herramientas: pincel de radio 0–5 para
+  **destapar o tapar a mano** (`nieblaPintar`, `arrayUnion`/`arrayRemove`) y
+  "Reiniciar (tapar todo)". Pendiente: obstáculos que tapen la vista (P52),
+  filtrar el orden de turnos y otras listas que nombran tokens fuera de la
+  visión, y ocultar de verdad (hoy es solo visual, P54).
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

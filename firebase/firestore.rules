@@ -211,6 +211,19 @@ service cloud.firestore {
           && despues.orden.size() == antes.orden.size();
       }
 
+      // Niebla de guerra (mapa/niebla o mapas/{id}/estado/niebla):
+      // {activa, descubiertas:[celdas empaquetadas], actualizado}. El GM
+      // escribe todo (prender/apagar, reiniciar, destapar o tapar a mano);
+      // cualquier miembro puede sumar celdas descubiertas mientras se mueve
+      // (solo toca `descubiertas`).
+      function nieblaSoloCeldas() {
+        return request.resource.data.descubiertas is list
+          && request.resource.data.descubiertas.size() <= 30000
+          && (resource == null
+            ? request.resource.data.keys().hasOnly(['descubiertas'])
+            : request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubiertas']));
+      }
+
       // Imagen de fondo del mapa (mapa/fondo, mapa/fondoImagen), modo
       // (mapa/modo), iniciativa (mapa/iniciativa) y cuál mapa ven los
       // jugadores (mapa/activo, ver mapas/{mapaId} más abajo). Se ven
@@ -219,6 +232,7 @@ service cloud.firestore {
       match /mapa/{doc} {
         allow read: if esMiembro(c);
         allow write: if esGM(c)
+          || (doc == 'niebla' && esMiembro(c) && nieblaSoloCeldas())
           || (doc == 'iniciativa' && esMiembro(c) && resource != null
             && iniciativaPropia(resource.data, request.resource.data));
       }
@@ -394,6 +408,7 @@ service cloud.firestore {
         match /estado/{doc} {
           allow read: if esMiembro(c);
           allow write: if esGM(c)
+            || (doc == 'niebla' && esMiembro(c) && nieblaSoloCeldas())
             || (doc == 'iniciativa' && esMiembro(c) && resource != null
               && iniciativaPropia(resource.data, request.resource.data));
         }

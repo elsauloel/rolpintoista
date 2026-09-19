@@ -231,10 +231,7 @@ cada uno con su stat** (P4, en principio Destreza contra Especial); también
 se puede **buscar a propósito** (P6), igual de manual. **Pendiente de probar:**
 las invocaciones en el sigilo.
 
-**Falta definir** (las preguntas completas están en
-[`preguntas-abiertas.md`](preguntas-abiertas.md)): si otro bando ve la posición
-que quedó (P8, "última posición vista" ya existe en la niebla) y el costo de
-entrar (P1).
+**Ya sin preguntas abiertas del sigilo** (2026-09-19): el costo de entrar queda en 1 No2 (P1, a revisar con los colegas) y quien se esconde a la vista deja una marca de última posición por **dos turnos** (P8, construido). Pendiente solo de probar: las invocaciones.
 
 ## Antes de abrirlo al público
 

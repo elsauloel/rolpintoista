@@ -1437,6 +1437,49 @@ function sigiloRevisar(){
   });
 }
 
+// Marca "?" atenuada de la última posición vista de un token (niebla y sigilo).
+function dibujarFantasma(col, fila, color, z){
+  const c = hexCentro(col, fila);
+  trazarPuntos(verticesHex(c.x, c.y, HEX * 0.68));
+  ctx.fillStyle = colorConAlfa(color || '#9A867E', 0.35); ctx.fill();
+  ctx.setLineDash([5 / z, 4 / z]);
+  ctx.strokeStyle = 'rgba(237,227,210,.75)'; ctx.lineWidth = 2 / z; ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `700 ${HEX * 0.7}px "Space Grotesk", system-ui, sans-serif`;
+  ctx.fillStyle = 'rgba(237,227,210,.85)';
+  ctx.fillText('?', c.x, c.y + HEX * 0.04);
+}
+// Sigilo: un rival que se escondió a la vista deja su última posición conocida
+// marcada SIGILO_MARCA_TURNOS turnos (los que pasa el Mantenimiento). Es de cada
+// navegador: se anota mientras se lo ve y nace cuando desaparece por el sigilo.
+const SIGILO_MARCA_TURNOS = 2;
+const sigiloUltimaVista = new Map();   // tokenId -> {col, fila}: dónde lo vi antes de esconderse
+const sigiloFantasmas = new Map();     // tokenId -> {col, fila, hasta}
+// ¿Es un token que YO no veo por estar en sigilo? (jugador: los creeps; GM: los
+// personajes, salvo con su 👁).
+function ocultoPorSigiloParaMi(t){
+  if(!enSigilo(t)) return false;
+  return soyGM ? (t.tipo === 'pj' && !ojoRevelando) : t.tipo === 'creep';
+}
+function sigiloFantasmasActualizar(){
+  tokens.forEach((t, id) => {
+    if(t.oculto || !(soyGM ? t.tipo === 'pj' : t.tipo === 'creep')) return;
+    if(enSigilo(t)){
+      const u = sigiloUltimaVista.get(id);
+      if(u && !sigiloFantasmas.has(id) && ocultoPorSigiloParaMi(t)){
+        sigiloFantasmas.set(id, {col: u.col, fila: u.fila, hasta: (mantenimientoNumero || 0) + SIGILO_MARCA_TURNOS});
+      }
+    }else{
+      if(tokenVisiblePorNiebla(t)) sigiloUltimaVista.set(id, {col: t.col, fila: t.fila});
+      sigiloFantasmas.delete(id);
+    }
+  });
+  [...sigiloFantasmas.keys(), ...sigiloUltimaVista.keys()].forEach(id => {
+    if(!tokens.has(id)){ sigiloFantasmas.delete(id); sigiloUltimaVista.delete(id); }
+  });
+}
+
 // El GM no ve a los personajes en sigilo, salvo apretando el ojo 👁: al
 // prenderlo se avisa a todos los jugadores (línea roja en la Mesa y un
 // destello con un ojo, ver `mesaAlertaOjo` en comun/mesa.js). Se apaga solo
@@ -1656,6 +1699,7 @@ function escucharMantenimiento(){
     const numero = doc.exists ? Math.round(num(doc.data().numero)) : 0;
     const antes = mantenimientoNumero;
     mantenimientoNumero = numero;
+    pedirDibujo();   // las marcas del sigilo duran por turnos
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
     const base = '../';
@@ -2213,6 +2257,7 @@ function calcularDisposicion(){
 function dibujar(){
   nieblaActualizar();
   sigiloRevisar();
+  sigiloFantasmasActualizar();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0F0C0E';
   ctx.fillRect(0, 0, lienzo.width, lienzo.height);
@@ -2705,19 +2750,16 @@ function dibujar(){
       nieblaFantasmas.forEach((f, id) => {
         const t = tokens.get(id);
         if(!t || nieblaVista.has(nbPack(t.col, t.fila))) return;
-        const c = hexCentro(f.col, f.fila);
-        trazarPuntos(verticesHex(c.x, c.y, HEX * 0.68));
-        ctx.fillStyle = colorConAlfa(t.color || '#9A867E', 0.35); ctx.fill();
-        ctx.setLineDash([5 / z, 4 / z]);
-        ctx.strokeStyle = 'rgba(237,227,210,.75)'; ctx.lineWidth = 2 / z; ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = `700 ${HEX * 0.7}px "Space Grotesk", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(237,227,210,.85)';
-        ctx.fillText('?', c.x, c.y + HEX * 0.04);
+        dibujarFantasma(f.col, f.fila, t.color, z);
       });
     }
   }
+  // Sigilo: quien se escondió a la vista deja su última posición marcada un par de turnos.
+  sigiloFantasmas.forEach((f, id) => {
+    const t = tokens.get(id);
+    if(!t || !ocultoPorSigiloParaMi(t) || (mantenimientoNumero || 0) >= f.hasta) return;
+    dibujarFantasma(f.col, f.fila, t.color, z);
+  });
 
   // Ping (clic derecho): un anillo que se expande y se apaga solo, con
   // el nombre de quién lo mandó, arriba de todo lo demás.

@@ -1634,6 +1634,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <h3>Botonera</h3>
         <span class="botonera-badge" id="botonera-badge-nitros">No2 0/0</span>
         <span class="botonera-badge" id="botonera-badge-sp">SP 0/0</span>
+        <span class="botonera-badge" id="botonera-badge-def" title="Defensa">Def 0</span>
       </div>
       <button class="iconbtn" id="botonera-x">Cerrar</button>
     </header>
@@ -4709,6 +4710,7 @@ function renderBotonera(){
   $('#botonera-badge-nitros').textContent = `No2 ${fmt(num(S.nitros))}/${fmt(nitrosMaximo(c))}`;
   const spMax = spMaximo(c);
   $('#botonera-badge-sp').textContent = `SP ${fmt(spMax - num(S.spGastado))}/${fmt(spMax)}`;
+  $('#botonera-badge-def').textContent = `Def ${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}`;
 
   // Habilidades sociales: arriba de todo en modo narrativo, al final (con
   // el resto de las habilidades) en modo combate — según lo que publique

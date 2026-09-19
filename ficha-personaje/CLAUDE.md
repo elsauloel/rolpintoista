@@ -132,6 +132,17 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   estado alterado (`htmlEstadoAlUsar`, compartido con los consumibles) →
   origen (Job con cuántos puntos costó — `jobCosto`, 1 por defecto, lo suma `jobBudget` vía `jobCostoDe` —, o de dónde salió; imagen) → resumen. Al crear, Guardar aparece
   en el último paso; al editar, siempre, y los pasos se pueden saltar.
+  **Actualización 2026-09-19 — primero, ¿automatizarla?** El primer paso
+  del asistente (`PASOS_HAB`, `pasosHabilidad(draft)`) pregunta Sí/No
+  (`automatizada`; una habilidad nueva arranca en `null` y no deja avanzar
+  sin responder; las viejas, sin el dato, cuentan como automatizadas —
+  `habAutomatizada`). **Sí**: pasos Costo (SP, No2 y ahora **HP**,
+  `hpCosto`, que se descuenta solo con `fijarHp` y no deja usarla si no
+  sobra vida) y **Efecto** (la tirada y el estado sobre uno mismo, que antes
+  eran dos pasos, Tirada y Estado, ahora juntos). **No**: solo Qué es,
+  Origen y Listo; el botón pasa a **Anunciar** (publica la descripción en la
+  Mesa, sin costo, sin tirada y sin estado). "Otro recurso" (más allá de
+  No2, SP y HP) todavía no existe: ver P55.
 - **Ítems paso a paso** (`abrirAsistenteItem`, asistente compartido
   `comun/asistente-item.js`): `openEditor` manda ahí todo ítem de
   inventario o catálogo que no sea consumible (nuevo o existente). Paso 1:

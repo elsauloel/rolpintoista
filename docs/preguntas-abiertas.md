@@ -167,3 +167,11 @@ esto.
 - 🔲 **P54. Alcance de lo oculto.** Por ahora, ¿alcanza con ocultarlo en lo
   visual (un jugador técnico que mire la base de datos vería todo), como el
   token "oculto"? *(2026-09-19)*
+
+## Habilidades automatizadas
+
+- 🔲 **P55. "Otro recurso" en el costo de una habilidad.** El asistente
+  ya automatiza No2, SP y HP. El usuario mencionó "u otro recurso": ¿cuál?
+  (¿municiones, cargas de un ítem, un recurso propio de una clase?). Además,
+  hoy pagar HP no deja usarla si te dejaría en 0 (hay que tener más vida que
+  el costo): ¿está bien, o se puede pagar con la vida entera? *(2026-09-19)*

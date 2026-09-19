@@ -288,3 +288,8 @@ que guarda cada parte (igual que con dos ventanas del mismo jugador).
 **Título de la pestaña** (2026-09-19): "Ficha — <personaje> · <partida>" con un
 personaje abierto, y "Ficha de personaje — <partida>" sin ninguno
 (`fichaIdentidadRender`, que se llama al abrir, soltar y renombrar).
+
+**Reposición de la miniatura** (2026-09-19): al abrir su ficha, si el dueño
+tiene retrato pero `fichas/{id}.miniatura` está vacía (el token del mapa se
+ve sin foto), la ficha la vuelve a publicar sola (`f.miniaturaDoc`,
+`f.reponerMiniatura`, en `fichaGuardarTick`).

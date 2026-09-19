@@ -9075,7 +9075,7 @@ async function fichaGuardarTick(forzar){
     if(forzar || ahora - t.cambio >= GUARDAR_QUIETO_MS || ahora - t.desde >= GUARDAR_MAX_MS) listas.push([parte, json]);
   });
   if(juntos && !listas.length) tiposGuardarJunto = false;
-  if(!listas.length && !f.revisarResumen){ fichaEstadoAlDia(); return; }
+  if(!listas.length && !f.revisarResumen && !f.reponerMiniatura){ fichaEstadoAlDia(); return; }
 
   f.escribiendo = true;
   f.revisarResumen = false;
@@ -9094,6 +9094,11 @@ async function fichaGuardarTick(forzar){
   if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
   const retrato = listas.find(([parte]) => parte === 'retrato');
   if(retrato) cambios.miniatura = await fichaMiniaturaActual();
+  else if(f.reponerMiniatura){
+    const mini = await fichaMiniaturaActual();
+    if(mini) cambios.miniatura = mini;
+    f.reponerMiniatura = false;
+  }
   if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
 
   try{
@@ -9175,6 +9180,7 @@ function fichaEscuchar(f){
     const d = doc.data();
     const lectura = fichaSoloLecturaPara(d.duenoUid, f);
     f.duenoUid = d.duenoUid;
+    f.miniaturaDoc = typeof d.miniatura === 'string' ? d.miniatura : '';   // la que ven los tokens del mapa
     if(lectura !== f.soloLectura){
       f.soloLectura = lectura;
       toast(lectura ? 'Este personaje pasó a otro dueño: queda en solo lectura' : 'Ahora este personaje es tuyo');
@@ -9207,6 +9213,8 @@ function fichaEscuchar(f){
         fichaPonerImagenesInvocaciones(imgInvocaciones);
         renderInvocaciones();
         f.cargada = true;
+        // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.
+        if(!f.soloLectura && !f.miniaturaDoc && (S.meta.imagen || S.meta.miniatura)){ f.reponerMiniatura = true; }
         f.revisarResumen = true;
         fichaMostrarLectura();
         fichaEstadoAlDia();

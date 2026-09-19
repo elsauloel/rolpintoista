@@ -2730,10 +2730,15 @@ document.addEventListener('keydown', e => {
   // el foco en un control del panel (la barra de opacidad).
   if(borradorElemento && e.key === 'Enter'){ e.preventDefault(); consolidarBorradorElemento(); return; }
   if(borradorElemento && e.key === 'Escape'){ descartarBorradorElemento(); return; }
+  // Ctrl+B: abre o cierra la bitácora flotante (también escribiendo en ella).
+  if((e.key === 'b' || e.key === 'B') && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
+    e.preventDefault();
+    abrirBitacoraFlotante(!bitacoraFlotanteAbierta);
+    return;
+  }
   if(e.target.closest && e.target.closest('input,select,textarea')) return;
-  // L o Ctrl+L: prende o apaga el Lápiz (con Ctrl+L se frena que el
-  // navegador salte a la barra de direcciones).
-  if((e.key === 'l' || e.key === 'L') && !e.altKey && !e.metaKey && fbMiembro){
+  // L: prende o apaga el Lápiz.
+  if((e.key === 'l' || e.key === 'L') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
     if(herramientaActiva === 'lapiz') desactivarHerramienta();
     else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'lapiz'; renderToolkit(); }
@@ -4960,10 +4965,10 @@ function imagenElementoOpcionHtml(imagen){
 }
 
 const HERRAMIENTAS = [
-  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L o Ctrl+L'},
+  {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'F'},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
-  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
+  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},
 ];
 let herramientaActiva = '';
 // Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho

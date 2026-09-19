@@ -210,10 +210,8 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
-  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas, **`F`** Terreno y Formas, **`B`** la Botonera del personaje principal (solo jugadores; el primer token de personaje suyo en el mapa, o su primera ficha; se cierra con Esc). La bitácora ya no tiene atajo. **`L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
-    anda mientras se escribe en un campo). Ojo: en algunos navegadores
-    Ctrl+L no se deja interceptar y salta a la barra de direcciones; la `L`
-    sola anda siempre.
+  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas, **`F`** Terreno y Formas, **`B`** la Botonera del personaje principal (solo jugadores; el primer token de personaje suyo en el mapa, o su primera ficha; se cierra con Esc). **`Ctrl+B`** abre y cierra la bitácora (anda incluso escribiendo en ella). **`L`** prende o apaga el Lápiz (2026-09-19; no
+    anda mientras se escribe en un campo). `Ctrl+L` se sacó (2026-09-19): el navegador lo usa para la barra de direcciones.
   - **Dos estilos** (`lapizEstilo`, `localStorage` `lapiz-estilo`, selector
     en su ventanita, decidido 2026-09-19): **Libre** (lo de arriba) y **Por
     casilleros**, un marcador de trayectoria como la estela de movimiento

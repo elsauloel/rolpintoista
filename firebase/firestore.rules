@@ -483,6 +483,8 @@ service cloud.firestore {
       }
     }
 
+    // (Firestore no admite comodines dentro de un nombre, por eso el match es
+    // /{bib}/{id} y se limita por lista de colecciones.)
     // Biblioteca global de creeps (comun/biblioteca.js), fuera de las
     // campañas: sirve para cualquier partida. Solo texto. Cada entrada:
     // {nombre, etiquetas, descripcion, nivel, json, autorUid, autorNombre,
@@ -505,22 +507,22 @@ service cloud.firestore {
         && d.autorUid is string
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
-    match /biblioteca_{tipo}/{id} {
-      allow read: if verificado() && tipo in ['creeps', 'skills', 'pasivas'];
-      allow create, update: if esDuenoProyecto() && tipo in ['creeps', 'skills', 'pasivas']
+    match /{bib}/{id} {
+      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas'];
+      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas']
         && entradaBiblioteca(request.resource.data);
-      allow delete: if esDuenoProyecto() && tipo in ['creeps', 'skills', 'pasivas'];
+      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas'];
     }
-    match /propuestas_{tipo}/{id} {
-      allow read: if verificado() && tipo in ['creeps', 'skills', 'pasivas']
+    match /{prop}/{id} {
+      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
         && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
-      allow create: if verificado() && tipo in ['creeps', 'skills', 'pasivas']
+      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
         && entradaBiblioteca(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;
       allow update: if false;
-      allow delete: if esDuenoProyecto()
-        || (verificado() && resource.data.autorUid == request.auth.uid);
+      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
+        && (esDuenoProyecto() || (verificado() && resource.data.autorUid == request.auth.uid));
     }
   }
 }

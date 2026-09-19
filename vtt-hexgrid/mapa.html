@@ -384,6 +384,7 @@ aside{
 .ini-fila input.ini-valor{width:46px;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:var(--r);padding:2px 4px;color:var(--paper)}
 .ini-quitar{color:var(--muted);font-size:12px;line-height:1;padding:0 2px;cursor:pointer}
 .ini-quitar:hover{color:var(--danger)}
+.ini-quitar[data-ini-ocultar]:hover{color:var(--brass)}
 #iniciativa-pie{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border-top:1px solid var(--line-soft)}
 #iniciativa-pie .btn{font-size:10px;padding:5px 8px}
 #iniciativa-vacio{padding:8px 10px;color:var(--muted)}
@@ -1986,7 +1987,7 @@ $('#btn-mantenimiento').onclick = async () => {
 };
 
 /* ---------- Tablero de iniciativa (orden de turnos) ----------
-   campanas/<partida>/mapa/iniciativa = {orden: [{id, valor}], turno, ronda}.
+   campanas/<partida>/mapa/iniciativa = {orden: [{id, valor, oculto?}], turno, ronda}.
    Lo arma y lo cambia el GM (las reglas solo lo dejan escribir a él); todos
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
@@ -2000,7 +2001,7 @@ function escucharIniciativa(){
     const d = doc.exists ? doc.data() : {};
     const antesTurno = iniciativa.turno, antesRonda = iniciativa.ronda;
     iniciativa = {
-      orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor)})).filter(o => o.id),
+      orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true})).filter(o => o.id),
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
     };
@@ -2019,7 +2020,7 @@ function puedeEditarIniciativa(t){
 
 async function guardarIniciativa(cambios){
   const datos = {
-    orden: iniciativa.orden.map(o => ({id: o.id, valor: num(o.valor)})),
+    orden: iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}),
     turno: iniciativa.turno,
     ronda: iniciativa.ronda,
     ...cambios,
@@ -2039,9 +2040,9 @@ function ordenarIniciativa(lista){
 }
 
 function iniciativaPonerTodos(){
-  const previos = new Map(iniciativa.orden.map(o => [o.id, o.valor]));
-  const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id))}));
-  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => ({id: o.id, valor: o.valor})), turno: 0});
+  const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
+  const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
+  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0});
 }
 
 function iniciativaSiguiente(){
@@ -2065,7 +2066,7 @@ function renderIniciativa(){
   // turno pasa igual cuando le toca, pero no se nota que estuvo ahí).
   const visibles = iniciativa.orden.map((o, i) => ({o, i})).filter(({o}) => {
     const t = tokens.get(o.id);
-    return soyGM || !(t && t.oculto);
+    return soyGM || !(o.oculto || (t && t.oculto));   // oculto por el GM en la lista, o token oculto
   });
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
@@ -2078,7 +2079,7 @@ function renderIniciativa(){
       const color = (t && t.color) || '#9A867E';
       // Al GM se le marca con 🙈 para acordarse de que ese no lo ven los
       // jugadores, aunque él sí lo vea en su propia lista.
-      const oculto = !!(t && t.oculto);
+      const oculto = !!(t && t.oculto) || !!o.oculto;
       // El valor lo edita el GM (cualquier fila) o el dueño (la propia): algo
       // pudo habérselo cambiado a mitad de combate. Sacar de la lista sigue
       // siendo solo del GM.
@@ -2089,7 +2090,7 @@ function renderIniciativa(){
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
-        (soyGM ? `<button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
+        (soyGM ? `<button type="button" class="ini-quitar" data-ini-ocultar="${esc(o.id)}" title="${o.oculto ? 'Mostrarlo a los jugadores en la lista' : 'Ocultarlo a los jugadores en la lista'}">${o.oculto ? '🙈' : '👁'}</button><button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
       '</div>';
     }).join('');
   }
@@ -2116,11 +2117,16 @@ function conectarIniciativa(){
       const anterior = iniciativa.orden.find(o => o.id === id);
       const nuevo = num(inp.value);
       if(!anterior || anterior.valor === nuevo) return;
-      const orden = iniciativa.orden.map(o => o.id === id ? {id, valor: nuevo} : o);
+      const orden = iniciativa.orden.map(o => o.id === id ? {...o, valor: nuevo} : o);
       guardarIniciativa({orden});
       publicarCambioIniciativa(id, anterior.valor, nuevo);
     };
     inp.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); inp.blur(); } };
+  });
+  caja.querySelectorAll('[data-ini-ocultar]').forEach(b => b.onclick = () => {
+    // Oculta (o muestra) esa fila a los jugadores; el turno pasa igual cuando le toca.
+    const orden = iniciativa.orden.map(o => o.id === b.dataset.iniOcultar ? {...o, oculto: !o.oculto} : o);
+    guardarIniciativa({orden});
   });
   caja.querySelectorAll('[data-ini-quitar]').forEach(b => b.onclick = () => {
     const orden = iniciativa.orden.filter(o => o.id !== b.dataset.iniQuitar);

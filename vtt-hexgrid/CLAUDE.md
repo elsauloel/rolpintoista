@@ -224,6 +224,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   (`publicarCambioIniciativa`, `desde: 'recordatorio'`). Tocar una fila
   selecciona y centra ese token. Plegado por navegador en `localStorage`
   (`mapa-iniciativa-plegada`).
+- **El GM puede ocultar cualquier fila del orden de turnos** (2026-09-19): en
+  cada fila el GM tiene un botón 👁/🙈 (`data-ini-ocultar`) que la oculta o la
+  muestra a los jugadores, sin importar el token (guarda `oculto: true` en esa
+  entrada de `mapa/iniciativa`; antes solo se escondían las de tokens ocultos).
+  Los jugadores no ven esa fila (el turno pasa igual cuando le toca, sin que se
+  note que estuvo); el GM la ve marcada con 🙈. Hoy es solo visual: los datos
+  llegan a todos, como el resto de lo oculto.
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del

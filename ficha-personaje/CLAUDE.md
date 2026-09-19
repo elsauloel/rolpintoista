@@ -296,7 +296,7 @@ ve sin foto), la ficha la vuelve a publicar sola (`f.miniaturaDoc`,
 
 **+ Habilidad: de clase o custom** (2026-09-19): `data-add="habilidades"` abre
 `#scrim-hab-clase` (`abrirHabClase`) en vez del editor. Custom → el asistente
-de siempre, con Job 3 por defecto (`HAB_JOB_CUSTOM`). De clase → elegir clase
+de siempre, con Job 2 por defecto (`HAB_JOB_CUSTOM`). De clase → elegir clase
 y "Agregar" (`agregarHabClase`): copia la skill de `CLASES_SKILLS`
-(`comun/skills-clase.js`) al personaje, con Job 1 si `S.meta.clase` coincide
-con esa clase (`esMiClase`) o 2 si no, y `habClaseId` para no repetirla.
+(`comun/skills-clase.js`) al personaje, siempre con Job 1 (`HAB_JOB_CLASE`,
+sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.

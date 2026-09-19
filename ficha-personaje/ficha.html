@@ -7036,9 +7036,10 @@ function comprarCarrito(){
 
 
 /* ---------- + Habilidad: de clase (pool cargado) o custom ----------
-   Job: de tu clase 1 punto, de otra clase 2, inventada de cero 3.
+   Job: cualquier habilidad de clase prefabricada 1 punto, custom 2.
    El pool sale de comun/skills-clase.js (CLASES_SKILLS). */
-const HAB_JOB_CUSTOM = 3;
+const HAB_JOB_CUSTOM = 2;
+const HAB_JOB_CLASE = 1;
 const normClase = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const claveHabClase = h => h.habClaseId || '';
 function esMiClase(clase){
@@ -7053,18 +7054,18 @@ function abrirHabClase(claseId){
     $('#hab-clase-body').innerHTML = `
       <div class="hint" style="margin-bottom:10px">Habilidad de clase = elegís una ya armada y queda cargada con toda su configuración. Custom = la armás vos paso a paso.</div>
       <div class="opcion-fila" style="margin-bottom:14px">
-        <button type="button" class="opcion-btn" data-habclase-custom="1">Habilidad custom<br><small>3 de Job</small></button>
+        <button type="button" class="opcion-btn" data-habclase-custom="1">Habilidad custom<br><small>2 de Job</small></button>
       </div>
       <div class="cat-grouphead" style="margin-top:0"><span>Habilidad de clase</span></div>
-      <div class="hint" style="margin:6px 0">${S.meta.clase ? `Tu clase: <b>${esc(S.meta.clase)}</b> (1 de Job). Las de otra clase cuestan 2.` : 'Todavía no escribiste tu clase en la ficha: sin eso todas cuestan 2 de Job.'}</div>
+      <div class="hint" style="margin:6px 0">Cualquier habilidad de clase cuesta 1 de Job${S.meta.clase ? ` (tu clase: <b>${esc(S.meta.clase)}</b>)` : ''}.</div>
       <div class="opcion-fila">${CLASES_SKILLS.map(c => `<button type="button" class="opcion-btn" data-habclase-clase="${c.id}" ${c.habilidades.length ? '' : 'disabled'}>${esc(c.nombre)}${esMiClase(c) ? ' ★' : ''}<br><small>${c.habilidades.length ? c.habilidades.length + ' cargada' + (c.habilidades.length === 1 ? '' : 's') : 'sin cargar'}</small></button>`).join('')}</div>`;
     return;
   }
-  const costo = esMiClase(clase) ? 1 : 2;
+  const costo = HAB_JOB_CLASE;
   $('#hab-clase-titulo').textContent = `Habilidades de ${clase.nombre}`;
   $('#hab-clase-body').innerHTML = `
     <button type="button" class="btn ghost" data-habclase-volver="1" style="margin-bottom:10px">← Volver</button>
-    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>${costo === 1 ? ' (es de tu clase)' : ' (no es de tu clase)'}. Te quedan ${fmt(jobBudget().resto)}.</div>
+    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>. Te quedan ${fmt(jobBudget().resto)}.</div>
     <div class="habs-grid" style="grid-template-columns:1fr">${clase.habilidades.map(h => {
       const ya = S.habilidades.some(x => claveHabClase(x) === h.id);
       const costoTxt = costoHabilidadTxt({...h, automatizada: h.automatizada !== false});
@@ -7081,7 +7082,7 @@ function agregarHabClase(claseId, habId){
   const base = clase && clase.habilidades.find(h => h.id === habId);
   if(!base) return;
   if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
-  const job = esMiClase(clase) ? 1 : 2;
+  const job = HAB_JOB_CLASE;
   S.habilidades.push({
     id: uid(), nombre: base.nombre, detalle: base.detalle, costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
@@ -7245,7 +7246,7 @@ function drawEditorHabilidad(){
         ${etiqueta("La compré con puntos de Job")}
       </label>` +
       (conJob ? `<div class="f"><label>¿Cuántos puntos de Job te costó?</label><input data-c="jobCosto" type="number" step="1" min="0" value="${fmt(jobCostoDe(draft))}" data-hab-enter="1" style="max-width:120px">
-        <div class="hint" style="margin-top:5px">De clase: 1 si es de tu clase, 2 si es de otra. Inventada de cero: 3. Te quedan ${fmt(jobBudget().resto)} de Job${editing.id ? " (contando esta)" : ""}.</div></div>` : `<div class="f"><label>¿De dónde salió?</label><input data-c="origen" value="${esc(draft.origen ?? '')}" placeholder="ej. Regalo de un hechicero, raza, objeto…" data-hab-enter="1"></div>`) +
+        <div class="hint" style="margin-top:5px">De clase prefabricada: 1. Custom: 2. Te quedan ${fmt(jobBudget().resto)} de Job${editing.id ? " (contando esta)" : ""}.</div></div>` : `<div class="f"><label>¿De dónde salió?</label><input data-c="origen" value="${esc(draft.origen ?? '')}" placeholder="ej. Regalo de un hechicero, raza, objeto…" data-hab-enter="1"></div>`) +
       campoImagenHtml(draft);
   }
   if(info.id === 'listo'){

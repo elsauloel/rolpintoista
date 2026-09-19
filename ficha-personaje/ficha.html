@@ -1788,6 +1788,20 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-sin-nitros">
+  <div class="modal" style="max-width:440px">
+    <header><h3>No te alcanzan los Nitros</h3><button class="iconbtn" id="sin-nitros-x">Cancelar</button></header>
+    <div class="body">
+      <p id="sin-nitros-texto" style="margin:0 0 8px"></p>
+      <p class="hint" style="margin:0">Si la hacés igual, se anota en rojo en la Mesa que se realizó sin Nitros suficientes, y los Nitros que tengas se gastan hasta llegar a 0.</p>
+    </div>
+    <footer>
+      <button class="btn" id="sin-nitros-cancel">Cancelar</button>
+      <button class="btn primary" id="sin-nitros-igual">Realizar de cualquier modo</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-slot-lleno">
   <div class="modal" style="max-width:460px">
     <header><h3>Slot equipado</h3><button class="iconbtn" id="slot-lleno-x">Cerrar</button></header>
@@ -3436,7 +3450,7 @@ function repararArmadura(){
 const tieneSigilo = () => S.habilidades.some(h => String(h.nombre || '').trim().toLowerCase() === 'sigilo');
 const efectoSigilo = () => S.efectos.find(e => e.activo !== false && String(e.nombre || '').trim().toLowerCase() === 'sigilo');
 
-function alternarSigilo(){
+function alternarSigilo(forzar){
   const actual = efectoSigilo();
   if(actual){
     S.efectos = S.efectos.filter(e => e !== actual);
@@ -3445,12 +3459,12 @@ function alternarSigilo(){
     return;
   }
   const costo = num(IT2.nitrosSigilo);
-  if(num(S.nitros) < costo){
-    toast(`No te alcanzan los Nitros — entrar en sigilo cuesta ${fmt(costo)}`);
+  if(num(S.nitros) < costo && !forzar){
+    avisarSinNitros(costo, 'entrar en sigilo', () => alternarSigilo(true));
     return;
   }
   const preset = EFECTOS_PRESET.find(p => p.nombre === 'Sigilo');
-  S.nitros = num(S.nitros) - costo;
+  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, 'entró en sigilo') : costo);
   S.efectos.push({id: uid(), nombre: 'Sigilo', imagen: '', turnos: 0, stacks: 1, hpturno: 0, stacksturno: 0,
     permanente: true, activo: true, popup: false, detalle: (preset && preset.detalle) || '', mods: [], ...flagsDePreset('Sigilo')});
   renderList('efectos'); renderNitros(); refresh();
@@ -5697,11 +5711,15 @@ document.addEventListener('click', e => {
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
     if(it && num(it.unidades) > 0){
       const costoNitros = costoConsumirNitros(key);
+      let gastoNitros = costoNitros;
       if(costoNitros > num(S.nitros)){
-        toast(`No te alcanzan los Nitros — consumir ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'} cuesta ${costoNitros}`);
-        return;
+        if(!b.dataset.sinnitros){
+          avisarSinNitros(costoNitros, `consumir ${it.nombre} ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'}`, () => { b.dataset.sinnitros = '1'; b.click(); delete b.dataset.sinnitros; });
+          return;
+        }
+        gastoNitros = gastoNitrosForzado(costoNitros, `consumió ${it.nombre}`);
       }
-      S.nitros = num(S.nitros) - costoNitros;
+      S.nitros = num(S.nitros) - gastoNitros;
 
       const cargaMax = Math.max(1, num(it.cargaMax) || 1);
       let carga = num(it.cargaActual ?? cargaMax);
@@ -6696,6 +6714,41 @@ function equipoModoAbrir(){
 }
 $('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
 $('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') $('#scrim-equipo').classList.remove('open'); });
+
+/* ---------- Acciones sin Nitros suficientes ----------
+   No hay Nitros negativos: si una acción cuesta más de lo que tenés, se
+   frena con un pop-up (Cancelar, o Realizar de cualquier modo — por ejemplo
+   para saber la tirada de ataque). Si se hace igual, se gastan los Nitros que
+   haya (hasta 0) y queda una línea roja en la Mesa (desde: 'alerta-roja'). */
+let sinNitrosPendiente = null;
+
+function avisarSinNitros(costo, accion, continuar){
+  sinNitrosPendiente = {continuar, costo, accion};
+  $('#sin-nitros-texto').innerHTML = `No podés <b>${esc(accion)}</b>: cuesta <b>${fmt(costo)} No2</b> y tenés <b>${fmt(Math.max(0, num(S.nitros)))}</b>.`;
+  $('#scrim-sin-nitros').classList.add('open');
+}
+// Publica la línea roja y devuelve cuántos Nitros descontar (los que haya, nunca de más).
+function gastoNitrosForzado(costo, hizo){
+  const disp = Math.max(0, num(S.nitros));
+  if(fbDb && fbUsuario && fbMiembro){
+    const nombre = ((S.meta && S.meta.nombre) || '').trim() || fbMiembro.nombre;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `⚠ ${nombre} ${hizo} sin Nitros suficientes`, formula: `Costaba ${fmt(costo)} No2 y tenía ${fmt(disp)}`,
+      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar la alerta de Nitros:', err));
+  }
+  return Math.min(costo, disp);
+}
+function cerrarSinNitros(){ sinNitrosPendiente = null; $('#scrim-sin-nitros').classList.remove('open'); }
+$('#sin-nitros-x').onclick = $('#sin-nitros-cancel').onclick = cerrarSinNitros;
+$('#scrim-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'scrim-sin-nitros') cerrarSinNitros(); });
+$('#sin-nitros-igual').onclick = () => {
+  const p = sinNitrosPendiente;
+  cerrarSinNitros();
+  if(p) p.continuar();
+};
 
 /* ---------- Equipar con el slot lleno: Reemplazar o Comparar ----------
    Al tocar Equipar en un ítem de la mochila cuyo slot no tiene lugar, en
@@ -8102,7 +8155,7 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-historial').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 
@@ -8197,14 +8250,14 @@ function pdgParaArma(arma, c){
   return {valor: v, excluidos};
 }
 
-function atacarConArma(arma){
+function atacarConArma(arma, forzar){
   const costo = costoAtaqueNitros(arma);
-  if(costo > num(S.nitros)){
-    toast(`No te alcanzan los Nitros — este ataque cuesta ${costo} y tenés ${fmt(num(S.nitros))}`);
+  if(costo > num(S.nitros) && !forzar){
+    avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(arma, true));
     return;
   }
   const primero = ataquesConArma(arma) === 0;
-  S.nitros = num(S.nitros) - costo;
+  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
   S.ataquesTurno = num(S.ataquesTurno) + 1;
   S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(arma) + 1};
   renderNitros();
@@ -8550,7 +8603,7 @@ function costoAtaqueHabTxt(){
   return `ataque: ${opciones.map(o => `${o.arma.nombre} ${fmt(costoAtaqueNitros(o.arma))}`).join(' / ')} No2`;
 }
 
-function ejecutarHabilidad(id, armaId){
+function ejecutarHabilidad(id, armaId, forzar){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
   // No automatizada: "Anunciar" solo publica la descripción en la Mesa.
@@ -8600,12 +8653,12 @@ function ejecutarHabilidad(id, armaId){
     return;
   }
   const costoNitros = costoNitrosHab(it, arma);
-  if(costoNitros > num(S.nitros)){
-    toast(`No te alcanzan los Nitros — ${it.nombre} cuesta ${fmt(costoNitros)}${nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`);
+  if(costoNitros > num(S.nitros) && !forzar){
+    avisarSinNitros(costoNitros, `usar ${it.nombre}${nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(id, armaId, true));
     return;
   }
   const costoSp = parseCostoSp(it.costo);
-  S.nitros = num(S.nitros) - costoNitros;
+  S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(costoNitros, `usó ${it.nombre}`) : costoNitros);
   S.spGastado = num(S.spGastado) + costoSp;
   const costoHp = num(it.hpCosto);
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);

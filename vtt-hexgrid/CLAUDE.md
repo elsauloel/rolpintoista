@@ -690,7 +690,7 @@ hexágono con otro sin importar bando. Todavía no está construido.
   creep privado (solo GM, `creepDefensaMapa`). Las invocaciones siguen con
   el campo simple.
 
-- **Alerta roja de sigilo** (2026-09-19): si un personaje **en sigilo** entra en
+- **Alertas rojas y sin No2** (2026-09-19; reemplaza a la primera versión): ya no hay No2 negativos. Mover o girar sin No2 suficientes se bloquea con un aviso (para eso está 🦶 Mover libre); en la ficha, atacar, usar una habilidad, consumir o entrar en sigilo sin No2 abren un pop-up con Cancelar o "Realizar de cualquier modo" (`avisarSinNitros`), que gasta los No2 que haya (hasta 0) y deja una línea roja en la Mesa (`desde: 'alerta-roja'`, `gastoNitrosForzado`). Además, si un personaje **en sigilo** entra en
   🦶 Mover libre, o se pasa de sus No2 al moverse o girar, se publica una línea
   roja en la Mesa (`desde: 'sigilo-alerta'`, `sigiloAlertaRoja`; se dibuja en
   `comun/mesa.js` sin el destello del ojo) — "⚠ X (en sigilo) entró en Mover

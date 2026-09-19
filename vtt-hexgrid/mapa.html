@@ -1487,7 +1487,7 @@ async function sigiloAlertaRoja(t, que, detalle){
     await fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
       origen: `⚠ ${nombreDe(t)} (en sigilo) ${que}`, formula: detalle || '', rolls: [], mod: 0, total: 0,
-      desde: 'sigilo-alerta', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      desde: 'alerta-roja', cuando: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){ console.error('No se pudo publicar la alerta de sigilo:', err); }
 }
@@ -4152,7 +4152,7 @@ function cerrarGirosLibres(exceptoId){
 // Llega una tirada nueva a la Mesa (comun/mesa.js): un ataque, una habilidad, una tirada
 // cualquiera cuenta como acción; los avisos del sistema (sigilo, alerta, turno) no.
 function mesaAlAccionNueva(docs){
-  if(docs.some(d => !['recordatorio', 'alerta', 'sigilo-alerta', 'mantenimiento'].includes(d.data().desde))) giroLibre.clear();
+  if(docs.some(d => !['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento'].includes(d.data().desde))) giroLibre.clear();
 }
 function abrirGiroLibre(id, celdas){
   if(modoMapa !== 'combate' || !celdas || celdas.length < 2) return;
@@ -4323,12 +4323,18 @@ async function confirmarRuta(){
   document.body.classList.remove('con-ruta');
   if(!t){ cancelarRuta(); return; }
   const costo = p.pasos * p.porCasillero;
+  // Sin No2 suficientes no se mueve (no hay No2 negativos): para eso está Mover libre.
+  const cm = costoMoverDe(t);
+  if(cm && costo > cm.disponibles){
+    toast(`No te alcanzan los No2: mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} cuesta ${fmt(costo)} y tenés ${fmt(Math.max(0, cm.disponibles))}. Para moverte igual, usá Mover libre (🦶).`);
+    cancelarRuta();
+    return;
+  }
   const origen = p.celdas[0], seq0 = nieblaSeq, pend0 = new Set(nieblaPendientes), rotAntes = num(t.rotacion || 0);
   try{
     const esCreep = t.tipo === 'creep';
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     rutaPendiente = null;
-    if(quedan < 0) sigiloAlertaRoja(t, 'se pasó de sus No2 al moverse', `Gastó ${fmt(costo)} y le quedaron ${fmt(quedan)}`);
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
@@ -5866,12 +5872,16 @@ function hudConectar(t){
       costo = 0;
       toast('Elegiste hacia dónde mirás (gratis). Desde ahora, cada giro cuesta 1 No2 por giro de 60°.');
     }
+    if(costo > 0 && !giroSinCosto && costoMoverDe(tok) && costo > costoMoverDe(tok).disponibles){
+      tok.rotacion = inicial; pedirDibujo();
+      toast(`No te alcanzan los No2 para girar: cuesta ${fmt(costo)} y tenés ${fmt(Math.max(0, costoMoverDe(tok).disponibles))}. Con Mover libre (🦶) girar es gratis.`);
+      return;
+    }
     if(costo > 0 && !giroSinCosto && costoMoverDe(tok)){
       try{
         const esCreep = tok.tipo === 'creep';
         const quedan = esCreep ? await gastarNitrosCreep(tok.fichaId, costo) : await gastarNitros(tok.fichaId, costo);
         cobrado = costo;
-        if(quedan < 0) sigiloAlertaRoja(tok, 'se pasó de sus No2 al girar', `Gastó ${fmt(costo)} y le quedaron ${fmt(quedan)}`);
         toast(`Giro: −${fmt(costo)} No2 · ${esCreep ? 'le quedan' : 'te quedan'} ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de los No2' : ''}`);
       }catch(err){
         console.error('No se pudo cobrar el giro:', err);

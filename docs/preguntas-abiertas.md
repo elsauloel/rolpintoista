@@ -217,10 +217,9 @@ equivalente que da Con (5), o sea +5 HP máx.
 - ✅ **P62. "FP".** Era SP.
 - ✅ **P63. Apilar.** Respondido 2026-09-19: sí, la misma pasiva se puede
   comprar más de una vez.
-- 🔲 **P64. Tope de compras.** Respondido 2026-09-19: el tope es la **mitad
-  del nivel, redondeada hacia abajo**. Falta aclarar si es por cada pasiva
-  (ej. nivel 6 → hasta 3 copias de cada una) o en total entre todas las
-  pasivas de este tipo. *(2026-09-19)*
+- ✅ **P64. Tope de compras.** Respondido 2026-09-19: el tope es la **mitad
+  del nivel, redondeada hacia abajo, y es POR CADA PASIVA
+  (ej. nivel 6 → hasta 3 copias de cada una). *(2026-09-19)*
 - 🔲 **P65. Pasivas situacionales.** Se van viendo más adelante
   (2026-09-19).
 - ✅ **P66. Quién las carga.** Respondido 2026-09-19: mismo esquema que la

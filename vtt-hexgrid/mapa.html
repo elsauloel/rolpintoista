@@ -2745,6 +2745,12 @@ document.addEventListener('keydown', e => {
     abrirToolkit(!toolkitAbierto);
     return;
   }
+  // B: abre o cierra la bitácora flotante.
+  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
+    e.preventDefault();
+    abrirBitacoraFlotante(!bitacoraFlotanteAbierta);
+    return;
+  }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
@@ -4933,7 +4939,7 @@ const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L o Ctrl+L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
-  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true},
+  {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'B'},
 ];
 let herramientaActiva = '';
 // Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho

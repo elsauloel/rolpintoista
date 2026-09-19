@@ -210,7 +210,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
-  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas. **`L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
+  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas, **`B`** la bitácora. **`L` o `Ctrl+L`** prende o apaga el Lápiz (2026-09-19; no
     anda mientras se escribe en un campo). Ojo: en algunos navegadores
     Ctrl+L no se deja interceptar y salta a la barra de direcciones; la `L`
     sola anda siempre.

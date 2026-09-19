@@ -71,7 +71,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
    flotante, no tapa el mapa — los cambios se ven ahí atrás en vivo antes
    de Guardar. */
 #elem-edit{
-  position:fixed;top:70px;right:346px;z-index:90;width:260px;max-width:calc(100vw - 362px);
+  position:fixed;top:130px;right:346px;z-index:90;width:260px;max-width:calc(100vw - 362px);
   max-height:calc(100vh - 90px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
   border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:8px
 }
@@ -118,6 +118,13 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #modo-switch[data-modo="combate"] .perilla::after{left:18px}
 #modo-switch:disabled{opacity:1;cursor:default}
 .zoom .btn{padding:7px 10px}
+/* Switch de modo y zoom: flotan sobre el mapa, arriba a la derecha. */
+#flotantes-mapa{position:absolute;top:12px;right:12px;z-index:24;display:flex;align-items:center;gap:8px;
+  background:rgba(26,20,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 8px 22px rgba(0,0,0,.5);padding:5px 7px}
+#barra-acciones-token{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#barra-acciones-token .chico-barra{padding:5px 10px;font-size:10.5px}
+#token-etiqueta,#elemento-etiqueta{top:64px!important}
 /* Mantenimiento (GM), arriba de todo en la barra lateral: verde para que se note. */
 .btn-mant{width:100%;background:rgba(46,107,87,.25);border-color:#3E9B5B;color:#CFE6D8;font-weight:700;padding:9px 12px}
 .btn-mant:hover{background:#2E6B57;border-color:#3E9B5B;color:#EAF3E6}
@@ -545,10 +552,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
   <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span></button>
-  <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
-    <span class="perilla"></span><span id="modo-texto">Narrativo</span>
-  </button>
-  <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <div class="desplegable" id="personajes-caja" hidden>
     <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
@@ -569,15 +572,20 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
-  <div class="zoom">
-    <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
-    <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
-  </div>
 </header>
 
 <main>
   <div id="lienzo-caja">
     <canvas id="lienzo"></canvas>
+    <div id="flotantes-mapa">
+      <div class="zoom">
+        <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
+        <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
+      </div>
+      <button type="button" id="modo-switch" role="switch" aria-checked="false" data-modo="narrativo" disabled title="Modo del mapa (lo cambia el GM)">
+        <span class="perilla"></span><span id="modo-texto">Narrativo</span>
+      </button>
+    </div>
     <div id="aviso-mapa" hidden></div>
     <div id="hud" hidden></div>
     <div id="token-etiqueta" hidden></div>
@@ -613,6 +621,10 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <aside>
     <div class="seccion" id="caja-mantenimiento" hidden>
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
+    </div>
+    <div class="seccion" id="barra-acciones-token">
+      <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+      <a class="btn chico-barra" href="../comun/prueba-dados.html" target="_blank" rel="noopener" style="text-decoration:none" title="Elegir cómo se ven y suenan tus dados 3D">Personalización 🎲</a>
     </div>
     <div class="seccion" id="panel-token"></div>
     <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
@@ -4850,7 +4862,6 @@ function renderPanel(forzar){
           '</span>' +
         '</span>' +
       '</span></h2>' +
-      '<a class="btn chico-barra" href="../comun/prueba-dados.html" target="_blank" rel="noopener" style="text-decoration:none" title="Elegir cómo se ven y suenan tus dados 3D">Personalización 🎲</a>' +
       '</div>';
     return;
   }

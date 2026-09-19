@@ -37,6 +37,13 @@ nuevo de Rol Pintoísta. Paso 2 de
   visual — todavía no hay cono de visión ni sigilo que lo use (ver
   "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`); cuando se
   construya, el lado opuesto al frente es el punto ciego.
+- **Cabecera en una línea** (2026-09-19): para que entre, salieron de la
+  cabecera el **switch de modo y el zoom −/+** (ahora flotan sobre el mapa, arriba a
+  la derecha, `#flotantes-mapa`; los carteles del token y del elemento
+  seleccionado bajaron debajo de ellos) y **+ Token** (ahora está en la barra
+  del costado, `#barra-acciones-token`, junto a "Personalización 🎲" de los dados);
+  y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
+  estado, Mapas, GM Tools/Mi ficha, Personajes, Fondo, 👁, Dados y Centrar.
 - **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
   la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
@@ -143,7 +150,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que
   copian las otras tres herramientas.
-- **Modo narrativo / combate** (switch en la cabecera, `modoMapa`, doc
+- **Modo narrativo / combate** (switch flotante arriba a la derecha del mapa, junto al zoom −/+ — `#flotantes-mapa`, 2026-09-19; antes estaba en la cabecera —, `modoMapa`, doc
   `campanas/{id}/mapa/modo` = `{modo}`): lo cambia el GM y lo ven todos.
   Narrativo (verde): la estela se ve pero mover no gasta No2
   (`costoMoverDe` devuelve null). Combate (rojo): mover gasta No2 y la

@@ -2745,6 +2745,13 @@ document.addEventListener('keydown', e => {
     abrirToolkit(!toolkitAbierto);
     return;
   }
+  // F: prende o apaga Terreno y Formas.
+  if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
+    e.preventDefault();
+    if(herramientaActiva === 'elemento') desactivarHerramienta();
+    else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'elemento'; renderToolkit(); }
+    return;
+  }
   // B: abre o cierra la bitácora flotante.
   if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
@@ -4937,7 +4944,7 @@ function imagenElementoOpcionHtml(imagen){
 
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L o Ctrl+L'},
-  {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true},
+  {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'F'},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'B'},
 ];

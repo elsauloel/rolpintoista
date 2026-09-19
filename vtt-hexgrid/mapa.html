@@ -124,6 +124,8 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
   box-shadow:0 8px 22px rgba(0,0,0,.5);padding:5px 7px}
 #barra-acciones-token{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #barra-acciones-token .chico-barra{padding:5px 10px;font-size:10.5px}
+#ayuda-token .ayuda-globo{left:-90px}
+#panel-token:empty{display:none}
 #token-etiqueta,#elemento-etiqueta{top:64px!important}
 /* Mantenimiento (GM), arriba de todo en la barra lateral: verde para que se note. */
 .btn-mant{width:100%;background:rgba(46,107,87,.25);border-color:#3E9B5B;color:#CFE6D8;font-weight:700;padding:9px 12px}
@@ -626,6 +628,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     </div>
     <div class="seccion" id="barra-acciones-token">
       <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token</button>
+      <span class="ayuda-icono" id="ayuda-token" tabindex="0" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
       <a class="btn chico-barra" href="../comun/prueba-dados.html" target="_blank" rel="noopener" style="text-decoration:none" title="Elegir cómo se ven y suenan tus dados 3D">Personalización 🎲</a>
     </div>
     <div class="seccion" id="panel-token"></div>
@@ -4643,6 +4646,25 @@ function actualizarEscuchasCreeps(){
   });
 }
 
+// Ayuda del (?) de la barra del costado: cómo se mueven los tokens y la guía de colores de los bordes.
+function actualizarAyudaToken(){
+  const item = (color, texto) => `<span><i style="border-color:${color}"></i>${texto}</span>`;
+  // El GM no suele tener tokens de personaje propios: el dorado solo
+  // aparece en su leyenda si tiene alguno.
+  const gmConPropios = soyGM && [...tokens.values()].some(x => claseToken(x) === 'propio');
+  const ayuda = soyGM
+    ? 'Tocá un token para ver de quién es. Vos movés los creeps y los NPC arrastrándolos; los personajes los mueve cada jugador. ' +
+      'En modo combate los creeps gastan sus No2 al moverse (si se pasan, te pide confirmar); los NPC se mueven sin costo. Con el switch de arriba pasás de modo narrativo a combate para toda la mesa. '
+    : 'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ';
+  const leyenda = soyGM
+    ? (gmConPropios ? item(BORDE.propio, 'Tuyos') : '') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC') + item(BORDE.jugador, 'Jugadores')
+    : item(BORDE.propio, 'Tuyos') + item(BORDE.jugador, 'Otros jugadores') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC');
+  $('#ayuda-token-globo').innerHTML =
+    ayuda +
+    'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.' +
+    '<span class="leyenda">' + leyenda + '</span>';
+}
+
 function renderPanel(forzar){
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
@@ -4669,6 +4691,7 @@ function renderPanel(forzar){
   }
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
+  actualizarAyudaToken();
   $('#btn-fondo').hidden = !soyGM;
   renderNiebla();
   renderOjo();
@@ -4839,32 +4862,8 @@ function renderPanel(forzar){
   // Los datos del token se ven en los controles flotantes (HUD): el panel
   // del costado queda solo con Token (?) y la configuración de los dados.
   if(!t || !editandoToken){
-    const item = (color, texto) => `<span><i style="border-color:${color}"></i>${texto}</span>`;
-    // El GM no suele tener tokens de personaje propios: el dorado solo
-    // aparece en su leyenda si tiene alguno.
-    const gmConPropios = soyGM && [...tokens.values()].some(x => claseToken(x) === 'propio');
-    const ayuda = soyGM
-      ? 'Tocá un token para ver de quién es. Vos movés los creeps y los NPC arrastrándolos; los personajes los mueve cada jugador. ' +
-        'En modo combate los creeps gastan sus No2 al moverse (si se pasan, te pide confirmar); los NPC se mueven sin costo. Con el switch de arriba pasás de modo narrativo a combate para toda la mesa. '
-      : 'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ';
-    const leyenda = soyGM
-      ? (gmConPropios ? item(BORDE.propio, 'Tuyos') : '') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC') + item(BORDE.jugador, 'Jugadores')
-      : item(BORDE.propio, 'Tuyos') + item(BORDE.jugador, 'Otros jugadores') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC');
-    panel.innerHTML =
-      // La ayuda queda escondida detrás del (?): aparece al pasar el cursor
-      // (o al tocarlo en pantallas táctiles).
-      // Barra partida en dos: a la izquierda Token (?), a la derecha la
-      // configuración de los dados 3D.
-      '<div class="barra-token">' +
-      '<h2 class="con-ayuda">Token <span class="ayuda-icono" tabindex="0" aria-label="Ayuda">?' +
-        '<span class="ayuda-globo" role="tooltip">' +
-          ayuda +
-          'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.' +
-          '<span class="leyenda">' + leyenda +
-          '</span>' +
-        '</span>' +
-      '</span></h2>' +
-      '</div>';
+    // (La ayuda de los tokens vive en el (?) de la barra de arriba: actualizarAyudaToken.)
+    panel.innerHTML = '';
     return;
   }
 

@@ -182,8 +182,8 @@ nuevo de Rol Pintoísta. Paso 2 de
   vía `modificarCreep` (transacción sobre `privado/ficha` + resumen +
   firma, la misma que usa `cambiarVidaCreep`). El panel del creep le
   muestra al GM sus No2.
-- Panel del costado: solo Mantenimiento (GM), "Token (?)" con la ayuda y la
-  leyenda de colores, y el botón de configuración de los dados 3D. Los datos
+- Panel del costado: Mantenimiento (GM) y una barra fija con **+ Token**, el (?) con la ayuda y la
+  leyenda de colores de los bordes (`#ayuda-token`, `actualizarAyudaToken`; 2026-09-19, antes era una barra aparte "Token (?)") y el botón de configuración de los dados 3D. Los datos
   del token van en el HUD flotante (no se repiten acá). "✎ Editar token"
   está en el globo del ⚙ del HUD: abre en el panel el vínculo, nombre,
   color, dueño (GM) y "Sacar del mapa" (`editandoToken`).

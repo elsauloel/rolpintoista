@@ -678,3 +678,14 @@ hexágono con otro sin importar bando. Todavía no está construido.
 - `../comun/mesa.js` y `../comun/tiradas.js` — la Mesa y las fórmulas de
   dados, compartidas con la ficha y gm-tools (el mapa define
   `MESA_DESDE = 'mapa'` y `mesaQuien()`, y tiene su propio HTML de Mesa).
+
+- **Vida desde el círculo rojo del HUD** (2026-09-19): el clic abre un mini
+  menú (`hudHpHtml`) con dos modos que se cambian ahí mismo: **1 · Recibe
+  daño** (por defecto: se escribe el daño del golpe, se le resta la Defensa,
+  con Invulnerable y Escudo mágico — `resolverGolpe`, `danioCreep`,
+  `danioPj`) y **2 · HP directo** (el de siempre: valor, +5, −3). Explica lo
+  que va a pasar y muestra una vista previa en vivo. Para un PJ la Defensa
+  sale de `resumen.def` que publica la ficha (`fichaResumen`; una ficha que
+  no se guardó desde entonces no la tiene y avisa); para un creep, del
+  creep privado (solo GM, `creepDefensaMapa`). Las invocaciones siguen con
+  el campo simple.

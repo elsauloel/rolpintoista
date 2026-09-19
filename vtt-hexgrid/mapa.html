@@ -446,6 +446,14 @@ aside{
   pointer-events:auto;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
   border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
 }
+#hud .hud-hp-modos{display:flex;gap:6px;margin-bottom:8px}
+#hud .hud-hp-modos .hud-mini{flex:1;padding:4px 6px}
+#hud .hud-mini.activo{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+#hud .hud-hp-expl{color:var(--muted);line-height:1.4;margin-bottom:8px}
+#hud .hud-hp-expl b{color:var(--paper)}
+#hud input.hud-hp-in{width:100%;box-sizing:border-box;height:32px;border-radius:var(--r);border:1px solid var(--line);background:rgba(15,12,14,.96);color:var(--paper);font-family:"Space Mono",monospace;font-size:13px;padding:0 8px}
+#hud .hud-hp-prev{min-height:18px;margin-top:6px;font-family:"Space Mono",monospace;font-size:11.5px;color:var(--brass)}
+#hud .hud-hp-pie{margin-top:6px;font-size:10.5px;color:var(--muted)}
 #hud .hud-globo-acciones{margin-top:8px;display:flex;justify-content:flex-end}
 #hud .hud-globo h3{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
 #hud .hud-estado{display:flex;align-items:center;gap:6px;padding:4px 0;border-top:1px solid var(--line-soft)}
@@ -5282,6 +5290,7 @@ function hudDatos(t){
     hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
     sp: conSp ? sp : null, spMax: conSp ? spMax : null,
     no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
+    def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
     estados: (v && v.resumen && v.resumen.estados) || [],
   };
 }
@@ -5328,8 +5337,156 @@ function hudHtml(t){
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
+  if(hudGlobo === 'hp' && puede) globo = hudHpHtml(t, d);
   if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t, d);
   return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
+}
+
+/* ---------- Vida desde el círculo rojo: recibir daño o cambiar HP directo ----------
+   Un clic en el círculo rojo abre un mini menú con dos opciones que se
+   cambian ahí mismo: 1) "Recibe daño" (por defecto): se escribe el daño del
+   golpe y se le resta la Defensa; 2) "HP directo": el número de siempre
+   (valor, +5, -3) sin tener en cuenta la Defensa. */
+let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
+
+function creepDefensaMapa(sc){
+  const activos = (sc.estados || []).filter(e => e && e.activo !== false);
+  let v = num(sc.defensa);
+  if(activos.some(e => e.armaduraArruinada)){
+    v -= (sc.equipo || []).filter(it => it.tipoItem === 'armadura_blanda' || it.tipoItem === 'armadura_rigida')
+      .reduce((a, it) => a + num(it.def), 0);
+  }
+  v -= activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
+  return Math.max(0, v);
+}
+
+// Golpe − Defensa, con Invulnerable y Escudo mágico (mismas reglas que gm-tools
+// con los creeps). Modifica el escudo de `efectos`: pasar una copia para solo mirar.
+function resolverGolpe(golpe, defensa, efectos){
+  const activos = (efectos || []).filter(e => e && e.activo !== false);
+  if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
+  let recibido = Math.max(0, golpe - defensa);
+  let absorbido = 0;
+  const escudo = activos.find(e => num(e.escudoMagico) > 0 && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
+  if(escudo && recibido > 0){
+    const actual = num(escudo.escudoMagicoActual ?? escudo.escudoMagico);
+    absorbido = Math.min(recibido, actual);
+    escudo.escudoMagicoActual = actual - absorbido;
+    recibido -= absorbido;
+  }
+  return {recibido, absorbido, defensa, espinas: recibido > 0 && activos.some(e => e.espinas)};
+}
+
+function leerGolpe(texto){
+  const crudo = String(texto || '').trim().replace(',', '.');
+  return /^\d+(?:\.\d+)?$/.test(crudo) ? parseFloat(crudo) : null;
+}
+
+function golpeTexto(nombre, golpe, r, previo, nuevo){
+  const extra = [];
+  if(r.absorbido) extra.push(`Escudo mágico absorbió ${fmt(r.absorbido)}`);
+  if(r.espinas) extra.push(`Espinas: cobrale ${fmt(Math.ceil(r.recibido * 0.5))} al atacante`);
+  const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
+  if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
+  if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
+  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(r.recibido)} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;
+}
+
+async function danioCreep(t, texto){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const res = await modificarCreep(t.fichaId, sc => {
+    const r = resolverGolpe(golpe, creepDefensaMapa(sc), sc.estados);
+    const previo = num(sc.hp);
+    sc.hp = Math.max(0, previo - r.recibido);
+    return {r, previo, nuevo: sc.hp};
+  });
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+}
+
+async function danioPj(t, texto){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const res = await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const rs = ficha.data().resumen || {};
+    if(rs.def === undefined) throw new Error('SIN_DEF');
+    const r = resolverGolpe(golpe, num(rs.def), datos.efectos);
+    const previo = num(datos.hp);
+    datos.hp = Math.max(0, previo - r.recibido);
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
+    return {r, previo, nuevo: datos.hp};
+  });
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+}
+
+function hudHpHtml(t, d){
+  const danio = hpModo === 'danio';
+  const def = d.def === null || d.def === undefined ? null : d.def;
+  return `<div class="hud-globo hud-hp">
+    <h3>Vida · ${esc(nombreDe(t))}</h3>
+    <div class="hud-hp-modos">
+      <button type="button" class="hud-mini${danio ? ' activo' : ''}" data-hud-hpmodo="danio">1 · Recibe daño</button>
+      <button type="button" class="hud-mini${danio ? '' : ' activo'}" data-hud-hpmodo="directo">2 · HP directo</button>
+    </div>
+    <div class="hud-hp-expl">${danio
+      ? (def === null
+        ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
+        : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
+      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
+    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
+    <div class="hud-hp-prev" data-hud-hp-prev></div>
+    <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
+  </div>`;
+}
+
+// Lo que va a pasar, en vivo mientras se escribe (sin tocar nada todavía).
+function hudHpPrevia(t, d, texto){
+  const crudo = String(texto || '').trim();
+  if(!crudo) return '';
+  const hp = num(d.hp);
+  if(hpModo === 'directo'){
+    const nuevo = leerValorVital(crudo, hp);
+    if(nuevo === null) return 'Escribí un número, o +5 / −3';
+    const tope = num(d.hpMax) > 0 ? Math.min(num(d.hpMax), nuevo) : nuevo;
+    return `HP ${fmt(hp)} → ${fmt(Math.max(0, tope))}`;
+  }
+  if(/^[+\-−]/.test(crudo)) return 'Para curar o ajustar sin Defensa, usá 2 · HP directo';
+  const golpe = leerGolpe(crudo);
+  if(golpe === null) return 'Escribí el daño del golpe (un número)';
+  if(d.def === null || d.def === undefined) return '—';
+  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  const r = resolverGolpe(golpe, num(d.def), sc ? structuredClone(sc.estados || []) : []);
+  if(r.invulnerable) return 'Invulnerable: no recibe daño';
+  const nuevo = Math.max(0, hp - r.recibido);
+  return `${fmt(golpe)} − Def ${fmt(num(d.def))} = ${fmt(Math.max(0, golpe - num(d.def)))}${r.absorbido ? ` (escudo −${fmt(r.absorbido)})` : ''} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+}
+
+async function hudHpAplicar(t, texto){
+  if(!String(texto).trim()) return;
+  try{
+    if(hpModo === 'directo'){
+      hudGlobo = '';
+      await hudAplicar('hp', texto);
+      return;
+    }
+    if(/^[+\-−]/.test(String(texto).trim())){ toast('Para curar o ajustar sin Defensa, usá 2 · HP directo'); return; }
+    if(t.tipo === 'creep') await danioCreep(t, texto); else await danioPj(t, texto);
+    hudGlobo = '';
+  }catch(err){
+    console.error('No se pudo aplicar el daño:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí el daño del golpe (un número)'
+      : err.message === 'SIN_DEF' ? 'Su ficha todavía no publicó la Defensa: usá 2 · HP directo'
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo aplicar: ' + err.message);
+  }finally{
+    pedirDibujo();
+  }
 }
 
 function hudEstadosHtml(t, estados, puede){
@@ -5471,7 +5628,7 @@ function hudUbicar(){
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
-  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
+  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);
@@ -5550,9 +5707,28 @@ function hudAcomodarGlobo(globos, r){
 function hudConectar(t){
   const hud = $('#hud');
   hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
+    // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
+    if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; }
+      hudEditando = ''; pedirDibujo();
+      return;
+    }
     hudEditando = b.dataset.hudValor; hudGlobo = ''; pedirDibujo();
     setTimeout(() => { const i = hud.querySelector('[data-hud-in]'); if(i) i.focus(); }, 30);
   });
+  // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
+  hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
+  const campoHp = hud.querySelector('[data-hud-hp-in]');
+  if(campoHp){
+    const dHp = hudDatos(t);
+    const previa = hud.querySelector('[data-hud-hp-prev]');
+    campoHp.oninput = () => { previa.textContent = hudHpPrevia(t, dHp, campoHp.value); };
+    campoHp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudHpAplicar(t, campoHp.value); }
+      if(e.key === 'Escape'){ e.stopPropagation(); hudGlobo = ''; pedirDibujo(); }
+    };
+    setTimeout(() => campoHp.focus(), 30);
+  }
   const campo = hud.querySelector('[data-hud-in]');
   if(campo){
     campo.onkeydown = e => {

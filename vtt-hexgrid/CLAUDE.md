@@ -291,7 +291,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   - `trazoSeleccionado` y la selección de token (`seleccion`) son
     mutuamente excluyentes (`trazoSeleccionar`/`seleccionar` se limpian
     entre sí).
-  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas, **`F`** Terreno y Formas, **`M`** 🦶 Mover libre del token seleccionado (el mismo botón del HUD; con el modo prendido, otra `M` lo apaga), **`B`** la Botonera del personaje principal (solo jugadores; el primer token de personaje suyo en el mapa, o su primera ficha; se cierra con Esc). **`Ctrl+B`** abre y cierra la bitácora (anda incluso escribiendo en ella). **`L`** prende o apaga el Lápiz (2026-09-19; no
+  - **Atajos** (2026-09-19; no andan mientras se escribe en un campo; los botones lo avisan en su cartel al pasar el mouse): **`H`** abre y cierra la caja de herramientas, **`F`** Terreno y Formas, **`M`** 🦶 Mover libre del token seleccionado (el mismo botón del HUD; con el modo prendido, otra `M` lo apaga), **`B`** la Botonera del personaje principal (solo jugadores; el primer token de personaje suyo en el mapa, o su primera ficha; se cierra con Esc o con otra `B`, tanto con el foco en el mapa como adentro de la Botonera — la ficha en `?modo=botonera` lo maneja igual que Escape). **`Ctrl+B`** abre y cierra la bitácora (anda incluso escribiendo en ella). **`L`** prende o apaga el Lápiz (2026-09-19; no
     anda mientras se escribe en un campo). `Ctrl+L` se sacó (2026-09-19): el navegador lo usa para la barra de direcciones.
   - **Dos estilos** (`lapizEstilo`, `localStorage` `lapiz-estilo`, selector
     en su ventanita, decidido 2026-09-19): **Libre** (lo de arriba) y **Por
@@ -392,6 +392,7 @@ nuevo de Rol Pintoísta. Paso 2 de
     Destildarlo después de crear el elemento no se puede — es de las
     cosas fijas al crear (junto con tipo/celdas), para eso se borra y se
     crea uno nuevo (ver ⚙️ más abajo).
+  - **Cartel del elemento seleccionado** (`#elemento-etiqueta`, `actualizarEtiquetaElemento`, 2026-09-19): arriba a la derecha, igual que el del token, dice la forma, su creador y en grande si es **🧱 SÓLIDO (bloquea el paso, borde rojo)** o **🚶 TRANSITABLE (borde verde)**, más si es invisible o está fijado.
   - **Actualización 2026-09-19 — el token se choca:** en vez de dejar
     cruzar el obstáculo y cancelar recién al soltar, `extenderRuta`
     corta el avance en la última casilla libre (devuelve `chocado`) y el

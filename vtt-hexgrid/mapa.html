@@ -362,6 +362,20 @@ aside{
 }
 #token-etiqueta b{color:var(--brass);font-weight:600}
 #token-etiqueta span{color:var(--muted);font-weight:400}
+/* Cartel del elemento (Terreno/Formas) seleccionado: deja claro si bloquea el
+   paso (sólido) o se puede pisar. */
+#elemento-etiqueta{
+  position:absolute;top:12px;right:12px;z-index:23;max-width:70%;pointer-events:none;
+  background:rgba(26,20,24,.9);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.5);
+  padding:6px 12px;font-size:13px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#elemento-etiqueta b{color:var(--brass);font-weight:600}
+#elemento-etiqueta span{color:var(--muted);font-weight:400}
+#elemento-etiqueta .es-solido{color:#F08A84;font-weight:700}
+#elemento-etiqueta .es-libre{color:#8EE6A8;font-weight:700}
+#elemento-etiqueta.solido{border-color:rgba(216,82,75,.85)}
+#elemento-etiqueta.libre{border-color:rgba(142,230,168,.55)}
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
 #hud .hud-anillo{position:absolute;left:0;top:0}
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
@@ -554,6 +568,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div id="aviso-mapa" hidden></div>
     <div id="hud" hidden></div>
     <div id="token-etiqueta" hidden></div>
+    <div id="elemento-etiqueta" hidden></div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
@@ -3275,7 +3290,8 @@ document.addEventListener('keydown', e => {
   // Con la Botonera o las Acciones abiertas, el teclado es de esa ventana:
   // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
   if(!$('#botonera-capa').hidden){
-    if(e.key === 'Escape') escapeABotonera();
+    // Escape, o B (la tecla que la abre; solo jugadores), la cierra.
+    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && !soyGM)) escapeABotonera();
     return;
   }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
@@ -5021,6 +5037,32 @@ function hudAjustesHtml(t, d){
 // Cartel fijo arriba a la derecha con el nombre del token y su dueño (el
 // jugador, o "GM" en un creep/NPC): no se achica con el zoom, para
 // leerlo igual con la grilla chiquita.
+// Cartel fijo del elemento (Terreno/Formas) seleccionado: si es sólido o transitable,
+// bien visible. Se actualiza al dibujar (solo toca el DOM si cambia).
+let etiquetaElementoTexto = null;
+function actualizarEtiquetaElemento(){
+  const el = $('#elemento-etiqueta');
+  const e = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
+  if(!e || !fbMiembro || creando || panelFondo || panelMapas || !puedeVerElemento(e)){
+    if(etiquetaElementoTexto !== ''){ el.hidden = true; etiquetaElementoTexto = ''; }
+    return;
+  }
+  const forma = e.tipo === 'linea' ? 'Línea' : e.tipo === 'libre' ? 'Forma libre' : 'Flor';
+  const estado = e.solido
+    ? '<span class="es-solido">🧱 SÓLIDO · bloquea el paso</span>'
+    : '<span class="es-libre">🚶 TRANSITABLE · se puede pisar</span>';
+  const extra = (e.invisible ? ' · <span>👁 invisible para jugadores</span>' : '') + (e.fijado ? ' · <span>📌 fijado</span>' : '');
+  const dueno = nombreMiembro(e.duenoUid);
+  const html = `<b>${forma}</b> <span>${esc(/^\(/.test(dueno) ? dueno : `(${dueno})`)}</span> · ${estado}${extra}`;
+  const clase = e.solido ? 'solido' : 'libre';
+  const clave = clase + '|' + html;
+  if(clave === etiquetaElementoTexto) return;
+  etiquetaElementoTexto = clave;
+  el.className = clase;
+  el.innerHTML = html;
+  el.hidden = false;
+}
+
 function actualizarEtiquetaToken(){
   const el = $('#token-etiqueta');
   const t = seleccion ? tokens.get(seleccion) : null;
@@ -5033,6 +5075,7 @@ function actualizarEtiquetaToken(){
 // Dibuja el HUD y lo acomoda sobre el token seleccionado.
 function hudUbicar(){
   actualizarEtiquetaToken();
+  actualizarEtiquetaElemento();
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !fbMiembro || creando || panelFondo || panelMapas){ hud.hidden = true; return; }

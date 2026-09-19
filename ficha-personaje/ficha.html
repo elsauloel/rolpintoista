@@ -9683,6 +9683,15 @@ if(MODO_BOTONERA){
   const revisarCerrada = () => {
     if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open')) botoneraAvisarMapa('botonera-cerrada');
   };
+  // B (la misma tecla que la abre desde el mapa): cierra la Botonera. Se hace
+  // como Escape, que ya cierra todas las ventanitas; no anda mientras se escribe.
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'b' && e.key !== 'B') return;
+    if(e.ctrlKey || e.altKey || e.metaKey || e.isTrusted === false) return;
+    if(e.target && e.target.closest && e.target.closest('input,select,textarea,[contenteditable]')) return;
+    e.preventDefault();
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+  });
   const observador = new MutationObserver(revisarCerrada);
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {

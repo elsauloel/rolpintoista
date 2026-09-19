@@ -219,7 +219,7 @@ público").
 3. ✅ (2026-09-19) Cono y alerta dibujados (con el frente automático al moverse, el punto
    ciego y los sólidos que tapan la vista); también para creeps e
    invocaciones.
-4. Ruptura automática por entrar al cono, y el aviso de tiradas por pasos
+4. ✅ (2026-09-19) Ruptura automática por entrar al cono, y el aviso de tiradas por pasos
    en la alerta.
 5. ✅ (2026-09-19) Costo de girar: 1 No2 por giro de 60°, solo en combate.
 

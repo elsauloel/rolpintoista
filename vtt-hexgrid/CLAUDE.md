@@ -103,6 +103,22 @@ nuevo de Rol Pintoísta. Paso 2 de
   cuenta (PJ vinculado o creep). Todavía falta: la ruptura automática del
   sigilo al entrar en un cono, el aviso de tiradas por pasos en la alerta y
   que el sigilo tenga en cuenta las invocaciones.
+- **🕶 Sigilo, paso 4: detección** (2026-09-19). **Ruptura automática**: un
+  token en sigilo que queda dentro del **cono** de un rival (creep si es
+  personaje; personaje si es creep) pierde el sigilo solo —
+  `sigiloRevisar`, en cada `dibujar` pero solo si algo cambió; lo hace el que
+  maneja ese token (el dueño, o el GM con sus creeps) sacando el estado con
+  `hudEstadoCambiar` — y sale una línea en la Mesa ("perdió el sigilo · lo
+  detectó X"). **Al soltar** el token (no mientras se arrastra para evaluar
+  rutas: P18), `sigiloEvaluarRuta` **corta la ruta en la primera casilla
+  que cae en un cono**: aparece donde lo detectaron (P9). **Tiradas**: cada paso
+  que da dentro de la **zona de alerta** de un rival cuenta como una tirada
+  de detección; el mapa solo cuenta y publica en la Mesa "X dio N pasos en la
+  zona de alerta de Y → N tiradas de detección" cuando el movimiento se guarda
+  (`sigiloPublicarAvisos`); la tirada es manual (en principio Destreza contra
+  Especial, P3). Caminar de espaldas al rival no cuenta (su punto ciego).
+  Todavía falta: definir quién tira (P4), buscar a propósito (P6), la
+  acción hostil que rompe el sigilo (P7) y la ficha de las invocaciones.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

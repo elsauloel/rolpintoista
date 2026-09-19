@@ -1346,6 +1346,97 @@ function zonasParaVer(){
   return rivales.map(zonasSigilo);
 }
 
+/* ---------- Sigilo, paso 4: detección automática y avisos ----------
+   Un token en sigilo que pisa el CONO de un rival (creep si es personaje,
+   personaje si es creep) pierde el sigilo solo — y al soltarlo, la ruta se
+   corta en esa casilla: aparece donde lo detectaron. Cada paso dentro de la
+   ZONA DE ALERTA de un rival pide una tirada de detección, que es manual: el
+   mapa solo cuenta y avisa en la Mesa. Solo cuenta lo efectivo (lo que se
+   suelta), no lo que se arrastra para evaluar rutas. */
+const sigiloAvisosPendientes = new Map();   // tokenId -> [{rival, pasos}] a publicar cuando el movimiento se guarda
+const sigiloRompiendo = new Set();
+let sigiloFirmaRev = '';
+
+function rivalesDe(t){
+  const lista = [];
+  tokens.forEach(r => {
+    if(r === t || r.oculto) return;
+    if(t.tipo === 'pj' ? r.tipo !== 'creep' : r.tipo !== 'pj') return;
+    const e = estadoDe(r);
+    if(e && e.muerto) return;
+    lista.push(r);
+  });
+  return lista;
+}
+function zonasClaves(r){
+  const z = zonasSigilo(r);
+  return {nombre: nombreDe(r), cono: new Set(z.cono.map(c => nbPack(c.col, c.fila))), alerta: new Set(z.alerta.map(c => nbPack(c.col, c.fila)))};
+}
+async function sigiloAviso(origen, formula){
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen, formula: formula || '', rolls: [], mod: 0, total: 0,
+      desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo avisar del sigilo en la Mesa:', err); }
+}
+// Al soltar un token en sigilo: corta la ruta en la primera casilla que cae en un
+// cono rival y cuenta los pasos que da dentro de cada zona de alerta.
+function sigiloEvaluarRuta(t, a){
+  const rivales = rivalesDe(t).map(zonasClaves);
+  if(!rivales.length) return;
+  const ruta = a.ruta;
+  let corte = -1;
+  for(let i = 1; i < ruta.length && corte < 0; i++){
+    const k = nbPack(ruta[i].col, ruta[i].fila);
+    if(rivales.some(z => z.cono.has(k))) corte = i;
+  }
+  const fin = corte >= 0 ? corte : ruta.length - 1;
+  const avisos = [];
+  rivales.forEach(z => {
+    let pasos = 0;
+    for(let i = 1; i <= fin; i++) if(z.alerta.has(nbPack(ruta[i].col, ruta[i].fila))) pasos++;
+    if(pasos > 0) avisos.push({rival: z.nombre, pasos});
+  });
+  if(corte >= 0) ruta.length = corte + 1;
+  if(avisos.length) sigiloAvisosPendientes.set(a.id, avisos);
+}
+function sigiloPublicarAvisos(id){
+  const avisos = sigiloAvisosPendientes.get(id);
+  sigiloAvisosPendientes.delete(id);
+  const t = tokens.get(id);
+  if(!avisos || !t) return;
+  avisos.forEach(av => sigiloAviso(
+    `🕶 Detección · ${nombreDe(t)} dio ${av.pasos} paso${av.pasos === 1 ? '' : 's'} en la zona de alerta de ${av.rival}`,
+    `${av.pasos} tirada${av.pasos === 1 ? '' : 's'} de detección (en principio Destreza contra Especial; las resuelve la mesa)`));
+}
+async function romperSigilo(id, detector){
+  const t = tokens.get(id);
+  const e = t && estadoDe(t);
+  const idx = e ? e.estados.findIndex(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo') : -1;
+  if(idx < 0) return;
+  sigiloRompiendo.add(id);
+  try{
+    await hudEstadoCambiar(t, idx, 'quitar');
+    sigiloAviso(`🕶 ${nombreDe(t)} perdió el sigilo`, `Lo detectó ${detector}: entró en su cono de detección`);
+  }finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
+}
+// Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo
+// manejar (mi personaje; el GM, sus creeps) quedó dentro de un cono rival, pierde el sigilo.
+function sigiloRevisar(){
+  if(!fbUsuario) return;
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
+  if(firma === sigiloFirmaRev) return;
+  sigiloFirmaRev = firma;
+  tokens.forEach((t, id) => {
+    if(sigiloRompiendo.has(id) || !puedoCambiarVida(t) || !enSigilo(t)) return;
+    const k = nbPack(t.col, t.fila);
+    const det = rivalesDe(t).map(zonasClaves).find(z => z.cono.has(k));
+    if(det) romperSigilo(id, det.nombre);
+  });
+}
+
 // El GM no ve a los personajes en sigilo, salvo apretando el ojo 👁: al
 // prenderlo se avisa a todos los jugadores (línea roja en la Mesa y un
 // destello con un ojo, ver `mesaAlertaOjo` en comun/mesa.js). Se apaga solo
@@ -2121,6 +2212,7 @@ function calcularDisposicion(){
 // Devuelve true si todavía hay algo animándose.
 function dibujar(){
   nieblaActualizar();
+  sigiloRevisar();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0F0C0E';
   ctx.fillRect(0, 0, lienzo.width, lienzo.height);
@@ -3080,6 +3172,17 @@ function soltar(){
     const a = arrastre;
     arrastre = null;
     const t = tokens.get(a.id);
+    // Sigilo: si la ruta pisa un cono rival, se corta ahí (aparece donde lo
+    // detectaron) y se anotan los pasos en las zonas de alerta.
+    if(!a.libre && a.movio && t && a.ruta.length > 1 && enSigilo(t)){
+      const largo = a.ruta.length;
+      sigiloEvaluarRuta(t, a);
+      if(a.ruta.length < largo){
+        const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
+        a.x = pc.x; a.y = pc.y;
+        toast('🕶 Te detectaron: el movimiento se corta donde entraste en su cono');
+      }
+    }
     const pasos = a.ruta.length - 1;
     if(a.libre){
       const fin = mundoAHex(a.x, a.y);
@@ -3764,12 +3867,14 @@ async function moverToken(id, col, fila, celdas){
   const doc = coleccionTokens().doc(id);
   try{
     await doc.update(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot});
+    sigiloPublicarAvisos(id);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); return; }catch(e){ err = e; }
     }
+    sigiloAvisosPendientes.delete(id);
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
   }

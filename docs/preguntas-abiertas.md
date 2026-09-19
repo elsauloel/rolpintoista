@@ -26,7 +26,7 @@ Diseño en curso: ver "Sigilo (en diseño)" en [`plan-sistema-nuevo.md`](plan-si
 
 - 🔲 **P1. Costo de entrar en sigilo.** Hoy: 1 No2, marcado "a revisar". ¿Se confirma? *(2026-09-16)*
 - 🔲 **P2. Moverse en sigilo.** ¿Cuesta lo mismo que moverse normal o más No2? *(2026-09-16)*
-- 🔲 **P3. Tirada de detección: qué se tira.** ¿Qué contra qué (ej. Sigilo contra Percepción)? ¿De qué stats sale cada una? *(2026-09-16)*
+- 🔲 **P3. Tirada de detección: qué se tira.** En principio **Destreza (el que se esconde) contra Especial (el que vigila)**, anotado el 2026-09-19 y "a debatir". No hace falta cerrarlo para programar el mecanismo: la tirada no es automática, la resuelve la mesa a mano.
 - 🔲 **P4. Tirada de detección: quién tira.** ¿El que está escondido, el que vigila, o los dos? *(2026-09-16)*
 - 🔲 **P5. Tirada de detección: cuántas.** ¿Una por cada hexágono de la zona de alerta que pisa, o una por movimiento? *(2026-09-16)*
 - 🔲 **P6. Otras formas de detectar.** ¿Se puede buscar a propósito (tirada de percepción del GM o de un jugador)? *(2026-09-16)*

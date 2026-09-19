@@ -153,6 +153,10 @@ público").
   P12). Entrar cuesta **1 No2** *(a revisar)*; moverse en sigilo **cuesta lo
   mismo** que moverse normal *(a debatir)*. Encaja con las habilidades
   automatizadas de la ficha (costo + estado sobre uno mismo).
+  **Quién puede entrar en sigilo** (2026-09-19): quien tiene la habilidad
+  "Sigilo" cargada en sus habilidades. Un ítem, la clase o cualquier
+  circunstancia solo tiene que agregársela; el botón directo de la Botonera
+  aparece con solo tenerla (no importa cómo llegó).
 - **Se rompe**: (1) automáticamente si el token **entra en el campo de
   detección automática** (el cono) de un enemigo; (2) al hacer una **acción
   hostil**: cualquier acción con efecto directo sobre un enemigo (un ataque,

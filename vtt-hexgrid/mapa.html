@@ -128,6 +128,15 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #btn-nuevo .ayuda-icono:hover,#btn-nuevo .ayuda-icono:focus{background:#180F08;color:var(--brass);border-color:#180F08}
 #btn-nuevo .ayuda-globo{left:-70px;text-align:left}
 #panel-token:empty{display:none}
+/* (⌨) de los atajos de teclado: a la derecha de todo de la cabecera; el globo se abre hacia la izquierda. */
+.ayuda-atajos{width:30px;height:30px;font-size:15px;flex:none}
+.ayuda-atajos .ayuda-globo{left:auto;right:0;width:340px;font-size:12px}
+.atajos-titulo{display:block;margin:0 0 6px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.atajos-titulo + .atajos + .atajos-titulo{margin-top:10px}
+.atajos{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:baseline}
+.atajos kbd{font-family:"Space Mono",monospace;font-size:11px;padding:1px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;background:var(--panel);color:var(--brass);white-space:nowrap;justify-self:start}
+.atajos span kbd{display:inline}
+.atajos .combo{white-space:nowrap}
 #token-etiqueta,#elemento-etiqueta{top:64px!important}
 /* Mantenimiento (GM), arriba de todo en la barra lateral: verde para que se note. */
 .btn-mant{width:100%;background:rgba(46,107,87,.25);border-color:#3E9B5B;color:#CFE6D8;font-weight:700;padding:9px 12px}
@@ -580,6 +589,26 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
+  <span class="ayuda-icono ayuda-atajos" id="ayuda-atajos" tabindex="0" aria-label="Atajos de teclado">⌨<span class="ayuda-globo" role="tooltip">
+    <b class="atajos-titulo">Atajos de teclado</b>
+    <span class="atajos">
+      <kbd>H</kbd><span>Abrir o cerrar la caja de herramientas</span>
+      <kbd>L</kbd><span>Lápiz (prender / apagar)</span>
+      <kbd>F</kbd><span>Terreno y Formas (prender / apagar)</span>
+      <kbd>M</kbd><span>Mover libre del token seleccionado (otra <kbd>M</kbd> lo apaga)</span>
+      <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
+      <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
+      <kbd>Enter</kbd><span>Crear la forma en borrador · confirmar un movimiento</span>
+      <kbd>Esc</kbd><span>Cancelar y salir: herramienta, borrador, Mover libre, menús, Botonera</span>
+      <kbd>Supr</kbd><span>Borrar el token, dibujo o forma seleccionado</span>
+    </span>
+    <b class="atajos-titulo">Con el mouse</b>
+    <span class="atajos">
+      <kbd>Clic der.</kbd><span>Ping para todos · salir de la herramienta activa · cancelar un arrastre</span>
+      <kbd>Rueda</kbd><span>Zoom</span>
+      <kbd>Arrastrar</kbd><span>Mover el token, o desplazar el mapa si arrastrás el fondo</span>
+    </span>
+  </span></span>
 </header>
 
 <main>

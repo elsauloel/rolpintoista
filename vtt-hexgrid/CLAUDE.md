@@ -44,6 +44,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   barra del costado volvió a la cabecera, con el (?) de la guía de colores adentro del botón, `#ayuda-token`; y "Personalización 🎲" de los dados pasó al pie de la grilla de dados);
   y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
   estado, Mapas, + Token (?), GM Tools/Mi ficha, Personajes, Fondo, 👁 y Centrar (Dados pasó al borde izquierdo del mapa).
+- **⌨ Lista de atajos** (2026-09-19): un ícono a la derecha de todo de la
+  cabecera (`#ayuda-atajos`) que al pasar el mouse muestra el globo con todos
+  los atajos de teclado y del mouse (H, L, F, M, B, Ctrl+B, Enter, Esc,
+  Supr; clic derecho, rueda, arrastrar). **Es texto fijo en el HTML: al
+  sumar, sacar o cambiar un atajo, hay que actualizar esa lista.**
 - **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
   la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar

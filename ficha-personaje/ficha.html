@@ -1984,6 +1984,13 @@ function migrarObjIt2(o){
 function migrarEstadoIt2(st){
   const f = st.formulas || (st.formulas = {});
   ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
+  // Armadura rota ahora resta 1 de Defensa por cada acumulación (antes: la mitad).
+  (st.efectos || []).forEach(e => {
+    if(e.armaduraRota && !(e.mods || []).some(m => m.stat === 'def')){
+      e.mods = [...(e.mods || []), {stat: 'def', val: -1}];
+      e.stacks = Math.max(1, num(e.stacks) || 1);
+    }
+  });
   ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'esp*3' : 'agl'; });
   // SP Regen: base 0 (solo lo dan habilidades, equipo o estados). Las fichas
   // que quedaron con la base vieja (floor(int/2)) vuelven a 0.
@@ -2873,19 +2880,12 @@ function compute(){
   // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
   // Nitros, así que actúan al moverse (ver costoMoverCasillero).
   const armaduraArruinada = efectosActivos.some(e => e.armaduraArruinada);
-  const armaduraRota = efectosActivos.some(e => e.armaduraRota);
   if(armaduraArruinada){
     // Solo anula lo que aportan las armaduras (slot 'armadura': blandas y
     // rígidas), no guantes, casco, botas, escudo u otro equipo.
     ['def', ...TIPOS_IDS].forEach(id => {
       if(Number.isNaN(final[id])) return;
       final[id] -= aporteSlot('armadura', id);
-    });
-  }
-  if(armaduraRota){
-    ['def', ...TIPOS_IDS].forEach(id => {
-      if(Number.isNaN(final[id])) return;
-      final[id] = Math.floor(final[id] / 2);
     });
   }
 
@@ -3693,7 +3693,7 @@ function aportesModInv(inv, statId){
 }
 function invEstadosArmadura(inv){
   const activos = (inv.estados||[]).filter(e => e.activo !== false);
-  return {arruinada: activos.some(e => e.armaduraArruinada), rota: activos.some(e => e.armaduraRota)};
+  return {arruinada: activos.some(e => e.armaduraArruinada), rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0)};
 }
 function invAporteArmadura(inv, statId){
   return (inv.equipo||[]).filter(it => slotDe(it.tipoItem) === 'armadura')
@@ -3703,14 +3703,13 @@ function invDefensaEfectiva(inv){
   const {arruinada, rota} = invEstadosArmadura(inv);
   let v = num(inv.defensa);
   if(arruinada) v -= invAporteArmadura(inv, 'def');
-  if(rota) v = Math.floor(v / 2);
+  v -= rota;  // Armadura rota: -1 por cada acumulación
   return Math.max(0, v);
 }
 function invCritEfectivo(inv, i){
-  const {arruinada, rota} = invEstadosArmadura(inv);
+  const {arruinada} = invEstadosArmadura(inv);
   let v = num(inv.crit[i]);
   if(arruinada) v -= invAporteArmadura(inv, 'tipo'+(i+1));
-  if(rota) v = Math.floor(v / 2);
   return v;
 }
 function invEstadoActivo(inv, flag){
@@ -4428,6 +4427,14 @@ function activarEfectoPresetInv(preset){
   const {nombre, ...resto} = preset;
   const datos = {id: uid(), nombre, ...structuredClone(resto)};
   inv.estados = inv.estados || [];
+  const yaRotaInv = datos.armaduraRota ? inv.estados.find(e => e.armaduraRota) : null;
+  if(yaRotaInv){
+    yaRotaInv.stacks = Math.max(1, num(yaRotaInv.stacks) || 1) + 1;
+    yaRotaInv.activo = true;
+    renderInvocaciones();
+    toast(`${inv.nombre}: ${yaRotaInv.nombre} ×${yaRotaInv.stacks}`);
+    return;
+  }
   inv.estados.push(datos);
   if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
   renderInvocaciones();
@@ -4594,6 +4601,7 @@ const LISTS = {
       const deEquipo = !!i.origenItem;
       return `<div class="ef-chip${activo ? '' : ' pausado'}${urgente ? ' urgente' : ''}${det ? ' con-tip' : ''}${deEquipo ? ' de-equipo' : ''}"${det ? ` data-tip="${esc(det)}"` : ''}>
         <button type="button" class="ef-chip-toggle" data-toggle="${i.id}" title="${activo ? 'Pausar' : 'Activar'}">${activo ? '✓' : '○'}</button>
+        ${i.armaduraRota ? `<button type="button" class="ef-chip-toggle" data-armrota="${i.id}:-1" title="Un punto menos de armadura rota (al llegar a 0, se repara)">−</button><button type="button" class="ef-chip-toggle" data-armrota="${i.id}:1" title="Un punto más de armadura rota">+</button>` : ''}
         <button type="button" class="ef-chip-cuerpo" data-view="efectos:${i.id}" title="Ver el detalle">
           <span class="ef-chip-nombre">${esc(i.nombre)}</span>
           ${partes.length ? `<span class="ef-chip-datos">${esc(partes.join(' · '))}</span>` : ''}
@@ -5440,6 +5448,18 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.nivelsocial){ abrirNivelSocial(b.dataset.nivelsocial); return; }
+  if(b.dataset.armrota){
+    const [erId, d] = b.dataset.armrota.split(':');
+    const er = S.efectos.find(x => x.id === erId);
+    if(er){
+      const n = Math.max(1, num(er.stacks) || 1) + num(d);
+      if(n <= 0){ S.efectos = S.efectos.filter(x => x.id !== erId); toast('Armadura reparada'); }
+      else er.stacks = n;
+      renderList('efectos');
+      refresh();
+    }
+    return;
+  }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
     let it = S.inventario.find(x=>x.id===id);
@@ -6095,7 +6115,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
   escudoMagico:'Escudo mágico — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
-  armaduraRota:'Defensa y Res. a crítico totales a la mitad (redondeado abajo)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
+  armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
 const CAMPO_NUM = ['compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
@@ -6119,8 +6139,8 @@ const EFECTOS_PRESET = [
     detalle:'Sin Nitros este turno.'},
   {nombre:'Hypeado', polaridad:'buff', turnos:3, mods:[{stat:'nitros', val:1}],
     detalle:'+1 a los Nitros máximos. ⚠ Valor provisorio (antes +1 Acción).'},
-  {nombre:'Armadura rota', polaridad:'debuff', turnos:0, permanente:true, armaduraRota:true,
-    detalle:'Corta a la mitad (redondeado hacia abajo) el valor total de Defensa y Resistencia a crítico del personaje. Permanente — se quita con Oleo reparador.'},
+  {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true, mods:[{stat:'def', val:-1}],
+    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada vez que te rompen la armadura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Armadura arruinada', polaridad:'debuff', turnos:0, permanente:true, armaduraArruinada:true,
     detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Resistencia a crítico. No afecta guantes, cascos, botas ni otro equipo. Permanente — se quita con Oleo reparador.'},
   {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpturno:-1, stacksturno:1, permanente:true, esVeneno:true,
@@ -6316,6 +6336,16 @@ function activarEfectoPreset(preset){
   closeModal();
   if(draft.activo !== false && estaBloqueadoElDebuff(draft)){
     toast(`Inmune ahora mismo — ${draft.nombre} no se pudo aplicar`);
+    return;
+  }
+  // Armadura rota se acumula: cada rotura suma un stack (-1 Defensa) en el mismo estado.
+  const yaRota = draft.armaduraRota ? S.efectos.find(e => e.armaduraRota) : null;
+  if(yaRota){
+    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
+    yaRota.activo = true;
+    renderList('efectos');
+    refresh();
+    toast(`${yaRota.nombre} ×${yaRota.stacks}`);
     return;
   }
   S.efectos.push(draft);
@@ -8105,7 +8135,6 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   if(['def', ...TIPOS_IDS].includes(id)){
     const arruina = activos.find(e => e.armaduraArruinada);
     if(arruina) h += lupaFila(`${esc(arruina.nombre)} <span class="lupa-gris">(estado alterado · anula lo que da la armadura)</span>`, lupaSigno(-aporteSlot('armadura', id)));
-    activos.filter(e => e.armaduraRota).slice(0, 1).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(estado alterado · la mitad, para abajo)</span>`, '÷ 2'); });
   }
   if(id === 'nitros') activos.filter(e => e.forzarNitros !== '' && e.forzarNitros != null).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(tope)</span>`, fmt(num(e.forzarNitros))); });
   const nombreTotal = !STAT_FULL[id] || STAT_FULL[id] === STAT_LABEL[id] ? (STAT_LABEL[id] || id)

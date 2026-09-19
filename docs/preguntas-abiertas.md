@@ -263,3 +263,24 @@ equivalente que da Con (5), o sea +5 HP máx.
   decisión. Falta seguir con las de 2 y 3 Job. *(2026-09-19)*
   **Actualización 2026-09-19:** se sumaron Defensa (+1) y Ranuras de
   cinturón (+1); las resistencias a críticos quedan afuera por ahora.
+
+## Estados alterados (buffs y debuffs)
+
+- 🔲 **P73. Repasar todos los buffs y debuffs, uno por uno.** Pedido del
+  usuario 2026-09-19: revisar, auditar y modificar cada estado alterado
+  (presets de `EFECTOS_PRESET` en `ficha-personaje/ficha.html` y
+  `ESTADOS_PRESET_GM` en `gm-toolset/gm-tools.html`), uno a uno con el usuario.
+  Empezó con Armadura rota (P74). Lista actual: Veneno, Regeneración,
+  Pajaritos, Cansado, Exhausto, Stun, Hypeado, Armadura rota, Armadura
+  arruinada, Veneno severo, Sangrado, Lisiado, Inmovilizado, Rengo,
+  Invulnerable, Inmunidad a CC, Espinas, Escudo mágico, Afortunado, Sangre
+  pura, Coagulación extrema, Blindado, Sigilo. *(2026-09-19)*
+- ✅ **P74. Armadura rota.** Hecho 2026-09-19: ya no corta a la mitad
+  Defensa y Res. a crítico. Cada acumulación resta **1 de Defensa** (solo
+  Defensa), es permanente y acumulable: activar el estado de nuevo suma un
+  stack en vez de duplicarlo. Se cura solo con ítem/habilidad especial
+  (Oleo reparador la quita entera). El chip tiene **− / +** para ajustar los
+  stacks (al llegar a 0 se repara), en la ficha, en las invocaciones y en
+  los creeps de gm-tools. Los estados viejos se convierten solos. En la
+  ficha el −1 es un mod de Defensa del estado (se ve en el desglose de
+  Defensa); en creeps e invocaciones se aplica por la marca.

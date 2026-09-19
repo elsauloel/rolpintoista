@@ -1903,7 +1903,7 @@ function creepEstadosArmadura(sc){
   const activos = (sc.estados||[]).filter(e => e.activo !== false);
   return {
     arruinada: activos.some(e => e.armaduraArruinada),
-    rota: activos.some(e => e.armaduraRota),
+    rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0),  // puntos de Defensa que quita
   };
 }
 function creepAporteArmadura(sc, statId){
@@ -1914,14 +1914,13 @@ function creepDefensaEfectiva(sc){
   const {arruinada, rota} = creepEstadosArmadura(sc);
   let v = num(sc.defensa);
   if(arruinada) v -= creepAporteArmadura(sc, 'def');
-  if(rota) v = Math.floor(v / 2);
+  v -= rota;
   return Math.max(0, v);
 }
 function creepCritEfectivo(sc, i){
-  const {arruinada, rota} = creepEstadosArmadura(sc);
+  const {arruinada} = creepEstadosArmadura(sc);
   let v = num(sc.crit[i]);
   if(arruinada) v -= creepAporteArmadura(sc, 'tipo'+(i+1));
-  if(rota) v = Math.floor(v / 2);
   return v;
 }
 /* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
@@ -2022,7 +2021,7 @@ function defensaOrigenTxt(sc){
   if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
   const {arruinada, rota} = creepEstadosArmadura(sc);
   if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
-  if(rota) L.push('Armadura rota: a la mitad');
+  if(rota) L.push(`Armadura rota: -${rota} de Defensa`);
   L.push(`= ${fmt(creepDefensaEfectiva(sc))}`);
   return L.join('\n');
 }
@@ -2042,9 +2041,8 @@ function critOrigenTxt(sc, i){
   });
   const resto = num(sc.crit[i]) - deItems;
   if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
-  const {arruinada, rota} = creepEstadosArmadura(sc);
+  const {arruinada} = creepEstadosArmadura(sc);
   if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
-  if(rota) L.push('Armadura rota: a la mitad');
   L.push(`= ${conSigno(creepCritEfectivo(sc, i))}`);
   return L.join('\n');
 }
@@ -2810,9 +2808,11 @@ function cardCompactoHtml(sc){
     const clave = `${sc.id}:${es.id}`;
     const abierto = estadoChipAbierto === clave;
     const dura = es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;
+    const xRota = es.armaduraRota && num(es.stacks) > 1 ? ` ×${fmt(num(es.stacks))}` : '';
     return `<span class="chip-estado-wrap${abierto ? ' abierto' : ''}">
-      <button type="button" class="chip-estado con-tip" data-toggleestado="${clave}" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</button>
-      ${abierto ? `${es.permanente ? '' : `<button type="button" class="chip-accion" data-turnoestado="${clave}:-1" title="Un turno menos">−</button>
+      <button type="button" class="chip-estado con-tip" data-toggleestado="${clave}" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')}${xRota} · ${dura}</button>
+      ${abierto ? `${es.armaduraRota ? `<button type="button" class="chip-accion" data-stackestado="${clave}:-1" title="Un punto menos de armadura rota (al llegar a 0, se repara)">−</button>
+      <button type="button" class="chip-accion" data-stackestado="${clave}:1" title="Un punto más de armadura rota">+</button>` : ''}${es.permanente ? '' : `<button type="button" class="chip-accion" data-turnoestado="${clave}:-1" title="Un turno menos">−</button>
       <button type="button" class="chip-accion" data-turnoestado="${clave}:1" title="Un turno más">+</button>`}
       <button type="button" class="chip-accion chip-quitar" data-rmestado="${clave}" title="Quitar el estado">✕</button>
       <button type="button" class="chip-accion" data-editarestado="${clave}" title="Editar el estado">⚙</button>` : ''}
@@ -2876,7 +2876,7 @@ const ESTADOS_PRESET_GM = [
   {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:1}],
     detalle:'+1 a los No2 máximos. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
-    detalle:'Corta a la mitad (redondeado hacia abajo) la Defensa y Res. a crítico totales. Permanente — se quita con Oleo reparador.'},
+    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Armadura arruinada', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraArruinada:true,
     detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico. No afecta el resto del equipo. Permanente — se quita con Oleo reparador.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
@@ -2988,6 +2988,15 @@ function activarEstadoPresetCreep(preset){
   FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = !!preset[f]; });
   if(estaBloqueadoElDebuffCreep(sc, datos)){
     toast(`${sc.nombre}: inmune ahora mismo — ${preset.nombre} no se pudo aplicar`);
+    return;
+  }
+  // Armadura rota se acumula: cada rotura suma un stack (-1 Defensa) en el mismo estado.
+  const yaRota = datos.armaduraRota ? sc.estados.find(e => e.armaduraRota) : null;
+  if(yaRota){
+    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
+    yaRota.activo = true;
+    renderAll();
+    toast(`${sc.nombre}: ${yaRota.nombre} ×${yaRota.stacks}`);
     return;
   }
   const es = {id: uid(), ...datos};
@@ -3980,12 +3989,25 @@ document.addEventListener('input', e => {
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.
-  if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado))) cerrarChipEstado(b);
+  if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado || b.dataset.stackestado))) cerrarChipEstado(b);
   if(!b) return;
 
   if(b.dataset.toggleestado){
     estadoChipAbierto = estadoChipAbierto === b.dataset.toggleestado ? null : b.dataset.toggleestado;
     renderAll();
+    return;
+  }
+  if(b.dataset.stackestado){
+    // Armadura rota: suma o resta un stack (-1 Defensa cada uno); en 0 se repara.
+    const [scId, esId, d] = b.dataset.stackestado.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      const n = Math.max(1, num(es.stacks) || 1) + num(d);
+      if(n <= 0){ sc.estados = sc.estados.filter(x => x.id !== esId); estadoChipAbierto = null; toast('Armadura reparada'); }
+      else { es.stacks = n; estadoChipAbierto = `${scId}:${esId}`; }
+      renderAll();
+    }
     return;
   }
   if(b.dataset.turnoestado){

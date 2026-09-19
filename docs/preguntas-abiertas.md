@@ -189,9 +189,13 @@ físico, daño mágico, tanque.
   edita en vivo, más simple) o archivo en el repo sincronizado por GitHub
   como el catálogo (versionable, igual para todos)? Recomendación: ver
   conversación 2026-09-19. *(2026-09-19)*
-- 🔲 **P57. Quién puede editarla.** ¿Solo el dueño del proyecto carga
-  entradas y cada GM las copia a su partida, o cada GM puede sumar las suyas
-  a una biblioteca personal? *(2026-09-19)*
+- ✅ **P57. Quién puede editarla.** Respondido 2026-09-19: dos niveles.
+  **Biblioteca oficial**: solo el dueño del proyecto la edita, todos los GM
+  la leen. **Propuestas**: cualquier GM aprieta "Guardar en la biblioteca" y
+  el creep/skill queda como propuesta pendiente (con quién la mandó); el
+  dueño las audita, ajusta y etiqueta una por una, y recién ahí pasan a la
+  oficial. Los jugadores comunes no ven la biblioteca. Falta confirmar si
+  mandan propuestas solo los GM (sugerido) o cualquier cuenta.
 - 🔲 **P58. Categorías.** Definir la lista de etiquetas (creeps: ambiente,
   tipo, rol, nivel; skills: rol, tipo de daño, alcance) y si un ítem puede
   tener varias. *(2026-09-19)*

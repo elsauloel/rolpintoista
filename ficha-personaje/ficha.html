@@ -1771,6 +1771,13 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-slot-lleno">
+  <div class="modal" style="max-width:460px">
+    <header><h3>Slot equipado</h3><button class="iconbtn" id="slot-lleno-x">Cerrar</button></header>
+    <div class="body" id="slot-lleno-body"></div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-comparar">
   <div class="modal" style="max-width:560px">
     <header><h3>Comparar</h3><button class="iconbtn" id="comparar-x">Cerrar</button></header>
@@ -5433,6 +5440,8 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.view){ const [k,id] = b.dataset.view.split(':'); openViewer(k, id); return; }
   if(b.dataset.comparar){ abrirComparar(b.dataset.comparar); return; }
+  if(b.dataset.slotComparar){ abrirComparar(slotLlenoItemId); return; }
+  if(b.dataset.reemplazar){ const [eqId, nuevoId] = b.dataset.reemplazar.split(':'); reemplazarEquipado(eqId, nuevoId); return; }
   if(b.dataset.compararElegir){ comparandoEquipadoId = b.dataset.compararElegir; renderComparar(); return; }
   if(b.dataset.jobver){
     const [k,id] = b.dataset.jobver.split(':');
@@ -5478,6 +5487,7 @@ document.addEventListener('click', e => {
           const usadoSinEste = computeSlots().find(s => s.id === slotDef.id)?.usado || 0;
           const propio = slotDef.peso ? (slotDef.peso[it.tipoItem] || 1) : 1;
           if(usadoSinEste + propio > slotDef.max){
+            if(abrirSlotLleno(it.id)) return;  // menú: Reemplazar o Comparar
             toast(`No entra: ${slotDef.label} quedaría en ${fmt(usadoSinEste + propio)} / ${fmt(slotDef.max)}`);
             return;
           }
@@ -6610,6 +6620,54 @@ function statsComparablesDe(item){
   return out;
 }
 
+/* ---------- Equipar con el slot lleno: Reemplazar o Comparar ----------
+   Al tocar Equipar en un ítem de la mochila cuyo slot no tiene lugar, en
+   vez de un aviso se abre este menú. Comparar usa la misma ventana que el
+   catálogo (abrirComparar). */
+let slotLlenoItemId = null;
+
+function abrirSlotLleno(itemId){
+  const it = S.inventario.find(x => x.id === itemId);
+  const info = it && slotOcupadoInfo(it);
+  if(!it || !info || !info.equipados.length) return false;
+  slotLlenoItemId = itemId;
+  const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(it.tipoItem));
+  $('#slot-lleno-body').innerHTML = `
+    <div class="hint" style="margin-bottom:10px">${esc(slotDef.label)} no tiene lugar para <b>${esc(it.nombre)}</b>. Ya tenés equipado:</div>
+    ${info.equipados.map(e => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+      <b>${esc(e.nombre)}</b>
+      <button type="button" class="btn" data-reemplazar="${e.id}:${it.id}">Reemplazar</button>
+    </div>`).join('')}
+    <button type="button" class="btn" data-slot-comparar="1" style="width:100%;margin-top:8px">Comparar</button>`;
+  $('#scrim-slot-lleno').classList.add('open');
+  return true;
+}
+
+// Saca el equipado y pone el de la mochila. Si el slot igual no alcanza
+// (ej. un arma de dos manos con escudo puesto), se deshace y se avisa.
+function reemplazarEquipado(equipadoId, nuevoId){
+  const nuevo = S.inventario.find(x => x.id === nuevoId);
+  const viejo = S.inventario.find(x => x.id === equipadoId);
+  if(!nuevo || !viejo) return;
+  const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(nuevo.tipoItem));
+  viejo.equipado = false;
+  nuevo.equipado = true;
+  const usado = slotDef ? (computeSlots().find(s => s.id === slotDef.id)?.usado || 0) : 0;
+  if(slotDef && usado > slotDef.max){
+    viejo.equipado = true;
+    nuevo.equipado = false;
+    toast(`Igual no entra: ${slotDef.label} quedaría en ${fmt(usado)} / ${fmt(slotDef.max)}. Sacá otro ítem del slot primero.`);
+    return;
+  }
+  $('#scrim-comparar').classList.remove('open');
+  $('#scrim-slot-lleno').classList.remove('open');
+  renderInventario();
+  refresh();
+  toast(`${nuevo.nombre} equipado en lugar de ${viejo.nombre}`);
+}
+$('#slot-lleno-x').onclick = () => $('#scrim-slot-lleno').classList.remove('open');
+$('#scrim-slot-lleno').addEventListener('mousedown', e => { if(e.target.id === 'scrim-slot-lleno') $('#scrim-slot-lleno').classList.remove('open'); });
+
 let comparandoItemId = null;
 let comparandoEquipadoId = null;
 
@@ -6666,6 +6724,7 @@ function renderComparar(){
       <thead><tr><th>Stat</th><th>Equipado</th><th>Nuevo</th></tr></thead>
       <tbody>${filasHtml}</tbody>
     </table>
+    ${S.inventario.some(x => x.id === item.id && !x.equipado) ? `<button type="button" class="btn primary" data-reemplazar="${equipado.id}:${item.id}" style="width:100%;margin-top:12px">Reemplazar ${esc(equipado.nombre)}</button>` : ''}
   `;
 }
 
@@ -6793,6 +6852,7 @@ const ARCHIVO_CATALOGO = 'datos/catalogo.json';
 function itemCatalogo(id){
   return S.catalogo.find(x => x.id === id)
     || (tiendaCargada && Array.isArray(tiendaCargada.itemsDatos) ? tiendaCargada.itemsDatos.find(x => x && x.id === id) : null)
+    || S.inventario.find(x => x.id === id)  // un ítem de la mochila (Comparar desde "Equipar")
     || null;
 }
 

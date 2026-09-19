@@ -133,3 +133,10 @@ versión parecida en más de una, es candidato a juntar.
 - **`grilla-dados.js`, pie opcional** (2026-09-19): `grillaConectar(boton, {…, pie})` acepta
   un HTML que se muestra debajo de la grilla (el mapa pone ahí el link
   "Personalización 🎲" a `prueba-dados.html`); sin `pie` no aparece nada.
+
+- **`skills-clase.js`** — `CLASES_SKILLS`: el pool de habilidades de clase
+  ya cerradas (las 7 clases, la mayoría todavía vacía). La ficha lo ofrece en
+  "+ Habilidad → De clase" (`abrirHabClase`/`agregarHabClase`) y copia la skill
+  al personaje con `habClaseId` (para no duplicarla) y Job 1 si es de su clase,
+  2 si es de otra (Custom: 3). Una skill se agrega acá recién cuando queda ✅
+  en [`../docs/clases-borrador.md`](../docs/clases-borrador.md).

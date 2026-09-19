@@ -293,3 +293,10 @@ personaje abierto, y "Ficha de personaje — <partida>" sin ninguno
 tiene retrato pero `fichas/{id}.miniatura` está vacía (el token del mapa se
 ve sin foto), la ficha la vuelve a publicar sola (`f.miniaturaDoc`,
 `f.reponerMiniatura`, en `fichaGuardarTick`).
+
+**+ Habilidad: de clase o custom** (2026-09-19): `data-add="habilidades"` abre
+`#scrim-hab-clase` (`abrirHabClase`) en vez del editor. Custom → el asistente
+de siempre, con Job 3 por defecto (`HAB_JOB_CUSTOM`). De clase → elegir clase
+y "Agregar" (`agregarHabClase`): copia la skill de `CLASES_SKILLS`
+(`comun/skills-clase.js`) al personaje, con Job 1 si `S.meta.clase` coincide
+con esa clase (`esMiClase`) o 2 si no, y `habClaseId` para no repetirla.

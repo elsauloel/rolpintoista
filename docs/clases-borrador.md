@@ -1,5 +1,7 @@
 # Clases — borrador de trabajo
 
+**Cada skill que queda ✅ se carga también en `comun/skills-clase.js`** (el pool que la ficha ofrece en "+ Habilidad → De clase"); el resto sigue acá.
+
 Transcripción de `00-clases.pdf` (**segunda versión**, la iteración más
 parecida al sistema actual) para revisarla **clase por clase, skill por
 skill**. Cuando una skill queda cerrada se marca ✅ y se reescribe con los
@@ -15,11 +17,10 @@ estaban en este mismo formato.
 - Skill **de tu clase**: cuesta **1 punto de Job**.
 - Skill **de otra clase**: cuesta **2 puntos de Job**.
 - Skill **inventada de cero**: cuesta **3 puntos de Job**.
-- Cuando el pool esté cargado, **+ Habilidad** en la ficha deja elegir
-  de las skills cargadas (además de crear una propia).
+- **+ Habilidad** en la ficha (hecho 2026-09-19) pregunta primero "De clase" o "Custom" (3 de Job); "De clase" deja elegir la clase y agregar las skills ya cargadas, con Job 1 si es la clase escrita en la ficha, 2 si no. Además del pool, se puede crear una propia (Custom).
 
-Hoy la ficha tiene Clase como texto libre y cada habilidad/pasiva con Job
-cuesta siempre 1 (`jobBudget`, 3 puntos + 3 por nivel).
+Hoy la ficha tiene Clase como texto libre (se compara con el nombre de la clase, sin tildes ni mayúsculas) y cada pasiva con Job
+cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
 
 ## Reglas generales (decididas)
 

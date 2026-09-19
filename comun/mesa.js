@@ -94,12 +94,38 @@ function mesaFilaContenido(t){
     (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
 }
 
+// Alerta del ojo 👁 del GM (revela lo que estaba oculto): línea roja en la
+// Mesa y, en todas las pantallas, un destello rojo con un ojo grande que
+// aparece de golpe y a 1–2 segundos se apaga con fade. (Idea a futuro: cambiar
+// el emoji por un PNG de ojo con fondo transparente.)
+function mesaAlertaOjo(){
+  if(!document.getElementById('mesa-alerta-css')){
+    const st = document.createElement('style');
+    st.id = 'mesa-alerta-css';
+    st.textContent =
+      '.mesa-tirada.mesa-alerta{background:rgba(160,20,20,.9)!important;color:#fff!important;border:1px solid #ff6a6a!important}' +
+      '.mesa-tirada.mesa-alerta .mesa-quien,.mesa-tirada.mesa-alerta .mesa-detalle{color:#fff!important}' +
+      '#alerta-ojo{position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
+        'background:radial-gradient(ellipse at center,rgba(200,20,20,.35) 0%,rgba(150,0,0,.6) 60%,rgba(90,0,0,.8) 100%);opacity:1;transition:opacity 1.3s ease-out}' +
+      '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
+      '#alerta-ojo.apagar{opacity:0}';
+    document.head.appendChild(st);
+  }
+  document.getElementById('alerta-ojo')?.remove();
+  const capa = document.createElement('div');
+  capa.id = 'alerta-ojo';
+  capa.innerHTML = '<span>👁</span>';
+  document.body.appendChild(capa);
+  setTimeout(() => capa.classList.add('apagar'), 1100);
+  setTimeout(() => capa.remove(), 2600);
+}
+
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   // Resumen de esa misma última tirada: solo existe en la Mesa flotante
   // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
@@ -123,6 +149,15 @@ function mesaRender(docs){
       div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
       div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Alerta del ojo del GM: línea roja bien evidente y el destello en pantalla.
+    if(t.desde === 'alerta'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">👁 ${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva){ setTimeout(() => div.classList.remove('nueva'), 1500); mesaAlertaOjo(); }
       cuerpo.appendChild(div);
       return;
     }

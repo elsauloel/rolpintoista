@@ -536,6 +536,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <button type="button" class="btn" id="btn-niebla" title="Niebla de guerra (solo GM)" hidden>🌫 Niebla: no</button>
   <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
+  <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente." hidden>👁 Revelar lo oculto</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -1269,6 +1270,35 @@ function enSigilo(t){
   const e = estadoDe(t);
   return !!(e && e.estados.some(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo'));
 }
+// El GM no ve a los personajes en sigilo, salvo apretando el ojo 👁: al
+// prenderlo se avisa a todos los jugadores (línea roja en la Mesa y un
+// destello con un ojo, ver `mesaAlertaOjo` en comun/mesa.js). Se apaga solo
+// al recargar.
+let ojoRevelando = false;
+function renderOjo(){
+  const b = $('#btn-ojo');
+  b.hidden = !(soyGM && fbMiembro);
+  b.classList.toggle('primary', ojoRevelando);
+  b.textContent = ojoRevelando ? '👁 Ocultar de nuevo' : '👁 Revelar lo oculto';
+}
+$('#btn-ojo').onclick = async () => {
+  if(!soyGM) return;
+  ojoRevelando = !ojoRevelando;
+  renderOjo(); pedirDibujo();
+  if(!ojoRevelando){ toast('Volvés a no ver lo oculto'); return; }
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: 'GM',
+      origen: 'El GM está revelando lo oculto', formula: 'Todo lo que estaba en sigilo se ve ahora',
+      rolls: [], mod: 0, total: 0, desde: 'alerta',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo avisar a los jugadores:', err);
+    ojoRevelando = false; renderOjo(); pedirDibujo();
+    toast('No se pudo avisar a los jugadores, así que no se reveló nada');
+  }
+};
 // El jugador con un personaje suyo en sigilo ve el mapa con un tinte violáceo.
 function yoEnSigilo(){
   if(soyGM || !fbUsuario) return false;
@@ -1282,6 +1312,7 @@ function yoEnSigilo(){
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
   if(!soyGM && t.tipo === 'creep' && enSigilo(t)) return false;   // creep en sigilo: los jugadores no lo ven
+  if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
   return nieblaVista.has(nbPack(t.col, t.fila));
 }
@@ -2261,6 +2292,11 @@ function dibujar(){
 
   // Tokens.
   disposicion = calcularDisposicion();
+  // Si el token seleccionado dejó de verse (niebla, sigilo), se suelta.
+  if(seleccion && tokens.has(seleccion) && !disposicion.some(d => d.id === seleccion)){
+    const sel = seleccion;
+    setTimeout(() => { if(seleccion === sel) seleccionar(null); }, 0);
+  }
   const etiquetas = HEX * z >= 22;
   disposicion.forEach(d => {
     const t = tokens.get(d.id);
@@ -4277,6 +4313,7 @@ function renderPanel(forzar){
   $('#btn-nuevo').disabled = !fbMiembro;
   $('#btn-fondo').hidden = !soyGM;
   renderNiebla();
+  renderOjo();
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
   actualizarBotonMapas();

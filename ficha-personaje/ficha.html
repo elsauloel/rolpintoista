@@ -1914,6 +1914,7 @@ const IT2 = {
   nitrosConsumirCinturon: 1,
   nitrosConsumirMochila: 2,
   nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
+  nitrosSigilo: 1,              // entrar en sigilo (a revisar, P1)
   // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
   // pasan a dar "+N × esto" de SP.
   spPorBono: 1,
@@ -3371,6 +3372,35 @@ function repararArmadura(){
   return antes - S.efectos.length;
 }
 
+/* ---------- Sigilo: entrar y salir con un botón (Botonera) ----------
+   Quien tiene la habilidad "Sigilo" ve en la Botonera un botón directo, sin
+   pasar por "+ Estado". Entrar cuesta IT2.nitrosSigilo (1 No2, a revisar) y
+   aplica el estado alterado "Sigilo" sobre uno mismo (el mapa lo lee de ahí);
+   salir es gratis. No se avisa en la Mesa: el sigilo no se anuncia. */
+const tieneSigilo = () => S.habilidades.some(h => String(h.nombre || '').trim().toLowerCase() === 'sigilo');
+const efectoSigilo = () => S.efectos.find(e => e.activo !== false && String(e.nombre || '').trim().toLowerCase() === 'sigilo');
+
+function alternarSigilo(){
+  const actual = efectoSigilo();
+  if(actual){
+    S.efectos = S.efectos.filter(e => e !== actual);
+    renderList('efectos'); refresh();
+    toast('Saliste del sigilo');
+    return;
+  }
+  const costo = num(IT2.nitrosSigilo);
+  if(num(S.nitros) < costo){
+    toast(`No te alcanzan los Nitros — entrar en sigilo cuesta ${fmt(costo)}`);
+    return;
+  }
+  const preset = EFECTOS_PRESET.find(p => p.nombre === 'Sigilo');
+  S.nitros = num(S.nitros) - costo;
+  S.efectos.push({id: uid(), nombre: 'Sigilo', imagen: '', turnos: 0, stacks: 1, hpturno: 0, stacksturno: 0,
+    permanente: true, activo: true, popup: false, detalle: (preset && preset.detalle) || '', mods: [], ...flagsDePreset('Sigilo')});
+  renderList('efectos'); renderNitros(); refresh();
+  toast(`Entraste en sigilo${costo ? ` · -${fmt(costo)} No2` : ''}`);
+}
+
 function aplicarEfectoDeConsumo(it){
   const src = configEfectoDe(it);
   const nombre = (src.efectoNombre || '').trim();
@@ -4681,6 +4711,13 @@ function renderBotonera(){
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
 
+  // Sigilo: botón directo para quien tiene la habilidad (ver alternarSigilo).
+  if(tieneSigilo()){
+    const dentro = !!efectoSigilo();
+    const falta = !dentro && num(S.nitros) < num(IT2.nitrosSigilo);
+    html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${dentro ? ' usada' : ''}${falta ? ' sin-recursos' : ''}" data-sigilo="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🕶 ${dentro ? 'Salir del sigilo' : `Entrar en sigilo · ${fmt(num(IT2.nitrosSigilo))} No2`}</button></div>`;
+  }
+
   html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
@@ -5485,6 +5522,7 @@ document.addEventListener('click', e => {
     }
     return;
   }
+  if(b.dataset.sigilo){ alternarSigilo(); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
   if(b.id === 'btn-invocar'){
     S.invocaciones.push(nuevaInvocacion());

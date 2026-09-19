@@ -210,8 +210,8 @@ público").
   (P17 y P52).
 
 **Cómo lo vamos a construir, paso a paso:**
-1. El estado "Sigilo" y quién ve qué (visual), con el filtro violáceo.
-2. El botón 👁 del GM y su aviso a los jugadores.
+1. ✅ (2026-09-19) El estado "Sigilo" y quién ve qué (visual), con el filtro violáceo, más el botón directo "Entrar en sigilo" en la Botonera de la ficha.
+2. ✅ (2026-09-19) El botón 👁 del GM y su aviso a los jugadores (fila roja en la Mesa y destello con ojo en todas las pantallas).
 3. Cono y alerta dibujados (con el frente automático al moverse, el punto
    ciego y los sólidos que tapan la vista); también para creeps e
    invocaciones.

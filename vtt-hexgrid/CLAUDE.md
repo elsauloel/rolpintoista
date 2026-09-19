@@ -65,17 +65,30 @@ nuevo de Rol Pintoísta. Paso 2 de
   "Reiniciar (tapar todo)". Pendiente: obstáculos que tapen la vista (P52),
   filtrar el orden de turnos y otras listas que nombran tokens fuera de la
   visión, y ocultar de verdad (hoy es solo visual, P54).
-- **🕶 Sigilo, paso 1** (2026-09-19; diseño en `../docs/plan-sistema-nuevo.md`,
-  "Sigilo"). Por ahora solo visual y solo el estado: hay un preset de
-  estado alterado **"Sigilo"** (no vence) en la ficha (`EFECTOS_PRESET`) y en
-  gm-tools (`ESTADOS_PRESET_GM`); el mapa lo detecta por el nombre en el
-  resumen de la ficha o del creep (`enSigilo`). Un token en sigilo se dibuja
-  semitransparente; **un creep en sigilo no lo ven los jugadores**
-  (`tokenVisiblePorNiebla`); y quien tiene un personaje suyo en sigilo ve el
-  mapa con un **filtro violáceo tenue** (`yoEnSigilo`, al final de
-  `dibujar`). Todavía falta: que el GM no vea a los personajes en sigilo
-  salvo con su botón 👁 (con aviso rojo a los jugadores), el cono y la zona
-  de alerta, la ruptura automática y el costo de girar.
+- **🕶 Sigilo, pasos 1 y 2** (2026-09-19; diseño en `../docs/plan-sistema-nuevo.md`,
+  "Sigilo"). Todo visual. **Estado:** preset de estado alterado **"Sigilo"**
+  (no vence) en la ficha (`EFECTOS_PRESET`) y en gm-tools
+  (`ESTADOS_PRESET_GM`); el mapa lo detecta por el nombre en el resumen de la
+  ficha o del creep (`enSigilo`). Un token en sigilo se dibuja
+  semitransparente; **un creep en sigilo no lo ven los jugadores** y **un
+  personaje en sigilo no lo ve el GM** (`tokenVisiblePorNiebla`); quien tiene
+  un personaje suyo en sigilo ve el mapa con un **filtro violáceo tenue**
+  (`yoEnSigilo`, al final de `dibujar`). **Ojo del GM:** botón
+  `👁 Revelar lo oculto` en la cabecera (`ojoRevelando`, `#btn-ojo`, se apaga
+  al recargar): al prenderlo se publica en la Mesa una línea
+  `desde: 'alerta'` que en **todas las pantallas** de la partida (mapa,
+  ficha, gm-tools; `comun/mesa.js`, `mesaAlertaOjo`) sale como fila roja y
+  dispara un destello rojo con un ojo 👁 grande que aparece de golpe y a ~1 s
+  se apaga con fade (el ojo es un emoji por ahora; cambiarlo por un PNG de ojo
+  con fondo transparente cuando haya uno). Si no se puede publicar el aviso,
+  no se revela nada. Un token seleccionado que deja de verse (niebla o
+  sigilo) se suelta solo. **Botón directo en la ficha:** quien tiene la
+  habilidad "Sigilo" ve arriba de la Botonera `🕶 Entrar en sigilo · 1 No2`
+  (`alternarSigilo`, `IT2.nitrosSigilo`, a revisar) que aplica el estado sobre
+  uno mismo, y `🕶 Salir del sigilo` (gratis) — sin pasar por "+ Estado", y
+  sin aviso en la Mesa. Todavía falta: que el GM no vea la ficha del que está
+  en sigilo, el cono y la zona de alerta, la ruptura automática y el costo de
+  girar.
 - **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
   personaje acá): `#estado` muestra "Partida · Usuario · GM"; ya no hay
   botón "⌂" (lo reemplaza el menú ☰, `../comun/menu-sitio.js`). Es la que

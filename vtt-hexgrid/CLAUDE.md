@@ -104,12 +104,17 @@ nuevo de Rol Pintoísta. Paso 2 de
   sigilo al entrar en un cono, el aviso de tiradas por pasos en la alerta y
   que el sigilo tenga en cuenta las invocaciones.
   **Giro gratis después de moverse** (2026-09-19, en combate): al soltar un
-  movimiento el token (personaje, creep o invocación) puede **elegir hacia
-  dónde queda mirando sin gastar No2** — su primer giro con el ↻ es gratis
-  (`giroLibre`, `abrirGiroLibre`); una vez establecida esa dirección, cada giro
-  cuesta 1 No2 por giro de 60°. La ventana gratis se acaba con el próximo
-  Mantenimiento o al cambiar de mapa, y vive en cada navegador (recargar la
-  página la pierde). Si no gira, se queda mirando hacia donde caminó.
+  movimiento el token (personaje, creep o invocación) tiene **derecho a elegir
+  hacia dónde queda mirando sin gastar No2** — su primer giro con el ↻ es
+  gratis (`giroLibre`, `abrirGiroLibre`); una vez establecida esa dirección,
+  cada giro cuesta 1 No2 por giro de 60°. **Si decide quedarse mirando hacia
+  donde llegó, esa es su elección (el giro gratis se gastó sin girar)**: la
+  ventana se cierra con **cualquier acción que venga después, propia o ajena**
+  (`cerrarGirosLibres`): que ese u otro token se mueva, que avance el turno de
+  la iniciativa, o que llegue una tirada nueva a la Mesa que no sea un aviso
+  del sistema (ataque, habilidad, tirada libre: `mesaAlAccionNueva`, avisado por
+  `comun/mesa.js`); también con el próximo Mantenimiento o al cambiar de mapa.
+  Vive en cada navegador (recargar la página la pierde).
 - **🕶 Sigilo, paso 4: detección** (2026-09-19). **Ruptura automática**: un
   token en sigilo que queda dentro del **cono** de un rival (creep si es
   personaje; personaje si es creep) pierde el sigilo solo —

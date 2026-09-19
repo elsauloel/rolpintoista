@@ -1909,11 +1909,13 @@ try{ iniciativaPlegada = localStorage.getItem('mapa-iniciativa-plegada') === '1'
 function escucharIniciativa(){
   cortarIniciativa = fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
+    const antesTurno = iniciativa.turno, antesRonda = iniciativa.ronda;
     iniciativa = {
       orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor)})).filter(o => o.id),
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
     };
+    if(iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda) giroLibre.clear();   // avanzó el turno: acción de otro
     renderIniciativa();
   }, err => console.error('Error escuchando la iniciativa:', err));
 }
@@ -3925,6 +3927,7 @@ function trazoEn(x, y){
 async function moverToken(id, col, fila, celdas){
   const t = tokens.get(id);
   if(!t) return;
+  giroLibre.clear();   // moverse es una acción: cierra los giros gratis de antes (el de este se abre al guardar)
   // Se mueve ya en pantalla; si Firebase lo rechaza, vuelve solo a su lugar.
   t.col = col; t.fila = fila;
   const ruta = (celdas || []).slice(-RUTA_MAX_CELDAS).flatMap(c => [c.col, c.fila]);
@@ -3964,6 +3967,15 @@ async function moverToken(id, col, fila, celdas){
 // En combate, después de moverse el token puede elegir hacia dónde queda
 // mirando sin gastar No2 (con el handle ↻ del HUD); ese primer giro es gratis y
 // cada giro que siga cuesta. Pasa por token y se acaba con el próximo Mantenimiento.
+// Cualquier otra acción (propia o ajena) se toma como que decidió no girar: se cierra.
+function cerrarGirosLibres(exceptoId){
+  [...giroLibre].forEach(id => { if(id !== exceptoId) giroLibre.delete(id); });
+}
+// Llega una tirada nueva a la Mesa (comun/mesa.js): un ataque, una habilidad, una tirada
+// cualquiera cuenta como acción; los avisos del sistema (sigilo, alerta, turno) no.
+function mesaAlAccionNueva(docs){
+  if(docs.some(d => !['recordatorio', 'alerta', 'mantenimiento'].includes(d.data().desde))) giroLibre.clear();
+}
 function abrirGiroLibre(id, celdas){
   if(modoMapa !== 'combate' || !celdas || celdas.length < 2) return;
   giroLibre.add(id);
@@ -4153,6 +4165,7 @@ function escucharTokens(){
       const d = ch.doc.data({serverTimestamps: 'estimate'});
       // Ruta nueva de otro (la propia ya se mostró al mover): estela unos segundos.
       const previo = tokens.get(ch.doc.id);
+      if(ch.type === 'modified' && previo && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila)))) cerrarGirosLibres(ch.doc.id);   // otro token se movió: acción ajena
       const ruta = Array.isArray(d.ruta) ? d.ruta.map(v => Math.round(num(v))) : [];
       const rutaJson = JSON.stringify(ruta);
       if(ch.type === 'modified' && ruta.length > 2 && previo && previo.rutaJson !== rutaJson){

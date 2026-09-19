@@ -181,6 +181,12 @@ function mesaRender(docs){
     cuerpo.appendChild(div);
   });
   mesaIdsVistos = new Set(docs.map(d => d.id));
+  // Aviso opcional a la herramienta de que llegaron tiradas nuevas (el mapa lo
+  // usa para cerrar el "giro gratis" cuando alguien hace algo).
+  if(!primeraVez && typeof mesaAlAccionNueva === 'function'){
+    const nuevas = docs.filter(d => nuevasIds.has(d.id));
+    if(nuevas.length) mesaAlAccionNueva(nuevas);
+  }
   // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
   if(!primeraVez && typeof dadosAnimarTirada === 'function'){
     docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));

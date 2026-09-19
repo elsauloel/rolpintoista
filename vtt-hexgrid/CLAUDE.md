@@ -51,6 +51,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   escucha este mismo doc (`modoMapaEscuchar`, su propio `modoMapa`) para
   reordenar la Botonera: habilidades sociales al final en combate, arriba
   de todo en narrativo — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md).
+- **Clic derecho mientras arrastrás un token cancela el movimiento** y vuelve a su casilla (`cancelarArrastreToken`, 2026-09-19).
 - Se mueven arrastrando; se escribe **una sola vez al soltar** (no durante
   el arrastre) por el tope de escrituras del plan gratis. Los demás ven el
   token deslizarse a la casilla nueva.

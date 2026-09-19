@@ -2273,8 +2273,23 @@ function tokenEn(x, y){
 /* ---------- Mouse / dedo sobre el mapa ---------- */
 
 lienzo.addEventListener('contextmenu', e => e.preventDefault());
+// Clic derecho con un token a medio arrastrar: cancela el movimiento y el
+// token vuelve a donde estaba. (El botón derecho apretado con el izquierdo
+// ya sostenido llega como mousedown, no siempre como pointerdown.)
+function cancelarArrastreToken(){
+  if(!arrastre) return false;
+  const a = arrastre;
+  arrastre = null;
+  visibles.delete(a.id);
+  lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
+  toast('Movimiento cancelado');
+  pedirDibujo();
+  return true;
+}
+lienzo.addEventListener('mousedown', e => { if(e.button === 2) cancelarArrastreToken(); });
 lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
+    if(cancelarArrastreToken()) return;
     // Con una herramienta de dibujo activa, el clic derecho es "salir de
     // acá" (no ping) — es la forma más práctica de volver al cursor
     // normal sin ir a buscar el botón de la barra lateral.

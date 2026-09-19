@@ -32,7 +32,11 @@ function grillaEstilos(){
 #grilla-dados button:active{background:var(--copper,#C98545);color:#180F08}
 #grilla-dados .grilla-dado{text-align:left;min-width:62px;color:var(--brass,#E0A458);font-weight:700}
 #grilla-dados .grilla-dado i{font-style:normal;display:inline-block;width:18px;color:var(--muted,#9A867E);font-weight:400}
-#grilla-dados .grilla-cant{border-left:1px solid var(--line-soft,#2A2126)}`;
+#grilla-dados .grilla-cant{border-left:1px solid var(--line-soft,#2A2126)}
+#grilla-dados .grilla-pie{margin-top:6px;padding-top:6px;border-top:1px solid var(--line-soft,#2A2126);display:flex;justify-content:center}
+#grilla-dados .grilla-pie a{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:inherit;text-decoration:none;padding:6px 12px;border:1px solid var(--line,#3B2E34);border-radius:var(--r,3px)}
+#grilla-dados .grilla-pie[hidden]{display:none}
+#grilla-dados .grilla-pie a:hover{border-color:var(--brass,#E0A458);color:var(--brass,#E0A458)}`;
   document.head.appendChild(s);
 }
 
@@ -46,7 +50,7 @@ function grillaArmar(){
   panel.innerHTML = '<table>' + GRILLA_CARAS.map(c =>
     `<tr><td><button type="button" class="grilla-dado" data-n="1" data-caras="${c}" title="Tirar 1d${c}"><i>${GRILLA_ICONO[c]}</i>D${c}</button></td>` +
     GRILLA_CANTIDADES.map(n => `<td class="grilla-cant"><button type="button" data-n="${n}" data-caras="${c}" title="Tirar ${n}d${c}">${n}</button></td>`).join('') +
-    '</tr>').join('') + '</table>';
+    '</tr>').join('') + '</table><div class="grilla-pie" hidden></div>';
   panel.addEventListener('click', e => {
     const b = e.target.closest('button[data-caras]');
     if(!b || !grilla.alTirar) return;
@@ -87,12 +91,15 @@ function grillaCerrar(){
 }
 
 // boton: el que abre/cierra. ancla: junto a qué se ubica. alTirar(formula).
-function grillaConectar(boton, {ancla, lado, alTirar}){
+// pie (opcional): HTML que va debajo de la grilla (el mapa pone ahí "Personalización" de los dados).
+function grillaConectar(boton, {ancla, lado, alTirar, pie}){
   boton.addEventListener('click', e => {
     e.stopPropagation();
     const panel = grilla.panel || grillaArmar();
     if(!panel.hidden && grilla.boton === boton){ grillaCerrar(); return; }
     Object.assign(grilla, {boton, ancla: ancla || boton, lado: lado || 'costado', alTirar});
+    const zonaPie = panel.querySelector('.grilla-pie');
+    if(zonaPie){ zonaPie.innerHTML = pie || ''; zonaPie.hidden = !pie; }
     panel.hidden = false;
     boton.classList.add('activo');
     grillaUbicar();

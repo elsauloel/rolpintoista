@@ -129,3 +129,7 @@ versión parecida en más de una, es candidato a juntar.
   con el ojo (`comun/ojo.png`) grande que a ~1 s se apaga con fade. Lo publica el botón "👁
   Revelar lo oculto" del mapa; lo ven todos los que tengan la Mesa (mapa,
   ficha, gm-tools). Su CSS se inyecta solo (no va en cada HTML).
+
+- **`grilla-dados.js`, pie opcional** (2026-09-19): `grillaConectar(boton, {…, pie})` acepta
+  un HTML que se muestra debajo de la grilla (el mapa pone ahí el link
+  "Personalización 🎲" a `prueba-dados.html`); sin `pie` no aparece nada.

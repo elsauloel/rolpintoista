@@ -40,10 +40,10 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **Cabecera en una línea** (2026-09-19): para que entre, salieron de la
   cabecera el **switch de modo y el zoom −/+** (ahora flotan sobre el mapa, arriba a
   la derecha, `#flotantes-mapa`; los carteles del token y del elemento
-  seleccionado bajaron debajo de ellos) y **+ Token** (ahora está en la barra
-  del costado, `#barra-acciones-token`, junto a "Personalización 🎲" de los dados);
+  seleccionado bajaron debajo de ellos) y **+ Token** (que después de pasar por una
+  barra del costado volvió a la cabecera, con el (?) de la guía de colores adentro del botón, `#ayuda-token`; y "Personalización 🎲" de los dados pasó al pie de la grilla de dados);
   y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
-  estado, Mapas, GM Tools/Mi ficha, Personajes, Fondo, 👁 y Centrar (Dados pasó al borde izquierdo del mapa).
+  estado, Mapas, + Token (?), GM Tools/Mi ficha, Personajes, Fondo, 👁 y Centrar (Dados pasó al borde izquierdo del mapa).
 - **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
   la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
@@ -191,8 +191,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   vía `modificarCreep` (transacción sobre `privado/ficha` + resumen +
   firma, la misma que usa `cambiarVidaCreep`). El panel del creep le
   muestra al GM sus No2.
-- Panel del costado: Mantenimiento (GM) y una barra fija con **+ Token**, el (?) con la ayuda y la
-  leyenda de colores de los bordes (`#ayuda-token`, `actualizarAyudaToken`; 2026-09-19, antes era una barra aparte "Token (?)") y el botón de configuración de los dados 3D. Los datos
+- Panel del costado: Mantenimiento (GM) y, cuando hace falta, el panel de Editar token / Mapas / Fondo (2026-09-19: ya no hay barra de arriba con + Token, el (?) y Personalización). Los datos
   del token van en el HUD flotante (no se repiten acá). "✎ Editar token"
   está en el globo del ⚙ del HUD: abre en el panel el vínculo, nombre,
   color, dueño (GM) y "Sacar del mapa" (`editandoToken`).

@@ -1147,6 +1147,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
   background:var(--wine);color:var(--paper);border:1px solid var(--brass);border-radius:var(--r);
   padding:7px 14px;font-family:"Space Mono",monospace;font-size:11.5px;box-shadow:0 8px 20px -8px rgba(0,0,0,.7);pointer-events:none
 }
+#ficha-lectura button{pointer-events:auto;margin-left:10px;cursor:pointer}
+#ficha-lectura.editando-gm{background:#5b4310;border-color:#E0A458
+}
 </style>
 <style>
 /* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
@@ -8962,7 +8965,7 @@ function fichaEstadoAlDia(){
   if(f.reintentarDesde){ fichaEstado('⚠ No se pudo guardar — reintentando', 'error'); return; }
   if(f.escribiendo){ fichaEstado('Guardando…'); return; }
   if(Object.keys(f.sucias).length){ fichaEstado('Cambios sin guardar…'); return; }
-  fichaEstado(`✓ Guardado en la mesa · ${fichaNombre()}`, 'ok');
+  fichaEstado(`✓ Guardado en la mesa · ${fichaNombre()}${f.editaGM ? ' (editando como GM)' : ''}`, 'ok');
 }
 
 // Usuario a mostrar en la barra junto al personaje abierto: el dueño, si es
@@ -8978,10 +8981,36 @@ function fichaIdentidadRender(){
     : `<b>📜 Ficha</b> <span class="sec">${esc(barraTexto())}</span>`;
 }
 
+// ¿La ficha se abre solo para mirar? El dueño la edita; cualquier otro la mira.
+// El GM también la mira, pero puede pasar a editarla (para ayudar a un jugador
+// nuevo a configurar habilidades, automatizarlas, etc.): f.editaGM.
+function fichaSoloLecturaPara(duenoUid, f){
+  if(fbMiembro.gm) return !(f && f.editaGM);
+  return duenoUid !== fbUsuario.uid;
+}
+
+async function fichaAlternarEdicionGM(){
+  const f = fichaVivo;
+  if(!f || !fbMiembro.gm || !f.cargada) return;
+  if(f.editaGM){
+    await fichaGuardarTick(true);   // sube lo que quedó pendiente antes de volver a mirar
+    f.editaGM = false;
+    f.soloLectura = true;
+    toast('Volviste a solo lectura');
+  }else{
+    f.editaGM = true;
+    f.soloLectura = false;
+    toast('Editás esta ficha como GM: lo que cambies se guarda en el personaje');
+  }
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+}
+
 async function fichaMostrarLectura(){
   let cartel = $('#ficha-lectura');
   const f = fichaVivo;
-  if(!f || !f.soloLectura){
+  const editaGM = !!(f && f.editaGM && fbMiembro.gm);
+  if(!f || (!f.soloLectura && !editaGM)){
     if(cartel) cartel.remove();
     fichaIdentidadUsuario = '';
     fichaIdentidadRender();
@@ -8992,13 +9021,26 @@ async function fichaMostrarLectura(){
     cartel.id = 'ficha-lectura';
     document.body.appendChild(cartel);
   }
-  cartel.textContent = 'Solo lectura: este personaje no es tuyo, los cambios que hagas acá no se guardan.';
+  cartel.classList.toggle('editando-gm', editaGM);
+  const armar = dueno => {
+    cartel.textContent = editaGM
+      ? `Editando como GM el personaje${dueno ? ' de ' + dueno : ''}: lo que cambies se guarda en su ficha.`
+      : `Solo lectura: ${dueno ? 'personaje de ' + dueno : 'este personaje no es tuyo'}. Los cambios que hagas acá no se guardan.`;
+    if(fbMiembro.gm){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'mini';
+      b.textContent = editaGM ? 'Volver a solo lectura' : '✎ Editar como GM';
+      b.onclick = fichaAlternarEdicionGM;
+      cartel.appendChild(b);
+    }
+  };
+  armar('');
   fichaIdentidadUsuario = '';  // se corrige abajo apenas se sepa el dueño; mientras, muestra tu nombre
   fichaIdentidadRender();
   try{
     const m = await fbDb.doc(fbRutaCampana(`miembros/${f.duenoUid}`)).get();
-    if(m.exists && fichaVivo === f && f.soloLectura){
-      cartel.textContent = `Solo lectura: personaje de ${m.data().nombre}. Los cambios que hagas acá no se guardan.`;
+    if(m.exists && fichaVivo === f && (f.soloLectura || f.editaGM)){
+      armar(m.data().nombre);
       fichaIdentidadUsuario = m.data().nombre;
       fichaIdentidadRender();
     }
@@ -9102,7 +9144,8 @@ function fichaRecordar(id, soloEnPestana){
 function fichaNuevoEstado(id, duenoUid, cargada){
   return {
     id, duenoUid,
-    soloLectura: duenoUid !== fbUsuario.uid || !!fbMiembro.gm,  // el GM solo mira
+    editaGM: false,   // el GM puede pasar a editar (fichaAlternarEdicionGM)
+    soloLectura: fichaSoloLecturaPara(duenoUid, null),
     cargada,
     ultimo: {}, sucias: {}, enviando: {},
     ultimoResumen: '', revisarResumen: false,
@@ -9124,7 +9167,7 @@ function fichaEscuchar(f){
       return;
     }
     const d = doc.data();
-    const lectura = d.duenoUid !== fbUsuario.uid || !!fbMiembro.gm;
+    const lectura = fichaSoloLecturaPara(d.duenoUid, f);
     f.duenoUid = d.duenoUid;
     if(lectura !== f.soloLectura){
       f.soloLectura = lectura;
@@ -9317,7 +9360,7 @@ async function abrirPersonajes(){
       const nivel = x.resumen && x.resumen.nivel ? ` · Lv ${fmt(num(x.resumen.nivel))}` : '';
       const dueno = propia ? '' : ` — ${nombres.get(x.duenoUid) || '¿?'}`;
       b.textContent = `${x.nombre || 'Sin nombre'}${nivel}${dueno}${abierto ? ' (abierto)' : ''}`;
-      if(!propia && !abierto) b.title = 'Se abre en una pestaña nueva, en solo lectura';
+      if(!propia && !abierto) b.title = fbMiembro.gm ? 'Se abre en una pestaña nueva, en solo lectura (como GM la podés editar desde ahí)' : 'Se abre en una pestaña nueva, en solo lectura';
       b.onclick = async () => {
         $('#scrim-personajes').classList.remove('open');
         if(abierto) return;
@@ -9758,7 +9801,7 @@ function modoMapaEscuchar(){
 
 async function mantenimientoRevisar(){
   const f = fichaVivo;
-  if(mantenimientoSenal === null || !f || !f.cargada || f.soloLectura) return;
+  if(mantenimientoSenal === null || !f || !f.cargada || f.soloLectura || f.editaGM) return;   // el GM editando no aplica el mantenimiento del personaje: lo hace su dueño
   if(mantenimientoRevisando){ mantenimientoOtraVez = true; return; }
   mantenimientoRevisando = true;
   try{

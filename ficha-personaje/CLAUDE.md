@@ -268,3 +268,19 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   navegación principal entre partida, mapa y fichas; el mapa además carga
   la ficha adentro en un iframe (`?modo=botonera`) para la Botonera de
   cada jugador.
+
+## El GM puede editar la ficha de un jugador (2026-09-19)
+
+Para ayudar a un jugador nuevo o al que le cuesta (configurar habilidades,
+automatizarlas, etc.): el GM abre la ficha de cualquiera (en solo lectura,
+como siempre) y en el cartel de arriba toca **"✎ Editar como GM"**
+(`fichaAlternarEdicionGM`, `f.editaGM`); el cartel pasa a ámbar ("Editando
+como GM el personaje de X…") y lo que cambie se guarda en la ficha del
+personaje, con el mismo guardado en vivo de siempre. "Volver a solo lectura"
+sube lo pendiente y lo suelta. Entrar en modo edición es una decisión
+explícita del GM, no el estado por defecto, para no tocar una ficha sin querer.
+**El Mantenimiento no se aplica desde la vista del GM** (lo hace el dueño,
+`mantenimientoRevisar`), para no cobrarlo dos veces. Necesita las reglas de
+`firebase/firestore.rules` publicadas (el GM escribe `fichas/{id}` y
+`fichas/{id}/partes/*`). Si el dueño y el GM editan a la vez, gana el último
+que guarda cada parte (igual que con dos ventanas del mismo jugador).

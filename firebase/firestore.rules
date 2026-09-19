@@ -134,10 +134,11 @@ service cloud.firestore {
       // Fichas de personaje en vivo (ficha-personaje/ficha.html).
       // Documento principal: {duenoUid, nombre, resumen, miniatura, creado,
       // actualizado}; contenido en partes/{parte}: {json, actualizado}.
-      // Son solo de jugadores: todos los miembros las ven; solo el dueño las
-      // crea, modifica y borra. El GM no crea ni edita fichas (lo suyo va en
-      // gm-tools); solo puede reasignar el dueño y borrarlas (lo usa "Borrar
-      // la partida" en el inicio).
+      // Son de los jugadores: todos los miembros las ven; solo el dueño las
+      // crea y borra. Las edita el dueño y también el GM (para ayudar a un
+      // jugador nuevo: botón "✎ Editar como GM" de la ficha); el GM además
+      // reasigna el dueño y las borra (lo usa "Borrar la partida" en el
+      // inicio). El GM no crea fichas (lo suyo va en gm-tools).
       match /fichas/{f} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
@@ -155,16 +156,19 @@ service cloud.firestore {
           && (
             (resource.data.duenoUid == request.auth.uid
               && request.resource.data.duenoUid == resource.data.duenoUid)
-            || (esGM(c)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid']))
+            // El GM puede ayudar a un jugador: edita su ficha (nombre, resumen,
+            // miniatura) y reasigna el dueño.
+            || esGM(c)
           );
         allow delete: if esMiembro(c) && (resource.data.duenoUid == request.auth.uid || esGM(c));
 
         match /partes/{p} {
           allow read: if esMiembro(c);
+          // El dueño escribe su ficha; el GM también (para ayudar a un jugador
+          // nuevo a configurar habilidades, automatizarlas, etc.).
           allow write: if esMiembro(c)
-            && get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid
-            && !esGM(c);
+            && (esGM(c)
+              || get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid);
           allow delete: if esGM(c);
         }
       }

@@ -128,7 +128,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   vacías a propósito. `miniatura` (documento principal, no la parte) es
   el retrato a 96px para el token del mapa: la elegida a mano si existe,
   si no el centro del retrato recortado automático como antes. Todos los
-  miembros leen todo; solo el dueño escribe. Son fichas de jugadores: el GM no crea ni edita (en la ficha las ve en solo lectura; lo suyo va en gm-tools); solo puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
+  miembros leen todo; el dueño escribe y **también el GM** (desde 2026-09-19, para ayudar a un jugador: botón "✎ Editar como GM" en la ficha, que por defecto la abre en solo lectura). Son fichas de jugadores: el GM no las crea (lo suyo va en gm-tools); además puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
   muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se

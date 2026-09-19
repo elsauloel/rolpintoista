@@ -43,7 +43,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   seleccionado bajaron debajo de ellos) y **+ Token** (ahora está en la barra
   del costado, `#barra-acciones-token`, junto a "Personalización 🎲" de los dados);
   y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
-  estado, Mapas, GM Tools/Mi ficha, Personajes, Fondo, 👁, Dados y Centrar.
+  estado, Mapas, GM Tools/Mi ficha, Personajes, Fondo, 👁 y Centrar (Dados pasó al borde izquierdo del mapa).
 - **👁 Menú del ojo (GM)** (2026-09-19): un botón cuadrado con el ícono 👁 en
   la cabecera (`#btn-ojo-menu`, solo para el GM) abre hacia abajo un
   desplegable (`#ojo-menu`, `abrirMenuOjo`; se cierra al elegir algo, al tocar
@@ -597,7 +597,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   historial y al entrar se limpian las de más de 48 h
   (`../comun/mesa-historial.js`, igual que en ficha y gm-tools).
 - **Grilla de dados** (`../comun/grilla-dados.js`, como la de Roll20): botón
-  🎲 Dados en la barra de arriba; se despliega debajo con D4…D100 × 1–6 y
+  🎲 (`#toolkit-dados`, 2026-09-19: antes era "🎲 Dados" en la cabecera) en el borde izquierdo del mapa, justo arriba de la pestaña de la caja de herramientas y del mismo tamaño y forma — lo ven jugadores y GM por igual; se despliega al costado con D4…D100 × 1–6 y
   cada clic publica la tirada en la Mesa. En ficha y gm-tools el botón está
   al pie de la Mesa flotante y la grilla se abre al costado.
 - **Ping (clic derecho en el mapa)**: un anillo que se expande y se apaga

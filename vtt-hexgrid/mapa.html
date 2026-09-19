@@ -40,7 +40,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.primary:hover{background:var(--brass)}
 .btn.peligro{border-color:var(--wine);color:var(--danger)}
 .btn.peligro:hover{border-color:var(--danger)}
-#btn-dados.activo{border-color:var(--brass);color:var(--brass)}
+#toolkit-dados.activo{color:var(--paper);border-color:var(--copper)}
 
 /* Recorte de imagen (comun/recorte-imagen.js): elegir qué parte de la
    foto se ve antes de guardarla como imagen de un token. */
@@ -229,14 +229,16 @@ aside{
   border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
 }
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
-#toolkit-pestana{
+#toolkit-pestana,#toolkit-dados{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
   width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
   background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
   box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
-#toolkit-pestana:hover{background:var(--panel2);color:var(--paper)}
+#toolkit-pestana:hover,#toolkit-dados:hover{background:var(--panel2);color:var(--paper)}
+/* El botón de dados va justo arriba de la pestaña, del mismo tamaño y forma. */
+#toolkit-dados{top:calc(50% - 77px);transform:none}
 #toolkit.abierto #toolkit-pestana{color:var(--paper);border-color:var(--copper)}
 #toolkit-cab{
   padding:12px 14px 10px;border-bottom:1px solid var(--line-soft);
@@ -570,7 +572,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
-  <button type="button" class="btn" id="btn-dados" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button>
   <button type="button" class="btn" id="btn-centrar" title="Llevar la vista a tus tokens">Centrar</button>
 </header>
 
@@ -604,6 +605,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <div id="toolkit-pie">Las herramientas se van a ir sumando de a una.</div>
       </nav>
       <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">☭</button>
+      <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad">🎲</button>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>
@@ -6300,7 +6302,7 @@ $('#mesa-dados').innerHTML = dadosBotonHtml();
 dadosConectarBoton($('#mesa-dados'));
 $('#mesa-historial').innerHTML = mesaBorrarHtml();
 // Grilla de dados debajo del botón de la barra de arriba (comun/grilla-dados.js).
-grillaConectar($('#btn-dados'), {lado: 'abajo', alTirar: f => mesaPublicar('Tirada libre', tirarDados(f))});
+grillaConectar($('#toolkit-dados'), {lado: 'costado', alTirar: f => mesaPublicar('Tirada libre', tirarDados(f))});
 
 $('#mesa-tirar').onsubmit = e => {
   e.preventDefault();

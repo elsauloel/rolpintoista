@@ -255,3 +255,9 @@ equivalente que da Con (5), o sea +5 HP máx.
   (+5 Hp.Max), Reserva de poder (+3 SP), Recuperación mental (+1 SP Regen),
   Regeneración (3 HP/turno), Voluntad de hierro (+2 Res.CC), Ojo avizor (+1
   visión). Faltan las de 2 y 3 Job y el resto de la tabla (P60).
+- ✅ **P72. Pasivas de los demás stats secundarios.** Cargadas 2026-09-19 a
+  pedido del usuario, 1 Job cada una, +1 (Res.Mg, Dmg, Bloqueo, Crg.Max, Eva,
+  Iniciativa, No2, Rng, PdG, Crit, Parry, PdG.Mg, Res.Mt, Rango de casteo).
+  Marcadas "⚠ a revisar" No2, Rng y Crit (fuertes para 1 Job). No se
+  cargaron Defensa, Ranuras de cinturón ni Res.Crit (Tipo 4–12): esperan
+  decisión. Falta seguir con las de 2 y 3 Job. *(2026-09-19)*

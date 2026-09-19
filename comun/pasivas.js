@@ -17,7 +17,8 @@
 
    Escalón = lo que da 1 punto del atributo del que sale el stat (Hp.Max 5,
    SP 3, el resto 1). Excepciones decididas (docs/preguntas-abiertas.md
-   P70): Res.CC da +2. Solo van acá las tandas que el dueño ya validó. */
+   P70): Res.CC da +2. Los +1 de los stats restantes se cargaron el 2026-09-19 a pedido del dueño;
+   los marcados ⚠ (No2, Rng, Crit) son los que más hay que revisar. */
 const PASIVAS_BASE = [
   {poolId: 'robustez', nombre: 'Robustez', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]},
@@ -31,4 +32,33 @@ const PASIVAS_BASE = [
    detalle: '+2 a la resistencia al crowd control.', mods: [{stat: 'rescc', val: 2}]},
   {poolId: 'ojo-avizor', nombre: 'Ojo avizor', jobCosto: 1, etiquetas: ['visión', 'utilidad'],
    detalle: '+1 al campo de visión (radio en hexágonos).', mods: [{stat: 'vision', val: 1}]},
+  // Resto de los stats secundarios (escalón +1 = lo que da 1 punto de su atributo).
+  {poolId: 'temple-magico', nombre: 'Temple mágico', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
+   detalle: '+1 Res.Mg (resistencia mágica).', mods: [{stat: 'resmg', val: 1}]},
+  {poolId: 'golpe-fuerte', nombre: 'Golpe fuerte', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 Dmg (daño).', mods: [{stat: 'dmg', val: 1}]},
+  {poolId: 'guardia-firme', nombre: 'Guardia firme', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Bloqueo.', mods: [{stat: 'bloqueo', val: 1}]},
+  {poolId: 'espalda-de-mula', nombre: 'Espalda de mula', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
+   detalle: '+1 Crg.Max (carga máxima).', mods: [{stat: 'crgmax', val: 1}]},
+  {poolId: 'pies-ligeros', nombre: 'Pies ligeros', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Eva (evasión).', mods: [{stat: 'eva', val: 1}]},
+  {poolId: 'reflejos-de-gato', nombre: 'Reflejos de gato', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
+   detalle: '+1 Iniciativa.', mods: [{stat: 'ini', val: 1}]},
+  {poolId: 'impulso', nombre: 'Impulso', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
+   detalle: '+1 No2 (nitros). ⚠ De las más fuertes para 1 Job: a revisar.', mods: [{stat: 'nitros', val: 1}]},
+  {poolId: 'vista-de-halcon', nombre: 'Vista de halcón', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 Rng (rango). ⚠ A revisar.', mods: [{stat: 'rng', val: 1}]},
+  {poolId: 'punteria', nombre: 'Puntería', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 PdG (probabilidad de golpe).', mods: [{stat: 'pdg', val: 1}]},
+  {poolId: 'ojo-critico', nombre: 'Ojo crítico', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 Crit. ⚠ A revisar.', mods: [{stat: 'crit', val: 1}]},
+  {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
+  {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 PdG.Mg (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
+  {poolId: 'mente-serena', nombre: 'Mente serena', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
+   detalle: '+1 Res.Mt (resistencia mental).', mods: [{stat: 'resm', val: 1}]},
+  {poolId: 'largo-alcance-arcano', nombre: 'Largo alcance arcano', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
+   detalle: '+1 Rango de casteo.', mods: [{stat: 'rangocasteo', val: 1}]},
 ];

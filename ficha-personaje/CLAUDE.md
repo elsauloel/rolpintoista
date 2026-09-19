@@ -128,10 +128,11 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   la 🔍 siga abriendo).
 - **Editor de habilidades paso a paso** (`PASOS_HABILIDAD`, `drawEditorHabilidad`):
   `drawEditor` deriva ahí para `habilidades`. Pasos: qué es (nombre y
-  descripción) → costo (SP y No2; No2 puede ser un número, X o "ATAQUE" = lo que cuesta atacar con el arma elegida al ejecutar, `nitrosAtaque`/`registrarAtaqueDeHabilidad`, y cuenta como ese ataque; cada uno puede ser X: `spVariable`/`nitrosVariable`, se eligen en `#scrim-costox` y lo fijo queda bloqueado; categoría) → tirada (stat y/o fórmula) →
+  descripción) → costo (SP y No2; No2 puede ser un número, X o "ATAQUE" = lo que cuesta atacar con el arma elegida al ejecutar, `nitrosAtaque`/`registrarAtaqueDeHabilidad`, y cuenta como ese ataque; cada uno puede ser X: `spVariable`/`nitrosVariable`, se eligen en `#scrim-costox` y lo fijo queda bloqueado) → tirada (stat y/o fórmula) →
   estado alterado (`htmlEstadoAlUsar`, compartido con los consumibles) →
   origen (Job con cuántos puntos costó — `jobCosto`, 1 por defecto, lo suma `jobBudget` vía `jobCostoDe` —, o de dónde salió; imagen) → resumen. Al crear, Guardar aparece
   en el último paso; al editar, siempre, y los pasos se pueden saltar.
+  **Las categorías "Espameable"/"No espameable" ya no existen** (2026-09-19): se sacó el campo, el aviso de "ya usada este turno", la nota de la lupa y el reinicio en el Mantenimiento; las habilidades viejas que traían `categoria` la ignoran.
   **Actualización 2026-09-19 — primero, ¿automatizarla?** El primer paso
   del asistente (`PASOS_HAB`, `pasosHabilidad(draft)`) pregunta Sí/No
   (`automatizada`; una habilidad nueva arranca en `null` y no deja avanzar

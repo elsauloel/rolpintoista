@@ -3304,6 +3304,15 @@ document.addEventListener('keydown', e => {
     abrirToolkit(!toolkitAbierto);
     return;
   }
+  // M: prende o apaga 🦶 Mover libre del token seleccionado (si se puede).
+  if((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault();
+    const tm = seleccion ? tokens.get(seleccion) : null;
+    if(tm && puedoMoverLibre(tm)) activarMoverLibre(seleccion);
+    else if(moverLibre) activarMoverLibre(moverLibre);
+    else toast('Elegí primero un token tuyo para moverlo libre');
+    return;
+  }
   // F: prende o apaga Terreno y Formas.
   if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
@@ -4909,7 +4918,7 @@ function hudHtml(t){
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
-    (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre: llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
+    (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     '</div>' +

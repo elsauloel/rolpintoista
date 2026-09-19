@@ -4509,19 +4509,17 @@ const LISTS = {
   habilidades:{
     empty:'Sin habilidades cargadas.',
     row:i => {
-      const noEspameable = i.categoria === 'No espameable';
-      const yaUsada = noEspameable && i.usadaEsteTurno === true;
       const sinNitros = sinNitrosPara(i);
       const bloqueada = sinNitros;
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''} ${i.categoria?`<span class="tag cat">${esc(i.categoria)}</span>`:''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
       </div>
-      <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (yaUsada?' · ya usada este turno':(sinNitros?' · sin recursos':'')) : 'Anunciar'}</button>
+      <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       </div>`;
     }
   },
@@ -4650,15 +4648,13 @@ function renderTodasHabilidades(){
   const grid = $('#todas-habilidades-grid');
   if(!S.habilidades.length){ grid.innerHTML = '<div class="hint">Sin habilidades cargadas.</div>'; return; }
   grid.innerHTML = `<div class="habs-grid">${S.habilidades.map(i => {
-    const noEspameable = i.categoria === 'No espameable';
-    const yaUsada = noEspameable && i.usadaEsteTurno === true;
     const sinNitros = sinNitrosPara(i);
     const bloqueada = sinNitros;
     return `<div class="habs-grid-item">
       <div class="habs-grid-nombre">${esc(i.nombre)}</div>
       <div class="habs-grid-btns">
         <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-        <button class="ejecutar-btn${yaUsada?' usada':''}" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' : 'Anunciar'}</button>
+        <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' : 'Anunciar'}</button>
       </div>
       ${costoHabilidadTxt(i) ? `<div class="habs-grid-costo">${esc(costoHabilidadTxt(i))}</div>` : ''}
     </div>`;
@@ -4809,8 +4805,6 @@ function renderBotonera(){
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>
       <div class="botonera-list-grid">
         ${S.habilidades.length ? S.habilidades.map(i => {
-          const noEspameable = i.categoria === 'No espameable';
-          const yaUsada = noEspameable && i.usadaEsteTurno === true;
           const sinNitros = sinNitrosPara(i);
           // Nombre y costo a la izquierda; Ver y Ejecutar siempre juntos a la derecha.
           return `<div class="cat-row bot-fila">
@@ -4820,7 +4814,7 @@ function renderBotonera(){
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${yaUsada?" usada":""}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':""}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':""}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
             </div>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
@@ -6014,8 +6008,6 @@ document.addEventListener('click', e => {
   if(preset && preset.closest('#presets-body')){ aplicarPresetEfecto(preset.dataset.preset); return; }
   const tipo = e.target.closest('[data-tipoitem]');
   if(tipo){ aplicarTipoItem(tipo.dataset.tipoitem); return; }
-  const cat = e.target.closest('[data-cat-hab]');
-  if(cat && editing){ editing.draft.categoria = cat.dataset.catHab; drawEditor(); return; }
 });
 $('#tienda-salir').onclick = () => salirDeLaTienda();
 $('#catalogo-orden').addEventListener('change', e => { catalogoOrden = e.target.value; renderCatalogoModal(); });
@@ -6047,7 +6039,7 @@ const SCHEMA = {
   inventario: {titulo:'Ítem de inventario', campos:['nombre','imagen','tipoItem','manoPreferida','peso','ranuras','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','equipado','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
   catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
-  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','categoria','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
+  habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','origen','detalle'], mods:true},
   // El dado ya no se escribe a mano: sale del nivel (botón "+ Nivel" en la lista).
   sociales: {titulo:'Social', campos:['nombre','imagen','detalle'], mods:false},
@@ -6057,7 +6049,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
   stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
   job:'Adquirida con puntos de Job', jobCosto:'Puntos de Job que costó (si fue con Job)', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
-  categoria:'Categoría', unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
+  unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
   danoAmplificado:'Daño amplificado (dados extra sin sumar peso)', armaDeRango:'Arma de rango (el botón de Daño Arma no suma el stat Dmg)',
   manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoDetalle:'Detalle del estado',
@@ -6069,7 +6061,6 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
 const CAMPO_NUM = ['jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
-const CATEGORIAS_HABILIDAD = ['', 'Espameable', 'No espameable'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
@@ -6376,7 +6367,6 @@ function openViewer(key, id){
 
   if(key === 'habilidades'){
     if(it.costo) L.push(linea('Costo', it.costo));
-    if(it.categoria) L.push(linea('Categoría', it.categoria));
     L.push(linea("Adquirida con Job", it.job !== false ? `Sí · ${fmt(jobCostoDe(it))} punto${jobCostoDe(it) === 1 ? "" : "s"}` : "No"));
     if(it.job === false && it.origen) L.push(linea("Origen", it.origen));
   }
@@ -7039,7 +7029,7 @@ function openEditor(key, id, equipadoPreset, opciones){
     equipado: equipadoPreset !== undefined ? equipadoPreset : true,
     activo:true, stacks:1, costo:'', nitrosCosto:IT2.nitrosHabilidad, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:8, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
-    unidades:1, consumible:false, curahp:0, precioCompra:0, usadaEsteTurno:false,
+    unidades:1, consumible:false, curahp:0, precioCompra:0,
     efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
     forzarNitros:'', mitadPdgEva:false, armaduraRota:false, armaduraArruinada:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
@@ -7156,12 +7146,7 @@ function drawEditorHabilidad(){
         <input data-c="hpCosto" type="number" step="1" min="0" value="${esc(num(draft.hpCosto))}" data-hab-enter="1" style="max-width:120px">
         <div class="hint" style="margin-top:5px">Se descuenta sola al ejecutarla. No te deja usarla si te dejaría en 0: tenés que tener más vida que el costo. 0 = no gasta.</div>
       </div>
-      <div class="f"><label>¿Se puede usar más de una vez por turno?</label>
-        <div class="opcion-fila">
-          ${CATEGORIAS_HABILIDAD.map(c => `<button type="button" class="opcion-btn ${draft.categoria === c ? 'activa' : ''}" data-cat-hab="${esc(c)}">${esc(c || 'Sin categoría')}</button>`).join('')}
-        </div>
-        <div class="hint" style="margin-top:5px">"No espameable": una vez por turno (si la repetís, la ficha te pregunta). "Espameable": todas las que te alcancen.</div>
-      </div>`;
+      `;
   }
   if(info.id === 'efecto'){
     const opcionStat = s => `<option value="${s.id}" ${draft.tiradaStat === s.id ? 'selected' : ''}>${esc(s.label)} · ${esc(s.full)}</option>`;
@@ -7197,7 +7182,6 @@ function drawEditorHabilidad(){
       ${auto ? `${fila('SP', esc(costoSp || 'no gasta'))}
       ${fila("No2", nitrosAtaque(draft) ? "como un ataque (elegís el arma al usarla)" : nitrosVariable(draft) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
       ${fila('HP', num(draft.hpCosto) > 0 ? fmt(num(draft.hpCosto)) : 'no gasta')}
-      ${fila('Uso', esc(draft.categoria || 'Sin categoría'))}
       ${fila('Tirada', esc(tirada || 'no tira'))}
       ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}` : ''}
       ${fila("Origen", esc(draft.job !== false ? `Puntos de Job (${fmt(jobCostoDe(draft))})` : (draft.origen || "otro")))}
@@ -7443,13 +7427,6 @@ function drawEditor(){
       <div class="hint" style="margin-top:5px">Guarda esta configuración (turnos, stacks, HP por turno, modificadores, etc.) para poder elegirla de nuevo junto a los demás presets.</div>
     </div>`;
     html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
-  }
-  if(sc.campos.includes('categoria')){
-    // Son tres opciones: entran todas en una fila, no hace falta desplegable.
-    html += `<div class="f"><label>${CAMPO_LABEL.categoria}</label>
-      <div class="opcion-fila">
-        ${CATEGORIAS_HABILIDAD.map(c => `<button type="button" class="opcion-btn ${draft.categoria===c?'activa':''}" data-cat-hab="${esc(c)}">${esc(c || 'Sin categoría')}</button>`).join('')}
-      </div></div>`;
   }
   if(sc.campos.includes('tipoItem')){
     const catActual = CATEGORIAS.find(c => c.id === draft.tipoItem);
@@ -8135,7 +8112,6 @@ function lupaHtml(clave){
     let usaHp = false;
     if(num(h0.hpCosto) > 0){ usaHp = true; costo += lupaFila('HP', fmt(num(h0.hpCosto))); }
     if(!costo) costo = lupaFila('Costo', 'gratis');
-    if(h0.categoria === 'No espameable') costo += lupaNota(`Una vez por turno${h0.usadaEsteTurno ? ' (ya la usaste este turno)' : ''}.`);
     let disp = '';
     if(usaNitros) disp += lupaFila('No2', fmt(num(S.nitros)), costoNitrosHab(h0) > num(S.nitros) ? 'lupa-falta' : '');
     if(usaHp) disp += lupaFila('HP', fmt(num(S.hp)), num(S.hp) <= num(h0.hpCosto) ? 'lupa-falta' : '');
@@ -8165,7 +8141,6 @@ function lupaHtml(clave){
       const sp = parseCostoSp(h0.costo);
       if(sp) costo += lupaFila(`SP <span class="lupa-gris">(${esc(h0.costo)})</span>`, `${fmt(sp)} SP`);
     }
-    if(h0.categoria === 'No espameable') costo += lupaNota(`No espameable: una vez por turno${h0.usadaEsteTurno ? ' (ya se usó)' : ''}.`);
     costo += lupaFila('Disponibles', `${fmt(num(S.nitros))} No2 · ${fmt(spMaximo(c) - num(S.spGastado))} SP`);
     let out = lupaSeccion('Costo', costo);
     const stat = h0.tiradaStat;
@@ -8262,9 +8237,6 @@ function ejecutarHabilidad(id, armaId){
     toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
     return;
   }
-  if(it.categoria === 'No espameable' && it.usadaEsteTurno === true && armaId === undefined){
-    if(!confirm(`${it.nombre} ya se usó este turno.\n\n¿La ejecutás de nuevo igual?`)) return;
-  }
   // Con costo de ataque: primero se elige el arma (si hay más de una).
   let arma = null;
   if(nitrosAtaque(it)){
@@ -8311,7 +8283,6 @@ function ejecutarHabilidad(id, armaId){
   const costoHp = num(it.hpCosto);
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
   const ataque = registrarAtaqueDeHabilidad(it, arma);
-  if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
   tirarExtraDeItem(it);
@@ -8360,7 +8331,6 @@ function confirmarCostoVariable(){
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
   const ataque = registrarAtaqueDeHabilidad(it, pendingArmaHab === undefined ? null : pendingArmaHab);
   pendingArmaHab = undefined;
-  if(it.categoria === 'No espameable') it.usadaEsteTurno = true;
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
   tirarExtraDeItem(it);
@@ -8458,7 +8428,6 @@ function mantenimiento(){
   S.nitros = nitrosMaximo();
   S.ataquesTurno = 0;
   S.ataquesArma = {};
-  S.habilidades.forEach(h => { h.usadaEsteTurno = false; });
 
   let invocacionesVencidas = 0;
   S.invocaciones.forEach(inv => {

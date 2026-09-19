@@ -126,6 +126,6 @@ versión parecida en más de una, es candidato a juntar.
 - **Alerta del ojo 👁 del GM** (`mesa.js`, `mesaAlertaOjo`, 2026-09-19): una
   línea de la Mesa con `desde: 'alerta'` se dibuja como fila roja y, si llega
   nueva (no al cargar el historial), dispara en esa pantalla un destello rojo
-  con un ojo 👁 grande que a ~1 s se apaga con fade. Lo publica el botón "👁
+  con el ojo (`comun/ojo.png`) grande que a ~1 s se apaga con fade. Lo publica el botón "👁
   Revelar lo oculto" del mapa; lo ven todos los que tengan la Mesa (mapa,
   ficha, gm-tools). Su CSS se inyecta solo (no va en cada HTML).

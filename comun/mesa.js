@@ -94,10 +94,12 @@ function mesaFilaContenido(t){
     (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
 }
 
-// Alerta del ojo 👁 del GM (revela lo que estaba oculto): línea roja en la
-// Mesa y, en todas las pantallas, un destello rojo con un ojo grande que
-// aparece de golpe y a 1–2 segundos se apaga con fade. (Idea a futuro: cambiar
-// el emoji por un PNG de ojo con fondo transparente.)
+// Ruta del PNG del ojo, relativa a este script (así sirve desde cualquier herramienta).
+const MESA_OJO_URL = (() => { try{ return document.currentScript && document.currentScript.src ? new URL('ojo.png', document.currentScript.src).href : ''; }catch(e){ return ''; } })();
+if(MESA_OJO_URL){ try{ new Image().src = MESA_OJO_URL; }catch(e){} }   // se precarga para que aparezca de golpe
+// Alerta del ojo del GM (revela lo que estaba oculto): línea roja en la
+// Mesa y, en todas las pantallas, un destello rojo con el ojo (comun/ojo.png)
+// que aparece de golpe y a 1–2 segundos se apaga con fade.
 function mesaAlertaOjo(){
   if(!document.getElementById('mesa-alerta-css')){
     const st = document.createElement('style');
@@ -107,6 +109,7 @@ function mesaAlertaOjo(){
       '.mesa-tirada.mesa-alerta .mesa-quien,.mesa-tirada.mesa-alerta .mesa-detalle{color:#fff!important}' +
       '#alerta-ojo{position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
         'background:radial-gradient(ellipse at center,rgba(200,20,20,.35) 0%,rgba(150,0,0,.6) 60%,rgba(90,0,0,.8) 100%);opacity:1;transition:opacity 1.3s ease-out}' +
+      '#alerta-ojo img{width:min(85vw,1000px);max-height:80vh;object-fit:contain;filter:drop-shadow(0 0 40px rgba(255,60,30,.85))}' +
       '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
       '#alerta-ojo.apagar{opacity:0}';
     document.head.appendChild(st);
@@ -114,7 +117,10 @@ function mesaAlertaOjo(){
   document.getElementById('alerta-ojo')?.remove();
   const capa = document.createElement('div');
   capa.id = 'alerta-ojo';
-  capa.innerHTML = '<span>👁</span>';
+  // El ojo es un PNG con fondo transparente (comun/ojo.png); si no carga, queda el emoji.
+  capa.innerHTML = MESA_OJO_URL ? '<img alt="" src="' + MESA_OJO_URL + '">' : '<span>👁</span>';
+  const imgOjo = capa.querySelector('img');
+  if(imgOjo) imgOjo.onerror = () => { capa.innerHTML = '<span>👁</span>'; };
   document.body.appendChild(capa);
   setTimeout(() => capa.classList.add('apagar'), 1100);
   setTimeout(() => capa.remove(), 2600);

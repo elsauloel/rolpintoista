@@ -236,3 +236,11 @@ equivalente que da Con (5), o sea +5 HP máx.
   propuesta en la conversación del 2026-09-19 (bonos a stats, regeneración
   por turno, bonus a tiradas por situación, campo de visión, resistencias).
   Falta que el usuario la revise efecto por efecto. *(2026-09-19)*
+- ✅ **P69. Campo de visión en la ficha.** Hecho 2026-09-19: stat `vision`
+  (radio en hexágonos, base 6 por la P47), en un cuadro "Campo de visión"
+  debajo de Defensa; se puede modificar con mods de pasivas, ítems y
+  estados (aparece en "Otros" al elegir el stat). La niebla del mapa todavía
+  no lo lee.
+- ✅ **P70. Escalones excepcionales.** Respondido 2026-09-19: la pasiva de
+  Res.CC da **+2** por 1 Job (excepción a "+1"); la de campo de visión da
+  **+1**. Resto de la tabla de escalones (P60) sigue pendiente.

@@ -1344,6 +1344,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
             <button type="button" class="btn" id="btn-bloqueo">🎲 Bloqueo</button>
           </div>
           <div id="def-breakdown"></div>
+          <button type="button" class="armbox armbox-def" id="vision-tile" data-stat="vision" style="margin-top:8px" title="Radio del campo de visión, en hexágonos (base 6). Lo modifican pasivas, ítems y estados">
+            <div class="dl">Campo de visión</div>
+            <div class="dv"><span id="v-vision">6</span> <small style="font-size:11px">hex</small></div>
+          </button>
+          <div id="vision-breakdown"></div>
           <div class="hint" style="margin:11px 0 6px">Resistencia a críticos</div>
           <div class="derived tipos-derived" id="tipos" style="--dcols:5"></div>
           <div id="tipos-breakdown"></div>
@@ -1902,6 +1907,10 @@ const EXTRA = [
   {id:'tipo4', label:'Tipo 10', full:'Resistencia a crítico — armas Tipo 10 (d10)'},
   {id:'tipo5', label:'Tipo 12', full:'Resistencia a crítico — armas Tipo 12 (d12, explosivos/modernas)'},
   {id:'capcinturon', label:'Ranuras cinturón', full:'Ranuras extra para consumibles que da el cinturón equipado'},
+  // Radio del campo de visión en hexágonos (base 6, decidido con la niebla de
+  // guerra: P47). Se ve en un cuadro junto a Defensa; lo modifican pasivas,
+  // ítems y estados. La niebla del mapa todavía no lo lee.
+  {id:'vision', label:'Campo de visión', full:'Campo de visión (radio en hexágonos)'},
 ];
 const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
 
@@ -1976,6 +1985,7 @@ function migrarEstadoIt2(st){
   // SP Regen: base 0 (solo lo dan habilidades, equipo o estados). Las fichas
   // que quedaron con la base vieja (floor(int/2)) vuelven a 0.
   if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = '0';
+  if(f.vision === undefined) f.vision = '6';
   Object.keys(f).forEach(k => {
     if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
   });
@@ -2174,7 +2184,7 @@ const DEFAULT = {
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des',
     pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'0', rangocasteo:'esp',
-    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0'
+    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', vision:'6'
   },
   inventario:[],
   cinturon:[],
@@ -3009,6 +3019,11 @@ function renderArmadura(){
   tile.classList.toggle('nerfed', m < 0);
   $('#v-def').textContent = Number.isNaN(c.final.def) ? '?' : fmt(c.final.def);
   $('#def-breakdown').innerHTML = openStat === 'def' ? breakdown('def', c) : '';
+  const tv = $('#vision-tile');
+  tv.classList.toggle('boosted', c.modTotal.vision > 0);
+  tv.classList.toggle('nerfed', c.modTotal.vision < 0);
+  $('#v-vision').textContent = Number.isNaN(c.final.vision) ? '?' : fmt(c.final.vision);
+  $('#vision-breakdown').innerHTML = openStat === 'vision' ? breakdown('vision', c) : '';
 
   $('#tipos').innerHTML = TIPOS_IDS.map(id => {
     const d = EXTRA.find(e => e.id === id);
@@ -3568,7 +3583,7 @@ function renderHistorialSesion(){
 
 /* ---------- Tirar dados a partir del valor de un stat (formulaParaValor: comun/tiradas.js) ---------- */
 
-const STATS_SIN_TIRADA = ['hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
+const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda

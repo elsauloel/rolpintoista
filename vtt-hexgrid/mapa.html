@@ -1492,7 +1492,9 @@ async function sigiloAlertaRoja(t, que, detalle){
   }catch(err){ console.error('No se pudo publicar la alerta de sigilo:', err); }
 }
 // Al soltar un token en sigilo: corta la ruta en la primera casilla que cae en un
-// cono rival y cuenta los pasos que da dentro de cada zona de alerta.
+// cono rival (detección inmediata). La zona de alerta (detección con tirada) NO cuenta
+// mientras se mueve: esa detección a medias pide estar quieto y atento, así que caminar
+// por ahí no interrumpe ni genera tiradas (decidido 2026-09-19).
 function sigiloEvaluarRuta(t, a){
   const rivales = rivalesDe(t).map(zonasClaves);
   if(!rivales.length) return;
@@ -1502,15 +1504,7 @@ function sigiloEvaluarRuta(t, a){
     const k = nbPack(ruta[i].col, ruta[i].fila);
     if(rivales.some(z => z.cono.has(k))) corte = i;
   }
-  const fin = corte >= 0 ? corte : ruta.length - 1;
-  const avisos = [];
-  rivales.forEach(z => {
-    let pasos = 0;
-    for(let i = 1; i <= fin; i++) if(z.alerta.has(nbPack(ruta[i].col, ruta[i].fila))) pasos++;
-    if(pasos > 0) avisos.push({rival: z.nombre, pasos});
-  });
   if(corte >= 0) ruta.length = corte + 1;
-  if(avisos.length) sigiloAvisosPendientes.set(a.id, avisos);
 }
 function sigiloPublicarAvisos(id){
   const avisos = sigiloAvisosPendientes.get(id);

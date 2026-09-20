@@ -135,6 +135,15 @@ function mesaAlertaOjo(){
   setTimeout(() => capa.remove(), 2600);
 }
 
+// Número de turno en la cabecera de la Mesa flotante (lo pone la herramienta que lo sabe:
+// la ficha y gm-tools). Se guarda por si la Mesa se arma después.
+let mesaTurnoActual = null;
+function mesaPonerTurno(n){
+  mesaTurnoActual = n;
+  const el = document.getElementById('mesa-turno');
+  if(el) el.textContent = n ? 'T' + n : '';
+}
+
 function mesaRender(docs){
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
@@ -242,13 +251,14 @@ async function mesaIniciar(alEntrar){
   mesa.id = 'mesa';
   mesa.innerHTML =
     '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
-      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span>' + dadosBotonHtml() + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
+      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span><span id="mesa-turno" title="Turno actual" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#9A867E"></span>' + dadosBotonHtml() + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
     '</div>' +
     '<div id="mesa-resumen"></div>' +
     '<div id="mesa-cuerpo"></div>' +
     '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>' +
     '<div id="mesa-grilla"><button type="button" class="btn" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button></div>';
   document.body.appendChild(mesa);
+  mesaPonerTurno(mesaTurnoActual);
   const cabecera = $('#mesa-cabecera');
   dadosConectarBoton(mesa);
   // Grilla de dados al costado de la cajita (comun/grilla-dados.js).

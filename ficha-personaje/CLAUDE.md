@@ -318,7 +318,7 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   sesión en memoria quedan, pero sin pantalla.
 
 - **Estados alterados sin crecer** (2026-09-19): el cuadro de estados de la
-  cabecera fija muestra los chips que entran en 2 filas (`ESTADOS_FILAS`,
+  cabecera fija muestra los chips que entran en 1 fila (`ESTADOS_FILAS`,
   `ajustarEstados`); si sobran, un botón "＋N · Ver todos" abre la lista completa
   en una ventana (`#scrim-todos-estados`, mismos chips y botones).
 - **Encabezado compacto** (2026-09-19): menos alto (foto y nombre más chicos,
@@ -340,3 +340,8 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   Bitácora, 🗺 Mapa y 💾 Respaldo (el ＋ Personaje nuevo está en el menú de Personajes). La barra de arriba
   queda solo con el texto (partida y estado de guardado). Mismos ids, así que
   el código no cambió.
+
+- **Turno** (2026-09-19): se sacaron de la tarjeta de Estados el "Turno N", el
+  botón ↺ Turno y el registro del Mantenimiento. El número de turno se ve como
+  "T5" en la cabecera de la Mesa flotante (`mesaPonerTurno` en `comun/mesa.js`,
+  lo llaman la ficha y gm-tools).

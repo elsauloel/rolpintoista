@@ -1282,14 +1282,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <header>
           <h2>Estados alterados</h2>
           <div style="display:flex;gap:6px;align-items:center">
-            <span class="tag" id="turno-tag">Turno 1</span>
-            <button class="iconbtn" id="btn-turno-reset" title="Reiniciar el contador de turno a 1">↺ Turno</button>
             <button class="iconbtn" id="btn-limpiar-estados" title="Sacar todos los estados alterados de una vez">⌫ Limpiar</button>
             <button class="iconbtn iconbtn-add" data-add="efectos">+ Estado</button>
           </div>
         </header>
         <div class="body">
-          <div class="log" id="maint-log"></div>
           <div id="list-efectos"></div>
         </div>
       </section>
@@ -4687,7 +4684,7 @@ function renderList(key){
    chips que entran en ESTADOS_FILAS filas; el resto se esconde y aparece un
    botón "＋N · Ver todos" que abre la lista completa (mismos chips, mismos
    botones). */
-const ESTADOS_FILAS = 2;
+const ESTADOS_FILAS = 1;
 
 function ajustarEstados(){
   const el = $('#list-efectos');
@@ -8227,8 +8224,8 @@ function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
    ========================================================= */
 
 function renderTurno(){
-  $('#turno-tag').textContent = 'Turno ' + (S.turno || 1);
-  $('#maint-log').innerHTML = (S.log || []).join('<br>');
+  // El número de turno se muestra en la cabecera de la Mesa flotante.
+  if(typeof mesaPonerTurno === 'function') mesaPonerTurno(S.turno || 1);
 }
 
 function renderNitros(){
@@ -9164,13 +9161,6 @@ function fichaNueva(){
 // Mantenimiento ya no necesita subir nada aparte.
 // El Mantenimiento ya no tiene botón en la ficha: lo toca el GM en el mapa
 // y cada ficha lo aplica sola (ver "Mantenimiento del GM" al final).
-$('#btn-turno-reset').onclick = () => {
-  if(!confirm('Esto vuelve el contador de turno a 1. No toca SP, Nitros ni los estados alterados. ¿Seguís?')) return;
-  S.turno = 1;
-  S.log = ['<b style="color:var(--brass)">Turno 1</b>', 'El contador de turno se reinició manualmente.'];
-  renderTurno();
-  toast('Turno reiniciado a 1');
-};
 
 let fichaVivo = null;  // adelantado: renderAll() ya lo usa para la identidad de la barra
 renderAll();

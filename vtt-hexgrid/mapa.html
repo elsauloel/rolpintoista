@@ -617,6 +617,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <kbd>M</kbd><span>Mover libre del token seleccionado (otra <kbd>M</kbd> lo apaga)</span>
       <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
+      <span class="combo"><kbd>Ctrl</kbd> + <kbd>L</kbd></span><span>Modo lentes: ver los conos de detección (prender / apagar)</span>
       <kbd>Enter</kbd><span>Crear la forma en borrador · confirmar un movimiento</span>
       <kbd>Esc</kbd><span>Cancelar y salir: herramienta, borrador, Mover libre, colocar un token, menús, Botonera</span>
       <kbd>Supr</kbd><span>Borrar el token, dibujo o forma seleccionado</span>
@@ -639,7 +640,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
       </div>
       <div class="desplegable" id="lentes-caja">
-        <button type="button" class="btn btn-cuadrado" id="btn-zonas" aria-expanded="false" title="Lentes: ver los conos de detección y las zonas de alerta">👓</button>
+        <button type="button" class="btn btn-cuadrado" id="btn-zonas" aria-expanded="false" title="Lentes: ver los conos de detección y las zonas de alerta (Ctrl + L)">👓</button>
         <div class="desplegable-lista" id="lentes-menu" hidden>
           <button type="button" class="btn" id="lentes-activar" style="width:100%">👓 Modo lentes: no</button>
           <div id="lentes-opciones">
@@ -3573,11 +3574,13 @@ function abrirMenuLentes(abrir){
   if(abrir) renderBotonZonas();
 }
 $('#btn-zonas').onclick = () => abrirMenuLentes($('#lentes-menu').hidden);
-$('#lentes-activar').onclick = () => {
+function alternarLentes(){
   verZonas = !verZonas;
   try{ localStorage.setItem('mapa-ver-zonas', verZonas ? '1' : '0'); }catch(e){}
   renderBotonZonas(); pedirDibujo();
-};
+  toast(verZonas ? '👓 Modo lentes prendido' : '👓 Modo lentes apagado');
+}
+$('#lentes-activar').onclick = alternarLentes;
 $('#lentes-filtros').addEventListener('click', e => {
   const b = e.target.closest('[data-lentes-filtro]'); if(!b) return;
   lentesFiltro = b.dataset.lentesFiltro;
@@ -3609,6 +3612,12 @@ document.addEventListener('keydown', e => {
   // el foco en un control del panel (la barra de opacidad).
   if(borradorElemento && e.key === 'Enter'){ e.preventDefault(); consolidarBorradorElemento(); return; }
   if(borradorElemento && e.key === 'Escape'){ descartarBorradorElemento(); return; }
+  // Ctrl+L: prende o apaga el modo lentes (conos de detección). La L sola es del Lápiz.
+  if((e.key === 'l' || e.key === 'L') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey){
+    e.preventDefault();
+    alternarLentes();
+    return;
+  }
   // Ctrl+Z: deshace el último movimiento o giro propio (no mientras se escribe en un campo).
   if((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && !(e.target.closest && e.target.closest('input,select,textarea,[contenteditable]'))){
     e.preventDefault();

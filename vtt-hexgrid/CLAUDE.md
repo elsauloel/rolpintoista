@@ -726,3 +726,5 @@ hexágono con otro sin importar bando. Todavía no está construido.
   (Todos / Aliados / Rivales / NPC); ya no tiene lista de tokens. Para ver solo un
   token se lo **selecciona en el mapa** (`seleccion`): con un token seleccionado se
   muestran solo sus zonas; al soltar la selección vuelve al filtro.
+  **Atajo `Ctrl+L`** (2026-09-19): prende y apaga el modo lentes (`alternarLentes`);
+  la `L` sola sigue siendo el Lápiz. Está en la lista de atajos del mapa.

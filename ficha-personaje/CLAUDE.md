@@ -325,3 +325,12 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   menos márgenes) y el **Loot** en una sola fila; los tipos de loot especial
   viven en un desplegable (`#loot-esp-pop`, se abre con "Especial N ▾" o con
   "+"), así que agregar más tipos ya no estira el encabezado.
+
+- **Encabezado solo con identidad** (2026-09-19): quedan la foto (cuadrada, 84 px,
+  muestra el recorte que se elige al subirla; al tocarla se ve la foto entera con
+  Cambiar / Editar recorte / Eliminar) y nombre, raza, clase, subclase y nivel.
+  Lo demás pasó al **dock izquierdo** (`#dock-izq`), cada botón abre un panel al
+  lado: ⭐ **Exp y Job**, 💰 **DDE y loot** (con el desplegable de loot especial) y
+  📖 **Bitácora** (así las dos columnas quedan de 3 y 3). **Inteligencia** pasó a
+  Atributos, junto al Campo de visión. El recuadro de **SP** del encabezado se
+  eliminó (la barra azul ya lo muestra).

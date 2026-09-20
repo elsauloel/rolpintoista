@@ -67,17 +67,16 @@ a{color:var(--brass)}
   background:linear-gradient(180deg, rgba(201,133,69,.10), rgba(0,0,0,0) 60%), var(--panel);
   padding:12px 16px;
   display:grid;
-  grid-template-columns:auto minmax(0,1.3fr) minmax(0,1.2fr);
+  grid-template-columns:auto minmax(0,1fr);
   gap:10px 16px;
   align-items:center;
 }
 .hero > *{min-width:0}
-@media(max-width:900px){.hero{grid-template-columns:auto minmax(0,1fr)}}
 @media(max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}}
 
 .portrait-wrap{position:relative;align-self:start}
 .portrait{
-  width:68px;height:84px;flex:none;border:1px solid var(--line-soft);border-radius:var(--r);
+  width:84px;height:84px;flex:none;border:1px solid var(--line-soft);border-radius:var(--r);
   background:var(--panel2);overflow:hidden;cursor:pointer;
   display:flex;align-items:center;justify-content:center;padding:0;
 }
@@ -199,7 +198,17 @@ a{color:var(--brass)}
 .card--atributos{margin-top:16px}
 #attrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:9px;align-items:start}
 #attrs .attr{margin-bottom:0}
-.vision-fila{margin-top:10px;max-width:300px}
+.vision-fila{margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
+.vision-fila > .armbox{width:auto;min-width:170px}
+.vision-fila > .counter{min-width:190px}
+.vision-fila #vision-breakdown{flex-basis:100%;order:5}
+.dock-item{position:relative}
+.dock-panel{position:absolute;left:152px;top:0;z-index:62;width:280px;display:flex;flex-direction:column;gap:8px;padding:10px;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.dock-panel[hidden]{display:none}
+.dock-panel-ancho{width:min(460px,calc(100vw - 180px));max-height:82vh;overflow-y:auto;top:auto;bottom:0}
+.dock-panel-ancho .card{margin:0}
+.dock-panel .counter-exp{grid-column:auto}
 
 .card{border:1px solid var(--line);border-top:3px solid var(--line);background:var(--panel);}
 /* Cada contenedor del home tiene su propia tonalidad, para reconocerlo
@@ -306,7 +315,6 @@ a{color:var(--brass)}
   font-family:"Space Mono",monospace;font-size:11px;
 }
 .breakdown .row{display:flex;justify-content:space-between;gap:12px;padding:2px 0;color:var(--muted)}
-#sp-breakdown:not(:empty){margin-top:10px}
 .breakdown .row b{color:var(--paper);font-weight:700}
 .breakdown .fx{display:flex;gap:6px;align-items:center;margin-top:7px}
 .breakdown .fx input{font-family:"Space Mono",monospace;font-size:11px}
@@ -1194,6 +1202,57 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <!-- Accesos rápidos pegados al borde izquierdo: la Botonera y el Mapa. Se abren al pasar el mouse. -->
 <aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
+  <div class="dock-item">
+    <button type="button" class="dock-btn" data-dock-panel="prog" title="Experiencia y puntos de Job"><span class="dock-ico">⭐</span><span class="dock-txt">Exp y Job</span></button>
+    <div class="dock-panel" id="dock-panel-prog" hidden>
+        <div class="counter counter-exp" id="c-exp" title="Al llegar al umbral, sube de nivel y el marcador reinicia">
+          <label>Experiencia</label>
+          <div class="expnums"><input id="f-exp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
+        </div>
+        <div class="counter calc" id="c-job" title="3 puntos base + 3 por nivel, menos las habilidades/pasivas adquiridas con Job">
+          <label>Job</label>
+          <div class="val" id="v-job">0</div>
+          <div class="sub" id="v-job-sub"></div>
+        </div>
+    </div>
+  </div>
+  <div class="dock-item">
+    <button type="button" class="dock-btn" data-dock-panel="botin" title="Doblones (DDE) y loot"><span class="dock-ico">💰</span><span class="dock-txt">DDE y loot</span></button>
+    <div class="dock-panel" id="dock-panel-botin" hidden>
+        <div class="counter"><label>DDE($)</label><input id="f-dde" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"></div>
+        <div class="counter loot">
+          <label>Loot</label>
+          <div class="loot-rows">
+            <div class="loot-row"><span class="loot-dot n"></span><span class="loot-l">Normal</span><input id="f-loot-normal" type="number"></div>
+            <div class="loot-row"><span class="loot-dot m"></span><span class="loot-l">Mágico</span><input id="f-loot-magico" type="number"></div>
+            <div class="loot-row loot-esp-toggle"><span class="loot-dot e"></span><button type="button" class="loot-esp-btn" id="btn-loot-esp" title="Ver y editar los tipos de loot especial">Especial <b id="loot-esp-total">0</b> ▾</button><button class="loot-add" id="btn-loot-add" title="Agregar tipo de loot especial">+</button></div>
+          </div>
+          <div class="loot-especial" id="loot-esp-pop" hidden>
+            <div id="loot-esp-list"></div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="dock-item">
+    <button type="button" class="dock-btn" data-dock-panel="bitacora" title="Bitácora compartida de la partida"><span class="dock-ico">📖</span><span class="dock-txt">Bitácora</span></button>
+    <div class="dock-panel dock-panel-ancho" id="dock-panel-bitacora" hidden>
+      <section class="card card--bitacora">
+        <header>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora de la partida</h2></div>
+          <button class="iconbtn iconbtn-add" id="btn-bitacora-add" title="Nueva página compartida">+ Página</button>
+        </header>
+        <div class="body">
+          <div class="bitacora-tabs" id="bitacora-tabs"></div>
+          <div id="bitacora-entradas" class="bit-entradas"></div>
+          <div class="bit-sumar">
+            <textarea id="bitacora-nueva" rows="2" placeholder="Sumá lo que pasó: deudas, pactos, lugares, gente… (Ctrl + Enter para sumar)"></textarea>
+            <button type="button" class="btn primary" id="bitacora-sumar">Sumar</button>
+          </div>
+          <div class="hint" id="bitacora-estado">La bitácora es de toda la mesa: todos la leen y cualquiera suma o corrige.</div>
+        </div>
+      </section>
+    </div>
+  </div>
   <a class="dock-btn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva"><span class="dock-ico">⬡</span><span class="dock-txt">Mapa</span></a>
 </aside>
 <div class="wrap">
@@ -1266,42 +1325,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <div class="idfield"><label>Nivel</label><input id="f-nivel" type="number"></div>
       </div>
     </div>
-    <div class="counters">
-      <div class="counter counter-exp" id="c-exp" title="Al llegar al umbral, sube de nivel y el marcador reinicia">
-        <label>Experiencia</label>
-        <div class="expnums"><input id="f-exp" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"><span class="expmax">/ <span id="v-exp-max">100</span></span></div>
-      </div>
-      <div class="counter"><label>DDE($)</label><input id="f-dde" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"></div>
-      <div class="counter calc" id="c-job" title="3 puntos base + 3 por nivel, menos las habilidades/pasivas adquiridas con Job">
-        <label>Job</label>
-        <div class="val" id="v-job">0</div>
-        <div class="sub" id="v-job-sub"></div>
-      </div>
-      <div class="counter calc" id="c-sp">
-        <label>SP</label>
-        <div class="sp-nums">
-          <input type="number" id="f-sp" class="sp-input" value="0">
-          <button type="button" class="sp-max" id="v-sp-natural-btn" data-stat="sp" title="Ver detalle">/ 0</button>
-        </div>
-      </div>
-      <div class="counter calc" id="c-inteligencia" title="Se calcula sola: 6 al crear el personaje, +3 por nivel">
-        <label>Inteligencia</label>
-        <div class="val" id="v-inteligencia">6</div>
-        <div class="sub" id="v-inteligencia-sub"></div>
-      </div>
-      <div class="counter loot">
-        <label>Loot</label>
-        <div class="loot-rows">
-          <div class="loot-row"><span class="loot-dot n"></span><span class="loot-l">Normal</span><input id="f-loot-normal" type="number"></div>
-          <div class="loot-row"><span class="loot-dot m"></span><span class="loot-l">Mágico</span><input id="f-loot-magico" type="number"></div>
-          <div class="loot-row loot-esp-toggle"><span class="loot-dot e"></span><button type="button" class="loot-esp-btn" id="btn-loot-esp" title="Ver y editar los tipos de loot especial">Especial <b id="loot-esp-total">0</b> ▾</button><button class="loot-add" id="btn-loot-add" title="Agregar tipo de loot especial">+</button></div>
-        </div>
-        <div class="loot-especial" id="loot-esp-pop" hidden>
-          <div id="loot-esp-list"></div>
-        </div>
-      </div>
-    </div>
-    <div id="sp-breakdown"></div>
   </div>
 
       <section class="card card--atributos">
@@ -1318,6 +1341,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
               <div class="dv"><span id="v-vision">6</span> <small style="font-size:11px">hex</small></div>
             </button>
             <div id="vision-breakdown"></div>
+            <div class="counter calc" id="c-inteligencia" title="Se calcula sola: 6 al crear el personaje, +3 por nivel">
+              <label>Inteligencia</label>
+              <div class="val" id="v-inteligencia">6</div>
+              <div class="sub" id="v-inteligencia-sub"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1391,22 +1419,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <button class="iconbtn iconbtn-add" data-add="sociales">+ Social</button>
         </header>
         <div class="body" id="list-sociales"></div>
-      </section>
-
-      <section class="card card--bitacora">
-        <header>
-          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="bitacora" title="Contraer/expandir">👁</button><h2>Bitácora de la partida</h2></div>
-          <button class="iconbtn iconbtn-add" id="btn-bitacora-add" title="Nueva página compartida">+ Página</button>
-        </header>
-        <div class="body">
-          <div class="bitacora-tabs" id="bitacora-tabs"></div>
-          <div id="bitacora-entradas" class="bit-entradas"></div>
-          <div class="bit-sumar">
-            <textarea id="bitacora-nueva" rows="2" placeholder="Sumá lo que pasó: deudas, pactos, lugares, gente… (Ctrl + Enter para sumar)"></textarea>
-            <button type="button" class="btn primary" id="bitacora-sumar">Sumar</button>
-          </div>
-          <div class="hint" id="bitacora-estado">La bitácora es de toda la mesa: todos la leen y cualquiera suma o corrige.</div>
-        </div>
       </section>
     </div>
   </div>
@@ -3333,21 +3345,10 @@ function renderVitals(){
   const spMax = spMaximo(c);
   const gastado = num(S.spGastado);
   const sp = spMax - gastado;
-  const fSp = $('#f-sp');
-  if(document.activeElement !== fSp) fSp.value = fmt(sp);
   // Segunda barra del recuadro de vida (arriba de todo).
   if(document.activeElement !== $('#f-sp-vital')) $('#f-sp-vital').value = fmt(Math.max(0, sp));
   $('#v-spmax-vital').textContent = fmt(spMax);
   $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
-  $('#v-sp-natural-btn').textContent = `/ ${fmt(spMax)}`;
-  $('#c-sp').classList.toggle('penal', sp < 0);
-  $('#c-sp').title = `Special Power (${S.formulas.sp || 'esp*3'}): se gasta al usar habilidades; al pasar turno recupera SP Regen (${fmt(Number.isNaN(c.final.spregen) ? 0 : c.final.spregen)}). El resto, con recargas, consumibles, descanso o editando el número${gastado ? `. Gastado: ${fmt(gastado)}` : ''}`;
-  $('#sp-breakdown').innerHTML = openStat === 'sp'
-    ? breakdown('sp', c) + (gastado ? `<div class="breakdown" style="border-top:none;margin-top:-1px">
-        <div class="row"><span>Gastado (desde la última recarga)</span><b style="color:var(--danger)">-${fmt(gastado)}</b></div>
-        <div class="row tot"><span>Disponibles</span><b>${fmt(sp)}</b></div>
-      </div>` : '')
-    : '';
   $('#equipo-over').innerHTML = c.sobrecarga > 0
     ? `Te pasás por ${fmt(c.sobrecarga)}.${IT2.penalidadSobrecargaDefinida ? '' : ` ${IT2_PENDIENTE('la penalidad por sobrecarga todavía no está definida (antes restaba de Bonos)')}`}` : '';
 }
@@ -4765,6 +4766,19 @@ function ocultarEfTip(){
   if(efTipEl) efTipEl.style.display = 'none';
 }
 
+// Dock izquierdo: cada botón con data-dock-panel abre su panel al lado (uno a la vez).
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-dock-panel]');
+  if(!b) return;
+  const panel = $('#dock-panel-' + b.dataset.dockPanel);
+  const abrir = panel.hidden;
+  document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; });
+  panel.hidden = !abrir;
+});
+document.addEventListener('pointerdown', e => {
+  if(e.target.closest('.dock-item')) return;
+  document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; });
+});
 document.addEventListener('pointerdown', e => {
   const pop = $('#loot-esp-pop');
   if(pop && !pop.hidden && !e.target.closest('.counter.loot')) pop.hidden = true;
@@ -5130,7 +5144,7 @@ function abrirJobLista(){
 function renderPortrait(){
   const img = $('#portrait-img'), empty = $('#portrait-empty'), rm = $('#portrait-rm');
   if(S.meta.imagen){
-    img.src = S.meta.imagen; img.style.display = 'block'; empty.style.display = 'none'; rm.style.display = 'flex';
+    img.src = S.meta.miniatura || S.meta.imagen; img.style.display = 'block'; empty.style.display = 'none'; rm.style.display = 'flex';
   }else{
     img.removeAttribute('src'); img.style.display = 'none'; empty.style.display = 'flex'; rm.style.display = 'none';
   }
@@ -5278,12 +5292,6 @@ document.addEventListener('input', e => {
     const row = (S.loot.especial||[]).find(l => l.id === t.dataset.lootEsp);
     if(row){ row[t.dataset.lk] = t.dataset.lk === 'cantidad' ? num(t.value) : t.value; }
     lootEspTotal();
-    return;
-  }
-  if(t.id === 'f-sp'){
-    // Editar el número a mano es la forma de recargar SP (descanso, etc.).
-    S.spGastado = spMaximo() - num(t.value);
-    renderVitals();
     return;
   }
   if(t.id === 'f-nitros'){
@@ -5852,6 +5860,7 @@ function cargarArchivoLocal(){
 async function elegirRecorteRetrato(fuente){
   try{
     S.meta.miniatura = await recortarImagen(fuente, {lado: MINIATURA_PX, tope: MINIATURA_MAX});
+    renderPortrait();
   }catch(err){
     if(err.message !== 'cancelado') toast('No se pudo recortar esa imagen');
   }
@@ -5865,6 +5874,7 @@ $('#portrait-input').onchange = async ev => {
     S.meta.miniatura = '';
     renderPortrait();
     await elegirRecorteRetrato(file);
+    renderPortrait();
   }catch(err){
     toast('No se pudo cargar esa imagen');
   }
@@ -8217,7 +8227,7 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); $('#scrim-todos-estados').classList.remove('open'); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); $('#scrim-todos-estados').classList.remove('open'); document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; }); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 

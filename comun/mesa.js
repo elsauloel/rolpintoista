@@ -109,7 +109,9 @@ if(MESA_OJO_URL){ try{ new Image().src = MESA_OJO_URL; }catch(e){} }   // se pre
 // Alerta del ojo del GM (revela lo que estaba oculto): línea roja en la
 // Mesa y, en todas las pantallas, un destello rojo con el ojo (comun/ojo.png)
 // que aparece de golpe y a 1–2 segundos se apaga con fade.
-function mesaAlertaOjo(){
+// Estilos de las filas rojas de la Mesa y del destello: se ponen apenas se dibuja la Mesa,
+// no solo cuando llega la alerta, para que las filas viejas del historial también se vean rojas.
+function mesaAlertaEstilos(){
   if(!document.getElementById('mesa-alerta-css')){
     const st = document.createElement('style');
     st.id = 'mesa-alerta-css';
@@ -123,6 +125,10 @@ function mesaAlertaOjo(){
       '#alerta-ojo.apagar{opacity:0}';
     document.head.appendChild(st);
   }
+}
+
+function mesaAlertaOjo(){
+  mesaAlertaEstilos();
   document.getElementById('alerta-ojo')?.remove();
   const capa = document.createElement('div');
   capa.id = 'alerta-ojo';
@@ -145,6 +151,7 @@ function mesaPonerTurno(n){
 }
 
 function mesaRender(docs){
+  mesaAlertaEstilos();
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));

@@ -2751,7 +2751,7 @@ function dibujar(){
       if(!tokenVisiblePorNiebla(t)) return;
       if(!lentesMuestra(id, t)) return;
       const est = estadoDe(t);
-      if(est && est.muerto) return;
+      if(est && (est.muerto || est.dormida)) return;   // muertos o invocaciones dormidas no ven
       const zn = zonasSigilo(t);
       pintarZona(zn.alerta, 'rgba(232,140,50,.38)', 'rgba(255,170,80,.9)');
       pintarZona(zn.cono, 'rgba(60,120,210,.45)', 'rgba(110,170,255,.95)');

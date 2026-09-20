@@ -1003,6 +1003,7 @@ let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
+let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '';   // crear el elemento como trampa oculta
 let elemImagen = '';        // data URL de la textura elegida; no se recuerda entre sesiones
 try{ elemTipo = localStorage.getItem('elem-tipo') || elemTipo; }catch(e){}
 try{ elemTamano = parseInt(localStorage.getItem('elem-tamano'), 10) || elemTamano; }catch(e){}
@@ -1537,12 +1538,12 @@ async function sigiloAviso(origen, formula){
 // regla sin que la mesa se entere. Solo avisa; no impide nada.
 // Línea roja SIN nombres ni datos del sigilo: solo avisa que hace falta una tirada, para que
 // nadie sepa quién ni por qué (tiene que tirar percepción y, si falla, misterio).
-async function alertaRojaAnonima(origen){
+async function alertaRojaAnonima(origen, detalle){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-      origen, formula: '', rolls: [], mod: 0, total: 0,
+      origen, formula: detalle || '', rolls: [], mod: 0, total: 0,
       desde: 'alerta-roja', cuando: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){ console.error('No se pudo publicar la alerta:', err); }
@@ -2552,6 +2553,7 @@ function dibujar(){
     listaElementos.push([ID_BORRADOR, {
       tipo: origenBorrador.tipo, origen: origenBorrador.origen, celdas: [...origenBorrador.celdas.values()], rotacion: 0,
       color: elemColor, alfa: elemAlfa, solido: elemSolido, invisible: !!(soyGM && elemInvisible),
+      trampa: elemTrampa, trampaNombre: elemTrampaNombre, trampaDetalle: elemTrampaDetalle, disparada: false,
       imagen: elemImagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, duenoUid: fbUsuario.uid,
     }]);
   }
@@ -2606,6 +2608,24 @@ function dibujar(){
       ctx.strokeStyle = colorConAlfa(el.color, Math.min(1, el.alfa / 100 + 0.25));
       ctx.lineWidth = 2 / z;
       ctx.stroke();
+    }
+    if(el.trampa){
+      // Trampa: armada = ámbar con ⚠ (solo la ven su dueño y el GM); disparada = roja con ✖ (la ven todos).
+      const disp = !!el.disparada;
+      trazarCeldas(celdas);
+      ctx.fillStyle = disp ? 'rgba(216,82,75,.28)' : 'rgba(224,164,88,.18)'; ctx.fill();
+      bordeCeldas(celdas);
+      ctx.setLineDash([8 / z, 5 / z]);
+      ctx.strokeStyle = disp ? 'rgba(232,90,80,1)' : 'rgba(255,190,90,1)';
+      ctx.lineWidth = 3.5 / z; ctx.stroke();
+      ctx.setLineDash([]);
+      const pT = hexCentro(celdas[0].col, celdas[0].fila);
+      ctx.save();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `700 ${18 / z}px system-ui, sans-serif`;
+      ctx.fillStyle = disp ? '#FF6A60' : '#FFC46B';
+      ctx.fillText(disp ? '✖' : '⚠', pT.x, pT.y);
+      ctx.restore();
     }
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
@@ -3526,14 +3546,24 @@ function soltar(){
         toast('🕶 Te detectaron: el movimiento se corta donde entraste en su cono');
       }
     }
-    // Detección inmediata: si un rival en sigilo queda dentro del cono en algún casillero, se corta ahí.
-    if(!a.libre && a.movio && t && a.ruta.length > 1 && !enSigilo(t)){
-      const corte = percepcionEvaluarRuta(t, a.ruta, null);
-      if(corte){
-        a.ruta = a.ruta.slice(0, corte.indice + 1);
+    // Se corta la ruta donde ocurra primero: un rival en sigilo dentro del cono (detección
+    // inmediata) o una trampa (pisarla, o quedar al lado si tiene Percepción aumentada).
+    trampaPendiente = null;
+    if(!a.libre && a.movio && t && a.ruta.length > 1){
+      const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.ruta, null) : null;
+      const trampa = trampasEvaluarRuta(a.id, t, a.ruta);
+      const corteTrampa = trampa && (!corte || trampa.indice < corte.indice) ? trampa : null;
+      const corteSigilo = corte && (!corteTrampa) ? corte : null;
+      const indice = corteTrampa ? corteTrampa.indice : (corteSigilo ? corteSigilo.indice : -1);
+      if(indice >= 0){
+        a.ruta = a.ruta.slice(0, indice + 1);
         const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
         a.x = pc.x; a.y = pc.y;
-        toast(`🕶 Viste a ${corte.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
+        if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
+        else{
+          trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el};
+          toast(corteTrampa.tipo === 'pisa' ? '⚠ Pisaste algo: el movimiento se corta acá' : '🔎 Algo llama tu atención: el movimiento se corta acá');
+        }
       }
     }
     const pasos = a.ruta.length - 1;
@@ -3557,6 +3587,7 @@ function soltar(){
       }else{
         const fin = a.ruta[pasos];
         moverToken(a.id, fin.col, fin.fila, a.ruta);
+        if(trampaPendiente) trampaResolver();
       }
     }
     pedirDibujo();
@@ -3764,6 +3795,8 @@ function puedeManipularElemento(el){
 }
 // Un elemento invisible solo lo ven el GM y su creador (el resto, nada).
 function puedeVerElemento(el){
+  // Una trampa sin disparar solo la ven su dueño y el GM; disparada, todos.
+  if(el.trampa && !el.disparada && !puedeManipularElemento(el)) return false;
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
@@ -3848,6 +3881,10 @@ function escucharElementos(){
         imgDY: num(d.imgDY) || 0,
         fijado: d.fijado === true,
         duenoUid: d.duenoUid,
+        trampa: d.trampa === true,
+        trampaNombre: typeof d.trampaNombre === 'string' ? d.trampaNombre : '',
+        trampaDetalle: typeof d.trampaDetalle === 'string' ? d.trampaDetalle : '',
+        disparada: d.disparada === true,
       });
     });
     pedirDibujo();
@@ -3865,6 +3902,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
+      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -3915,7 +3953,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY},
+    original: {color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada},
   };
   renderEditorElemento();
 }
@@ -3970,6 +4008,10 @@ function renderEditorElemento(){
     <label class="etiqueta">Transparencia</label>
     <input type="range" id="elem-edit-alfa" min="0" max="100" step="5" value="${el.alfa}">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+    <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
+    ${el.trampa ? `<input type="text" id="elem-edit-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(el.trampaNombre || '')}" style="margin-top:6px">
+    <input type="text" id="elem-edit-trampa-detalle" maxlength="200" placeholder="Qué hace" value="${esc(el.trampaDetalle || '')}" style="margin-top:6px">
+    ${el.disparada ? '<div class="fila" style="margin-top:6px"><span class="hint">Disparada: la ven todos.</span><button type="button" class="btn" id="elem-edit-rearmar">Rearmar</button></div>' : ''}` : ''}
     ${tieneImagen && V ? `
       <label class="etiqueta">Imagen (arrastrar para mover, rueda del mouse para zoom)</label>
       <div class="elem-edit-visor" id="elem-edit-visor" style="width:${V.w}px;height:${V.h}px"><img id="elem-edit-img" src="${el.imagen}"></div>
@@ -3989,7 +4031,8 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-x').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-guardar').onclick = () => {
-    const cambios = {color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY};
+    const cambios = {color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
+      trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
     moverElemento(id, cambios);
@@ -4001,6 +4044,14 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
   if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
+  const chkTrampa = caja.querySelector('#elem-edit-trampa');
+  if(chkTrampa) chkTrampa.onchange = () => { vivo({trampa: chkTrampa.checked, disparada: false}); renderEditorElemento(); };
+  const trNombre = caja.querySelector('#elem-edit-trampa-nombre');
+  if(trNombre) trNombre.oninput = () => vivo({trampaNombre: trNombre.value});
+  const trDetalle = caja.querySelector('#elem-edit-trampa-detalle');
+  if(trDetalle) trDetalle.oninput = () => vivo({trampaDetalle: trDetalle.value});
+  const trRearmar = caja.querySelector('#elem-edit-rearmar');
+  if(trRearmar) trRearmar.onclick = () => { vivo({disparada: false}); renderEditorElemento(); };
 
   if(tieneImagen && V){
     const visor = caja.querySelector('#elem-edit-visor');
@@ -4371,6 +4422,7 @@ function mostrarConfirmacionRuta(){
 
 function cancelarRuta(){
   rutaPendiente = null;
+  trampaPendiente = null;
   $('#ruta-confirmar').hidden = true;
   document.body.classList.remove('con-ruta');
   pedirDibujo();
@@ -4474,6 +4526,65 @@ function nieblaDeshacer(seq0, pend0){
    sigiloRevisar) y su token aparece para todos. No hay tirada: se ve de manera directa. La
    zona de alerta no interrumpe a quien camina. Igual para personajes y creeps. */
 
+/* ---------- Trampas ocultas ----------
+   Un elemento con `trampa` es una trampa: solo la ven su dueño y el GM hasta que se dispara.
+   La dispara un rival del dueño (los creeps si la puso un jugador; los personajes si la puso el
+   GM) que pise cualquiera de sus casillas en la ruta: el movimiento se corta ahí, la trampa
+   queda marcada como disparada (visible para todos) y se avisa en rojo en la Mesa. Quien tiene
+   la pasiva Percepción aumentada, además, se detiene al quedar justo al lado de una: le
+   corresponde una tirada de percepción (una vez por trampa). */
+let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el}
+const trampasAvisadas = new Set();   // 'token:trampa' ya avisadas por cercanía
+
+function trampaDispara(t, el){
+  const dueno = miembros.get(el.duenoUid);
+  return dueno && dueno.gm ? t.tipo === 'pj' : t.tipo === 'creep';
+}
+function tokenPercepcionAumentada(t){
+  const v = vinculo(t), r = v && v.resumen;
+  return t.tipo === 'pj' && !!(r && r.percepcionAumentada);
+}
+function vecinosDeCasilla(c){
+  const c0 = hexACubo(c);
+  return VECINO_LADO.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
+}
+function trampasEvaluarRuta(tokId, t, ruta){
+  const trampas = [];
+  elementos.forEach((el, id) => {
+    if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
+  });
+  if(!trampas.length) return null;
+  const atento = tokenPercepcionAumentada(t);
+  for(let i = 1; i < ruta.length; i++){
+    const pisa = trampas.find(x => x.set.has(nbPack(ruta[i].col, ruta[i].fila)));
+    if(pisa) return {indice: i, tipo: 'pisa', id: pisa.id, el: pisa.el};
+    if(atento){
+      const vec = vecinosDeCasilla(ruta[i]).map(v => nbPack(v.col, v.fila));
+      const cerca = trampas.find(x => !trampasAvisadas.has(tokId + ':' + x.id) && vec.some(k => x.set.has(k)));
+      if(cerca) return {indice: i, tipo: 'cerca', id: cerca.id, el: cerca.el};
+    }
+  }
+  return null;
+}
+// Después de que el token llegó a la casilla donde se cortó.
+async function trampaResolver(){
+  const p = trampaPendiente;
+  trampaPendiente = null;
+  if(!p) return;
+  const t = tokens.get(p.tokenId);
+  if(!t) return;
+  if(p.tipo === 'pisa'){
+    try{ await coleccionElementos().doc(p.id).update({disparada: true}); }
+    catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
+    const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
+    alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
+    return;
+  }
+  trampasAvisadas.add(p.tokenId + ':' + p.id);
+  toast('🔎 Algo llama tu atención cerca: corresponde una tirada de percepción');
+  alertaRojaAnonima('⚠ Hace falta una tirada de percepción');
+}
+
 function percepcionEvaluarRuta(t, ruta, ignorar){
   const ocultos = [];
   rivalesDe(t).forEach(r => {
@@ -4516,6 +4627,7 @@ async function confirmarRuta(){
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
+    if(trampaPendiente && trampaPendiente.tokenId === p.id) trampaResolver();
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep
       ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
@@ -6490,6 +6602,9 @@ function renderHerramientaFlotante(){
       ${imagenElementoOpcionHtml(elemImagen)}
       <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+      <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
+      ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
+      <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">` : ''}
       <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
       ${borradorElemento ? `<div class="nt-pista" style="color:var(--paper);border-top:1px solid var(--line);padding-top:8px;margin-top:8px">
         Borrador: ajustá lo de arriba y mirá cómo queda en el mapa. Hacé clic en otro lado (o Enter) para crearlo; Esc o clic derecho lo descartan.</div>
@@ -6596,6 +6711,12 @@ $('#herramienta-flotante').addEventListener('change', e => {
     renderHerramientaFlotante();
     return;
   }
+  if(e.target.id === 'elem-trampa-check'){
+    elemTrampa = e.target.checked;
+    renderHerramientaFlotante();
+    pedirDibujo();
+    return;
+  }
   if(e.target.id === 'elem-invisible-check'){
     elemInvisible = e.target.checked;
     try{ localStorage.setItem('elem-invisible', elemInvisible ? '1' : ''); }catch(err){}
@@ -6609,6 +6730,8 @@ $('#herramienta-flotante').addEventListener('change', e => {
   }
 });
 $('#herramienta-flotante').addEventListener('input', e => {
+  if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
+  if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'niebla-radio'){
     nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
     const et = e.target.previousElementSibling;

@@ -30,6 +30,9 @@ const PASIVAS_BASE = [
    detalle: 'Recuperás 3 HP por turno (en el Mantenimiento).', mods: [], regenHp: 3},
   {poolId: 'voluntad-de-hierro', nombre: 'Voluntad de hierro', jobCosto: 1, etiquetas: ['resistencia', 'stat'],
    detalle: '+2 a la resistencia al crowd control.', mods: [{stat: 'rescc', val: 2}]},
+  {poolId: 'percepcion-aumentada', nombre: 'Percepción aumentada', jobCosto: 1, etiquetas: ['utilidad', 'percepción'],
+   detalle: 'Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón). Además, las trampas ocultas cercanas te avisan: si en tu camino quedás justo al lado de una, el movimiento se interrumpe y corresponde una tirada de percepción.',
+   mods: [], percepcionAumentada: true},
   {poolId: 'ojo-avizor', nombre: 'Ojo avizor', jobCosto: 1, etiquetas: ['visión', 'utilidad'],
    detalle: '+1 al campo de visión (radio en hexágonos).', mods: [{stat: 'vision', val: 1}]},
   // Resto de los stats secundarios (escalón +1 = lo que da 1 punto de su atributo).

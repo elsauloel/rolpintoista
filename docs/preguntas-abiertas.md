@@ -314,7 +314,7 @@ al confirmar un movimiento, el mapa mira si alguna casilla de la ruta cae en una
 trampa enemiga y publica una línea roja en la Mesa. Solo avisa (los efectos se
 resuelven a mano, como el resto de los avisos).
 
-- 🔲 **P78. Quién es "rival".** Trampa de un jugador: ¿la disparan los creeps y
+- ✅ **P78–P84 (trampas, primera versión hecha 2026-09-20; ver vtt-hexgrid/CLAUDE.md).** P78 (rival). Trampa de un jugador: ¿la disparan los creeps y
   también otros jugadores, o solo los creeps? Trampa del GM: ¿los personajes?
   ¿Los aliados del dueño nunca la activan? *(2026-09-19)*
 - 🔲 **P79. Visibilidad.** ¿La trampa la ven solo su dueño (y el GM), o también

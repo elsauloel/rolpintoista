@@ -3651,6 +3651,25 @@ const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
 // con el total más alto. statId es opcional — solo importa para esos tres.
+/* ---------- Percepción ----------
+   Se tira con el Especial. La pasiva "Percepción aumentada" sube un escalón cada dado
+   (d6 → d8, d8 → d10…) y además hace que el mapa le avise de las trampas ocultas cercanas. */
+const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
+function tienePercepcionAumentada(){
+  return (S.pasivas || []).some(p => p.poolId === 'percepcion-aumentada' || p.percepcionAumentada);
+}
+function tirarPercepcion(){
+  const f = formulaParaValor(compute().final.esp);
+  if(!f){ toast('Percepción: tu Especial no se puede tirar con dados reales'); return; }
+  const mejor = tienePercepcionAumentada();
+  const combo = f.combo.map(d => mejor ? (PERCEPCION_DADO_SUBE[d] || d) : d);
+  const rolls = combo.map(d => 1 + Math.floor(Math.random() * d));
+  const cuenta = {};
+  combo.forEach(d => { cuenta[d] = (cuenta[d] || 0) + 1; });
+  const formula = Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (f.mod ? `+${f.mod}` : '');
+  registrarTirada(mejor ? 'Percepción (aumentada)' : 'Percepción', {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod});
+}
+
 function tirarValorStat(nombre, valor, statId, extra){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -4866,6 +4885,9 @@ function renderBotonera(){
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
 
+  // Percepción: tirada del Especial (con dado más alto si tiene la pasiva Percepción aumentada).
+  html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Especial${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
+
   // Sigilo: botón directo para quien tiene la habilidad (ver alternarSigilo).
   if(tieneSigilo()){
     const dentro = !!efectoSigilo();
@@ -5486,6 +5508,7 @@ document.addEventListener('click', e => {
     if(b.dataset.botoneraaccion === 'atacar') $('#btn-atacar-pdg').click();
     if(b.dataset.botoneraaccion === 'danio') $('#btn-danio-arma').click();
     if(b.dataset.botoneraaccion === 'esquivar') $('#btn-esquivar').click();
+    if(b.dataset.botoneraaccion === 'percepcion') tirarPercepcion();
     if(b.dataset.botoneraaccion === 'parry') $('#btn-parry').click();
     if(b.dataset.botoneraaccion === 'bloqueo') $('#btn-bloqueo').click();
     return;
@@ -9423,6 +9446,7 @@ function fichaResumen(){
     hpMax: n(c.final.hpmax),
     def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
     esp: n(c.final.esp),   // Especial: el mapa tira la Percepción de este personaje
+    percepcionAumentada: tienePercepcionAumentada(),   // el mapa le avisa de las trampas ocultas cercanas
     sp: spMax - num(S.spGastado),
     spMax,
     // Para mover el token desde el mapa: Nitros que quedan y cuánto cuesta

@@ -343,3 +343,9 @@ miembro puede sumar casillas mientras mueve su personaje (las reglas solo le
 dejan tocar `descubiertas`). Tope de 30000 casillas en las reglas (Firestore
 indexa cada elemento del arreglo: pasado de ~40000 falla). El campo de visión
 y la última posición vista se calculan en cada navegador y no se guardan.
+
+- **Trampas** (2026-09-20): los `elementos` del mapa (`campanas/{id}/elementos` y
+  `mapas/{mapaId}/elementos`) pueden llevar `trampa` (bool), `trampaNombre` (≤40),
+  `trampaDetalle` (≤200) y `disparada` (bool). Las crea y edita su dueño o el GM; un
+  rival que la pisa puede cambiar **solo** `disparada` a `true`. Hay que publicar
+  las reglas nuevas.

@@ -424,6 +424,11 @@ service cloud.firestore {
           && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
           && (!('imgDY' in d) || (d.imgDY is number && d.imgDY >= -10000 && d.imgDY <= 10000))
           && (!('fijado' in d) || d.fijado is bool)
+          // Trampa: solo su dueño (y el GM) la ve hasta que se dispara.
+          && (!('trampa' in d) || d.trampa is bool)
+          && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
+          && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 200))
+          && (!('disparada' in d) || d.disparada is bool)
           && d.duenoUid is string;
       }
       match /elementos/{id} {
@@ -433,11 +438,15 @@ service cloud.firestore {
           && request.resource.data.duenoUid == request.auth.uid
           && request.resource.data.creado == request.time
           && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
-        allow update: if esMiembro(c)
-          && (resource.data.duenoUid == request.auth.uid || esGM(c))
-          && elementoValido(request.resource.data)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY'])
-          && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c));
+        allow update: if esMiembro(c) && (
+          ((resource.data.duenoUid == request.auth.uid || esGM(c))
+            && elementoValido(request.resource.data)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'disparada'])
+            && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
+          // Un rival que pisa una trampa la marca como disparada (solo ese campo).
+          || (resource.data.get('trampa', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
+            && request.resource.data.disparada == true));
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -518,11 +527,14 @@ service cloud.firestore {
             && request.resource.data.duenoUid == request.auth.uid
             && request.resource.data.creado == request.time
             && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c));
-          allow update: if esMiembro(c)
-            && (resource.data.duenoUid == request.auth.uid || esGM(c))
-            && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY'])
-            && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c));
+          allow update: if esMiembro(c) && (
+            ((resource.data.duenoUid == request.auth.uid || esGM(c))
+              && elementoValido(request.resource.data)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'disparada'])
+              && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
+            || (resource.data.get('trampa', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
+              && request.resource.data.disparada == true));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

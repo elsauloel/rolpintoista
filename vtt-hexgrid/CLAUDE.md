@@ -738,3 +738,22 @@ hexágono con otro sin importar bando. Todavía no está construido.
   aparecía recién con el siguiente, "en eco"). Ahora el ping se anota una sola vez
   con la hora local, ignora el 'modified' y la edad nunca es negativa
   (`escucharPings`).
+
+- **Trampas ocultas** (2026-09-20, P78–P84): un elemento de Terreno y Formas con
+  la casilla **"Trampa (oculta a los rivales)"** (nombre y "qué hace") — al crearlo
+  (panel de la herramienta) o desde el ⚙ de uno ya creado. Campos del elemento:
+  `trampa`, `trampaNombre`, `trampaDetalle`, `disparada`. La ven solo su dueño y el
+  GM hasta que se dispara (`puedeVerElemento`); armada se dibuja ámbar con ⚠,
+  disparada roja con ✖ para todos. **Quién la dispara** (`trampaDispara`): los
+  creeps si la puso un jugador, los personajes si la puso el GM; los aliados nunca.
+  Al soltar una ruta (`trampasEvaluarRuta`), si algún casillero pisa la trampa el
+  movimiento se corta ahí, se marca `disparada: true` (las reglas dejan que
+  cualquier miembro cambie solo ese campo) y sale una línea roja en la Mesa:
+  "⚠ Trampa de *dueño*: *nombre* — *token* la activó — *qué hace*". Los efectos se
+  resuelven a mano. **Percepción aumentada** (pasiva de `comun/pasivas.js`,
+  `resumen.percepcionAumentada`): además, al quedar justo **al lado** de una trampa
+  (una vez por trampa) el movimiento se interrumpe y aparece "corresponde una tirada
+  de percepción" (aviso propio + línea roja anónima en la Mesa). Tirada:
+  🔎 **Tirar percepción** en la Botonera (`tirarPercepcion`: Especial, con un dado más
+  alto por escalón si tiene la pasiva). Pendiente: tiradas para detectar/desarmar y
+  límites para crearlas.

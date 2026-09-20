@@ -41,7 +41,8 @@
   const bu = (nombre, detalle, no2, mods, turnos) => ({nombre, detalle, no2, efecto: {mods, turnos}});   // estado sobre sí mismo
   const cu = (nombre, detalle, no2, k) => ({nombre, detalle, no2, cura: k});
   const es = (nombre, detalle, no2, estado, polaridad, turnos, extra) => ({nombre, detalle, no2, efecto: {mods: (extra && extra.mods) || {}, turnos, nombre: estado, polaridad, hp: (extra && extra.hp) || 0}});   // estado del juego sobre sí mismo (Sigilo, Invulnerable…)
-  const tr = (nombre, detalle, no2, codigo) => ({nombre, detalle, no2, trampa: codigo});   // trampa: {T} en la descripción = su daño según el nivel
+  const tr = (nombre, detalle, no2, codigo) => ({nombre, detalle, no2, trampa: codigo});
+  const ts = (nombre, detalle, no2) => ({nombre, detalle, no2, colocar: true});   // trampa sin daño (alarma, red…)   // trampa: {T} en la descripción = su daño según el nivel
   const mecEtiquetas = (...sps) => { const t = []; sps.forEach(x => { if(x.trampa || /trampa/i.test(x.detalle)) t.push('trampas'); if(x.efecto && x.efecto.nombre === 'Sigilo') t.push('sigilo'); }); return [...new Set(t)]; };
   const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
@@ -53,6 +54,11 @@
   // La descripción queda lista para usar: qué hace, qué está automatizado (con los números) y qué se resuelve a mano.
   // {T} en la descripción = el daño de la trampa según el nivel.
   const textoHab = (sp, n) => sp.detalle.replace(/\{T\}/g, sp.trampa ? danoTxt(sp.trampa, n) : '');
+  // Opciones de la trampa que coloca la habilidad, deducidas de la descripción: área "flor de 1" y cuántas pone.
+  const opcionesTrampa = sp => ({
+    radio: /flor de 1/i.test(sp.detalle) ? 1 : 0,
+    cant: /3 minas|3 trampas/i.test(sp.detalle) ? 3 : /dos trampas|2 trampas/i.test(sp.detalle) ? 2 : 1,
+  });
   function armarDetalle(sp, n, cd, lenta){
     const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
       `cooldown ${cd}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
@@ -65,11 +71,16 @@
       const hp = ef.hp ? `; ${ef.hp > 0 ? 'recupera' : 'pierde'} ${Math.abs(ef.hp)} HP por turno` : '';
       auto.push(ef.nombre ? `queda con el estado ${ef.nombre}${m ? ' (' + m + ')' : ''}${dur}${hp}` : `se aplica a sí mismo ${m}${dur}`);
     }
-    if(sp.trampa) auto.push(`cuando alguien pisa la trampa, el mapa tira ${danoTxt(sp.trampa, n)} y se lo aplica solo (poné ese daño en el campo de daño de la trampa)`);
+    if(sp.trampa !== undefined || sp.colocar){
+      const o = opcionesTrampa(sp);
+      auto.push(`al usarla, coloca sola ${o.cant > 1 ? o.cant + ' trampas ocultas' : 'la trampa oculta'} al lado de su token en el mapa que ve el GM${o.radio ? ' (área: flor de ' + o.radio + ')' : ''}${sp.trampa ? `; cuando alguien la pisa, el mapa tira ${danoTxt(sp.trampa, n)} y se lo aplica solo` : ''}; los jugadores no la ven hasta que se dispara y la habilidad no se anuncia en la Mesa`);
+    }
     const frases = textoHab(sp, n).split(/(?<=[.!?])\s+/);
     const cierra = t => /[.!?]$/.test(t) ? t : t + '.';
-    const propias = frases.filter(f => !MANUAL_RE.test(f)).map(sinEtiqueta);
-    const manual = frases.filter(f => MANUAL_RE.test(f)).map(sinEtiqueta);
+    // Una trampa se coloca sola: ahí solo queda a mano lo que la descripción marca con "(a mano)".
+    const esManual = f => (sp.trampa !== undefined || sp.colocar) ? /a mano/i.test(f) : MANUAL_RE.test(f);
+    const propias = frases.filter(f => !esManual(f)).map(sinEtiqueta);
+    const manual = frases.filter(f => esManual(f)).map(sinEtiqueta);
     return `${propias.length ? propias.map(cierra).join(' ') + ' ' : ''}⚙ Automatizado: ${auto.join('; ')}. ✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`;
   }
   function armarHab(sp, n, cd, lenta){
@@ -77,6 +88,10 @@
     if(lenta) h.cdArranca = true;
     if(sp.dano) h.tiradaExtra = danoTxt(sp.dano, n);
     if(sp.cura) h.curaHp = sp.cura * n;
+    if(sp.trampa !== undefined || sp.colocar){
+      const o = opcionesTrampa(sp);
+      h.trampaColocar = {nombre: sp.nombre, detalle: sinEtiqueta(textoHab(sp, n)).slice(0, 200), dano: sp.trampa ? danoTxt(sp.trampa, n) : '', radio: o.radio, cant: o.cant};
+    }
     if(sp.efecto){
       h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = sp.efecto.polaridad || 'buff';
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
@@ -204,7 +219,7 @@
     'Sale del suelo cuando menos se lo espera.');
   cr('minas', 2, 'Kobold dinamitero', 'rango', 'humanoide', 'Cartucho de dinamita',
     at('Cartucho', 'Lanza un cartucho de dinamita.', 'M'),
-    [tr('Cartucho enterrado', 'Entierra un cartucho con mecha en una casilla: al pisarlo explota en flor de 1 con {T} (a mano el área). Se coloca con Terreno y Formas → Trampa (a mano).', 3, 'H'), 5],
+    [tr('Cartucho enterrado', 'Entierra un cartucho con mecha en una casilla: al pisarlo explota en flor de 1 con {T}.', 3, 'H'), 5],
     'Pequeño, cobarde y con demasiada dinamita.');
   cr('minas', 2, 'Escarabajo de cobre', 'tanque', 'bestia', 'Mandíbulas de cobre',
     bu('Caparazón', '+3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
@@ -230,7 +245,7 @@
     'Devora roca y todo lo que hay adentro.');
   cr('minas', 4, 'Zapador demente', 'rango', 'humanoide', 'Detonador',
     at('Granada', 'Granada de mano.', 'M'),
-    [tr('Campo minado', 'Siembra 3 minas en casillas cercanas: cada una hace {T} a quien la pise (una trampa por mina, a mano). Se colocan con Terreno y Formas → Trampa.', 4, 'M'), 6],
+    [tr('Campo minado', 'Siembra 3 minas en casillas cercanas: cada una hace {T} a quien la pise.', 4, 'M'), 6],
     'Perdió la razón (y varios dedos) entre las cargas.');
   cr('minas', 4, 'Vigía de cristal', 'mago', 'elemental', 'Rayo de cristal',
     at('Refracción', 'Rayo que ignora armadura (a mano).', 'M'),
@@ -320,7 +335,7 @@
   const TG = ['goblin', 'tribu goblin'];
   cr('bosque', 1, 'Goblin recolector', 'rapido', 'humanoide', 'Cuchillo de hongo',
     at('Tajo furtivo', 'Si el objetivo ya fue atacado este turno, +2 al daño (a mano).', 'L'),
-    [tr('Trampa de raíces', 'Deja una trampa de raíces en una casilla adyacente: {T} al primero que la pise, que además queda Inmovilizado (a mano). Se coloca con Terreno y Formas → Trampa (a mano).', 2, 'L'), 4],
+    [tr('Trampa de raíces', 'Deja una trampa de raíces en una casilla adyacente: {T} al primero que la pise, que además queda Inmovilizado (a mano).', 2, 'L'), 4],
     'Sale a juntar hongos, ramas y todo lo que no esté clavado.', TG);
   cr('bosque', 1, 'Goblin lancero', 'brutal', 'humanoide', 'Lanza de punta de hueso',
     at('Lanzazo', 'Ataque con lanza; llega a 2 casillas.', 'L'),
@@ -595,7 +610,7 @@
     'Espera en la curva del camino con cara de pocos amigos.');
   hu('bandidos', 3, 'Ballestero emboscado', 'rango', 'Ballesta del arbusto', 'Capucha de emboscada',
     at('Virote desde el arbusto', 'Ataque a distancia; si el objetivo no lo vio, +2 al PdG (a mano).', 'M'),
-    [tr('Cepo del emboscado', 'Deja un cepo oculto en el camino: {T} al que lo pise, que queda Inmovilizado (a mano). Se coloca con Terreno y Formas → Trampa (a mano).', 2, 'L'), 4],
+    [tr('Cepo del emboscado', 'Deja un cepo oculto en el camino: {T} al que lo pise, que queda Inmovilizado (a mano).', 2, 'L'), 4],
     'Silencioso, paciente y con un pésimo sentido del humor.');
   hu('bandidos', 4, 'Envenenador de la banda', 'debuffer', 'Daga de la viuda verde', 'Chaleco de escamas del envenenador',
     at('Daga envenenada', 'Daño y 2 stacks de Veneno al objetivo (a mano).', 'M'),
@@ -608,7 +623,7 @@
   // Bárbaros
   hu('bárbaros', 1, 'Cazador bárbaro', 'rango', 'Honda del cazador de jabalíes', null,
     at('Piedra certera', 'Piedra lanzada con honda.', 'L'),
-    [tr('Lazo de caza', 'Deja un lazo escondido: {T} al que lo pise, que queda Rengo (a mano). Se coloca con Terreno y Formas → Trampa (a mano).', 1, 'L'), 3],
+    [tr('Lazo de caza', 'Deja un lazo escondido: {T} al que lo pise, que queda Rengo (a mano).', 1, 'L'), 3],
     'Persigue jabalíes y huye de los inviernos.');
   hu('bárbaros', 2, 'Guerrero de clan', 'brutal', 'Hacha del clan', 'Coraza de cuero del clan',
     at('Hachazo', 'Golpe de hacha.', 'M'),
@@ -715,7 +730,7 @@
   /* ================= TRAMPEROS Y SIGILOSOS (usan las mecánicas de trampas y sigilo) ================= */
   cr('bosque', 2, 'Trampero silvano', 'rapido', 'humanoide', 'Cuchillo de desollar',
     at('Puñalada de trampero', 'Un tajo rápido.', 'L'),
-    [tr('Cepo de dientes', 'Deja un cepo de dientes en una casilla: {T} al que lo pise, que queda Rengo (a mano). Se coloca con Terreno y Formas → Trampa (a mano).', 2, 'M'), 4],
+    [tr('Cepo de dientes', 'Deja un cepo de dientes en una casilla: {T} al que lo pise, que queda Rengo (a mano).', 2, 'M'), 4],
     'Vive de lo que cae en sus cepos, sean ciervos o viajeros.');
   cr('bosque', 3, 'Cazador furtivo', 'rango', 'humanoide', 'Arco corto',
     at('Flecha desde el follaje', 'Flecha a distancia; +2 al daño si el objetivo no lo vio (a mano).', 'M'),
@@ -723,11 +738,11 @@
     'Caza de noche y no deja huellas.');
   cr('minas', 3, 'Kobold artificiero', 'rango', 'humanoide', 'Ballesta de bolsillo',
     at('Virote con mecha', 'Un virote con un cartucho atado.', 'M'),
-    [tr('Mina de mecha', 'Entierra una mina con mecha lenta: al pisarla explota con {T} en flor de 1 (a mano el área). Se coloca con Terreno y Formas → Trampa (a mano).', 3, 'H'), 5],
+    [tr('Mina de mecha', 'Entierra una mina con mecha lenta: al pisarla explota con {T} en flor de 1.', 3, 'H'), 5],
     'El mejor amigo de los derrumbes.');
   cr('montañas', 3, 'Cazador de las cumbres', 'rapido', 'humanoide', 'Lanza corta',
     at('Lanzazo', 'Una estocada rápida.', 'M'),
-    [tr('Foso con estacas', 'Cava un foso tapado con nieve: {T} de caída al que lo pise (a mano). Se coloca con Terreno y Formas → Trampa.', 3, 'H'), 5],
+    [tr('Foso con estacas', 'Cava un foso tapado con nieve: {T} de caída al que lo pise (a mano).', 3, 'H'), 5],
     'Nunca persigue: espera a que la presa caiga sola.');
   cr('templo', 2, 'Vigía sombrío', 'rapido', 'humanoide', 'Daga de meteorito',
     at('Corte silencioso', 'Un tajo desde las sombras.', 'L'),
@@ -735,12 +750,12 @@
     'Se mueve sin hacer ruido entre las ruinas.');
   cr('templo', 4, 'Guardián de sellos', 'mago', 'humanoide', 'Bastón de runas',
     at('Chispa del sello', 'Un chispazo rúnico.', 'M'),
-    [tr('Sello explosivo', 'Graba un sello en el piso: al pisarlo explota en flor de 1 con {T} mágico (a mano el área). Se coloca con Terreno y Formas → Trampa.', 3, 'H'), 5],
+    [tr('Sello explosivo', 'Graba un sello en el piso: al pisarlo explota en flor de 1 con {T} mágico.', 3, 'H'), 5],
     'Protege lo que nadie quiere ya.');
 
   hu('bandidos', 2, 'Trampero de caminos', 'rapido', 'Punzón del ladronzuelo', 'Casaca curtida de salteador',
     at('Puñalada de trampero', 'Un tajo rápido.', 'L'),
-    [tr('Cepo en el camino', 'Deja un cepo escondido: {T} al que lo pise, que queda Inmovilizado (a mano). Se coloca con Terreno y Formas → Trampa (a mano).', 2, 'L'), 4],
+    [tr('Cepo en el camino', 'Deja un cepo escondido: {T} al que lo pise, que queda Inmovilizado (a mano).', 2, 'L'), 4],
     'Prepara la ruta antes de que llegue la caravana.');
   hu('bandidos', 3, 'Sicario de las sombras', 'rapido', 'Ballesta del arbusto', 'Capucha de emboscada',
     at('Virote desde la sombra', 'Ataque a distancia; +2 al daño si el objetivo no lo vio (a mano).', 'M'),
@@ -748,29 +763,29 @@
     'Nunca se lo ve entrar ni salir.');
   hu('bandidos', 4, 'Saboteador de la banda', 'debuffer', 'Daga de la viuda verde', 'Chaleco de escamas del envenenador',
     at('Daga sucia', 'Daño y 1 stack de Veneno al objetivo (a mano).', 'M'),
-    [tr('Trampa de dardos envenenados', 'Deja una trampa de dardos: {T} y el que la pise queda Envenenado (a mano). Se coloca con Terreno y Formas → Trampa.', 3, 'M'), 5],
+    [tr('Trampa de dardos envenenados', 'Deja una trampa de dardos: {T} y el que la pise queda Envenenado (a mano).', 3, 'M'), 5],
     'Arregla el camino para que nadie llegue entero.');
   hu('bárbaros', 2, 'Cazador de fosos', 'brutal', 'Hacha del clan', 'Coraza de cuero del clan',
     at('Hachazo', 'Un golpe pesado.', 'M'),
-    [tr('Foso con estacas', 'Cava un foso tapado: {T} de caída al que lo pise (a mano). Se coloca con Terreno y Formas → Trampa.', 3, 'H'), 5],
+    [tr('Foso con estacas', 'Cava un foso tapado: {T} de caída al que lo pise (a mano).', 3, 'H'), 5],
     'Caza mamuts con hoyos.');
   hu('guardia de la ciudad', 2, 'Vigía de patrulla', 'apoyo', 'Lanza de guardia de puerta', 'Coraza de puerta',
     at('Lanzazo de vigía', 'Una estocada.', 'M'),
-    [ta('Alarma de patrulla', 'Deja una alarma en una casilla: al pisarla suena en la Mesa y los guardias se ponen en guardia (a mano). Se coloca con Terreno y Formas → Trampa, sin daño.', 1), 3],
+    [ts('Alarma de patrulla', 'Deja una alarma en una casilla: al pisarla suena en la Mesa y los guardias se ponen en guardia (a mano). Es una trampa sin daño.', 1), 3],
     'Cuelga campanitas de cada cuerda.');
   hu('piratas espaciales', 3, 'Minador de cubierta', 'rango', 'Arcabuz de cubierta', 'Casco de artillero pintado a mano',
     at('Tiro de arcabuz', 'Un disparo a distancia.', 'M'),
-    [tr('Mina magnética', 'Pega una mina al piso de la cubierta: explota en flor de 1 con {T} a quien la pise (a mano el área). Se coloca con Terreno y Formas → Trampa.', 3, 'H'), 5],
+    [tr('Mina magnética', 'Pega una mina al piso de la cubierta: explota en flor de 1 con {T} a quien la pise.', 3, 'H'), 5],
     'Llena la nave enemiga de sorpresas.');
   hu('cultistas', 3, 'Guardián de runas', 'mago', 'Báculo del inquisidor', 'Pasamontañas de inquisidor',
     at('Chispa ritual', 'Un chispazo.', 'M'),
-    [tr('Runa explosiva', 'Graba una runa en el piso: explota en flor de 1 con {T} mágico (a mano el área). Se coloca con Terreno y Formas → Trampa.', 3, 'H'), 5],
+    [tr('Runa explosiva', 'Graba una runa en el piso: explota en flor de 1 con {T} mágico.', 3, 'H'), 5],
     'Sus runas esperan pacientes.');
   hu('mercenarios', 3, 'Trampero a sueldo', 'rango', 'Arco del rastreador', 'Grebas del rastreador',
     at('Flecha de trampero', 'Una flecha a distancia.', 'M'),
-    [tr('Red de cazador', 'Una red en el camino: {T} por el tirón y quien la pise queda Inmovilizado 1 turno (a mano). Se coloca con Terreno y Formas → Trampa.', 2, 'L'), 4],
+    [tr('Red de cazador', 'Una red en el camino: {T} por el tirón y quien la pise queda Inmovilizado 1 turno (a mano).', 2, 'L'), 4],
     'Cobra por presa viva.');
 
   window.CREEPS_BASE = lista;
-  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE};
+  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar};
 })();

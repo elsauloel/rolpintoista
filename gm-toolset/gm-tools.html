@@ -4844,10 +4844,12 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
+    // Una trampa se coloca sola y en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
+    if(h.trampaColocar) colocarTrampaDeHab(sc, h);
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
-    if(habCreepTira(h)) mesaConTexto((h && h.detalle) || "");
+    else if(habCreepTira(h)) mesaConTexto((h && h.detalle) || "");
     else mesaPublicarHabilidadCreep(sc, h);
-    if(habCreepTira(h)) tirarExtraDeHab(h, sc);
+    if(habCreepTira(h) && !h.trampaColocar) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
@@ -5960,6 +5962,20 @@ async function renderListaPersonajes(){
 // Mismo criterio que "Borrar personaje" de la ficha (confirmar + escribir el
 // nombre), pero acá el GM puede borrar la de cualquier jugador; de paso saca
 // los tokens que la usan (el suyo y los de sus invocaciones).
+/* Habilidad con trampa: la coloca sola, oculta a los jugadores, al lado del token del creep en el mapa que el GM está mirando. */
+async function colocarTrampaDeHab(sc, h){
+  const t = h.trampaColocar;
+  try{
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', radio: t.radio || 0, cant: t.cant || 1});
+    if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
+    else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
+    else toast('No hay casilla libre al lado del token para la trampa');
+  }catch(err){
+    console.error('No se pudo colocar la trampa:', err);
+    toast('No se pudo colocar la trampa' + (err.code === 'permission-denied' ? ' (sin permiso)' : ' — ponela a mano'));
+  }
+}
+
 /* Al borrar un creep: si hay tokens que lo representan (en el mapa de siempre o en cualquier mapa guardado), pregunta si borrarlos también. */
 async function preguntarBorrarTokensDeCreep(creepId){
   if(!fbDb || !fbUsuario) return;

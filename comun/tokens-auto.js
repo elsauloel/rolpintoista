@@ -65,5 +65,66 @@ const TokensAuto = (() => {
     return {creados: n, salteados: items.length - n, mapaId};
   }
 
-  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens};
+  /* ---------- Trampas automáticas ----------
+     Una habilidad de creep con trampa (h.trampaColocar) coloca sola el elemento-trampa en el mapa que el GM está mirando,
+     en la casilla libre más cercana al frente del token del que la usa (si está ocupada, prueba las demás vecinas).
+     Es un elemento de Terreno y Formas con `trampa: true`: lo ven solo su dueño (el GM) y el GM hasta que se dispara, y el
+     mapa tira y aplica el daño (`trampaDano`) cuando alguien la pisa. Las reglas de `elementos` ya lo permiten. */
+  function rotarCubo(dq, dr, pasos){
+    let q = dq, r = dr, s = -dq - dr;
+    for(let i = 0; i < ((pasos % 6) + 6) % 6; i++){ const nq = -r, nr = -s; s = -q; q = nq; r = nr; }
+    return {dq: q, dr: r};
+  }
+  const aCubo = c => ({q: c.col, r: c.fila - (c.col - (c.col & 1)) / 2});
+  const deCubo = (q, r) => ({col: q, fila: r + (q - (q & 1)) / 2});
+  function celdasFlor(R){
+    const res = [];
+    for(let dq = -R; dq <= R; dq++) for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++) res.push(dq, dr);
+    return res;
+  }
+  function celdasAbsolutas(e){
+    const o = aCubo(e.origen), pasos = Math.round((e.rotacion || 0) / 60), out = [];
+    for(let i = 0; i + 1 < (e.celdas || []).length; i += 2){
+      const d = rotarCubo(e.celdas[i], e.celdas[i + 1], pasos);
+      const c = deCubo(o.q + d.dq, o.r + d.dr);
+      out.push(`${c.col},${c.fila}`);
+    }
+    return out;
+  }
+  /* o: {fichaId, tipoToken?, nombre, detalle, dano, radio, cant, fuegoAmigo, color, mapaId?}
+     Devuelve {colocadas, mapaId, motivo?} (motivo: 'sin-token' | 'sin-lugar'). */
+  async function colocarTrampas(o){
+    const mapaId = o.mapaId || await mapaQueMiraElGM();
+    const tokens = await fbDb.collection(fbRutaCampana(rutaTokens(mapaId))).get();
+    const mio = tokens.docs.find(d => d.data().fichaId === o.fichaId && d.data().tipo === (o.tipoToken || 'creep'));
+    if(!mio) return {colocadas: 0, mapaId, motivo: 'sin-token'};
+    const elCol = fbDb.collection(fbRutaCampana(mapaId === MAPA_PRINCIPAL_ID ? 'elementos' : `mapas/${mapaId}/elementos`));
+    const els = await elCol.get();
+    const ocupadas = new Set(tokens.docs.map(d => `${d.data().col},${d.data().fila}`));
+    els.docs.forEach(d => { const e = d.data(); if(e.solido) celdasAbsolutas(e).forEach(k => ocupadas.add(k)); });
+    const t = mio.data(), base = aCubo({col: t.col, fila: t.fila});
+    const frente = ((Math.round((t.rotacion || 0) / 60) % 6) + 6) % 6;   // 0 = mira hacia abajo
+    const elegidas = [];
+    [0, 1, 5, 2, 4, 3].forEach(k => {
+      const d = rotarCubo(0, 1, frente + k);
+      const c = deCubo(base.q + d.dq, base.r + d.dr);
+      if(elegidas.length < (o.cant || 1) && !ocupadas.has(`${c.col},${c.fila}`)) elegidas.push(c);
+    });
+    if(!elegidas.length) return {colocadas: 0, mapaId, motivo: 'sin-lugar'};
+    const lote = fbDb.batch();
+    elegidas.forEach(c => {
+      lote.set(elCol.doc(), {
+        tipo: 'flor', origen: {col: c.col, fila: c.fila}, celdas: celdasFlor(o.radio || 0), rotacion: 0,
+        color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#D9A21B', alfa: 45, solido: false, invisible: false,
+        imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
+        trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
+        disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
+        duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+    await lote.commit();
+    return {colocadas: elegidas.length, mapaId};
+  }
+
+  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas};
 })();

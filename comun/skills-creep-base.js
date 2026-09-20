@@ -29,6 +29,7 @@
   const eS = (detalle, no2, nombre, polaridad, turnos, extra) => ({detalle, no2, efecto: {mods: (extra && extra.mods) || {}, turnos, nombre, polaridad, hp: (extra && extra.hp) || 0}});
   // Trampa: el daño ({T} en la descripción) escala con el nivel; se coloca con Terreno y Formas → Trampa.
   const tR = (detalle, no2, codigo) => ({detalle, no2, trampa: codigo});
+  const tS = (detalle, no2) => ({detalle, no2, colocar: true});   // trampa sin daño (alarma, red, humo…)
   const lista = [];
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -37,7 +38,7 @@
     const sp = {nombre, ...spBase};
     const lenta = cd >= 4;
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
-    const aMano = frases.some(f => U.MANUAL_RE.test(f));
+    const aMano = frases.some(f => (U.esTrampa(sp) ? /a mano/i : U.MANUAL_RE).test(f));
     const etiquetas = [...fn].map(c => FN[c]).filter(Boolean), razasTxt = [...razas].map(c => RZ[c]).filter(Boolean), rolesTxt = [...roles].map(c => RO[c]).filter(Boolean);
     const mecTags = mec ? mec.split(',').map(t => t.trim()).filter(Boolean) : [];
     const OBJ = ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno'];
@@ -296,32 +297,32 @@
 
   /* ================= TRAMPAS (se colocan con Terreno y Formas → Trampa) ================= */
   // La habilidad cobra No2 y cooldown sola; el daño de la trampa lo tira y aplica el mapa cuando alguien la pisa (campo "daño automático").
-  H('Trampa de púas', 'D', 'hdb', 'ex', 3, tR('Deja una trampa oculta de púas en una casilla: daño {T} a quien la pise. Se coloca con Terreno y Formas → Trampa (a mano).', 2, 'M'), 'trampas,terreno');
-  H('Cepo', 'DK', 'hd', 'ex', 3, tR('Deja un cepo en una casilla: daño {T} y el que lo pise queda Inmovilizado (a mano). Se coloca con Terreno y Formas → Trampa.', 2, 'L'), 'trampas,terreno');
-  H('Foso oculto', 'D', 'hdb', 'ex', 4, tR('Cava un foso tapado en una casilla: daño {T} de caída. Se coloca con Terreno y Formas → Trampa (a mano).', 3, 'H'), 'trampas,terreno');
-  H('Mina de contacto', 'DA', 'hdc', 'rx', 4, tR('Entierra una mina: explota en una flor de 1 con daño {T} (marcá la trampa como de área, a mano).', 3, 'H'), 'trampas,terreno');
-  H('Campo minado', 'DA', 'hdc', 'rx', 6, tR('Siembra 3 minas en casillas cercanas: cada una hace {T} a quien la pise (a mano, una trampa por mina).', 4, 'M'), 'trampas,terreno');
+  H('Trampa de púas', 'D', 'hdb', 'ex', 3, tR('Deja una trampa oculta de púas en una casilla: daño {T} a quien la pise.', 2, 'M'), 'trampas,terreno');
+  H('Cepo', 'DK', 'hd', 'ex', 3, tR('Deja un cepo en una casilla: daño {T} y el que lo pise queda Inmovilizado (a mano).', 2, 'L'), 'trampas,terreno');
+  H('Foso oculto', 'D', 'hdb', 'ex', 4, tR('Cava un foso tapado en una casilla: daño {T} de caída.', 3, 'H'), 'trampas,terreno');
+  H('Mina de contacto', 'DA', 'hdc', 'rx', 4, tR('Entierra una mina: explota en una flor de 1 con daño {T}.', 3, 'H'), 'trampas,terreno');
+  H('Campo minado', 'DA', 'hdc', 'rx', 6, tR('Siembra 3 minas en casillas cercanas: cada una hace {T} a quien la pise.', 4, 'M'), 'trampas,terreno');
   H('Trampa de veneno', 'DX', 'hdb', 'x', 3, tR('Una trampa con dardos envenenados: daño {T} y el que la pise queda Envenenado (a mano).', 2, 'L'), 'trampas,terreno');
   H('Trampa de fuego', 'DA', 'hde', 'gx', 4, tR('Un pozo de brea y chispa: daño {T} en flor de 1 y deja el suelo ardiendo (a mano).', 3, 'M'), 'trampas,terreno');
   H('Trampa de hielo', 'DK', 'e', 'gx', 4, tR('Una placa de hielo: daño {T} y el que la pise pierde 1 No2 en su próximo turno (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Trampa de red', 'K', 'hdb', 'x', 3, tR('Una red escondida: quien la pisa queda Inmovilizado 1 turno (a mano); sin daño.', 2, 'L'), 'trampas,terreno');
-  H('Alambre tenso', 'DK', 'hd', 'ex', 3, tR('Un alambre en una línea de casillas: daño {T} y quien lo cruza cae al piso (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Trampa de alarma', 'X', 'hdb', 'ax', 2, tA('Deja una alarma en una casilla: al pisarla suena en la Mesa y los creeps cercanos se ponen en guardia (a mano). Se coloca como Trampa sin daño.', 1), 'trampas,terreno');
+  H('Trampa de red', 'K', 'hdb', 'x', 3, tS('Una red escondida: quien la pisa queda Inmovilizado 1 turno (a mano); sin daño.', 2), 'trampas,terreno');
+  H('Alambre tenso', 'DK', 'hd', 'ex', 3, tR('Un alambre tenso en una casilla: daño {T} y quien lo cruza cae al piso (a mano).', 2, 'L'), 'trampas,terreno');
+  H('Trampa de alarma', 'X', 'hdb', 'ax', 2, tS('Deja una alarma en una casilla: al pisarla suena en la Mesa y los creeps cercanos se ponen en guardia (a mano). Es una trampa sin daño.', 1), 'trampas,terreno');
   H('Trampa sonora', 'DK', 'hdc', 'x', 3, tR('Un petardo enorme: daño {T} y los adyacentes quedan Pajaritos hasta el final de su turno (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Trampa de runas', 'DA', 'hdma', 'g', 5, tR('Grava una runa en el piso: explota en flor de 1 con daño mágico {T} (a mano el área).', 3, 'H'), 'trampas,terreno');
+  H('Trampa de runas', 'DA', 'hdma', 'g', 5, tR('Grava una runa en el piso: explota en flor de 1 con daño mágico {T}.', 3, 'H'), 'trampas,terreno');
   H('Cepo de alma', 'DX', 'ma', 'gx', 5, tR('Un cepo espectral: daño {T} y el que lo pise pierde 2 No2 en su próximo turno (a mano).', 3, 'M'), 'trampas,terreno');
   H('Trampa de ácido', 'DX', 'ba', 'x', 4, tR('Un charco de ácido tapado: daño {T} y el que lo pise pierde 1 de Defensa 3 turnos (a mano).', 3, 'M'), 'trampas,terreno');
   H('Zarzal traicionero', 'DK', 'p', 'x', 3, tR('Un matorral de espinas escondido: daño {T} y queda Rengo (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Telaraña oculta', 'K', 'b', 'x', 3, tR('Hilos casi invisibles: quien los toca queda Inmovilizado 1 turno (a mano), sin daño.', 2, 'L'), 'trampas,terreno');
+  H('Telaraña oculta', 'K', 'b', 'x', 3, tS('Hilos casi invisibles: quien los toca queda Inmovilizado 1 turno (a mano), sin daño.', 2), 'trampas,terreno');
   H('Descarga oculta', 'DK', 'ca', 'x', 4, tR('Una placa eléctrica: daño {T} y el que la pise pierde 1 No2 (a mano).', 3, 'M'), 'trampas,terreno');
-  H('Trampa de humo', 'X', 'hd', 'ex', 3, tA('Un frasco que al pisarlo suelta humo en flor de 1: los de adentro pierden 2 de Evasión y no ven (a mano). Trampa sin daño.', 2), 'trampas,niebla y visión');
-  H('Cebo', 'X', 'hdb', 'x', 3, tA('Deja un cebo (comida, oro brillante): los personajes deben pasar una tirada de Res.Mt o irán hacia él (a mano). Puede ser una trampa sin daño.', 2), 'trampas');
-  H('Trampa doble', 'DK', 'hd', 'x', 5, tR('Dos trampas juntas en casillas vecinas: daño {T} cada una (a mano, dos trampas).', 4, 'M'), 'trampas,terreno');
+  H('Trampa de humo', 'X', 'hd', 'ex', 3, tS('Un frasco que al pisarlo suelta humo en flor de 1: los de adentro pierden 2 de Evasión y no ven (a mano). Trampa sin daño.', 2), 'trampas,niebla y visión');
+  H('Cebo', 'X', 'hdb', 'x', 3, tS('Deja un cebo (comida, oro brillante): los personajes deben pasar una tirada de Res.Mt o irán hacia él (a mano). Es una trampa sin daño.', 2), 'trampas');
+  H('Trampa doble', 'DK', 'hd', 'x', 5, tR('Dos trampas juntas en casillas vecinas: daño {T} cada una.', 4, 'M'), 'trampas,terreno');
   H('Cazador de trampas', 'B', 'hdb', 'ex', 3, tA('Detecta trampas: el GM revela las trampas armadas en 4 casilleros alrededor del creep (a mano).', 1), 'trampas,percepción');
   H('Desarmar trampa', 'B', 'hd', 'ex', 2, tA('Desarma una trampa adyacente: se borra sin dispararla (a mano).', 1), 'trampas');
   H('Rearmar trampa', 'B', 'hd', 'ex', 3, tA('Rearma una trampa ya disparada en su casilla: vuelve a estar oculta (a mano, tocá el ⚙ de esa trampa).', 1), 'trampas');
   H('Empujar a la trampa', 'DK', 'bcd', 'mt', 3, zO('Empuja al objetivo un casillero hacia una trampa o un peligro (a mano); si lo pisa se dispara sola.', 2, 'L'), 'trampas');
-  H('Ingeniero de trampas', 'B', 'hd', 'ex', 6, tA('Prepara todo un perímetro: se colocan 3 trampas de nivel bajo en casillas cercanas antes de que empiece el combate (a mano).', 4), 'trampas,terreno');
+  H('Ingeniero de trampas', 'B', 'hd', 'ex', 6, tR('Prepara un perímetro: deja 3 trampas ocultas en casillas cercanas, cada una con daño {T}.', 4, 'L'), 'trampas,terreno');
 
   /* ================= TERRENO Y FORMAS (elementos del mapa) ================= */
   H('Muro de tierra', 'K', 'e', 'gt', 4, tA('Levanta una línea de 3 casilleros de muro Sólido: bloquea el paso y la vista (Terreno y Formas, Sólido, a mano).', 3), 'terreno y formas,terreno');

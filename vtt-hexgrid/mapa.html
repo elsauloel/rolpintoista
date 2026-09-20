@@ -1491,10 +1491,11 @@ async function sigiloAlertaRoja(t, que, detalle){
     });
   }catch(err){ console.error('No se pudo publicar la alerta de sigilo:', err); }
 }
-// Al soltar un token en sigilo: corta la ruta en la primera casilla que cae en un
-// cono rival (detección inmediata). La zona de alerta (detección con tirada) NO cuenta
-// mientras se mueve: esa detección a medias pide estar quieto y atento, así que caminar
-// por ahí no interrumpe ni genera tiradas (decidido 2026-09-19).
+// Al soltar un token en sigilo (mientras ÉL se mueve): corta la ruta en la primera casilla
+// que cae en un cono rival (detección inmediata) y cuenta los pasos que da dentro de cada
+// zona de alerta: corresponde una tirada de detección por paso, que se anuncia en rojo en la
+// Mesa. NO se interrumpe el movimiento por la zona de alerta: el oculto ve las zonas y decide
+// cuándo entrar, así que sabe lo que hace (decidido 2026-09-19, escenario 1).
 function sigiloEvaluarRuta(t, a){
   const rivales = rivalesDe(t).map(zonasClaves);
   if(!rivales.length) return;
@@ -1504,16 +1505,24 @@ function sigiloEvaluarRuta(t, a){
     const k = nbPack(ruta[i].col, ruta[i].fila);
     if(rivales.some(z => z.cono.has(k))) corte = i;
   }
+  const fin = corte >= 0 ? corte : ruta.length - 1;
+  const avisos = [];
+  rivales.forEach(z => {
+    let pasos = 0;
+    for(let i = 1; i <= fin; i++) if(z.alerta.has(nbPack(ruta[i].col, ruta[i].fila))) pasos++;
+    if(pasos > 0) avisos.push({rival: z.nombre, pasos});
+  });
   if(corte >= 0) ruta.length = corte + 1;
+  if(avisos.length) sigiloAvisosPendientes.set(a.id, avisos);
 }
 function sigiloPublicarAvisos(id){
   const avisos = sigiloAvisosPendientes.get(id);
   sigiloAvisosPendientes.delete(id);
   const t = tokens.get(id);
   if(!avisos || !t) return;
-  avisos.forEach(av => sigiloAviso(
-    `🕶 Detección · ${nombreDe(t)} dio ${av.pasos} paso${av.pasos === 1 ? '' : 's'} en la zona de alerta de ${av.rival}`,
-    `${av.pasos} tirada${av.pasos === 1 ? '' : 's'} de detección (en principio Destreza contra Especial; las resuelve la mesa)`));
+  avisos.forEach(av => sigiloAlertaRoja(t,
+    `entró en la zona de alerta de ${av.rival} (${av.pasos} paso${av.pasos === 1 ? '' : 's'})`,
+    `Corresponde${av.pasos === 1 ? '' : 'n'} ${av.pasos} tirada${av.pasos === 1 ? '' : 's'} de detección (percepción) — una por paso, la resuelve la mesa`));
 }
 async function romperSigilo(id, detector){
   const t = tokens.get(id);

@@ -712,8 +712,10 @@ hexágono con otro sin importar bando. Todavía no está construido.
   giró o entró en sigilo); si un rival camina hasta verlo, decide la percepción.
   Solo se revisa el cono (la zona de alerta sigue siendo del que está oculto).
 
-- **Movimiento y zona de alerta** (2026-09-19): al moverse (el oculto o el que
-  camina) **solo cuenta el cono** (detección inmediata): corta el movimiento. La
-  zona de alerta (detección con tirada) no cuenta ni genera tiradas por paso; se
-  justifica porque pide estar quieto y atento. Se sacó el conteo de pasos en la
-  alerta de `sigiloEvaluarRuta`.
+- **Movimiento y zona de alerta** (2026-09-19, escenario 1: se mueve el oculto):
+  entrar en la zona de alerta (roja) da **una tirada de detección por paso**,
+  anunciada en **rojo** en la Mesa (`sigiloEvaluarRuta` cuenta los pasos,
+  `sigiloPublicarAvisos` la publica). **No se interrumpe** el movimiento: el
+  oculto ve las zonas y decide cuándo entrar, y cada paso es consciente. Solo el
+  cono (azul) corta. Falta el escenario 2 (se mueve el que ve al oculto: hoy
+  solo cuenta el cono).

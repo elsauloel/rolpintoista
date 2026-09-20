@@ -4779,7 +4779,9 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-finalizar-combate'){
+    combateRep.enMapa = null;
     renderReporteCombate();
+    cargarCreepsEnMapa();
     cargarJugadoresCombate();
     $('#scrim-finalizar-combate').classList.add('open');
     return;
@@ -5340,7 +5342,25 @@ const XP_ESCAPO_PCT = 0.2;
    ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
 let xpContarEscapados = true;
 let combateRep = nuevoCombateRep();
-function nuevoCombateRep(){ return {oro: {}, xpAjuste: 0, oroAjuste: 0, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false}; }
+function nuevoCombateRep(){ return {oro: {}, xpAjuste: 0, oroAjuste: 0, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null}; }
+
+/* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
+   en gm-tools puede haber muchos creeps armados de antemano que no están en la pelea. */
+async function cargarCreepsEnMapa(){
+  if(!fbDb || !fbMiembro){ combateRep.enMapa = new Set(S.creeps.map(s => s.id)); renderReporteCombate(); return; }
+  try{
+    const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+    const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : '_principal';
+    const ruta = mapaId === '_principal' ? 'tokens' : `mapas/${mapaId}/tokens`;
+    const snap = await fbDb.collection(fbRutaCampana(ruta)).get();
+    combateRep.enMapa = new Set(snap.docs.map(d => d.data()).filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId));
+  }catch(err){
+    console.error('No se pudieron leer los tokens del mapa publicado:', err);
+    combateRep.enMapa = new Set();
+    toast('No se pudo leer el mapa publicado: no hay creeps para repartir');
+  }
+  renderReporteCombate();
+}
 
 // El oro se tira UNA sola vez por creep (±20% sobre su valor base) y no se recalcula al reabrir el reporte.
 function oroDeCreep(sc){
@@ -5428,7 +5448,7 @@ function itemsExtraDelReporte(){
 }
 
 function generarReporteCombate(contarEscapados){
-  const filas = S.creeps.filter(sc => !sc.recompensado).map(sc => {
+  const filas = S.creeps.filter(sc => !sc.recompensado && combateRep.enMapa && combateRep.enMapa.has(sc.id)).map(sc => {
     const derrotado = num(sc.hp) <= 0;
     const xpBase = xpBasePorNivel(sc.nivel);
     const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
@@ -5482,9 +5502,14 @@ function itemsPublicables(rep){
 }
 
 function renderReporteCombate(){
+  if(combateRep.enMapa === null){
+    $('#finalizar-combate-body').innerHTML = `<div class="hint">Buscando los creeps que están en el mapa publicado…</div>`;
+    $('#finalizar-combate-publicar').style.display = 'none';
+    return;
+  }
   const rep = generarReporteCombate(xpContarEscapados);
   if(!rep.filas.length){
-    $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps para repartir: todos ya se repartieron o no hay ninguno cargado.</div>`;
+    $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps para repartir. Solo cuentan los creeps con un <b>token vinculado en el mapa publicado</b> que todavía no se repartieron.</div>`;
     $('#finalizar-combate-publicar').style.display = 'none';
     return;
   }

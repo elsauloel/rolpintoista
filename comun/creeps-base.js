@@ -1,5 +1,5 @@
 /* Catálogo base de creeps por ESCENARIO (auditar todos: son un primer borrador).
-   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60. Cada uno trae dos habilidades:
+   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10). Cada uno trae dos habilidades:
    una RÁPIDA (cooldown 2) y una LENTA (cooldown 3 a 6, según lo poderosa) que arranca el
    combate con el cooldown ya activo (cdArranca). Lo que se puede automatizar en un creep va
    automatizado: costo en No2 (o "lo de un ataque"), tirada de daño, estados con bonos a sí
@@ -54,7 +54,7 @@
   }
 
   const lista = [];
-  function cr(esc, n, nombre, rol, tipo, arma, rapida, lenta, notas){
+  function cr(esc, n, nombre, rol, tipo, arma, rapida, lenta, notas, extras){
     const total = 33 + 3 * (n - 1);
     const [con, fue, agl, des, esp] = repartir(total, PESOS[rol]);
     const rango = rol === 'rango' || rol === 'mago';
@@ -72,7 +72,7 @@
     };
     lista.push({
       poolId: 'creep-' + esc + '-' + n + '-' + slug(nombre), nombre: nombre + ' (auditar)', nivel: n,
-      etiquetas: [ESCENARIO_TXT[esc], 'nivel ' + n, ROL_TXT[rol], tipo, 'auditar'],
+      etiquetas: [ESCENARIO_TXT[esc], 'nivel ' + n, ROL_TXT[rol], tipo, ...(extras || []), 'auditar'],
       detalle: `${notas || ''} Rápida: ${rapida.nombre}. Lenta: ${spL.nombre} (CD ${cdL}).`.trim(), datos,
     });
   }
@@ -208,6 +208,49 @@
     at('Encanto helado', 'Daño mágico; el objetivo pierde 1 No2 (a mano).', 'H'),
     [zo('Baile de las sombras', 'Ilusión en flor de 2: los golpeados atacan a un aliado si fallan Res.Mt (a mano).', 3, 'H'), 6],
     'Belleza cruel: el bosque baila cuando ella lo ordena.');
+
+  /* ---- Tribu de goblins del bosque (2 por nivel; etiquetas 'goblin' y 'tribu goblin') ---- */
+  const TG = ['goblin', 'tribu goblin'];
+  cr('bosque', 1, 'Goblin recolector', 'rapido', 'humanoide', 'Cuchillo de hongo',
+    at('Tajo furtivo', 'Si el objetivo ya fue atacado este turno, +2 al daño (a mano).', 'L'),
+    [ta('Trampa de raíces', 'Deja una trampa de raíces en una casilla adyacente: el primero que la pise queda Inmovilizado (a mano).', 2), 4],
+    'Sale a juntar hongos, ramas y todo lo que no esté clavado.', TG);
+  cr('bosque', 1, 'Goblin lancero', 'brutal', 'humanoide', 'Lanza de punta de hueso',
+    at('Lanzazo', 'Ataque con lanza; llega a 2 casillas.', 'L'),
+    [bu('Grito de la tribu', 'Chilla para darse ánimo: +2 al daño 2 turnos.', 2, {dmg: 2}, 2), 4],
+    'Pelea mejor cuando lo miran los demás.', TG);
+  cr('bosque', 2, 'Goblin hondero', 'rango', 'humanoide', 'Honda de cuero',
+    at('Piedrazo', 'Piedra lanzada con honda.', 'M'),
+    [zo('Ráfaga de piedras', 'Varias piedras seguidas: tirá el daño 2 veces (a mano).', 3, 'H'), 5],
+    'Puntería tramposa y una bolsa llena de guijarros.', TG);
+  cr('bosque', 2, 'Goblin tamborilero', 'apoyo', 'humanoide', 'Palillos de hueso',
+    bu('Ritmo de guerra', '+2 No2 para él hasta el final del turno (y los goblins cercanos, a mano).', 1, {nitros: 2}, 1),
+    [zo('Tambor ensordecedor', 'Onda de sonido en flor de 1: daño y Pajaritos hasta el final de su turno (a mano).', 3, 'M'), 4],
+    'Marca el paso de la tribu con un tambor de tronco hueco.', TG);
+  cr('bosque', 3, 'Goblin jinete de lobo', 'rapido', 'humanoide', 'Lanza corta',
+    at('Carga montada', 'Se mueve 4 casillas en línea recta y ataca con +3 de daño.', 'M'),
+    [zo('Presa doble', 'Jinete y lobo atacan juntos: tirá el daño 2 veces (a mano).', 3, 'H'), 5],
+    'Un goblin enorme para su tamaño, montado en un lobo que no lo quiere.', TG);
+  cr('bosque', 3, 'Chamán de hongos goblin', 'mago', 'humanoide', 'Bastón de hongos',
+    at('Esporas alucinógenas', 'Daño mágico; el objetivo queda Pajaritos 1 turno si falla Res.Mt (a mano).', 'M'),
+    [cu('Sopa de la tribu', 'Cocina un caldo curativo y se cura.', 2, 5), 5],
+    'Sus hongos curan, alucinan o matan: depende del día.', TG);
+  cr('bosque', 4, 'Capitán goblin', 'brutal', 'humanoide', 'Hacha de guerra goblin',
+    at('Tajo de capitán', 'Golpe pesado.', 'H'),
+    [bu('¡A mí la tribu!', 'Reúne a los suyos: +3 Defensa y +3 al daño 2 turnos.', 2, {def: 3, dmg: 3}, 2), 5],
+    'Sobrevivió a tres jefes de tribu y por eso manda.', TG);
+  cr('bosque', 4, 'Goblin lanzabombas', 'rango', 'humanoide', 'Tarro de savia explosiva',
+    at('Bomba de savia', 'Bomba pegajosa; el objetivo pierde 1 No2 (a mano).', 'M'),
+    [zo('Bomba de esporas', 'Explosión en flor de 2: daño y Envenenados (a mano).', 3, 'H'), 5],
+    'Inventor de la tribu: casi siempre falla, casi siempre estalla.', TG);
+  cr('bosque', 5, 'Rey de la tribu goblin', 'brutal', 'humanoide', 'Cetro de huesos',
+    at('Golpe del rey', 'Golpe demoledor.', 'H'),
+    [bu('Corona de huesos', 'Se envalentona: +4 Defensa y +4 al daño 2 turnos.', 2, {def: 4, dmg: 4}, 2), 6],
+    'Gobierna cientos de goblins desde un trono de raíces y calaveras.', TG);
+  cr('bosque', 5, 'Chamán ancestral goblin', 'mago', 'humanoide', 'Hongo viejo',
+    at('Rayo del hongo viejo', 'Daño mágico.', 'H'),
+    [zo('Ritual del hongo', 'Hongos en flor de 3: daño enorme y alucinaciones (Pajaritos) (a mano).', 3, 'H'), 6],
+    'El goblin más viejo del bosque y el que más sabe.', TG);
 
   /* ================= MONTAÑAS ================= */
   cr('montañas', 1, 'Cabra montés', 'rapido', 'bestia', 'Cuernos',

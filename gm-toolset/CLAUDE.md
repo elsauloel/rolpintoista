@@ -209,7 +209,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   **Reiniciar combate** (Turno 0). Las que no están marcadas no se tocan.
 
 - **Catálogo base de creeps por escenario** (2026-09-20, `comun/creeps-base.js`,
-  `CREEPS_BASE`): 60 creeps — Minas, Bosques, Montañas y Templo antiguo con
+  `CREEPS_BASE`): 60 creeps (más la tribu de goblins del bosque, 10 con la etiqueta `goblin`) — Minas, Bosques, Montañas y Templo antiguo con
   influencia alienígena × niveles 1 a 5 × 3 — todos con "(auditar)" en el nombre y
   la etiqueta `auditar`. Aparecen en "+ Creep" → biblioteca junto a lo que apruebe
   el dueño (opción `base` de `Biblioteca.abrir`), con etiquetas de escenario, nivel,

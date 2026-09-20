@@ -361,3 +361,7 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   mochila con Sacar / Equipar / Cambiar…, ahora también con **Ver** y **Editar** y el
   **peso equipado** arriba. Columnas: Mochila y Cinturón a la izquierda; Habilidades,
   Pasivas y Sociales a la derecha.
+
+- **Habilidades que curan** (2026-09-20): campo `curaHp` de la habilidad (asistente:
+  "Vida (HP) que cura"): al ejecutarla se suma a la vida propia sin pasar del máximo.
+  La usa Recuperación del Tanque (`comun/skills-clase.js`).

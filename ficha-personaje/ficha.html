@@ -6272,7 +6272,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)', armaduraArruinada:'Anula lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
-const CAMPO_NUM = ['compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['curaHp','compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
@@ -7664,6 +7664,10 @@ function drawEditorHabilidad(){
         <input data-c="hpCosto" type="number" step="1" min="0" value="${esc(num(draft.hpCosto))}" data-hab-enter="1" style="max-width:120px">
         <div class="hint" style="margin-top:5px">Se descuenta sola al ejecutarla. No te deja usarla si te dejaría en 0: tenés que tener más vida que el costo. 0 = no gasta.</div>
       </div>
+      <div class="f"><label>Vida (HP) que cura</label>
+        <input data-c="curaHp" type="number" step="1" min="0" value="${esc(num(draft.curaHp))}" data-hab-enter="1" style="max-width:120px">
+        <div class="hint" style="margin-top:5px">Se suma sola a tu vida al ejecutarla, sin pasar del máximo (sobre vos). 0 = no cura.</div>
+      </div>
       `;
   }
   if(info.id === 'efecto'){
@@ -7700,6 +7704,7 @@ function drawEditorHabilidad(){
       ${auto ? `${fila('SP', esc(costoSp || 'no gasta'))}
       ${fila("No2", nitrosAtaque(draft) ? "como un ataque (elegís el arma al usarla)" : nitrosVariable(draft) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
       ${fila('HP', num(draft.hpCosto) > 0 ? fmt(num(draft.hpCosto)) : 'no gasta')}
+      ${fila('Cura', num(draft.curaHp) > 0 ? `+${fmt(num(draft.curaHp))} HP` : 'no cura')}
       ${fila('Tirada', esc(tirada || 'no tira'))}
       ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}` : ''}
       ${fila("Origen", esc(draft.job !== false ? `Puntos de Job (${fmt(jobCostoDe(draft))})` : (draft.origen || "otro")))}
@@ -8782,6 +8787,7 @@ function costoHabilidadTxt(h){
   const costo = String(h.costo || '').trim();
   if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
   if(num(h.hpCosto) > 0) partes.push(`${fmt(num(h.hpCosto))} HP`);
+  if(num(h.curaHp) > 0) partes.push(`cura ${fmt(num(h.curaHp))} HP`);
   return partes.join(' · ');
 }
 
@@ -8873,6 +8879,8 @@ function ejecutarHabilidad(id, armaId, forzar){
   S.spGastado = num(S.spGastado) + costoSp;
   const costoHp = num(it.hpCosto);
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
+  const curaHp = num(it.curaHp);
+  if(curaHp > 0) fijarHp(num(S.hp) + curaHp);   // cura sobre uno mismo, sin pasar del máximo
   const ataque = registrarAtaqueDeHabilidad(it, arma);
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
@@ -8885,6 +8893,7 @@ function ejecutarHabilidad(id, armaId, forzar){
   if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
   partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
   if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+  if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
   if(ataque) partes.push(ataque);
   if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
   toast(`${it.nombre} ${partes.join(' · ')}`);
@@ -8920,6 +8929,7 @@ function confirmarCostoVariable(){
   S.spGastado = num(S.spGastado) + sp;
   const costoHp = num(it.hpCosto);
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
+  if(num(it.curaHp) > 0) fijarHp(num(S.hp) + num(it.curaHp));
   const ataque = registrarAtaqueDeHabilidad(it, pendingArmaHab === undefined ? null : pendingArmaHab);
   pendingArmaHab = undefined;
   const efecto = aplicarEfectoDeConsumo(it);

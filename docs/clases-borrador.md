@@ -148,7 +148,7 @@ Estados que define la clase:
    hasta el final de su próximo turno.
 3. **Aura de espinas** [1] — Devuelve 1/4 del daño del ataque como true
    damage hasta el comienzo del próximo turno.
-4. **Recuperación** [1] — NO2: (2). Recupera 9 HP.
+4. ✅ **Recuperación** — SP 1, No2 2. Cura **9 HP fijos** sobre uno mismo, sin pasar el HP máximo; se puede usar con el HP lleno (gasta igual). Automatizada con el campo `curaHp` de la habilidad (2026-09-20).
 5. **Sonic Boom** [2] — Onda expansiva (Fuerza / Constitución). Flash (SP
    x 2). Golpea el piso creando una onda de choque en un cono al frente,
    que hace perder una cantidad de No2 igual a 1 + la diferencia en la

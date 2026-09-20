@@ -399,3 +399,16 @@ resuelven a mano, como el resto de los avisos).
   borrador sin automatizar; (4) el crítico y las resistencias, que siguen "en pausa".
   `datos/reglas.json` (el borrador viejo) quedó como archivo histórico. La página ya no
   tiene modo de edición: se edita el `.md` y se recompila.
+
+- 🔲 **P91. Botín, experiencia y despojos (en debate, 2026-09-20; todavía sin construir).**
+  **Cerrado:**
+  1. Los ítems que sueltan los creeps derrotados (arma y equipo) se publican a los jugadores en una lista con **"Sumar a la mochila"**; el primero que lo toca se lo lleva.
+  2. Un ítem que **no está en el catálogo** se convierte en un ítem **compatible con la ficha** (equipable), con sus mismos números; el precio lo fija Claude por comparación con ítems parecidos del catálogo, ajustado por efectos.
+  3. **Filtro del GM** antes de publicar (destildar ítems, sumar botín extra) y **XP editable** (cálculo automático + sumar/restar del GM).
+  4. **Mochila llena**: no deja cargar; lo que no entra pasa a **despojos**. Lo que nadie toma, también.
+  5. Los jugadores ven **solo el nombre** (características al pasar el mouse); si el ítem se puede equipar en una ranura ya ocupada, botón **Comparar**; acceso fácil a la mochila y cuántas ranuras libres quedan.
+  6. **Quién puede tomar**: sin regla programada (lo decide la narrativa).
+  7. **"Loot" pasa a llamarse "despojos"** (incluido el contador de la ficha).
+  8. **Despojos** = lo que los creeps dropean y los jugadores no se llevan. El GM aprieta **"Despojar"** y se reparte entre los jugadores (fracción: redondeo hacia arriba). Son una **moneda intermedia** (a futuro, crafteo).
+  9. **Valor**: si un ítem se despoja, al **vender los despojos** se obtiene la **mitad de su valor de venta** en **doblones del espacio (DDE)**. Los despojos se venden en **cualquier tienda** (opción nueva en el menú del Vendedor).
+  **Abierto:** (a) tratamiento de los tres tipos actuales del contador (Normal, Mágico, Especial); (b) qué más se puede hacer con los despojos; (c) si los creeps sin ítems también dan despojos (ej. "Piel de lobo"); (d) confirmar que "valor de venta" = precio de catálogo; (e) el resumen de XP/loot que ve hoy solo el GM, ¿lo ven también los jugadores?

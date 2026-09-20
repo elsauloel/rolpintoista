@@ -5111,6 +5111,20 @@ function verificarMiniatura(fichaId, src){
 
 // Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
 // las barras, estados e imagen de los tokens vinculados.
+function mostrarSubidaNivelMapa(nivel, nombre){
+  let cap = document.getElementById('scrim-nivel-nuevo');
+  if(!cap){
+    cap = document.createElement('div');
+    cap.id = 'scrim-nivel-nuevo';
+    cap.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(8,5,7,.78);display:flex;align-items:center;justify-content:center';
+    cap.innerHTML = '<div style="background:var(--panel);border:1px solid var(--brass);border-radius:6px;padding:30px 34px;text-align:center;max-width:380px"><div style="font-size:54px">🎉</div><div style="font-family:Fraunces,serif;font-weight:900;font-size:28px;color:var(--brass);margin:8px 0" id="nivel-nuevo-titulo"></div><div style="color:var(--paper);margin-bottom:16px">¡Felicitaciones! Abrí tu ficha para repartir tus puntos nuevos.</div><button class="btn primary" id="nivel-nuevo-ok">¡Genial!</button></div>';
+    document.body.appendChild(cap);
+    cap.querySelector('#nivel-nuevo-ok').onclick = () => { cap.style.display = 'none'; };
+  }
+  cap.querySelector('#nivel-nuevo-titulo').textContent = `${nombre}: ¡subiste al nivel ${nivel}!`;
+  cap.style.display = 'flex';
+}
+
 function escucharVinculables(){
   const escuchar = (coleccion, mapa, campos) => fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
@@ -5120,6 +5134,11 @@ function escucharVinculables(){
       campos.forEach(k => { o[k] = d[k]; });
       o.nombre = String(d.nombre || '?');
       if(coleccion === 'fichas'){
+        // Si sube de nivel un personaje mío (por ejemplo al cobrar la experiencia de un combate), pop-up de felicitación.
+        const previo = mapa.get(ch.doc.id);
+        if(previo && fbUsuario && d.duenoUid === fbUsuario.uid && previo.resumen && d.resumen && num(d.resumen.nivel) > num(previo.resumen.nivel) && num(previo.resumen.nivel) > 0){
+          mostrarSubidaNivelMapa(num(d.resumen.nivel), o.nombre);
+        }
         if((!o.miniatura || miniaturasInvalidas.has(ch.doc.id)) && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
         if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
         else if(!miniaturasLocales.has(ch.doc.id) && !miniaturasInvalidas.has(ch.doc.id)) verificarMiniatura(ch.doc.id, o.miniatura);

@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-20T21:41:30Z",
+ "actualizado": "2026-09-20T22:00:00Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1453,7 +1453,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Al **finalizar un combate**, el GM ve un reporte con la experiencia, el oro y los ítems que soltaron los enemigos derrotados, los ajusta si hace falta y lo **publica**.\n\n## Experiencia\n- **Cada creep derrotado da XP** según su nivel. El total del combate se divide **entre la cantidad de jugadores**, como si todos estuvieran vivos (redondeando hacia arriba).\n- Un jugador **inconsciente** ([[Muerte|inconsciente y muerte]]) recibe **solo el 25%** de lo que le tocaba, redondeado hacia abajo. Uno **muerto**, nada.\n- El GM puede **sumar o restar** experiencia por circunstancias especiales de la pelea, y **dejar a un jugador afuera** (por ejemplo, si no estuvo en el combate).\n- La experiencia se carga **sola** en la ficha. Si sube de nivel, le aparece un aviso de felicitación.\n\n## Oro (DDE)\nCada creep humano o humanoide carga un poco de oro, con una pequeña variación al azar (±20%). Al publicar, el total se reparte entre los jugadores y se suma solo a su ficha. Una línea **verde** en la [[La Mesa|Mesa]] cuenta cuánto recibió cada uno.\n\n## Ítems y despojos\nLos ítems que soltaron los enemigos quedan en una lista: cada jugador toma con **\"Sumar a la mochila\"** los que quiera. Cuando el GM aprieta **Despojar**, todo lo que quedó se convierte en [[Despojos]] y se reparte.\n\n> [!info] En construcción\n> Esta parte del sistema se está armando por tandas: algunas piezas todavía no funcionan en la herramienta."
+   "cuerpo": "Al **finalizar un combate**, el GM ve un reporte con la experiencia, el oro y los ítems que soltaron los enemigos derrotados, los ajusta si hace falta y lo **publica**.\n\n## Experiencia\n- **Cada creep derrotado da XP** según su nivel. El total del combate se divide **entre la cantidad de jugadores**, como si todos estuvieran vivos (redondeando hacia arriba).\n- Un jugador **inconsciente** ([[Muerte|inconsciente y muerte]]) recibe **solo el 25%** de lo que le tocaba, redondeado hacia abajo. Uno **muerto**, nada.\n- El GM puede **sumar o restar** experiencia por circunstancias especiales de la pelea, y **dejar a un jugador afuera** (por ejemplo, si no estuvo en el combate).\n- La experiencia se carga **sola** en la ficha. Si sube de nivel, le aparece un aviso de felicitación.\n\n## Oro (DDE)\nCada creep humano o humanoide carga un poco de oro, con una pequeña variación al azar (±20%). Al publicar, el total se reparte entre los jugadores y se suma solo a su ficha. Una línea **verde** en la [[La Mesa|Mesa]] cuenta cuánto recibió cada uno.\n\n## Ítems y despojos\nLos ítems que soltaron los enemigos quedan en una lista: cada jugador toma con **\"Sumar a la mochila\"** los que quiera. Cuando el GM aprieta **Despojar**, todo lo que quedó se convierte en [[Despojos]] y se reparte.\n\n> [!info] En construcción\n> La publicación de la XP y el oro ya funciona. Falta la lista del botín para los jugadores (con \"Sumar a la mochila\") y el botón Despojar: se están armando."
   },
   {
    "id": "habilidades",

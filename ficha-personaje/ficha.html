@@ -3130,9 +3130,72 @@ function applyExp(rawValue){
   if(subio){
     $('#f-exp').value = S.meta.exp;
     $('#f-nivel').value = S.meta.nivel;
-    toast(`¡Subiste a nivel ${nivel}!`);
+    mostrarSubidaNivel(nivel);
   }
   renderExp();
+}
+
+/* Pop-up de subida de nivel (también le aparece en el mapa: mira el nivel de su ficha en el resumen). */
+function mostrarSubidaNivel(nivel){
+  toast(`¡Subiste a nivel ${nivel}!`);
+  let cap = document.getElementById('scrim-nivel-nuevo');
+  if(!cap){
+    cap = document.createElement('div');
+    cap.className = 'scrim';
+    cap.id = 'scrim-nivel-nuevo';
+    cap.style.zIndex = '90';
+    cap.innerHTML = '<div class="modal" style="max-width:380px;text-align:center;border-top-color:var(--brass)"><div class="body" style="padding:34px 20px;display:flex;flex-direction:column;align-items:center;gap:14px"><div style="font-size:54px">🎉</div><div style="font-family:Fraunces,serif;font-weight:900;font-size:30px;color:var(--brass)" id="nivel-nuevo-titulo"></div><div style="color:var(--paper)">¡Felicitaciones! Ya podés repartir tus puntos nuevos de atributo y de Job.</div><button class="btn primary" id="nivel-nuevo-ok">¡Genial!</button></div></div>';
+    document.body.appendChild(cap);
+    cap.querySelector('#nivel-nuevo-ok').onclick = () => cap.classList.remove('open');
+    cap.addEventListener('mousedown', e => { if(e.target === cap) cap.classList.remove('open'); });
+  }
+  cap.querySelector('#nivel-nuevo-titulo').textContent = `¡Subiste al nivel ${nivel}!`;
+  cap.classList.add('open');
+}
+
+/* ---------- Recompensas del combate (XP y DDE) ----------
+   El GM las publica en campanas/<id>/recompensas (una por personaje); la ficha las aplica UNA sola vez (transacción
+   sobre el documento) apenas está abierta y editable, y avisa con un pop-up si sube de nivel. */
+let recompensasPendientes = [], recompensasAplicando = false;
+function recompensasEscuchar(){
+  if(!fbUsuario) return;
+  fbDb.collection(fbRutaCampana('recompensas')).where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false).onSnapshot(snap => {
+    recompensasPendientes = snap.docs;
+    recompensasRevisar();
+  }, err => console.error('Error escuchando las recompensas:', err));
+}
+async function recompensasRevisar(){
+  const f = fichaVivo;
+  if(!f || !f.cargada || f.soloLectura || f.editaGM || recompensasAplicando) return;
+  const mias = recompensasPendientes.filter(d => d.data().fichaId === f.id);
+  if(!mias.length) return;
+  recompensasAplicando = true;
+  try{
+    for(const d of mias){
+      const tomada = await fbDb.runTransaction(async tx => {
+        const x = await tx.get(d.ref);
+        if(!x.exists || x.data().aplicada) return false;
+        tx.update(d.ref, {aplicada: true});
+        return true;
+      });
+      if(!tomada || fichaVivo !== f) continue;
+      const r = d.data();
+      const nivelAntes = num(S.meta.nivel);
+      if(num(r.xp) > 0) applyExp(num(S.meta.exp) + num(r.xp));
+      if(num(r.dde) > 0){ S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); }
+      if(num(r.despojos) > 0){ S.loot.normal = num(S.loot.normal) + num(r.despojos); $('#f-loot-normal').value = S.loot.normal; }
+      refresh();
+      const partes = [];
+      if(num(r.xp) > 0) partes.push(`+${fmt(num(r.xp))} XP`);
+      if(num(r.dde) > 0) partes.push(`+${fmt(num(r.dde))} DDE`);
+      if(num(r.despojos) > 0) partes.push(`+${fmt(num(r.despojos))} despojos`);
+      if(partes.length) toast(`🎁 ${partes.join(' · ')}`);
+    }
+  }catch(err){
+    console.error('No se pudieron aplicar las recompensas:', err);
+  }finally{
+    recompensasAplicando = false;
+  }
 }
 
 function attrBudget(){
@@ -9668,6 +9731,7 @@ function fichaResumen(){
     nitrosMax: n(c.final.nitros),
     costoMover: IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado') ? 0 : costoMoverCasillero(),
     muerto: !!(S.muerto && S.muerto.activo),
+    muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
     estados: (S.efectos || [])
       .filter(e => e && e.activo !== false && e.nombre)
       .slice(0, 30)
@@ -10023,6 +10087,7 @@ function fichaEscuchar(f){
         fichaEstadoAlDia();
         if(MODO_BOTONERA) botoneraModoAbrir();
         mantenimientoRevisar();
+        recompensasRevisar();
         return;
       }
       let cambio = false;
@@ -10498,6 +10563,7 @@ async function fbAlEntrar(){
   mantenimientoEscuchar();
   modoMapaEscuchar();
   tiendaEstadoEscuchar();
+  recompensasEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

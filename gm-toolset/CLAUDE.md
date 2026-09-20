@@ -234,3 +234,19 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   se puede saltar a cualquier paso sin perder nada; trabaja sobre el creep real (crear lo agrega y **Cancelar** lo quita).
   Los creeps base (`creeps-base.js`) ya traen tipo, jefe, oro, arma natural y nombre de trofeo (51 con arma natural).
   Todavía **no** se usan al finalizar el combate (tandas 3 y 4).
+
+- **Fin del combate: reporte y publicación** (2026-09-20, tanda 3 de P91): "🏁 Finalizar Combate" (`renderReporteCombate`, estado `combateRep`)
+  lista **quiénes cobran** (las fichas de la partida con su estado: en pie / inconsciente / muerto según `resumen.hp` y
+  `resumen.muertoDef`; el GM destilda a quien no estuvo), **XP** (por creep; escapados al 20% opcional; ajuste del GM +/−; base por jugador =
+  ⌈total ÷ jugadores incluidos⌉; inconsciente ⌊25%⌋, muerto 0), **oro** (`oroDeCreep`: ±20% sobre `oroBase`, tirado UNA sola vez por creep;
+  ajuste del GM; ⌈total ÷ jugadores⌉ para todos los incluidos) y **botín** (ítems que suelta cada creep derrotado con casilla para
+  destildar: arma si no es natural, equipo, trofeo; más "ítem extra" a mano). Los ítems que no están en el catálogo se convierten
+  a la forma de un ítem de la ficha con **precio estimado** por comparación con el catálogo (`precioEstimadoArma/Equipo`, pool de la
+  rareza del nivel, + 8 por punto de bono y 40 por efecto al golpear). **🎁 Publicar recompensas** (`publicarRecompensas`) escribe
+  `campanas/<id>/recompensas/{auto}` (una por personaje: `fichaId`, `duenoUid`, `xp`, `dde`, `aplicada`) y `campanas/<id>/botin/{auto}`
+  (un doc por ítem: `json` con la plantilla, `tomadoPor`), deja una **línea verde** en la Mesa (`desde: 'recompensa'`, `comun/mesa.js`) y marca
+  los creeps `recompensado` (no cuentan en el próximo reporte hasta "Reiniciar combate"). La **ficha** aplica cada recompensa una sola
+  vez (`recompensasRevisar`, transacción sobre el doc) cuando el personaje está abierto y editable; si sube de nivel, pop-up de
+  felicitación (`mostrarSubidaNivel`; el mapa lo muestra mirando el nivel del resumen de la ficha propia, `mostrarSubidaNivelMapa`).
+  Reglas nuevas: `recompensas` y `botin` (hay que pegarlas). Falta (tanda 4): el botín en la ficha de los jugadores ("Sumar a la mochila",
+  Comparar, ranuras libres) y "Despojar".

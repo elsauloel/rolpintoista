@@ -1000,7 +1000,8 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
     <header><h3>🏁 Resumen del combate</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
     <div class="body" id="finalizar-combate-body" style="display:flex;flex-direction:column;gap:16px"></div>
     <footer>
-      <button class="btn primary" id="finalizar-combate-cerrar">Cerrar</button>
+      <button class="btn ghost" id="finalizar-combate-cerrar">Cerrar</button>
+      <button class="btn primary" id="finalizar-combate-publicar" title="Carga la XP y el oro en las fichas y abre el botín para los jugadores">🎁 Publicar recompensas</button>
     </footer>
   </div>
 </div>
@@ -4779,6 +4780,7 @@ document.addEventListener('click', e => {
   }
   if(b.id === 'btn-finalizar-combate'){
     renderReporteCombate();
+    cargarJugadoresCombate();
     $('#scrim-finalizar-combate').classList.add('open');
     return;
   }
@@ -5309,6 +5311,8 @@ function reiniciarCombate(){
   S.turno = 0;
   // Turno 0: las habilidades lentas vuelven a arrancar con el cooldown activo.
   S.creeps.forEach(sc => (sc.habilidades || []).forEach(h => { if(h.cdArranca) h.cdActual = num(h.cd); }));
+  S.creeps.forEach(sc => { sc.recompensado = false; });   // un combate nuevo: vuelven a contar para el reporte
+  combateRep = nuevoCombateRep();
   renderAll();
   toast('Combate reiniciado · Turno 0');
 }
@@ -5328,97 +5332,277 @@ function xpBasePorNivel(nivel){
   return 40 * n + 5 * n * (n - 1);
 }
 
-function lootDeCreep(sc){
-  const items = [];
-  if(sc.armaNombre) items.push(sc.armaNombre);
-  (sc.equipo || []).forEach(it => items.push(it.nombre));
-  return items;
-}
-
-function precioDeItemLoot(nombre){
-  const it = CATALOGO_EQUIPO.find(i => i.nombre === nombre);
-  return it ? num(it.precioCompra) : null;
-}
-
 // XP que da un creep que escapó, sobre la que daría derrotado.
 const XP_ESCAPO_PCT = 0.2;
 
-// Asume que todo creep con HP <= 0 fue derrotado por el grupo (XP y loot
-// completos) y que todo creep con vida escapó (20% de la XP, sin loot).
-// Con contarEscapados en false, los que escaparon no suman al total.
+/* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
+   El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
+   ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
+let xpContarEscapados = true;
+let combateRep = nuevoCombateRep();
+function nuevoCombateRep(){ return {oro: {}, xpAjuste: 0, oroAjuste: 0, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false}; }
+
+// El oro se tira UNA sola vez por creep (±20% sobre su valor base) y no se recalcula al reabrir el reporte.
+function oroDeCreep(sc){
+  if(combateRep.oro[sc.id] === undefined){
+    const base = num(sc.oroBase);
+    combateRep.oro[sc.id] = base > 0 ? Math.max(0, Math.round(base * (1 + (Math.random() * 0.4 - 0.2)))) : 0;
+  }
+  return combateRep.oro[sc.id];
+}
+
+/* --- Ítems que suelta un creep, ya con la forma de un ítem de la ficha --- */
+function medianaPrecio(lista){
+  const v = lista.map(i => num(i.precioCompra)).filter(x => x > 0).sort((a, b) => a - b);
+  return v.length ? v[Math.floor(v.length / 2)] : 0;
+}
+function tierPorPrecio(p){ return p <= 120 ? 'Común' : p <= 170 ? 'Buena Calidad' : p <= 500 ? 'Raro' : 'Excepcional'; }   // los rangos del catálogo
+function ajustePorEfectos(mods, efectos){
+  const suma = (mods || []).filter(m => m.stat !== 'def' && num(m.val) > 0).reduce((a, m) => a + num(m.val), 0);
+  return suma * 8 + (efectos || []).length * 40;
+}
+// Precio estimado de un arma que no está en el catálogo: mediana de las de su Tipo y peso, ajustada por bonos y efectos.
+// El pool de comparación es de la rareza que corresponde al nivel del creep (1–2 Común, 3–4 hasta Buena Calidad, 5 todas).
+function poolPorNivel(lista, nivel){
+  const n = num(nivel) || 1;
+  const ok = lista.filter(i => n <= 2 ? i.tier === 'Común' : n <= 4 ? (i.tier === 'Común' || i.tier === 'Buena Calidad') : true);
+  return ok.length ? ok : lista;
+}
+function precioEstimadoArma(d, nivel){
+  const armas = poolPorNivel(CATALOGO_EQUIPO.filter(i => /^arma_/.test(i.tipoItem)), nivel);
+  let base = medianaPrecio(armas.filter(i => num(i.tipoDado) === num(d.tipoDado) && num(i.peso) === num(d.peso)));
+  if(!base) base = medianaPrecio(armas.filter(i => num(i.tipoDado) === num(d.tipoDado)));
+  if(!base) base = 60;
+  return Math.max(20, Math.round((base + ajustePorEfectos(d.mods, d.efectosGolpe)) / 5) * 5);
+}
+// Ídem para una pieza de defensa: mediana de las de su categoría y Defensa parecida.
+function precioEstimadoEquipo(d, nivel){
+  const piezas = poolPorNivel(CATALOGO_EQUIPO.filter(i => i.tipoItem === d.tipoItem), nivel);
+  let base = medianaPrecio(piezas.filter(i => Math.abs(num(i.def) - num(d.def)) <= 1));
+  if(!base) base = Math.max(30, num(d.def) * 25);
+  return Math.max(20, Math.round((base + ajustePorEfectos(d.mods, [])) / 5) * 5);
+}
+function plantillaDeCatalogo(c){
+  const mods = [...(c.mods || [])];
+  if(num(c.def)) mods.unshift({stat: 'def', val: num(c.def)});
+  return {nombre: c.nombre, tipoItem: c.tipoItem, tier: c.tier || 'Común', peso: num(c.peso), ranuras: num(c.ranuras) || 0, precioCompra: num(c.precioCompra),
+    tipoDado: num(c.tipoDado), danoFijo: num(c.danoFijo), danoAmplificado: num(c.danoAmplificado), armaDeRango: !!c.armaDeRango, mods,
+    efectosGolpe: structuredClone(c.efectosGolpe || []), detalle: c.detalle || '', descripcionNarrativa: c.descripcionNarrativa || '', consumible: false};
+}
+function plantillaArmaCreep(sc){
+  const c = CATALOGO_EQUIPO.find(i => i.nombre === sc.armaNombre && /^arma_/.test(i.tipoItem));
+  if(c) return {...plantillaDeCatalogo(c), estimado: false};
+  const d = {tipoDado: num(sc.armaTipo) || 8, peso: Math.max(1, num(sc.armaPeso) || 1), mods: structuredClone(sc.armaMods || []), efectosGolpe: structuredClone(sc.armaEfectos || [])};
+  const precio = precioEstimadoArma(d, sc.nivel);
+  return {nombre: sc.armaNombre, tipoItem: sc.armaManos || 'arma_1m', tier: tierPorPrecio(precio), peso: d.peso, ranuras: 0, precioCompra: precio,
+    tipoDado: d.tipoDado, danoFijo: num(sc.armaFijo), danoAmplificado: num(sc.armaAmplificado), armaDeRango: !!sc.armaDeRango, mods: d.mods, efectosGolpe: d.efectosGolpe,
+    detalle: sc.armaDetalle || '', descripcionNarrativa: `Arma de ${nombreLimpioCreep(sc)}.`, consumible: false, estimado: true};
+}
+function plantillaEquipoCreep(it, nivel){
+  const c = CATALOGO_EQUIPO.find(i => i.nombre === it.nombre && i.tipoItem === it.tipoItem);
+  if(c) return {...plantillaDeCatalogo(c), estimado: false};
+  const mods = [...(it.mods || [])];
+  if(num(it.def)) mods.unshift({stat: 'def', val: num(it.def)});
+  const precio = precioEstimadoEquipo({tipoItem: it.tipoItem, def: it.def, mods: it.mods}, nivel);
+  return {nombre: it.nombre, tipoItem: it.tipoItem, tier: tierPorPrecio(precio), peso: 1, ranuras: 0, precioCompra: precio, tipoDado: 0, danoFijo: 0, danoAmplificado: 0,
+    armaDeRango: false, mods, efectosGolpe: [], detalle: it.detalle || '', descripcionNarrativa: '', consumible: false, estimado: true};
+}
+function plantillaTrofeo(tr, sc){
+  return {nombre: tr.nombre, tipoItem: 'otros', tier: 'Común', peso: 0, ranuras: 1, precioCompra: tr.precioCompra, tipoDado: 0, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
+    mods: [], efectosGolpe: [], detalle: `Trofeo de ${nombreLimpioCreep(sc)}. No se equipa: se vende en una tienda o se convierte en despojos.`,
+    descripcionNarrativa: 'Un recuerdo de una pelea que salió bien.', consumible: false, trofeo: true, estimado: false};
+}
+function itemsDeCreep(sc){
+  const out = [];
+  const nom = nombreLimpioCreep(sc);
+  if(sc.armaNombre && !sc.armaNatural){ const t = plantillaArmaCreep(sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
+  (sc.equipo || []).forEach(it => { const t = plantillaEquipoCreep(it, sc.nivel); out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
+  const tr = trofeoDeCreep(sc);
+  if(tr) out.push({clave: `${sc.id}:trofeo`, nombre: tr.nombre, precioCompra: tr.precioCompra, template: plantillaTrofeo(tr, sc), origen: nom, trofeo: true});
+  return out;
+}
+function itemsExtraDelReporte(){
+  return combateRep.extras.map((e, i) => ({clave: `extra:${i}`, nombre: e.nombre, precioCompra: e.precioCompra, origen: 'Botín extra',
+    template: {nombre: e.nombre, tipoItem: 'otros', tier: 'Común', peso: 0, ranuras: 1, precioCompra: e.precioCompra, tipoDado: 0, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
+      mods: [], efectosGolpe: [], detalle: '', descripcionNarrativa: '', consumible: false, estimado: false}}));
+}
+
 function generarReporteCombate(contarEscapados){
-  const filas = S.creeps.map(sc => {
+  const filas = S.creeps.filter(sc => !sc.recompensado).map(sc => {
     const derrotado = num(sc.hp) <= 0;
     const xpBase = xpBasePorNivel(sc.nivel);
     const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
     const cuenta = derrotado || contarEscapados;
-    return {sc, derrotado, xp, cuenta, loot: derrotado ? lootDeCreep(sc) : []};
+    return {sc, derrotado, xp, cuenta, oro: derrotado ? oroDeCreep(sc) : 0, items: derrotado ? itemsDeCreep(sc) : []};
   });
-  const xpTotal = filas.reduce((a,f) => a + (f.cuenta ? f.xp : 0), 0);
+  const xpTotal = filas.reduce((a, f) => a + (f.cuenta ? f.xp : 0), 0);
   return {filas, xpTotal};
 }
 
-let xpCantidadJugadores = 3;
-let xpContarEscapados = true;
+/* --- Jugadores: las fichas de la partida, con su estado al terminar el combate --- */
+function estadoDeFicha(f){
+  const r = f.resumen || {};
+  if(r.hp !== undefined && num(r.hp) <= 0) return r.muertoDef ? 'muerto' : 'inconsciente';
+  return 'en pie';
+}
+async function cargarJugadoresCombate(){
+  if(combateRep.cargando || !fbDb || !fbMiembro) return;
+  combateRep.cargando = true;
+  try{
+    const [fichas, miembros] = await Promise.all([fbDb.collection(fbRutaCampana('fichas')).get(), fbDb.collection(fbRutaCampana('miembros')).get()]);
+    const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
+    const previos = new Map((combateRep.jugadores || []).map(j => [j.id, j]));
+    combateRep.jugadores = fichas.docs.map(d => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid, dueno: nombres.get(d.data().duenoUid) || '',
+      estado: estadoDeFicha(d.data()), incluido: previos.has(d.id) ? previos.get(d.id).incluido : true}))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  }catch(err){
+    console.error('No se pudieron leer los personajes:', err);
+    combateRep.jugadores = combateRep.jugadores || [];
+  }finally{
+    combateRep.cargando = false;
+    renderReporteCombate();
+  }
+}
+const FACTOR_XP_ESTADO = {'en pie': 1, inconsciente: 0.25, muerto: 0};
+
+// El reparto de XP y de oro entre los jugadores incluidos.
+function calcularReparto(rep){
+  const incluidos = (combateRep.jugadores || []).filter(j => j.incluido);
+  const n = incluidos.length;
+  const xpTotal = Math.max(0, rep.xpTotal + num(combateRep.xpAjuste));
+  const oroTotal = Math.max(0, rep.filas.reduce((a, f) => a + (f.derrotado ? f.oro : 0), 0) + num(combateRep.oroAjuste));
+  const xpBase = n ? Math.ceil(xpTotal / n) : 0;            // como si todos estuvieran vivos, redondeo hacia arriba
+  const ddeCada = n ? Math.ceil(oroTotal / n) : 0;
+  const porJugador = incluidos.map(j => ({j, xp: Math.floor(xpBase * FACTOR_XP_ESTADO[j.estado]), dde: ddeCada}));   // el inconsciente cobra el 25%, redondeado hacia abajo
+  return {n, xpTotal, oroTotal, xpBase, ddeCada, porJugador};
+}
+function itemsPublicables(rep){
+  const todos = [...rep.filas.flatMap(f => f.items), ...itemsExtraDelReporte()];
+  return todos.filter(i => !combateRep.quitados.has(i.clave));
+}
 
 function renderReporteCombate(){
-  const {filas, xpTotal} = generarReporteCombate(xpContarEscapados);
-  if(!filas.length){
-    $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps cargados — nada que resumir.</div>`;
+  const rep = generarReporteCombate(xpContarEscapados);
+  if(!rep.filas.length){
+    $('#finalizar-combate-body').innerHTML = `<div class="hint">No hay creeps para repartir: todos ya se repartieron o no hay ninguno cargado.</div>`;
+    $('#finalizar-combate-publicar').style.display = 'none';
     return;
   }
+  $('#finalizar-combate-publicar').style.display = '';
+  if(combateRep.jugadores === null && !combateRep.cargando) cargarJugadoresCombate();
+  const {filas} = rep;
+  const rp = calcularReparto(rep);
   const hayEscapados = filas.some(f => !f.derrotado);
   const filasHtml = filas.map(f => `
     <div class="reporte-fila${f.cuenta ? '' : ' no-cuenta'}">
       <span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
-      <span class="reporte-estado ${f.derrotado?'derrotado':'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span>
-      <span class="reporte-xp" title="${f.cuenta ? '' : 'No se cuenta en el total'}">+${fmt(f.xp)} XP</span>
+      <span class="reporte-estado ${f.derrotado ? 'derrotado' : 'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span>
+      <span class="reporte-xp" title="${f.cuenta ? '' : 'No se cuenta en el total'}">+${fmt(f.xp)} XP${f.derrotado && f.oro ? ` · ${fmt(f.oro)} DDE` : ''}</span>
     </div>`).join('');
 
-  const conLoot = filas.filter(f => f.derrotado && f.loot.length);
-  const lootHtml = conLoot.length
-    ? conLoot.map(f => `
-      <div class="reporte-loot-creep">
-        <div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div>
-        <div class="reporte-loot-items">${f.loot.map(nombre => {
-          const precio = precioDeItemLoot(nombre);
-          return `<span class="reporte-loot-item">${esc(nombre)}${precio!=null?` <span class="reporte-loot-precio">${fmt(precio)} DDE</span>`:''}</span>`;
-        }).join('')}</div>
-      </div>`).join('')
-    : `<div class="hint">Sin objetos equipados entre los creeps derrotados.</div>`;
+  const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${combateRep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${combateRep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span></label>`;
+  const conItems = filas.filter(f => f.items.length);
+  const extras = itemsExtraDelReporte();
+  const lootHtml = (conItems.length || extras.length)
+    ? conItems.map(f => `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div><div class="reporte-loot-items">${f.items.map(itemHtml).join('')}</div></div>`).join('')
+      + (extras.length ? `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">Botín extra</div><div class="reporte-loot-items">${extras.map(itemHtml).join('')}</div></div>` : '')
+    : `<div class="hint">Ningún creep derrotado suelta ítems.</div>`;
 
-  const xpPorJugador = xpCantidadJugadores > 0 ? Math.round(xpTotal / xpCantidadJugadores) : 0;
+  const jug = combateRep.jugadores;
+  const jugHtml = jug === null ? '<div class="hint">Cargando personajes…</div>'
+    : jug.length ? jug.map(j => {
+        const p = rp.porJugador.find(x => x.j === j);
+        return `<label class="reporte-fila${j.incluido ? '' : ' no-cuenta'}" style="cursor:pointer;gap:8px;align-items:center">
+          <input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>
+          <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}</span>
+          <span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span>
+          <span class="reporte-xp">${j.incluido ? `+${fmt(p.xp)} XP · +${fmt(p.dde)} DDE` : 'sin recompensas'}</span></label>`;
+      }).join('')
+    : '<div class="hint">Todavía no hay personajes en la partida.</div>';
 
   $('#finalizar-combate-body').innerHTML = `
     <div>
-      <div class="reporte-seccion-titulo">Experiencia obtenida</div>
-      <div class="reporte-lista">${filasHtml}</div>
-      ${hayEscapados ? `<label class="reporte-contar-escapados">
-        <input type="checkbox" id="finalizar-combate-contar-escapados" ${xpContarEscapados ? 'checked' : ''}>
-        Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)
-      </label>` : ''}
-      <div class="reporte-total">Total del grupo: <b>${fmt(xpTotal)} XP</b></div>
-      <div class="reporte-dividir">
-        Dividir entre <input type="number" id="finalizar-combate-jugadores" min="1" step="1" value="${xpCantidadJugadores}">
-        jugadores <span class="reporte-xp-por-jugador">→ <b id="finalizar-combate-xp-por-jugador">${fmt(xpPorJugador)}</b> XP c/u</span>
-      </div>
+      <div class="reporte-seccion-titulo">Quiénes cobran</div>
+      <div class="reporte-lista">${jugHtml}</div>
+      <div class="hint" style="margin-top:4px">Destildá a quien no estuvo en el combate. En pie cobra el 100% de la XP; inconsciente, el 25% (redondeado hacia abajo); muerto, nada. El oro se reparte parejo.</div>
     </div>
     <div>
-      <div class="reporte-seccion-titulo">Loot obtenido (creeps derrotados)</div>
-      <div class="reporte-loot-lista">${lootHtml}</div>
+      <div class="reporte-seccion-titulo">Experiencia y oro</div>
+      <div class="reporte-lista">${filasHtml}</div>
+      ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" id="finalizar-combate-contar-escapados" ${xpContarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)</label>` : ''}
+      <div class="reporte-dividir" style="margin-top:8px">Ajuste del GM a la XP <input type="number" step="10" id="rep-xp-ajuste" value="${num(combateRep.xpAjuste)}" style="width:90px"> <span class="hint">(sumá o restá por circunstancias de la pelea)</span></div>
+      <div class="reporte-total">XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `base por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador'}</div>
+      <div class="reporte-dividir" style="margin-top:8px">Ajuste del GM al oro <input type="number" step="5" id="rep-oro-ajuste" value="${num(combateRep.oroAjuste)}" style="width:90px"> <span class="hint">(el oro ya tiene su variación de ±20%: no se vuelve a tirar)</span></div>
+      <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
     </div>
-  `;
+    <div>
+      <div class="reporte-seccion-titulo">Botín (los jugadores lo toman con "Sumar a la mochila")</div>
+      <div class="reporte-loot-lista">${lootHtml}</div>
+      <div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="rep-extra-nombre" placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" id="rep-extra-precio" placeholder="Precio" style="width:90px"><button type="button" class="btn" id="rep-extra-add">+ Sumar</button></div>
+    </div>`;
 
-  $('#finalizar-combate-jugadores').addEventListener('input', e => {
-    const n = Math.max(1, Math.round(num(e.target.value)) || 1);
-    xpCantidadJugadores = n;
-    $('#finalizar-combate-xp-por-jugador').textContent = fmt(Math.round(xpTotal / n));
-  });
-  const contar = $('#finalizar-combate-contar-escapados');
-  if(contar) contar.addEventListener('change', e => {
-    xpContarEscapados = e.target.checked;
+  const b = $('#finalizar-combate-body');
+  b.querySelectorAll('[data-rep-item]').forEach(c => c.onchange = () => { if(c.checked) combateRep.quitados.delete(c.dataset.repItem); else combateRep.quitados.add(c.dataset.repItem); renderReporteCombate(); });
+  b.querySelectorAll('[data-rep-jug]').forEach(c => c.onchange = () => { const j = combateRep.jugadores.find(x => x.id === c.dataset.repJug); if(j) j.incluido = c.checked; renderReporteCombate(); });
+  $('#rep-xp-ajuste').onchange = e => { combateRep.xpAjuste = num(e.target.value); renderReporteCombate(); };
+  $('#rep-oro-ajuste').onchange = e => { combateRep.oroAjuste = num(e.target.value); renderReporteCombate(); };
+  $('#rep-extra-add').onclick = () => {
+    const nombre = $('#rep-extra-nombre').value.trim();
+    if(!nombre){ toast('Escribí el nombre del ítem extra'); return; }
+    combateRep.extras.push({nombre: nombre.slice(0, 60), precioCompra: Math.max(0, num($('#rep-extra-precio').value))});
     renderReporteCombate();
-  });
+  };
+  const contar = $('#finalizar-combate-contar-escapados');
+  if(contar) contar.addEventListener('change', e => { xpContarEscapados = e.target.checked; renderReporteCombate(); });
+  $('#finalizar-combate-publicar').disabled = combateRep.publicando || !rp.n;
+}
+
+// Línea verde en la Mesa (comun/mesa.js, desde 'recompensa').
+async function mesaLineaVerde(origen, formula){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: String(origen).slice(0, 200), formula: String(formula || '').slice(0, 600),
+      rolls: [], mod: 0, total: 0, desde: 'recompensa', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo escribir la línea verde en la Mesa:', err); }
+}
+
+async function publicarRecompensas(){
+  if(combateRep.publicando) return;
+  if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Solo el GM de la partida puede publicar'); return; }
+  const rep = generarReporteCombate(xpContarEscapados);
+  const rp = calcularReparto(rep);
+  if(!rp.n){ toast('Elegí al menos un jugador'); return; }
+  const items = itemsPublicables(rep);
+  if(!confirm(`¿Publicar?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) al botín\n\nLas recompensas se cargan solas en las fichas.`)) return;
+  combateRep.publicando = true;
+  renderReporteCombate();
+  try{
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const batch = fbDb.batch();
+    rp.porJugador.forEach(({j, xp, dde}) => {
+      batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: 0, estado: j.estado, aplicada: false, creado: ts});
+    });
+    items.forEach(i => {
+      batch.set(fbDb.collection(fbRutaCampana('botin')).doc(), {nombre: String(i.nombre).slice(0, 80), json: JSON.stringify(i.template), origen: String(i.origen).slice(0, 80),
+        precioCompra: num(i.precioCompra), despojos: Math.ceil(num(i.precioCompra) / 4), tomadoPor: '', tomadoNombre: '', creado: ts});
+    });
+    await batch.commit();
+    const lineas = rp.porJugador.map(({j, xp, dde}) => `${j.nombre}: +${fmt(xp)} XP${j.estado !== 'en pie' ? ` (${j.estado})` : ''}, +${fmt(dde)} DDE`).join(' · ');
+    await mesaLineaVerde('🎁 Recompensas del combate', lineas + (items.length ? ` · ${items.length} ítem(s) en el botín` : ''));
+    rep.filas.forEach(f => { f.sc.recompensado = true; });   // no se vuelven a contar en el próximo reporte
+    combateRep = nuevoCombateRep();
+    renderAll();
+    $('#scrim-finalizar-combate').classList.remove('open');
+    toast('Recompensas publicadas ✓ — se cargan solas en las fichas');
+  }catch(err){
+    console.error('No se pudieron publicar las recompensas:', err);
+    combateRep.publicando = false;
+    renderReporteCombate();
+    toast(err.code === 'permission-denied' ? 'Faltan las reglas nuevas de Firebase (recompensas/botín): pegalas en la consola' : 'No se pudo publicar — mirá la consola');
+  }
 }
 
 let toastT;
@@ -5758,6 +5942,7 @@ $('#revivircreep-x').onclick = () => { revivirCreepId = null; $('#scrim-revivir-
 $('#scrim-revivir-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-revivir-creep'){ revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); } });
 $('#finalizar-combate-x').onclick = () => $('#scrim-finalizar-combate').classList.remove('open');
 $('#finalizar-combate-cerrar').onclick = () => $('#scrim-finalizar-combate').classList.remove('open');
+$('#finalizar-combate-publicar').onclick = publicarRecompensas;
 $('#scrim-finalizar-combate').addEventListener('mousedown', e => { if(e.target.id==='scrim-finalizar-combate') $('#scrim-finalizar-combate').classList.remove('open'); });
 $('#scrim-ia').addEventListener('mousedown', e => { if(e.target.id==='scrim-ia') $('#scrim-ia').classList.remove('open'); });
 document.addEventListener('keydown', e => {

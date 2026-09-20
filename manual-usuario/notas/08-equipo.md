@@ -281,5 +281,5 @@ Cada creep humano o humanoide carga un poco de oro, con una pequeña variación 
 Los ítems que soltaron los enemigos quedan en una lista: cada jugador toma con **"Sumar a la mochila"** los que quiera. Cuando el GM aprieta **Despojar**, todo lo que quedó se convierte en [[Despojos]] y se reparte.
 
 > [!info] En construcción
-> Esta parte del sistema se está armando por tandas: algunas piezas todavía no funcionan en la herramienta.
+> La publicación de la XP y el oro ya funciona. Falta la lista del botín para los jugadores (con "Sumar a la mochila") y el botón Despojar: se están armando.
 

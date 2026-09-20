@@ -245,6 +245,28 @@ service cloud.firestore {
         allow write: if esGM(c) && doc in ['borrador', 'publicada'];
       }
 
+      // Recompensas de un combate (XP y DDE por personaje): las publica el GM; la ficha del dueño las marca
+      // como aplicadas UNA vez (solo ese campo, de false a true) apenas las carga.
+      match /recompensas/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && resource.data.duenoUid == request.auth.uid);
+        allow create, delete: if esGM(c);
+        allow update: if esMiembro(c) && resource.data.duenoUid == request.auth.uid
+          && resource.data.aplicada == false
+          && request.resource.data.aplicada == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['aplicada']);
+      }
+
+      // Botín de un combate: un documento por ítem, con su plantilla en `json`. Lo crea y borra el GM; cualquier
+      // miembro puede tomarlo (poner su uid en `tomadoPor` mientras esté vacío; el primero se lo lleva).
+      match /botin/{id} {
+        allow read: if esMiembro(c);
+        allow create, delete: if esGM(c);
+        allow update: if esMiembro(c)
+          && resource.data.tomadoPor == ''
+          && request.resource.data.tomadoPor == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
+      }
+
       // Tiendas guardadas con nombre (una por lugar o vendedor al que se
       // vuelve): {nombre, json, actualizado}. Solo el GM.
       match /tiendas/{id} {

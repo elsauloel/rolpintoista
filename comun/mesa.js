@@ -117,6 +117,8 @@ function mesaAlertaEstilos(){
     st.id = 'mesa-alerta-css';
     st.textContent =
       '.mesa-tirada.mesa-alerta{background:rgba(160,20,20,.9)!important;color:#fff!important;border:1px solid #ff6a6a!important}' +
+      '.mesa-tirada.mesa-recompensa{background:rgba(22,110,52,.92)!important;color:#fff!important;border:1px solid #5fd38a!important}' +
+      '.mesa-tirada.mesa-recompensa .mesa-quien,.mesa-tirada.mesa-recompensa .mesa-detalle{color:#fff!important}' +
       '.mesa-tirada.mesa-alerta .mesa-quien,.mesa-tirada.mesa-alerta .mesa-detalle{color:#fff!important}' +
       '#alerta-ojo{position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
         'background:radial-gradient(ellipse at center,rgba(200,20,20,.35) 0%,rgba(150,0,0,.6) 60%,rgba(90,0,0,.8) 100%);opacity:1;transition:opacity 1.3s ease-out}' +
@@ -156,7 +158,7 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   // Resumen de esa misma última tirada: solo existe en la Mesa flotante
   // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
@@ -189,6 +191,15 @@ function mesaRender(docs){
       div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
       div.innerHTML = `<span class="mesa-quien">👁 ${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva){ setTimeout(() => div.classList.remove('nueva'), 1500); mesaAlertaOjo(); }
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Recompensas del combate: línea verde que queda verde (XP, DDE y despojos que se cargaron a cada uno).
+    if(t.desde === 'recompensa'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-recompensa' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
     }

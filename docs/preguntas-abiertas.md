@@ -302,3 +302,34 @@ equivalente que da Con (5), o sea +5 HP máx.
 - 🔲 **P77. Cadena Parry → Bloqueo.** Sin resolver: si es el Bloqueo del
   atacante contra el del defensor, y qué pasa si gana el Parry pero pierde el
   Bloqueo. Hoy cada tirada es suelta y la resuelve la mesa. *(2026-09-19)*
+
+## Trampas (mapa)
+
+Idea del usuario (2026-09-19): jugadores y GM pueden crear objetos en el mapa y
+asignarles el rol de **trampa**; cuando un personaje **rival** del dueño la
+pisa, se dispara y se avisa en el log (la Mesa). Diseño recién empezado.
+Propuesta de base: la trampa es un elemento del mapa (Terreno y Formas) con una
+marca `trampa` (nombre y descripción de qué hace, escritos por quien la crea);
+al confirmar un movimiento, el mapa mira si alguna casilla de la ruta cae en una
+trampa enemiga y publica una línea roja en la Mesa. Solo avisa (los efectos se
+resuelven a mano, como el resto de los avisos).
+
+- 🔲 **P78. Quién es "rival".** Trampa de un jugador: ¿la disparan los creeps y
+  también otros jugadores, o solo los creeps? Trampa del GM: ¿los personajes?
+  ¿Los aliados del dueño nunca la activan? *(2026-09-19)*
+- 🔲 **P79. Visibilidad.** ¿La trampa la ven solo su dueño (y el GM), o también
+  sus aliados? ¿Se ve distinto a los demás objetos (marca de trampa)? Los rivales
+  no la ven hasta que se dispara. *(2026-09-19)*
+- 🔲 **P80. Cuándo se dispara.** ¿Al pasar por la casilla en cualquier punto de
+  la ruta (y el movimiento se corta ahí, como con los conos de detección) o solo
+  si termina el movimiento encima? Propuesta: cualquier casilla de la ruta, y se
+  corta ahí. *(2026-09-19)*
+- 🔲 **P81. Una vez o siempre.** ¿Se gasta al dispararse (desaparece o queda
+  marcada como disparada) o sigue armada? Propuesta: una vez, con opción de
+  dejarla armada. *(2026-09-19)*
+- 🔲 **P82. Qué hace.** ¿Solo aviso con el texto que puso el creador, o más
+  adelante daño/estado automáticos? Propuesta: solo aviso por ahora. *(2026-09-19)*
+- 🔲 **P83. Detectar y desarmar.** ¿Hay tirada para verla o desarmarla, o eso
+  queda entre los jugadores a mano? *(2026-09-19)*
+- 🔲 **P84. Quién puede crear.** ¿Cualquier jugador, en cualquier lugar del mapa,
+  o con algún límite (cantidad, costo de No2, solo en combate)? *(2026-09-19)*

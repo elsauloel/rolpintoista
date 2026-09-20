@@ -1553,20 +1553,10 @@ async function sigiloAviso(origen, formula){
     });
   }catch(err){ console.error('No se pudo avisar del sigilo en la Mesa:', err); }
 }
-// Alerta roja en la Mesa cuando un personaje en sigilo hace algo que se sale de lo
-// normal (Mover libre, gastar más No2 de los que tiene): que no se "chispotee" una
-// regla sin que la mesa se entere. Solo avisa; no impide nada.
-// Línea roja SIN nombres ni datos del sigilo: solo avisa que hace falta una tirada, para que
-// nadie sepa quién ni por qué (tiene que tirar percepción y, si falla, misterio).
-async // Lista de trampas guardadas en el panel de creación: tocar el nombre la carga, ✕ la borra.
+// Lista de trampas guardadas en el panel de creación: tocar el nombre la carga, ✕ la borra.
 function trampasGuardadasHtml(){
   if(!trampasGuardadas.length) return `<label class="etiqueta">Trampas</label><button type="button" class="btn chico" id="trampas-catalogo" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button>`;
   return `<label class="etiqueta">Trampas guardadas</label><button type="button" class="btn chico" id="trampas-catalogo" style="margin-bottom:4px" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button><div class="trampas-guardadas">${trampasGuardadas.map((g, i) => `<div class="tg-fila"><button type="button" class="btn chico tg-usar" data-tg-usar="${i}" title="${esc(g.detalle || '')}">${esc(g.nombre)}${g.amiga ? ' · 🔥' : ''}</button><button type="button" class="btn chico" data-tg-proponer="${i}" title="Proponerla al catálogo de trampas para que el dueño la evalúe">📤</button><button type="button" class="btn chico peligro" data-tg-borrar="${i}" title="Borrar de las guardadas">✕</button></div>`).join('')}</div>`;
-}
-// Lista de trampas guardadas en el panel de creación: tocar el nombre la carga, ✕ la borra.
-function trampasGuardadasHtml(){
-  if(!trampasGuardadas.length) return '';
-  return `<label class="etiqueta">Trampas guardadas</label><div class="trampas-guardadas">${trampasGuardadas.map((g, i) => `<div class="tg-fila"><button type="button" class="btn chico tg-usar" data-tg-usar="${i}" title="${esc(g.detalle || '')}">${esc(g.nombre)}${g.amiga ? ' · 🔥' : ''}</button><button type="button" class="btn chico peligro" data-tg-borrar="${i}" title="Borrar de las guardadas">✕</button></div>`).join('')}</div>`;
 }
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
@@ -1588,6 +1578,11 @@ function abrirCatalogoTrampas(){
     subtitulo: e => e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '',
   });
 }
+// Alerta roja en la Mesa cuando un personaje en sigilo hace algo que se sale de lo
+// normal (Mover libre, gastar más No2 de los que tiene): que no se "chispotee" una
+// regla sin que la mesa se entere. Solo avisa; no impide nada.
+// Línea roja SIN nombres ni datos del sigilo: solo avisa que hace falta una tirada, para que
+// nadie sepa quién ni por qué (tiene que tirar percepción y, si falla, misterio).
 async function alertaRojaAnonima(origen, detalle){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   try{

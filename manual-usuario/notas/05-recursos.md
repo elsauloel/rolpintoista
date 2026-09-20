@@ -14,7 +14,7 @@ estado: confirmado
 
 - **HP máximo = [[Constitución]] × 5.**
 - Cuando te pegan, el daño **se resta de tu HP** (después de restar tu [[Defensa]]).
-- Cuando llegás a **0**, entrás en estado de [[Muerte]].
+- Cuando llegás a **0**, quedás **inconsciente** ([[Muerte|inconsciente y muerte]]).
 - Podés recuperar HP con consumibles, habilidades que curan (como la *Recuperación* del [[Tanque]]) y la [[Pasivas|pasiva]] *Regeneración*, que cura algo en cada [[Mantenimiento]].
 
 ## Cómo se toca tu vida en la mesa

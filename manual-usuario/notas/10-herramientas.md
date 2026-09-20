@@ -52,7 +52,7 @@ Se abre con el mouse encima:
 | 👥 **Personajes** | Cambiar de personaje o crear uno; ver los de otros en solo lectura |
 | 🏪 **Vendedor** | Abrir la [[Tiendas\|tienda]] publicada por el GM |
 | ⭐ **Exp y Job** | Experiencia y [[Puntos de Job]] |
-| 💰 **DDE y loot** | [[DDE]] y loot |
+| 💰 **DDE y despojos** | [[DDE]] y [[Despojos]] |
 | 📖 **Bitácora** | [[La Bitácora]] |
 | 🛡 **Equipo** | [[Equipo y ranuras]] |
 | 🗺 **Mapa** | Ir a [[El mapa]] |

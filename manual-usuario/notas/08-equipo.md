@@ -217,7 +217,7 @@ alias: [Moneda, Dinero, Economía, Plata, Precio]
 tags: [economía]
 estado: pendiente
 +++
-**DDE** es la **moneda** del juego y la unidad de precio de todos los ítems del [[Catálogo de ítems]]. Tu saldo está en el botón **💰 DDE y loot** del dock de la ficha.
+**DDE** es la **moneda** del juego y la unidad de precio de todos los ítems del [[Catálogo de ítems]]. Tu saldo está en el botón **💰 DDE y despojos** del dock de la ficha.
 
 Los precios van de decenas (lo Común) a miles (lo Legendario): ver [[Rareza]].
 
@@ -226,20 +226,60 @@ Los precios van de decenas (lo Común) a miles (lo Legendario): ver [[Rareza]].
 
 +++
 titulo: Tiendas
-alias: [Vendedor, Tienda, Comprar, Vender, Loot, Botín]
+alias: [Vendedor, Tienda, Comprar, Vender, Botín]
 tags: [economía, herramientas]
 estado: borrador
 +++
-Los ítems se compran en **tiendas** que arma el GM con el [[Generador de tiendas]]:
+Los ítems se compran y se venden en **tiendas** que arma y maneja el GM con el [[Generador de tiendas]]:
 
 1. El GM arma la tienda (aleatoria o curada a mano) y la **publica**.
-2. Vos la abrís con **🏪 Vendedor** en la ficha y ves su stock en vivo.
-3. Comprás y el ítem va a tu mochila, con el DDE descontado.
+2. **El GM decide cuándo está abierta.** Con un interruptor la abre o la cierra. Mientras está **cerrada**, tu botón **🏪 Vendedor** aparece desactivado y, al pasar el cursor, dice **"Tienda cerrada"**.
+3. Con la tienda abierta, entrás con **🏪 Vendedor** y ves su stock en vivo. Comprás y el ítem va a tu mochila, con el DDE descontado.
+4. **Vender solo se puede en una tienda.** Dentro del Vendedor, el botón **💰 Vender** abre tu mochila: elegís qué ítems vender (y cuántas unidades) y ves cuánto vas a cobrar. También ahí vendés tus [[Despojos]].
+5. **Cualquier tienda, de cualquier tamaño y tipo, compra de todo:** los ítems de los jugadores y los despojos.
 
-Cuando el GM **cierra** la tienda, desaparece. Además hay **tiendas guardadas** (una por lugar) para volver a ellas.
+## Cuánto pagan
+- **Valor de venta de un ítem:** si el ítem no tiene uno propio, es **la mitad de su precio de compra**.
+- Cada tienda tiene dos **ajustes de precios**: uno **al comprar** (lo que pagás) y otro **al vender** (lo que cobrás, ítems y despojos incluidos). Un vendedor avaro puede cobrar caro y pagar poco.
+- Lo que tenés **equipado no se vende**: sacalo antes.
 
-## Loot
-El **loot** es lo que encontrás sin comprar. Se anota en el dock (**💰 DDE y loot**): hay loot normal y **tipos de loot especial** que el grupo define.
+Además hay **tiendas guardadas** (una por lugar) para volver a ellas.
 
-> [!question] Reglas de loot
-> ¿Qué tipos de loot especial existen y qué se hace con cada uno?
++++
+titulo: Despojos
+alias: [Despojo, Loot, Botín, Despojar]
+tags: [economía, combate]
+estado: borrador
++++
+Los **despojos** son lo que dejan los enemigos y nadie se llevó. Se anotan en el dock de la ficha (**💰 DDE y despojos**).
+
+- **Qué son:** una moneda intermedia. Cuando termina un combate, los ítems que soltaron los enemigos quedan en una lista; los jugadores toman los que quieran, y lo que sobra, cuando el GM aprieta **Despojar**, se convierte en despojos y se reparte entre los jugadores.
+- **Cuánto valen:** **1 despojo se vende por 1 DDE** en cualquier tienda ([[Tiendas]]). Un ítem despojado da despojos por la **mitad de su valor de venta** (un cuarto de su precio de compra, si no tiene uno propio).
+- **Tipos:** además del despojo común, la ficha tiene contadores de despojos **mágicos** y **especiales** que se anotan a mano por ahora.
+
+> [!question] A futuro
+> Se piensa un sistema de crafteo donde los despojos sirvan para fabricar cosas. Todavía no está diseñado.
+
++++
+titulo: Experiencia y despojos
+alias: [Experiencia, XP, Exp, Final del combate, Recompensas, Oro de los creeps]
+tags: [economía, combate]
+estado: borrador
++++
+Al **finalizar un combate**, el GM ve un reporte con la experiencia, el oro y los ítems que soltaron los enemigos derrotados, los ajusta si hace falta y lo **publica**.
+
+## Experiencia
+- **Cada creep derrotado da XP** según su nivel. El total del combate se divide **entre la cantidad de jugadores**, como si todos estuvieran vivos (redondeando hacia arriba).
+- Un jugador **inconsciente** ([[Muerte|inconsciente y muerte]]) recibe **solo el 25%** de lo que le tocaba, redondeado hacia abajo. Uno **muerto**, nada.
+- El GM puede **sumar o restar** experiencia por circunstancias especiales de la pelea, y **dejar a un jugador afuera** (por ejemplo, si no estuvo en el combate).
+- La experiencia se carga **sola** en la ficha. Si sube de nivel, le aparece un aviso de felicitación.
+
+## Oro (DDE)
+Cada creep humano o humanoide carga un poco de oro, con una pequeña variación al azar (±20%). Al publicar, el total se reparte entre los jugadores y se suma solo a su ficha. Una línea **verde** en la [[La Mesa|Mesa]] cuenta cuánto recibió cada uno.
+
+## Ítems y despojos
+Los ítems que soltaron los enemigos quedan en una lista: cada jugador toma con **"Sumar a la mochila"** los que quiera. Cuando el GM aprieta **Despojar**, todo lo que quedó se convierte en [[Despojos]] y se reparte.
+
+> [!info] En construcción
+> Esta parte del sistema se está armando por tandas: algunas piezas todavía no funcionan en la herramienta.
+

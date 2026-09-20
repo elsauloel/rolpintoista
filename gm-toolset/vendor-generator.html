@@ -239,7 +239,8 @@ input[type=checkbox]{width:auto}
 
   <div class="publicacion" id="publicacion" style="display:none">
     <span id="publicacion-texto"></span>
-    <button class="btn ghost" id="btn-cerrar-tienda" style="display:none" title="Los jugadores dejan de ver la tienda en su ficha">Cerrar tienda</button>
+    <button class="btn" id="btn-abrir-tienda" style="display:none" title="Abrir o cerrar la tienda a los jugadores (el botón 🏪 de su ficha)">🔴 Cerrada · abrir</button>
+    <button class="btn ghost" id="btn-cerrar-tienda" style="display:none" title="Los jugadores dejan de ver la tienda en su ficha">Retirar tienda</button>
   </div>
 
   <div class="panel">
@@ -291,8 +292,13 @@ input[type=checkbox]{width:auto}
         <input type="text" id="preview-buscar" placeholder="Buscar por nombre…" style="width:200px">
       </div>
       <div class="ajuste-grupo">
-        <label for="f-ajuste">Precios</label>
-        <input type="number" id="f-ajuste" step="5" value="0" title="Porcentaje sobre el precio de catálogo: negativo descuenta, positivo recarga">
+        <label for="f-ajuste">Al comprar</label>
+        <input type="number" id="f-ajuste" step="5" value="0" title="Lo que pagan los jugadores: porcentaje sobre el precio de catálogo (negativo descuenta, positivo recarga)">
+        <span class="hint">%</span>
+      </div>
+      <div class="ajuste-grupo">
+        <label for="f-ajuste-venta">Al vender</label>
+        <input type="number" id="f-ajuste-venta" step="5" value="0" title="Lo que cobran los jugadores al venderle a esta tienda (ítems y despojos): porcentaje sobre el valor de venta. Negativo paga menos, positivo paga más.">
         <span class="hint">%</span>
       </div>
       <button type="button" class="ajuste-preset" data-ajuste="-25">-25%</button>
@@ -1950,6 +1956,17 @@ function abrirAgregar(){
   $('#scrim-agregar').classList.add('open');
 }
 
+function ajusteVentaActual(){
+  return tiendaActual ? (Number(tiendaActual.ajusteVenta) || 0) : 0;
+}
+function aplicarAjusteVenta(pct){
+  if(!tiendaActual) return;
+  const n = Math.max(-90, Math.min(500, Math.round(Number(pct) || 0)));
+  tiendaActual.ajusteVenta = n;
+  $('#f-ajuste-venta').value = n;
+  tiendaCambio();
+}
+
 function aplicarAjuste(pct){
   if(!tiendaActual) return;
   const n = Math.max(-90, Math.min(500, Math.round(Number(pct) || 0)));
@@ -1963,6 +1980,7 @@ function aplicarAjuste(pct){
 function marcarAjuste(){
   const n = ajusteActual();
   $('#f-ajuste').value = n;
+  $('#f-ajuste-venta').value = ajusteVentaActual();
   document.querySelectorAll('.ajuste-preset[data-ajuste]').forEach(b =>
     b.classList.toggle('activo', Number(b.dataset.ajuste) === n));
 }
@@ -2039,7 +2057,7 @@ function actualizarHint(){
 
 const BORRADOR_QUIETO_MS = 1200;
 
-let tiendaFb = {listo: false, timer: null, guardando: false, pendiente: false, publicadaJson: null, publicadaCuando: null};
+let tiendaFb = {abierta: false, listo: false, timer: null, guardando: false, pendiente: false, publicadaJson: null, publicadaCuando: null};
 
 function puedeGuardar(){
   return tiendaFb.listo;
@@ -2148,6 +2166,9 @@ function renderPublicacion(){
     return;
   }
   cerrar.style.display = '';
+  const abrir = $('#btn-abrir-tienda');
+  abrir.style.display = '';
+  abrir.textContent = tiendaFb.abierta ? '🟢 Abierta · cerrar' : '🔴 Cerrada · abrir';
   let pub = null;
   try{ pub = JSON.parse(tiendaFb.publicadaJson); }catch(e){}
   const nombre = (pub && pub.nombre) || 'Tienda';
@@ -2158,7 +2179,7 @@ function renderPublicacion(){
   const alDia = tiendaActual && JSON.stringify(tiendaParaGuardar()) === tiendaFb.publicadaJson;
   caja.classList.add(alDia ? 'al-dia' : 'pendiente');
   $('#publicacion-texto').innerHTML =
-    `Los jugadores ven: <b>${esc(nombre)}</b> (${fmt(cantidad)} ítems${esc(cuando)})` +
+    `${tiendaFb.abierta ? '🟢 <b>Abierta</b>' : '🔴 <b>Cerrada</b> (los jugadores no pueden entrar)'} · <b>${esc(nombre)}</b> (${fmt(cantidad)} ítems${esc(cuando)})` +
     (tiendaActual ? (alDia ? ' · ✓ igual a la que estás armando' : ' · <b>lo que estás armando tiene cambios sin publicar</b>') : '');
 }
 
@@ -2170,10 +2191,10 @@ async function publicarShop(){
   btn.disabled = true;
   try{
     const json = JSON.stringify(tiendaParaGuardar());
-    await refTienda('publicada').set({json, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await refTienda('publicada').set({json, actualizado: firebase.firestore.FieldValue.serverTimestamp(), abierta: tiendaFb.abierta === true});
     clearTimeout(tiendaFb.timer);
     await guardarBorrador();
-    toast('Tienda publicada ✓ — los jugadores ya la ven con el botón Vendedor de su ficha');
+    toast(tiendaFb.abierta ? 'Tienda publicada ✓ — los jugadores la ven abierta' : 'Tienda publicada ✓ — sigue CERRADA: abrila cuando quieras que entren');
   }catch(err){
     console.error('Error publicando la tienda:', err);
     toast('No se pudo publicar — revisá la consola');
@@ -2182,12 +2203,35 @@ async function publicarShop(){
   }
 }
 
+async function avisarMesaTienda(texto){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: texto, formula: '', rolls: [], mod: 0, total: 0,
+      desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo avisar en la Mesa:', err); }
+}
+
+async function alternarTienda(){
+  if(!puedeGuardar() || !tiendaFb.publicadaJson) return;
+  const abrir = !tiendaFb.abierta;
+  try{
+    await refTienda('publicada').update({abierta: abrir});
+    avisarMesaTienda(abrir ? '🏪 La tienda está abierta' : '🏪 La tienda se cerró');
+    toast(abrir ? 'Tienda abierta: los jugadores ya pueden entrar' : 'Tienda cerrada');
+  }catch(err){
+    console.error('No se pudo cambiar el estado de la tienda:', err);
+    toast('No se pudo cambiar el estado — revisá la consola');
+  }
+}
+
 async function cerrarTienda(){
   if(!puedeGuardar() || !tiendaFb.publicadaJson) return;
-  if(!confirm('¿Cerrar la tienda? Los jugadores dejan de verla en su ficha. Lo que estás armando acá no se borra.')) return;
+  if(!confirm('¿Retirar la tienda? Se borra la publicada: los jugadores dejan de verla. Lo que estás armando acá no se borra. (Para cerrarla un rato sin borrarla, usá el interruptor Abierta/Cerrada.)')) return;
   try{
     await refTienda('publicada').delete();
-    toast('Tienda cerrada');
+    toast('Tienda retirada');
   }catch(err){
     console.error('Error cerrando la tienda:', err);
     toast('No se pudo cerrar la tienda — revisá la consola');
@@ -2395,6 +2439,7 @@ async function iniciarTiendaEnVivo(){
     const d = snap.exists ? snap.data() : null;
     if(d) tiendaDesdeJson(d.json);  // por si tiene ítems propios que este catálogo no
     tiendaFb.publicadaJson = d ? d.json : null;
+    tiendaFb.abierta = !!(d && d.abierta === true);
     tiendaFb.publicadaCuando = d && d.actualizado ? d.actualizado.toDate() : null;
     renderPublicacion();
   }, err => console.error('No se pudo escuchar la tienda publicada:', err));
@@ -2416,6 +2461,7 @@ $('#guardadas-lista').addEventListener('click', e => {
 $('#btn-publicar').addEventListener('click', publicarShop);
 $('#btn-personalizada').addEventListener('click', crearTiendaPersonalizada);
 $('#btn-cerrar-tienda').addEventListener('click', cerrarTienda);
+$('#btn-abrir-tienda').addEventListener('click', alternarTienda);
 $('#btn-agregar-items').addEventListener('click', abrirAgregar);
 $('#btn-item-nuevo').addEventListener('click', () => abrirItemNuevo());
 $('#itemnuevo-x').addEventListener('click', () => $('#scrim-item-nuevo').classList.remove('open'));
@@ -2462,6 +2508,7 @@ $('#preview-buscar').addEventListener('input', renderPreview);
 $('#agregar-rubro').addEventListener('change', renderAgregarLista);
 $('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
+$('#f-ajuste-venta').addEventListener('change', e => aplicarAjusteVenta(e.target.value));
 $('#f-orden').addEventListener('change', e => { ordenActual = e.target.value; renderPreview(); renderAgregarLista(); });
 $('#btn-orden-dir').addEventListener('click', () => { ordenDesc = !ordenDesc; renderOrdenControles(); renderPreview(); renderAgregarLista(); });
 $('#ver-x').addEventListener('click', () => $('#scrim-ver').classList.remove('open'));

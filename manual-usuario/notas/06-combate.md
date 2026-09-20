@@ -280,25 +280,28 @@ Cada vez que se activa, **baja en 1 la [[Defensa]] que da el equipo** del objeti
 > - ¿Qué habilidades de clase reparan armadura?
 
 +++
-titulo: Muerte
-alias: [Muerto, Permadeath, Morir, Revivir, HP 0]
+titulo: Inconsciente y muerte
+alias: [Muerte, Muerto, Inconsciente, Permadeath, Morir, Revivir, HP 0]
 tags: [combate, reglas-base]
 estado: borrador
 +++
-Cuando tu [[HP]] llega a **0**, entrás en estado de **Muerto**.
+Cuando tu [[HP]] llega a **0**, quedás **inconsciente**. Todavía no estás muerto.
 
 - Tenés una ventana de **5 [[Mantenimiento|mantenimientos]]** para que te revivan.
 - Dentro de esa ventana se puede revivir con **objetos o efectos** (por ejemplo, el consumible *Ankh de Reencarnación*, que si estaba en tu cinturón te revive con el 25% del HP).
-- Si pasan los 5 mantenimientos, **morís definitivamente** (*permadeath*).
+- Si pasan los 5 mantenimientos sin que te revivan, **morís**: quedás **muerto** para siempre (lo que antes se llamaba *permadeath*).
+
+## Qué pasa con la experiencia
+Al terminar un combate, un personaje **inconsciente** recibe solo el **25%** de la experiencia que le tocaba (redondeado hacia abajo). Uno **muerto** no recibe nada. Ver [[Experiencia y despojos]].
 
 > [!tip] Un aliado puede salvarte
 > Aunque el Ankh no esté en tu cinturón, **un aliado puede usarlo sobre tu cuerpo** para revivirte.
 
-> [!question] Estando muerto
-> - ¿Podés hacer algo estando "Muerto" pero revivible, o quedás fuera de juego?
+> [!question] Estando inconsciente
+> - ¿Podés hacer algo estando inconsciente, o quedás fuera de juego hasta que te revivan?
 > - ¿Cuánto HP devuelve un revivir (1, la mitad, el máximo, depende del objeto)?
 > - ¿Los 5 mantenimientos cuentan desde el que sigue al HP 0?
-> - ¿Cambia algo fuera de combate (por ejemplo, morir de veneno sin pelea activa)?
+> - ¿Cambia algo fuera de combate (por ejemplo, caer inconsciente por veneno sin pelea activa)?
 
 +++
 titulo: Sigilo

@@ -37,7 +37,8 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 | **Crg.Max** | Carga máxima | [[Carga máxima]] |
 | **Res.Mg / Res.CC / Res.Mt** | Resistencias mágica, a CC y mental | [[Resistencias]] |
 | **SP Regen** | SP que recuperás en cada mantenimiento | [[SP]] |
-| **DDE** | Moneda | [[DDE]] |
+| **DDE** | Moneda (doblones del espacio) | [[DDE]] |
+| **Despojos** | Lo que sueltan los enemigos y nadie se llevó: se vende a 1 DDE | [[Despojos]] |
 
 ## Combate
 | Término | Significa | Ver |
@@ -117,7 +118,7 @@ No. Solo HP y No2. → [[Creeps]]
 Con SP Regen (cada mantenimiento), habilidades, consumibles y descanso. → [[SP]]
 
 ## ¿Qué pasa si me quedo en 0 de HP?
-Entrás en estado de Muerto: tenés 5 mantenimientos para que te revivan. → [[Muerte]]
+Quedás inconsciente: tenés 5 mantenimientos para que te revivan; si pasan, morís. → [[Muerte]]
 
 ## ¿Puedo tener más de un personaje?
 Sí, en la misma partida. → [[Inicio y partidas]]

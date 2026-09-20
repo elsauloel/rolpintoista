@@ -179,6 +179,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   tienda"); la leen todos y la abre el botón 🏪 Vendedor de la ficha, que
   además escucha los cambios mientras el jugador está en la tienda. Solo el
   GM escribe. El json puede traer `guardadaId`: de qué tienda guardada salió.
+  **Abierta/cerrada (2026-09-20):** `publicada` lleva además `abierta` (bool, fuera del `json`): el GM la abre y cierra con un interruptor (no hace falta republicar) y la ficha escucha siempre ese doc: cerrada, el botón 🏪 queda desactivado ("Tienda cerrada"). Publicar conserva el estado (una tienda nueva arranca cerrada). El json suma `ajusteVenta` (%: lo que cobran los jugadores al vender ítems y despojos); `ajustePrecio` sigue siendo lo que pagan al comprar. No hizo falta cambiar las reglas.
 - `campanas/{id}/tiendas/{auto}` — `{nombre, json, actualizado}`. Tiendas
   guardadas con nombre, una por lugar o vendedor al que se vuelve (ej. el
   pueblito Zapallo); `json` con la misma forma que `tienda/*`. Se guardan a

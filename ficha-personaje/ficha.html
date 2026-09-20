@@ -1223,15 +1223,15 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     </div>
   </div>
   <div class="dock-item">
-    <button type="button" class="dock-btn" data-dock-panel="botin" title="Doblones (DDE) y loot"><span class="dock-ico">💰</span><span class="dock-txt">DDE y loot</span></button>
+    <button type="button" class="dock-btn" data-dock-panel="botin" title="Doblones (DDE) y despojos"><span class="dock-ico">💰</span><span class="dock-txt">DDE y despojos</span></button>
     <div class="dock-panel" id="dock-panel-botin" hidden>
         <div class="counter"><label>DDE($)</label><input id="f-dde" type="text" inputmode="decimal" title="Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter"></div>
         <div class="counter loot">
-          <label>Loot</label>
+          <label>Despojos</label>
           <div class="loot-rows">
             <div class="loot-row"><span class="loot-dot n"></span><span class="loot-l">Normal</span><input id="f-loot-normal" type="number"></div>
             <div class="loot-row"><span class="loot-dot m"></span><span class="loot-l">Mágico</span><input id="f-loot-magico" type="number"></div>
-            <div class="loot-row loot-esp-toggle"><span class="loot-dot e"></span><button type="button" class="loot-esp-btn" id="btn-loot-esp" title="Ver y editar los tipos de loot especial">Especial <b id="loot-esp-total">0</b> ▾</button><button class="loot-add" id="btn-loot-add" title="Agregar tipo de loot especial">+</button></div>
+            <div class="loot-row loot-esp-toggle"><span class="loot-dot e"></span><button type="button" class="loot-esp-btn" id="btn-loot-esp" title="Ver y editar los tipos de despojos especiales">Especial <b id="loot-esp-total">0</b> ▾</button><button class="loot-add" id="btn-loot-add" title="Agregar tipo de loot especial">+</button></div>
           </div>
           <div class="loot-especial" id="loot-esp-pop" hidden>
             <div id="loot-esp-list"></div>
@@ -1528,12 +1528,24 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-vender">
+  <div class="modal" style="max-width:640px">
+    <header><h3>💰 Vender a la tienda</h3><button class="iconbtn" id="vender-x">Cerrar</button></header>
+    <div class="body" id="vender-cuerpo"></div>
+    <footer style="justify-content:space-between">
+      <span class="hint" id="vender-total" style="font-size:14px;color:var(--paper)"></span>
+      <button class="btn primary" id="vender-confirmar">Vender lo elegido</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-catalogo">
   <div class="modal catalogo-modal botonera-modal">
     <header>
       <h3>Catálogo del fabricante</h3>
       <div style="display:flex;gap:8px;align-items:center">
         <span class="tienda-badge" id="tienda-badge" style="display:none"></span>
+        <button class="iconbtn" id="tienda-vender" style="display:none" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
         <button class="iconbtn" id="tienda-salir" style="display:none">Ver catálogo completo</button>
         <span class="catalogo-dde-badge">DDE disponibles: <b id="catalogo-dde">0</b></span>
         <button class="iconbtn iconbtn-add" id="btn-catalogo-nuevo">+ Ítem al catálogo</button>
@@ -1795,7 +1807,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <div class="body" id="view-body"></div>
     <footer style="justify-content:flex-end;gap:8px">
       <button class="btn del" id="view-del-btn">Eliminar</button>
-      <button class="btn vender" id="view-vender-btn">Vender</button>
       <button class="btn primary" id="view-edit-btn">Editar</button>
     </footer>
   </div>
@@ -3437,7 +3448,7 @@ function renderOverlayMuerte(){
   $('#btn-revivir').style.display = S.muerto.definitivo ? 'none' : '';
   $('#overlay-muerte-centro').innerHTML = S.muerto.definitivo
     ? `<div class="muerte-final">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATRÁS</div>`
-    : `<div class="muerte-label">turnos hasta muerte definitiva:</div><div class="muerte-numero">${fmt(S.muerto.turnos)}</div>`;
+    : `<div class="muerte-label">INCONSCIENTE · turnos hasta morir:</div><div class="muerte-numero">${fmt(S.muerto.turnos)}</div>`;
 }
 
 function renderVitals(){
@@ -5147,7 +5158,7 @@ function renderLootEspecial(){
   const list = S.loot.especial || [];
   $('#loot-esp-list').innerHTML = list.length ? list.map(l => `
     <div class="loot-esp-row">
-      <input class="nom" data-loot-esp="${l.id}" data-lk="nombre" value="${esc(l.nombre)}" placeholder="Tipo de loot">
+      <input class="nom" data-loot-esp="${l.id}" data-lk="nombre" value="${esc(l.nombre)}" placeholder="Tipo de despojo">
       <input class="cant" type="number" data-loot-esp="${l.id}" data-lk="cantidad" value="${l.cantidad}">
       <button class="rm" data-loot-esp-rm="${l.id}" title="Quitar">×</button>
     </div>`).join('') : `<div class="loot-esp-empty">Sin tipos agregados.</div>`;
@@ -6524,7 +6535,6 @@ function verPresetEfecto(valor){
   `;
   $('#view-edit-btn').style.display = 'none';
   $('#view-del-btn').style.display = 'none';
-  $('#view-vender-btn').style.display = 'none';
   $('#scrim-view').classList.add('open');
 }
 
@@ -6754,17 +6764,6 @@ function openViewer(key, id){
   `;
   $('#view-edit-btn').style.display = '';
   $('#view-del-btn').style.display = '';
-  // Vender solo aplica a lo que está en la mochila o el cinturón: el
-  // catálogo es la lista de lo que existe, no cosas que uno tenga.
-  const vendible = ['inventario','cinturon'].includes(key) && precioVentaDe(it) > 0;
-  const btnVender = $('#view-vender-btn');
-  btnVender.style.display = vendible ? '' : 'none';
-  if(vendible){
-    const unidades = num(it.unidades) || 1;
-    btnVender.textContent = unidades > 1
-      ? `Vender 1 (${fmt(precioVentaDe(it))} DDE)`
-      : `Vender (${fmt(precioVentaDe(it))} DDE)`;
-  }
   $('#scrim-view').classList.add('open');
 }
 
@@ -7249,10 +7248,13 @@ function renderCabeceraTienda(){
   const salir = $('#tienda-salir');
   const nuevo = $('#btn-catalogo-nuevo');
   const verCompleto = $('#catalogo-ver-completo');
+  if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
   if(tiendaCargada){
     const pct = Number(tiendaCargada.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
-    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}${extra}`;
+    const pv = Number(tiendaCargada.ajusteVenta) || 0;
+    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}`;
+    if($('#tienda-vender')) $('#tienda-vender').style.display = '';
     badge.style.display = '';
     salir.style.display = '';
     if(nuevo) nuevo.style.display = 'none';
@@ -7303,8 +7305,111 @@ function tiendaDesdeDoc(snap){
     migrarObjTipos(it);
     it.escalaTipos = ESCALA_TIPOS;
   });
-  return t && Array.isArray(t.items) && t.items.length ? t : null;
+  if(!(t && Array.isArray(t.items) && t.items.length)) return null;
+  t.abierta = snap.data().abierta === true;   // el GM decide cuándo está accesible
+  return t;
 }
+
+/* ---------- Tienda abierta o cerrada ----------
+   El GM abre y cierra la tienda con un interruptor (vendor-generator). Mientras está cerrada, el botón
+   🏪 queda desactivado y dice "Tienda cerrada". Se escucha siempre, no solo dentro de la tienda. */
+let tiendaAbiertaAhora = false, tiendaEstadoEscucha = null;
+function renderBotonTienda(){
+  const btn = $('#btn-vendedor');
+  if(!btn) return;
+  btn.disabled = !tiendaAbiertaAhora;
+  btn.title = tiendaAbiertaAhora ? 'Abrir la tienda que publicó el GM: comprar y vender' : 'Tienda cerrada';
+}
+function tiendaEstadoEscuchar(){
+  if(tiendaEstadoEscucha || !fbDb || !fbMiembro) return;
+  tiendaEstadoEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
+    tiendaAbiertaAhora = snap.exists && snap.data().abierta === true;
+    renderBotonTienda();
+  }, err => console.error('No se pudo escuchar el estado de la tienda:', err));
+}
+
+/* ---------- Vender en la tienda ----------
+   Solo se vende acá (ya no desde la ventana de cada ítem). Lo equipado no se vende. Cada tienda compra de todo:
+   ítems de la mochila y del cinturón, y despojos (1 DDE cada uno). El "ajuste al vender" de la tienda
+   sube o baja lo que se cobra, también en los despojos. */
+let venderSel = {};   // clave 'inventario:id' | 'cinturon:id' | 'despojos' -> cantidad elegida
+function ajusteVentaTienda(){ return tiendaCargada ? (Number(tiendaCargada.ajusteVenta) || 0) : 0; }
+function precioVentaTienda(base){ return Math.max(0, Math.round(num(base) * (1 + ajusteVentaTienda() / 100) * 100) / 100); }
+function itemsVendibles(){
+  const out = [];
+  ['inventario', 'cinturon'].forEach(key => (S[key] || []).forEach(it => {
+    if(it.equipado) return;
+    const base = precioVentaDe(it);
+    if(base > 0) out.push({clave: `${key}:${it.id}`, key, it, unidades: num(it.unidades) || 1, unit: precioVentaTienda(base)});
+  }));
+  return out;
+}
+function totalVenta(){
+  let t = 0;
+  itemsVendibles().forEach(v => { t += (venderSel[v.clave] || 0) * v.unit; });
+  t += (venderSel.despojos || 0) * precioVentaTienda(1);
+  return Math.round(t * 100) / 100;
+}
+function renderVender(){
+  const lista = itemsVendibles();
+  const desp = Math.max(0, Math.floor(num(S.loot.normal)));
+  const ajuste = ajusteVentaTienda();
+  const fila = (clave, nombre, max, unit, extra) => `<div class="vender-fila" style="display:grid;grid-template-columns:24px 1fr auto 74px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line-soft)">
+      <input type="checkbox" data-vender-chk="${esc(clave)}"${venderSel[clave] ? ' checked' : ''}>
+      <span>${esc(nombre)}${extra || ''}</span>
+      <span class="hint">${fmt(unit)} DDE c/u</span>
+      ${max > 1 ? `<input type="number" min="1" max="${max}" data-vender-cant="${esc(clave)}" value="${venderSel[clave] || max}" style="width:70px">` : `<span class="hint">×1</span>`}
+    </div>`;
+  $('#vender-cuerpo').innerHTML = `
+    <p class="hint" style="margin:0 0 8px">${ajuste ? `Esta tienda paga con un ajuste de ${ajuste > 0 ? '+' : ''}${ajuste}%. ` : ''}Lo que tenés equipado no se puede vender: sacalo antes.</p>
+    ${desp > 0 ? fila('despojos', 'Despojos', desp, precioVentaTienda(1)) : ''}
+    ${lista.map(v => fila(v.clave, v.it.nombre || '(sin nombre)', v.unidades, v.unit, v.unidades > 1 ? ` <span class="hint">(tenés ${fmt(v.unidades)})</span>` : '')).join('')}
+    ${!lista.length && !desp ? '<div class="hint">No tenés nada para vender.</div>' : ''}`;
+  $('#vender-total').innerHTML = `Vas a cobrar: <b>${fmt(totalVenta())} DDE</b>`;
+}
+function abrirVender(){
+  if(!tiendaCargada){ toast('Abrí primero la tienda'); return; }
+  venderSel = {};
+  renderVender();
+  $('#scrim-vender').classList.add('open');
+}
+function confirmarVender(){
+  if(!tiendaCargada){ toast('La tienda está cerrada'); return; }
+  const total = totalVenta();
+  if(!total){ toast('Elegí qué vender'); return; }
+  let nombres = [];
+  itemsVendibles().forEach(v => {
+    const q = Math.min(venderSel[v.clave] || 0, v.unidades);
+    if(!q) return;
+    nombres.push(q > 1 ? `${v.it.nombre} ×${q}` : v.it.nombre);
+    if(q >= v.unidades) S[v.key] = S[v.key].filter(x => x.id !== v.it.id); else v.it.unidades = v.unidades - q;
+  });
+  const qd = Math.min(venderSel.despojos || 0, Math.max(0, Math.floor(num(S.loot.normal))));
+  if(qd){ S.loot.normal = num(S.loot.normal) - qd; nombres.push(`${qd} despojo${qd === 1 ? '' : 's'}`); $('#f-loot-normal').value = S.loot.normal; }
+  S.meta.dde = Math.round((num(S.meta.dde) + total) * 100) / 100;
+  $('#f-dde').value = fmt(S.meta.dde);
+  renderInventario(); renderList('cinturon'); refresh();
+  venderSel = {};
+  $('#scrim-vender').classList.remove('open');
+  toast(`Vendiste ${nombres.join(', ')} · +${fmt(total)} DDE (tenés ${fmt(num(S.meta.dde))})`);
+}
+$('#tienda-vender').onclick = abrirVender;
+$('#vender-x').onclick = () => $('#scrim-vender').classList.remove('open');
+$('#vender-confirmar').onclick = confirmarVender;
+$('#vender-cuerpo').addEventListener('change', e => {
+  const chk = e.target.dataset.venderChk, cant = e.target.dataset.venderCant;
+  if(chk !== undefined){
+    const fila = e.target.closest('.vender-fila').querySelector('[data-vender-cant]');
+    const max = fila ? num(fila.max) : 1;
+    venderSel[chk] = e.target.checked ? (fila ? Math.max(1, Math.min(max, num(fila.value))) : 1) : 0;
+  }else if(cant !== undefined){
+    const max = num(e.target.max);
+    const q = Math.max(1, Math.min(max, Math.round(num(e.target.value)) || 1));
+    e.target.value = q;
+    if(venderSel[cant]) venderSel[cant] = q;
+  }
+  $('#vender-total').innerHTML = `Vas a cobrar: <b>${fmt(totalVenta())} DDE</b>`;
+});
 
 async function abrirVendedor(){
   if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede abrir la tienda'); return; }
@@ -7312,7 +7417,7 @@ async function abrirVendedor(){
   btn.disabled = true;
   try{
     const tienda = tiendaDesdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get());
-    if(!tienda){ toast('El GM no tiene ninguna tienda abierta'); return; }
+    if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
 
     tiendaCargada = tienda;
     verCatalogoCompleto = false;
@@ -7326,7 +7431,7 @@ async function abrirVendedor(){
     console.error('Error trayendo la tienda:', err);
     toast('No se pudo abrir la tienda — revisá la consola');
   }finally{
-    btn.disabled = false;
+    renderBotonTienda();
   }
 }
 
@@ -7338,7 +7443,13 @@ function escucharTienda(){
   tiendaEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
     if(primera){ primera = false; return; }  // es la misma que se acaba de abrir
     if(!tiendaCargada){ dejarDeEscucharTienda(); return; }
-    const nueva = tiendaDesdeDoc(snap);
+    let nueva = tiendaDesdeDoc(snap);
+    if(nueva && !nueva.abierta){   // el GM la cerró: se sale de la tienda
+      tiendaCargada = null; carritoCatalogo = []; dejarDeEscucharTienda();
+      $('#scrim-catalogo').classList.remove('open'); $('#scrim-vender').classList.remove('open');
+      toast('El GM cerró la tienda');
+      return;
+    }
     tiendaCargada = nueva;
     // Lo que ya no se vende sale del carrito.
     const antes = carritoCatalogo.length;
@@ -9138,7 +9249,7 @@ function mantenimiento(){
       S.muerto.definitivo = true;
       log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
     }else{
-      log.push(`Muerte definitiva en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
+      log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
     }
     renderOverlayMuerte();
   }
@@ -9373,36 +9484,7 @@ $('#btn-limpiar-estados').onclick = () => {
   toast(`${cuantos} estado(s) eliminado(s)`);
 };
 
-/* Vende una unidad y suma los DDE. Lo equipado no se vende de una: hay
-   que sacárselo antes, así no se va por accidente lo que se tiene puesto. */
-$('#view-vender-btn').onclick = () => {
-  if(!viewing) return;
-  const {key, id} = viewing;
-  const it = (S[key] || []).find(x => x.id === id);
-  if(!it) return;
-  if(it.equipado){
-    toast(`${it.nombre} está equipado — sacátelo antes de venderlo`);
-    return;
-  }
-  const precio = precioVentaDe(it);
-  if(!precio){ toast(`${it.nombre} no tiene precio de venta`); return; }
-
-  const unidades = num(it.unidades) || 1;
-  if(unidades > 1){
-    it.unidades = unidades - 1;
-  }else{
-    S[key] = S[key].filter(x => x.id !== id);
-    $('#scrim-view').classList.remove('open');
-    viewing = null;
-  }
-  S.meta.dde = num(S.meta.dde) + precio;
-  $('#f-dde').value = fmt(S.meta.dde);
-
-  if(key === 'inventario') renderInventario(); else renderList('cinturon');
-  refresh();
-  if(viewing) openViewer(key, id);   // sigue abierto: refrescar lo que muestra
-  toast(`Vendiste ${it.nombre} · +${fmt(precio)} DDE (tenés ${fmt(num(S.meta.dde))})`);
-};
+/* La venta de ítems ya no existe fuera de la tienda: se hace desde "Vender" en el Vendedor (ver abrirVender). */
 
 $('#view-del-btn').onclick = () => {
   if(!viewing) return;
@@ -10415,6 +10497,7 @@ async function fbAlEntrar(){
   mesaHistorialAlEntrar();
   mantenimientoEscuchar();
   modoMapaEscuchar();
+  tiendaEstadoEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

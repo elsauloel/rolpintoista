@@ -1206,6 +1206,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
   <button type="button" class="dock-btn" id="btn-equipo" title="Equipo: lo que llevás puesto y la mochila, para cambiar de un lado a otro"><span class="dock-ico">🛡</span><span class="dock-txt">Equipo</span></button>
+  <button type="button" class="dock-btn" id="btn-botin-loot" title="Botín: lo que soltaron los creeps y nadie tomó todavía" hidden><span class="dock-ico">🎁</span><span class="dock-txt">Botín <b id="botin-loot-n"></b></span></button>
   <button type="button" class="dock-btn" id="btn-personajes" title="Ver y abrir los personajes de la partida"><span class="dock-ico">👥</span><span class="dock-txt">Personajes</span></button>
   <button type="button" class="dock-btn" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar"><span class="dock-ico">🏪</span><span class="dock-txt">Vendedor</span></button>
   <div class="dock-item">
@@ -1846,6 +1847,13 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <div class="modal" style="max-width:460px">
     <header><h3>Slot equipado</h3><button class="iconbtn" id="slot-lleno-x">Cerrar</button></header>
     <div class="body" id="slot-lleno-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-botin-loot">
+  <div class="modal" style="max-width:640px">
+    <header><h3>🎁 Botín del combate</h3><button class="iconbtn" id="botin-loot-x">Cerrar</button></header>
+    <div class="body" id="botin-loot-body"></div>
   </div>
 </div>
 
@@ -5805,6 +5813,7 @@ document.addEventListener('click', e => {
     const id = b.dataset.toggle;
     let it = S.inventario.find(x=>x.id===id);
     if(it){
+      if(!it.equipado && it.trofeo){ toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return; }
       if(!it.equipado && it.tipoItem === 'consumibles'){
         S.inventario = S.inventario.filter(x => x.id !== id);
         it.equipado = false;
@@ -7009,6 +7018,134 @@ function equipoModoAbrir(){
 }
 // Desde el dock de la ficha: el mismo panel que abre el 🛡 del token en el mapa.
 $('#btn-equipo').onclick = () => { renderEquipo(); $('#scrim-equipo').classList.add('open'); };
+
+/* ---------- Botín del combate (lo que soltaron los creeps) ----------
+   El GM publica un doc por ítem en campanas/<id>/botin ({nombre, json con la plantilla, precioCompra, despojos, tomadoPor}).
+   Acá se lista lo que nadie tomó todavía: "Sumar a la mochila" lo reclama con una transacción (el primero se lo lleva) y lo
+   agrega a la mochila; si la mochila está llena no entra. Lo que sobra, el GM lo convierte en despojos ("Despojar"). */
+let botinLoot = [];   // [{docId, nombre, item, despojos, origen}]
+function botinLootEscuchar(){
+  if(!fbUsuario) return;
+  fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
+    botinLoot = [];
+    snap.docs.forEach(d => {
+      const x = d.data();
+      if(x.tomadoPor) return;
+      let item = null;
+      try{ item = JSON.parse(x.json || 'null'); }catch(e){}
+      if(!item) return;
+      item.id = 'botin-' + d.id;
+      botinLoot.push({docId: d.id, nombre: x.nombre || item.nombre, item, despojos: num(x.despojos), origen: x.origen || ''});
+    });
+    botinLootRender();
+  }, err => console.error('Error escuchando el botín:', err));
+}
+function botinItemPorId(id){
+  const b = botinLoot.find(x => x.item.id === id);
+  return b ? b.item : null;
+}
+function botinPuedeTomar(){
+  const f = fichaVivo;
+  return !!(f && f.cargada && !f.soloLectura && !f.editaGM);
+}
+function mochilaUsada(){ return S.inventario.filter(i => !i.equipado).reduce((a, i) => a + ranurasDe(i), 0); }
+function botinTextoItem(item){
+  const partes = [];
+  if(item.tier) partes.push(item.tier);
+  if(CATEGORIA_LABEL[item.tipoItem]) partes.push(CATEGORIA_LABEL[item.tipoItem]);
+  const dano = ES_ARMA(item.tipoItem) ? armaDanoTxt(item) : '';
+  if(dano) partes.push('Daño ' + dano);
+  const st = statsComparablesDe(item);
+  Object.keys(st).forEach(k => { if(k !== 'danoprom') partes.push(`${STAT_COMPARABLE_LABEL[k] || STAT_LABEL[k] || k} ${st[k] > 0 ? '+' : ''}${fmt(st[k])}`); });
+  (item.efectosGolpe || []).forEach(e => { if(e && e.nombre) partes.push('Al golpear: ' + e.nombre); });
+  partes.push(`Peso ${fmt(num(item.peso))}`);
+  if(item.detalle) partes.push(item.detalle);
+  return partes.join(' · ');
+}
+function botinLootRender(){
+  const btn = $('#btn-botin-loot');
+  if(btn){
+    btn.hidden = !botinLoot.length;
+    $('#botin-loot-n').textContent = botinLoot.length ? `(${botinLoot.length})` : '';
+  }
+  if($('#scrim-botin-loot').classList.contains('open')) botinLootCuerpo();
+}
+function botinLootCuerpo(){
+  const cap = num(S.caps.mochila), usado = mochilaUsada();
+  const libres = cap > 0 ? Math.max(0, cap - usado) : null;
+  const puede = botinPuedeTomar();
+  $('#botin-loot-body').innerHTML = `
+    <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+      <span>Mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras${libres !== null ? ` · <b>${fmt(libres)}</b> libres` : ''}</span>
+      <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
+    </div>
+    ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para tomar cosas del botín.</div>'}
+    ${botinLoot.length ? botinLoot.map(b => {
+      const info = slotOcupadoInfo(b.item);
+      const comparar = info && info.equipados.length;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
+        <div style="flex:1;min-width:0" title="${esc(botinTextoItem(b.item))}">
+          <div style="font-weight:600">${esc(b.nombre)}${b.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
+          <div class="hint">≈ ${fmt(b.despojos)} despojos${b.origen ? ' · de ' + esc(b.origen) : ''}${info && info.ocupado ? ' · slot ocupado' : ''}</div>
+        </div>
+        ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(b.item.id)}">Comparar</button>` : ''}
+        <button type="button" class="btn primary" data-botin-tomar="${esc(b.docId)}"${puede ? '' : ' disabled'}>Sumar a la mochila</button>
+      </div>`;
+    }).join('') : '<div class="hint">No queda nada sin tomar.</div>'}`;
+}
+async function botinTomar(docId){
+  if(!botinPuedeTomar()){ toast('Abrí tu personaje para tomar el botín'); return; }
+  const b = botinLoot.find(x => x.docId === docId);
+  if(!b) return;
+  const item = b.item;
+  const igual = item.trofeo ? S.inventario.find(i => i.trofeo && i.nombre === item.nombre) : null;   // los trofeos iguales se apilan en una ranura
+  const cap = num(S.caps.mochila);
+  if(!igual && cap > 0 && mochilaUsada() + ranurasDe(item) > cap){ toast(`Mochila llena: ${b.nombre} no entra (se va a convertir en despojos si nadie lo toma)`); return; }
+  const ref = fbDb.collection(fbRutaCampana('botin')).doc(docId);
+  let ok = false, quien = '';
+  try{
+    ok = await fbDb.runTransaction(async tx => {
+      const x = await tx.get(ref);
+      if(!x.exists) return false;
+      if(x.data().tomadoPor){ quien = x.data().tomadoNombre || ''; return false; }
+      tx.update(ref, {tomadoPor: fbUsuario.uid, tomadoNombre: String(S.meta.nombre || fbMiembro.nombre || '').slice(0, 60)});
+      return true;
+    });
+  }catch(err){
+    console.error('No se pudo tomar el botín:', err);
+    toast('No se pudo tomar' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
+    return;
+  }
+  if(!ok){ toast(quien ? `${b.nombre} ya lo tomó ${quien}` : `${b.nombre} ya no está`); return; }
+  if(igual){ igual.unidades = num(igual.unidades) + 1; }
+  else{
+    const nuevo = structuredClone(item);
+    nuevo.id = uid();
+    nuevo.equipado = false;
+    nuevo.unidades = 1;
+    nuevo.ranuras = item.ranuras ?? 1;
+    S.inventario.push(nuevo);
+  }
+  renderInventario();
+  refresh();
+  toast(`${b.nombre} → mochila`);
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(S.meta.nombre || ''), origen: `🎁 ${S.meta.nombre || fbMiembro.nombre} tomó ${b.nombre}`, formula: '',
+      rolls: [], mod: 0, total: 0, desde: 'recompensa', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo escribir en la Mesa:', err); }
+}
+$('#btn-botin-loot').onclick = () => { botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); };
+$('#botin-loot-x').onclick = () => $('#scrim-botin-loot').classList.remove('open');
+$('#botin-loot-body').addEventListener('click', e => {
+  const t = e.target.closest('[data-botin-tomar]');
+  if(t){ botinTomar(t.dataset.botinTomar); return; }
+  const c = e.target.closest('[data-botin-comparar]');
+  if(c){ abrirComparar(c.dataset.botinComparar); return; }
+  if(e.target.closest('#botin-loot-mochila')){ $('#scrim-botin-loot').classList.remove('open'); renderEquipo(); $('#scrim-equipo').classList.add('open'); }
+});
+
 $('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
 $('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') $('#scrim-equipo').classList.remove('open'); });
 
@@ -7303,6 +7440,7 @@ function itemCatalogo(id){
   return S.catalogo.find(x => x.id === id)
     || (tiendaCargada && Array.isArray(tiendaCargada.itemsDatos) ? tiendaCargada.itemsDatos.find(x => x && x.id === id) : null)
     || S.inventario.find(x => x.id === id)  // un ítem de la mochila (Comparar desde "Equipar")
+    || botinItemPorId(id)                   // un ítem del botín (Comparar desde "Botín")
     || null;
 }
 
@@ -10564,6 +10702,7 @@ async function fbAlEntrar(){
   modoMapaEscuchar();
   tiendaEstadoEscuchar();
   recompensasEscuchar();
+  botinLootEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

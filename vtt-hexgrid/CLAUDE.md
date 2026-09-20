@@ -785,3 +785,5 @@ hexágono con otro sin importar bando. Todavía no está construido.
   las reglas): al dispararse el mapa tira el daño (`trampaAplicarDano`), lo aplica con `danioPj`/`danioCreep` a quien
   la activó (restando su Defensa) y, si es de área, a los creeps de adentro cuando mueve el GM; a los demás se les
   avisa en la Mesa. Los estados y las tiradas para evitarla siguen a mano y el texto lo aclara.
+
+- **Tokens automáticos y fin de combate en el mapa** (2026-09-20, solo GM, en `#caja-mantenimiento`): **📥 Importar tokens** (elige un grupo de creeps de GM Tools; crea sus tokens ocultos), **👥 Tokens de jugadores** (los personajes de la partida, visibles) — ambos en fila al centro de lo que se ve (`mapa-centro` en `localStorage`, `guardarVista`), en el mapa mostrado y salteando los que ya tienen token (`comun/tokens-auto.js`); **🏁 Finalizar combate** y **🎁 Botín** abren GM Tools en un iframe (`abrirModoGM`).

@@ -737,7 +737,7 @@ html.modo-acciones, html.modo-acciones body{background:transparent!important;min
 html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop){display:none!important}
 </style>
 <script>
-if(new URLSearchParams(location.search).get('modo') === 'acciones') document.documentElement.classList.add('modo-acciones');
+if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.search).get('modo'))) document.documentElement.classList.add('modo-acciones');   // finalizar y botín: el mapa los abre igual que las Acciones
 </script>
 </head>
 <body>
@@ -754,6 +754,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
       <span class="accesos-sep"></span>
       <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
+      <button type="button" class="iconbtn" id="btn-botin" title="Lo que soltaron los creeps y nadie tomó: repartir como despojos">🎁 Botín</button>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Vuelve el contador de turnos a cero">↺ Reiniciar combate</button>
       <button type="button" class="iconbtn dk-catalogo" id="btn-catalogo" title="Catálogo de equipo para los creeps">⚔ Catálogo</button>
       <span class="accesos-sep"></span>
@@ -779,6 +780,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 
 
   <div id="empty" class="empty-state" style="display:none">Sin creeps todavía. Tocá "+ Creep" para agregar el primero.</div>
+  <div id="grupos-barra"></div>
   <div class="grid" id="grid"></div>
 </div>
 
@@ -995,6 +997,17 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
   </div>
 </div>
 
+<div class="scrim" id="scrim-botin-gm">
+  <div class="modal" style="max-width:600px">
+    <header><h3>🎁 Botín del combate</h3><button class="iconbtn" id="botin-gm-x">Cerrar</button></header>
+    <div class="body" id="botin-gm-cuerpo"></div>
+    <footer>
+      <button class="btn ghost" id="botin-gm-cerrar">Cerrar</button>
+      <button class="btn primary" id="botin-gm-despojar" title="Convierte en despojos lo que nadie tomó y lo reparte">🧰 Despojar</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-finalizar-combate">
   <div class="modal" style="max-width:640px">
     <header><h3>🏁 Resumen del combate</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
@@ -1124,6 +1137,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/biblioteca.js"></script>
+<script src="../comun/tokens-auto.js"></script>
 <script src="../comun/creeps-base.js"></script>
 <script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
@@ -1947,7 +1961,7 @@ function nuevoCreep(){
     habilidades:[],
     estados:[],
     notas:'',
-    tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, armaNatural:false, trofeoEspecial:{nombre:'', precio:0},   // recompensas
+    grupo:'', tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, armaNatural:false, trofeoEspecial:{nombre:'', precio:0},   // recompensas
     escalaTipos: ESCALA_TIPOS,
   };
 }
@@ -1966,7 +1980,7 @@ function guardarCreepEnBiblioteca(sc){
 }
 
 function agregarCreepDeBiblioteca(datos){
-  const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: ''});
+  const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: '', grupo: grupoParaNuevo()});
   sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
   sc.equipo = (sc.equipo || []).map(it => ({...it, id: uid()}));
@@ -2495,6 +2509,7 @@ function normalizarCreep(sc){
   migrarCreepTipos(sc);
   migrarCreepEspecial(sc);
   // Recompensas (2026-09-20): los creeps viejos no las traen.
+  if(typeof sc.grupo !== 'string') sc.grupo = '';
   if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';
   if(sc.tipoCriaturaOtro === undefined) sc.tipoCriaturaOtro = '';
   sc.jefe = sc.jefe === true;
@@ -2536,7 +2551,11 @@ function renderAll(){
   const grid = $('#grid');
   $('#empty').style.display = S.creeps.length ? 'none' : 'block';
   S.creeps.forEach(normalizarCreep);
-  grid.innerHTML = S.creeps.map(sc => cardCompactoHtml(sc)).join('');
+  renderGruposBarra();
+  const visibles = S.creeps.filter(pasaGrupo);
+  grid.innerHTML = visibles.map(sc => cardCompactoHtml(sc)).join('');
+  if(S.creeps.length && !visibles.length){ $('#empty').style.display = 'block'; $('#empty').textContent = 'No hay creeps en este grupo. Con el grupo abierto, "+ Creep" agrega uno acá, o cambiale el grupo a un creep desde su ficha.'; }
+  else $('#empty').textContent = 'Sin creeps todavía. Tocá "+ Creep" para agregar el primero.';
   if($('#scrim-editar-creep').classList.contains('open')) renderEditarCreep();
   if(asistCreepAbierto()) renderAsistenteCreep();
   if($('#scrim-acciones-creep').classList.contains('open')) renderAccionesCreep();
@@ -2730,6 +2749,7 @@ function abrirAsistenteCreep(scId){
   if(!scId){
     const sc = nuevoCreep();
     sc.nombre = 'Creep nuevo';
+    sc.grupo = grupoParaNuevo();
     S.creeps.push(sc);
     scId = sc.id;
     nuevo = true;
@@ -3137,6 +3157,8 @@ function cardHtml(sc){
       <input type="file" class="imginput" data-imginput="${sc.id}" accept="image/*" hidden>
     </div>
     <div class="cbody">
+
+      ${grupoSelectHtml(sc)}
 
       <div class="vitalbar">
         <div class="vital-mini hp">
@@ -4529,7 +4551,7 @@ document.addEventListener('click', e => {
       textoAsistente: '🧭 Crear paso a paso',
       alAsistente: () => abrirAsistenteCreep(null),
       base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
-      alCrearDeCero: () => { S.creeps.push(nuevoCreep()); renderAll(); },
+      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.grupo = grupoParaNuevo(); S.creeps.push(nuevo); renderAll(); },
       alElegir: agregarCreepDeBiblioteca,
       alVer: verCreepDeBiblioteca,
       grupos: [
@@ -4779,11 +4801,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-finalizar-combate'){
-    combateRep.enMapa = null;
-    renderReporteCombate();
-    cargarCreepsEnMapa();
-    cargarJugadoresCombate();
-    $('#scrim-finalizar-combate').classList.add('open');
+    abrirReporteFinalizar();
     return;
   }
   if(b.id === 'btn-respaldo-partida'){
@@ -5594,6 +5612,14 @@ async function mesaLineaVerde(origen, formula){
   }catch(err){ console.error('No se pudo escribir la línea verde en la Mesa:', err); }
 }
 
+function abrirReporteFinalizar(){
+  combateRep.enMapa = null;
+  renderReporteCombate();
+  cargarCreepsEnMapa();
+  cargarJugadoresCombate();
+  $('#scrim-finalizar-combate').classList.add('open');
+}
+
 async function publicarRecompensas(){
   if(combateRep.publicando) return;
   if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Solo el GM de la partida puede publicar'); return; }
@@ -5622,6 +5648,7 @@ async function publicarRecompensas(){
     renderAll();
     $('#scrim-finalizar-combate').classList.remove('open');
     toast('Recompensas publicadas ✓ — se cargan solas en las fichas');
+    if(items.length) abrirBotinGM();   // para ver qué toman los jugadores y despojar después
   }catch(err){
     console.error('No se pudieron publicar las recompensas:', err);
     combateRep.publicando = false;
@@ -5629,6 +5656,182 @@ async function publicarRecompensas(){
     toast(err.code === 'permission-denied' ? 'Faltan las reglas nuevas de Firebase (recompensas/botín): pegalas en la consola' : 'No se pudo publicar — mirá la consola');
   }
 }
+
+
+/* =========================================================
+   Grupos de creeps (pestañas por escenario) y tokens automáticos
+   Un creep pertenece a UN solo grupo (campo `grupo`); para repetir uno en otro escenario se lo duplica.
+   ========================================================= */
+let grupoActivo = '';   // '' = todos · '__sin' = sin grupo · si no, el nombre del grupo
+try{ grupoActivo = localStorage.getItem('gm-grupo-activo') || ''; }catch(e){}
+function gruposExtra(){ try{ const g = JSON.parse(localStorage.getItem('gm-grupos-extra') || '[]'); return Array.isArray(g) ? g : []; }catch(e){ return []; } }
+function guardarGruposExtra(l){ try{ localStorage.setItem('gm-grupos-extra', JSON.stringify(l)); }catch(e){} }
+function nombresDeGrupos(){
+  const set = new Set(gruposExtra());
+  S.creeps.forEach(sc => { if(sc.grupo) set.add(sc.grupo); });
+  return [...set].sort((a, b) => a.localeCompare(b, 'es'));
+}
+function pasaGrupo(sc){
+  if(!grupoActivo) return true;
+  if(grupoActivo === '__sin') return !sc.grupo;
+  return sc.grupo === grupoActivo;
+}
+function grupoParaNuevo(){ return grupoActivo && grupoActivo !== '__sin' ? grupoActivo : ''; }
+function fijarGrupoActivo(g){
+  grupoActivo = g;
+  try{ localStorage.setItem('gm-grupo-activo', g); }catch(e){}
+  renderAll();
+}
+function renderGruposBarra(){
+  const caja = $('#grupos-barra');
+  if(!caja) return;
+  const grupos = nombresDeGrupos();
+  const cuenta = g => S.creeps.filter(sc => g === '' ? true : g === '__sin' ? !sc.grupo : sc.grupo === g).length;
+  const sinGrupo = cuenta('__sin');
+  const tab = (id, texto, n) => `<button type="button" class="btn${grupoActivo === id ? ' primary' : ''}" data-grupo-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px">${esc(texto)} <span class="hint">${n}</span></button>`;
+  const real = grupoActivo && grupoActivo !== '__sin' && grupos.includes(grupoActivo);
+  caja.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
+      ${tab('', 'Todos', cuenta(''))}${grupos.map(g => tab(g, g, cuenta(g))).join('')}${sinGrupo && grupos.length ? tab('__sin', 'Sin grupo', sinGrupo) : ''}
+      <button type="button" class="btn ghost" data-grupo-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un grupo (un escenario de combate)">＋ Grupo</button>
+      ${real ? `<span style="margin-left:auto;display:flex;gap:6px">
+        <button type="button" class="btn primary" data-grupo-tokens="1" title="Crea un token por cada creep de este grupo, en fila, en el centro del mapa que estás viendo (ocultos a los jugadores)">🎯 Crear tokens (${cuenta(grupoActivo)})</button>
+        <button type="button" class="btn ghost" data-grupo-renombrar="1" title="Renombrar el grupo">✎</button>
+        <button type="button" class="btn ghost" data-grupo-borrar="1" title="Quitar el grupo (los creeps quedan sin grupo)">🗑</button></span>` : ''}
+    </div>`;
+}
+async function crearTokensDelGrupo(){
+  if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
+  const lista = S.creeps.filter(sc => sc.grupo === grupoActivo);
+  if(!lista.length){ toast('Ese grupo no tiene creeps'); return; }
+  try{
+    const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})));
+    toast(r.creados ? `🎯 ${r.creados} token(s) creados en el mapa que estás viendo, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los creeps de ese grupo ya tienen token en ese mapa');
+  }catch(err){
+    console.error('No se pudieron crear los tokens:', err);
+    toast('No se pudieron crear los tokens — mirá la consola');
+  }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b) return;
+  if(b.dataset.grupoTab !== undefined){ fijarGrupoActivo(b.dataset.grupoTab); return; }
+  if(b.dataset.grupoNuevo){
+    const n = (prompt('Nombre del grupo (por ejemplo, el escenario de combate):') || '').trim().slice(0, 40);
+    if(!n) return;
+    if(!nombresDeGrupos().includes(n)) guardarGruposExtra([...gruposExtra(), n]);
+    fijarGrupoActivo(n);
+    return;
+  }
+  if(b.dataset.grupoTokens){ crearTokensDelGrupo(); return; }
+  if(b.dataset.grupoRenombrar){
+    const n = (prompt('Nuevo nombre del grupo:', grupoActivo) || '').trim().slice(0, 40);
+    if(!n || n === grupoActivo) return;
+    S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = n; });
+    guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo).concat(n));
+    fijarGrupoActivo(n);
+    return;
+  }
+  if(b.dataset.grupoBorrar){
+    if(!confirm(`¿Quitar el grupo "${grupoActivo}"? Los creeps no se borran: quedan sin grupo.`)) return;
+    S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = ''; });
+    guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo));
+    fijarGrupoActivo('');
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if(t.dataset.grupoCreep === undefined) return;
+  const sc = S.creeps.find(s => s.id === t.dataset.grupoCreep);
+  if(!sc) return;
+  let g = t.value;
+  if(g === '__nuevo'){
+    g = (prompt('Nombre del grupo nuevo:') || '').trim().slice(0, 40);
+    if(!g){ renderAll(); return; }
+    if(!nombresDeGrupos().includes(g)) guardarGruposExtra([...gruposExtra(), g]);
+  }
+  sc.grupo = g;
+  renderAll();
+});
+function grupoSelectHtml(sc){
+  const gs = nombresDeGrupos();
+  return `<div class="mini-f" style="margin-bottom:8px"><label>Grupo (escenario)</label>
+    <select data-grupo-creep="${sc.id}"><option value="">(sin grupo)</option>${gs.map(g => `<option value="${esc(g)}"${sc.grupo === g ? ' selected' : ''}>${esc(g)}</option>`).join('')}<option value="__nuevo">＋ nuevo grupo…</option></select></div>`;
+}
+
+/* =========================================================
+   Botín pendiente (GM): lo que los jugadores no tomaron → "Despojar"
+   campanas/<id>/botin/*: un doc por ítem ({nombre, json, despojos, tomadoPor, tomadoNombre}).
+   Despojar suma los despojos de lo que quedó, los reparte entre los jugadores elegidos (hacia arriba) como
+   recompensas (la ficha las aplica sola) y borra el botín.
+   ========================================================= */
+let botinGM = {docs: [], jugadores: null, incluidos: new Set(), escucha: null, ocupado: false};
+function botinEscuchar(){
+  if(botinGM.escucha || !fbDb || !fbMiembro) return;
+  botinGM.escucha = fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
+    botinGM.docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if($('#scrim-botin-gm').classList.contains('open')) renderBotinGM();
+  }, err => console.error('No se pudo escuchar el botín:', err));
+}
+async function abrirBotinGM(){
+  botinEscuchar();
+  $('#scrim-botin-gm').classList.add('open');
+  renderBotinGM();
+  if(botinGM.jugadores === null && fbDb && fbMiembro){
+    try{
+      const fichas = await fbDb.collection(fbRutaCampana('fichas')).get();
+      botinGM.jugadores = fichas.docs.map(d => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      botinGM.incluidos = new Set(botinGM.jugadores.map(j => j.id));
+    }catch(err){ botinGM.jugadores = []; console.error(err); }
+    renderBotinGM();
+  }
+}
+function renderBotinGM(){
+  const libres = botinGM.docs.filter(d => !d.tomadoPor);
+  const tomados = botinGM.docs.filter(d => d.tomadoPor);
+  const total = libres.reduce((a, d) => a + num(d.despojos), 0);
+  const jug = botinGM.jugadores;
+  const n = jug ? jug.filter(j => botinGM.incluidos.has(j.id)).length : 0;
+  const cada = n ? Math.ceil(total / n) : 0;
+  $('#botin-gm-cuerpo').innerHTML = `
+    <div class="reporte-seccion-titulo">Sin tomar (${libres.length})</div>
+    <div class="reporte-loot-items">${libres.length ? libres.map(d => `<span class="reporte-loot-item">${esc(d.nombre)} <span class="reporte-loot-precio">${fmt(num(d.despojos))} despojos</span></span>`).join('') : '<span class="hint">No queda nada sin tomar.</span>'}</div>
+    ${tomados.length ? `<div class="reporte-seccion-titulo" style="margin-top:12px">Ya tomados (${tomados.length})</div>
+      <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')}</span>`).join('')}</div>` : ''}
+    <div class="reporte-seccion-titulo" style="margin-top:14px">Despojar: ${fmt(total)} despojos${n ? ` → ${fmt(cada)} c/u (hacia arriba)` : ''}</div>
+    ${jug === null ? '<div class="hint">Cargando personajes…</div>' : jug.map(j => `<label class="reporte-fila" style="cursor:pointer;gap:8px;align-items:center"><input type="checkbox" data-botin-jug="${esc(j.id)}"${botinGM.incluidos.has(j.id) ? ' checked' : ''}><span class="reporte-nombre">${esc(j.nombre)}</span></label>`).join('')}
+    <div class="hint" style="margin-top:6px">Preguntá a la mesa si alguien quiere algo más y después apretá <b>Despojar</b>: lo que queda se convierte en despojos, se reparte y se carga solo en las fichas.</div>`;
+  $('#botin-gm-cuerpo').querySelectorAll('[data-botin-jug]').forEach(c => c.onchange = () => { if(c.checked) botinGM.incluidos.add(c.dataset.botinJug); else botinGM.incluidos.delete(c.dataset.botinJug); renderBotinGM(); });
+  $('#botin-gm-despojar').disabled = botinGM.ocupado || !botinGM.docs.length || !n;
+}
+async function despojarBotin(){
+  if(botinGM.ocupado) return;
+  const libres = botinGM.docs.filter(d => !d.tomadoPor);
+  const elegidos = (botinGM.jugadores || []).filter(j => botinGM.incluidos.has(j.id));
+  if(!elegidos.length){ toast('Elegí al menos un personaje'); return; }
+  const total = libres.reduce((a, d) => a + num(d.despojos), 0);
+  const cada = Math.ceil(total / elegidos.length);
+  if(!confirm(`¿Despojar?\n\nLo que no se tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).`)) return;
+  botinGM.ocupado = true; renderBotinGM();
+  try{
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const batch = fbDb.batch();
+    if(cada > 0) elegidos.forEach(j => batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp: 0, dde: 0, despojos: cada, estado: 'despojos', aplicada: false, creado: ts}));
+    botinGM.docs.forEach(d => batch.delete(fbDb.collection(fbRutaCampana('botin')).doc(d.id)));
+    await batch.commit();
+    await mesaLineaVerde('🧰 Despojos del combate', `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} despojos a ${elegidos.map(j => j.nombre).join(', ')}`);
+    toast(`Despojado ✓ — +${fmt(cada)} despojos para cada uno`);
+    $('#scrim-botin-gm').classList.remove('open');
+  }catch(err){
+    console.error('No se pudo despojar:', err);
+    toast(err.code === 'permission-denied' ? 'Faltan las reglas nuevas de Firebase' : 'No se pudo despojar — mirá la consola');
+  }finally{
+    botinGM.ocupado = false;
+  }
+}
+$('#botin-gm-despojar').onclick = despojarBotin;
+$('#botin-gm-x').onclick = () => $('#scrim-botin-gm').classList.remove('open');
+$('#botin-gm-cerrar').onclick = () => $('#scrim-botin-gm').classList.remove('open');
+document.addEventListener('click', e => { if(e.target.closest('#btn-botin')) abrirBotinGM(); });
 
 let toastT;
 function toast(msg){
@@ -6094,6 +6297,7 @@ function creepPublico(sc, orden){
     nombre: String(sc.nombre || 'Creep').slice(0, 60),
     orden,
     color: String(sc.color || ''),
+    grupo: String(sc.grupo || '').slice(0, 40),   // el mapa lo usa para "Importar tokens" de un grupo
     resumen: {
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
@@ -6305,7 +6509,10 @@ async function gmProcesarSnapshot(snap){
     g.listo = true;
     gmEstadoAlDia();
     gmMantenimientoRevisar();
-    if(MODO_ACCIONES) accionesModoAbrir(new URLSearchParams(location.search).get('creep'));
+    const modoGM = new URLSearchParams(location.search).get('modo');
+    if(modoGM === 'finalizar'){ abrirReporteFinalizar(); gmAvisarMapa('acciones-lista'); }
+    else if(modoGM === 'botin'){ abrirBotinGM(); gmAvisarMapa('acciones-lista'); }
+    else if(MODO_ACCIONES) accionesModoAbrir(new URLSearchParams(location.search).get('creep'));
     // ?editar=<creep>: el mapa abre la ficha completa de ese creep (botón 📜 del token).
     const paraEditar = new URLSearchParams(location.search).get('editar');
     if(!MODO_ACCIONES && paraEditar && S.creeps.some(s => s.id === paraEditar)) abrirEditarCreep(paraEditar);

@@ -720,6 +720,13 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <aside>
     <div class="seccion" id="caja-mantenimiento" hidden>
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+        <button type="button" class="btn chico" id="btn-finalizar-mapa" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
+        <button type="button" class="btn chico" id="btn-botin-mapa" title="Lo que los jugadores no tomaron: repartirlo como despojos">🎁 Botín</button>
+        <button type="button" class="btn chico" id="btn-importar-tokens" title="Crea un token por cada creep de un grupo de GM Tools, en fila, en el centro de lo que ves (ocultos)">📥 Importar tokens</button>
+        <button type="button" class="btn chico" id="btn-tokens-jugadores" title="Crea los tokens de los personajes de los jugadores que todavía no tienen token en este mapa">👥 Tokens de jugadores</button>
+      </div>
+      <div id="importar-menu" style="display:none;flex-direction:column;gap:4px;margin-top:6px"></div>
     </div>
     <div class="seccion" id="panel-token"></div>
     <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
@@ -787,6 +794,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/mesa.js"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/biblioteca.js"></script>
+<script src="../comun/tokens-auto.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script>
 /* =========================================================
@@ -2555,6 +2563,8 @@ function inicial(nombre){
 
 function guardarVista(){
   try{ localStorage.setItem('mapa-vista', JSON.stringify(vista)); }catch(e){}
+  // También el hexágono del centro de la pantalla: TokensAuto (comun/tokens-auto.js) lo usa para poner los tokens nuevos ahí.
+  try{ const w = pantallaAMundo(anchoPx / 2, altoPx / 2); localStorage.setItem('mapa-centro', JSON.stringify(mundoAHex(w.x, w.y))); }catch(e){}
 }
 function cargarVista(){
   try{
@@ -5150,7 +5160,7 @@ function escucharVinculables(){
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
-  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'grupo', 'color']);
 }
 
 function componerFondo(){
@@ -6695,6 +6705,64 @@ function abrirBotoneraPrincipal(){
   if(!fichaId){ toast('No tenés un personaje con Botonera'); return; }
   abrirBotonera(fichaId);
 }
+
+/* GM Tools adentro del mapa: el reporte de fin de combate (modo=finalizar) y el botín para despojar (modo=botin). */
+function abrirModoGM(modo){
+  const capa = $('#botonera-capa');
+  const marco = $('#botonera-marco');
+  capa.hidden = false;
+  ubicarBotoneraCapa();
+  botonera = {herramienta: 'gm', fichaId: '', lista: false, pendiente: null};
+  $('#botonera-cargando-texto').textContent = modo === 'finalizar' ? 'Abriendo el reporte del combate…' : 'Abriendo el botín…';
+  $('#botonera-cargando').hidden = false;
+  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=${modo}`);
+}
+$('#btn-finalizar-mapa').onclick = () => abrirModoGM('finalizar');
+$('#btn-botin-mapa').onclick = () => abrirModoGM('botin');
+
+/* Tokens automáticos (comun/tokens-auto.js): uno por creep de un grupo, o uno por personaje de jugador. */
+function centroDeLaVista(){
+  const w = pantallaAMundo(anchoPx / 2, altoPx / 2);
+  return mundoAHex(w.x, w.y);
+}
+$('#btn-importar-tokens').onclick = () => {
+  const menu = $('#importar-menu');
+  if(menu.style.display === 'flex'){ menu.style.display = 'none'; return; }
+  const grupos = new Map();
+  creepsPub.forEach((c, id) => { if(c.grupo) grupos.set(c.grupo, [...(grupos.get(c.grupo) || []), {id, nombre: c.nombre, color: c.color}]); });
+  if(!grupos.size){ toast('No hay grupos de creeps: armalos en GM Tools (pestañas de creeps)'); return; }
+  menu.innerHTML = [...grupos.entries()].sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([g, l]) => `<button type="button" class="btn chico" data-imp-grupo="${esc(g)}">${esc(g)} · ${l.length} creep(s)</button>`).join('');
+  menu.style.display = 'flex';
+};
+$('#importar-menu').addEventListener('click', async e => {
+  const b = e.target.closest('[data-imp-grupo]');
+  if(!b) return;
+  const lista = [];
+  creepsPub.forEach((c, id) => { if(c.grupo === b.dataset.impGrupo) lista.push({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}); });
+  $('#importar-menu').style.display = 'none';
+  try{
+    const r = await TokensAuto.crear(lista, {mapaId: mapaMostrado, centro: centroDeLaVista()});
+    toast(r.creados ? `📥 ${r.creados} token(s) creados, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los creeps del grupo ya tienen token en este mapa');
+  }catch(err){
+    console.error('No se pudieron importar los tokens:', err);
+    toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+});
+$('#btn-tokens-jugadores').onclick = async () => {
+  const fichas = [...fichasPub.entries()].filter(([id]) => !String(id).includes(SEP_INVOCACION));
+  if(!fichas.length){ toast('Todavía no hay personajes en la partida'); return; }
+  if(!confirm(`Se crean los tokens (visibles) de estos personajes, en fila, en el centro de lo que ves. Los que ya tienen token en este mapa se saltean:\n\n${fichas.map(([, f]) => f.nombre).join(', ')}`)) return;
+  try{
+    const items = fichas.map(([id, f], i) => ({nombre: f.nombre, color: COLORES[i % COLORES.length], tipo: 'pj', fichaId: id, duenoUid: f.duenoUid, oculto: false}));
+    const r = await TokensAuto.crear(items, {mapaId: mapaMostrado, centro: centroDeLaVista()});
+    toast(r.creados ? `👥 ${r.creados} token(s) de jugadores creados${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los personajes ya tienen token en este mapa');
+  }catch(err){
+    console.error('No se pudieron crear los tokens de jugadores:', err);
+    toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+};
+
+setTimeout(guardarVista, 2000);   // deja anotado el centro de la vista aunque el GM no la mueva
 
 function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');

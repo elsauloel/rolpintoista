@@ -365,3 +365,5 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 - **Habilidades que curan** (2026-09-20): campo `curaHp` de la habilidad (asistente:
   "Vida (HP) que cura"): al ejecutarla se suma a la vida propia sin pasar del máximo.
   La usa Recuperación del Tanque (`comun/skills-clase.js`).
+
+- **Botín del combate** (2026-09-20, tanda 4): botón 🎁 del dock (`#btn-botin-loot`, aparece si hay botín) → `#scrim-botin-loot`: lo que soltaron los creeps y nadie tomó (`botinLootEscuchar`, colección `botin`). Nombre con hover de características, "≈ N despojos", **Sumar a la mochila** (`botinTomar`: transacción sobre el doc, el primero se lo lleva; mochila llena = no entra; trofeos iguales se apilan en una ranura; línea verde en la Mesa), **Comparar** (`itemCatalogo` conoce los `botin-<id>`), ranuras libres y "Abrir mochila". Los ítems con `trofeo: true` no se pueden equipar.

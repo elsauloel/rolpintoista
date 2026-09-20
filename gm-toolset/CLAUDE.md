@@ -248,5 +248,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   los creeps `recompensado` (no cuentan en el próximo reporte hasta "Reiniciar combate"). La **ficha** aplica cada recompensa una sola
   vez (`recompensasRevisar`, transacción sobre el doc) cuando el personaje está abierto y editable; si sube de nivel, pop-up de
   felicitación (`mostrarSubidaNivel`; el mapa lo muestra mirando el nivel del resumen de la ficha propia, `mostrarSubidaNivelMapa`).
-  Reglas nuevas: `recompensas` y `botin` (hay que pegarlas). Falta (tanda 4): el botín en la ficha de los jugadores ("Sumar a la mochila",
+  Reglas nuevas: `recompensas` y `botin` (hay que pegarlas). Tanda 4 hecha: el botín en la ficha ("Sumar a la mochila",
   Comparar, ranuras libres) y "Despojar".
+
+- **Grupos de creeps, tokens automáticos y botín** (2026-09-20, tanda 4): campo `grupo` del creep (pestañas `#grupos-barra`, `grupoActivo`, `pasaGrupo`; los creeps nuevos van al grupo abierto; cambiar de grupo desde su ficha, `grupoSelectHtml`). Con un grupo abierto, **🎯 Crear tokens** (`crearTokensDelGrupo`, `comun/tokens-auto.js`) pone un token oculto por creep en fila al centro de la vista del mapa que mira el GM, salteando los que ya tienen. **🎁 Botín** (`#scrim-botin-gm`, `abrirBotinGM`): lo que nadie tomó; **🧰 Despojar** lo convierte en despojos, los reparte (hacia arriba) como recompensas y borra el botín. Modos de iframe `?modo=finalizar|botin` para abrirlos desde el mapa.

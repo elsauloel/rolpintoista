@@ -485,6 +485,10 @@ input[type=file]{display:none}
 }
 .card-compacto .lv-compacto{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);flex:none}
 .chips-estados{display:flex;flex-wrap:wrap;gap:5px}
+.habs-mini{display:flex;flex-direction:column;margin-top:6px}
+.hab-mini{display:flex;align-items:center;gap:6px;padding:4px 0;border-top:1px solid var(--line-soft)}
+.hab-mini-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px}
+.hab-mini .verbtn,.hab-mini .hab-ejecutar{flex:none;padding:2px 9px;font-size:11px}
 .chip-estado{
   font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.03em;border:1px solid var(--line);
   border-radius:99px;padding:3px 9px;color:var(--paper);background:var(--panel2);cursor:pointer
@@ -2851,8 +2855,26 @@ function cardCompactoHtml(sc){
       </div>
       <div class="chips-estados">${chips}<button type="button" class="chip-estado chip-add" data-addestado="${sc.id}">+ Estado</button></div>
       <button type="button" class="addhab" data-abriracciones="${sc.id}" style="margin-top:2px">⚡ Acciones</button>
+      ${habsMiniHtml(sc)}
     </div>
   </div>`;
+}
+
+// Habilidades del creep, a mano en la tarjeta: nombre + Ver + Ejecutar (mismos botones que las Acciones).
+function habsMiniHtml(sc){
+  const habs = sc.habilidades || [];
+  if(!habs.length) return '';
+  return `<div class="habs-mini">${habs.map(h => {
+    const bloqueo = bloqueoHabCreep(sc, h);
+    const partes = [costoHabCreepTxt(sc, h)];
+    if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
+    const titulo = (bloqueo ? bloqueo + ' · ' : '') + partes.join(' · ');
+    return `<div class="hab-mini">
+      <span class="hab-mini-nombre" title="${esc(titulo)}">${esc(h.nombre || 'Sin nombre')}</span>
+      <button type="button" class="verbtn" data-verhabaccion="${sc.id}:${h.id}">Ver</button>
+      <button type="button" class="hab-ejecutar" data-ejecutar="${sc.id}:${h.id}" title="${esc(titulo)}" ${bloqueo ? 'disabled' : ''}>Ejecutar</button>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 // Banderas que un estado de creep puede llevar más allá de lo genérico

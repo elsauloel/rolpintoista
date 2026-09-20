@@ -394,7 +394,7 @@ Jugadores y GM pueden **poner trampas en el mapa**. Una trampa es un objeto de *
 - **Los rivales no la ven.** La ven solo su dueño y el GM hasta que se dispara. Armada se dibuja **ámbar con ⚠**; disparada, **roja con ✖** para todos.
 - **Quién la dispara:** los creeps, si la puso un jugador; los personajes, si la puso el GM. **Los aliados nunca**, salvo que tenga **"Fuego amigo: SÍ"**: entonces la disparan también los aliados y su dueño.
 - Al soltar un movimiento, si algún casillero de la ruta pisa la trampa, **el movimiento se corta ahí** y aparece una línea roja en la [[La Mesa|Mesa]] con el nombre, quién la activó y qué hace.
-- **Sus efectos se resuelven a mano** (por ahora solo avisa).
+- **Daño automático:** si la trampa tiene una tirada de daño (por ejemplo, 2d6), el mapa la tira solo y se la aplica a quien la activó, restando su [[Defensa]]. En un área también daña a los creeps de adentro cuando mueve el GM; a los demás se les avisa en la Mesa. **Estados y tiradas para evitarla siguen a mano**, y el texto de cada trampa lo aclara.
 
 ## Detectarlas
 La pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al quedar justo al lado de una trampa y avisa que corresponde una **tirada de percepción** (botón 🔎 en la Botonera: [[Especial]], con dado más alto por escalón).
@@ -402,7 +402,8 @@ La pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al
 ## Guardarlas y compartirlas
 - **💾 Guardar como recurrente:** deja la trampa (nombre, efecto, forma, tamaño, color) en tu lista "Trampas guardadas" (por navegador).
 - **📤 Proponer** al catálogo de trampas: el dueño del proyecto las revisa y pasan a ser oficiales.
-- **📚 Catálogo de trampas:** lista oficial con buscador y etiquetas. → [[Biblioteca de la comunidad]]
+- **📚 Catálogo de trampas:** 24 trampas de ejemplo (oso, foso, mina, nube de veneno, runas…), todas "creadas automáticamente: requieren auditar", con buscador y filtros. → [[Biblioteca de la comunidad]]
+- **Crear una trampa custom:** en el mismo catálogo, un asistente paso a paso te guía: clase, qué hace, forma, nombre y aspecto, resumen.
 
 > [!question] Todavía sin decidir
 > ¿Hay tirada para **detectar o desarmar** una trampa? ¿Hay límite para crearlas (cantidad, costo de No2, solo en combate)? ¿Habrá **trampas como consumibles** del catálogo?

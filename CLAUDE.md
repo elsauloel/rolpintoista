@@ -36,6 +36,10 @@
   invocador de abejas con sigilo, veneno y trampas, un sacerdote con escopeta
   de balas de agua bendita… Todo entra. **El rol del GM no es limitar sino
   acompañar y moderar.**
+- **Regla de automatización** (dicha por el dueño, 2026-09-20): **siempre que un
+  efecto pueda automatizarse, se automatiza; cuando no se puede, se aclara** en la
+  descripción de algún modo ("⚙ Automatizado: …" / "✋ A mano: …", como en las
+  habilidades de los creeps base y las trampas del catálogo).
 - **Consecuencia para el código y el diseño**: las herramientas *ayudan y
   recuerdan*, no *prohíben ni obligan*. Preferir avisar (y dejar seguir) antes
   que bloquear; dejar siempre una salida manual (editar un valor, forzar una

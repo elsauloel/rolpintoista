@@ -787,6 +787,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/mesa.js"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/biblioteca.js"></script>
+<script src="../comun/trampas-base.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1019,7 +1020,7 @@ let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
-let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
+let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '';   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
 let trampasGuardadas = [];
 try{ const g = JSON.parse(localStorage.getItem('mapa-trampas-guardadas') || '[]'); if(Array.isArray(g)) trampasGuardadas = g.filter(x => x && typeof x.nombre === 'string').slice(0, 40); }catch(e){}
@@ -1561,7 +1562,7 @@ function trampasGuardadasHtml(){
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
   if(!g) return;
-  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga;
+  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || '';
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
   elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(g.tamano)) || 1));
   if(/^#[0-9a-fA-F]{6}$/.test(g.color || '')) elemColor = g.color;
@@ -1574,10 +1575,185 @@ function cargarTrampaEnPanel(g){
 function abrirCatalogoTrampas(){
   Biblioteca.abrir({
     tipo: 'trampas', titulo: 'Catálogo de trampas',
+    base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
+    textoCrearDeCero: '+ Crear una trampa custom (paso a paso)',
+    alCrearDeCero: abrirAsistenteTrampa,
     alElegir: cargarTrampaEnPanel,
-    subtitulo: e => e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '',
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    grupos: [
+      {nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']},
+      {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']},
+      {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']},
+      {nombre: 'Alcance', tags: ['área']},
+    ],
   });
 }
+function guardarTrampaRecurrente(g){
+  const i = trampasGuardadas.findIndex(x => x.nombre === g.nombre);
+  if(i >= 0) trampasGuardadas[i] = g; else trampasGuardadas.push(g);
+  guardarTrampasGuardadas();
+  renderHerramientaFlotante();
+}
+function trampaDanoValido(t){ return /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(t || '').trim()); }
+
+/* ---------- Asistente paso a paso para crear una trampa propia ---------- */
+const TRAMPA_TIPOS = [
+  {id: 'dano', nombre: '💥 Daño directo', ayuda: 'Hiere a quien la pisa: foso, cuchillas, dardos…', dano: true, forma: 'flor', tam: 1, color: '#8A8A8A'},
+  {id: 'veneno', nombre: '☠️ Veneno o gas', ayuda: 'Una nube que envenena o adormece a los de adentro.', dano: false, estado: 'Veneno', forma: 'flor', tam: 2, color: '#4C9A2A'},
+  {id: 'explosiva', nombre: '🧨 Explosiva', ayuda: 'Estalla en un área y daña a todos los de adentro (aliados incluidos).', dano: true, forma: 'flor', tam: 2, color: '#D9531E', amiga: true},
+  {id: 'inmoviliza', nombre: '🪤 Atrapa', ayuda: 'Deja a quien la pisa sin poder moverse: oso, red, arena…', dano: false, estado: 'Inmovilizado', forma: 'flor', tam: 1, color: '#B5A642'},
+  {id: 'debuff', nombre: '🌀 Debilita', ayuda: 'Un debuff: Rengo, Pajaritos, Lisiado, Cansado…', dano: false, estado: 'Pajaritos', forma: 'flor', tam: 1, color: '#7A5FD0'},
+  {id: 'control', nombre: '🧠 Controla', ayuda: 'Stun, confusión, agotamiento: le quita el control de sus acciones.', dano: false, estado: 'Stun', forma: 'flor', tam: 1, color: '#B784E0'},
+  {id: 'alarma', nombre: '🔔 Alarma', ayuda: 'No hiere: avisa. Alerta a los enemigos cercanos.', dano: false, estado: '', forma: 'linea', tam: 3, color: '#C0A060'},
+  {id: 'otra', nombre: '✨ Otra cosa', ayuda: 'Algo distinto: lo describís vos.', dano: false, estado: '', forma: 'flor', tam: 1, color: '#3F6FB0'},
+];
+const TRAMPA_ESTADOS = [
+  ['', 'Ninguno'], ['Veneno', 'Veneno (1 de daño por stack por turno)'], ['Sangrado', 'Sangrado (2 HP por turno hasta curarse)'],
+  ['Inmovilizado', 'Inmovilizado'], ['Rengo', 'Rengo (moverse cuesta 2 No2)'], ['Pajaritos', 'Pajaritos (PdG y Evasión a la mitad)'],
+  ['Lisiado', 'Lisiado (PdG y Parry a la mitad)'], ['Stun', 'Stun (sin No2)'], ['Exhausto', 'Exhausto (1 No2 como mucho)'],
+  ['Cansado', 'Cansado (-1 No2 máximo)'], ['Sentado', 'Sentado (-2 Evasión, pararse cuesta 1 No2)'], ['Confusión', 'Confusión (1d4 antes de cada acción)'],
+];
+const TRAMPA_SALVACIONES = ['', 'Evasión', 'Fuerza', 'Res.CC', 'Res.Mg', 'Res.Mt'];
+const TRAMPA_PASOS = ['Qué clase es', 'Qué hace', 'Forma y tamaño', 'Nombre y aspecto', 'Resumen'];
+let wt = null;   // estado del asistente
+
+function trampaDanoTexto(w){
+  if(!w.dano) return '';
+  const fijo = Math.round(num(w.fijo));
+  return `${Math.max(1, Math.round(num(w.dados)) || 1)}d${w.caras}${fijo ? (fijo > 0 ? '+' : '') + fijo : ''}`;
+}
+// El texto que se guarda en la trampa (máximo 200 caracteres, el tope del mapa).
+function trampaDetalleArmado(w){
+  const partes = [];
+  const d = trampaDanoTexto(w);
+  if(d) partes.push(`${d} de daño${w.tipoId === 'explosiva' ? ' explosivo' : ''} (automático)`);
+  if(w.estado){
+    const est = TRAMPA_ESTADOS.find(x => x[0] === w.estado);
+    let t = est ? est[1] : w.estado;
+    const turnos = Math.round(num(w.turnos));
+    if(w.estado === 'Veneno' && Math.round(num(w.stacks)) > 0) t = `${Math.round(num(w.stacks))} stacks de Veneno (1 de daño por stack por turno)`;
+    else if(turnos > 0) t += ` ${turnos} turno${turnos === 1 ? '' : 's'}`;
+    partes.push(t + ' (a mano)');
+  }
+  if(w.salvacion && num(w.dificultad) > 0) partes.push(`${w.salvacion} contra ${Math.round(num(w.dificultad))} lo evita (a mano)`);
+  if((w.extra || '').trim()) partes.push(w.extra.trim());
+  const txt = partes.join('. ');
+  return txt ? (/[.!?]$/.test(txt) ? txt : txt + '.') : '';
+}
+
+function abrirAsistenteTrampa(){
+  wt = {paso: 0, tipoId: '', dano: false, dados: 2, caras: 6, fijo: 0, estado: '', turnos: 2, stacks: 2, salvacion: '', dificultad: 10, extra: '',
+    forma: 'flor', tam: 1, nombre: '', color: '#3F6FB0', alfa: 45, amiga: false, detalleFinal: null};
+  let capa = document.getElementById('scrim-asistente-trampa');
+  if(!capa){
+    capa = document.createElement('div');
+    capa.className = 'scrim';
+    capa.id = 'scrim-asistente-trampa';
+    capa.style.zIndex = '95';
+    capa.innerHTML = '<div class="modal" style="max-width:640px"><header><h3 id="wt-titulo">Crear una trampa</h3><button class="iconbtn" id="wt-x">Cancelar</button></header><div class="body" id="wt-cuerpo"></div><footer id="wt-pie"></footer></div>';
+    document.body.appendChild(capa);
+    capa.addEventListener('mousedown', e => { if(e.target === capa) cerrarAsistenteTrampa(); });
+    capa.addEventListener('click', clicAsistenteTrampa);
+    capa.addEventListener('input', entradaAsistenteTrampa);
+    capa.addEventListener('change', entradaAsistenteTrampa);
+  }
+  pintarAsistenteTrampa();
+  capa.classList.add('open');
+}
+function cerrarAsistenteTrampa(){
+  const capa = document.getElementById('scrim-asistente-trampa');
+  if(capa) capa.classList.remove('open');
+  wt = null;
+}
+function trampaResumenGuardable(){
+  const detalle = (wt.detalleFinal !== null ? wt.detalleFinal : trampaDetalleArmado(wt)).trim().slice(0, 200);
+  return {nombre: wt.nombre.trim().slice(0, 40), detalle, amiga: !!wt.amiga, tipo: wt.forma, tamano: Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(wt.tam)) || 1)),
+    color: wt.color, alfa: Number(wt.alfa), dano: wt.dano ? trampaDanoTexto(wt) : ''};
+}
+function pintarAsistenteTrampa(){
+  const w = wt;
+  if(!w) return;
+  const cuerpo = document.getElementById('wt-cuerpo'), pie = document.getElementById('wt-pie');
+  document.getElementById('wt-titulo').textContent = `Crear una trampa · paso ${w.paso + 1} de ${TRAMPA_PASOS.length}: ${TRAMPA_PASOS[w.paso]}`;
+  const campo = (etiqueta, html, ayuda) => `<div class="f" style="margin-bottom:12px"><label>${etiqueta}</label>${html}${ayuda ? `<div class="hint" style="margin-top:4px">${ayuda}</div>` : ''}</div>`;
+  let h = '';
+  if(w.paso === 0){
+    h = `<p class="hint" style="margin:0 0 10px">Elegí la clase que más se parezca a tu idea. Después ajustás todo.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">${TRAMPA_TIPOS.map(t => `<button type="button" class="btn${w.tipoId === t.id ? ' primary' : ''}" data-wt-tipo="${t.id}" style="text-align:left;white-space:normal"><b>${t.nombre}</b><br><small>${t.ayuda}</small></button>`).join('')}</div>`;
+  }else if(w.paso === 1){
+    h = campo('¿Hace daño?', `<label class="tk-lapiz-check" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-wt-campo="dano"${w.dano ? ' checked' : ''}> Sí: se tira solo y se descuenta de la vida de quien la activa (restando su Defensa)</label>`)
+      + (w.dano ? campo('Cuánto daño', `<div style="display:flex;gap:6px;align-items:center"><input type="number" min="1" max="20" data-wt-campo="dados" value="${esc(w.dados)}" style="width:70px"> d <select data-wt-campo="caras">${[4, 6, 8, 10, 12].map(c => `<option value="${c}"${num(w.caras) === c ? ' selected' : ''}>${c}</option>`).join('')}</select> + <input type="number" data-wt-campo="fijo" value="${esc(w.fijo)}" style="width:70px"></div>`, `Guía: nivel 1 → 1d6, 2 → 2d6, 3 → 3d6, 4 → 4d6, 5 → 5d6. Ahora: <b>${trampaDanoTexto(w)}</b>.`) : '')
+      + campo('¿Aplica un estado?', `<select data-wt-campo="estado">${TRAMPA_ESTADOS.map(e => `<option value="${e[0]}"${w.estado === e[0] ? ' selected' : ''}>${e[1]}</option>`).join('')}</select>`, 'El estado se anota en la Mesa: <b>aplicarlo lo hace la mesa a mano</b> (la herramienta todavía no lo puede poner sola sobre otros).')
+      + (w.estado ? (w.estado === 'Veneno'
+          ? campo('Stacks de veneno', `<input type="number" min="1" max="10" data-wt-campo="stacks" value="${esc(w.stacks)}" style="width:90px">`)
+          : campo('Duración (turnos)', `<input type="number" min="0" max="10" data-wt-campo="turnos" value="${esc(w.turnos)}" style="width:90px">`)) : '')
+      + campo('¿Se puede evitar con una tirada?', `<div style="display:flex;gap:6px;align-items:center"><select data-wt-campo="salvacion">${TRAMPA_SALVACIONES.map(s => `<option value="${s}"${w.salvacion === s ? ' selected' : ''}>${s || 'No, no hay tirada'}</option>`).join('')}</select>${w.salvacion ? ` contra <input type="number" min="1" max="30" data-wt-campo="dificultad" value="${esc(w.dificultad)}" style="width:80px">` : ''}</div>`, 'Guía: dificultad 6 + 2 por nivel de la trampa. La tirada se resuelve a mano.')
+      + campo('Algo más (opcional)', `<input type="text" maxlength="90" data-wt-campo="extra" value="${esc(w.extra)}" placeholder="ej. suena una alarma que alerta a 8 casillas">`);
+  }else if(w.paso === 2){
+    h = campo('Forma', `<select data-wt-campo="forma"><option value="flor"${w.forma === 'flor' ? ' selected' : ''}>Flor: un centro y su alrededor</option><option value="linea"${w.forma === 'linea' ? ' selected' : ''}>Línea</option><option value="libre"${w.forma === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option></select>`)
+      + (w.forma === 'libre' ? '' : campo(w.forma === 'flor' ? 'Radio' : 'Largo', `<input type="number" min="1" max="${TAMANO_ELEMENTO_MAX}" data-wt-campo="tam" value="${esc(w.tam)}" style="width:90px">`,
+          w.forma === 'flor' ? '1 = una sola casilla. 2 = la casilla y su primer anillo, y así.' : 'Cuántas casillas de largo.'))
+      + '<p class="hint">En el mapa, después de elegir "Cargar para colocarla", hacés clic donde va y arrastrás hasta el tamaño; se ajusta a lo de acá.</p>';
+  }else if(w.paso === 3){
+    h = campo('Nombre', `<input type="text" maxlength="40" data-wt-campo="nombre" value="${esc(w.nombre)}" placeholder="ej. Trampa de oso">`, 'Es lo que sale en la Mesa cuando se dispara (hasta 40 letras).')
+      + campo('Color', `<div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === w.color ? ' elegido' : ''}" data-wt-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>`)
+      + campo('Transparencia', `<input type="range" min="0" max="100" step="5" data-wt-campo="alfa" value="${esc(w.alfa)}">`)
+      + campo('Fuego amigo', `<label class="tk-lapiz-check" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-wt-campo="amiga"${w.amiga ? ' checked' : ''}> Sí: también la disparan tus aliados (y vos)</label>`, 'No: solo la disparan tus rivales. Las minas y derrumbes suelen ser "sí".');
+  }else{
+    const g = trampaResumenGuardable();
+    h = `<p class="hint" style="margin:0 0 10px">Revisá el texto que se va a ver en la Mesa cuando alguien la active. Podés corregirlo.</p>
+      ${campo('Nombre', `<b>${esc(g.nombre || '(sin nombre)')}</b> · ${g.tipo === 'flor' ? 'flor' : g.tipo} ${g.tipo === 'libre' ? '' : 'de ' + g.tamano} · ${g.amiga ? 'fuego amigo' : 'solo rivales'}`)}
+      ${campo('Qué hace (máx. 200 letras)', `<textarea rows="4" maxlength="200" data-wt-campo="detalleFinal" style="width:100%">${esc(g.detalle)}</textarea>`, `<b>⚙ Automático:</b> ${g.dano ? `tira ${esc(g.dano)} de daño y se lo aplica a quien la activa (en un área, también a los creeps si sos GM; a los demás jugadores se les avisa en la Mesa)` : 'solo avisa en la Mesa cuando se dispara'}. <b>✋ A mano:</b> estados, tiradas para evitarla y cualquier otro efecto del texto.`)}`;
+  }
+  cuerpo.innerHTML = h;
+  const ultimo = w.paso === TRAMPA_PASOS.length - 1;
+  const bloqueado = (w.paso === 0 && !w.tipoId) || (w.paso === 3 && !w.nombre.trim());
+  pie.innerHTML = `<button type="button" class="btn ghost" data-wt-nav="atras"${w.paso === 0 ? ' disabled' : ''}>← Atrás</button>
+    ${ultimo ? `<button type="button" class="btn" data-wt-fin="guardar">💾 Guardar como recurrente</button><button type="button" class="btn primary" data-wt-fin="colocar">Cargar para colocarla</button>`
+      : `<button type="button" class="btn primary" data-wt-nav="sig"${bloqueado ? ' disabled' : ''}>Siguiente →</button>`}`;
+}
+function clicAsistenteTrampa(e){
+  if(!wt) return;
+  if(e.target.closest('#wt-x')){ cerrarAsistenteTrampa(); return; }
+  const tipo = e.target.closest('[data-wt-tipo]');
+  if(tipo){
+    const t = TRAMPA_TIPOS.find(x => x.id === tipo.dataset.wtTipo);
+    Object.assign(wt, {tipoId: t.id, dano: !!t.dano, estado: t.estado || '', forma: t.forma, tam: t.tam, color: t.color, amiga: !!t.amiga, detalleFinal: null});
+    pintarAsistenteTrampa();
+    return;
+  }
+  const color = e.target.closest('[data-wt-color]');
+  if(color){ wt.color = color.dataset.wtColor; pintarAsistenteTrampa(); return; }
+  const nav = e.target.closest('[data-wt-nav]');
+  if(nav && !nav.disabled){
+    if(nav.dataset.wtNav === 'sig'){ wt.detalleFinal = null; wt.paso = Math.min(TRAMPA_PASOS.length - 1, wt.paso + 1); }
+    else wt.paso = Math.max(0, wt.paso - 1);
+    pintarAsistenteTrampa();
+    return;
+  }
+  const fin = e.target.closest('[data-wt-fin]');
+  if(fin){
+    const g = trampaResumenGuardable();
+    if(!g.nombre){ toast('Falta el nombre de la trampa'); return; }
+    if(fin.dataset.wtFin === 'guardar'){
+      guardarTrampaRecurrente(g);
+      toast(`Trampa "${g.nombre}" guardada: la encontrás en "Trampas guardadas"`);
+    }
+    cerrarAsistenteTrampa();
+    if(fin.dataset.wtFin === 'colocar') cargarTrampaEnPanel(g);
+  }
+}
+function entradaAsistenteTrampa(e){
+  if(!wt) return;
+  const c = e.target.dataset && e.target.dataset.wtCampo;
+  if(!c) return;
+  wt[c] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  const sig = document.querySelector('#wt-pie [data-wt-nav="sig"]');
+  if(sig && wt.paso === 3) sig.disabled = !wt.nombre.trim();   // el nombre habilita "Siguiente" sin redibujar
+  // Lo que cambia otras partes de la pantalla se vuelve a dibujar (solo al confirmar el cambio, para no perder el foco al tipear).
+  if(e.type === 'change' && ['dano', 'estado', 'salvacion', 'forma', 'caras', 'dados', 'fijo'].includes(c)) pintarAsistenteTrampa();
+}
+
 // Alerta roja en la Mesa cuando un personaje en sigilo hace algo que se sale de lo
 // normal (Mover libre, gastar más No2 de los que tiene): que no se "chispotee" una
 // regla sin que la mesa se entere. Solo avisa; no impide nada.
@@ -3931,6 +4107,7 @@ function escucharElementos(){
         trampaDetalle: typeof d.trampaDetalle === 'string' ? d.trampaDetalle : '',
         disparada: d.disparada === true,
         fuegoAmigo: d.fuegoAmigo === true,
+        trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
       });
     });
     pedirDibujo();
@@ -3948,7 +4125,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
-      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga} : {}),
+      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : ''} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -4616,6 +4793,26 @@ function trampasEvaluarRuta(tokId, t, ruta){
   }
   return null;
 }
+// Daño automático de la trampa: se tira solo y se descuenta (con la Defensa) de quien la activó. En un área
+// también de los creeps de adentro si mueve el GM; a los personajes de otros jugadores solo se les avisa en la Mesa.
+async function trampaAplicarDano(t, el){
+  if(!trampaDanoValido(el.trampaDano)) return;
+  const tir = tirarDados(el.trampaDano.trim());
+  if(!tir) return;
+  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
+  const afectados = [t];
+  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila))) afectados.push(x); });
+  const partes = [];
+  for(const x of afectados){
+    let hecho = false;
+    try{
+      if(x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(tir.total)); hecho = true; }
+      else if(x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && puedoMover(x)){ await danioPj(x, String(tir.total)); hecho = true; }
+    }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
+    partes.push(`${x.oculto ? 'Alguien' : nombreDe(x)}: ${hecho ? 'daño aplicado solo' : 'aplicalo a mano'}`);
+  }
+  alertaRojaAnonima(`💥 ${el.trampaNombre || 'Trampa'}: ${tir.formula} = ${tir.total} de daño (menos la Defensa de cada uno)`, partes.join(' · '));
+}
 // Después de que el token llegó a la casilla donde se cortó.
 async function trampaResolver(){
   const p = trampaPendiente;
@@ -4628,6 +4825,7 @@ async function trampaResolver(){
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
+    await trampaAplicarDano(t, p.el);
     return;
   }
   trampasAvisadas.add(p.tokenId + ':' + p.id);
@@ -6656,6 +6854,7 @@ function renderHerramientaFlotante(){
       <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
       ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">
+      <input type="text" id="elem-trampa-dano" maxlength="12" placeholder="Daño automático (ej. 2d6; vacío = solo avisa)" value="${esc(elemTrampaDano)}" style="margin-top:6px" title="Al dispararse, el mapa tira este daño solo y se lo aplica a quien la activa (restando su Defensa)">
       <label class="tk-lapiz-check" title="Sí: también la disparan tus aliados (y vos). No: solo los rivales."><input type="checkbox" id="elem-trampa-amiga"${elemTrampaAmiga ? ' checked' : ''}> Fuego amigo: <b>${elemTrampaAmiga ? 'SÍ' : 'NO'}</b> (la disparan también los aliados)</label>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
       ${trampasGuardadasHtml()}
@@ -6697,11 +6896,8 @@ $('#herramienta-flotante').addEventListener('click', e => {
     const nombre = elemTrampaNombre.trim();
     if(!nombre){ toast('Ponele un nombre a la trampa para guardarla'); return; }
     const g = {nombre: nombre.slice(0, 40), detalle: elemTrampaDetalle.trim().slice(0, 200), amiga: elemTrampaAmiga,
-      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa};
-    const i = trampasGuardadas.findIndex(x => x.nombre === g.nombre);
-    if(i >= 0) trampasGuardadas[i] = g; else trampasGuardadas.push(g);
-    guardarTrampasGuardadas();
-    renderHerramientaFlotante();
+      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : ''};
+    guardarTrampaRecurrente(g);
     toast(`Trampa "${g.nombre}" guardada`);
     return;
   }
@@ -6826,6 +7022,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
 $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
+  if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }
   if(e.target.id === 'niebla-radio'){
     nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
     const et = e.target.previousElementSibling;

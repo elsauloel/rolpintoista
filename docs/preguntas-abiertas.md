@@ -383,6 +383,12 @@ resuelven a mano, como el resto de los avisos).
     muy altos comparados con el resto del catálogo; Lanzallamas es el único
     arma de rango antiguo y ahora conviven con los nuevos.
 
+- 🔲 **P90. Trampas: catálogo base y daño automático (2026-09-20).** Se inventaron 24 trampas
+  (todas a auditar) y un asistente paso a paso para crear las propias. Se automatizó lo único que hoy se
+  puede: el **daño** (`trampaDano`). Sigue a mano: estados sobre otros, tiradas para evitarla, alarmas.
+  Pendiente de decidir: ¿aplicar estados automáticamente a quien la activa (habría que poner el estado en su
+  ficha)? ¿el daño de área debería alcanzar también a los personajes de otros jugadores (hoy solo se les avisa)?
+  Las **dificultades y los daños** del catálogo son una guía mía (6 + 2 por nivel; 1d6 a 5d6).
 - 🔲 **P89. Manual nuevo (2026-09-20).** Se escribió el manual completo (13 capítulos,
   ~110 notas, navegable como un vault: `manual-usuario/notas/*.md` → `datos/manual.json`).
   **Todas las dudas quedaron dentro del propio manual** como recuadros `> [!question]`,

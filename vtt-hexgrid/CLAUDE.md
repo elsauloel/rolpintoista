@@ -773,3 +773,15 @@ hexágono con otro sin importar bando. Todavía no está construido.
   para colocarla (`abrirCatalogoTrampas`, `cargarTrampaEnPanel`). Usa
   `comun/biblioteca.js`, que ahora también carga el mapa (con sus propios
   estilos de ventana).
+
+- **Catálogo base de trampas y asistente** (2026-09-20, `comun/trampas-base.js`, `TRAMPAS_BASE`): 24 trampas
+  inventadas (oso, foso, red, brea, dardos, mina, barril de pólvora, nube de veneno, runas, escarcha, portal…) con
+  nivel 1–5, todas marcadas "(Trampa creada automáticamente: requiere auditar.)" en su descripción y con la etiqueta
+  `auditar`. Aparecen en **📚 Catálogo de trampas** (opción `base` de `Biblioteca.abrir`, con filtros agrupados).
+  Ahí mismo, **"+ Crear una trampa custom (paso a paso)"** abre `abrirAsistenteTrampa` (`wt`): 1 clase de trampa,
+  2 qué hace (daño, estado, tirada para evitarla, extra), 3 forma y tamaño, 4 nombre y aspecto, 5 resumen editable
+  → "Cargar para colocarla" o "💾 Guardar como recurrente".
+  **Daño automático** (`trampaDano`, campo nuevo del elemento, tirada tipo `2d6`, ≤12 letras; hace falta publicar
+  las reglas): al dispararse el mapa tira el daño (`trampaAplicarDano`), lo aplica con `danioPj`/`danioCreep` a quien
+  la activó (restando su Defensa) y, si es de área, a los creeps de adentro cuando mueve el GM; a los demás se les
+  avisa en la Mesa. Los estados y las tiradas para evitarla siguen a mano y el texto lo aclara.

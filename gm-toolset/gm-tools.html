@@ -4646,8 +4646,10 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.del){
     if(!confirm('¿Borrar este creep? No se puede deshacer.')) return;
-    S.creeps = S.creeps.filter(s=>s.id!==b.dataset.del);
+    const idBorrado = b.dataset.del;
+    S.creeps = S.creeps.filter(s=>s.id!==idBorrado);
     renderAll();
+    preguntarBorrarTokensDeCreep(idBorrado);
     return;
   }
   if(b.dataset.dup){
@@ -5958,6 +5960,26 @@ async function renderListaPersonajes(){
 // Mismo criterio que "Borrar personaje" de la ficha (confirmar + escribir el
 // nombre), pero acá el GM puede borrar la de cualquier jugador; de paso saca
 // los tokens que la usan (el suyo y los de sus invocaciones).
+/* Al borrar un creep: si hay tokens que lo representan (en el mapa de siempre o en cualquier mapa guardado), pregunta si borrarlos también. */
+async function preguntarBorrarTokensDeCreep(creepId){
+  if(!fbDb || !fbUsuario) return;
+  try{
+    const mapas = await fbDb.collection(fbRutaCampana('mapas')).get();
+    const colecciones = [fbDb.collection(fbRutaCampana('tokens')), ...mapas.docs.map(m => fbDb.collection(fbRutaCampana(`mapas/${m.id}/tokens`)))];
+    const snaps = await Promise.all(colecciones.map(c => c.where('fichaId', '==', creepId).get()));
+    const tokens = snaps.flatMap(sn => sn.docs).filter(d => d.data().tipo === 'creep');
+    if(!tokens.length) return;
+    if(!confirm(`Ese creep tiene ${tokens.length} token${tokens.length === 1 ? '' : 's'} en el mapa (contando todos los mapas guardados).\n\n¿Borrar también ${tokens.length === 1 ? 'ese token' : 'esos tokens'}?\nSi elegís "Cancelar", quedan en el mapa como tokens sin vincular.`)) return;
+    const lote = fbDb.batch();
+    tokens.forEach(d => lote.delete(d.ref));
+    await lote.commit();
+    toast(`${tokens.length} token${tokens.length === 1 ? '' : 's'} borrado${tokens.length === 1 ? '' : 's'} del mapa`);
+  }catch(err){
+    console.error('No se pudieron borrar los tokens del creep:', err);
+    toast('No se pudieron borrar los tokens — borralos desde el mapa');
+  }
+}
+
 async function borrarPersonajeGM(id, nombre, boton){
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes (podés bajar un respaldo con "💾 Respaldo partida").\n\n¿Seguís?`;

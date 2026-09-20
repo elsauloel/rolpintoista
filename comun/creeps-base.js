@@ -1,5 +1,5 @@
 /* Catálogo base de creeps por ESCENARIO (auditar todos: son un primer borrador).
-   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10) 20 DEBUFFERS (uno por escenario y nivel) y 30 HUMANOS de seis facciones con equipo del catálogo (cada uno con nombre propio inspirado en el creep que lo lleva). Cada uno trae dos habilidades:
+   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10) 20 DEBUFFERS (uno por escenario y nivel) y 30 HUMANOS de seis facciones con equipo del catálogo (cada uno con nombre propio inspirado en el creep que lo lleva). Todos traen sus recompensas: tipo de criatura, jefe, oro base, arma natural y trofeo (los que tienen arma natural sueltan un trofeo en vez del arma). Cada uno trae dos habilidades:
    una RÁPIDA (cooldown 2) y una LENTA (cooldown 3 a 6, según lo poderosa) que arranca el
    combate con el cooldown ya activo (cdArranca). Lo que se puede automatizar en un creep va
    automatizado: costo en No2 (o "lo de un ataque"), tirada de daño, estados con bonos a sí
@@ -76,6 +76,46 @@
     return h;
   }
 
+  /* ---- Recompensas (oro, arma natural, trofeo) ---- */
+  // Jefes: dejan el doble de oro y de trofeo.
+  const JEFES = new Set(['Reina de los kobolds', 'Rey de la tribu goblin', 'Sumo Sacerdote del Vacío', 'Reina de las hadas oscuras',
+    'Gigante de escarcha', 'Dragón de ceniza joven', 'Titán de granito', 'Hidra de zarzas', 'Avatar de la Estrella Negra', 'Ent ancestral',
+    'Coloso de mineral', 'Jefe de la banda', 'Jefe de guerra bárbaro', 'Capitán de la guardia', 'Capitán pirata', 'Sumo profeta del culto',
+    'Cazarrecompensas legendario']);
+  // Armas que aunque el creep sea "natural" son un objeto (se sueltan como ítem).
+  const ARMAS_OBJETO = new Set(['Alabarda de granito', 'Lanza de obsidiana', 'Ballesta fantasma', 'Báculo de luz']);
+  const TIPOS_NATURALES = new Set(['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto']);
+  // Nombre del trofeo de cada creep con arma natural (el valor sale solo del nivel: 16/30/50/75/110, jefes el doble).
+  const TROFEOS = {
+    'Rata de socavón': 'Dientes de rata de socavón', 'Luciérnaga de gas': 'Glándula de metano', 'Topo excavador': 'Garra de topo excavador',
+    'Escarabajo de cobre': 'Mandíbula de escarabajo de cobre', 'Araña de cavernas': 'Colmillo de araña de cavernas', 'Gusano de roca': 'Diente de gusano de roca',
+    'Devorador de vetas': 'Diente de diamante', 'Lobo gris': 'Colmillo de lobo gris', 'Jabalí colmilludo': 'Colmillo de jabalí', 'Sapo venenoso': 'Lengua de sapo venenoso',
+    'Oso pardo furioso': 'Zarpa de oso pardo', 'Huargo alfa': 'Colmillo de huargo alfa', 'Hidra de zarzas': 'Cabeza espinosa de hidra', 'Cabra montés': 'Cuerno de cabra montés',
+    'Águila de risco': 'Garra de águila de risco', 'Yeti joven': 'Garra helada de yeti', 'Arpía de tormenta': 'Garra eléctrica de arpía', 'Wyvern joven': 'Aguijón de wyvern',
+    'Dragón de ceniza joven': 'Escama de ceniza', 'Cuervo de mal agüero': 'Pico de cuervo de mal agüero', 'Arpía cantora': 'Garra de arpía cantora',
+    'Musgo carnívoro': 'Zarcillo de musgo carnívoro', 'Ent joven': 'Astilla de ent joven', 'Ent ancestral': 'Rama de ent ancestral', 'Hongo de galería': 'Sombrero de hongo de galería',
+    'Reina de las esporas': 'Corona de micelio', 'Enredadera parasitaria': 'Zarcillo parasitario',
+    'Vigía de cristal': 'Esquirla de cristal del vigía', 'Nube de sílice': 'Puñado de sílice', 'Espectro de la ventisca': 'Copo de escarcha eterna',
+    'Enjambre de esporas': 'Saco de esporas alienígenas', 'Cría rasgadora': 'Garra quitinosa de cría', 'Pulpo de vacío': 'Tentáculo de pulpo de vacío',
+    'Devorador de mentes': 'Tentáculo de devorador de mentes', 'Avatar de la Estrella Negra': 'Fragmento de la Estrella Negra', 'Abominación fusionada': 'Extremidad de abominación',
+    'Larva psíquica': 'Mandíbula translúcida de larva', 'Parásito de aura': 'Tentáculo de parásito de aura', 'Ojo flotante del templo': 'Iris del templo', 'Oráculo disonante': 'Eco cristalizado del oráculo',
+    'Golem de escoria': 'Puño de escoria fría', 'Coloso de mineral': 'Fragmento de mineral del coloso', 'Ídolo parpadeante': 'Astilla de ídolo parpadeante', 'Roca viva': 'Trozo de roca viva',
+    'Titán de granito': 'Núcleo de granito del titán', 'Golem de meteorito': 'Puño de meteorito', 'Centinela biomecánico': 'Núcleo de plasma del centinela',
+    'Espectro del capataz': 'Jirón helado del capataz', 'Espíritu del bosque podrido': 'Raíz del bosque podrido', 'Wendigo del paso': 'Garra de wendigo',
+  };
+  // Oro base: humanos 15/40/75/120/175 (5n²+10n); humanoides la mitad a múltiplos de 5; jefes el doble; el resto 0.
+  function oroBase(tipo, n, jefe){
+    const humano = 5 * n * n + 10 * n;
+    const v = tipo === 'humano' ? humano : tipo === 'humanoide' ? Math.floor(humano / 2 / 5 + 0.5) * 5 : 0;
+    return jefe ? v * 2 : v;
+  }
+  function recompensas(nombre, n, tipo, arma){
+    const jefe = JEFES.has(nombre);
+    const natural = TIPOS_NATURALES.has(tipo) && !ARMAS_OBJETO.has(arma);
+    return {tipoCriatura: tipo, tipoCriaturaOtro: '', jefe, oroBase: oroBase(tipo, n, jefe), armaNatural: natural,
+      trofeoEspecial: {nombre: natural ? (TROFEOS[nombre] || '') : '', precio: 0}};
+  }
+
   const lista = [];
   function cr(esc, n, nombre, rol, tipo, arma, rapida, lenta, notas, extras){
     const total = 33 + 3 * (n - 1);
@@ -92,6 +132,7 @@
       defensa, armaduraTipo: '', equipo: [], crit: [0, 0, 0, 0, 0],
       habilidades: [armarHab(rapida, n, 2, false), armarHab(spL, n, cdL, true)],
       estados: [], notas: notas || '', escalaTipos: 2, imagen: '',
+      ...recompensas(nombre, n, tipo, arma),
     };
     lista.push({
       poolId: 'creep-' + esc + '-' + n + '-' + slug(nombre), nombre: nombre + ' (auditar)', nivel: n,
@@ -123,6 +164,7 @@
       crit,
       habilidades: [armarHab(rapida, n, 2, false), armarHab(spL, n, cdL, true)],
       estados: [], notas: notas || '', escalaTipos: 2, imagen: '',
+      ...recompensas(nombre, n, 'humano', A.nombre),
     };
     const equipoTxt = `${A.nombre} (${A.tier})${P ? ' + ' + P.nombre + ' (' + P.tier + ')' : ''}`;
     lista.push({

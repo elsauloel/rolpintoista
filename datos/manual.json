@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-20T21:31:27Z",
+ "actualizado": "2026-09-20T21:41:30Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1842,7 +1842,7 @@
    ],
    "estado": "borrador",
    "capitulo": "gm",
-   "cuerpo": "Un **creep** es cualquier personaje que maneja el GM: un monstruo, un guardia, un comerciante, un aliado. Un PNJ del GM **es un creep con otro nombre**.\n\n## Cómo se arma\n- **Atributos** (arrancan en 1) y **HP = Con × 5**, como un jugador. Para repartir, una guía útil es el presupuesto del jugador: **33 + 3 por nivel**.\n- **Un arma** (una sola) y **armadura**, con el asistente de ítems ([[Crear tus propios ítems]]).\n- **Habilidades** con el mismo asistente que los jugadores: costo (SP/No2/HP), tirada, estado, **cooldown** y una casilla **\"Habilidad lenta\"** (arranca el combate en cooldown).\n- **Estados** propios, resistencias a crítico y **stats derivados** completos.\n\n## Un creep en el mapa\nSe **vincula** a un token: barra de vida (solo % para jugadores), estados, y botones para el GM (📜 abre su ficha, ⚡ Acciones). Cuando se mueve, gasta No2 igual que un jugador.\n\n> [!info] Los creeps no tienen SP\n> Solo No2 y HP (y los costos de sus habilidades en No2).\n\nVer también: [[Catálogo de creeps]], [[Cómo armar un encuentro]]."
+   "cuerpo": "Un **creep** es cualquier personaje que maneja el GM: un monstruo, un guardia, un comerciante, un aliado. Un PNJ del GM **es un creep con otro nombre**.\n\n## Cómo se arma\n- **Atributos** (arrancan en 1) y **HP = Con × 5**, como un jugador. Para repartir, una guía útil es el presupuesto del jugador: **33 + 3 por nivel**.\n- **Un arma** (una sola) y **armadura**, con el asistente de ítems ([[Crear tus propios ítems]]).\n- **Habilidades** con el mismo asistente que los jugadores: costo (SP/No2/HP), tirada, estado, **cooldown** y una casilla **\"Habilidad lenta\"** (arranca el combate en cooldown).\n- **Estados** propios, resistencias a crítico y **stats derivados** completos.\n- **Recompensas:** el **tipo de criatura**, si es **jefe**, cuánto **oro** carga (con una ayuda \"?\" que sugiere el valor), si el arma es **natural** y un **trofeo especial** opcional. Un creep con arma natural no suelta el arma: suelta un **trofeo**, que los jugadores venden o convierten en [[Despojos]].\n\n> [!tip] Paso a paso\n> En **+ Creep → Crear paso a paso** un asistente te guía por siete pasos: qué es, atributos (con presets por rol y nivel), arma, armadura, habilidades, recompensas y resumen. El mismo asistente sirve para **editar** (botón **🧭 Paso a paso** en la ficha del creep) y siempre podés volver a un paso anterior sin perder nada.\n\n## Un creep en el mapa\nSe **vincula** a un token: barra de vida (solo % para jugadores), estados, y botones para el GM (📜 abre su ficha, ⚡ Acciones). Cuando se mueve, gasta No2 igual que un jugador.\n\n> [!info] Los creeps no tienen SP\n> Solo No2 y HP (y los costos de sus habilidades en No2).\n\nVer también: [[Catálogo de creeps]], [[Cómo armar un encuentro]]."
   },
   {
    "id": "catalogo-de-creeps",

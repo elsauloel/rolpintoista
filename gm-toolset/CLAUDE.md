@@ -221,3 +221,16 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   ahora también funciona en los creeps). Los efectos sobre otros quedan escritos en la
   descripción, a mano. Se corrigió además que los **bonos de Defensa de un estado**
   cuenten en la Defensa del creep (`creepDefensaEfectiva`, y `creepDefensaMapa`).
+
+- **Recompensas del creep y asistente paso a paso** (2026-09-20, tanda 2 de P91/P92): campos nuevos del creep
+  `tipoCriatura` (+ `tipoCriaturaOtro`), `jefe`, `oroBase`, `armaNatural` y `trofeoEspecial {nombre, precio}` (defaults en
+  `nuevoCreep`/`normalizarCreep`). Sección **Recompensas** en la ficha completa del creep (`recompensasHtml`) con ayudas "?"
+  (oro, arma natural, trofeo) y el resumen "Al morir suelta: …" (`dropsResumenCreep`); también se ve en **Ver**.
+  Reglas: oro sugerido `oroSugeridoCreep` (humano 5n²+10n = 15/40/75/120/175; humanoide la mitad a múltiplos de 5; jefe ×2;
+  resto 0); trofeo `trofeoDeCreep` (arma natural → trofeo con el nombre del arma + " de " + creep, o el especial;
+  precio por nivel 16/30/50/75/110, jefe ×2; despojos = ⌈precio/4⌉). Cambiar el tipo sugiere `armaNatural` y el oro.
+  **🧭 Asistente** (`abrirAsistenteCreep`, estado `asist`): "+ Creep → Crear paso a paso" y "🧭 Paso a paso" en la ficha del
+  creep (edita). 7 pasos (qué es, atributos con preset por rol y nivel, arma, armadura, habilidades, recompensas, resumen),
+  se puede saltar a cualquier paso sin perder nada; trabaja sobre el creep real (crear lo agrega y **Cancelar** lo quita).
+  Los creeps base (`creeps-base.js`) ya traen tipo, jefe, oro, arma natural y nombre de trofeo (51 con arma natural).
+  Todavía **no** se usan al finalizar el combate (tandas 3 y 4).

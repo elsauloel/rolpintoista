@@ -332,8 +332,10 @@ const Biblioteca = (() => {
     if(opts.alCrearDeCero){
       cero.style.display = '';
       cero.innerHTML = `<button class="btn primary" id="bib-cero-btn">${esc(opts.textoCrearDeCero || 'Crear de cero')}</button>
+        ${opts.alAsistente ? `<button class="btn primary" id="bib-asistente-btn">${esc(opts.textoAsistente || 'Crear paso a paso')}</button>` : ''}
         <span class="hint"> …o elegí uno de la biblioteca:</span>`;
       q('bib-cero-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alCrearDeCero(); };
+      if(opts.alAsistente) q('bib-asistente-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alAsistente(); };
     }else cero.style.display = 'none';
     q('scrim-biblioteca').classList.add('open');
     q('bib-lista').innerHTML = '<div class="hint">Cargando…</div>';

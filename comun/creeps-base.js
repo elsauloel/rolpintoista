@@ -1,5 +1,5 @@
 /* Catálogo base de creeps por ESCENARIO (auditar todos: son un primer borrador).
-   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10). Cada uno trae dos habilidades:
+   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10) y 20 DEBUFFERS (uno por escenario y nivel). Cada uno trae dos habilidades:
    una RÁPIDA (cooldown 2) y una LENTA (cooldown 3 a 6, según lo poderosa) que arranca el
    combate con el cooldown ya activo (cdArranca). Lo que se puede automatizar en un creep va
    automatizado: costo en No2 (o "lo de un ataque"), tirada de daño, estados con bonos a sí
@@ -18,8 +18,9 @@
   const PESOS = {
     brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .12, .16], rapido: [.16, .18, .30, .24, .12],
     rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36],
+    debuffer: [.22, .08, .18, .14, .38],
   };
-  const ROL_TXT = {brutal: 'melee', tanque: 'tanque', rapido: 'emboscador', rango: 'rango', mago: 'mágico', apoyo: 'apoyo'};
+  const ROL_TXT = {brutal: 'melee', tanque: 'tanque', rapido: 'emboscador', rango: 'rango', mago: 'mágico', apoyo: 'apoyo', debuffer: 'debuffer'};
   const TIPO_ARMA = [4, 6, 6, 8, 10];   // por nivel 1..5
   const PESO_ARMA = [1, 1, 2, 2, 2];
 
@@ -383,6 +384,94 @@
     bu('Bendición del Vacío', '+4 Defensa y +3 al daño para él (y aliados, a mano) 2 turnos.', 1, {def: 4, dmg: 3}, 2),
     [zo('Ritual de invocación', 'Invoca 1d4 esporas alienígenas al combate (a mano) y daña a todos los cercanos.', 3, 'H'), 6],
     'El último que entendió el lenguaje del templo.');
+
+  /* ================= DEBUFFERS (rol 'debuffer': debilitan, maldicen y envenenan; no pegan fuerte) =================
+     Sus maldiciones enfrentan Especial contra Res. Mental del objetivo (a mano, como las de la clase Debuffer).
+     Lo que le pasa a otros queda escrito en la descripción; se automatiza lo que le pasa a él mismo. */
+  // Minas
+  cr('minas', 1, 'Hongo de galería', 'debuffer', 'planta', 'Sombrero venenoso',
+    ta('Esporas ciegas', 'Esporas en la cara: el objetivo tira con -1 a la PdG hasta el final de su próximo turno si falla Res.Mt (a mano).', 1),
+    [ta('Moho pegajoso', 'Deja el suelo pegajoso en flor de 1: los que lo pisen quedan Rengos 2 turnos (a mano).', 2), 3],
+    'Crece donde hay humedad y hace toser a todos los que pasan.');
+  cr('minas', 2, 'Kobold maldiciente', 'debuffer', 'humanoide', 'Pico de juguete',
+    ta('Maldición del pico roto', 'Especial contra Res.Mt: el objetivo queda Lisiado 2 turnos (a mano).', 1),
+    [ta('Mal de mina', 'Especial contra Res.Mt: el objetivo queda Cansado (-1 No2 máx.) 2 turnos (a mano).', 2), 4],
+    'Susurra insultos en un idioma que no existe, y funcionan.');
+  cr('minas', 3, 'Nube de sílice', 'debuffer', 'elemental', 'Tormenta de polvo',
+    ta('Polvo en los ojos', 'Nube en flor de 1: los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 1),
+    [zo('Silicosis', 'Aire irrespirable: daño y 3 stacks de Veneno al objetivo (a mano).', 2, 'M'), 4],
+    'Polvo que aprendió a odiar a los pulmones.');
+  cr('minas', 4, 'Chamán de las galerías', 'debuffer', 'humanoide', 'Cetro de hueso de rata',
+    ta('Mal de ojo', 'Especial contra Res.Mt: el objetivo repite su próxima tirada y se queda con el valor más bajo (a mano).', 1),
+    [ta('Derrumbe mental', 'Especial contra Res.Mt: Confusión 2 turnos; antes de actuar, el objetivo tira 1d4 (1 el chamán elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 3), 5],
+    'Dice que la montaña le habla, y a veces acierta.');
+  cr('minas', 5, 'Reina de las esporas', 'debuffer', 'planta', 'Corona de micelio',
+    ta('Esporas alucinógenas', 'Nube en flor de 2: Confusión a los afectados 2 turnos (a mano, 1d4 por acción).', 2),
+    [zo('Micelio hambriento', 'Raíces en el suelo: el objetivo queda Inmovilizado 1 turno y recibe 3 stacks de Veneno (a mano).', 3, 'H'), 6],
+    'Cuarenta hectáreas de hongo que decidieron ser una sola persona.');
+  // Bosque
+  cr('bosque', 1, 'Sapo venenoso', 'debuffer', 'bestia', 'Lengua pegajosa',
+    ta('Lengua pegajosa', 'Atrapa al objetivo: queda Rengo 2 turnos si falla Fuerza (a mano).', 1),
+    [ta('Baba tóxica', 'Al golpearlo cuerpo a cuerpo, el atacante recibe 2 stacks de Veneno (a mano). Dura hasta su próximo turno.', 1), 3],
+    'Colorido, gordo y muy poco simpático.');
+  cr('bosque', 2, 'Hada rencorosa', 'debuffer', 'humanoide', 'Aguja de zarza',
+    ta('Polvo de picazón', 'Especial contra Res.Mt: el objetivo tira con -1 en todo 2 turnos (Maldición debilitante) (a mano).', 1),
+    [ta('Sueño pesado', 'Especial contra Res.Mt: el objetivo queda Exhausto (1 No2 máx.) 1 turno (a mano).', 2), 4],
+    'Diminuta, brillante y con memoria eterna para los agravios.');
+  cr('bosque', 3, 'Bruja de los pantanos', 'debuffer', 'humanoide', 'Cucharón de caldero',
+    ta('Maldición extenuante', 'Especial contra Res.Mt: todas las acciones del objetivo cuestan +1 No2 durante 1 turno (a mano).', 2),
+    [zo('Niebla venenosa', 'Nube en flor de 2: daño y 3 stacks de Veneno a quien esté adentro en el Mantenimiento (a mano).', 3, 'M'), 5],
+    'Vive en un caldero más grande que su casa.');
+  cr('bosque', 4, 'Enredadera parasitaria', 'debuffer', 'planta', 'Zarcillos',
+    ta('Zarcillos', 'Atrapa a un objetivo a hasta 3 casillas: Inmovilizado 2 turnos si falla Fuerza (a mano).', 2),
+    [cu('Savia drenante', 'Drena la vida del atrapado: se cura y el objetivo pierde lo mismo (a mano).', 2, 4), 5],
+    'Lo que parece un arbusto ya te está mirando.');
+  cr('bosque', 5, 'Espíritu del bosque podrido', 'debuffer', 'no-muerto', 'Raíces muertas',
+    ta('Maldición tormentosa', 'Especial contra Res.Mt: por cada acción, el objetivo recibe daño igual a su No2 - 1, 3 turnos (a mano).', 3),
+    [zo('Plaga', 'Aplica Veneno severo (empieza en 1 y sube 1 por mantenimiento) al objetivo (a mano) y daña.', 3, 'H'), 6],
+    'El bosque enfermo que ya no perdona.');
+  // Montañas
+  cr('montañas', 1, 'Cuervo de mal agüero', 'debuffer', 'bestia', 'Pico afilado',
+    ta('Graznido', 'El objetivo tira con -1 a la PdG hasta el final de su próximo turno si falla Res.Mt (a mano).', 1),
+    [ta('Presagio', 'Marca a un objetivo: la próxima vez que falle una tirada, pierde 1 No2 (a mano).', 2), 3],
+    'Nadie sabe si trae mala suerte o solo la anuncia.');
+  cr('montañas', 2, 'Espectro de la ventisca', 'debuffer', 'elemental', 'Frío cortante',
+    ta('Aliento helado', 'Cono de 3 al frente: los afectados quedan Cansados (-1 No2 máx.) 2 turnos (a mano).', 1),
+    [ta('Escarcha', 'Especial contra Res.Mt: el objetivo queda Rengo y con -1 Defensa 2 turnos (a mano).', 2), 4],
+    'Un frío que camina.');
+  cr('montañas', 3, 'Arpía cantora', 'debuffer', 'bestia', 'Garras de arpía',
+    ta('Canto confuso', 'Especial contra Res.Mt: Confusión 1 turno; antes de actuar, el objetivo tira 1d4 (1 la arpía elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 2),
+    [ta('Chillido', 'Grito en flor de 1: los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 2), 4],
+    'Su voz es preciosa, y ese es el problema.');
+  cr('montañas', 4, 'Bruja de la nevada', 'debuffer', 'humanoide', 'Bastón de carámbano',
+    ta('Maldición debilitante', 'Especial contra Res.Mt: -1 a todas las tiradas del objetivo 2 turnos, acumulable (a mano).', 2),
+    [zo('Tormenta de hielo', 'Granizo en flor de 2: daño y los golpeados quedan Inmovilizados 1 turno si fallan Fuerza (a mano).', 3, 'H'), 5],
+    'Camina sobre la nieve sin dejar huellas.');
+  cr('montañas', 5, 'Wendigo del paso', 'debuffer', 'no-muerto', 'Garras de hambre',
+    ta('Hambre helada', 'Especial contra Res.Mt: el objetivo queda Exhausto (1 No2 máx.) 2 turnos (a mano).', 3),
+    [cu('Susurro helado', 'Drena a un objetivo con Especial contra Res.Mt: daño y se cura lo mismo (a mano).', 3, 5), 6],
+    'Lo que dejó de ser humano en una nevada hace siglos.');
+  // Templo antiguo con influencia alienígena
+  cr('templo', 1, 'Larva psíquica', 'debuffer', 'alienígena', 'Mandíbulas translúcidas',
+    ta('Zumbido mental', 'El objetivo tira con -1 en todo hasta el final de su próximo turno si falla Res.Mt (a mano).', 1),
+    [ta('Eco mental', 'Repite en la cabeza del objetivo lo último que hizo: pierde 1 No2 (a mano).', 2), 3],
+    'Se mete en la cabeza y no se va.');
+  cr('templo', 2, 'Parásito de aura', 'debuffer', 'alienígena', 'Tentáculo fino',
+    ta('Succión de energía', 'Especial contra Res.Mt: el objetivo pierde 1d4 SP y el parásito no se cura (a mano).', 1),
+    [ta('Fiebre alienígena', 'Especial contra Res.Mt: el objetivo queda Cansado (-1 No2 máx.) 2 turnos (a mano).', 2), 4],
+    'Se alimenta de lo que los demás no saben que tienen.');
+  cr('templo', 3, 'Acólito telepático', 'debuffer', 'humanoide', 'Bastón de cristal',
+    ta('Intrusión mental', 'Especial contra Res.Mt: Confusión 1 turno; antes de actuar, el objetivo tira 1d4 (1 el acólito elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 2),
+    [ta('Silencio del templo', 'Especial contra Res.Mt: el objetivo no puede usar habilidades con SP 1 turno (a mano).', 3), 5],
+    'Habla sin abrir la boca y escucha lo que no dijiste.');
+  cr('templo', 4, 'Ojo flotante del templo', 'debuffer', 'alienígena', 'Mirada del abismo',
+    ta('Mirada paralizante', 'Especial contra Res.Mt: el objetivo queda Stun (sin No2) hasta su próximo turno (a mano).', 3),
+    [ta('Maldición del vacío', 'Especial contra Res.Mt: -2 a todas las tiradas del objetivo 2 turnos (a mano).', 3), 5],
+    'Un ojo sin cuerpo que no parpadea nunca.');
+  cr('templo', 5, 'Oráculo disonante', 'debuffer', 'alienígena', 'Voz de otro cielo',
+    ta('Control mental', 'Especial contra Especial + Res.Mt: controla al objetivo un turno (nada que lo dañe a sí mismo); gasta 1 No2 por cada No2 que use el controlado (a mano).', 3),
+    [ta('Colapso', 'Especial contra Res.Mt: el objetivo queda Stun y luego Exhausto un turno (a mano).', 4), 6],
+    'Dice cosas verdaderas en el orden equivocado.');
 
   window.CREEPS_BASE = lista;
 })();

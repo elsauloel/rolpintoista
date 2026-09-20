@@ -30,7 +30,7 @@ const Biblioteca = (() => {
     pasivas: ['stat', 'regeneración', 'resistencia', 'defensiva', 'ofensiva', 'utilidad', 'visión', 'situacional'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',
-      'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'emboscador'],
+      'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'emboscador', 'debuffer'],
   };
 
   const estado = {};   // tipo -> {oficial, propuestas, vista, filtros:Set, texto, opts}

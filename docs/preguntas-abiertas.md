@@ -346,3 +346,13 @@ resuelven a mano, como el resto de los avisos).
   corta ahí, y si el sigilo se rompe solo o dispara una tirada de detección a
   mano. Se puede resolver junto con las trampas (P78–P84), que necesitan la misma
   revisión de la ruta. *(2026-09-19)*
+
+- 🔲 **P86. Trampas como consumibles del catálogo.** Pedido del usuario
+  2026-09-20 (anotado): crear trampas en el catálogo de consumibles — un
+  consumible "trampa" que, al usarlo, arma una trampa en el mapa (con nombre,
+  qué hace y fuego amigo ya cargados). Falta definir cómo se coloca desde el
+  consumible y si gasta la unidad al colocarla o al dispararse. Hoy las trampas
+  recurrentes se guardan por navegador (P78–P84, primera versión). *(2026-09-20)*
+- ✅ **P87. Armas de dos manos.** 2026-09-20: se había descartado y se sacó del
+  asistente de ítems, pero el usuario **se arrepintió el mismo día**: la opción
+  de arma de una o dos manos queda como estaba (revertido).

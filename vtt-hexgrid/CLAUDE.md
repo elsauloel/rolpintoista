@@ -757,3 +757,11 @@ hexágono con otro sin importar bando. Todavía no está construido.
   🔎 **Tirar percepción** en la Botonera (`tirarPercepcion`: Especial, con un dado más
   alto por escalón si tiene la pasiva). Pendiente: tiradas para detectar/desarmar y
   límites para crearlas.
+
+- **Trampas: fuego amigo y recurrentes** (2026-09-20): la trampa lleva `fuegoAmigo`
+  (casilla "Fuego amigo: SÍ/NO" al crearla y en el ⚙): con SÍ la disparan también
+  los aliados y su dueño (`trampaDispara`). **💾 Guardar como recurrente** deja la
+  trampa (nombre, qué hace, fuego amigo, forma, tamaño, color y transparencia)
+  en la lista "Trampas guardadas" del panel; tocar su nombre la carga para
+  colocarla, ✕ la borra. Se guardan **por navegador** (`localStorage`
+  `mapa-trampas-guardadas`), no en la nube.

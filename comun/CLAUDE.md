@@ -148,3 +148,5 @@ versión parecida en más de una, es candidato a juntar.
   al personaje con `habClaseId` (para no duplicarla) y Job 1 si es de su clase,
   2 si es de otra (Custom: 3). Una skill se agrega acá recién cuando queda ✅
   en [`../docs/clases-borrador.md`](../docs/clases-borrador.md).
+
+- **`biblioteca.js`, filtros agrupados y Ver** (2026-09-20): `opts.grupos = [{nombre, tags}]` muestra las etiquetas en menús desplegables por criterio (dentro de un grupo alcanza con una etiqueta, entre grupos se piden todos; lo que no está en ningún grupo va a "Otros"); sin `grupos` quedan los chips sueltos. `opts.alVer(datos, entrada)` agrega el botón 👁 Ver junto a Agregar (gm-tools lo usa para ver un creep completo, `verCreepDeBiblioteca`).

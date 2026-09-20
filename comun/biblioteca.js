@@ -99,6 +99,13 @@ const Biblioteca = (() => {
       .bib-fila .desc{font-size:12px;opacity:.85;margin-top:4px}
       .bib-fila .acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
       .bib-tabs{display:flex;gap:8px}
+      .bib-grupos{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+      .bib-grupo{position:relative}
+      .bib-grupo > button{display:flex;gap:6px;align-items:center}
+      .bib-grupo > button .n{background:var(--copper,#c98545);color:#180F08;border-radius:999px;padding:0 7px;font-size:11px;font-weight:700}
+      .bib-pop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:5;min-width:220px;max-width:340px;background:var(--panel,#1a1418);border:1px solid var(--copper,#c98545);border-radius:8px;padding:10px;box-shadow:0 10px 26px rgba(0,0,0,.6)}
+      .bib-grupo.abierto .bib-pop{display:block}
+      .bib-activos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;width:100%}
     `;
     document.head.appendChild(estilos);
     const cont = document.createElement('div');
@@ -146,11 +153,23 @@ const Biblioteca = (() => {
       pintarLista();
     });
     q('bib-chips').addEventListener('click', e => {
+      const g = e.target.closest('[data-bibgrupo]');
+      if(g){
+        const st = estado[actual];
+        if(g.dataset.bibgrupo === '__limpiar'){ st.filtros.clear(); st.grupoAbierto = null; }
+        else st.grupoAbierto = st.grupoAbierto === g.dataset.bibgrupo ? null : g.dataset.bibgrupo;
+        pintarChips(); pintarLista();
+        return;
+      }
       const b = e.target.closest('[data-bibtag]'); if(!b) return;
       const st = estado[actual];
       const t = b.dataset.bibtag;
       if(st.filtros.has(t)) st.filtros.delete(t); else st.filtros.add(t);
       pintarChips(); pintarLista();
+    });
+    q('scrim-biblioteca').addEventListener('mousedown', e => {
+      const st = estado[actual];
+      if(st && st.grupoAbierto && !e.target.closest('.bib-grupo')){ st.grupoAbierto = null; pintarChips(); }
     });
     q('bib-tabs').addEventListener('click', e => {
       const b = e.target.closest('[data-bibvista]'); if(!b) return;
@@ -183,15 +202,47 @@ const Biblioteca = (() => {
     const cuenta = {};
     listaVista(st).forEach(e => e.etiquetas.forEach(t => { cuenta[t] = (cuenta[t] || 0) + 1; }));
     const tags = Object.keys(cuenta).sort((a, b) => a.localeCompare(b, 'es'));
-    document.getElementById('bib-chips').innerHTML = tags.map(t =>
-      `<button class="bib-chip${st.filtros.has(t) ? ' on' : ''}" data-bibtag="${esc(t)}">${esc(t)} · ${cuenta[t]}</button>`).join('');
+    const chip = t => `<button class="bib-chip${st.filtros.has(t) ? ' on' : ''}" data-bibtag="${esc(t)}">${esc(t)} · ${cuenta[t]}</button>`;
+    const cont = document.getElementById('bib-chips');
+    if(!st.opts.grupos){ cont.className = 'bib-chips'; cont.innerHTML = tags.map(chip).join(''); return; }
+    // Filtros agrupados por criterio, cada grupo en un menú desplegable.
+    const grupos = agruparEtiquetas(st, tags);
+    cont.className = 'bib-grupos';
+    cont.innerHTML = grupos.map(g => {
+      const sel = g.tags.filter(t => st.filtros.has(t)).length;
+      return `<div class="bib-grupo${st.grupoAbierto === g.nombre ? ' abierto' : ''}">
+        <button class="btn${sel ? ' primary' : ''}" data-bibgrupo="${esc(g.nombre)}">${esc(g.nombre)}${sel ? ` <span class="n">${sel}</span>` : ''} ▾</button>
+        <div class="bib-pop"><div class="bib-chips">${g.tags.map(chip).join('')}</div></div></div>`;
+    }).join('') + (st.filtros.size ? `<div class="bib-activos"><span class="hint">Filtrando:</span>${[...st.filtros].map(t =>
+      `<button class="bib-chip on" data-bibtag="${esc(t)}">${esc(t)} ✕</button>`).join('')}<button class="btn ghost" data-bibgrupo="__limpiar">Limpiar filtros</button></div>` : '');
+  }
+  // opts.grupos = [{nombre, tags:[...]}]; lo que no está en ningún grupo va a "Otros".
+  function agruparEtiquetas(st, tags){
+    const usadas = new Set();
+    const out = st.opts.grupos.map(g => {
+      const ts = g.tags.filter(t => tags.includes(t));
+      ts.forEach(t => usadas.add(t));
+      return {nombre: g.nombre, tags: ts};
+    }).filter(g => g.tags.length);
+    const otros = tags.filter(t => !usadas.has(t));
+    if(otros.length) out.push({nombre: 'Otros', tags: otros});
+    return out;
+  }
+  // Con grupos: dentro de un grupo alcanza con una de las etiquetas elegidas (o); entre grupos deben cumplirse todos (y).
+  function pasaFiltros(st, e){
+    if(!st.opts.grupos) return [...st.filtros].every(t => e.etiquetas.includes(t));
+    const porGrupo = {};
+    agruparEtiquetas(st, [...new Set(listaVista(st).flatMap(x => x.etiquetas))]).forEach(g => g.tags.forEach(t => { porGrupo[t] = g.nombre; }));
+    const req = {};
+    st.filtros.forEach(t => { (req[porGrupo[t] || 'Otros'] = req[porGrupo[t] || 'Otros'] || []).push(t); });
+    return Object.values(req).every(ts => ts.some(t => e.etiquetas.includes(t)));
   }
 
   function pintarLista(){
     const st = estado[actual];
     const propuestas = st.vista === 'propuestas';
     const f = listaVista(st).filter(e =>
-      [...st.filtros].every(t => e.etiquetas.includes(t))
+      pasaFiltros(st, e)
       && (!st.texto || (e.nombre + ' ' + e.descripcion).toLowerCase().includes(st.texto)));
     document.getElementById('bib-cuenta').textContent = `${f.length} de ${listaVista(st).length}`;
     document.getElementById('bib-lista').innerHTML = f.length ? f.map(e => `
@@ -273,7 +324,7 @@ const Biblioteca = (() => {
     actual = tipo;
     estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: ''};
     const st = estado[tipo];
-    st.opts = opts; st.vista = 'oficial'; st.filtros.clear(); st.texto = '';
+    st.opts = opts; st.vista = 'oficial'; st.filtros.clear(); st.texto = ''; st.grupoAbierto = null;
     const q = id => document.getElementById(id);
     q('bib-titulo').textContent = `📚 ${opts.titulo || 'Biblioteca'}`;
     q('bib-buscar').value = '';

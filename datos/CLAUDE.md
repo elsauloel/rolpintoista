@@ -25,6 +25,9 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   `herramientas/importar.py`. Ver `herramientas/LEEME.md` para el flujo
   completo — **nunca se edita este archivo a mano ni se edita el catálogo
   embebido en los HTML de juego directamente**, siempre por ese pipeline.
+- **Auditoría 2026-09-20** (ver P88 en `docs/preguntas-abiertas.md`): la resistencia a crítico
+  de las defensas se limitó por tier (Tipo 4 y 6 en Común; Tipo 10 y 12 solo
+  en Excepcional/Legendario y de a 1) y el catálogo pasó a 611 ítems.
 - **`catalogo-editor.html`** — la herramienta de edición: listado
   filtrable, alta/edición/borrado de ítems, mismo patrón de Guardar/Cargar
   archivo/Subir datos/Token que el resto de las herramientas de la

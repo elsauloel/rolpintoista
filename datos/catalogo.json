@@ -80,6 +80,71 @@
   {
     "mods": [],
     "efectoMods": [],
+    "id": "new-elixir-de-fenix",
+    "nombre": "Elixir de Fénix",
+    "tier": "Legendario",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 450,
+    "detalle": "Recuperás 150 HP al instante.",
+    "descripcionNarrativa": "Un líquido dorado que se mueve solo dentro del frasco. Tibio, como algo que respira.",
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 150,
+    "curabonosPct": 0,
+    "consumible": true,
+    "imagen": "",
+    "legacy": false,
+    "efectoNombre": "",
+    "efectoPreset": "",
+    "efectoTurnos": 0,
+    "efectoHpTurno": 0,
+    "efectoPermanente": false,
+    "efectoDetalle": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "rescc",
+        "val": 3
+      },
+      {
+        "stat": "resmg",
+        "val": 4
+      }
+    ],
+    "id": "new-elixir-de-piedra-eterna",
+    "nombre": "Elixir de piedra eterna",
+    "tier": "Legendario",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 440,
+    "detalle": "Otorga Defensa +6, Resistencia a CC +3 y Resistencia mágica +4 durante 3 turnos. Al usarlo se activa el estado \"Piedra eterna (elixir)\".",
+    "descripcionNarrativa": "Un jarabe gris y pesado que raspa la garganta. Después la piel no siente nada.",
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": true,
+    "imagen": "",
+    "legacy": false,
+    "efectoNombre": "Piedra eterna (elixir)",
+    "efectoPreset": "",
+    "efectoTurnos": 3,
+    "efectoHpTurno": 0,
+    "efectoPermanente": false,
+    "efectoDetalle": "Defensa +6, Resistencia a CC +3, Resistencia mágica +4. Dura 3 turnos."
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
     "id": "cat-moneda-reroll",
     "nombre": "Moneda Re-Roll",
     "tier": "Buena Calidad",
@@ -1887,6 +1952,45 @@
     "efectoDetalle": "Acciones máximas +2. Dura hasta el fin del combate (bórralo a mano al terminar).",
     "consumible": true,
     "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "resmg",
+        "val": 5
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      }
+    ],
+    "id": "new-pergamino-del-velo-eterno",
+    "nombre": "Pergamino del Velo Eterno",
+    "tier": "Legendario",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 480,
+    "detalle": "Otorga Defensa +5, Resistencia mágica +5 y Evasión +2 durante 3 turnos. Al usarlo se activa el estado \"Velo eterno (pergamino)\".",
+    "descripcionNarrativa": "Tinta plateada sobre papel que parece no tener bordes. Al desenrollarlo, la luz se apaga un poco.",
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": true,
+    "imagen": "",
+    "legacy": false,
+    "efectoNombre": "Velo eterno (pergamino)",
+    "efectoPreset": "",
+    "efectoTurnos": 3,
+    "efectoHpTurno": 0,
+    "efectoPermanente": false,
+    "efectoDetalle": "Defensa +5, Resistencia mágica +5, Evasión +2. Dura 3 turnos."
   },
   {
     "mods": [],
@@ -4106,6 +4210,41 @@
     "mods": [],
     "efectoMods": [
       {
+        "stat": "ini",
+        "val": 5
+      },
+      {
+        "stat": "mov",
+        "val": 3
+      }
+    ],
+    "id": "new-pocion-de-segundo-aire",
+    "nombre": "Poción de segundo aire",
+    "tier": "Legendario",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 420,
+    "detalle": "Recuperás 60 HP y ganás Iniciativa +5 y Movimiento +3 durante 3 turnos. Al usarla se activa el estado \"Segundo aire (poción)\".",
+    "descripcionNarrativa": "Un frasco chico con burbujas que suben y bajan. Sabe a menta y a victoria.",
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 60,
+    "curabonosPct": 0,
+    "consumible": true,
+    "imagen": "",
+    "legacy": false,
+    "efectoNombre": "Segundo aire (poción)",
+    "efectoPreset": "",
+    "efectoTurnos": 3,
+    "efectoHpTurno": 0,
+    "efectoPermanente": false,
+    "efectoDetalle": "Iniciativa +5, Movimiento +3. Dura 3 turnos."
+  },
+  {
+    "mods": [],
+    "efectoMods": [
+      {
         "stat": "accionesmax",
         "val": 1
       }
@@ -4270,6 +4409,41 @@
   },
   {
     "mods": [],
+    "efectoMods": [
+      {
+        "stat": "fue",
+        "val": 2
+      },
+      {
+        "stat": "con",
+        "val": 2
+      }
+    ],
+    "id": "new-sangre-de-dragon",
+    "nombre": "Sangre de dragón",
+    "tier": "Legendario",
+    "tipoItem": "consumibles",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 500,
+    "detalle": "Otorga Fuerza +2 y Constitución +2 durante todo el combate. Al usarlo se activa el estado \"Sangre de dragón\".",
+    "descripcionNarrativa": "Espesa, oscura, humeante. Se bebe rápido y se agradece después.",
+    "unidades": 1,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "consumible": true,
+    "imagen": "",
+    "legacy": false,
+    "efectoNombre": "Sangre de dragón",
+    "efectoPreset": "",
+    "efectoTurnos": 0,
+    "efectoHpTurno": 0,
+    "efectoPermanente": true,
+    "efectoDetalle": "Fuerza +2 y Constitución +2. Dura hasta el fin del combate (bórralo a mano al terminar)."
+  },
+  {
+    "mods": [],
     "efectoMods": [],
     "id": "new-sifon-de-soda-antiguo-a-presion",
     "nombre": "Sifón de soda",
@@ -4278,7 +4452,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 10,
-    "detalle": "",
+    "detalle": "Sifón de soda: al usarlo recuperás 10 HP.",
     "descripcionNarrativa": "Sifón de vidrio azul con la etiqueta despegada. Nadie recuerda quién lo cargó.",
     "legacy": false,
     "unidades": 1,
@@ -4399,6 +4573,265 @@
       }
     ],
     "efectoMods": [],
+    "id": "new-alabarda-de-guardia",
+    "nombre": "Alabarda de guardia",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 230,
+    "detalle": "Arma de dos manos, Tipo 8. Alcance +1. Puede Derribar (25%).",
+    "descripcionNarrativa": "Hacha, pica y garfio en una sola asta. El garfio sirve para bajar jinetes.",
+    "tipoDado": 8,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Derribar",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Si entra, el objetivo cae al suelo (recordatorio: aplicarlo a mano)."
+      }
+    ]
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 7
+      },
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arco-compuesto-elfico",
+    "nombre": "Arco compuesto élfico",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "peso": 3,
+    "ranuras": 1,
+    "precioCompra": 900,
+    "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +7. PdG +2.",
+    "descripcionNarrativa": "Madera, asta y tendón en capas tan finas que no se nota dónde termina una y empieza la otra.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arco-corto",
+    "nombre": "Arco corto",
+    "tier": "Común",
+    "tipoItem": "arma_2m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 70,
+    "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
+    "descripcionNarrativa": "De fresno sin pulir. Sirve para cazar conejos y para cosas menos amistosas.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 8
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arco-del-cazador-de-eclipses",
+    "nombre": "Arco del cazador de eclipses",
+    "tier": "Legendario",
+    "tipoItem": "arma_2m",
+    "peso": 3,
+    "ranuras": 1,
+    "precioCompra": 1850,
+    "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +8. Crítico +2. Provoca Sangrado (50%).",
+    "descripcionNarrativa": "Con él se bajó un sol, cuentan. La cuerda todavía vibra con el eco.",
+    "tipoDado": 8,
+    "danoFijo": 2,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true,
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
+      }
+    ]
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 5
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arco-largo-de-tejo",
+    "nombre": "Arco largo de tejo",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_2m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 160,
+    "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +5.",
+    "descripcionNarrativa": "Alto como quien lo usa y con una tensión que asusta. Los pescadores lo llaman \"la caña grande\".",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-ballesta-de-mano",
+    "nombre": "Ballesta de mano",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 130,
+    "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+    "descripcionNarrativa": "Cabe en una mano y no perdona. Se carga con una palanquita que siempre se traba.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 5
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-ballesta-pesada",
+    "nombre": "Ballesta pesada",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 260,
+    "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +5. Puede Romper armadura (25%).",
+    "descripcionNarrativa": "Se arma con una manija y un pie. Cuando dispara, el cuadrillo atraviesa lo que se ponga en el medio.",
+    "tipoDado": 8,
+    "danoFijo": 2,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true,
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
+      }
+    ]
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
     "id": "new-baston-de-monje",
     "nombre": "Bastón de monje",
     "tier": "Común",
@@ -4419,6 +4852,38 @@
     "imagen": ""
   },
   {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-baston-ferrado",
+    "nombre": "Bastón ferrado",
+    "tier": "Común",
+    "tipoItem": "arma_2m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 50,
+    "detalle": "Arma de dos manos, Tipo 6. Parry +1.",
+    "descripcionNarrativa": "Un palo largo con las puntas reforzadas de hierro. Lo usan hasta los monjes con voto de paz.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-bate-de-baseball",
@@ -4428,7 +4893,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 1 dado de daño +1 fijo.",
     "descripcionNarrativa": "Aluminio abollado con el logo casi borrado. Alguien lo usó para otra cosa antes.",
     "tipoDado": 10,
     "danoFijo": 1,
@@ -4556,7 +5021,7 @@
     "peso": 1,
     "ranuras": 1,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 1 dado de daño. Crítico +10.",
     "descripcionNarrativa": "Cuero cosido sobre plomo. Discreta, fácil de esconder bajo el saco.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -4694,7 +5159,7 @@
     "peso": 1,
     "ranuras": 1,
     "precioCompra": 30,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
     "descripcionNarrativa": "Hoja corta con muescas para desollar. Huele a lo último que abrió.",
     "tipoDado": 4,
     "danoFijo": 0,
@@ -4716,7 +5181,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
     "descripcionNarrativa": "La daga de siempre. Todos empiezan con una.",
     "tipoDado": 4,
     "danoFijo": 1,
@@ -4796,7 +5261,7 @@
     "peso": 1,
     "ranuras": 1,
     "precioCompra": 70,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
     "descripcionNarrativa": "Hoja gruesa y pareja, sin gracia ninguna. Cumple.",
     "tipoDado": 6,
     "danoFijo": 1,
@@ -4849,7 +5314,7 @@
     "peso": 1,
     "ranuras": 1,
     "precioCompra": 30,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 6: 1 dado de daño.",
     "descripcionNarrativa": "Liviana y manejable. La primera que le dan a cualquiera.",
     "tipoDado": 6,
     "danoFijo": 0,
@@ -4871,7 +5336,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 50,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
     "descripcionNarrativa": "Filo redondeado a propósito. Sirve para aprender y para pegar igual.",
     "tipoDado": 6,
     "danoFijo": 0,
@@ -5047,6 +5512,74 @@
     "imagen": ""
   },
   {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-espadon-de-batalla",
+    "nombre": "Espadón de batalla",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_2m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 170,
+    "detalle": "Arma de dos manos, Tipo 8.",
+    "descripcionNarrativa": "Una hoja del largo de un niño. Se blande con los hombros más que con los brazos.",
+    "tipoDado": 8,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false
+  },
+  {
+    "mods": [
+      {
+        "stat": "dmg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-espadon-del-titan-caido",
+    "nombre": "Espadón del Titán caído",
+    "tier": "Legendario",
+    "tipoItem": "arma_2m",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 1900,
+    "detalle": "Arma de dos manos, Tipo 10. Daño +2. Puede Romper armadura (50%).",
+    "descripcionNarrativa": "Forjado con el esqueleto de un gigante que nunca terminó de caerse. Cada golpe se siente en el suelo.",
+    "tipoDado": 10,
+    "danoFijo": 2,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
+      }
+    ]
+  },
+  {
     "mods": [
       {
         "stat": "crit",
@@ -5172,7 +5705,7 @@
     "tipoItem": "arma_1m",
     "peso": 1,
     "ranuras": 4,
-    "precioCompra": 0,
+    "precioCompra": 1300,
     "detalle": "Crítico +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.",
     "descripcionNarrativa": "El facón es la medida del hombre y el juez de los agravios.",
     "tipoDado": 4,
@@ -5323,7 +5856,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 60,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 2 dados de daño.",
     "descripcionNarrativa": "Un palo con una punta más gorda que la otra. No hace falta explicar más.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -5365,6 +5898,47 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-guadana-del-segador",
+    "nombre": "Guadaña del segador",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "peso": 3,
+    "ranuras": 1,
+    "precioCompra": 880,
+    "detalle": "Arma de dos manos, Tipo 10. Crítico +1. Provoca Sangrado (50%).",
+    "descripcionNarrativa": "Hoja curva que suena a viento cuando gira. En el campo cosechaba trigo. Ahora cosecha otra cosa.",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
+      }
+    ]
   },
   {
     "mods": [],
@@ -5541,6 +6115,33 @@
   {
     "mods": [],
     "efectoMods": [],
+    "id": "new-hacha-de-batalla-a-dos-manos",
+    "nombre": "Hacha de batalla a dos manos",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "peso": 3,
+    "ranuras": 1,
+    "precioCompra": 250,
+    "detalle": "Arma de dos manos, Tipo 10.",
+    "descripcionNarrativa": "Filo doble, mango largo y una cabeza que cuesta levantar. Termina lo que empieza.",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
     "id": "new-hacha-de-constructor",
     "nombre": "Hacha de constructor",
     "tier": "Común",
@@ -5679,7 +6280,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 100,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 8: 2 dados de daño +1 fijo.",
     "descripcionNarrativa": "Aligerada a costa de masa. Se maneja rápido.",
     "tipoDado": 8,
     "danoFijo": 1,
@@ -5732,7 +6333,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 8: 2 dados de daño.",
     "descripcionNarrativa": "Mango largo, cabeza pesada. Pensada para árboles, usada para otra cosa.",
     "tipoDado": 8,
     "danoFijo": 0,
@@ -5885,7 +6486,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 8: 1 dado de daño.",
     "descripcionNarrativa": "Corta y de una mano. Cabe en el cinturón sin molestar.",
     "tipoDado": 8,
     "danoFijo": 0,
@@ -5896,6 +6497,38 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-honda-de-cuero",
+    "nombre": "Honda de cuero",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 40,
+    "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
+    "descripcionNarrativa": "Una tira de cuero y un puñado de piedras. Vieja como la guerra.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
   },
   {
     "mods": [
@@ -6012,6 +6645,38 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-lanza-de-caza",
+    "nombre": "Lanza de caza",
+    "tier": "Común",
+    "tipoItem": "arma_2m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 65,
+    "detalle": "Arma de dos manos, Tipo 8. Alcance +1.",
+    "descripcionNarrativa": "Asta de fresno y punta de hierro con una aleta para trabar. Pensada para jabalíes, usada para todo.",
+    "tipoDado": 8,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false
   },
   {
     "mods": [
@@ -6233,7 +6898,7 @@
     "peso": 3,
     "ranuras": 1,
     "precioCompra": 100,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
     "descripcionNarrativa": "Cabeza de acero macizo, mango de nogal. Sin vueltas.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -6407,7 +7072,7 @@
     "peso": 4,
     "ranuras": 1,
     "precioCompra": 140,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 4 dados de daño. Crítico +10. Parry +1.",
     "descripcionNarrativa": "Cabeza enorme y mango corto. Autoridad hecha herramienta.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -6418,6 +7083,42 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-martillo-del-titan",
+    "nombre": "Martillo del Titán",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "peso": 3,
+    "ranuras": 1,
+    "precioCompra": 950,
+    "detalle": "Arma de dos manos, Tipo 12. Puede Aturdir (25%).",
+    "descripcionNarrativa": "Una masa de piedra negra en un mango que no debería aguantarla. La aguanta.",
+    "tipoDado": 12,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Aturdir",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
+      }
+    ]
   },
   {
     "mods": [
@@ -6505,7 +7206,7 @@
     "peso": 3,
     "ranuras": 1,
     "precioCompra": 90,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
     "descripcionNarrativa": "Pesada, con bridas verticales. De cuerpo de guardia de ciudad.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -6590,7 +7291,7 @@
     "peso": 2,
     "ranuras": 1,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Arma de una mano, Tipo 4: 2 dados de daño.",
     "descripcionNarrativa": "Punzón fino con mango de madera. Nadie pregunta por qué lo llevás.",
     "tipoDado": 4,
     "danoFijo": 0,
@@ -6637,6 +7338,83 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-pistola-de-chispa",
+    "nombre": "Pistola de chispa",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 210,
+    "detalle": "Arma de una mano a distancia, Tipo 8. Rango +4. El disparo hace ruido: alerta a los que estén cerca.",
+    "descripcionNarrativa": "Un solo tiro, mucho humo y un ruido que se oye desde tres calles.",
+    "tipoDado": 8,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true,
+    "efectosGolpe": [
+      {
+        "nombre": "Estruendo",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "El disparo se oye a la redonda: avisale al GM para que los cercanos se alerten."
+      }
+    ]
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 5
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-pistola-de-duelo-de-plata",
+    "nombre": "Pistola de duelo de plata",
+    "tier": "Excepcional",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 780,
+    "detalle": "Arma de una mano a distancia, Tipo 8. Rango +5. Crítico +1.",
+    "descripcionNarrativa": "Cañón largo grabado con hiedras. Fue de un noble que jamás falló un duelo. Los otros no se quejaron.",
+    "tipoDado": 8,
+    "danoFijo": 2,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
   },
   {
     "mods": [],
@@ -6730,6 +7508,51 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 5
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-revolver-del-pistolero",
+    "nombre": "Revólver del pistolero",
+    "tier": "Legendario",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 1500,
+    "detalle": "Arma de una mano a distancia, Tipo 10. Rango +5. Crítico +2. Cada golpe puede dejar al objetivo Aturdido (50%).",
+    "descripcionNarrativa": "Seis balas, seis nombres grabados en la culata. Ninguno vuelve a hablar.",
+    "tipoDado": 10,
+    "danoFijo": 2,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true,
+    "efectosGolpe": [
+      {
+        "nombre": "Aturdir",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
+      }
+    ]
   },
   {
     "mods": [],
@@ -6974,6 +7797,60 @@
     "mods": [
       {
         "stat": "def",
+        "val": 16
+      },
+      {
+        "stat": "bloqueo",
+        "val": 5
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-baluarte-del-ultimo-bastion",
+    "nombre": "Baluarte del Último Bastión",
+    "tier": "Legendario",
+    "tipoItem": "escudo_2m",
+    "peso": 6,
+    "ranuras": 0,
+    "precioCompra": 1700,
+    "detalle": "Bloqueo +5. Parry +2. Resistencia a críticos tipo 4: +3. Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Movimiento -2. Mientras esté equipado, la armadura rota o arruinada no te afecta.",
+    "descripcionNarrativa": "Una muralla portátil. Dicen que en la última batalla la muralla se quedó atrás y el escudo sostuvo el frente.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "Inmune a rotura de armadura (escudo)",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "Mientras esté equipado, la armadura rota o arruinada no le hace nada.",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 5
       },
       {
@@ -7145,7 +8022,7 @@
         "val": 7
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
       }
     ],
@@ -7157,7 +8034,7 @@
     "peso": 3,
     "ranuras": 1,
     "precioCompra": 90,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Capas superpuestas remachadas. Trabajo serio de armería.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7235,10 +8112,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7249,7 +8122,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Resistencia a críticos tipo 8 y 10",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Placas superpuestas sobre madera. Pesa, pero come impactos.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7267,10 +8140,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7281,7 +8150,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipo 6 y 8",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Tablas de tilo encoladas y forradas en lienzo. Se rompe y se repone.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7357,15 +8226,11 @@
         "val": 7
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
-      },
-      {
         "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
         "val": 1
       }
     ],
@@ -7377,7 +8242,7 @@
     "peso": 4,
     "ranuras": 1,
     "precioCompra": 90,
-    "detalle": "Bloqueo +1, Resistencia crit tipo 10 y 12",
+    "detalle": "Resistencia a críticos tipo 8: +1. Bloqueo +1, Resistencia crit tipo 10 y 12",
     "descripcionNarrativa": "De sitio, con puntal propio. Detrás de él se recarga tranquilo.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7395,14 +8260,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7413,7 +8270,7 @@
     "peso": 4,
     "ranuras": 1,
     "precioCompra": 46,
-    "detalle": "Resistencia +1 a tipos 6, 8 y 10",
+    "detalle": "Resistencia a críticos tipo 6: +1. Resistencia +1 a tipos 6, 8 y 10",
     "descripcionNarrativa": "Redondo y chico. Cubre poco pero se mueve rápido.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7454,6 +8311,60 @@
     "mods": [
       {
         "stat": "def",
+        "val": 14
+      },
+      {
+        "stat": "bloqueo",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-escudo-torre-del-guardian",
+    "nombre": "Escudo torre del Guardián",
+    "tier": "Excepcional",
+    "tipoItem": "escudo_2m",
+    "peso": 6,
+    "ranuras": 1,
+    "precioCompra": 900,
+    "detalle": "Bloqueo +4. Resistencia a críticos tipo 4 y 6: +2. Resistencia a críticos tipo 8 y 10: +1. Movimiento -2.",
+    "descripcionNarrativa": "Lo llevaba el guardián de un puente que nadie cruzó en cien años. Tiene marcas de todas las veces que lo intentaron.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 6
       },
       {
@@ -7485,20 +8396,16 @@
         "val": 8
       },
       {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
         "stat": "tipo2",
         "val": 1
       },
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "bloqueo",
-        "val": 2
       }
     ],
     "efectoMods": [],
@@ -7509,12 +8416,108 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 160,
-    "detalle": "bloqueo +2, Resistencia a críticos 6, 8 y 10",
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1.",
     "descripcionNarrativa": "Mejor forjado que el común, con refuerzo de acero en el borde.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 12
+      },
+      {
+        "stat": "bloqueo",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-muralla-de-acero",
+    "nombre": "Muralla de acero",
+    "tier": "Raro",
+    "tipoItem": "escudo_2m",
+    "peso": 5,
+    "ranuras": 1,
+    "precioCompra": 260,
+    "detalle": "Bloqueo +3. Resistencia a críticos tipo 4, 6 y 8: +1. Movimiento -1.",
+    "descripcionNarrativa": "Chapa de acero de la altura de un hombre. Se apoya en el piso y se pelea desde atrás.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-pavez-de-madera-reforzada",
+    "nombre": "Pavés de madera reforzada",
+    "tier": "Buena Calidad",
+    "tipoItem": "escudo_2m",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 140,
+    "detalle": "Bloqueo +2. Resistencia a críticos tipo 4 y 6: +1. Movimiento -1.",
+    "descripcionNarrativa": "Una puerta con manijas. Lo suficientemente ancho como para esconderse detrás y suspirar.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
     "consumible": false,
     "imagen": ""
   },
@@ -7587,10 +8590,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7601,7 +8600,7 @@
     "peso": 3,
     "ranuras": 1,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipo 6 y 8",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Tablitas encoladas con un umbo de hierro al centro.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7617,7 +8616,7 @@
         "val": 3
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -7629,7 +8628,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipo 10",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Sirve. Nadie va a admitir que sirve, pero sirve.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7643,6 +8642,10 @@
       {
         "stat": "def",
         "val": 8
+      },
+      {
+        "stat": "bloqueo",
+        "val": 4
       },
       {
         "stat": "tipo1",
@@ -7659,14 +8662,6 @@
       {
         "stat": "tipo4",
         "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
-      },
-      {
-        "stat": "bloqueo",
-        "val": 4
       }
     ],
     "efectoMods": [],
@@ -7677,7 +8672,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 850,
-    "detalle": "bloqueo +4, +1 a resistencia de todo crítico",
+    "detalle": "bloqueo +4, +1 a resistencia de los críticos tipo 4, 6, 8 y 10",
     "descripcionNarrativa": "Salió de la arena con su dueño y sin una sola abolladura.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -7703,14 +8698,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -7721,7 +8708,7 @@
     "peso": 3,
     "ranuras": 1,
     "precioCompra": 130,
-    "detalle": "Resistencia a todos los críticos +1",
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1",
     "descripcionNarrativa": "Bronce antiguo con una cara grabada. Incomoda mirarla de frente.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
@@ -9704,10 +10691,6 @@
       {
         "stat": "tipo4",
         "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -9718,7 +10701,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 2500,
-    "detalle": "Otorga 1 de resistencia a todos los críticos",
+    "detalle": "Otorga 1 de resistencia a los críticos tipo 4, 6, 8 y 10",
     "descripcionNarrativa": "Placas diminutas superpuestas que se acomodan solas al mover el dedo.",
     "tipoDado": 0,
     "danoFijo": 0,
@@ -9886,15 +10869,177 @@
   {
     "mods": [
       {
+        "stat": "pdg",
+        "val": 1
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-del-cazador",
+    "nombre": "Anillo del Cazador",
+    "tier": "Buena Calidad",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1600,
+    "detalle": "Mientras esté equipado, otorga PdG +1 y Rango +1.",
+    "descripcionNarrativa": "Tiene grabada una huella de pisada. Nadie sabe de qué bicho.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-del-centinela",
+    "nombre": "Anillo del Centinela",
+    "tier": "Buena Calidad",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1600,
+    "detalle": "Mientras esté equipado, otorga Bloqueo +1 y Parry +1.",
+    "descripcionNarrativa": "Un aro de hierro con una muesca donde apoyás el pulgar cuando esperás.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-del-corredor",
+    "nombre": "Anillo del Corredor",
+    "tier": "Buena Calidad",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1600,
+    "detalle": "Mientras esté equipado, otorga Iniciativa +1 y Evasión +1.",
+    "descripcionNarrativa": "Liviano como una pluma. Sospechosamente liviano.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdgmg",
+        "val": 1
+      },
+      {
+        "stat": "resmg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-del-estudioso",
+    "nombre": "Anillo del Estudioso",
+    "tier": "Buena Calidad",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1600,
+    "detalle": "Mientras esté equipado, otorga PdG mágico +1 y Resistencia mágica +1.",
+    "descripcionNarrativa": "Un aro de latón con una gema chica que enfoca lo que mira. Ayuda a leer con poca luz.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "hpmax",
+        "val": 15
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-anillo-del-sobreviviente",
+    "nombre": "Anillo del Sobreviviente",
+    "tier": "Buena Calidad",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1600,
+    "detalle": "Mientras esté equipado, otorga HP máximo +15.",
+    "descripcionNarrativa": "Un aro que se calienta cuando te lastiman. Sigue tibio después de que pasa.",
+    "tipoDado": 0,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
         "stat": "def",
         "val": 8
       },
       {
         "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
         "val": 1
       }
     ],
@@ -9906,7 +11051,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 100,
-    "detalle": "Reduce críticos tipo 8 y 10",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Placas encastradas sobre base de cuero. Varias armaduras en una.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -9991,7 +11136,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "",
+    "detalle": "Defensa +3.",
     "descripcionNarrativa": "Cuero sin curtir del todo. Se estira con el uso y nunca vuelve.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10134,7 +11279,7 @@
     "peso": 4,
     "ranuras": 1,
     "precioCompra": 100,
-    "detalle": "",
+    "detalle": "Defensa +10.",
     "descripcionNarrativa": "Placas lisas sin blasón ni marca de herrero. Cumple, y con eso alcanza.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10241,7 +11386,7 @@
     "tipoItem": "cabeza",
     "peso": 0,
     "ranuras": 0,
-    "precioCompra": 0,
+    "precioCompra": 1200,
     "detalle": "Otorga habilidad Sigilo. En la intemperie tira el doble para no ser descubierto. Resistencia a cc +2. Resistencia mental +4.  Efecto secreto por set completo.",
     "descripcionNarrativa": "Boina gastada de ala ancha, calada bien sobre los ojos. La usó un gaucho que nunca dejó rastro.",
     "equipoEstadoNombre": "",
@@ -10268,8 +11413,7 @@
     "tipoItem": "piernas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "Movimiento +1.",
     "descripcionNarrativa": "Amplias, cómodas y hechas para caminar todo el día.",
     "equipoEstadoNombre": "",
@@ -10304,8 +11448,7 @@
     "tipoItem": "piernas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 150,
     "detalle": "Constitución +1. Movimiento +1. Resistencia a CC +1.",
     "descripcionNarrativa": "Tela reforzada en la entrepierna. Aguantan semanas de marcha sin ceder.",
     "equipoEstadoNombre": "",
@@ -10323,10 +11466,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -10337,7 +11476,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Reduce críticos tipo 8 y 10",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Puntera reforzada y suela claveteada. De obra y de guerra.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10375,8 +11514,7 @@
     "tipoItem": "pies",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 180,
     "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6: +1. Iniciativa +2. PdG +1.",
     "descripcionNarrativa": "Espolones de acero al talón. Patean primero.",
     "equipoEstadoNombre": "",
@@ -10482,7 +11620,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 8: +1. Defensa +5. Movimiento +1.",
     "descripcionNarrativa": "Caña alta hasta la rodilla, con espuela montada. De montar, no de caminar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10505,7 +11643,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "",
+    "detalle": "Defensa +6.",
     "descripcionNarrativa": "Cuero grueso con suela de madera. Duran una vida si se las cuida.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10559,20 +11697,16 @@
         "val": 4
       },
       {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "mov",
         "val": -1
       },
       {
         "stat": "eva",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -10583,7 +11717,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Resistencia a críticos tipo 8 y 10: +1. Movimiento -1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipo 6: +1. Movimiento -1. Evasión -1.",
     "descripcionNarrativa": "Plástico duro imposible de doblar. Protegen mucho, caminan horrible.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10629,6 +11763,10 @@
         "val": 8
       },
       {
+        "stat": "hpmax",
+        "val": 10
+      },
+      {
         "stat": "tipo1",
         "val": 2
       },
@@ -10637,12 +11775,8 @@
         "val": 2
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "hpmax",
-        "val": 10
       }
     ],
     "efectoMods": [],
@@ -10653,7 +11787,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 220,
-    "detalle": "Resistencia a críticos tipo 10: +1. Resistencia a críticos tipo 4 y 6: +2. Hp máximo: +10.",
+    "detalle": "Resistencia a críticos tipo 4 y 6: +2. Resistencia a críticos tipo 8: +1. Hp máximo: +10.",
     "descripcionNarrativa": "Cada pisada deja marca en la tierra.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10680,7 +11814,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 180,
-    "detalle": "Resistencia a críticos 10: +1",
+    "detalle": "Resistencia a críticos tipo 10: +1.",
     "descripcionNarrativa": "Macizas hasta lo absurdo. Cada paso deja marca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -10940,7 +12074,7 @@
         "val": 1
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -10952,7 +12086,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "Resistencia a críticos tipos 4 y 8: +1.",
+    "detalle": "Resistencia a críticos tipo 4 y 6: +1.",
     "descripcionNarrativa": "Clavos en la suela para agarrar el piso. Marcan el camino.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11182,7 +12316,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Defensa +2.",
     "descripcionNarrativa": "Cuero blando cosido a mano, de vestir más que de campo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11197,7 +12331,7 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -11209,7 +12343,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipos 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Usados por alguien más antes. Todavía dan para una campaña.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11293,8 +12427,7 @@
     "tipoItem": "piernas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 110,
     "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
     "descripcionNarrativa": "Cuero parejo y bien curtido, cortado a medida.",
     "equipoEstadoNombre": "",
@@ -11322,7 +12455,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 4: +1. Defensa +2.",
     "descripcionNarrativa": "Cuero blando que sigue la pierna sin apretar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11348,8 +12481,7 @@
     "tipoItem": "piernas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Lana áspera tejida a máquina. Abrigan y poco más.",
     "equipoEstadoNombre": "",
@@ -11419,8 +12551,7 @@
     "tipoItem": "piernas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 450,
     "detalle": "Resistencia a críticos tipos 4 y 6: +2. Constitución +1. Movimiento +1. Regeneración +1 HP por turno.",
     "descripcionNarrativa": "Piel correosa del críptido. Se regenera sola de los cortes chicos.",
     "equipoEstadoNombre": "Regeneración (calzas)",
@@ -11603,7 +12734,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "",
+    "detalle": "Defensa +5.",
     "descripcionNarrativa": "Fina y sin refuerzos, pensada para no estorbar ningún movimiento.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11626,7 +12757,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Defensa +1.",
     "descripcionNarrativa": "Lona de vela reciclada. Protege de las astillas y poco más.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11672,7 +12803,7 @@
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -11684,7 +12815,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Alguien le puso las tachas a mano, torcidas y con orgullo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11699,7 +12830,7 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -11711,7 +12842,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "Resistencia a crítico tipo 10: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Plástico con el escudo de un club de barrio despegándose.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11784,7 +12915,7 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -11796,7 +12927,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Hojalata martillada de fábrica mayorista. Cumple, apenas.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11888,9 +13019,8 @@
     "tipoItem": "cabeza",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 4: +1. Defensa +2.",
     "descripcionNarrativa": "Cuero blando con relleno en la coronilla. Simple y efectiva.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11940,7 +13070,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Defensa +1.",
     "descripcionNarrativa": "Lana sin teñir de oveja de descarte. Pica un poco.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11966,8 +13096,7 @@
     "tipoItem": "cabeza",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 145,
     "detalle": "Ignora 1 punto de resistencia a crítico del objetivo al atacar sorprendiendo.",
     "descripcionNarrativa": "Paño negro que traga la luz. El que la lleva llega antes de que lo vean.",
     "equipoEstadoNombre": "",
@@ -11998,8 +13127,7 @@
     "tipoItem": "cabeza",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 145,
     "detalle": "Evasión +1. Iniciativa +1.",
     "descripcionNarrativa": "Tejido tratado con grasa animal que no hace ruido al moverse.",
     "equipoEstadoNombre": "",
@@ -12030,8 +13158,7 @@
     "tipoItem": "cabeza",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 90,
     "detalle": "Resistencia a críticos tipos 4 y 6: +1.",
     "descripcionNarrativa": "Cuero bien curtido que cubre cabeza y nuca. Desvía golpes de refilón.",
     "equipoEstadoNombre": "",
@@ -12070,8 +13197,7 @@
     "tipoItem": "cabeza",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 600,
     "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Especial +1. Rango de casteo +2.",
     "descripcionNarrativa": "Fibra de la serpiente madre del agua. Sigue húmeda aunque esté seca.",
     "equipoEstadoNombre": "",
@@ -12250,6 +13376,10 @@
         "val": 5
       },
       {
+        "stat": "esp",
+        "val": 2
+      },
+      {
         "stat": "tipo1",
         "val": 2
       },
@@ -12259,19 +13389,15 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo4",
-        "val": 2
+        "val": 1
       },
       {
         "stat": "tipo5",
-        "val": 2
-      },
-      {
-        "stat": "esp",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12282,7 +13408,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 1200,
-    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  +2 de resistencia a todos los críticos. +5 a cualquier tirada de interacción social. +2 a especial",
+    "detalle": "suma 5 a cualquier tirada de intrusión mental, ilusión, estados anímicos.  Resistencia a críticos tipo 4 y 6: +2, tipo 8, 10 y 12: +1. +5 a cualquier tirada de interacción social. +2 a especial",
     "descripcionNarrativa": "Del otro lado de la discusión. Amplifica en vez de bloquear.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12307,10 +13433,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12320,9 +13442,8 @@
     "tipoItem": "cabeza",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4, 6, 8 y 10: +1.",
+    "precioCompra": 145,
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1.",
     "descripcionNarrativa": "Hierro caído del cielo, más denso de lo normal. Vale lo que pesa.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12337,20 +13458,16 @@
         "val": 4
       },
       {
+        "stat": "eva",
+        "val": -1
+      },
+      {
         "stat": "tipo2",
         "val": 1
       },
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "eva",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -12361,7 +13478,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 140,
-    "detalle": "Resistencia a críticos tipo 6, 8 y 10: +1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1. Evasión -1.",
     "descripcionNarrativa": "Segmentos de acero en cúpula. Cobertura pareja a costa de peso.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12378,10 +13495,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12391,9 +13504,8 @@
     "tipoItem": "cabeza",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1.",
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Cuero hervido y prensado hasta ponerse duro. Barato y efectivo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12478,12 +13590,12 @@
         "val": 4
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "eva",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12494,7 +13606,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Reduce críticos Tipo 10. Evasión -1",
+    "detalle": "Resistencia a críticos tipo 6: +1. Evasión -1",
     "descripcionNarrativa": "Llamas anaranjadas sobre fondo negro. Un trabajo de amor.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12509,12 +13621,12 @@
         "val": 2
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "eva",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -12525,7 +13637,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipo 10: +1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipo 6: +1. Evasión -1.",
     "descripcionNarrativa": "Plástico duro con la calcomanía medio despegada. No pregunten de dónde salió.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12857,8 +13969,7 @@
     "tipoItem": "cinturon",
     "peso": 0,
     "ranuras": 8,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 500,
     "detalle": "Resistencia mental +2. Rango de casteo +1. Ranuras para consumibles +8.",
     "descripcionNarrativa": "Las botellas nunca se rompen adentro.",
     "equipoEstadoNombre": "",
@@ -12939,8 +14050,7 @@
     "tipoItem": "cinturon",
     "peso": 0,
     "ranuras": 6,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 170,
     "detalle": "Evasión +1. Iniciativa +1. Ranuras para consumibles +6.",
     "descripcionNarrativa": "Tiene compartimentos que nadie encuentra.",
     "equipoEstadoNombre": "",
@@ -13088,6 +14198,10 @@
         "val": 7
       },
       {
+        "stat": "mov",
+        "val": -2
+      },
+      {
         "stat": "tipo1",
         "val": 1
       },
@@ -13098,14 +14212,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "mov",
-        "val": -2
       }
     ],
     "efectoMods": [],
@@ -13116,7 +14222,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 130,
-    "detalle": "Resistencia a críticos tipos 4, 6, 8 y 10: +1. Movimiento -2.",
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1. Movimiento -2.",
     "descripcionNarrativa": "Franjas de acero articuladas sobre cuero. Clásico de armería seria.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13178,20 +14284,16 @@
         "val": 7
       },
       {
+        "stat": "eva",
+        "val": -1
+      },
+      {
         "stat": "tipo1",
         "val": 1
       },
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "eva",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -13202,7 +14304,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "Reduce críticos tipo 4, 6 y 8. evasión -1",
+    "detalle": "Resistencia a críticos tipo 4 y 6: +1. evasión -1",
     "descripcionNarrativa": "Reglamentaria, pesada, con el número de inventario grabado atrás.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13231,10 +14333,6 @@
       {
         "stat": "tipo4",
         "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -13245,7 +14343,7 @@
     "peso": 6,
     "ranuras": 0,
     "precioCompra": 250,
-    "detalle": "Reduce críticos de cualquier tipo.",
+    "detalle": "Reduce críticos tipo 4, 6, 8 y 10.",
     "descripcionNarrativa": "Maciza y sin articulaciones. Se camina despacio y no importa.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13543,10 +14641,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -13557,7 +14651,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Reduce críticos Tipo 4, 6 y 8.",
+    "detalle": "Resistencia a críticos tipo 4 y 6: +1.",
     "descripcionNarrativa": "Anillos gruesos y desparejos. Pesa como una condena.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13715,8 +14809,7 @@
     "tipoItem": "cinturon",
     "peso": 0,
     "ranuras": 1,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 65,
     "detalle": "Ranuras para consumibles +1.",
     "descripcionNarrativa": "Una tira de tela enrollada a la cintura. Lo más básico que hay.",
     "equipoEstadoNombre": "",
@@ -13837,7 +14930,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Defensa +3.",
     "descripcionNarrativa": "Visera rígida y escudo dorado. Impone más de lo que protege.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -13952,8 +15045,7 @@
     "tipoItem": "cabeza",
     "peso": 4,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 145,
     "detalle": "Reduce críticos Tipo 4, 6, 8 y 10.",
     "descripcionNarrativa": "Cobertura total de una sola pieza. No se ve casi nada y no hace falta.",
     "equipoEstadoNombre": "",
@@ -13969,6 +15061,14 @@
         "val": 8
       },
       {
+        "stat": "eva",
+        "val": -1
+      },
+      {
+        "stat": "pdg",
+        "val": -1
+      },
+      {
         "stat": "tipo1",
         "val": 2
       },
@@ -13978,19 +15078,7 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "tipo4",
         "val": 1
-      },
-      {
-        "stat": "eva",
-        "val": -1
-      },
-      {
-        "stat": "pdg",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -14001,7 +15089,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 140,
-    "detalle": "Resistencia a críticos tipos 4, 6 y 8: +2. Resistencia a críticos tipo 10: +1. Evasión -1. Pdg -1.",
+    "detalle": "Resistencia a críticos tipo 4 y 6: +2. Resistencia a críticos tipo 8: +1. Evasión -1. Pdg -1.",
     "descripcionNarrativa": "Cobertura total de placa. No se ve casi nada, pero tampoco entra casi nada.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14113,7 +15201,7 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -14125,7 +15213,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 50,
-    "detalle": "Resistencia a crítico tipo 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Entregadas en el primer día de instrucción. Nunca calzan bien del todo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14179,14 +15267,6 @@
         "val": 8
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
         "stat": "mov",
         "val": 2
       },
@@ -14197,6 +15277,14 @@
       {
         "stat": "resm",
         "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14206,9 +15294,8 @@
     "tipoItem": "piernas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4 y 8: +2. Agilidad +1. Movimiento +2. Resistencia mental +2.",
+    "precioCompra": 450,
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 8: +1. Agilidad +1. Movimiento +2. Resistencia mental +2.",
     "descripcionNarrativa": "Pezuña de unicornio laminada. Liviana de un modo que no debería.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14223,7 +15310,7 @@
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -14235,7 +15322,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Chapa fina atada con correas de cuero. Suena al caminar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14332,8 +15419,7 @@
     "tipoItem": "piernas",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 1350,
     "detalle": "Resistencia a críticos tipos 4: +3. Resistencia a críticos tipos 6: +2. Resistencia a críticos tipos 8 y 10: +1. Resistencia a críticos tipo 12: +1. Constitución +2. Movimiento -1. Resistencia mental +4. Armadura indestructible.",
     "descripcionNarrativa": "Bronce de una estatua que ya no existe. Sigue de pie igual.",
     "equipoEstadoNombre": "Armadura indestructible (grebas)",
@@ -14349,22 +15435,6 @@
         "val": 8
       },
       {
-        "stat": "tipo1",
-        "val": 2
-      },
-      {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "mov",
         "val": -1
       },
@@ -14375,6 +15445,18 @@
       {
         "stat": "rescc",
         "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14385,7 +15467,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 220,
-    "detalle": "Resistencia a críticos tipos 4: +2. Resistencia a críticos tipos 6, 8 y 10: +1. Resistencia a CC +3. Resistencia Mental +3. Movimiento -1.",
+    "detalle": "Resistencia a críticos tipo 4: +2. Resistencia a críticos tipo 6 y 8: +1. Resistencia a CC +3. Resistencia Mental +3. Movimiento -1.",
     "descripcionNarrativa": "Hierro macizo sin adornos. El que las lleva no retrocede porque no puede.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14450,8 +15532,7 @@
     "tipoItem": "piernas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 110,
     "detalle": "Resistencia a críticos tipos 4 y 8: +1. Parry +1.",
     "descripcionNarrativa": "Placa al frente, malla en la articulación. Solución de compromiso.",
     "equipoEstadoNombre": "",
@@ -14486,8 +15567,7 @@
     "tipoItem": "manos",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 85,
     "detalle": "Reduce críticos Tipo 4, 6 y 8.",
     "descripcionNarrativa": "Placas articuladas dedo por dedo. El estándar de cualquier armería.",
     "equipoEstadoNombre": "",
@@ -14591,10 +15671,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14605,7 +15681,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "Reduce críticos Tipo 4, 6, 8 y 10.",
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1.",
     "descripcionNarrativa": "Sin adornos, con los nudillos reforzados. Para pelear, no para desfilar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14663,18 +15739,6 @@
         "val": 10
       },
       {
-        "stat": "tipo1",
-        "val": 3
-      },
-      {
-        "stat": "tipo2",
-        "val": 2
-      },
-      {
-        "stat": "tipo3",
-        "val": 2
-      },
-      {
         "stat": "pdg",
         "val": 5
       },
@@ -14685,6 +15749,18 @@
       {
         "stat": "des",
         "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14694,9 +15770,8 @@
     "tipoItem": "manos",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4: +3. Resistencia a críticos tipos 6: +2. Resistencia a críticos tipo 8: +2. Destreza +2. PdG +5. Parry +2.",
+    "precioCompra": 1625,
+    "detalle": "Resistencia a críticos tipo 4: +3. Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Destreza +2. PdG +5. Parry +2.",
     "descripcionNarrativa": "Nadie vio bien lo que pasó. El resultado quedó igual.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14721,14 +15796,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14739,7 +15806,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 180,
-    "detalle": "Reduce críticos Tipo 4, 6, 8, 10 y 12.",
+    "detalle": "Reduce críticos Tipo 4, 6 y 8.",
     "descripcionNarrativa": "Hechos por el mejor herrero para sus propias manos.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -14958,8 +16025,7 @@
     "tipoItem": "manos",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 85,
     "detalle": "Reduce críticos Tipo 4 y 6.",
     "descripcionNarrativa": "Cuero doble en la palma, donde más se gasta.",
     "equipoEstadoNombre": "",
@@ -15009,8 +16075,7 @@
     "tipoItem": "manos",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 85,
     "detalle": "Buen agarre para trepar y colgar de un acantilado.",
     "descripcionNarrativa": "Cera en la palma para agarrar mejor. Se pegan a la roca.",
     "equipoEstadoNombre": "",
@@ -15080,8 +16145,7 @@
     "tipoItem": "manos",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 750,
     "detalle": "Resistencia a críticos tipos 4 y 6: +2. Destreza +1. PdG +2.",
     "descripcionNarrativa": "Piel del duende guaranítico del monte. Agarran lo que no se deja agarrar.",
     "equipoEstadoNombre": "",
@@ -15179,7 +16243,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 6: +1. Defensa +2.",
     "descripcionNarrativa": "Guata cosida en el dorso. Más de abrigo que de defensa.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15252,7 +16316,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "",
+    "detalle": "Defensa +2. Movimiento +1.",
     "descripcionNarrativa": "Tres rayas al costado. Cómodo hasta lo sospechoso.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15298,16 +16362,12 @@
         "val": 3
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
         "stat": "pdg",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15318,7 +16378,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipo 6 y 8: +1. PdG -1",
+    "detalle": "Resistencia a críticos tipo 6: +1. PdG -1",
     "descripcionNarrativa": "Chapa fina remachada al dorso. Suenan más de lo que sirven.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15409,10 +16469,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15423,7 +16479,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 150,
-    "detalle": "Reduce críticos Tipo 6, 8 y 10.",
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1.",
     "descripcionNarrativa": "Tiras de acero superpuestas que se deslizan al cerrar el puño.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15461,8 +16517,7 @@
     "tipoItem": "manos",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 85,
     "detalle": "Resistencia a críticos tipos 4, 6 y 8: +1. PdG +1.",
     "descripcionNarrativa": "Dorso en placa, palma en malla para no perder el agarre.",
     "equipoEstadoNombre": "",
@@ -15634,7 +16689,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 40,
-    "detalle": "",
+    "detalle": "Defensa +1. SP +1.",
     "descripcionNarrativa": "Tejido con patrones florales. Muy abrigaditos.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15709,10 +16764,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo5",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -15723,7 +16774,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 170,
-    "detalle": "Reducción a críticos tipos 8 y 12: +1",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Pelaje áspero de bestia grande. Abrigan y aguantan.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -15955,8 +17006,7 @@
     "tipoItem": "piernas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 150,
     "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Constitución +1.",
     "descripcionNarrativa": "Cuero grueso de bestia grande. Pesado, pero casi no lo atraviesan.",
     "equipoEstadoNombre": "",
@@ -15999,8 +17049,7 @@
     "tipoItem": "piernas",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 450,
     "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipo 8: +1. Constitución +1. Movimiento +2. Resistencia a CC +2.",
     "descripcionNarrativa": "Fibra del guardián andino de las vicuñas. Camina la altura sin cansarse.",
     "equipoEstadoNombre": "",
@@ -16197,8 +17246,7 @@
     "tipoItem": "cabeza",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 1200,
     "detalle": "Especial +1. Bonos +2. Resistencia mental +4. Refleja 50% de todo daño mágico recibido.",
     "descripcionNarrativa": "Volumen imposible, presencia inapelable. Nadie le discute nada al que la lleva.",
     "equipoEstadoNombre": "",
@@ -16216,10 +17264,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16229,9 +17273,8 @@
     "tipoItem": "piernas",
     "peso": 3,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "",
+    "precioCompra": 110,
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Segmentos que se deslizan en la rodilla. Buen trabajo de bisagra.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16320,7 +17363,7 @@
         "val": 2
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -16332,7 +17375,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipos 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Cuero prensado hasta ponerse rígido. El paso obligado del que arranca.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16366,8 +17409,7 @@
     "tipoItem": "piernas",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 110,
     "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 4 y 8: +1.",
     "descripcionNarrativa": "Placas superpuestas sobre base de cuero. Prolijo y flexible.",
     "equipoEstadoNombre": "",
@@ -16438,7 +17480,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 4: +1. Defensa +4.",
     "descripcionNarrativa": "Curtido en corteza de quebracho. Duro y oscuro.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16455,10 +17497,6 @@
       {
         "stat": "tipo2",
         "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16469,7 +17507,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "Reduce críticos tipo 6 y 8",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Placas desparejas, remaches de más. El primer trabajo de alguien.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16542,8 +17580,7 @@
     "tipoItem": "piernas",
     "peso": 1,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 60,
     "detalle": "Resistencia a críticos tipo 4: +1.",
     "descripcionNarrativa": "Retazos de cuero cosidos entre sí. Cada parche cuenta una historia.",
     "equipoEstadoNombre": "",
@@ -16687,11 +17724,7 @@
         "val": 4
       },
       {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -16703,7 +17736,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Reduce críticos tipo 8 y 10",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Todavía tiene el espejo retrovisor. Nadie se lo quiso sacar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16718,12 +17751,12 @@
         "val": 3
       },
       {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "eva",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16734,7 +17767,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "Resistencia a críticos tipo 10: +1. Evasión -1.",
+    "detalle": "Resistencia a críticos tipo 6: +1. Evasión -1.",
     "descripcionNarrativa": "Dos tapas de tacho atadas a la rodilla. Funciona, no pregunten cómo.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16790,10 +17823,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16804,7 +17833,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 120,
-    "detalle": "Resistencia a críticos tipos 4, 8 y 10: +1.",
+    "detalle": "Resistencia a críticos tipo 4 y 8: +1.",
     "descripcionNarrativa": "Placas articuladas en el empeine. Buen trabajo de herrero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16819,16 +17848,12 @@
         "val": 4
       },
       {
-        "stat": "tipo2",
-        "val": 1
-      },
-      {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
         "stat": "mov",
         "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -16839,7 +17864,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipos 6 y 8: +1. Movimiento -1.",
+    "detalle": "Resistencia a críticos tipo 6: +1. Movimiento -1.",
     "descripcionNarrativa": "Aros remachados sobre el empeine. Pesan y se nota.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16924,7 +17949,7 @@
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -16936,7 +17961,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 70,
-    "detalle": "Resistencia a críticos tipo 8: +1.",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Chapa fina sobre botín de cuero. Ruidosos y básicos.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -16994,20 +18019,16 @@
         "val": 8
       },
       {
-        "stat": "tipo3",
-        "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
         "stat": "mov",
         "val": -1
       },
       {
         "stat": "rescc",
         "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -17018,7 +18039,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 220,
-    "detalle": "Resistencia a críticos tipos 8 y 10: +1. Movimiento -1. Resistencia a CC +2.",
+    "detalle": "Resistencia a críticos tipo 8: +1. Movimiento -1. Resistencia a CC +2.",
     "descripcionNarrativa": "Hierro macizo. El que los lleva se planta y no lo mueve nadie.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17064,20 +18085,16 @@
         "val": 6
       },
       {
+        "stat": "mov",
+        "val": -1
+      },
+      {
         "stat": "tipo2",
         "val": 1
       },
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
-      },
-      {
-        "stat": "mov",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -17088,7 +18105,7 @@
     "peso": 3,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Reduce críticos Tipo 6, 8 y 10. -1 Movimiento.",
+    "detalle": "Resistencia a críticos tipo 6 y 8: +1. -1 Movimiento.",
     "descripcionNarrativa": "Placas encastradas que cubren todo el pie. Caminar es un trámite.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17141,8 +18158,7 @@
     "tipoItem": "cabeza",
     "peso": 0,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 70,
     "detalle": "Bonos +1.",
     "descripcionNarrativa": "Paja trenzada a mano. Protege más del sol que de los golpes.",
     "equipoEstadoNombre": "",
@@ -17390,7 +18406,7 @@
         "val": 4
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
       }
     ],
@@ -17402,7 +18418,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 90,
-    "detalle": "Resistencia a críticos tipo 10: +1",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Vueltas de paño grueso con una placa escondida adentro.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17540,8 +18556,7 @@
     "tipoItem": "cabeza",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
+    "precioCompra": 90,
     "detalle": "Resistencia a críticos tipos 4 y 8: +1. PdG +1.",
     "descripcionNarrativa": "Frente en placa, nuca en malla. Visibilidad a cambio de un punto débil atrás.",
     "equipoEstadoNombre": "",
@@ -17559,10 +18574,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -17573,7 +18584,7 @@
     "peso": 4,
     "ranuras": 0,
     "precioCompra": 110,
-    "detalle": "Reduce críticos Tipo 8 y 10.",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Cubre toda la cabeza. Se ve por dos ranuras y se escucha la mitad.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17685,6 +18696,10 @@
         "val": 8
       },
       {
+        "stat": "resm",
+        "val": 2
+      },
+      {
         "stat": "tipo1",
         "val": 2
       },
@@ -17694,11 +18709,7 @@
       },
       {
         "stat": "tipo3",
-        "val": 2
-      },
-      {
-        "stat": "resm",
-        "val": 2
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -17708,9 +18719,8 @@
     "tipoItem": "cabeza",
     "peso": 2,
     "ranuras": 0,
-    "ocultoEnCatalogo": true,
-    "precioCompra": 0,
-    "detalle": "Resistencia a críticos tipos 4, 6 y 8: +2. Resistencia mental +2.",
+    "precioCompra": 600,
+    "detalle": "Resistencia a críticos tipo 4 y 6: +2. Resistencia a críticos tipo 8: +1. Resistencia mental +2.",
     "descripcionNarrativa": "Escama del vampiro cambiaformas mapuche. Se acomoda sola a la cabeza.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17725,6 +18735,10 @@
         "val": 4
       },
       {
+        "stat": "pdg",
+        "val": -1
+      },
+      {
         "stat": "tipo1",
         "val": 1
       },
@@ -17733,12 +18747,8 @@
         "val": 1
       },
       {
-        "stat": "tipo4",
+        "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "pdg",
-        "val": -1
       }
     ],
     "efectoMods": [],
@@ -17749,7 +18759,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 120,
-    "detalle": "Resistencia a críticos tipos 4, 6 y 10: +1. PdG -1",
+    "detalle": "Resistencia a críticos tipo 4, 6 y 8: +1. PdG -1",
     "descripcionNarrativa": "Acero bien templado con barra nasal. Clásico y confiable.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17840,10 +18850,6 @@
       {
         "stat": "tipo3",
         "val": 1
-      },
-      {
-        "stat": "tipo4",
-        "val": 1
       }
     ],
     "efectoMods": [],
@@ -17854,7 +18860,7 @@
     "peso": 2,
     "ranuras": 0,
     "precioCompra": 80,
-    "detalle": "Reduce críticos Tipo 8 y 10.",
+    "detalle": "Resistencia a críticos tipo 8: +1.",
     "descripcionNarrativa": "Casquete de acero sin protección facial. Rápido de poner.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17927,7 +18933,7 @@
         "val": 3
       },
       {
-        "stat": "tipo3",
+        "stat": "tipo2",
         "val": 1
       }
     ],
@@ -17939,7 +18945,7 @@
     "peso": 1,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "",
+    "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Suela de soga con capellada de cuero. Frescas y sin ninguna pretensión.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -17966,7 +18972,7 @@
     "peso": 0,
     "ranuras": 0,
     "precioCompra": 60,
-    "detalle": "",
+    "detalle": "Defensa +1. Movimiento +1.",
     "descripcionNarrativa": "Lona cruda con la costura por fuera. Lo mínimo indispensable.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,

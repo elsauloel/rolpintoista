@@ -356,3 +356,29 @@ resuelven a mano, como el resto de los avisos).
 - ✅ **P87. Armas de dos manos.** 2026-09-20: se había descartado y se sacó del
   asistente de ítems, pero el usuario **se arrepintió el mismo día**: la opción
   de arma de una o dos manos queda como estaba (revertido).
+
+- 🔲 **P88. Auditoría del catálogo (2026-09-20, hecha sin preguntar; a corregir).**
+  Qué se hizo, para que el usuario ajuste lo que no le cierre:
+  - **Resistencia a críticos en defensas, por tier** (Tipos 4, 6, 8, 10, 12):
+    Común solo Tipo 4 y 6; Buena Calidad hasta Tipo 8; Raro hasta Tipo 8 (Tipo 10
+    solo en armadura rígida o con Defensa ≥ 9); Excepcional hasta Tipo 10;
+    Legendario hasta Tipo 12 (1 punto). Los valores altos (Tipo 10 y 12) son
+    raros, y tope de +1. Lo que sobraba se bajó al Tipo más alto permitido (no se
+    sumó, se tomó el mayor). Excepciones a propósito: Casco de Magnetto y
+    Guanteletes de Adamantium (+2 a todos). 57 ítems cambiaron; su Detalle se
+    reescribió para que diga lo mismo que los números.
+  - **Se completó**: 36 ítems sin Detalle (texto armado con sus números), 37 sin
+    precio (mediana de su rubro y tier) y **35 ítems que estaban ocultos
+    (`ocultoEnCatalogo`) ahora se ven** (los de la tanda "ia-").
+  - **Pool nuevo (32 ítems)**: armas a distancia (no había ninguna salvo el
+    Lanzallamas) — honda, ballesta de mano, pistola de chispa, pistola de duelo,
+    revólver, arcos y ballesta pesada; 9 armas de dos manos cuerpo a cuerpo
+    (bastón ferrado a Espadón del Titán caído); 4 escudos de dos manos (no había
+    ninguno); 5 anillos de Buena Calidad (había 0) y 5 consumibles Legendarios
+    (había 0). Todos con precio, narrativa, Detalle y estados/efectos al golpear
+    cuando corresponde.
+  - **Sin tocar (a decidir)**: los mods `mov` siguen (la ficha los convierte a
+    No2 al abrir); el `crit +10` de la Cachiporra y el Martillo de sargento
+    parece un valor de la escala vieja; los precios de anillos (1200–3000) son
+    muy altos comparados con el resto del catálogo; Lanzallamas es el único
+    arma de rango antiguo y ahora conviven con los nuevos.

@@ -1115,6 +1115,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/biblioteca.js"></script>
+<script src="../comun/creeps-base.js"></script>
 <script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
@@ -1918,6 +1919,8 @@ function creepAporteArmadura(sc, statId){
 function creepDefensaEfectiva(sc){
   const {arruinada, rota} = creepEstadosArmadura(sc);
   let v = num(sc.defensa);
+  // Bonos de Defensa de los estados (ej. Piel de escoria): se suman por stack.
+  (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
   if(arruinada) v -= creepAporteArmadura(sc, 'def');
   v -= rota;
   return Math.max(0, v);
@@ -4056,6 +4059,7 @@ document.addEventListener('click', e => {
     Biblioteca.abrir({
       tipo: 'creeps', titulo: 'Creep nuevo',
       textoCrearDeCero: '+ Crear de cero',
+      base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
       alCrearDeCero: () => { S.creeps.push(nuevoCreep()); renderAll(); },
       alElegir: agregarCreepDeBiblioteca,
     });
@@ -4270,6 +4274,7 @@ document.addEventListener('click', e => {
     sc.nitros = num(sc.nitros) - costo;
     h.cdActual = num(h.cd);
     if(habCreepAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
+    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
@@ -4278,6 +4283,7 @@ document.addEventListener('click', e => {
     else mesaPublicarHabilidadCreep(sc, h);
     if(habCreepTira(h)) tirarExtraDeHab(h, sc);
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
+    if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
     toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);

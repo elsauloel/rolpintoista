@@ -64,7 +64,7 @@ const Biblioteca = (() => {
   // Entradas incluidas en el código (opts.base): siempre están, aun sin Firebase.
   function entradasBase(opts){
     return (opts.base || []).map(b => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
-      descripcion: b.detalle || '', nivel: b.jobCosto, autorUid: '', autorNombre: '', datos: b, base: true}));
+      descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true}));
   }
 
   async function cargar(tipo, forzar){

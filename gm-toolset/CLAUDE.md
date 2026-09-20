@@ -207,3 +207,17 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   cooldown ya activo (`cdActual = cd`, como si la hubiera usado el turno anterior):
   al crearla o marcarla, al agregar el creep desde la biblioteca y al
   **Reiniciar combate** (Turno 0). Las que no están marcadas no se tocan.
+
+- **Catálogo base de creeps por escenario** (2026-09-20, `comun/creeps-base.js`,
+  `CREEPS_BASE`): 60 creeps — Minas, Bosques, Montañas y Templo antiguo con
+  influencia alienígena × niveles 1 a 5 × 3 — todos con "(auditar)" en el nombre y
+  la etiqueta `auditar`. Aparecen en "+ Creep" → biblioteca junto a lo que apruebe
+  el dueño (opción `base` de `Biblioteca.abrir`), con etiquetas de escenario, nivel,
+  rol y tipo. Atributos = 33 + 3 por nivel (mismo presupuesto que gm-tools) repartidos
+  por rol; HP = Con × 5. Cada uno lleva **una skill rápida** (cooldown 2) y **una
+  lenta** (cooldown 3 a 6, `cdArranca`: arranca el combate en cooldown). Automatizado
+  por skill: costo en No2 (o "lo de un ataque"), tirada de daño (`tiradaExtra`),
+  estados con bonos a sí mismo (Def, Dmg, No2, Eva, Res.Mg) y cura (`curaHp`, que
+  ahora también funciona en los creeps). Los efectos sobre otros quedan escritos en la
+  descripción, a mano. Se corrigió además que los **bonos de Defensa de un estado**
+  cuenten en la Defensa del creep (`creepDefensaEfectiva`, y `creepDefensaMapa`).

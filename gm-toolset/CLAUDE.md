@@ -198,3 +198,12 @@ hay trabajo reciente o en curso de otra conversación (ver
 
 **`?editar=<creep>`** (2026-09-19): al cargar, abre la ventana "Editar creep" de ese
 creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
+
+- **Habilidades a mano en la tarjeta** (2026-09-20): la tarjeta compacta del creep
+  lista sus habilidades debajo de ⚡ Acciones (`habsMiniHtml`), cada una con su
+  nombre, **Ver** y **Ejecutar** (los mismos botones y reglas que las Acciones).
+- **Habilidad lenta** (2026-09-20): en el paso de costo del asistente de habilidad
+  de un creep, la casilla "Habilidad lenta" (`cdArranca`) hace que arranque con el
+  cooldown ya activo (`cdActual = cd`, como si la hubiera usado el turno anterior):
+  al crearla o marcarla, al agregar el creep desde la biblioteca y al
+  **Reiniciar combate** (Turno 0). Las que no están marcadas no se tocan.

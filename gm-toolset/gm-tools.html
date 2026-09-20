@@ -942,6 +942,7 @@ if(new URLSearchParams(location.search).get('modo') === 'acciones') document.doc
           <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0" data-hc-enter="1"></div>
           <div class="mini-f"><label>Otro costo</label><input type="text" id="hc-costo" placeholder="opcional" data-hc-enter="1"></div>
         </div>
+        <label class="chk-lenta" style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer"><input type="checkbox" id="hc-cd-arranca" style="width:auto"> <span><b>Habilidad lenta</b>: arranca el combate con el cooldown ya activo (como si la hubiera usado el turno anterior)</span></label>
         <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). "Otro costo" es un recordatorio libre: vida, un objeto, etc.</div>
       </div>
       <div class="hc-paso" data-hc-paso="2">
@@ -1834,7 +1835,7 @@ function guardarCreepEnBiblioteca(sc){
 
 function agregarCreepDeBiblioteca(datos){
   const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: ''});
-  sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid()}));
+  sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
   S.creeps.push(sc);
   renderAll();
@@ -3534,6 +3535,7 @@ function abrirEditorHabCreep(scId, habId){
   $("#hc-acciones").value = habCreepAtaque(h) ? IT2_CREEP.nitrosHabilidad : (h.nitrosCosto ?? IT2_CREEP.nitrosHabilidad);
   editingHabCreepPdgAuto = false;
   $('#hc-cd').value = h.cd || 0;
+  $('#hc-cd-arranca').checked = !!h.cdArranca;
   $('#hc-detalle').value = h.detalle || '';
   $('#hc-tirada').value = h.tiradaExtra || '';
   $("#hc-tirada-stat").innerHTML = hcOpcionesStat(h.tiradaStat || "");
@@ -3565,6 +3567,10 @@ function guardarEditorHabCreep(){
   h.costo = $('#hc-costo').value;
   h.nitrosCosto = $("#hc-nitros-modo").value === "ataque" ? "ATAQUE" : Math.max(0, num($("#hc-acciones").value) || 0);
   h.cd = Math.max(0, num($('#hc-cd').value) || 0);
+  // Habilidad lenta: empieza con el cooldown ya activo (al crearla, al marcarla, y en cada combate nuevo).
+  const eraLenta = !!h.cdArranca;
+  h.cdArranca = $('#hc-cd-arranca').checked;
+  if(h.cdArranca && (!eraLenta || !editingHabCreep.habId)) h.cdActual = h.cd;
   h.detalle = $('#hc-detalle').value;
   h.tiradaExtra = $('#hc-tirada').value.trim();
   h.tiradaStat = $("#hc-tirada-stat").value;
@@ -4818,6 +4824,8 @@ function mantenimiento(){
 function reiniciarCombate(){
   if(!confirm('¿Reiniciar el combate? El contador vuelve a cero.')) return;
   S.turno = 0;
+  // Turno 0: las habilidades lentas vuelven a arrancar con el cooldown activo.
+  S.creeps.forEach(sc => (sc.habilidades || []).forEach(h => { if(h.cdArranca) h.cdActual = num(h.cd); }));
   renderAll();
   toast('Combate reiniciado · Turno 0');
 }

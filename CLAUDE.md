@@ -19,6 +19,24 @@
 > Queda congelada como archivo histórico — no se migran sus personajes ni
 > sus datos, y no hace falta convivir con ella.
 
+## La esencia del Rol Pintoísta (ADN del proyecto)
+
+**El Rol Pintoísta ofrece una plataforma, no un corsé.** Es un juego de rol
+*sandbox* y promueve ese espíritu:
+
+- **Las reglas son referencias**, no leyes estrictas. La mesa las usa, las
+  dobla o las ignora según convenga a la historia.
+- **Los personajes, los equipos y todo el catálogo son sugerencias e
+  invitaciones**, no requisitos. Los números de un ítem, una clase o un creep
+  son un punto de partida que cualquiera puede cambiar o inventar de cero.
+- **Consecuencia para el código y el diseño**: las herramientas *ayudan y
+  recuerdan*, no *prohíben ni obligan*. Preferir avisar (y dejar seguir) antes
+  que bloquear; dejar siempre una salida manual (editar un valor, forzar una
+  acción, crear un ítem propio); no encerrar al GM ni a los jugadores en el
+  balance del catálogo. Automatizar lo que ahorra trabajo, nunca lo que le
+  quita al grupo la decisión. Ante la duda entre "regla estricta" y "libertad
+  de mesa", gana la libertad.
+
 Conjunto de herramientas HTML standalone para jugar Rol Pintoísta en vivo,
 cada uno desde su casa: mapa de hexágonos con tokens, fichas de personaje,
 panel de combate del GM, generador de tiendas. Un "Roll20 propio" con solo

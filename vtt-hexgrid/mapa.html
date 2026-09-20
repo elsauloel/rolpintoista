@@ -1550,19 +1550,13 @@ async function romperSigilo(id, detector){
 }
 // Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo
 // manejar (mi personaje; el GM, sus creeps) quedó dentro de un cono rival, pierde el sigilo.
-const sigiloFirmaPropia = new Map();
 function sigiloRevisar(){
   if(!fbUsuario) return;
   const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
   if(firma === sigiloFirmaRev) return;
   sigiloFirmaRev = firma;
   tokens.forEach((t, id) => {
-    // Solo si el propio token cambió (se movió, giró o entró en sigilo): si es un rival el que
-    // camina hasta verlo, decide la tirada de percepción (ver Percepción), no el mapa solo.
-    const propia = `${t.col},${t.fila},${t.rotacion || 0},${enSigilo(t) ? 1 : 0}`;
-    const cambio = sigiloFirmaPropia.get(id) !== propia;
-    sigiloFirmaPropia.set(id, propia);
-    if(!cambio || sigiloRompiendo.has(id) || !puedoCambiarVida(t) || !enSigilo(t)) return;
+    if(sigiloRompiendo.has(id) || !puedoCambiarVida(t) || !enSigilo(t)) return;
     const k = nbPack(t.col, t.fila);
     const det = rivalesDe(t).map(zonasClaves).find(z => z.cono.has(k));
     if(det) romperSigilo(id, det.nombre);
@@ -3446,16 +3440,14 @@ function soltar(){
         toast('🕶 Te detectaron: el movimiento se corta donde entraste en su cono');
       }
     }
-    // Percepción: si un rival en sigilo queda a la vista en algún casillero, se corta ahí.
-    percepcionPendiente = null;
-    if(!a.libre && a.movio && t && a.ruta.length > 1){
+    // Detección inmediata: si un rival en sigilo queda dentro del cono en algún casillero, se corta ahí.
+    if(!a.libre && a.movio && t && a.ruta.length > 1 && !enSigilo(t)){
       const corte = percepcionEvaluarRuta(t, a.ruta, null);
       if(corte){
-        percepcionPendiente = {id: a.id, resto: a.ruta.slice(corte.indice), ocultos: corte.ocultos, ignorar: new Set(corte.ocultos.map(o => o.id))};
         a.ruta = a.ruta.slice(0, corte.indice + 1);
         const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
         a.x = pc.x; a.y = pc.y;
-        toast('🕶 Alguien en sigilo quedó a la vista: el movimiento se corta acá');
+        toast(`🕶 Viste a ${corte.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
       }
     }
     const pasos = a.ruta.length - 1;
@@ -3479,7 +3471,6 @@ function soltar(){
       }else{
         const fin = a.ruta[pasos];
         moverToken(a.id, fin.col, fin.fila, a.ruta);
-        if(percepcionPendiente) percepcionAbrir();
       }
     }
     pedirDibujo();
@@ -3513,7 +3504,6 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && !soyGM)) escapeABotonera();
     return;
   }
-  if(e.key === 'Escape' && document.getElementById('percepcion-capa')){ percepcionPendiente = null; percepcionCerrar(); toast('Movimiento interrumpido'); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
@@ -4259,7 +4249,6 @@ function mostrarConfirmacionRuta(){
 
 function cancelarRuta(){
   rutaPendiente = null;
-  percepcionPendiente = null;
   $('#ruta-confirmar').hidden = true;
   document.body.classList.remove('con-ruta');
   pedirDibujo();
@@ -4356,13 +4345,12 @@ function nieblaDeshacer(seq0, pend0){
     .catch(err => console.error('No se pudo volver a tapar la niebla:', err));
 }
 
-/* ---------- Percepción: un rival en sigilo entra en el campo de visión de quien camina ----------
-   Al soltar una ruta se revisa casillero por casillero (con el cono de quien camina mirando
-   hacia el siguiente paso). Si en alguno queda a la vista un rival en sigilo, el movimiento se
-   corta ahí y corresponde una tirada de percepción (Especial): se tira, y después se elige el
-   resultado — Falló: la ruta sigue como si nada; Exitosa: se interrumpe y quien lo vio decide.
-   Es igual para personajes y creeps. */
-let percepcionPendiente = null;   // {id, resto: casillas que faltan, ocultos: [{id, nombre}], ignorar: Set de ids}
+/* ---------- Detección inmediata al caminar (escenario 2) ----------
+   Quien camina (sin estar en sigilo) y en algún casillero de su ruta deja a un rival en sigilo
+   dentro de su CONO (detección inmediata, cono azul): el movimiento se corta ahí. Al quedar
+   detectado, el que estaba oculto pierde el sigilo solo (lo hace su dueño o el GM, ver
+   sigiloRevisar) y su token aparece para todos. No hay tirada: se ve de manera directa. La
+   zona de alerta no interrumpe a quien camina. Igual para personajes y creeps. */
 
 function percepcionEvaluarRuta(t, ruta, ignorar){
   const ocultos = [];
@@ -4381,100 +4369,6 @@ function percepcionEvaluarRuta(t, ruta, ignorar){
     if(vistos.length) return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
   }
   return null;
-}
-
-function percepcionValorEspecial(t){
-  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? num(sc.esp) : null; }
-  const v = vinculo(t), r = v && v.resumen;
-  return r && r.esp !== undefined ? num(r.esp) : null;
-}
-
-function percepcionCerrar(){
-  const capa = $('#percepcion-capa');
-  if(capa) capa.remove();
-}
-function percepcionPintar(etapa){
-  const p = percepcionPendiente;
-  const t = p && tokens.get(p.id);
-  if(!t){ percepcionPendiente = null; percepcionCerrar(); return; }
-  let capa = $('#percepcion-capa');
-  if(!capa){
-    capa = document.createElement('div');
-    capa.id = 'percepcion-capa';
-    capa.style.cssText = 'position:fixed;inset:0;z-index:95;display:flex;align-items:flex-start;justify-content:center;padding-top:14vh;pointer-events:none';
-    document.body.appendChild(capa);
-  }
-  const quien = esc(nombreDe(t)), vistos = p.ocultos.map(o => esc(o.nombre)).join(', ');
-  const btn = (id, txt, extra) => `<button type="button" class="btn" id="${id}" style="width:100%;margin-top:8px${extra || ''}">${txt}</button>`;
-  capa.innerHTML = `<div style="pointer-events:auto;width:min(420px,92vw);background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);padding:16px 18px;box-shadow:0 14px 34px rgba(0,0,0,.65)">` + (etapa === 'tirar'
-    ? `<h3 style="margin:0 0 8px;font-size:15px">🕶 Corresponde una tirada de percepción</h3>
-       <p style="margin:0 0 6px"><b>${quien}</b> tiene a <b>${vistos}</b> dentro de su campo de visión. El movimiento se interrumpió en esta casilla.</p>
-       <p style="margin:0;font-size:12px;color:var(--muted)">Tirá percepción (Especial) y compará con la tirada de Destreza de quien está oculto.</p>
-       ${btn('perc-tirar', '🎲 Tirar percepción')}${btn('perc-ya', 'Ya la tiré por mi cuenta')}`
-    : `<h3 style="margin:0 0 8px;font-size:15px">Resultado de la percepción</h3>
-       <p style="margin:0;font-size:12px;color:var(--muted)">¿Qué pasó con la tirada de ${quien}?</p>
-       ${btn('perc-fallo', '✘ Falló: la ruta continúa como si nada')}${btn('perc-exito', `✔ Exitosa: se interrumpe y ${quien} decide qué hacer`, ';border-color:var(--copper)')}`) + '</div>';
-  const q = id => capa.querySelector('#' + id);
-  if(etapa === 'tirar'){
-    q('perc-tirar').onclick = () => {
-      const val = percepcionValorEspecial(t);
-      const f = val === null ? null : formulaParaValor(val);
-      if(!f) toast('No se pudo armar la tirada con dados: tirala a mano');
-      else mesaPublicar(`Percepción · ${nombreDe(t)}`, tirarDados(f.formula));
-      percepcionPintar('resultado');
-    };
-    q('perc-ya').onclick = () => percepcionPintar('resultado');
-  }else{
-    q('perc-fallo').onclick = () => percepcionResolver(false);
-    q('perc-exito').onclick = () => percepcionResolver(true);
-  }
-}
-function percepcionAbrir(){ if(percepcionPendiente) percepcionPintar('tirar'); }
-
-async function percepcionResolver(exito){
-  const p = percepcionPendiente;
-  const t = p && tokens.get(p.id);
-  percepcionPendiente = null;
-  percepcionCerrar();
-  if(!p || !t) return;
-  const quien = nombreDe(t), vistos = p.ocultos.map(o => o.nombre).join(', ');
-  if(!exito){
-    sigiloAviso(`🕶 Percepción fallida · ${quien} no notó a ${vistos}`, 'La ruta continúa');
-    percepcionContinuar(p);
-    return;
-  }
-  const sinPermiso = [];
-  for(const o of p.ocultos){
-    const h = tokens.get(o.id);
-    if(h && puedoCambiarVida(h)) await romperSigilo(o.id, quien); else sinPermiso.push(o.nombre);
-  }
-  sigiloAviso(`🕶 Percepción exitosa · ${quien} detectó a ${vistos}`,
-    'Se interrumpe el movimiento: decide qué hace.' + (sinPermiso.length ? ` (${sinPermiso.join(', ')}: quien lo controla debe sacarle el estado Sigilo)` : ''));
-  toast(`Movimiento interrumpido: ${quien} detectó a ${vistos}`);
-}
-
-// Falló la percepción: sigue el tramo que faltaba (con los ya probados sin volver a tirar).
-function percepcionContinuar(p){
-  const t = tokens.get(p.id);
-  if(!t || p.resto.length < 2) return;
-  const ignorar = new Set([...p.ignorar]);
-  let ruta = p.resto;
-  const corte = percepcionEvaluarRuta(t, ruta, ignorar);
-  if(corte){
-    corte.ocultos.forEach(o => ignorar.add(o.id));
-    percepcionPendiente = {id: p.id, resto: ruta.slice(corte.indice), ocultos: corte.ocultos, ignorar};
-    ruta = ruta.slice(0, corte.indice + 1);
-  }
-  const pasos = ruta.length - 1;
-  const cm = costoMoverDe(t);
-  if(cm){
-    rutaPendiente = {id: p.id, celdas: ruta, pasos, porCasillero: cm.porCasillero, disponibles: cm.disponibles};
-    confirmarRuta();
-  }else{
-    const fin = ruta[pasos];
-    moverToken(p.id, fin.col, fin.fila, ruta);
-    if(percepcionPendiente) percepcionAbrir();
-  }
 }
 
 async function confirmarRuta(){
@@ -4500,7 +4394,6 @@ async function confirmarRuta(){
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
-    if(percepcionPendiente && percepcionPendiente.id === p.id) percepcionAbrir();
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep
       ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`

@@ -698,19 +698,7 @@ hexágono con otro sin importar bando. Todavía no está construido.
   se salen de lo normal. Las acciones de la ficha (atacar, habilidades) ya se
   frenan solas sin No2, así que no hacen falta.
 
-- **Percepción al caminar** (2026-09-19, P85): al soltar una ruta, se revisa
-  casillero por casillero el cono de quien camina (mirando hacia el siguiente
-  paso). Si un **rival en sigilo** queda a la vista, el movimiento se corta ahí
-  y aparece "Corresponde una tirada de percepción"
-  (`percepcionEvaluarRuta`, `percepcionPintar`): se tira Especial
-  (🎲, sale a la Mesa; `resumen.esp` en las fichas) y después se elige el
-  resultado — **Falló**: sigue el tramo que faltaba (`percepcionContinuar`, sin
-  volver a tirar por los ya probados); **Exitosa**: se interrumpe, se le saca el
-  Sigilo al detectado si se puede (`romperSigilo`) y quien lo vio decide. Igual
-  para personajes y creeps. El auto-rompimiento del sigilo
-  (`sigiloRevisar`) ahora solo actúa cuando **el propio oculto** cambió (se movió,
-  giró o entró en sigilo); si un rival camina hasta verlo, decide la percepción.
-  Solo se revisa el cono (la zona de alerta sigue siendo del que está oculto).
+- **Detección inmediata al caminar** (2026-09-19, escenario 2, P85): quien camina (sin estar en sigilo) y en algún casillero de su ruta deja a un rival en sigilo dentro de su **cono** (`percepcionEvaluarRuta`): el movimiento **se corta ahí**, el oculto **pierde el sigilo solo** (`sigiloRevisar`, lo hace su dueño o el GM) y su token aparece para todos. **Sin tirada** (se ve de manera directa). La zona de alerta no interrumpe a quien camina. Igual para personajes y creeps. (Se sacó el cartel de tirada de percepción de la primera versión.)
 
 - **Movimiento y zona de alerta** (2026-09-19, escenario 1: se mueve el oculto):
   entrar en la zona de alerta (roja) da **una tirada de detección por paso**,

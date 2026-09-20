@@ -1,5 +1,5 @@
 /* Catálogo base de creeps por ESCENARIO (auditar todos: son un primer borrador).
-   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10) y 20 DEBUFFERS (uno por escenario y nivel). Cada uno trae dos habilidades:
+   Cuatro escenarios × niveles 1 a 5 × 3 creeps = 60, más la tribu de goblins del bosque (10) 20 DEBUFFERS (uno por escenario y nivel) y 30 HUMANOS de seis facciones con equipo real del catálogo. Cada uno trae dos habilidades:
    una RÁPIDA (cooldown 2) y una LENTA (cooldown 3 a 6, según lo poderosa) que arranca el
    combate con el cooldown ya activo (cdArranca). Lo que se puede automatizar en un creep va
    automatizado: costo en No2 (o "lo de un ataque"), tirada de daño, estados con bonos a sí
@@ -12,7 +12,8 @@
    según el rol; HP = Con × 5. */
 
 (function(){
-  const COLOR = {minas: '#B87333', bosque: '#3E9B5B', montañas: '#6F8FAF', templo: '#9B5FD0'};
+  const COLOR = {minas: '#B87333', bosque: '#3E9B5B', montañas: '#6F8FAF', templo: '#9B5FD0',
+    bandidos: '#8B5A2B', 'bárbaros': '#B34A3A', 'guardia de la ciudad': '#5B7FA6', 'piratas espaciales': '#2E8B8B', cultistas: '#7A3E9D', mercenarios: '#A08A45'};
   const ESCENARIO_TXT = {minas: 'minas', bosque: 'bosque', montañas: 'montañas', templo: 'templo alienígena'};
   // Reparto de atributos por rol: [Con, Fue, Agi, Des, Esp]
   const PESOS = {
@@ -38,17 +39,38 @@
   const zo = (nombre, detalle, no2, dano) => ({nombre, detalle, no2, dano});                  // especial con tirada de daño
   const ta = (nombre, detalle, no2) => ({nombre, detalle, no2});                                // solo anuncio (efectos a mano)
   const bu = (nombre, detalle, no2, mods, turnos) => ({nombre, detalle, no2, efecto: {mods, turnos}});   // estado sobre sí mismo
-  const cu = (nombre, detalle, no2, k) => ({nombre, detalle, no2, cura: k});                  // cura k × nivel
+  const cu = (nombre, detalle, no2, k) => ({nombre, detalle, no2, cura: k});
+  const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
   function danoTxt(d, n){ return d === 'L' ? `1d6+${n}` : d === 'M' ? `2d6+${n}` : `3d6+${n + 1}`; }
+  const MOD_TXT = {def: 'Defensa', dmg: 'Daño', nitros: 'No2', eva: 'Evasión', resmg: 'Res.Mg'};
+  // Frases de la descripción que la herramienta NO resuelve sola (efectos sobre otros, movimiento, geometría del área).
+  const MANUAL_RE = /a mano|casilla|flor de|cono|línea|empuj|salta|se mueve|ignora|todos|adyacent|aliado|el objetivo|los golpeados|los afectados|los que|quedan|queda /i;
+  const sinEtiqueta = t => t.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')').replace(/\s+/g, ' ').trim();
+  // La descripción queda lista para usar: qué hace, qué está automatizado (con los números) y qué se resuelve a mano.
+  function armarDetalle(sp, n, cd, lenta){
+    const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
+      `cooldown ${cd}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
+    if(sp.dano) auto.push(`tira ${danoTxt(sp.dano, n)} de daño`);
+    if(sp.cura) auto.push(`se cura ${sp.cura * n} HP sin pasar de su máximo`);
+    if(sp.efecto){
+      const m = Object.keys(sp.efecto.mods).map(k => `${sp.efecto.mods[k] > 0 ? '+' : ''}${sp.efecto.mods[k]} ${MOD_TXT[k] || k}`).join(', ');
+      auto.push(`se aplica a sí mismo ${m} durante ${sp.efecto.turnos} turno${sp.efecto.turnos === 1 ? '' : 's'}`);
+    }
+    const frases = sp.detalle.split(/(?<=[.!?])\s+/);
+    const cierra = t => /[.!?]$/.test(t) ? t : t + '.';
+    const propias = frases.filter(f => !MANUAL_RE.test(f)).map(sinEtiqueta);
+    const manual = frases.filter(f => MANUAL_RE.test(f)).map(sinEtiqueta);
+    return `${propias.length ? propias.map(cierra).join(' ') + ' ' : ''}⚙ Automatizado: ${auto.join('; ')}. ✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`;
+  }
   function armarHab(sp, n, cd, lenta){
-    const h = {nombre: sp.nombre, detalle: sp.detalle, cd, cdActual: lenta ? cd : 0, costo: '', nitrosCosto: sp.no2};
+    const h = {nombre: sp.nombre, detalle: armarDetalle(sp, n, cd, lenta), cd, cdActual: lenta ? cd : 0, costo: '', nitrosCosto: sp.no2};
     if(lenta) h.cdArranca = true;
     if(sp.dano) h.tiradaExtra = danoTxt(sp.dano, n);
     if(sp.cura) h.curaHp = sp.cura * n;
     if(sp.efecto){
       h.efectoNombre = sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = 'buff';
-      h.efectoDetalle = sp.detalle;
+      h.efectoDetalle = sinEtiqueta(sp.detalle);
       h.efectoMods = Object.keys(sp.efecto.mods).map(stat => ({stat, val: sp.efecto.mods[stat]}));
     }
     return h;
@@ -78,10 +100,42 @@
     });
   }
 
+  /* ---- Humanos: equipo tomado del catálogo (tabla ITEMS) ---- */
+  const ITEMS = {"Daga": {"nombre": "Daga", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [], "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo."}, "Sable común": {"nombre": "Sable común", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "ini", "val": 1}], "efectosGolpe": [], "detalle": "iniciativa +1"}, "Peto de cuero curtido": {"nombre": "Peto de cuero curtido", "tier": "Común", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 4}, {"stat": "tipo1", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 4: +1. Defensa +4."}, "Ballesta de mano": {"nombre": "Ballesta de mano", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": true, "mods": [{"stat": "rng", "val": 3}], "efectosGolpe": [], "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3."}, "Capucha de cuero acolchada": {"nombre": "Capucha de cuero acolchada", "tier": "Común", "tipoItem": "cabeza", "tipoDado": 0, "peso": 0, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 2}, {"stat": "tipo1", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 4: +1. Defensa +2."}, "Daga de guardia": {"nombre": "Daga de guardia", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [{"nombre": "Ignora 1 de Res. crítico", "caras": 1, "exitos": 1, "dado": "", "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."}], "detalle": "Ignora 1 punto de resistencia al crítico"}, "Cota de escamas de cuero": {"nombre": "Cota de escamas de cuero", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 3}, {"stat": "tipo2", "val": 2}, {"stat": "tipo3", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 8: +1."}, "Espada larga": {"nombre": "Espada larga", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "pdg", "val": 2}], "efectosGolpe": [], "detalle": "pdg +2"}, "Gambesón del veterano de frontera": {"nombre": "Gambesón del veterano de frontera", "tier": "Raro", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 3, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 7}, {"stat": "tipo1", "val": 2}, {"stat": "tipo2", "val": 2}, {"stat": "rescc", "val": 2}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a CC +2."}, "Honda de cuero": {"nombre": "Honda de cuero", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": true, "mods": [{"stat": "rng", "val": 3}], "efectosGolpe": [], "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3."}, "Hacha": {"nombre": "Hacha", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 8, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [{"nombre": "Rompe armadura", "caras": 1, "exitos": 1, "dado": "", "detalle": "Aplicale el estado Armadura rota al objetivo."}], "detalle": "Rompe armadura."}, "Armadura de cuero rígido": {"nombre": "Armadura de cuero rígido", "tier": "Común", "tipoItem": "armadura_rigida", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 4}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Reduce críticos Tipo 4 y 6"}, "Bastón de monje": {"nombre": "Bastón de monje", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 10, "peso": 1, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "rng", "val": 1}], "efectosGolpe": [], "detalle": "alcance +1"}, "Túnica de acólito": {"nombre": "Túnica de acólito", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 0, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 2}, {"stat": "bonos", "val": 2}], "efectosGolpe": [], "detalle": "Bonos +2"}, "Hacha de batalla": {"nombre": "Hacha de batalla", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 8, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "bloqueo", "val": 1}], "efectosGolpe": [{"nombre": "Rompe armadura", "caras": 1, "exitos": 1, "dado": "", "detalle": "Aplicale el estado Armadura rota al objetivo."}], "detalle": "Rompe armadura. +1 al bloqueo"}, "Armadura de cuero reforzado": {"nombre": "Armadura de cuero reforzado", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 3}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Reduce críticos Tipo 4 y 6."}, "Hacha danesa": {"nombre": "Hacha danesa", "tier": "Raro", "tipoItem": "arma_1m", "tipoDado": 8, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "rng", "val": 1}], "efectosGolpe": [{"nombre": "Rompe armadura", "caras": 1, "exitos": 1, "dado": "", "detalle": "Aplicale el estado Armadura rota al objetivo."}], "detalle": "alcance +1. Rompe armadura. "}, "Espada corta de instrucción": {"nombre": "Espada corta de instrucción", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [], "detalle": "Arma de una mano, Tipo 6: 2 dados de daño."}, "Lanza corta": {"nombre": "Lanza corta", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "rng", "val": 1}], "efectosGolpe": [], "detalle": "alcance +1"}, "Coraza de guardia de cuartel": {"nombre": "Coraza de guardia de cuartel", "tier": "Común", "tipoItem": "armadura_rigida", "tipoDado": 0, "peso": 4, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 7}, {"stat": "eva", "val": -1}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 4 y 6: +1. evasión -1"}, "Casco de cuero endurecido": {"nombre": "Casco de cuero endurecido", "tier": "Común", "tipoItem": "cabeza", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 3}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 6: +1."}, "Sable militar": {"nombre": "Sable militar", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "pdg", "val": 1}], "efectosGolpe": [], "detalle": "pdg +1"}, "Media armadura de escudero": {"nombre": "Media armadura de escudero", "tier": "Buena Calidad", "tipoItem": "armadura_rigida", "tipoDado": 0, "peso": 3, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 5}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}, {"stat": "tipo3", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipos 4, 6 y 8: +1."}, "Sable de caballería": {"nombre": "Sable de caballería", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "pdg", "val": 1}, {"stat": "parry", "val": 1}], "efectosGolpe": [], "detalle": "pdg +1, parry +1"}, "Coraza de hierro": {"nombre": "Coraza de hierro", "tier": "Raro", "tipoItem": "armadura_rigida", "tipoDado": 0, "peso": 6, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 10}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}, {"stat": "tipo3", "val": 1}, {"stat": "tipo4", "val": 1}], "efectosGolpe": [], "detalle": "Reduce críticos tipo 4, 6, 8 y 10."}, "Cuchillo de cazador": {"nombre": "Cuchillo de cazador", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [], "detalle": "Arma de una mano, Tipo 4: 1 dado de daño."}, "Campera de cuero de motociclista con tachas": {"nombre": "Campera de cuero de motociclista con tachas", "tier": "Común", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 3}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 6: +1."}, "Casco de moto vintage pintado a mano": {"nombre": "Casco de moto vintage pintado a mano", "tier": "Común", "tipoItem": "cabeza", "tipoDado": 0, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 4}, {"stat": "eva", "val": -1}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 6: +1. Evasión -1"}, "Cimitarra de guardia": {"nombre": "Cimitarra de guardia", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "parry", "val": 2}], "efectosGolpe": [], "detalle": "Parry +2"}, "Cota de malla de acero": {"nombre": "Cota de malla de acero", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 5}, {"stat": "tipo1", "val": 1}, {"stat": "tipo2", "val": 1}, {"stat": "tipo3", "val": 1}], "efectosGolpe": [], "detalle": "Reduce críticos Tipo 4, 6 y 8."}, "Espada bastarda": {"nombre": "Espada bastarda", "tier": "Raro", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 2, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "parry", "val": 1}, {"stat": "bloqueo", "val": 1}], "efectosGolpe": [], "detalle": "parry+1, bloqueo+1"}, "Gambesón acolchado de doble capa": {"nombre": "Gambesón acolchado de doble capa", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 4}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Reduce críticos tipo 6"}, "Estileto común": {"nombre": "Estileto común", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "crit", "val": 1}], "efectosGolpe": [], "detalle": "crítico +1"}, "Hoz": {"nombre": "Hoz", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [{"nombre": "Sangrado", "caras": 2, "exitos": 1, "dado": "", "detalle": "Aplicale Sangrado al objetivo."}], "detalle": "sangrado 50%"}, "Capucha de lana cruda": {"nombre": "Capucha de lana cruda", "tier": "Común", "tipoItem": "cabeza", "tipoDado": 0, "peso": 0, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 1}], "efectosGolpe": [], "detalle": "Defensa +1."}, "Báculo de batalla": {"nombre": "Báculo de batalla", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 10, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "bloqueo", "val": 1}, {"stat": "rng", "val": 1}], "efectosGolpe": [], "detalle": "alcance +1, bloqueo +1"}, "Pasamontañas de tejido basto": {"nombre": "Pasamontañas de tejido basto", "tier": "Común", "tipoItem": "cabeza", "tipoDado": 0, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 2}, {"stat": "tipo1", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 4: +1."}, "Daga de Capitán": {"nombre": "Daga de Capitán", "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "pdg", "val": 1}], "efectosGolpe": [], "detalle": "pdg +1"}, "Túnica de sanador": {"nombre": "Túnica de sanador", "tier": "Buena Calidad", "tipoItem": "armadura_blanda", "tipoDado": 0, "peso": 0, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 1}], "efectosGolpe": [], "detalle": "Regeneración +2. Cualquier efecto de sanación que ejecute sana +5"}, "Capuz de vidente de feria": {"nombre": "Capuz de vidente de feria", "tier": "Raro", "tipoItem": "cabeza", "tipoDado": 0, "peso": 0, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 2}, {"stat": "esp", "val": 1}, {"stat": "rangocasteo", "val": 1}], "efectosGolpe": [], "detalle": "Especial +1. Rango de casteo +1."}, "Espada corta oxidada": {"nombre": "Espada corta oxidada", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [{"nombre": "Envenenar", "caras": 2, "exitos": 1, "dado": "", "detalle": "Aplicale Veneno al objetivo."}], "detalle": "envenena x 50% de chances"}, "Espada ancha": {"nombre": "Espada ancha", "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 1, "danoFijo": 1, "danoAmplificado": 0, "armaDeRango": false, "mods": [], "efectosGolpe": [], "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo."}, "Escudo de madera": {"nombre": "Escudo de madera", "tier": "Común", "tipoItem": "escudo_1m", "tipoDado": 0, "peso": 4, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 5}, {"stat": "tipo2", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipo 6: +1."}, "Arco corto": {"nombre": "Arco corto", "tier": "Común", "tipoItem": "arma_2m", "tipoDado": 6, "peso": 1, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": true, "mods": [{"stat": "rng", "val": 4}], "efectosGolpe": [], "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4."}, "Grebas de acero templado": {"nombre": "Grebas de acero templado", "tier": "Buena Calidad", "tipoItem": "piernas", "tipoDado": 0, "peso": 3, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 5}, {"stat": "tipo2", "val": 1}, {"stat": "tipo3", "val": 1}], "efectosGolpe": [], "detalle": "Resistencia a críticos tipos 6 y 8: +1."}, "Escudo grande": {"nombre": "Escudo grande", "tier": "Buena Calidad", "tipoItem": "escudo_1m", "tipoDado": 0, "peso": 4, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "def", "val": 7}, {"stat": "bloqueo", "val": 2}], "efectosGolpe": [], "detalle": "bloqueo +2"}, "Katana": {"nombre": "Katana", "tier": "Raro", "tipoItem": "arma_1m", "tipoDado": 6, "peso": 2, "danoFijo": 0, "danoAmplificado": 0, "armaDeRango": false, "mods": [{"stat": "pdg", "val": 2}, {"stat": "crit", "val": 1}], "efectosGolpe": [], "detalle": "pdg+2, crítico +1"}};
+  const TIPO_A_CRIT = {tipo1: 0, tipo2: 1, tipo3: 2, tipo4: 3, tipo5: 4};
+  function hu(fac, n, nombre, rol, armaN, piezaN, rapida, lenta, notas){
+    const [con, fue, agl, des, esp] = repartir(33 + 3 * (n - 1), PESOS[rol]);
+    const A = ITEMS[armaN], P = piezaN ? ITEMS[piezaN] : null;
+    const defP = P ? P.mods.filter(m => m.stat === 'def').reduce((a, m) => a + m.val, 0) : 0;
+    const modsP = P ? P.mods.filter(m => m.stat !== 'def') : [];
+    const crit = [0, 0, 0, 0, 0];
+    modsP.forEach(m => { if(TIPO_A_CRIT[m.stat] !== undefined) crit[TIPO_A_CRIT[m.stat]] += m.val; });
+    const hpMax = con * 5;
+    const [spL, cdL] = lenta;
+    const datos = {
+      nombre: nombre + ' (auditar)', nivel: n, color: COLOR[fac], hp: hpMax, hpMax, spd: 5, ataquesTurno: 0,
+      con, fue, agl, des, esp,
+      armaTipo: A.tipoDado, armaPeso: A.peso, armaFijo: A.danoFijo, armaAmplificado: A.danoAmplificado,
+      armaDeRango: A.armaDeRango, armaNombre: A.nombre, armaDetalle: A.detalle, armaMods: structuredClone(A.mods),
+      armaEfectos: structuredClone(A.efectosGolpe), armaManos: A.tipoItem,
+      defensa: defP, armaduraTipo: P ? P.nombre : '',
+      equipo: P ? [{id: 'eq-' + slug(nombre), nombre: P.nombre, tipoItem: P.tipoItem, def: defP, mods: structuredClone(modsP), detalle: P.detalle}] : [],
+      crit,
+      habilidades: [armarHab(rapida, n, 2, false), armarHab(spL, n, cdL, true)],
+      estados: [], notas: notas || '', escalaTipos: 2, imagen: '',
+    };
+    const equipoTxt = `${A.nombre} (${A.tier})${P ? ' + ' + P.nombre + ' (' + P.tier + ')' : ''}`;
+    lista.push({
+      poolId: 'creep-' + slug(fac) + '-' + n + '-' + slug(nombre), nombre: nombre + ' (auditar)', nivel: n,
+      etiquetas: [fac, 'nivel ' + n, ROL_TXT[rol], 'humano', 'auditar'],
+      detalle: `${notas || ''} Equipo: ${equipoTxt}. Rápida: ${rapida.nombre}. Lenta: ${spL.nombre} (CD ${cdL}).`.trim(), datos,
+    });
+  }
+
   /* ================= MINAS ================= */
   cr('minas', 1, 'Rata de socavón', 'rapido', 'bestia', 'Dientes de rata',
     at('Mordisco infectado', 'Si golpea, tirá 1d4: con 1 el objetivo queda Envenenado (a mano).', 'L'),
-    [zo('Plaga en la galería', 'Chilla y llama a la manada: entran 2 ratas más este turno (a mano).', 2, 'L'), 3],
+    [ta('Plaga en la galería', 'Chilla y llama a la manada: entran 2 ratas más este turno (a mano).', 2), 3],
     'Roedor enorme de las galerías, ataca en manada.');
   cr('minas', 1, 'Minero poseído', 'brutal', 'humanoide', 'Pico oxidado',
     at('Picada', 'Golpe pesado de pico.', 'M'),
@@ -89,7 +143,7 @@
     'Un trabajador que ya no recuerda por qué sigue picando.');
   cr('minas', 1, 'Luciérnaga de gas', 'rango', 'bestia', 'Chispa de metano',
     at('Chispa', 'Chispazo de gas a distancia.', 'L'),
-    [zo('Nube de metano', 'Gas en flor de 1: los que lo respiran quedan Pajaritos hasta el final de su turno (a mano).', 2, 'L'), 4],
+    [ta('Nube de metano', 'Gas en flor de 1: los que lo respiran quedan Pajaritos hasta el final de su turno (a mano).', 2), 4],
     'Insecto que flota entre los túneles y vuelve el aire inflamable.');
 
   cr('minas', 2, 'Topo excavador', 'rapido', 'bestia', 'Garras de excavación',
@@ -141,7 +195,7 @@
     'Se mueve por la roca como un pez por el agua.');
   cr('minas', 5, 'Reina de los kobolds', 'apoyo', 'humanoide', 'Cetro de mina',
     bu('Grito de la reina', 'Ella gana +2 Defensa y +2 al daño; los kobolds aliados también (a mano).', 1, {def: 2, dmg: 2}, 2),
-    [cu('Banquete de cristales', 'Se cura tragando cristales.', 2, 6), 5],
+    [cu('Banquete de cristales', 'Se cura tragando cristales de las paredes.', 2, 6), 5],
     'Gobierna cientos de kobolds desde un trono de mineral.');
 
   /* ================= BOSQUES ================= */
@@ -168,7 +222,7 @@
     'Guardián de los senderos que nadie vio nunca.');
   cr('bosque', 2, 'Sapo venenoso', 'rapido', 'bestia', 'Lengua pegajosa',
     at('Lengüetazo', 'Ataque a distancia corta; el objetivo queda Envenenado (a mano).', 'M'),
-    [zo('Nube de esporas ponzoñosas', 'Veneno en flor de 1: 1 de daño por turno durante 3 turnos (a mano).', 2, 'L'), 4],
+    [ta('Nube de esporas ponzoñosas', 'Veneno en flor de 1: los afectados reciben Veneno (1 de daño por turno) durante 3 turnos (a mano).', 2), 4],
     'Colorido, gordo y letal al tacto.');
 
   cr('bosque', 3, 'Ent joven', 'tanque', 'planta', 'Puño de tronco',
@@ -264,7 +318,7 @@
     'Espera a los viajeros en el paso y cobra peaje.');
   cr('montañas', 1, 'Águila de risco', 'rango', 'bestia', 'Garras',
     at('Picado', 'Ataca desde el aire; +2 al PdG si viene de altura (a mano).', 'L'),
-    [zo('Chillido ensordecedor', 'Chillido en flor de 1: los golpeados quedan Pajaritos 1 turno (a mano).', 2, 'L'), 4],
+    [ta('Chillido ensordecedor', 'Chillido en flor de 1: los golpeados quedan Pajaritos 1 turno (a mano).', 2), 4],
     'Vigila los desfiladeros desde las corrientes de aire.');
 
   cr('montañas', 2, 'Yeti joven', 'brutal', 'bestia', 'Puños de hielo',
@@ -424,7 +478,7 @@
     'Vive en un caldero más grande que su casa.');
   cr('bosque', 4, 'Enredadera parasitaria', 'debuffer', 'planta', 'Zarcillos',
     ta('Zarcillos', 'Atrapa a un objetivo a hasta 3 casillas: Inmovilizado 2 turnos si falla Fuerza (a mano).', 2),
-    [cu('Savia drenante', 'Drena la vida del atrapado: se cura y el objetivo pierde lo mismo (a mano).', 2, 4), 5],
+    [dc('Savia drenante', 'Drena la vida del atrapado: daño, y ella se cura una cantidad fija.', 2, 'L', 4), 5],
     'Lo que parece un arbusto ya te está mirando.');
   cr('bosque', 5, 'Espíritu del bosque podrido', 'debuffer', 'no-muerto', 'Raíces muertas',
     ta('Maldición tormentosa', 'Especial contra Res.Mt: por cada acción, el objetivo recibe daño igual a su No2 - 1, 3 turnos (a mano).', 3),
@@ -449,7 +503,7 @@
     'Camina sobre la nieve sin dejar huellas.');
   cr('montañas', 5, 'Wendigo del paso', 'debuffer', 'no-muerto', 'Garras de hambre',
     ta('Hambre helada', 'Especial contra Res.Mt: el objetivo queda Exhausto (1 No2 máx.) 2 turnos (a mano).', 3),
-    [cu('Susurro helado', 'Drena a un objetivo con Especial contra Res.Mt: daño y se cura lo mismo (a mano).', 3, 5), 6],
+    [dc('Susurro helado', 'Drena a un objetivo con Especial contra Res.Mt: daño, y él se cura una cantidad fija.', 3, 'M', 5), 6],
     'Lo que dejó de ser humano en una nevada hace siglos.');
   // Templo antiguo con influencia alienígena
   cr('templo', 1, 'Larva psíquica', 'debuffer', 'alienígena', 'Mandíbulas translúcidas',
@@ -472,6 +526,138 @@
     ta('Control mental', 'Especial contra Especial + Res.Mt: controla al objetivo un turno (nada que lo dañe a sí mismo); gasta 1 No2 por cada No2 que use el controlado (a mano).', 3),
     [ta('Colapso', 'Especial contra Res.Mt: el objetivo queda Stun y luego Exhausto un turno (a mano).', 4), 6],
     'Dice cosas verdaderas en el orden equivocado.');
+
+  /* ================= HUMANOS (seis facciones; equipo real del catálogo) =================
+     Equipo por nivel (cada arma o pieza cuenta como un ítem): nivel 1 = 1 Común; nivel 2 = 2 Comunes;
+     nivel 3 = 1 Común + 1 Buena Calidad; nivel 4 = 2 Buena Calidad; nivel 5 = 1 Buena Calidad + 1 Raro.
+     El arma sale del catálogo (Tipo, peso, bonos y efectos al golpear) y la pieza de defensa suma su Defensa y sus
+     resistencias a crítico al creep. */
+  // Bandidos
+  hu('bandidos', 1, 'Ladronzuelo de callejón', 'rapido', 'Daga', null,
+    at('Puñalada rastrera', 'Si flanquea al objetivo (un aliado suyo adyacente a él), +2 al daño (a mano).', 'L'),
+    [ta('Bolsillo ajeno', 'Roba un ítem chico del cinturón del objetivo y se aleja 3 casillas (a mano).', 2), 3],
+    'Roba lo que puede y corre antes de que lo miren.');
+  hu('bandidos', 2, 'Salteador de caminos', 'brutal', 'Sable común', 'Peto de cuero curtido',
+    at('Tajo de camino', 'Golpe de sable.', 'M'),
+    [bu('Grito de asalto', 'Se lanza al ataque: +2 al daño 2 turnos.', 2, {dmg: 2}, 2), 4],
+    'Espera en la curva del camino con cara de pocos amigos.');
+  hu('bandidos', 3, 'Ballestero emboscado', 'rango', 'Ballesta de mano', 'Capucha de cuero acolchada',
+    at('Virote desde el arbusto', 'Ataque a distancia; si el objetivo no lo vio, +2 al PdG (a mano).', 'M'),
+    [zo('Tiro de gracia', 'Ignora armadura ligera y suma +3 al daño si el objetivo tiene menos de la mitad de su HP (a mano).', 3, 'H'), 5],
+    'Silencioso, paciente y con un pésimo sentido del humor.');
+  hu('bandidos', 4, 'Envenenador de la banda', 'debuffer', 'Daga de guardia', 'Cota de escamas de cuero',
+    at('Daga envenenada', 'Daño y 2 stacks de Veneno al objetivo (a mano).', 'M'),
+    [zo('Frasco de gas', 'Lanza un frasco en flor de 1: daño; los afectados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'M'), 5],
+    'Sabe de venenos más que de modales.');
+  hu('bandidos', 5, 'Jefe de la banda', 'brutal', 'Espada larga', 'Gambesón del veterano de frontera',
+    at('Tajo del jefe', 'Golpe pesado.', 'H'),
+    [bu('¡A mí, muchachos!', 'Reúne a la banda: +3 Defensa y +3 al daño 2 turnos (los bandidos cercanos también, a mano).', 2, {def: 3, dmg: 3}, 2), 5],
+    'Manda porque sobrevivió a todos los que antes mandaban.');
+  // Bárbaros
+  hu('bárbaros', 1, 'Cazador bárbaro', 'rango', 'Honda de cuero', null,
+    at('Piedra certera', 'Piedra lanzada con honda.', 'L'),
+    [bu('Rastro de la presa', 'Se agacha y acecha: +3 Evasión hasta su próximo turno.', 1, {eva: 3}, 1), 3],
+    'Persigue jabalíes y huye de los inviernos.');
+  hu('bárbaros', 2, 'Guerrero de clan', 'brutal', 'Hacha', 'Armadura de cuero rígido',
+    at('Hachazo', 'Golpe de hacha.', 'M'),
+    [bu('Cantar de guerra', 'Entona el canto del clan: +2 Defensa y +2 al daño 2 turnos.', 2, {def: 2, dmg: 2}, 2), 4],
+    'Pelea por su clan y por la última cerveza.');
+  hu('bárbaros', 3, 'Chamán de la tormenta', 'mago', 'Bastón de monje', 'Túnica de acólito',
+    at('Chispa de tormenta', 'Daño mágico eléctrico.', 'M'),
+    [zo('Rayo del cielo', 'Un rayo cae en flor de 1: daño; los golpeados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'H'), 5],
+    'Habla con las nubes, y las nubes contestan.');
+  hu('bárbaros', 4, 'Berserker', 'brutal', 'Hacha de batalla', 'Armadura de cuero reforzado',
+    at('Hachazo salvaje', 'Golpe descontrolado.', 'H'),
+    [bu('Furia berserker', 'Pierde el control: +4 al daño, +2 No2 y -2 Defensa este turno.', 2, {dmg: 4, nitros: 2, def: -2}, 1), 5],
+    'Cuando se enoja, ya no distingue entre amigos y enemigos.');
+  hu('bárbaros', 5, 'Jefe de guerra bárbaro', 'tanque', 'Hacha danesa', 'Cota de escamas de cuero',
+    at('Golpe del jefe', 'Golpe demoledor.', 'H'),
+    [bu('Rugido de guerra', 'Ruge: +3 Defensa y +4 al daño 2 turnos; los enemigos cercanos tiran Res.Mt o quedan Pajaritos 1 turno (a mano).', 2, {def: 3, dmg: 4}, 2), 6],
+    'Sus cicatrices cuentan una historia más larga que la de la tribu.');
+  // Guardia de la ciudad
+  hu('guardia de la ciudad', 1, 'Recluta de la guardia', 'tanque', 'Espada corta de instrucción', null,
+    at('Estocada de instrucción', 'Golpe torpe pero firme.', 'L'),
+    [bu('Formación cerrada', 'Se planta: +2 Defensa hasta su próximo turno.', 1, {def: 2}, 1), 3],
+    'Tiene el uniforme grande y el coraje justo.');
+  hu('guardia de la ciudad', 2, 'Guardia de puerta', 'tanque', 'Lanza corta', 'Coraza de guardia de cuartel',
+    at('Pinchazo de lanza', 'Ataque con lanza; llega a 2 casillas.', 'M'),
+    [bu('¡Alto en nombre de la ley!', 'Se pone en guardia: +3 Defensa 2 turnos.', 1, {def: 3}, 2), 4],
+    'Pide papeles a todo el que pasa, incluso a los que no tienen.');
+  hu('guardia de la ciudad', 3, 'Ballestero de muralla', 'rango', 'Ballesta de mano', 'Casco de cuero endurecido',
+    at('Saeta', 'Disparo de ballesta.', 'M'),
+    [zo('Descarga de la muralla', 'Dispara dos veces seguidas: tirá el daño 2 veces (a mano).', 3, 'H'), 5],
+    'Vigila desde arriba y no falla dos veces.');
+  hu('guardia de la ciudad', 4, 'Sargento de la guardia', 'apoyo', 'Sable militar', 'Media armadura de escudero',
+    at('Tajo del sargento', 'Golpe de sable militar.', 'M'),
+    [bu('Orden de carga', 'Da la orden: +3 al daño 2 turnos (los guardias cercanos también, a mano).', 1, {dmg: 3}, 2), 4],
+    'Grita tan fuerte que se lo oye desde la otra punta de la ciudad.');
+  hu('guardia de la ciudad', 5, 'Capitán de la guardia', 'tanque', 'Sable de caballería', 'Coraza de hierro',
+    at('Espadazo de mando', 'Golpe firme.', 'H'),
+    [bu('Escudo de la ciudad', 'Ordena cerrar filas: +4 Defensa y +3 Res.Mg 2 turnos (los guardias cercanos también, a mano).', 2, {def: 4, resmg: 3}, 2), 5],
+    'La ley, en persona y con armadura.');
+  // Piratas espaciales
+  hu('piratas espaciales', 1, 'Grumete polizón', 'rapido', 'Cuchillo de cazador', null,
+    at('Puñalada de cubierta', 'Ataque rápido.', 'L'),
+    [bu('Escurrirse', 'Se desliza entre las piernas de todos: +3 Evasión hasta su siguiente turno.', 1, {eva: 3}, 1), 3],
+    'Se coló en la nave por el hambre y se quedó por la aventura.');
+  hu('piratas espaciales', 2, 'Marinero con sable', 'brutal', 'Sable común', 'Campera de cuero de motociclista con tachas',
+    at('Sablazo', 'Golpe de sable.', 'M'),
+    [cu('Trago de ron', 'Un trago de ron de contrabando y se siente mejor.', 1, 3), 4],
+    'Navega por estrellas que no figuran en ningún mapa.');
+  hu('piratas espaciales', 3, 'Artillero de cubierta', 'rango', 'Ballesta de mano', 'Casco de moto vintage pintado a mano',
+    at('Disparo de mosquete', 'Daño de rango.', 'M'),
+    [zo('Andanada de cañón', 'Cañonazo en flor de 1: daño a todos los adyacentes al punto (a mano elegir el punto).', 3, 'H'), 5],
+    'Ama los cañones y sospecha de todo lo que no explota.');
+  hu('piratas espaciales', 4, 'Contramaestre', 'brutal', 'Cimitarra de guardia', 'Cota de malla de acero',
+    at('Latigazo de cabo', 'Golpe con el cabo; el objetivo pierde 1 No2 (a mano).', 'M'),
+    [bu('¡Todos a estribor!', 'Grita órdenes: +2 No2 y +2 al daño este turno (los piratas cercanos también, a mano).', 1, {nitros: 2, dmg: 2}, 1), 4],
+    'Sin él la nave se iría a pique en una hora.');
+  hu('piratas espaciales', 5, 'Capitán pirata', 'brutal', 'Espada bastarda', 'Gambesón acolchado de doble capa',
+    at('Estocada del capitán', 'Golpe de espada bastarda.', 'H'),
+    [zo('Cañonazo del Espectro', 'Ordena disparar los cañones de su nave: daño en flor de 2 (a mano elegir el punto).', 3, 'H'), 6],
+    'Su nave es rápida, su fama es larga y su paciencia es corta.');
+  // Cultistas
+  hu('cultistas', 1, 'Acólito de capucha', 'apoyo', 'Estileto común', null,
+    at('Puñalada ritual', 'Daño con una daga ritual.', 'L'),
+    [cu('Ofrenda de sangre', 'Se corta la palma y se cura con el poder del culto.', 2, 2), 3],
+    'Recién entró al culto y todavía cree en todo.');
+  hu('cultistas', 2, 'Cultista encapuchado', 'debuffer', 'Hoz', 'Capucha de lana cruda',
+    at('Hoz ceremonial', 'Golpe de hoz.', 'M'),
+    [ta('Cántico debilitante', 'Especial contra Res.Mt: el objetivo tira con -1 a todo 2 turnos (a mano).', 2), 4],
+    'Canta en un idioma inventado y muy convincente.');
+  hu('cultistas', 3, 'Inquisidor del culto', 'mago', 'Báculo de batalla', 'Pasamontañas de tejido basto',
+    at('Llama purificadora', 'Daño mágico de fuego.', 'M'),
+    [zo('Sentencia', 'Daño mágico; el objetivo queda Lisiado 2 turnos si falla Res.Mt (a mano).', 3, 'H'), 5],
+    'Persigue herejes que todavía no sabían que lo eran.');
+  hu('cultistas', 4, 'Sacerdote oscuro', 'debuffer', 'Daga de Capitán', 'Túnica de sanador',
+    at('Daga del sacrificio', 'Daño y Sangrado al objetivo (aplicar Sangrado a mano).', 'M'),
+    [dc('Comunión oscura', 'Drena a un objetivo con Especial contra Res.Mt: daño y él se cura una cantidad fija (el HP que pierde el objetivo es solo el daño de la tirada).', 3, 'M', 4), 5],
+    'Sus sermones duran horas y siempre terminan mal.');
+  hu('cultistas', 5, 'Sumo profeta del culto', 'mago', 'Báculo de batalla', 'Capuz de vidente de feria',
+    at('Visión abrasadora', 'Daño mágico.', 'H'),
+    [bu('Bendición del culto', 'Se envuelve en luz oscura: +4 Defensa, +4 Res.Mg y +3 al daño 2 turnos (los cultistas cercanos también, a mano).', 2, {def: 4, resmg: 4, dmg: 3}, 2), 6],
+    'Vio el final del mundo y le pareció una buena noticia.');
+  // Mercenarios
+  hu('mercenarios', 1, 'Espada de alquiler novata', 'brutal', 'Espada corta oxidada', null,
+    at('Tajo por encargo', 'Golpe de espada.', 'L'),
+    [bu('Pago por adelantado', 'Se motiva: +2 al daño 2 turnos.', 1, {dmg: 2}, 2), 3],
+    'Todavía no cobró su primer trabajo.');
+  hu('mercenarios', 2, 'Mercenario de taberna', 'brutal', 'Espada ancha', 'Escudo de madera',
+    at('Golpe de taberna', 'Golpe firme.', 'M'),
+    [bu('Guardia de escudo', 'Levanta el escudo: +3 Defensa 2 turnos.', 1, {def: 3}, 2), 4],
+    'Lo contratan para peleas y lo despiden por las cuentas.');
+  hu('mercenarios', 3, 'Rastreador a sueldo', 'rango', 'Arco corto', 'Grebas de acero templado',
+    at('Flecha de rastreo', 'Daño de rango.', 'M'),
+    [zo('Marca del contrato', 'Marca a un objetivo: +3 al PdG contra él hasta su próximo turno (a mano); tirá el daño ahora.', 2, 'M'), 4],
+    'Encuentra a cualquiera si el pago es bueno.');
+  hu('mercenarios', 4, 'Veterano de mil batallas', 'tanque', 'Espada larga', 'Escudo grande',
+    at('Tajo veterano', 'Golpe experto.', 'H'),
+    [bu('Piel curtida de mil batallas', 'Aguanta el dolor: +4 Defensa 2 turnos.', 1, {def: 4}, 2), 5],
+    'Ya vio todo y ninguna de las cosas le gustó.');
+  hu('mercenarios', 5, 'Cazarrecompensas legendario', 'rapido', 'Katana', 'Cota de malla de acero',
+    at('Corte de katana', 'Golpe rápido y limpio.', 'H'),
+    [zo('Captura', 'Ataque de captura: daño; el objetivo queda Inmovilizado 1 turno si falla Fuerza (a mano).', 3, 'H'), 5],
+    'Nunca volvió con las manos vacías, ni una sola vez.');
 
   window.CREEPS_BASE = lista;
 })();

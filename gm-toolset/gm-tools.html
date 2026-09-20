@@ -1906,6 +1906,7 @@ function agregarCreepDeBiblioteca(datos){
   const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: ''});
   sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
+  sc.equipo = (sc.equipo || []).map(it => ({...it, id: uid()}));
   S.creeps.push(sc);
   renderAll();
   toast(`${sc.nombre} agregado a la mesa`);
@@ -4152,7 +4153,8 @@ document.addEventListener('click', e => {
         {nombre: 'Escenario', tags: ['minas', 'bosque', 'montañas', 'templo alienígena']},
         {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']},
         {nombre: 'Rol', tags: ['melee', 'tanque', 'emboscador', 'rango', 'mágico', 'apoyo', 'debuffer']},
-        {nombre: 'Tipo', tags: ['humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena']},
+        {nombre: 'Tipo', tags: ['humano', 'humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena']},
+        {nombre: 'Facción', tags: ['bandidos', 'bárbaros', 'guardia de la ciudad', 'piratas espaciales', 'cultistas', 'mercenarios']},
         {nombre: 'Tribu', tags: ['goblin', 'tribu goblin']},
       ],
     });

@@ -209,7 +209,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   **Reiniciar combate** (Turno 0). Las que no están marcadas no se tocan.
 
 - **Catálogo base de creeps por escenario** (2026-09-20, `comun/creeps-base.js`,
-  `CREEPS_BASE`): 60 creeps (más la tribu de goblins del bosque, 10 con la etiqueta `goblin`, y 20 **debuffers**, uno por escenario y nivel, con la etiqueta `debuffer`: maldiciones de Especial contra Res. Mental, veneno, confusión y control, casi todo "a mano") — Minas, Bosques, Montañas y Templo antiguo con
+  `CREEPS_BASE`): 60 creeps (más la tribu de goblins del bosque, 10 con la etiqueta `goblin`, y 20 **debuffers**, uno por escenario y nivel, con la etiqueta `debuffer`: maldiciones de Especial contra Res. Mental, veneno, confusión y control, casi todo "a mano") y **30 humanos** de seis facciones (bandidos, bárbaros, guardia de la ciudad, piratas espaciales, cultistas, mercenarios; etiqueta `humano` + la facción) con **equipo real del catálogo** (nivel 1: arma Común; 2: arma + pieza Comunes; 3: Común + Buena Calidad; 4: dos Buena Calidad; 5: Buena Calidad + Raro; el arma cuenta como un ítem). **Cada habilidad de la biblioteca trae en su descripción "⚙ Automatizado: …" (costo, cooldown, daño, cura, estado propio, con los números) y "✋ A mano: …"** (`armarDetalle` en `creeps-base.js`) — Minas, Bosques, Montañas y Templo antiguo con
   influencia alienígena × niveles 1 a 5 × 3 — todos con "(auditar)" en el nombre y
   la etiqueta `auditar`. Aparecen en "+ Creep" → biblioteca junto a lo que apruebe
   el dueño (opción `base` de `Biblioteca.abrir`), con etiquetas de escenario, nivel,

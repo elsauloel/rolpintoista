@@ -2698,11 +2698,21 @@ function dibujar(){
       celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
       ctx.strokeStyle = colorConAlfa(color, alfa); ctx.lineWidth = 4 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
     }
-    celdas.forEach(c => {
+    // Cada casillero lleva su número (1, 2, 3…) para contar trayectorias de un vistazo.
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
+    celdas.forEach((c, i) => {
       const p = hexCentro(c.col, c.fila);
-      ctx.beginPath(); ctx.arc(p.x, p.y, 5 / z, 0, 2 * Math.PI);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 9 / z, 0, 2 * Math.PI);
       ctx.fillStyle = colorConAlfa(color, alfa); ctx.fill();
+      ctx.strokeStyle = `rgba(15,12,14,${0.85 * alfa})`; ctx.lineWidth = 1.5 / z; ctx.stroke();
+      ctx.fillStyle = `rgba(255,255,255,${alfa})`;
+      ctx.strokeStyle = `rgba(0,0,0,${0.7 * alfa})`; ctx.lineWidth = 2.5 / z;
+      ctx.strokeText(String(i + 1), p.x, p.y + 0.5 / z);
+      ctx.fillText(String(i + 1), p.x, p.y + 0.5 / z);
     });
+    ctx.restore();
     if(seleccionada){
       ctx.beginPath();
       celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
@@ -3051,7 +3061,7 @@ function dibujar(){
   // Ping (clic derecho): un anillo que se expande y se apaga solo, con
   // el nombre de quién lo mandó, arriba de todo lo demás.
   pings.forEach((p, id) => {
-    const t = (Date.now() - p.creadoMs) / PING_MS;
+    const t = Math.max(0, (Date.now() - p.creadoMs) / PING_MS);
     if(t >= 1){ pings.delete(id); return; }
     animando = true;
     const radio = HEX * (0.4 + t * 2.2);
@@ -3715,11 +3725,17 @@ function escucharPings(){
   cortarPingsListener = coleccionPings().onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
       if(ch.type === 'removed'){ pings.delete(ch.doc.id); return; }
+      // Cuando el servidor confirma el ping propio llega un cambio 'modified' con la hora del
+      // SERVIDOR: si el reloj de esta compu está atrasado, esa hora queda en el futuro, la animación
+      // daba un radio negativo, fallaba el dibujo y el ping aparecía recién con el siguiente. Por eso
+      // el ping se anota una sola vez, con la hora de acá, y la edad nunca es negativa.
+      if(pings.has(ch.doc.id)) return;
       const d = ch.doc.data({serverTimestamps: 'estimate'});
       const creadoMs = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
-      pings.set(ch.doc.id, {x: num(d.x), y: num(d.y), duenoUid: d.duenoUid, creadoMs});
-      const restan = PING_MS - (Date.now() - creadoMs);
-      setTimeout(() => { coleccionPings().doc(ch.doc.id).delete().catch(() => {}); }, Math.max(0, restan));
+      const edad = Math.max(0, Date.now() - creadoMs);
+      if(edad >= PING_MS){ coleccionPings().doc(ch.doc.id).delete().catch(() => {}); return; }
+      pings.set(ch.doc.id, {x: num(d.x), y: num(d.y), duenoUid: d.duenoUid, creadoMs: Date.now() - edad});
+      setTimeout(() => { coleccionPings().doc(ch.doc.id).delete().catch(() => {}); }, PING_MS - edad);
     });
     pedirDibujo();
   }, err => console.error('Error escuchando los pings del mapa:', err));

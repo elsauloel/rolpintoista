@@ -728,3 +728,13 @@ hexágono con otro sin importar bando. Todavía no está construido.
   muestran solo sus zonas; al soltar la selección vuelve al filtro.
   **Atajo `Ctrl+L`** (2026-09-19): prende y apaga el modo lentes (`alternarLentes`);
   la `L` sola sigue siendo el Lápiz. Está en la lista de atajos del mapa.
+
+- **Lápiz por casilleros numerado** (2026-09-20): cada casillero de una
+  trayectoria del lápiz lleva su número (1, 2, 3…) en un círculo del color del
+  trazo, para contar recorridos (`dibujarRutaHex`).
+- **Arreglo del ping** (2026-09-20): con la hora de la compu atrasada respecto del
+  servidor, la confirmación del servidor dejaba la hora del ping en el futuro, el
+  radio de la animación daba negativo y `ctx.arc` fallaba, cortando el dibujo (el ping
+  aparecía recién con el siguiente, "en eco"). Ahora el ping se anota una sola vez
+  con la hora local, ignora el 'modified' y la edad nunca es negativa
+  (`escucharPings`).

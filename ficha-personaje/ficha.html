@@ -4899,7 +4899,7 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) más el peso del arma que uses">
+          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) más el peso del arma. Después de un Parry, es la del Parry">
             ${lupaBotonHtml('stat:bloqueo')}
             <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
           </button>
@@ -8331,6 +8331,10 @@ function pdgParaArma(arma, c){
    Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma.
    Con más de un arma equipada, se elige con cuál. Sin arma: Parry cuesta
    lo de un ataque sin arma (⚠ provisorio) y el Bloqueo no suma peso. */
+// Arma con la que se hizo el último Parry (id, o '' si fue sin arma). El Bloqueo que
+// sigue (defensa: Parry y después Bloqueo) usa esa misma arma sin volver a preguntar.
+// null = no hay un Parry esperando su Bloqueo. Se limpia al bloquear, atacar o pasar el turno.
+let parryArmaPendiente = null;
 const costoParryNitros = arma => IT2.redondeoPrimerAtaque(tipoAtaque(arma) / 2);
 
 function costoParryTxt(){
@@ -8359,6 +8363,7 @@ function parryConArma(arma, forzar){
   }
   S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `hizo Parry${con}`) : costo);
   renderNitros();
+  parryArmaPendiente = arma ? arma.id : '';
   tirarValorStat(arma ? `Parry · ${arma.nombre}` : 'Parry', statParaArma('parry', arma), 'parry');
   toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}`);
   refresh();
@@ -8371,11 +8376,21 @@ function bloqueoConArma(arma){
 
 // Botones 🎲 Parry y 🎲 Bloqueo: con dos o más armas equipadas se elige con cuál.
 function elegirArmaDefensa(tipo){
+  // Bloqueo justo después de un Parry: es con la misma arma, no se elige otra vez.
+  if(tipo === 'bloqueo' && parryArmaPendiente !== null){
+    const armaDelParry = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) : null;
+    if(!parryArmaPendiente || armaDelParry){
+      parryArmaPendiente = null;
+      bloqueoConArma(armaDelParry || null);
+      return;
+    }
+    parryArmaPendiente = null;   // el arma ya no está equipada: se elige de nuevo
+  }
   const armas = armasEquipadasConDano();
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta lo de un primer ataque con el arma que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas.'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta lo de un primer ataque con el arma que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}
@@ -8384,6 +8399,7 @@ function elegirArmaDefensa(tipo){
 }
 
 function atacarConArma(arma, forzar){
+  parryArmaPendiente = null;
   const costo = costoAtaqueNitros(arma);
   if(costo > num(S.nitros) && !forzar){
     avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(arma, true));
@@ -8941,6 +8957,7 @@ function mantenimiento(){
   }
 
   S.turno = (S.turno || 1) + 1;
+  parryArmaPendiente = null;
   // Nitros se recargan al máximo y el primer ataque vuelve a costar la
   // mitad. El SP no se recarga entero: recupera SP Regen, sin pasar del
   // máximo (si ya estaba por encima, no se toca).

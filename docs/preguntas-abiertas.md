@@ -294,6 +294,9 @@ equivalente que da Con (5), o sea +5 HP máx.
   armas equipadas se elige con cuál en los dos casos. Hecho en la ficha
   (`parryConArma`, `bloqueoConArma`, `elegirArmaDefensa`). Sin arma: el Parry
   cuesta lo de un ataque sin arma (provisorio) y el Bloqueo no suma peso.
+  **Actualización 2026-09-19:** el Bloqueo del defensor usa solo el arma con la
+  que hizo el Parry (no vuelve a preguntar); si no hubo Parry antes (ej. el
+  Bloqueo del atacante), se elige el arma como siempre.
 - 🔲 **P76. Parry con escudo.** Distinto al de arma; falta definir su paso a
   paso (costo, qué se tira, con qué se suma). *(2026-09-19)*
 - 🔲 **P77. Cadena Parry → Bloqueo.** Sin resolver: si es el Bloqueo del

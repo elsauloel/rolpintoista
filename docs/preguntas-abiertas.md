@@ -333,3 +333,16 @@ resuelven a mano, como el resto de los avisos).
   queda entre los jugadores a mano? *(2026-09-19)*
 - 🔲 **P84. Quién puede crear.** ¿Cualquier jugador, en cualquier lugar del mapa,
   o con algún límite (cantidad, costo de No2, solo en combate)? *(2026-09-19)*
+
+## Sigilo: detección durante el movimiento del rival
+
+- 🔲 **P85. Detección a lo largo de la ruta del que camina.** Hoy, cuando se
+  mueve el personaje oculto se revisa casillero por casillero, pero cuando se
+  mueve el rival (el oculto queda quieto) solo cuenta la posición final. Se
+  quiere revisar también los casilleros del medio del rival (con su cono mirando
+  hacia el siguiente paso). **Decidido 2026-09-19: el sistema tiene que ser el
+  mismo en las dos direcciones** — creep que camina y personaje oculto, o
+  personaje que camina y creep oculto. Falta: si el movimiento del que camina se
+  corta ahí, y si el sigilo se rompe solo o dispara una tirada de detección a
+  mano. Se puede resolver junto con las trampas (P78–P84), que necesitan la misma
+  revisión de la ruta. *(2026-09-19)*

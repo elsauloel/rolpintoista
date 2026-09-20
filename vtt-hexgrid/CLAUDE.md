@@ -714,7 +714,7 @@ hexágono con otro sin importar bando. Todavía no está construido.
 
 - **Movimiento y zona de alerta** (2026-09-19, escenario 1: se mueve el oculto):
   entrar en la zona de alerta (roja) da **una tirada de detección por paso**,
-  anunciada en **rojo** en la Mesa, anónima: "Hace falta una tirada de detección" (`sigiloEvaluarRuta` cuenta los pasos,
+  anunciada en **rojo** en la Mesa, anónima: "Hace falta una tirada de percepción" (`sigiloEvaluarRuta` cuenta los pasos,
   `sigiloPublicarAvisos` la publica). **No se interrumpe** el movimiento: el
   oculto ve las zonas y decide cuándo entrar, y cada paso es consciente. Solo el
   cono (azul) corta. Falta el escenario 2 (se mueve el que ve al oculto: hoy

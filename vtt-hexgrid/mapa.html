@@ -1505,7 +1505,7 @@ async function sigiloAlertaRoja(t, que, detalle){
 }
 // Al soltar un token en sigilo (mientras ÉL se mueve): corta la ruta en la primera casilla
 // que cae en un cono rival (detección inmediata) y cuenta los pasos que da dentro de cada
-// zona de alerta: corresponde una tirada de detección por paso, que se anuncia en rojo en la
+// zona de alerta: corresponde una tirada de percepción por paso, que se anuncia en rojo en la
 // Mesa. NO se interrumpe el movimiento por la zona de alerta: el oculto ve las zonas y decide
 // cuándo entrar, así que sabe lo que hace (decidido 2026-09-19, escenario 1).
 function sigiloEvaluarRuta(t, a){
@@ -1534,8 +1534,8 @@ function sigiloPublicarAvisos(id){
   if(!avisos || !t) return;
   // Uno por rival que ve la zona; sin decir quién se mueve ni que está en sigilo.
   avisos.forEach(av => alertaRojaAnonima(av.pasos === 1
-    ? '⚠ Hace falta una tirada de detección'
-    : `⚠ Hacen falta ${av.pasos} tiradas de detección`));
+    ? '⚠ Hace falta una tirada de percepción'
+    : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
 }
 async function romperSigilo(id, detector){
   const t = tokens.get(id);

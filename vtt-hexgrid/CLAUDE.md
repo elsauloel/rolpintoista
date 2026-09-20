@@ -715,3 +715,11 @@ hexágono con otro sin importar bando. Todavía no está construido.
   `localStorage` `mapa-ver-zonas`). Colores más opacos que los de sigilo para que se
   vean bien. Un token oculto, en sigilo que no ves o muerto no muestra sus zonas
   (no delata nada).
+
+- **👓 Lentes con menú** (2026-09-19; reemplaza al botón simple): el 👓 abre hacia
+  abajo un menú (`#lentes-menu`) con **Modo lentes: sí/no** y, cuando está prendido,
+  un filtro **Todos / Aliados / Rivales / NPC** (`lentesCategoria`: personajes,
+  creeps vinculados, tokens grises) o una lista de **tokens para marcar** y ver solo
+  sus zonas (la selección manda sobre el filtro; "quitar selección" la limpia).
+  Apagado, el mapa funciona como siempre. Se recuerdan por navegador el modo
+  (`mapa-ver-zonas`) y el filtro (`mapa-lentes-filtro`).

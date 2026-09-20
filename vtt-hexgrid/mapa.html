@@ -152,6 +152,15 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 /* Personajes: lista desplegable de las fichas de la partida. */
 .btn-personajes{background:rgba(63,111,176,.2);border-color:#3F6FB0;color:#B9D2EA}
 .btn-personajes:hover,.btn-personajes[aria-expanded="true"]{background:#3F6FB0;border-color:#5B8DBE;color:#F2F6FB}
+.lentes-tit{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 4px 4px}
+.lentes-filtros{display:flex;flex-wrap:wrap;gap:5px;padding:0 3px}
+.lentes-filtros .btn.activo{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.lentes-fila{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:var(--r);cursor:pointer;font-size:13px}
+.lentes-fila:hover{background:rgba(63,111,176,.25)}
+.lentes-fila input{width:auto;margin:0}
+.lentes-fila small{margin-left:auto;font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted)}
+#lentes-opciones.apagado{opacity:.4;pointer-events:none}
+.enlace-mini{background:none;border:none;color:var(--brass);text-decoration:underline;padding:0;font-size:10px;cursor:pointer;margin-left:6px}
 .desplegable{position:relative}
 .desplegable-lista{
   position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
@@ -628,7 +637,23 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
         <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
       </div>
-      <button type="button" class="btn btn-cuadrado" id="btn-zonas" aria-pressed="false" title="Ver los conos de detección (azul) y las zonas de alerta (naranja) de todos los tokens">👓</button>
+      <div class="desplegable" id="lentes-caja">
+        <button type="button" class="btn btn-cuadrado" id="btn-zonas" aria-expanded="false" title="Lentes: ver los conos de detección y las zonas de alerta">👓</button>
+        <div class="desplegable-lista" id="lentes-menu" hidden>
+          <button type="button" class="btn" id="lentes-activar" style="width:100%">👓 Modo lentes: no</button>
+          <div id="lentes-opciones">
+            <div class="lentes-tit">Mostrar</div>
+            <div class="lentes-filtros" id="lentes-filtros">
+              <button type="button" class="btn chico" data-lentes-filtro="todos">Todos</button>
+              <button type="button" class="btn chico" data-lentes-filtro="aliados">Aliados</button>
+              <button type="button" class="btn chico" data-lentes-filtro="rivales">Rivales</button>
+              <button type="button" class="btn chico" data-lentes-filtro="npc">NPC</button>
+            </div>
+            <div class="lentes-tit">O solo estos tokens <button type="button" class="enlace-mini" id="lentes-limpiar">quitar selección</button></div>
+            <div id="lentes-tokens"></div>
+          </div>
+        </div>
+      </div>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -1432,15 +1457,38 @@ function zonasSigilo(t){
 }
 // Quien está en sigilo ve las zonas de los rivales que ve: un jugador, las de los
 // creeps; el GM con un creep en sigilo, las de los personajes.
-// 👓 Botón de los lentes (grupo flotante del mapa): muestra u oculta los conos y zonas de todos.
-let verZonas = false;
-try{ verZonas = localStorage.getItem('mapa-ver-zonas') === '1'; }catch(e){}
+// 👓 Lentes (grupo flotante del mapa): un menú que prende el modo lentes y deja elegir qué conos y
+// zonas se ven — todos, solo aliados, rivales o NPC, o solo los de los tokens que se marquen.
+// Apagado, el mapa funciona exactamente igual que siempre.
+let verZonas = false;          // modo lentes prendido
+let lentesFiltro = 'todos';    // 'todos' | 'aliados' | 'rivales' | 'npc'
+const lentesTokens = new Set();  // ids marcados: si hay alguno, se ven solo esos
+try{
+  verZonas = localStorage.getItem('mapa-ver-zonas') === '1';
+  lentesFiltro = localStorage.getItem('mapa-lentes-filtro') || 'todos';
+}catch(e){}
+function lentesCategoria(t){
+  const c = claseToken(t);
+  return c === 'creep' ? 'rivales' : c === 'npc' ? 'npc' : 'aliados';
+}
+function lentesMuestra(id, t){
+  if(lentesTokens.size) return lentesTokens.has(id);
+  return lentesFiltro === 'todos' || lentesCategoria(t) === lentesFiltro;
+}
 function renderBotonZonas(){
   const b = $('#btn-zonas');
   if(!b) return;
   b.classList.toggle('activo', verZonas);
-  b.setAttribute('aria-pressed', verZonas ? 'true' : 'false');
-  b.title = verZonas ? 'Ocultar los conos de detección y las zonas de alerta' : 'Ver los conos de detección (azul) y las zonas de alerta (naranja) de todos los tokens';
+  $('#lentes-activar').textContent = verZonas ? '👓 Modo lentes: sí' : '👓 Modo lentes: no';
+  $('#lentes-activar').classList.toggle('primary', verZonas);
+  $('#lentes-opciones').classList.toggle('apagado', !verZonas);
+  $('#lentes-filtros').querySelectorAll('[data-lentes-filtro]').forEach(x => x.classList.toggle('activo', !lentesTokens.size && x.dataset.lentesFiltro === lentesFiltro));
+  // Lista de tokens que se ven (los ocultos o en sigilo que no ves, no aparecen).
+  const filas = [...tokens.entries()].filter(([id, t]) => !(t.oculto && !soyGM) && tokenVisiblePorNiebla(t))
+    .sort((a, b) => nombreDe(a[1]).localeCompare(nombreDe(b[1]), 'es'));
+  $('#lentes-tokens').innerHTML = filas.length ? filas.map(([id, t]) =>
+    `<label class="lentes-fila"><input type="checkbox" data-lentes-token="${esc(id)}" ${lentesTokens.has(id) ? 'checked' : ''}><span>${esc(nombreDe(t))}</span><small>${lentesCategoria(t)}</small></label>`).join('')
+    : '<div class="vacio" style="padding:4px 6px">No hay tokens.</div>';
 }
 function zonasParaVer(){
   const rivales = [];
@@ -2703,9 +2751,10 @@ function dibujar(){
       ctx.fillStyle = relleno; ctx.fill();
       ctx.strokeStyle = borde; ctx.lineWidth = 2 / z; ctx.stroke();
     };
-    tokens.forEach(t => {
+    tokens.forEach((t, id) => {
       if(t.oculto && !soyGM) return;
       if(!tokenVisiblePorNiebla(t)) return;
+      if(!lentesMuestra(id, t)) return;
       const est = estadoDe(t);
       if(est && est.muerto) return;
       const zn = zonasSigilo(t);
@@ -3524,12 +3573,34 @@ lienzo.addEventListener('wheel', e => {
   zoomEn(px, py, Math.exp(-e.deltaY * 0.0015));
 }, {passive: false});
 
-$('#btn-zonas').onclick = () => {
+function abrirMenuLentes(abrir){
+  $('#lentes-menu').hidden = !abrir;
+  $('#btn-zonas').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  if(abrir) renderBotonZonas();
+}
+$('#btn-zonas').onclick = () => abrirMenuLentes($('#lentes-menu').hidden);
+$('#lentes-activar').onclick = () => {
   verZonas = !verZonas;
   try{ localStorage.setItem('mapa-ver-zonas', verZonas ? '1' : '0'); }catch(e){}
-  renderBotonZonas();
-  pedirDibujo();
+  renderBotonZonas(); pedirDibujo();
 };
+$('#lentes-filtros').addEventListener('click', e => {
+  const b = e.target.closest('[data-lentes-filtro]'); if(!b) return;
+  lentesFiltro = b.dataset.lentesFiltro;
+  lentesTokens.clear();
+  try{ localStorage.setItem('mapa-lentes-filtro', lentesFiltro); }catch(err){}
+  renderBotonZonas(); pedirDibujo();
+});
+$('#lentes-tokens').addEventListener('change', e => {
+  const c = e.target.closest('[data-lentes-token]'); if(!c) return;
+  if(c.checked) lentesTokens.add(c.dataset.lentesToken); else lentesTokens.delete(c.dataset.lentesToken);
+  renderBotonZonas(); pedirDibujo();
+});
+$('#lentes-limpiar').onclick = () => { lentesTokens.clear(); renderBotonZonas(); pedirDibujo(); };
+document.addEventListener('pointerdown', e => {
+  if(!$('#lentes-menu').hidden && !e.target.closest('#lentes-caja')) abrirMenuLentes(false);
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#lentes-menu').hidden) abrirMenuLentes(false); });
 renderBotonZonas();
 $('#btn-acercar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 1.25);
 $('#btn-alejar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 0.8);

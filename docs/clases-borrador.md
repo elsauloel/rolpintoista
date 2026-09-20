@@ -35,6 +35,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
   resultado).
 - **Espameable**: se puede repetir en el turno; el límite lo ponen los
   Nitros.
+- **Costo en No2 por defecto** (2026-09-20): si el texto de una skill no dice cuántos No2 cuesta, cuesta **1**; si está vinculada a un ataque, cuesta lo que cuesta ese ataque (Tipo ÷ 2 el primero del turno con el arma, Tipo completo después). "Flash" o un "No2: 0" explícito son la excepción.
 - **Costo "Ataque"**: la skill cuesta los Nitros del ataque que
   corresponda en ese turno con esa arma (Tipo ÷ 2 si es el primero, Tipo
   completo después) y cuenta como ataque del turno. En la ficha se usa con
@@ -153,8 +154,7 @@ Estados que define la clase:
    x 2). Golpea el piso creando una onda de choque en un cono al frente,
    que hace perder una cantidad de No2 igual a 1 + la diferencia en la
    tirada. Si perdiera todos los No2 de este modo, queda Sentado.
-6. **Piel resistente** [5] — Otorga una armadura temporal: Defensa 5, Res.
-   Mágica 5, reduce críticos de todo tipo. Duración: 2 turnos.
+6. ✅ **Piel resistente** — SP 5, No2 1 (regla general). Estado de 2 turnos sobre uno mismo: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (Tipo 4 a 12). ⚠ El +1 a los críticos y la duración de 2 turnos completos son propuesta mía, sin confirmar.
 7. **Daño en área** [2] — Ataque con daño en área de flor. No afecta al
    tanque.
 8. **Takle** [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque

@@ -1081,8 +1081,6 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .dock-izq:hover .dock-btn,.dock-btn:focus-visible{width:176px}
 .dock-btn:hover{border-color:var(--copper);background:var(--panel2);color:var(--brass)}
 #btn-botonera{border-color:var(--copper)}
-#btn-reset{border-color:var(--wine);color:var(--danger)}
-#btn-reset:hover{background:var(--wine);color:var(--paper)}
 .accesos{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
 #menu-sitio-boton,#menu-sitio{z-index:49!important} /* debajo de las ventanas (z 50) */
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
@@ -1252,7 +1250,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
   <a class="dock-btn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva"><span class="dock-ico">🗺</span><span class="dock-txt">Mapa</span></a>
   <button type="button" class="dock-btn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)"><span class="dock-ico">💾</span><span class="dock-txt">Respaldo</span></button>
-  <button type="button" class="dock-btn" id="btn-reset" title="Crear un personaje nuevo en la mesa"><span class="dock-ico">＋</span><span class="dock-txt">Personaje nuevo</span></button>
 </aside>
 <div class="wrap">
 
@@ -9167,7 +9164,6 @@ function fichaNueva(){
 // Mantenimiento ya no necesita subir nada aparte.
 // El Mantenimiento ya no tiene botón en la ficha: lo toca el GM en el mapa
 // y cada ficha lo aplica sola (ver "Mantenimiento del GM" al final).
-$('#btn-reset').onclick = () => crearPersonajeNuevo();
 $('#btn-turno-reset').onclick = () => {
   if(!confirm('Esto vuelve el contador de turno a 1. No toca SP, Nitros ni los estados alterados. ¿Seguís?')) return;
   S.turno = 1;

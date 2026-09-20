@@ -337,6 +337,6 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 
 - **Todos los botones de la barra de arriba pasaron al dock** (2026-09-19): en
   orden ⚡ Botonera, 👥 Personajes, 🏪 Vendedor, ⭐ Exp y Job, 💰 DDE y loot, 📖
-  Bitácora, 🗺 Mapa, 💾 Respaldo y ＋ Personaje nuevo. La barra de arriba
+  Bitácora, 🗺 Mapa y 💾 Respaldo (el ＋ Personaje nuevo está en el menú de Personajes). La barra de arriba
   queda solo con el texto (partida y estado de guardado). Mismos ids, así que
   el código no cambió.

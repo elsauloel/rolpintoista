@@ -101,7 +101,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   ficha, gm-tools; `comun/mesa.js`, `mesaAlertaOjo`) sale como fila roja y
   dispara un destello rojo con un ojo 👁 grande que aparece de golpe y a ~1 s
   se apaga con fade (el ojo es el PNG `comun/ojo.png`, con fondo transparente; si no carga, queda el emoji 👁).
-  Si no se puede publicar el aviso,
+  Al volver a la visión normal (apagar el 👁) también queda una línea común en la Mesa: "El GM dejó de revelar lo oculto", sin destello. Si no se puede publicar el aviso de revelar,
   no se revela nada. Un token seleccionado que deja de verse (niebla o
   sigilo) se suelta solo. **Botón directo en la ficha:** quien tiene la
   habilidad "Sigilo" ve arriba de la Botonera `🕶 Entrar en sigilo · 1 No2`

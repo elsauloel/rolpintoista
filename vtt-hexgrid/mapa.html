@@ -1605,7 +1605,12 @@ $('#btn-ojo').onclick = async () => {
   if(!soyGM) return;
   ojoRevelando = !ojoRevelando;
   renderOjo(); renderIniciativa(); pedirDibujo();
-  if(!ojoRevelando){ toast('Volvés a no ver lo oculto'); return; }
+  if(!ojoRevelando){
+    toast('Volvés a no ver lo oculto');
+    // También se avisa a la mesa (línea común, sin el destello del ojo): lo oculto vuelve a estarlo.
+    sigiloAviso('👁 El GM dejó de revelar lo oculto', 'Vuelve la visión normal: lo que estaba en sigilo vuelve a estar oculto');
+    return;
+  }
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: 'GM',

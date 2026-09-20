@@ -90,7 +90,7 @@ datos/                   JSONs de la partida (personajes, creeps, tablero)
   creeps-publico.json     Estado público de los creeps (lo sube gm-tools.html)
   tienda-publica.json     Tienda publicada (la sube vendor-generator.html)
 
-manual-usuario/          Manual de reglas de la campaña (en construcción)
+manual-usuario/          Manual del sistema, navegable como un vault (notas/*.md -> datos/manual.json)
 vtt-hexgrid/              Mapa hexagonal virtual (en pausa, sin código todavía)
 docs/                     Notas de workflow y generales
 herramientas/             Scripts Python: sincronizan assets/catalogo.xlsx

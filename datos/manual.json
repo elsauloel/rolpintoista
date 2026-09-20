@@ -1,0 +1,1981 @@
+{
+ "titulo": "Manual — Rol Pintoísta",
+ "actualizado": "2026-09-20T08:38:05Z",
+ "capitulos": [
+  {
+   "id": "empezar",
+   "titulo": "Empezar",
+   "icono": "🚀",
+   "resumen": "Lo primero que tenés que leer: qué es el juego, cómo se usa este manual y cómo es una primera sesión.",
+   "orden": 0
+  },
+  {
+   "id": "mundo",
+   "titulo": "El mundo y el tono",
+   "icono": "🌌",
+   "resumen": "De qué va el universo: lo absurdo como norma, la magia y la tecnología como iguales, y la campaña que se juega hoy.",
+   "orden": 1
+  },
+  {
+   "id": "personaje",
+   "titulo": "Tu personaje",
+   "icono": "🧙",
+   "resumen": "Cómo se arma un personaje: los cinco atributos, de dónde salen tus números y cómo crecés de nivel.",
+   "orden": 2
+  },
+  {
+   "id": "tiradas",
+   "titulo": "Tiradas y dados",
+   "icono": "🎲",
+   "resumen": "Cómo se tira cada stat, cómo se comparan dos tiradas, qué es un crítico y dónde queda todo registrado.",
+   "orden": 3
+  },
+  {
+   "id": "recursos",
+   "titulo": "Recursos",
+   "icono": "⚡",
+   "resumen": "Tres barras que dominan el combate: vida, poder especial y nitros. Cómo se ganan, se gastan y se recuperan.",
+   "orden": 4
+  },
+  {
+   "id": "combate",
+   "titulo": "Combate",
+   "icono": "⚔️",
+   "resumen": "Cómo se pelea: turnos, ataque y defensa, daño, críticos, muerte, sigilo, trampas e invocaciones.",
+   "orden": 5
+  },
+  {
+   "id": "estados",
+   "titulo": "Estados alterados",
+   "icono": "🌀",
+   "resumen": "Los efectos temporales (buffs y debuffs) que te cambian los números: veneno, sigilo, escudos, control…",
+   "orden": 6
+  },
+  {
+   "id": "equipo",
+   "titulo": "Equipo y economía",
+   "icono": "🛡️",
+   "resumen": "Qué llevás puesto y en la mochila, cuánto pesa, cuánto cuesta y cómo se consigue.",
+   "orden": 7
+  },
+  {
+   "id": "habilidades",
+   "titulo": "Habilidades y clases",
+   "icono": "✨",
+   "resumen": "Skills activas, pasivas y sociales; las siete clases y la biblioteca compartida.",
+   "orden": 8
+  },
+  {
+   "id": "herramientas",
+   "titulo": "Las herramientas",
+   "icono": "🧰",
+   "resumen": "Un recorrido por cada herramienta del sitio: la ficha, la Botonera, el mapa, la bitácora y el resto.",
+   "orden": 9
+  },
+  {
+   "id": "gm",
+   "titulo": "Para el GM",
+   "icono": "🎭",
+   "resumen": "Todo lo que necesita quien narra: creeps, encuentros, tiendas, mapa y cómo mantener la mesa fluida.",
+   "orden": 10
+  },
+  {
+   "id": "glosario",
+   "titulo": "Glosario y ayudas",
+   "icono": "📚",
+   "resumen": "Siglas y palabras del juego, preguntas frecuentes y tablas de referencia rápida.",
+   "orden": 11
+  },
+  {
+   "id": "sobre-este-manual",
+   "titulo": "Sobre este manual",
+   "icono": "📝",
+   "resumen": "Cómo se mantiene, cómo completarlo y qué cambió con las iteraciones del sistema.",
+   "orden": 12
+  }
+ ],
+ "notas": [
+  {
+   "id": "bienvenida",
+   "titulo": "Bienvenida",
+   "alias": [
+    "Inicio",
+    "Qué es el Rol Pintoísta"
+   ],
+   "tags": [
+    "empezar"
+   ],
+   "estado": "borrador",
+   "capitulo": "empezar",
+   "cuerpo": "**El Rol Pintoísta** es un juego de rol de mesa (de esos con dados, personajes y un narrador) que se juega *en vivo, cada uno desde su casa*, con herramientas propias: una ficha de personaje, un mapa de hexágonos, una mesa de tiradas compartida y un panel para el narrador. Un \"Roll20 propio\", hecho a medida del grupo.\n\nLo que lo distingue es la [[La esencia del Rol Pintoísta|esencia]]: es una **plataforma, no un corsé**. Las reglas de este manual son *referencias* y los personajes y ítems son *invitaciones*. Si algo no te cierra, se cambia en la mesa.\n\n> [!tip] ¿Por dónde empiezo?\n> - **Nunca jugaste rol:** leé [[Tu primera sesión en 10 minutos]] y después [[Un turno de ejemplo]].\n> - **Ya sabés rol y querés armar tu personaje:** andá a [[Crear un personaje]].\n> - **Sos el narrador (GM):** empezá por [[El rol del GM]].\n> - **Buscás una palabra o sigla:** usá el buscador de arriba, o el [[Glosario]].\n\n## Cómo está armado el sistema, en una frase\nCada personaje tiene cinco [[Atributos]]; de ellos salen los [[Stats derivados]] que se tiran con [[Cómo se tira un stat|dados]]; en combate se gastan tres recursos —[[HP]], [[SP]] y [[Nitros (No2)]]— y todo se mueve sobre [[El mapa]]."
+  },
+  {
+   "id": "la-esencia-del-rol-pintoista",
+   "titulo": "La esencia del Rol Pintoísta",
+   "alias": [
+    "Esencia",
+    "Filosofía sandbox",
+    "Plataforma no corsé",
+    "Sandbox"
+   ],
+   "tags": [
+    "empezar",
+    "filosofía"
+   ],
+   "estado": "confirmado",
+   "capitulo": "empezar",
+   "cuerpo": "> [!info] Dicho por el creador del juego\n> **El Rol Pintoísta ofrece una plataforma, no un corsé.** Las reglas son referencias. Los personajes y los equipos son sugerencias, invitaciones, no reglas estrictas. Es un juego de rol *sandbox* que promueve el espíritu sandbox.\n\n## Una invitación a crear entre todos\nEl Rol Pintoísta es **una invitación a la creación colectiva**. Cada quien imagina a su personaje como quiere, y está bien:\n\n- Un **paladín** que pelea por la piedad y la justicia. ✔\n- Una **piedra consciente** que, de alguna manera absurda, consiguió construirse un robot para desenvolverse por el mundo. ✔\n- Un **pendorcho galáctico**: una figura geométrica abstracta que flota por el espacio y se comunica por telepatía, lo cual friquea bastante a quienes no están familiarizados con él. ✔\n- Un **gusano pedorro**, con estética casi de *Ren y Stimpy*, que lanza pedos tóxicos. ✔\n- Un **asesino invocador de abejas** en la noche, con sigilo, veneno y trampas. ✔\n- Un **sacerdote católico** (de inspiración en esa cultura) con una escopeta de balas rellenas de agua bendita para impartir justicia divina. ✔\n\n> [!tip] La respuesta a \"¿puedo ser…?\"\n> **Sí, también podés.** Lo demás —los números, las habilidades, el equipo— se arma *alrededor* de la idea, no al revés. Ver [[Crear un personaje]] y [[Crear tus propios ítems]].\n\n## El GM no limita: acompaña y modera\nEl rol del máster **no es poner límites**, es **acompañar y moderar**: ayudar a que la idea de cada uno funcione en la mesa, cuidar que todos la pasen bien y mantener el ritmo. Ver [[El rol del GM]].\n\n## Qué significa en la práctica\n- **Las reglas son referencias.** Este manual te dice \"así funciona normalmente\". Si la historia pide otra cosa, la mesa decide. Nadie te va a frenar con un artículo.\n- **Todo lo que hay en el [[Catálogo de ítems]] es una sugerencia.** Los números de un arma, una armadura o una clase son un punto de partida. Podés cambiarlos, inventar los tuyos con [[Crear tus propios ítems]] o pedirle al GM uno hecho a medida.\n- **Las herramientas ayudan, no mandan.** La ficha calcula, avisa y recuerda, pero casi siempre te deja seguir \"de cualquier modo\" si vos así lo decidís (por ejemplo, gastar más [[Nitros (No2)|Nitros]] de los que tenés).\n- **Lo que no se puede automatizar, se recuerda.** Los [[Efectos al golpear]] se resaltan en la [[La Mesa|Mesa]], pero aplicarlos sobre el rival lo hace el grupo, a propósito.\n\n> [!tip] La pregunta que resuelve casi todo\n> Ante cualquier duda de reglas: *¿qué hace mejor la historia que estamos contando?* Eso gana.\n\nVer también: [[Filosofía del mundo]], [[Cómo usar este manual]]."
+  },
+  {
+   "id": "como-usar-este-manual",
+   "titulo": "Cómo usar este manual",
+   "alias": [
+    "Ayuda del manual",
+    "Navegar el manual"
+   ],
+   "tags": [
+    "empezar",
+    "manual"
+   ],
+   "estado": "confirmado",
+   "capitulo": "empezar",
+   "cuerpo": "Este manual está pensado para **recorrerse saltando**, como una wiki, no para leerse de tapa a tapa.\n\n## Buscar\n- Apretá **`/`** en cualquier momento y escribí. El buscador entiende acentos y mayúsculas indistintamente, y busca en títulos, otros nombres (por ejemplo, \"No2\" encuentra *Nitros*), etiquetas y en todo el texto.\n- **Enter** abre el resultado marcado (o la lista completa de resultados).\n\n## Seguir los enlaces\n- Las palabras en <span style=\"color:var(--azul)\">azul</span> son enlaces a otras notas: [[Nitros (No2)]], [[Parry]], [[Sigilo]]…\n- **Pasá el mouse** por encima de un enlace y aparece una vista previa, sin salir de lo que estás leyendo.\n- Un enlace **gris con lápiz ✎** es una nota que se mencionó pero todavía nadie escribió (todas están listadas en 📌 Pendientes).\n- Al pie de cada nota y en la columna derecha vas a ver **\"Se menciona en\"** (quién habla de esta regla) y **\"Enlaza a\"** (de qué depende).\n\n## Otras formas de recorrerlo\n- **Árbol de la izquierda:** capítulos y notas. Debajo, las **etiquetas** (`#combate`, `#recursos`…): tocá una y ves todas las notas del tema.\n- **A–Z:** el índice alfabético completo.\n- **🕸 Mapa:** un grafo de cómo se conectan todas las notas (con las que faltan como círculos huecos).\n- **← →:** volver y avanzar, como en un navegador.\n\n## Los carteles\nCada nota tiene un estado:\n\n| Estado | Qué significa |\n|---|---|\n| ✅ Confirmado | Regla decidida y probada en la mesa. |\n| 🟡 Borrador | Hay contenido, pero puede cambiar. |\n| 🔲 Pendiente | Falta casi todo. |\n\nY dentro de las notas aparecen recuadros:\n\n> [!tip] Tip\n> Un consejo práctico.\n\n> [!warning] Ojo\n> Algo que suele confundirse.\n\n> [!example] Ejemplo\n> Un caso concreto, con números.\n\nY un recuadro **violeta con ❓** marca una **duda sin resolver**: todas se juntan en 📌 **Pendientes** (botón de arriba), para irlas completando de a poco."
+  },
+  {
+   "id": "que-necesito-para-jugar",
+   "titulo": "Qué necesito para jugar",
+   "alias": [
+    "Requisitos",
+    "Roles",
+    "Jugador",
+    "Jugadores"
+   ],
+   "tags": [
+    "empezar",
+    "herramientas"
+   ],
+   "estado": "borrador",
+   "capitulo": "empezar",
+   "cuerpo": "## Lo que necesitás\n- Una **compu con navegador** (Chrome, Edge, Firefox). El sistema está pensado *solo para compu*, no para celular.\n- Una **cuenta**: con Google, o con email y contraseña (te llega un link para confirmar). Ver [[Inicio y partidas]].\n- Un grupo: un **GM** y uno o más **jugadores**.\n\n## Los dos roles\n| | Jugador | GM (Game Master) |\n|---|---|---|\n| Qué hace | Maneja su [[Crear un personaje|personaje]] | Narra el mundo, maneja a los enemigos y arma el escenario |\n| Sus herramientas | [[La ficha]], [[La Botonera]], [[El mapa]] | [[GM Tools]], [[Generador de tiendas]], [[El mapa]] |\n| Ve | Lo que su personaje puede ver | Todo (incluso lo oculto: [[Ocultar y revelar]]) |\n\n> [!info] Quién es GM\n> **Quien crea una partida es su GM.** Los que se suman después son jugadores. Si el GM cambia, puede pasarle el rol a otro: [[Traspaso de GM]].\n\n## Lo que no necesitás\nNo hace falta instalar nada ni saber de computación. Todo se abre desde el sitio web y el sistema guarda solo."
+  },
+  {
+   "id": "tu-primera-sesion-en-10-minutos",
+   "titulo": "Tu primera sesión en 10 minutos",
+   "alias": [
+    "Primera sesión",
+    "Guía rápida",
+    "Empezar a jugar"
+   ],
+   "tags": [
+    "empezar",
+    "guía"
+   ],
+   "estado": "borrador",
+   "capitulo": "empezar",
+   "cuerpo": "Una guía rápida para llegar a la mesa sin haber leído todo lo demás.\n\n## 1. Entrá y elegí una partida\nIniciás sesión y ves las partidas del grupo. Elegís la tuya (o la creás si sos el GM). Te pide un **nombre** para esa partida: es cómo te van a ver los demás. → [[Inicio y partidas]]\n\n## 2. Armá tu personaje\nAbrís [[La ficha]] y creás un personaje nuevo. Lo mínimo:\n1. **Nombre, raza, clase y nivel.**\n2. **Repartir los puntos de [[Atributos]]** (33 en nivel 1).\n3. **Comprar ítems** en el [[Catálogo de ítems]] o pedirle al GM lo que quieras usar, y **equiparlos** ([[Equipo y ranuras]]).\n4. **Elegir habilidades** con tus puntos de [[Puntos de Job|Job]]. Si te pinta, empezá por una de tu [[Clases|clase]].\n\n→ Guía completa: [[Crear un personaje]].\n\n## 3. Conocé tu Botonera\n[[La Botonera]] es tu control remoto: atacar, tirar stats, usar habilidades y consumibles, todo con un clic. La 🔍 al lado de cada botón te explica cómo se calcula.\n\n## 4. Mirá el mapa\nEn [[El mapa]] ves tu token. Lo arrastrás para moverte (en combate cuesta [[Nitros (No2)]]). Todo lo que tires aparece en [[La Mesa]], visible para todos.\n\n## 5. Tu primer combate\nCuando el GM pone el mapa en [[Modo narrativo y modo combate|modo combate]], tirás [[Iniciativa]], esperás tu turno y hacés lo tuyo: mover, atacar, usar una habilidad. Cuando terminás, [[Mantenimiento|pasa el turno]]. → [[Un turno de ejemplo]].\n\n> [!tip] Lo más importante\n> No hace falta memorizar nada. Los botones hacen las cuentas y la 🔍 te dice por qué. Y si algo no cierra, recordá la [[La esencia del Rol Pintoísta|esencia]]: la mesa decide."
+  },
+  {
+   "id": "un-turno-de-ejemplo",
+   "titulo": "Un turno de ejemplo",
+   "alias": [
+    "Ejemplo de turno",
+    "Ejemplo de combate"
+   ],
+   "tags": [
+    "empezar",
+    "combate",
+    "ejemplo"
+   ],
+   "estado": "borrador",
+   "capitulo": "empezar",
+   "cuerpo": "Seguimos a **Lía**, una guerrera de nivel 3 con una espada de [[Daño y Tipo de arma|Tipo 6]], contra un goblin.\n\n> [!example] El turno de Lía\n> **Antes del combate.** El GM pasa el mapa a modo combate. Todos tiran [[Iniciativa]]; Lía saca 9 y va segunda.\n>\n> **Le toca a Lía.** Empieza el turno con sus [[Nitros (No2)|Nitros]] llenos: su Agilidad es 6, así que tiene 6.\n> 1. **Se mueve** dos casilleros hacia el goblin: 2 Nitros → le quedan 4. En el mapa ve la ruta y confirma al soltar el token.\n> 2. **Ataca.** Es su primer ataque con la espada, así que cuesta Tipo ÷ 2 = 3 Nitros → le queda 1.\n> 3. **Tira [[Atacar|PdG]]** contra la Evasión del goblin. Gana.\n> 4. **Tira el daño:** 1d6 de la espada + su stat Daño (3). Sale 4 + 3 = 7.\n> 5. El goblin tiene [[Defensa]] 2: recibe 7 − 2 = **5 de daño** en su [[HP]].\n>\n> **Fin del turno.** Con 1 Nitro no le alcanza para otro ataque (el segundo cuesta el Tipo completo: 6). Lo guarda, o lo gasta en un paso más. Cuando todos actuaron viene el [[Mantenimiento]]: sus Nitros se recargan solos.\n\n## Qué mirar de este ejemplo\n- **Cada cosa cuesta [[Costos en Nitros|Nitros]]**: mover, atacar, equipar, usar un ítem.\n- **Atacar es una tirada contra otra**: [[Tirada enfrentada]].\n- **El daño se resta de la Defensa** antes de llegar a la vida.\n- Todas las tiradas quedan en [[La Mesa]] para que nadie dude.\n\n> [!question] A confirmar\n> Cuando un ataque no alcanza en Nitros, la ficha solo *avisa* y deja hacerlo \"de cualquier modo\". ¿El manual debería decir que en mesa **no se puede**, o que queda a criterio del GM?"
+  },
+  {
+   "id": "filosofia-del-mundo",
+   "titulo": "Filosofía del mundo",
+   "alias": [
+    "Principio de absurdidad",
+    "Absurdo con coherencia",
+    "Tono",
+    "Frase guía"
+   ],
+   "tags": [
+    "mundo",
+    "filosofía"
+   ],
+   "estado": "borrador",
+   "capitulo": "mundo",
+   "cuerpo": "El Rol Pintoísta es un universo donde **lo absurdo es lo normal**. Fantasía medieval, cyberpunk, steampunk, ópera espacial, folklore y magia conviven en la misma mesa. No hay una estética dominante, un único período histórico ni una tecnología que mande: hay una única forma de estar todos representados bajo la misma lógica interna.\n\n## Principio de absurdidad\nLas combinaciones inesperadas definen al juego. Pero **absurdo no es sinónimo de azar**: cada elemento disparatado tiene que sostenerse con lógica propia. Es la misma fórmula del [[Catálogo de ítems]]: una gorra de policía federal, unas ojotas o una tapa de tacho de basura como escudo conviven con ítems \"serios\" bajo las mismas reglas.\n\n> [!example] Absurdo con lógica\n> Una *Tapa de tacho de basura* es un escudo de [[Rareza|Común]]: defiende poco, resiste críticos bajos y a nadie le sorprende. Un *Casco de moto vintage pintado a mano* protege, pero te achica la Evasión. Lo raro está en el objeto; lo coherente, en cómo funciona.\n\n## Diversidad\nCada civilización, cultura o facción puede tener su propia tecnología, religión, ornamentación, oficios y materiales. **La diversidad es la norma esperada**, no la excepción.\n\n## Frase guía\n> Rol Pintoísta no tiene una estética dominante. Tiene una mirada propia. Cualquier objeto, criatura o personaje, sin importar su origen, pertenece al mismo universo si respeta ese principio: absurdidad y coherencia interna coexisten con naturalidad.\n\nVer también: [[Magia y tecnología]], [[La esencia del Rol Pintoísta]].\n\n> [!question] Estilo visual\n> Existe una guía de estilo para generar ilustraciones (pintura semirealista, luz cálida, composición centrada). Todavía no está en el manual. ¿Querés un apéndice de estilo visual cuando lleguen las ilustraciones de ítems?"
+  },
+  {
+   "id": "magia-y-tecnologia",
+   "titulo": "Magia y tecnología",
+   "alias": [
+    "Magia",
+    "Tecnología"
+   ],
+   "tags": [
+    "mundo"
+   ],
+   "estado": "borrador",
+   "capitulo": "mundo",
+   "cuerpo": "En este mundo **magia y tecnología tienen el mismo estatus**, tanto en la historia como en las reglas. Ninguna es \"más válida\" y pueden combinarse sin fricción: un rifle rúnico, una armadura biotecnológica encantada, un lanzallamas con grimorio.\n\n## Cómo se nota en las reglas\n- Lo mágico y lo tecnológico **usan los mismos recursos**: [[SP]] para las habilidades, [[Nitros (No2)]] para actuar.\n- El atributo [[Especial]] es el \"motor\" de los hechizos (SP, PdG.Mg, [[Resistencias|Res.Mt]]), pero nada te impide que una pistola de chispa —un arma de [[Ataques a distancia|rango]]— use Destreza como cualquier otra.\n- Un objeto puede mezclar los dos mundos: en el [[Catálogo de ítems]] hay ítems de \"ciencia\" con efectos de \"magia\" y viceversa.\n\n> [!tip] Para el GM\n> No hace falta justificar por qué una armadura de plasma convive con un báculo de hielo. Alcanza con que **el objeto funcione con coherencia** una vez que existe."
+  },
+  {
+   "id": "piratas-en-el-espacio",
+   "titulo": "Piratas en el espacio",
+   "alias": [
+    "Campaña actual",
+    "Campaña"
+   ],
+   "tags": [
+    "mundo",
+    "campaña"
+   ],
+   "estado": "pendiente",
+   "capitulo": "mundo",
+   "cuerpo": "**Piratas en el espacio** es la campaña que juega hoy el grupo. Es importante no confundirla con el sistema:\n\n| | Qué es |\n|---|---|\n| **Rol Pintoísta** | El *sistema* de reglas y las herramientas (esto que estás leyendo). |\n| **Piratas en el espacio** | Una *campaña* que se juega con ese sistema. |\n\nCada partida en [[Inicio y partidas|el sitio]] es una campaña distinta: sus personajes, mapas y tiendas no se mezclan con los de otra.\n\n> [!question] Ambientación\n> Todavía no hay una nota de mundo: geografía, facciones, tono de la campaña, reglas de la casa. Completar cuando esté definido."
+  },
+  {
+   "id": "crear-un-personaje",
+   "titulo": "Crear un personaje",
+   "alias": [
+    "Creación de personaje",
+    "Nuevo personaje",
+    "Armar un personaje"
+   ],
+   "tags": [
+    "personaje",
+    "guía"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "Crear un personaje es, en el fondo, **subir de nivel 0 a 1**: repartís unos pools de puntos y elegís qué llevás puesto.\n\n## Primero, la idea\n**Vos elegís quién sos.** Un paladín de la piedad, una piedra consciente con un robot, un pendorcho galáctico telepático, un gusano pedorro, un asesino invocador de abejas, un sacerdote con escopeta de agua bendita: todo entra ([[La esencia del Rol Pintoísta]]). Los números vienen después y el GM te ayuda a armarlos.\n\n## Paso a paso\n1. **Identidad.** Nombre, raza, [[Clases|clase]], subclase y nivel (arrancás en 1). Podés subir una foto: la ficha te deja elegir qué recorte va en tu token del [[El mapa|mapa]].\n2. **Atributos.** Repartí **33 puntos** entre los cinco [[Atributos]] (mínimo 3 cada uno). → [[Niveles y puntos]]\n3. **Job.** Tenés **3 puntos de [[Puntos de Job|Job]]** para comprar habilidades y pasivas. → [[Habilidades]], [[Pasivas]]\n4. **Inteligencia.** Se calcula sola (6 al crear): es tu presupuesto para [[Inteligencia y habilidades sociales|habilidades sociales]].\n5. **Equipo.** Comprá o pedí ítems del [[Catálogo de ítems]] y [[Equipo y ranuras|equipalos]]. El GM te da tu [[DDE]] inicial.\n6. **Historia.** Un nombre, un motivo, una manía. Es puramente narrativo… y es lo más divertido.\n\n> [!tip] Empezá simple\n> Un personaje divertido cabe en dos líneas (\"guerrera lenta que se cree elegante\"). Los números vienen solos: no hace falta optimizar antes de jugar.\n\n## Guardado\nLa ficha **se guarda sola** en la partida. Además podés bajar un respaldo (💾), ver [[Respaldo de la partida]].\n\n> [!question] Pasos extra\n> ¿Hay pasos más allá de repartir puntos y elegir equipo (elegir trasfondo, profesión inicial, rasgos de raza)? ¿Las razas dan algún bono? Hoy la raza es solo un texto.\n\n> [!question] Límites al repartir\n> ¿Hay un máximo por atributo al crear? ¿El costo de subir un atributo es siempre 1 punto = 1 stat? Hoy la ficha no pone tope."
+  },
+  {
+   "id": "atributos",
+   "titulo": "Atributos",
+   "alias": [
+    "Atributos primarios",
+    "Stats primarios",
+    "Atributos principales"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "personaje",
+   "cuerpo": "Todo personaje tiene **cinco atributos**. Son el \"esqueleto\" del personaje: de cada uno se desprenden varios [[Stats derivados]] (los números que efectivamente se tiran).\n\n| Atributo | Abrev. | De él salen |\n|---|---|---|\n| [[Fuerza]] | FUE | [[Daño y Tipo de arma\\|Daño]], [[Bloqueo]], [[Carga máxima]] |\n| [[Constitución]] | CON | [[HP]] máximo, [[Resistencias\\|Res. Mágica y Res. CC]] |\n| [[Especial]] | ESP | [[SP]], PdG.Mg, Res. Mental, Rango de casteo |\n| [[Destreza]] | DES | [[Atacar\\|PdG]], [[Golpe crítico\\|Crítico]], [[Parry]], [[Ataques a distancia\\|Rango]] |\n| [[Agilidad]] | AGL | [[Evasión]], [[Iniciativa]], [[Nitros (No2)]] |\n\nCada atributo, además, cambia el **dado** que tirás: ver [[Cómo se tira un stat]].\n\n> [!info] Un sexto número: Inteligencia\n> No se reparte como los cinco: es un presupuesto aparte para lo social. → [[Inteligencia y habilidades sociales]]\n\n> [!warning] Ojo: \"Especial\" antes se llamaba \"Inteligencia\"\n> Cambió de nombre para liberar \"Inteligencia\" para otra cosa. Si ves \"Int\" en material viejo, es **Especial**."
+  },
+  {
+   "id": "fuerza",
+   "titulo": "Fuerza",
+   "alias": [
+    "FUE",
+    "Fue"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "La potencia física. De ella salen:\n\n- **Daño (Dmg):** se suma al dado del arma al [[Atacar|conectar un golpe]].\n- **[[Bloqueo]]:** la segunda tirada de una defensa exitosa con [[Parry]].\n- **[[Carga máxima]] (Crg.Max):** cuánto equipo podés llevar puesto sin penalidad.\n\n> [!tip] Cuándo conviene\n> Si tu personaje va a pegar fuerte con armas cuerpo a cuerpo, cargar armadura pesada o pararse delante de todos."
+  },
+  {
+   "id": "constitucion",
+   "titulo": "Constitución",
+   "alias": [
+    "CON",
+    "Con"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "personaje",
+   "cuerpo": "La resistencia del cuerpo.\n\n- **[[HP]] máximo = Constitución × 5.**\n- **Res. Mágica** y **Res. CC** (*Crowd Control*): ver [[Resistencias]].\n\nCambiar tu Constitución cambia tu HP máximo: si estabas con la vida llena, sube con él; si no, nunca te cura de más."
+  },
+  {
+   "id": "especial",
+   "titulo": "Especial",
+   "alias": [
+    "ESP",
+    "Esp",
+    "Especial (atributo)"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "personaje",
+   "cuerpo": "El atributo de lo **mágico y lo extraño** (antes \"Inteligencia\"). De él salen:\n\n- **[[SP]] = Especial × 3**: el \"mana\" para tus habilidades.\n- **PdG.Mg:** la \"probabilidad de golpe\" de los hechizos, en paralelo al PdG físico.\n- **Res. Mental** ([[Resistencias]]).\n- **Rango de casteo:** hasta dónde llegan tus hechizos.\n\n> [!warning] No confundir con SP\n> **Especial** es el atributo (ESP). **SP** (*Special Power*) es el recurso que se gasta. Siempre se escribe \"SP\", nunca \"Esp\"."
+  },
+  {
+   "id": "destreza",
+   "titulo": "Destreza",
+   "alias": [
+    "DES",
+    "Des"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "La precisión y la técnica. De ella salen:\n\n- **PdG (Probabilidad de Golpe):** lo que tirás para conectar un [[Atacar|ataque]].\n- **[[Golpe crítico|Crítico (%)]]:** tu chance de crítico.\n- **[[Parry]]:** la alternativa a la [[Evasión]] para defenderte con tu arma.\n- **Rng (Rango):** hasta dónde llegan tus [[Ataques a distancia]]."
+  },
+  {
+   "id": "agilidad",
+   "titulo": "Agilidad",
+   "alias": [
+    "AGL",
+    "Agi",
+    "Agl"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "personaje",
+   "cuerpo": "La velocidad y los reflejos. De ella salen:\n\n- **[[Evasión]] (Eva):** esquivar un ataque.\n- **[[Iniciativa]] (Ini):** el orden en que actuás en combate.\n- **[[Nitros (No2)]]:** **igual a tu Agilidad**. Es el recurso que paga *todo* lo que hacés en tu turno: moverte, atacar, usar ítems.\n\n> [!info] Por eso Agilidad es clave\n> Más Agilidad = más Nitros = más cosas por turno. Es el atributo que más cambia cuánto podés hacer en un combate."
+  },
+  {
+   "id": "stats-derivados",
+   "titulo": "Stats derivados",
+   "alias": [
+    "Derivados",
+    "Stats secundarios",
+    "Secundarios",
+    "Estadísticas"
+   ],
+   "tags": [
+    "personaje",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "De cada [[Atributos|atributo]] se desprenden varios **stats derivados**. Todos son *variables*: los cambian el equipo, las habilidades, los estados y los consumibles. No son un número fijo.\n\n| Stat | Sale de | Para qué |\n|---|---|---|\n| Hp.Max | [[Constitución]] × 5 | Tu vida máxima ([[HP]]) |\n| Res.Mg · Res.CC | Constitución | [[Resistencias]] |\n| Dmg | [[Fuerza]] | Suma al [[Daño y Tipo de arma\\|daño]] |\n| Bloqueo | Fuerza | Segunda tirada de la defensa ([[Bloqueo]]) |\n| Crg.Max | Fuerza | [[Carga máxima]] |\n| Eva | [[Agilidad]] | [[Evasión]] |\n| Ini | Agilidad | [[Iniciativa]] |\n| No2 | Agilidad | [[Nitros (No2)]] |\n| PdG | [[Destreza]] | [[Atacar]] |\n| Crit | Destreza | [[Golpe crítico]] |\n| Parry | Destreza | [[Parry]] |\n| Rng | Destreza | [[Ataques a distancia]] |\n| SP | [[Especial]] × 3 | [[SP]] |\n| PdG.Mg · Res.Mt · Rango de casteo | Especial | Hechizos |\n\n## Stats sin atributo \"padre\"\n- **[[Defensa]] (Def):** viene del equipo, de habilidades o de efectos. Resta al daño físico.\n- **Resistencia a crítico** (por [[Daño y Tipo de arma|Tipo]] de arma: 4, 6, 8, 10, 12): ver [[Resistencia a crítico]].\n- **SP Regen:** los [[SP]] que recuperás en cada [[Mantenimiento]] (por defecto, 0).\n\n> [!tip] Dónde ver de dónde sale cada número\n> En la ficha, pasá el mouse por un stat: te dice **qué atributo, qué ítem y qué estado** lo modifican. Y la 🔍 de la [[La Botonera|Botonera]] lo desglosa.\n\n> [!question] Wellness\n> Aparece en el diseño original como stat sin padre. ¿De qué atributo deriva? ¿Existe todavía?"
+  },
+  {
+   "id": "niveles-y-puntos",
+   "titulo": "Niveles y puntos",
+   "alias": [
+    "Subir de nivel",
+    "Nivel",
+    "Puntos de atributo",
+    "Experiencia"
+   ],
+   "tags": [
+    "personaje",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "Se juega con **niveles**. Cada nivel te da tres pools de puntos, que se reciben *en cada subida*:\n\n| Qué | En nivel 1 | Por cada nivel más |\n|---|---|---|\n| Puntos de [[Atributos\\|atributo]] | **33** (mínimo 3 por atributo) | **+3** |\n| Puntos de [[Puntos de Job\\|Job]] | **3** | **+3** |\n| [[Inteligencia y habilidades sociales\\|Inteligencia]] | **6** | **+3** |\n\n> [!example] Un personaje de nivel 4\n> Repartió 33 + 3 × 3 = **42 puntos de atributo**, tiene 3 + 9 = **12 de Job** y 6 + 9 = **15 de Inteligencia**.\n\n## Subir de nivel\nCuando el GM lo decide, subís de nivel y repartís los nuevos puntos como quieras. Los **recursos siguen a su atributo**: si subís Constitución, tu [[HP]] máximo sube y, si estabas lleno, tu vida sube con él.\n\n> [!question] Experiencia\n> La ficha tiene un contador de Exp, pero el manual todavía no dice **cuánta Exp hace falta por nivel** ni cómo se gana. ¿Hay tabla, o el GM decide cuándo se sube de nivel (más en el espíritu [[La esencia del Rol Pintoísta|sandbox]])?\n\n> [!question] Reparto de los +3\n> ¿Los 3 puntos por nivel se reparten libremente entre los cinco atributos, o hay alguna restricción (por ejemplo, no más de 1 por atributo por nivel)?"
+  },
+  {
+   "id": "puntos-de-job",
+   "titulo": "Puntos de Job",
+   "alias": [
+    "Job",
+    "Puntos de habilidad",
+    "Jobs"
+   ],
+   "tags": [
+    "personaje",
+    "habilidades"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "Los **puntos de Job** son la moneda con la que \"comprás\" las **habilidades y pasivas** de tu personaje. Son independientes de los puntos de atributo.\n\n- **Nivel 1:** 3 puntos. **Por nivel:** +3.\n- Una habilidad **de clase** (prefabricada, de la [[Clases|clase]] que sea) cuesta **1 punto**.\n- Una habilidad **custom** (inventada de cero) cuesta **2 puntos**.\n- Una [[Pasivas|pasiva]] cuesta, por defecto, **1 punto** (algunas del catálogo cuestan más).\n\n> [!example] Un personaje de nivel 1\n> Con 3 puntos de Job puede llevarse, por ejemplo, tres skills de clase; o una skill de clase + una custom (1 + 2).\n\nEn la ficha, el contador de Job (⭐ **Exp y Job** en el dock) te muestra cuánto gastaste y cuánto te queda; al pasar el mouse ves en qué se fue cada punto.\n\n> [!question] Requisitos y árbol\n> ¿Una habilidad puede tener requisitos (nivel, otra habilidad previa) o es compra libre mientras haya puntos? Hoy es compra libre."
+  },
+  {
+   "id": "clases",
+   "titulo": "Clases",
+   "alias": [
+    "Clase",
+    "Profesión",
+    "Profesiones",
+    "Arquetipos"
+   ],
+   "tags": [
+    "personaje",
+    "clases",
+    "habilidades"
+   ],
+   "estado": "borrador",
+   "capitulo": "personaje",
+   "cuerpo": "Al armar el personaje elegís **una clase**. La clase es un *pool de habilidades sugeridas*, no una jaula: **cualquiera puede comprar habilidades de cualquier clase** por el mismo precio (1 punto de [[Puntos de Job|Job]]).\n\n## Las siete clases\n| Clase | En una frase |\n|---|---|\n| [[Warrior]] | Guerrero cuerpo a cuerpo: golpes potentes, cargas y saltos |\n| [[Asalto]] | Ágil y letal: velocidad, sigilo, críticos y venenos |\n| [[Tanque]] | El que aguanta: defensa, cura propia y control de tropa |\n| [[Mago]] | Hechizos de daño y control, movidos por Especial |\n| [[Shooter]] | Tirador: puntería, marcar objetivos, ráfagas |\n| [[Support]] | Apoyo: curas, buffs y ayuda al equipo |\n| [[Debuffer]] | Maldiciones, venenos y control |\n\n## Cómo se usan en la ficha\nEn **\"+ Habilidad\"** elegís *De clase* (eligiendo la clase y la skill) o *Custom*. Copiar una skill de clase te la deja lista con sus costos y su automatización, si la tiene. → [[Habilidades]]\n\n> [!info] Clase como texto\n> En la ficha la clase es un texto libre: no te limita ni te da bonos automáticos. Es una etiqueta para vos y el grupo."
+  },
+  {
+   "id": "como-se-tira-un-stat",
+   "titulo": "Cómo se tira un stat",
+   "alias": [
+    "Tirada de stat",
+    "Dado según stat",
+    "Dados",
+    "Tirar un stat",
+    "Valores impares"
+   ],
+   "tags": [
+    "tiradas",
+    "reglas-base",
+    "dados"
+   ],
+   "estado": "confirmado",
+   "capitulo": "tiradas",
+   "cuerpo": "La regla de oro del sistema: **el valor de un stat define qué dado se tira.**\n\n> [!example] La idea\n> **Evasión 6 → tirás 1d6.** Cuanto más alto el stat, más grande el dado (y más alto tu resultado promedio).\n\n## Los dados\nEl sistema usa los dados clásicos de rol: **d4, d6, d8, d10, d12, d20 y d100**. Cuando el stat es chico (1, 2 o 3), la ficha tira un dado \"imaginario\" del tamaño exacto (por ejemplo 1d3): hay que tirarlo con el 🎲 de la Mesa.\n\n## Valores impares: dado anterior +1\nSi el valor es impar, se tira el dado del valor anterior y se **suma 1**.\n\n| Stat | Tirada | | Stat | Tirada |\n|---|---|---|---|---|\n| 4 | 1d4 | | 9 | 1d8+1 |\n| 5 | 1d4+1 | | 10 | 1d10 |\n| 6 | 1d6 | | 11 | 1d10+1 |\n| 7 | 1d6+1 | | 12 | 1d12 |\n| 8 | 1d8 | | 13 | 1d12+1 |\n\n## Valores altos: combinaciones\nA partir de 14 no hay un dado único, así que se **combinan dados que sumen el valor en caras**, siempre con **la menor cantidad de dados posible** y, entre opciones parecidas, **la más pareja**.\n\n| Stat | Tirada | | Stat | Tirada |\n|---|---|---|---|---|\n| 14 | 1d6+1d8 | | 22 | 1d10+1d12 |\n| 15 | 1d6+1d8+1 | | 24 | 2d12 |\n| 16 | 2d8 | | 26 | 1d6+1d20 |\n| 18 | 1d8+1d10 | | 30 | 1d10+1d20 |\n| 20 | 1d20 | | 40 | 2d20 |\n| 21 | 1d20+1 | | 100 | 1d100 |\n\n> [!tip] No hace falta calcularlo\n> La ficha lo hace por vos: al apretar un botón de tirada arma la fórmula sola, y la 🔍 al lado te muestra qué dados salieron y de dónde. También podés tirar lo que quieras con la grilla 🎲 de la [[La Mesa|Mesa]].\n\n> [!info] Esto NO aplica al daño del arma\n> El dado de un arma depende de su [[Daño y Tipo de arma|Tipo]] (4, 6, 8, 10, 12) y su peso, no del valor de un stat.\n\n> [!question] Stat en cero o negativo\n> ¿Qué pasa con un stat en 0 o negativo (por una penalidad)? Hoy la ficha no tira nada. ¿Se debería tirar un mínimo, o directamente no hay tirada?"
+  },
+  {
+   "id": "tirada-enfrentada",
+   "titulo": "Tirada enfrentada",
+   "alias": [
+    "Tiradas enfrentadas",
+    "Vs",
+    "Enfrentar",
+    "Tirada vs tirada"
+   ],
+   "tags": [
+    "tiradas",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "tiradas",
+   "cuerpo": "La mecánica base del juego es la **tirada enfrentada**: una parte tira a favor de una acción y la otra tira *en contra* para evitarla o resistirla. **El que saca más, gana.** Cada uno tira con el dado que le toca según su stat ([[Cómo se tira un stat]]).\n\n| Situación | Tira uno | Tira el otro |\n|---|---|---|\n| Un ataque | [[Atacar\\|PdG]] del atacante | [[Evasión]] o [[Parry]] del defensor |\n| Un hechizo o maldición | Especial del que lo lanza | [[Resistencias\\|Res. Mental o Mágica]] del objetivo |\n| Detectar a alguien oculto | Especial del que vigila | Destreza del que se esconde (ver [[Campo de visión]]) |\n| Un taunt | Especial + 1 | Especial del objetivo |\n\n> [!warning] Ojo con los nombres\n> \"Defensa\" a secas es un stat que resta daño ([[Defensa]]). Lo que tira el defensor contra un ataque es su [[Evasión]] o su [[Parry]].\n\n> [!question] ¿Es el patrón universal?\n> ¿Todas las resoluciones son \"dos tiradas, gana la mayor\", o hay también tiradas contra una dificultad fija (por ejemplo, forzar una cerradura)? ¿Cómo se resuelve un **empate**? ¿Hay márgenes o grados de éxito?"
+  },
+  {
+   "id": "golpe-critico",
+   "titulo": "Golpe crítico",
+   "alias": [
+    "Crítico",
+    "Críticos",
+    "Crit",
+    "Crit%"
+   ],
+   "tags": [
+    "tiradas",
+    "combate"
+   ],
+   "estado": "pendiente",
+   "capitulo": "tiradas",
+   "cuerpo": "Un **golpe crítico** es un ataque especialmente certero. Tu chance viene del stat **Crítico (Crit)**, que sale de [[Destreza]] y se modifica con equipo y habilidades (algunas armas suman \"Crítico +1\", \"+2\").\n\n## Qué cambia si conectás un crítico\n- **Ignora la [[Defensa]]**: el daño pasa íntegro.\n- Algunas habilidades tienen un efecto distinto si el golpe es crítico (en la descripción figura como *\"Critical Matters\"*).\n- Algunos ítems y estados lo anulan: el estado [[Invulnerable]] bloquea cualquier daño, y \"Blindado\" hace inmune a críticos.\n\n## Cómo se protege uno\nCon la [[Resistencia a crítico]]: se acumula en la armadura y se aplica según el [[Daño y Tipo de arma|Tipo]] del arma atacante.\n\n> [!question] Cómo funciona exactamente\n> Este sistema está **en pausa**: falta definir cómo se determina un crítico más allá del porcentaje, qué efecto tiene exactamente al conectar y cómo se aplica la Resistencia a crítico por tipo. Todo lo de esta nota es lo que hoy hace la ficha; se ajusta cuando esté cerrado."
+  },
+  {
+   "id": "resistencia-a-critico",
+   "titulo": "Resistencia a crítico",
+   "alias": [
+    "Resistencia a críticos",
+    "Res. crítico",
+    "Res.Crit",
+    "Reduce críticos"
+   ],
+   "tags": [
+    "tiradas",
+    "equipo",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "tiradas",
+   "cuerpo": "La **resistencia a crítico** es un stat que da la armadura (y otros ítems) para **reducir los golpes críticos** de un cierto [[Daño y Tipo de arma|Tipo]] de arma. Hay cinco, una por Tipo: **4, 6, 8, 10 y 12**.\n\n> [!example] En un ítem\n> \"Resistencia a críticos tipo 4 y 6: +1\" significa que, contra armas de Tipo 4 y de Tipo 6, tu resistencia vale +1.\n\n## Convención de diseño del catálogo\nPara que las armaduras no vuelvan a un personaje inmune, el [[Catálogo de ítems]] sigue una regla suave según la [[Rareza]]:\n\n| Rareza | Resistencias que suele dar |\n|---|---|\n| Común | Tipo 4 y 6 |\n| Buena Calidad | Hasta Tipo 8 |\n| Raro | Hasta Tipo 8 (Tipo 10 solo en armadura pesada) |\n| Excepcional | Hasta Tipo 10 |\n| Legendario | Hasta Tipo 12 (de a +1) |\n\n**Los Tipos altos (10 y 12) son raros** y valen de a +1. Hay excepciones a propósito (algunos ítems míticos dan más). Es una guía, no una ley: ver [[La esencia del Rol Pintoísta]].\n\n> [!warning] Armadura arruinada\n> El estado [[Armadura rota|Armadura arruinada]] anula lo que aportan las armaduras a la Defensa **y** a la resistencia a crítico.\n\nVer también: [[Golpe crítico]]."
+  },
+  {
+   "id": "la-mesa",
+   "titulo": "La Mesa",
+   "alias": [
+    "Mesa de tiradas",
+    "Chat de tiradas",
+    "Grilla de dados",
+    "Dados 3D",
+    "Historial de tiradas"
+   ],
+   "tags": [
+    "tiradas",
+    "herramientas",
+    "dados"
+   ],
+   "estado": "confirmado",
+   "capitulo": "tiradas",
+   "cuerpo": "**La Mesa** es la cajita de tiradas compartida: cada dado que tirás desde la [[La ficha|ficha]], la [[La Botonera|Botonera]], [[GM Tools]] o [[El mapa|el mapa]] aparece ahí, **en vivo, para todos**. Es el \"chat de tiradas\": nadie duda de qué salió.\n\n## Qué ves en una tirada\nQuién tiró, qué y con qué fórmula, los dados, y el total. Los [[Efectos al golpear]] de un arma aparecen en una línea resaltada, y las alertas del GM (por ejemplo, [[Ocultar y revelar|el ojo 👁]]) en rojo.\n\n## Tirar dados libres\nEl botón **🎲 Dados** abre una **grilla estilo Roll20**: D4, D6, D8, D10, D12, D20 y D100, de 1 a 6 dados. Un clic = una tirada publicada en la Mesa.\n\n## Dados 3D\nCada tirada nueva hace rodar **dados 3D** sobre tu pantalla con el resultado real (podés apagarlos o elegir estilo desde la ⚙ o \"Personalización\"). Se superponen las tiradas de varios jugadores, cada una con el estilo de dados de quien la hizo.\n\n## Limpieza\n- El GM puede **borrar todo el historial** (🗑).\n- Además, lo que tenga **más de 48 horas** se borra solo cuando el GM abre una herramienta.\n- El historial es solo de la sesión: si querés guardar algo, hacé un [[Respaldo de la partida|respaldo]].\n\n> [!info] Confianza entre amigos\n> Los dados se tiran en el navegador de cada uno. El juego asume un grupo de confianza: nadie va a \"tocar el código\" para mejorar su tirada."
+  },
+  {
+   "id": "afortunado",
+   "titulo": "Afortunado",
+   "alias": [
+    "Ventaja",
+    "Tirar dos veces"
+   ],
+   "tags": [
+    "tiradas",
+    "estado"
+   ],
+   "estado": "confirmado",
+   "capitulo": "tiradas",
+   "cuerpo": "**Afortunado** es un [[Estados alterados|estado]] (buff): **toda tirada de PdG, Parry o Evasión se hace dos veces y te quedás con la mejor.** Dura unos turnos (o todo el combate, si viene de un pergamino). Es lo más parecido a una \"ventaja\" del sistema.\n\n> [!question] Wildcards\n> En diseños anteriores existían los **Wildcards**: un recurso diario para **repetir una tirada**. Hoy la ficha no los tiene. ¿Se retoman? ¿Cuántos por día, se acumulan, y se puede repetir la tirada de otro?"
+  },
+  {
+   "id": "hp",
+   "titulo": "HP",
+   "alias": [
+    "Vida",
+    "Puntos de vida",
+    "Hp.Max",
+    "Salud",
+    "Hit points"
+   ],
+   "tags": [
+    "recursos",
+    "combate"
+   ],
+   "estado": "confirmado",
+   "capitulo": "recursos",
+   "cuerpo": "**HP** (*Health Points*) es tu vida. La barra **roja** de tu ficha y de tu token en el mapa.\n\n- **HP máximo = [[Constitución]] × 5.**\n- Cuando te pegan, el daño **se resta de tu HP** (después de restar tu [[Defensa]]).\n- Cuando llegás a **0**, entrás en estado de [[Muerte]].\n- Podés recuperar HP con consumibles, habilidades que curan (como la *Recuperación* del [[Tanque]]) y la [[Pasivas|pasiva]] *Regeneración*, que cura algo en cada [[Mantenimiento]].\n\n## Cómo se toca tu vida en la mesa\nEn la ficha (y desde el círculo rojo del token en [[El mapa|el mapa]]) escribís un número para fijarla, o **+5 / −3** para sumar o restar. **El daño recibido lo aplicás vos en tu propia ficha.** No pasa de tu máximo ni baja de 0.\n\n> [!info] Los jugadores no ven los números de los enemigos\n> De un [[Creeps|creep]] los jugadores solo ven **cuán llena está la barra** (un porcentaje), no los HP exactos. El GM sí los ve.\n\n> [!question] Descanso\n> ¿Cómo se recupera HP fuera de combate? ¿Existe un \"descanso largo/corto\" formal, o queda a criterio narrativo del GM?"
+  },
+  {
+   "id": "sp",
+   "titulo": "SP",
+   "alias": [
+    "Special Power",
+    "Poder especial",
+    "Bonos",
+    "Mana",
+    "Regen de SP",
+    "SP Regen"
+   ],
+   "tags": [
+    "recursos",
+    "habilidades"
+   ],
+   "estado": "confirmado",
+   "capitulo": "recursos",
+   "cuerpo": "**SP** (*Special Power*) es el recurso de tus **habilidades**: funciona como el *mana* clásico de los JRPG. La barra **azul** de tu ficha y de tu token.\n\n- **SP máximo = [[Especial]] × 3.**\n- Cada [[Habilidades|habilidad]] cuesta cierta cantidad de SP (algunas, un costo variable *X*).\n- **No se recarga entero cada turno**: se va consumiendo a lo largo de la pelea.\n- Cada [[Mantenimiento]] recuperás tu **SP Regen** (por defecto es **0**: los personajes no regeneran SP solos). Lo dan habilidades, la [[Pasivas|pasiva]] *Recuperación mental*, consumibles y ciertos ítems.\n- También se recupera con **descanso**.\n\n> [!warning] SP no es \"Esp\"\n> **Especial** (ESP) es el atributo; **SP** es este recurso. Siempre \"SP\".\n\n> [!info] Antes se llamaba \"Bonos\"\n> Hasta la Iteración 2 este recurso se llamaba **Bonos**. Si lo ves en material viejo, es lo mismo que SP. → [[Historial de versiones]]\n\n## El sobrepeso lo baja\nSi el peso de tu equipo supera tu [[Carga máxima]], **por cada punto que te pasás perdés 1 de SP máximo**.\n\n> [!question] Piso del sobrepeso\n> ¿Se puede llegar a 0 de SP por sobrepeso? ¿La penalidad afecta solo al SP, o también al movimiento?"
+  },
+  {
+   "id": "nitros-no2",
+   "titulo": "Nitros (No2)",
+   "alias": [
+    "No2",
+    "Nitro",
+    "Nitros",
+    "Acciones",
+    "Movimiento"
+   ],
+   "tags": [
+    "recursos",
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "confirmado",
+   "capitulo": "recursos",
+   "cuerpo": "**Nitros** (se abrevia **No2**) es tu **energía de turno**: lo que gastás para *moverte* y *hacer cosas* durante tu turno.\n\n- **Nitros máximos = [[Agilidad]]** (más o menos lo que den el equipo, las habilidades o los estados).\n- **Se recargan al máximo en cada [[Mantenimiento]].**\n- No hay un tope absoluto: solo tu Agilidad y sus modificadores.\n- Reemplazan a las viejas \"3 acciones por turno\" y al stat Movimiento: hoy **mover y actuar salen del mismo bolsillo**.\n\n> [!example] Cuántas cosas hacés por turno\n> Con Agilidad 6 tenés 6 Nitros. Podés, por ejemplo: moverte 2 casilleros (2) + un ataque con arma Tipo 6 (3) + usar una poción del cinturón (1). Total: 6. Ni una cosa más.\n\n## Qué pasa si no te alcanza\nLa ficha **te avisa** y te da a elegir: cancelar, o \"**realizar de cualquier modo**\" (queda una línea roja en la [[La Mesa|Mesa]] para que todos lo sepan). En el mapa, moverte sin Nitros suficientes se bloquea con un aviso; para eso existe el botón **🦶 Mover libre** (para movimientos que el GM decide que no cuestan).\n\n## Tabla de costos\nTodo lo que cuesta Nitros: [[Costos en Nitros]].\n\n> [!info] Los enemigos también gastan Nitros\n> Los [[Creeps|creeps]] y las [[Invocaciones]] tienen su propio No2 y pagan igual."
+  },
+  {
+   "id": "costos-en-nitros",
+   "titulo": "Costos en Nitros",
+   "alias": [
+    "Tabla de costos",
+    "Costo de acciones",
+    "Cuánto cuesta"
+   ],
+   "tags": [
+    "recursos",
+    "combate",
+    "tabla"
+   ],
+   "estado": "confirmado",
+   "capitulo": "recursos",
+   "cuerpo": "Todo lo que se paga con [[Nitros (No2)|Nitros]] en combate:\n\n| Actividad | Costo |\n|---|---|\n| Mover 1 casillero | **1** (2 con [[Rengo]]; no se puede con [[Inmovilizado]]) |\n| Girar el token 60° (cambiar hacia dónde mirás) | **1** por giro, solo en combate |\n| Ejecutar una [[Habilidades\\|habilidad]] | **1** por defecto; algunas cuestan más o tienen costo variable (X) |\n| Una habilidad \"de ataque\" | Lo que cuesta atacar con ese arma |\n| **Primer ataque con un arma en el turno** | **Tipo ÷ 2** (redondeado para arriba) |\n| **Segundo ataque en adelante, con la misma arma** | **Tipo** completo |\n| Usar un consumible del **cinturón** | **1** |\n| Usar un consumible de la **mochila** | **2** |\n| Equipar o desequipar un ítem (solo combate) | **1** (reemplazar uno por otro: 2) |\n\n> [!example] Ataques con distintas armas\n> Un arma de **Tipo 4**: primer ataque 2, segundo 4, tercero 4… Un arma de **Tipo 8**: primer ataque 4, los siguientes 8 cada uno. Con **dos armas** equipadas, **cada una tiene su propio primer ataque barato**.\n\n## Detalles útiles\n- El \"primer ataque barato\" **se recalcula cada turno nuevo**.\n- En [[Modo narrativo y modo combate|modo narrativo]] moverte, equiparte y girar **no cuestan nada**.\n- Flash ([[Habilidades]]) es la excepción: no cuesta Nitros y se puede usar en el turno de otro.\n- Si una habilidad no dice cuánto cuesta, cuesta **1** (o lo de un ataque, si está atada a uno).\n\n> [!question] Costo variable (X)\n> ¿El \"X\" de algunas habilidades tiene un tope (por ejemplo X ≤ Especial) o es libre según cada habilidad?"
+  },
+  {
+   "id": "mantenimiento",
+   "titulo": "Mantenimiento",
+   "alias": [
+    "Fase de mantenimiento",
+    "Fin de ronda",
+    "Mantenimiento general"
+   ],
+   "tags": [
+    "recursos",
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "recursos",
+   "cuerpo": "El **mantenimiento** es la fase que ocurre **cuando ya actuó el último del orden de turnos**, antes de que empiece una nueva ronda. Es **igual para todos**: jugadores, aliados y enemigos.\n\n## Qué pasa en el mantenimiento\n- **Tus [[Nitros (No2)|Nitros]] se recargan** al máximo, y vuelve tu \"primer ataque barato\".\n- **Recuperás SP** igual a tu *SP Regen* (si tenés), sin pasar del máximo. Ver [[SP]].\n- **Regeneración** y curación por turno ([[Regeneración]], pasivas).\n- **Veneno**, sangrado y otros daños por turno ([[Veneno]], [[Sangrado]]).\n- **Se descuentan los turnos** de cada [[Estados alterados|estado alterado]]: los que llegan a 0 se van.\n- Cuenta el plazo de la [[Muerte]] (5 mantenimientos).\n\nEn la ficha hay un botón de **Mantenimiento** y, en el mapa, el GM lo aplica para todos los tokens. La ficha **no cobra el mantenimiento dos veces**: si el GM mira tu ficha, no se aplica desde su lado.\n\n> [!question] Qué más pasa acá\n> - ¿Los turnos de los estados bajan en el mantenimiento general, o cuando le toca actuar a cada personaje?\n> - ¿Los cooldowns de habilidades bajan acá?"
+  },
+  {
+   "id": "estructura-de-un-combate",
+   "titulo": "Estructura de un combate",
+   "alias": [
+    "Combate",
+    "Turno",
+    "Ronda",
+    "Turnos",
+    "Estructura del turno",
+    "Orden de turnos"
+   ],
+   "tags": [
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Un combate se juega en **rondas**. Dentro de cada ronda, todos actúan de a uno, en un orden fijo.\n\n## Cómo arranca\n1. El GM pasa el mapa a [[Modo narrativo y modo combate|modo combate]].\n2. **Todos tiran [[Iniciativa]]** (un stat de [[Agilidad]]). El resultado define el **orden**, que se intercala libremente entre aliados y enemigos: es personaje por personaje, no por bando.\n3. Ese orden aparece como una lista flotante en el mapa (**Orden de turnos**, arriba a la izquierda), y el GM avanza con **▶ Siguiente**.\n\n## La ronda\n1. Cada uno actúa **en su turno**, en orden.\n2. Cuando actuó el último, viene el [[Mantenimiento]] (se recargan los [[Nitros (No2)|Nitros]], corren los estados, etc.).\n3. Empieza una **ronda nueva** desde el primero.\n\n## Tu turno\nEn tu turno gastás tus **Nitros** en lo que quieras: moverte, [[Atacar|atacar]], usar [[Habilidades|habilidades]] o ítems. No hay \"fase de movimiento\" separada: es todo del mismo bolsillo. Ver [[Costos en Nitros]].\n\n> [!tip] Tu turno, en tres preguntas\n> ¿Cuántos Nitros tengo? ¿Qué quiero lograr este turno? ¿Cómo lo pago?\n\n> [!info] Turnos de los enemigos\n> El GM maneja a los [[Creeps]] con las mismas reglas de recursos que vos. Puede **ocultar** filas del orden de turnos (por ejemplo, un enemigo sorpresa): ver [[Ocultar y revelar]].\n\n> [!question] Detalles de la iniciativa\n> - ¿Se **vuelve a tirar** la Iniciativa en cada ronda o el orden queda fijo todo el combate? (Hoy el valor de cada fila se puede editar a mano en cualquier momento.)\n> - ¿Cómo se resuelve un **empate**? (Hoy: queda el orden en que ya estaban.)"
+  },
+  {
+   "id": "iniciativa",
+   "titulo": "Iniciativa",
+   "alias": [
+    "Ini",
+    "Orden de iniciativa"
+   ],
+   "tags": [
+    "combate",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "La **Iniciativa** es un stat derivado de [[Agilidad]]. **Se tira al iniciar el combate** y define **el orden** en que actúa cada uno en las rondas ([[Estructura de un combate]]). El de mayor resultado actúa primero.\n\n- Se tira con el dado que le toca a tu stat: [[Cómo se tira un stat]].\n- Aparece en la lista **Orden de turnos** del mapa. Podés corregir tu propio valor si algo lo cambia a mitad de combate; el GM puede editar cualquier fila.\n- Algunos ítems dan Iniciativa (+1, +2…), y otros la restan.\n\n> [!warning] Ojo: es \"Ini\", no \"Nitros\"\n> La Iniciativa decide **cuándo** actuás. Los Nitros deciden **cuánto** podés hacer cuando te toca."
+  },
+  {
+   "id": "modo-narrativo-y-modo-combate",
+   "titulo": "Modo narrativo y modo combate",
+   "alias": [
+    "Modo combate",
+    "Modo narrativo",
+    "Narrativo",
+    "Switch de modo"
+   ],
+   "tags": [
+    "combate",
+    "mapa"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "El [[El mapa|mapa]] tiene dos modos, que el **GM** cambia con un switch arriba a la derecha y que **ven todos**:\n\n| Modo | Color | Qué cambia |\n|---|---|---|\n| **Narrativo** | 🟢 verde | Explorás y hablás. **Moverte, equiparte y girar no cuestan Nitros.** Las [[Inteligencia y habilidades sociales\\|habilidades sociales]] van arriba en tu [[La Botonera\\|Botonera]]. |\n| **Combate** | 🔴 rojo | Todo cuesta [[Nitros (No2)]]. Aparece el **Orden de turnos**. Las habilidades sociales pasan al final de la Botonera. |\n\n> [!tip] Cuándo cambiar\n> El GM cambia a combate cuando empieza la pelea y vuelve a narrativo cuando termina, para no andar contando Nitros mientras se explora o se charla."
+  },
+  {
+   "id": "atacar",
+   "titulo": "Atacar",
+   "alias": [
+    "Ataque",
+    "Ataque cuerpo a cuerpo",
+    "PdG",
+    "Probabilidad de golpe",
+    "Golpear"
+   ],
+   "tags": [
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Así se resuelve un ataque cuerpo a cuerpo estándar:\n\n1. **El atacante** paga los [[Nitros (No2)|Nitros]] del ataque ([[Costos en Nitros]]) y tira **PdG** (Probabilidad de Golpe, de [[Destreza]]).\n2. **El defensor elige** cómo defenderse: [[Evasión]] o [[Parry]] ([[Defenderse de un ataque]]).\n3. Es una [[Tirada enfrentada]]: si el atacante gana, **conecta**.\n4. El atacante tira el **daño**: los dados de su arma ([[Daño y Tipo de arma]]) **+ su stat Daño** ([[Fuerza]]).\n5. Al resultado se le **resta la [[Defensa]]** del objetivo. La diferencia se descuenta de su [[HP]].\n6. Si el golpe fue [[Golpe crítico|crítico]], se ignora la Defensa: el daño pasa entero.\n7. Si el arma tiene [[Efectos al golpear]], aparecen resaltados en la Mesa (y se tiran, si tienen porcentaje).\n\n> [!example] Con números\n> Lía ataca con una espada (1d6) y tiene Daño 3. Tira el dado: sale 4 → 4 + 3 = **7**. El goblin tiene Defensa 2 → pierde **5 HP**.\n\n## En la Botonera\nEl botón **Atacar** cobra los Nitros y tira PdG; **Daño** tira el daño del arma. Con dos armas, se **desdoblan** (uno por arma; cada una con su propio PdG si tiene modificador propio).\n\n> [!question] Detalles abiertos\n> - Si la Defensa es igual o mayor al daño, ¿no se pierde HP o hay un mínimo que siempre pasa (por ejemplo, 1)?\n> - Con daño Tipo 10/12 (explosivo) o ataques a varios objetivos, ¿cambia algo de esta secuencia?"
+  },
+  {
+   "id": "defenderse-de-un-ataque",
+   "titulo": "Defenderse de un ataque",
+   "alias": [
+    "Defensa activa",
+    "Defensa cuerpo a cuerpo",
+    "Evasión o Parry"
+   ],
+   "tags": [
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!question] Cadena Parry → Bloqueo\n> Hoy cada tirada es suelta y la resuelve la mesa. Falta definir: ¿el Bloqueo es *tu Bloqueo contra el del atacante*? ¿Qué pasa si ganás el Parry pero **perdés** el Bloqueo (¿pasa el golpe entero, reducido, algo intermedio)?\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?\n> - Los **escudos**, ¿suman a Parry, a Bloqueo o a ninguno? (El Parry *con escudo* todavía no está definido.)"
+  },
+  {
+   "id": "evasion",
+   "titulo": "Evasión",
+   "alias": [
+    "Eva",
+    "Esquivar",
+    "Esquiva"
+   ],
+   "tags": [
+    "combate",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "La **Evasión** es un stat de [[Agilidad]]. Cuando te atacan, podés **esquivar por completo**: tirás tu Evasión contra el PdG del atacante ([[Tirada enfrentada]]). Si ganás, **no te toca**.\n\n- Se tira con el dado que le toca: Evasión 6 → 1d6.\n- Tenerla alta te hace difícil de golpear, pero no te protege si te alcanzan: para eso está la [[Defensa]].\n- Algunos estados la cambian (por ejemplo, el estado [[Pajaritos]] la reduce a la mitad).\n- El estado [[Afortunado]] te deja tirarla dos veces y quedarte con la mejor.\n\nAlternativa: [[Parry]]."
+  },
+  {
+   "id": "parry",
+   "titulo": "Parry",
+   "alias": [
+    "Parada",
+    "Parar",
+    "Parry con arma"
+   ],
+   "tags": [
+    "combate",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** lo mismo que un *primer ataque* con esa arma (Tipo ÷ 2), sin importar cuántos ataques hiciste en tu turno.\n- Con **dos armas** equipadas, elegís con cuál parar.\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin arma:** el Parry cuesta lo que un ataque sin arma (valor provisorio).\n- Estados como [[Lisiado]] te bajan el Parry a la mitad.\n\n> [!question] Parry con escudo\n> Es distinto al Parry con arma y todavía no está definido su paso a paso: costo, qué se tira y con qué se suma."
+  },
+  {
+   "id": "bloqueo",
+   "titulo": "Bloqueo",
+   "alias": [
+    "Bloque",
+    "Bloquear",
+    "Bloqueo con arma"
+   ],
+   "tags": [
+    "combate",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se tira con tu stat Bloqueo **más el peso del arma** con la que hiciste el Parry.\n- Si tenés dos armas, se usa **la misma con la que hiciste el Parry** (no vuelve a preguntarte).\n- Sin arma, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
+  },
+  {
+   "id": "defensa",
+   "titulo": "Defensa",
+   "alias": [
+    "Def",
+    "Defensa (stat)",
+    "Armadura",
+    "Reducción de daño"
+   ],
+   "tags": [
+    "combate",
+    "stats"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "La **Defensa** (Def) es el stat que **reduce el daño físico** que recibís: al recibir un golpe se **resta tu Defensa del daño**, y la diferencia es lo que baja tu [[HP]].\n\n> [!example] Con números\n> Te pegan 7 y tenés Defensa 3 → recibís **4** de daño.\n\n- **No sale de ningún atributo**: la dan objetos equipables (armaduras, cascos, escudos…), pero también habilidades y estados (por ejemplo, la *Piel resistente* del [[Tanque]]).\n- **Los [[Golpe crítico|golpes críticos]] la ignoran por completo.**\n- Se reduce con [[Armadura rota|Romper armadura]] y se anula con [[Armadura rota|Armadura arruinada]].\n- Por eso no hace falta una tirada: es \"solo un número\".\n\n> [!warning] No confundir con la defensa activa\n> El stat **Defensa** resta daño. La *elección* de esquivar o parar es la [[Defenderse de un ataque|defensa activa]]."
+  },
+  {
+   "id": "dano-y-tipo-de-arma",
+   "titulo": "Daño y Tipo de arma",
+   "alias": [
+    "Tipo",
+    "Tipo de arma",
+    "Tipo de dado",
+    "Tipo de daño",
+    "Peso",
+    "Dado de daño",
+    "Dmg",
+    "Daño"
+   ],
+   "tags": [
+    "combate",
+    "equipo",
+    "reglas-base"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "Cada arma tiene un **Tipo** y un **Peso**. Con esos dos números sabés cuánto pega.\n\n- **Tipo** = las **caras del dado** que tira. Tipo 6 = d6. (\"Tipo de dado\" y \"Tipo de daño\" son **la misma cosa**.)\n- **Peso** = la **cantidad de dados**. Peso 3 con Tipo 6 = **3d6**.\n- A la tirada se le **suma tu stat Daño** ([[Fuerza]]), salvo en armas de rango.\n- También puede tener **daño fijo** (un +N que se suma siempre) y **daño amplificado** (dados extra que no suman peso).\n\n## Los cinco Tipos\n| Tipo | Es… | Ejemplos |\n|---|---|---|\n| **4** | Perforante | Daga, cuchillo, honda |\n| **6** | Cortante | Espada corta, katana, arco |\n| **8** | Cortante pesado / contundente liviano | Hacha, lanza, ballesta |\n| **10** | Contundente pesado | Maza, martillo |\n| **12** | Explosivo (excepcional) | Lanzallamas, martillo del Titán |\n\n> [!info] El piso es Tipo 4\n> Sin arma, se ataca como Tipo 4. (Antes la escala arrancaba en Tipo 2; hoy va **4, 6, 8, 10, 12**.)\n\n## Por qué importa el Tipo\n1. **Cuesta [[Costos en Nitros|Nitros]]**: el primer ataque cuesta Tipo ÷ 2; los siguientes, el Tipo completo. Armas pesadas = ataques caros.\n2. **Define la [[Resistencia a crítico]] que se aplica.**\n\nVer también: [[Armas]], [[Atacar]]."
+  },
+  {
+   "id": "ataques-a-distancia",
+   "titulo": "Ataques a distancia",
+   "alias": [
+    "Rango",
+    "Rng",
+    "Alcance",
+    "Arma de rango",
+    "Disparar",
+    "Reglas del tiro"
+   ],
+   "tags": [
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Hay dos conceptos parecidos que comparten el mismo stat (**Rng**, de [[Destreza]]) pero **no son lo mismo**:\n\n| | Qué es | Ejemplo |\n|---|---|---|\n| **Rango** | La distancia de disparo de un arma **de rango** (arco, pistola, lanzallamas). Su daño **no suma** tu stat Daño. | Arco largo: Rango +5 |\n| **Alcance** | Un bono que puede tener un arma **cuerpo a cuerpo** para pegar *más allá* del casillero de al lado, **sin dejar de ser cuerpo a cuerpo** (sí suma Daño). | Lanza: Alcance +1 = pega a 2 casilleros |\n\n## Cómo se ataca a distancia\nFunciona **igual que un ataque normal** ([[Atacar]]): PdG contra la defensa del objetivo, y después el daño.\n\n## Distancia certera\nUn tirador dispara con certeza hasta una distancia igual a su **Destreza** (en casilleros). Más lejos, puede fallar: se tira **1d20** y hay que sacar:\n- hasta Destreza × 2: **7 o más**;\n- hasta Destreza × 3: **17 o más**;\n- más allá de Destreza × 3: **20**.\n\n> [!question] Confirmar\n> - ¿Esta regla del tiro sigue vigente con el stat Rng de la ficha, o Rng ya reemplaza la distancia certera?\n> - ¿Aplica Parry a distancia, o es solo cuerpo a cuerpo?"
+  },
+  {
+   "id": "efectos-al-golpear",
+   "titulo": "Efectos al golpear",
+   "alias": [
+    "Efectos de arma",
+    "Efectos de golpe",
+    "Envenenar",
+    "Sangrado (arma)"
+   ],
+   "tags": [
+    "combate",
+    "equipo"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "Algunas armas tienen **efectos que se aplican al golpeado**: Envenenar, Rompe armadura, Sangrado, Aturdir, Derribar…\n\n## Cómo funcionan en la mesa\nAl **tirar el daño** del arma:\n- Los efectos **sin porcentaje** aparecen enseguida **resaltados** en la [[La Mesa|Mesa]] (\"Envenenar: aplicale Veneno al objetivo\").\n- Los que tienen porcentaje **abren un pop-up para tirar**: un 50% es una moneda (1d2), un 25% es 1d4, etc. El resultado también queda en la Mesa.\n\n> [!warning] Aplicarlo lo hace el grupo\n> La herramienta **recuerda y tira**, pero **no toca el estado del rival**: aplicar el Veneno, romper la armadura o aturdir lo hace la mesa a mano. Es a propósito: ver [[La esencia del Rol Pintoísta]].\n\n> [!example] Espada de Nosferatu\n> Tiene dos efectos: \"Ignora armadura\" (50%: si entra, el golpe ignora la Defensa) y \"Drena vida\" (siempre: te curás tanto como el daño). Cada uno se anuncia y se tira cuando toca.\n\nVer también: [[Romper armadura]], [[Veneno]], [[Sangrado]]."
+  },
+  {
+   "id": "romper-armadura",
+   "titulo": "Romper armadura",
+   "alias": [
+    "Rompe armadura",
+    "Armadura rota (efecto)"
+   ],
+   "tags": [
+    "combate",
+    "equipo"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "**Romper armadura** es un [[Efectos al golpear|efecto de arma]] (típico de hachas y armas pesadas) con una probabilidad de activarse por golpe (por ejemplo, 50%).\n\nCada vez que se activa, **baja en 1 la [[Defensa]] que da el equipo** del objetivo. Lo modela el estado [[Armadura rota]]: se acumula (×N) y **es permanente hasta que se repara**.\n\n## Cómo se repara\n- Con una **habilidad**, o\n- Con el consumible **Óleo reparador** (Común, 25 DDE), que quita la armadura rota entera.\n\n> [!question] Detalles abiertos\n> - ¿La reducción tiene piso (puede llegar a Defensa 0 o negativa)?\n> - ¿Qué habilidades de clase reparan armadura?"
+  },
+  {
+   "id": "muerte",
+   "titulo": "Muerte",
+   "alias": [
+    "Muerto",
+    "Permadeath",
+    "Morir",
+    "Revivir",
+    "HP 0"
+   ],
+   "tags": [
+    "combate",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Cuando tu [[HP]] llega a **0**, entrás en estado de **Muerto**.\n\n- Tenés una ventana de **5 [[Mantenimiento|mantenimientos]]** para que te revivan.\n- Dentro de esa ventana se puede revivir con **objetos o efectos** (por ejemplo, el consumible *Ankh de Reencarnación*, que si estaba en tu cinturón te revive con el 25% del HP).\n- Si pasan los 5 mantenimientos, **morís definitivamente** (*permadeath*).\n\n> [!tip] Un aliado puede salvarte\n> Aunque el Ankh no esté en tu cinturón, **un aliado puede usarlo sobre tu cuerpo** para revivirte.\n\n> [!question] Estando muerto\n> - ¿Podés hacer algo estando \"Muerto\" pero revivible, o quedás fuera de juego?\n> - ¿Cuánto HP devuelve un revivir (1, la mitad, el máximo, depende del objeto)?\n> - ¿Los 5 mantenimientos cuentan desde el que sigue al HP 0?\n> - ¿Cambia algo fuera de combate (por ejemplo, morir de veneno sin pelea activa)?"
+  },
+  {
+   "id": "sigilo",
+   "titulo": "Sigilo",
+   "alias": [
+    "Sigilo",
+    "Ocultarse",
+    "Esconderse",
+    "Invi",
+    "Estar oculto"
+   ],
+   "tags": [
+    "sigilo",
+    "combate",
+    "mapa"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Un personaje o un creep puede **entrar en sigilo desde el mapa**: queda oculto para el bando rival.\n\n## Cómo se entra\n- Es una **habilidad estándar** (\"Sigilo\") que aplica el estado [[Sigilo (estado)|Sigilo]] sobre uno mismo. Quien la tenga cargada la ve como botón directo en la [[La Botonera|Botonera]].\n- Cuesta **1 No2** (a revisar). Moverte en sigilo cuesta lo mismo que moverte normal.\n\n## Quién ve qué\n| En sigilo | Lo ven | No lo ve |\n|---|---|---|\n| Un **personaje** | Su dueño y los demás jugadores (semitransparente) | El **GM** |\n| Un **creep** | El **GM** (semitransparente) | Los jugadores |\n\nCuando estás en sigilo ves el mapa con un **filtro violáceo tenue**, y tus tiradas se siguen viendo en la [[La Mesa|Mesa]].\n\n## Cuándo se rompe\n1. **Automáticamente:** si entrás en el **cono de detección** de un enemigo ([[Campo de visión]]).\n2. **Por una acción hostil:** cualquier acción con efecto directo sobre un enemigo (un ataque, una skill individual). Esto lo hace saber **el jugador a mano** (botón de la Botonera); el GM quita el estado del creep.\n3. Cuando te detectan, **aparecés donde te detectaron** y dejás una marca de tu última posición por **dos turnos**.\n\n## Detección\nCada **paso que das dentro de la zona de alerta** de un enemigo provoca una **tirada de detección** ([[Campo de visión]]). Es manual: el mapa cuenta los pasos y avisa; la resuelve la mesa (en principio **Destreza del que se esconde contra Especial del que vigila**). También se puede **buscar a propósito**, igual de manual.\n\n> [!info] Todo el ocultamiento es visual\n> El juego asume amigos de confianza: el mapa oculta lo que no debés ver, pero no hay un candado técnico.\n\n> [!question] A revisar\n> - Costo de entrar en sigilo: 1 No2 (a revisar con el grupo).\n> - ¿Qué cuenta como \"acción hostil\"? (Por ejemplo, invocar una nube tóxica en área: ¿rompe el sigilo?)\n> - Las invocaciones en sigilo: falta probarlas."
+  },
+  {
+   "id": "campo-de-vision",
+   "titulo": "Campo de visión",
+   "alias": [
+    "Cono",
+    "Cono de detección",
+    "Zona de alerta",
+    "Detección",
+    "Punto ciego",
+    "Visión",
+    "Orientación",
+    "Rotación"
+   ],
+   "tags": [
+    "sigilo",
+    "mapa"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Cada token del mapa **mira hacia uno de los 6 lados** de su hexágono (por defecto, hacia abajo). Se gira arrastrando el asa celeste ↻. **Girar cuesta 1 No2 por cada giro de 60°** (solo en combate), y al moverte quedás mirando hacia donde caminaste.\n\n## Las tres zonas\n| Zona | Qué es | Qué pasa |\n|---|---|---|\n| **Cono** (azul) | Los **16 hexágonos** de un rombo de 4 × 4 justo delante del token | Si alguien en [[Sigilo]] **entra acá**, **es detectado automáticamente**. |\n| **Zona de alerta** (naranja y roja) | El anillo alrededor del cono más los vecinos del token, menos el de atrás | **Cada paso** dentro provoca una **tirada de detección** (manual). |\n| **Punto ciego** | Atrás del token | Ahí no te ve. |\n\nLos tienen **personajes, creeps e invocaciones** por igual. Los sólidos del mapa (paredes, rocas) **tapan la vista**.\n\n## Verlos en el mapa\nCuando estás en sigilo se te dibujan el cono y la alerta (semitransparentes). El botón **👓 Ver conos** los muestra u oculta, con opciones (lentes) para filtrar cuáles.\n\n> [!info] También se puede evaluar sin comprometerse\n> Podés **arrastrar tu token para probar rutas**: nada se efectiviza (ni se rompe el sigilo) hasta que lo soltás en un lugar.\n\n> [!question] Modificadores\n> Se prevé que el cono y la superficie de visión puedan **modificarse** con efectos de ítems, skills o estados (por ejemplo, la pasiva *Percepción aumentada*). Falta definir cuáles y cuánto."
+  },
+  {
+   "id": "niebla-de-guerra",
+   "titulo": "Niebla de guerra",
+   "alias": [
+    "Niebla",
+    "Visión del grupo",
+    "Fog of war"
+   ],
+   "tags": [
+    "mapa",
+    "sigilo"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Con la **niebla de guerra** prendida (la activa el GM por mapa), **solo ves lo que tu grupo ve o vio**:\n\n- **Negro**: nunca visto. No se ve ni el mapa ni los tokens.\n- **Gris semitransparente**: ya descubierto pero fuera de la visión de ahora. Se ve el mapa, pero **no los tokens** que no sean aliados.\n- **Visión por defecto:** un radio de **6 casilleros** menos una **cuña ciega de 120° hacia atrás**. Gira con el frente del token.\n- Cada jugador ve la **unión** de lo que ven todos los personajes (incluidas las [[Invocaciones]] mientras estén invocadas y vivas).\n- **Lo descubierto es del grupo y persiste.**\n- Cuando un enemigo sale de tu visión queda una marca **\"?\"** donde lo viste por última vez.\n\nEl GM puede **destapar o tapar a mano** con un pincel, \"ver como jugador\" y reiniciar. El stat **Visión** de la ficha permite cambiar el radio.\n\n> [!question] Pendientes de diseño\n> Obstáculos que tapen la vista, y ocultar de verdad (hoy es solo visual) las listas que nombran tokens fuera de la visión."
+  },
+  {
+   "id": "trampas",
+   "titulo": "Trampas",
+   "alias": [
+    "Trampa",
+    "Trampas ocultas",
+    "Fuego amigo",
+    "Catálogo de trampas"
+   ],
+   "tags": [
+    "mapa",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Jugadores y GM pueden **poner trampas en el mapa**. Una trampa es un objeto de **Terreno y Formas** con la casilla **\"Trampa (oculta a los rivales)\"**, un nombre y un texto de \"qué hace\".\n\n## Cómo funcionan\n- **Los rivales no la ven.** La ven solo su dueño y el GM hasta que se dispara. Armada se dibuja **ámbar con ⚠**; disparada, **roja con ✖** para todos.\n- **Quién la dispara:** los creeps, si la puso un jugador; los personajes, si la puso el GM. **Los aliados nunca**, salvo que tenga **\"Fuego amigo: SÍ\"**: entonces la disparan también los aliados y su dueño.\n- Al soltar un movimiento, si algún casillero de la ruta pisa la trampa, **el movimiento se corta ahí** y aparece una línea roja en la [[La Mesa|Mesa]] con el nombre, quién la activó y qué hace.\n- **Sus efectos se resuelven a mano** (por ahora solo avisa).\n\n## Detectarlas\nLa pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al quedar justo al lado de una trampa y avisa que corresponde una **tirada de percepción** (botón 🔎 en la Botonera: [[Especial]], con dado más alto por escalón).\n\n## Guardarlas y compartirlas\n- **💾 Guardar como recurrente:** deja la trampa (nombre, efecto, forma, tamaño, color) en tu lista \"Trampas guardadas\" (por navegador).\n- **📤 Proponer** al catálogo de trampas: el dueño del proyecto las revisa y pasan a ser oficiales.\n- **📚 Catálogo de trampas:** lista oficial con buscador y etiquetas. → [[Biblioteca de la comunidad]]\n\n> [!question] Todavía sin decidir\n> ¿Hay tirada para **detectar o desarmar** una trampa? ¿Hay límite para crearlas (cantidad, costo de No2, solo en combate)? ¿Habrá **trampas como consumibles** del catálogo?"
+  },
+  {
+   "id": "invocaciones",
+   "titulo": "Invocaciones",
+   "alias": [
+    "Invocación",
+    "Invocar",
+    "Mascotas",
+    "Summons"
+   ],
+   "tags": [
+    "combate",
+    "personaje"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "Una **invocación** es una criatura o aliado que **traés a la pelea con una habilidad** (un espíritu, un robot, una mascota). **La maneja el jugador que la invoca**, no el GM, con las mismas funciones que un [[Creeps|creep]].\n\nCada invocación tiene:\n- **Atributos** con sus stats derivados y **HP** propios.\n- Su **propio No2** (paga mover y atacar igual que un personaje: [[Costos en Nitros]]).\n- **Arma y armadura** propias (con el mismo asistente de ítems), **resistencia a críticos** y [[Estados alterados|estados]].\n- **Habilidades** propias.\n- Su **propia Botonera** (\"▶ Usar\" en la tarjeta) y su token en el mapa.\n\nMientras están **invocadas y vivas**, dan **visión** al grupo ([[Niebla de guerra]]) y tienen [[Campo de visión|cono y alerta]] como cualquier token.\n\n> [!tip] Ficha aparte\n> En la ficha están en la sección **Invocaciones**, al final. \"✎ Editar\" abre atributos, arma, armadura, habilidades y estados."
+  },
+  {
+   "id": "estados-alterados",
+   "titulo": "Estados alterados",
+   "alias": [
+    "Estados",
+    "Estado",
+    "Buffs",
+    "Debuffs",
+    "Efectos",
+    "Buff",
+    "Debuff"
+   ],
+   "tags": [
+    "estado",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure) que cambia cómo funciona tu personaje. Puede ser bueno (**buff**) o malo (**debuff**).\n\n## Cómo se ven y cómo duran\n- Aparecen como **chips** en la ficha y como íconos en tu token del mapa. Pasá el mouse: te dicen qué hacen.\n- Tienen **turnos restantes** (o son *permanentes*), y a veces **stacks** (acumulaciones).\n- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van.\n- Pueden dar bonos o penalidades a stats (por ejemplo, +5 Defensa), o tener reglas propias (por ejemplo, \"no podés moverte\").\n\n## Cómo se aplican\n- Una **habilidad** o un **consumible** puede aplicarse un estado a sí mismo (esto sí se automatiza).\n- Los estados que un ataque aplica a un **rival** ([[Efectos al golpear]]) **los pone la mesa a mano**: el GM elige el estado en la ficha del creep, o el jugador en la suya.\n- Podés crear estados propios (personalizados) para lo que se te ocurra.\n\n## Los estados base\n| Estado | Tipo | En una línea |\n|---|---|---|\n| [[Veneno]] | debuff | Pierde HP por stack cada turno |\n| [[Sangrado]] | debuff | Pierde 2 HP por turno hasta curarse |\n| [[Regeneración]] | buff | Cura HP cada turno |\n| [[Pajaritos]] | debuff | PdG y Evasión a la mitad |\n| [[Lisiado]] | debuff | PdG y Parry a la mitad |\n| [[Stun]] | debuff (CC) | Sin Nitros |\n| [[Cansado y Exhausto\\|Cansado / Exhausto]] | debuff | Menos Nitros |\n| [[Rengo]] | debuff | Moverse cuesta el doble |\n| [[Inmovilizado]] | debuff | No te podés mover |\n| [[Armadura rota]] | debuff | −1 Defensa por acumulación |\n| [[Escudo mágico]] | buff | Barra extra de HP |\n| [[Invulnerable]] | buff | No recibís daño |\n| [[Afortunado]] | buff | Tirás dos veces y te quedás con la mejor |\n| [[Sigilo (estado)\\|Sigilo]] | buff | Estás oculto |\n\n> [!warning] Provisorios\n> Varios valores de la lista (Cansado, Exhausto, Hypeado, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).\n\n> [!question] Repaso pendiente\n> Falta revisar **uno por uno** todos los buffs y debuffs (qué hace cada uno exactamente, duración, si es acumulable). Esta lista es lo que hoy hace la ficha."
+  },
+  {
+   "id": "veneno",
+   "titulo": "Veneno",
+   "alias": [
+    "Envenenado",
+    "Veneno severo",
+    "Stacks de veneno"
+   ],
+   "tags": [
+    "estado"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Veneno** es un debuff de daño por turno: **pierde 1 HP por stack cada turno**, en el [[Mantenimiento]]. Los stacks y los turnos arrancan igualados y se van agotando juntos.\n\n- **Veneno severo:** hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca.\n- Se **cura** con consumibles (por ejemplo, un antídoto) o habilidades.\n- Lo bloquean [[Invulnerable]] y el estado **Sangre pura** (inmunidad a veneno).\n\n> [!question] Stacks\n> Falta definir cómo funciona exactamente acumular veneno (por ejemplo, la *Nube tóxica* del [[Debuffer]] \"solo aplica 1 stack a personajes ya envenenados\")."
+  },
+  {
+   "id": "sangrado",
+   "titulo": "Sangrado",
+   "alias": [
+    "Sangrando",
+    "Herida"
+   ],
+   "tags": [
+    "estado"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Sangrado** es un debuff **permanente** que hace perder **2 HP por turno** hasta que se cura.\n\n- Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).\n- Lo bloquea el estado **Coagulación extrema** (inmunidad a sangrado) e [[Invulnerable]]."
+  },
+  {
+   "id": "regeneracion",
+   "titulo": "Regeneración",
+   "alias": [
+    "Regen",
+    "Regen de HP",
+    "Regenerar"
+   ],
+   "tags": [
+    "estado",
+    "recursos"
+   ],
+   "estado": "confirmado",
+   "capitulo": "estados",
+   "cuerpo": "**Regeneración** es un buff que **cura HP cada turno** (5 por defecto, durante unos turnos). En el [[Mantenimiento]], cada estado de regeneración te suma su cura.\n\nAdemás existe la [[Pasivas|pasiva]] *Regeneración* (+3 HP por turno) que funciona sin turnos, siempre."
+  },
+  {
+   "id": "pajaritos",
+   "titulo": "Pajaritos",
+   "alias": [],
+   "tags": [
+    "estado"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Pajaritos** es un debuff (típico del [[Tanque]] y de golpes fuertes en la cabeza): **tu PdG y tu Evasión quedan a la mitad** (redondeado hacia abajo) mientras dure.\n\n> [!question] Definición de clase\n> El *Tanque* lo define como \"reduce a la mitad todas las tiradas de DES, ESP y AGI\". ¿Cuál vale: solo PdG y Evasión (lo que hace la ficha) o todos los stats de esos atributos?"
+  },
+  {
+   "id": "lisiado",
+   "titulo": "Lisiado",
+   "alias": [
+    "Lisiar"
+   ],
+   "tags": [
+    "estado"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Lisiado** es un debuff: **PdG y [[Parry]] a la mitad** (redondeado hacia abajo) mientras dure. Lo aplican habilidades como *Lisiar* del [[Asalto]] y lo cura, por ejemplo, un ítem de vendas."
+  },
+  {
+   "id": "stun",
+   "titulo": "Stun",
+   "alias": [
+    "Aturdido",
+    "Aturdir",
+    "Stun (estado)"
+   ],
+   "tags": [
+    "estado",
+    "control"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Stun** es un debuff de control ([[Crowd Control]]): **no tenés Nitros este turno.** Podés pensar pero no actuar.\n\n- Dura pocos turnos.\n- Lo evita el estado **Inmunidad a CC**.\n- Tu resistencia a esto es [[Resistencias|Res. CC]]."
+  },
+  {
+   "id": "cansado-y-exhausto",
+   "titulo": "Cansado y Exhausto",
+   "alias": [
+    "Cansado",
+    "Exhausto",
+    "Hypeado",
+    "Fatiga"
+   ],
+   "tags": [
+    "estado",
+    "recursos"
+   ],
+   "estado": "pendiente",
+   "capitulo": "estados",
+   "cuerpo": "Tres estados que modifican tus [[Nitros (No2)|Nitros]]:\n\n| Estado | Efecto |\n|---|---|\n| **Cansado** (debuff) | −1 a los Nitros máximos |\n| **Exhausto** (debuff, CC) | Como mucho **1 Nitro** por turno, sin importar tu máximo |\n| **Hypeado** (buff) | +1 a los Nitros máximos |\n\n> [!warning] Valores provisorios\n> Los tres eran \"−1 Acción / 1 Acción / +1 Acción\" y se pasaron a Nitros **1 a 1 sin recalibrar**.\n\n> [!question] Causa fatiga\n> Existe una condición \"Causa fatiga\" pendiente que el dueño va a definir con el grupo."
+  },
+  {
+   "id": "rengo",
+   "titulo": "Rengo",
+   "alias": [
+    "Rengo (estado)"
+   ],
+   "tags": [
+    "estado"
+   ],
+   "estado": "pendiente",
+   "capitulo": "estados",
+   "cuerpo": "**Rengo** es un debuff de movimiento: **moverte cuesta 2 Nitros por casillero** mientras dure (antes era \"Movimiento a la mitad\")."
+  },
+  {
+   "id": "inmovilizado",
+   "titulo": "Inmovilizado",
+   "alias": [
+    "Enraizado",
+    "Atrapado",
+    "Inmovilizar"
+   ],
+   "tags": [
+    "estado",
+    "control"
+   ],
+   "estado": "pendiente",
+   "capitulo": "estados",
+   "cuerpo": "**Inmovilizado** es un debuff de control: **no te podés mover** mientras dure. Los Nitros siguen sirviendo para todo lo demás (atacar, habilidades…).\n\n> [!warning] Regla provisoria\n> Está marcada como provisoria en la ficha. En el mapa, un personaje inmovilizado no gasta Nitros al arrastrar porque no debería poder moverse."
+  },
+  {
+   "id": "armadura-rota",
+   "titulo": "Armadura rota",
+   "alias": [
+    "Armadura arruinada",
+    "Armadura rota (estado)"
+   ],
+   "tags": [
+    "estado",
+    "equipo"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "Dos estados que castigan tu armadura:\n\n- **Armadura rota:** **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.\n- **Armadura arruinada:** **anula al 100%** lo que aportan las **armaduras equipadas** (blandas y rígidas) a Defensa y [[Resistencia a crítico]]. **No** afecta cascos, guantes, piernas ni botas. También es permanente hasta reparar."
+  },
+  {
+   "id": "escudo-magico",
+   "titulo": "Escudo mágico",
+   "alias": [
+    "Barrera",
+    "Escudo",
+    "Blindaje",
+    "Absorber daño"
+   ],
+   "tags": [
+    "estado",
+    "recursos"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n| Estado | Cuánto absorbe | Duración |\n|---|---|---|\n| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\nSe ve como una barra 🛡 sobre tu token."
+  },
+  {
+   "id": "invulnerable",
+   "titulo": "Invulnerable",
+   "alias": [
+    "Inmunidad",
+    "Blindado",
+    "Inmunidad a CC",
+    "Inmune"
+   ],
+   "tags": [
+    "estado"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.\n\nParientes más limitados:\n- **Blindado:** inmune a [[Golpe crítico|golpes críticos]].\n- **Inmunidad a CC:** inmune a estados de control ([[Stun]], Exhausto).\n- **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].\n\n> [!info] Inmunidades sin mecanismo\n> Algunos ítems dicen \"inmunidad a X\" pero **casi todos son un recordatorio**: el jugador y el GM lo tienen en cuenta a mano. Solo unos pocos están cableados a un estado real."
+  },
+  {
+   "id": "sigilo-estado",
+   "titulo": "Sigilo (estado)",
+   "alias": [
+    "Estado de sigilo"
+   ],
+   "tags": [
+    "estado",
+    "sigilo"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "El estado **Sigilo** (buff, permanente hasta que se rompe) marca que **estás oculto**: los enemigos no te ven en el mapa. Se rompe si entrás en el cono de detección de un enemigo o si hacés una acción hostil. Todo el detalle está en [[Sigilo]] y en [[Campo de visión]]."
+  },
+  {
+   "id": "crowd-control",
+   "titulo": "Crowd Control",
+   "alias": [
+    "CC",
+    "Control",
+    "Estados de control",
+    "Res.CC"
+   ],
+   "tags": [
+    "estado",
+    "control"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "**Crowd Control (CC)** agrupa a los estados que **te quitan control sobre lo que hacés**: [[Stun]], Exhausto, [[Inmovilizado]] y similares. Los identifica una marca especial en la ficha.\n\n- Tu defensa contra ellos es la [[Resistencias|Res. CC]] (de [[Constitución]]).\n- **Inmunidad a CC** los bloquea."
+  },
+  {
+   "id": "resistencias",
+   "titulo": "Resistencias",
+   "alias": [
+    "Res.Mg",
+    "Res.CC",
+    "Res.M",
+    "Res.Mt",
+    "Resistencia mágica",
+    "Resistencia mental",
+    "Resistencia a CC"
+   ],
+   "tags": [
+    "stats",
+    "estado"
+   ],
+   "estado": "pendiente",
+   "capitulo": "estados",
+   "cuerpo": "Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:\n\n| Resistencia | Sale de | Se usa contra |\n|---|---|---|\n| **Res. Mágica** (Res.Mg) | [[Constitución]] | Daño y efectos mágicos |\n| **Res. CC** | Constitución | Estados de [[Crowd Control]] |\n| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |\n\n> [!question] En pausa: están mezcladas\n> Las tres todavía están en **terreno ambiguo** entre sí (incluso si \"Res.M\" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora."
+  },
+  {
+   "id": "equipo-y-ranuras",
+   "titulo": "Equipo y ranuras",
+   "alias": [
+    "Ranuras",
+    "Slots",
+    "Equipar",
+    "Equipado",
+    "Equipo"
+   ],
+   "tags": [
+    "equipo",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Tu equipo se reparte en **ranuras** (slots). Lo que está *equipado* suma sus bonos a tus stats; lo que está en la **mochila** no.\n\n| Ranura | Cuántos ítems | Notas |\n|---|---|---|\n| **Manos** (armas y escudos) | 2 manos en total | Un arma de [[Armas\\|una mano]] usa 1; de dos manos usa las 2. Igual con [[Escudos]]. |\n| **Torso** (armadura) | 1 blanda **+** 1 rígida | Ver [[Armaduras y piezas de defensa]] |\n| **Cabeza** | 1 | |\n| **Manos** (guantes) | 1 | |\n| **Piernas** | 1 | |\n| **Pies** | 1 | |\n| **[[Anillos]]** | 2 (uno por mano) | |\n| **[[Cinturón y consumibles\\|Cinturón]]** | 5 por defecto | Para consumibles a mano |\n| **Otros** | libre | Categoría comodín |\n\n## Equipar y desequipar\n- Desde el botón **🛡 Equipo** de la ficha (o el 🛡 de tu token en el mapa): ves lo equipado por ranura y la mochila, con *Sacar / Equipar / Cambiar*, **Ver** y **Editar**.\n- **En combate cuesta [[Costos en Nitros|1 No2]]** cada equipar/desequipar (2 si reemplazás uno por otro). En narrativo, nada.\n- El [[Carga máxima|peso equipado]] se ve arriba del panel.\n\n> [!question] Detalles abiertos\n> - ¿Los anillos tienen restricción de mano, o da igual cuál va en cuál?\n> - ¿\"Otros\" tiene límite de cantidad?"
+  },
+  {
+   "id": "armas",
+   "titulo": "Armas",
+   "alias": [
+    "Arma",
+    "Arma de una mano",
+    "Arma de dos manos",
+    "Armas de rango"
+   ],
+   "tags": [
+    "equipo",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Un arma se define por su **[[Daño y Tipo de arma|Tipo y peso]]** (cuánto y cómo pega), su **empuñadura** (una mano o dos) y si es **de rango** o cuerpo a cuerpo ([[Ataques a distancia]]).\n\n- **Una mano** (`arma_1m`): dejás la otra mano libre para un [[Escudos|escudo]] o una segunda arma.\n- **Dos manos** (`arma_2m`): ocupa las dos manos. Suelen ser más pesadas o de rango largo (arcos, ballestas, espadones).\n- **Bonos:** muchas dan modificadores (Crítico +1, Parry +2, Rango +3).\n- **[[Efectos al golpear]]:** Envenenar, Rompe armadura, Aturdir…\n- Cada arma paga **su propio primer ataque barato** por turno ([[Costos en Nitros]]).\n\n> [!example] Cuatro armas del catálogo\n> **Daga** (Común, Tipo 4) · **Espada larga** (Buena calidad, Tipo 6) · **Hacha de batalla a dos manos** (Raro, Tipo 10, peso 3) · **Arco del cazador de eclipses** (Legendario, a distancia, +2 crítico, sangrado)."
+  },
+  {
+   "id": "escudos",
+   "titulo": "Escudos",
+   "alias": [
+    "Escudo",
+    "Escudo de una mano",
+    "Escudo de dos manos",
+    "Pavés"
+   ],
+   "tags": [
+    "equipo",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bloqueo]]** o **[[Parry]]**. Los hay de **una mano** (podés combinarlos con un arma) y de **dos manos** (más grandes: con uno equipado no llevás arma).\n\n> [!example] Del catálogo\n> *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).\n\n> [!question] Escudos en la defensa\n> El **Parry con escudo** todavía no está definido ([[Defenderse de un ataque]])."
+  },
+  {
+   "id": "armaduras-y-piezas-de-defensa",
+   "titulo": "Armaduras y piezas de defensa",
+   "alias": [
+    "Armadura",
+    "Armadura blanda",
+    "Armadura rígida",
+    "Casco",
+    "Guantes",
+    "Piernas",
+    "Botas",
+    "Pieza de defensa"
+   ],
+   "tags": [
+    "equipo"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Las piezas de defensa dan [[Defensa]] y [[Resistencia a crítico]] (y a veces bonos como Evasión o HP máximo). Se equipan en su ranura ([[Equipo y ranuras]]).\n\n## Torso: blanda y rígida\nSolo el torso distingue **blanda** (flexible: gambesones, cueros) y **rígida** (dura: placas, corazas). **Podés llevar una de cada una a la vez.** Las armaduras pesadas dan más Defensa pero suelen bajar tu Evasión o tu Movimiento y sumar [[Carga máxima|peso]].\n\n## Cabeza, manos, piernas, pies\nCategoría **plana**: un solo ítem por ranura, sin distinción de material.\n\n## Qué esperar según la rareza\nLa [[Rareza]] sube la Defensa y las resistencias, pero **las resistencias a críticos altos son escasas** a propósito: ver [[Resistencia a crítico]].\n\n> [!warning] Los estados las afectan\n> [[Armadura rota]] (−1 Def por acumulación) y Armadura arruinada (anula las armaduras del torso) las castigan."
+  },
+  {
+   "id": "anillos",
+   "titulo": "Anillos",
+   "alias": [
+    "Anillo",
+    "Anillos mágicos"
+   ],
+   "tags": [
+    "equipo"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Los **anillos** ocupan dos ranuras (**uno por mano**) y dan **un bono chico y específico**: Evasión +1, Rango +1, HP máximo +10, Iniciativa +1… Los hay de cada [[Rareza]]: a mayor rareza, más bono (y a veces varios).\n\nAlgunos no dan números sino un **efecto de estado** (\"Anillo de Sangre limpia\": inmunidad a veneno). Ver [[Invulnerable]]."
+  },
+  {
+   "id": "cinturon-y-consumibles",
+   "titulo": "Cinturón y consumibles",
+   "alias": [
+    "Cinturón",
+    "Consumibles",
+    "Consumible",
+    "Pociones",
+    "Pergaminos",
+    "Cinto"
+   ],
+   "tags": [
+    "equipo",
+    "recursos"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- El **cinturón** tiene **5 ranuras** por defecto; se compran cinturones para ampliarlo.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
+  },
+  {
+   "id": "mochila",
+   "titulo": "Mochila",
+   "alias": [
+    "Inventario",
+    "Mochila (inventario)"
+   ],
+   "tags": [
+    "equipo"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa una o más ranuras."
+  },
+  {
+   "id": "carga-maxima",
+   "titulo": "Carga máxima",
+   "alias": [
+    "Crg.Max",
+    "Peso",
+    "Peso equipado",
+    "Sobrepeso",
+    "Sobrecarga"
+   ],
+   "tags": [
+    "equipo",
+    "stats"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Tu **[[Fuerza]]** define tu **Carga máxima** (Crg.Max): cuánto peso podés llevar **equipado** sin castigo.\n\n- **Solo cuenta lo equipado.** Lo que está en la mochila no suma.\n- Cada ítem equipado tiene un **peso**. Se suman todos.\n- Si te pasás, **por cada punto de peso que sobra perdés 1 de [[SP]] máximo**.\n\n> [!example] Sobrecargado\n> Crg.Max 8, llevás 10 de peso → te pasás por 2 → tu SP máximo baja en 2.\n\n> [!question] Fórmula y efectos\n> - ¿Cuál es la fórmula exacta FUE → Crg.Max?\n> - ¿Hay piso (se puede llegar a 0 SP)? ¿El sobrepeso afecta el movimiento?\n> - ¿La penalidad baja el máximo del combate o se recalcula cada vez que cambia el equipo?"
+  },
+  {
+   "id": "rareza",
+   "titulo": "Rareza",
+   "alias": [
+    "Tier",
+    "Tiers",
+    "Común",
+    "Buena Calidad",
+    "Raro",
+    "Excepcional",
+    "Legendario",
+    "Calidad"
+   ],
+   "tags": [
+    "equipo",
+    "catálogo"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Cada ítem del [[Catálogo de ítems]] tiene una **rareza** (tier). Hay cinco:\n\n| Rareza | Qué esperar |\n|---|---|\n| **Común** | Lo de todos los días. Barato y fácil de conseguir. Números bajos. |\n| **Buena Calidad** | Mejor hecho. Un escalón sobre lo común. |\n| **Raro** | Ya se nota en la mesa. Puede traer un bono particular. |\n| **Excepcional** | Ítems especiales, con efectos fuertes. Precio alto. |\n| **Legendario** | Piezas únicas de historia propia. Pueden romper reglas menores. |\n\n## Rango de precios (en [[DDE]])\nComo orientación, los precios del catálogo van de **decenas** en lo Común a **más de mil** en lo Legendario. Un ítem Común típico cuesta 30–90; Excepcional, cientos; Legendario, 1000–2000.\n\n> [!tip] Inicio de partida\n> En las tiendas de **Inicio de partida** el GM limita la rareza a **Raro como tope**: nadie arranca con algo Excepcional.\n\n> [!question] Qué puede esperar encontrar el jugador\n> Falta el texto de \"qué implica cada rareza\" para el jugador (dónde se consigue, con qué frecuencia). Hoy es una guía de diseño."
+  },
+  {
+   "id": "catalogo-de-items",
+   "titulo": "Catálogo de ítems",
+   "alias": [
+    "Catálogo",
+    "Ítems",
+    "Items"
+   ],
+   "tags": [
+    "equipo",
+    "catálogo",
+    "herramientas"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "El **catálogo** es la lista compartida de ítems del juego: **más de 600** armas, escudos, armaduras, anillos, cinturones y consumibles, organizados por [[Rareza]] y categoría. Está en la ficha (\"comprar del catálogo\"), en el [[Generador de tiendas]] y en el editor de catálogo.\n\n> [!info] Son sugerencias\n> Cada ítem del catálogo es **una invitación, no una regla**: podés usarlo tal cual, modificarlo o inventar tus propios ([[Crear tus propios ítems]]). Ver [[La esencia del Rol Pintoísta]].\n\n## Cómo está organizado\n- **Categorías:** armas (1 y 2 manos), escudos, armaduras blandas y rígidas, cabeza, manos, piernas, pies, cinturones, anillos y consumibles.\n- **Cada ítem** tiene nombre, rareza, precio, peso, bonos, un **detalle** (qué hace, para el jugador) y una **descripción** (cómo es, con humor).\n- El catálogo **no lleva imágenes** por ahora.\n\n## Cómo llega un ítem nuevo\nCualquiera puede **proponer** un ítem que creó en la mesa (📦 *Agregar al catálogo*); el dueño del proyecto lo revisa. → [[Biblioteca de la comunidad]]"
+  },
+  {
+   "id": "crear-tus-propios-items",
+   "titulo": "Crear tus propios ítems",
+   "alias": [
+    "Ítem custom",
+    "Item custom",
+    "Crear ítem",
+    "Asistente de ítems",
+    "Ítems propios"
+   ],
+   "tags": [
+    "equipo",
+    "herramientas"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Podés inventar tus propios ítems: es una de las libertades centrales del [[La esencia del Rol Pintoísta|espíritu sandbox]]. Un **asistente paso a paso** (el mismo en la ficha, en GM Tools, en el generador de tiendas y en el editor del catálogo) te guía:\n\n1. **Qué es:** categoría, nombre y descripción con tus palabras.\n2. **Lo práctico** (según la categoría):\n   - **Armas:** [[Daño y Tipo de arma|Tipo, peso y daño]], empuñadura (una o dos manos; rango o alcance), bonos y [[Efectos al golpear|efectos al golpear]].\n   - **Defensa:** [[Defensa]] y [[Resistencia a crítico|resistencias a crítico]].\n   - **Otros:** bonos a stats.\n3. **Estado al equipar:** un estado que se activa solo al ponértelo.\n4. **Precio y lugar** (mochila, cinturón, equipado). Resumen y listo.\n\nLos **consumibles** usan un formulario aparte (cargas, curación, estado que aplican).\n\n> [!tip] Consejo de diseño\n> Para que se sienta parte del mundo, ponele un efecto **absurdo pero coherente** ([[Filosofía del mundo]]): una gorra de policía que da +1 a intimidar solo si estás de espaldas.\n\nPara publicarlo en el catálogo compartido: 📦 **Agregar al catálogo** ([[Catálogo de ítems]])."
+  },
+  {
+   "id": "dde",
+   "titulo": "DDE",
+   "alias": [
+    "Moneda",
+    "Dinero",
+    "Economía",
+    "Plata",
+    "Precio"
+   ],
+   "tags": [
+    "economía"
+   ],
+   "estado": "pendiente",
+   "capitulo": "equipo",
+   "cuerpo": "**DDE** es la **moneda** del juego y la unidad de precio de todos los ítems del [[Catálogo de ítems]]. Tu saldo está en el botón **💰 DDE y loot** del dock de la ficha.\n\nLos precios van de decenas (lo Común) a miles (lo Legendario): ver [[Rareza]].\n\n> [!question] Cómo se gana y gasta en mesa\n> Este es el lado *jugador* de la economía: cuánto DDE recibís por misión, qué se vende y a qué precio, si hay descuentos. La fórmula de precios interna es material de diseño y no necesariamente va en el manual."
+  },
+  {
+   "id": "tiendas",
+   "titulo": "Tiendas",
+   "alias": [
+    "Vendedor",
+    "Tienda",
+    "Comprar",
+    "Vender",
+    "Loot",
+    "Botín"
+   ],
+   "tags": [
+    "economía",
+    "herramientas"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "Los ítems se compran en **tiendas** que arma el GM con el [[Generador de tiendas]]:\n\n1. El GM arma la tienda (aleatoria o curada a mano) y la **publica**.\n2. Vos la abrís con **🏪 Vendedor** en la ficha y ves su stock en vivo.\n3. Comprás y el ítem va a tu mochila, con el DDE descontado.\n\nCuando el GM **cierra** la tienda, desaparece. Además hay **tiendas guardadas** (una por lugar) para volver a ellas.\n\n## Loot\nEl **loot** es lo que encontrás sin comprar. Se anota en el dock (**💰 DDE y loot**): hay loot normal y **tipos de loot especial** que el grupo define.\n\n> [!question] Reglas de loot\n> ¿Qué tipos de loot especial existen y qué se hace con cada uno?"
+  },
+  {
+   "id": "habilidades",
+   "titulo": "Habilidades",
+   "alias": [
+    "Habilidad",
+    "Skills",
+    "Skill",
+    "Habilidades activas",
+    "Habilidad automatizada",
+    "Flash",
+    "Espameable",
+    "Cooldown"
+   ],
+   "tags": [
+    "habilidades",
+    "reglas-base"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "Una **habilidad** es algo especial que tu personaje sabe hacer: un golpe, un hechizo, una maldición, una cura. Se compran con **[[Puntos de Job]]** y se **ejecutan** desde la ficha o la [[La Botonera|Botonera]].\n\n## De dónde salen\n- **De clase:** copiadas del pool de las [[Clases|siete clases]]. Cuestan **1 punto de Job**, sean de tu clase o de otra.\n- **Custom:** inventadas por vos o el GM. Cuestan **2 puntos de Job**.\n\n## Qué tiene una habilidad\n- **Costo en [[SP]]** (a veces un *X* variable) y **en [[Nitros (No2)|Nitros]]** (por defecto 1; una habilidad \"de ataque\" cuesta lo que un ataque, y cuenta como tal).\n- A veces **costo en HP** y un **cooldown** (turnos que hay que esperar).\n- Una **tirada** (un stat y/o una fórmula) y un **estado** que se aplica sobre uno mismo.\n- **Cura HP** sobre uno mismo, si es una habilidad de curación.\n\n## Automatizada o solo anunciada\nAl crearla, el asistente te pregunta **¿la automatizamos?**\n\n| | Qué hace al ejecutarla |\n|---|---|\n| **Sí** | Descuenta SP, Nitros y HP solos; tira lo que tenga que tirar; aplica el estado. |\n| **No** | Botón **Anunciar**: publica la descripción en la [[La Mesa\\|Mesa]], sin costo, sin tirada y sin estado. La resuelve el grupo. |\n\n> [!tip] Lo que no automatiza, se dice\n> Muchas habilidades tienen efectos sobre *otros* (empujar, marcar, quitar Nitros): eso queda escrito en la descripción y se resuelve en la mesa ([[La esencia del Rol Pintoísta]]).\n\n## Palabras que vas a ver en las descripciones\n| Palabra | Significa |\n|---|---|\n| **Flash** | No cuesta Nitros y se puede usar **durante el turno de otro**. Se declara **antes de que tire los dados**, nunca después de ver el resultado. |\n| **Espameable** | Se puede repetir en el turno; el límite lo ponen los Nitros. |\n| **Cooldown** | Turnos de espera antes de volver a usarla. |\n| **Amplificar** | Dados de daño de más, del [[Daño y Tipo de arma\\|Tipo]] del arma. |\n| **X** | Costo variable: elegís cuánto invertir al ejecutarla. |\n| **Critical Matters** | Si el ataque es [[Golpe crítico\\|crítico]], el efecto cambia. |\n| **⚖ A definir en mesa** | La duda no se cerró: se decide entre todos cuando aparezca en juego. |\n\n## Ejecutarla\nEn la Botonera, cada habilidad tiene **Ejecutar** y una **🔍** que te dice cuánto cuesta y cuánto te queda. Si no te alcanzan los Nitros, el botón queda apagado (la 🔍 sigue funcionando).\n\nVer también: [[Pasivas]], [[Biblioteca de la comunidad]]."
+  },
+  {
+   "id": "pasivas",
+   "titulo": "Pasivas",
+   "alias": [
+    "Pasiva",
+    "Habilidades pasivas",
+    "Catálogo de pasivas",
+    "Percepción aumentada"
+   ],
+   "tags": [
+    "habilidades"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "Una **pasiva** es una habilidad que **funciona sola, siempre**: no se ejecuta ni cuesta Nitros. Se compran con [[Puntos de Job]] (por defecto, 1 punto).\n\n## Cómo se agregan\nEn la ficha: **\"+ Pasiva → catálogo\"**. Elegís del catálogo y se copia a tu personaje; también podés inventar una propia.\n\n## Qué hacen\nBonos a un stat (**+5 HP máx**, **+3 SP**), **regeneración** (+3 HP por turno), o efectos especiales. Los que se pueden automatizar funcionan al cargarlos; lo demás queda como recordatorio en el texto.\n\n## Escalón\nCada compra da **lo que daría 1 punto del atributo del que sale el stat**: HP máx 5, SP 3, el resto 1. (Excepción: la resistencia a CC da +2.)\n\n## Se acumulan, con tope\nPodés **comprar la misma pasiva varias veces** y los bonos se suman. El **tope de compras** es **la mitad de tu nivel** (redondeado hacia abajo, mínimo 1).\n\n## Algunas del catálogo base\n| Pasiva | Efecto |\n|---|---|\n| **Robustez** | +5 HP máx |\n| **Reserva de poder** | +3 SP |\n| **Recuperación mental** | +1 SP por turno |\n| **Regeneración** | +3 HP por turno |\n| **Voluntad de hierro** | Res. mental/CC |\n| **Percepción aumentada** | Te avisa de trampas cercanas ([[Trampas]]) |\n| **Ojo avizor**, **Vista de halcón** | Más visión |\n| **Golpe fuerte**, **Puntería**, **Ojo crítico** | Más Daño, PdG, Crítico |\n| **Pies ligeros**, **Reflejos de gato**, **Impulso** | Movimiento, Evasión, Nitros |\n| **Espalda de mula**, **Bolsillos extra** | Carga y capacidad |\n\n> [!question] Todavía por definir\n> - Las **pasivas situacionales** (que solo valen en cierto momento) se irán viendo más adelante.\n> - Los +1 de No2, Rango y Crítico están marcados ⚠ en el catálogo: son los que más hay que revisar."
+  },
+  {
+   "id": "inteligencia-y-habilidades-sociales",
+   "titulo": "Inteligencia y habilidades sociales",
+   "alias": [
+    "Inteligencia",
+    "Habilidades sociales",
+    "Sociales",
+    "Habilidad social",
+    "Presupuesto social"
+   ],
+   "tags": [
+    "habilidades",
+    "personaje"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "Además de los cinco [[Atributos]] hay un número aparte, la **Inteligencia**, para las **habilidades sociales** (persuadir, mentir, intimidar, regatear…).\n\n## El presupuesto\nNo se reparte como los atributos: **se calcula sola**. **6 al crear el personaje, +3 por nivel.** Funciona como el presupuesto de Job: el total no baja, y lo que invertís en habilidades sociales se resta del disponible. El contador muestra cuánto te queda; al pasar el mouse ves en qué se fue cada punto.\n\n## Cómo funciona una habilidad social\nCada habilidad social tiene un **nivel** (puntos de Inteligencia invertidos + subidas gratis).\n\n- **Dado = nivel × 2 caras.** Nivel 2 → d4; nivel 3 → d6; nivel 0 → sin dado.\n- **La tirada** es siempre `1d(nivel × 2) + tu Inteligencia sin invertir`.\n\n> [!example] Persuadir nivel 3\n> Tenés Inteligencia total 9 y 3 puntos invertidos en Persuadir → te quedan 6 sin invertir. Tirás **1d6 + 6**.\n\n## Subir de nivel\nEl botón **+ Nivel** de cada habilidad social ofrece dos caminos:\n1. **Por Inteligencia:** elegís cuántos puntos invertís (se restan del presupuesto).\n2. **Por tirada máxima:** si sacás el máximo en la tirada, **subís +1 nivel gratis**.\n\n## En la Botonera\nCon nivel, aparecen en la Botonera: **arriba de todo en [[Modo narrativo y modo combate|modo narrativo]]**, y al final en combate."
+  },
+  {
+   "id": "biblioteca-de-la-comunidad",
+   "titulo": "Biblioteca de la comunidad",
+   "alias": [
+    "Biblioteca",
+    "Biblioteca global",
+    "Propuestas",
+    "Auditar propuestas"
+   ],
+   "tags": [
+    "herramientas",
+    "gm"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "La **biblioteca** es un catálogo **global y compartido** (no de una sola partida) donde se juntan creaciones del grupo: **creeps, pasivas, habilidades y trampas**.\n\n- **Elegir:** un buscador con **etiquetas** para encontrar lo que necesitás (en la ficha al agregar una pasiva; en GM Tools al agregar un creep; en el mapa al poner una trampa).\n- **Proponer:** si creaste algo que merece quedar, **📤 lo proponés** y queda pendiente.\n- **Auditar:** el **dueño del proyecto** revisa las propuestas y las aprueba: pasan a ser oficiales.\n- Hay una base de entradas **que vive en el código** (por ejemplo, los [[Catálogo de creeps]]), que siempre está disponible.\n\nVer también: [[Catálogo de ítems]]."
+  },
+  {
+   "id": "warrior",
+   "titulo": "Warrior",
+   "alias": [
+    "Guerrero"
+   ],
+   "tags": [
+    "clases",
+    "habilidades"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "Guerrero cuerpo a cuerpo: golpes potentes, cargas y saltos. Pool de [[Clases|clase]].\n\n## Automatizadas (listas para usar)\n| Skill | Costo | Efecto |\n|---|---|---|\n| **Arte de la guerra** | SP 2 · Flash (a confirmar) | +2 a una sola tirada de PdG, Parry, Bloqueo o Daño. |\n| **Amplificar daño** | SP X (máx. 3) · No2: ataque | Ataque con +X dados de daño del Tipo del arma. |\n| **Cañón Vasco** | SP 2 + X · No2 1 | Salta X casillas; si cae sobre un enemigo lo empuja 1; onda expansiva a los adyacentes. |\n| **Carga** | SP X · No2 X + ataque | Avanza X casilleros en línea recta y ataca con +X de daño fijo y +X a la PdG. |\n\n## En revisión (solo se anuncian)\nEstoicismo (+2 Def por cada enemigo adyacente), Remolino (ataque a todos los adyacentes), [[Parry]] (skill), Contraataque y Sacadito.\n\n> [!question] Por definir\n> Arte de la guerra: ¿se puede usar en todas las tiradas del turno o una sola vez por turno? Sacadito: qué pasa con los Nitros sobrantes."
+  },
+  {
+   "id": "asalto",
+   "titulo": "Asalto",
+   "alias": [
+    "Asesino",
+    "Rogue"
+   ],
+   "tags": [
+    "clases",
+    "habilidades",
+    "sigilo"
+   ],
+   "estado": "pendiente",
+   "capitulo": "habilidades",
+   "cuerpo": "Ágil y letal: velocidad, [[Sigilo|invisibilidad]], críticos y venenos. Pool de [[Clases|clase]].\n\n**Skills del borrador** (todavía sin automatizar): Dash, Lisiar ([[Lisiado]]), Tajear (sangrado), Invi (invisibilidad, se detecta con Percepción), Envenenar arma, Backstab (+5 desde la espalda, ignora 1 de resistencia a crítico), Degollar, Sprint, Tronco de huida y Robar SP.\n\n> [!question] Sin auditar\n> Ninguna está cargada como automatizada. Cada una se revisa una por una (costos nuevos en SP/Nitros) antes de pasar al pool de la ficha."
+  },
+  {
+   "id": "tanque",
+   "titulo": "Tanque",
+   "alias": [
+    "Tank"
+   ],
+   "tags": [
+    "clases",
+    "habilidades"
+   ],
+   "estado": "borrador",
+   "capitulo": "habilidades",
+   "cuerpo": "El que aguanta: defensa, cura propia y control de tropa. Pool de [[Clases|clase]].\n\n## Automatizadas\n| Skill | Costo | Efecto |\n|---|---|---|\n| **Blindaje** | SP 1 · Flash (SP ×2 en turno ajeno) | Solo sobre uno mismo: estado **Barrera**, absorbe 8 de la próxima fuente de daño ([[Escudo mágico]]). |\n| **Recuperación** | SP 1 · No2 2 | Curás **9 HP** fijos sobre vos (sin pasar el máximo). Se puede usar con la vida llena: gasta igual. |\n| **Piel resistente** | SP 5 · No2 1 | 2 turnos sobre vos: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico. |\n\n## En revisión\nShockwave, Aura de espinas (devuelve 1/4 del daño), Sonic Boom, Daño en área, Takle, Taunt y Miti-Miti (comparte la mitad del daño con un protegido).\n\n## Estados de la clase\n- [[Pajaritos]]: reduce a la mitad tiradas de Destreza, Especial y Agilidad.\n- **Sentado**: −2 a la evasión, no podés atacar; pararte cuesta 1 No2.\n\n> [!question] Sin confirmar\n> En *Piel resistente*, el +1 a las resistencias a crítico y la duración de 2 turnos completos son una propuesta, sin confirmar. En *Aura de espinas* faltan definir si el 1/4 se calcula sobre el daño que llega al HP o antes de la Defensa, si es solo melee o cualquier ataque, y cómo se redondea."
+  },
+  {
+   "id": "mago",
+   "titulo": "Mago",
+   "alias": [
+    "Hechicero",
+    "Wizard"
+   ],
+   "tags": [
+    "clases",
+    "habilidades"
+   ],
+   "estado": "pendiente",
+   "capitulo": "habilidades",
+   "cuerpo": "Hechizos de daño y control, movidos por [[Especial]]. Pool de [[Clases|clase]]. Casi todos son **Hechizo (PG: Esp · Daño: Esp)**.\n\n**Skills del borrador:** Chispazo (proyectil T4 P1 que ignora armadura), Rayo Mágico, Orbe arcano (área de flor de 1), Tormenta arcana (1d20 proyectiles en flor de 2), Ráfaga arcana (cono de 3), Toque mágico, Carga Elemental (fuego +50%, frío −1 No2 cada 5 de daño, eléctrico se propaga), Armadura Mágica (−50% daño hasta 10), Telekinesis y Control Mental.\n\n> [!question] Sin auditar\n> Todavía no hay skills automatizadas de Mago. Falta revisar costos (No2 y SP) una por una."
+  },
+  {
+   "id": "shooter",
+   "titulo": "Shooter",
+   "alias": [
+    "Tirador",
+    "Arquero"
+   ],
+   "tags": [
+    "clases",
+    "habilidades"
+   ],
+   "estado": "pendiente",
+   "capitulo": "habilidades",
+   "cuerpo": "Tirador: puntería, marcar objetivos y ráfagas. Pool de [[Clases|clase]]; usa mucho [[Ataques a distancia]].\n\n**Skills del borrador:** Apuntar, Acelerado, Enfocado, Parry a distancia (Flash), Headshot (+5 daño, falla si no es crítico), Proyectil perforante, Marcar, Repetición, Disparo múltiple y Tiro con comba.\n\n> [!question] Sin auditar\n> Ninguna automatizada todavía."
+  },
+  {
+   "id": "support",
+   "titulo": "Support",
+   "alias": [
+    "Apoyo",
+    "Healer",
+    "Sanador"
+   ],
+   "tags": [
+    "clases",
+    "habilidades"
+   ],
+   "estado": "pendiente",
+   "capitulo": "habilidades",
+   "cuerpo": "Apoyo: curas, buffs y ayuda al equipo. Pool de [[Clases|clase]].\n\n**Skills del borrador:** Empower (+3 a una tirada), Blessing (+1 a todas 2 turnos), Heal (4 + 1d6 HP), Shield (absorbe 14), Acelerador (casilla que da +2 No2), Endurecimiento (Def 3, Res.Mg 3), Re-roll (repetir tiradas aliadas), Smite, Transferir SP y Adrenalina.\n\n> [!question] Sin auditar\n> Ninguna automatizada todavía."
+  },
+  {
+   "id": "debuffer",
+   "titulo": "Debuffer",
+   "alias": [
+    "Maldiciones",
+    "Maldición",
+    "Hechicero oscuro"
+   ],
+   "tags": [
+    "clases",
+    "habilidades",
+    "estado"
+   ],
+   "estado": "pendiente",
+   "capitulo": "habilidades",
+   "cuerpo": "Maldiciones, venenos y control. Pool de [[Clases|clase]]. Sus maldiciones enfrentan **Especial contra Res. Mental** ([[Resistencias]]).\n\n**Skills del borrador:** Enyetar (repetir y quedarse con el más bajo), Confusión, Maldición debilitante (−1 a todas las tiradas), Maldición extenuante, Maldición tormentosa, Drenar vida, Balas de sangre, Transfusión sanguínea, [[Veneno]] y Nube tóxica (área que envenena).\n\n> [!question] Sin auditar\n> Ninguna automatizada todavía. Ojo: la página del Debuffer del PDF nuevo repetía la del Support; se usan las tarjetas de la versión anterior."
+  },
+  {
+   "id": "inicio-y-partidas",
+   "titulo": "Inicio y partidas",
+   "alias": [
+    "Partida",
+    "Partidas",
+    "Cuenta",
+    "Iniciar sesión",
+    "Menú",
+    "Home",
+    "Sitio web"
+   ],
+   "tags": [
+    "herramientas",
+    "empezar"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "El sitio vive en **elsauloel.github.io/rolpintoista**. Es una página web común: no se instala nada.\n\n## Tu cuenta\nEntrás con **Google**, o con **email y contraseña** (te llega un link para confirmar). El sitio arranca pidiendo iniciar sesión.\n\n## Las partidas\nDespués ves **todas las partidas del grupo** y te unís a una con un clic, o **creás una nueva** (y así te convertís en su GM). Cada partida es un mundo aparte: sus personajes, mapas, tiendas y bitácora no se mezclan con los de otra.\n\n- **El nombre se elige al entrar a cada partida** (es cómo te ven los demás).\n- **Un jugador puede tener varios personajes.**\n- El **GM** puede ver los jugadores, sacar a alguien, renombrar o borrar la partida (pide escribir el nombre, y ofrece antes un [[Respaldo de la partida|respaldo]]).\n- Un jugador puede **irse de la partida**; sus personajes quedan y el GM los reasigna.\n\n## El menú ☰\nEl botón **☰** arriba a la izquierda, igual en todas las páginas, abre el árbol del sitio: Home → tu partida abierta (con su mapa, tus personajes y, si sos GM, [[GM Tools]] y [[Generador de tiendas]]) → otras partidas → **Manual** → cerrar sesión.\n\n> [!info] Grupo de confianza\n> Cualquier cuenta ve todas las partidas y se une con un clic: el sistema asume un grupo cerrado de amigos."
+  },
+  {
+   "id": "la-ficha",
+   "titulo": "La ficha",
+   "alias": [
+    "Ficha",
+    "Ficha de personaje",
+    "Dock",
+    "Personajes",
+    "Exp y Job"
+   ],
+   "tags": [
+    "herramientas",
+    "personaje"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "La **ficha** es tu personaje entero en una página: identidad, [[Atributos]], [[Stats derivados]], habilidades, pasivas, sociales, mochila, cinturón, invocaciones y estados. **Se guarda sola** en la partida, por partes.\n\n## Qué ves\n- **Cabecera:** foto (con recorte para el token), nombre, raza, clase, subclase, nivel. Las barras de **HP** (roja) y **SP** (azul) y los [[Estados alterados|estados]] activos.\n- **Atributos** a todo el ancho, con sus derivados debajo y el **Campo de visión** ([[Campo de visión]]).\n- **Dos columnas:** a un lado Mochila y Cinturón; al otro Habilidades, Pasivas y Sociales; al final, [[Invocaciones]].\n- La **[[La Mesa|Mesa]]** flotante, con tus tiradas y las de todos.\n\n## El dock (los botones pegados al borde izquierdo)\nSe abre con el mouse encima:\n\n| Botón | Para qué |\n|---|---|\n| ⚡ **Botonera** | Acciones rápidas: [[La Botonera]] |\n| 👥 **Personajes** | Cambiar de personaje o crear uno; ver los de otros en solo lectura |\n| 🏪 **Vendedor** | Abrir la [[Tiendas\\|tienda]] publicada por el GM |\n| ⭐ **Exp y Job** | Experiencia y [[Puntos de Job]] |\n| 💰 **DDE y loot** | [[DDE]] y loot |\n| 📖 **Bitácora** | [[La Bitácora]] |\n| 🛡 **Equipo** | [[Equipo y ranuras]] |\n| 🗺 **Mapa** | Ir a [[El mapa]] |\n| 💾 **Respaldo** | [[Respaldo de la partida]] |\n\n## Editar y entender tus números\n- Pasá el mouse por un stat: ves de dónde sale (atributo, ítem, estado).\n- Los **recursos siguen a su atributo**: subir Constitución sube tu HP máximo.\n- **Estados** compactos: si son muchos, \"＋N · Ver todos\".\n- Con el mapa en combate, **equipar cuesta Nitros** ([[Costos en Nitros]]).\n\n## Ver y ayudar\nPodés **abrir la ficha de otro jugador en solo lectura**. El **GM** además puede tocar **\"✎ Editar como GM\"** para ayudar a alguien (configurar habilidades, por ejemplo): lo que cambie se guarda en la ficha de ese jugador. El Mantenimiento no se aplica desde la vista del GM.\n\n> [!info] Solo compu\n> La ficha está pensada para pantalla de computadora. Ver [[Qué necesito para jugar]]."
+  },
+  {
+   "id": "la-botonera",
+   "titulo": "La Botonera",
+   "alias": [
+    "Botonera",
+    "Acciones rápidas",
+    "Lupa",
+    "🔍"
+   ],
+   "tags": [
+    "herramientas",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "La **Botonera** (botón ⚡ del dock, o desde tu token en el mapa) es tu **control remoto**: ventanitas con todo lo que hacés en tu turno, en botones.\n\n## Qué tiene\n- **Combate:** **Atacar** (cobra los Nitros y tira PdG) y **Daño**. Con dos armas se desdoblan.\n- **Defensa:** Evasión, [[Parry]] y [[Bloqueo]], con el arma a elegir.\n- **Tiradas de stats:** cualquier stat con un clic ([[Cómo se tira un stat]]).\n- **[[Habilidades]]:** un **Ejecutar** por cada una, con costo, tirada y estado.\n- **Consumibles** del cinturón y de la mochila.\n- **Habilidades sociales** ([[Inteligencia y habilidades sociales]]), arriba en narrativo, abajo en combate.\n- **🔎 Percepción** (tirada de [[Especial]], para [[Trampas]] y detección).\n- **Sigilo:** el botón \"Entrar en sigilo\" aparece con solo tener la habilidad ([[Sigilo]]).\n\n## La 🔍 lupa\nAl lado de cada botón hay una **🔍**: **no tira nada**, te explica **de qué stat sale la tirada**, sus modificadores con origen, cómo se reparte en dados y **cuánto cuesta** en Nitros o SP. Es la mejor forma de aprender el sistema.\n\n## Avisos\n- **Sin recursos:** un botón sin Nitros suficientes queda apagado (la 🔍 sigue abriendo). Al tocarlo te avisa y te deja **\"realizar de cualquier modo\"**, con una línea roja en la Mesa.\n- Todo lo que tirás aparece en [[La Mesa]]."
+  },
+  {
+   "id": "el-mapa",
+   "titulo": "El mapa",
+   "alias": [
+    "Mapa",
+    "Tablero",
+    "Hexágonos",
+    "Grilla",
+    "Mapa hexagonal",
+    "VTT"
+   ],
+   "tags": [
+    "herramientas",
+    "mapa"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "El **mapa** es un tablero de **hexágonos** compartido y en vivo. Todos ven los mismos movimientos al instante.\n\n## Lo básico\n- **Tokens:** cada personaje tiene el suyo (con su foto); los enemigos, los del GM. Un token **vinculado** a una ficha muestra su **barra de HP y SP, y sus estados**. → [[Tokens]]\n- **Modo narrativo / combate:** el GM lo cambia. → [[Modo narrativo y modo combate]]\n- **Orden de turnos:** lista flotante (solo en combate). → [[Estructura de un combate]]\n- **La Mesa** al costado: → [[La Mesa]].\n- El **fondo** del mapa puede ser una imagen que el GM sube.\n\n## Moverte\nArrastrás tu token. Se dibuja **la ruta** casillero por casillero y todos ven una **estela** unos segundos. En combate **cada casillero cuesta Nitros**: al soltar se te pide confirmar (o cancelar). Otras cosas útiles:\n- **Clic derecho mientras arrastrás** cancela el movimiento.\n- **Ctrl + Z** deshace el último movimiento.\n- **Girar** el token con el asa celeste ([[Campo de visión]]).\n- **🦶 Mover libre:** mover sin gastar Nitros (para cuando el GM lo decide).\n\n## Sobre el token\nAl seleccionar tu token aparecen controles flotantes: la **vida** (círculo rojo: escribís +N/−N), **SP**, ⚡ **Botonera**, 🛡 **Equipo**, girar, mover libre y editar.\n\n## Herramientas del mapa\n- **Caja de herramientas:** lápiz, terreno y formas (obstáculos, líneas, flores, áreas), regla, mediciones. → [[Terreno y dibujo]]\n- **Ping:** clic derecho en el mapa marca un lugar (un anillo que se expande).\n- **Niebla de guerra, sigilo, conos, trampas:** ver [[Niebla de guerra]], [[Sigilo]], [[Campo de visión]], [[Trampas]].\n- **Varios mapas guardados:** el GM puede tener muchos y cambiar.\n- **Grilla de dados** ([[La Mesa]]) y la **bitácora flotante** ([[La Bitácora]]).\n\n> [!tip] Atajos\n> El ícono ⌨ en el mapa muestra la lista de atajos."
+  },
+  {
+   "id": "tokens",
+   "titulo": "Tokens",
+   "alias": [
+    "Token",
+    "HUD",
+    "Token vinculado",
+    "Creep token"
+   ],
+   "tags": [
+    "herramientas",
+    "mapa"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "Un **token** es la ficha del tablero: el dibujito de un personaje, enemigo, objeto o trampa.\n\n- **Vinculado:** un token de personaje se conecta a su [[La ficha|ficha]] (y uno de enemigo a su [[Creeps|creep]]). Muestra HP, SP y estados en vivo, y la foto de la ficha.\n- **Sin vincular:** para un NPC, una puerta o un objeto: tiene nombre, color e imagen propios.\n- **Dueño:** cada jugador mueve **los suyos**; el GM mueve **todos**.\n- **Se crean con \"+ Token\"**: elegís qué es, dónde y hacia dónde mira. El GM puede crear uno a nombre de un jugador.\n- **Varios en la misma casilla** se acomodan en ronda.\n- El GM puede **ocultar** tokens ([[Ocultar y revelar]])."
+  },
+  {
+   "id": "terreno-y-dibujo",
+   "titulo": "Terreno y dibujo",
+   "alias": [
+    "Terreno y Formas",
+    "Caja de herramientas",
+    "Lápiz",
+    "Dibujar",
+    "Regla"
+   ],
+   "tags": [
+    "herramientas",
+    "mapa"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "La **caja de herramientas** del [[El mapa|mapa]] (a la izquierda) es para **dibujar y marcar**. Cualquiera puede usarla:\n\n- **✏️ Lápiz:** dibuja a mano sobre el mapa mientras lo tenés apretado (y por casilleros numerados).\n- **⬡ Terreno y Formas:** coloca **objetos** con forma (flor de radio N, línea, libre), tamaño, color y transparencia. Se usan para marcar obstáculos, áreas de hechizos y [[Trampas]]. Los **sólidos** tapan la vista ([[Campo de visión]]).\n- **Regla/medición:** para contar casilleros.\n- **🌫 Niebla** (solo GM): destapar o tapar a mano ([[Niebla de guerra]])."
+  },
+  {
+   "id": "la-bitacora",
+   "titulo": "La Bitácora",
+   "alias": [
+    "Bitácora",
+    "Diario",
+    "Notas de la partida"
+   ],
+   "tags": [
+    "herramientas",
+    "empezar"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "La **bitácora** es el **diario compartido de la partida**: quién hizo qué, pistas, nombres, lo que no querés olvidar.\n\n- **Páginas:** cualquiera las crea y las renombra.\n- **Entradas:** cada una en el **color de su autor**, con autor y fecha.\n- **Cualquiera puede corregir** una entrada; **borra** solo el autor (o quien creó la página) o el GM.\n- La abrís desde el dock de la ficha (📖) o como **bitácora flotante** en el mapa.\n- Funciona también en solo lectura."
+  },
+  {
+   "id": "respaldo-de-la-partida",
+   "titulo": "Respaldo de la partida",
+   "alias": [
+    "Respaldo",
+    "Backup",
+    "Guardar copia",
+    "Cargar respaldo"
+   ],
+   "tags": [
+    "herramientas"
+   ],
+   "estado": "confirmado",
+   "capitulo": "herramientas",
+   "cuerpo": "Como el plan gratis del servicio no hace copias de seguridad, **todos pueden bajar un respaldo** a un archivo `.json`:\n\n- **Jugadores:** botón **💾 Respaldo** en la ficha: baja tu personaje y lo que podés leer de la partida. Se recarga con **Cargar archivo**.\n- **GM:** **Respaldo partida** en [[GM Tools]]: incluye los creeps completos. **Cargar respaldo** reemplaza los creeps de la mesa por los del archivo (con confirmación).\n- Al **borrar una partida**, el sistema te ofrece bajar un respaldo antes.\n\n> [!tip] Hacelo seguido\n> Un respaldo antes de una sesión larga o de un cambio grande es barato y salva la partida."
+  },
+  {
+   "id": "editor-de-catalogo",
+   "titulo": "Editor de catálogo",
+   "alias": [
+    "Editor del catálogo",
+    "Catálogo editor"
+   ],
+   "tags": [
+    "herramientas",
+    "catálogo"
+   ],
+   "estado": "borrador",
+   "capitulo": "herramientas",
+   "cuerpo": "Herramienta para el **dueño del proyecto**: un listado filtrable de todo el [[Catálogo de ítems]] con alta, edición y borrado de ítems, usando el mismo asistente paso a paso ([[Crear tus propios ítems]]). Los cambios se sincronizan con las herramientas de juego (ficha, GM Tools, generador de tiendas)."
+  },
+  {
+   "id": "el-rol-del-gm",
+   "titulo": "El rol del GM",
+   "alias": [
+    "GM",
+    "Game Master",
+    "Narrador",
+    "Master",
+    "Dungeon Master"
+   ],
+   "tags": [
+    "gm",
+    "empezar"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "El **GM** (Game Master) es quien **narra el mundo**: describe lugares, interpreta a los personajes no jugadores, maneja a los enemigos y decide cuándo empieza y termina cada escena. **Quien crea una partida es su GM.**\n\n## No limita: acompaña y modera\nEl GM **no está para decir que no**. Está para **acompañar y moderar**: ayudar a que la idea de cada jugador funcione (un paladín justiciero, una piedra consciente con un robot, un gusano pedorro tóxico, un sacerdote con escopeta de agua bendita…), traducirla a números razonables y cuidar que nadie tape a los demás. El Rol Pintoísta es **una invitación a la creación colectiva** ([[La esencia del Rol Pintoísta]]).\n\n> [!example] En la práctica\n> Un jugador quiere ser un **pendorcho galáctico** (una figura geométrica que se comunica por telepatía). El GM no pregunta \"¿eso está en el manual?\": pregunta \"¿cómo se mueve, cómo pelea, qué le pasa a la gente cuando le habla en la cabeza?\", y arma con el jugador las habilidades y el equipo que lo representen.\n\n## Lo que hace en el sistema\n| Tarea | Con qué |\n|---|---|\n| Maneja a los enemigos y aliados | [[GM Tools]] ([[Creeps]]) |\n| Arma y publica tiendas | [[Generador de tiendas]] |\n| Arma el escenario, cambia de modo, oculta y revela | [[El mapa]], [[Ocultar y revelar]] |\n| Decide las reglas de la casa | [[La esencia del Rol Pintoísta]] |\n| Ayuda a un jugador con su ficha | \"✎ Editar como GM\" en [[La ficha]] |\n\n> [!tip] El mejor consejo\n> **Las reglas son referencias**. Si algo frena la historia, cambialo, avisale al grupo y seguí. Ver [[La esencia del Rol Pintoísta]].\n\n## Lo que puede y no puede ver\nEl GM ve todo (creeps, tokens ocultos con el 👁), **excepto la ficha de un personaje en [[Sigilo]]**. **No modifica** las fichas de los jugadores salvo cuando entra explícitamente en \"Editar como GM\".\n\nVer también: [[Cómo armar un encuentro]], [[Traspaso de GM]]."
+  },
+  {
+   "id": "gm-tools",
+   "titulo": "GM Tools",
+   "alias": [
+    "Herramientas del GM",
+    "Panel del GM",
+    "Panel de combate",
+    "Tablero del GM"
+   ],
+   "tags": [
+    "gm",
+    "herramientas"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "**GM Tools** es el panel de combate del GM. Maneja a los **[[Creeps]]**: sus stats, arma, armadura, habilidades y estados.\n\n## Qué hay\n- **Tarjetas de creeps:** compactas, con HP, No2 y **⚡ Acciones** (Atacar, moverse, habilidades con **Ver** y **Ejecutar**). Un lápiz abre la ficha completa para editar.\n- **+ Creep**, **+ Creep con IA** y la **[[Biblioteca de la comunidad|biblioteca]]** con creeps hechos.\n- **Mantenimiento**: cobra el [[Mantenimiento]] a todos.\n- **Personajes:** lista de los de la mesa (abre cada ficha en otra pestaña).\n- **Tablero:** las tarjetas de estado de todos (jugadores y creeps).\n- **Reiniciar combate** (Turno 0), **Catálogo**, **Respaldo partida** ([[Respaldo de la partida]]).\n\n## Cómo pagan los creeps\nIgual que un jugador: **No2 = su Agilidad**, atacar cuesta Tipo ÷ 2 y después Tipo completo, cada habilidad cuesta lo que dice. Moverse lo cobra **el mapa** cuando arrastrás su token.\n\n## Lo que ven los jugadores\nDe cada creep, **solo el token, cuán llena está la barra (un porcentaje) y sus estados**. Nunca sus números ni su ficha."
+  },
+  {
+   "id": "creeps",
+   "titulo": "Creeps",
+   "alias": [
+    "Creep",
+    "Enemigos",
+    "Monstruos",
+    "PNJ",
+    "NPC",
+    "Personajes del GM"
+   ],
+   "tags": [
+    "gm",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "Un **creep** es cualquier personaje que maneja el GM: un monstruo, un guardia, un comerciante, un aliado. Un PNJ del GM **es un creep con otro nombre**.\n\n## Cómo se arma\n- **Atributos** (arrancan en 1) y **HP = Con × 5**, como un jugador. Para repartir, una guía útil es el presupuesto del jugador: **33 + 3 por nivel**.\n- **Un arma** (una sola) y **armadura**, con el asistente de ítems ([[Crear tus propios ítems]]).\n- **Habilidades** con el mismo asistente que los jugadores: costo (SP/No2/HP), tirada, estado, **cooldown** y una casilla **\"Habilidad lenta\"** (arranca el combate en cooldown).\n- **Estados** propios, resistencias a crítico y **stats derivados** completos.\n\n## Un creep en el mapa\nSe **vincula** a un token: barra de vida (solo % para jugadores), estados, y botones para el GM (📜 abre su ficha, ⚡ Acciones). Cuando se mueve, gasta No2 igual que un jugador.\n\n> [!info] Los creeps no tienen SP\n> Solo No2 y HP (y los costos de sus habilidades en No2).\n\nVer también: [[Catálogo de creeps]], [[Cómo armar un encuentro]]."
+  },
+  {
+   "id": "catalogo-de-creeps",
+   "titulo": "Catálogo de creeps",
+   "alias": [
+    "Creeps base",
+    "Creeps por escenario",
+    "Tribu goblin",
+    "Goblins",
+    "Escenarios"
+   ],
+   "tags": [
+    "gm",
+    "catálogo"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "Para no arrancar de cero, hay un **catálogo base de 70 creeps** listo para usar, en **+ Creep → biblioteca**.\n\n## Cuatro escenarios × cinco niveles\n**Minas · Bosques · Montañas · Templo antiguo con influencia alienígena**, cada uno con enemigos de **nivel 1 a 5**, tres por nivel, con roles distintos (brutal, rápido, rango, mago, apoyo).\n\n## La tribu goblin del bosque\nDiez goblins (niveles 1 a 5) con la etiqueta *goblin*: recolector, lancero, hondero, tamborilero, jinete de lobo, chamán de hongos, capitán, lanzabombas… hasta el **Rey de la tribu**.\n\n## Cómo son\n- **Atributos** con el presupuesto del jugador (33 + 3 por nivel) repartidos según el rol.\n- Cada uno lleva **una skill rápida** (cooldown 2) y **una lenta** (cooldown 3–6, arranca en cooldown).\n- Se automatiza lo que se puede (costo en No2, tirada de daño, estados con bonos a sí mismo, cura). Lo que afecta a otros queda **escrito en la descripción** y se resuelve a mano.\n\n> [!warning] \"(auditar)\"\n> Todos llevan **(auditar)** en el nombre y la etiqueta *auditar*: son una propuesta, no un dogma. Ajustalos a tu mesa. Ver [[La esencia del Rol Pintoísta]]."
+  },
+  {
+   "id": "como-armar-un-encuentro",
+   "titulo": "Cómo armar un encuentro",
+   "alias": [
+    "Encuentro",
+    "Armar un combate",
+    "Preparar una pelea",
+    "Dificultad"
+   ],
+   "tags": [
+    "gm",
+    "guía",
+    "combate"
+   ],
+   "estado": "pendiente",
+   "capitulo": "gm",
+   "cuerpo": "Una guía rápida para preparar una pelea:\n\n1. **Elegí el escenario** y armá el [[El mapa|mapa]] con [[Terreno y dibujo|obstáculos]] y, si querés, un fondo.\n2. **Sumá creeps** desde el [[Catálogo de creeps]] o creá los tuyos. Para una pelea \"normal\", suele andar **uno o dos por jugador, del nivel del grupo** o uno menos.\n3. **Ponelos en el mapa** (vinculados a su creep) y decidí cuáles empiezan **ocultos** ([[Ocultar y revelar]]).\n4. Cuando empiece: pasá a **[[Modo narrativo y modo combate|modo combate]]**, tirá [[Iniciativa]] para todos (\"Traer tokens\" en el orden de turnos).\n5. En tu turno con un creep: **⚡ Acciones**. Al terminar, **▶ Siguiente**. Después de cada ronda: **[[Mantenimiento]]**.\n6. Al terminar, volvé a narrativo y repartí [[Tiendas|loot]] y experiencia.\n\n> [!question] Cómo medir la dificultad\n> No hay todavía una guía de **balance**: cuántos creeps de qué nivel para un grupo de N personajes de nivel X. Es material para armar con la experiencia de las primeras sesiones."
+  },
+  {
+   "id": "generador-de-tiendas",
+   "titulo": "Generador de tiendas",
+   "alias": [
+    "Generar tienda",
+    "Vendor",
+    "Tienda del GM"
+   ],
+   "tags": [
+    "gm",
+    "herramientas",
+    "economía"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "El **generador de tiendas** arma el stock de un comerciante y lo publica para los jugadores.\n\n## Cómo se usa\n1. Elegís el **tamaño** y una **categoría**: *Ramos generales*, *Alquimista*, *Herrero* o *Inicio de partida*.\n2. **Generar tienda** sortea el stock según la [[Rareza]] típica de cada tamaño.\n3. **Ajustás:** \"🎲 Otro\" cambia un ítem por otro del mismo rubro; \"+ Agregar ítems\" suma del catálogo; \"+ Crear ítem nuevo\" abre el [[Crear tus propios ítems|asistente]]; el ajuste de precios sube o baja todo.\n4. **Publicar tienda:** los jugadores la ven con **🏪 Vendedor** ([[Tiendas]]). **Cerrar tienda** la baja.\n\n## Reglas de cada categoría\n- **Alquimista:** al menos **40% de ítems \"clásicos\"** (los legacy), si hay suficientes.\n- **Inicio de partida:** mismo reparto que Ramos generales, pero **nunca supera Raro**.\n\n## Tiendas guardadas\nUna por **lugar**: la abierta recuerda de cuál salió. **Guardar** es a mano (te avisa si hay cambios sin guardar). **Regenerar** vuelve a sortear el stock conservando nombre, precios y lugar."
+  },
+  {
+   "id": "ocultar-y-revelar",
+   "titulo": "Ocultar y revelar",
+   "alias": [
+    "Ojo del GM",
+    "Tokens ocultos",
+    "Revelar lo oculto",
+    "Ojo",
+    "Ocultar tokens"
+   ],
+   "tags": [
+    "gm",
+    "mapa",
+    "sigilo"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "El GM puede **esconder** cosas del mapa y de las listas:\n\n- **Ocultar un token** (botón 👁/🙈 en sus controles): los jugadores no lo ven; el GM sí.\n- **Ocultar una fila del orden de turnos:** el turno pasa por ahí, pero los jugadores no ven que estuvo.\n- **Sigilo** de un creep: el GM lo ve semitransparente ([[Sigilo]]).\n- **Trampas:** los rivales no las ven ([[Trampas]]).\n\n## El ojo 👁 revela\nEl botón **👁 Revelar lo oculto** muestra al GM (y solo a él) todo lo escondido: incluso los personajes en sigilo. Y avisa a **todos los jugadores** con un destello rojo con un ojo grande en pantalla y una **fila roja en la [[La Mesa|Mesa]]**: es una regla de honestidad de la mesa, nadie mira a escondidas.\n\n> [!info] Es visual\n> El ocultamiento es del lado de cada navegador. En un grupo de confianza alcanza; si algún día se abre al público, habría que reforzarlo."
+  },
+  {
+   "id": "traspaso-de-gm",
+   "titulo": "Traspaso de GM",
+   "alias": [
+    "Cambiar de GM",
+    "Ceder el GM",
+    "Nuevo GM"
+   ],
+   "tags": [
+    "gm"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "Si el GM quiere **pasarle el rol** a otro jugador (por ejemplo, alguien más va a narrar la próxima campaña), puede **ofrecérselo** desde el inicio de la partida. El otro **recibe la oferta** cuando entra y la acepta o la rechaza. Recién ahí cambia el rol.\n\n> [!tip] Antes de traspasarlo\n> Bajá un [[Respaldo de la partida|respaldo]] por las dudas: es la mejor forma de no perder nada en un cambio de manos."
+  },
+  {
+   "id": "glosario",
+   "titulo": "Glosario",
+   "alias": [
+    "Siglas",
+    "Abreviaturas",
+    "Diccionario",
+    "Términos"
+   ],
+   "tags": [
+    "glosario"
+   ],
+   "estado": "borrador",
+   "capitulo": "glosario",
+   "cuerpo": "Todas las palabras y siglas del juego, con un enlace a la nota que las explica.\n\n## Recursos y stats\n| Término | Significa | Ver |\n|---|---|---|\n| **HP** | Puntos de vida (Con × 5) | [[HP]] |\n| **SP** | Special Power: recurso de habilidades (Esp × 3) | [[SP]] |\n| **No2 / Nitros** | Energía de turno (= Agilidad) | [[Nitros (No2)]] |\n| **FUE** | Fuerza | [[Fuerza]] |\n| **CON** | Constitución | [[Constitución]] |\n| **ESP** | Especial (ex Inteligencia) | [[Especial]] |\n| **DES** | Destreza | [[Destreza]] |\n| **AGL / Agi** | Agilidad | [[Agilidad]] |\n| **Int** | Inteligencia: presupuesto para lo social | [[Inteligencia y habilidades sociales]] |\n| **PdG** | Probabilidad de Golpe: lo que tirás para conectar | [[Atacar]] |\n| **PdG.Mg** | PdG de los hechizos | [[Especial]] |\n| **Dmg** | Daño que se suma al del arma | [[Daño y Tipo de arma]] |\n| **Def** | Defensa: resta al daño físico | [[Defensa]] |\n| **Eva** | Evasión: esquivar | [[Evasión]] |\n| **Parry** | Desviar con el arma | [[Parry]] |\n| **Bloqueo** | Segunda tirada tras un Parry | [[Bloqueo]] |\n| **Ini** | Iniciativa: orden de turnos | [[Iniciativa]] |\n| **Crit** | Chance de golpe crítico | [[Golpe crítico]] |\n| **Rng** | Rango: alcance a distancia | [[Ataques a distancia]] |\n| **Crg.Max** | Carga máxima | [[Carga máxima]] |\n| **Res.Mg / Res.CC / Res.Mt** | Resistencias mágica, a CC y mental | [[Resistencias]] |\n| **SP Regen** | SP que recuperás en cada mantenimiento | [[SP]] |\n| **DDE** | Moneda | [[DDE]] |\n\n## Combate\n| Término | Significa | Ver |\n|---|---|---|\n| **Tipo** | Caras del dado de un arma (4–12) | [[Daño y Tipo de arma]] |\n| **Peso** | Cantidad de dados de un arma | [[Daño y Tipo de arma]] |\n| **T4 P1** | \"Tipo 4, Peso 1\" (1d4) | [[Daño y Tipo de arma]] |\n| **Alcance** | Bono cuerpo a cuerpo para pegar más lejos | [[Ataques a distancia]] |\n| **Ronda** | Una vuelta completa de turnos | [[Estructura de un combate]] |\n| **Mantenimiento** | Fase al final de la ronda | [[Mantenimiento]] |\n| **Crowd Control (CC)** | Estados de control | [[Crowd Control]] |\n| **Buff / Debuff** | Estado bueno / malo | [[Estados alterados]] |\n| **Stack** | Acumulación de un estado | [[Estados alterados]] |\n| **Flash** | Habilidad sin Nitros, en turno ajeno | [[Habilidades]] |\n| **Espameable** | Repetible en el turno | [[Habilidades]] |\n| **Cooldown** | Turnos de espera de una habilidad | [[Habilidades]] |\n| **Amplificar** | Dados extra de daño | [[Habilidades]] |\n| **Critical Matters** | El efecto cambia si es crítico | [[Golpe crítico]] |\n| **Cono / alerta** | Zonas de detección | [[Campo de visión]] |\n| **Sigilo** | Estar oculto | [[Sigilo]] |\n| **Fuego amigo** | Una trampa que afecta a aliados | [[Trampas]] |\n\n## Equipo\n| Término | Significa | Ver |\n|---|---|---|\n| **Tier / Rareza** | Común · Buena Calidad · Raro · Excepcional · Legendario | [[Rareza]] |\n| **Ranura / Slot** | Lugar donde se equipa un ítem | [[Equipo y ranuras]] |\n| **Blanda / Rígida** | Los dos tipos de armadura de torso | [[Armaduras y piezas de defensa]] |\n| **Consumible** | Ítem que se gasta al usarlo | [[Cinturón y consumibles]] |\n| **Catálogo** | Lista compartida de ítems | [[Catálogo de ítems]] |\n\n## Personaje y mesa\n| Término | Significa | Ver |\n|---|---|---|\n| **Job** | Puntos para comprar habilidades | [[Puntos de Job]] |\n| **Skill / Habilidad** | Algo que sabés hacer | [[Habilidades]] |\n| **Pasiva** | Habilidad que funciona sola | [[Pasivas]] |\n| **Creep** | Personaje del GM | [[Creeps]] |\n| **Invocación** | Aliado que manejás vos | [[Invocaciones]] |\n| **GM** | Game Master, narrador | [[El rol del GM]] |\n| **Mesa** | Chat de tiradas compartido | [[La Mesa]] |\n| **Botonera** | Control remoto de tu turno | [[La Botonera]] |\n| **Token** | Ficha en el tablero | [[Tokens]] |\n| **Bitácora** | Diario compartido | [[La Bitácora]] |\n\n> [!question] Términos que faltan\n> Wellness, Wildcard y la definición formal de \"descanso\" están abiertos. Sumalos cuando estén definidos."
+  },
+  {
+   "id": "preguntas-frecuentes",
+   "titulo": "Preguntas frecuentes",
+   "alias": [
+    "FAQ",
+    "Dudas comunes",
+    "Preguntas comunes"
+   ],
+   "tags": [
+    "glosario",
+    "guía"
+   ],
+   "estado": "borrador",
+   "capitulo": "glosario",
+   "cuerpo": "## ¿Puedo cambiar una regla?\nSí. Las reglas son **referencias**, no un corsé. La mesa decide. → [[La esencia del Rol Pintoísta]]\n\n## ¿Por qué no me deja atacar?\nSeguramente te faltan **Nitros**. La ficha te avisa y te deja hacerlo de cualquier modo si lo decidís. → [[Nitros (No2)]]\n\n## ¿Cuántas cosas puedo hacer por turno?\nLas que te alcancen los Nitros: moverte, atacar, usar ítems. → [[Costos en Nitros]]\n\n## ¿Cómo sé de dónde sale un número de mi ficha?\nPasá el mouse por el stat, o tocá la **🔍** al lado del botón. → [[La Botonera]]\n\n## ¿Cuál es la diferencia entre Evasión y Parry?\nEvasión (Agilidad) esquiva el golpe entero; Parry (Destreza) lo desvía con tu arma y abre una segunda tirada de Bloqueo. → [[Defenderse de un ataque]]\n\n## ¿Qué diferencia hay entre Defensa y esquivar?\n**Defensa** resta daño *después* de que te pegaron; **esquivar** evita que te peguen. → [[Defensa]]\n\n## ¿Los enemigos tienen SP?\nNo. Solo HP y No2. → [[Creeps]]\n\n## ¿Cómo recupero SP?\nCon SP Regen (cada mantenimiento), habilidades, consumibles y descanso. → [[SP]]\n\n## ¿Qué pasa si me quedo en 0 de HP?\nEntrás en estado de Muerto: tenés 5 mantenimientos para que te revivan. → [[Muerte]]\n\n## ¿Puedo tener más de un personaje?\nSí, en la misma partida. → [[Inicio y partidas]]\n\n## ¿Puedo jugar desde el celular?\nNo está pensado para eso: solo compu. → [[Qué necesito para jugar]]\n\n## ¿Cómo agrego un ítem inventado al catálogo?\nCon el botón **📦 Agregar al catálogo** del asistente. → [[Crear tus propios ítems]]\n\n## ¿Qué es \"auditar\"?\nQue el dueño del proyecto revise algo antes de aprobarlo (creeps del catálogo, propuestas de la comunidad). → [[Biblioteca de la comunidad]]"
+  },
+  {
+   "id": "tablas-de-referencia-rapida",
+   "titulo": "Tablas de referencia rápida",
+   "alias": [
+    "Referencia rápida",
+    "Tablas",
+    "Cheat sheet",
+    "Apéndice"
+   ],
+   "tags": [
+    "glosario",
+    "tabla"
+   ],
+   "estado": "borrador",
+   "capitulo": "glosario",
+   "cuerpo": "Lo esencial en una pantalla. Para el detalle, seguí los enlaces.\n\n## Recursos\n| | Máximo | Se recupera |\n|---|---|---|\n| [[HP]] | Con × 5 | Curas, regeneración, descanso |\n| [[SP]] | Esp × 3 | SP Regen por mantenimiento, habilidades |\n| [[Nitros (No2)\\|Nitros]] | Agilidad | Todo en cada mantenimiento |\n\n## Puntos por nivel\n| | Nivel 1 | Por nivel |\n|---|---|---|\n| Atributos | 33 (mín. 3) | +3 |\n| [[Puntos de Job\\|Job]] | 3 | +3 |\n| [[Inteligencia y habilidades sociales\\|Inteligencia]] | 6 | +3 |\n\n## Costos en Nitros\n| Acción | Costo |\n|---|---|\n| Mover 1 casillero | 1 |\n| Girar 60° | 1 |\n| Habilidad | 1 (o lo indicado) |\n| 1.er ataque con un arma / Parry | Tipo ÷ 2 |\n| Ataques siguientes | Tipo |\n| Consumible: cinturón / mochila | 1 / 2 |\n| Equipar / desequipar | 1 |\n\n## Tipos de arma\n| Tipo | Dado | Es |\n|---|---|---|\n| 4 | d4 | Perforante |\n| 6 | d6 | Cortante |\n| 8 | d8 | Cortante pesado / contundente liviano |\n| 10 | d10 | Contundente pesado |\n| 12 | d12 | Explosivo |\n\n## Costo de habilidades (Job)\n| Tipo | Puntos |\n|---|---|\n| De clase (cualquiera) | 1 |\n| Custom | 2 |\n| Pasiva | 1 (por defecto) |\n\n## Resistencia a crítico por rareza\n| Común | Buena | Raro | Excepcional | Legendario |\n|---|---|---|---|---|\n| Tipo 4–6 | hasta 8 | hasta 8 | hasta 10 | hasta 12 |\n\nMás detalle: [[Resistencia a crítico]], [[Rareza]]."
+  },
+  {
+   "id": "como-completar-y-mantener-este-manual",
+   "titulo": "Cómo completar y mantener este manual",
+   "alias": [
+    "Mantener el manual",
+    "Editar el manual",
+    "Contribuir al manual",
+    "Escribir una nota"
+   ],
+   "tags": [
+    "manual"
+   ],
+   "estado": "confirmado",
+   "capitulo": "sobre-este-manual",
+   "cuerpo": "Este manual está pensado para **crecer de a poco**. Se escribió a partir de todo lo conversado hasta hoy; lo que no estaba claro quedó **abierto a propósito** (recuadros violetas ❓) para que el dueño del sistema lo vaya completando.\n\n## Dónde ver lo que falta\nEl botón **📌 Pendientes** del manual junta en una sola pantalla:\n- todas las **preguntas abiertas** (agrupadas por capítulo),\n- las notas en **borrador** o **pendientes**,\n- los **enlaces a notas que todavía no existen**.\n\n## Cómo se edita\nEl manual es un conjunto de archivos de texto en `manual-usuario/notas/`, uno por capítulo (`01-empezar.md`, `02-mundo.md`…). Adentro hay **varias notas**; cada una empieza con una cabecera entre líneas `+++`:\n\n```\n  +++\ntitulo: Nitros (No2)\nalias: [No2, Nitro, Nitros]\ntags: [recursos, combate]\nestado: confirmado\n  +++\nTexto de la nota…\n```\n\n- **`alias`**: otros nombres con los que se encuentra y se enlaza (el buscador y los `[[enlaces]]` los usan).\n- **`estado`**: `confirmado`, `borrador` o `pendiente`.\n- **`tags`**: etiquetas del árbol lateral.\n\n## Escritura\n| Para… | Escribí |\n|---|---|\n| Enlazar a otra nota | `[[Nombre de la nota]]` |\n| Enlazar con otro texto | `[[Nombre de la nota\\|texto que se ve]]` |\n| Enlazar a una sección | `[[Nota#Sección]]` |\n| Una pregunta abierta | `> [!question] Título` y debajo la pregunta |\n| Un consejo / advertencia / ejemplo | `> [!tip]`, `> [!warning]`, `> [!example]` |\n\nSi el nombre de la nota **no existe**, el enlace queda gris con lápiz ✎: es una nota por escribir, y aparece en Pendientes.\n\n## Publicar los cambios\nDespués de editar, se corre `herramientas/compilar_manual.py` (arma `datos/manual.json`), y se sube el resultado. El manual publicado lee ese archivo.\n\n> [!tip] Se puede abrir con Obsidian\n> Los archivos usan la misma sintaxis (`[[enlaces]]`, `> [!callouts]`) que Obsidian, salvo la cabecera `+++`, que es propia de este sistema."
+  },
+  {
+   "id": "historial-de-versiones",
+   "titulo": "Historial de versiones",
+   "alias": [
+    "Iteraciones",
+    "Iteración 2",
+    "Bonos",
+    "Acciones",
+    "Cambios del sistema",
+    "Versión vieja"
+   ],
+   "tags": [
+    "manual"
+   ],
+   "estado": "borrador",
+   "capitulo": "sobre-este-manual",
+   "cuerpo": "Cambios importantes del sistema, para entender material viejo:\n\n| Cambio | Antes | Ahora |\n|---|---|---|\n| **Iteración 2** (2026-09-04) | **Bonos** y **Acciones** por turno | [[SP]] (Special Power) y [[Nitros (No2)]] |\n| **Movimiento** | Un stat aparte | Se paga con [[Nitros (No2)\\|Nitros]] |\n| **Inteligencia → Especial** (2026-09-18) | El atributo se llamaba \"Inteligencia\" | Se llama [[Especial]]; \"Inteligencia\" ahora es el presupuesto para [[Inteligencia y habilidades sociales\\|habilidades sociales]] |\n| **Escala de Tipos** | Tipos 2, 4, 6, 8, 10 | Tipos **4, 6, 8, 10, 12** ([[Daño y Tipo de arma]]) |\n| **Piezas de defensa** | Cascos/guantes/piernas/botas blandos y rígidos | Una sola categoría plana por ranura; solo el torso distingue blanda/rígida |\n| **Skill de clase** | 1 de tu clase, 2 de otra, 3 custom | **1** de clase (cualquiera), **2** custom ([[Puntos de Job]]) |\n| **Wildcards** | Contador diario para repetir tiradas | Sacados de la ficha (ver [[Afortunado]]) |\n| **Sync de datos** | Subir/Bajar datos por GitHub | Todo en vivo, se guarda solo |\n\n## La campaña vieja\n\"Piratas en el espacio\" se jugaba con la versión anterior del sistema. Quedó archivada: ver [[Piratas en el espacio]]."
+  }
+ ]
+}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Manual del jugador — Piratas en el espacio</title>
+<title>Manual — Rol Pintoísta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -11,638 +11,870 @@
 :root{
   --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
   --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
-  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --azul:#5B9BD5; --r:4px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:
-    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
-    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
-    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
-  color:var(--paper);
-  font-family:"Space Grotesk", system-ui, sans-serif;
-  font-size:14px;
-  line-height:1.5;
-  min-height:100vh;
+  background:radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.5;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;
 }
-h1,h2,h3{font-family:"Fraunces",serif;font-weight:600;margin:0}
-button{font:inherit;cursor:pointer}
-.hint{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;color:var(--muted)}
-.btn{
-  border:1px solid var(--line);background:var(--panel2);color:var(--paper);
-  padding:7px 12px;border-radius:var(--r);font-size:13px
-}
-.btn:hover{border-color:var(--copper)}
-.btn.primary{background:var(--copper);border-color:var(--copper);color:#1c1208;font-weight:700}
-.btn.primary:hover{background:var(--brass)}
-.btn.ghost{background:none}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.iconbtn{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);padding:4px 8px;font-size:12px}
-.iconbtn:hover{border-color:var(--copper);color:var(--brass)}
-input[type=text],textarea{
+h1,h2,h3,h4{font-family:"Fraunces",serif;font-weight:600;margin:0}
+button{font:inherit;cursor:pointer;color:inherit}
+a{color:var(--brass)}
+.mono{font-family:"Space Mono",monospace}
+
+/* ---------- Cabecera ---------- */
+header{flex:none;display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.25)}
+header .marca{font-family:"Fraunces",serif;font-size:18px;font-weight:600;cursor:pointer;white-space:nowrap;background:none;border:none;color:var(--paper);padding:0}
+header .marca small{display:block;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.1em;color:var(--muted);font-weight:400}
+.buscador{position:relative;flex:1;max-width:560px;min-width:160px}
+.buscador input{
   width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--paper);
-  padding:8px 10px;border-radius:var(--r);font-family:inherit;font-size:14px
+  padding:8px 34px 8px 34px;border-radius:999px;font:inherit;font-size:14px
 }
-textarea{resize:vertical;min-height:160px;line-height:1.6}
-input:focus,textarea:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
-
-header{
-  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  padding:14px 22px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18)
+.buscador input:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+.buscador .lupa{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.buscador kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 5px}
+#sugerencias{
+  position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--copper);
+  border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.6);z-index:60;max-height:70vh;overflow-y:auto;display:none
 }
-header h1{font-size:19px}
-header .estado{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted)}
-header .estado.ok{color:var(--absenta)}
-header .estado.err{color:var(--danger)}
-header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#sugerencias.abierto{display:block}
+.sug{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line-soft);padding:9px 12px}
+.sug:last-child{border-bottom:none}
+.sug.sel,.sug:hover{background:var(--panel2)}
+.sug .t{font-weight:700;color:var(--brass)}
+.sug .c{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-left:6px}
+.sug .s{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.sug-vacio{padding:12px;color:var(--muted)}
+mark{background:rgba(224,164,88,.32);color:var(--paper);border-radius:2px;padding:0 1px}
+header .acciones{display:flex;gap:6px;margin-left:auto}
+.iconbtn{border:1px solid var(--line);background:none;color:var(--muted);border-radius:var(--r);padding:6px 10px;font-size:13px;white-space:nowrap}
+.iconbtn:hover:not(:disabled){border-color:var(--copper);color:var(--brass)}
+.iconbtn:disabled{opacity:.35;cursor:default}
 
-.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
-/* En pantalla ancha, índice y contenido scrollean cada uno por su lado */
-@media(min-width:761px){
-  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
-  header{flex:none}
-  .layout{flex:1;min-height:0}
-  nav.toc,main.contenido{min-height:0}
+/* ---------- Estructura ---------- */
+.layout{flex:1;min-height:0;display:grid;grid-template-columns:270px minmax(0,1fr) 250px}
+nav.arbol,main.contenido,aside.lateral{min-height:0;overflow-y:auto}
+nav.arbol{border-right:1px solid var(--line);padding:14px 10px}
+aside.lateral{border-left:1px solid var(--line);padding:18px 14px}
+main.contenido{padding:26px 38px 60px;scroll-behavior:smooth}
+main.contenido > .hoja{max-width:780px;margin:0 auto}
+@media(max-width:1180px){.layout{grid-template-columns:250px minmax(0,1fr)} aside.lateral{display:none}}
+@media(max-width:800px){
+  body{height:auto;overflow:auto}
+  .layout{display:block}
+  nav.arbol{border-right:none;border-bottom:1px solid var(--line);max-height:38vh}
+  main.contenido{padding:18px 16px 50px;overflow:visible}
 }
-@media(max-width:760px){.layout{grid-template-columns:1fr}}
 
-nav.toc{border-right:1px solid var(--line);padding:16px 10px;overflow-y:auto}
-nav.toc .capitulo{margin-bottom:4px}
-nav.toc .capitulo-head{
-  display:flex;align-items:center;gap:6px;padding:8px 8px;border-radius:var(--r);cursor:pointer;
-  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)
-}
-nav.toc .capitulo-head:hover{background:var(--panel2)}
-nav.toc .capitulo-head .car{transition:transform .15s;flex:none;font-size:10px;color:var(--muted)}
-nav.toc .capitulo.cerrado .car{transform:rotate(-90deg)}
-nav.toc .capitulo.cerrado .secciones{display:none}
-nav.toc .secciones{display:flex;flex-direction:column;gap:2px;margin:2px 0 8px;padding-left:14px}
-nav.toc .seccion-btn{
-  text-align:left;border:none;background:none;color:var(--paper);padding:6px 8px;border-radius:var(--r);
-  font-size:13px;border-left:2px solid transparent
-}
-nav.toc .seccion-btn:hover{background:var(--panel2)}
-nav.toc .seccion-btn.activa{background:var(--panel2);border-left-color:var(--copper);color:var(--brass);font-weight:700}
-nav.toc .vacio{color:var(--muted);font-size:12px;padding:4px 8px}
-nav.toc .toc-edit-row{display:flex;gap:6px;padding:8px}
+/* ---------- Árbol ---------- */
+.arbol .cap-cab{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:var(--r);cursor:pointer;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);user-select:none}
+.arbol .cap-cab:hover{background:var(--panel2)}
+.arbol .cap-cab .car{font-size:9px;color:var(--muted);transition:transform .15s}
+.arbol .cap.cerrado .car{transform:rotate(-90deg)}
+.arbol .cap.cerrado .notas{display:none}
+.arbol .cap-cab .n{margin-left:auto;color:var(--muted);font-size:10px}
+.arbol .notas{display:flex;flex-direction:column;gap:1px;margin:1px 0 8px 12px;padding-left:8px;border-left:1px solid var(--line-soft)}
+.arbol .nota-btn{text-align:left;border:none;background:none;padding:5px 8px;border-radius:var(--r);font-size:13px;color:var(--paper);border-left:2px solid transparent;display:flex;gap:6px;align-items:baseline}
+.arbol .nota-btn:hover{background:var(--panel2)}
+.arbol .nota-btn.activa{background:var(--panel2);border-left-color:var(--copper);color:var(--brass);font-weight:700}
+.arbol .nota-btn .e{font-size:9px;opacity:.85;flex:none}
+.arbol h5{margin:16px 8px 6px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 6px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:2px 9px;font-size:11.5px;cursor:pointer;text-decoration:none;display:inline-block}
+.chip:hover{border-color:var(--copper);color:var(--brass)}
+.chip .n{opacity:.6;margin-left:3px}
 
-main.contenido{padding:26px 34px;overflow-y:auto}
-main.contenido > *{max-width:692px}
-main.contenido .sin-seleccion{color:var(--muted);margin-top:40px;text-align:center}
-main.contenido .cap-eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin-bottom:6px}
-main.contenido h2{font-size:26px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
-main.contenido .cuerpo{font-size:15px;line-height:1.7}
-main.contenido .cuerpo p{margin:0 0 14px}
-main.contenido .cuerpo ul{margin:0 0 14px;padding-left:22px}
-main.contenido .cuerpo li{margin-bottom:4px}
-main.contenido .cuerpo .vacia{color:var(--muted);font-style:italic}
-main.contenido .cuerpo ol{margin:0 0 14px;padding-left:24px}
-main.contenido .cuerpo strong{color:var(--brass);font-weight:700}
-main.contenido .cuerpo code{font-family:"Space Mono",monospace;font-size:12.5px;background:var(--panel2);border:1px solid var(--line-soft);padding:1px 5px;border-radius:var(--r)}
-main.contenido .cuerpo h3{font-size:18px;margin:22px 0 10px;color:var(--brass)}
-main.contenido .cuerpo h4{font-size:16px;margin:18px 0 8px}
-main.contenido .cuerpo hr{border:none;border-top:1px solid var(--line-soft);margin:22px 0}
-main.contenido .cuerpo blockquote{margin:0 0 14px;padding:10px 14px;border-left:3px solid var(--copper);background:rgba(201,133,69,.07);border-radius:0 var(--r) var(--r) 0}
-main.contenido .cuerpo blockquote > :last-child{margin-bottom:0}
-main.contenido .cuerpo .tabla-scroll{overflow-x:auto;margin:0 0 16px}
-main.contenido .cuerpo table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
-main.contenido .cuerpo th,main.contenido .cuerpo td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-main.contenido .cuerpo th{background:var(--panel2);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
-main.contenido .cuerpo tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+/* ---------- Nota ---------- */
+.migas{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.migas a{color:var(--copper);text-decoration:none}
+.migas a:hover{text-decoration:underline}
+.hoja > h1{font-size:34px;line-height:1.15;margin-bottom:10px}
+.hoja .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--line-soft)}
+.badge{font-family:"Space Mono",monospace;font-size:10.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line)}
+.badge.confirmado{color:var(--absenta);border-color:rgba(168,194,86,.5)}
+.badge.borrador{color:var(--brass);border-color:rgba(224,164,88,.5)}
+.badge.pendiente{color:var(--muted)}
+.cuerpo{font-size:15.5px;line-height:1.75}
+.cuerpo p{margin:0 0 15px}
+.cuerpo ul,.cuerpo ol{margin:0 0 15px;padding-left:24px}
+.cuerpo li{margin-bottom:5px}
+.cuerpo li > ul,.cuerpo li > ol{margin:5px 0 5px}
+.cuerpo strong{color:var(--brass)}
+.cuerpo em{color:#f1e7d4}
+.cuerpo code{font-family:"Space Mono",monospace;font-size:12.8px;background:var(--panel2);border:1px solid var(--line-soft);padding:1px 6px;border-radius:var(--r)}
+.cuerpo h2{font-size:24px;margin:34px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line-soft);scroll-margin-top:12px}
+.cuerpo h3{font-size:19px;margin:26px 0 10px;color:var(--brass);scroll-margin-top:12px}
+.cuerpo h4{font-size:16px;margin:20px 0 8px;scroll-margin-top:12px}
+.cuerpo hr{border:none;border-top:1px solid var(--line-soft);margin:24px 0}
+.cuerpo .tabla{overflow-x:auto;margin:0 0 18px}
+.cuerpo table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
+.cuerpo th,.cuerpo td{border:1px solid var(--line);padding:7px 11px;text-align:left;vertical-align:top}
+.cuerpo th{background:var(--panel2);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
+.cuerpo tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.cuerpo blockquote{margin:0 0 15px;padding:10px 16px;border-left:3px solid var(--copper);background:rgba(201,133,69,.07);border-radius:0 var(--r) var(--r) 0}
+.cuerpo .task{list-style:none;margin-left:-22px}
+.cuerpo pre{background:var(--panel2);border:1px solid var(--line-soft);border-radius:var(--r);padding:12px;overflow-x:auto;font-size:12.8px}
 
-.edicion-caja{border:1px solid var(--line);background:var(--panel2);border-radius:var(--r);padding:14px;margin-top:10px;display:flex;flex-direction:column;gap:10px}
-.edicion-caja .f{display:flex;flex-direction:column;gap:5px}
-.edicion-caja label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.edicion-caja .fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.edicion-caja .fila-derecha{margin-left:auto}
-.modo-edicion main.contenido .cuerpo{display:none}
-main.contenido .editor-seccion{display:none}
-.modo-edicion main.contenido .editor-seccion{display:block}
-.modo-edicion .solo-lectura{display:none}
-body:not(.modo-edicion) .solo-edicion{display:none}
-#btn-editar.activo{background:var(--wine);border-color:var(--wine);color:var(--paper)}
+/* Enlaces internos, estilo Obsidian */
+a.wl{color:var(--azul);text-decoration:none;border-bottom:1px dotted rgba(91,155,213,.55);cursor:pointer}
+a.wl:hover{color:#8fc2ee;border-bottom-style:solid}
+a.wl.roto{color:var(--muted);border-bottom:1px dashed var(--muted)}
+a.wl.roto::after{content:" ✎";font-size:.8em}
 
-.toast{
-  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
-  background:var(--panel2);border:1px solid var(--copper);color:var(--paper);padding:10px 16px;
-  border-radius:var(--r);font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:90vw
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Callouts */
+.callout{margin:0 0 17px;border:1px solid var(--line);border-left-width:4px;border-radius:var(--r);background:var(--panel);overflow:hidden}
+.callout .ct{display:flex;gap:8px;align-items:center;padding:8px 14px;font-weight:700;font-size:14px}
+.callout .cb{padding:0 16px 4px;font-size:15px}
+.callout .cb > :last-child{margin-bottom:10px}
+.callout.tip{border-left-color:var(--absenta)} .callout.tip .ct{color:var(--absenta);background:rgba(168,194,86,.07)}
+.callout.info,.callout.note{border-left-color:var(--azul)} .callout.info .ct,.callout.note .ct{color:var(--azul);background:rgba(91,155,213,.07)}
+.callout.warning{border-left-color:var(--danger)} .callout.warning .ct{color:var(--danger);background:rgba(212,87,78,.07)}
+.callout.example{border-left-color:var(--brass)} .callout.example .ct{color:var(--brass);background:rgba(224,164,88,.07)}
+.callout.question{border-left-color:#B784E0;border-style:dashed;border-left-style:solid} .callout.question .ct{color:#c9a3ea;background:rgba(183,132,224,.09)}
+
+/* Pie de la nota */
+.pie{margin-top:44px;border-top:1px solid var(--line);padding-top:18px}
+.pie h4{font-family:"Space Mono",monospace;font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.lista-links{display:flex;flex-wrap:wrap;gap:6px 8px;margin-bottom:18px}
+
+/* Lateral */
+aside.lateral h4{font-family:"Space Mono",monospace;font-weight:400;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}
+aside.lateral .bloque{margin-bottom:22px}
+aside.lateral a.item{display:block;color:var(--paper);text-decoration:none;padding:3px 0;font-size:13px;border-left:2px solid transparent;padding-left:8px}
+aside.lateral a.item:hover{color:var(--brass);border-left-color:var(--copper)}
+aside.lateral a.item.h3{padding-left:20px;color:var(--muted);font-size:12.5px}
+aside.lateral .vacio{color:var(--muted);font-size:12.5px}
+
+/* Inicio y listas */
+.hero{padding:10px 0 24px}
+.hero h1{font-size:40px;line-height:1.1;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:16px;max-width:560px}
+.grilla-cap{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:22px 0}
+.tarjeta{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:14px 16px;text-align:left;text-decoration:none;color:var(--paper);display:block}
+.tarjeta:hover{border-color:var(--copper);background:var(--panel2)}
+.tarjeta .ic{font-size:24px}
+.tarjeta h3{font-size:17px;margin:4px 0 4px}
+.tarjeta p{margin:0 0 8px;color:var(--muted);font-size:13px;line-height:1.45}
+.barra{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--line-soft)}
+.barra i{display:block;height:100%}
+.barra .c{background:var(--absenta)} .barra .b{background:var(--brass)} .barra .p{background:#5a4d52}
+.tarjeta .mini{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:5px}
+.resultado{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:9px;text-decoration:none;color:var(--paper);background:var(--panel)}
+.resultado:hover{border-color:var(--copper)}
+.resultado .t{font-weight:700;color:var(--brass);font-size:16px}
+.resultado .c{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-left:8px}
+.resultado .s{color:var(--muted);font-size:13.5px;margin-top:3px}
+.az{columns:2 280px;column-gap:26px}
+.az a{display:block;padding:3px 0;color:var(--paper);text-decoration:none;break-inside:avoid}
+.az a:hover{color:var(--brass)}
+.az .letra{font-family:"Fraunces",serif;font-size:22px;color:var(--copper);margin:14px 0 4px;break-after:avoid}
+.az small{color:var(--muted)}
+.vacio-grande{text-align:center;color:var(--muted);padding:40px 0}
+
+/* Vista previa al pasar el mouse */
+#preview{position:fixed;z-index:80;max-width:340px;background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);padding:11px 14px;box-shadow:0 10px 26px rgba(0,0,0,.6);display:none;pointer-events:none}
+#preview .t{font-family:"Fraunces",serif;font-weight:600;color:var(--brass);margin-bottom:4px}
+#preview .s{font-size:13px;color:var(--paper);line-height:1.5}
+#preview .c{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:6px}
+
+/* Grafo */
+#grafo{position:fixed;inset:0;z-index:70;background:#0c090b;display:none;flex-direction:column}
+#grafo.abierto{display:flex}
+#grafo .barra-g{display:flex;gap:10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line)}
+#grafo .barra-g h3{font-size:17px;white-space:nowrap}
+#grafo .leyenda{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--muted);margin-left:14px}
+#grafo .leyenda i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+#grafo canvas{flex:1;width:100%;min-height:0;cursor:grab}
+#grafo .ayuda{position:absolute;left:18px;bottom:12px;font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <h1>📖 <span id="titulo-manual">Manual del jugador</span></h1>
-    <div class="estado" id="estado">Sin cargar todavía.</div>
+  <button class="marca" id="btn-inicio" title="Ir al inicio">📖 Manual<small>ROL PINTOÍSTA</small></button>
+  <div class="buscador">
+    <span class="lupa">🔍</span>
+    <input id="q" type="search" autocomplete="off" placeholder="Buscar una regla, un término, una palabra…" aria-label="Buscar en el manual">
+    <kbd>/</kbd>
+    <div id="sugerencias"></div>
   </div>
   <div class="acciones">
-    <button class="iconbtn solo-edicion" id="btn-importar-md" title="Reemplazar TODO el manual con un documento .md (## = capítulo, ### = sección)">Importar .md…</button>
-    <input type="file" id="input-md" accept=".md,.txt,text/markdown,text/plain" style="display:none">
-    <button class="iconbtn solo-edicion" id="btn-guardar" title="Bajar una copia de respaldo del manual (reglas.json)">Descargar copia</button>
-    <button class="btn primary solo-edicion" id="btn-subir" title="Publicar en el sitio web (datos/reglas.json)">Publicar cambios</button>
-    <button class="btn" id="btn-editar" title="Activar/desactivar modo edición">✏ Editar</button>
+    <button class="iconbtn" id="btn-atras" title="Volver (Alt + ←)">←</button>
+    <button class="iconbtn" id="btn-adelante" title="Adelante (Alt + →)">→</button>
+    <button class="iconbtn" id="btn-az" title="Índice de todas las notas">A–Z</button>
+    <button class="iconbtn" id="btn-pend" title="Preguntas abiertas y cosas por completar">📌 Pendientes</button>
+    <button class="iconbtn" id="btn-grafo" title="Mapa de cómo se conectan las notas">🕸 Mapa</button>
   </div>
 </header>
 
 <div class="layout">
-  <nav class="toc" id="toc"></nav>
-  <main class="contenido" id="contenido">
-    <div class="sin-seleccion">Elegí una sección del índice para leerla.</div>
-  </main>
+  <nav class="arbol" id="arbol" aria-label="Índice del manual"></nav>
+  <main class="contenido" id="contenido"><div class="hoja"><p class="vacio-grande">Cargando el manual…</p></div></main>
+  <aside class="lateral" id="lateral"></aside>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="preview"></div>
+
+<div id="grafo">
+  <div class="barra-g">
+    <h3>🕸 Mapa del manual</h3>
+    <div class="leyenda" id="leyenda-g"></div>
+    <button class="iconbtn" id="cerrar-grafo" style="margin-left:auto">✕ Cerrar (Esc)</button>
+  </div>
+  <canvas id="lienzo"></canvas>
+  <div class="ayuda">Arrastrá el fondo para mover · rueda para acercar · clic en una nota para abrirla · las notas huecas todavía no están escritas</div>
+</div>
 
 <script>
 /* =========================================================
-   Manual del jugador — HTML standalone, sin dependencias.
-   El contenido (capítulos → secciones → texto) vive en
-   datos/reglas.json, no acá: este archivo es solo la
-   estructura de navegación + el editor. Mismo patrón de
-   guardado/carga en JSON y sincronización con GitHub que
-   ficha.html, gm-tools.html y vendor-generator.html.
+   Manual del Rol Pintoísta — navegable como un vault de Obsidian.
+   El contenido vive en datos/manual.json, que sale de compilar los
+   archivos de manual-usuario/notas/*.md con
+   herramientas/compilar_manual.py. Este archivo solo lee y muestra.
    ========================================================= */
-
 const GH_REPO = 'elsauloel/rolpintoista';
-const GH_BRANCH = 'nueva-version';   // la rama que publica el sitio web
-const ARCHIVO_REGLAS = 'datos/reglas.json';
-
+const GH_BRANCH = 'nueva-version';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const uid = () => Math.random().toString(36).slice(2, 10);
+const fold = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const slug = s => fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const ESTADO = {confirmado: ['✅', 'Confirmado'], borrador: ['🟡', 'Borrador'], pendiente: ['🔲', 'Pendiente']};
+const PALETA = ['#E0A458', '#5B9BD5', '#A8C256', '#D4574E', '#B784E0', '#4FA88C', '#D07B3A', '#C4485A', '#8FB84F', '#7d9ab8', '#c9a3ea', '#e6c87a', '#6fbf9f', '#b89a7a'];
 
-let M = { titulo: 'Manual del jugador', actualizado: '', capitulos: [] };
-let seleccion = null;   // {capId, secId}
-let editando = false;
-let cerrados = new Set(JSON.parse(localStorage.getItem('manual-cerrados') || '[]'));
+let M = null, porId = {}, porNombre = {}, capPorId = {}, enlacesSal = {}, enlacesEnt = {}, rotos = {};
 
-function toast(msg){
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => el.classList.remove('show'), 2600);
-}
-function estado(msg, clase){
-  const el = $('#estado');
-  el.textContent = msg;
-  el.className = 'estado' + (clase ? ' ' + clase : '');
+/* ---------- Carga ---------- */
+async function cargar(){
+  let datos = null;
+  try{
+    const r = await fetch('../datos/manual.json', {cache: 'no-store'});
+    if(r.ok) datos = await r.json();
+  }catch(e){ /* file:// u offline: se prueba GitHub */ }
+  if(!datos){
+    try{
+      const r = await fetch(`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/datos/manual.json`, {cache: 'no-store'});
+      if(r.ok) datos = await r.json();
+    }catch(e){}
+  }
+  if(!datos){
+    $('#contenido').innerHTML = '<div class="hoja"><p class="vacio-grande">No se pudo cargar el manual. Abrilo desde el sitio web, o revisá tu conexión.</p></div>';
+    return;
+  }
+  M = datos;
+  indexar();
+  dibujarArbol();
+  window.addEventListener('hashchange', ruta);
+  ruta();
 }
 
-/* ---------- Render: Markdown simplificado, hecho a mano (sin librerías) ----------
-   Soporta lo que usa el documento del manual: párrafos, listas "- " y "1. ",
-   tablas "| a | b |", citas "> ", títulos "### ", separador "---",
-   **negrita**, *cursiva* y `código`. */
-function inlineHtml(s){
-  const codigos = [];
-  let h = esc(s).replace(/`([^`]+)`/g, (_, c) => { codigos.push(c); return ` ${codigos.length - 1} `; });
-  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-       .replace(/(^|[^*\w])\*(?!\s)([^*]+?)\*(?!\w)/g, '$1<em>$2</em>');
-  return h.replace(/ (\d+) /g, (_, i) => `<code>${codigos[i]}</code>`);
+function indexar(){
+  porId = {}; porNombre = {}; capPorId = {}; enlacesSal = {}; enlacesEnt = {}; rotos = {};
+  M.capitulos.forEach(c => capPorId[c.id] = c);
+  M.notas.forEach(n => {
+    porId[n.id] = n;
+    [n.id, n.titulo, ...(n.alias || [])].forEach(k => { const f = fold(k); if(f && !porNombre[f]) porNombre[f] = n; });
+    n._t = fold(n.titulo); n._a = (n.alias || []).map(fold); n._tags = (n.tags || []).map(fold);
+    n._plano = textoPlano(n.cuerpo);
+    n._b = fold(n._plano);
+    n._h = fold(encabezados(n.cuerpo).map(h => h.texto).join(' | '));
+    n._res = resumenDe(n.cuerpo);
+  });
+  M.notas.forEach(n => {
+    enlacesSal[n.id] = new Set();
+    for(const m of sinCodigo(n.cuerpo).replace(/\\\|/g, '|').matchAll(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/g)){
+      const dest = porNombre[fold(m[1].trim())];
+      if(dest){
+        if(dest.id !== n.id){
+          enlacesSal[n.id].add(dest.id);
+          (enlacesEnt[dest.id] = enlacesEnt[dest.id] || new Set()).add(n.id);
+        }
+      }else{
+        const k = m[1].trim();
+        (rotos[k] = rotos[k] || new Set()).add(n.id);
+      }
+    }
+  });
 }
-function tipoLinea(l){
-  const s = l.trim();
-  if(!s) return 'blanco';
-  if(/^#{1,6}\s/.test(s)) return 'titulo';
-  if(/^(-{3,}|\*{3,})$/.test(s)) return 'hr';
-  if(s.startsWith('>')) return 'cita';
-  if(s.startsWith('|')) return 'tabla';
-  if(/^[-*]\s/.test(s)) return 'ul';
-  if(/^\d+[.)]\s/.test(s)) return 'ol';
-  return 'p';
+
+/* ---------- Texto plano y resúmenes ---------- */
+function sinCodigo(md){ return md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, ''); }
+function textoPlano(md){
+  return md.replace(/\\\|/g, '|').replace(/^\s*>\s*\[![^\]]+\][+-]?\s*/gm, '').replace(/\[\[([^\]|#]+)(?:#[^\]|]*)?\|([^\]]+)\]\]/g, '$2')
+    .replace(/\[\[([^\]|#]+)(?:#([^\]|]*))?\]\]/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^\s*#{1,4}\s*/gm, '').replace(/^\s*>\s?/gm, '').replace(/^\s*\|?[-: |]+\|?\s*$/gm, '')
+    .replace(/[*_`|]/g, '').replace(/^\s*[-*]\s+/gm, '').replace(/\s+/g, ' ').trim();
 }
-function celdas(l){
-  let s = l.trim();
-  if(s.startsWith('|')) s = s.slice(1);
-  if(s.endsWith('|')) s = s.slice(0, -1);
-  return s.split('|').map(c => c.trim());
+function resumenDe(md){
+  const bloques = md.split(/\n\s*\n/).map(b => b.trim()).filter(b => b && !/^(#|\||>\s*\[!|---)/.test(b));
+  const t = textoPlano(bloques[0] || '');
+  return t.length > 230 ? t.slice(0, 227).replace(/\s+\S*$/, '') + '…' : t;
 }
-function tablaHtml(filas){
-  const esSeparador = l => /^\|?[\s:|-]+$/.test(l) && l.includes('-');
-  let cabecera = null;
-  if(filas.length > 1 && esSeparador(filas[1])){ cabecera = celdas(filas[0]); filas = filas.slice(2); }
-  filas = filas.filter(l => !esSeparador(l));
-  const th = cabecera ? `<thead><tr>${cabecera.map(c => `<th>${inlineHtml(c)}</th>`).join('')}</tr></thead>` : '';
-  const tb = filas.map(l => `<tr>${celdas(l).map(c => `<td>${inlineHtml(c)}</td>`).join('')}</tr>`).join('');
-  return `<div class="tabla-scroll"><table>${th}<tbody>${tb}</tbody></table></div>`;
+function encabezados(md){
+  const out = [];
+  let enCodigo = false;
+  md.split('\n').forEach(l => {
+    if(/^```/.test(l)) enCodigo = !enCodigo;
+    const m = !enCodigo && l.match(/^(#{2,4})\s+(.*)$/);
+    if(m) out.push({nivel: m[1].length, texto: m[2].replace(/[*_`]/g, '').trim(), id: slug(m[2])});
+  });
+  return out;
 }
-function bloquesHtml(lineas){
+
+/* ---------- Markdown ---------- */
+function resolverLink(nombre){ return porNombre[fold(nombre.trim())] || null; }
+function inline(s){
+  const cods = [];
+  s = s.replace(/`([^`]+)`/g, (_, c) => { cods.push(c); return `@@C${cods.length - 1}@@`; });
+  s = esc(s);
+  s = s.replace(/\[\[([^\]|#]+)(?:#([^\]|]*))?(?:\|([^\]]*))?\]\]/g, (_, nom, sec, txt) => {
+    nom = nom.replace(/&amp;/g, '&');
+    const n = resolverLink(nom);
+    const vista = txt || (sec ? `${nom} › ${sec}` : nom);
+    if(!n) return `<a class="wl roto" data-nombre="${esc(nom)}" href="#/falta/${encodeURIComponent(nom.trim())}">${vista}</a>`;
+    return `<a class="wl" data-id="${n.id}" href="#/nota/${n.id}${sec ? '/' + slug(sec) : ''}">${txt || (sec ? `${esc(n.titulo)} › ${sec}` : (fold(nom) === fold(n.titulo) ? esc(n.titulo) : nom))}</a>`;
+  });
+  s = s.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*\w])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  return s.replace(/@@C(\d+)@@/g, (_, i) => `<code>${esc(cods[i])}</code>`);
+}
+
+const CALLOUT = {
+  tip: ['💡', 'Tip'], info: ['ℹ️', 'Para saber'], note: ['📝', 'Nota'], warning: ['⚠️', 'Ojo'],
+  example: ['🎲', 'Ejemplo'], question: ['❓', 'Abierto — a completar'],
+};
+
+function md(texto){
+  const L = texto.replace(/\r/g, '').split('\n');
   const out = [];
   let i = 0;
-  while(i < lineas.length){
-    const tipo = tipoLinea(lineas[i]);
-    if(tipo === 'blanco'){ i++; continue; }
-    if(tipo === 'hr'){ out.push('<hr>'); i++; continue; }
-    if(tipo === 'titulo'){
-      const m = lineas[i].trim().match(/^(#+)\s+(.*)$/);
-      const n = Math.min(4, Math.max(3, m[1].length));
-      out.push(`<h${n}>${inlineHtml(m[2])}</h${n}>`);
-      i++; continue;
+  const esBlanco = l => /^\s*$/.test(l);
+  const esLista = l => /^\s*([-*]|\d+\.)\s+/.test(l);
+  const esTabla = (l, sig) => /^\s*\|.*\|\s*$/.test(l) && sig !== undefined && /^\s*\|?[\s:|-]+\|?\s*$/.test(sig) && sig.includes('-');
+  while(i < L.length){
+    const l = L[i];
+    if(esBlanco(l)){ i++; continue; }
+    if(/^```/.test(l)){
+      const cod = []; i++;
+      while(i < L.length && !/^```/.test(L[i])) cod.push(L[i++]);
+      i++; out.push(`<pre>${esc(cod.join('\n'))}</pre>`); continue;
     }
-    const grupo = [];
-    while(i < lineas.length && tipoLinea(lineas[i]) === tipo){ grupo.push(lineas[i].trim()); i++; }
-    if(tipo === 'cita') out.push(`<blockquote>${bloquesHtml(grupo.map(l => l.replace(/^>\s?/, '')))}</blockquote>`);
-    else if(tipo === 'tabla') out.push(tablaHtml(grupo));
-    else if(tipo === 'ul') out.push(`<ul>${grupo.map(l => `<li>${inlineHtml(l.replace(/^[-*]\s+/, ''))}</li>`).join('')}</ul>`);
-    else if(tipo === 'ol'){
-      const inicio = parseInt(grupo[0], 10);
-      out.push(`<ol${inicio !== 1 ? ` start="${inicio}"` : ''}>${grupo.map(l => `<li>${inlineHtml(l.replace(/^\d+[.)]\s+/, ''))}</li>`).join('')}</ol>`);
+    let m = l.match(/^(#{1,4})\s+(.*)$/);
+    if(m){
+      const nivel = Math.max(2, m[1].length);
+      out.push(`<h${nivel} id="s-${slug(m[2])}">${inline(m[2])}</h${nivel}>`); i++; continue;
     }
-    else out.push(`<p>${grupo.map(inlineHtml).join('<br>')}</p>`);
+    if(/^\s*---+\s*$/.test(l)){ out.push('<hr>'); i++; continue; }
+    if(esTabla(l, L[i + 1])){
+      const celdas = r => r.trim().replace(/^\|/, '').replace(/\|$/, '').replace(/\\\|/g, '@@BAR@@').split('|').map(c => c.replace(/@@BAR@@/g, '|').trim());
+      const cab = celdas(l); i += 2;
+      const filas = [];
+      while(i < L.length && /^\s*\|/.test(L[i])) filas.push(celdas(L[i++]));
+      out.push(`<div class="tabla"><table><thead><tr>${cab.map(c => `<th>${inline(c)}</th>`).join('')}</tr></thead><tbody>${
+        filas.map(f => `<tr>${cab.map((_, k) => `<td>${inline(f[k] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+      continue;
+    }
+    if(/^\s*>/.test(l)){
+      const q = [];
+      while(i < L.length && /^\s*>/.test(L[i])) q.push(L[i++].replace(/^\s*>\s?/, ''));
+      const c = q[0].match(/^\[!(\w+)\][+-]?\s*(.*)$/);
+      if(c){
+        const tipo = CALLOUT[c[1].toLowerCase()] ? c[1].toLowerCase() : 'note';
+        const [ic, def] = CALLOUT[tipo];
+        out.push(`<div class="callout ${tipo}"><div class="ct"><span>${ic}</span><span>${inline(c[2] || def)}</span></div><div class="cb">${md(q.slice(1).join('\n'))}</div></div>`);
+      }else out.push(`<blockquote>${md(q.join('\n'))}</blockquote>`);
+      continue;
+    }
+    if(esLista(l)){
+      const items = [];
+      while(i < L.length && (esLista(L[i]) || (/^\s{2,}\S/.test(L[i]) && items.length))){
+        if(esLista(L[i])){
+          const mm = L[i].match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+          items.push({sang: Math.floor(mm[1].replace(/\t/g, '  ').length / 2), orden: /\d/.test(mm[2]), txt: mm[3]});
+        }else items[items.length - 1].txt += ' ' + L[i].trim();
+        i++;
+      }
+      out.push(listaHtml(items));
+      continue;
+    }
+    const par = [];
+    while(i < L.length && !esBlanco(L[i]) && !/^(#{1,4}\s|```|\s*>|\s*---+\s*$)/.test(L[i]) && !esLista(L[i]) && !esTabla(L[i], L[i + 1])) par.push(L[i++]);
+    out.push(`<p>${inline(par.join(' '))}</p>`);
   }
-  return out.join('');
+  return out.join('\n');
 }
-function cuerpoHtml(texto){
-  const t = (texto || '').trim();
-  if(!t) return `<p class="vacia">Todavía no hay contenido en esta sección.</p>`;
-  return bloquesHtml(t.split('\n'));
-}
-
-/* ---------- Importar un documento .md entero ----------
-   "# " = título del manual, "## " = capítulo, "### " = sección.
-   Lo que queda antes del primer "### " de un capítulo va a una sección
-   "General" (o con el nombre del capítulo, si no tiene otras). */
-function slug(s){
-  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || uid();
-}
-function markdownAManual(md){
-  const limpiar = s => s.replace(/\*\*?|`/g, '').trim();
-  let titulo = '';
-  const caps = [];
-  let cap = null, sec = null;
-  for(const l of md.replace(/\r\n?/g, '\n').split('\n')){
-    let m;
-    if(!titulo && !cap && (m = l.match(/^#\s+(.+)/))){ titulo = limpiar(m[1]); continue; }
-    if((m = l.match(/^##\s+(.+)/))){ cap = {titulo: limpiar(m[1]), secciones: []}; caps.push(cap); sec = null; continue; }
-    if(!cap){ cap = {titulo: 'Portada', secciones: []}; caps.push(cap); }
-    if((m = l.match(/^###\s+(.+)/))){ sec = {titulo: limpiar(m[1]), lineas: []}; cap.secciones.push(sec); continue; }
-    if(!sec){ sec = {titulo: null, lineas: []}; cap.secciones.push(sec); }
-    sec.lineas.push(l);
-  }
-  const capitulos = caps.map(c => {
-    const secs = c.secciones.map(s => {
-      const lineas = s.lineas.slice();
-      const sobra = l => !l.trim() || tipoLinea(l) === 'hr';
-      while(lineas.length && sobra(lineas[0])) lineas.shift();
-      while(lineas.length && sobra(lineas[lineas.length - 1])) lineas.pop();
-      return {titulo: s.titulo, contenido: lineas.join('\n')};
-    }).filter(s => s.titulo !== null || s.contenido);
-    if(!secs.length) secs.push({titulo: null, contenido: ''});
-    const usados = new Set();
-    return {
-      id: slug(c.titulo),
-      titulo: c.titulo,
-      secciones: secs.map(s => {
-        const t = s.titulo ?? (secs.length === 1 ? c.titulo : 'General');
-        let id = slug(t), n = 2;
-        while(usados.has(id)) id = slug(t) + '-' + n++;
-        usados.add(id);
-        return {id, titulo: t, contenido: s.contenido};
-      }),
-    };
+function listaHtml(items){
+  let html = '', pila = [];
+  const abrir = it => { const t = it.orden ? 'ol' : 'ul'; pila.push(t); html += `<${t}>`; };
+  items.forEach((it, k) => {
+    const nivel = Math.min(it.sang, pila.length);
+    while(pila.length > nivel + 1 && pila.length > 1){ html += `</li></${pila.pop()}>`; }
+    if(pila.length === 0) abrir(it);
+    else if(it.sang >= pila.length){ abrir(it); }
+    else html += '</li>';
+    let txt = it.txt, cls = '';
+    const t = txt.match(/^\[( |x)\]\s+(.*)$/i);
+    if(t){ txt = (t[1].toLowerCase() === 'x' ? '☑ ' : '☐ ') + t[2]; cls = ' class="task"'; }
+    html += `<li${cls}>${inline(txt)}`;
   });
-  return {titulo: titulo || 'Manual del jugador', actualizado: new Date().toISOString(), capitulos};
+  while(pila.length){ html += `</li></${pila.pop()}>`; }
+  return html;
 }
 
-/* ---------- Índice (sidebar) ---------- */
-function renderToc(){
-  const nav = $('#toc');
-  if(!M.capitulos.length){
-    nav.innerHTML = `<div class="vacio">Sin capítulos todavía.</div>` + tocEditRow();
-    return;
+/* ---------- Árbol lateral ---------- */
+const abiertos = new Set();
+function dibujarArbol(){
+  const porCap = {};
+  M.notas.forEach(n => (porCap[n.capitulo] = porCap[n.capitulo] || []).push(n));
+  let h = '';
+  M.capitulos.forEach(c => {
+    const ns = porCap[c.id] || [];
+    h += `<div class="cap${abiertos.has(c.id) ? '' : ' cerrado'}" data-cap="${c.id}">
+      <div class="cap-cab" data-tog="${c.id}"><span class="car">▼</span><span>${esc(c.icono)} ${esc(c.titulo)}</span><span class="n">${ns.length}</span></div>
+      <div class="notas">${ns.map(n => `<a class="nota-btn" data-nota="${n.id}" href="#/nota/${n.id}"><span class="e">${ESTADO[n.estado] ? ESTADO[n.estado][0] : ''}</span><span>${esc(n.titulo)}</span></a>`).join('')}</div></div>`;
+  });
+  const tags = {};
+  M.notas.forEach(n => (n.tags || []).forEach(t => tags[t] = (tags[t] || 0) + 1));
+  const top = Object.entries(tags).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es')).slice(0, 40);
+  h += `<h5>Etiquetas</h5><div class="chips">${top.map(([t, n]) => `<a class="chip" href="#/etiqueta/${encodeURIComponent(t)}">#${esc(t)}<span class="n">${n}</span></a>`).join('')}</div>`;
+  $('#arbol').innerHTML = h;
+}
+$('#arbol').addEventListener('click', e => {
+  const t = e.target.closest('[data-tog]');
+  if(!t) return;
+  const cap = t.parentElement;
+  cap.classList.toggle('cerrado');
+  cap.classList.contains('cerrado') ? abiertos.delete(t.dataset.tog) : abiertos.add(t.dataset.tog);
+});
+function marcarActiva(id){
+  document.querySelectorAll('.nota-btn.activa').forEach(b => b.classList.remove('activa'));
+  const b = id && document.querySelector(`.nota-btn[data-nota="${id}"]`);
+  if(b){
+    b.classList.add('activa');
+    const cap = b.closest('.cap');
+    if(cap){ cap.classList.remove('cerrado'); abiertos.add(cap.dataset.cap); }
+    const arbol = $('#arbol'), r = b.getBoundingClientRect(), ra = arbol.getBoundingClientRect();
+    if(r.top < ra.top || r.bottom > ra.bottom) b.scrollIntoView({block: 'center'});
   }
-  nav.innerHTML = M.capitulos.map(cap => {
-    const cerrado = cerrados.has(cap.id);
-    const secs = (cap.secciones || []).map(sec => `
-      <button type="button" class="seccion-btn ${seleccion && seleccion.capId===cap.id && seleccion.secId===sec.id ? 'activa' : ''}"
-        data-ir="${cap.id}:${sec.id}">${esc(sec.titulo || 'Sin título')}</button>`).join('')
-      || `<div class="vacio">Sin secciones.</div>`;
-    return `
-    <div class="capitulo ${cerrado ? 'cerrado' : ''}" data-cap="${cap.id}">
-      <div class="capitulo-head" data-toggle="${cap.id}">
-        <span class="car">▾</span><span>${esc(cap.titulo || 'Sin título')}</span>
-      </div>
-      <div class="secciones">${secs}</div>
-    </div>`;
-  }).join('') + tocEditRow();
-}
-function tocEditRow(){
-  return `<div class="toc-edit-row solo-lectura-oculto" id="toc-edit-row" style="display:${editando?'flex':'none'}">
-    <button type="button" class="iconbtn" id="btn-nuevo-capitulo" style="flex:1">+ Capítulo</button>
-  </div>`;
 }
 
-/* ---------- Contenido principal ---------- */
-function seccionActual(){
-  if(!seleccion) return null;
-  const cap = M.capitulos.find(c => c.id === seleccion.capId);
-  const sec = cap && (cap.secciones || []).find(s => s.id === seleccion.secId);
-  return cap && sec ? {cap, sec} : null;
-}
-
-function renderContenido(){
+/* ---------- Rutas ---------- */
+function ruta(){
+  if(!M) return;
+  const partes = (location.hash.replace(/^#\/?/, '') || '').split('/').map(decodeURIComponent);
+  const [tipo, arg, sec] = partes;
+  cerrarGrafo();
   const cont = $('#contenido');
-  const actual = seccionActual();
-  if(!actual){
-    cont.innerHTML = `<div class="sin-seleccion">Elegí una sección del índice para leerla.</div>`;
-    return;
-  }
-  const {cap, sec} = actual;
-  cont.innerHTML = `
-    <div class="cap-eyebrow">${esc(cap.titulo)}</div>
-    <h2>${esc(sec.titulo || 'Sin título')}</h2>
-    <div class="cuerpo">${cuerpoHtml(sec.contenido)}</div>
-    <div class="editor-seccion">
-      <div class="edicion-caja">
-        <div class="f"><label>Título de la sección</label><input type="text" data-editar="titulo" value="${esc(sec.titulo)}"></div>
-        <div class="f"><label>Contenido — línea en blanco = párrafo nuevo · "- " = lista · "| a | b |" = tabla · "> " = cita · **negrita** · *cursiva*</label>
-          <textarea data-editar="contenido" rows="14">${esc(sec.contenido)}</textarea>
-        </div>
-        <div class="fila">
-          <button type="button" class="iconbtn" id="btn-borrar-seccion">Borrar esta sección</button>
-          <span class="fila-derecha hint">capítulo: ${esc(cap.titulo)}</span>
-        </div>
-      </div>
-    </div>`;
+  let id = null;
+  if(!tipo || tipo === 'inicio') vistaInicio();
+  else if(tipo === 'nota' && porId[arg]){ id = arg; vistaNota(porId[arg], sec); }
+  else if(tipo === 'falta') vistaFalta(arg);
+  else if(tipo === 'buscar') vistaBusqueda(arg || '');
+  else if(tipo === 'etiqueta') vistaEtiqueta(arg);
+  else if(tipo === 'capitulo') vistaCapitulo(arg);
+  else if(tipo === 'pendientes') vistaPendientes();
+  else if(tipo === 'az') vistaAZ();
+  else vistaInicio();
+  marcarActiva(id);
+  if(!(tipo === 'nota' && sec)) cont.scrollTop = 0;
+  document.title = (id ? porId[id].titulo + ' — ' : '') + 'Manual del Rol Pintoísta';
+}
+function ir(h){ location.hash = h; }
+
+function capTxt(n){ const c = capPorId[n.capitulo]; return c ? `${c.icono} ${c.titulo}` : ''; }
+function badge(n){ const e = ESTADO[n.estado]; return e ? `<span class="badge ${n.estado}">${e[0]} ${e[1]}</span>` : ''; }
+function lateralVacio(){ $('#lateral').innerHTML = ''; }
+
+/* ---------- Vistas ---------- */
+function vistaInicio(){
+  const inicio = porId['bienvenida'];
+  const porCap = {};
+  M.notas.forEach(n => (porCap[n.capitulo] = porCap[n.capitulo] || []).push(n));
+  const tarjetas = M.capitulos.map(c => {
+    const ns = porCap[c.id] || [];
+    const cnt = e => ns.filter(n => n.estado === e).length;
+    const t = ns.length || 1;
+    return `<a class="tarjeta" href="#/capitulo/${c.id}"><div class="ic">${esc(c.icono)}</div><h3>${esc(c.titulo)}</h3><p>${esc(c.resumen)}</p>
+      <div class="barra"><i class="c" style="width:${cnt('confirmado') / t * 100}%"></i><i class="b" style="width:${cnt('borrador') / t * 100}%"></i><i class="p" style="width:${cnt('pendiente') / t * 100}%"></i></div>
+      <div class="mini">${ns.length} notas</div></a>`;
+  }).join('');
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="hero"><h1>Manual del Rol Pintoísta</h1><p>Una plataforma para jugar, no un corsé. Buscá una regla, seguí los enlaces azules o recorré los capítulos.</p></div>
+    ${inicio ? `<div class="cuerpo">${md(inicio.cuerpo)}</div>` : ''}
+    <h2 style="margin:30px 0 4px">Capítulos</h2>
+    <div class="grilla-cap">${tarjetas}</div>
+    <div class="cuerpo"><p class="hint" style="color:var(--muted);font-size:13px">La barra de cada capítulo muestra cuánto está <span style="color:var(--absenta)">confirmado</span>, en <span style="color:var(--brass)">borrador</span> o <span style="color:var(--muted)">pendiente</span>.</p></div>
+  </div>`;
+  $('#lateral').innerHTML = `<div class="bloque"><h4>Atajos</h4><span class="vacio"><b>/</b> buscar · <b>Alt ←/→</b> volver/avanzar · <b>Esc</b> cerrar</span></div>
+    <div class="bloque"><h4>Números</h4><span class="vacio">${M.notas.length} notas · ${M.notas.filter(n => n.estado === 'confirmado').length} confirmadas · ${Object.keys(rotos).length} por escribir</span></div>`;
 }
 
-function irA(capId, secId){
-  seleccion = {capId, secId};
-  renderToc();
-  renderContenido();
+function vistaNota(n, sec){
+  const cap = capPorId[n.capitulo];
+  const heads = encabezados(n.cuerpo);
+  const entrantes = [...(enlacesEnt[n.id] || [])].map(i => porId[i]).sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+  const salientes = [...(enlacesSal[n.id] || [])].map(i => porId[i]).sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+  const linkNota = x => `<a class="wl" data-id="${x.id}" href="#/nota/${x.id}">${esc(x.titulo)}</a>`;
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="migas"><a href="#/inicio">Inicio</a> › <a href="#/capitulo/${n.capitulo}">${esc(capTxt(n))}</a></div>
+    <h1>${esc(n.titulo)}</h1>
+    <div class="meta">${badge(n)}${(n.alias || []).length ? `<span class="badge" title="También se busca como">= ${esc(n.alias.join(' · '))}</span>` : ''}
+      ${(n.tags || []).map(t => `<a class="chip" href="#/etiqueta/${encodeURIComponent(t)}">#${esc(t)}</a>`).join('')}</div>
+    <div class="cuerpo">${md(n.cuerpo) || '<p><em>Esta nota todavía está vacía.</em></p>'}</div>
+    <div class="pie">
+      ${salientes.length ? `<h4>Relacionadas</h4><div class="lista-links">${salientes.map(linkNota).join('')}</div>` : ''}
+      ${entrantes.length ? `<h4>Se menciona en</h4><div class="lista-links">${entrantes.map(linkNota).join('')}</div>` : ''}
+    </div></div>`;
+  $('#lateral').innerHTML = `
+    ${heads.length ? `<div class="bloque"><h4>En esta nota</h4>${heads.map(h => `<a class="item ${h.nivel > 2 ? 'h3' : ''}" href="#/nota/${n.id}/${h.id}">${esc(h.texto)}</a>`).join('')}</div>` : ''}
+    <div class="bloque"><h4>Se menciona en (${entrantes.length})</h4>${entrantes.length ? entrantes.map(x => `<a class="item" href="#/nota/${x.id}">${esc(x.titulo)}</a>`).join('') : '<span class="vacio">Nadie enlaza acá todavía.</span>'}</div>
+    <div class="bloque"><h4>Enlaza a (${salientes.length})</h4>${salientes.length ? salientes.map(x => `<a class="item" href="#/nota/${x.id}">${esc(x.titulo)}</a>`).join('') : '<span class="vacio">Sin enlaces salientes.</span>'}</div>
+    <div class="bloque"><button class="iconbtn" onclick="abrirGrafo('${n.id}')">🕸 Ver en el mapa</button></div>`;
+  if(sec){ const el = document.getElementById('s-' + sec); if(el) setTimeout(() => el.scrollIntoView({block: 'start'}), 30); }
 }
 
-/* ---------- Edición: capítulos y secciones ---------- */
-function nuevoCapitulo(){
-  const titulo = prompt('Nombre del capítulo (ej. Combate, Creación de personaje):');
-  if(!titulo || !titulo.trim()) return;
-  const cap = {id: uid(), titulo: titulo.trim(), secciones: []};
-  M.capitulos.push(cap);
-  renderToc();
-  nuevaSeccion(cap.id);
-}
-function nuevaSeccion(capId){
-  const cap = M.capitulos.find(c => c.id === capId);
-  if(!cap) return;
-  const titulo = prompt('Nombre de la sección (ej. Cómo funciona el daño):');
-  if(!titulo || !titulo.trim()) return;
-  cap.secciones = cap.secciones || [];
-  const sec = {id: uid(), titulo: titulo.trim(), contenido: ''};
-  cap.secciones.push(sec);
-  cerrados.delete(capId);
-  guardarCerrados();
-  irA(cap.id, sec.id);
-}
-function borrarCapitulo(capId){
-  const cap = M.capitulos.find(c => c.id === capId);
-  if(!cap) return;
-  if(!confirm(`¿Borrar el capítulo "${cap.titulo}" y todas sus secciones?`)) return;
-  M.capitulos = M.capitulos.filter(c => c.id !== capId);
-  if(seleccion && seleccion.capId === capId) seleccion = null;
-  renderToc(); renderContenido();
-}
-function borrarSeccionActual(){
-  const actual = seccionActual();
-  if(!actual) return;
-  if(!confirm(`¿Borrar la sección "${actual.sec.titulo}"?`)) return;
-  actual.cap.secciones = actual.cap.secciones.filter(s => s.id !== actual.sec.id);
-  seleccion = null;
-  renderToc(); renderContenido();
-}
-function guardarCerrados(){
-  localStorage.setItem('manual-cerrados', JSON.stringify([...cerrados]));
+function vistaFalta(nombre){
+  const desde = [...(rotos[nombre] || [])].map(i => porId[i]).filter(Boolean);
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="migas"><a href="#/inicio">Inicio</a> › nota por escribir</div>
+    <h1>${esc(nombre)}</h1>
+    <div class="meta"><span class="badge pendiente">🔲 Todavía no existe</span></div>
+    <div class="callout question"><div class="ct"><span>✎</span><span>Nota por escribir</span></div><div class="cb"><p>Otras notas mencionan «${esc(nombre)}», pero todavía nadie la escribió. Si sabés cómo funciona, contáselo al GM o a quien mantiene el manual.</p></div></div>
+    <div class="pie"><h4>La mencionan</h4><div class="lista-links">${desde.map(x => `<a class="wl" href="#/nota/${x.id}">${esc(x.titulo)}</a>`).join('') || '—'}</div></div></div>`;
+  lateralVacio();
 }
 
-function setModoEdicion(on){
-  editando = on;
-  document.body.classList.toggle('modo-edicion', on);
-  $('#btn-editar').classList.toggle('activo', on);
-  renderToc();
+function vistaCapitulo(id){
+  const c = capPorId[id];
+  if(!c) return vistaInicio();
+  const ns = M.notas.filter(n => n.capitulo === id);
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="migas"><a href="#/inicio">Inicio</a> › capítulo</div>
+    <h1>${esc(c.icono)} ${esc(c.titulo)}</h1><p style="color:var(--muted);font-size:16px;margin:0 0 22px">${esc(c.resumen)}</p>
+    ${ns.map(n => `<a class="resultado" href="#/nota/${n.id}"><span class="t">${esc(n.titulo)}</span> ${badge(n)}<div class="s">${esc(n._res)}</div></a>`).join('')}</div>`;
+  lateralVacio();
 }
 
-/* ---------- Eventos ---------- */
-document.addEventListener('click', e => {
-  const toggle = e.target.closest('[data-toggle]');
-  if(toggle){
-    const id = toggle.dataset.toggle;
-    if(cerrados.has(id)) cerrados.delete(id); else cerrados.add(id);
-    guardarCerrados();
-    renderToc();
-    return;
-  }
-  const ir = e.target.closest('[data-ir]');
-  if(ir){ const [capId, secId] = ir.dataset.ir.split(':'); irA(capId, secId); return; }
+function vistaEtiqueta(t){
+  const ns = M.notas.filter(n => (n.tags || []).map(fold).includes(fold(t))).sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="migas"><a href="#/inicio">Inicio</a> › etiqueta</div>
+    <h1>#${esc(t)}</h1><p style="color:var(--muted);margin:0 0 20px">${ns.length} nota(s) con esta etiqueta.</p>
+    ${ns.map(n => `<a class="resultado" href="#/nota/${n.id}"><span class="t">${esc(n.titulo)}</span><span class="c">${esc(capTxt(n))}</span><div class="s">${esc(n._res)}</div></a>`).join('') || '<p class="vacio-grande">Ninguna nota tiene esa etiqueta.</p>'}</div>`;
+  lateralVacio();
+}
 
-  if(e.target.id === 'btn-nuevo-capitulo'){ nuevoCapitulo(); return; }
-  if(e.target.id === 'btn-borrar-seccion'){ borrarSeccionActual(); return; }
+function vistaAZ(){
+  const ns = M.notas.slice().sort((a, b) => fold(a.titulo).localeCompare(fold(b.titulo), 'es'));
+  let h = '', letra = '';
+  ns.forEach(n => {
+    const l = (fold(n.titulo)[0] || '#').toUpperCase();
+    if(l !== letra){ letra = l; h += `<div class="letra">${/[A-Z]/.test(l) ? l : '#'}</div>`; }
+    h += `<a href="#/nota/${n.id}">${esc(n.titulo)} ${(n.alias || []).length ? `<small>· ${esc(n.alias.join(', '))}</small>` : ''}</a>`;
+  });
+  $('#contenido').innerHTML = `<div class="hoja"><div class="migas"><a href="#/inicio">Inicio</a> › índice</div><h1>Índice A–Z</h1><p style="color:var(--muted);margin:0 0 10px">${ns.length} notas. Entre paréntesis, otros nombres con los que también se encuentran.</p><div class="az">${h}</div></div>`;
+  lateralVacio();
+}
+
+function vistaPendientes(){
+  const preguntas = [];
+  M.notas.forEach(n => {
+    const lineas = n.cuerpo.split('\n');
+    for(let i = 0; i < lineas.length; i++){
+      const m = lineas[i].match(/^\s*>\s*\[!question\][+-]?\s*(.*)$/i);
+      if(m){
+        const cuerpo = [];
+        let j = i + 1;
+        while(j < lineas.length && /^\s*>/.test(lineas[j])) cuerpo.push(lineas[j++].replace(/^\s*>\s?/, ''));
+        preguntas.push({n, titulo: m[1], cuerpo: cuerpo.join('\n')});
+        i = j - 1;
+      }
+    }
+  });
+  const porNota = {};
+  preguntas.forEach(p => (porNota[p.n.id] = porNota[p.n.id] || []).push(p));
+  const borradores = M.notas.filter(n => n.estado !== 'confirmado');
+  const bloques = M.capitulos.map(c => {
+    const ns = M.notas.filter(n => n.capitulo === c.id && porNota[n.id]);
+    if(!ns.length) return '';
+    return `<h3 style="margin:22px 0 8px">${esc(c.icono)} ${esc(c.titulo)}</h3>` + ns.map(n => `<div class="callout question"><div class="ct"><span>❓</span><a class="wl" href="#/nota/${n.id}">${esc(n.titulo)}</a></div><div class="cb">${porNota[n.id].map(p => `<div>${p.titulo ? `<p><strong>${inline(p.titulo)}</strong></p>` : ''}${md(p.cuerpo)}</div>`).join('')}</div></div>`).join('');
+  }).join('');
+  const porEscribir = Object.entries(rotos).sort((a, b) => a[0].localeCompare(b[0], 'es'));
+  $('#contenido').innerHTML = `<div class="hoja">
+    <div class="migas"><a href="#/inicio">Inicio</a> › pendientes</div>
+    <h1>📌 Pendientes</h1>
+    <p style="color:var(--muted);font-size:16px;margin:0 0 20px">Todo lo que falta completar del manual, en un solo lugar: preguntas abiertas, notas a medio escribir y enlaces a notas que todavía no existen.</p>
+    <h2 style="margin:26px 0 6px">❓ Preguntas abiertas (${preguntas.length})</h2>${bloques || '<p class="vacio-grande">No hay preguntas abiertas.</p>'}
+    <h2 style="margin:34px 0 10px">🟡 Notas en borrador o pendientes (${borradores.length})</h2>
+    <div class="lista-links">${borradores.map(n => `<a class="wl" href="#/nota/${n.id}">${ESTADO[n.estado] ? ESTADO[n.estado][0] : ''} ${esc(n.titulo)}</a>`).join('')}</div>
+    <h2 style="margin:34px 0 10px">✎ Notas por escribir (${porEscribir.length})</h2>
+    <div class="lista-links">${porEscribir.map(([k]) => `<a class="wl roto" href="#/falta/${encodeURIComponent(k)}">${esc(k)}</a>`).join('') || '—'}</div></div>`;
+  lateralVacio();
+}
+
+/* ---------- Búsqueda ---------- */
+function buscar(q){
+  const ts = fold(q).split(/\s+/).filter(Boolean);
+  if(!ts.length) return [];
+  const res = [];
+  M.notas.forEach(n => {
+    let total = 0;
+    for(const t of ts){
+      let s = 0;
+      if(n._t === t) s += 100; else if(n._t.startsWith(t)) s += 60; else if(n._t.includes(t)) s += 40;
+      n._a.forEach(a => { if(a === t) s += 90; else if(a.startsWith(t)) s += 50; else if(a.includes(t)) s += 30; });
+      if(n._tags.some(x => x === t || x.includes(t))) s += 25;
+      if(n._h.includes(t)) s += 15;
+      const veces = n._b.split(t).length - 1;
+      if(veces) s += 4 + Math.min(veces, 8);
+      if(!s){ total = 0; break; }
+      total += s;
+    }
+    if(total) res.push({n, s: total});
+  });
+  return res.sort((a, b) => b.s - a.s || a.n.titulo.localeCompare(b.n.titulo, 'es'));
+}
+function marcar(txt, ts){
+  const f = fold(txt), rangos = [];
+  ts.forEach(t => { if(t.length < 2) return; let d = 0, i; while((i = f.indexOf(t, d)) !== -1){ rangos.push([i, i + t.length]); d = i + t.length; } });
+  if(!rangos.length) return esc(txt);
+  rangos.sort((x, y) => x[0] - y[0]);
+  let out = '', p = 0;
+  rangos.forEach(([a, b]) => { if(a < p) return; out += esc(txt.slice(p, a)) + '<mark>' + esc(txt.slice(a, b)) + '</mark>'; p = b; });
+  return out + esc(txt.slice(p));
+}
+function fragmento(n, ts){
+  const t = ts.find(x => n._b.includes(x));
+  if(!t) return esc(n._res);
+  const i = n._b.indexOf(t);
+  const a = Math.max(0, i - 60), b = Math.min(n._plano.length, i + 130);
+  const trozo = (a > 0 ? '…' : '') + n._plano.slice(a, b) + (b < n._plano.length ? '…' : '');
+  return marcar(trozo, ts);
+}
+function vistaBusqueda(q){
+  const ts = fold(q).split(/\s+/).filter(Boolean);
+  const res = buscar(q);
+  $('#q').value = q;
+  $('#contenido').innerHTML = `<div class="hoja"><div class="migas"><a href="#/inicio">Inicio</a> › búsqueda</div>
+    <h1>Resultados para «${esc(q)}»</h1><p style="color:var(--muted);margin:0 0 18px">${res.length} nota(s)</p>
+    ${res.map(({n}) => `<a class="resultado" href="#/nota/${n.id}"><span class="t">${marcar(n.titulo, ts)}</span><span class="c">${esc(capTxt(n))}</span> ${badge(n)}<div class="s">${fragmento(n, ts)}</div></a>`).join('')
+      || `<p class="vacio-grande">No encontré nada con «${esc(q)}».<br>Probá con otra palabra, o mirá el <a href="#/az">índice A–Z</a>.</p>`}</div>`;
+  lateralVacio();
+}
+
+const inp = $('#q'), sug = $('#sugerencias');
+let selSug = -1;
+function mostrarSug(){
+  const q = inp.value.trim();
+  if(!q){ sug.classList.remove('abierto'); return; }
+  const ts = fold(q).split(/\s+/).filter(Boolean);
+  const res = buscar(q).slice(0, 8);
+  selSug = -1;
+  sug.innerHTML = res.length
+    ? res.map(({n}) => `<button class="sug" data-id="${n.id}"><span class="t">${marcar(n.titulo, ts)}</span><span class="c">${esc(capTxt(n))}</span><span class="s">${fragmento(n, ts)}</span></button>`).join('')
+      + `<button class="sug" data-todos="1"><span class="t">Ver todos los resultados →</span></button>`
+    : `<div class="sug-vacio">Nada con «${esc(q)}». Enter para buscar igual.</div>`;
+  sug.classList.add('abierto');
+}
+inp.addEventListener('input', mostrarSug);
+inp.addEventListener('focus', mostrarSug);
+inp.addEventListener('keydown', e => {
+  const btns = [...sug.querySelectorAll('.sug')];
+  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    if(!btns.length) return;
+    selSug = (selSug + (e.key === 'ArrowDown' ? 1 : -1) + btns.length) % btns.length;
+    btns.forEach((b, i) => b.classList.toggle('sel', i === selSug));
+    btns[selSug].scrollIntoView({block: 'nearest'});
+  }else if(e.key === 'Enter'){
+    e.preventDefault();
+    const b = btns[selSug];
+    if(b && b.dataset.id){ sug.classList.remove('abierto'); ir('#/nota/' + b.dataset.id); }
+    else{ sug.classList.remove('abierto'); if(inp.value.trim()) ir('#/buscar/' + encodeURIComponent(inp.value.trim())); }
+  }else if(e.key === 'Escape'){ sug.classList.remove('abierto'); inp.blur(); }
 });
-
-document.addEventListener('input', e => {
-  const campo = e.target.dataset && e.target.dataset.editar;
-  if(!campo) return;
-  const actual = seccionActual();
-  if(!actual) return;
-  actual.sec[campo] = e.target.value;
-  if(campo === 'titulo') renderToc();
-});
-
-// Botón "capítulo" también permite agregarle una sección y borrarlo, con
-// clic derecho para no llenar la barra de botones — más simple: dos clics
-// largos no hacen falta, alcanza con el prompt de arriba. Para borrar un
-// capítulo entero se ofrece un botón por capítulo solo en modo edición.
-document.addEventListener('contextmenu', e => {
-  const head = e.target.closest('.capitulo-head');
-  if(!head || !editando) return;
+sug.addEventListener('mousedown', e => {
+  const b = e.target.closest('.sug');
+  if(!b) return;
   e.preventDefault();
-  const capId = head.dataset.toggle;
-  const accion = prompt('Escribí "sección" para agregar una sección nueva acá, o "borrar" para borrar este capítulo:');
-  if(!accion) return;
-  if(accion.trim().toLowerCase().startsWith('sec')) nuevaSeccion(capId);
-  else if(accion.trim().toLowerCase().startsWith('borr')) borrarCapitulo(capId);
+  sug.classList.remove('abierto');
+  if(b.dataset.id) ir('#/nota/' + b.dataset.id);
+  else ir('#/buscar/' + encodeURIComponent(inp.value.trim()));
+});
+document.addEventListener('click', e => { if(!e.target.closest('.buscador')) sug.classList.remove('abierto'); });
+
+/* ---------- Vista previa al pasar el mouse por un enlace ---------- */
+const prev = $('#preview');
+document.addEventListener('mouseover', e => {
+  const a = e.target.closest('a.wl');
+  if(!a || !M) return;
+  const n = a.dataset.id ? porId[a.dataset.id] : null;
+  if(n){
+    prev.innerHTML = `<div class="t">${esc(n.titulo)}</div><div class="s">${esc(n._res) || '<em>(nota vacía)</em>'}</div><div class="c">${esc(capTxt(n))} · ${ESTADO[n.estado] ? ESTADO[n.estado][1] : ''}</div>`;
+  }else if(a.classList.contains('roto')){
+    prev.innerHTML = `<div class="t">${esc(a.dataset.nombre || '')}</div><div class="s"><em>Nota por escribir.</em></div>`;
+  }else return;
+  prev.style.display = 'block';
+  const r = a.getBoundingClientRect();
+  const w = prev.offsetWidth, h = prev.offsetHeight;
+  let x = Math.min(r.left, innerWidth - w - 12), y = r.bottom + 8;
+  if(y + h > innerHeight - 8) y = r.top - h - 8;
+  prev.style.left = Math.max(8, x) + 'px'; prev.style.top = Math.max(8, y) + 'px';
+});
+document.addEventListener('mouseout', e => { if(e.target.closest && e.target.closest('a.wl')) prev.style.display = 'none'; });
+document.addEventListener('click', () => { prev.style.display = 'none'; });
+
+/* ---------- Mapa (grafo) ---------- */
+const cv = $('#lienzo'), ctx = cv.getContext('2d');
+let G = null, animG = 0;
+function abrirGrafo(actual){
+  if(!M) return;
+  const nodos = [], idx = {};
+  const colorCap = {};
+  M.capitulos.forEach((c, i) => colorCap[c.id] = PALETA[i % PALETA.length]);
+  M.notas.forEach(n => { idx[n.id] = nodos.length; nodos.push({id: n.id, n, x: 0, y: 0, vx: 0, vy: 0, grado: 0, color: colorCap[n.capitulo], titulo: n.titulo}); });
+  const aristas = [];
+  M.notas.forEach(n => enlacesSal[n.id].forEach(d => { aristas.push([idx[n.id], idx[d]]); nodos[idx[n.id]].grado++; nodos[idx[d]].grado++; }));
+  Object.entries(rotos).forEach(([k, set]) => {
+    const i = nodos.length; nodos.push({id: null, roto: k, x: 0, y: 0, vx: 0, vy: 0, grado: 0, color: '#6b5a60', titulo: k});
+    set.forEach(o => { if(idx[o] !== undefined){ aristas.push([idx[o], i]); nodos[i].grado++; nodos[idx[o]].grado++; } });
+  });
+  nodos.forEach((n, i) => { const a = i * 2.399, r = 30 + Math.sqrt(i) * 34; n.x = Math.cos(a) * r; n.y = Math.sin(a) * r; });
+  G = {nodos, aristas, zoom: 1, ox: 0, oy: 0, actual, hover: null, alpha: 1, idx};
+  $('#leyenda-g').innerHTML = M.capitulos.map(c => `<span><i style="background:${colorCap[c.id]}"></i>${esc(c.titulo)}</span>`).join('') + (Object.keys(rotos).length ? '<span><i style="background:#6b5a60"></i>por escribir</span>' : '');
+  $('#grafo').classList.add('abierto');
+  redimensionar();
+  cancelAnimationFrame(animG);
+  for(let k = 0; k < 320; k++) simular();
+  ajustarGrafo();
+  dibujarGrafo();
+}
+function cerrarGrafo(){ $('#grafo').classList.remove('abierto'); cancelAnimationFrame(animG); }
+function ajustarGrafo(){
+  const r = cv.getBoundingClientRect();
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  G.nodos.forEach(p => { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+  G.zoom = Math.max(.25, Math.min(1.6, Math.min(r.width / (x1 - x0 + 220), r.height / (y1 - y0 + 120))));
+  G.ox = -(x0 + x1) / 2; G.oy = -(y0 + y1) / 2;
+}
+function simular(){
+  const {nodos, aristas} = G, a = G.alpha;
+  for(let i = 0; i < nodos.length; i++){
+    const p = nodos[i];
+    p.vx -= p.x * 0.0025 * a; p.vy -= p.y * 0.0025 * a;
+    for(let j = i + 1; j < nodos.length; j++){
+      const q = nodos[j];
+      let dx = p.x - q.x, dy = p.y - q.y, d2 = dx * dx + dy * dy + 0.01;
+      if(d2 > 360000) continue;
+      const f = 9000 / d2 * a, d = Math.sqrt(d2);
+      dx /= d; dy /= d;
+      p.vx += dx * f; p.vy += dy * f; q.vx -= dx * f; q.vy -= dy * f;
+    }
+  }
+  aristas.forEach(([i, j]) => {
+    const p = nodos[i], q = nodos[j];
+    const dx = q.x - p.x, dy = q.y - p.y, d = Math.sqrt(dx * dx + dy * dy) + 0.01;
+    const f = (d - 110) * 0.01 * a;
+    p.vx += dx / d * f; p.vy += dy / d * f; q.vx -= dx / d * f; q.vy -= dy / d * f;
+  });
+  nodos.forEach(p => { if(p.fijo) return; p.x += p.vx; p.y += p.vy; p.vx *= 0.6; p.vy *= 0.6; });
+  G.alpha *= 0.985;
+}
+function redimensionar(){
+  const r = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function aPantalla(p){ const r = cv.getBoundingClientRect(); return [r.width / 2 + (p.x + G.ox) * G.zoom, r.height / 2 + (p.y + G.oy) * G.zoom]; }
+function dibujarGrafo(){
+  if(!G) return;
+  const r = cv.getBoundingClientRect();
+  ctx.clearRect(0, 0, r.width, r.height);
+  const vecinos = new Set();
+  const act = G.hover !== null ? G.hover : (G.actual !== undefined ? G.idx[G.actual] : undefined);
+  if(act !== undefined) G.aristas.forEach(([i, j]) => { if(i === act) vecinos.add(j); if(j === act) vecinos.add(i); });
+  ctx.lineWidth = 1;
+  G.aristas.forEach(([i, j]) => {
+    const [x1, y1] = aPantalla(G.nodos[i]), [x2, y2] = aPantalla(G.nodos[j]);
+    const res = act !== undefined && (i === act || j === act);
+    ctx.strokeStyle = res ? 'rgba(224,164,88,.75)' : 'rgba(150,130,125,.22)';
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  });
+  G.nodos.forEach((p, i) => {
+    const [x, y] = aPantalla(p);
+    const rad = (3.5 + Math.min(p.grado, 14) * 0.55) * Math.max(.7, Math.min(G.zoom, 1.6));
+    ctx.beginPath(); ctx.arc(x, y, rad, 0, 7);
+    if(p.roto){ ctx.strokeStyle = '#9a867e'; ctx.lineWidth = 1.2; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]); }
+    else{ ctx.fillStyle = p.color; ctx.globalAlpha = (act === undefined || i === act || vecinos.has(i)) ? 1 : .45; ctx.fill(); ctx.globalAlpha = 1; }
+    if(i === act){ ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
+    const mostrar = i === act || vecinos.has(i) || p.grado >= 10 || G.zoom > 1.5;
+    if(mostrar){
+      ctx.font = (i === act ? '700 13px' : '12px') + ' "Space Grotesk",sans-serif';
+      ctx.fillStyle = i === act ? '#fff' : 'rgba(237,227,210,.85)';
+      ctx.fillText(p.titulo, x + rad + 4, y + 4);
+    }
+  });
+}
+function nodoEn(mx, my){
+  let mejor = null, d = 1e9;
+  G.nodos.forEach((p, i) => { const [x, y] = aPantalla(p); const dd = (x - mx) ** 2 + (y - my) ** 2; const rad = 9 + Math.min(p.grado, 14) * .5; if(dd < rad * rad && dd < d){ d = dd; mejor = i; } });
+  return mejor;
+}
+let arrastre = null;
+cv.addEventListener('mousedown', e => {
+  if(!G) return;
+  const r = cv.getBoundingClientRect(), i = nodoEn(e.clientX - r.left, e.clientY - r.top);
+  arrastre = {x: e.clientX, y: e.clientY, mov: false, nodo: i, ox: G.ox, oy: G.oy};
+  cv.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if(!G || !$('#grafo').classList.contains('abierto')) return;
+  const r = cv.getBoundingClientRect();
+  if(arrastre){
+    const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
+    if(Math.abs(dx) + Math.abs(dy) > 3) arrastre.mov = true;
+    if(arrastre.mov){
+      if(arrastre.nodo !== null){ const p = G.nodos[arrastre.nodo]; p.fijo = true; p.x += (e.clientX - arrastre.x) / G.zoom; p.y += (e.clientY - arrastre.y) / G.zoom; arrastre.x = e.clientX; arrastre.y = e.clientY; G.alpha = Math.max(G.alpha, .3); }
+      else{ G.ox = arrastre.ox + dx / G.zoom; G.oy = arrastre.oy + dy / G.zoom; }
+      dibujarGrafo();
+      if(G.alpha > .015) requestAnimationFrame(() => { simular(); dibujarGrafo(); });
+    }
+  }else{
+    const i = nodoEn(e.clientX - r.left, e.clientY - r.top);
+    if(i !== G.hover){ G.hover = i; cv.style.cursor = i !== null ? 'pointer' : 'grab'; dibujarGrafo(); }
+  }
+});
+window.addEventListener('mouseup', () => {
+  if(!arrastre) return;
+  const a = arrastre; arrastre = null; cv.style.cursor = 'grab';
+  if(G) G.nodos.forEach(p => p.fijo = false);
+  if(!a.mov && a.nodo !== null && G){
+    const p = G.nodos[a.nodo];
+    if(p.id){ cerrarGrafo(); ir('#/nota/' + p.id); }
+    else{ cerrarGrafo(); ir('#/falta/' + encodeURIComponent(p.roto)); }
+  }
+});
+cv.addEventListener('wheel', e => { if(!G) return; e.preventDefault(); G.zoom = Math.max(.35, Math.min(4, G.zoom * (e.deltaY < 0 ? 1.12 : .89))); dibujarGrafo(); }, {passive: false});
+window.addEventListener('resize', () => { if($('#grafo').classList.contains('abierto')){ redimensionar(); dibujarGrafo(); } });
+
+/* ---------- Botones y atajos ---------- */
+$('#btn-inicio').addEventListener('click', () => ir('#/inicio'));
+$('#btn-atras').addEventListener('click', () => history.back());
+$('#btn-adelante').addEventListener('click', () => history.forward());
+$('#btn-az').addEventListener('click', () => ir('#/az'));
+$('#btn-pend').addEventListener('click', () => ir('#/pendientes'));
+$('#btn-grafo').addEventListener('click', () => { const m = location.hash.match(/#\/nota\/([^/]+)/); abrirGrafo(m ? decodeURIComponent(m[1]) : undefined); });
+$('#cerrar-grafo').addEventListener('click', cerrarGrafo);
+document.addEventListener('keydown', e => {
+  const enCampo = /^(INPUT|TEXTAREA)$/.test((e.target.tagName || ''));
+  if(e.key === '/' && !enCampo){ e.preventDefault(); inp.focus(); inp.select(); }
+  else if(e.key === 'Escape'){ cerrarGrafo(); prev.style.display = 'none'; }
 });
 
-$('#btn-editar').onclick = () => setModoEdicion(!editando);
-
-/* ---------- Carga / guardado local ---------- */
-function aplicarDatos(datos, origen){
-  M = Object.assign({titulo: 'Manual del jugador', actualizado: '', capitulos: []}, datos);
-  seleccion = null;
-  $('#titulo-manual').textContent = M.titulo;
-  document.title = M.titulo;
-  renderToc();
-  renderContenido();
-  estado(origen, 'ok');
-}
-
-$('#btn-guardar').onclick = () => {
-  M.actualizado = new Date().toISOString();
-  const blob = new Blob([JSON.stringify(M, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'reglas.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('Descargado: reglas.json');
-};
-
-$('#btn-importar-md').onclick = () => $('#input-md').click();
-$('#input-md').onchange = async e => {
-  const file = e.target.files[0];
-  e.target.value = '';
-  if(!file) return;
-  if(M.capitulos.length && !confirm(`Esto reemplaza todo el manual con el contenido de "${file.name}". ¿Seguir?`)) return;
-  const datos = markdownAManual(await file.text());
-  aplicarDatos(datos, `Importado desde ${file.name} — acordate de Publicar cambios`);
-  toast(`Importados ${datos.capitulos.length} capítulos`);
-};
-
-/* ---------- GitHub: mismo patrón de token que las otras herramientas ---------- */
-function ghCabeceras(accept){
-  const cab = {Accept: accept};
-  const token = localStorage.getItem('gh-token');
-  if(token) cab.Authorization = 'Bearer ' + token.trim();
-  return cab;
-}
-const GH_TOKEN_URL = 'https://github.com/settings/tokens/new?description=Rolpintoista&scopes=public_repo';
-
-function ghPedirToken(){
-  return new Promise(res => {
-    const btnCss = 'padding:8px 12px;border-radius:8px;border:1px solid #555;background:#2a2a30;color:#eee;cursor:pointer;font:inherit';
-    const fondo = document.createElement('div');
-    fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
-    const caja = document.createElement('div');
-    caja.style.cssText = 'background:#1b1b1f;color:#eee;border:1px solid #444;border-radius:12px;max-width:460px;width:100%;padding:18px;font:14px/1.5 system-ui,sans-serif';
-    caja.innerHTML =
-      '<h3 style="margin:0 0 10px;font-size:16px">Token de GitHub</h3>' +
-      '<ol style="margin:0 0 14px;padding-left:20px">' +
-        '<li>Tocá <b>Abrir GitHub</b>: se abre en otra pestaña, ya con los permisos correctos elegidos.</li>' +
-        '<li>Bajá hasta el final y tocá <b>Generate token</b>.</li>' +
-        '<li>Copiá el token verde (ojo: solo se muestra una vez).</li>' +
-        '<li>Volvé <b>a esta pestaña</b> y pegalo en el casillero de abajo.</li>' +
-      '</ol>' +
-      '<button type="button" data-gh="abrir" style="' + btnCss + ';width:100%;margin-bottom:10px">Abrir GitHub ↗</button>' +
-      '<input type="text" data-gh="input" placeholder="Pegá el token acá (ghp_…)" ' +
-        'style="width:100%;box-sizing:border-box;padding:9px;border-radius:8px;border:1px solid #555;background:#111;color:#eee;font:inherit;margin-bottom:12px">' +
-      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-        '<button type="button" data-gh="cancelar" style="' + btnCss + '">Cancelar</button>' +
-        '<button type="button" data-gh="guardar" style="' + btnCss + ';border-color:#6a8;background:#2c4636">Guardar</button>' +
-      '</div>' +
-      '<div style="margin-top:10px;opacity:.65;font-size:12px">Queda guardado en este navegador (mismo token que usan las otras herramientas).</div>';
-    fondo.appendChild(caja);
-    document.body.appendChild(fondo);
-    const campo = caja.querySelector('[data-gh="input"]');
-    campo.focus();
-    const cerrar = valor => { fondo.remove(); res(valor); };
-    caja.querySelector('[data-gh="abrir"]').onclick = () => window.open(GH_TOKEN_URL, '_blank');
-    caja.querySelector('[data-gh="cancelar"]').onclick = () => cerrar(null);
-    caja.querySelector('[data-gh="guardar"]').onclick = () => cerrar(campo.value.trim() || null);
-    fondo.onmousedown = ev => { if(ev.target === fondo) cerrar(null); };
-  });
-}
-async function ghToken(pedirDeNuevo){
-  let t = localStorage.getItem('gh-token');
-  if(!t || pedirDeNuevo){
-    t = await ghPedirToken();
-    if(t) localStorage.setItem('gh-token', t.trim());
-  }
-  return t ? t.trim() : null;
-}
-
-function aBase64(texto){
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(new Blob([texto]));
-  });
-}
-async function shaRemoto(ruta){
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${GH_BRANCH}`;
-  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.object+json'), cache: 'no-store'});
-  if(resp.status === 404) return null;
-  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} consultando ${ruta}`);
-  return (await resp.json()).sha;
-}
-async function ghSubir(ruta, texto, token, mensaje){
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
-  const sha = await shaRemoto(ruta);
-  const resp = await fetch(url, {
-    method: 'PUT',
-    headers: {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'},
-    body: JSON.stringify({message: mensaje, content: await aBase64(texto), branch: GH_BRANCH, ...(sha ? {sha} : {})}),
-  });
-  if(resp.status === 401 || resp.status === 403) throw {auth: true};
-  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
-}
-
-async function traerUltimaVersion(silencioso){
-  if(!silencioso){ estado('Buscando la última versión…'); }
-  try{
-    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_REGLAS}?ref=${GH_BRANCH}`;
-    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
-    if(resp.status === 404){
-      if(!silencioso) estado('Todavía no hay reglas.json publicado en GitHub — arrancás con el esqueleto local.', 'err');
-      return;
-    }
-    if(resp.status === 429 || resp.status === 403){
-      if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err');
-      return;
-    }
-    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
-    const datos = await resp.json();
-    aplicarDatos(datos, 'Última versión traída de GitHub ✓');
-  }catch(err){
-    console.error('Error trayendo el manual:', err);
-    estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
-  }
-}
-$('#btn-subir').onclick = async () => {
-  const btn = $('#btn-subir');
-  const token = await ghToken(false);
-  if(!token){ toast('Sin token de GitHub no se puede publicar'); return; }
-  btn.disabled = true;
-  toast('Publicando…');
-  try{
-    M.actualizado = new Date().toISOString();
-    await ghSubir(ARCHIVO_REGLAS, JSON.stringify(M, null, 2), token, 'Manual: actualizar contenido');
-    toast('Publicado ✓ — el sitio web se actualiza en un par de minutos');
-  }catch(err){
-    if(err && err.auth){
-      localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá Publicar cambios de nuevo');
-    }else{
-      console.error('Error publicando el manual:', err);
-      toast('No se pudo publicar — revisá la consola');
-    }
-  }finally{
-    btn.disabled = false;
-  }
-};
-
-/* ---------- Arranque: trae la última versión sola; si falla, se queda
-   con el esqueleto vacío para no bloquear la edición offline. ---------- */
-async function cargarDelSitio(){
-  // Servido por http (sitio web o servidor local): el reglas.json que viaja
-  // junto a esta página. Abierto con doble clic (file://) esto falla y se
-  // cae a GitHub como siempre.
-  if(!location.protocol.startsWith('http')) return false;
-  try{
-    const resp = await fetch('../datos/reglas.json', {cache: 'no-store'});
-    if(!resp.ok) return false;
-    aplicarDatos(await resp.json(), 'Manual cargado ✓');
-    return true;
-  }catch(err){
-    return false;
-  }
-}
-
-renderToc();
-renderContenido();
-cargarDelSitio().then(ok => { if(!ok) traerUltimaVersion(true); });
+cargar();
 </script>
 </body>
 </html>

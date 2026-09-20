@@ -1,0 +1,156 @@
++++
+capitulo: Tiradas y dados
+icono: 🎲
+resumen: Cómo se tira cada stat, cómo se comparan dos tiradas, qué es un crítico y dónde queda todo registrado.
++++
+
++++
+titulo: Cómo se tira un stat
+alias: [Tirada de stat, Dado según stat, Dados, Tirar un stat, Valores impares]
+tags: [tiradas, reglas-base, dados]
+estado: confirmado
++++
+La regla de oro del sistema: **el valor de un stat define qué dado se tira.**
+
+> [!example] La idea
+> **Evasión 6 → tirás 1d6.** Cuanto más alto el stat, más grande el dado (y más alto tu resultado promedio).
+
+## Los dados
+El sistema usa los dados clásicos de rol: **d4, d6, d8, d10, d12, d20 y d100**. Cuando el stat es chico (1, 2 o 3), la ficha tira un dado "imaginario" del tamaño exacto (por ejemplo 1d3): hay que tirarlo con el 🎲 de la Mesa.
+
+## Valores impares: dado anterior +1
+Si el valor es impar, se tira el dado del valor anterior y se **suma 1**.
+
+| Stat | Tirada | | Stat | Tirada |
+|---|---|---|---|---|
+| 4 | 1d4 | | 9 | 1d8+1 |
+| 5 | 1d4+1 | | 10 | 1d10 |
+| 6 | 1d6 | | 11 | 1d10+1 |
+| 7 | 1d6+1 | | 12 | 1d12 |
+| 8 | 1d8 | | 13 | 1d12+1 |
+
+## Valores altos: combinaciones
+A partir de 14 no hay un dado único, así que se **combinan dados que sumen el valor en caras**, siempre con **la menor cantidad de dados posible** y, entre opciones parecidas, **la más pareja**.
+
+| Stat | Tirada | | Stat | Tirada |
+|---|---|---|---|---|
+| 14 | 1d6+1d8 | | 22 | 1d10+1d12 |
+| 15 | 1d6+1d8+1 | | 24 | 2d12 |
+| 16 | 2d8 | | 26 | 1d6+1d20 |
+| 18 | 1d8+1d10 | | 30 | 1d10+1d20 |
+| 20 | 1d20 | | 40 | 2d20 |
+| 21 | 1d20+1 | | 100 | 1d100 |
+
+> [!tip] No hace falta calcularlo
+> La ficha lo hace por vos: al apretar un botón de tirada arma la fórmula sola, y la 🔍 al lado te muestra qué dados salieron y de dónde. También podés tirar lo que quieras con la grilla 🎲 de la [[La Mesa|Mesa]].
+
+> [!info] Esto NO aplica al daño del arma
+> El dado de un arma depende de su [[Daño y Tipo de arma|Tipo]] (4, 6, 8, 10, 12) y su peso, no del valor de un stat.
+
+> [!question] Stat en cero o negativo
+> ¿Qué pasa con un stat en 0 o negativo (por una penalidad)? Hoy la ficha no tira nada. ¿Se debería tirar un mínimo, o directamente no hay tirada?
+
++++
+titulo: Tirada enfrentada
+alias: [Tiradas enfrentadas, Vs, Enfrentar, Tirada vs tirada]
+tags: [tiradas, reglas-base]
+estado: borrador
++++
+La mecánica base del juego es la **tirada enfrentada**: una parte tira a favor de una acción y la otra tira *en contra* para evitarla o resistirla. **El que saca más, gana.** Cada uno tira con el dado que le toca según su stat ([[Cómo se tira un stat]]).
+
+| Situación | Tira uno | Tira el otro |
+|---|---|---|
+| Un ataque | [[Atacar\|PdG]] del atacante | [[Evasión]] o [[Parry]] del defensor |
+| Un hechizo o maldición | Especial del que lo lanza | [[Resistencias\|Res. Mental o Mágica]] del objetivo |
+| Detectar a alguien oculto | Especial del que vigila | Destreza del que se esconde (ver [[Campo de visión]]) |
+| Un taunt | Especial + 1 | Especial del objetivo |
+
+> [!warning] Ojo con los nombres
+> "Defensa" a secas es un stat que resta daño ([[Defensa]]). Lo que tira el defensor contra un ataque es su [[Evasión]] o su [[Parry]].
+
+> [!question] ¿Es el patrón universal?
+> ¿Todas las resoluciones son "dos tiradas, gana la mayor", o hay también tiradas contra una dificultad fija (por ejemplo, forzar una cerradura)? ¿Cómo se resuelve un **empate**? ¿Hay márgenes o grados de éxito?
+
++++
+titulo: Golpe crítico
+alias: [Crítico, Críticos, Crit, Crit%]
+tags: [tiradas, combate]
+estado: pendiente
++++
+Un **golpe crítico** es un ataque especialmente certero. Tu chance viene del stat **Crítico (Crit)**, que sale de [[Destreza]] y se modifica con equipo y habilidades (algunas armas suman "Crítico +1", "+2").
+
+## Qué cambia si conectás un crítico
+- **Ignora la [[Defensa]]**: el daño pasa íntegro.
+- Algunas habilidades tienen un efecto distinto si el golpe es crítico (en la descripción figura como *"Critical Matters"*).
+- Algunos ítems y estados lo anulan: el estado [[Invulnerable]] bloquea cualquier daño, y "Blindado" hace inmune a críticos.
+
+## Cómo se protege uno
+Con la [[Resistencia a crítico]]: se acumula en la armadura y se aplica según el [[Daño y Tipo de arma|Tipo]] del arma atacante.
+
+> [!question] Cómo funciona exactamente
+> Este sistema está **en pausa**: falta definir cómo se determina un crítico más allá del porcentaje, qué efecto tiene exactamente al conectar y cómo se aplica la Resistencia a crítico por tipo. Todo lo de esta nota es lo que hoy hace la ficha; se ajusta cuando esté cerrado.
+
++++
+titulo: Resistencia a crítico
+alias: [Resistencia a críticos, Res. crítico, Res.Crit, Reduce críticos]
+tags: [tiradas, equipo, combate]
+estado: borrador
++++
+La **resistencia a crítico** es un stat que da la armadura (y otros ítems) para **reducir los golpes críticos** de un cierto [[Daño y Tipo de arma|Tipo]] de arma. Hay cinco, una por Tipo: **4, 6, 8, 10 y 12**.
+
+> [!example] En un ítem
+> "Resistencia a críticos tipo 4 y 6: +1" significa que, contra armas de Tipo 4 y de Tipo 6, tu resistencia vale +1.
+
+## Convención de diseño del catálogo
+Para que las armaduras no vuelvan a un personaje inmune, el [[Catálogo de ítems]] sigue una regla suave según la [[Rareza]]:
+
+| Rareza | Resistencias que suele dar |
+|---|---|
+| Común | Tipo 4 y 6 |
+| Buena Calidad | Hasta Tipo 8 |
+| Raro | Hasta Tipo 8 (Tipo 10 solo en armadura pesada) |
+| Excepcional | Hasta Tipo 10 |
+| Legendario | Hasta Tipo 12 (de a +1) |
+
+**Los Tipos altos (10 y 12) son raros** y valen de a +1. Hay excepciones a propósito (algunos ítems míticos dan más). Es una guía, no una ley: ver [[La esencia del Rol Pintoísta]].
+
+> [!warning] Armadura arruinada
+> El estado [[Armadura rota|Armadura arruinada]] anula lo que aportan las armaduras a la Defensa **y** a la resistencia a crítico.
+
+Ver también: [[Golpe crítico]].
+
++++
+titulo: La Mesa
+alias: [Mesa de tiradas, Chat de tiradas, Grilla de dados, Dados 3D, Historial de tiradas]
+tags: [tiradas, herramientas, dados]
+estado: confirmado
++++
+**La Mesa** es la cajita de tiradas compartida: cada dado que tirás desde la [[La ficha|ficha]], la [[La Botonera|Botonera]], [[GM Tools]] o [[El mapa|el mapa]] aparece ahí, **en vivo, para todos**. Es el "chat de tiradas": nadie duda de qué salió.
+
+## Qué ves en una tirada
+Quién tiró, qué y con qué fórmula, los dados, y el total. Los [[Efectos al golpear]] de un arma aparecen en una línea resaltada, y las alertas del GM (por ejemplo, [[Ocultar y revelar|el ojo 👁]]) en rojo.
+
+## Tirar dados libres
+El botón **🎲 Dados** abre una **grilla estilo Roll20**: D4, D6, D8, D10, D12, D20 y D100, de 1 a 6 dados. Un clic = una tirada publicada en la Mesa.
+
+## Dados 3D
+Cada tirada nueva hace rodar **dados 3D** sobre tu pantalla con el resultado real (podés apagarlos o elegir estilo desde la ⚙ o "Personalización"). Se superponen las tiradas de varios jugadores, cada una con el estilo de dados de quien la hizo.
+
+## Limpieza
+- El GM puede **borrar todo el historial** (🗑).
+- Además, lo que tenga **más de 48 horas** se borra solo cuando el GM abre una herramienta.
+- El historial es solo de la sesión: si querés guardar algo, hacé un [[Respaldo de la partida|respaldo]].
+
+> [!info] Confianza entre amigos
+> Los dados se tiran en el navegador de cada uno. El juego asume un grupo de confianza: nadie va a "tocar el código" para mejorar su tirada.
+
++++
+titulo: Afortunado
+alias: [Ventaja, Tirar dos veces]
+tags: [tiradas, estado]
+estado: confirmado
++++
+**Afortunado** es un [[Estados alterados|estado]] (buff): **toda tirada de PdG, Parry o Evasión se hace dos veces y te quedás con la mejor.** Dura unos turnos (o todo el combate, si viene de un pergamino). Es lo más parecido a una "ventaja" del sistema.
+
+> [!question] Wildcards
+> En diseños anteriores existían los **Wildcards**: un recurso diario para **repetir una tirada**. Hoy la ficha no los tiene. ¿Se retoman? ¿Cuántos por día, se acumulan, y se puede repetir la tirada de otro?

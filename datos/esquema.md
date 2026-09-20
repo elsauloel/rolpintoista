@@ -183,22 +183,26 @@ La arma `gm-toolset/vendor-generator.html`, la lee
 Solo guarda ids — el nombre, la imagen y los stats de cada ítem salen del
 catálogo embebido en la ficha, no viajan en este archivo.
 
-## Manual del jugador — `datos/reglas.json`
+## Manual — `datos/manual.json`
 
-Estructura independiente, no comparte forma con lo anterior (es contenido
-de texto, no datos de partida):
+Lo genera `herramientas/compilar_manual.py` a partir de los archivos de texto
+de `manual-usuario/notas/` (uno por capítulo). Es contenido, no datos de
+partida:
 
 ```jsonc
 {
-  "titulo": "Manual del jugador — Piratas en el espacio",
-  "actualizado": "2026-08-14T...",
-  "capitulos": [
-    {"id": "...", "titulo": "Combate", "secciones": [
-      {"id": "...", "titulo": "Cómo funciona el daño", "contenido": "texto plano..."}
-    ]}
-  ]
+  "titulo": "Manual — Rol Pintoísta",
+  "actualizado": "2026-09-20T...",
+  "capitulos": [{"id": "combate", "titulo": "Combate", "icono": "⚔️", "resumen": "...", "orden": 5}],
+  "notas": [{
+    "id": "nitros-no2", "titulo": "Nitros (No2)",
+    "alias": ["No2", "Nitro"], "tags": ["recursos", "combate"],
+    "estado": "confirmado",        // confirmado | borrador | pendiente
+    "capitulo": "recursos",
+    "cuerpo": "Markdown con [[enlaces]] y > [!callouts]"
+  }]
 }
 ```
 
-`contenido` es Markdown simplificado (párrafos, listas, tablas, citas,
-negrita/cursiva). Ver `manual-usuario/CLAUDE.md`.
+`datos/reglas.json` es el borrador viejo del manual (capítulos → secciones):
+queda como archivo histórico, ya no lo lee nada.

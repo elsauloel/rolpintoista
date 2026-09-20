@@ -1,0 +1,232 @@
++++
+capitulo: Estados alterados
+icono: 🌀
+resumen: Los efectos temporales (buffs y debuffs) que te cambian los números: veneno, sigilo, escudos, control…
++++
+
++++
+titulo: Estados alterados
+alias: [Estados, Estado, Buffs, Debuffs, Efectos, Buff, Debuff]
+tags: [estado, reglas-base]
+estado: borrador
++++
+Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure) que cambia cómo funciona tu personaje. Puede ser bueno (**buff**) o malo (**debuff**).
+
+## Cómo se ven y cómo duran
+- Aparecen como **chips** en la ficha y como íconos en tu token del mapa. Pasá el mouse: te dicen qué hacen.
+- Tienen **turnos restantes** (o son *permanentes*), y a veces **stacks** (acumulaciones).
+- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van.
+- Pueden dar bonos o penalidades a stats (por ejemplo, +5 Defensa), o tener reglas propias (por ejemplo, "no podés moverte").
+
+## Cómo se aplican
+- Una **habilidad** o un **consumible** puede aplicarse un estado a sí mismo (esto sí se automatiza).
+- Los estados que un ataque aplica a un **rival** ([[Efectos al golpear]]) **los pone la mesa a mano**: el GM elige el estado en la ficha del creep, o el jugador en la suya.
+- Podés crear estados propios (personalizados) para lo que se te ocurra.
+
+## Los estados base
+| Estado | Tipo | En una línea |
+|---|---|---|
+| [[Veneno]] | debuff | Pierde HP por stack cada turno |
+| [[Sangrado]] | debuff | Pierde 2 HP por turno hasta curarse |
+| [[Regeneración]] | buff | Cura HP cada turno |
+| [[Pajaritos]] | debuff | PdG y Evasión a la mitad |
+| [[Lisiado]] | debuff | PdG y Parry a la mitad |
+| [[Stun]] | debuff (CC) | Sin Nitros |
+| [[Cansado y Exhausto\|Cansado / Exhausto]] | debuff | Menos Nitros |
+| [[Rengo]] | debuff | Moverse cuesta el doble |
+| [[Inmovilizado]] | debuff | No te podés mover |
+| [[Armadura rota]] | debuff | −1 Defensa por acumulación |
+| [[Escudo mágico]] | buff | Barra extra de HP |
+| [[Invulnerable]] | buff | No recibís daño |
+| [[Afortunado]] | buff | Tirás dos veces y te quedás con la mejor |
+| [[Sigilo (estado)\|Sigilo]] | buff | Estás oculto |
+
+> [!warning] Provisorios
+> Varios valores de la lista (Cansado, Exhausto, Hypeado, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).
+
+> [!question] Repaso pendiente
+> Falta revisar **uno por uno** todos los buffs y debuffs (qué hace cada uno exactamente, duración, si es acumulable). Esta lista es lo que hoy hace la ficha.
+
++++
+titulo: Veneno
+alias: [Envenenado, Veneno severo, Stacks de veneno]
+tags: [estado]
+estado: borrador
++++
+**Veneno** es un debuff de daño por turno: **pierde 1 HP por stack cada turno**, en el [[Mantenimiento]]. Los stacks y los turnos arrancan igualados y se van agotando juntos.
+
+- **Veneno severo:** hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca.
+- Se **cura** con consumibles (por ejemplo, un antídoto) o habilidades.
+- Lo bloquean [[Invulnerable]] y el estado **Sangre pura** (inmunidad a veneno).
+
+> [!question] Stacks
+> Falta definir cómo funciona exactamente acumular veneno (por ejemplo, la *Nube tóxica* del [[Debuffer]] "solo aplica 1 stack a personajes ya envenenados").
+
++++
+titulo: Sangrado
+alias: [Sangrando, Herida]
+tags: [estado]
+estado: borrador
++++
+**Sangrado** es un debuff **permanente** que hace perder **2 HP por turno** hasta que se cura.
+
+- Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).
+- Lo bloquea el estado **Coagulación extrema** (inmunidad a sangrado) e [[Invulnerable]].
+
++++
+titulo: Regeneración
+alias: [Regen, Regen de HP, Regenerar]
+tags: [estado, recursos]
+estado: confirmado
++++
+**Regeneración** es un buff que **cura HP cada turno** (5 por defecto, durante unos turnos). En el [[Mantenimiento]], cada estado de regeneración te suma su cura.
+
+Además existe la [[Pasivas|pasiva]] *Regeneración* (+3 HP por turno) que funciona sin turnos, siempre.
+
++++
+titulo: Pajaritos
+alias: []
+tags: [estado]
+estado: borrador
++++
+**Pajaritos** es un debuff (típico del [[Tanque]] y de golpes fuertes en la cabeza): **tu PdG y tu Evasión quedan a la mitad** (redondeado hacia abajo) mientras dure.
+
+> [!question] Definición de clase
+> El *Tanque* lo define como "reduce a la mitad todas las tiradas de DES, ESP y AGI". ¿Cuál vale: solo PdG y Evasión (lo que hace la ficha) o todos los stats de esos atributos?
+
++++
+titulo: Lisiado
+alias: [Lisiar]
+tags: [estado]
+estado: borrador
++++
+**Lisiado** es un debuff: **PdG y [[Parry]] a la mitad** (redondeado hacia abajo) mientras dure. Lo aplican habilidades como *Lisiar* del [[Asalto]] y lo cura, por ejemplo, un ítem de vendas.
+
++++
+titulo: Stun
+alias: [Aturdido, Aturdir, Stun (estado)]
+tags: [estado, control]
+estado: borrador
++++
+**Stun** es un debuff de control ([[Crowd Control]]): **no tenés Nitros este turno.** Podés pensar pero no actuar.
+
+- Dura pocos turnos.
+- Lo evita el estado **Inmunidad a CC**.
+- Tu resistencia a esto es [[Resistencias|Res. CC]].
+
++++
+titulo: Cansado y Exhausto
+alias: [Cansado, Exhausto, Hypeado, Fatiga]
+tags: [estado, recursos]
+estado: pendiente
++++
+Tres estados que modifican tus [[Nitros (No2)|Nitros]]:
+
+| Estado | Efecto |
+|---|---|
+| **Cansado** (debuff) | −1 a los Nitros máximos |
+| **Exhausto** (debuff, CC) | Como mucho **1 Nitro** por turno, sin importar tu máximo |
+| **Hypeado** (buff) | +1 a los Nitros máximos |
+
+> [!warning] Valores provisorios
+> Los tres eran "−1 Acción / 1 Acción / +1 Acción" y se pasaron a Nitros **1 a 1 sin recalibrar**.
+
+> [!question] Causa fatiga
+> Existe una condición "Causa fatiga" pendiente que el dueño va a definir con el grupo.
+
++++
+titulo: Rengo
+alias: [Rengo (estado)]
+tags: [estado]
+estado: pendiente
++++
+**Rengo** es un debuff de movimiento: **moverte cuesta 2 Nitros por casillero** mientras dure (antes era "Movimiento a la mitad").
+
++++
+titulo: Inmovilizado
+alias: [Enraizado, Atrapado, Inmovilizar]
+tags: [estado, control]
+estado: pendiente
++++
+**Inmovilizado** es un debuff de control: **no te podés mover** mientras dure. Los Nitros siguen sirviendo para todo lo demás (atacar, habilidades…).
+
+> [!warning] Regla provisoria
+> Está marcada como provisoria en la ficha. En el mapa, un personaje inmovilizado no gasta Nitros al arrastrar porque no debería poder moverse.
+
++++
+titulo: Armadura rota
+alias: [Armadura arruinada, Armadura rota (estado)]
+tags: [estado, equipo]
+estado: borrador
++++
+Dos estados que castigan tu armadura:
+
+- **Armadura rota:** **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.
+- **Armadura arruinada:** **anula al 100%** lo que aportan las **armaduras equipadas** (blandas y rígidas) a Defensa y [[Resistencia a crítico]]. **No** afecta cascos, guantes, piernas ni botas. También es permanente hasta reparar.
+
++++
+titulo: Escudo mágico
+alias: [Barrera, Escudo, Blindaje, Absorber daño]
+tags: [estado, recursos]
+estado: borrador
++++
+Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.
+
+| Estado | Cuánto absorbe | Duración |
+|---|---|---|
+| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |
+| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |
+
+Se ve como una barra 🛡 sobre tu token.
+
++++
+titulo: Invulnerable
+alias: [Inmunidad, Blindado, Inmunidad a CC, Inmune]
+tags: [estado]
+estado: borrador
++++
+**Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.
+
+Parientes más limitados:
+- **Blindado:** inmune a [[Golpe crítico|golpes críticos]].
+- **Inmunidad a CC:** inmune a estados de control ([[Stun]], Exhausto).
+- **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].
+
+> [!info] Inmunidades sin mecanismo
+> Algunos ítems dicen "inmunidad a X" pero **casi todos son un recordatorio**: el jugador y el GM lo tienen en cuenta a mano. Solo unos pocos están cableados a un estado real.
+
++++
+titulo: Sigilo (estado)
+alias: [Estado de sigilo]
+tags: [estado, sigilo]
+estado: borrador
++++
+El estado **Sigilo** (buff, permanente hasta que se rompe) marca que **estás oculto**: los enemigos no te ven en el mapa. Se rompe si entrás en el cono de detección de un enemigo o si hacés una acción hostil. Todo el detalle está en [[Sigilo]] y en [[Campo de visión]].
+
++++
+titulo: Crowd Control
+alias: [CC, Control, Estados de control, Res.CC]
+tags: [estado, control]
+estado: borrador
++++
+**Crowd Control (CC)** agrupa a los estados que **te quitan control sobre lo que hacés**: [[Stun]], Exhausto, [[Inmovilizado]] y similares. Los identifica una marca especial en la ficha.
+
+- Tu defensa contra ellos es la [[Resistencias|Res. CC]] (de [[Constitución]]).
+- **Inmunidad a CC** los bloquea.
+
++++
+titulo: Resistencias
+alias: [Res.Mg, Res.CC, Res.M, Res.Mt, Resistencia mágica, Resistencia mental, Resistencia a CC]
+tags: [stats, estado]
+estado: pendiente
++++
+Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:
+
+| Resistencia | Sale de | Se usa contra |
+|---|---|---|
+| **Res. Mágica** (Res.Mg) | [[Constitución]] | Daño y efectos mágicos |
+| **Res. CC** | Constitución | Estados de [[Crowd Control]] |
+| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |
+
+> [!question] En pausa: están mezcladas
+> Las tres todavía están en **terreno ambiguo** entre sí (incluso si "Res.M" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora.

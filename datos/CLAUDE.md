@@ -50,8 +50,11 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   estados, sin datos privados). Lo escribe `gm-tools.html`.
 - **`tienda-publica.json`** — la tienda generada y publicada por
   `vendor-generator.html`. La lee la ficha (botón Vendedor).
-- **`reglas.json`** — contenido del manual de usuario. Ver
+- **`manual.json`** — el manual compilado (lo genera
+  `herramientas/compilar_manual.py` desde `manual-usuario/notas/`). Ver
   [`../manual-usuario/CLAUDE.md`](../manual-usuario/CLAUDE.md).
+- **`reglas.json`** — el borrador viejo del manual; archivo histórico, ya no
+  se usa.
 - **`esquema.md`** — referencia de formato de todo lo de arriba.
 
 ## Dependencias con otras carpetas

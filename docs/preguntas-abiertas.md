@@ -382,3 +382,14 @@ resuelven a mano, como el resto de los avisos).
     parece un valor de la escala vieja; los precios de anillos (1200–3000) son
     muy altos comparados con el resto del catálogo; Lanzallamas es el único
     arma de rango antiguo y ahora conviven con los nuevos.
+
+- 🔲 **P89. Manual nuevo (2026-09-20).** Se escribió el manual completo (13 capítulos,
+  ~110 notas, navegable como un vault: `manual-usuario/notas/*.md` → `datos/manual.json`).
+  **Todas las dudas quedaron dentro del propio manual** como recuadros `> [!question]`,
+  que se juntan en la pantalla 📌 Pendientes (hoy ~50). Cosas puntuales que conviene
+  mirar primero: (1) reglas que puse como "confirmadas" aunque salgan solo del código
+  (Regeneración de 5 HP, Sigilo a 1 No2, etc.); (2) el ejemplo de "Un turno de ejemplo";
+  (3) las notas de clase de Asalto/Mago/Shooter/Support/Debuffer, que solo listan el
+  borrador sin automatizar; (4) el crítico y las resistencias, que siguen "en pausa".
+  `datos/reglas.json` (el borrador viejo) quedó como archivo histórico. La página ya no
+  tiene modo de edición: se edita el `.md` y se recompila.

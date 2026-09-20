@@ -29,6 +29,13 @@
 - **Los personajes, los equipos y todo el catálogo son sugerencias e
   invitaciones**, no requisitos. Los números de un ítem, una clase o un creep
   son un punto de partida que cualquiera puede cambiar o inventar de cero.
+- **Es una invitación a la creación colectiva.** Cada quien imagina a su
+  personaje como quiere: un paladín de la piedad y la justicia, una piedra
+  consciente que se construyó un robot, un pendorcho galáctico (figura
+  geométrica telepática), un gusano pedorro estilo Ren y Stimpy, un asesino
+  invocador de abejas con sigilo, veneno y trampas, un sacerdote con escopeta
+  de balas de agua bendita… Todo entra. **El rol del GM no es limitar sino
+  acompañar y moderar.**
 - **Consecuencia para el código y el diseño**: las herramientas *ayudan y
   recuerdan*, no *prohíben ni obligan*. Preferir avisar (y dejar seguir) antes
   que bloquear; dejar siempre una salida manual (editar un valor, forzar una
@@ -103,7 +110,7 @@ lo que el grupo usa.
 | [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa de hexágonos en vivo con tokens (`mapa.html`, Firebase) | En desarrollo activo |
 | [`comun/`](comun/CLAUDE.md) | Código JS compartido entre las herramientas (sesión, menú, Mesa, dados, lupa, asistente de ítems…) | En uso activo |
 | [`datos/`](datos/CLAUDE.md) | Catálogo de ítems (`catalogo.json`, sincronizado por GitHub contra `main`) + su editor | En uso activo |
-| [`manual-usuario/`](manual-usuario/CLAUDE.md) | Manual de reglas de la campaña | En construcción, cargándose de a poco |
+| [`manual-usuario/`](manual-usuario/CLAUDE.md) | El manual, navegable como un vault de Obsidian (buscador, enlaces, backlinks, mapa, pendientes); fuente en `notas/*.md` | Primera versión completa (2026-09-20), con preguntas abiertas para completar |
 | [`docs/`](docs/CLAUDE.md) | Plan del sistema nuevo, workflow de Firebase/GitHub, preguntas de diseño abiertas | Con contenido activo |
 | `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |

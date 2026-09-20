@@ -628,6 +628,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <button type="button" class="btn" id="btn-alejar" title="Alejar">−</button>
         <button type="button" class="btn" id="btn-acercar" title="Acercar">+</button>
       </div>
+      <button type="button" class="btn btn-cuadrado" id="btn-zonas" aria-pressed="false" title="Ver los conos de detección (azul) y las zonas de alerta (naranja) de todos los tokens">👓</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -1431,6 +1432,16 @@ function zonasSigilo(t){
 }
 // Quien está en sigilo ve las zonas de los rivales que ve: un jugador, las de los
 // creeps; el GM con un creep en sigilo, las de los personajes.
+// 👓 Botón de los lentes (grupo flotante del mapa): muestra u oculta los conos y zonas de todos.
+let verZonas = false;
+try{ verZonas = localStorage.getItem('mapa-ver-zonas') === '1'; }catch(e){}
+function renderBotonZonas(){
+  const b = $('#btn-zonas');
+  if(!b) return;
+  b.classList.toggle('activo', verZonas);
+  b.setAttribute('aria-pressed', verZonas ? 'true' : 'false');
+  b.title = verZonas ? 'Ocultar los conos de detección y las zonas de alerta' : 'Ver los conos de detección (azul) y las zonas de alerta (naranja) de todos los tokens';
+}
 function zonasParaVer(){
   const rivales = [];
   let espectador = false;
@@ -2682,6 +2693,27 @@ function dibujar(){
     pintar(zn.cono, 'rgba(63,111,176,.26)', 'rgba(63,111,176,.6)');
   });
 
+  // 👓 Ver conos: el cono de detección (azul) y la zona de alerta (naranja) de todos los tokens
+  // que se ven (los ocultos o en sigilo que no ves, tampoco muestran sus zonas).
+  if(verZonas){
+    const pintarZona = (lista, relleno, borde) => {
+      if(!lista.length) return;
+      ctx.beginPath();
+      lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+      ctx.fillStyle = relleno; ctx.fill();
+      ctx.strokeStyle = borde; ctx.lineWidth = 2 / z; ctx.stroke();
+    };
+    tokens.forEach(t => {
+      if(t.oculto && !soyGM) return;
+      if(!tokenVisiblePorNiebla(t)) return;
+      const est = estadoDe(t);
+      if(est && est.muerto) return;
+      const zn = zonasSigilo(t);
+      pintarZona(zn.alerta, 'rgba(232,140,50,.38)', 'rgba(255,170,80,.9)');
+      pintarZona(zn.cono, 'rgba(60,120,210,.45)', 'rgba(110,170,255,.95)');
+    });
+  }
+
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {
     if(t.oculto && !soyGM) return;
@@ -3492,6 +3524,13 @@ lienzo.addEventListener('wheel', e => {
   zoomEn(px, py, Math.exp(-e.deltaY * 0.0015));
 }, {passive: false});
 
+$('#btn-zonas').onclick = () => {
+  verZonas = !verZonas;
+  try{ localStorage.setItem('mapa-ver-zonas', verZonas ? '1' : '0'); }catch(e){}
+  renderBotonZonas();
+  pedirDibujo();
+};
+renderBotonZonas();
 $('#btn-acercar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 1.25);
 $('#btn-alejar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 0.8);
 $('#btn-centrar').onclick = centrarEnMios;

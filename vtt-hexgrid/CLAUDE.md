@@ -707,3 +707,11 @@ hexágono con otro sin importar bando. Todavía no está construido.
   oculto ve las zonas y decide cuándo entrar, y cada paso es consciente. Solo el
   cono (azul) corta. Falta el escenario 2 (se mueve el que ve al oculto: hoy
   solo cuenta el cono).
+
+- **👓 Ver conos** (2026-09-19): botón cuadrado en el grupo flotante `#flotantes-mapa`
+  (junto al zoom, antes del 👁 y del switch de modo) que prende y apaga el dibujo de
+  los **conos de detección (azul) y zonas de alerta (naranja)** de **todos** los
+  tokens que se ven (`verZonas`, en `dibujar`; se recuerda por navegador en
+  `localStorage` `mapa-ver-zonas`). Colores más opacos que los de sigilo para que se
+  vean bien. Un token oculto, en sigilo que no ves o muerto no muestra sus zonas
+  (no delata nada).

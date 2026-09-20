@@ -63,3 +63,4 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   sincronizado con `assets/catalogo.xlsx` y con los tres HTML de juego.
 - `ficha-personaje/`, `gm-toolset/` — todos leen y escriben algo de acá
   vía la API de contenidos de GitHub (no filesystem directo).
+- **Nombres propios del equipo de los humanos** (2026-09-20): ver `gm-toolset/CLAUDE.md`; el catálogo pasó a 665 ítems (54 clones con nombre inspirado en el creep).

@@ -4610,6 +4610,38 @@
     "mods": [
       {
         "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arcabuz-de-cubierta",
+    "nombre": "Arcabuz de cubierta",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 130,
+    "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+    "descripcionNarrativa": "Igual que «Ballesta de mano» del catálogo, pero con historia propia: lo lleva «Artillero de cubierta». Cabe en una mano y no perdona. Se carga con una palanquita que siempre se traba.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
         "val": 7
       },
       {
@@ -4723,6 +4755,38 @@
     "mods": [
       {
         "stat": "rng",
+        "val": 4
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-arco-del-rastreador",
+    "nombre": "Arco del rastreador",
+    "tier": "Común",
+    "tipoItem": "arma_2m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 70,
+    "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
+    "descripcionNarrativa": "Igual que «Arco corto» del catálogo, pero con historia propia: lo lleva «Rastreador a sueldo». De fresno sin pulir. Sirve para cazar conejos y para cosas menos amistosas.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
         "val": 5
       }
     ],
@@ -4759,6 +4823,38 @@
       }
     ],
     "efectoMods": [],
+    "id": "new-ballesta-de-almenara",
+    "nombre": "Ballesta de almenara",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 130,
+    "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+    "descripcionNarrativa": "Igual que «Ballesta de mano» del catálogo, pero con historia propia: lo lleva «Ballestero de muralla». Cabe en una mano y no perdona. Se carga con una palanquita que siempre se traba.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
     "id": "new-ballesta-de-mano",
     "nombre": "Ballesta de mano",
     "tier": "Buena Calidad",
@@ -4768,6 +4864,38 @@
     "precioCompra": 130,
     "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
     "descripcionNarrativa": "Cabe en una mano y no perdona. Se carga con una palanquita que siempre se traba.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-ballesta-del-arbusto",
+    "nombre": "Ballesta del arbusto",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 130,
+    "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+    "descripcionNarrativa": "Igual que «Ballesta de mano» del catálogo, pero con historia propia: lo lleva «Ballestero emboscado». Cabe en una mano y no perdona. Se carga con una palanquita que siempre se traba.",
     "tipoDado": 6,
     "danoFijo": 1,
     "unidades": 0,
@@ -4841,6 +4969,33 @@
     "precioCompra": 90,
     "detalle": "alcance +1",
     "descripcionNarrativa": "Madera lustrada por décadas de manos. No tiene un solo adorno.",
+    "tipoDado": 10,
+    "danoFijo": 1,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-baston-del-trueno",
+    "nombre": "Bastón del trueno",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "alcance +1",
+    "descripcionNarrativa": "Igual que «Bastón de monje» del catálogo, pero con historia propia: lo lleva «Chamán de la tormenta». Madera lustrada por décadas de manos. No tiene un solo adorno.",
     "tipoDado": 10,
     "danoFijo": 1,
     "danoAmplificado": 0,
@@ -4974,6 +5129,68 @@
   {
     "mods": [
       {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-baculo-del-sumo-profeta",
+    "nombre": "Báculo del Sumo Profeta",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 140,
+    "detalle": "alcance +1, bloqueo +1",
+    "descripcionNarrativa": "Igual que «Báculo de batalla» del catálogo, pero con historia propia: lo lleva «Sumo profeta del culto». Madera dura con refuerzos de hierro en las puntas. Alcanza más de lo que parece.",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-baculo-del-inquisidor",
+    "nombre": "Báculo del inquisidor",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 140,
+    "detalle": "alcance +1, bloqueo +1",
+    "descripcionNarrativa": "Igual que «Báculo de batalla» del catálogo, pero con historia propia: lo lleva «Inquisidor del culto». Madera dura con refuerzos de hierro en las puntas. Alcanza más de lo que parece.",
+    "tipoDado": 10,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
         "stat": "esp",
         "val": 2
       },
@@ -5088,6 +5305,33 @@
     "imagen": ""
   },
   {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cimitarra-del-contramaestre",
+    "nombre": "Cimitarra del contramaestre",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 75,
+    "detalle": "Parry +2",
+    "descripcionNarrativa": "Igual que «Cimitarra de guardia» del catálogo, pero con historia propia: lo lleva «Contramaestre». Curva prolija, bien balanceada. Reglamentaria de cuerpo de guardia.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-colmillo-dientes-de-sable",
@@ -5161,6 +5405,28 @@
     "precioCompra": 30,
     "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
     "descripcionNarrativa": "Hoja corta con muescas para desollar. Huele a lo último que abrió.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-cuchillo-del-grumete-polizon",
+    "nombre": "Cuchillo del grumete polizón",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 30,
+    "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
+    "descripcionNarrativa": "Igual que «Cuchillo de cazador» del catálogo, pero con historia propia: lo lleva «Grumete polizón». Hoja corta con muescas para desollar. Huele a lo último que abrió.",
     "tipoDado": 4,
     "danoFijo": 0,
     "danoAmplificado": 0,
@@ -5254,6 +5520,64 @@
   {
     "mods": [],
     "efectoMods": [],
+    "id": "new-daga-de-la-viuda-verde",
+    "nombre": "Daga de la viuda verde",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "detalle": "Ignora 1 punto de resistencia al crítico",
+    "descripcionNarrativa": "Igual que «Daga de guardia» del catálogo, pero con historia propia: lo lleva «Envenenador de la banda». Punta triangular, hecha para meterse entre las placas.",
+    "tipoDado": 4,
+    "danoFijo": 1,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Ignora 1 de Res. crítico",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-daga-del-sacrificio",
+    "nombre": "Daga del sacrificio",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "pdg +1",
+    "descripcionNarrativa": "Igual que «Daga de Capitán» del catálogo, pero con historia propia: lo lleva «Sacerdote oscuro». Empuñadura con el escudo de la compañía. Se entrega con el rango.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
     "id": "cat-espada-ancha",
     "nombre": "Espada ancha",
     "tier": "Común",
@@ -5294,6 +5618,37 @@
     "precioCompra": 120,
     "detalle": "parry+1, bloqueo+1",
     "descripcionNarrativa": "Se usa con una o con dos manos. Nunca termina de decidirse.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      },
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-espada-bastarda-del-espectro",
+    "nombre": "Espada bastarda del Espectro",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "detalle": "parry+1, bloqueo+1",
+    "descripcionNarrativa": "Igual que «Espada bastarda» del catálogo, pero con historia propia: lo lleva «Capitán pirata». Se usa con una o con dos manos. Nunca termina de decidirse.",
     "tipoDado": 6,
     "danoFijo": 1,
     "danoAmplificado": 0,
@@ -5411,6 +5766,135 @@
         "detalle": "Te curás tanto HP como el daño que hiciste."
       }
     ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-espada-de-alquiler-oxidada",
+    "nombre": "Espada de alquiler oxidada",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "envenena x 50% de chances",
+    "descripcionNarrativa": "Igual que «Espada corta oxidada» del catálogo, pero con historia propia: lo lleva «Espada de alquiler novata». El óxido comió la hoja hasta dejarla porosa. Lo que entra ahí no sale limpio.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Envenenar",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale Veneno al objetivo."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-espada-de-recluta-de-la-guardia",
+    "nombre": "Espada de recluta de la guardia",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 50,
+    "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
+    "descripcionNarrativa": "Igual que «Espada corta de instrucción» del catálogo, pero con historia propia: lo lleva «Recluta de la guardia». Filo redondeado a propósito. Sirve para aprender y para pegar igual.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-espada-de-taberna",
+    "nombre": "Espada de taberna",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 70,
+    "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
+    "descripcionNarrativa": "Igual que «Espada ancha» del catálogo, pero con historia propia: lo lleva «Mercenario de taberna». Hoja gruesa y pareja, sin gracia ninguna. Cumple.",
+    "tipoDado": 6,
+    "danoFijo": 1,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-espada-del-jefe-de-los-mil-caminos",
+    "nombre": "Espada del Jefe de los Mil Caminos",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 90,
+    "detalle": "pdg +2",
+    "descripcionNarrativa": "Igual que «Espada larga» del catálogo, pero con historia propia: lo lleva «Jefe de la banda». Un palmo más larga que la corta, y eso cambia todo.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-espada-del-veterano-de-mil-batallas",
+    "nombre": "Espada del veterano de mil batallas",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 90,
+    "detalle": "pdg +2",
+    "descripcionNarrativa": "Igual que «Espada larga» del catálogo, pero con historia propia: lo lleva «Veterano de mil batallas». Un palmo más larga que la corta, y eso cambia todo.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -5623,6 +6107,33 @@
     "precioCompra": 50,
     "detalle": "crítico +1",
     "descripcionNarrativa": "Punta finísima y nada más. Está hecho para un solo tipo de trabajo.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-estileto-ritual-del-acolito",
+    "nombre": "Estileto ritual del acólito",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 50,
+    "detalle": "crítico +1",
+    "descripcionNarrativa": "Igual que «Estileto común» del catálogo, pero con historia propia: lo lleva «Acólito de capucha». Punta finísima y nada más. Está hecho para un solo tipo de trabajo.",
     "tipoDado": 4,
     "danoFijo": 0,
     "danoAmplificado": 0,
@@ -6324,6 +6835,42 @@
     "imagen": ""
   },
   {
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-hacha-de-la-furia-roja",
+    "nombre": "Hacha de la furia roja",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 1,
+    "precioCompra": 110,
+    "detalle": "Rompe armadura. +1 al bloqueo",
+    "descripcionNarrativa": "Igual que «Hacha de batalla» del catálogo, pero con historia propia: lo lleva «Berserker». Cabeza ancha con refuerzo en el mango. Se puede parar un golpe con ella.",
+    "tipoDado": 8,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale el estado Armadura rota al objetivo."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-hacha-de-lenador",
@@ -6375,6 +6922,73 @@
         "exitos": 1,
         "dado": "",
         "detalle": "Te curás la mitad del daño que hiciste."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-hacha-del-jefe-de-guerra",
+    "nombre": "Hacha del Jefe de Guerra",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "detalle": "alcance +1. Rompe armadura. ",
+    "descripcionNarrativa": "Igual que «Hacha danesa» del catálogo, pero con historia propia: lo lleva «Jefe de guerra bárbaro». Asta larga y hoja delgada. Vikinga, veloz y letal.",
+    "tipoDado": 8,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale el estado Armadura rota al objetivo."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-hacha-del-clan",
+    "nombre": "Hacha del clan",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 60,
+    "detalle": "Rompe armadura.",
+    "descripcionNarrativa": "Igual que «Hacha» del catálogo, pero con historia propia: lo lleva «Guerrero de clan». Hacha de leña reconvertida. Nadie le cambió el mango todavía.",
+    "tipoDado": 8,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale el estado Armadura rota al objetivo."
       }
     ],
     "equipoEstadoNombre": "",
@@ -6534,6 +7148,38 @@
     "mods": [
       {
         "stat": "rng",
+        "val": 3
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-honda-del-cazador-de-jabalies",
+    "nombre": "Honda del cazador de jabalíes",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 1,
+    "precioCompra": 40,
+    "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
+    "descripcionNarrativa": "Igual que «Honda de cuero» del catálogo, pero con historia propia: lo lleva «Cazador bárbaro». Una tira de cuero y un puñado de piedras. Vieja como la guerra.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "unidades": 0,
+    "cargaMax": 0,
+    "curahp": 0,
+    "curabonosPct": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "equipoEstadoPreset": "",
+    "consumible": false,
+    "imagen": "",
+    "danoAmplificado": 0,
+    "armaDeRango": true
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
         "val": 1
       }
     ],
@@ -6589,6 +7235,37 @@
     "imagen": ""
   },
   {
+    "mods": [],
+    "efectoMods": [],
+    "id": "new-hoz-ceremonial",
+    "nombre": "Hoz ceremonial",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 75,
+    "detalle": "sangrado 50%",
+    "descripcionNarrativa": "Igual que «Hoz» del catálogo, pero con historia propia: lo lleva «Cultista encapuchado». Curva y filosa por dentro. Engancha antes de cortar.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Aplicale Sangrado al objetivo."
+      }
+    ],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
     "mods": [
       {
         "stat": "pdg",
@@ -6609,6 +7286,37 @@
     "precioCompra": 120,
     "detalle": "pdg+2, crítico +1",
     "descripcionNarrativa": "Curva perfecta, filo obsesivo. Alguien le dedicó una vida a esta hoja.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-katana-del-cazarrecompensas",
+    "nombre": "Katana del cazarrecompensas",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "detalle": "pdg+2, crítico +1",
+    "descripcionNarrativa": "Igual que «Katana» del catálogo, pero con historia propia: lo lleva «Cazarrecompensas legendario». Curva perfecta, filo obsesivo. Alguien le dedicó una vida a esta hoja.",
     "tipoDado": 6,
     "danoFijo": 0,
     "danoAmplificado": 0,
@@ -6677,6 +7385,33 @@
     "imagen": "",
     "danoAmplificado": 0,
     "armaDeRango": false
+  },
+  {
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-lanza-de-guardia-de-puerta",
+    "nombre": "Lanza de guardia de puerta",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 75,
+    "detalle": "alcance +1",
+    "descripcionNarrativa": "Igual que «Lanza corta» del catálogo, pero con historia propia: lo lleva «Guardia de puerta». Asta de fresno y punta de hierro. La primera línea de cualquier milicia.",
+    "tipoDado": 4,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
   },
   {
     "mods": [
@@ -7419,6 +8154,28 @@
   {
     "mods": [],
     "efectoMods": [],
+    "id": "new-punzon-del-ladronzuelo",
+    "nombre": "Punzón del ladronzuelo",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
+    "descripcionNarrativa": "Igual que «Daga» del catálogo, pero con historia propia: lo lleva «Ladronzuelo de callejón». La daga de siempre. Todos empiezan con una.",
+    "tipoDado": 4,
+    "danoFijo": 1,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [],
+    "efectoMods": [],
     "id": "new-punal-aserrado",
     "nombre": "Puñal aserrado",
     "tier": "Raro",
@@ -7646,6 +8403,33 @@
   {
     "mods": [
       {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-sable-de-abordaje",
+    "nombre": "Sable de abordaje",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "iniciativa +1",
+    "descripcionNarrativa": "Igual que «Sable común» del catálogo, pero con historia propia: lo lleva «Marinero con sable». Curvo, liviano y rápido de sacar. De caballería barata.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
         "stat": "pdg",
         "val": 1
       },
@@ -7664,6 +8448,91 @@
     "precioCompra": 75,
     "detalle": "pdg +1, parry +1",
     "descripcionNarrativa": "Curvo y liviano, pensado para pegar al galope.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-sable-de-mando-del-capitan",
+    "nombre": "Sable de mando del capitán",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 75,
+    "detalle": "pdg +1, parry +1",
+    "descripcionNarrativa": "Igual que «Sable de caballería» del catálogo, pero con historia propia: lo lleva «Capitán de la guardia». Curvo y liviano, pensado para pegar al galope.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-sable-del-sargento",
+    "nombre": "Sable del sargento",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 80,
+    "detalle": "pdg +1",
+    "descripcionNarrativa": "Igual que «Sable militar» del catálogo, pero con historia propia: lo lleva «Sargento de la guardia». Reglamentario, con vaina de cuero rígido. Miles iguales a este.",
+    "tipoDado": 6,
+    "danoFijo": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-sable-mellado-del-camino-real",
+    "nombre": "Sable mellado del camino real",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "iniciativa +1",
+    "descripcionNarrativa": "Igual que «Sable común» del catálogo, pero con historia propia: lo lleva «Salteador de caminos». Curvo, liviano y rápido de sacar. De caballería barata.",
     "tipoDado": 6,
     "danoFijo": 0,
     "danoAmplificado": 0,
@@ -7987,6 +8856,34 @@
     "mods": [
       {
         "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-escudo-abollado-del-veterano",
+    "nombre": "Escudo abollado del veterano",
+    "tier": "Buena Calidad",
+    "tipoItem": "escudo_1m",
+    "peso": 4,
+    "ranuras": 1,
+    "precioCompra": 90,
+    "detalle": "bloqueo +2",
+    "descripcionNarrativa": "Igual que «Escudo grande» del catálogo, pero con historia propia: lo lleva «Veterano de mil batallas». Cobertura de rodilla a hombro. Cansa el brazo a los diez minutos.",
+    "tipoDado": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 10
       },
       {
@@ -8152,6 +9049,34 @@
     "precioCompra": 70,
     "detalle": "Resistencia a críticos tipo 6: +1.",
     "descripcionNarrativa": "Tablas de tilo encoladas y forradas en lienzo. Se rompe y se repone.",
+    "tipoDado": 0,
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-escudo-de-taberna",
+    "nombre": "Escudo de taberna",
+    "tier": "Común",
+    "tipoItem": "escudo_1m",
+    "peso": 4,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Igual que «Escudo de madera» del catálogo, pero con historia propia: lo lleva «Mercenario de taberna». Tablas de tilo encoladas y forradas en lienzo. Se rompe y se repone.",
     "tipoDado": 0,
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12827,6 +13752,33 @@
     "mods": [
       {
         "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-campera-de-marinero-espacial",
+    "nombre": "Campera de marinero espacial",
+    "tier": "Común",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Igual que «Campera de cuero de motociclista con tachas» del catálogo, pero con historia propia: lo lleva «Marinero con sable». Alguien le puso las tachas a mano, torcidas y con orgullo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 1
       },
       {
@@ -13032,6 +13984,33 @@
     "mods": [
       {
         "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-capucha-de-emboscada",
+    "nombre": "Capucha de emboscada",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 4: +1. Defensa +2.",
+    "descripcionNarrativa": "Igual que «Capucha de cuero acolchada» del catálogo, pero con historia propia: lo lleva «Ballestero emboscado». Cuero blando con relleno en la coronilla. Simple y efectiva.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 1
       },
       {
@@ -13072,6 +14051,29 @@
     "precioCompra": 40,
     "detalle": "Defensa +1.",
     "descripcionNarrativa": "Lana sin teñir de oveja de descarte. Pica un poco.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-capucha-de-lana-del-culto",
+    "nombre": "Capucha de lana del culto",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "detalle": "Defensa +1.",
+    "descripcionNarrativa": "Igual que «Capucha de lana cruda» del catálogo, pero con historia propia: lo lleva «Cultista encapuchado». Lana sin teñir de oveja de descarte. Pica un poco.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -13241,6 +14243,37 @@
     "mods": [
       {
         "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "esp",
+        "val": 1
+      },
+      {
+        "stat": "rangocasteo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-capuz-del-sumo-profeta",
+    "nombre": "Capuz del Sumo Profeta",
+    "tier": "Raro",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "Especial +1. Rango de casteo +1.",
+    "descripcionNarrativa": "Igual que «Capuz de vidente de feria» del catálogo, pero con historia propia: lo lleva «Sumo profeta del culto». Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 3
       },
       {
@@ -13266,6 +14299,33 @@
     "precioCompra": 240,
     "detalle": "Especial +1. Bonos +1. Rango de casteo +1.",
     "descripcionNarrativa": "Paño grueso con bolsillos internos para tinta. Ordena la cabeza.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-casaca-curtida-de-salteador",
+    "nombre": "Casaca curtida de salteador",
+    "tier": "Común",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Resistencia a críticos tipo 4: +1. Defensa +4.",
+    "descripcionNarrativa": "Igual que «Peto de cuero curtido» del catálogo, pero con historia propia: lo lleva «Salteador de caminos». Curtido en corteza de quebracho. Duro y oscuro.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -13464,6 +14524,37 @@
       {
         "stat": "tipo2",
         "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-casco-de-artillero-pintado-a-mano",
+    "nombre": "Casco de artillero pintado a mano",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 6: +1. Evasión -1",
+    "descripcionNarrativa": "Igual que «Casco de moto vintage pintado a mano» del catálogo, pero con historia propia: lo lleva «Artillero de cubierta». Llamas anaranjadas sobre fondo negro. Un trabajo de amor.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       },
       {
         "stat": "tipo3",
@@ -13618,6 +14709,33 @@
     "mods": [
       {
         "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-casco-de-muralla",
+    "nombre": "Casco de muralla",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 70,
+    "detalle": "Resistencia a críticos tipo 6: +1.",
+    "descripcionNarrativa": "Igual que «Casco de cuero endurecido» del catálogo, pero con historia propia: lo lleva «Ballestero de muralla». Cuero hervido y prensado hasta ponerse duro. Barato y efectivo.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 2
       },
       {
@@ -13713,6 +14831,37 @@
     "precioCompra": 130,
     "detalle": "Resistencia a críticos tipo 6: +1., resistencia a críticos tipo 4: +2",
     "descripcionNarrativa": "Fibra sintética que no pertenece a esta época y a nadie le importa.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-chaleco-de-escamas-del-envenenador",
+    "nombre": "Chaleco de escamas del envenenador",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 8: +1.",
+    "descripcionNarrativa": "Igual que «Cota de escamas de cuero» del catálogo, pero con historia propia: lo lleva «Envenenador de la banda». Escamas de cuero hervido cosidas en hileras. Trabajo paciente de taller.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -14234,6 +15383,37 @@
     "mods": [
       {
         "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-coraza-de-cuero-del-clan",
+    "nombre": "Coraza de cuero del clan",
+    "tier": "Común",
+    "tipoItem": "armadura_rigida",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "detalle": "Reduce críticos Tipo 4 y 6",
+    "descripcionNarrativa": "Igual que «Armadura de cuero rígido» del catálogo, pero con historia propia: lo lleva «Guerrero de clan». Cuero hervido y moldeado al torso. El puente entre lo blando y lo duro.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 9
       },
       {
@@ -14406,6 +15586,41 @@
     "mods": [
       {
         "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-coraza-de-puerta",
+    "nombre": "Coraza de puerta",
+    "tier": "Común",
+    "tipoItem": "armadura_rigida",
+    "peso": 4,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "detalle": "Resistencia a críticos tipo 4 y 6: +1. evasión -1",
+    "descripcionNarrativa": "Igual que «Coraza de guardia de cuartel» del catálogo, pero con historia propia: lo lleva «Guardia de puerta». Reglamentaria, pesada, con el número de inventario grabado atrás.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 10
       },
       {
@@ -14492,6 +15707,45 @@
     "mods": [
       {
         "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-coraza-del-capitan-de-la-ciudad",
+    "nombre": "Coraza del capitán de la ciudad",
+    "tier": "Raro",
+    "tipoItem": "armadura_rigida",
+    "peso": 6,
+    "ranuras": 0,
+    "precioCompra": 250,
+    "detalle": "Reduce críticos tipo 4, 6, 8 y 10.",
+    "descripcionNarrativa": "Igual que «Coraza de hierro» del catálogo, pero con historia propia: lo lleva «Capitán de la guardia». Maciza y sin articulaciones. Se camina despacio y no importa.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 3
       },
       {
@@ -14513,6 +15767,37 @@
     "precioCompra": 100,
     "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 8: +1.",
     "descripcionNarrativa": "Escamas de cuero hervido cosidas en hileras. Trabajo paciente de taller.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cota-de-escamas-del-jefe-de-guerra",
+    "nombre": "Cota de escamas del jefe de guerra",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Resistencia a críticos tipo 6: +2. Resistencia a críticos tipos 8: +1.",
+    "descripcionNarrativa": "Igual que «Cota de escamas de cuero» del catálogo, pero con historia propia: lo lleva «Jefe de guerra bárbaro». Escamas de cuero hervido cosidas en hileras. Trabajo paciente de taller.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -14641,6 +15926,41 @@
       {
         "stat": "tipo2",
         "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cota-de-malla-de-contramaestre",
+    "nombre": "Cota de malla de contramaestre",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Reduce críticos Tipo 4, 6 y 8.",
+    "descripcionNarrativa": "Igual que «Cota de malla de acero» del catálogo, pero con historia propia: lo lleva «Contramaestre». Anillos remachados uno por uno. Suena bajito al caminar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -14727,6 +16047,41 @@
     "precioCompra": 210,
     "detalle": "Reduce críticos Tipo 4, 6, 8 y 10.",
     "descripcionNarrativa": "Placas superpuestas remachadas sobre malla. Cobertura casi total.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-cota-del-cazarrecompensas",
+    "nombre": "Cota del cazarrecompensas",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Reduce críticos Tipo 4, 6 y 8.",
+    "descripcionNarrativa": "Igual que «Cota de malla de acero» del catálogo, pero con historia propia: lo lleva «Cazarrecompensas legendario». Anillos remachados uno por uno. Suena bajito al caminar.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -14839,6 +16194,68 @@
     "precioCompra": 90,
     "detalle": "Reduce críticos tipo 6",
     "descripcionNarrativa": "Dos capas de guata cosidas en rombos. Abriga de más en verano.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "rescc",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-gambeson-de-mando-del-jefe-bandido",
+    "nombre": "Gambesón de mando del jefe bandido",
+    "tier": "Raro",
+    "tipoItem": "armadura_blanda",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 270,
+    "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a CC +2.",
+    "descripcionNarrativa": "Igual que «Gambesón del veterano de frontera» del catálogo, pero con historia propia: lo lleva «Jefe de la banda». Relleno apretado hasta el hueso, con remiendos de tres campañas distintas.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-gambeson-del-capitan-del-espectro",
+    "nombre": "Gambesón del capitán del Espectro",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Reduce críticos tipo 6",
+    "descripcionNarrativa": "Igual que «Gambesón acolchado de doble capa» del catálogo, pero con historia propia: lo lleva «Capitán pirata». Dos capas de guata cosidas en rombos. Abriga de más en verano.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -15503,6 +16920,37 @@
     "equipoEstadoNombre": "Inmune a restricciones de movimiento (grebas)",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "Mientras esté equipado, no se le pueden aplicar restricciones de movimiento (Lisiado, Inmovilizado, Rengo).",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-grebas-del-rastreador",
+    "nombre": "Grebas del rastreador",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 150,
+    "detalle": "Resistencia a críticos tipos 6 y 8: +1.",
+    "descripcionNarrativa": "Igual que «Grebas de acero templado» del catálogo, pero con historia propia: lo lleva «Rastreador a sueldo». Acero bien trabajado, articulado en la rodilla.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
   },
@@ -16565,6 +18013,41 @@
     "mods": [
       {
         "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-media-armadura-de-sargento",
+    "nombre": "Media armadura de sargento",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "detalle": "Resistencia a críticos tipos 4, 6 y 8: +1.",
+    "descripcionNarrativa": "Igual que «Media armadura de escudero» del catálogo, pero con historia propia: lo lleva «Sargento de la guardia». Placa en torso y hombros, malla en las juntas. Solución de compromiso honesta.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 4
       },
       {
@@ -17155,6 +18638,33 @@
       }
     ],
     "efectoMods": [],
+    "id": "new-pasamontanas-de-inquisidor",
+    "nombre": "Pasamontañas de inquisidor",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 50,
+    "detalle": "Resistencia a críticos tipo 4: +1.",
+    "descripcionNarrativa": "Igual que «Pasamontañas de tejido basto» del catálogo, pero con historia propia: lo lleva «Inquisidor del culto». Tejido grueso que cubre cabeza y cuello. Abriga tanto que da calor de más.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
     "id": "ia-pasamontanas-de-tejido-basto",
     "nombre": "Pasamontañas de tejido basto",
     "tier": "Común",
@@ -17556,6 +19066,37 @@
     "precioCompra": 190,
     "detalle": "Resistencia a críticos tipos 4 y 6: +2. Resistencia a críticos tipo 8: +1. Especial +1. Rango de casteo +1. Evasión -1.",
     "descripcionNarrativa": "Runas grabadas a cincel, todavía brillan tenue cuando hay magia cerca.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-pieles-del-berserker",
+    "nombre": "Pieles del berserker",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "detalle": "Reduce críticos Tipo 4 y 6.",
+    "descripcionNarrativa": "Igual que «Armadura de cuero reforzado» del catálogo, pero con historia propia: lo lleva «Berserker». Cuero doble con costura de tiento en los bordes. Trabajo honesto de talabartero.",
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
     "equipoEstadoDetalle": "",
@@ -18457,6 +19998,33 @@
     "mods": [
       {
         "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "bonos",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-tunica-de-nubarron",
+    "nombre": "Túnica de nubarrón",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "detalle": "Bonos +2",
+    "descripcionNarrativa": "Igual que «Túnica de acólito» del catálogo, pero con historia propia: lo lleva «Chamán de la tormenta». Tela áspera, sin adornos. La primera prenda de cualquiera que empieza a estudiar.",
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
         "val": 1
       }
     ],
@@ -18470,6 +20038,29 @@
     "precioCompra": 110,
     "detalle": "Regeneración +2. Cualquier efecto de sanación que ejecute sana +5",
     "descripcionNarrativa": "Lino blanco que no se mancha de sangre, por más que debería.",
+    "equipoEstadoNombre": "Regeneración (túnica)",
+    "equipoEstadoHpTurno": 2,
+    "equipoEstadoDetalle": "Cura 2 HP cada turno mientras esté equipada.",
+    "consumible": false,
+    "imagen": ""
+  },
+  {
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "id": "new-tunica-del-sacerdote-oscuro",
+    "nombre": "Túnica del sacerdote oscuro",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "detalle": "Regeneración +2. Cualquier efecto de sanación que ejecute sana +5",
+    "descripcionNarrativa": "Igual que «Túnica de sanador» del catálogo, pero con historia propia: lo lleva «Sacerdote oscuro». Lino blanco que no se mancha de sangre, por más que debería.",
     "equipoEstadoNombre": "Regeneración (túnica)",
     "equipoEstadoHpTurno": 2,
     "equipoEstadoDetalle": "Cura 2 HP cada turno mientras esté equipada.",

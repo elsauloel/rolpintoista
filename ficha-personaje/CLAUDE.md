@@ -334,3 +334,9 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   📖 **Bitácora** (así las dos columnas quedan de 3 y 3). **Inteligencia** pasó a
   Atributos, junto al Campo de visión. El recuadro de **SP** del encabezado se
   eliminó (la barra azul ya lo muestra).
+
+- **Todos los botones de la barra de arriba pasaron al dock** (2026-09-19): en
+  orden ⚡ Botonera, 👥 Personajes, 🏪 Vendedor, ⭐ Exp y Job, 💰 DDE y loot, 📖
+  Bitácora, 🗺 Mapa, 💾 Respaldo y ＋ Personaje nuevo. La barra de arriba
+  queda solo con el texto (partida y estado de guardado). Mismos ids, así que
+  el código no cambió.

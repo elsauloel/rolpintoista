@@ -197,7 +197,13 @@ a{color:var(--brass)}
 .col{display:flex;flex-direction:column;gap:16px;min-width:0}
 .card--atributos{margin-top:16px}
 #attrs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
-@media(max-width:1250px){#attrs{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}#attrs .attr{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
+@media(max-width:1250px){
+  #attrs .attr .glyph{width:62px;padding:6px}
+  #attrs .attr .full{padding:6px 8px;font-size:11px}
+  #attrs .attr .derived{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #attrs .d{padding:6px 7px}
+  #attrs .d .dv{font-size:17px}
+}#attrs .attr{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
 #attrs .attr .derived{flex:1;align-content:start}
 .vision-fila{margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
 .vision-fila > .armbox{width:auto;min-width:170px}

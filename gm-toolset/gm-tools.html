@@ -1140,6 +1140,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/tokens-auto.js"></script>
 <script src="../comun/creeps-base.js"></script>
 <script src="../comun/skills-creep-base.js"></script>
+<script src="../comun/armas-naturales-base.js"></script>
 <script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
@@ -2810,6 +2811,7 @@ function renderAsistenteCreep(){
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
         <button type="button" class="addhab" data-editararma="${sc.id}" style="margin:0">✎ Crear o editar el arma (paso a paso)</button>
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin:0">⚔ Elegir del fabricante</button>
+        <button type="button" class="addhab" data-armanat="${sc.id}" style="margin:0">🐾 Arma natural del catálogo</button>
       </div>
       ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${sc.armaNatural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
           'Si es natural, al morir suelta un trofeo en vez del arma y ningún jugador la puede equipar.')}`;
@@ -3203,6 +3205,7 @@ function cardHtml(sc){
           <div class="arma-compacta-top">
             <span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
             <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
+            <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
           <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div>
@@ -3547,7 +3550,10 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   }
   const detalle = h.efectoDetalle || '';
   const mods = structuredClone(h.efectoMods || []);
-  const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado} : {};
+  // Con un preset conocido (Invulnerable, Espinas, Escudo mágico, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
+  const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
+    stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
+  if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
   let es = sc.estados.find(x => x.nombre === nombre);
   if(es){
     es.turnos = turnos; es.stacks = stacks; es.hpTurno = hpTurno;
@@ -4015,10 +4021,37 @@ function abrirCatalogoHabilidades(scId){
     },
     grupos: [
       {nombre: 'Función', tags: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área']},
+      {nombre: 'Mecánica del juego', tags: ['sigilo', 'trampas', 'terreno y formas', 'niebla y visión', 'iniciativa', 'aura', 'estados alterados', 'orientación', 'percepción', 'movimiento', 'botín', 'jefe']},
+      {nombre: 'A quién apunta', tags: ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno']},
       {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
       {nombre: 'Rol', tags: ['melee', 'tanque', 'emboscador', 'rango', 'mágico', 'apoyo', 'debuffer']},
       {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
       {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
+    ],
+  });
+}
+
+/* Catálogo de armas naturales (comun/armas-naturales-base.js): garras, colmillos, aguijones, tentáculos, aliento…
+   Al elegir una se calcula con el nivel del creep y reemplaza su arma; el creep pasa a tener arma natural (suelta trofeo). */
+function abrirCatalogoArmasNaturales(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return;
+  Biblioteca.abrir({
+    tipo: 'armas_naturales', titulo: `Arma natural para ${sc.nombre || 'el creep'}`,
+    base: typeof ARMAS_NATURALES_BASE !== 'undefined' ? ARMAS_NATURALES_BASE : [],
+    subtitulo: e => ` · ${e.etiquetas.includes('pesada') ? 'pesada' : e.etiquetas.includes('ligera') ? 'ligera' : 'media'} · ${e.etiquetas.includes('a distancia') ? 'a distancia' : 'cuerpo a cuerpo'}`,
+    alElegir: datos => {
+      if(sc.armaNombre && !confirm(`${sc.nombre || 'El creep'} ya tiene "${sc.armaNombre}". ¿Reemplazarla por ${datos.nombre}?`)) return;
+      Object.assign(sc, armarArmaNatural(datos, sc.nivel));
+      renderAll();
+      toast(`${datos.nombre} equipada (arma natural, nivel ${sc.nivel || 1})`);
+    },
+    grupos: [
+      {nombre: 'Parte del cuerpo', tags: ['garras', 'colmillos', 'aguijón', 'espinas', 'cuernos', 'cola', 'alas', 'patas', 'puños', 'tentáculos', 'pinzas', 'pico', 'lengua', 'enjambre', 'toque', 'aliento', 'escupitajo', 'hilo', 'energía', 'proyectil']},
+      {nombre: 'Efecto al golpear', tags: ['Envenenar', 'Veneno severo', 'Sangrado', 'Rompe armadura', 'Arruina armadura', 'Aturdir', 'Derribar', 'Lisiado', 'Dejar rengo', 'Pajaritos', 'Inmovilizar', 'Agarrar', 'Empuje', 'Drena vida', 'Prende fuego', 'Ignora armadura', 'Ignora 1 de Res. crítico', 'Ceguera', 'sin efecto']},
+      {nombre: 'Alcance', tags: ['cuerpo a cuerpo', 'a distancia']},
+      {nombre: 'Potencia', tags: ['ligera', 'media', 'pesada']},
+      {nombre: 'Tipo de daño', tags: ['cortante', 'perforante', 'contundente', 'elemental', 'mágico', 'ácido']},
     ],
   });
 }
@@ -4589,6 +4622,7 @@ document.addEventListener('click', e => {
         {nombre: 'Tipo', tags: ['humano', 'humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena']},
         {nombre: 'Facción', tags: ['bandidos', 'bárbaros', 'guardia de la ciudad', 'piratas espaciales', 'cultistas', 'mercenarios']},
         {nombre: 'Tribu', tags: ['goblin', 'tribu goblin']},
+        {nombre: 'Mecánica', tags: ['trampas', 'sigilo']},
       ],
     });
     return;
@@ -4713,6 +4747,10 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const bloqueo = creepStatValor(sc, 'bloqueo');
     tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueo);
+    return;
+  }
+  if(b.dataset.armanat){
+    abrirCatalogoArmasNaturales(b.dataset.armanat);
     return;
   }
   if(b.dataset.equipardelfabricante){

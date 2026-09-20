@@ -19,7 +19,7 @@ versión parecida en más de una, es candidato a juntar.
 
 ## Contenido
 
-- **`biblioteca.js`** — biblioteca global de creeps y pasivas (y luego skills): ventana
+- **`biblioteca.js`** — biblioteca global de creeps, pasivas y trampas (y luego skills): ventana
   para elegir con buscador y etiquetas, guardar como propuesta (o directo si
   es el dueño del proyecto) y auditar propuestas. `Biblioteca.abrir({tipo,
   titulo, alElegir, alCrearDeCero})` y `Biblioteca.guardar({tipo, datos,

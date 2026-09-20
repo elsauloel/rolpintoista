@@ -567,20 +567,20 @@ service cloud.firestore {
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
     match /{bib}/{id} {
-      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas'];
-      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas']
+      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas'];
+      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas']
         && entradaBiblioteca(request.resource.data);
-      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas'];
+      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas'];
     }
     match /{prop}/{id} {
-      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
+      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
         && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
-      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
+      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
         && entradaBiblioteca(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;
       allow update: if false;
-      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas']
+      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
         && (esDuenoProyecto() || (verificado() && resource.data.autorUid == request.auth.uid));
     }
   }

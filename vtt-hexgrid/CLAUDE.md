@@ -765,3 +765,11 @@ hexágono con otro sin importar bando. Todavía no está construido.
   en la lista "Trampas guardadas" del panel; tocar su nombre la carga para
   colocarla, ✕ la borra. Se guardan **por navegador** (`localStorage`
   `mapa-trampas-guardadas`), no en la nube.
+  **Catálogo de trampas** (2026-09-20): cada trampa guardada tiene 📤 para
+  **proponerla** al catálogo (`Biblioteca.guardar`, tipo `trampas`, colección
+  `propuestas_trampas`); el dueño del proyecto las audita desde la pestaña
+  Propuestas y pasan a `biblioteca_trampas`. El botón **📚 Catálogo de trampas**
+  del panel abre la lista oficial (con buscador y etiquetas) y carga la elegida
+  para colocarla (`abrirCatalogoTrampas`, `cargarTrampaEnPanel`). Usa
+  `comun/biblioteca.js`, que ahora también carga el mapa (con sus propios
+  estilos de ventana).

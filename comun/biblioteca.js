@@ -1,5 +1,5 @@
 /* =========================================================
-   BIBLIOTECA GLOBAL (creeps, pasivas y, más adelante, skills)
+   BIBLIOTECA GLOBAL (creeps, pasivas, trampas y, más adelante, skills)
    Base de datos compartida por todas las campañas, para que un GM no
    arme creeps de cero en cada partida. Solo texto, sin imágenes.
 
@@ -26,6 +26,7 @@ const Biblioteca = (() => {
 
   // Etiquetas sugeridas al guardar (cada uno puede escribir las suyas).
   const SUGERENCIAS = {
+    trampas: ['foso', 'veneno', 'explosiva', 'alarma', 'mágica', 'mecánica', 'atrapa', 'fuego amigo'],
     pasivas: ['stat', 'regeneración', 'resistencia', 'defensiva', 'ofensiva', 'utilidad', 'visión', 'situacional'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',

@@ -138,7 +138,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   miembros leen todo; el dueño escribe y **también el GM** (desde 2026-09-19, para ayudar a un jugador: botón "✎ Editar como GM" en la ficha, que por defecto la abre en solo lectura). Son fichas de jugadores: el GM no las crea (lo suyo va en gm-tools); además puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
   escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
 - `biblioteca_creeps/{id}` y `propuestas_creeps/{id}` (**fuera de las
-  campañas**, sirven para cualquier partida; `biblioteca_skills`, `biblioteca_pasivas` y
+  campañas**, sirven para cualquier partida; `biblioteca_skills`, `biblioteca_pasivas`, `biblioteca_trampas` y
   `propuestas_skills`/`propuestas_pasivas`; pasivas ya se usan desde la ficha) —
   `{nombre, etiquetas[], descripcion, nivel, json, autorUid, autorNombre,
   creado}`, solo texto (el creep sin imagen, con la vida llena). La oficial

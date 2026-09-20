@@ -336,7 +336,7 @@ resuelven a mano, como el resto de los avisos).
 
 ## Sigilo: detección durante el movimiento del rival
 
-- 🔲 **P85. Detección a lo largo de la ruta del que camina.** Hoy, cuando se
+- ✅ **P85. Detección a lo largo de la ruta del que camina (hecho 2026-09-19, ver vtt-hexgrid/CLAUDE.md).** Hoy, cuando se
   mueve el personaje oculto se revisa casillero por casillero, pero cuando se
   mueve el rival (el oculto queda quieto) solo cuenta la posición final. Se
   quiere revisar también los casilleros del medio del rival (con su cono mirando

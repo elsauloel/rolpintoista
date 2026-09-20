@@ -353,3 +353,11 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   modo del mapa. Sin No2 suficientes: el pop-up de siempre (cancelar o "realizar
   de cualquier modo", con la línea roja en la Mesa). Solo la ficha; los creeps de
   gm-tools no lo aplican.
+
+- **Equipado → botón 🛡 Equipo** (2026-09-20): la tarjeta "Equipado" salió de las
+  columnas (queda oculta en `#equipo-oculto` porque el código todavía la actualiza)
+  y en el dock hay un botón **🛡 Equipo** (`#btn-equipo`) que abre el mismo panel que
+  el 🛡 del token en el mapa (`renderEquipo`, `#scrim-equipo`): equipado por slot y
+  mochila con Sacar / Equipar / Cambiar…, ahora también con **Ver** y **Editar** y el
+  **peso equipado** arriba. Columnas: Mochila y Cinturón a la izquierda; Habilidades,
+  Pasivas y Sociales a la derecha.

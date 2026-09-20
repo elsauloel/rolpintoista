@@ -549,6 +549,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .cat-row .cat-manage{display:flex;gap:4px;flex:none}
 .cat-manage button{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:4px 7px;border-radius:var(--r)}
 .cat-tipo{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.equipo-peso{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.equipo-peso b{color:var(--brass)}
 .equipo-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .equipo-tit{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
 .equipo-slot{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;margin-bottom:8px}
@@ -819,6 +821,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
    catálogo, tarjetas) quede por encima y no tapado, sin depender del orden
    en que están escritos en el HTML. */
 #scrim-botonera{z-index:49}
+#scrim-view{z-index:52}   /* "Ver" un ítem desde el panel Equipo tiene que quedar encima */
 .modal.botonera-modal{max-width:1500px;width:calc(100% - 20px);max-height:none}
 .botonera-modal .body{overflow:visible;max-height:none}
 .botonera-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start;min-width:0}
@@ -1202,6 +1205,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <!-- Accesos rápidos pegados al borde izquierdo: la Botonera y el Mapa. Se abren al pasar el mouse. -->
 <aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
+  <button type="button" class="dock-btn" id="btn-equipo" title="Equipo: lo que llevás puesto y la mochila, para cambiar de un lado a otro"><span class="dock-ico">🛡</span><span class="dock-txt">Equipo</span></button>
   <button type="button" class="dock-btn" id="btn-personajes" title="Ver y abrir los personajes de la partida"><span class="dock-ico">👥</span><span class="dock-txt">Personajes</span></button>
   <button type="button" class="dock-btn" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar"><span class="dock-ico">🏪</span><span class="dock-txt">Vendedor</span></button>
   <div class="dock-item">
@@ -1372,19 +1376,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <div id="list-cinturon"></div>
         </div>
       </section>
-
-      <section class="card card--equipo">
-        <header>
-          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="equipo" title="Contraer/expandir">👁</button><h2>Equipado</h2></div>
-          <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
-        </header>
-        <div class="body">
-          <div class="cap"><span>Peso equipado</span><span><b id="cap-equipo-n">0</b> / <span id="cap-equipo-t">0</span></span></div>
-          <div class="capbar" id="cap-equipo-bar"><span></span></div>
-          <div class="overload" id="equipo-over"></div>
-          <div id="list-equipo"></div>
-        </div>
-      </section>
     </div>
 
     <!-- COLUMNA 2: habilidades y bitácora -->
@@ -1420,6 +1411,20 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 
   <!-- La tarjeta de Combate se sacó de la vista (era redundante con la Botonera). Sus elementos siguen acá,
        ocultos, porque el código de la ficha todavía los actualiza; el Campo de visión pasó a Atributos. -->
+  <div id="equipo-oculto" hidden>
+      <section class="card card--equipo">
+        <header>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="equipo" title="Contraer/expandir">👁</button><h2>Equipado</h2></div>
+          <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
+        </header>
+        <div class="body">
+          <div class="cap"><span>Peso equipado</span><span><b id="cap-equipo-n">0</b> / <span id="cap-equipo-t">0</span></span></div>
+          <div class="capbar" id="cap-equipo-bar"><span></span></div>
+          <div class="overload" id="equipo-over"></div>
+          <div id="list-equipo"></div>
+        </div>
+      </section>
+  </div>
   <div id="combate-oculto" hidden>
       <section class="card card--combate">
         <header><div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="combate" title="Contraer/expandir">👁</button><h2>COMBATE</h2></div></header>
@@ -6755,6 +6760,7 @@ function equipoFilaHtml(it, boton){
       <div class="cat-meta">${esc(equipoStatTxt(it))}</div>
       <div class="imeta">${modTags(it.mods)}</div>
     </div>
+    <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button>
     ${boton}
   </div>`;
 }
@@ -6780,7 +6786,10 @@ function renderEquipo(){
       }).join('')}
     </div>`;
   }).join('');
-  $('#equipo-body').innerHTML = `<div class="equipo-cols">
+  const cEq = compute();
+  const crgEq = Number.isNaN(cEq.final.crgmax) ? 0 : cEq.final.crgmax;
+  const pesoEq = `<div class="equipo-peso">Peso equipado <b>${fmt(cEq.pesoEquipado)}</b> / ${fmt(crgEq)}${cEq.sobrecarga > 0 ? ` · <span style="color:var(--danger)">te pasás por ${fmt(cEq.sobrecarga)}</span>` : ''}</div>`;
+  $('#equipo-body').innerHTML = pesoEq + `<div class="equipo-cols">
     <div><h4 class="equipo-tit">Equipado</h4>${izq}</div>
     <div><h4 class="equipo-tit">Mochila</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
@@ -6792,6 +6801,8 @@ function equipoModoAbrir(){
   $('#scrim-equipo').classList.add('open');
   botoneraAvisarMapa('botonera-lista');
 }
+// Desde el dock de la ficha: el mismo panel que abre el 🛡 del token en el mapa.
+$('#btn-equipo').onclick = () => { renderEquipo(); $('#scrim-equipo').classList.add('open'); };
 $('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
 $('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') $('#scrim-equipo').classList.remove('open'); });
 

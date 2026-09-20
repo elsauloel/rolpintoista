@@ -38,7 +38,7 @@
     const sp = {nombre, ...spBase};
     const lenta = cd >= 4;
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
-    const aMano = frases.some(f => (U.esTrampa(sp) ? /a mano/i : U.MANUAL_RE).test(f));
+    const aMano = U.hayManual(sp);
     const etiquetas = [...fn].map(c => FN[c]).filter(Boolean), razasTxt = [...razas].map(c => RZ[c]).filter(Boolean), rolesTxt = [...roles].map(c => RO[c]).filter(Boolean);
     const mecTags = mec ? mec.split(',').map(t => t.trim()).filter(Boolean) : [];
     const OBJ = ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno'];
@@ -51,6 +51,7 @@
       if(!objTags.length) objTags.push('a sí mismo');
     }
     if(sp.efecto && sp.efecto.nombre && !mecPuras.includes('estados alterados')) mecPuras.push('estados alterados');
+    if(U.aplicaDe(sp) && !mecPuras.includes('estados alterados')) mecPuras.push('estados alterados');
     if(fn.includes('I')) mecPuras.push('invocación');
     lista.push({
       poolId: 'hab-' + slug(nombre) + '-' + lista.length, nombre,

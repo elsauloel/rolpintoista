@@ -1138,6 +1138,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/sesion.js"></script>
 <script src="../comun/biblioteca.js"></script>
 <script src="../comun/tokens-auto.js"></script>
+<script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/creeps-base.js"></script>
 <script src="../comun/skills-creep-base.js"></script>
 <script src="../comun/armas-naturales-base.js"></script>
@@ -4850,6 +4851,7 @@ document.addEventListener('click', e => {
     else if(habCreepTira(h)) mesaConTexto((h && h.detalle) || "");
     else mesaPublicarHabilidadCreep(sc, h);
     if(habCreepTira(h) && !h.trampaColocar) tirarExtraDeHab(h, sc);
+    if(h.estadoObjetivo) elegirObjetivoDeHab(sc, h);   // a quién le pegó: se le aplica el estado solo
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
@@ -5962,11 +5964,65 @@ async function renderListaPersonajes(){
 // Mismo criterio que "Borrar personaje" de la ficha (confirmar + escribir el
 // nombre), pero acá el GM puede borrar la de cualquier jugador; de paso saca
 // los tokens que la usan (el suyo y los de sus invocaciones).
+/* Habilidad que deja un estado sobre otro (h.estadoObjetivo): el GM elige a quién le pegó (o nadie, si falló) y se le aplica solo.
+   Un creep lo recibe directo; un personaje lo recibe por un aviso en campanas/<id>/estados que su ficha aplica sola (comun/estados-aplicar.js). */
+async function elegirObjetivoDeHab(sc, h){
+  const spec = h.estadoObjetivo;
+  let toks = [];
+  try{
+    const mapaId = await TokensAuto.mapaQueMiraElGM();
+    const snap = await fbDb.collection(fbRutaCampana(TokensAuto.rutaTokens(mapaId))).get();
+    toks = snap.docs.map(d => ({id: d.id, ...d.data()}));
+  }catch(err){ console.error('No se pudieron leer los tokens para elegir objetivo:', err); }
+  toks = toks.filter(t => t.fichaId && !String(t.fichaId).includes('~') && !(t.tipo === 'creep' && t.fichaId === sc.id))
+    .sort((a, b) => (a.tipo === b.tipo ? 0 : a.tipo === 'pj' ? -1 : 1) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+  const cap = document.createElement('div');
+  cap.className = 'scrim open';
+  cap.style.zIndex = '400';
+  cap.innerHTML = `<div class="modal" style="max-width:440px">
+    <header><h3>🎯 ¿A quién le pegó ${esc(h.nombre || 'la habilidad')}?</h3></header>
+    <div class="body">
+      <p class="hint" style="margin:0 0 10px">Se le aplica solo: <b>${esc(EstadosAplicar.texto(spec))}</b>. Elegí a quien la recibió; si falló, tocá "Nadie".</p>
+      ${toks.length ? toks.map(t => `<button type="button" class="addhab" data-obj="${esc(t.id)}" style="display:block;width:100%;margin:0 0 6px;text-align:left">${t.tipo === 'pj' ? '🧑' : '👹'} ${esc(t.nombre)}${t.oculto ? ' 🙈' : ''}</button>`).join('') : '<div class="hint">No hay otros tokens en el mapa que estás viendo.</div>'}
+    </div>
+    <footer><button class="btn ghost" data-obj-nadie>Nadie (falló)</button></footer>
+  </div>`;
+  document.body.appendChild(cap);
+  const cerrar = () => cap.remove();
+  cap.addEventListener('click', async e => {
+    if(e.target.closest('[data-obj-nadie]') || e.target === cap){ cerrar(); return; }
+    const b = e.target.closest('[data-obj]');
+    if(!b) return;
+    const tok = toks.find(t => t.id === b.dataset.obj);
+    cerrar();
+    if(tok) await aplicarEstadoAObjetivo(tok, spec, `${sc.nombre}: ${h.nombre || ''}`);
+  });
+}
+async function aplicarEstadoAObjetivo(tok, spec, origen){
+  try{
+    if(tok.tipo === 'creep'){
+      const c = S.creeps.find(x => x.id === tok.fichaId);
+      if(!c){ toast(`${tok.nombre} no está entre los creeps de esta mesa`); return; }
+      const r = EstadosAplicar.aplicarACreep(c, spec);
+      if(!r.ok){ toast(`${c.nombre}: inmune ahora mismo (${r.motivo}) — no recibió ${spec.nombre}`); return; }
+      if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(c);
+      renderAll();
+      toast(`🎯 ${c.nombre} recibe ${EstadosAplicar.texto(spec)}`);
+      return;
+    }
+    await EstadosAplicar.encolarPj({fichaId: tok.fichaId, duenoUid: tok.duenoUid, spec, origen});
+    toast(`🎯 ${tok.nombre} recibe ${EstadosAplicar.texto(spec)} (su ficha lo aplica sola)`);
+  }catch(err){
+    console.error('No se pudo aplicar el estado:', err);
+    toast('No se pudo aplicar el estado' + (err.code === 'permission-denied' ? ' (faltan pegar las reglas nuevas)' : ''));
+  }
+}
+
 /* Habilidad con trampa: la coloca sola, oculta a los jugadores, al lado del token del creep en el mapa que el GM está mirando. */
 async function colocarTrampaDeHab(sc, h){
   const t = h.trampaColocar;
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', radio: t.radio || 0, cant: t.cant || 1});
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', radio: t.radio || 0, cant: t.cant || 1, estado: t.estado || null});
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');

@@ -3206,6 +3206,75 @@ async function recompensasRevisar(){
   }
 }
 
+/* ---------- Estados que te dejan otros (una habilidad de un creep, una trampa) ----------
+   El GM o el mapa dejan un aviso en campanas/<id>/estados; la ficha lo aplica UNA sola vez (transacción sobre el documento) apenas
+   está abierta y editable, respetando Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema (comun/estados-aplicar.js). */
+let estadosPendientes = [], estadosAplicando = false;
+function estadosEscuchar(){
+  if(!fbUsuario) return;
+  fbDb.collection(fbRutaCampana('estados')).where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false).onSnapshot(snap => {
+    estadosPendientes = snap.docs;
+    estadosRevisar();
+  }, err => console.error('Error escuchando los estados recibidos:', err));
+}
+async function estadosRevisar(){
+  const f = fichaVivo;
+  if(!f || !f.cargada || f.soloLectura || f.editaGM || estadosAplicando) return;
+  const mios = estadosPendientes.filter(d => d.data().fichaId === f.id);
+  if(!mios.length) return;
+  estadosAplicando = true;
+  try{
+    for(const d of mios){
+      const tomada = await fbDb.runTransaction(async tx => {
+        const x = await tx.get(d.ref);
+        if(!x.exists || x.data().aplicada) return false;
+        tx.update(d.ref, {aplicada: true});
+        return true;
+      });
+      if(!tomada || fichaVivo !== f) continue;
+      let spec = null;
+      try{ spec = JSON.parse(d.data().spec || 'null'); }catch(e){}
+      if(spec && spec.nombre) aplicarEstadoRecibido(spec, d.data().origen);
+    }
+  }catch(err){
+    console.error('No se pudieron aplicar los estados recibidos:', err);
+  }finally{
+    estadosAplicando = false;
+  }
+}
+function aplicarEstadoRecibido(spec, origen){
+  const preset = EFECTOS_PRESET.find(p => p.nombre === spec.nombre);
+  let draft;
+  if(preset){
+    const {nombre, ...resto} = preset;
+    draft = {id: uid(), nombre, ...structuredClone(resto)};
+    if(spec.turnos !== undefined && spec.turnos !== null) draft.turnos = spec.turnos;
+  }else{
+    const mods = (spec.mods || []).map(m => ({stat: m.stat, val: num(m.val)}));
+    const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${STAT_LABEL[m.stat] || m.stat}`);
+    if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
+    draft = {id: uid(), nombre: spec.nombre, polaridad: spec.polaridad || 'debuff', turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
+      permanente: false, detalle: spec.detalle || txt.join(', '), mods};
+  }
+  draft.activo = true;
+  if(!draft.polaridad) draft.polaridad = 'debuff';
+  const quien = origen ? `${origen}: ` : '';
+  if(estaBloqueadoElDebuff(draft)){
+    toast(`🛡 ${quien}Inmune ahora mismo — ${draft.nombre} no te afectó`);
+    return;
+  }
+  const yaRota = draft.armaduraRota ? S.efectos.find(e => e.armaduraRota) : null;
+  if(yaRota){
+    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
+    yaRota.activo = true;
+  }else{
+    S.efectos.push(draft);
+  }
+  renderList('efectos');
+  refresh();
+  toast(`🎯 ${quien}recibiste ${draft.nombre}`);
+}
+
 function attrBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
   const total = 33 + 3 * (nivel - 1);
@@ -10702,6 +10771,7 @@ async function fbAlEntrar(){
   modoMapaEscuchar();
   tiendaEstadoEscuchar();
   recompensasEscuchar();
+  estadosEscuchar();
   botinLootEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }

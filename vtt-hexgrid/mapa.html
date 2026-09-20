@@ -795,6 +795,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/biblioteca.js"></script>
 <script src="../comun/tokens-auto.js"></script>
+<script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script>
 /* =========================================================
@@ -4118,6 +4119,7 @@ function escucharElementos(){
         disparada: d.disparada === true,
         fuegoAmigo: d.fuegoAmigo === true,
         trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
+        trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
       });
     });
     pedirDibujo();
@@ -4823,6 +4825,31 @@ async function trampaAplicarDano(t, el){
   }
   alertaRojaAnonima(`💥 ${el.trampaNombre || 'Trampa'}: ${tir.formula} = ${tir.total} de daño (menos la Defensa de cada uno)`, partes.join(' · '));
 }
+// Estado alterado de la trampa (Inmovilizado, Veneno, −2 Daño…): se aplica solo a quien la pisó y, si es de área, a todos los de adentro.
+// Un creep lo recibe directo (solo si mueve el GM); un personaje, por un aviso que su ficha aplica sola (comun/estados-aplicar.js).
+async function trampaAplicarEstado(t, el){
+  if(!el.trampaEstado) return;
+  let spec = null;
+  try{ spec = JSON.parse(el.trampaEstado); }catch(e){ return; }
+  if(!spec || !spec.nombre) return;
+  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
+  const afectados = [t];
+  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila))) afectados.push(x); });
+  const nombres = [];
+  for(const x of afectados){
+    if(!x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;
+    try{
+      if(x.tipo === 'creep'){
+        if(!soyGM) continue;
+        await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) throw new Error('inmune'); });
+      }else{
+        await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: el.trampaNombre || 'Trampa'});
+      }
+      nombres.push(x.oculto ? 'Alguien' : nombreDe(x));
+    }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
+  }
+  if(nombres.length) alertaRojaAnonima(`🎯 ${el.trampaNombre || 'Trampa'}: ${EstadosAplicar.texto(spec)}`, `${nombres.join(', ')}: estado aplicado solo`);
+}
 // Después de que el token llegó a la casilla donde se cortó.
 async function trampaResolver(){
   const p = trampaPendiente;
@@ -4836,6 +4863,7 @@ async function trampaResolver(){
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
     await trampaAplicarDano(t, p.el);
+    await trampaAplicarEstado(t, p.el);
     return;
   }
   trampasAvisadas.add(p.tokenId + ':' + p.id);

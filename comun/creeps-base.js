@@ -47,7 +47,7 @@
   const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
   function danoTxt(d, n){ return d === 'L' ? `1d6+${n}` : d === 'M' ? `2d6+${n}` : `3d6+${n + 1}`; }
-  const MOD_TXT = {def: 'Defensa', dmg: 'Daño', nitros: 'No2', eva: 'Evasión', resmg: 'Res.Mg'};
+  const MOD_TXT = {def: 'Defensa', dmg: 'Daño', nitros: 'No2', eva: 'Evasión', resmg: 'Res.Mg', resm: 'Res.Mt'};
   // Frases de la descripción que la herramienta NO resuelve sola (efectos sobre otros, movimiento, geometría del área).
   const MANUAL_RE = /a mano|casilla|flor de|cono|línea|empuj|salta|se mueve|ignora|todos|adyacent|aliado|el objetivo|los golpeados|los afectados|los que|quedan|queda /i;
   const sinEtiqueta = t => t.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')').replace(/\s+/g, ' ').trim();
@@ -59,6 +59,56 @@
     radio: /flor de 1/i.test(sp.detalle) ? 1 : 0,
     cant: /3 minas|3 trampas/i.test(sp.detalle) ? 3 : /dos trampas|2 trampas/i.test(sp.detalle) ? 2 : 1,
   });
+  /* Estados que la habilidad (o la trampa) deja sobre OTRO, con el nombre de la habilidad como clave.
+     A('Veneno') usa el preset; A('Debilitado', 3, {dmg: -2}) es un estado propio de 3 turnos; el 4º valor son HP por turno.
+     Al usar la habilidad, gm-tools deja elegir a quién le pegó y se lo aplica solo; una trampa se lo aplica a quien la pisa. */
+  const A = (nombre, turnos, mods, hp) => {
+    const o = {nombre};
+    if(turnos !== undefined) o.turnos = turnos;
+    if(mods && Object.keys(mods).length) o.mods = Object.keys(mods).map(stat => ({stat, val: mods[stat]}));
+    if(hp) o.hp = hp;
+    return o;
+  };
+  const APLICA = {
+    'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}), 'Ceguera': A('Cegado', 2, {eva: -3}),
+    'Ralentizar': A('Ralentizado', 1, {nitros: -2}), 'Intimidar': A('Intimidado', 2, {dmg: -1}), 'Romper armadura': A('Armadura dañada', 3, {def: -2}),
+    'Veneno': A('Veneno'), 'Pudrición': A('Podrido', 3, {def: -2, dmg: -1}), 'Susurros': A('Susurros', 3, {resm: -2}),
+    'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Red': A('Inmovilizado', 1), 'Trampa de raíces': A('Inmovilizado', 2),
+    'Hechizo de lentitud': A('Lentitud', 2, {nitros: -1}), 'Quemadura': A('Quemado', 2, {}, -2), 'Escarcha': A('Escarcha', 1, {nitros: -2}),
+    'Oxidar': A('Oxidado', 3, {dmg: -2}), 'Desmoralizar': A('Desmoralizado', 2, {resm: -2, dmg: -1}), 'Polvo revelador': A('Cegado', 2, {eva: -2}),
+    'Escupitajo ácido': A('Corroído', 2, {def: -1}), 'Lanza de hielo': A('Escarcha', 1, {nitros: -1}), 'Descarga eléctrica': A('Descarga', 1, {nitros: -1}),
+    'Golpe de escudo': A('Golpe de escudo', 1, {nitros: -1}), 'Dardo venenoso': A('Veneno'), 'Mordisco venenoso': A('Veneno'),
+    'Corte profundo': A('Sangrado'), 'Zarpazo desgarrador': A('Sangrado'), 'Golpe que sangra': A('Sangrado'), 'Herida sangrante': A('Sangrado'),
+    'Sembrar veneno': A('Veneno'), 'Aturdir con estruendo': A('Stun'), 'Aturdir': A('Stun'), 'Congelar': A('Stun'), 'Hipnosis': A('Stun', 1),
+    'Agotar': A('Exhausto'), 'Cansar': A('Cansado'), 'Lisiar': A('Lisiado'), 'Clavar al suelo': A('Inmovilizado'), 'Romper la rodilla': A('Rengo'),
+    'Mordisco que lisia': A('Rengo'), 'Disparo a la rodilla': A('Rengo'), 'Nublar la mente': A('Pajaritos'), 'Golpe atontador': A('Pajaritos'),
+    'Golpe de pomo': A('Pajaritos', 1), 'Corroer el metal': A('Armadura rota'), 'Disolver la armadura': A('Armadura arruinada'), 'Toxina severa': A('Veneno severo'),
+    // trampas
+    'Cepo': A('Inmovilizado', 2), 'Trampa de veneno': A('Veneno'), 'Trampa de hielo': A('Escarcha', 1, {nitros: -1}), 'Trampa de red': A('Inmovilizado', 1),
+    'Trampa sonora': A('Pajaritos', 1), 'Cepo de alma': A('Drenado', 1, {nitros: -2}), 'Trampa de ácido': A('Corroído', 3, {def: -1}),
+    'Zarzal traicionero': A('Rengo'), 'Telaraña oculta': A('Inmovilizado', 1), 'Descarga oculta': A('Descarga', 1, {nitros: -1}), 'Trampa de humo': A('Cegado', 2, {eva: -2}),
+    // trampas de creeps concretos
+    'Cepo del emboscado': A('Inmovilizado', 2), 'Lazo de caza': A('Rengo'), 'Cepo de dientes': A('Rengo'), 'Cepo en el camino': A('Inmovilizado', 2),
+    'Trampa de dardos envenenados': A('Veneno'), 'Red de cazador': A('Inmovilizado', 1),
+  };
+  const aplicaDe = sp => sp.aplica || APLICA[sp.nombre] || null;
+  // Frases de la descripción: las que se resuelven solas y las que quedan a mano. Con un estado automático sobre otro (o una
+  // trampa que se coloca sola) solo queda a mano lo que la descripción marca con "(a mano)" y sea movimiento, área o algo que el
+  // programa no maneja; el "(a mano)" de un estado que ahora se aplica solo se descarta.
+  function frasesDe(sp, n){
+    const ap = aplicaDe(sp), solo = !!ap || sp.trampa !== undefined || !!sp.colocar;
+    const REAL = /empuj|casillero|salta|se aleja|al piso|derrib|huye|sigilo|revela|repite|suelta|roba|no puede|invoc|entran|llegan|jala|arrastr|vuelve|gana|ganan|sube|baja/i;
+    let frases = textoHab(sp, n).split(/(?<=[.!?])\s+/);
+    if(ap) frases = frases.map(f => REAL.test(f) ? f : f.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')')).map(f => f.replace(/(A|a)plic[aá]le/g, (m, c) => c + 'plica'));
+    const esManual = f => solo ? /a mano/i.test(f) : MANUAL_RE.test(f);
+    return {propias: frases.filter(f => !esManual(f)).map(sinEtiqueta), manual: frases.filter(f => esManual(f)).map(sinEtiqueta)};
+  }
+  const hayManual = sp => frasesDe(sp, 1).manual.length > 0;
+  const textoAplica = ap => {
+    const mods = (ap.mods || []).map(m => `${m.val > 0 ? '+' : ''}${m.val} ${MOD_TXT[m.stat] || m.stat}`);
+    const extra = [ap.turnos ? `${ap.turnos} turno${ap.turnos === 1 ? '' : 's'}` : '', ...mods, ap.hp ? `${ap.hp > 0 ? '+' : ''}${ap.hp} HP por turno` : ''].filter(Boolean);
+    return ap.nombre + (extra.length ? ` (${extra.join(', ')})` : '');
+  };
   function armarDetalle(sp, n, cd, lenta){
     const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
       `cooldown ${cd}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
@@ -75,12 +125,13 @@
       const o = opcionesTrampa(sp);
       auto.push(`al usarla, coloca sola ${o.cant > 1 ? o.cant + ' trampas ocultas' : 'la trampa oculta'} al lado de su token en el mapa que ve el GM${o.radio ? ' (área: flor de ' + o.radio + ')' : ''}${sp.trampa ? `; cuando alguien la pisa, el mapa tira ${danoTxt(sp.trampa, n)} y se lo aplica solo` : ''}; los jugadores no la ven hasta que se dispara y la habilidad no se anuncia en la Mesa`);
     }
-    const frases = textoHab(sp, n).split(/(?<=[.!?])\s+/);
+    const ap = aplicaDe(sp);
+    if(ap){
+      const trampa = sp.trampa !== undefined || sp.colocar;
+      auto.push(trampa ? `cuando alguien pisa la trampa, le aplica solo el estado ${textoAplica(ap)}` : `al usarla te deja elegir a quién le pegó (o "nadie" si falló) y le aplica solo el estado ${textoAplica(ap)} (si es un personaje, su ficha lo recibe sola)`);
+    }
     const cierra = t => /[.!?]$/.test(t) ? t : t + '.';
-    // Una trampa se coloca sola: ahí solo queda a mano lo que la descripción marca con "(a mano)".
-    const esManual = f => (sp.trampa !== undefined || sp.colocar) ? /a mano/i.test(f) : MANUAL_RE.test(f);
-    const propias = frases.filter(f => !esManual(f)).map(sinEtiqueta);
-    const manual = frases.filter(f => esManual(f)).map(sinEtiqueta);
+    const {propias, manual} = frasesDe(sp, n);
     return `${propias.length ? propias.map(cierra).join(' ') + ' ' : ''}⚙ Automatizado: ${auto.join('; ')}. ✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`;
   }
   function armarHab(sp, n, cd, lenta){
@@ -91,6 +142,9 @@
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);
       h.trampaColocar = {nombre: sp.nombre, detalle: sinEtiqueta(textoHab(sp, n)).slice(0, 200), dano: sp.trampa ? danoTxt(sp.trampa, n) : '', radio: o.radio, cant: o.cant};
+      if(aplicaDe(sp)) h.trampaColocar.estado = aplicaDe(sp);
+    }else if(aplicaDe(sp)){
+      h.estadoObjetivo = aplicaDe(sp);   // gm-tools deja elegir a quién le pegó y se lo aplica
     }
     if(sp.efecto){
       h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = sp.efecto.polaridad || 'buff';
@@ -787,5 +841,5 @@
     'Cobra por presa viva.');
 
   window.CREEPS_BASE = lista;
-  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar};
+  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
 })();

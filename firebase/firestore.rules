@@ -267,6 +267,25 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
       }
 
+      // Estados que te deja otro (una habilidad de un creep, una trampa): un documento por aviso, {fichaId, duenoUid, spec, origen,
+      // aplicada, creado}. Cualquier miembro lo crea (el GM, o el jugador que pisa una trampa); la ficha del dueño lo marca como
+      // aplicado UNA vez (solo ese campo, de false a true) y agrega el estado a su ficha. Nadie escribe en la ficha de otro.
+      match /estados/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && resource.data.duenoUid == request.auth.uid);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['fichaId', 'duenoUid', 'spec', 'origen', 'aplicada', 'creado'])
+          && request.resource.data.fichaId is string && request.resource.data.duenoUid is string
+          && request.resource.data.spec is string && request.resource.data.spec.size() <= 600
+          && request.resource.data.origen is string && request.resource.data.origen.size() <= 80
+          && request.resource.data.aplicada == false
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c) && resource.data.duenoUid == request.auth.uid
+          && resource.data.aplicada == false
+          && request.resource.data.aplicada == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['aplicada']);
+        allow delete: if esGM(c);
+      }
+
       // Tiendas guardadas con nombre (una por lugar o vendedor al que se
       // vuelve): {nombre, json, actualizado}. Solo el GM.
       match /tiendas/{id} {
@@ -432,7 +451,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'disparada', 'fuegoAmigo'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -451,6 +470,7 @@ service cloud.firestore {
           && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
           && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 200))
           && (!('trampaDano' in d) || (d.trampaDano is string && d.trampaDano.size() <= 12))
+          && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
           && (!('disparada' in d) || d.disparada is bool)
           && (!('fuegoAmigo' in d) || d.fuegoAmigo is bool)
           && d.duenoUid is string;
@@ -465,7 +485,7 @@ service cloud.firestore {
         allow update: if esMiembro(c) && (
           ((resource.data.duenoUid == request.auth.uid || esGM(c))
             && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'disparada', 'fuegoAmigo'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo'])
             && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
           || (resource.data.get('trampa', false) == true
@@ -554,7 +574,7 @@ service cloud.firestore {
           allow update: if esMiembro(c) && (
             ((resource.data.duenoUid == request.auth.uid || esGM(c))
               && elementoValido(request.resource.data)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'disparada', 'fuegoAmigo'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo'])
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])

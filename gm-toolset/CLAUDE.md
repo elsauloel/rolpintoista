@@ -257,3 +257,5 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 
 - **Trampas y sigilo en los creeps base** (2026-09-20): se sumaron 14 creeps (ahora 134) y se cambiaron 5 habilidades lentas por trampas reales. Creeps con trampas: Goblin recolector, Kobold dinamitero/artificiero, Zapador demente, Cazador de las cumbres, Guardián de sellos y de runas, Trampero silvano/de caminos/a sueldo, Saboteador de la banda, Cazador de fosos, Vigía de patrulla, Minador de cubierta, Ballestero emboscado, Cazador bárbaro; con sigilo: Cazador furtivo, Vigía sombrío, Sicario de las sombras. Etiquetas nuevas `trampas` y `sigilo` (filtro "Mecánica").
 - **Arma natural del catálogo** (2026-09-20): botón 🐾 (`data-armanat`) — ver `comun/armas-naturales-base.js`.
+
+- **Estados sobre otros, automáticos** (2026-09-20): las habilidades con `estadoObjetivo` (57 del catálogo y varias trampas de creeps) abren, al ejecutarse, "🎯 ¿A quién le pegó?" con los tokens del mapa que mira el GM; el estado se aplica solo (creeps directo, personajes por aviso en `estados` que su ficha aplica). Ver `comun/estados-aplicar.js`.

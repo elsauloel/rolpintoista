@@ -252,3 +252,5 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   Comparar, ranuras libres) y "Despojar".
 
 - **Grupos de creeps, tokens automáticos y botín** (2026-09-20, tanda 4): campo `grupo` del creep (pestañas `#grupos-barra`, `grupoActivo`, `pasaGrupo`; los creeps nuevos van al grupo abierto; cambiar de grupo desde su ficha, `grupoSelectHtml`). Con un grupo abierto, **🎯 Crear tokens** (`crearTokensDelGrupo`, `comun/tokens-auto.js`) pone un token oculto por creep en fila al centro de la vista del mapa que mira el GM, salteando los que ya tienen. **🎁 Botín** (`#scrim-botin-gm`, `abrirBotinGM`): lo que nadie tomó; **🧰 Despojar** lo convierte en despojos, los reparte (hacia arriba) como recompensas y borra el botín. Modos de iframe `?modo=finalizar|botin` para abrirlos desde el mapa.
+
+- **Catálogo de habilidades para creeps** (2026-09-20): "+ Habilidad" de un creep abre la biblioteca de `comun/skills-creep-base.js` (190 habilidades, filtros por función, velocidad, rol, raza y automatización); elegir una la agrega calculada con el nivel del creep. "+ Crear de cero" abre el asistente paso a paso de siempre.

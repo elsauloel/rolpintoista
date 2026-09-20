@@ -702,4 +702,5 @@
     'Nunca volvió con las manos vacías, ni una sola vez.');
 
   window.CREEPS_BASE = lista;
+  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE};
 })();

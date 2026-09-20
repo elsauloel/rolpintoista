@@ -1139,6 +1139,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/biblioteca.js"></script>
 <script src="../comun/tokens-auto.js"></script>
 <script src="../comun/creeps-base.js"></script>
+<script src="../comun/skills-creep-base.js"></script>
 <script src="../comun/barra.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/respaldo.js"></script>
@@ -3995,6 +3996,33 @@ function hcResumenHtml(){
     ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
 }
 
+/* Catálogo de habilidades para creeps (comun/skills-creep-base.js): se elige una, se calcula con el nivel del creep y se agrega.
+   "Crear de cero" sigue abriendo el asistente paso a paso de siempre. */
+function abrirCatalogoHabilidades(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return;
+  Biblioteca.abrir({
+    tipo: 'habs_creep', titulo: `Habilidad para ${sc.nombre || 'el creep'}`,
+    textoCrearDeCero: '+ Crear de cero (paso a paso)',
+    alCrearDeCero: () => abrirEditorHabCreep(sc.id, null),
+    base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
+    subtitulo: e => ` · ${e.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep`,
+    alElegir: datos => {
+      const h = armarHabilidadDeCreep(datos, sc.nivel);
+      sc.habilidades.push({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0});
+      renderAll();
+      toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})`);
+    },
+    grupos: [
+      {nombre: 'Función', tags: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área']},
+      {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
+      {nombre: 'Rol', tags: ['melee', 'tanque', 'emboscador', 'rango', 'mágico', 'apoyo', 'debuffer']},
+      {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
+      {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
+    ],
+  });
+}
+
 function abrirEditorHabCreep(scId, habId){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
@@ -4719,9 +4747,7 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.addhab){
     const sc = S.creeps.find(s=>s.id===b.dataset.addhab);
-    if(sc){
-      abrirEditorHabCreep(sc.id, null);  // paso a paso; se agrega al guardar
-    }
+    if(sc) abrirCatalogoHabilidades(sc.id);
     return;
   }
   if(b.dataset.addestado){

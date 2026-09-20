@@ -28,7 +28,7 @@ const CLASES_SKILLS = [
     {id: 'warrior-arte-de-la-guerra', nombre: 'Arte de la guerra', costo: '2', nitrosCosto: 0,
      detalle: 'Flash. +2 a una sola tirada de PdG, Parry, Bloqueo o Daño. No se usa más de una vez sobre la misma tirada. ⚖ A definir en mesa: ¿todas las veces que quieras en el turno, o una sola por turno?'},
     {id: 'warrior-amplificar-dano', nombre: 'Amplificar daño', costo: 'X', nitrosCosto: 'ATAQUE',
-     detalle: 'Espameable. Ataque con +X dados de daño del Tipo del arma. X máx. 3 (a mano: la ficha no lo limita).'},
+     detalle: 'Ataque con +X dados de daño del Tipo del arma. X máx. 3 (a mano: la ficha no lo limita).'},
     skillSA('warrior', 'Sacadito', 'En pausa, a definir. SP 3. Recibe 10 Nitros que puede usar en ataques consecutivos iguales. Acumulable con otras skills si todos los ataques son idénticos.'),
     {id: 'warrior-canon-vasco', nombre: 'Cañón Vasco', costo: '2 + X', nitrosCosto: 1,
      detalle: 'Salta X casillas (X hasta Fue); si cae sobre un enemigo lo empuja 1. Al caer, los enemigos adyacentes (flor de 1, no aliados) reciben X + tirada de Fuerza de daño de onda expansiva (defienden con Constitución, a confirmar). Puede atacar al caer (pagando el ataque) con +X daño fijo. Al ejecutar, poné el SP total (2 + X).'},

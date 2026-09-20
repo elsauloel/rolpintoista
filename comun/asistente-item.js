@@ -44,7 +44,7 @@ const AsistenteItem = (() => {
     4: {nombre: 'Perforante', ejemplo: 'dagas, estoques, lanzas livianas'},
     6: {nombre: 'Cortante', ejemplo: 'espadas, cimitarras, hachas de mano'},
     8: {nombre: 'Cortante pesado o contundente liviano', ejemplo: 'hachas de guerra, mazas, bastones'},
-    10: {nombre: 'Contundente pesado', ejemplo: 'martillos de guerra, mazas de dos manos'},
+    10: {nombre: 'Contundente pesado', ejemplo: 'martillos de guerra, mazas pesadas'},
     12: {nombre: 'Explosivo / armas modernas', ejemplo: 'lanzallamas, explosivos (tier Excepcional)'},
   };
   const CATEGORIAS = [
@@ -283,7 +283,8 @@ const AsistenteItem = (() => {
     if(paso.id === 'que'){
       titulo('¿Qué es?', 'Elegí el tipo de ítem, ponele nombre y contá con palabras todo lo que hace. Los pasos siguientes cargan solo la parte práctica (lo que la herramienta calcula o recuerda sola).');
       if(!cfg.fijarCategoria){
-        const permitidas = CATEGORIAS.filter(c => !cfg.categorias || cfg.categorias.includes(c.id));
+        // Las armas de dos manos se descartaron: ya no se ofrecen (solo se muestra si el ítem que se edita ya lo es).
+        const permitidas = CATEGORIAS.filter(c => (!cfg.categorias || cfg.categorias.includes(c.id)) && (c.id !== 'arma_2m' || d.tipoItem === 'arma_2m'));
         const grupos = [...new Set(permitidas.map(c => c.grupo))];
         h += `<div class="aa-campo"><label>Tipo de ítem</label>${grupos.map(gr => `<div class="aa-cat-grupo">${GRUPO_TITULO[gr]}</div>
           <div class="aa-opciones">${permitidas.filter(c => c.grupo === gr).map(c => op('cat', c.id, d.tipoItem === c.id, e(c.label))).join('')}</div>`).join('')}</div>`;
@@ -339,7 +340,6 @@ const AsistenteItem = (() => {
     if(paso.id === 'empunadura'){
       titulo('¿Cómo se empuña y a qué distancia pega?', 'Las manos que ocupa definen qué más se puede llevar al mismo tiempo; la distancia define si el daño suma el Dmg (que sale de la Fuerza).');
       const dos = d.tipoItem === 'arma_2m';
-      h += campo('Manos', `<div class="aa-opciones">${op('manos', 'arma_1m', !dos, 'Una mano')}${op('manos', 'arma_2m', dos, 'Dos manos')}</div>`);
       h += efecto(q.ctx === 'creep'
         ? `Un creep lleva <b>una sola arma</b>: las manos no le cambian nada. Solo cuentan si después la publicás en el catálogo.`
         : dos

@@ -2000,6 +2000,7 @@ const IT2 = {
   nitrosConsumirMochila: 2,
   nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
   nitrosSigilo: 1,              // entrar en sigilo (a revisar, P1)
+  nitrosEquipar: 1,             // equipar o desequipar un ítem, solo en modo combate del mapa
   // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
   // pasan a dar "+N × esto" de SP.
   spPorBono: 1,
@@ -5601,7 +5602,11 @@ document.addEventListener('click', e => {
           }
         }
       }
-      it.equipado = !it.equipado; renderInventario(); refresh(); return;
+      const eraEquipado = it.equipado;
+      conCostoEquipar(1, `${eraEquipado ? 'desequipar' : 'equipar'} ${it.nombre}`, `${eraEquipado ? 'desequipó' : 'equipó'} ${it.nombre}`, () => {
+        it.equipado = !it.equipado; renderInventario(); refresh();
+      });
+      return;
     }
     it = S.efectos.find(x=>x.id===id);
     if(it){ it.activo = it.activo === false; renderList('efectos'); refresh(); return; }
@@ -6831,6 +6836,24 @@ $('#sin-nitros-igual').onclick = () => {
    catálogo (abrirComparar). */
 let slotLlenoItemId = null;
 
+/* En modo combate, equipar o desequipar un ítem cuesta No2 (IT2.nitrosEquipar) cada vez:
+   reemplazar uno por otro son dos. Sin No2 suficientes: el pop-up de siempre (cancelar o
+   hacerlo igual, con la línea roja en la Mesa). En narrativo no cuesta nada. `accion` es lo que
+   se hace una vez pagado. */
+function conCostoEquipar(veces, infinitivo, pasado, accion){
+  const costo = (modoMapaListo && modoMapa === 'combate') ? veces * IT2.nitrosEquipar : 0;
+  if(!costo){ accion(); return; }
+  const pagar = forzar => {
+    const gasto = forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, pasado) : costo;
+    S.nitros = num(S.nitros) - gasto;
+    renderNitros();
+    accion();
+    toast(`−${fmt(gasto)} No2 (equipar en combate)`);
+  };
+  if(costo > num(S.nitros)) avisarSinNitros(costo, infinitivo, () => pagar(true));
+  else pagar(false);
+}
+
 function abrirSlotLleno(itemId){
   const it = S.inventario.find(x => x.id === itemId);
   const info = it && slotOcupadoInfo(it);
@@ -6855,20 +6878,25 @@ function reemplazarEquipado(equipadoId, nuevoId){
   const viejo = S.inventario.find(x => x.id === equipadoId);
   if(!nuevo || !viejo) return;
   const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(nuevo.tipoItem));
+  // Se prueba si entra ANTES de cobrar nada.
   viejo.equipado = false;
   nuevo.equipado = true;
   const usado = slotDef ? (computeSlots().find(s => s.id === slotDef.id)?.usado || 0) : 0;
+  viejo.equipado = true;
+  nuevo.equipado = false;
   if(slotDef && usado > slotDef.max){
-    viejo.equipado = true;
-    nuevo.equipado = false;
     toast(`Igual no entra: ${slotDef.label} quedaría en ${fmt(usado)} / ${fmt(slotDef.max)}. Sacá otro ítem del slot primero.`);
     return;
   }
-  $('#scrim-comparar').classList.remove('open');
-  $('#scrim-slot-lleno').classList.remove('open');
-  renderInventario();
-  refresh();
-  toast(`${nuevo.nombre} equipado en lugar de ${viejo.nombre}`);
+  conCostoEquipar(2, `reemplazar ${viejo.nombre} por ${nuevo.nombre}`, `reemplazó ${viejo.nombre} por ${nuevo.nombre}`, () => {
+    viejo.equipado = false;
+    nuevo.equipado = true;
+    $('#scrim-comparar').classList.remove('open');
+    $('#scrim-slot-lleno').classList.remove('open');
+    renderInventario();
+    refresh();
+    toast(`${nuevo.nombre} equipado en lugar de ${viejo.nombre}`);
+  });
 }
 $('#slot-lleno-x').onclick = () => $('#scrim-slot-lleno').classList.remove('open');
 $('#scrim-slot-lleno').addEventListener('mousedown', e => { if(e.target.id === 'scrim-slot-lleno') $('#scrim-slot-lleno').classList.remove('open'); });
@@ -10334,8 +10362,10 @@ function mantenimientoEscuchar(){
 // final (con el resto de las habilidades) en combate. 'combate' por
 // defecto hasta que se sepa el modo real (ver vtt-hexgrid/CLAUDE.md).
 let modoMapa = 'combate';
+let modoMapaListo = false;   // ya se leyó el modo real (para cobrar No2 solo con el modo confirmado)
 function modoMapaEscuchar(){
   fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
+    modoMapaListo = true;
     modoMapa = (doc.exists && doc.data().modo === 'narrativo') ? 'narrativo' : 'combate';
     renderBotoneraSiAbierta();
   }, err => console.error('Error escuchando el modo del mapa:', err));

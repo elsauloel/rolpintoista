@@ -345,3 +345,11 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   botón ↺ Turno y el registro del Mantenimiento. El número de turno se ve como
   "T5" en la cabecera de la Mesa flotante (`mesaPonerTurno` en `comun/mesa.js`,
   lo llaman la ficha y gm-tools).
+
+- **Equipar cuesta No2 en combate** (2026-09-20): con el mapa en modo combate,
+  cada equipar y cada desequipar cuesta 1 No2 (`IT2.nitrosEquipar`,
+  `conCostoEquipar`); reemplazar un ítem por otro (menú "Slot equipado" →
+  Reemplazar) son 2. En narrativo no cuesta nada, ni mientras no se haya leído el
+  modo del mapa. Sin No2 suficientes: el pop-up de siempre (cancelar o "realizar
+  de cualquier modo", con la línea roja en la Mesa). Solo la ficha; los creeps de
+  gm-tools no lo aplican.

@@ -572,6 +572,7 @@ input[type=file]{display:none}
 /* Ver creep: secciones con recuadros; habilidades y estados muestran su
    descripción al pasar el mouse (.con-tip). */
 #scrim-view .modal{max-width:680px}
+#scrim-view.desde-biblioteca{z-index:93}
 .vc-cuerpo{padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line)}
 .vc-seccion{display:flex;flex-direction:column;gap:6px;padding-top:10px}
 .vc-cajas{display:grid;gap:6px}
@@ -3798,7 +3799,18 @@ function efectosAlPegarCreep(sc){
 function verCreep(id){
   const sc = S.creeps.find(x => x.id === id);
   if(!sc) return;
-
+  verCreepDatos(sc, false);
+}
+// Ver un creep de la biblioteca (todavía no está en la mesa): se arma una copia con
+// los valores por defecto y se muestra con todo el detalle, sin agregarla a S.creeps.
+function verCreepDeBiblioteca(datos){
+  const sc = Object.assign(creepBaseGuardado(), structuredClone(datos), {id: 'vista-previa'});
+  sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid()}));
+  sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
+  sc.nitros = creepNitrosMax(sc);   // en la vista previa, con los No2 llenos
+  verCreepDatos(sc, true);
+}
+function verCreepDatos(sc, completo){
   // Recuadro con título chico y valor destacado; tip = texto al pasar el mouse.
   const caja = (label, valor, tip) => `<div class="vc-caja${tip ? ' con-tip' : ''}"${tip ? ` data-tip="${esc(tip)}"` : ''}>
       <span class="vc-caja-label">${esc(label)}</span><span class="vc-caja-valor">${esc(valor)}</span></div>`;
@@ -3860,11 +3872,17 @@ function verCreep(id){
         ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
       </div>
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
-      ${seccion('Habilidades', habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>')}
+      ${seccion('Habilidades', completo
+        ? (sc.habilidades.length ? sc.habilidades.map(h => `<div class="vc-equipo">
+            <div class="equipo-item-top"><span class="equipado-nombre">${esc(h.nombre || '(sin nombre)')}</span></div>
+            <div class="equipo-item-meta">${esc([costoHabCreepTxt(sc, h), num(h.cd) > 0 ? `CD ${fmt(num(h.cd))}` : '', h.cdArranca ? 'lenta (arranca en cooldown)' : ''].filter(Boolean).join(' · '))}</div>
+            ${h.detalle ? `<div class="arma-detalle">${esc(h.detalle)}</div>` : ''}</div>`).join('') : '<div class="hint">Sin habilidades.</div>')
+        : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
       ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;
+  $('#scrim-view').classList.toggle('desde-biblioteca', !!completo);   // por encima de la ventana de la biblioteca
   $('#scrim-view').classList.add('open');
 }
 
@@ -4129,6 +4147,7 @@ document.addEventListener('click', e => {
       base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
       alCrearDeCero: () => { S.creeps.push(nuevoCreep()); renderAll(); },
       alElegir: agregarCreepDeBiblioteca,
+      alVer: verCreepDeBiblioteca,
     });
     return;
   }

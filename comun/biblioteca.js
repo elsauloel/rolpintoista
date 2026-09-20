@@ -203,6 +203,7 @@ const Biblioteca = (() => {
         </div>
         <div class="acc">
           <button class="btn primary" data-bibacc="agregar" data-id="${esc(e.id)}">${propuestas ? 'Traer a mi mesa' : 'Agregar'}</button>
+          ${st.opts.alVer ? `<button class="btn" data-bibacc="ver" data-id="${esc(e.id)}">👁 Ver</button>` : ''}
           ${esDueno() && propuestas ? `<button class="btn" data-bibacc="aprobar" data-id="${esc(e.id)}">Aprobar</button>
             <button class="btn ghost" data-bibacc="rechazar" data-id="${esc(e.id)}">Rechazar</button>` : ''}
           ${esDueno() && !propuestas && !e.base ? `<button class="btn" data-bibacc="etiquetas" data-id="${esc(e.id)}">✎ Etiquetas</button>
@@ -220,7 +221,9 @@ const Biblioteca = (() => {
     if(!ent) return;
     const acc = b.dataset.bibacc;
     try{
-      if(acc === 'agregar'){
+      if(acc === 'ver'){
+        st.opts.alVer(structuredClone(ent.datos), ent);
+      }else if(acc === 'agregar'){
         st.opts.alElegir(structuredClone(ent.datos));
         document.getElementById('scrim-biblioteca').classList.remove('open');
       }else if(acc === 'rechazar'){

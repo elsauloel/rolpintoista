@@ -1481,6 +1481,18 @@ async function sigiloAviso(origen, formula){
 // Alerta roja en la Mesa cuando un personaje en sigilo hace algo que se sale de lo
 // normal (Mover libre, gastar más No2 de los que tiene): que no se "chispotee" una
 // regla sin que la mesa se entere. Solo avisa; no impide nada.
+// Línea roja SIN nombres ni datos del sigilo: solo avisa que hace falta una tirada, para que
+// nadie sepa quién ni por qué (tiene que tirar percepción y, si falla, misterio).
+async function alertaRojaAnonima(origen){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen, formula: '', rolls: [], mod: 0, total: 0,
+      desde: 'alerta-roja', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo publicar la alerta:', err); }
+}
 async function sigiloAlertaRoja(t, que, detalle){
   if(!t || !fbDb || !fbUsuario || !fbMiembro || !enSigilo(t)) return;
   try{
@@ -1520,9 +1532,10 @@ function sigiloPublicarAvisos(id){
   sigiloAvisosPendientes.delete(id);
   const t = tokens.get(id);
   if(!avisos || !t) return;
-  avisos.forEach(av => sigiloAlertaRoja(t,
-    `entró en la zona de alerta de ${av.rival} (${av.pasos} paso${av.pasos === 1 ? '' : 's'})`,
-    `Corresponde${av.pasos === 1 ? '' : 'n'} ${av.pasos} tirada${av.pasos === 1 ? '' : 's'} de detección (percepción) — una por paso, la resuelve la mesa`));
+  // Uno por rival que ve la zona; sin decir quién se mueve ni que está en sigilo.
+  avisos.forEach(av => alertaRojaAnonima(av.pasos === 1
+    ? '⚠ Hace falta una tirada de detección'
+    : `⚠ Hacen falta ${av.pasos} tiradas de detección`));
 }
 async function romperSigilo(id, detector){
   const t = tokens.get(id);

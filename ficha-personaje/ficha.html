@@ -3645,7 +3645,7 @@ const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
 // con el total más alto. statId es opcional — solo importa para esos tres.
-function tirarValorStat(nombre, valor, statId){
+function tirarValorStat(nombre, valor, statId, extra){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
   const conVentaja = ['pdg','parry','eva'].includes(statId) &&
@@ -3659,7 +3659,8 @@ function tirarValorStat(nombre, valor, statId){
     const segundo = tirar();
     if(segundo.total > intento.total) intento = segundo;
   }
-  const r = {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total};
+  const ex = num(extra);   // bono plano que no cambia los dados (ej. peso del arma en el Bloqueo)
+  const r = {formula: f.formula + (ex ? `+${ex}` : ''), rolls: intento.rolls, mod: f.mod + ex, total: intento.total + ex};
   registrarTirada(conVentaja ? `${nombre} (Afortunado)` : nombre, r);
 }
 
@@ -4894,11 +4895,11 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="Parry">
+          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma: cuesta siempre lo de un primer ataque (' + costoParryTxt() + ')')}">
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo">
+          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) más el peso del arma que uses">
             ${lupaBotonHtml('stat:bloqueo')}
             <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
           </button>
@@ -5621,6 +5622,13 @@ document.addEventListener('click', e => {
     const [habId, armaId] = b.dataset.habarma.split(":");
     $("#scrim-elegir-arma").classList.remove("open");
     ejecutarHabilidad(habId, armaId);
+    return;
+  }
+  if(b.dataset.defarma){
+    const [tipoDef, armaDefId] = b.dataset.defarma.split(':');
+    $('#scrim-elegir-arma').classList.remove('open');
+    const armaDef = S.inventario.find(x => x.id === armaDefId) || null;
+    if(tipoDef === 'parry') parryConArma(armaDef); else bloqueoConArma(armaDef);
     return;
   }
   if(b.dataset.atacararma){
@@ -8317,6 +8325,64 @@ function pdgParaArma(arma, c){
   return {valor: v, excluidos};
 }
 
+/* ---------- Parry y Bloqueo con arma ----------
+   Parry: siempre cuesta No2 — lo mismo que un primer ataque con esa arma
+   (Tipo ÷ 2), sin importar cuántos ataques hiciste en el turno.
+   Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma.
+   Con más de un arma equipada, se elige con cuál. Sin arma: Parry cuesta
+   lo de un ataque sin arma (⚠ provisorio) y el Bloqueo no suma peso. */
+const costoParryNitros = arma => IT2.redondeoPrimerAtaque(tipoAtaque(arma) / 2);
+
+function costoParryTxt(){
+  const armas = armasEquipadasConDano();
+  if(!armas.length) return `${fmt(costoParryNitros(null))} No2 (sin arma, provisorio)`;
+  return armas.map(a => `${a.item.nombre}: ${fmt(costoParryNitros(a.item))} No2`).join(' · ');
+}
+
+// Valor del stat cuando se usa ESA arma: no cuentan los modificadores que vienen de otra arma equipada.
+function statParaArma(statId, arma){
+  const c = compute();
+  const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(m.itemId));
+  if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
+  let v = c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
+  const activos = (S.efectos || []).filter(e => e.activo !== false);
+  if(statId === 'parry' && activos.some(e => e.lisiado)) v = Math.floor(v / 2);
+  return v;
+}
+
+function parryConArma(arma, forzar){
+  const costo = costoParryNitros(arma);
+  const con = arma ? ' con ' + arma.nombre : '';
+  if(costo > num(S.nitros) && !forzar){
+    avisarSinNitros(costo, `hacer Parry${con}`, () => parryConArma(arma, true));
+    return;
+  }
+  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `hizo Parry${con}`) : costo);
+  renderNitros();
+  tirarValorStat(arma ? `Parry · ${arma.nombre}` : 'Parry', statParaArma('parry', arma), 'parry');
+  toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}`);
+  refresh();
+}
+
+function bloqueoConArma(arma){
+  const peso = arma ? num(arma.peso) : 0;
+  tirarValorStat(arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', statParaArma('bloqueo', arma), 'bloqueo', peso);
+}
+
+// Botones 🎲 Parry y 🎲 Bloqueo: con dos o más armas equipadas se elige con cuál.
+function elegirArmaDefensa(tipo){
+  const armas = armasEquipadasConDano();
+  const ir = arma => (tipo === 'parry' ? parryConArma(arma) : bloqueoConArma(arma));
+  if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
+  $('#elegir-arma-lista').innerHTML =
+    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta lo de un primer ataque con el arma que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas.'}</div>` +
+    armas.map(a => `
+    <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}
+    </button>`).join('');
+  $('#scrim-elegir-arma').classList.add('open');
+}
+
 function atacarConArma(arma, forzar){
   const costo = costoAtaqueNitros(arma);
   if(costo > num(S.nitros) && !forzar){
@@ -9045,8 +9111,8 @@ $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scri
 $('#btn-atacar-pdg').onclick = atacar;
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva, 'eva');
-$('#btn-parry').onclick = () => tirarValorStat('Parry', compute().final.parry, 'parry');
-$('#btn-bloqueo').onclick = () => tirarValorStat('Bloqueo', compute().final.bloqueo);
+$('#btn-parry').onclick = () => elegirArmaDefensa('parry');
+$('#btn-bloqueo').onclick = () => elegirArmaDefensa('bloqueo');
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');
 $('#scrim-elegir-arma').addEventListener('mousedown', e => { if(e.target.id==='scrim-elegir-arma') $('#scrim-elegir-arma').classList.remove('open'); });
 $('#c-job').addEventListener('click', abrirJobLista);

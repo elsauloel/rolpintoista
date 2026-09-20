@@ -284,3 +284,18 @@ equivalente que da Con (5), o sea +5 HP máx.
   los creeps de gm-tools. Los estados viejos se convierten solos. En la
   ficha el −1 es un mod de Defensa del estado (se ve en el desglose de
   Defensa); en creeps e invocaciones se aplica por la marca.
+
+## Parry y Bloqueo
+
+- ✅ **P75. Parry con arma: costo y Bloqueo.** Decidido 2026-09-19: el **Parry
+  siempre cuesta No2**, lo mismo que un primer ataque con esa arma (Tipo ÷ 2),
+  sin importar los ataques que ya hiciste en el turno. El **Bloqueo** se tira
+  con el substat Bloqueo (deriva de Fuerza) **más el peso del arma**. Con dos
+  armas equipadas se elige con cuál en los dos casos. Hecho en la ficha
+  (`parryConArma`, `bloqueoConArma`, `elegirArmaDefensa`). Sin arma: el Parry
+  cuesta lo de un ataque sin arma (provisorio) y el Bloqueo no suma peso.
+- 🔲 **P76. Parry con escudo.** Distinto al de arma; falta definir su paso a
+  paso (costo, qué se tira, con qué se suma). *(2026-09-19)*
+- 🔲 **P77. Cadena Parry → Bloqueo.** Sin resolver: si es el Bloqueo del
+  atacante contra el del defensor, y qué pasa si gana el Parry pero pierde el
+  Bloqueo. Hoy cada tirada es suelta y la resuelve la mesa. *(2026-09-19)*

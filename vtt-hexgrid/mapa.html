@@ -155,6 +155,7 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 .lentes-tit{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 4px 4px}
 .lentes-filtros{display:flex;flex-wrap:wrap;gap:5px;padding:0 3px}
 .lentes-filtros .btn.activo{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.lentes-nota{font-size:11.5px;color:var(--muted);margin:10px 4px 2px;line-height:1.35}
 .lentes-fila{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:var(--r);cursor:pointer;font-size:13px}
 .lentes-fila:hover{background:rgba(63,111,176,.25)}
 .lentes-fila input{width:auto;margin:0}
@@ -649,8 +650,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
               <button type="button" class="btn chico" data-lentes-filtro="rivales">Rivales</button>
               <button type="button" class="btn chico" data-lentes-filtro="npc">NPC</button>
             </div>
-            <div class="lentes-tit">O solo estos tokens <button type="button" class="enlace-mini" id="lentes-limpiar">quitar selección</button></div>
-            <div id="lentes-tokens"></div>
+            <div class="lentes-nota">Tocá un token en el mapa para ver solo sus zonas; tocá afuera para volver.</div>
           </div>
         </div>
       </div>
@@ -1462,7 +1462,6 @@ function zonasSigilo(t){
 // Apagado, el mapa funciona exactamente igual que siempre.
 let verZonas = false;          // modo lentes prendido
 let lentesFiltro = 'todos';    // 'todos' | 'aliados' | 'rivales' | 'npc'
-const lentesTokens = new Set();  // ids marcados: si hay alguno, se ven solo esos
 try{
   verZonas = localStorage.getItem('mapa-ver-zonas') === '1';
   lentesFiltro = localStorage.getItem('mapa-lentes-filtro') || 'todos';
@@ -1471,8 +1470,9 @@ function lentesCategoria(t){
   const c = claseToken(t);
   return c === 'creep' ? 'rivales' : c === 'npc' ? 'npc' : 'aliados';
 }
+// Con un token seleccionado se ven solo sus zonas; sin selección, las del filtro elegido.
 function lentesMuestra(id, t){
-  if(lentesTokens.size) return lentesTokens.has(id);
+  if(seleccion) return id === seleccion;
   return lentesFiltro === 'todos' || lentesCategoria(t) === lentesFiltro;
 }
 function renderBotonZonas(){
@@ -1482,13 +1482,7 @@ function renderBotonZonas(){
   $('#lentes-activar').textContent = verZonas ? '👓 Modo lentes: sí' : '👓 Modo lentes: no';
   $('#lentes-activar').classList.toggle('primary', verZonas);
   $('#lentes-opciones').classList.toggle('apagado', !verZonas);
-  $('#lentes-filtros').querySelectorAll('[data-lentes-filtro]').forEach(x => x.classList.toggle('activo', !lentesTokens.size && x.dataset.lentesFiltro === lentesFiltro));
-  // Lista de tokens que se ven (los ocultos o en sigilo que no ves, no aparecen).
-  const filas = [...tokens.entries()].filter(([id, t]) => !(t.oculto && !soyGM) && tokenVisiblePorNiebla(t))
-    .sort((a, b) => nombreDe(a[1]).localeCompare(nombreDe(b[1]), 'es'));
-  $('#lentes-tokens').innerHTML = filas.length ? filas.map(([id, t]) =>
-    `<label class="lentes-fila"><input type="checkbox" data-lentes-token="${esc(id)}" ${lentesTokens.has(id) ? 'checked' : ''}><span>${esc(nombreDe(t))}</span><small>${lentesCategoria(t)}</small></label>`).join('')
-    : '<div class="vacio" style="padding:4px 6px">No hay tokens.</div>';
+  $('#lentes-filtros').querySelectorAll('[data-lentes-filtro]').forEach(x => x.classList.toggle('activo', x.dataset.lentesFiltro === lentesFiltro));
 }
 function zonasParaVer(){
   const rivales = [];
@@ -3587,16 +3581,9 @@ $('#lentes-activar').onclick = () => {
 $('#lentes-filtros').addEventListener('click', e => {
   const b = e.target.closest('[data-lentes-filtro]'); if(!b) return;
   lentesFiltro = b.dataset.lentesFiltro;
-  lentesTokens.clear();
   try{ localStorage.setItem('mapa-lentes-filtro', lentesFiltro); }catch(err){}
   renderBotonZonas(); pedirDibujo();
 });
-$('#lentes-tokens').addEventListener('change', e => {
-  const c = e.target.closest('[data-lentes-token]'); if(!c) return;
-  if(c.checked) lentesTokens.add(c.dataset.lentesToken); else lentesTokens.delete(c.dataset.lentesToken);
-  renderBotonZonas(); pedirDibujo();
-});
-$('#lentes-limpiar').onclick = () => { lentesTokens.clear(); renderBotonZonas(); pedirDibujo(); };
 document.addEventListener('pointerdown', e => {
   if(!$('#lentes-menu').hidden && !e.target.closest('#lentes-caja')) abrirMenuLentes(false);
 });

@@ -720,6 +720,9 @@ hexágono con otro sin importar bando. Todavía no está construido.
   abajo un menú (`#lentes-menu`) con **Modo lentes: sí/no** y, cuando está prendido,
   un filtro **Todos / Aliados / Rivales / NPC** (`lentesCategoria`: personajes,
   creeps vinculados, tokens grises) o una lista de **tokens para marcar** y ver solo
-  sus zonas (la selección manda sobre el filtro; "quitar selección" la limpia).
-  Apagado, el mapa funciona como siempre. Se recuerdan por navegador el modo
+  sus zonas (la selección manda sobre el filtro; "quitar selección" la limpia).  Apagado, el mapa funciona como siempre. Se recuerdan por navegador el modo
   (`mapa-ver-zonas`) y el filtro (`mapa-lentes-filtro`).
+  **Actualización 2026-09-19:** el menú quedó solo con **Modo lentes** y el filtro
+  (Todos / Aliados / Rivales / NPC); ya no tiene lista de tokens. Para ver solo un
+  token se lo **selecciona en el mapa** (`seleccion`): con un token seleccionado se
+  muestran solo sus zonas; al soltar la selección vuelve al filtro.

@@ -624,6 +624,12 @@ input[type=file]{display:none}
 .f label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .hint{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .modal .body{padding:14px 16px}
+/* Grupos como contenedores: el creep se arrastra (⠿) hasta la pestaña de otro grupo. */
+.grip-creep{cursor:grab;color:var(--muted);user-select:none;padding:0 4px;font-size:15px;line-height:1}
+.grip-creep:hover{color:var(--brass)}
+.grupo-tag{font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:0 6px;margin-left:4px;white-space:nowrap}
+#grupos-barra .btn.arrastrando-encima{outline:2px dashed var(--brass);outline-offset:1px;background:rgba(224,164,88,.18)}
+body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""]){border-style:dashed}
 /* Bitácora del GM: mismo formato que la de los jugadores (ficha.html). */
 .bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
 .bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:9px}
@@ -3359,8 +3365,9 @@ function cardCompactoHtml(sc){
   return `
   <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
+      <span class="grip-creep" draggable="true" data-arrastrar-creep="${sc.id}" title="Arrastrá hasta un grupo de arriba para mover este creep${sc.grupo ? ` (ahora está en «${esc(sc.grupo)}»)` : ' (ahora está sin grupo)'}">⠿</span>
       <button type="button" class="eyebtn" data-editarcreep="${sc.id}" title="Editar creep">${SVG_LAPIZ}</button>
-      <span class="name-compacto">${esc(sc.nombre)}</span>
+      <span class="name-compacto">${esc(sc.nombre)}</span>${grupoActivo === '' && sc.grupo ? `<span class="grupo-tag" title="Grupo de este creep">${esc(sc.grupo)}</span>` : ''}
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
       <button class="verbtn" data-ver="${sc.id}">Ver</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
@@ -5849,7 +5856,7 @@ function renderGruposBarra(){
   const tab = (id, texto, n) => `<button type="button" class="btn${grupoActivo === id ? ' primary' : ''}" data-grupo-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px">${esc(texto)} <span class="hint">${n}</span></button>`;
   const real = grupoActivo && grupoActivo !== '__sin' && grupos.includes(grupoActivo);
   caja.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
-      ${tab('', 'Todos', cuenta(''))}${grupos.map(g => tab(g, g, cuenta(g))).join('')}${sinGrupo && grupos.length ? tab('__sin', 'Sin grupo', sinGrupo) : ''}
+      ${tab('', 'Todos', cuenta(''))}${grupos.map(g => tab(g, g, cuenta(g))).join('')}${grupos.length ? tab('__sin', 'Sin grupo', sinGrupo) : ''}
       <button type="button" class="btn ghost" data-grupo-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un grupo (un escenario de combate)">＋ Grupo</button>
       ${real ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
         <label class="hint" style="display:flex;gap:4px;align-items:center" title="Mapa vinculado a este grupo: Crear tokens y Traer tokens (en el mapa) lo usan">🗺 <select data-grupo-mapa="1" style="padding:3px 6px;font-size:12.5px"><option value="">sin mapa</option>${[...mapasNombres.keys()].map(id => `<option value="${esc(id)}"${TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo) === id ? ' selected' : ''}>${esc(nombreDeMapaGM(id))}</option>`).join('')}</select></label>
@@ -5935,6 +5942,53 @@ document.addEventListener('change', async e => {
   }
   sc.grupo = g;
   renderAll();
+});
+/* Arrastrar un creep (⠿) a la pestaña de un grupo (o a "Sin grupo") lo mueve. "Todos" no es un contenedor: no recibe. */
+let creepArrastrado = '';
+function grupoDestinoDeTab(tab){
+  if(!tab || tab.dataset.grupoTab === undefined || tab.dataset.grupoTab === '') return null;
+  return tab.dataset.grupoTab === '__sin' ? '' : tab.dataset.grupoTab;
+}
+document.addEventListener('dragstart', e => {
+  const grip = e.target.closest && e.target.closest('[data-arrastrar-creep]');
+  if(!grip) return;
+  creepArrastrado = grip.dataset.arrastrarCreep;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', creepArrastrado);
+  const card = grip.closest('.card');
+  if(card) e.dataTransfer.setDragImage(card, 20, 20);
+  document.body.classList.add('arrastrando-creep');
+});
+document.addEventListener('dragend', () => {
+  creepArrastrado = '';
+  document.body.classList.remove('arrastrando-creep');
+  document.querySelectorAll('.arrastrando-encima').forEach(x => x.classList.remove('arrastrando-encima'));
+});
+document.addEventListener('dragover', e => {
+  if(!creepArrastrado) return;
+  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
+  if(grupoDestinoDeTab(tab) === null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  tab.classList.add('arrastrando-encima');
+});
+document.addEventListener('dragleave', e => {
+  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
+  if(tab && !tab.contains(e.relatedTarget)) tab.classList.remove('arrastrando-encima');
+});
+document.addEventListener('drop', e => {
+  if(!creepArrastrado) return;
+  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
+  const destino = grupoDestinoDeTab(tab);
+  if(destino === null) return;
+  e.preventDefault();
+  const sc = S.creeps.find(s => s.id === creepArrastrado);
+  creepArrastrado = '';
+  document.body.classList.remove('arrastrando-creep');
+  if(!sc || (sc.grupo || '') === destino){ renderAll(); return; }
+  sc.grupo = destino;
+  renderAll();
+  toast(`📦 ${nombreLimpioCreep(sc)} → ${destino || 'Sin grupo'}`);
 });
 function grupoSelectHtml(sc){
   const gs = nombresDeGrupos();

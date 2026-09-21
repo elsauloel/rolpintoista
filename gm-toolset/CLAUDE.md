@@ -259,3 +259,5 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **Arma natural del catálogo** (2026-09-20): botón 🐾 (`data-armanat`) — ver `comun/armas-naturales-base.js`.
 
 - **Estados sobre otros, automáticos** (2026-09-20): las habilidades con `estadoObjetivo` (57 del catálogo y varias trampas de creeps) abren, al ejecutarse, "🎯 ¿A quién le pegó?" con los tokens del mapa que mira el GM; el estado se aplica solo (creeps directo, personajes por aviso en `estados` que su ficha aplica). Ver `comun/estados-aplicar.js`.
+
+- **Protección de jefe** (2026-09-21, P95 versión inicial): un creep marcado **Jefe** (`sc.jefe`) es **inmune a Stun** (`estaBloqueadoElDebuffCreep`, y `EstadosAplicar.bloqueadoCreep` para habilidades y trampas) y tiene **+1 Res.Mg** (`creepStatValor`, con línea en la lupa): la tirada contra los debuffs. Automático; para apagarlo, se desmarca "Jefe". No cubre Exhausto ni otros controles.

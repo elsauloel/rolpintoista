@@ -2663,7 +2663,7 @@ function recompensasHtml(sc){
         ${t === 'otros' ? `<input type="text" data-rec="tipoCriaturaOtro" data-id="${sc.id}" value="${esc(sc.tipoCriaturaOtro || '')}" placeholder="¿Qué tipo es?" maxlength="30" style="margin-top:4px">` : ''}
       </div>
       <div class="mini-f"><label>¿Es jefe?</label>
-        <label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Jefe (doble oro y doble trofeo)</label>
+        <label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Jefe (doble oro y trofeo; protección: inmune a Stun y +1 Res.Mg)</label>
       </div>
     </div>
     <div class="mini-f" style="margin-top:8px"><label>Oro que carga (DDE) ${ayudaQ(AYUDA_ORO)}</label>
@@ -2791,7 +2791,7 @@ function renderAsistenteCreep(){
           <option value="otros"${t === 'otros' ? ' selected' : ''}>Otros…</option></select>
           ${t === 'otros' ? `<input type="text" data-rec="tipoCriaturaOtro" data-id="${sc.id}" value="${esc(sc.tipoCriaturaOtro || '')}" placeholder="Escribí qué tipo es" maxlength="30" style="margin-top:6px">` : ''}`,
           'Define cuánto oro se sugiere y si el arma es natural por defecto (podés cambiar ambas cosas después).')
-      + campo('¿Es un jefe?', `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo</label>`)
+      + campo('¿Es un jefe?', `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun y tiene +1 Res.Mg (protección de jefe)</label>`)
       + campo('Imagen (opcional)', `<button type="button" class="addhab" data-ac-img="1" style="margin:0">${sc.imagen ? 'Cambiar imagen' : '+ Elegir imagen'}</button>
           <input type="file" data-imginput="${sc.id}" accept="image/*" hidden>`)
       + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600" style="width:100%">${esc(sc.notas || '')}</textarea>`);
@@ -2944,6 +2944,7 @@ function creepStatValor(sc, statId){
   if((statId === 'pdg' || statId === 'parry') && (sc.estados||[]).some(e => e.activo !== false && e.lisiado)){
     v = Math.floor(v / 2);
   }
+  if(statId === 'resmg' && sc.jefe) v += 1;   // protección de jefe: +1 Res.Mg (la tirada contra los debuffs)
   if(statId === 'mov'){
     const activos = (sc.estados||[]).filter(e => e.activo !== false);
     if(activos.some(e => e.inmovilizado)) v = 0;
@@ -2966,6 +2967,7 @@ function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
   if(statId !== attr) aportesModCreep(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
   if(!aportesModCreep(sc, attr).length && (statId === attr || !aportesModCreep(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
   if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
+  if(statId === 'resmg' && sc.jefe) h += lupaFila('Protección de jefe', '+1');
   const valor = creepStatValor(sc, statId);
   h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
   let out = lupaSeccion('De dónde sale', h);
@@ -3527,6 +3529,7 @@ const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
 // esSangrado, la misma marca que llevan los presets).
 function estaBloqueadoElDebuffCreep(sc, objEfecto){
   if(!objEfecto || objEfecto.polaridad !== 'debuff') return false;
+  if(sc.jefe && objEfecto.nombre === 'Stun') return true;   // protección de jefe: inmune a Stun
   const activos = (sc.estados || []).filter(e => e.activo !== false);
   if(activos.some(e => e.invulnerable)) return true;
   if(objEfecto.esCC && activos.some(e => e.inmunidadCC)) return true;
@@ -3545,7 +3548,7 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   const stacks = Math.max(1, num(h.efectoStacks) || 1);
   const hpTurno = num(h.efectoHpTurno);
   const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
-  if(estaBloqueadoElDebuffCreep(sc, {polaridad, esCC: preset && preset.esCC, esVeneno: preset && preset.esVeneno, esSangrado: preset && preset.esSangrado})){
+  if(estaBloqueadoElDebuffCreep(sc, {nombre, polaridad, esCC: preset && preset.esCC, esVeneno: preset && preset.esVeneno, esSangrado: preset && preset.esSangrado})){
     toast(`${sc.nombre}: inmune ahora mismo — ${nombre} no hizo efecto`);
     return null;
   }

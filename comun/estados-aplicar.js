@@ -59,8 +59,9 @@ const EstadosAplicar = (() => {
   }
 
   // Inmunidades del que recibe el estado (las mismas reglas que gm-tools y la ficha).
-  function bloqueadoCreep(estados, est){
+  function bloqueadoCreep(estados, est, sc){
     if(!est || est.polaridad !== 'debuff') return false;
+    if(sc && sc.jefe && est.nombre === 'Stun') return 'Protección de jefe';
     const activos = (estados || []).filter(e => e.activo !== false);
     if(activos.some(e => e.invulnerable)) return 'Invulnerable';
     if(est.esCC && activos.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
@@ -73,7 +74,7 @@ const EstadosAplicar = (() => {
   function aplicarACreep(sc, spec){
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     const est = componer(spec);
-    const b = bloqueadoCreep(sc.estados, est);
+    const b = bloqueadoCreep(sc.estados, est, sc);
     if(b) return {ok: false, motivo: b};
     if(est.armaduraRota){
       const ya = sc.estados.find(e => e.armaduraRota);

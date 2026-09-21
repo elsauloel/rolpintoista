@@ -279,14 +279,14 @@ aside{
   border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
 }
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
-#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-botin{
+#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-botin,#toolkit-mapas{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
   width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
   background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
   box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
-#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
+#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-mapas:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
 /* 🎁 Despojos: arriba de 🎭, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
 #toolkit-botin{top:calc(50% - 231px);transform:none}
 #toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
@@ -295,6 +295,19 @@ aside{
 /* El botón de tokens va arriba de los dados, del mismo tamaño y forma; su menú se despliega al costado. */
 #toolkit-tokens{top:calc(50% - 154px);transform:none}
 #toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
+/* 🗺 Mapas: arriba de 🎁, del mismo tamaño y forma; su menú se despliega al costado (mapas guardados + fondo). */
+#toolkit-mapas{top:calc(50% - 308px);transform:none}
+#toolkit-mapas[hidden]{display:none}
+#toolkit-mapas.activo{color:var(--paper);border-color:var(--copper)}
+#toolkit-mapas.distinto{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+#mapas-menu{
+  position:absolute;left:calc(100% + 56px);top:calc(50% - 308px);z-index:30;width:300px;max-height:78vh;overflow:auto;
+  padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
+  box-shadow:6px 6px 22px rgba(0,0,0,.55)
+}
+#mapas-menu[hidden]{display:none}
+#mapas-menu h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin:0}
+#mapas-menu .mm-sec{margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft)}
 #tokens-menu{
   position:absolute;left:calc(100% + 56px);top:calc(50% - 154px);z-index:30;min-width:250px;max-width:320px;max-height:60vh;overflow:auto;
   display:flex;flex-direction:column;gap:6px;padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
@@ -635,7 +648,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <header>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
-  <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span> <span aria-hidden="true">▾</span></button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled hidden>+ Token</button>
   <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
@@ -643,7 +655,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
   </div>
-  <button type="button" class="btn" id="btn-fondo" title="Imagen de fondo del mapa (solo GM)" hidden>🖼 Fondo</button>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -731,7 +742,9 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
       <button type="button" id="toolkit-botin" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate">🎁</button>
       <button type="button" id="toolkit-tokens" title="Tokens: poner uno nuevo (y, si sos GM, traer los de los jugadores y los de los creeps)">🎭</button>
+      <button type="button" id="toolkit-mapas" hidden title="Mapas: ver, publicar, crear o borrar mapas guardados, y el fondo">🗺</button>
       <div id="tokens-menu" hidden></div>
+      <div id="mapas-menu" hidden></div>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>
@@ -977,7 +990,7 @@ const PING_MS = 1800;
 let cortarPingsListener = null;
 let paneo = null;             // {inicioX, inicioY, x, y}
 let creando = false;
-let panelFondo = false;       // GM: panel de la imagen de fondo abierto
+let mapasMenuAbierto = false;   // GM: menú 🗺 del borde izquierdo (mapas guardados + fondo)
 let editandoToken = false;    // panel del token en modo "Editar"
 // GM: creep completo (parte privada, que solo lee el GM) de cada creep con
 // token en el mapa: vida con números y No2 para cobrar al moverlo.
@@ -998,7 +1011,6 @@ let arrastreTrazo = null;     // {id, dx, dy, inicioX, inicioY, movio}: arrastra
 let rotandoTrazo = null;      // {id, cx, cy} (cx,cy: centro en pantalla, fijo durante el arrastre)
 let arrastreElemento = null;  // {id, inicioX, inicioY, movio}: arrastra un elemento de terreno/formas
 let rotandoElemento = null;   // {id}
-let panelMapas = false;
 // Grupos de creeps vinculados a un mapa (para "Traer tokens de creeps"): chips con ✕ y un selector para sumar otro.
 function gruposDeMapaHtml(mapaId){
   try{ return gruposDeMapaHtmlSeguro(mapaId); }catch(err){ console.error('No se pudieron listar los grupos del mapa:', err); return ''; }   // que esto nunca rompa el panel de Mapas
@@ -1192,20 +1204,18 @@ function escucharMapas(){
     }
     recalcularMapaMostrado();
     actualizarBotonMapas();
-    if(panelMapas) renderPanel(true);
+    renderMapasMenu(true);
   }, err => console.error('Error escuchando la lista de mapas:', err));
 }
 
 function actualizarBotonMapas(){
-  const boton = $('#btn-mapas');
+  const boton = $('#toolkit-mapas');
   if(!boton) return;
-  boton.hidden = !fbMiembro;
-  boton.disabled = !soyGM;
-  $('#mapas-nombre').textContent = nombreMapa(mapaMostrado);
-  boton.classList.toggle('primary', soyGM && mapaMostrado !== mapaActivo);
-  boton.title = !soyGM ? 'Mapa que armó el GM'
-    : mapaMostrado === mapaActivo ? 'Mapas guardados: ver otro, publicar, renombrar o crear uno nuevo (+ Nuevo mapa)'
-    : `Mapas guardados — estás armando este; los jugadores ven "${nombreMapa(mapaActivo)}"`;
+  boton.hidden = !(fbMiembro && soyGM);   // los mapas guardados los maneja solo el GM
+  boton.classList.toggle('distinto', soyGM && mapaMostrado !== mapaActivo);
+  boton.title = mapaMostrado === mapaActivo
+    ? `Mapas: estás en "${nombreMapa(mapaMostrado)}". Ver otro, publicar, crear uno nuevo, y el fondo`
+    : `Mapas: estás armando "${nombreMapa(mapaMostrado)}"; los jugadores ven "${nombreMapa(mapaActivo)}"`;
 }
 
 async function crearMapa(){
@@ -5694,10 +5704,11 @@ function actualizarAyudaToken(){
 }
 
 function renderPanel(forzar){
+  renderMapasMenu(forzar);
   const panel = $('#panel-token');
   const t = seleccion ? tokens.get(seleccion) : null;
   actualizarEscuchasCreeps();
-  const clave = JSON.stringify([creando, panelFondo, panelMapas, seleccion, editandoToken]);
+  const clave = JSON.stringify([creando, seleccion, editandoToken]);
   const v = t ? vinculo(t) : null;
   const opciones = (creando || t) ? [
     [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre + JSON.stringify(((f.resumen && f.resumen.invocaciones) || []).map(i => [i.id, i.nombre]))),
@@ -5707,7 +5718,6 @@ function renderPanel(forzar){
     t && [t.nombre, t.color, t.tipo, t.duenoUid, t.col, t.fichaId, t.fila],
     v && [v.nombre, v.resumen],
     opciones, soyGM, [...miembros.entries()], !!fbMiembro,
-    panelFondo && fondo && [fondo.ancho, !!fondo.dato], moverFondo,
     t && t.tipo === 'creep' && (s => s && [s.hp, s.hpMax, s.nitros])(creepPrivadoDe(t.fichaId)),
   ]);
   if(!forzar){
@@ -5720,7 +5730,6 @@ function renderPanel(forzar){
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
   actualizarAyudaToken();
-  $('#btn-fondo').hidden = !soyGM;
   renderNiebla();
   renderOjo();
   $('#caja-mantenimiento').hidden = !soyGM;
@@ -5729,75 +5738,6 @@ function renderPanel(forzar){
   $('#nuevo-token-capa').hidden = !creando;
   if(!creando) $('#nuevo-token-ventana').innerHTML = '';
 
-  if(panelMapas && soyGM){
-    const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
-      .sort((a, b) => mapasLista.get(a).creadoMs - mapasLista.get(b).creadoMs)]
-      .map(id => {
-        const viendo = id === mapaMostrado, activo = id === mapaActivo;
-        return `<div class="mapa-fila${viendo ? ' viendo' : ''}">
-          <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
-          <div class="fila" style="margin-top:4px">
-            ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
-            ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}
-            <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
-            ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
-          </div>
-          ${gruposDeMapaHtml(id)}
-        </div>`;
-      }).join('');
-    panel.innerHTML =
-      // El botón de crear va ARRIBA (con muchos mapas, abajo quedaba fuera de la vista).
-      '<div class="fila" style="margin:0 0 8px;justify-content:space-between"><h2 style="margin:0">Mapas</h2><span><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button> <button type="button" class="btn" id="mapas-cerrar" title="Cerrar la lista de mapas">Cerrar</button></span></div>' +
-      '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
-      filas;
-    panel.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
-    panel.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
-    panel.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
-    panel.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
-    panel.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = () => { if(sel.value) vincularGrupoAMapa(sel.value, sel.dataset.mapaGrupoAdd); });
-    panel.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
-    $('#mapa-nuevo').onclick = crearMapa;
-    $('#mapas-cerrar').onclick = () => { panelMapas = false; renderPanel(true); };
-    return;
-  }
-
-  if(panelFondo && soyGM){
-    const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
-    panel.innerHTML =
-      '<h2>Fondo del mapa</h2>' +
-      '<div class="fila" style="margin-top:0">' +
-        `<button type="button" class="btn primary" id="fondo-cargar">${fondo ? 'Cambiar imagen' : 'Cargar imagen'}</button>` +
-        (fondo ? '<button type="button" class="btn peligro" id="fondo-quitar">Quitar</button>' : '') +
-      '</div>' +
-      (fondo
-        ? `<label class="etiqueta">Ancho, en casillas</label><div class="fila" style="margin-top:0"><input id="fondo-ancho" type="number" min="1" max="400" step="0.5" value="${casillas}"><button type="button" class="btn" id="fondo-ancho-ok">Aplicar</button></div>` +
-          `<label class="fila" style="cursor:pointer"><input type="checkbox" id="fondo-mover" style="width:auto"${moverFondo ? ' checked' : ''}> Arrastrar el fondo con el mouse</label>` +
-          '<p class="ayuda" style="margin-top:6px">Con esa casilla tildada, arrastrar un lugar vacío mueve la imagen para acomodarla a la grilla. Destildala para volver a desplazar la vista.</p>'
-        : '<p class="ayuda" style="margin-top:8px">La imagen se achica sola para que entre en la mesa. Todos la ven debajo de la grilla.</p>') +
-      '<div class="fila"><button type="button" class="btn" id="fondo-cerrar">Listo</button></div>';
-    $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
-    $('#fondo-cerrar').onclick = () => { panelFondo = false; moverFondo = false; renderPanel(true); pedirDibujo(); };
-    if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
-      if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
-      try{
-        const lote = fbDb.batch();
-        lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))));
-        lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))));
-        await lote.commit();
-        moverFondo = false;
-      }
-      catch(err){ console.error(err); toast('No se pudo quitar el fondo'); }
-    };
-    if($('#fondo-ancho-ok')) $('#fondo-ancho-ok').onclick = () => {
-      const n = num($('#fondo-ancho').value);
-      if(n < 1 || n > 400){ toast('Poné un ancho entre 1 y 400 casillas'); return; }
-      fondo.ancho = n * ANCHO_CASILLA;
-      pedirDibujo();
-      guardarFondo({ancho: fondo.ancho});
-    };
-    if($('#fondo-mover')) $('#fondo-mover').onchange = e => { moverFondo = e.target.checked; };
-    return;
-  }
 
   if(creando){
     let color = COLORES[Math.floor(Math.random() * COLORES.length)];
@@ -5946,22 +5886,93 @@ function renderPanel(forzar){
   };
 }
 
-$('#btn-fondo').onclick = () => {
-  if(!soyGM) return;
-  panelFondo = !panelFondo;
-  if(panelFondo){ creando = false; panelMapas = false; seleccion = null; }
+/* ---------- 🗺 Mapas: botón del borde izquierdo (solo GM) ----------
+   Mapas guardados (ver, publicar, renombrar, borrar, grupos de creeps vinculados, + Nuevo mapa) y el fondo del mapa que se está mirando.
+   Vive en un menú al costado del botón, como el de 🎭 Tokens: la barra lateral (donde se ve la Mesa) no se usa para menús. */
+let mapasMenuFirma = '';
+function renderMapasMenu(forzar){
+  const menu = $('#mapas-menu'), boton = $('#toolkit-mapas');
+  if(!menu || !boton) return;
+  if(!soyGM || !fbMiembro) mapasMenuAbierto = false;
+  menu.hidden = !mapasMenuAbierto;
+  boton.classList.toggle('activo', mapasMenuAbierto);
+  if(!mapasMenuAbierto) return;
+  if(!forzar && menu.contains(document.activeElement) && menu.innerHTML) return;   // no pisar lo que se está escribiendo
+  const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
+    .sort((a, b) => mapasLista.get(a).creadoMs - mapasLista.get(b).creadoMs)]
+    .map(id => {
+      const viendo = id === mapaMostrado, activo = id === mapaActivo;
+      return `<div class="mapa-fila${viendo ? ' viendo' : ''}">
+        <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
+        <div class="fila" style="margin-top:4px">
+          ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
+          ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}
+          <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
+          ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
+        </div>
+        ${gruposDeMapaHtml(id)}
+      </div>`;
+    }).join('');
+  const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
+  const html =
+    '<div class="fila" style="margin:0 0 8px;justify-content:space-between"><h2>🗺 Mapas</h2><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button></div>' +
+    '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
+    filas +
+    '<div class="mm-sec"><h2>🖼 Fondo de este mapa</h2>' +
+    '<div class="fila" style="margin-top:8px">' +
+      `<button type="button" class="btn primary" id="fondo-cargar">${fondo ? 'Cambiar imagen' : 'Cargar imagen'}</button>` +
+      (fondo ? '<button type="button" class="btn peligro" id="fondo-quitar">Quitar</button>' : '') +
+    '</div>' +
+    (fondo
+      ? `<label class="etiqueta">Ancho, en casillas</label><div class="fila" style="margin-top:0"><input id="fondo-ancho" type="number" min="1" max="400" step="0.5" value="${casillas}"><button type="button" class="btn" id="fondo-ancho-ok">Aplicar</button></div>` +
+        `<label class="fila" style="cursor:pointer"><input type="checkbox" id="fondo-mover" style="width:auto"${moverFondo ? ' checked' : ''}> Arrastrar el fondo con el mouse</label>` +
+        '<p class="ayuda" style="margin-top:6px">Con esa casilla tildada, arrastrar un lugar vacío mueve la imagen para acomodarla a la grilla. Destildala para volver a desplazar la vista.</p>'
+      : '<p class="ayuda" style="margin-top:8px">La imagen se achica sola para que entre en la mesa. Todos la ven debajo de la grilla.</p>') +
+    '</div>';
+  if(!forzar && html === mapasMenuFirma) return;
+  mapasMenuFirma = html;
+  menu.innerHTML = html;
+  menu.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
+  menu.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
+  menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
+  menu.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
+  menu.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = () => { if(sel.value) vincularGrupoAMapa(sel.value, sel.dataset.mapaGrupoAdd); });
+  menu.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
+  $('#mapa-nuevo').onclick = crearMapa;
+  $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
+  if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
+    if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
+    try{
+      const lote = fbDb.batch();
+      lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))));
+      lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))));
+      await lote.commit();
+      moverFondo = false;
+    }
+    catch(err){ console.error(err); toast('No se pudo quitar el fondo'); }
+  };
+  if($('#fondo-ancho-ok')) $('#fondo-ancho-ok').onclick = () => {
+    const n = num($('#fondo-ancho').value);
+    if(n < 1 || n > 400){ toast('Poné un ancho entre 1 y 400 casillas'); return; }
+    fondo.ancho = n * ANCHO_CASILLA;
+    pedirDibujo();
+    guardarFondo({ancho: fondo.ancho});
+  };
+  if($('#fondo-mover')) $('#fondo-mover').onchange = e => { moverFondo = e.target.checked; };
+}
+function abrirMapasMenu(abrir){
+  if(abrir && !(soyGM && fbMiembro)) return;
+  mapasMenuAbierto = abrir;
+  if(abrir){ abrirTokensMenu(false); creando = false; seleccion = null; }
   else moverFondo = false;
+  renderMapasMenu(true);
   renderPanel(true);
   pedirDibujo();
-};
-
-$('#btn-mapas').onclick = () => {
-  if(!soyGM) return;
-  panelMapas = !panelMapas;
-  if(panelMapas){ creando = false; panelFondo = false; moverFondo = false; seleccion = null; }
-  renderPanel(true);
-  pedirDibujo();
-};
+}
+$('#toolkit-mapas').onclick = e => { e.stopPropagation(); abrirMapasMenu(!mapasMenuAbierto); };
+$('#mapas-menu').addEventListener('click', e => e.stopPropagation());
+// Solo se cierra con el mismo botón o con Esc: mientras se acomoda el fondo hay que poder tocar el mapa con el menú abierto.
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && mapasMenuAbierto && !editandoElemento && !moverLibre && !herramientaActiva && !colocando && !creando) abrirMapasMenu(false); });
 
 function cancelarNuevoToken(){
   if(!creando) return;
@@ -5978,7 +5989,7 @@ $('#nuevo-token-capa').addEventListener('contextmenu', e => {
 $('#btn-nuevo').onclick = e => {
   if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token
   if(!fbMiembro) return;
-  creando = true; seleccion = null; panelFondo = false; panelMapas = false; moverFondo = false;
+  creando = true; seleccion = null; moverFondo = false;
   renderPanel(true); pedirDibujo();
 };
 
@@ -6310,7 +6321,7 @@ let etiquetaElementoTexto = null;
 function actualizarEtiquetaElemento(){
   const el = $('#elemento-etiqueta');
   const e = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
-  if(!e || !fbMiembro || creando || panelFondo || panelMapas || !puedeVerElemento(e)){
+  if(!e || !fbMiembro || creando || !puedeVerElemento(e)){
     if(etiquetaElementoTexto !== ''){ el.hidden = true; etiquetaElementoTexto = ''; }
     return;
   }
@@ -6333,7 +6344,7 @@ function actualizarEtiquetaElemento(){
 function actualizarEtiquetaToken(){
   const el = $('#token-etiqueta');
   const t = seleccion ? tokens.get(seleccion) : null;
-  if(!t || !fbMiembro || creando || panelFondo || panelMapas){ el.hidden = true; return; }
+  if(!t || !fbMiembro || creando){ el.hidden = true; return; }
   const dueno = t.tipo === 'creep' ? 'GM' : nombreMiembro(t.duenoUid);
   el.innerHTML = `<b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span>`;
   el.hidden = false;
@@ -6346,7 +6357,7 @@ function hudUbicar(){
   actualizarAvisoColocacion();
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
-  if(!t || !fbMiembro || creando || panelFondo || panelMapas){ hud.hidden = true; return; }
+  if(!t || !fbMiembro || creando){ hud.hidden = true; return; }
   const d = disposicion.find(x => x.id === seleccion);
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
@@ -6912,7 +6923,7 @@ function escucharEnlaces(){
   if(!soyGM || typeof TokensAuto.enlacesEscuchar !== 'function') return;
   try{ TokensAuto.enlacesEscuchar(l => {
     enlacesGM = l;
-    if(panelMapas) renderPanel(true);
+    renderMapasMenu(true);
     if(!$('#tokens-menu').hidden) renderTokensMenu();
   }); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); }
 }
@@ -6973,7 +6984,7 @@ function abrirTokensMenu(abrir){
   const menu = $('#tokens-menu');
   menu.hidden = !abrir;
   $('#toolkit-tokens').classList.toggle('activo', abrir);
-  if(abrir){ tokensMenuCreeps = false; renderTokensMenu(); }
+  if(abrir){ tokensMenuCreeps = false; renderTokensMenu(); if(mapasMenuAbierto) abrirMapasMenu(false); }
 }
 $('#toolkit-tokens').onclick = e => {
   e.stopPropagation();

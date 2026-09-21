@@ -277,14 +277,19 @@ aside{
   border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
 }
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
-#toolkit-pestana,#toolkit-dados,#toolkit-tokens{
+#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-botin{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
   width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
   background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
   box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
-#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover{background:var(--panel2);color:var(--paper)}
+#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
+/* 🎁 Despojos: arriba de 🎭, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
+#toolkit-botin{top:calc(50% - 231px);transform:none}
+#toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
+#toolkit-botin.pendiente{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+@keyframes latidoBotin{50%{box-shadow:0 0 0 4px rgba(184,115,51,.35)}}
 /* El botón de tokens va arriba de los dados, del mismo tamaño y forma; su menú se despliega al costado. */
 #toolkit-tokens{top:calc(50% - 154px);transform:none}
 #toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
@@ -718,6 +723,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       </nav>
       <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">☭</button>
       <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
+      <button type="button" id="toolkit-botin" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate">🎁</button>
       <button type="button" id="toolkit-tokens" title="Tokens: poner uno nuevo (y, si sos GM, traer los de los jugadores y los de los creeps)">🎭</button>
       <div id="tokens-menu" hidden></div>
     </div>
@@ -738,8 +744,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div class="seccion" id="caja-mantenimiento" hidden>
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
-        <button type="button" class="btn chico" id="btn-finalizar-mapa" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
-        <button type="button" class="btn chico" id="btn-botin-mapa" title="Después de que los jugadores eligieron del botín: lo que nadie tomó se convierte en despojos y se reparte">🧰 Despojar</button>
+        <button type="button" class="btn chico" id="btn-finalizar-mapa" style="grid-column:1/-1" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
       </div>
     </div>
     <div class="seccion" id="panel-token"></div>
@@ -6708,7 +6713,7 @@ function botoneraEnMitad(){ return window.innerWidth > 760; }
 function ubicarBotoneraCapa(){
   const capa = $('#botonera-capa');
   if(capa.hidden) return;
-  if(!botoneraEnMitad()){ capa.removeAttribute('style'); return; }
+  if(!botoneraEnMitad() || botonera.completa){ capa.removeAttribute('style'); return; }   // la ventana de la batalla ocupa todo el centro
   const r = $('#lienzo-caja').getBoundingClientRect();
   Object.assign(capa.style, {
     left: r.left + 'px', top: r.top + 'px', right: 'auto', bottom: 'auto',
@@ -6737,16 +6742,18 @@ function centrarTokenDeBotonera(herramienta, id){
 function abrirBotonera(fichaId, mensaje, invId){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
+  const completa = !!(mensaje && mensaje.tipo === 'abrir-botin');   // la ventana de la batalla ocupa todo el centro
   capa.hidden = false;
+  botonera.completa = completa;
   ubicarBotoneraCapa();
-  centrarTokenDeBotonera('ficha', fichaId);
+  if(!completa) centrarTokenDeBotonera('ficha', fichaId);
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
     botonera.invId = invId || '';
     marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera', inv: invId || ''}, location.origin);
     enfocarBotonera();
     return;
   }
-  botonera = {herramienta: 'ficha', fichaId, invId: invId || '', lista: false, pendiente: mensaje || null};
+  botonera = {herramienta: 'ficha', fichaId, invId: invId || '', lista: false, pendiente: mensaje || null, completa};
   $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
   const inv = invId ? `&inv=${encodeURIComponent(invId)}` : '';
@@ -6773,38 +6780,58 @@ function abrirBotoneraPrincipal(){
   abrirBotonera(fichaId);
 }
 
-/* Botín del combate: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana del botín (la de la ficha, en el
-   mismo iframe de la Botonera) con los equipos y trofeos para elegir. Solo reacciona a botín NUEVO, no al que ya estaba al entrar. */
-let botinMapaPrimero = true, botinMapaTimer = null;
-function escucharBotinParaJugador(){
-  if(soyGM || !fbUsuario) return;
-  fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
-    const nuevo = !botinMapaPrimero && snap.docChanges().some(ch => ch.type === 'added' && !ch.doc.data().tomadoPor);
-    botinMapaPrimero = false;
-    if(!nuevo) return;
-    clearTimeout(botinMapaTimer);
-    botinMapaTimer = setTimeout(() => {
-      const fichaId = fichaPrincipalId();
-      if(!fichaId){ toast('🎁 Hay botín del combate, pero no tenés un personaje para tomarlo'); return; }
-      toast('🎁 El GM abrió el botín del combate');
-      abrirBotonera(fichaId, {tipo: 'abrir-botin'});
-    }, 700);
-  }, err => console.error('Error escuchando el botín:', err));
+/* Batalla terminada: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana (la de la ficha, en el iframe de la
+   Botonera, a pantalla casi completa) con lo que recibe cada uno y los despojos para elegir. El botón 🎁 del borde izquierdo (para todos, junto
+   a 🎭 y 🎲) la vuelve a abrir mientras haya botín publicado; con el botín cerrado, se apaga. Solo reacciona a un combate NUEVO (`numero`),
+   no al que ya estaba al entrar. Lo lee de campanas/<id>/combate/actual. */
+let combateMapa = null, combatePrimero = true, combateNumeroVisto = null, combateTimer = null;
+const combatePublicado = () => !!(combateMapa && combateMapa.estado === 'publicado');
+function actualizarBotonDespojosMapa(){
+  const b = $('#toolkit-botin');
+  if(!b) return;
+  b.disabled = !combatePublicado();
+  b.title = combatePublicado() ? (soyGM ? 'Despojos: ver qué tomó cada uno y convertir en despojos lo que nadie tomó' : 'Despojos: abrir la ventana de la batalla para elegir del botín') : 'Despojos: se habilita cuando el GM publica el botín de un combate';
 }
+function abrirBatallaDeJugador(){
+  const fichaId = fichaPrincipalId();
+  if(!fichaId){ toast('🎁 Hay botín del combate, pero no tenés un personaje para tomarlo'); return; }
+  abrirBotonera(fichaId, {tipo: 'abrir-botin'});
+}
+function escucharBotinParaJugador(){
+  if(!fbUsuario) return;
+  fbDb.doc(fbRutaCampana('combate/actual')).onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : null;
+    const nuevo = !combatePrimero && !!d && d.numero !== combateNumeroVisto;
+    const cerrada = combatePublicado() && d && d.estado !== 'publicado';
+    combatePrimero = false;
+    combateMapa = d;
+    if(d) combateNumeroVisto = d.numero;
+    actualizarBotonDespojosMapa();
+    $('#toolkit-botin').classList.toggle('pendiente', combatePublicado());
+    if(!soyGM && nuevo){
+      clearTimeout(combateTimer);
+      combateTimer = setTimeout(() => { toast('⚔ Batalla terminada'); abrirBatallaDeJugador(); }, 600);
+    }
+    if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
+  }, err => console.error('Error escuchando el fin del combate:', err));
+}
+$('#toolkit-botin').onclick = () => {
+  if(!combatePublicado()) return;
+  if(soyGM) abrirModoGM('botin'); else abrirBatallaDeJugador();
+};
 
 /* GM Tools adentro del mapa: el reporte de fin de combate (modo=finalizar) y el botín para despojar (modo=botin). */
 function abrirModoGM(modo){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
+  botonera = {herramienta: 'gm', fichaId: '', lista: false, pendiente: null, completa: true};
   ubicarBotoneraCapa();
-  botonera = {herramienta: 'gm', fichaId: '', lista: false, pendiente: null};
   $('#botonera-cargando-texto').textContent = modo === 'finalizar' ? 'Abriendo el reporte del combate…' : 'Abriendo el botín…';
   $('#botonera-cargando').hidden = false;
   marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=${modo}`);
 }
 $('#btn-finalizar-mapa').onclick = () => abrirModoGM('finalizar');
-$('#btn-botin-mapa').onclick = () => abrirModoGM('botin');
 
 /* Tokens automáticos (comun/tokens-auto.js): uno por creep de un grupo, o uno por personaje de jugador. */
 function centroDeLaVista(){
@@ -6907,6 +6934,7 @@ function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   capa.hidden = false;
+  botonera.completa = false;
   ubicarBotoneraCapa();
   centrarTokenDeBotonera('gm', creepId);
   // gm-tools ya cargado: solo cambia de creep (instantáneo).

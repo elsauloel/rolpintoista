@@ -13,6 +13,7 @@
 - [ ] Paso 6: auditoría de contenido por tandas — skills de clase (13 de 62) → habilidades de creeps → creeps base → armas naturales → trampas base → catálogo (~60 ítems) → pasivas y estados → manual.
 
 ## 2. Probar con la mesa abierta (nada de esto se probó con sesión iniciada y varios jugadores)
+- [ ] **Volver a pegar `firebase/firestore.rules`** (nueva colección `combate`): sin eso no se abre la ventana "Batalla terminada" ni se habilitan los botones 🎁.
 - [ ] Pegar `firebase/firestore.rules` en la consola (**Desarrollar y realizar pruebas** → Ctrl+A → pegar → Publicar) y verificar que quedó (buscar `estados` y `botin`).
 - [ ] Grupos de creeps, **tokens automáticos** (creeps y jugadores), **Finalizar combate y Botín desde el mapa**, botón **🎭** del borde izquierdo y **grupos vinculados a mapas**.
 - [ ] Reporte de fin de combate → recompensas en la ficha → **botín**: Sumar a la mochila, Comparar, **Despojar**.

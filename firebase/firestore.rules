@@ -286,6 +286,14 @@ service cloud.firestore {
         allow delete: if esGM(c);
       }
 
+      // Fin de un combate ("Batalla terminada"): combate/actual = {numero, estado: 'publicado' | 'cerrado', titulo, jugadores: [{fichaId,
+      // nombre, estado, xp, dde}], items, creado}. Lo escribe el GM al confirmar el reporte (publicado, o cerrado si no hay botín) y
+      // al despojar (cerrado); lo leen todos: de ahí sale la ventana con lo que recibe cada jugador y cuándo se habilitan los botones 🎁.
+      match /combate/{doc} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c) && doc == 'actual';
+      }
+
       // Tiendas guardadas con nombre (una por lugar o vendedor al que se
       // vuelve): {nombre, json, actualizado}. Solo el GM.
       match /tiendas/{id} {

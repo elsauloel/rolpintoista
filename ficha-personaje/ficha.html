@@ -1193,6 +1193,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 <style>
 /* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
+.dock-btn:disabled{opacity:.4;cursor:not-allowed}
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
 html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop){display:none!important}
 </style>
@@ -1206,7 +1207,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
   <button type="button" class="dock-btn" id="btn-equipo" title="Equipo: lo que llevás puesto y la mochila, para cambiar de un lado a otro"><span class="dock-ico">🛡</span><span class="dock-txt">Equipo</span></button>
-  <button type="button" class="dock-btn" id="btn-botin-loot" title="Botín: lo que soltaron los creeps y nadie tomó todavía" hidden><span class="dock-ico">🎁</span><span class="dock-txt">Botín <b id="botin-loot-n"></b></span></button>
+  <button type="button" class="dock-btn" id="btn-botin-loot" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate"><span class="dock-ico">🎁</span><span class="dock-txt">Despojos <b id="botin-loot-n"></b></span></button>
   <button type="button" class="dock-btn" id="btn-personajes" title="Ver y abrir los personajes de la partida"><span class="dock-ico">👥</span><span class="dock-txt">Personajes</span></button>
   <button type="button" class="dock-btn" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar"><span class="dock-ico">🏪</span><span class="dock-txt">Vendedor</span></button>
   <div class="dock-item">
@@ -1851,8 +1852,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 </div>
 
 <div class="scrim" id="scrim-botin-loot">
-  <div class="modal" style="max-width:640px">
-    <header><h3>🎁 Botín del combate</h3><button class="iconbtn" id="botin-loot-x">Cerrar</button></header>
+  <div class="modal" style="max-width:920px;width:94vw">
+    <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" id="botin-loot-x">Cerrar</button></header>
     <div class="body" id="botin-loot-body"></div>
   </div>
 </div>
@@ -7087,6 +7088,7 @@ function equipoModoAbrir(){
 }
 // El mapa abre el botín del combate en este iframe (mensaje 'abrir-botin').
 function botinModoAbrir(){
+  if(!combatePublicado() && !(combateActual && (combateActual.jugadores || []).length)){ toast('No hay botín publicado'); botoneraAvisarMapa('botonera-cerrada'); return; }
   document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
   botinLootCuerpo();
   $('#scrim-botin-loot').classList.add('open');
@@ -7100,13 +7102,35 @@ $('#btn-equipo').onclick = () => { renderEquipo(); $('#scrim-equipo').classList.
    Acá se lista lo que nadie tomó todavía: "Sumar a la mochila" lo reclama con una transacción (el primero se lo lleva) y lo
    agrega a la mochila; si la mochila está llena no entra. Lo que sobra, el GM lo convierte en despojos ("Despojar"). */
 let botinLoot = [];   // [{docId, nombre, item, despojos, origen}]
-let botinLootPrimero = true;
+/* Estado del combate (campanas/<id>/combate/actual): {numero, estado: 'publicado' | 'cerrado', jugadores: [{fichaId, nombre, estado, xp, dde}]}.
+   Un combate NUEVO abre solo la ventana "Batalla terminada" (dentro del mapa la abre el mapa); el botón 🎁 del dock solo se habilita con el botín
+   publicado; cuando el GM lo cierra (convierte en despojos lo que nadie tomó) la ventana se cierra y el botón se apaga. */
+let combateActual = null, combatePrimero = true, combateNumeroVisto = null;
+function combateEscuchar(){
+  if(!fbUsuario) return;
+  fbDb.doc(fbRutaCampana('combate/actual')).onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : null;
+    const nuevo = !combatePrimero && !!d && d.numero !== combateNumeroVisto;
+    const cerrada = !!combateActual && combateActual.estado === 'publicado' && !!d && d.estado !== 'publicado';
+    combatePrimero = false;
+    combateActual = d;
+    if(d) combateNumeroVisto = d.numero;
+    botinLootRender();
+    const abierta = $('#scrim-botin-loot').classList.contains('open');
+    if(nuevo && !document.documentElement.classList.contains('modo-botonera') && botinPuedeTomar()){
+      toast('⚔ Batalla terminada');
+      botinLootCuerpo();
+      $('#scrim-botin-loot').classList.add('open');
+    }else if(cerrada && abierta){
+      $('#scrim-botin-loot').classList.remove('open');
+      toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
+    }
+  }, err => console.error('Error escuchando el fin del combate:', err));
+}
+const combatePublicado = () => !!(combateActual && combateActual.estado === 'publicado');
 function botinLootEscuchar(){
   if(!fbUsuario) return;
   fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
-    // Botín NUEVO (no el que ya estaba al entrar): se abre solo la ventana, salvo dentro del mapa (ahí la abre el mapa).
-    const nuevo = !botinLootPrimero && snap.docChanges().some(ch => ch.type === 'added' && !ch.doc.data().tomadoPor);
-    botinLootPrimero = false;
     botinLoot = [];
     snap.docs.forEach(d => {
       const x = d.data();
@@ -7118,11 +7142,6 @@ function botinLootEscuchar(){
       botinLoot.push({docId: d.id, nombre: x.nombre || item.nombre, item, despojos: num(x.despojos), origen: x.origen || ''});
     });
     botinLootRender();
-    if(nuevo && !document.documentElement.classList.contains('modo-botonera') && botinPuedeTomar()){
-      toast('🎁 El GM abrió el botín del combate');
-      botinLootCuerpo();
-      $('#scrim-botin-loot').classList.add('open');
-    }
   }, err => console.error('Error escuchando el botín:', err));
 }
 function botinItemPorId(id){
@@ -7150,16 +7169,30 @@ function botinTextoItem(item){
 function botinLootRender(){
   const btn = $('#btn-botin-loot');
   if(btn){
-    btn.hidden = !botinLoot.length;
-    $('#botin-loot-n').textContent = botinLoot.length ? `(${botinLoot.length})` : '';
+    btn.disabled = !combatePublicado();   // solo con el botín publicado
+    $('#botin-loot-n').textContent = combatePublicado() && botinLoot.length ? `(${botinLoot.length})` : '';
   }
   if($('#scrim-botin-loot').classList.contains('open')) botinLootCuerpo();
 }
 function botinLootCuerpo(){
   const cap = num(S.caps.mochila), usado = mochilaUsada();
   const libres = cap > 0 ? Math.max(0, cap - usado) : null;
-  const puede = botinPuedeTomar();
+  const puede = botinPuedeTomar() && combatePublicado();
+  const yo = fichaVivo && fichaVivo.id;
+  const js = (combateActual && Array.isArray(combateActual.jugadores)) ? combateActual.jugadores : [];
+  const recompensas = js.length ? `<div style="margin-bottom:14px">
+      <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lo que recibe cada jugador</div>
+      <div style="display:flex;flex-direction:column;gap:4px">${js.map(j => `<div style="display:flex;gap:10px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,${j.fichaId === yo ? '.10' : '.04'});${j.fichaId === yo ? 'outline:1px solid var(--copper, #B87333)' : ''}">
+        <b style="flex:1">${esc(j.nombre)}${j.fichaId === yo ? ' <span class="hint">(vos)</span>' : ''}</b>
+        <span class="hint">${esc(j.estado || '')}</span>
+        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.xp))}</b> XP</span>
+        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.dde))}</b> DDE</span></div>`).join('')}</div>
+      <div class="hint" style="margin-top:4px">La experiencia y el oro se cargan solos en cada ficha.</div></div>` : '';
+  const cerrado = combateActual && combateActual.estado === 'cerrado' && botinLoot.length === 0
+    ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';
   $('#botin-loot-body').innerHTML = `
+    ${recompensas}${cerrado}
+    <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Despojos: elegí lo que te llevás</div>
     <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
       <span>Mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras${libres !== null ? ` · <b>${fmt(libres)}</b> libres` : ''}</span>
       <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
@@ -10788,6 +10821,7 @@ async function fbAlEntrar(){
   tiendaEstadoEscuchar();
   recompensasEscuchar();
   estadosEscuchar();
+  combateEscuchar();
   botinLootEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }

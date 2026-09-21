@@ -754,7 +754,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
       <span class="accesos-sep"></span>
       <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
-      <button type="button" class="iconbtn" id="btn-botin" title="Después de que los jugadores eligieron del botín: lo que nadie tomó se convierte en despojos y se reparte">🧰 Despojar</button>
+      <button type="button" class="iconbtn" id="btn-botin" disabled title="Se habilita cuando el botín está publicado. Ahí ves qué tomó cada uno y convertís en despojos lo que nadie tomó">🎁 Despojos</button>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Vuelve el contador de turnos a cero">↺ Reiniciar combate</button>
       <button type="button" class="iconbtn dk-catalogo" id="btn-catalogo" title="Catálogo de equipo para los creeps">⚔ Catálogo</button>
       <span class="accesos-sep"></span>
@@ -999,7 +999,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 
 <div class="scrim" id="scrim-botin-gm">
   <div class="modal" style="max-width:600px">
-    <header><h3>🧰 Despojar lo que nadie tomó</h3><button class="iconbtn" id="botin-gm-x">Cerrar</button></header>
+    <header><h3>⚔ Batalla terminada — despojos</h3><button class="iconbtn" id="botin-gm-x">Cerrar</button></header>
     <div class="body" id="botin-gm-cuerpo"></div>
     <footer>
       <button class="btn ghost" id="botin-gm-cerrar">Cerrar</button>
@@ -1009,8 +1009,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 </div>
 
 <div class="scrim" id="scrim-finalizar-combate">
-  <div class="modal" style="max-width:640px">
-    <header><h3>🏁 Fin del combate — ajustá lo que van a ver los jugadores</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
+  <div class="modal" style="max-width:980px;width:94vw">
+    <header><h3>⚔ Batalla terminada <span class="hint" style="font-weight:400;font-size:13px">— ajustá lo que van a ver los jugadores y confirmá</span></h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
     <div class="body" id="finalizar-combate-body" style="display:flex;flex-direction:column;gap:16px"></div>
     <footer>
       <button class="btn ghost" id="finalizar-combate-cerrar">Cerrar</button>
@@ -5639,12 +5639,12 @@ function renderReporteCombate(){
 
   $('#finalizar-combate-body').innerHTML = `
     <div>
-      <div class="reporte-seccion-titulo">Quiénes cobran</div>
+      <div class="reporte-seccion-titulo">Lo que recibe cada jugador</div>
       <div class="reporte-lista">${jugHtml}</div>
       <div class="hint" style="margin-top:4px">Destildá a quien no estuvo en el combate. En pie cobra el 100% de la XP; inconsciente, el 25% (redondeado hacia abajo); muerto, nada. El oro se reparte parejo.</div>
     </div>
     <div>
-      <div class="reporte-seccion-titulo">Experiencia y oro</div>
+      <div class="reporte-seccion-titulo">Cálculo: experiencia y oro de los creeps</div>
       <div class="reporte-lista">${filasHtml}</div>
       ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" id="finalizar-combate-contar-escapados" ${xpContarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)</label>` : ''}
       <div class="reporte-dividir" style="margin-top:8px">Ajuste del GM a la XP <input type="number" step="10" id="rep-xp-ajuste" value="${num(combateRep.xpAjuste)}" style="width:90px"> <span class="hint">(sumá o restá por circunstancias de la pelea)</span></div>
@@ -5653,7 +5653,7 @@ function renderReporteCombate(){
       <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
     </div>
     <div>
-      <div class="reporte-seccion-titulo">Botín (los jugadores lo toman con "Sumar a la mochila")</div>
+      <div class="reporte-seccion-titulo">Despojos: equipos y trofeos que los jugadores van a poder elegir</div>
       <div class="reporte-loot-lista">${lootHtml}</div>
       <div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="rep-extra-nombre" placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" id="rep-extra-precio" placeholder="Precio" style="width:90px"><button type="button" class="btn" id="rep-extra-add">+ Sumar</button></div>
     </div>`;
@@ -5709,6 +5709,8 @@ async function publicarRecompensas(){
     rp.porJugador.forEach(({j, xp, dde}) => {
       batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: 0, estado: j.estado, aplicada: false, creado: ts});
     });
+    batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {numero: Date.now(), estado: items.length ? 'publicado' : 'cerrado', titulo: 'Batalla terminada', items: items.length, creado: ts,
+      jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde}) => ({fichaId: j.id, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100}))});
     items.forEach(i => {
       batch.set(fbDb.collection(fbRutaCampana('botin')).doc(), {nombre: String(i.nombre).slice(0, 80), json: JSON.stringify(i.template), origen: String(i.origen).slice(0, 80),
         precioCompra: num(i.precioCompra), despojos: Math.ceil(num(i.precioCompra) / 4), tomadoPor: '', tomadoNombre: '', creado: ts});
@@ -5720,7 +5722,7 @@ async function publicarRecompensas(){
     combateRep = nuevoCombateRep();
     renderAll();
     $('#scrim-finalizar-combate').classList.remove('open');
-    toast(items.length ? 'Confirmado ✓ — los jugadores ven la ventana del botín en el mapa; lo que quede lo despojás con 🧰 Despojar' : 'Confirmado ✓ — la XP y el oro se cargan solos en las fichas');
+    toast(items.length ? 'Confirmado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, cerrás con 🎁 Despojos' : 'Confirmado ✓ — la XP y el oro se cargan solos en las fichas');
   }catch(err){
     console.error('No se pudieron publicar las recompensas:', err);
     combateRep.publicando = false;
@@ -5870,7 +5872,24 @@ function botinEscuchar(){
     if($('#scrim-botin-gm').classList.contains('open')) renderBotinGM();
   }, err => console.error('No se pudo escuchar el botín:', err));
 }
+/* Estado del combate (campanas/<id>/combate/actual): el botón 🎁 Despojos solo se habilita con el botín publicado. */
+let combateActual;   // undefined = todavía no se leyó; null = no hay combate
+function combateEscuchar(){
+  fbDb.doc(fbRutaCampana('combate/actual')).onSnapshot(snap => {
+    combateActual = snap.exists ? snap.data() : null;
+    actualizarBotonDespojos();
+    if(!(combateActual && combateActual.estado === 'publicado') && $('#scrim-botin-gm').classList.contains('open') && !botinGM.ocupado) $('#scrim-botin-gm').classList.remove('open');
+  }, err => console.error('Error escuchando el estado del combate:', err));
+}
+function actualizarBotonDespojos(){
+  const b = $('#btn-botin');
+  if(b) b.disabled = !(combateActual && combateActual.estado === 'publicado');
+}
 async function abrirBotinGM(){
+  if(combateActual === undefined && fbDb){
+    try{ const s = await fbDb.doc(fbRutaCampana('combate/actual')).get(); combateActual = s.exists ? s.data() : null; }catch(err){ combateActual = null; }
+  }
+  if(!(combateActual && combateActual.estado === 'publicado')){ toast('No hay botín publicado: se habilita cuando confirmás el fin de un combate con ítems'); return; }
   botinEscuchar();
   $('#scrim-botin-gm').classList.add('open');
   renderBotinGM();
@@ -5915,6 +5934,7 @@ async function despojarBotin(){
     const batch = fbDb.batch();
     if(cada > 0) elegidos.forEach(j => batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp: 0, dde: 0, despojos: cada, estado: 'despojos', aplicada: false, creado: ts}));
     botinGM.docs.forEach(d => batch.delete(fbDb.collection(fbRutaCampana('botin')).doc(d.id)));
+    batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
     await batch.commit();
     await mesaLineaVerde('🧰 Despojos del combate', `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} despojos a ${elegidos.map(j => j.nombre).join(', ')}`);
     toast(`Despojado ✓ — +${fmt(cada)} despojos para cada uno`);
@@ -6760,7 +6780,7 @@ function gmAlEntrar(){
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); }
 }
 
 /* ---------- Mantenimiento del GM ----------

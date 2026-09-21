@@ -7206,6 +7206,7 @@ function botinLootCuerpo(){
           <div style="font-weight:600">${esc(b.nombre)}${b.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
           <div class="hint">≈ ${fmt(b.despojos)} despojos${b.origen ? ' · de ' + esc(b.origen) : ''}${info && info.ocupado ? ' · slot ocupado' : ''}</div>
         </div>
+        <button type="button" class="mini" data-view="catalogo:${esc(b.item.id)}">Ver</button>
         ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(b.item.id)}">Comparar</button>` : ''}
         <button type="button" class="btn primary" data-botin-tomar="${esc(b.docId)}"${puede ? '' : ' disabled'}>Sumar a la mochila</button>
       </div>`;

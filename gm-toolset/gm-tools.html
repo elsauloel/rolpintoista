@@ -3641,7 +3641,7 @@ function textoBusquedaDeGM(item){
 }
 
 function equipoItemHtml(item, idx){
-  const esArma = item.tipoItem.startsWith('arma_');
+  const esArma = String(item.tipoItem).startsWith('arma_');
   const esCons = item.tipoItem === 'consumibles';
   const statTxt = esArma
     ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`
@@ -3666,9 +3666,11 @@ function equipoItemHtml(item, idx){
 // Tarjeta de "Ver" de un ítem del catálogo — mismo formato que la de
 // vendor-generator.html/ficha.html, con imagen y descripción narrativa
 // si el ítem las trae.
-function verItemGM(idx){
-  const item = CATALOGO_EQUIPO[idx];
+function verItemGM(idx){ verItemDatos(CATALOGO_EQUIPO[idx]); }
+// Ventana de detalles de un ítem (del catálogo, o una plantilla del botín).
+function verItemDatos(item){
   if(!item) return;
+  item = {tipoItem: 'otros', ...item};
   const linea = (label, val) => (val === '' || val === null || val === undefined)
     ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
   const esArma = item.tipoItem.startsWith('arma_');
@@ -3679,7 +3681,9 @@ function verItemGM(idx){
   if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
   if(item.def) L.push(linea('Defensa', `${num(item.def)>0?'+':''}${fmt(num(item.def))}`));
   L.push(linea('Peso', fmt(num(item.peso))));
-  L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE`));
+  L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE${item.estimado ? ' (estimado por comparación con el catálogo)' : ''}`));
+  if(item.trofeo) L.push(linea('Trofeo', 'No se equipa: se vende en una tienda o se convierte en despojos'));
+  if(esArma && (item.efectosGolpe || []).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
   if(esCons) L.push(linea('Consumible', item.curahp ? `${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP al consumir` : 'Sin efecto numérico'));
   const otros = (item.mods || []).filter(m => m.stat && m.stat !== 'def');
   if(otros.length) L.push(linea('Otros modificadores', otros.map(m => `${STAT_LABEL_GM[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
@@ -5622,7 +5626,7 @@ function renderReporteCombate(){
     </div>`).join('');
 
   const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${combateRep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
-      <input type="checkbox" data-rep-item="${esc(i.clave)}"${combateRep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span></label>`;
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${combateRep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
   const conItems = filas.filter(f => f.items.length);
   const extras = itemsExtraDelReporte();
   const lootHtml = (conItems.length || extras.length)
@@ -5664,6 +5668,11 @@ function renderReporteCombate(){
     </div>`;
 
   const b = $('#finalizar-combate-body');
+  b.querySelectorAll('[data-rep-ver]').forEach(x => x.onclick = e => {
+    e.preventDefault(); e.stopPropagation();
+    const it = [...rep.filas.flatMap(f => f.items), ...itemsExtraDelReporte()].find(i => i.clave === x.dataset.repVer);
+    if(it) verItemDatos(it.template);
+  });
   b.querySelectorAll('[data-rep-item]').forEach(c => c.onchange = () => { if(c.checked) combateRep.quitados.delete(c.dataset.repItem); else combateRep.quitados.add(c.dataset.repItem); renderReporteCombate(); });
   b.querySelectorAll('[data-rep-jug]').forEach(c => c.onchange = () => { const j = combateRep.jugadores.find(x => x.id === c.dataset.repJug); if(j) j.incluido = c.checked; renderReporteCombate(); });
   $('#rep-xp-ajuste').onchange = e => { combateRep.xpAjuste = num(e.target.value); renderReporteCombate(); };
@@ -5919,12 +5928,18 @@ function renderBotinGM(){
   const cada = n ? Math.ceil(total / n) : 0;
   $('#botin-gm-cuerpo').innerHTML = `
     <div class="reporte-seccion-titulo">Sin tomar (${libres.length})</div>
-    <div class="reporte-loot-items">${libres.length ? libres.map(d => `<span class="reporte-loot-item">${esc(d.nombre)} <span class="reporte-loot-precio">${fmt(num(d.despojos))} despojos</span></span>`).join('') : '<span class="hint">No queda nada sin tomar.</span>'}</div>
+    <div class="reporte-loot-items">${libres.length ? libres.map(d => `<span class="reporte-loot-item">${esc(d.nombre)} <span class="reporte-loot-precio">${fmt(num(d.despojos))} despojos</span> <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('') : '<span class="hint">No queda nada sin tomar.</span>'}</div>
     ${tomados.length ? `<div class="reporte-seccion-titulo" style="margin-top:12px">Ya tomados (${tomados.length})</div>
-      <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')}</span>`).join('')}</div>` : ''}
+      <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')} <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('')}</div>` : ''}
     <div class="reporte-seccion-titulo" style="margin-top:14px">Despojar: ${fmt(total)} despojos${n ? ` → ${fmt(cada)} c/u (hacia arriba)` : ''}</div>
     ${jug === null ? '<div class="hint">Cargando personajes…</div>' : jug.map(j => `<label class="reporte-fila" style="cursor:pointer;gap:8px;align-items:center"><input type="checkbox" data-botin-jug="${esc(j.id)}"${botinGM.incluidos.has(j.id) ? ' checked' : ''}><span class="reporte-nombre">${esc(j.nombre)}</span></label>`).join('')}
     <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá <b>Despojar</b>: lo que queda se convierte en despojos, se reparte y se carga solo en las fichas, y el botín se cierra del todo.</div>`;
+  $('#botin-gm-cuerpo').querySelectorAll('[data-botin-ver]').forEach(x => x.onclick = () => {
+    const d = botinGM.docs.find(y => y.id === x.dataset.botinVer);
+    let it = null;
+    try{ it = JSON.parse((d && d.json) || 'null'); }catch(e){}
+    if(it) verItemDatos({...it, nombre: it.nombre || d.nombre});
+  });
   $('#botin-gm-cuerpo').querySelectorAll('[data-botin-jug]').forEach(c => c.onchange = () => { if(c.checked) botinGM.incluidos.add(c.dataset.botinJug); else botinGM.incluidos.delete(c.dataset.botinJug); renderBotinGM(); });
   $('#botin-gm-despojar').disabled = botinGM.ocupado || !botinGM.docs.length || !n;
 }

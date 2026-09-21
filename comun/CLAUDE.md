@@ -25,7 +25,7 @@ versión parecida en más de una, es candidato a juntar.
   titulo, alElegir, alCrearDeCero})` y `Biblioteca.guardar({tipo, datos,
   nombre, nivel})`; `Biblioteca.abrir` acepta `base` (entradas del código que siempre están, aunque Firebase falle) y `subtitulo(entrada)`. Crea su propio HTML. Depende de `sesion.js`. La usan `ficha.html` (pasivas) y
   `gm-tools.html` (creeps).
-- **`creeps-base.js`** — `CREEPS_BASE`: 120 creeps (60 por escenario + 10 goblins + 20 debuffers + 30 humanos, a auditar), en la biblioteca de creeps de gm-tools.
+- **`creeps-base.js`** — `CREEPS_BASE`: 173 creeps (60 por escenario + 20 goblins + 14 kobolds + 15 hombres cabra + 20 debuffers + 30 humanos + tramperos/sigilosos, a auditar), en la biblioteca de creeps de gm-tools.
 - **`pasivas.js`** — `PASIVAS_BASE`: catálogo base de pasivas de Job (bonos a stats con escalones y regeneración de HP). La ficha lo ofrece en "+ Pasiva → catálogo"; se suma a las aprobadas desde Firebase (`biblioteca_pasivas`).
 - **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
   partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida

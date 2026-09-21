@@ -34,7 +34,7 @@
 
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
-- [ ] Los **134 creeps base** (todos dicen "(auditar)") y sus recompensas.
+- [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.
 - [ ] Las **66 armas naturales**: potencia y porcentajes de los efectos.
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".

@@ -160,7 +160,7 @@
   const JEFES = new Set(['Reina de los kobolds', 'Rey de la tribu goblin', 'Sumo Sacerdote del Vacío', 'Reina de las hadas oscuras',
     'Gigante de escarcha', 'Dragón de ceniza joven', 'Titán de granito', 'Hidra de zarzas', 'Avatar de la Estrella Negra', 'Ent ancestral',
     'Coloso de mineral', 'Jefe de la banda', 'Jefe de guerra bárbaro', 'Capitán de la guardia', 'Capitán pirata', 'Sumo profeta del culto',
-    'Cazarrecompensas legendario']);
+    'Cazarrecompensas legendario', 'Patriarca cabruno']);
   // Armas que aunque el creep sea "natural" son un objeto (se sueltan como ítem).
   const ARMAS_OBJETO = new Set(['Alabarda de granito', 'Lanza de obsidiana', 'Ballesta fantasma', 'Báculo de luz']);
   const TIPOS_NATURALES = new Set(['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto']);
@@ -839,6 +839,189 @@
     at('Flecha de trampero', 'Una flecha a distancia.', 'M'),
     [tr('Red de cazador', 'Una red en el camino: {T} por el tirón y quien la pise queda Inmovilizado 1 turno (a mano).', 2, 'L'), 4],
     'Cobra por presa viva.');
+
+  /* ================= TRIBUS Y CLANES (2026-09-21): más variedad de kobolds, goblins y hombres cabra =================
+     Cada uno con un rol distinto y mecánicas del juego distintas: sigilo, trampas (con y sin daño), estados propios
+     (Espinas, Regeneración, Blindado, Escudo mágico, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
+     aplican solos (Veneno, Quemado, Rengo, Cegado, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito…). */
+  // Un ataque o habilidad que además deja un estado sobre el objetivo (se aplica solo al usarla, o al pisar la trampa).
+  const ap = (sp, estado) => ({...sp, aplica: estado});
+
+  /* ---- Kobolds de las minas abandonadas (14: 3 / 3 / 3 / 3 / 2 por nivel; se suman a los que ya había) ---- */
+  const KB = ['kobold', 'tribu kobold'];
+  cr('minas', 1, 'Kobold rascador', 'rapido', 'humanoide', 'Cuchillo de rascar',
+    at('Rasguño cobarde', 'Un tajo rápido y a esconderse.', 'L'),
+    [es('Por la grieta', 'Se cuela en una grieta de la pared y desaparece de la vista.', 2, 'Sigilo', 'buff', 0), 3],
+    'Vive en las paredes y solo sale cuando nadie mira.', KB);
+  cr('minas', 1, 'Kobold farolero', 'apoyo', 'humanoide', 'Farol de aceite',
+    ap(zo('Aceite hirviendo', 'Salpica aceite caliente del farol: daño y el objetivo queda Quemado 2 turnos.', 1, 'L'), A('Quemado', 2, {}, -2)),
+    [ap(ta('Destello de farol', 'Levanta el farol con un fogonazo: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 2), A('Cegado', 2, {eva: -3})), 4],
+    'Guía a los suyos por las galerías con una luz que quema.', KB);
+  cr('minas', 1, 'Kobold escudero de barril', 'tanque', 'humanoide', 'Palo con clavos',
+    bu('Tapa de barril', 'Se cubre con una tapa de barril: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Bien agachado', 'Se hace una bolita bajo la tapa: ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3), 4],
+    'Más tapa que kobold.', KB);
+
+  cr('minas', 2, 'Kobold picador', 'brutal', 'humanoide', 'Pico de mina',
+    at('Picotazo', 'Un golpe de pico.', 'M'),
+    [ap(zo('Pico en la rodilla', 'Pico bajo: daño y el objetivo queda Rengo.', 2, 'M'), A('Rengo')), 4],
+    'Pica primero a las piernas, porque es lo que alcanza.', KB);
+  cr('minas', 2, 'Kobold curandero de hongos', 'apoyo', 'humanoide', 'Cuchara de palo',
+    cu('Hongo curativo', 'Se come un hongo de galería y se cura.', 1, 3),
+    [es('Caldo de la tribu', 'Un caldo espeso: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 2}), 4],
+    'Su sopa cura casi todo y sabe a pies.', KB);
+  cr('minas', 2, 'Kobold campanero', 'rapido', 'humanoide', 'Cuchillo de cocina',
+    at('Cuchillada', 'Un tajo rápido.', 'L'),
+    [ts('Cordel de campanas', 'Tiende un cordel con latas en una casilla: al pisarlo suena en la Mesa y los kobolds se ponen en guardia (a mano). Es una trampa sin daño.', 1), 3],
+    'Nadie se acerca a la madriguera sin que suene.', KB);
+
+  cr('minas', 3, 'Kobold corredor de túneles', 'rapido', 'humanoide', 'Estoque de aguja',
+    at('Estocada corta', 'Una estocada rápida.', 'M'),
+    [es('Carrera loca', 'Un torrente de energía: +1 No2 máximo.', 1, 'Hypeado', 'buff', 3), 4],
+    'Conoce cada atajo y jamás se queda quieto.', KB);
+  cr('minas', 3, 'Kobold coraza de cristal', 'tanque', 'humanoide', 'Martillo de herrero',
+    at('Martillazo', 'Un golpe pesado.', 'M'),
+    [es('Piel de mineral', 'Se incrusta cristales en la piel: devuelve daño en cuerpo a cuerpo (se cobra a mano) y gana +2 Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 2}}), 5],
+    'Se pegó cristales por todos lados y ahora nadie se le acerca.', KB);
+  cr('minas', 3, 'Kobold hechicero de la llama', 'mago', 'humanoide', 'Vara de escamas',
+    at('Llamarada', 'Fuego mágico a distancia.', 'M'),
+    [ap(zo('Bola de fuego draconiana', 'Explosión en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    'Jura descender de un dragón y nadie se lo discute.', KB);
+
+  cr('minas', 4, 'Kobold tejedor de redes', 'rango', 'humanoide', 'Red con plomos',
+    ap(at('Red pesada', 'Lanza una red con plomos: daño y el objetivo queda Inmovilizado 1 turno.', 'M'), A('Inmovilizado', 1)),
+    [ap(ts('Red del techo', 'Cuelga una red oculta del techo en una casilla: al pisarla, el que cae queda Inmovilizado 1 turno. Es una trampa sin daño.', 2), A('Inmovilizado', 1)), 4],
+    'Caza murciélagos, ratas y, ahora, aventureros.', KB);
+  cr('minas', 4, 'Kobold capataz de la mina', 'brutal', 'humanoide', 'Látigo de cuero',
+    at('Latigazo de capataz', 'Un latigazo seco.', 'M'),
+    [bu('¡A picar, gusanos!', 'Azuza a los suyos: él gana +3 Daño y +1 No2 2 turnos (los kobolds cercanos también, a mano).', 2, {dmg: 3, nitros: 1}, 2), 5],
+    'Manda con un látigo y con un chillido que se oye en toda la galería.', KB);
+  cr('minas', 4, 'Kobold devoto del dragón', 'apoyo', 'humanoide', 'Cetro de escama',
+    bu('Escamas de fe', 'Reza a su dragón: +3 Res.Mg hasta el final de su turno.', 1, {resmg: 3}, 1),
+    [es('Bendición escamosa', 'Una barrera mágica en forma de escamas absorbe daño de cualquier fuente.', 3, 'Escudo mágico', 'buff', 3), 5],
+    'Reza tan fuerte que a veces le contestan.', KB);
+
+  cr('minas', 5, 'Kobold guardia real', 'tanque', 'humanoide', 'Alabarda de cobre',
+    at('Golpe de escolta', 'Un golpe pesado con la alabarda.', 'H'),
+    [es('Guardia de la reina', 'Se planta frente a su reina: no lo aturden ni lo agotan.', 2, 'Inmunidad a CC', 'buff', 3), 5],
+    'Solo se separa de la reina para ir a comer.', KB);
+  cr('minas', 5, 'Kobold llameante', 'brutal', 'humanoide', 'Garras al rojo',
+    ap(at('Zarpazo de brasa', 'Garras al rojo: daño y el objetivo queda Quemado 2 turnos.', 'H'), A('Quemado', 2, {}, -2)),
+    [zo('Aliento de dragón', 'Vomita fuego en un cono de 3 casillas: daño enorme a todos los que estén en el cono (a mano).', 3, 'H'), 6],
+    'Un kobold que se tragó una brasa del dragón y no se le fue nunca.', KB);
+
+  /* ---- Más goblins del bosque (10: 2 por nivel; se suman a los que ya había) ---- */
+  cr('bosque', 1, 'Goblin cazador de ranas', 'rango', 'humanoide', 'Cerbatana',
+    ap(at('Dardo pegajoso', 'Un dardo con resina de rana: daño y el objetivo queda Ralentizado (-2 No2) 1 turno.', 'L'), A('Ralentizado', 1, {nitros: -2})),
+    [es('Entre los helechos', 'Se mete entre los helechos y desaparece de la vista.', 2, 'Sigilo', 'buff', 0), 3],
+    'Pasa el día acuclillado esperando que alguien pase.', TG);
+  cr('bosque', 1, 'Goblin portaescudo', 'tanque', 'humanoide', 'Garrote de raíz',
+    bu('Escudo de corteza', 'Se tapa con una corteza: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Corteza espinosa', 'Su escudo de corteza tiene espinas: devuelve daño en cuerpo a cuerpo (se cobra a mano).', 2, 'Espinas', 'buff', 3), 4],
+    'Lo peor que puede hacerle es pegarle.', TG);
+
+  cr('bosque', 2, 'Goblin envenenador de puntas', 'debuffer', 'humanoide', 'Puñal de espina',
+    ap(at('Punta untada', 'Una puñalada con veneno de hongo: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [ap(tr('Zarzal envenenado', 'Siembra zarzas venenosas en una casilla: {T} al que las pise, que queda Envenenado.', 3, 'M'), A('Veneno')), 5],
+    'Sus armas nunca se limpian, a propósito.', TG);
+  cr('bosque', 2, 'Goblin sisador', 'rapido', 'humanoide', 'Daga chica',
+    at('Manotazo', 'Un golpe rápido y una mano larga.', 'L'),
+    [bu('Sale corriendo', 'Le roba un objeto barato al objetivo y escapa (el robo, a mano): +4 Evasión hasta su próximo turno.', 2, {eva: 4}, 1), 4],
+    'Todo lo que brilla es suyo, incluso lo que no brilla.', TG);
+
+  cr('bosque', 3, 'Goblin apicultor', 'debuffer', 'humanoide', 'Panal en honda',
+    at('Panal lanzado', 'Lanza un panal enojado.', 'M'),
+    [ap(zo('Enjambre', 'Nube de avispas en flor de 1: daño y los afectados quedan Pajaritos hasta el final de su próximo turno.', 3, 'M'), A('Pajaritos', 1)), 4],
+    'Las avispas lo quieren; a los demás, no.', TG);
+  cr('bosque', 3, 'Goblin arquero de copa', 'rango', 'humanoide', 'Arco de rama',
+    at('Flecha desde la copa', 'Una flecha larga desde lo alto.', 'M'),
+    [es('Ojo de cazador', 'Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2), 4],
+    'Vive en los árboles y solo baja a buscar flechas.', TG);
+
+  cr('bosque', 4, 'Goblin quiebrahuesos', 'brutal', 'humanoide', 'Maza de tronco',
+    ap(at('Mazazo', 'Un mazazo brutal: daño y la armadura del objetivo queda Rota.', 'H'), A('Armadura rota')),
+    [es('Piel de sapo', 'Su piel gruesa cierra las heridas solas: inmune al sangrado.', 1, 'Coagulación extrema', 'buff', 3), 4],
+    'Le encanta el sonido que hacen las armaduras al romperse.', TG);
+  cr('bosque', 4, 'Goblin sembrador de zarzas', 'rapido', 'humanoide', 'Hoz de mano',
+    at('Hozazo', 'Un tajo rápido con la hoz.', 'M'),
+    [ap(tr('Zarzal traicionero', 'Deja un zarzal oculto en una casilla: {T} al que lo pise, que queda Rengo.', 3, 'M'), A('Rengo')), 5],
+    'Donde él pasa, el bosque se llena de espinas.', TG);
+
+  cr('bosque', 5, 'Goblin guardia de huesos', 'tanque', 'humanoide', 'Escudo de costillas',
+    ap(at('Golpe de escudo de hueso', 'Un golpe pesado con el escudo: daño y el objetivo pierde 1 No2 un turno.', 'H'), A('Golpe de escudo', 1, {nitros: -1})),
+    [es('Huesos que se sueldan', 'Sus huesos se sueldan solos: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 3}), 5],
+    'Protege al rey con una armadura que fue de su abuelo.', TG);
+  cr('bosque', 5, 'Goblin bruja del pantano', 'debuffer', 'humanoide', 'Cucharón de caldero',
+    at('Rayo pantanoso', 'Un rayo verde de barro.', 'H'),
+    [ap(zo('Maldición del pantano', 'Niebla verde en flor de 2: daño y los afectados quedan Malditos (-2 Res.Mg, -1 Defensa) 3 turnos.', 3, 'H'), A('Maldito', 3, {resmg: -2, def: -1})), 6],
+    'Cocina maldiciones con lo que encuentra en el fondo del pantano.', TG);
+
+  /* ---- Hombres cabra de las montañas (raza nueva: 14, de nivel 1 a 5; etiquetas 'hombre cabra' y 'clan cabruno') ---- */
+  const HC = ['hombre cabra', 'clan cabruno'];
+  cr('montañas', 1, 'Hombre cabra escalador', 'rapido', 'humanoide', 'Lanza de pastor',
+    at('Cornada corta', 'Un cabezazo rápido: empuja 1 casilla al objetivo (a mano).', 'L'),
+    [bu('Paso de cabra', 'Salta 4 casillas sobre obstáculos (a mano): +3 Evasión hasta su próximo turno.', 2, {eva: 3}, 1), 4],
+    'Sube por paredes donde otros ni siquiera pisarían.', HC);
+  cr('montañas', 1, 'Hombre cabra pastor con honda', 'rango', 'humanoide', 'Honda de pastor',
+    at('Piedra de pastor', 'Una piedra lanzada con honda.', 'L'),
+    [ap(ta('Silbido de pastor', 'Un silbido agudo que taladra los oídos: el objetivo queda Pajaritos hasta el final de su próximo turno.', 2), A('Pajaritos', 1)), 4],
+    'Cuida su rebaño con puntería y con muy mal carácter.', HC);
+  cr('montañas', 1, 'Hombre cabra cornudo', 'brutal', 'humanoide', 'Cuernos con puntas',
+    at('Cabezazo', 'Embiste con los cuernos.', 'L'),
+    [zo('Embestida de tres pasos', 'Carga en línea recta hasta 3 casillas: daño y empuja 2 casillas al objetivo (a mano).', 2, 'M'), 4],
+    'Discute con la cabeza, siempre con la cabeza.', HC);
+
+  cr('montañas', 2, 'Hombre cabra flautista', 'apoyo', 'humanoide', 'Flauta de hueso',
+    bu('Marcha brava', 'Toca una marcha: él gana +2 Daño y +1 No2 hasta el final de su turno (los del clan cercanos también, a mano).', 1, {dmg: 2, nitros: 1}, 1),
+    [ap(ta('Canción de cuna', 'Una nana lenta y dulce: el objetivo queda Stun hasta el final de su próximo turno.', 3), A('Stun', 1)), 5],
+    'Toca lo que el clan necesita: ánimo o sueño.', HC);
+  cr('montañas', 2, 'Hombre cabra guardián del risco', 'tanque', 'humanoide', 'Escudo de piedra',
+    ap(at('Golpe de escudo', 'Un golpe con el escudo de piedra: daño y el objetivo pierde 1 No2 un turno.', 'M'), A('Golpe de escudo', 1, {nitros: -1})),
+    [es('Pies firmes', 'Se planta en el sendero: no lo aturden ni lo agotan.', 2, 'Inmunidad a CC', 'buff', 3), 5],
+    'Nadie pasó por su sendero sin que él quisiera.', HC);
+  cr('montañas', 2, 'Hombre cabra derrumbador', 'rango', 'humanoide', 'Honda de peñascos',
+    at('Peñasco lanzado', 'Una piedra grande lanzada con honda.', 'M'),
+    [tr('Peñasco colgado', 'Deja un peñasco en equilibrio sobre una casilla: cae con {T} a quien pase por debajo.', 3, 'H'), 5],
+    'Le encanta que las piedras se caigan solas, con ayuda.', HC);
+
+  cr('montañas', 3, 'Hombre cabra vigía de cumbre', 'rango', 'humanoide', 'Arco largo de cuerno',
+    at('Flecha del vigía', 'Una flecha larga y certera.', 'M'),
+    [ap(zo('Flecha de humo', 'Flecha con humo: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 2, 'M'), A('Cegado', 2, {eva: -2})), 4],
+    'Ve todo el valle desde arriba y avisa con un balido.', HC);
+  cr('montañas', 3, 'Hombre cabra forjador', 'brutal', 'humanoide', 'Martillo de forja',
+    ap(at('Martillo caliente', 'Un martillazo al rojo: daño y el objetivo queda Quemado 2 turnos.', 'M'), A('Quemado', 2, {}, -2)),
+    [bu('Forjado en fuego', 'Se templa con el calor de la forja: +3 Defensa y +3 Daño 2 turnos.', 2, {def: 3, dmg: 3}, 2), 5],
+    'Golpea el metal igual que a los invitados.', HC);
+  cr('montañas', 3, 'Hombre cabra chamán del viento', 'mago', 'humanoide', 'Bastón con cuernos',
+    at('Ráfaga cortante', 'Viento afilado como una cuchilla.', 'M'),
+    [zo('Vendaval', 'Viento huracanado en flor de 2: daño y empuja 2 casillas a los golpeados (a mano).', 3, 'H'), 5],
+    'Habla con el viento y a veces el viento le hace caso.', HC);
+
+  cr('montañas', 4, 'Hombre cabra ariete', 'tanque', 'humanoide', 'Casco de hierro con cuernos',
+    at('Embestida', 'Carga con la cabeza: daño y empuja 1 casilla al objetivo (a mano).', 'M'),
+    [ap(zo('Choque de ariete', 'Un cabezazo con todo el cuerpo: daño y el objetivo queda Stun hasta el final de su próximo turno.', 3, 'H'), A('Stun', 1)), 6],
+    'Ya derribó tres puertas, dos murallas y una montaña chica.', HC);
+  cr('montañas', 4, 'Hombre cabra curandero de las cumbres', 'apoyo', 'humanoide', 'Cayado de espino',
+    cu('Té de cumbres', 'Bebe una infusión de hierbas de altura y se cura.', 1, 5),
+    [es('Bendición de la montaña', 'Un aire puro le cierra las heridas: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 3}), 5],
+    'Recolecta hierbas que solo crecen donde nadie llega.', HC);
+  cr('montañas', 4, 'Hombre cabra acechador de nieve', 'rapido', 'humanoide', 'Cuchillo de hielo',
+    at('Cornada por la espalda', 'Un ataque rápido; +3 al daño si el objetivo no lo vio (a mano).', 'H'),
+    [es('Ventisca a su favor', 'Se pierde entre la ventisca y desaparece de la vista.', 2, 'Sigilo', 'buff', 0), 3],
+    'Se pinta de blanco y espera a que pase alguien.', HC);
+
+  cr('montañas', 5, 'Patriarca cabruno', 'brutal', 'humanoide', 'Cetro de cuernos',
+    at('Cornada del patriarca', 'Un golpe demoledor.', 'H'),
+    [zo('Alud', 'Hace caer un alud en flor de 3: daño enorme y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
+    'El más viejo, el más terco y el que decide todo en el clan.', HC);
+  cr('montañas', 5, 'Hombre cabra oráculo de las cumbres', 'debuffer', 'humanoide', 'Bastón de tormenta',
+    at('Rayo de tormenta', 'Un rayo desde las nubes.', 'H'),
+    [ap(ta('Maldición del oráculo', 'Ve el peor futuro de un enemigo y se lo dice: queda Maldito (-2 Res.Mg, -1 Defensa) 3 turnos.', 3), A('Maldito', 3, {resmg: -2, def: -1})), 5],
+    'Sus profecías casi siempre acaban mal, para el que las escucha.', HC);
+  cr('montañas', 5, 'Hombre cabra francotirador', 'rango', 'humanoide', 'Arco de cuerno de carnero',
+    at('Flecha certera', 'Un disparo perfecto.', 'H'),
+    [tr('Alud en el paso', 'Deja una carga de rocas lista en el sendero: al pisarla se desata un alud en flor de 1 con {T}.', 4, 'H'), 6],
+    'Nunca falla; a veces solo avisa.', HC);
 
   window.CREEPS_BASE = lista;
   window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};

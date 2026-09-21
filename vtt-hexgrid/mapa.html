@@ -399,18 +399,22 @@ aside{
 }
 .bit-tab-x:hover{background:var(--danger);color:#fff}
 /* Con la caja abierta, el orden de turnos se corre para no quedar tapado. */
-#iniciativa{transition:left .22s ease}
-#lienzo-caja.toolkit-abierto #iniciativa{left:232px}
+#iniciativa:not(.movida){transition:left .22s ease}
+#lienzo-caja.toolkit-abierto #iniciativa:not(.movida){left:284px}
 /* Tablero de iniciativa (estilo Roll20): flotante, semitransparente y
    plegable. Solo se ve en modo combate. */
 #iniciativa{
-  position:absolute;left:12px;top:12px;z-index:22;width:230px;max-width:calc(100% - 24px);
+  position:absolute;left:64px;top:12px;z-index:22;width:230px;max-width:calc(100% - 76px);
   background:rgba(26,20,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);
   border-radius:var(--r);box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;overflow:hidden
 }
 #iniciativa:hover{background:rgba(26,20,24,.95)}
+/* Achicado: medio transparente (se opaca al pasar el mouse); se arrastra desde la cabecera. */
+#iniciativa{transition:opacity .18s ease}
+#iniciativa.plegado{opacity:.55}
+#iniciativa.plegado:hover,#iniciativa.arrastrando{opacity:1}
 #iniciativa-cab{
-  display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--brass);border-bottom:1px solid var(--line-soft)
 }
 #iniciativa.plegado #iniciativa-cab{border-bottom:none}
@@ -2472,6 +2476,7 @@ function renderIniciativa(){
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>'
     : '';
   conectarIniciativa();
+  iniciativaEncuadrar();
 }
 
 function conectarIniciativa(){
@@ -2513,12 +2518,60 @@ function conectarIniciativa(){
   if(limpiar) limpiar.onclick = () => { if(confirm('¿Vaciar el orden de turnos?')) guardarIniciativa({orden: [], turno: 0, ronda: 1}); };
 }
 
-$('#iniciativa-cab').onclick = e => {
-  if(e.target.closest('input')) return;
-  iniciativaPlegada = !iniciativaPlegada;
-  try{ localStorage.setItem('mapa-iniciativa-plegada', iniciativaPlegada ? '1' : ''); }catch(e2){}
-  renderIniciativa();
-};
+/* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo
+   patrón que la Bitácora y la Mesa): así no queda tapado por los botones del
+   dock de la izquierda. La posición (relativa al mapa) se guarda por navegador. */
+var iniciativaPos = null;   // (var: renderIniciativa puede correr antes de esta línea)
+try{ iniciativaPos = JSON.parse(localStorage.getItem('mapa-iniciativa-posicion') || 'null'); }catch(e){}
+function iniciativaEncuadrar(){
+  const caja = $('#iniciativa'), marco = $('#lienzo-caja');
+  if(!iniciativaPos){ caja.classList.remove('movida'); caja.style.left = caja.style.top = ''; return; }
+  if(caja.hidden || !caja.offsetWidth) return;
+  caja.classList.add('movida');
+  const x = Math.max(0, Math.min(iniciativaPos.x, marco.clientWidth - caja.offsetWidth));
+  const y = Math.max(0, Math.min(iniciativaPos.y, marco.clientHeight - caja.offsetHeight));
+  caja.style.left = x + 'px'; caja.style.top = y + 'px';
+}
+window.addEventListener('resize', iniciativaEncuadrar);
+{
+  const caja = $('#iniciativa'), cab = $('#iniciativa-cab'), marco = $('#lienzo-caja');
+  let arrastre = null, recienMovida = false;
+  cab.addEventListener('pointerdown', e => {
+    if(e.button !== 0 || e.target.closest('input')) return;
+    const r = caja.getBoundingClientRect(), m = marco.getBoundingClientRect();
+    arrastre = {px: e.clientX, py: e.clientY, x: r.left - m.left, y: r.top - m.top, movio: false};
+    cab.setPointerCapture(e.pointerId);
+  });
+  cab.addEventListener('pointermove', e => {
+    if(!arrastre) return;
+    const dx = e.clientX - arrastre.px, dy = e.clientY - arrastre.py;
+    if(!arrastre.movio && Math.abs(dx) + Math.abs(dy) < 5) return;
+    arrastre.movio = true;
+    caja.classList.add('arrastrando');
+    iniciativaPos = {x: arrastre.x + dx, y: arrastre.y + dy};
+    iniciativaEncuadrar();
+  });
+  const soltar = () => {
+    if(!arrastre) return;
+    recienMovida = arrastre.movio;
+    arrastre = null;
+    caja.classList.remove('arrastrando');
+    if(recienMovida){
+      iniciativaPos = {x: parseFloat(caja.style.left), y: parseFloat(caja.style.top)};
+      try{ localStorage.setItem('mapa-iniciativa-posicion', JSON.stringify(iniciativaPos)); }catch(e){}
+    }
+  };
+  cab.addEventListener('pointerup', soltar);
+  cab.addEventListener('pointercancel', soltar);
+  // Clic (sin arrastrar): achica o agranda.
+  cab.onclick = e => {
+    if(recienMovida){ recienMovida = false; return; }
+    if(e.target.closest('input')) return;
+    iniciativaPlegada = !iniciativaPlegada;
+    try{ localStorage.setItem('mapa-iniciativa-plegada', iniciativaPlegada ? '1' : ''); }catch(e2){}
+    renderIniciativa();
+  };
+}
 
 function escucharModo(){
   escucharModo.listo = false;

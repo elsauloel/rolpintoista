@@ -231,6 +231,12 @@ nuevo de Rol Pintoísta. Paso 2 de
   Los jugadores no ven esa fila (el turno pasa igual cuando le toca, sin que se
   note que estuvo); el GM la ve marcada con 🙈. Hoy es solo visual: los datos
   llegan a todos, como el resto de lo oculto.
+  **Flotante y arrastrable** (2026-09-19): el orden de turnos ya no queda tapado
+  por los botones del dock de la izquierda — arranca a la derecha del dock y se
+  **arrastra desde la cabecera** (`iniciativaEncuadrar`, posición relativa al
+  mapa guardada por navegador en `mapa-iniciativa-posicion`, como la Bitácora);
+  un clic sin arrastrar la achica o agranda, y **achicada se ve medio
+  transparente** (55 %, se opaca al pasar el mouse).
   **Sigilo y orden de turnos** (2026-09-19): quien está en sigilo desaparece
   solo de la lista para el bando rival mientras dure — los jugadores no ven
   a los creeps en sigilo; el GM no ve a los personajes en sigilo salvo con su 👁

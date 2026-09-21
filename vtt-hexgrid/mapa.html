@@ -808,7 +808,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/mesa.js"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/biblioteca.js"></script>
-<script src="../comun/tokens-auto.js"></script>
+<script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script>
@@ -990,6 +990,9 @@ let rotandoElemento = null;   // {id}
 let panelMapas = false;
 // Grupos de creeps vinculados a un mapa (para "Traer tokens de creeps"): chips con ✕ y un selector para sumar otro.
 function gruposDeMapaHtml(mapaId){
+  try{ return gruposDeMapaHtmlSeguro(mapaId); }catch(err){ console.error('No se pudieron listar los grupos del mapa:', err); return ''; }   // que esto nunca rompa el panel de Mapas
+}
+function gruposDeMapaHtmlSeguro(mapaId){
   const propios = TokensAuto.gruposDeMapa(enlacesGM, mapaId);
   const existentes = new Set([...gruposDeCreepsPub().keys(), ...enlacesGM.map(e => e.grupo)]);
   const libres = [...existentes].filter(g => TokensAuto.mapaDeGrupo(enlacesGM, g) !== mapaId).sort((a, b) => a.localeCompare(b, 'es'));
@@ -6791,12 +6794,12 @@ function centroDeLaVista(){
    centro de lo que se ve, saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
 let enlacesGM = [];   // [{grupo, mapaId}] (campanas/<id>/gm/gruposMapas, solo el GM)
 function escucharEnlaces(){
-  if(!soyGM) return;
-  TokensAuto.enlacesEscuchar(l => {
+  if(!soyGM || typeof TokensAuto.enlacesEscuchar !== 'function') return;
+  try{ TokensAuto.enlacesEscuchar(l => {
     enlacesGM = l;
     if(panelMapas) renderPanel(true);
     if(!$('#tokens-menu').hidden) renderTokensMenu();
-  });
+  }); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); }
 }
 function gruposDeCreepsPub(){
   const m = new Map();

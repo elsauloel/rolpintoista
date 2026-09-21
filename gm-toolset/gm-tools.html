@@ -1137,7 +1137,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/biblioteca.js"></script>
-<script src="../comun/tokens-auto.js"></script>
+<script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/creeps-base.js"></script>
 <script src="../comun/skills-creep-base.js"></script>
@@ -6761,7 +6761,7 @@ function gmAlEntrar(){
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); gruposMapasEscuchar(); }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } }
 }
 
 /* ---------- Mantenimiento del GM ----------

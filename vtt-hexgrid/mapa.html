@@ -55,9 +55,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 /* Ventana de "Nuevo token": centrada sobre el mapa, con el fondo oscurecido
    (Esc o clic derecho la cierran sin crear nada). */
-#nuevo-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
-#nuevo-token-capa[hidden]{display:none}
-#nuevo-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+#nuevo-token-capa,#editar-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#nuevo-token-capa[hidden],#editar-token-capa[hidden]{display:none}
+#nuevo-token-ventana,#editar-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
 .nt-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .nt-cab button{font-size:16px;color:var(--muted);line-height:1}
 .nt-cab button:hover{color:var(--paper)}
@@ -780,6 +780,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 </main>
 
 <div id="nuevo-token-capa" hidden><div id="nuevo-token-ventana"></div></div>
+<div id="editar-token-capa" hidden><div id="editar-token-ventana"></div></div>
 
 <!-- Bitácora de la partida: flotante y arrastrable, como la Mesa de la
      ficha. Se abre y cierra del todo con 📖 en la caja de herramientas;
@@ -5725,7 +5726,7 @@ function renderPanel(forzar){
     // Si sigue abierto el mismo panel, no pisar lo que alguien está
     // escribiendo o eligiendo.
     const mismoPanel = firmaPanel.startsWith(clave + '|');
-    if(mismoPanel && (creando || panel.contains(document.activeElement))) return;
+    if(mismoPanel && (creando || panel.contains(document.activeElement) || $('#editar-token-ventana').contains(document.activeElement))) return;
   }
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
@@ -5832,7 +5833,10 @@ function renderPanel(forzar){
 
   // Los datos del token se ven en los controles flotantes (HUD): el panel
   // del costado queda solo con Token (?) y la configuración de los dados.
+  const ed = $('#editar-token-ventana');
+  $('#editar-token-capa').hidden = !(t && editandoToken);
   if(!t || !editandoToken){
+    ed.innerHTML = '';
     // (La ayuda de los tokens vive en el (?) de la barra de arriba: actualizarAyudaToken.)
     panel.innerHTML = '';
     return;
@@ -5843,7 +5847,7 @@ function renderPanel(forzar){
 
   // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
   let color = t.color;
-  panel.innerHTML =
+  ed.innerHTML =
     `<h2>Editar token · ${titulo.toLowerCase()}</h2>` +
     (editable
       ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
@@ -5864,7 +5868,7 @@ function renderPanel(forzar){
 
   $('#token-volver').onclick = () => { editandoToken = false; renderPanel(true); };
   if(editable){
-    conectarColores(panel, c => color = c);
+    conectarColores(ed, c => color = c);
     const guardar = async () => {
       const fichaId = $('#token-vinculo').value;
       const vv = fichaId ? vinculo({tipo: t.tipo, fichaId}) : null;
@@ -5985,6 +5989,15 @@ $('#nuevo-token-capa').addEventListener('contextmenu', e => {
   e.preventDefault();
   cancelarNuevoToken();
 });
+
+// Editar token: ventana emergente. Se cierra con clic en el fondo, clic derecho (fuera de un campo) o Esc.
+function cerrarEditarToken(){ if(!editandoToken) return; editandoToken = false; renderPanel(true); pedirDibujo(); }
+$('#editar-token-capa').addEventListener('mousedown', e => { if(e.target === $('#editar-token-capa')) cerrarEditarToken(); });
+$('#editar-token-capa').addEventListener('contextmenu', e => {
+  if(e.target.closest('input,textarea,select')) return;
+  e.preventDefault(); cerrarEditarToken();
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && editandoToken && !document.querySelector('.recorte-scrim')){ e.stopImmediatePropagation(); cerrarEditarToken(); } }, true);
 
 $('#btn-nuevo').onclick = e => {
   if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token

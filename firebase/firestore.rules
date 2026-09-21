@@ -627,20 +627,20 @@ service cloud.firestore {
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
     match /{bib}/{id} {
-      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas'];
-      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas']
+      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep'];
+      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep']
         && entradaBiblioteca(request.resource.data);
-      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas'];
+      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep'];
     }
     match /{prop}/{id} {
-      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
+      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
         && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
-      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
+      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
         && entradaBiblioteca(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;
       allow update: if false;
-      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas']
+      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
         && (esDuenoProyecto() || (verificado() && resource.data.autorUid == request.auth.uid));
     }
   }

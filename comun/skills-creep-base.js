@@ -427,7 +427,9 @@
   window.HABILIDADES_CREEP_BASE = lista;
 
   // Arma la habilidad de un creep del nivel dado a partir de una entrada de la biblioteca.
+  // Una versión editada y propuesta a la biblioteca (`datos.habilidad`) ya viene calculada: se copia tal cual, sin escalar con el nivel.
   window.armarHabilidadDeCreep = function(datos, nivel){
+    if(datos && datos.habilidad) return structuredClone(datos.habilidad);
     const n = Math.max(1, Math.min(20, Math.round(Number(nivel) || 1)));
     return U.armarHab(datos.sp, n, datos.cd, !!datos.lenta);
   };

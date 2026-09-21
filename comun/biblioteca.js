@@ -28,6 +28,7 @@ const Biblioteca = (() => {
   const SUGERENCIAS = {
     trampas: ['foso', 'veneno', 'explosiva', 'alarma', 'mágica', 'mecánica', 'atrapa', 'fuego amigo'],
     pasivas: ['stat', 'regeneración', 'resistencia', 'defensiva', 'ofensiva', 'utilidad', 'visión', 'situacional'],
+    habs_creep: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'área', 'rápida', 'lenta', 'sigilo', 'trampas'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',
       'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'emboscador', 'debuffer'],
@@ -103,7 +104,7 @@ const Biblioteca = (() => {
       .bib-grupo{position:relative}
       .bib-grupo > button{display:flex;gap:6px;align-items:center}
       .bib-grupo > button .n{background:var(--copper,#c98545);color:#180F08;border-radius:999px;padding:0 7px;font-size:11px;font-weight:700}
-      .bib-pop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:5;min-width:220px;max-width:340px;background:var(--panel,#1a1418);border:1px solid var(--copper,#c98545);border-radius:8px;padding:10px;box-shadow:0 10px 26px rgba(0,0,0,.6)}
+      .bib-pop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:5;min-width:220px;max-width:340px;background:var(--panel,#1a1418);border:1px solid var(--copper,#c98545);border-radius:8px;padding:10px;box-shadow:0 10px 26px rgba(0,0,0,.6);max-height:240px;overflow:auto}
       .bib-grupo.abierto .bib-pop{display:block}
       .bib-activos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;width:100%}
     `;
@@ -129,10 +130,9 @@ const Biblioteca = (() => {
         <div class="body" style="display:flex;flex-direction:column;gap:10px">
           <div class="hint" id="bibg-aviso"></div>
           <div class="f"><label>Nombre</label><input id="bibg-nombre" maxlength="60"></div>
-          <div class="f"><label>Etiquetas (separadas por coma)</label>
-            <input id="bibg-etiquetas" list="bibg-sugeridas" placeholder="ej: bosque, bestia, melee">
-            <datalist id="bibg-sugeridas"></datalist>
-            <div class="hint" id="bibg-sug-txt"></div></div>
+          <div class="f"><label>Etiquetas</label>
+            <div class="bib-grupos" id="bibg-tags" style="margin-bottom:6px"></div>
+            <input id="bibg-etiquetas" placeholder="Las que elijas arriba aparecen acá; podés escribir otras, separadas por coma"></div>
           <div class="f"><label>Descripción corta (opcional)</label><textarea id="bibg-desc" rows="3" maxlength="300"></textarea></div>
         </div>
         <footer>
@@ -178,6 +178,44 @@ const Biblioteca = (() => {
       pintar();
     });
     q('bib-lista').addEventListener('click', accionFila);
+
+    // Selector de etiquetas de "Guardar en la biblioteca": el campo de texto es la fuente de verdad, los chips lo escriben.
+    q('bibg-tags').addEventListener('click', e => {
+      const g = e.target.closest('[data-bibggrupo]');
+      if(g){ tagsGuardar.abierto = tagsGuardar.abierto === g.dataset.bibggrupo ? null : g.dataset.bibggrupo; pintarTagsGuardar(); return; }
+      const b = e.target.closest('[data-bibgtag]'); if(!b) return;
+      const sel = limpiarEtiquetas(q('bibg-etiquetas').value);
+      const t = b.dataset.bibgtag.toLowerCase().slice(0, 30);
+      q('bibg-etiquetas').value = (sel.includes(t) ? sel.filter(x => x !== t) : [...sel, t]).join(', ');
+      pintarTagsGuardar();
+    });
+    q('bibg-etiquetas').addEventListener('input', pintarTagsGuardar);
+    q('scrim-biblioteca-guardar').addEventListener('mousedown', e => {
+      if(tagsGuardar.abierto && !e.target.closest('.bib-grupo')){ tagsGuardar.abierto = null; pintarTagsGuardar(); }
+    });
+  }
+
+  const tagsGuardar = {grupos: [], abierto: null};
+  function pintarTagsGuardar(){
+    const sel = new Set(limpiarEtiquetas(document.getElementById('bibg-etiquetas').value));
+    const chip = t => `<button type="button" class="bib-chip${sel.has(t.toLowerCase()) ? ' on' : ''}" data-bibgtag="${esc(t)}">${esc(t)}</button>`;
+    document.getElementById('bibg-tags').innerHTML = tagsGuardar.grupos.map(g => {
+      const n = g.tags.filter(t => sel.has(t.toLowerCase())).length;
+      return `<div class="bib-grupo${tagsGuardar.abierto === g.nombre ? ' abierto' : ''}">
+        <button type="button" class="btn${n ? ' primary' : ''}" data-bibggrupo="${esc(g.nombre)}">${esc(g.nombre)}${n ? ` <span class="n">${n}</span>` : ''} ▾</button>
+        <div class="bib-pop"><div class="bib-chips">${g.tags.map(chip).join('')}</div></div></div>`;
+    }).join('');
+  }
+  // Todas las etiquetas disponibles: las de los grupos definidos + las que ya usan las entradas de la biblioteca + las sugeridas del tipo.
+  function armarGruposTags(defGrupos, tags){
+    const usadas = new Set();
+    const out = (defGrupos || []).map(g => {
+      g.tags.forEach(t => usadas.add(t));
+      return {nombre: g.nombre, tags: [...g.tags]};
+    });
+    const otros = [...tags].filter(t => !usadas.has(t)).sort((a, b) => a.localeCompare(b, 'es'));
+    if(otros.length) out.push({nombre: defGrupos && defGrupos.length ? 'Otros' : 'Etiquetas', tags: otros});
+    return out;
   }
 
   let actual = null;
@@ -365,9 +403,19 @@ const Biblioteca = (() => {
     q('bibg-nombre').value = opts.nombre || '';
     q('bibg-etiquetas').value = '';
     q('bibg-desc').value = '';
-    const sug = SUGERENCIAS[tipo] || [];
-    q('bibg-sugeridas').innerHTML = sug.map(s => `<option value="${esc(s)}">`).join('');
-    q('bibg-sug-txt').textContent = sug.length ? 'Ideas: ' + sug.join(', ') : '';
+    // Etiquetas para elegir: primero las conocidas de entrada; después se suman las que ya usa la biblioteca (si se puede leer).
+    const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos}};
+    const defGrupos = opts.grupos || (st.opts && st.opts.grupos) || null;
+    const conocidas = new Set(SUGERENCIAS[tipo] || []);
+    (defGrupos || []).forEach(g => g.tags.forEach(t => conocidas.add(t)));
+    tagsGuardar.grupos = armarGruposTags(defGrupos, conocidas);
+    tagsGuardar.abierto = null;
+    pintarTagsGuardar();
+    cargar(tipo, false).then(() => {
+      [...(st.oficial || []), ...(st.propuestas || [])].forEach(e => e.etiquetas.forEach(t => conocidas.add(t)));
+      tagsGuardar.grupos = armarGruposTags(defGrupos, conocidas);
+      pintarTagsGuardar();
+    }).catch(() => {});
     q('scrim-biblioteca-guardar').classList.add('open');
     q('bibg-ok').onclick = async () => {
       const nombre = q('bibg-nombre').value.trim().slice(0, 60);

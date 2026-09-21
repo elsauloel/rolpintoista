@@ -3002,6 +3002,39 @@ function dibujar(){
     }
   });
 
+  // Niebla de guerra (negra: nunca vista; gris: descubierta pero fuera de la visión de ahora).
+  // A los jugadores (y al GM con "Como jugador") tapa todo lo de abajo y se pinta después de los
+  // tokens. Al GM sin "Como jugador" solo se le insinúa: se pinta ANTES de las estelas, las auras y
+  // los tokens, para que los nombres y las estelas se lean bien aunque estén en zona tapada.
+  const pintarNiebla = () => {
+    const aplica = nieblaAplica();
+    const alfaNegra = aplica ? 1 : 0.4, alfaGris = aplica ? 0.6 : 0.25;
+    const margen = HEX * 2;
+    const x0 = a.x - margen, y0 = a.y - margen, x1 = b.x + margen, y1 = b.y + margen;
+    const abiertas = [], grises = [];
+    const dentro = c => { const p = hexCentro(c.col, c.fila); return p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1; };
+    nieblaDescubierta.forEach(k => { if(nieblaVista.has(k)) return; const c = nbUnpack(k); if(dentro(c)) grises.push(c); });
+    nieblaVista.forEach(k => { const c = nbUnpack(k); if(dentro(c)) abiertas.push(c); });
+    const trazarLista = lista => lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    // Negra: todo el cuadro menos las casillas descubiertas o a la vista.
+    ctx.beginPath();
+    ctx.rect(x0, y0, x1 - x0, y1 - y0);
+    trazarLista(grises); trazarLista(abiertas);
+    ctx.globalAlpha = alfaNegra;
+    ctx.fillStyle = '#000';
+    ctx.fill('evenodd');
+    // Gris: lo ya descubierto que ahora no se ve.
+    if(grises.length){
+      ctx.beginPath();
+      trazarLista(grises);
+      ctx.globalAlpha = alfaGris;
+      ctx.fillStyle = 'rgb(58,60,70)';
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+  if(nieblaActiva && !nieblaAplica()) pintarNiebla();
+
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
   // de movimientos recientes (se desvanecen).
   let animando = false;
@@ -3324,30 +3357,7 @@ function dibujar(){
   // ahora. Al GM (sin "Como jugador") solo se le insinúa.
   if(nieblaActiva){
     const aplica = nieblaAplica();
-    const alfaNegra = aplica ? 1 : 0.4, alfaGris = aplica ? 0.6 : 0.25;
-    const margen = HEX * 2;
-    const x0 = a.x - margen, y0 = a.y - margen, x1 = b.x + margen, y1 = b.y + margen;
-    const abiertas = [], grises = [];
-    const dentro = c => { const p = hexCentro(c.col, c.fila); return p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1; };
-    nieblaDescubierta.forEach(k => { if(nieblaVista.has(k)) return; const c = nbUnpack(k); if(dentro(c)) grises.push(c); });
-    nieblaVista.forEach(k => { const c = nbUnpack(k); if(dentro(c)) abiertas.push(c); });
-    const trazarLista = lista => lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
-    // Negra: todo el cuadro menos las casillas descubiertas o a la vista.
-    ctx.beginPath();
-    ctx.rect(x0, y0, x1 - x0, y1 - y0);
-    trazarLista(grises); trazarLista(abiertas);
-    ctx.globalAlpha = alfaNegra;
-    ctx.fillStyle = '#000';
-    ctx.fill('evenodd');
-    // Gris: lo ya descubierto que ahora no se ve.
-    if(grises.length){
-      ctx.beginPath();
-      trazarLista(grises);
-      ctx.globalAlpha = alfaGris;
-      ctx.fillStyle = 'rgb(58,60,70)';
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
+    if(aplica) pintarNiebla();   // al GM sin "Como jugador" ya se le pintó antes de las estelas
     // Última posición vista de lo que ya no está a la vista.
     if(aplica){
       nieblaFantasmas.forEach((f, id) => {

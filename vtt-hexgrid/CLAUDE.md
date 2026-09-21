@@ -80,7 +80,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   salió de la visión (solo en memoria de cada navegador). **GM**: botón
   `🌫 Niebla: sí/no` en la cabecera (prende/apaga por mapa) y, con la niebla
   prendida, `👁 Como jugador` (por navegador, `niebla-como-jugador`); sin él,
-  la niebla se le insinúa (negra al 40 %, gris al 25 %). Herramienta
+  la niebla se le insinúa (negra al 40 %, gris al 25 %), **pintada por debajo de las estelas, las auras y los tokens** (`pintarNiebla`, 2026-09-21) para que se lean bien los nombres y las estelas aunque estén en zona tapada; a los jugadores y con "Como jugador" tapa todo, encima de los tokens. Herramienta
   `🌫 Niebla` (solo GM) en la caja de herramientas: pincel de radio 0–5 para
   **destapar o tapar a mano** (`nieblaPintar`, `arrayUnion`/`arrayRemove`) y
   "Reiniciar (tapar todo)". Pendiente: obstáculos que tapen la vista (P52),

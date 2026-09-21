@@ -739,7 +739,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
         <button type="button" class="btn chico" id="btn-finalizar-mapa" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
-        <button type="button" class="btn chico" id="btn-botin-mapa" title="Lo que los jugadores no tomaron: repartirlo como despojos">🎁 Botín</button>
+        <button type="button" class="btn chico" id="btn-botin-mapa" title="Después de que los jugadores eligieron del botín: lo que nadie tomó se convierte en despojos y se reparte">🧰 Despojar</button>
       </div>
     </div>
     <div class="seccion" id="panel-token"></div>
@@ -6756,8 +6756,8 @@ function abrirBotonera(fichaId, mensaje, invId){
 // Atajo B: la Botonera del personaje principal de un jugador — el primer
 // token de personaje suyo en el mapa que se ve, o, si no tiene ninguno
 // puesto, su primera ficha.
-function abrirBotoneraPrincipal(){
-  if(!fbUsuario) return;
+function fichaPrincipalId(){
+  if(!fbUsuario) return '';
   let fichaId = '';
   for(const t of tokens.values()){
     if(t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && t.fichaId && !t.fichaId.includes(SEP_INVOCACION)){ fichaId = t.fichaId; break; }
@@ -6765,8 +6765,31 @@ function abrirBotoneraPrincipal(){
   if(!fichaId){
     for(const [id, f] of fichasPub.entries()){ if(f.duenoUid === fbUsuario.uid){ fichaId = id; break; } }
   }
+  return fichaId;
+}
+function abrirBotoneraPrincipal(){
+  const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('No tenés un personaje con Botonera'); return; }
   abrirBotonera(fichaId);
+}
+
+/* Botín del combate: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana del botín (la de la ficha, en el
+   mismo iframe de la Botonera) con los equipos y trofeos para elegir. Solo reacciona a botín NUEVO, no al que ya estaba al entrar. */
+let botinMapaPrimero = true, botinMapaTimer = null;
+function escucharBotinParaJugador(){
+  if(soyGM || !fbUsuario) return;
+  fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
+    const nuevo = !botinMapaPrimero && snap.docChanges().some(ch => ch.type === 'added' && !ch.doc.data().tomadoPor);
+    botinMapaPrimero = false;
+    if(!nuevo) return;
+    clearTimeout(botinMapaTimer);
+    botinMapaTimer = setTimeout(() => {
+      const fichaId = fichaPrincipalId();
+      if(!fichaId){ toast('🎁 Hay botín del combate, pero no tenés un personaje para tomarlo'); return; }
+      toast('🎁 El GM abrió el botín del combate');
+      abrirBotonera(fichaId, {tipo: 'abrir-botin'});
+    }, 700);
+  }, err => console.error('Error escuchando el botín:', err));
 }
 
 /* GM Tools adentro del mapa: el reporte de fin de combate (modo=finalizar) y el botín para despojar (modo=botin). */
@@ -7659,6 +7682,7 @@ function arrancarEnVivo(){
   escucharMapas();
   escucharMapaActivo();
   escucharEnlaces();
+  escucharBotinParaJugador();
   mesaEscuchar();
   mesaHistorialAlEntrar();
   actualizarBotonMapas();

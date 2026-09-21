@@ -754,7 +754,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
       <span class="accesos-sep"></span>
       <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
-      <button type="button" class="iconbtn" id="btn-botin" title="Lo que soltaron los creeps y nadie tomó: repartir como despojos">🎁 Botín</button>
+      <button type="button" class="iconbtn" id="btn-botin" title="Después de que los jugadores eligieron del botín: lo que nadie tomó se convierte en despojos y se reparte">🧰 Despojar</button>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Vuelve el contador de turnos a cero">↺ Reiniciar combate</button>
       <button type="button" class="iconbtn dk-catalogo" id="btn-catalogo" title="Catálogo de equipo para los creeps">⚔ Catálogo</button>
       <span class="accesos-sep"></span>
@@ -999,7 +999,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 
 <div class="scrim" id="scrim-botin-gm">
   <div class="modal" style="max-width:600px">
-    <header><h3>🎁 Botín del combate</h3><button class="iconbtn" id="botin-gm-x">Cerrar</button></header>
+    <header><h3>🧰 Despojar lo que nadie tomó</h3><button class="iconbtn" id="botin-gm-x">Cerrar</button></header>
     <div class="body" id="botin-gm-cuerpo"></div>
     <footer>
       <button class="btn ghost" id="botin-gm-cerrar">Cerrar</button>
@@ -1010,11 +1010,11 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 
 <div class="scrim" id="scrim-finalizar-combate">
   <div class="modal" style="max-width:640px">
-    <header><h3>🏁 Resumen del combate</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
+    <header><h3>🏁 Fin del combate — ajustá lo que van a ver los jugadores</h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
     <div class="body" id="finalizar-combate-body" style="display:flex;flex-direction:column;gap:16px"></div>
     <footer>
       <button class="btn ghost" id="finalizar-combate-cerrar">Cerrar</button>
-      <button class="btn primary" id="finalizar-combate-publicar" title="Carga la XP y el oro en las fichas y abre el botín para los jugadores">🎁 Publicar recompensas</button>
+      <button class="btn primary" id="finalizar-combate-publicar" title="Confirma lo que ajustaste: carga la XP y el oro en las fichas y les abre a los jugadores, en el mapa, la ventana del botín para que elijan">✔ Confirmar</button>
     </footer>
   </div>
 </div>
@@ -5700,7 +5700,7 @@ async function publicarRecompensas(){
   const rp = calcularReparto(rep);
   if(!rp.n){ toast('Elegí al menos un jugador'); return; }
   const items = itemsPublicables(rep);
-  if(!confirm(`¿Publicar?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) al botín\n\nLas recompensas se cargan solas en las fichas.`)) return;
+  if(!confirm(`¿Confirmar?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\nLa XP y el oro se cargan solos en las fichas${items.length ? ', y a los jugadores se les abre la ventana del botín en el mapa para que elijan' : ''}.`)) return;
   combateRep.publicando = true;
   renderReporteCombate();
   try{
@@ -5720,8 +5720,7 @@ async function publicarRecompensas(){
     combateRep = nuevoCombateRep();
     renderAll();
     $('#scrim-finalizar-combate').classList.remove('open');
-    toast('Recompensas publicadas ✓ — se cargan solas en las fichas');
-    if(items.length) abrirBotinGM();   // para ver qué toman los jugadores y despojar después
+    toast(items.length ? 'Confirmado ✓ — los jugadores ven la ventana del botín en el mapa; lo que quede lo despojás con 🧰 Despojar' : 'Confirmado ✓ — la XP y el oro se cargan solos en las fichas');
   }catch(err){
     console.error('No se pudieron publicar las recompensas:', err);
     combateRep.publicando = false;

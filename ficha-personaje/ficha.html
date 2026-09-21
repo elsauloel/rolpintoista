@@ -7085,6 +7085,13 @@ function equipoModoAbrir(){
   $('#scrim-equipo').classList.add('open');
   botoneraAvisarMapa('botonera-lista');
 }
+// El mapa abre el botín del combate en este iframe (mensaje 'abrir-botin').
+function botinModoAbrir(){
+  document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
+  botinLootCuerpo();
+  $('#scrim-botin-loot').classList.add('open');
+  botoneraAvisarMapa('botonera-lista');
+}
 // Desde el dock de la ficha: el mismo panel que abre el 🛡 del token en el mapa.
 $('#btn-equipo').onclick = () => { renderEquipo(); $('#scrim-equipo').classList.add('open'); };
 
@@ -7093,9 +7100,13 @@ $('#btn-equipo').onclick = () => { renderEquipo(); $('#scrim-equipo').classList.
    Acá se lista lo que nadie tomó todavía: "Sumar a la mochila" lo reclama con una transacción (el primero se lo lleva) y lo
    agrega a la mochila; si la mochila está llena no entra. Lo que sobra, el GM lo convierte en despojos ("Despojar"). */
 let botinLoot = [];   // [{docId, nombre, item, despojos, origen}]
+let botinLootPrimero = true;
 function botinLootEscuchar(){
   if(!fbUsuario) return;
   fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
+    // Botín NUEVO (no el que ya estaba al entrar): se abre solo la ventana, salvo dentro del mapa (ahí la abre el mapa).
+    const nuevo = !botinLootPrimero && snap.docChanges().some(ch => ch.type === 'added' && !ch.doc.data().tomadoPor);
+    botinLootPrimero = false;
     botinLoot = [];
     snap.docs.forEach(d => {
       const x = d.data();
@@ -7107,6 +7118,11 @@ function botinLootEscuchar(){
       botinLoot.push({docId: d.id, nombre: x.nombre || item.nombre, item, despojos: num(x.despojos), origen: x.origen || ''});
     });
     botinLootRender();
+    if(nuevo && !document.documentElement.classList.contains('modo-botonera') && botinPuedeTomar()){
+      toast('🎁 El GM abrió el botín del combate');
+      botinLootCuerpo();
+      $('#scrim-botin-loot').classList.add('open');
+    }
   }, err => console.error('Error escuchando el botín:', err));
 }
 function botinItemPorId(id){
@@ -10834,6 +10850,7 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
+    if(e.data.tipo === 'abrir-botin' && fichaVivo && fichaVivo.cargada) botinModoAbrir();
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"

@@ -1003,7 +1003,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <div class="body" id="botin-gm-cuerpo"></div>
     <footer>
       <button class="btn ghost" id="botin-gm-cerrar">Cerrar</button>
-      <button class="btn primary" id="botin-gm-despojar" title="Convierte en despojos lo que nadie tomó y lo reparte">🧰 Despojar</button>
+      <button class="btn primary" id="botin-gm-despojar" title="Convierte en despojos lo que nadie tomó, lo reparte y cierra el botín del todo">🧰 Despojar lo que nadie tomó</button>
     </footer>
   </div>
 </div>
@@ -5716,13 +5716,16 @@ async function publicarRecompensas(){
         precioCompra: num(i.precioCompra), despojos: Math.ceil(num(i.precioCompra) / 4), tomadoPor: '', tomadoNombre: '', creado: ts});
     });
     await batch.commit();
+    combateActual = {...(combateActual || {}), estado: items.length ? 'publicado' : 'cerrado'};   // sin esperar al snapshot
+    actualizarBotonDespojos();
     const lineas = rp.porJugador.map(({j, xp, dde}) => `${j.nombre}: +${fmt(xp)} XP${j.estado !== 'en pie' ? ` (${j.estado})` : ''}, +${fmt(dde)} DDE`).join(' · ');
     await mesaLineaVerde('🎁 Recompensas del combate', lineas + (items.length ? ` · ${items.length} ítem(s) en el botín` : ''));
     rep.filas.forEach(f => { f.sc.recompensado = true; });   // no se vuelven a contar en el próximo reporte
     combateRep = nuevoCombateRep();
     renderAll();
     $('#scrim-finalizar-combate').classList.remove('open');
-    toast(items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, cerrás con 🎁 Despojos' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas');
+    toast(items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, apretás Despojar' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas');
+    if(items.length) abrirBotinGM();   // el GM ve qué toma cada uno; puede cerrar la ventana y volver a abrirla con 🎁 Despojos
   }catch(err){
     console.error('No se pudieron publicar las recompensas:', err);
     combateRep.publicando = false;
@@ -5916,7 +5919,7 @@ function renderBotinGM(){
       <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')}</span>`).join('')}</div>` : ''}
     <div class="reporte-seccion-titulo" style="margin-top:14px">Despojar: ${fmt(total)} despojos${n ? ` → ${fmt(cada)} c/u (hacia arriba)` : ''}</div>
     ${jug === null ? '<div class="hint">Cargando personajes…</div>' : jug.map(j => `<label class="reporte-fila" style="cursor:pointer;gap:8px;align-items:center"><input type="checkbox" data-botin-jug="${esc(j.id)}"${botinGM.incluidos.has(j.id) ? ' checked' : ''}><span class="reporte-nombre">${esc(j.nombre)}</span></label>`).join('')}
-    <div class="hint" style="margin-top:6px">Preguntá a la mesa si alguien quiere algo más y después apretá <b>Despojar</b>: lo que queda se convierte en despojos, se reparte y se carga solo en las fichas.</div>`;
+    <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá <b>Despojar</b>: lo que queda se convierte en despojos, se reparte y se carga solo en las fichas, y el botín se cierra del todo.</div>`;
   $('#botin-gm-cuerpo').querySelectorAll('[data-botin-jug]').forEach(c => c.onchange = () => { if(c.checked) botinGM.incluidos.add(c.dataset.botinJug); else botinGM.incluidos.delete(c.dataset.botinJug); renderBotinGM(); });
   $('#botin-gm-despojar').disabled = botinGM.ocupado || !botinGM.docs.length || !n;
 }

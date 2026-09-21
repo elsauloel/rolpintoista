@@ -633,7 +633,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <header>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
-  <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span></button>
+  <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span> <span aria-hidden="true">▾</span></button>
   <button type="button" class="btn primary" id="btn-nuevo" disabled hidden>+ Token</button>
   <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
@@ -1202,7 +1202,7 @@ function actualizarBotonMapas(){
   $('#mapas-nombre').textContent = nombreMapa(mapaMostrado);
   boton.classList.toggle('primary', soyGM && mapaMostrado !== mapaActivo);
   boton.title = !soyGM ? 'Mapa que armó el GM'
-    : mapaMostrado === mapaActivo ? 'Mapas guardados'
+    : mapaMostrado === mapaActivo ? 'Mapas guardados: ver otro, publicar, renombrar o crear uno nuevo (+ Nuevo mapa)'
     : `Mapas guardados — estás armando este; los jugadores ven "${nombreMapa(mapaActivo)}"`;
 }
 

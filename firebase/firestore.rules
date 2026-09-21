@@ -163,6 +163,15 @@ service cloud.firestore {
         }
       }
 
+      // Bitácora privada del GM (gm-toolset/gm-tools.html, "📖 Bitácora GM"): mismo
+      // formato que la compartida, pero solo el GM la lee y la escribe.
+      match /gmBitacora/{p} {
+        allow read, write: if esGM(c);
+        match /entradas/{e} {
+          allow read, write: if esGM(c);
+        }
+      }
+
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)

@@ -624,6 +624,24 @@ input[type=file]{display:none}
 .f label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .hint{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .modal .body{padding:14px 16px}
+/* Bitácora del GM: mismo formato que la de los jugadores (ficha.html). */
+.bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:9px}
+.bit-entrada{display:flex;gap:6px;align-items:flex-start;padding:5px 7px;border-left:3px solid;border-radius:var(--r);background:rgba(0,0,0,.18)}
+.bit-entrada .bit-texto{flex:1;min-width:0;white-space:pre-wrap;word-wrap:break-word;font-size:13px;line-height:1.45}
+.bit-entrada .bit-firma{color:var(--muted);font-size:11px;white-space:nowrap}
+.bit-entrada .bit-botones{display:flex;gap:3px;flex:none;opacity:.55}
+.bit-entrada:hover .bit-botones{opacity:1}
+.bit-entrada textarea{width:100%;min-height:60px}
+.bit-sumar{display:flex;gap:7px;align-items:stretch}
+.bit-sumar textarea{flex:1;min-height:44px;resize:vertical}
+.bit-vacia{color:var(--muted);font-size:12px}
+.bit-tab{display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:rgba(0,0,0,.18);border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer}
+.bit-tab.active{border-color:var(--copper);background:rgba(201,133,69,.12)}
+.bit-tab-name{background:none;border:none;padding:2px 2px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;color:var(--paper);width:auto;min-width:0;max-width:110px}
+.bit-tab.active .bit-tab-name{color:var(--brass);font-weight:700}
+.bit-tab-x{width:16px;height:16px;border-radius:50%;color:var(--muted);font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none;background:none;border:none;cursor:pointer}
+.bit-tab-x:hover{background:var(--danger);color:#fff}
 .modal footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)}
 
 .catalogo-modal{max-width:640px;max-height:82vh;display:flex;flex-direction:column}
@@ -766,6 +784,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
       <span class="accesos-sep"></span>
       <button type="button" class="iconbtn dk-tablero" id="btn-tablero" title="Ver el estado del combate: personajes y creeps con su HP y sus estados">📋 Tablero</button>
       <button type="button" class="iconbtn dk-historial" id="btn-historial" title="Tiradas y acciones de esta sesión">🕘 Historial</button>
+      <button type="button" class="iconbtn" id="btn-gbit" title="Bitácora privada del GM: páginas y notas que solo ves vos (los jugadores tienen la suya, compartida, en su ficha)">📖 Bitácora GM</button>
       <button type="button" class="iconbtn" id="btn-botin" disabled title="Se habilita cuando el botín está publicado. Ahí ves qué tomó cada uno y convertís en despojos lo que nadie tomó">🎁 Despojos</button>
       <button type="button" class="iconbtn dk-reset" id="btn-reset" title="Vuelve el contador de turnos a cero">↺ Reiniciar combate</button>
       <button type="button" class="iconbtn dk-catalogo" id="btn-catalogo" title="Catálogo de equipo para los creeps">⚔ Catálogo</button>
@@ -1005,6 +1024,25 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <div class="body" id="verestado-body"></div>
     <footer>
       <button class="btn primary" id="verestado-editar">Editar</button>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-gbit">
+  <div class="modal" style="max-width:720px">
+    <header><h3>📖 Bitácora del GM <span class="hint" style="font-weight:400;font-size:13px">— privada: solo la ve el GM</span></h3><button class="iconbtn" id="gbit-x">Cerrar</button></header>
+    <div class="body">
+      <div class="bitacora-tabs" id="gbit-tabs"></div>
+      <div id="gbit-entradas" class="bit-entradas"></div>
+      <div class="bit-sumar">
+        <textarea id="gbit-nueva" rows="2" placeholder="Anotá lo que se viene: secretos, tramas, PNJ, giros… (Ctrl + Enter para sumar)"></textarea>
+        <button type="button" class="btn primary" id="gbit-sumar">Sumar</button>
+      </div>
+      <div class="hint" id="gbit-estado" style="margin-top:8px">Esta bitácora es solo tuya (del GM): los jugadores no la ven.</div>
+    </div>
+    <footer>
+      <button class="btn ghost" id="gbit-add" title="Nueva página privada">+ Página</button>
+      <button class="btn ghost" id="gbit-cerrar">Cerrar</button>
     </footer>
   </div>
 </div>
@@ -6013,6 +6051,233 @@ $('#botin-gm-x').onclick = () => $('#scrim-botin-gm').classList.remove('open');
 $('#botin-gm-cerrar').onclick = () => $('#scrim-botin-gm').classList.remove('open');
 document.addEventListener('click', e => { if(e.target.closest('#btn-botin')) abrirBotinGM(); });
 
+/* =========================================================
+   BITÁCORA DEL GM (privada, Firebase)
+   campanas/<partida>/gmBitacora/<página> = {nombre, creado, creadoUid, creadoPor}
+   campanas/<partida>/gmBitacora/<página>/entradas/<id> =
+     {texto, uid, autor, creado, editado?, editadoUid?, editadoPor?}
+   Mismo formato que la bitácora de los jugadores (ficha.html), pero solo la
+   lee y escribe el GM. Cada entrada va en el color de su autor.
+   ========================================================= */
+const GBIT_COLORES = ['#E0A458', '#8EE6A8', '#7FB3F0', '#F08FA8', '#C9A8F5', '#F2D16B', '#6FD6C8', '#F0A36F'];
+const gbit = {paginas: [], activa: '', entradas: [], corteEntradas: null, editando: '', escuchando: false};
+
+function gbitColor(uid){
+  let h = 0;
+  for(const ch of String(uid || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return GBIT_COLORES[h % GBIT_COLORES.length];
+}
+function gbitFecha(ts){
+  if(!ts || !ts.toDate) return '';
+  const d = ts.toDate();
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+}
+function gbitEscuchar(){
+  if(gbit.escuchando) return;
+  gbit.escuchando = true;
+  try{ gbit.activa = localStorage.getItem('gbit-activa-' + FB_CAMPANA) || ''; }catch(e){}
+  fbDb.collection(fbRutaCampana('gmBitacora')).orderBy('creado').onSnapshot(snap => {
+    gbit.paginas = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if(!gbit.paginas.some(p => p.id === gbit.activa)) gbitElegir(gbit.paginas.length ? gbit.paginas[0].id : '');
+    else if(!gbit.corteEntradas) gbitElegir(gbit.activa);
+    else gbitRender();
+  }, err => {
+    console.error('Error escuchando la bitácora del GM:', err);
+    $('#gbit-estado').textContent = 'No se pudo leer la bitácora del GM. ¿Están publicadas las reglas nuevas de Firestore?';
+  });
+}
+function gbitElegir(id){
+  gbit.activa = id;
+  gbit.editando = '';
+  try{ localStorage.setItem('gbit-activa-' + FB_CAMPANA, id); }catch(e){}
+  if(gbit.corteEntradas){ gbit.corteEntradas(); gbit.corteEntradas = null; }
+  gbit.entradas = [];
+  if(id){
+    gbit.corteEntradas = fbDb.collection(fbRutaCampana(`gmBitacora/${id}/entradas`)).orderBy('creado')
+      .onSnapshot(snap => {
+        gbit.entradas = snap.docs.map(d => ({id: d.id, ...d.data({serverTimestamps: 'estimate'})}));
+        const lista = $('#gbit-entradas');
+        const alFondo = lista.scrollHeight - lista.scrollTop - lista.clientHeight < 30;
+        gbitRender();
+        if(alFondo) lista.scrollTop = lista.scrollHeight;
+      }, err => console.error('Error escuchando las entradas de la bitácora del GM:', err));
+  }
+  gbitRender();
+}
+function gbitRender(){
+  const tabs = $('#gbit-tabs'), lista = $('#gbit-entradas');
+  const conectado = !!(gbit.escuchando && fbDb && fbMiembro && fbMiembro.gm);
+  $('#gbit-add').disabled = !conectado;
+  $('#gbit-sumar').disabled = !conectado || !gbit.activa;
+  $('#gbit-nueva').disabled = !conectado || !gbit.activa;
+  if(!conectado){
+    tabs.innerHTML = '';
+    lista.innerHTML = '<div class="bit-vacia">Sin conexión con la partida como GM: la bitácora del GM no está disponible.</div>';
+    return;
+  }
+  // No redibujar las pestañas mientras se les cambia el nombre.
+  if(!tabs.contains(document.activeElement)){
+    tabs.innerHTML = gbit.paginas.map(p => `
+      <div class="bit-tab ${p.id === gbit.activa ? 'active' : ''}" data-gbit-pagina="${esc(p.id)}">
+        <input class="bit-tab-name" data-gbit-nombre="${esc(p.id)}" value="${esc(p.nombre || 'Página')}" maxlength="40" title="Clic para abrir · editá el nombre y apretá Enter">
+        <button type="button" class="bit-tab-x" data-gbit-borrar-pagina="${esc(p.id)}" title="Borrar página">×</button>
+      </div>`).join('');
+  }
+  if(!gbit.paginas.length){
+    lista.innerHTML = '<div class="bit-vacia">Todavía no hay páginas. Tocá "+ Página" para empezar tu bitácora.</div>';
+    return;
+  }
+  if(!gbit.entradas.length){
+    lista.innerHTML = '<div class="bit-vacia">Esta página está vacía: sumá lo primero abajo.</div>';
+    return;
+  }
+  // No redibujar mientras se corrige una entrada (se perdería lo escrito).
+  if(gbit.editando && lista.querySelector('textarea[data-gbit-edicion]')) return;
+  lista.innerHTML = gbit.entradas.map(en => {
+    const color = gbitColor(en.uid);
+    const firma = `${esc(en.autor || '?')} · ${gbitFecha(en.creado)}` +
+      (en.editadoPor ? ` · editado por ${esc(en.editadoPor)} ${gbitFecha(en.editado)}` : '');
+    if(en.id === gbit.editando){
+      return `<div class="bit-entrada" style="border-left-color:${color};flex-direction:column">
+        <textarea data-gbit-edicion="${esc(en.id)}">${esc(en.texto || '')}</textarea>
+        <div style="display:flex;margin-top:4px;gap:6px">
+          <button type="button" class="btn ghost" data-gbit-guardar="${esc(en.id)}">Guardar</button>
+          <button type="button" class="btn ghost" data-gbit-cancelar="1">Cancelar</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="bit-entrada" style="border-left-color:${color}">
+      <div class="bit-texto" style="color:${color}">${esc(en.texto || '')} <span class="bit-firma">(${firma})</span></div>
+      <div class="bit-botones">
+        <button type="button" class="iconbtn" data-gbit-editar="${esc(en.id)}" title="Corregir">✎</button>
+        <button type="button" class="iconbtn" data-gbit-borrar="${esc(en.id)}" title="Borrar">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function gbitNuevaPagina(){
+  if(!fbDb || !fbMiembro || !fbMiembro.gm) return;
+  try{
+    const ref = await fbDb.collection(fbRutaCampana('gmBitacora')).add({
+      nombre: `Página ${gbit.paginas.length + 1}`,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+      creadoUid: fbUsuario.uid,
+      creadoPor: fbMiembro.nombre,
+    });
+    gbitElegir(ref.id);
+    setTimeout(() => { const i = document.querySelector(`[data-gbit-nombre="${ref.id}"]`); if(i){ i.focus(); i.select(); } }, 300);
+  }catch(err){
+    console.error('No se pudo crear la página del GM:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear la página');
+  }
+}
+async function gbitSumar(){
+  const campo = $('#gbit-nueva');
+  const texto = campo.value.trim();
+  if(!texto || !gbit.activa || !fbDb || !fbMiembro) return;
+  campo.disabled = true;
+  try{
+    await fbDb.collection(fbRutaCampana(`gmBitacora/${gbit.activa}/entradas`)).add({
+      texto: texto.slice(0, 4000),
+      uid: fbUsuario.uid,
+      autor: fbMiembro.nombre,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    campo.value = '';
+    const lista = $('#gbit-entradas');
+    setTimeout(() => { lista.scrollTop = lista.scrollHeight; }, 50);
+  }catch(err){
+    console.error('No se pudo sumar a la bitácora del GM:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo sumar a la bitácora');
+  }finally{
+    campo.disabled = false;
+    campo.focus();
+  }
+}
+async function gbitGuardarEdicion(id){
+  const campo = document.querySelector(`textarea[data-gbit-edicion="${id}"]`);
+  if(!campo) return;
+  const texto = campo.value.trim();
+  if(!texto){ toast('Si querés sacarla, usá ✕'); return; }
+  try{
+    await fbDb.doc(fbRutaCampana(`gmBitacora/${gbit.activa}/entradas/${id}`)).update({
+      texto: texto.slice(0, 4000),
+      editado: firebase.firestore.FieldValue.serverTimestamp(),
+      editadoUid: fbUsuario.uid,
+      editadoPor: fbMiembro.nombre,
+    });
+    gbit.editando = '';
+    gbitRender();
+  }catch(err){
+    console.error('No se pudo corregir la entrada del GM:', err);
+    toast('No se pudo guardar la corrección');
+  }
+}
+async function gbitBorrarPagina(id){
+  const p = gbit.paginas.find(x => x.id === id);
+  if(!confirm(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene?`)) return;
+  try{
+    const entradas = await fbDb.collection(fbRutaCampana(`gmBitacora/${id}/entradas`)).get();
+    const lote = fbDb.batch();
+    entradas.docs.forEach(d => lote.delete(d.ref));
+    lote.delete(fbDb.doc(fbRutaCampana(`gmBitacora/${id}`)));
+    await lote.commit();
+  }catch(err){
+    console.error('No se pudo borrar la página del GM:', err);
+    toast('No se pudo borrar la página');
+  }
+}
+function gbitAbrir(){
+  $('#scrim-gbit').classList.add('open');
+  gbitRender();
+}
+function gbitCerrar(){ $('#scrim-gbit').classList.remove('open'); }
+$('#btn-gbit').onclick = gbitAbrir;
+$('#gbit-x').onclick = gbitCerrar;
+$('#gbit-cerrar').onclick = gbitCerrar;
+$('#gbit-add').onclick = gbitNuevaPagina;
+$('#gbit-sumar').onclick = gbitSumar;
+$('#gbit-nueva').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); gbitSumar(); }
+});
+$('#gbit-tabs').addEventListener('click', e => {
+  const borrar = e.target.closest('[data-gbit-borrar-pagina]');
+  if(borrar){ gbitBorrarPagina(borrar.dataset.gbitBorrarPagina); return; }
+  const tab = e.target.closest('[data-gbit-pagina]');
+  if(tab && tab.dataset.gbitPagina !== gbit.activa) gbitElegir(tab.dataset.gbitPagina);
+});
+$('#gbit-tabs').addEventListener('change', e => {
+  const input = e.target.closest('[data-gbit-nombre]');
+  if(!input) return;
+  const nombre = input.value.trim().slice(0, 40);
+  if(!nombre) return;
+  fbDb.doc(fbRutaCampana(`gmBitacora/${input.dataset.gbitNombre}`)).update({nombre})
+    .catch(err => { console.error('No se pudo renombrar la página del GM:', err); toast('No se pudo renombrar la página'); });
+});
+$('#gbit-tabs').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.matches('[data-gbit-nombre]')){ e.preventDefault(); e.target.blur(); }
+});
+$('#gbit-entradas').addEventListener('click', e => {
+  const editar = e.target.closest('[data-gbit-editar]');
+  if(editar){
+    gbit.editando = editar.dataset.gbitEditar;
+    gbitRender();
+    const campo = document.querySelector(`textarea[data-gbit-edicion="${gbit.editando}"]`);
+    if(campo){ campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }
+    return;
+  }
+  const guardar = e.target.closest('[data-gbit-guardar]');
+  if(guardar){ gbitGuardarEdicion(guardar.dataset.gbitGuardar); return; }
+  if(e.target.closest('[data-gbit-cancelar]')){ gbit.editando = ''; gbitRender(); return; }
+  const borrar = e.target.closest('[data-gbit-borrar]');
+  if(borrar){
+    if(!confirm('¿Borrar esta entrada de la bitácora del GM?')) return;
+    fbDb.doc(fbRutaCampana(`gmBitacora/${gbit.activa}/entradas/${borrar.dataset.gbitBorrar}`)).delete()
+      .catch(err => { console.error('No se pudo borrar la entrada del GM:', err); toast('No se pudo borrar'); });
+  }
+});
+gbitRender();  // estado inicial: sin conexión hasta entrar a la partida
+
 let toastT;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
@@ -6842,7 +7107,7 @@ function gmAlEntrar(){
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); gbitEscuchar(); }
 }
 
 /* ---------- Mantenimiento del GM ----------

@@ -66,6 +66,17 @@ async function fbArmarRespaldo(){
       entradas: (await docs(p.ref.collection("entradas").orderBy("creado"))).map(plano),
     })));
   }catch(e){ console.warn("Respaldo sin bitácora:", e); }
+  // Bitácora privada del GM (solo la puede leer el GM).
+  let bitacoraGM = [];
+  if(esGM){
+    try{
+      const paginasGM = await docs(base.collection("gmBitacora").orderBy("creado"));
+      bitacoraGM = await Promise.all(paginasGM.map(async p => ({
+        ...plano(p),
+        entradas: (await docs(p.ref.collection("entradas").orderBy("creado"))).map(plano),
+      })));
+    }catch(e){ console.warn("Respaldo sin la bitácora del GM:", e); }
+  }
   // Tienda del vendedor: el json tal cual lo guarda el generador de tiendas.
   const tiendaJson = d => {
     if(!d || !d.exists) return null;
@@ -106,6 +117,7 @@ async function fbArmarRespaldo(){
     mapasExtra,
     tiradas: tiradas.map(plano),
     bitacora,
+    ...(esGM ? {bitacoraGM} : {}),
     tienda: {
       publicada: tiendaJson(tiendaPublicada),
       ...(esGM ? {borrador: tiendaJson(tiendaBorrador), guardadas: tiendasGuardadas.map(d => ({id: d.id, nombre: d.data().nombre, tienda: tiendaJson(d)}))} : {}),

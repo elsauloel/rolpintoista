@@ -960,7 +960,7 @@ $('#btn-borrar-definitivo').onclick = async () => {
   $('#borrar-error').textContent = '';
   try{
     // Colecciones con subcolecciones: primero los hijos.
-    for(const [col, sub, texto] of [['fichas', 'partes', 'personajes'], ['creeps', 'privado', 'creeps'], ['bitacora', 'entradas', 'bitácora']]){
+    for(const [col, sub, texto] of [['fichas', 'partes', 'personajes'], ['creeps', 'privado', 'creeps'], ['bitacora', 'entradas', 'bitácora'], ['gmBitacora', 'entradas', 'bitácora del GM']]){
       estado(`Borrando ${texto}…`);
       const snap = await base.collection(col).get();
       for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));

@@ -165,6 +165,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   Todos leen, suman páginas y entradas, y corrigen cualquier entrada; borra
   el autor (o quien creó la página) o el GM. Va en el respaldo y se borra con
   la partida.
+- `campanas/{id}/gmBitacora/{página}` y `gmBitacora/{página}/entradas/{auto}` —
+  mismo formato que `bitacora`, pero **privada del GM** (solo el GM lee y
+  escribe). La usa el botón 📖 Bitácora GM de `gm-tools.html`. Va en el
+  respaldo (solo si lo baja el GM, como `bitacoraGM`) y se borra con la partida.
 - `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
   gm-tools. Solo el GM.
 - `campanas/{id}/tienda/borrador` y `campanas/{id}/tienda/publicada` —

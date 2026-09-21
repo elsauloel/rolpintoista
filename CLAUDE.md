@@ -14,6 +14,9 @@
 > marca ✅ ahí. Antes de preguntarle algo de diseño al usuario, mirar si ya
 > está en esa lista.
 >
+> **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
+> siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
+>
 > El repo tiene otra rama, `main`: la versión vieja de la campaña "Piratas
 > en el espacio", con sincronización manual por GitHub en vez de Firebase.
 > Queda congelada como archivo histórico — no se migran sus personajes ni

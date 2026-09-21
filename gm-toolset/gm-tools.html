@@ -158,7 +158,12 @@ a.btn{text-decoration:none;display:inline-block}
 .reporte-seccion-titulo{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
 .reporte-lista{display:flex;flex-direction:column;gap:6px}
 .reporte-fila{display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);background:var(--panel2);padding:7px 10px}
+/* los checkbox de las filas no heredan el ancho de los campos de texto */
+.reporte-fila input[type=checkbox],.reporte-loot-item input[type=checkbox],.reporte-contar-escapados input[type=checkbox]{width:auto;min-width:0;flex:none;margin:0;padding:0}
 .reporte-nombre{flex:1;font-weight:700;font-size:13px;min-width:0}
+label.reporte-fila .reporte-nombre{display:flex;flex-direction:column;gap:2px}
+label.reporte-fila .reporte-nombre .reporte-nivel{margin-left:0}
+.reporte-xp.suelto{min-width:96px}
 .reporte-nivel{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);font-weight:400;margin-left:6px}
 .reporte-estado{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;flex:none}
 .reporte-estado.derrotado{color:var(--absenta);border:1px solid var(--absenta)}
@@ -5633,7 +5638,7 @@ function renderReporteCombate(){
           <input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>
           <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}</span>
           <span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span>
-          <span class="reporte-xp">${j.incluido ? `+${fmt(p.xp)} XP · +${fmt(p.dde)} DDE` : 'sin recompensas'}</span></label>`;
+          ${j.incluido ? `<span class="reporte-xp suelto">+${fmt(p.xp)} XP</span><span class="reporte-xp suelto">+${fmt(p.dde)} DDE</span>` : '<span class="reporte-xp">sin recompensas</span>'}</label>`;
       }).join('')
     : '<div class="hint">Todavía no hay personajes en la partida.</div>';
 

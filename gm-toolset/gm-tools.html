@@ -164,6 +164,9 @@ a.btn{text-decoration:none;display:inline-block}
 label.reporte-fila .reporte-nombre{display:flex;flex-direction:column;gap:2px}
 label.reporte-fila .reporte-nombre .reporte-nivel{margin-left:0}
 .reporte-xp.suelto{min-width:96px}
+.rep-valor{display:inline-flex;align-items:center;gap:4px;font-family:"Space Mono",monospace;font-weight:700;color:var(--brass);white-space:nowrap}
+.rep-num{width:76px!important;text-align:right;padding:4px 6px!important;font-weight:700}
+.rep-num.editado{border-color:var(--brass)!important;box-shadow:0 0 0 1px var(--brass)}
 .reporte-nivel{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);font-weight:400;margin-left:6px}
 .reporte-estado{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;flex:none}
 .reporte-estado.derrotado{color:var(--absenta);border:1px solid var(--absenta)}
@@ -5442,7 +5445,7 @@ const XP_ESCAPO_PCT = 0.2;
    ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
 let xpContarEscapados = true;
 let combateRep = nuevoCombateRep();
-function nuevoCombateRep(){ return {oro: {}, xpAjuste: 0, oroAjuste: 0, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null}; }
+function nuevoCombateRep(){ return {oro: {}, manual: {}, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null}; }
 
 /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
    en gm-tools puede haber muchos creeps armados de antemano que no están en la pelea. */
@@ -5589,11 +5592,16 @@ const FACTOR_XP_ESTADO = {'en pie': 1, inconsciente: 0.25, muerto: 0};
 function calcularReparto(rep){
   const incluidos = (combateRep.jugadores || []).filter(j => j.incluido);
   const n = incluidos.length;
-  const xpTotal = Math.max(0, rep.xpTotal + num(combateRep.xpAjuste));
-  const oroTotal = Math.max(0, rep.filas.reduce((a, f) => a + (f.derrotado ? f.oro : 0), 0) + num(combateRep.oroAjuste));
+  const xpTotal = Math.max(0, rep.xpTotal);
+  const oroTotal = Math.max(0, rep.filas.reduce((a, f) => a + (f.derrotado ? f.oro : 0), 0));
   const xpBase = n ? Math.ceil(xpTotal / n) : 0;            // como si todos estuvieran vivos, redondeo hacia arriba
   const ddeCada = n ? Math.ceil(oroTotal / n) : 0;
-  const porJugador = incluidos.map(j => ({j, xp: Math.floor(xpBase * FACTOR_XP_ESTADO[j.estado]), dde: ddeCada}));   // el inconsciente cobra el 25%, redondeado hacia abajo
+  // Lo calculado (el inconsciente cobra el 25%, redondeado hacia abajo), salvo lo que el GM fijó directamente para ese jugador.
+  const porJugador = incluidos.map(j => {
+    const xpAuto = Math.floor(xpBase * FACTOR_XP_ESTADO[j.estado]), ddeAuto = ddeCada;
+    const m = combateRep.manual[j.id] || {};
+    return {j, xp: m.xp !== undefined ? m.xp : xpAuto, dde: m.dde !== undefined ? m.dde : ddeAuto, xpAuto, ddeAuto, editado: m.xp !== undefined || m.dde !== undefined};
+  });
   return {n, xpTotal, oroTotal, xpBase, ddeCada, porJugador};
 }
 function itemsPublicables(rep){
@@ -5642,7 +5650,9 @@ function renderReporteCombate(){
           <input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>
           <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}</span>
           <span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span>
-          ${j.incluido ? `<span class="reporte-xp suelto">+${fmt(p.xp)} XP</span><span class="reporte-xp suelto">+${fmt(p.dde)} DDE</span>` : '<span class="reporte-xp">sin recompensas</span>'}</label>`;
+          ${j.incluido ? `<span class="rep-valor" title="${p.editado ? 'Lo fijaste vos (calculado: ' + fmt(p.xpAuto) + ' XP, ' + fmt(p.ddeAuto) + ' DDE)' : 'Calculado: podés cambiarlo'}">+<input type="number" min="0" step="1" class="rep-num${p.editado ? ' editado' : ''}" data-rep-xp="${esc(j.id)}" value="${p.xp}"> XP</span>
+            <span class="rep-valor">+<input type="number" min="0" step="1" class="rep-num${p.editado ? ' editado' : ''}" data-rep-dde="${esc(j.id)}" value="${p.dde}"> DDE</span>
+            ${p.editado ? `<button type="button" class="iconbtn" data-rep-reset="${esc(j.id)}" title="Volver al valor calculado" style="padding:2px 8px">↺</button>` : '<span style="width:34px"></span>'}` : '<span class="reporte-xp">sin recompensas</span>'}</label>`;
       }).join('')
     : '<div class="hint">Todavía no hay personajes en la partida.</div>';
 
@@ -5650,16 +5660,14 @@ function renderReporteCombate(){
     <div>
       <div class="reporte-seccion-titulo">Lo que recibe cada jugador</div>
       <div class="reporte-lista">${jugHtml}</div>
-      <div class="hint" style="margin-top:4px">Destildá a quien no estuvo en el combate. En pie cobra el 100% de la XP; inconsciente, el 25% (redondeado hacia abajo); muerto, nada. El oro se reparte parejo.</div>
+      <div class="hint" style="margin-top:4px">Destildá a quien no estuvo en el combate. <b>Los números de cada jugador se pueden cambiar directamente</b> (XP y DDE); ↺ vuelve al valor calculado. Lo calculado: en pie cobra el 100% de la XP, inconsciente el 25% (hacia abajo), muerto nada; el oro se reparte parejo.</div>
     </div>
     <div>
       <div class="reporte-seccion-titulo">Cálculo: experiencia y oro de los creeps</div>
       <div class="reporte-lista">${filasHtml}</div>
       ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" id="finalizar-combate-contar-escapados" ${xpContarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)</label>` : ''}
-      <div class="reporte-dividir" style="margin-top:8px">Ajuste del GM a la XP <input type="number" step="10" id="rep-xp-ajuste" value="${num(combateRep.xpAjuste)}" style="width:90px"> <span class="hint">(sumá o restá por circunstancias de la pelea)</span></div>
-      <div class="reporte-total">XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `base por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador'}</div>
-      <div class="reporte-dividir" style="margin-top:8px">Ajuste del GM al oro <input type="number" step="5" id="rep-oro-ajuste" value="${num(combateRep.oroAjuste)}" style="width:90px"> <span class="hint">(el oro ya tiene su variación de ±20%: no se vuelve a tirar)</span></div>
-      <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
+      <div class="reporte-total">Calculado — XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `base por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador'}</div>
+      <div class="reporte-total">Calculado — oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20%, no se vuelve a tirar) · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
     </div>
     <div>
       <div class="reporte-seccion-titulo">Despojos: equipos y trofeos que los jugadores van a poder elegir</div>
@@ -5675,8 +5683,13 @@ function renderReporteCombate(){
   });
   b.querySelectorAll('[data-rep-item]').forEach(c => c.onchange = () => { if(c.checked) combateRep.quitados.delete(c.dataset.repItem); else combateRep.quitados.add(c.dataset.repItem); renderReporteCombate(); });
   b.querySelectorAll('[data-rep-jug]').forEach(c => c.onchange = () => { const j = combateRep.jugadores.find(x => x.id === c.dataset.repJug); if(j) j.incluido = c.checked; renderReporteCombate(); });
-  $('#rep-xp-ajuste').onchange = e => { combateRep.xpAjuste = num(e.target.value); renderReporteCombate(); };
-  $('#rep-oro-ajuste').onchange = e => { combateRep.oroAjuste = num(e.target.value); renderReporteCombate(); };
+  b.querySelectorAll('[data-rep-xp],[data-rep-dde]').forEach(inp => inp.onchange = () => {
+    const id = inp.dataset.repXp || inp.dataset.repDde, campo = inp.dataset.repXp ? 'xp' : 'dde';
+    const v = Math.max(0, num(inp.value));
+    (combateRep.manual[id] = combateRep.manual[id] || {})[campo] = campo === 'xp' ? Math.round(v) : Math.round(v * 100) / 100;
+    renderReporteCombate();
+  });
+  b.querySelectorAll('[data-rep-reset]').forEach(x => x.onclick = () => { delete combateRep.manual[x.dataset.repReset]; renderReporteCombate(); });
   $('#rep-extra-add').onclick = () => {
     const nombre = $('#rep-extra-nombre').value.trim();
     if(!nombre){ toast('Escribí el nombre del ítem extra'); return; }
@@ -5715,7 +5728,7 @@ async function publicarRecompensas(){
   if(!rp.n){ toast('Elegí al menos un jugador'); return; }
   if(combateActual && combateActual.estado === 'publicado'){ toast('Hay un botín anterior sin cerrar: cerralo primero con 🎁 Despojos (ahí se pagan su XP y su oro)'); return; }
   const items = itemsPublicables(rep);
-  if(!confirm(`¿Publicar los despojos?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`)) return;
+  if(!confirm(`¿Publicar los despojos?\n\n${rp.porJugador.map(({j, xp, dde}) => `· ${j.nombre}: +${fmt(xp)} XP, +${fmt(dde)} DDE`).join('\n')}\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`)) return;
   combateRep.publicando = true;
   renderReporteCombate();
   try{

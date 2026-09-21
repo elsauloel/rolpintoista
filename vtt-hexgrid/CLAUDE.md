@@ -612,7 +612,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   ver "Sigilo (en diseño)" en `../docs/plan-sistema-nuevo.md`) — un
   jugador que mire la base de datos directamente podría ver el token
   igual, las reglas no lo esconden a ese nivel.
-- **🗺 Varios mapas guardados** (botón de la cabecera, con el nombre del
+- **🗺 Varios mapas guardados** (botón de la cabecera, con el nombre del (2026-09-21: "+ Nuevo mapa" está ARRIBA del panel, con Cerrar, porque con muchos mapas abajo quedaba fuera de la vista; el panel del costado se desplaza si es largo, y el botón de la cabecera lleva una ▾)
   mapa que se está mostrando; solo el GM puede abrirlo y hacer algo,
   jugadores lo ven pero deshabilitado): el GM arma de antemano escenarios
   con su propio fondo, sus tokens, su modo narrativo/combate y su orden de

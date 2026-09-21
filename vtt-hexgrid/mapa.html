@@ -130,6 +130,8 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #btn-nuevo .ayuda-icono:hover,#btn-nuevo .ayuda-icono:focus{background:#180F08;color:var(--brass);border-color:#180F08}
 #btn-nuevo .ayuda-globo{left:-70px;text-align:left}
 #panel-token:empty{display:none}
+/* Con muchos mapas (u otros paneles largos) el panel del costado se desplaza en vez de cortarse. */
+#panel-token{max-height:62vh;overflow-y:auto}
 /* Aviso fijo mientras se coloca un token nuevo (lugar y orientación). */
 #colocando-aviso{
   position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:26;max-width:80%;text-align:center;pointer-events:none;
@@ -5744,10 +5746,10 @@ function renderPanel(forzar){
         </div>`;
       }).join('');
     panel.innerHTML =
-      '<h2>Mapas</h2>' +
+      // El botón de crear va ARRIBA (con muchos mapas, abajo quedaba fuera de la vista).
+      '<div class="fila" style="margin:0 0 8px;justify-content:space-between"><h2 style="margin:0">Mapas</h2><span><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button> <button type="button" class="btn" id="mapas-cerrar" title="Cerrar la lista de mapas">Cerrar</button></span></div>' +
       '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
-      filas +
-      '<div class="fila" style="margin-top:10px"><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button><button type="button" class="btn" id="mapas-cerrar">Cerrar</button></div>';
+      filas;
     panel.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
     panel.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
     panel.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));

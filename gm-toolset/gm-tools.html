@@ -1008,7 +1008,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <div class="body" id="botin-gm-cuerpo"></div>
     <footer>
       <button class="btn ghost" id="botin-gm-cerrar">Cerrar</button>
-      <button class="btn primary" id="botin-gm-despojar" title="Convierte en despojos lo que nadie tomó, lo reparte y cierra el botín del todo">🧰 Despojar lo que nadie tomó</button>
+      <button class="btn primary" id="botin-gm-despojar" title="Último paso: convierte en despojos lo que nadie tomó, carga la XP, el oro y los despojos en las fichas y cierra el botín del todo">🏁 Cerrar botín y repartir XP y oro</button>
     </footer>
   </div>
 </div>
@@ -5713,18 +5713,20 @@ async function publicarRecompensas(){
   const rep = generarReporteCombate(xpContarEscapados);
   const rp = calcularReparto(rep);
   if(!rp.n){ toast('Elegí al menos un jugador'); return; }
+  if(combateActual && combateActual.estado === 'publicado'){ toast('Hay un botín anterior sin cerrar: cerralo primero con 🎁 Despojos (ahí se pagan su XP y su oro)'); return; }
   const items = itemsPublicables(rep);
-  if(!confirm(`¿Publicar los despojos?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\nLa XP y el oro se cargan solos en las fichas${items.length ? ', y a los jugadores se les abre la ventana del botín en el mapa para que elijan' : ''}.`)) return;
+  if(!confirm(`¿Publicar los despojos?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`)) return;
   combateRep.publicando = true;
   renderReporteCombate();
   try{
     const ts = firebase.firestore.FieldValue.serverTimestamp();
     const batch = fbDb.batch();
-    rp.porJugador.forEach(({j, xp, dde}) => {
+    // Con ítems en el botín, la XP y el oro se cargan en las fichas al CERRAR el botín (🎁 Despojos → cerrar); sin ítems, ya mismo.
+    if(!items.length) rp.porJugador.forEach(({j, xp, dde}) => {
       batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: 0, estado: j.estado, aplicada: false, creado: ts});
     });
     batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {numero: Date.now(), estado: items.length ? 'publicado' : 'cerrado', titulo: 'Batalla terminada', items: items.length, creado: ts,
-      jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde}) => ({fichaId: j.id, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100}))});
+      jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde}) => ({fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100}))});
     items.forEach(i => {
       batch.set(fbDb.collection(fbRutaCampana('botin')).doc(), {nombre: String(i.nombre).slice(0, 80), json: JSON.stringify(i.template), origen: String(i.origen).slice(0, 80),
         precioCompra: num(i.precioCompra), despojos: Math.ceil(num(i.precioCompra) / 4), tomadoPor: '', tomadoNombre: '', creado: ts});
@@ -5933,7 +5935,7 @@ function renderBotinGM(){
       <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')} <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('')}</div>` : ''}
     <div class="reporte-seccion-titulo" style="margin-top:14px">Despojar: ${fmt(total)} despojos${n ? ` → ${fmt(cada)} c/u (hacia arriba)` : ''}</div>
     ${jug === null ? '<div class="hint">Cargando personajes…</div>' : jug.map(j => `<label class="reporte-fila" style="cursor:pointer;gap:8px;align-items:center"><input type="checkbox" data-botin-jug="${esc(j.id)}"${botinGM.incluidos.has(j.id) ? ' checked' : ''}><span class="reporte-nombre">${esc(j.nombre)}</span></label>`).join('')}
-    <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá <b>Despojar</b>: lo que queda se convierte en despojos, se reparte y se carga solo en las fichas, y el botín se cierra del todo.</div>`;
+    <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá el botón de abajo: lo que nadie tomó se convierte en despojos y se reparte, <b>recién ahí se cargan en las fichas la experiencia y el oro</b> de la batalla, y el botín se cierra del todo.</div>`;
   $('#botin-gm-cuerpo').querySelectorAll('[data-botin-ver]').forEach(x => x.onclick = () => {
     const d = botinGM.docs.find(y => y.id === x.dataset.botinVer);
     let it = null;
@@ -5941,26 +5943,36 @@ function renderBotinGM(){
     if(it) verItemDatos({...it, nombre: it.nombre || d.nombre});
   });
   $('#botin-gm-cuerpo').querySelectorAll('[data-botin-jug]').forEach(c => c.onchange = () => { if(c.checked) botinGM.incluidos.add(c.dataset.botinJug); else botinGM.incluidos.delete(c.dataset.botinJug); renderBotinGM(); });
-  $('#botin-gm-despojar').disabled = botinGM.ocupado || !botinGM.docs.length || !n;
+  $('#botin-gm-despojar').disabled = botinGM.ocupado;
+  $('#botin-gm-despojar').textContent = libres.length ? '🏁 Despojar lo que nadie tomó y repartir XP y oro' : '🏁 Cerrar botín y repartir XP y oro';
 }
 async function despojarBotin(){
   if(botinGM.ocupado) return;
   const libres = botinGM.docs.filter(d => !d.tomadoPor);
   const elegidos = (botinGM.jugadores || []).filter(j => botinGM.incluidos.has(j.id));
-  if(!elegidos.length){ toast('Elegí al menos un personaje'); return; }
+  const cobran = (combateActual && Array.isArray(combateActual.jugadores)) ? combateActual.jugadores : [];
   const total = libres.reduce((a, d) => a + num(d.despojos), 0);
-  const cada = Math.ceil(total / elegidos.length);
-  if(!confirm(`¿Despojar?\n\nLo que no se tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).`)) return;
+  const cada = elegidos.length ? Math.ceil(total / elegidos.length) : 0;
+  const lineasPago = cobran.map(c => `${c.nombre}: +${fmt(num(c.xp))} XP, +${fmt(num(c.dde))} DDE`).join('\n');
+  if(!confirm(`¿Cerrar el botín?\n\n· ${libres.length ? `Lo que nadie tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).` : 'No queda nada sin tomar.'}\n· Se cargan en las fichas la experiencia y el oro de la batalla:\n${lineasPago || '(nada)'}`)) return;
   botinGM.ocupado = true; renderBotinGM();
   try{
     const ts = firebase.firestore.FieldValue.serverTimestamp();
     const batch = fbDb.batch();
-    if(cada > 0) elegidos.forEach(j => batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp: 0, dde: 0, despojos: cada, estado: 'despojos', aplicada: false, creado: ts}));
+    // Un solo pago por personaje: la XP y el DDE de la batalla + su parte de los despojos. La ficha del dueño lo aplica sola.
+    const ids = [...new Set([...cobran.map(c => c.fichaId), ...elegidos.map(j => j.id)])];
+    ids.forEach(id => {
+      const c = cobran.find(x => x.fichaId === id), e = elegidos.find(x => x.id === id), f = (botinGM.jugadores || []).find(x => x.id === id);
+      const xp = c ? num(c.xp) : 0, dde = c ? num(c.dde) : 0, desp = e ? cada : 0;
+      const duenoUid = (c && c.duenoUid) || (f && f.duenoUid) || '';
+      if(!duenoUid || !(xp > 0 || dde > 0 || desp > 0)) return;
+      batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: id, duenoUid, nombre: String((c && c.nombre) || (f && f.nombre) || '').slice(0, 60), xp, dde, despojos: desp, estado: (c && c.estado) || 'despojos', aplicada: false, creado: ts});
+    });
     botinGM.docs.forEach(d => batch.delete(fbDb.collection(fbRutaCampana('botin')).doc(d.id)));
     batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
     await batch.commit();
-    await mesaLineaVerde('🧰 Despojos del combate', `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} despojos a ${elegidos.map(j => j.nombre).join(', ')}`);
-    toast(`Despojado ✓ — +${fmt(cada)} despojos para cada uno`);
+    await mesaLineaVerde('🏁 Botín cerrado', `${libres.length ? `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} c/u a ${elegidos.map(j => j.nombre).join(', ')} · ` : ''}XP y oro cargados en las fichas`);
+    toast('Botín cerrado ✓ — XP, oro y despojos cargados en las fichas');
     $('#scrim-botin-gm').classList.remove('open');
   }catch(err){
     console.error('No se pudo despojar:', err);

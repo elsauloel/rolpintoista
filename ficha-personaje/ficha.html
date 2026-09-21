@@ -7187,7 +7187,7 @@ function botinLootCuerpo(){
         <span class="hint">${esc(j.estado || '')}</span>
         <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.xp))}</b> XP</span>
         <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.dde))}</b> DDE</span></div>`).join('')}</div>
-      <div class="hint" style="margin-top:4px">La experiencia y el oro se cargan solos en cada ficha.</div></div>` : '';
+      <div class="hint" style="margin-top:4px">${combatePublicado() ? 'La experiencia y el oro se cargan en las fichas cuando el GM cierra el botín, después de que todos elijan.' : 'La experiencia y el oro ya se cargaron en las fichas.'}</div></div>` : '';
   const cerrado = combateActual && combateActual.estado === 'cerrado' && botinLoot.length === 0
     ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';
   $('#botin-loot-body').innerHTML = `

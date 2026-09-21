@@ -127,5 +127,26 @@ const TokensAuto = (() => {
     return {colocadas: elegidas.length, mapaId};
   }
 
-  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas};
+  /* ---------- Grupos de creeps ↔ mapas ----------
+     Cada grupo de creeps (GM Tools) puede vincularse a un mapa guardado, para "Traer tokens" de un golpe. Un grupo tiene a lo sumo un
+     mapa; un mapa puede tener varios grupos. Vive en campanas/<id>/gm/gruposMapas = {enlaces: [{grupo, mapaId}]} (solo el GM). */
+  const refEnlaces = () => fbDb.doc(fbRutaCampana('gm/gruposMapas'));
+  function enlacesEscuchar(alCambiar){
+    return refEnlaces().onSnapshot(snap => {
+      const d = snap.exists ? snap.data() : {};
+      alCambiar((Array.isArray(d.enlaces) ? d.enlaces : []).filter(e => e && e.grupo && e.mapaId));
+    }, err => console.error('Error escuchando los grupos vinculados a mapas:', err));
+  }
+  async function enlacesGuardar(lista){
+    await refEnlaces().set({
+      enlaces: lista.slice(0, 200).map(e => ({grupo: String(e.grupo).slice(0, 40), mapaId: String(e.mapaId).slice(0, 80)})),
+      actualizado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+  // Lista nueva con el grupo vinculado a ese mapa (o sin mapa si mapaId viene vacío).
+  const vincular = (lista, grupo, mapaId) => [...lista.filter(e => e.grupo !== grupo), ...(mapaId ? [{grupo, mapaId}] : [])];
+  const mapaDeGrupo = (lista, grupo) => { const e = lista.find(x => x.grupo === grupo); return e ? e.mapaId : ''; };
+  const gruposDeMapa = (lista, mapaId) => lista.filter(e => e.mapaId === mapaId).map(e => e.grupo);
+
+  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, enlacesEscuchar, enlacesGuardar, vincular, mapaDeGrupo, gruposDeMapa};
 })();

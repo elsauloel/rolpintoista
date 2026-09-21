@@ -124,6 +124,8 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
   box-shadow:0 8px 22px rgba(0,0,0,.5);padding:5px 7px}
 /* + Token con su (?) adentro: el globo de ayuda se abre hacia abajo desde el botón. */
 #btn-nuevo{position:relative;display:inline-flex;align-items:center;gap:8px}
+#ayuda-token{position:relative}
+#ayuda-token .ayuda-globo{left:-70px;text-align:left}
 #btn-nuevo .ayuda-icono{width:17px;height:17px;border-color:rgba(24,15,8,.6);color:#180F08;font-weight:700;cursor:help}
 #btn-nuevo .ayuda-icono:hover,#btn-nuevo .ayuda-icono:focus{background:#180F08;color:var(--brass);border-color:#180F08}
 #btn-nuevo .ayuda-globo{left:-70px;text-align:left}
@@ -275,14 +277,26 @@ aside{
   border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
 }
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
-#toolkit-pestana,#toolkit-dados{
+#toolkit-pestana,#toolkit-dados,#toolkit-tokens{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
   width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
   background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
   box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
-#toolkit-pestana:hover,#toolkit-dados:hover{background:var(--panel2);color:var(--paper)}
+#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover{background:var(--panel2);color:var(--paper)}
+/* El botón de tokens va arriba de los dados, del mismo tamaño y forma; su menú se despliega al costado. */
+#toolkit-tokens{top:calc(50% - 154px);transform:none}
+#toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
+#tokens-menu{
+  position:absolute;left:calc(100% + 56px);top:calc(50% - 154px);z-index:30;min-width:250px;max-width:320px;max-height:60vh;overflow:auto;
+  display:flex;flex-direction:column;gap:6px;padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
+  box-shadow:6px 6px 22px rgba(0,0,0,.55)
+}
+#tokens-menu[hidden]{display:none}
+#tokens-menu .tm-tit{display:flex;justify-content:space-between;align-items:center;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+#tokens-menu .tm-sub{display:flex;flex-direction:column;gap:4px;margin:0 0 2px 10px;padding-left:8px;border-left:2px solid var(--line-soft)}
+#tokens-menu .hint{font-size:11.5px;opacity:.8}
 /* El botón de dados va justo arriba de la pestaña, del mismo tamaño y forma. */
 #toolkit-dados{top:calc(50% - 77px);transform:none}
 #toolkit.abierto #toolkit-pestana{color:var(--paper);border-color:var(--copper)}
@@ -611,7 +625,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
   <button type="button" class="btn" id="btn-mapas" title="Mapas guardados" hidden>🗺 <span id="mapas-nombre">Mapa 1</span></button>
-  <button type="button" class="btn primary" id="btn-nuevo" disabled>+ Token <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span></button>
+  <button type="button" class="btn primary" id="btn-nuevo" disabled hidden>+ Token</button>
+  <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <div class="desplegable" id="personajes-caja" hidden>
     <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
@@ -703,6 +718,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
       </nav>
       <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">☭</button>
       <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
+      <button type="button" id="toolkit-tokens" title="Tokens: poner uno nuevo (y, si sos GM, traer los de los jugadores y los de los creeps)">🎭</button>
+      <div id="tokens-menu" hidden></div>
     </div>
     <!-- Tablero de iniciativa: flotante y transparente, solo en modo combate -->
     <div id="iniciativa" hidden>
@@ -723,10 +740,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
         <button type="button" class="btn chico" id="btn-finalizar-mapa" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
         <button type="button" class="btn chico" id="btn-botin-mapa" title="Lo que los jugadores no tomaron: repartirlo como despojos">🎁 Botín</button>
-        <button type="button" class="btn chico" id="btn-importar-tokens" title="Crea un token por cada creep de un grupo de GM Tools, en fila, en el centro de lo que ves (ocultos)">📥 Importar tokens</button>
-        <button type="button" class="btn chico" id="btn-tokens-jugadores" title="Crea los tokens de los personajes de los jugadores que todavía no tienen token en este mapa">👥 Tokens de jugadores</button>
       </div>
-      <div id="importar-menu" style="display:none;flex-direction:column;gap:4px;margin-top:6px"></div>
     </div>
     <div class="seccion" id="panel-token"></div>
     <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
@@ -973,7 +987,22 @@ let arrastreTrazo = null;     // {id, dx, dy, inicioX, inicioY, movio}: arrastra
 let rotandoTrazo = null;      // {id, cx, cy} (cx,cy: centro en pantalla, fijo durante el arrastre)
 let arrastreElemento = null;  // {id, inicioX, inicioY, movio}: arrastra un elemento de terreno/formas
 let rotandoElemento = null;   // {id}
-let panelMapas = false;       // GM: panel de mapas guardados abierto
+let panelMapas = false;
+// Grupos de creeps vinculados a un mapa (para "Traer tokens de creeps"): chips con ✕ y un selector para sumar otro.
+function gruposDeMapaHtml(mapaId){
+  const propios = TokensAuto.gruposDeMapa(enlacesGM, mapaId);
+  const existentes = new Set([...gruposDeCreepsPub().keys(), ...enlacesGM.map(e => e.grupo)]);
+  const libres = [...existentes].filter(g => TokensAuto.mapaDeGrupo(enlacesGM, g) !== mapaId).sort((a, b) => a.localeCompare(b, 'es'));
+  return `<div class="fila" style="margin-top:4px;flex-wrap:wrap;gap:4px;align-items:center" title="Los grupos de creeps vinculados a este mapa se traen juntos con 🎭 → Traer tokens de creeps">
+      <span class="ayuda" style="margin:0">Grupos:</span>
+      ${propios.map(g => `<span class="btn" style="padding:2px 6px;font-size:11.5px;display:inline-flex;gap:4px;align-items:center">${esc(g)} <a href="#" data-mapa-grupo-quitar="${esc(g)}" title="Desvincular" style="text-decoration:none;color:inherit">✕</a></span>`).join('') || '<span class="ayuda" style="margin:0">ninguno</span>'}
+      ${libres.length ? `<select data-mapa-grupo-add="${esc(mapaId)}" style="max-width:130px;font-size:11.5px"><option value="">＋ vincular grupo…</option>${libres.map(g => `<option value="${esc(g)}">${esc(g)}${TokensAuto.mapaDeGrupo(enlacesGM, g) ? ' (hoy: ' + esc(nombreMapa(TokensAuto.mapaDeGrupo(enlacesGM, g))) + ')' : ''}</option>`).join('')}</select>` : ''}
+    </div>`;
+}
+async function vincularGrupoAMapa(grupo, mapaId){
+  try{ await TokensAuto.enlacesGuardar(TokensAuto.vincular(enlacesGM, grupo, mapaId)); }
+  catch(err){ console.error('No se pudo vincular el grupo:', err); toast('No se pudo vincular el grupo'); }
+}       // GM: panel de mapas guardados abierto
 
 /* ---------- Lápiz (caja de herramientas) ----------
    campanas/<partida>/trazos/{auto} (o mapas/{id}/trazos/{auto}): {puntos:
@@ -5640,6 +5669,7 @@ function renderPanel(forzar){
             <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
             ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
           </div>
+          ${gruposDeMapaHtml(id)}
         </div>`;
       }).join('');
     panel.innerHTML =
@@ -5651,6 +5681,8 @@ function renderPanel(forzar){
     panel.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
     panel.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
     panel.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
+    panel.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = () => { if(sel.value) vincularGrupoAMapa(sel.value, sel.dataset.mapaGrupoAdd); });
+    panel.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
     $('#mapa-nuevo').onclick = crearMapa;
     $('#mapas-cerrar').onclick = () => { panelMapas = false; renderPanel(true); };
     return;
@@ -6753,30 +6785,37 @@ function centroDeLaVista(){
   const w = pantallaAMundo(anchoPx / 2, altoPx / 2);
   return mundoAHex(w.x, w.y);
 }
-$('#btn-importar-tokens').onclick = () => {
-  const menu = $('#importar-menu');
-  if(menu.style.display === 'flex'){ menu.style.display = 'none'; return; }
-  const grupos = new Map();
-  creepsPub.forEach((c, id) => { if(c.grupo) grupos.set(c.grupo, [...(grupos.get(c.grupo) || []), {id, nombre: c.nombre, color: c.color}]); });
-  if(!grupos.size){ toast('No hay grupos de creeps: armalos en GM Tools (pestañas de creeps)'); return; }
-  menu.innerHTML = [...grupos.entries()].sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([g, l]) => `<button type="button" class="btn chico" data-imp-grupo="${esc(g)}">${esc(g)} · ${l.length} creep(s)</button>`).join('');
-  menu.style.display = 'flex';
-};
-$('#importar-menu').addEventListener('click', async e => {
-  const b = e.target.closest('[data-imp-grupo]');
-  if(!b) return;
+/* ---------- Tokens: botón del borde izquierdo (🎭) ----------
+   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer tokens de jugadores" y "Traer tokens de
+   creeps" (por grupo; los grupos vinculados a este mapa van primero y se pueden traer todos juntos). Los tokens salen en fila, en el
+   centro de lo que se ve, saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
+let enlacesGM = [];   // [{grupo, mapaId}] (campanas/<id>/gm/gruposMapas, solo el GM)
+function escucharEnlaces(){
+  if(!soyGM) return;
+  TokensAuto.enlacesEscuchar(l => {
+    enlacesGM = l;
+    if(panelMapas) renderPanel(true);
+    if(!$('#tokens-menu').hidden) renderTokensMenu();
+  });
+}
+function gruposDeCreepsPub(){
+  const m = new Map();
+  creepsPub.forEach(c => { if(c.grupo) m.set(c.grupo, (m.get(c.grupo) || 0) + 1); });
+  return m;
+}
+async function traerTokensDeGrupos(nombres){
   const lista = [];
-  creepsPub.forEach((c, id) => { if(c.grupo === b.dataset.impGrupo) lista.push({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}); });
-  $('#importar-menu').style.display = 'none';
+  creepsPub.forEach((c, id) => { if(nombres.includes(c.grupo)) lista.push({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}); });
+  if(!lista.length){ toast('Esos grupos no tienen creeps'); return; }
   try{
     const r = await TokensAuto.crear(lista, {mapaId: mapaMostrado, centro: centroDeLaVista()});
-    toast(r.creados ? `📥 ${r.creados} token(s) creados, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los creeps del grupo ya tienen token en este mapa');
+    toast(r.creados ? `👹 ${r.creados} token(s) de creeps creados, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos esos creeps ya tienen token en este mapa');
   }catch(err){
-    console.error('No se pudieron importar los tokens:', err);
+    console.error('No se pudieron traer los tokens de creeps:', err);
     toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
   }
-});
-$('#btn-tokens-jugadores').onclick = async () => {
+}
+async function traerTokensDeJugadores(){
   const fichas = [...fichasPub.entries()].filter(([id]) => !String(id).includes(SEP_INVOCACION));
   if(!fichas.length){ toast('Todavía no hay personajes en la partida'); return; }
   if(!confirm(`Se crean los tokens (visibles) de estos personajes, en fila, en el centro de lo que ves. Los que ya tienen token en este mapa se saltean:\n\n${fichas.map(([, f]) => f.nombre).join(', ')}`)) return;
@@ -6785,12 +6824,58 @@ $('#btn-tokens-jugadores').onclick = async () => {
     const r = await TokensAuto.crear(items, {mapaId: mapaMostrado, centro: centroDeLaVista()});
     toast(r.creados ? `👥 ${r.creados} token(s) de jugadores creados${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los personajes ya tienen token en este mapa');
   }catch(err){
-    console.error('No se pudieron crear los tokens de jugadores:', err);
+    console.error('No se pudieron traer los tokens de jugadores:', err);
     toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
   }
+}
+let tokensMenuCreeps = false;   // el submenú de grupos está desplegado
+function renderTokensMenu(){
+  const menu = $('#tokens-menu');
+  const grupos = gruposDeCreepsPub();
+  const deEsteMapa = TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado).filter(g => grupos.has(g));
+  const filaGrupo = g => {
+    const otro = TokensAuto.mapaDeGrupo(enlacesGM, g);
+    const nota = otro === mapaMostrado ? '★ ' : '';
+    const sufijo = otro && otro !== mapaMostrado ? ` → ${nombreMapa(otro)}` : '';
+    return `<button type="button" class="btn chico" data-tm-grupo="${esc(g)}" style="text-align:left">${nota}${esc(g)} · ${grupos.get(g)}${esc(sufijo)}</button>`;
+  };
+  menu.innerHTML =
+    `<div class="tm-tit"><span>🎭 Tokens</span></div>` +
+    '<button type="button" class="btn primary chico" data-tm="nuevo" style="text-align:left">＋ Token nuevo</button>' +
+    '<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Crea los tokens de los personajes que todavía no tienen token en este mapa">👥 Traer tokens de jugadores</button>' +
+    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Crea un token por cada creep de un grupo de GM Tools (ocultos)">👹 Traer tokens de creeps ${tokensMenuCreeps ? '▴' : '▾'}</button>` +
+    (tokensMenuCreeps
+      ? '<div class="tm-sub">' + (grupos.size
+          ? (deEsteMapa.length ? `<button type="button" class="btn primary chico" data-tm="vinculados" style="text-align:left" title="Los grupos que vinculaste a este mapa (en GM Tools o en 🗺 Mapas)">★ Grupos de este mapa: ${esc(deEsteMapa.join(', '))}</button>` : '')
+            + [...grupos.keys()].sort((a, b) => a.localeCompare(b, 'es')).map(filaGrupo).join('')
+          : '<div class="hint">No hay grupos de creeps: armalos en GM Tools.</div>') + '</div>'
+      : '');
+}
+function abrirTokensMenu(abrir){
+  const menu = $('#tokens-menu');
+  menu.hidden = !abrir;
+  $('#toolkit-tokens').classList.toggle('activo', abrir);
+  if(abrir){ tokensMenuCreeps = false; renderTokensMenu(); }
+}
+$('#toolkit-tokens').onclick = e => {
+  e.stopPropagation();
+  if(!soyGM){ $('#btn-nuevo').click(); return; }   // jugador: directo a "Nuevo token"
+  abrirTokensMenu($('#tokens-menu').hidden);
 };
-
-setTimeout(guardarVista, 2000);   // deja anotado el centro de la vista aunque el GM no la mueva
+$('#tokens-menu').addEventListener('click', e => {
+  e.stopPropagation();
+  const g = e.target.closest('[data-tm-grupo]');
+  if(g){ abrirTokensMenu(false); traerTokensDeGrupos([g.dataset.tmGrupo]); return; }
+  const b = e.target.closest('[data-tm]');
+  if(!b) return;
+  const que = b.dataset.tm;
+  if(que === 'nuevo'){ abrirTokensMenu(false); $('#btn-nuevo').click(); }
+  else if(que === 'jugadores'){ abrirTokensMenu(false); traerTokensDeJugadores(); }
+  else if(que === 'creeps'){ tokensMenuCreeps = !tokensMenuCreeps; renderTokensMenu(); }
+  else if(que === 'vinculados'){ abrirTokensMenu(false); traerTokensDeGrupos(TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado)); }
+});
+document.addEventListener('mousedown', e => { if(!$('#tokens-menu').hidden && !e.target.closest('#tokens-menu, #toolkit-tokens')) abrirTokensMenu(false); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#tokens-menu').hidden) abrirTokensMenu(false); });
 
 function abrirAcciones(creepId, mensaje){
   const capa = $('#botonera-capa');
@@ -7570,6 +7655,7 @@ function arrancarEnVivo(){
   // iniciativa/tokens del mapa que corresponda).
   escucharMapas();
   escucharMapaActivo();
+  escucharEnlaces();
   mesaEscuchar();
   mesaHistorialAlEntrar();
   actualizarBotonMapas();

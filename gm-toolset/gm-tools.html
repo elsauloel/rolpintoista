@@ -5766,18 +5766,34 @@ function renderGruposBarra(){
   caja.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
       ${tab('', 'Todos', cuenta(''))}${grupos.map(g => tab(g, g, cuenta(g))).join('')}${sinGrupo && grupos.length ? tab('__sin', 'Sin grupo', sinGrupo) : ''}
       <button type="button" class="btn ghost" data-grupo-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un grupo (un escenario de combate)">＋ Grupo</button>
-      ${real ? `<span style="margin-left:auto;display:flex;gap:6px">
+      ${real ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <label class="hint" style="display:flex;gap:4px;align-items:center" title="Mapa vinculado a este grupo: Crear tokens y Traer tokens (en el mapa) lo usan">🗺 <select data-grupo-mapa="1" style="padding:3px 6px;font-size:12.5px"><option value="">sin mapa</option>${[...mapasNombres.keys()].map(id => `<option value="${esc(id)}"${TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo) === id ? ' selected' : ''}>${esc(nombreDeMapaGM(id))}</option>`).join('')}</select></label>
         <button type="button" class="btn primary" data-grupo-tokens="1" title="Crea un token por cada creep de este grupo, en fila, en el centro del mapa que estás viendo (ocultos a los jugadores)">🎯 Crear tokens (${cuenta(grupoActivo)})</button>
         <button type="button" class="btn ghost" data-grupo-renombrar="1" title="Renombrar el grupo">✎</button>
         <button type="button" class="btn ghost" data-grupo-borrar="1" title="Quitar el grupo (los creeps quedan sin grupo)">🗑</button></span>` : ''}
     </div>`;
+}
+/* Grupo ↔ mapa: cada grupo puede tener un mapa vinculado (el mismo dato se edita desde el panel de Mapas del mapa). Si lo tiene,
+   "Crear tokens" los pone en ese mapa; si no, en el que el GM está viendo. */
+let gruposMapas = [];
+const mapasNombres = new Map();
+function nombreDeMapaGM(id){ return mapasNombres.get(id) || (id === '_principal' ? 'Mapa 1' : id); }
+function gruposMapasEscuchar(){
+  TokensAuto.enlacesEscuchar(l => { gruposMapas = l; renderGruposBarra(); });
+  fbDb.collection(fbRutaCampana('mapas')).onSnapshot(snap => {
+    mapasNombres.clear();
+    snap.docs.forEach(d => mapasNombres.set(d.id, String(d.data().nombre || 'Mapa')));
+    if(!mapasNombres.has('_principal')) mapasNombres.set('_principal', 'Mapa 1');
+    renderGruposBarra();
+  }, err => console.error('Error escuchando la lista de mapas:', err));
 }
 async function crearTokensDelGrupo(){
   if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
   const lista = S.creeps.filter(sc => sc.grupo === grupoActivo);
   if(!lista.length){ toast('Ese grupo no tiene creeps'); return; }
   try{
-    const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})));
+    const mapaVinculado = TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo);
+    const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})), mapaVinculado ? {mapaId: mapaVinculado} : undefined);
     toast(r.creados ? `🎯 ${r.creados} token(s) creados en el mapa que estás viendo, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los creeps de ese grupo ya tienen token en ese mapa');
   }catch(err){
     console.error('No se pudieron crear los tokens:', err);
@@ -5800,6 +5816,8 @@ document.addEventListener('click', e => {
     const n = (prompt('Nuevo nombre del grupo:', grupoActivo) || '').trim().slice(0, 40);
     if(!n || n === grupoActivo) return;
     S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = n; });
+    const mapaDelGrupo = TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo);
+    if(mapaDelGrupo) TokensAuto.enlacesGuardar(TokensAuto.vincular(TokensAuto.vincular(gruposMapas, grupoActivo, ''), n, mapaDelGrupo)).catch(err => console.error(err));
     guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo).concat(n));
     fijarGrupoActivo(n);
     return;
@@ -5807,12 +5825,20 @@ document.addEventListener('click', e => {
   if(b.dataset.grupoBorrar){
     if(!confirm(`¿Quitar el grupo "${grupoActivo}"? Los creeps no se borran: quedan sin grupo.`)) return;
     S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = ''; });
+    if(TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo)) TokensAuto.enlacesGuardar(TokensAuto.vincular(gruposMapas, grupoActivo, '')).catch(err => console.error(err));
     guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo));
     fijarGrupoActivo('');
   }
 });
-document.addEventListener('change', e => {
+document.addEventListener('change', async e => {
   const t = e.target;
+  if(t.dataset.grupoMapa !== undefined){
+    try{
+      await TokensAuto.enlacesGuardar(TokensAuto.vincular(gruposMapas, grupoActivo, t.value));
+      toast(t.value ? `🗺 ${grupoActivo} vinculado a ${nombreDeMapaGM(t.value)}` : `🗺 ${grupoActivo} ya no tiene mapa vinculado`);
+    }catch(err){ console.error(err); toast('No se pudo vincular el mapa'); }
+    return;
+  }
   if(t.dataset.grupoCreep === undefined) return;
   const sc = S.creeps.find(s => s.id === t.dataset.grupoCreep);
   if(!sc) return;
@@ -6735,7 +6761,7 @@ function gmAlEntrar(){
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); gruposMapasEscuchar(); }
 }
 
 /* ---------- Mantenimiento del GM ----------

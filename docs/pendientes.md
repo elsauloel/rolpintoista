@@ -3,7 +3,8 @@
 > Lista viva para ir tachando. Las **decisiones de diseño** sin cerrar viven en [`preguntas-abiertas.md`](preguntas-abiertas.md) (con número P);
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
-## 1. Casteo con SP (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
+## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
+> Retomar por el primer paso sin ✅ de `proceso-casteo.md` (hoy: paso 1, tipos de daño). Lo de abajo es solo un resumen.
 - [ ] **Decidir** (P97): tipos de daño de casteo y cuáles ignoran armadura; nombre del daño genérico; resistencia por tipo; armadura mágica; esquiva de áreas (¿tira Evasión contra algo?, costo en No2, ¿reacción fuera de turno?); ¿renombrar "Mg"?
 - [ ] Paso 2: campo `tipoDanio` en habilidades (ficha, invocaciones, creeps) y que el daño recibido **no reste Defensa** cuando el tipo ignora armadura (mapa `danioPj`/`danioCreep`, gm-tools, ficha, trampas).
 - [ ] Paso 3: escribir "qué tira cada lado" (PdG.Mg vs Evasión / Res.Mg / Res.Mt) en la descripción de cada habilidad de casteo.

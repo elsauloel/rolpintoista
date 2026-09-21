@@ -71,7 +71,7 @@ Números tomados del repo el 2026-09-21. **"Revisar" no es "cambiar"**: cada pun
 | B8 | **Estados** (`ESTADOS_PRESET`) | Escudo mágico, Sangre pura, Blindado… | cuáles son resistencias por tipo |
 | B9 | **Manual** (`manual-usuario/notas` 03, 07, 08, 09, 11, 12) | Especial, Resistencias, estados, habilidades, glosario | una nota nueva de "casteo" y ajustar el glosario |
 
-## 3. Orden propuesto
+## 3. Orden propuesto (el proceso completo, con decisiones y estados, está en [`proceso-casteo.md`](proceso-casteo.md))
 1. **Definir y documentar** (este archivo + manual): la lista de tipos de daño y cuáles ignoran armadura; el nombre del daño genérico; las preguntas de P97.
 2. **Tipo de daño en las habilidades** (A1, A2, A3): el campo `tipoDanio` y el cálculo del daño recibido; primero solo el de armadura sí/no.
 3. **"Qué tira cada lado" en las descripciones** (A4): un formato fijo de una línea; empezar por las habilidades de creeps y las skills de clase.

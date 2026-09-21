@@ -1010,11 +1010,11 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 
 <div class="scrim" id="scrim-finalizar-combate">
   <div class="modal" style="max-width:980px;width:94vw">
-    <header><h3>⚔ Batalla terminada <span class="hint" style="font-weight:400;font-size:13px">— ajustá lo que van a ver los jugadores y confirmá</span></h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
+    <header><h3>⚔ Batalla terminada <span class="hint" style="font-weight:400;font-size:13px">— revisá y ajustá lo que van a ver los jugadores; recién se les muestra cuando publicás</span></h3><button class="iconbtn" id="finalizar-combate-x">Cerrar</button></header>
     <div class="body" id="finalizar-combate-body" style="display:flex;flex-direction:column;gap:16px"></div>
     <footer>
       <button class="btn ghost" id="finalizar-combate-cerrar">Cerrar</button>
-      <button class="btn primary" id="finalizar-combate-publicar" title="Confirma lo que ajustaste: carga la XP y el oro en las fichas y les abre a los jugadores, en el mapa, la ventana del botín para que elijan">✔ Confirmar</button>
+      <button class="btn primary" id="finalizar-combate-publicar" title="Publica lo que revisaste: carga la XP y el oro en las fichas y les abre a los jugadores, en el mapa, la ventana de la batalla para que elijan los despojos">📢 Publicar despojos</button>
     </footer>
   </div>
 </div>
@@ -5700,7 +5700,7 @@ async function publicarRecompensas(){
   const rp = calcularReparto(rep);
   if(!rp.n){ toast('Elegí al menos un jugador'); return; }
   const items = itemsPublicables(rep);
-  if(!confirm(`¿Confirmar?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\nLa XP y el oro se cargan solos en las fichas${items.length ? ', y a los jugadores se les abre la ventana del botín en el mapa para que elijan' : ''}.`)) return;
+  if(!confirm(`¿Publicar los despojos?\n\n· ${rp.n} jugador(es): ${fmt(rp.xpBase)} XP base y ${fmt(rp.ddeCada)} DDE c/u\n· ${items.length} ítem(s) en el botín\n\nLa XP y el oro se cargan solos en las fichas${items.length ? ', y a los jugadores se les abre la ventana del botín en el mapa para que elijan' : ''}.`)) return;
   combateRep.publicando = true;
   renderReporteCombate();
   try{
@@ -5722,7 +5722,7 @@ async function publicarRecompensas(){
     combateRep = nuevoCombateRep();
     renderAll();
     $('#scrim-finalizar-combate').classList.remove('open');
-    toast(items.length ? 'Confirmado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, cerrás con 🎁 Despojos' : 'Confirmado ✓ — la XP y el oro se cargan solos en las fichas');
+    toast(items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, cerrás con 🎁 Despojos' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas');
   }catch(err){
     console.error('No se pudieron publicar las recompensas:', err);
     combateRep.publicando = false;

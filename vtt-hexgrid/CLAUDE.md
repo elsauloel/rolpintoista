@@ -265,6 +265,18 @@ nuevo de Rol Pintoísta. Paso 2 de
   esconde al elegir un vínculo). El panel se
   acomoda para no salirse del mapa (`hudAcomodarGlobo`). Ojo: lo que
   `escucharTokens` no copie del documento se pierde al volver de Firebase.
+  **🪪 Tarjeta del creep** (2026-09-22, `hudTarjetaHtml`): en cualquier
+  token de creep (no en los de PJ), sin importar quién lo tenga
+  seleccionado — su miniatura más grande, el equipo (solo nombres, sin
+  DEF/mods/detalle) y los estados alterados (de solo lectura, sin los
+  botones de editar de ◎), más la Nota narrativa si tiene una. Todo de
+  solo lectura, pensado para que un jugador la abra desde el mapa sin
+  preguntarle al GM. No hace falta ningún cambio de reglas: el documento
+  del creep ya se lee entero con `esMiembro` (`equipoNombres`/`notas` se
+  arman client-side en `escucharVinculables`, filtrando `equipo` a solo
+  `nombre`); la imagen en detalle sigue siendo la `miniatura` pública de
+  96 px — la imagen original de mayor resolución sigue siendo del GM
+  (`creeps/<id>/privado/imagen`), a propósito.
 - **"+ Token" abre una ventana propia** (`#nuevo-token-capa`/
   `#nuevo-token-ventana`, centrada con el fondo oscurecido; antes se armaba
   en la barra lateral, decidido 2026-09-19), ordenada por campos (tipo,

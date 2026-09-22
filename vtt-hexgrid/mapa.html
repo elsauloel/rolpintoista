@@ -114,11 +114,15 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 /* Ventanita propia de la herramienta activa (Lápiz/Terreno/Formas): antes
    las opciones se desplegaban adentro de la barra lateral, una debajo de
-   la otra sin límite. A la derecha de la barra (abierta o no), sin tapar
-   #elem-edit del otro lado. */
+   la otra sin límite. Del lado derecho, como #elem-edit (nunca del lado
+   izquierdo: ahí vive el tablero de iniciativa, #iniciativa, en esa
+   misma franja — un panel izquierdo, con esta lista de trampas que puede
+   crecer sin tope, se lo tapaba entero). Ancla desde abajo (#elem-edit
+   ancla desde arriba) para que, si están los dos abiertos a la vez, se
+   estorben lo menos posible. */
 #herramienta-flotante{
-  position:fixed;top:70px;left:236px;z-index:90;width:250px;max-width:calc(100vw - 32px);
-  max-height:calc(100vh - 90px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
+  position:fixed;bottom:16px;right:346px;z-index:90;width:250px;max-width:calc(100vw - 362px);
+  max-height:calc(100vh - 32px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
   border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:2px
 }
 .herr-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);margin-bottom:6px}
@@ -1687,6 +1691,7 @@ let sigiloFirmaRev = '';
    más PdG/Evasión en ataques de oportunidad, o que dejan bloquearlos. */
 function oportunidadEvaluarRuta(t, ruta){
   if(!ruta || ruta.length < 2) return [];
+  if(t.oculto) return [];  // un token oculto no delata su movimiento en la Mesa
   const rivales = rivalesDe(t);
   if(!rivales.length) return [];
   const avisados = new Set(), salidos = [];

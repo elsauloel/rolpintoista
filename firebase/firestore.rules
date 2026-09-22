@@ -648,15 +648,16 @@ service cloud.firestore {
 
     // Preguntas de diseño (preguntas-diseno/preguntas.html): el log donde el dueño del proyecto tira preguntas y
     // cualquier cuenta confirmada (los amigos con los que arma las reglas) suma preguntas o respuestas/sugerencias.
-    // Dos pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta') y "Por desarrollar" (tipo
-    // 'pendiente', lo que falta construir — el dueño lo tira y cualquiera puede proponer ahí también, 2026-09-22).
+    // Tres pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta'), "Desarrollo creativo" (tipo
+    // 'pendiente', lo que falta construir) y "Falta testear" (tipo 'testeo', mecánicas para probar en mesa) —
+    // las últimas dos, 2026-09-22, el dueño las tira pero cualquiera puede sumar o tildar también.
     // Fuera de las campañas a propósito: es sobre el sistema en general, no de una partida puntual. No hace falta
-    // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'pendiente'|'respuesta',
-    // texto, padreId (una respuesta apunta a su pregunta o pendiente; '' si no es una respuesta), resuelta (solo en
-    // preguntas/pendientes, no en respuestas), autorUid, autorNombre, creado}.
+    // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'pendiente'|
+    // 'testeo'|'respuesta', texto, padreId (una respuesta apunta a su entrada; '' si no es una respuesta), resuelta
+    // (solo en preguntas/pendientes/testeos, no en respuestas), autorUid, autorNombre, creado}.
     function entradaPregunta(d) {
       return d.keys().hasOnly(['tipo', 'texto', 'padreId', 'resuelta', 'autorUid', 'autorNombre', 'creado'])
-        && d.tipo in ['pregunta', 'respuesta', 'pendiente']
+        && d.tipo in ['pregunta', 'respuesta', 'pendiente', 'testeo']
         && d.texto is string && d.texto.size() > 0 && d.texto.size() <= 4000
         && d.padreId is string && d.padreId.size() <= 64
         && d.resuelta is bool

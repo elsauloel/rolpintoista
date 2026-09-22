@@ -118,6 +118,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
   <div class="tabs" id="tabs" hidden>
     <button type="button" class="tab" id="tab-preguntas" data-tab="pregunta">💬 Preguntas</button>
     <button type="button" class="tab" id="tab-pendientes" data-tab="pendiente">🎨 Desarrollo creativo</button>
+    <button type="button" class="tab" id="tab-testeos" data-tab="testeo">🧪 Falta testear</button>
   </div>
 </header>
 
@@ -172,6 +173,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const TABS = {
   pregunta: {compuestaPh: 'Escribí una pregunta nueva…', btnTxt: '＋ Preguntar', filtroTxt: 'Mostrar las resueltas', vacioAbiertas: 'No hay preguntas abiertas. Tildá "Mostrar las resueltas" para ver el historial, o escribí la primera.', badge: 'Resuelta', accionHecha: '✓ Marcar resuelta', accionReabrir: '↺ Reabrir'},
   pendiente: {compuestaPh: 'Proponé algo para desarrollar…', btnTxt: '＋ Proponer', filtroTxt: 'Mostrar las ya hechas', vacioAbiertas: 'No hay propuestas abiertas por ahora. Tildá "Mostrar las ya hechas" para ver el historial, o proponé algo vos.', badge: 'Hecho', accionHecha: '✓ Marcar hecho', accionReabrir: '↺ Reabrir'},
+  testeo: {compuestaPh: 'Sumá algo para probar en mesa…', btnTxt: '＋ Sumar', filtroTxt: 'Mostrar los ya probados', vacioAbiertas: 'No hay nada pendiente de probar. Tildá "Mostrar los ya probados" para ver el historial, o sumá algo vos.', badge: 'Probado', accionHecha: '✓ Marcar probado', accionReabrir: '↺ Reabrir'},
 };
 
 // Resumen de mecánicas/reglas incorporadas en los últimos días (no cambios de aspecto), a criterio del

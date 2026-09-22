@@ -135,8 +135,7 @@ lo que el grupo usa.
 | `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |
 | `firebase/` | `firestore.rules`, la copia versionada de los permisos | En uso activo |
-| [`preguntas-diseno/`](preguntas-diseno/CLAUDE.md) | Log compartido con dos pestañas — preguntas/respuestas y "Desarrollo creativo" (propuestas + resumen de lo incorporado) —, pensado para el celular (excepción a "solo compu") | En uso activo |
-| [`testeos/`](testeos/CLAUDE.md) | Checklist personal del dueño con mecánicas nuevas para probar en mesa (sin Firebase, solo `localStorage`) | En uso activo |
+| [`preguntas-diseno/`](preguntas-diseno/CLAUDE.md) | Log compartido con tres pestañas — Preguntas, Desarrollo creativo (propuestas + resumen de lo incorporado) y Falta testear —, pensado para el celular (excepción a "solo compu") | En uso activo |
 | `gestor.html` (raíz) | Actualiza el código de las herramientas desde `main` | Legado — no toca datos de partida en `nueva-version` |
 
 Esquema de datos de Firebase: [`docs/workflow-firebase.md`](docs/workflow-firebase.md).

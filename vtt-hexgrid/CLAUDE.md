@@ -44,6 +44,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   barra del costado volvió a la cabecera, con el (?) de la guía de colores adentro del botón, `#ayuda-token`; y "Personalización 🎲" de los dados pasó al pie de la grilla de dados);
   y la niebla y el ojo pasaron al menú 👁. La cabecera quedó con: ☰, título y
   estado, Mapas, + Token (?), GM Tools/Mi ficha, Personajes, Fondo y Centrar (Dados pasó al borde izquierdo del mapa).
+  📋 Tablero se sumó después, junto a GM Tools/Mi ficha (ver más abajo).
 - **⌨ Lista de atajos** (2026-09-19): un ícono a la derecha de todo de la
   cabecera (`#ayuda-atajos`) que al pasar el mouse muestra el globo con todos
   los atajos de teclado y del mouse (D, H, L, F, M, B, Ctrl+B, Enter, Esc,
@@ -627,11 +628,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   distinto del publicado. Sin límite de mapas guardados; se renombran y se
   borran (salvo el primero, `MAPA_PRINCIPAL`, que sigue siendo el que
   había antes de esta función — no se le movió ningún dato).
-- **📋 Tablero de combate** (botón fijo apilado en el borde izquierdo del
-  mapa, junto a 🎭/🎲/🎁/🗺 — ver "botones apilados" más abajo —
-  `#toolkit-tablero`, para cualquiera: GM o jugador, no se esconde):
-  tarjetas con HP/SP y estados de todo lo que tiene token en el mapa
-  **publicado** (`mapaActivo`, no `mapaMostrado` — sigue mostrando el
+- **📋 Tablero de combate** (botón de la cabecera, `#btn-tablero`, junto a
+  "⚔ GM Tools"/"📜 Mi ficha" — para cualquiera: GM o jugador, no se
+  esconde; **no** está en la pila de botones del borde izquierdo, ver
+  abajo): tarjetas con HP/SP y estados de todo lo que tiene token en el
+  mapa **publicado** (`mapaActivo`, no `mapaMostrado` — sigue mostrando el
   mismo tablero aunque el GM esté mirando/armando otro escenario,
   `tableroTokensEscuchar`). Los datos salen de `fichasPub`/`creepsPub`
   (ya en vivo); lo nuevo es solo saber quién tiene token ahí. A los
@@ -643,18 +644,25 @@ nuevo de Rol Pintoísta. Paso 2 de
   [`../gm-toolset/CLAUDE.md`](../gm-toolset/CLAUDE.md)) — acá además hace
   falta el filtro de oculto/sigilo porque lo ve cualquiera, no solo el GM.
 - **Botones apilados del borde izquierdo** (🧰 pestaña, 🎲 Dados, 🎭
-  Tokens, 📋 Tablero, 🎁 Despojos, 🗺 Mapas — cada uno `position:absolute`
-  con `bottom:calc(24px + Npx)`, ancladas al borde de ABAJO de la
-  pantalla, no al centro vertical): si se suma un botón más al stack, va
-  arriba del último (`bottom` más grande) manteniendo los 77px de
-  separación entre uno y el siguiente — y los menús que cuelgan de un
-  botón (`#tokens-menu`, `#mapas-menu`) tienen que llevar el mismo
-  `bottom`. **Ancladas abajo a propósito** (2026-09-22): con el centro
-  vertical, cada botón nuevo necesitaba más alto libre arriba del centro,
-  y en una ventana de ~720px de alto (común) el de más arriba terminaba
-  tapado por la cabecera — pasó con 🗺 Mapas al sumar 📋 Tablero. Antes de
-  agregar otro botón al stack, probar con `resize_window` a una altura
-  chica (~700px) que el de más arriba siga visible.
+  Tokens, 🎁 Despojos, 🗺 Mapas — cada uno `position:absolute` con
+  `bottom:calc(24px + Npx)`, ancladas al borde de ABAJO de la pantalla, no
+  al centro vertical): si se suma un botón más al stack, va arriba del
+  último (`bottom` más grande) manteniendo los 77px de separación entre
+  uno y el siguiente. **Ancladas abajo a propósito** (2026-09-22): con el
+  centro vertical, cada botón nuevo necesitaba más alto libre arriba del
+  centro, y en una ventana de ~720px de alto (común) el de más arriba
+  terminaba tapado por la cabecera. Antes de agregar otro botón al stack,
+  probar con `resize_window` a una altura chica (~700px) que el de más
+  arriba siga visible — y si un botón es para cualquiera (no solo GM),
+  mejor ponerlo en la cabecera como 📋 Tablero, no acá: el stack ya está
+  bastante lleno y la cabecera tiene de sobra.
+  - **`#tokens-menu`/`#mapas-menu`** (los desplegables de 🎭/🗺, al costado
+    del stack): van con `top` Y `bottom` puestos (sin `height`) para que
+    el navegador les dé el alto que entra justo entre la cabecera y el
+    piso, con scroll propio si el contenido no entra — **no** están
+    pegadas a la altura de su botón. Antes colgaban del mismo `bottom`
+    que su botón y con contenido largo (muchos mapas guardados) crecían
+    para arriba y se cortaban con el borde de la ventana (2026-09-22).
 - Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.

@@ -5100,8 +5100,16 @@ async function trampaResolver(){
 
 // Quien camina (sin estar en sigilo) puede entrar en el CONO de un rival en sigilo (detección
 // inmediata: corta el movimiento y lo revela, ver más abajo) o en su ZONA DE ALERTA nomás — ahí no
-// se corta nada, pero cada paso adentro pide una tirada de percepción, igual que cuando es el
-// oculto el que camina (escenario 2 de detección, 2026-09-22: antes solo contaba el cono).
+// se corta nada, pero pide una tirada de percepción, igual que cuando es el oculto el que camina
+// (escenario 2 de detección, 2026-09-22: antes solo contaba el cono).
+// El cono (línea de visión directa) se mira en CADA paso: cruzarlo te delata aunque no te
+// quedes ahí. La zona de alerta (P105, 2026-09-22) en cambio **solo cuenta si te quedás parado**:
+// pasar de largo por ahí no dispara nada — se mira nomás en la casilla donde termina la ruta,
+// orientada hacia el último paso que diste (antes contaba cada paso de más adentro de la zona,
+// aunque fuera de paso).
+function rotacionDePaso(pa, pb){
+  return (((Math.round(Math.atan2(-(pb.x - pa.x), pb.y - pa.y) * 180 / Math.PI / 60) * 60) % 360) + 360) % 360;
+}
 function percepcionEvaluarRuta(t, id, ruta, ignorar){
   const ocultos = [];
   rivalesDe(t).forEach(r => {
@@ -5112,18 +5120,17 @@ function percepcionEvaluarRuta(t, id, ruta, ignorar){
   });
   percepcionAvisosPendientes.delete(id);
   if(!ocultos.length) return null;
-  const pasos = new Map();   // ocultoId -> pasos dados en su zona de alerta antes de detectarlo (o de llegar)
   for(let i = 1; i < ruta.length; i++){
     const pa = hexCentro(ruta[i - 1].col, ruta[i - 1].fila), pb = hexCentro(ruta[i].col, ruta[i].fila);
-    const rot = (((Math.round(Math.atan2(-(pb.x - pa.x), pb.y - pa.y) * 180 / Math.PI / 60) * 60) % 360) + 360) % 360;
-    const z = zonasClaves({col: ruta[i].col, fila: ruta[i].fila, rotacion: rot});
+    const z = zonasClaves({col: ruta[i].col, fila: ruta[i].fila, rotacion: rotacionDePaso(pa, pb)});
     const vistos = ocultos.filter(o => z.cono.has(nbPack(o.tok.col, o.tok.fila)));
-    if(vistos.length){
-      if(pasos.size) percepcionAvisosPendientes.set(id, pasos);
-      return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
-    }
-    ocultos.forEach(o => { if(z.alerta.has(nbPack(o.tok.col, o.tok.fila))) pasos.set(o.id, (pasos.get(o.id) || 0) + 1); });
+    if(vistos.length) return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
   }
+  const fin = ruta.length - 1;
+  const pa = hexCentro(ruta[fin - 1].col, ruta[fin - 1].fila), pb = hexCentro(ruta[fin].col, ruta[fin].fila);
+  const zFin = zonasClaves({col: ruta[fin].col, fila: ruta[fin].fila, rotacion: rotacionDePaso(pa, pb)});
+  const pasos = new Map();
+  ocultos.forEach(o => { if(zFin.alerta.has(nbPack(o.tok.col, o.tok.fila))) pasos.set(o.id, 1); });
   if(pasos.size) percepcionAvisosPendientes.set(id, pasos);
   return null;
 }

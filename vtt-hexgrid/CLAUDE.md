@@ -112,11 +112,10 @@ nuevo de Rol Pintoísta. Paso 2 de
 - **🕶 Sigilo, paso 3: cono, alerta y girar** (2026-09-19). **Cono** de 16
   hexágonos (`zonasSigilo`, `CONO_LADO`): rombo de 4 × 4 que arranca delante
   del token (filas de 1, 2, 3, 4, 3, 2 y 1) y **zona de alerta**: el anillo
-  alrededor del cono más los vecinos del token salvo el de atrás. Quien
-  está en sigilo los ve dibujados semitransparentes (azul y naranja) **de los
-  rivales que ve**: un jugador, los de los creeps; el GM con un creep en
-  sigilo, los de los personajes (`zonasParaVer`). Los elementos **Sólidos
-  tapan la vista** (`solidosSet`, `lineaLibre`): lo que queda detrás de uno
+  alrededor del cono más los vecinos del token salvo el de atrás. Entrar en
+  sigilo prende el modo lentes para poder verlos (ver "Entrar en sigilo ya
+  no muestra todas las zonas de una", 2026-09-22, más abajo). Los elementos
+  **Sólidos tapan la vista** (`solidosSet`, `lineaLibre`): lo que queda detrás de uno
   no cuenta ni para las zonas ni para la visión de la niebla. **Al caminar el
   token queda mirando hacia donde fue** (último paso de la ruta, gratis;
   `moverToken`). **Girar con el handle ↻ cuesta `COSTO_GIRO_NO2` (1) por cada
@@ -137,6 +136,7 @@ nuevo de Rol Pintoísta. Paso 2 de
   `comun/mesa.js`); también con el próximo Mantenimiento o al cambiar de mapa.
   **Con 🦶 Mover libre prendido el HUD se limpia** (2026-09-19): solo queda el pie, en rojo y pulsando, y el ↻ (`libreActivo` en `hudHtml`); desaparecen los demás botones del anillo y los globos abiertos, para que se note que el modo está activo. **Girar no cuesta nada** con 🦶 Mover libre prendido, ni cuando el GM gira el token de un jugador (no puede tocar su ficha, así que antes fallaba con "No se pudo cobrar el giro"); en esos casos tampoco se gasta el giro gratis.
   Vive en cada navegador (recargar la página la pierde).
+- **Entrar en sigilo ya no muestra todas las zonas de una** (2026-09-22, a pedido del dueño; reemplaza el párrafo de "quien está en sigilo ve las zonas..." de más abajo): antes, apenas un jugador (o el GM con un creep) entraba en sigilo, se dibujaban automáticamente **todas** las zonas de los rivales visibles (`zonasParaVer()`, ya eliminada). Ahora eso solo **prende el modo lentes** (`verZonas = true`, `revisarAutoLentes()`, disparado desde `escucharVinculables` al detectar la transición false→true de `huboAlguienEnSigilo()` — jugador: `yoEnSigilo()`; GM: algún creep suyo en sigilo) y las zonas se ven igual que con 👓 Ver conos normal: tocando un token puntual, o con "👁 Ver todas las zonas" si se quiere ver todo junto. **Acceso directo al 👁** (mismo pedido): con el modo lentes prendido y el menú del 👓 cerrado, un botón cuadrado 👁 queda flotando justo debajo del 👓 (`#btn-zonas-todas`, mismo dato que "Ver todas las zonas" del menú) para no tener que abrir el desplegable cada vez.
 - **🕶 Sigilo, paso 4: detección** (2026-09-19). **Ruptura automática**: un
   token en sigilo que queda dentro del **cono** de un rival (creep si es
   personaje; personaje si es creep) pierde el sigilo solo —

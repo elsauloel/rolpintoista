@@ -85,7 +85,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 | **Bitácora** | Diario compartido | [[La Bitácora]] |
 
 > [!question] Términos que faltan
-> Wellness, Wildcard y la definición formal de "descanso" están abiertos. Sumalos cuando estén definidos.
+> Wellness y la definición formal de "descanso" están abiertos. **Wildcard** ya tiene contador en la ficha (ver [[Tiradas y dados]]), pero le falta la mecánica — sumalo entero cuando esté definida.
 
 +++
 titulo: Preguntas frecuentes

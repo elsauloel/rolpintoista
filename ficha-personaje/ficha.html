@@ -136,6 +136,10 @@ a{color:var(--brass)}
 .counter-exp input{flex:1 1 auto;width:auto;min-width:0;font-size:19px}
 .expmax{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap;flex:none}
 @media(max-width:420px){.counter-exp{grid-column:span 1}}
+/* Wildcards: valor actual y máximo, los dos a mano, sin fórmula (mismo layout que Experiencia pero editables los dos). */
+.wildcards-nums{display:flex;align-items:baseline;gap:5px;min-width:0}
+.wildcards-nums input{width:52px!important;flex:none;text-align:center;font-size:15px}
+.wildcards-nums .expmax{display:flex;align-items:baseline;gap:3px}
 .counter.penal{border-color:rgba(212,87,78,.5)}
 .counter.penal input{color:var(--danger)}
 .counter.penal .sub{color:var(--danger)}
@@ -1215,7 +1219,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <button type="button" class="dock-btn" id="btn-personajes" title="Ver y abrir los personajes de la partida"><span class="dock-ico">👥</span><span class="dock-txt">Personajes</span></button>
   <button type="button" class="dock-btn" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar"><span class="dock-ico">🏪</span><span class="dock-txt">Vendedor</span></button>
   <div class="dock-item">
-    <button type="button" class="dock-btn" data-dock-panel="prog" title="Experiencia y puntos de Job"><span class="dock-ico">⭐</span><span class="dock-txt">Exp y Job</span></button>
+    <button type="button" class="dock-btn" data-dock-panel="prog" title="Experiencia, puntos de Job y Wildcards"><span class="dock-ico">⭐</span><span class="dock-txt">Exp y Job</span></button>
     <div class="dock-panel" id="dock-panel-prog" hidden>
         <div class="counter counter-exp" id="c-exp" title="Al llegar al umbral, sube de nivel y el marcador reinicia">
           <label>Experiencia</label>
@@ -1225,6 +1229,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <label>Job</label>
           <div class="val" id="v-job">0</div>
           <div class="sub" id="v-job-sub"></div>
+        </div>
+        <div class="counter" id="c-wildcards" title="Contador libre: el valor actual y el máximo se escriben a mano, sin fórmula ni tope">
+          <label>Wildcards</label>
+          <div class="wildcards-nums"><input id="f-wildcards" type="number" inputmode="decimal"><span class="expmax">/ <input id="f-wildcardsMax" type="number" inputmode="decimal"></span></div>
         </div>
     </div>
   </div>
@@ -2265,7 +2273,7 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, imagen:'', miniatura:''},
+        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, imagen:'', miniatura:''},
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
@@ -5534,7 +5542,7 @@ function renderAll(){
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
   fichaIdentidadRender();  // por si cambió el nombre del personaje
-  ['raza','clase','subclase','nivel','exp','dde'].forEach(k => $('#f-'+k).value = S.meta[k]);
+  ['raza','clase','subclase','nivel','exp','dde','wildcards','wildcardsMax'].forEach(k => $('#f-'+k).value = S.meta[k]);
   renderPortrait();
   $('#f-loot-normal').value = S.loot.normal;
   $('#f-loot-magico').value = S.loot.magico;
@@ -5665,6 +5673,8 @@ document.addEventListener('input', e => {
   if(['f-loot-normal','f-loot-magico'].includes(t.id)){
     S.loot[t.id.replace('f-loot-','')] = num(t.value); return;
   }
+  if(t.id === 'f-wildcards'){ S.meta.wildcards = num(t.value); return; }
+  if(t.id === 'f-wildcardsMax'){ S.meta.wildcardsMax = num(t.value); return; }
   if(t.dataset.lootEsp !== undefined){
     const row = (S.loot.especial||[]).find(l => l.id === t.dataset.lootEsp);
     if(row){ row[t.dataset.lk] = t.dataset.lk === 'cantidad' ? num(t.value) : t.value; }

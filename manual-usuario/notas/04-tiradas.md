@@ -149,5 +149,5 @@ estado: confirmado
 +++
 **Afortunado** es un [[Estados alterados|estado]] (buff): **toda tirada de PdG, Parry o Evasión se hace dos veces y te quedás con la mejor.** Dura unos turnos (o todo el combate, si viene de un pergamino). Es lo más parecido a una "ventaja" del sistema.
 
-> [!question] Wildcards
-> En diseños anteriores existían los **Wildcards**: un recurso diario para **repetir una tirada**. Hoy la ficha no los tiene. ¿Se retoman? ¿Cuántos por día, se acumulan, y se puede repetir la tirada de otro?
+> [!question] Wildcards (P102)
+> **El contador volvió a la ficha (2026-09-22)**, en el panel ⭐ Exp y Job: un valor actual y un máximo, los dos a mano, **sin ninguna mecánica todavía** — como Job o DDE pero sin fórmula, solo un número libre. La pregunta de diseño de antes sigue abierta: ¿para qué se usan? La idea original era un recurso diario para **repetir una tirada**. ¿Se retoman con esa regla? ¿Cuántos por día, se acumulan, y se puede repetir la tirada de otro?

@@ -648,13 +648,15 @@ service cloud.firestore {
 
     // Preguntas de diseño (preguntas-diseno/preguntas.html): el log donde el dueño del proyecto tira preguntas y
     // cualquier cuenta confirmada (los amigos con los que arma las reglas) suma preguntas o respuestas/sugerencias.
+    // Dos pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta') y "Por desarrollar" (tipo
+    // 'pendiente', lo que falta construir — el dueño lo tira y cualquiera puede proponer ahí también, 2026-09-22).
     // Fuera de las campañas a propósito: es sobre el sistema en general, no de una partida puntual. No hace falta
-    // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'respuesta', texto,
-    // padreId (una respuesta apunta a la pregunta; '' si es una pregunta), resuelta (solo en preguntas), autorUid,
-    // autorNombre, creado}.
+    // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'pendiente'|'respuesta',
+    // texto, padreId (una respuesta apunta a su pregunta o pendiente; '' si no es una respuesta), resuelta (solo en
+    // preguntas/pendientes, no en respuestas), autorUid, autorNombre, creado}.
     function entradaPregunta(d) {
       return d.keys().hasOnly(['tipo', 'texto', 'padreId', 'resuelta', 'autorUid', 'autorNombre', 'creado'])
-        && d.tipo in ['pregunta', 'respuesta']
+        && d.tipo in ['pregunta', 'respuesta', 'pendiente']
         && d.texto is string && d.texto.size() > 0 && d.texto.size() <= 4000
         && d.padreId is string && d.padreId.size() <= 64
         && d.resuelta is bool

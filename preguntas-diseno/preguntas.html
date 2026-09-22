@@ -41,11 +41,19 @@ button{cursor:pointer}
 .btn[disabled]{opacity:.5}
 
 header{
-  position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px 16px;
+  position:sticky;top:0;z-index:5;padding:14px 16px 0;
   background:rgba(15,12,14,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)
 }
+header .cab{display:flex;align-items:center;gap:10px;padding-bottom:12px}
 header h1{font-size:17px;margin:0;flex:1;min-width:0}
 header .quien{font-size:12px;color:var(--muted);white-space:nowrap}
+
+.tabs{display:flex;gap:4px}
+.tab{
+  border:1px solid var(--line);border-bottom:none;background:var(--panel2);color:var(--muted);
+  border-radius:var(--r) var(--r) 0 0;padding:9px 14px;font-weight:700;font-size:13.5px;flex:1;text-align:center
+}
+.tab.activo{background:var(--panel);color:var(--paper);border-color:var(--copper)}
 
 main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 
@@ -89,19 +97,33 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 
 .mio{position:relative}
 .mio .p-borrar{position:absolute;top:10px;right:10px;background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+
+#changelog-wrap{margin-bottom:16px}
+#btn-changelog{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center}
+#changelog-lista{margin-top:10px;display:none;flex-direction:column;gap:8px}
+#changelog-lista.open{display:flex}
+.cambio{border:1px solid var(--line-soft);border-left:3px solid var(--absenta);background:var(--panel2);border-radius:var(--r);padding:9px 12px}
+.cambio .p-fecha{display:block;margin-bottom:3px}
+.cambio .p-texto{font-size:13.5px}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>💬 Preguntas de diseño</h1>
-  <span class="quien" id="quien-soy" hidden></span>
-  <button type="button" class="btn chico ghost" id="btn-salir" hidden>Salir</button>
+  <div class="cab">
+    <h1>💬 Preguntas de diseño</h1>
+    <span class="quien" id="quien-soy" hidden></span>
+    <button type="button" class="btn chico ghost" id="btn-salir" hidden>Salir</button>
+  </div>
+  <div class="tabs" id="tabs" hidden>
+    <button type="button" class="tab" id="tab-preguntas" data-tab="pregunta">💬 Preguntas</button>
+    <button type="button" class="tab" id="tab-pendientes" data-tab="pendiente">🎨 Desarrollo creativo</button>
+  </div>
 </header>
 
 <div id="login-box">
   <h2>Preguntas de diseño</h2>
-  <p>El log de preguntas y respuestas para ir definiendo las reglas del Rol Pintoísta entre todos, sin depender de coincidir en el chat. Entrá con tu cuenta de Google — después queda recordada en este teléfono o compu.</p>
+  <p>El log de preguntas, respuestas y propuestas para ir definiendo las reglas del Rol Pintoísta entre todos, sin depender de coincidir en el chat. Entrá con tu cuenta de Google — después queda recordada en este teléfono o compu.</p>
   <button type="button" class="btn primary" id="btn-google" style="width:100%;padding:14px">Entrar con Google</button>
   <div id="login-error"></div>
 </div>
@@ -111,8 +133,14 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
     <textarea id="txt-nueva" placeholder="Escribí una pregunta nueva…"></textarea>
     <div class="fila"><button type="button" class="btn primary" id="btn-nueva">＋ Preguntar</button></div>
   </div>
+  <div id="changelog-wrap" hidden>
+    <button type="button" class="btn chico ghost" id="btn-changelog">
+      <span>📜 Resumen de lo ya incorporado</span><span id="changelog-flecha">▾</span>
+    </button>
+    <div id="changelog-lista"></div>
+  </div>
   <div class="filtros">
-    <label><input type="checkbox" id="chk-resueltas"> Mostrar las resueltas</label>
+    <label><input type="checkbox" id="chk-resueltas"> <span id="chk-resueltas-txt">Mostrar las resueltas</span></label>
   </div>
   <div id="lista"><div class="cargando">Cargando…</div></div>
 </main>
@@ -130,11 +158,55 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
    sin depender de coincidir en el chat de WhatsApp. Pensada para el
    celular: entrar y salir tiene que ser instantáneo, la sesión de Google
    queda recordada sola en ese navegador.
+
+   Dos pestañas, misma colección, filtradas por tipo (2026-09-22): "Preguntas"
+   (tipo 'pregunta') es lo de siempre; "Por desarrollar" (tipo 'pendiente')
+   es el log de lo que falta construir — el dueño anota ahí lo que va
+   pensando y CUALQUIERA puede sumar su propia propuesta de desarrollo,
+   no solo el dueño. Las respuestas (tipo 'respuesta') sirven para las dos
+   por igual, apuntando por padreId a una pregunta o a un pendiente.
    ========================================================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+const TABS = {
+  pregunta: {compuestaPh: 'Escribí una pregunta nueva…', btnTxt: '＋ Preguntar', filtroTxt: 'Mostrar las resueltas', vacioAbiertas: 'No hay preguntas abiertas. Tildá "Mostrar las resueltas" para ver el historial, o escribí la primera.', badge: 'Resuelta', accionHecha: '✓ Marcar resuelta', accionReabrir: '↺ Reabrir'},
+  pendiente: {compuestaPh: 'Proponé algo para desarrollar…', btnTxt: '＋ Proponer', filtroTxt: 'Mostrar las ya hechas', vacioAbiertas: 'No hay propuestas abiertas por ahora. Tildá "Mostrar las ya hechas" para ver el historial, o proponé algo vos.', badge: 'Hecho', accionHecha: '✓ Marcar hecho', accionReabrir: '↺ Reabrir'},
+};
+
+// Resumen de mecánicas/reglas incorporadas en los últimos días (no cambios de aspecto), a criterio del
+// asistente (pedido 2026-09-22). Es historial de solo lectura, fijo en el HTML — no vive en Firestore, así
+// que no se puede sumar ni borrar desde acá; se edita a mano en este archivo cuando el dueño lo pide.
+// Ver preguntas-diseno/CLAUDE.md.
+const CAMBIOS_RECIENTES = [
+  {fecha:'2026-09-22', texto:'Se sumó un aviso de "ataque de oportunidad": cuando alguien se aleja de un rival cuerpo a cuerpo, aparece un cartel rojo en la Mesa avisándolo (no se resuelve solo, es solo el aviso).'},
+  {fecha:'2026-09-22', texto:'Se sumó el visualizador de rango en el mapa: dos botones que muestran alrededor de tu token hasta dónde llega tu ataque normal y hasta dónde tu magia, con atajos de teclado.'},
+  {fecha:'2026-09-22', texto:'El Sangrado ahora se acumula: si te lo vuelven a aplicar mientras ya lo tenés, suma más daño por turno en vez de quedar igual.'},
+  {fecha:'2026-09-22', texto:'Se sacó el estado "Armadura arruinada": todo lo que lo aplicaba ahora aplica "Armadura rota", para simplificar.'},
+  {fecha:'2026-09-22', texto:'Se recalibraron Cansado y Exhausto: bajan los No2 máximos en una fracción en vez de un número fijo, para que escalen mejor según el personaje.'},
+  {fecha:'2026-09-22', texto:'Stun quedó en 2 turnos de duración y ahora hace fallar la Evasión directamente, sin tirar el dado.'},
+  {fecha:'2026-09-22', texto:'Se corrigió que el estado "Pajaritos" no afectaba a los creeps del GM, solo a los personajes de los jugadores.'},
+  {fecha:'2026-09-22', texto:'Volvió a la ficha el contador de Wildcards: un valor y un máximo que se editan a mano (todavía sin una mecánica automática atrás).'},
+  {fecha:'2026-09-22', texto:'La Mesa de tiradas ahora marca en rojo o verde cuándo una tirada estuvo afectada por un estado alterado, y lo explica en el texto.'},
+  {fecha:'2026-09-21', texto:'Se armó el flujo de "Batalla terminada": el GM revisa y publica el botín, y recién ahí se les abre la ventana a los jugadores para repartirlo.'},
+  {fecha:'2026-09-21', texto:'Se sumó el sistema de botín: cada jugador puede sumar ítems a su mochila (se lo lleva el primero que llega) o comparar antes de decidir.'},
+  {fecha:'2026-09-21', texto:'El reporte de fin de combate ahora reparte experiencia y dinero: un valor para todo el grupo y un extra aparte para alguien puntual si hizo falta.'},
+  {fecha:'2026-09-21', texto:'Se sumó la opción de marcar a un creep como "Jefe": queda inmune al aturdimiento y con más resistencia mágica, automáticamente.'},
+  {fecha:'2026-09-21', texto:'Los grupos de creeps del GM se pueden vincular a un mapa guardado, para traer todos sus tokens de un solo botón.'},
+  {fecha:'2026-09-21', texto:'La tienda tiene un interruptor de abierta/cerrada que maneja el GM; comprar y vender solo funciona mientras está abierta.'},
+  {fecha:'2026-09-20', texto:'Las trampas del mapa pueden quedar ocultas y dispararse solas cuando alguien las pisa, tirando su daño y avisando en la Mesa.'},
+  {fecha:'2026-09-20', texto:'Se sumó una tirada de percepción cuando alguien pasa muy cerca de una trampa sin llegar a pisarla.'},
+  {fecha:'2026-09-20', texto:'Las habilidades de creep que son trampas (enredaderas, pozos, etc.) ahora colocan la trampa solas en el mapa al usarlas.'},
+  {fecha:'2026-09-20', texto:'Se armó un catálogo grande de habilidades y armas naturales para creeps, listo para filtrar y usar al crear un enemigo nuevo.'},
+  {fecha:'2026-09-20', texto:'Se sumaron botones para traer de una todos los tokens de un grupo de creeps o de los personajes de los jugadores al mapa.'},
+  {fecha:'2026-09-19', texto:'Se terminó el sistema de sigilo: cono de detección, zona de alerta, y que un personaje escondido se revele solo si un rival lo detecta.'},
+  {fecha:'2026-09-19', texto:'Se sumó la niebla de guerra: el mapa se va destapando de a poco según lo que ve el grupo, con un modo para que el GM lo mire "como jugador".'},
+  {fecha:'2026-09-19', texto:'Se sumaron el Bloqueo y el Parry con el arma equipada como opciones de defensa en combate.'},
+  {fecha:'2026-09-19', texto:'Ahora se puede deshacer el último movimiento o giro en el mapa con Ctrl+Z, por si uno se equivoca.'},
+];
+
 let entradas = [];   // todo lo que llega de Firestore, tal cual
+let tabActiva = 'pregunta';
 let mostrarResueltas = false;
 
 function fechaTxt(ts){
@@ -147,12 +219,28 @@ function fechaTxt(ts){
   return d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' ' + hhmm;
 }
 
+let changelogAbierto = false;
+function renderChangelog(){
+  $('#changelog-lista').innerHTML = CAMBIOS_RECIENTES.map(c => `
+    <div class="cambio">
+      <div class="p-cab"><span class="p-fecha">${esc(c.fecha)}</span></div>
+      <div class="p-texto">${esc(c.texto)}</div>
+    </div>`).join('');
+}
+
 function render(){
+  const t = TABS[tabActiva];
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('activo', b.dataset.tab === tabActiva));
+  $('#txt-nueva').placeholder = t.compuestaPh;
+  $('#btn-nueva').textContent = t.btnTxt;
+  $('#chk-resueltas-txt').textContent = t.filtroTxt;
+  $('#changelog-wrap').hidden = tabActiva !== 'pendiente';
+
   const cont = $('#lista');
-  const preguntas = entradas.filter(e => e.tipo === 'pregunta' && (mostrarResueltas || !e.resuelta))
+  const preguntas = entradas.filter(e => e.tipo === tabActiva && (mostrarResueltas || !e.resuelta))
     .sort((a, b) => (b.creadoMs || 0) - (a.creadoMs || 0));
   if(!preguntas.length){
-    cont.innerHTML = `<div class="vacio">${mostrarResueltas ? 'Todavía no hay nada acá.' : 'No hay preguntas abiertas. Tildá "Mostrar las resueltas" para ver el historial, o escribí la primera.'}</div>`;
+    cont.innerHTML = `<div class="vacio">${mostrarResueltas ? 'Todavía no hay nada acá.' : t.vacioAbiertas}</div>`;
     return;
   }
   cont.innerHTML = preguntas.map(p => {
@@ -161,11 +249,11 @@ function render(){
       .sort((a, b) => (a.creadoMs || 0) - (b.creadoMs || 0));
     return `<div class="pregunta${p.resuelta ? ' resuelta' : ''}${mias ? ' mio' : ''}" data-id="${esc(p.id)}">
       ${mias ? `<button type="button" class="p-borrar" data-borrar="${esc(p.id)}" title="Borrar">✕</button>` : ''}
-      <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? '<span class="p-badge">Resuelta</span>' : ''}</div>
+      <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? `<span class="p-badge">${t.badge}</span>` : ''}</div>
       <div class="p-texto">${esc(p.texto)}</div>
       <div class="p-acciones">
         <button type="button" class="btn chico" data-responder="${esc(p.id)}">💬 Responder</button>
-        <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? '↺ Reabrir' : '✓ Marcar resuelta'}</button>
+        <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? t.accionReabrir : t.accionHecha}</button>
       </div>
       ${respuestas.length ? `<div class="respuestas">${respuestas.map(r => `
         <div class="respuesta${fbUsuario && r.autorUid === fbUsuario.uid ? ' mio' : ''}" data-id="${esc(r.id)}">
@@ -215,6 +303,19 @@ async function crear(tipo, texto, padreId){
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
   if(!b) return;
+  if(b.id === 'btn-changelog'){
+    changelogAbierto = !changelogAbierto;
+    $('#changelog-lista').classList.toggle('open', changelogAbierto);
+    $('#changelog-flecha').textContent = changelogAbierto ? '▴' : '▾';
+    return;
+  }
+  if(b.dataset.tab){
+    tabActiva = b.dataset.tab;
+    mostrarResueltas = false;
+    $('#chk-resueltas').checked = false;
+    render();
+    return;
+  }
   if(b.dataset.responder){
     const caja = $('#responder-' + b.dataset.responder);
     if(caja){ caja.classList.add('open'); caja.querySelector('textarea').focus(); }
@@ -247,7 +348,7 @@ document.addEventListener('click', e => {
 });
 
 $('#btn-nueva').onclick = () => {
-  crear('pregunta', $('#txt-nueva').value, '');
+  crear(tabActiva, $('#txt-nueva').value, '');
   $('#txt-nueva').value = '';
 };
 $('#chk-resueltas').onchange = e => { mostrarResueltas = e.target.checked; render(); };
@@ -281,6 +382,7 @@ function iniciar(){
       $('#main').hidden = true;
       $('#quien-soy').hidden = true;
       $('#btn-salir').hidden = true;
+      $('#tabs').hidden = true;
       if(u && !u.emailVerified) $('#login-error').textContent = 'Confirmá tu email desde el link que te mandamos y volvé a entrar.';
       return;
     }
@@ -289,11 +391,13 @@ function iniciar(){
     $('#quien-soy').hidden = false;
     $('#quien-soy').textContent = u.displayName || u.email || '';
     $('#btn-salir').hidden = false;
+    $('#tabs').hidden = false;
     document.title = 'Preguntas de diseño — Rol Pintoísta';
     render();   // por si cambió quién es "mío" al cambiar de cuenta
     if(!escuchaArrancada){ escuchaArrancada = true; escuchar(); }
   });
 }
+renderChangelog();
 iniciar();
 </script>
 </body>

@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preguntas de diseño — Rol Pintoísta</title>
+<link rel="icon" type="image/svg+xml" href="../comun/icono.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Pensada para el celular a propósito (excepción a "solo compu" del resto del sitio, ver CLAUDE.md de esta carpeta):
+   una sola columna, botones grandes, sin nada que dependa de hover. */
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.45;
+  min-height:100vh;padding-bottom:40px;
+}
+a{color:var(--brass)}
+input,select,textarea,button{font-family:inherit;color:inherit;font-size:15px}
+textarea,input[type=text]{
+  width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--paper);padding:10px 12px;resize:vertical
+}
+textarea:focus,input:focus{outline:2px solid var(--copper);outline-offset:1px}
+button{cursor:pointer}
+.btn{
+  border:1px solid var(--line);background:var(--panel2);color:var(--paper);border-radius:var(--r);
+  padding:11px 16px;font-weight:700;font-size:14.5px;
+}
+.btn:active{background:var(--line)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08}
+.btn.chico{padding:7px 12px;font-size:13px;font-weight:600}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.5}
+
+header{
+  position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px 16px;
+  background:rgba(15,12,14,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)
+}
+header h1{font-size:17px;margin:0;flex:1;min-width:0}
+header .quien{font-size:12px;color:var(--muted);white-space:nowrap}
+
+main{max-width:640px;margin:0 auto;padding:14px 14px 0}
+
+#login-box{max-width:380px;margin:18vh auto 0;padding:0 20px;text-align:center}
+#login-box h2{font-size:19px;margin:0 0 8px}
+#login-box p{color:var(--muted);font-size:13.5px;margin:0 0 20px}
+#login-error{color:var(--danger);font-size:13px;margin-top:10px;min-height:1em}
+
+#compuesta{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+#compuesta textarea{min-height:64px}
+#compuesta .fila{display:flex;gap:8px;justify-content:flex-end}
+
+.filtros{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.filtros label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+
+.pregunta{
+  border:1px solid var(--line);border-left:3px solid var(--copper);background:var(--panel);
+  border-radius:var(--r);padding:12px 14px;margin-bottom:14px
+}
+.pregunta.resuelta{border-left-color:var(--bottle);opacity:.75}
+.p-cab{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.p-autor{font-weight:700;color:var(--brass)}
+.p-fecha{font-size:11.5px;color:var(--muted);font-family:"Space Mono",monospace}
+.p-texto{white-space:pre-wrap;word-break:break-word}
+.p-acciones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.p-badge{
+  font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;border:1px solid var(--bottle);color:var(--absenta)
+}
+
+.respuestas{margin:10px 0 0;padding-left:14px;border-left:2px solid var(--line-soft);display:flex;flex-direction:column;gap:8px}
+.respuesta{background:var(--panel2);border:1px solid var(--line-soft);border-radius:var(--r);padding:9px 11px}
+.respuesta .p-cab{margin-bottom:3px}
+
+.responder-caja{margin-top:10px;display:none;flex-direction:column;gap:8px}
+.responder-caja.open{display:flex}
+.responder-caja textarea{min-height:48px}
+
+.vacio{color:var(--muted);text-align:center;padding:30px 10px;font-size:13.5px}
+.cargando{color:var(--muted);text-align:center;padding:30px 10px}
+
+.mio{position:relative}
+.mio .p-borrar{position:absolute;top:10px;right:10px;background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💬 Preguntas de diseño</h1>
+  <span class="quien" id="quien-soy" hidden></span>
+  <button type="button" class="btn chico ghost" id="btn-salir" hidden>Salir</button>
+</header>
+
+<div id="login-box">
+  <h2>Preguntas de diseño</h2>
+  <p>El log de preguntas y respuestas para ir definiendo las reglas del Rol Pintoísta entre todos, sin depender de coincidir en el chat. Entrá con tu cuenta de Google — después queda recordada en este teléfono o compu.</p>
+  <button type="button" class="btn primary" id="btn-google" style="width:100%;padding:14px">Entrar con Google</button>
+  <div id="login-error"></div>
+</div>
+
+<main id="main" hidden>
+  <div id="compuesta">
+    <textarea id="txt-nueva" placeholder="Escribí una pregunta nueva…"></textarea>
+    <div class="fila"><button type="button" class="btn primary" id="btn-nueva">＋ Preguntar</button></div>
+  </div>
+  <div class="filtros">
+    <label><input type="checkbox" id="chk-resueltas"> Mostrar las resueltas</label>
+  </div>
+  <div id="lista"><div class="cargando">Cargando…</div></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/sesion.js"></script>
+<script>
+/* =========================================================
+   PREGUNTAS DE DISEÑO
+   Log compartido, fuera de cualquier partida (colección preguntas_diseno,
+   fuera de campanas/*): el dueño del proyecto tira preguntas de a poco,
+   cualquiera con cuenta confirmada suma preguntas o respuestas/sugerencias,
+   sin depender de coincidir en el chat de WhatsApp. Pensada para el
+   celular: entrar y salir tiene que ser instantáneo, la sesión de Google
+   queda recordada sola en ese navegador.
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let entradas = [];   // todo lo que llega de Firestore, tal cual
+let mostrarResueltas = false;
+
+function fechaTxt(ts){
+  if(!ts || !ts.toDate) return 'ahora';
+  const d = ts.toDate(), ahora = new Date();
+  const dias = Math.floor((ahora - d) / 86400000);
+  const hhmm = d.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+  if(dias <= 0 && d.toDateString() === ahora.toDateString()) return 'hoy ' + hhmm;
+  if(dias === 1) return 'ayer ' + hhmm;
+  return d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' ' + hhmm;
+}
+
+function render(){
+  const cont = $('#lista');
+  const preguntas = entradas.filter(e => e.tipo === 'pregunta' && (mostrarResueltas || !e.resuelta))
+    .sort((a, b) => (b.creadoMs || 0) - (a.creadoMs || 0));
+  if(!preguntas.length){
+    cont.innerHTML = `<div class="vacio">${mostrarResueltas ? 'Todavía no hay nada acá.' : 'No hay preguntas abiertas. Tildá "Mostrar las resueltas" para ver el historial, o escribí la primera.'}</div>`;
+    return;
+  }
+  cont.innerHTML = preguntas.map(p => {
+    const mias = fbUsuario && p.autorUid === fbUsuario.uid;
+    const respuestas = entradas.filter(e => e.tipo === 'respuesta' && e.padreId === p.id)
+      .sort((a, b) => (a.creadoMs || 0) - (b.creadoMs || 0));
+    return `<div class="pregunta${p.resuelta ? ' resuelta' : ''}${mias ? ' mio' : ''}" data-id="${esc(p.id)}">
+      ${mias ? `<button type="button" class="p-borrar" data-borrar="${esc(p.id)}" title="Borrar">✕</button>` : ''}
+      <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? '<span class="p-badge">Resuelta</span>' : ''}</div>
+      <div class="p-texto">${esc(p.texto)}</div>
+      <div class="p-acciones">
+        <button type="button" class="btn chico" data-responder="${esc(p.id)}">💬 Responder</button>
+        <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? '↺ Reabrir' : '✓ Marcar resuelta'}</button>
+      </div>
+      ${respuestas.length ? `<div class="respuestas">${respuestas.map(r => `
+        <div class="respuesta${fbUsuario && r.autorUid === fbUsuario.uid ? ' mio' : ''}" data-id="${esc(r.id)}">
+          ${fbUsuario && r.autorUid === fbUsuario.uid ? `<button type="button" class="p-borrar" data-borrar="${esc(r.id)}" title="Borrar">✕</button>` : ''}
+          <div class="p-cab"><span class="p-autor">${esc(r.autorNombre)}</span><span class="p-fecha">${fechaTxt(r.creado)}</span></div>
+          <div class="p-texto">${esc(r.texto)}</div>
+        </div>`).join('')}</div>` : ''}
+      <div class="responder-caja" id="responder-${esc(p.id)}">
+        <textarea placeholder="Escribí una respuesta o sugerencia…"></textarea>
+        <div class="fila" style="display:flex;gap:8px;justify-content:flex-end">
+          <button type="button" class="btn chico ghost" data-cancelar-responder="${esc(p.id)}">Cancelar</button>
+          <button type="button" class="btn chico primary" data-enviar-respuesta="${esc(p.id)}">Enviar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escuchar(){
+  fbDb.collection('preguntas_diseno').orderBy('creado', 'asc').onSnapshot(snap => {
+    entradas = snap.docs.map(d => {
+      const x = d.data();
+      return {id: d.id, ...x, creadoMs: x.creado && x.creado.toMillis ? x.creado.toMillis() : Date.now()};
+    });
+    render();
+  }, err => {
+    console.error('Error escuchando las preguntas:', err);
+    $('#lista').innerHTML = '<div class="vacio">No se pudo cargar (¿están publicadas las reglas nuevas de Firestore?).</div>';
+  });
+}
+
+async function crear(tipo, texto, padreId){
+  const t = texto.trim();
+  if(!t) return;
+  try{
+    await fbDb.collection('preguntas_diseno').add({
+      tipo, texto: t.slice(0, 4000), padreId: padreId || '', resuelta: false,
+      autorUid: fbUsuario.uid, autorNombre: (fbUsuario.displayName || fbUsuario.email || 'Alguien').slice(0, 40),
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){
+    console.error('No se pudo guardar:', err);
+    alert('No se pudo guardar. Revisá la conexión e intentá de nuevo.');
+  }
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b) return;
+  if(b.dataset.responder){
+    const caja = $('#responder-' + b.dataset.responder);
+    if(caja){ caja.classList.add('open'); caja.querySelector('textarea').focus(); }
+    return;
+  }
+  if(b.dataset.cancelarResponder){
+    const caja = $('#responder-' + b.dataset.cancelarResponder);
+    if(caja){ caja.classList.remove('open'); caja.querySelector('textarea').value = ''; }
+    return;
+  }
+  if(b.dataset.enviarRespuesta){
+    const id = b.dataset.enviarRespuesta;
+    const caja = $('#responder-' + id);
+    const ta = caja.querySelector('textarea');
+    crear('respuesta', ta.value, id);
+    ta.value = '';
+    caja.classList.remove('open');
+    return;
+  }
+  if(b.dataset.resolver){
+    const p = entradas.find(x => x.id === b.dataset.resolver);
+    if(p) fbDb.collection('preguntas_diseno').doc(p.id).update({resuelta: !p.resuelta}).catch(err => console.error(err));
+    return;
+  }
+  if(b.dataset.borrar){
+    if(!confirm('¿Borrar esto? No se puede deshacer.')) return;
+    fbDb.collection('preguntas_diseno').doc(b.dataset.borrar).delete().catch(err => console.error(err));
+    return;
+  }
+});
+
+$('#btn-nueva').onclick = () => {
+  crear('pregunta', $('#txt-nueva').value, '');
+  $('#txt-nueva').value = '';
+};
+$('#chk-resueltas').onchange = e => { mostrarResueltas = e.target.checked; render(); };
+$('#btn-salir').onclick = () => firebase.auth().signOut();
+
+$('#btn-google').onclick = async () => {
+  $('#login-error').textContent = '';
+  const proveedor = new firebase.auth.GoogleAuthProvider();
+  proveedor.setCustomParameters({prompt: 'select_account'});
+  try{
+    await firebase.auth().signInWithPopup(proveedor);
+  }catch(err){
+    // En el celular la ventanita suele estar bloqueada: se va a Google y vuelve.
+    if(err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment'){
+      await firebase.auth().signInWithRedirect(proveedor);
+      return;
+    }
+    if(err.code !== 'auth/cancelled-popup-request') $('#login-error').textContent = 'No se pudo entrar: ' + (err.message || err.code || '');
+  }
+};
+
+// A diferencia de las otras herramientas (que entran una vez y listo), acá conviene reaccionar en vivo a cada
+// cambio de sesión: volver de un signInWithRedirect (celular sin ventanita), o Salir, sin recargar la página.
+let escuchaArrancada = false;
+function iniciar(){
+  if(!fbIniciar()){ $('#login-error').textContent = 'Sin conexión con Firebase.'; return; }
+  firebase.auth().onAuthStateChanged(u => {
+    fbUsuario = u || null;
+    if(!fbCuentaConfirmada(u)){
+      $('#login-box').hidden = false;
+      $('#main').hidden = true;
+      $('#quien-soy').hidden = true;
+      $('#btn-salir').hidden = true;
+      if(u && !u.emailVerified) $('#login-error').textContent = 'Confirmá tu email desde el link que te mandamos y volvé a entrar.';
+      return;
+    }
+    $('#login-box').hidden = true;
+    $('#main').hidden = false;
+    $('#quien-soy').hidden = false;
+    $('#quien-soy').textContent = u.displayName || u.email || '';
+    $('#btn-salir').hidden = false;
+    document.title = 'Preguntas de diseño — Rol Pintoísta';
+    render();   // por si cambió quién es "mío" al cambiar de cuenta
+    if(!escuchaArrancada){ escuchaArrancada = true; escuchar(); }
+  });
+}
+iniciar();
+</script>
+</body>
+</html>

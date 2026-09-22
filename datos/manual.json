@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-21T21:17:12Z",
+ "actualizado": "2026-09-22T00:01:29Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -974,7 +974,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "**Veneno** es un debuff de daño por turno: **pierde 1 HP por stack cada turno**, en el [[Mantenimiento]]. Los stacks y los turnos arrancan igualados y se van agotando juntos.\n\n- **Veneno severo:** hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca.\n- Se **cura** con consumibles (por ejemplo, un antídoto) o habilidades.\n- Lo bloquean [[Invulnerable]] y el estado **Sangre pura** (inmunidad a veneno).\n\n> [!question] Stacks\n> Falta definir cómo funciona exactamente acumular veneno (por ejemplo, la *Nube tóxica* del [[Debuffer]] \"solo aplica 1 stack a personajes ya envenenados\")."
+   "cuerpo": "**Veneno** es un debuff de daño por turno: **pierde 1 HP por stack cada turno**, en el [[Mantenimiento]]. Los stacks y los turnos arrancan igualados y se van agotando juntos.\n\n- **Se acumula:** si te envenenan estando envenenado, los stacks nuevos **se suman** a los que ya tenés (4 + 4 = 8) en un solo estado, y los turnos pasan a valer el total de stacks para que se agoten juntos. No hay tope de stacks.\n- **Veneno severo** es un estado aparte: hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca y **no se acumula** (si ya lo tenés, una segunda aplicación no hace nada). Comparte con el Veneno común la idea de \"veneno\": un antídoto cura **ambos**.\n- Se **cura** con consumibles (por ejemplo, un antídoto) o habilidades.\n- Lo bloquean [[Invulnerable]] y el estado **Sangre pura** (inmunidad a veneno).\n\n> [!question] Cura automática\n> Hoy quitar el veneno con un antídoto es a mano (se saca el estado). Falta una mecánica de \"cura estados\" para consumibles y habilidades, que quite los dos venenos de una vez.\n\n> [!question] Nube tóxica\n> La *Nube tóxica* del [[Debuffer]] \"solo aplica 1 stack a personajes ya envenenados\": ¿se mantiene así o pasa a aplicar los stacks normales?"
   },
   {
    "id": "sangrado",

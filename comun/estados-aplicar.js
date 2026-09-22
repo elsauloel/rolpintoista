@@ -80,6 +80,18 @@ const EstadosAplicar = (() => {
       const ya = sc.estados.find(e => e.armaduraRota);
       if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
     }
+    // Veneno se acumula (suma sus stacks, turnos = stacks); Veneno severo no.
+    if(est.esVeneno){
+      const ya = sc.estados.find(e => e.esVeneno && e.nombre === est.nombre);
+      if(ya){
+        if(!est.permanente){
+          ya.stacks = Math.max(1, Number(ya.stacks) || 1) + Math.max(1, Number(est.stacks) || 1);
+          ya.turnos = ya.stacks;
+          ya.activo = true;
+        }
+        return {ok: true, estado: ya};
+      }
+    }
     const igual = sc.estados.find(e => e.nombre === est.nombre);
     if(igual){ Object.assign(igual, {...est, id: igual.id}); return {ok: true, estado: igual}; }
     sc.estados.push(est);

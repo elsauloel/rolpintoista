@@ -38,3 +38,9 @@
 - [ ] Las **66 armas naturales**: potencia y porcentajes de los efectos.
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
+
+## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
+- [x] **Veneno**: se acumula (suma stacks, turnos = stacks, sin tope); Veneno severo aparte y no se acumula.
+- [ ] **Mecánica "cura estados"** en consumibles y habilidades (el Antídoto debería quitar Veneno y Veneno severo; hoy se saca a mano).
+- [ ] **Nube tóxica** del Debuffer: ¿sigue aplicando solo 1 stack a alguien ya envenenado?
+- [ ] Seguir el repaso: Veneno severo, Sangrado, Regeneración, Pajaritos, Lisiado, Armadura rota/arruinada, Cansado, Exhausto, Stun, Hypeado, Inmovilizado, Rengo, protecciones, Afortunado, Sigilo.

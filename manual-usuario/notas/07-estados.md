@@ -55,12 +55,16 @@ estado: borrador
 +++
 **Veneno** es un debuff de daño por turno: **pierde 1 HP por stack cada turno**, en el [[Mantenimiento]]. Los stacks y los turnos arrancan igualados y se van agotando juntos.
 
-- **Veneno severo:** hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca.
+- **Se acumula:** si te envenenan estando envenenado, los stacks nuevos **se suman** a los que ya tenés (4 + 4 = 8) en un solo estado, y los turnos pasan a valer el total de stacks para que se agoten juntos. No hay tope de stacks.
+- **Veneno severo** es un estado aparte: hace 1 de daño el primer turno y **aumenta 1 con cada mantenimiento**. No caduca y **no se acumula** (si ya lo tenés, una segunda aplicación no hace nada). Comparte con el Veneno común la idea de "veneno": un antídoto cura **ambos**.
 - Se **cura** con consumibles (por ejemplo, un antídoto) o habilidades.
 - Lo bloquean [[Invulnerable]] y el estado **Sangre pura** (inmunidad a veneno).
 
-> [!question] Stacks
-> Falta definir cómo funciona exactamente acumular veneno (por ejemplo, la *Nube tóxica* del [[Debuffer]] "solo aplica 1 stack a personajes ya envenenados").
+> [!question] Cura automática
+> Hoy quitar el veneno con un antídoto es a mano (se saca el estado). Falta una mecánica de "cura estados" para consumibles y habilidades, que quite los dos venenos de una vez.
+
+> [!question] Nube tóxica
+> La *Nube tóxica* del [[Debuffer]] "solo aplica 1 stack a personajes ya envenenados": ¿se mantiene así o pasa a aplicar los stacks normales?
 
 +++
 titulo: Sangrado

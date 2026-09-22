@@ -3606,11 +3606,33 @@ function activarEstadoPresetCreep(preset){
     toast(`${sc.nombre}: ${yaRota.nombre} ×${yaRota.stacks}`);
     return;
   }
+  const yaVeneno = acumularVenenoCreep(sc, datos);
+  if(yaVeneno){
+    if(datos.permanente){ toast(`${sc.nombre}: ${datos.nombre} ya lo tiene, no se acumula`); return; }
+    renderAll();
+    toast(`${sc.nombre}: ${yaVeneno.nombre} ×${yaVeneno.stacks}`);
+    return;
+  }
   const es = {id: uid(), ...datos};
   sc.estados.push(es);
   if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
   renderAll();
   toast(`${sc.nombre}: ${preset.nombre} activado`);
+}
+
+// Veneno se acumula: una aplicación nueva suma sus stacks al Veneno que ya tiene el creep, en un solo
+// estado, y los turnos quedan igualados a los stacks. Veneno severo (permanente) no se acumula.
+// Devuelve el estado que ya estaba (null si no había). Igual que en ficha.html y comun/estados-aplicar.js.
+function acumularVenenoCreep(sc, nuevo){
+  if(!nuevo.esVeneno) return null;
+  const ya = (sc.estados || []).find(e => e.esVeneno && e.nombre === nuevo.nombre);
+  if(!ya) return null;
+  if(!nuevo.permanente){
+    ya.stacks = Math.max(1, num(ya.stacks) || 1) + Math.max(1, num(nuevo.stacks) || 1);
+    ya.turnos = ya.stacks;
+    ya.activo = true;
+  }
+  return ya;
 }
 
 function aplicarPresetEstadoCreep(valor){
@@ -3661,6 +3683,10 @@ function aplicarEfectoDeConsumoCreep(sc, h){
     stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
   if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
   let es = sc.estados.find(x => x.nombre === nombre);
+  if(es && preset && preset.esVeneno){
+    // Veneno se acumula (y el severo no): ver acumularVenenoCreep.
+    return acumularVenenoCreep(sc, {nombre, esVeneno: true, permanente: !!preset.permanente, stacks});
+  }
   if(es){
     es.turnos = turnos; es.stacks = stacks; es.hpTurno = hpTurno;
     es.polaridad = polaridad; es.detalle = detalle; es.mods = mods;

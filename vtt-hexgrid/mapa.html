@@ -5334,6 +5334,12 @@ function escucharTokens(){
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
     renderPanel();
+    // Ojo (2026-09-22): la ruptura de sigilo vivía solo adentro de dibujar(), que se
+    // dispara con requestAnimationFrame — en una pestaña de fondo (minimizada, otra
+    // pestaña al frente) el navegador frena esos frames y la detección podía tardar
+    // mucho en notarse aunque la posición ya hubiera llegado por Firebase. Se llama acá
+    // también, directo desde la llegada del dato, así no depende de que se esté dibujando.
+    sigiloRevisar();
     pedirDibujo();
   }, err => {
     console.error('Error escuchando los tokens:', err);
@@ -5432,6 +5438,7 @@ function escucharVinculables(){
     });
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
     renderPanel();
+    sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);

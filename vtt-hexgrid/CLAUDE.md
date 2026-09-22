@@ -734,6 +734,12 @@ hexágono con otro sin importar bando. Todavía no está construido.
   muestran solo sus zonas; al soltar la selección vuelve al filtro.
   **Atajo `Ctrl+L`** (2026-09-19): prende y apaga el modo lentes (`alternarLentes`);
   la `L` sola sigue siendo el Lápiz. Está en la lista de atajos del mapa.
+  **Actualización 2026-09-22 — se sacó el filtro Todos/Aliados/Rivales/NPC:**
+  "👁 Ver todas las zonas" ya no es configurable por categoría — ahora siempre
+  muestra solo las de **riesgo** (nunca las de tus propios aliados): para un
+  jugador, las de los creeps; para el GM, las de los personajes de los
+  jugadores (`lentesMuestra`, ver más abajo). Seleccionar un token puntual
+  sigue funcionando para cualquiera (aliado, rival o NPC), sin este límite.
 
 - **Lápiz por casilleros numerado** (2026-09-20): cada casillero de una
   trayectoria del lápiz lleva su número (1, 2, 3…) en un círculo del color del

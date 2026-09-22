@@ -23,6 +23,9 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 - Los estados que un ataque aplica a un **rival** ([[Efectos al golpear]]) **los pone la mesa a mano**: el GM elige el estado en la ficha del creep, o el jugador en la suya.
 - Podés crear estados propios (personalizados) para lo que se te ocurra.
 
+> [!tip] Regla de redondeo (2026-09-22)
+> Cuando un debuff o un buff tiene que redondear un número: **los debuffs redondean hacia abajo** (menos favorable) y **los buffs redondean hacia arriba** (más favorable), salvo que se diga lo contrario en ese estado puntual. Por eso Cansado, Exhausto, Pajaritos y Lisiado usan `floor` — son debuffs.
+
 ## Los estados base
 | Estado | Tipo | En una línea |
 |---|---|---|

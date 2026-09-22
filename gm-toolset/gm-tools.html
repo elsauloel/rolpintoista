@@ -5779,15 +5779,39 @@ function mantenimiento(){
   toast(`Turno ${S.turno} · No2 recargados${detalle ? ` · ${detalle}` : ''}`);
 }
 
+// Vuelve a tapar todo lo descubierto de la niebla del mapa PUBLICADO (el
+// que ven los jugadores) — mismo dato que "↺ Restablecer niebla" del mapa
+// (vtt-hexgrid/mapa.html, nieblaReiniciar()), pero disparado desde acá al
+// reiniciar el combate. Mejor esfuerzo: si falla, no interrumpe el resto.
+async function nieblaReiniciarDesdeGM(){
+  if(!fbDb || !fbMiembro) return;
+  try{
+    const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+    const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : '_principal';
+    const ruta = mapaId === '_principal' ? 'mapa/niebla' : `mapas/${mapaId}/estado/niebla`;
+    await fbDb.doc(fbRutaCampana(ruta)).set({descubiertas: []}, {merge: true});
+  }catch(err){ console.error('No se pudo restablecer la niebla al reiniciar el combate:', err); }
+}
+
+// Qué pasa al reiniciar combate (decidido 2026-09-22): los cooldowns de
+// habilidades vuelven a 0, salvo las marcadas "habilidad lenta"
+// (cdArranca), que arrancan con el cooldown ya activo; los Nitros de los
+// creeps se recargan a full; se restablece la niebla de guerra del mapa
+// publicado (los jugadores no ven nada tapado, ni ella ni sus creeps
+// quedan al descubierto por el reinicio, hasta que alguien vuelva a
+// moverse).
 function reiniciarCombate(){
   if(!confirm('¿Reiniciar el combate? El contador vuelve a cero.')) return;
   S.turno = 0;
-  // Turno 0: las habilidades lentas vuelven a arrancar con el cooldown activo.
-  S.creeps.forEach(sc => (sc.habilidades || []).forEach(h => { if(h.cdArranca) h.cdActual = num(h.cd); }));
-  S.creeps.forEach(sc => { sc.recompensado = false; });   // un combate nuevo: vuelven a contar para el reporte
+  S.creeps.forEach(sc => {
+    (sc.habilidades || []).forEach(h => { h.cdActual = h.cdArranca ? num(h.cd) : 0; });
+    sc.nitros = creepNitrosMax(sc);
+    sc.recompensado = false;   // un combate nuevo: vuelve a contar para el reporte
+  });
   combateRep = nuevoCombateRep();
+  nieblaReiniciarDesdeGM();
   renderAll();
-  toast('Combate reiniciado · Turno 0');
+  toast('Combate reiniciado · Turno 0 · No2 recargados · niebla restablecida');
 }
 
 /* =========================================================

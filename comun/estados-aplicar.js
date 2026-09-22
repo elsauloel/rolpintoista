@@ -7,7 +7,7 @@
    - `encolarPj({fichaId, duenoUid, spec, origen})`: para un personaje NO se escribe en su ficha desde afuera: se deja un
      aviso en campanas/<id>/estados y la ficha del dueño lo aplica sola, una vez (mismo mecanismo que las recompensas).
    spec = {nombre, turnos?, mods?: [{stat, val}], hp?, detalle?, polaridad?}. Si el nombre es el de un preset
-   (Veneno, Sangrado, Stun, Exhausto, Cansado, Lisiado, Inmovilizado, Rengo, Pajaritos, Armadura rota/arruinada, Veneno severo)
+   (Veneno, Sangrado, Stun, Exhausto, Cansado, Lisiado, Inmovilizado, Rengo, Pajaritos, Armadura rota, Veneno severo)
    se usa ese preset con sus marcas; si no, es un estado propio con lo que traiga la spec.
    Aplicar sobre el rival sigue pasando por una decisión del GM (elegir a quién le pegó) o por una trampa que alguien pisó.
    ========================================================= */
@@ -21,7 +21,6 @@ const EstadosAplicar = (() => {
     {nombre: 'Exhausto', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, esCC: true, exhausto: true, detalle: 'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
     {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
     {nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraRota: true, detalle: '−1 Defensa por cada acumulación (×N). Permanente y acumulable.'},
-    {nombre: 'Armadura arruinada', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraArruinada: true, detalle: 'Anula lo que aportan las armaduras equipadas a Defensa y Res. a crítico. Permanente.'},
     {nombre: 'Veneno severo', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -1, stacksTurno: 1, permanente: true, esVeneno: true, detalle: 'Hace 1 de daño el primer turno y 1 más con cada mantenimiento. No caduca.'},
     {nombre: 'Sangrado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -2, stacksTurno: 0, permanente: true, esSangrado: true, detalle: 'Pierde 2 HP por turno. Permanente hasta curarse.'},
     {nombre: 'Lisiado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, lisiado: true, detalle: 'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},

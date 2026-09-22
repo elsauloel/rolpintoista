@@ -163,14 +163,14 @@ estado: pendiente
 
 +++
 titulo: Armadura rota
-alias: [Armadura arruinada, Armadura rota (estado)]
+alias: [Armadura rota (estado)]
 tags: [estado, equipo]
 estado: borrador
 +++
-Dos estados que castigan tu armadura:
+**Armadura rota** castiga tu armadura: **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.
 
-- **Armadura rota:** **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.
-- **Armadura arruinada:** **anula al 100%** lo que aportan las **armaduras equipadas** (blandas y rígidas) a Defensa y [[Resistencia a crítico]]. **No** afecta cascos, guantes, piernas ni botas. También es permanente hasta reparar.
+> [!info] Armadura arruinada se sacó (2026-09-21)
+> Existía un segundo estado, Armadura arruinada, que anulaba al 100% lo que daba la armadura. Se eliminó del repaso de debuffs; lo que la aplicaba (algunas hachas, un par de armas naturales y una habilidad de creep) ahora suma stacks de Armadura rota en su lugar.
 
 +++
 titulo: Escudo mágico

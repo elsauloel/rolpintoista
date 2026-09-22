@@ -82,7 +82,7 @@ Categoría **plana**: un solo ítem por ranura, sin distinción de material.
 La [[Rareza]] sube la Defensa y las resistencias, pero **las resistencias a críticos altos son escasas** a propósito: ver [[Resistencia a crítico]].
 
 > [!warning] Los estados las afectan
-> [[Armadura rota]] (−1 Def por acumulación) y Armadura arruinada (anula las armaduras del torso) las castigan.
+> [[Armadura rota]] (−1 Def por acumulación) las castiga.
 
 +++
 titulo: Anillos

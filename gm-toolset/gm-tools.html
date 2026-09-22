@@ -1518,7 +1518,7 @@ const CATALOGO_EQUIPO = [
   {nombre:'Hacha', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:1, precioCompra:60, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], detalle:'Rompe armadura.', descripcionNarrativa:'Hacha de leña reconvertida. Nadie le cambió el mango todavía.'},
   {nombre:'Hacha con pico', tipoItem:'arma_1m', tier:'Buena Calidad', tipoDado:8, danoFijo:0, peso:2, precioCompra:110, def:0, efectosGolpe:[{nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], detalle:'ignora 1 de resistencia al crítico', descripcionNarrativa:'Filo de un lado, pico del otro. Dos formas de resolver el mismo problema.'},
   {nombre:'Hacha danesa', tipoItem:'arma_1m', tier:'Raro', tipoDado:8, danoFijo:0, peso:2, precioCompra:130, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], mods:[{stat:'rng', val:1}], detalle:'alcance +1. Rompe armadura.', descripcionNarrativa:'Asta larga y hoja delgada. Vikinga, veloz y letal.'},
-  {nombre:'Hacha de Durin', tipoItem:'arma_1m', tier:'Legendario', tipoDado:8, danoFijo:1, peso:4, precioCompra:1200, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}, {nombre:'Lisiado', caras:1, exitos:1, dado:'', detalle:'Aplicale Lisiado al objetivo.'}], detalle:'Arruina armadura. +2 a la fuerza. deja lisiado', descripcionNarrativa:'Forjada bajo la montaña por manos que ya no están. Sigue esperando su turno.'},
+  {nombre:'Hacha de Durin', tipoItem:'arma_1m', tier:'Legendario', tipoDado:8, danoFijo:1, peso:4, precioCompra:1200, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo (suma 3 stacks).'}, {nombre:'Lisiado', caras:1, exitos:1, dado:'', detalle:'Aplicale Lisiado al objetivo.'}], detalle:'Arruina armadura. +2 a la fuerza. deja lisiado', descripcionNarrativa:'Forjada bajo la montaña por manos que ya no están. Sigue esperando su turno.'},
   {nombre:'Hacha de batalla', tipoItem:'arma_1m', tier:'Buena Calidad', tipoDado:8, danoFijo:0, peso:2, precioCompra:110, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], mods:[{stat:'bloqueo', val:1}], detalle:'Rompe armadura. +1 al bloqueo', descripcionNarrativa:'Cabeza ancha con refuerzo en el mango. Se puede parar un golpe con ella.'},
   {nombre:'Hacha de batalla a dos manos', tipoItem:'arma_2m', tier:'Raro', tipoDado:10, danoFijo:0, peso:3, precioCompra:250, def:0, detalle:'Arma de dos manos, Tipo 10.', descripcionNarrativa:'Filo doble, mango largo y una cabeza que cuesta levantar. Termina lo que empieza.'},
   {nombre:'Hacha de constructor', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:2, precioCompra:90, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], detalle:'Rompe armadura', descripcionNarrativa:'Cabeza chata de un lado para clavar estacas. Sirve igual para lo otro.'},
@@ -1526,14 +1526,14 @@ const CATALOGO_EQUIPO = [
   {nombre:'Hacha de doble filo', tipoItem:'arma_1m', tier:'Raro', tipoDado:8, danoFijo:0, peso:3, precioCompra:120, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}, {nombre:'Ignora 1 de Res. crítico', caras:1, exitos:1, dado:'', detalle:'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'}], detalle:'Rompe armadura. Ignora 1 resistencia al crítico', descripcionNarrativa:'Simétrica, más pesada y mejor templada que la común.'},
   {nombre:'Hacha de guardia real', tipoItem:'arma_1m', tier:'Excepcional', tipoDado:8, danoFijo:1, peso:2, precioCompra:500, def:0, mods:[{stat:'parry', val:2}, {stat:'bloqueo', val:3}], detalle:'parry +2, bloqueo +3', descripcionNarrativa:'Ceremonial de apariencia, brutal en la práctica. Nadie se confunde dos veces.'},
   {nombre:'Hacha de guerra ligera', tipoItem:'arma_1m', tier:'Buena Calidad', tipoDado:8, danoFijo:1, peso:2, precioCompra:100, def:0, detalle:'Arma de una mano, Tipo 8: 2 dados de daño +1 fijo.', descripcionNarrativa:'Aligerada a costa de masa. Se maneja rápido.'},
-  {nombre:'Hacha de guerra pesada', tipoItem:'arma_1m', tier:'Raro', tipoDado:8, danoFijo:0, peso:2, precioCompra:130, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}], detalle:'Arruina armadura', descripcionNarrativa:'Tanto peso adelante que el golpe no se puede frenar a mitad de camino.'},
+  {nombre:'Hacha de guerra pesada', tipoItem:'arma_1m', tier:'Raro', tipoDado:8, danoFijo:0, peso:2, precioCompra:130, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo (suma 1 stack).'}], detalle:'Arruina armadura', descripcionNarrativa:'Tanto peso adelante que el golpe no se puede frenar a mitad de camino.'},
   {nombre:'Hacha de la furia roja', tipoItem:'arma_1m', tier:'Buena Calidad', tipoDado:8, danoFijo:0, peso:2, precioCompra:110, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], mods:[{stat:'bloqueo', val:1}], detalle:'Rompe armadura. +1 al bloqueo', descripcionNarrativa:'Igual que «Hacha de batalla» del catálogo, pero con historia propia: lo lleva «Berserker». Cabeza ancha con refuerzo en el mango. Se puede parar un golpe con ella.'},
   {nombre:'Hacha de leñador', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:2, precioCompra:60, def:0, detalle:'Arma de una mano, Tipo 8: 2 dados de daño.', descripcionNarrativa:'Mango largo, cabeza pesada. Pensada para árboles, usada para otra cosa.'},
   {nombre:'Hacha de madera mística', tipoItem:'arma_1m', tier:'Excepcional', tipoDado:8, danoFijo:0, peso:2, precioCompra:600, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}, {nombre:'Drena vida', caras:1, exitos:1, dado:'', detalle:'Te curás la mitad del daño que hiciste.'}], detalle:'Rompe armadura. Drena 50% del daño.', descripcionNarrativa:'Sin una sola pieza de metal. Toma algo del que corta y se lo da al que la lleva.'},
   {nombre:'Hacha del Jefe de Guerra', tipoItem:'arma_1m', tier:'Raro', tipoDado:8, danoFijo:0, peso:2, precioCompra:130, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], mods:[{stat:'rng', val:1}], detalle:'alcance +1. Rompe armadura.', descripcionNarrativa:'Igual que «Hacha danesa» del catálogo, pero con historia propia: lo lleva «Jefe de guerra bárbaro». Asta larga y hoja delgada. Vikinga, veloz y letal.'},
   {nombre:'Hacha del clan', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:1, precioCompra:60, def:0, efectosGolpe:[{nombre:'Rompe armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo.'}], detalle:'Rompe armadura.', descripcionNarrativa:'Igual que «Hacha» del catálogo, pero con historia propia: lo lleva «Guerrero de clan». Hacha de leña reconvertida. Nadie le cambió el mango todavía.'},
   {nombre:'Hacha dentada', tipoItem:'arma_1m', tier:'Buena Calidad', tipoDado:8, danoFijo:0, peso:2, precioCompra:115, def:0, efectosGolpe:[{nombre:'Sangrado', caras:2, exitos:1, dado:'', detalle:'Aplicale Sangrado al objetivo.'}], detalle:'50% de dejar sangrando', descripcionNarrativa:'El filo tiene dientes de sierra. Lo que abre no cierra fácil.'},
-  {nombre:'Hacha filo de diamante', tipoItem:'arma_1m', tier:'Excepcional', tipoDado:8, danoFijo:0, peso:3, precioCompra:450, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura arruinada al objetivo.'}], detalle:'Crítico aumentado. Arruina armadura.', descripcionNarrativa:'El filo tiene incrustaciones que muerden el acero como si fuera madera.'},
+  {nombre:'Hacha filo de diamante', tipoItem:'arma_1m', tier:'Excepcional', tipoDado:8, danoFijo:0, peso:3, precioCompra:450, def:0, efectosGolpe:[{nombre:'Arruina armadura', caras:1, exitos:1, dado:'', detalle:'Aplicale el estado Armadura rota al objetivo (suma 2 stacks).'}], detalle:'Crítico aumentado. Arruina armadura.', descripcionNarrativa:'El filo tiene incrustaciones que muerden el acero como si fuera madera.'},
   {nombre:'Hacha oxidada', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:1, precioCompra:50, def:0, efectosGolpe:[{nombre:'Envenenar', caras:2, exitos:1, dado:'', detalle:'Aplicale Veneno al objetivo.'}], detalle:'50% de chances de envenenar', descripcionNarrativa:'Herrumbrada hasta el mango. Cada corte que hace se infecta.'},
   {nombre:'Hachuela', tipoItem:'arma_1m', tier:'Común', tipoDado:8, danoFijo:0, peso:1, precioCompra:40, def:0, detalle:'Arma de una mano, Tipo 8: 1 dado de daño.', descripcionNarrativa:'Corta y de una mano. Cabe en el cinturón sin molestar.'},
   {nombre:'Honda de cuero', tipoItem:'arma_1m', tier:'Común', tipoDado:4, danoFijo:0, peso:1, precioCompra:40, def:0, armaDeRango:true, mods:[{stat:'rng', val:3}], detalle:'Arma de una mano a distancia, Tipo 4. Rango +3.', descripcionNarrativa:'Una tira de cuero y un puñado de piedras. Vieja como la guerra.'},
@@ -2129,14 +2129,10 @@ function creepModTotal(sc, statId){
   return total;
 }
 
-// Estados con armaduraRota/armaduraArruinada activos reducen o anulan la
-// Defensa y la Resistencia a crítico — igual que en ficha.html. Arruinada
-// solo anula lo que aporta el slot 'armadura' (blandas y rígidas), no el
-// resto del equipo (guantes, casco, botas, escudo).
+// Armadura rota activa reduce la Defensa — igual que en ficha.html.
 function creepEstadosArmadura(sc){
   const activos = (sc.estados||[]).filter(e => e.activo !== false);
   return {
-    arruinada: activos.some(e => e.armaduraArruinada),
     rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0),  // puntos de Defensa que quita
   };
 }
@@ -2145,19 +2141,15 @@ function creepAporteArmadura(sc, statId){
     .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
 }
 function creepDefensaEfectiva(sc){
-  const {arruinada, rota} = creepEstadosArmadura(sc);
+  const {rota} = creepEstadosArmadura(sc);
   let v = num(sc.defensa);
   // Bonos de Defensa de los estados (ej. Piel de escoria): se suman por stack.
   (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
-  if(arruinada) v -= creepAporteArmadura(sc, 'def');
   v -= rota;
   return Math.max(0, v);
 }
 function creepCritEfectivo(sc, i){
-  const {arruinada} = creepEstadosArmadura(sc);
-  let v = num(sc.crit[i]);
-  if(arruinada) v -= creepAporteArmadura(sc, 'tipo'+(i+1));
-  return v;
+  return num(sc.crit[i]);
 }
 /* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
    su atributo (fórmula base = el atributo) + mods (ver creepStatValor).
@@ -2255,8 +2247,7 @@ function defensaOrigenTxt(sc){
   });
   const resto = num(sc.defensa) - deItems;
   if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
-  const {arruinada, rota} = creepEstadosArmadura(sc);
-  if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
+  const {rota} = creepEstadosArmadura(sc);
   if(rota) L.push(`Armadura rota: -${rota} de Defensa`);
   L.push(`= ${fmt(creepDefensaEfectiva(sc))}`);
   return L.join('\n');
@@ -2277,14 +2268,12 @@ function critOrigenTxt(sc, i){
   });
   const resto = num(sc.crit[i]) - deItems;
   if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
-  const {arruinada} = creepEstadosArmadura(sc);
-  if(arruinada) L.push('Armadura arruinada: no cuenta lo de la armadura');
   L.push(`= ${conSigno(creepCritEfectivo(sc, i))}`);
   return L.join('\n');
 }
 
 function creepArmaduraOrigenTxt(sc){
-  const activos = (sc.estados||[]).filter(e => e.activo !== false && (e.armaduraRota || e.armaduraArruinada));
+  const activos = (sc.estados||[]).filter(e => e.activo !== false && e.armaduraRota);
   const nombres = activos.map(e => e.nombre || '(sin nombre)').join(', ');
   return `Reducido por: ${nombres || 'estado activo'}`;
 }
@@ -3469,7 +3458,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','inmovilizado','rengo','cansado','exhausto','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','inmovilizado','rengo','cansado','exhausto','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
@@ -3488,8 +3477,6 @@ const ESTADOS_PRESET_GM = [
     detalle:'+1 a los No2 máximos. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
     detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
-  {nombre:'Armadura arruinada', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraArruinada:true,
-    detalle:'Anula al 100% lo que aportan las armaduras equipadas (blandas y rígidas) a Defensa y Res. a crítico. No afecta el resto del equipo. Permanente — se quita con Oleo reparador.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
   {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-2, stacksTurno:0, permanente:true, esSangrado:true,
@@ -4291,7 +4278,7 @@ function abrirCatalogoArmasNaturales(scId){
     },
     grupos: [
       {nombre: 'Parte del cuerpo', tags: ['garras', 'colmillos', 'aguijón', 'espinas', 'cuernos', 'cola', 'alas', 'patas', 'puños', 'tentáculos', 'pinzas', 'pico', 'lengua', 'enjambre', 'toque', 'aliento', 'escupitajo', 'hilo', 'energía', 'proyectil']},
-      {nombre: 'Efecto al golpear', tags: ['Envenenar', 'Veneno severo', 'Sangrado', 'Rompe armadura', 'Arruina armadura', 'Aturdir', 'Derribar', 'Lisiado', 'Dejar rengo', 'Pajaritos', 'Inmovilizar', 'Agarrar', 'Empuje', 'Drena vida', 'Prende fuego', 'Ignora armadura', 'Ignora 1 de Res. crítico', 'Ceguera', 'sin efecto']},
+      {nombre: 'Efecto al golpear', tags: ['Envenenar', 'Veneno severo', 'Sangrado', 'Rompe armadura', 'Aturdir', 'Derribar', 'Lisiado', 'Dejar rengo', 'Pajaritos', 'Inmovilizar', 'Agarrar', 'Empuje', 'Drena vida', 'Prende fuego', 'Ignora armadura', 'Ignora 1 de Res. crítico', 'Ceguera', 'sin efecto']},
       {nombre: 'Alcance', tags: ['cuerpo a cuerpo', 'a distancia']},
       {nombre: 'Potencia', tags: ['ligera', 'media', 'pesada']},
       {nombre: 'Tipo de daño', tags: ['cortante', 'perforante', 'contundente', 'elemental', 'mágico', 'ácido']},

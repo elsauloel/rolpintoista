@@ -6571,7 +6571,7 @@
         "caras": 1,
         "exitos": 1,
         "dado": "",
-        "detalle": "Aplicale el estado Armadura arruinada al objetivo."
+        "detalle": "Aplicale el estado Armadura rota al objetivo (suma 3 stacks)."
       },
       {
         "nombre": "Lisiado",
@@ -6825,7 +6825,7 @@
         "caras": 1,
         "exitos": 1,
         "dado": "",
-        "detalle": "Aplicale el estado Armadura arruinada al objetivo."
+        "detalle": "Aplicale el estado Armadura rota al objetivo (suma 1 stack)."
       }
     ],
     "equipoEstadoNombre": "",
@@ -7050,7 +7050,7 @@
         "caras": 1,
         "exitos": 1,
         "dado": "",
-        "detalle": "Aplicale el estado Armadura arruinada al objetivo."
+        "detalle": "Aplicale el estado Armadura rota al objetivo (suma 2 stacks)."
       }
     ],
     "equipoEstadoNombre": "",

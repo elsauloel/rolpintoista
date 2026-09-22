@@ -177,7 +177,7 @@ La **Defensa** (Def) es el stat que **reduce el daño físico** que recibís: al
 
 - **No sale de ningún atributo**: la dan objetos equipables (armaduras, cascos, escudos…), pero también habilidades y estados (por ejemplo, la *Piel resistente* del [[Tanque]]).
 - **Los [[Golpe crítico|golpes críticos]] la ignoran por completo.**
-- Se reduce con [[Armadura rota|Romper armadura]] y se anula con [[Armadura rota|Armadura arruinada]].
+- Se reduce con [[Armadura rota|Romper armadura]] (−1 por acumulación).
 - Por eso no hace falta una tirada: es "solo un número".
 
 > [!warning] No confundir con la defensa activa

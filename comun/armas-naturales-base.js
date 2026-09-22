@@ -20,7 +20,7 @@
     venenoSevero: p => ef('Veneno severo', p, 'Aplicale Veneno severo al objetivo: 1 de daño el primer turno y 1 más con cada mantenimiento (a mano).'),
     sangrado: p => ef('Sangrado', p, 'Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano).'),
     rompe: p => ef('Rompe armadura', p, 'Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano).'),
-    arruina: p => ef('Arruina armadura', p, 'Aplicale el estado Armadura arruinada al objetivo (a mano).'),
+    arruina: p => ef('Arruina armadura', p, 'Aplicale el estado Armadura rota al objetivo (suma un stack, a mano).'),
     aturdir: p => ef('Aturdir', p, 'Si entra, el objetivo queda Stun: sin No2 este turno (a mano).'),
     derribar: p => ef('Derribar', p, 'Si entra, el objetivo cae al suelo (recordatorio: aplicarlo a mano).'),
     lisiar: p => ef('Lisiado', p, 'Aplicale Lisiado al objetivo: PdG y Parry a la mitad (a mano).'),

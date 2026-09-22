@@ -6099,10 +6099,6 @@ function creepDefensaMapa(sc){
   const activos = (sc.estados || []).filter(e => e && e.activo !== false);
   let v = num(sc.defensa);
   activos.forEach(es => { const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });   // bonos de Defensa de estados
-  if(activos.some(e => e.armaduraArruinada)){
-    v -= (sc.equipo || []).filter(it => it.tipoItem === 'armadura_blanda' || it.tipoItem === 'armadura_rigida')
-      .reduce((a, it) => a + num(it.def), 0);
-  }
   v -= activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
   return Math.max(0, v);
 }

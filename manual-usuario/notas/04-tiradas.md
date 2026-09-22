@@ -114,9 +114,6 @@ Para que las armaduras no vuelvan a un personaje inmune, el [[Catálogo de ítem
 
 **Los Tipos altos (10 y 12) son raros** y valen de a +1. Hay excepciones a propósito (algunos ítems míticos dan más). Es una guía, no una ley: ver [[La esencia del Rol Pintoísta]].
 
-> [!warning] Armadura arruinada
-> El estado [[Armadura rota|Armadura arruinada]] anula lo que aportan las armaduras a la Defensa **y** a la resistencia a crítico.
-
 Ver también: [[Golpe crítico]].
 
 +++

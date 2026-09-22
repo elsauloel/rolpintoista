@@ -396,7 +396,7 @@
   H('Romper la rodilla', 'K', 'hdb', 'mx', 3, tA('Aplicale al objetivo Rengo: su movimiento a la mitad 3 turnos (a mano).', 2), 'estados alterados');
   H('Nublar la mente', 'X', 'ma', 'gx', 3, tA('Aplicale al objetivo Pajaritos: PdG y Evasión a la mitad 3 turnos (a mano).', 2), 'estados alterados');
   H('Corroer el metal', 'X', 'ca', 'x', 4, tA('Aplicale al objetivo Armadura rota: −1 Defensa por acumulación, permanente hasta repararla (a mano).', 2), 'estados alterados');
-  H('Disolver la armadura', 'X', 'ca', 'x', 6, tA('Aplicale al objetivo Armadura arruinada: sus armaduras no aportan nada hasta repararlas (a mano).', 4), 'estados alterados');
+  H('Disolver la armadura', 'X', 'ca', 'x', 6, tA('Aplicale al objetivo Armadura rota (se acumula si ya la tiene) hasta repararla (a mano).', 4), 'estados alterados');
   H('Toxina severa', 'X', 'bp', 'x', 5, tA('Aplicale al objetivo Veneno severo: pierde 1 HP el primer turno y 1 más con cada mantenimiento, sin caducar (a mano).', 3), 'estados alterados');
   H('Golpe que sangra', 'DX', 'hd', 'me', 3, zO('Daño y aplicale al objetivo Sangrado (a mano).', 3, 'M'), 'estados alterados');
   H('Mordisco que lisia', 'DX', 'b', 'me', 3, zO('Muerde una pierna: daño y aplicale al objetivo Rengo (a mano).', 2, 'L'), 'estados alterados');

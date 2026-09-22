@@ -2,10 +2,13 @@
 
 ## Qué es
 
-`preguntas.html` — un log compartido con **tres pestañas** para definir
-las reglas, seguir el desarrollo y probar el Rol Pintoísta entre el dueño
-del proyecto y los amigos con los que arma el sistema (hoy dos: Enro y
-Seba), sin depender de coincidir en el chat de WhatsApp:
+`preguntas.html` — **"🛠 Herramientas de diseño"** (nombre de la página y
+de la pestaña del navegador; el nombre de la carpeta y del archivo quedan
+como están, `preguntas-diseno/preguntas.html`, para no romper enlaces —
+2026-09-22): un log compartido con **tres pestañas** para definir las
+reglas, seguir el desarrollo y probar el Rol Pintoísta entre el dueño del
+proyecto y los amigos con los que arma el sistema (hoy dos: Enro y Seba),
+sin depender de coincidir en el chat de WhatsApp:
 
 - **💬 Preguntas**: preguntas de diseño y sus respuestas/sugerencias. El
   dueño va tirando preguntas de a poco; cada uno responde o sugiere cuando
@@ -90,6 +93,14 @@ volver a loguearse ahí una vez. Ver la memoria del asistente
   probado queda escondido salvo que se tilde "Mostrar las…"), cada entrada
   con sus respuestas anidadas debajo. Marcar resuelto no borra nada — solo
   lo saca de la vista por defecto, para no perder el historial.
+- **Menú ☰ del sitio** (2026-09-22): a diferencia de la primera versión,
+  ahora carga `comun/menu-sitio.js` (después de `sesion.js`) y le deja
+  lugar en la cabecera (`header{padding-left:60px}`, mismo criterio que
+  `vtt-hexgrid/mapa.html`) — sirve aunque esta herramienta no pase por
+  `fbEntrarAPartida()` (el menú tolera `fbMiembro`/`fbPartida` sin definir
+  y solo muestra Home, Manual, esta misma herramienta y las partidas del
+  usuario). El link que apunta acá desde las demás herramientas dice
+  "🛠 Herramientas de diseño" (`menuDibujar` en `comun/menu-sitio.js`).
 - **El resumen de "ya incorporado"** (`CAMBIOS_RECIENTES` en el JS, visible
   solo en la pestaña Desarrollo creativo): es **texto fijo en el HTML, de
   solo lectura** — no vive en Firestore, no se puede sumar ni borrar desde

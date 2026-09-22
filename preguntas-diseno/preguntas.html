@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Preguntas de diseño — Rol Pintoísta</title>
+<title>Herramientas de diseño — Rol Pintoísta</title>
 <link rel="icon" type="image/svg+xml" href="../comun/icono.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,9 +41,9 @@ button{cursor:pointer}
 .btn[disabled]{opacity:.5}
 
 header{
-  position:sticky;top:0;z-index:5;padding:14px 16px 0;
+  position:sticky;top:0;z-index:5;padding:14px 16px 0 60px;
   background:rgba(15,12,14,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)
-}
+} /* padding-left: lugar para el botón ☰ del menú del sitio (comun/menu-sitio.js), fijo arriba a la izquierda */
 header .cab{display:flex;align-items:center;gap:10px;padding-bottom:12px}
 header h1{font-size:17px;margin:0;flex:1;min-width:0}
 header .quien{font-size:12px;color:var(--muted);white-space:nowrap}
@@ -111,7 +111,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 
 <header>
   <div class="cab">
-    <h1>💬 Preguntas de diseño</h1>
+    <h1>🛠 Herramientas de diseño</h1>
     <span class="quien" id="quien-soy" hidden></span>
     <button type="button" class="btn chico ghost" id="btn-salir" hidden>Salir</button>
   </div>
@@ -123,8 +123,8 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 </header>
 
 <div id="login-box">
-  <h2>Preguntas de diseño</h2>
-  <p>El log de preguntas, respuestas y propuestas para ir definiendo las reglas del Rol Pintoísta entre todos, sin depender de coincidir en el chat. Entrá con tu cuenta de Google — después queda recordada en este teléfono o compu.</p>
+  <h2>Herramientas de diseño</h2>
+  <p>Preguntas, propuestas de desarrollo y testeo para ir definiendo las reglas del Rol Pintoísta entre todos, sin depender de coincidir en el chat. Entrá con tu cuenta de Google — después queda recordada en este teléfono o compu.</p>
   <button type="button" class="btn primary" id="btn-google" style="width:100%;padding:14px">Entrar con Google</button>
   <div id="login-error"></div>
 </div>
@@ -150,6 +150,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
+<script src="../comun/menu-sitio.js"></script>
 <script>
 /* =========================================================
    PREGUNTAS DE DISEÑO
@@ -394,7 +395,7 @@ function iniciar(){
     $('#quien-soy').textContent = u.displayName || u.email || '';
     $('#btn-salir').hidden = false;
     $('#tabs').hidden = false;
-    document.title = 'Preguntas de diseño — Rol Pintoísta';
+    document.title = 'Herramientas de diseño — Rol Pintoísta';
     render();   // por si cambió quién es "mío" al cambiar de cuenta
     if(!escuchaArrancada){ escuchaArrancada = true; escuchar(); }
   });

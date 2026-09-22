@@ -627,10 +627,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   distinto del publicado. Sin límite de mapas guardados; se renombran y se
   borran (salvo el primero, `MAPA_PRINCIPAL`, que sigue siendo el que
   había antes de esta función — no se le movió ningún dato).
-- **📋 Tablero de combate** (botón fijo de la barra de herramientas de la
-  derecha, `#toolkit-tablero`, para cualquiera — GM o jugador, no se
-  esconde): tarjetas con HP/SP y estados de todo lo que tiene token en el
-  mapa **publicado** (`mapaActivo`, no `mapaMostrado` — sigue mostrando el
+- **📋 Tablero de combate** (botón fijo apilado en el borde izquierdo del
+  mapa, junto a 🎭/🎲/🎁/🗺 — ver "botones apilados" más abajo —
+  `#toolkit-tablero`, para cualquiera: GM o jugador, no se esconde):
+  tarjetas con HP/SP y estados de todo lo que tiene token en el mapa
+  **publicado** (`mapaActivo`, no `mapaMostrado` — sigue mostrando el
   mismo tablero aunque el GM esté mirando/armando otro escenario,
   `tableroTokensEscuchar`). Los datos salen de `fichasPub`/`creepsPub`
   (ya en vivo); lo nuevo es solo saber quién tiene token ahí. A los
@@ -641,6 +642,19 @@ nuevo de Rol Pintoísta. Paso 2 de
   Tablero de `gm-toolset/gm-tools.html`, pero sin código compartido (ver
   [`../gm-toolset/CLAUDE.md`](../gm-toolset/CLAUDE.md)) — acá además hace
   falta el filtro de oculto/sigilo porque lo ve cualquiera, no solo el GM.
+- **Botones apilados del borde izquierdo** (🧰 pestaña, 🎲 Dados, 🎭
+  Tokens, 📋 Tablero, 🎁 Despojos, 🗺 Mapas — cada uno `position:absolute`
+  con `bottom:calc(24px + Npx)`, ancladas al borde de ABAJO de la
+  pantalla, no al centro vertical): si se suma un botón más al stack, va
+  arriba del último (`bottom` más grande) manteniendo los 77px de
+  separación entre uno y el siguiente — y los menús que cuelgan de un
+  botón (`#tokens-menu`, `#mapas-menu`) tienen que llevar el mismo
+  `bottom`. **Ancladas abajo a propósito** (2026-09-22): con el centro
+  vertical, cada botón nuevo necesitaba más alto libre arriba del centro,
+  y en una ventana de ~720px de alto (común) el de más arriba terminaba
+  tapado por la cabecera — pasó con 🗺 Mapas al sumar 📋 Tablero. Antes de
+  agregar otro botón al stack, probar con `resize_window` a una altura
+  chica (~700px) que el de más arriba siga visible.
 - Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.

@@ -43,4 +43,6 @@
 - [x] **Veneno**: se acumula (suma stacks, turnos = stacks, sin tope); Veneno severo aparte y no se acumula.
 - [ ] **Mecánica "cura estados"** en consumibles y habilidades (el Antídoto debería quitar Veneno y Veneno severo; hoy se saca a mano).
 - [ ] **Nube tóxica** del Debuffer: ¿sigue aplicando solo 1 stack a alguien ya envenenado?
-- [ ] Seguir el repaso: Veneno severo, Sangrado, Regeneración, Pajaritos, Lisiado, Armadura rota/arruinada, Cansado, Exhausto, Stun, Hypeado, Inmovilizado, Rengo, protecciones, Afortunado, Sigilo.
+- [x] **Pajaritos**: sin cambios (PdG y Evasión a la mitad, redondeado abajo, 3 turnos).
+- [x] **Cansado**: cambió de −1 fijo a **corta los No2 máximos a 2/3** (pierde un tercio, redondeado hacia abajo). `cansado:true` en ficha, gm-tools e `comun/estados-aplicar.js`; ya no usa `mods`.
+- [ ] Seguir el repaso: Exhausto, Stun, Hypeado, Armadura rota/arruinada, Veneno severo, Sangrado, Regeneración, Lisiado, Inmovilizado, Rengo, protecciones, Afortunado, Sigilo.

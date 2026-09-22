@@ -570,7 +570,7 @@
     'Crece donde hay humedad y hace toser a todos los que pasan.');
   cr('minas', 2, 'Kobold maldiciente', 'debuffer', 'humanoide', 'Pico de juguete',
     ta('Maldición del pico roto', 'Especial contra Res.Mt: el objetivo queda Lisiado 2 turnos (a mano).', 1),
-    [ta('Mal de mina', 'Especial contra Res.Mt: el objetivo queda Cansado (-1 No2 máx.) 2 turnos (a mano).', 2), 4],
+    [ta('Mal de mina', 'Especial contra Res.Mt: el objetivo queda Cansado (pierde un tercio de sus No2 máx.) 2 turnos (a mano).', 2), 4],
     'Susurra insultos en un idioma que no existe, y funcionan.');
   cr('minas', 3, 'Nube de sílice', 'debuffer', 'elemental', 'Tormenta de polvo',
     ta('Polvo en los ojos', 'Nube en flor de 1: los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 1),
@@ -611,7 +611,7 @@
     [ta('Presagio', 'Marca a un objetivo: la próxima vez que falle una tirada, pierde 1 No2 (a mano).', 2), 3],
     'Nadie sabe si trae mala suerte o solo la anuncia.');
   cr('montañas', 2, 'Espectro de la ventisca', 'debuffer', 'elemental', 'Frío cortante',
-    ta('Aliento helado', 'Cono de 3 al frente: los afectados quedan Cansados (-1 No2 máx.) 2 turnos (a mano).', 1),
+    ta('Aliento helado', 'Cono de 3 al frente: los afectados quedan Cansados (pierden un tercio de sus No2 máx.) 2 turnos (a mano).', 1),
     [ta('Escarcha', 'Especial contra Res.Mt: el objetivo queda Rengo y con -1 Defensa 2 turnos (a mano).', 2), 4],
     'Un frío que camina.');
   cr('montañas', 3, 'Arpía cantora', 'debuffer', 'bestia', 'Garras de arpía',
@@ -633,7 +633,7 @@
     'Se mete en la cabeza y no se va.');
   cr('templo', 2, 'Parásito de aura', 'debuffer', 'alienígena', 'Tentáculo fino',
     ta('Succión de energía', 'Especial contra Res.Mt: el objetivo pierde 1d4 SP y el parásito no se cura (a mano).', 1),
-    [ta('Fiebre alienígena', 'Especial contra Res.Mt: el objetivo queda Cansado (-1 No2 máx.) 2 turnos (a mano).', 2), 4],
+    [ta('Fiebre alienígena', 'Especial contra Res.Mt: el objetivo queda Cansado (pierde un tercio de sus No2 máx.) 2 turnos (a mano).', 2), 4],
     'Se alimenta de lo que los demás no saben que tienen.');
   cr('templo', 3, 'Acólito telepático', 'debuffer', 'humanoide', 'Bastón de cristal',
     ta('Intrusión mental', 'Especial contra Res.Mt: Confusión 1 turno; antes de actuar, el objetivo tira 1d4 (1 el acólito elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 2),

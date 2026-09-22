@@ -17,7 +17,7 @@ const EstadosAplicar = (() => {
   const DEBUFFS = [
     {nombre: 'Veneno', polaridad: 'debuff', turnos: 4, stacks: 4, hpTurno: -1, stacksTurno: -1, esVeneno: true, detalle: 'Pierde 1 HP por stack cada turno.'},
     {nombre: 'Pajaritos', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, detalle: 'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Cansado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, mods: [{stat: 'nitros', val: -1}], detalle: '-1 a los No2 máximos.'},
+    {nombre: 'Cansado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, cansado: true, detalle: 'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
     {nombre: 'Exhausto', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 1, detalle: 'Como mucho 1 No2 por turno, sin importar el máximo normal.'},
     {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 este turno.'},
     {nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraRota: true, detalle: '−1 Defensa por cada acumulación (×N). Permanente y acumulable.'},

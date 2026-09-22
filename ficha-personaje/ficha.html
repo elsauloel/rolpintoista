@@ -3074,6 +3074,8 @@ function compute(){
 
   // Efectos activos que fuerzan/alteran un stat más allá de un modificador sumable.
   const efectosActivos = (S.efectos || []).filter(e => e.activo !== false);
+  // Cansado: los No2 máximos quedan en 2/3 (redondeado abajo) — se aplica sobre el valor natural, antes de que Stun/Exhausto lo forcen a un tope fijo.
+  if(efectosActivos.some(e => e.cansado) && !Number.isNaN(final.nitros)) final.nitros = Math.floor(final.nitros * 2 / 3);
   const forzados = efectosActivos
     .filter(e => e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
     .map(e => num(e.forzarNitros));
@@ -4092,6 +4094,7 @@ function invStatValor(inv, statId){
 }
 function invNitrosMax(inv){
   let v = num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros');
+  if(invEstadoActivo(inv, 'cansado')) v = Math.floor(v * 2 / 3);
   // Stun, Exhausto (u otro estado con forzarNitros): el más bajo activo gana.
   const forzados = (inv.estados || [])
     .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
@@ -5516,7 +5519,7 @@ function configEquipoEstadoDe(it){
 // mecánica real del preset "Afortunado".
 const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'inmovilizado', 'rengo', 'armaduraRota', 'armaduraArruinada', 'escudoMagico', 'forzarNitros'];
+  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'armaduraRota', 'armaduraArruinada', 'escudoMagico', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
   const p = EFECTOS_PRESET.find(x => x.nombre === (nombrePreset || '').trim());
   if(!p) return {};
@@ -6582,10 +6585,11 @@ const EFECTOS_PRESET = [
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  // PLACEHOLDER (Iteración 2): Cansado, Exhausto, Stun, Hypeado, Inmovilizado
-  // y Rengo pasaron de Acciones/Movimiento a Nitros 1 a 1, sin recalibrar.
-  {nombre:'Cansado', polaridad:'debuff', turnos:3, mods:[{stat:'nitros', val:-1}],
-    detalle:'-1 a los Nitros máximos. ⚠ Valor provisorio (antes −1 Acción).'},
+  // PLACEHOLDER (Iteración 2): Exhausto, Stun, Hypeado, Inmovilizado y Rengo
+  // pasaron de Acciones/Movimiento a Nitros 1 a 1, sin recalibrar. Cansado ya
+  // se recalibró (2026-09-21, P28): pierde un tercio de sus No2 máximos.
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, cansado:true,
+    detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
   {nombre:'Exhausto', polaridad:'debuff', turnos:3, forzarNitros:1, esCC:true,
     detalle:'Como mucho 1 Nitro por turno, sin importar el máximo normal. ⚠ Valor provisorio (antes 1 Acción).'},
   {nombre:'Stun', polaridad:'debuff', turnos:2, forzarNitros:0, esCC:true,

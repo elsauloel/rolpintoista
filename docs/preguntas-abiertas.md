@@ -59,7 +59,7 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P25. Tope de X en costos variables.** Hoy no hay tope (solo frena lo que tengas). ¿Hay un máximo, ej. según Especial? *(código)*
 - 🔲 **P26. Penalidad por sobrecarga.** Llevar más peso del que se puede no resta nada hoy (antes restaba de Bonos). ¿Qué penaliza? *(código)*
 - 🔲 **P27. Conversión de Bonos viejos a SP.** Equipo, estados y catálogo que daban "+N Bonos" hoy dan "+N SP" (1 a 1, `IT2.spPorBono`). ¿Es la conversión correcta? *(código)*
-- 🔲 **P28. Estados que tocaban Acciones/Movimiento.** Cansado, Exhausto, Stun, Hypeado, Inmovilizado y Rengo pasaron a Nitros 1 a 1, sin recalibrar. ¿Qué valores llevan? *(código)*
+- 🔲 **P28. Estados que tocaban Acciones/Movimiento.** Exhausto, Stun, Hypeado, Inmovilizado y Rengo pasaron a Nitros 1 a 1, sin recalibrar. ¿Qué valores llevan? *(código)* **Cansado ya se recalibró (2026-09-21):** en vez de −1 fijo, corta los No2 máximos a 2/3 (pierde un tercio, redondeado hacia abajo).
 - 🔲 **P29. SP Regen como stat.** Hoy existe con base 0 (solo lo dan habilidades, equipo o estados). ¿Se deja así o se saca el stat? *(2026-09-16)*
 - 🔲 **P43. Mecánica de armas de dos manos.** El asistente de ítems
   (`comun/asistente-item.js`) ya deja elegir "Arma de dos manos" (ocupa las

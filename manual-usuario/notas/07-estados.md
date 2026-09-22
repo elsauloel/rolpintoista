@@ -128,7 +128,7 @@ Tres estados que modifican tus [[Nitros (No2)|Nitros]]:
 
 | Estado | Efecto |
 |---|---|
-| **Cansado** (debuff) | −1 a los Nitros máximos |
+| **Cansado** (debuff) | Corta los Nitros máximos a 2/3 (pierde un tercio, redondeado hacia abajo) |
 | **Exhausto** (debuff, CC) | Como mucho **1 Nitro** por turno, sin importar tu máximo |
 | **Hypeado** (buff) | +1 a los Nitros máximos |
 

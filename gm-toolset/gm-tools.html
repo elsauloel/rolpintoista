@@ -2534,6 +2534,8 @@ const IT2_CREEP = {
 function creepNitrosMax(sc){
   let v = num(sc.agl) + creepModTotal(sc, 'agl')
     + creepModTotal(sc, 'nitros') + creepModTotal(sc, 'mov') + creepModTotal(sc, 'accionesmax');
+  // Cansado: los No2 máximos quedan en 2/3 (redondeado abajo), antes de que Stun/Exhausto los fuercen a un tope fijo.
+  if((sc.estados || []).some(e => e.activo !== false && e.cansado)) v = Math.floor(v * 2 / 3);
   // Stun, Exhausto: el más bajo activo gana.
   const forzados = (sc.estados || [])
     .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
@@ -3465,7 +3467,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','inmovilizado','rengo','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','armaduraArruinada','lisiado','inmovilizado','rengo','cansado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
@@ -3474,8 +3476,8 @@ const ESTADOS_PRESET_GM = [
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:-1}],
-    detalle:'-1 a los No2 máximos. ⚠ Valor provisorio (antes −1 Acción).'},
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, cansado:true,
+    detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
   {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true, forzarNitros:1,
     detalle:'Como mucho 1 No2 por turno, sin importar el máximo normal. ⚠ Valor provisorio (antes 1 Acción).'},
   {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, forzarNitros:0,

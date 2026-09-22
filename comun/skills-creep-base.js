@@ -390,7 +390,7 @@
   H('Herida sangrante', 'X', 'bhd', 'mx', 3, tA('Aplicale al objetivo el estado Sangrado: pierde 2 HP por turno hasta que se cure (a mano).', 2), 'estados alterados');
   H('Aturdir con estruendo', 'K', 'bcd', 'x', 5, tA('Aplicale al objetivo el estado Stun: se queda sin No2 este turno (a mano).', 3), 'estados alterados');
   H('Agotar', 'X', 'ma', 'x', 4, tA('Aplicale al objetivo Exhausto: como mucho 1 No2 por turno 3 turnos (a mano).', 2), 'estados alterados');
-  H('Cansar', 'X', '*', 'x', 3, tA('Aplicale al objetivo Cansado: −1 a sus No2 máximos 3 turnos (a mano).', 1), 'estados alterados');
+  H('Cansar', 'X', '*', 'x', 3, tA('Aplicale al objetivo Cansado: pierde un tercio de sus No2 máximos 3 turnos (a mano).', 1), 'estados alterados');
   H('Lisiar', 'X', 'bhd', 'mx', 4, tA('Aplicale al objetivo Lisiado: su PdG y Parry a la mitad 3 turnos (a mano).', 2), 'estados alterados');
   H('Clavar al suelo', 'K', 'hdb', 'x', 4, tA('Aplicale al objetivo Inmovilizado: su movimiento queda en 0 3 turnos (a mano).', 2), 'estados alterados');
   H('Romper la rodilla', 'K', 'hdb', 'mx', 3, tA('Aplicale al objetivo Rengo: su movimiento a la mitad 3 turnos (a mano).', 2), 'estados alterados');

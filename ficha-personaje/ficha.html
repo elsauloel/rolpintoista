@@ -3266,11 +3266,14 @@ function aplicarEstadoRecibido(spec, origen){
   }
   const yaRota = draft.armaduraRota ? S.efectos.find(e => e.armaduraRota) : null;
   const yaVeneno = acumularVeneno(S.efectos, draft);
+  const yaSangrado = acumularSangrado(S.efectos, draft);
   if(yaRota){
     yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
     yaRota.activo = true;
   }else if(yaVeneno){
     if(draft.permanente){ toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
+  }else if(yaSangrado){
+    // ya viene con +1 stack aplicado por acumularSangrado
   }else{
     S.efectos.push(draft);
   }
@@ -3291,6 +3294,16 @@ function acumularVeneno(lista, nuevo){
     ya.turnos = ya.stacks;
     ya.activo = true;
   }
+  return ya;
+}
+// Sangrado se acumula distinto: una reaplicación no suma sus stacks enteros, solo +1 (el daño por turno sube de a 1:
+// 2, 3, 4…). Mismo mecanismo que Armadura rota (un stack más en el mismo estado), no una tirada nueva de stacks.
+function acumularSangrado(lista, nuevo){
+  if(!nuevo.esSangrado) return null;
+  const ya = (lista || []).find(e => e.esSangrado && e.nombre === nuevo.nombre);
+  if(!ya) return null;
+  ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
+  ya.activo = true;
   return ya;
 }
 
@@ -4844,6 +4857,12 @@ function activarEfectoPresetInv(preset){
     if(datos.permanente){ toast(`${inv.nombre}: ${nombre} ya lo tiene, no se acumula`); return; }
     renderInvocaciones();
     toast(`${inv.nombre}: ${yaVenenoInv.nombre} ×${yaVenenoInv.stacks}`);
+    return;
+  }
+  const yaSangradoInv = acumularSangrado(inv.estados, datos);
+  if(yaSangradoInv){
+    renderInvocaciones();
+    toast(`${inv.nombre}: ${yaSangradoInv.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangradoInv.hpturno)) * num(yaSangradoInv.stacks))} ahora)`);
     return;
   }
   inv.estados.push(datos);
@@ -6841,6 +6860,13 @@ function activarEfectoPreset(preset){
     renderList('efectos');
     refresh();
     toast(`${yaVeneno.nombre} ×${yaVeneno.stacks}`);
+    return;
+  }
+  const yaSangrado = acumularSangrado(S.efectos, draft);
+  if(yaSangrado){
+    renderList('efectos');
+    refresh();
+    toast(`${yaSangrado.nombre}: +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpturno)) * num(yaSangrado.stacks))} ahora)`);
     return;
   }
   S.efectos.push(draft);

@@ -3507,8 +3507,8 @@ const ESTADOS_PRESET_GM = [
     detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
-  {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-2, stacksTurno:0, permanente:true, esSangrado:true,
-    detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
+  {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:2, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
+    detalle:'Pierde 2 HP por turno. Permanente hasta curarse. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true,
@@ -3632,6 +3632,12 @@ function activarEstadoPresetCreep(preset){
     toast(`${sc.nombre}: ${yaVeneno.nombre} ×${yaVeneno.stacks}`);
     return;
   }
+  const yaSangrado = acumularSangradoCreep(sc, datos);
+  if(yaSangrado){
+    renderAll();
+    toast(`${sc.nombre}: ${yaSangrado.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpTurno)) * num(yaSangrado.stacks))} ahora)`);
+    return;
+  }
   const es = {id: uid(), ...datos};
   sc.estados.push(es);
   if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
@@ -3651,6 +3657,16 @@ function acumularVenenoCreep(sc, nuevo){
     ya.turnos = ya.stacks;
     ya.activo = true;
   }
+  return ya;
+}
+// Sangrado se acumula distinto: una reaplicación suma solo +1 stack (el daño por turno sube de a 1), no una tirada
+// nueva de stacks — mismo criterio que Armadura rota.
+function acumularSangradoCreep(sc, nuevo){
+  if(!nuevo.esSangrado) return null;
+  const ya = (sc.estados || []).find(e => e.esSangrado && e.nombre === nuevo.nombre);
+  if(!ya) return null;
+  ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
+  ya.activo = true;
   return ya;
 }
 

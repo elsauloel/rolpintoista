@@ -77,6 +77,7 @@ estado: borrador
 +++
 **Sangrado** es un debuff **permanente** que hace perder **2 HP por turno** hasta que se cura.
 
+- **Se acumula (2026-09-22): si te vuelven a sangrar mientras ya sangrás, no se duplica el estado — suma +1 al daño por turno** (2 → 3 → 4…). Mismo criterio que Armadura rota: un stack más en el mismo estado, no una tirada nueva.
 - Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).
 - Lo bloquea el estado **Coagulación extrema** (inmunidad a sangrado) e [[Invulnerable]].
 

@@ -22,7 +22,7 @@ const EstadosAplicar = (() => {
     {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
     {nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraRota: true, detalle: '−1 Defensa por cada acumulación (×N). Permanente y acumulable.'},
     {nombre: 'Veneno severo', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -1, stacksTurno: 1, permanente: true, esVeneno: true, detalle: 'Hace 1 de daño el primer turno y 1 más con cada mantenimiento. No caduca.'},
-    {nombre: 'Sangrado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -2, stacksTurno: 0, permanente: true, esSangrado: true, detalle: 'Pierde 2 HP por turno. Permanente hasta curarse.'},
+    {nombre: 'Sangrado', polaridad: 'debuff', turnos: 0, stacks: 2, hpTurno: -1, stacksTurno: 0, permanente: true, esSangrado: true, detalle: 'Pierde 2 HP por turno. Permanente hasta curarse. Si se repite, suma +1 al daño por turno.'},
     {nombre: 'Lisiado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, lisiado: true, detalle: 'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
     {nombre: 'Inmovilizado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, inmovilizado: true, detalle: 'El Movimiento queda en 0 mientras dure.'},
     {nombre: 'Rengo', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, rengo: true, detalle: 'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
@@ -90,6 +90,11 @@ const EstadosAplicar = (() => {
         }
         return {ok: true, estado: ya};
       }
+    }
+    // Sangrado se acumula distinto: solo +1 stack por reaplicación (el daño por turno sube de a 1), no una tirada nueva.
+    if(est.esSangrado){
+      const ya = sc.estados.find(e => e.esSangrado && e.nombre === est.nombre);
+      if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
     }
     const igual = sc.estados.find(e => e.nombre === est.nombre);
     if(igual){ Object.assign(igual, {...est, id: igual.id}); return {ok: true, estado: igual}; }

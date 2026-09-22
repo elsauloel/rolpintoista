@@ -430,3 +430,18 @@ Mientras están **invocadas y vivas**, dan **visión** al grupo ([[Niebla de gue
 
 > [!tip] Ficha aparte
 > En la ficha están en la sección **Invocaciones**, al final. "✎ Editar" abre atributos, arma, armadura, habilidades y estados.
+
++++
+titulo: Ataque de oportunidad
+alias: [Oportunidad, AoO]
+tags: [combate, regla-base]
+estado: confirmado
++++
+Cuando **dos fichas de bandos distintos están adyacentes** (un casillero) y una **se aleja**, la otra tiene un **ataque de oportunidad**.
+
+- **Se puede hacer si tenés [[Nitros (No2)|No2]] disponibles**, y **cuesta lo mismo que un primer ataque**.
+- **No para el juego**: el mapa no frena el movimiento ni te obliga a nada. Solo avisa **en rojo, en la [[Mesa]]**, con los dos nombres — "*Fulano* se alejó de *Mengano*: posible ataque de oportunidad" — para que no se olvide de resolverse. **La tirada en sí es a mano.**
+- Se dispara la **primera vez** que dejás de estar adyacente durante el movimiento (si te alejás y volvés a acercarte en la misma jugada, ya sonó el aviso una vez).
+
+> [!info] Diseño futuro
+> Es la base para habilidades que jueguen con esto más adelante: más PdG o Evasión en ataques de oportunidad, habilidades que dejan bloquearlos, etc.

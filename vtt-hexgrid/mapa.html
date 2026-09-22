@@ -1628,6 +1628,43 @@ const sigiloAvisosPendientes = new Map();   // tokenId -> [{rival, pasos}] a pub
 const sigiloRompiendo = new Set();
 let sigiloFirmaRev = '';
 
+/* ---------- Ataque de oportunidad (regla establecida, 2026-09-22; no se automatiza la tirada) ----------
+   Cuando dos fichas de bandos distintos están adyacentes y una se aleja, la otra tiene un ataque de
+   oportunidad: se puede hacer si tiene No2 disponibles y cuesta lo mismo que un primer ataque. El mapa NO
+   frena el movimiento ni obliga a nada (no cortar la fluidez) — solo avisa en rojo en la Mesa con los dos
+   nombres, para que no se olvide de resolverse a mano. Punto de apoyo para diseño futuro: habilidades con
+   más PdG/Evasión en ataques de oportunidad, o que dejan bloquearlos. */
+function oportunidadEvaluarRuta(t, ruta){
+  if(!ruta || ruta.length < 2) return [];
+  const rivales = rivalesDe(t);
+  if(!rivales.length) return [];
+  const avisados = new Set(), salidos = [];
+  for(let i = 1; i < ruta.length && avisados.size < rivales.length; i++){
+    const antes = ruta[i - 1], despues = ruta[i];
+    rivales.forEach(r => {
+      if(avisados.has(r)) return;
+      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1){
+        avisados.add(r);
+        salidos.push(r);
+      }
+    });
+  }
+  return salidos;
+}
+async function oportunidadPublicarAvisos(t, salidos){
+  if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
+  for(const r of salidos){
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+        origen: `⚔ ${nombreDe(t)} se alejó de ${nombreDe(r)}: posible ataque de oportunidad`,
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){ console.error('No se pudo avisar el ataque de oportunidad:', err); }
+  }
+}
+
 function rivalesDe(t){
   const lista = [];
   tokens.forEach(r => {
@@ -3969,8 +4006,9 @@ function soltar(){
     }else if(a.movio && t && pasos > 0){
       if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
       visibles.set(a.id, {x: a.x, y: a.y});
+      const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
       if(a.costo){
-        rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles};
+        rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles, oportunidad};
         // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
         if(pasos * a.costo.porCasillero > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
         else confirmarRuta();
@@ -3978,6 +4016,7 @@ function soltar(){
         const fin = a.ruta[pasos];
         moverToken(a.id, fin.col, fin.fila, a.ruta);
         if(trampaPendiente) trampaResolver();
+        oportunidadPublicarAvisos(t, oportunidad);
       }
     }
     pedirDibujo();
@@ -5079,6 +5118,7 @@ async function confirmarRuta(){
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
     if(trampaPendiente && trampaPendiente.tokenId === p.id) trampaResolver();
+    oportunidadPublicarAvisos(t, p.oportunidad);
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep
       ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`

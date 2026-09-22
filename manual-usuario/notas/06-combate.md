@@ -400,7 +400,7 @@ Jugadores y GM pueden **poner trampas en el mapa**. Una trampa es un objeto de *
 - **Daño automático:** si la trampa tiene una tirada de daño (por ejemplo, 2d6), el mapa la tira solo y se la aplica a quien la activó, restando su [[Defensa]]. En un área también daña a los creeps de adentro cuando mueve el GM; a los demás se les avisa en la Mesa. **Estados y tiradas para evitarla siguen a mano**, y el texto de cada trampa lo aclara.
 
 ## Detectarlas
-La pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al quedar justo al lado de una trampa y avisa que corresponde una **tirada de percepción** (botón 🔎 en la Botonera: [[Especial]], con dado más alto por escalón).
+La pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al quedar justo al lado de una trampa y avisa que corresponde una **tirada de percepción** (botón 🔎 en la Botonera: [[Destreza]], con dado más alto por escalón).
 
 ## Guardarlas y compartirlas
 - **💾 Guardar como recurrente:** deja la trampa (nombre, efecto, forma, tamaño, color) en tu lista "Trampas guardadas" (por navegador).

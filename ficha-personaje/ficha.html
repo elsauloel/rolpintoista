@@ -1991,7 +1991,8 @@ const GRUPOS = [
     {id:'rng', label:'Rng', full:'Rango'},
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
     {id:'crit', label:'Crit', full:'Crítico'},
-    {id:'parry', label:'Parry', full:'Parry'}]},
+    {id:'parry', label:'Parry', full:'Parry'},
+    {id:'percepcion', label:'Percep.', full:'Percepción'}]},
   {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
     {id:'pdgmg', label:'PdG.Mg', full:'Probabilidad de golpe mágico'},
     {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
@@ -2292,7 +2293,7 @@ const DEFAULT = {
     resmg:'con', rescc:'con', hpmax:'con*5',
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
-    rng:'des', pdg:'des', crit:'des', parry:'des',
+    rng:'des', pdg:'des', crit:'des', parry:'des', percepcion:'des',
     pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'0', rangocasteo:'esp',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', vision:'6'
   },
@@ -3963,15 +3964,18 @@ const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
 // con el total más alto. statId es opcional — solo importa para esos tres.
 /* ---------- Percepción ----------
-   Se tira con el Especial. La pasiva "Percepción aumentada" sube un escalón cada dado
-   (d6 → d8, d8 → d10…) y además hace que el mapa le avise de las trampas ocultas cercanas. */
+   Stat derivado de Destreza (2026-09-22, antes salía directo del Especial —
+   GRUPOS/formulas.percepcion, junto a rng/pdg/crit/parry). La pasiva
+   "Percepción aumentada" sube un escalón cada dado (d6 → d8, d8 → d10…) y
+   además hace que el mapa le avise de las trampas ocultas cercanas. */
 const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
 function tienePercepcionAumentada(){
   return (S.pasivas || []).some(p => p.poolId === 'percepcion-aumentada' || p.percepcionAumentada);
 }
 function tirarPercepcion(){
-  const f = formulaParaValor(compute().final.esp);
-  if(!f){ toast('Percepción: tu Especial no se puede tirar con dados reales'); return; }
+  const valor = compute().final.percepcion;
+  const f = formulaParaValor(valor);
+  if(!f){ toast(`Percepción: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
   const mejor = tienePercepcionAumentada();
   const combo = f.combo.map(d => mejor ? (PERCEPCION_DADO_SUBE[d] || d) : d);
   const rolls = combo.map(d => 1 + Math.floor(Math.random() * d));
@@ -5246,8 +5250,8 @@ function renderBotonera(){
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
 
-  // Percepción: tirada del Especial (con dado más alto si tiene la pasiva Percepción aumentada).
-  html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Especial${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
+  // Percepción: tirada de Destreza (con dado más alto si tiene la pasiva Percepción aumentada).
+  html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
 
   // Sigilo: botón directo para quien tiene la habilidad (ver alternarSigilo).
   if(tieneSigilo()){
@@ -10081,7 +10085,8 @@ function fichaResumen(){
     hp: num(S.hp),
     hpMax: n(c.final.hpmax),
     def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
-    esp: n(c.final.esp),   // Especial: el mapa tira la Percepción de este personaje
+    esp: n(c.final.esp),   // Especial
+    percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
     rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
     rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
     percepcionAumentada: tienePercepcionAumentada(),   // el mapa le avisa de las trampas ocultas cercanas

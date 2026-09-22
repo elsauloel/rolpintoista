@@ -116,7 +116,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
 3. **Tajear** [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño
    por 3 turnos. *Critical Matters:* si es crítico, cambia el efecto a 5
    de daño hasta curarse.
-4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (ESP). El
+4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El
    rango para esta tirada depende de a qué velocidad se mueva: a
    velocidad normal (1 No2 por casillero) el rango es una flor de 3; a
    velocidad lenta (2 No2 por casillero), una flor de 2.

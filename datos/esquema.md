@@ -68,7 +68,7 @@ cada una (ver `SLOT_DEFS` en ficha.html).
 
 **Stats válidos en `mods`/`efectoMods`** (si no está en esta lista, el
 importador lo descarta): `con`, `fue`, `agl`, `des`, `esp`, `def`, `dmg`,
-`bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `pdgmg`,
+`bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `percepcion`, `pdgmg`,
 `resm`, `bonos`, `rangocasteo`, `rescc`, `hpmax`, `crgmax`, `accionesmax`,
 `tipo1`..`tipo5` (resistencia a crítico contra armas Tipo 4, 6, 8, 10 y 12; los ids
 quedaron de cuando la escala era 2..10).

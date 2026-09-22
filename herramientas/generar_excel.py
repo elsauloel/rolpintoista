@@ -33,7 +33,7 @@ def categoria(it):
 BASE = ['id','nombre','tier','tipoItem','peso','ranuras','precioCompra','detalle','descripcionNarrativa']
 CRIT = ['tipo1','tipo2','tipo3','tipo4','tipo5']
 OTROS_MODS = ['mov','bonos','eva','ini','pdg','crit','parry','fue','con','esp','agl','des',
-              'resm','rescc','rangocasteo','accionesmax','dmg','potencia','hpmax','crgmax','bloqueo','rng','pdgmg']
+              'resm','rescc','rangocasteo','accionesmax','dmg','potencia','hpmax','crgmax','bloqueo','rng','pdgmg','percepcion']
 
 COLUMNAS = {
     'Consumibles': BASE + ['legacy','unidades','cargaMax','curahp','curabonosPct',

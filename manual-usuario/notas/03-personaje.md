@@ -115,6 +115,7 @@ La precisión y la técnica. De ella salen:
 - **[[Golpe crítico|Crítico (%)]]:** tu chance de crítico.
 - **[[Parry]]:** la alternativa a la [[Evasión]] para defenderte con tu arma.
 - **Rng (Rango):** hasta dónde llegan tus [[Ataques a distancia]].
+- **[[Percepción]]:** lo que tirás para notar algo (trampas, alguien en [[Sigilo]]).
 
 +++
 titulo: Agilidad

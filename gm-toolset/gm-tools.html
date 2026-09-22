@@ -2180,7 +2180,7 @@ const CREEP_DERIVADOS_POR_ATTR = {
   con: [['resmg', 'Res.Mg'], ['rescc', 'Res.CC']],
   fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
   agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
-  des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crit'], ['parry', 'Parry']],
+  des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crit'], ['parry', 'Parry'], ['percepcion', 'Percep.']],
   esp: [['pdgmg', 'PdG.Mg'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
 };
 const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
@@ -3027,8 +3027,8 @@ let accionesCreepId = null;
 
 // Los 5 atributos base (entradas con attr apuntando a sí mismas) más los
 // stats secundarios derivados de un PJ (Res.Mg/Res.CC de Con, Dmg/
-// Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry de Des,
-// PdG.Mg/Res.M/Rango de casteo de Especial), sin agregar una grilla a la ficha
+// Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry/Percepción
+// de Des, PdG.Mg/Res.M/Rango de casteo de Especial), sin agregar una grilla a la ficha
 // del creep — se tiran desde acá, en Acciones. El set completo se usa
 // también para cálculos internos (formulasCombateCreep, danoTxt, etc.);
 // CREEP_STATS_TIRADA_IDS más abajo recorta cuáles se muestran como botón.
@@ -3038,14 +3038,14 @@ const CREEP_DERIVED_STATS = [
   {id:'resmg', label:'Res.Mg', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
   {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
   {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
-  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico', attr:'des'}, {id:'parry', label:'Parry', attr:'des'},
+  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
   {id:'pdgmg', label:'PdG.Mg', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
 ];
 
 // Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
 // Botonera de la ficha: los 5 atributos base + los secundarios que no
 // tienen ya su propio botón en la caja de Combate.
-const CREEP_STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'resm'];
+const CREEP_STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'resm', 'percepcion'];
 
 const CREEP_STAT_LOOKUP = Object.fromEntries(CREEP_DERIVED_STATS.map(d => [d.id, d]));
 function creepStatValor(sc, statId){
@@ -4146,7 +4146,7 @@ function hcMostrarPaso(n){
 
 // Stats que un creep puede tirar en una habilidad: los 5 atributos y los
 // secundarios con tirada (los mismos que ofrece la ficha).
-const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "resm"];
+const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "resm", "percepcion"];
 function hcStatLabel(id){
   const d = id ? CREEP_STAT_LOOKUP[id] : null;
   return d ? (ATTR_NOMBRE[id] || d.label) : "";

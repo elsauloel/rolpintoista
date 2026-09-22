@@ -802,7 +802,7 @@ hexágono con otro sin importar bando. Todavía no está construido.
   `resumen.percepcionAumentada`): además, al quedar justo **al lado** de una trampa
   (una vez por trampa) el movimiento se interrumpe y aparece "corresponde una tirada
   de percepción" (aviso propio + línea roja anónima en la Mesa). Tirada:
-  🔎 **Tirar percepción** en la Botonera (`tirarPercepcion`: Especial, con un dado más
+  🔎 **Tirar percepción** en la Botonera (`tirarPercepcion`: Destreza, con un dado más
   alto por escalón si tiene la pasiva). Pendiente: tiradas para detectar/desarmar y
   límites para crearlas.
 

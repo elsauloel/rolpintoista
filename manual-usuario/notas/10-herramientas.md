@@ -85,7 +85,7 @@ La **Botonera** (botón ⚡ del dock, o desde tu token en el mapa) es tu **contr
 - **[[Habilidades]]:** un **Ejecutar** por cada una, con costo, tirada y estado.
 - **Consumibles** del cinturón y de la mochila.
 - **Habilidades sociales** ([[Inteligencia y habilidades sociales]]), arriba en narrativo, abajo en combate.
-- **🔎 Percepción** (tirada de [[Especial]], para [[Trampas]] y detección).
+- **🔎 Percepción** (tirada de [[Destreza]], para [[Trampas]] y detección).
 - **Sigilo:** el botón "Entrar en sigilo" aparece con solo tener la habilidad ([[Sigilo]]).
 
 ## La 🔍 lupa

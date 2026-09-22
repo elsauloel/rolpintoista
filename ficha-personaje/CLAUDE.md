@@ -86,6 +86,21 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   de todo (`modoMapa`, escuchado en vivo de `mapa/modo` con
   `modoMapaEscuchar` — mismo dato que usa el mapa para su switch
   narrativo/combate).
+- **Percepción sale de Destreza** (2026-09-22, antes salía directo del
+  Especial): es un stat derivado más de Destreza (`GRUPOS`, junto a
+  Rng/PdG/Crit/Parry, fórmula por defecto `des`), pero con su propio botón
+  dedicado en vez del genérico — `tirarPercepcion()` usa
+  `compute().final.percepcion` y no aparece con 🎲 en la tarjeta de
+  Atributos (no está en `STATS_SIN_TIRADA`, simplemente su fila de
+  Destreza es una más; el botón vive aparte, arriba de Combate en la
+  Botonera). La pasiva "Percepción aumentada" sigue subiendo un escalón
+  cada dado (`PERCEPCION_DADO_SUBE`) sin importar de qué atributo salga el
+  valor. Mismo cambio en gm-tools (`CREEP_DERIVADOS_POR_ATTR`/
+  `CREEP_DERIVED_STATS`, ver [`../gm-toolset/CLAUDE.md`](../gm-toolset/CLAUDE.md))
+  y en el catálogo (`percepcion` es un stat de ítem válido más, como
+  `parry` o `rng`). Ningún dato viejo necesita migrarse: es un stat nuevo,
+  no un renombre — una ficha sin `formulas.percepcion` guardado
+  simplemente hereda el `'des'` por defecto al mezclarse con `DEFAULT`.
 - **Escala de Tipos +2** (bloque al lado de `migrarEstadoIt2`): los Tipos de
   arma son 4/6/8/10/12 (`DADOS_ARMA`; default 8; sin arma sigue en
   `IT2.tipoSinArma` = 4). Los stats `tipo1..tipo5` son ahora la resistencia

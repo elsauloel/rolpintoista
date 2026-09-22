@@ -61,6 +61,13 @@ hay trabajo reciente o en curso de otra conversación (ver
   Rango de Casteo de un creep, solo cambió el nombre. Creeps con datos
   viejos se convierten solos en `normalizarCreep` (`migrarCreepEspecial`/
   `migrarObjEspecial`, mismo criterio que `migrarCreepTipos`).
+- **Percepción de un creep sale de Destreza** (2026-09-22, mismo cambio
+  que en la ficha): quinto stat derivado de Destreza junto a Rango/PdG/
+  Crítico/Parry (`CREEP_DERIVADOS_POR_ATTR.des`, `CREEP_DERIVED_STATS`).
+  A diferencia de la ficha, acá no tiene botón propio — no hay pasiva de
+  creep que le suba el dado — así que va como cualquier otro stat tirable
+  en Acciones (`CREEP_STATS_TIRADA_IDS`) y como opción de tirada en el
+  editor de habilidades de creep (`HC_STATS_SECUNDARIOS`).
 - **Escala de Tipos +2**: Tipos de arma 4/6/8/10/12 (`DADOS_ARMA`, default
   8); `crit[0..4]` y `tipo1..tipo5` son la resistencia a Tipo 4..12. Un
   creep sin `escalaTipos: 2` es de antes y `normalizarCreep` lo corre +2

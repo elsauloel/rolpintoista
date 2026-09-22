@@ -6114,9 +6114,12 @@ async function publicarRecompensas(){
    Un creep pertenece a UN solo grupo (campo `grupo`); para repetir uno en otro escenario se lo duplica.
    ========================================================= */
 let grupoActivo = '';   // '' = todos · '__sin' = sin grupo · si no, el nombre del grupo
-try{ grupoActivo = localStorage.getItem('gm-grupo-activo') || ''; }catch(e){}
-function gruposExtra(){ try{ const g = JSON.parse(localStorage.getItem('gm-grupos-extra') || '[]'); return Array.isArray(g) ? g : []; }catch(e){ return []; } }
-function guardarGruposExtra(l){ try{ localStorage.setItem('gm-grupos-extra', JSON.stringify(l)); }catch(e){} }
+// Ojo (2026-09-22, bug real): estas dos claves tienen que ir por partida (FB_CAMPANA), igual que
+// gbit-activa-/bitacora-activa- más abajo — sin el sufijo, un grupo vacío creado en una partida
+// aparecía como pestaña en cualquier otra partida abierta en el mismo navegador.
+try{ grupoActivo = localStorage.getItem('gm-grupo-activo-' + FB_CAMPANA) || ''; }catch(e){}
+function gruposExtra(){ try{ const g = JSON.parse(localStorage.getItem('gm-grupos-extra-' + FB_CAMPANA) || '[]'); return Array.isArray(g) ? g : []; }catch(e){ return []; } }
+function guardarGruposExtra(l){ try{ localStorage.setItem('gm-grupos-extra-' + FB_CAMPANA, JSON.stringify(l)); }catch(e){} }
 function nombresDeGrupos(){
   const set = new Set(gruposExtra());
   S.creeps.forEach(sc => { if(sc.grupo) set.add(sc.grupo); });
@@ -6131,7 +6134,7 @@ function pasaGrupo(sc){
 function grupoParaNuevo(){ return grupoActivo && grupoActivo !== '__sin' ? grupoActivo : ''; }
 function fijarGrupoActivo(g){
   grupoActivo = g;
-  try{ localStorage.setItem('gm-grupo-activo', g); }catch(e){}
+  try{ localStorage.setItem('gm-grupo-activo-' + FB_CAMPANA, g); }catch(e){}
   renderAll();
 }
 function renderGruposBarra(){

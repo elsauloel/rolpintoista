@@ -10082,6 +10082,8 @@ function fichaResumen(){
     hpMax: n(c.final.hpmax),
     def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
     esp: n(c.final.esp),   // Especial: el mapa tira la Percepción de este personaje
+    rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
+    rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
     percepcionAumentada: tienePercepcionAumentada(),   // el mapa le avisa de las trampas ocultas cercanas
     sp: spMax - num(S.spGastado),
     spMax,

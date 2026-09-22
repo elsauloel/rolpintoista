@@ -671,6 +671,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <kbd>L</kbd><span>Lápiz (prender / apagar)</span>
       <kbd>F</kbd><span>Terreno y Formas (prender / apagar)</span>
       <kbd>M</kbd><span>Mover libre del token seleccionado (otra <kbd>M</kbd> lo apaga)</span>
+      <kbd>R</kbd><span>📏 Ver tu Rango alrededor de tu token (otra <kbd>R</kbd> lo apaga)</span>
+      <span class="combo"><kbd>Shift</kbd> + <kbd>R</kbd></span><span>🔮 Ver tu Rango de casteo</span>
       <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>L</kbd></span><span>Modo lentes: ver los conos de detección (prender / apagar)</span>
@@ -711,6 +713,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
           </div>
         </div>
       </div>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza): ver tu área alrededor tuyo. Apretá de vuelta para apagarlo. (R)">📏</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial): ver tu área alrededor tuyo. Apretá de vuelta para apagarlo. (Shift + R)">🔮</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -1550,6 +1554,33 @@ function zonasSigilo(t){
 // 👓 Lentes (grupo flotante del mapa): un menú que prende el modo lentes y deja elegir qué conos y
 // zonas se ven — todos, solo aliados, rivales o NPC, o solo los de los tokens que se marquen.
 // Apagado, el mapa funciona exactamente igual que siempre.
+/* ---------- 📏🔮 Visualizador de rango ----------
+   Muestra, alrededor de tu propio token, el área de tu Rango (Destreza) o tu Rango de casteo (Especial) — los mismos
+   números que publica la ficha en resumen.rng/resumen.rangocasteo (comun de ambos: solo tu personaje, no invocaciones
+   ni creeps). Modo local, no se sincroniza con nadie más; se apaga tocando el botón de vuelta, con Esc o cambiando
+   de token seleccionado. */
+let rangoActivo = false, rangoMagicoActivo = false;
+function miTokenPrincipal(){
+  if(!fbUsuario) return null;
+  for(const t of tokens.values()){
+    if(t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && t.fichaId && !t.fichaId.includes(SEP_INVOCACION)) return t;
+  }
+  return null;
+}
+function renderBotonesRango(){
+  const b1 = $('#btn-rango'), b2 = $('#btn-rango-magico');
+  if(b1) b1.classList.toggle('activo', rangoActivo);
+  if(b2) b2.classList.toggle('activo', rangoMagicoActivo);
+}
+function alternarRango(magico){
+  if(magico) rangoMagicoActivo = !rangoMagicoActivo; else rangoActivo = !rangoActivo;
+  if((magico ? rangoMagicoActivo : rangoActivo) && !miTokenPrincipal()) toast('No tenés un token tuyo en este mapa: no hay dónde mostrar el rango');
+  renderBotonesRango();
+  pedirDibujo();
+}
+$('#btn-rango').onclick = () => alternarRango(false);
+$('#btn-rango-magico').onclick = () => alternarRango(true);
+
 let verZonas = false;          // modo lentes prendido
 let lentesFiltro = 'todos';    // 'todos' | 'aliados' | 'rivales' | 'npc'
 try{
@@ -3179,6 +3210,16 @@ function dibujar(){
     ctx.strokeStyle = colorConAlfa(aura.color, 0.5); ctx.lineWidth = 2 / z; ctx.stroke();
   });
 
+  // 📏🔮 Visualizador de rango: el área alrededor de tu propio token (nada de esto se guarda ni lo ven los demás).
+  if(rangoActivo || rangoMagicoActivo){
+    const mt = miTokenPrincipal();
+    const f = mt && fichasPub.get(mt.fichaId);
+    if(mt && f && f.resumen){
+      if(rangoActivo && num(f.resumen.rng) > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(num(f.resumen.rng))), color: '#4FA8D8'}, z);
+      if(rangoMagicoActivo && num(f.resumen.rangocasteo) > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(num(f.resumen.rangocasteo))), color: '#9B7BD4'}, z);
+    }
+  }
+
   // Tokens.
   disposicion = calcularDisposicion();
   // Si el token seleccionado dejó de verse (niebla, sigilo), se suelta.
@@ -4047,6 +4088,13 @@ document.addEventListener('keydown', e => {
     if(tm && puedoMoverLibre(tm)) activarMoverLibre(seleccion);
     else if(moverLibre) activarMoverLibre(moverLibre);
     else toast('Elegí primero un token tuyo para moverlo libre');
+    return;
+  }
+  // R: 📏 Rango (Destreza); Shift+R: 🔮 Rango de casteo (Especial). Locales, no se sincronizan con nadie más.
+  // (Ctrl+R queda afuera a propósito: el navegador lo usa para recargar la página y no se puede pisar del todo.)
+  if((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault();
+    alternarRango(e.shiftKey);
     return;
   }
   // F: prende o apaga Terreno y Formas.

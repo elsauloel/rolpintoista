@@ -39,6 +39,19 @@
   invocador de abejas con sigilo, veneno y trampas, un sacerdote con escopeta
   de balas de agua bendita… Todo entra. **El rol del GM no es limitar sino
   acompañar y moderar.**
+- **La creación colectiva es del grupo, no solo del GM** (dicho por el dueño,
+  2026-09-22). Cualquier jugador puede proponer cambios, creaciones y diseño;
+  definirlo, aprobarlo, ajustarlo y consensuarlo es de la mesa — no una
+  decisión que baja de arriba. Es parte esencial del juego, no un detalle de
+  implementación. **Objetivo a futuro, si el proyecto se abre a más gente que
+  el grupo actual**: que cualquier jugador pueda subir su propia habilidad o
+  personaje a una biblioteca (como ya se hace hoy con creeps, pasivas,
+  trampas y habilidades de creep — ver `comun/biblioteca.js`), y que desde ahí
+  la dirección del proyecto revise y sume lo que corresponda al catálogo
+  general que van a poder ver otros usuarios. El mecanismo de propuesta y
+  aprobación que ya existe es, a propósito, el camino pensado para eso —
+  extenderlo a habilidades y personajes de jugador es trabajo pendiente, no
+  una pieza nueva de filosofía.
 - **Regla de automatización** (dicha por el dueño, 2026-09-20): **siempre que un
   efecto pueda automatizarse, se automatiza; cuando no se puede, se aclara** en la
   descripción de algún modo ("⚙ Automatizado: …" / "✋ A mano: …", como en las

@@ -133,7 +133,7 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 /* Con muchos mapas (u otros paneles largos) el panel del costado se desplaza en vez de cortarse. */
 #panel-token{max-height:62vh;overflow-y:auto}
 /* Aviso fijo mientras se coloca un token nuevo (lugar y orientación). */
-#colocando-aviso{
+#colocando-aviso,#lentes-aviso{
   position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:26;max-width:80%;text-align:center;pointer-events:none;
   background:rgba(26,20,24,.94);border:1px solid var(--copper);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.55);
   padding:8px 16px;font-size:13px;color:var(--paper)
@@ -702,14 +702,15 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <div class="desplegable-lista" id="lentes-menu" hidden>
           <button type="button" class="btn" id="lentes-activar" style="width:100%">👓 Modo lentes: no</button>
           <div id="lentes-opciones">
-            <div class="lentes-tit">Mostrar</div>
+            <div class="lentes-nota">Tocá un token en el mapa para ver solo sus zonas.</div>
+            <button type="button" class="btn chico" id="lentes-todos" style="width:100%">👁 Ver todas las zonas</button>
+            <div class="lentes-tit">De cuáles (con "Ver todas" o sin selección)</div>
             <div class="lentes-filtros" id="lentes-filtros">
               <button type="button" class="btn chico" data-lentes-filtro="todos">Todos</button>
               <button type="button" class="btn chico" data-lentes-filtro="aliados">Aliados</button>
               <button type="button" class="btn chico" data-lentes-filtro="rivales">Rivales</button>
               <button type="button" class="btn chico" data-lentes-filtro="npc">NPC</button>
             </div>
-            <div class="lentes-nota">Tocá un token en el mapa para ver solo sus zonas; tocá afuera para volver.</div>
           </div>
         </div>
       </div>
@@ -733,6 +734,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
     <div id="token-etiqueta" hidden></div>
     <div id="elemento-etiqueta" hidden></div>
     <div id="colocando-aviso" hidden></div>
+    <div id="lentes-aviso" hidden>👓 Seleccioná un token para ver su zona de riesgo, o tocá "Ver todas las zonas" en el menú del 👓.</div>
     <div id="ruta-confirmar" hidden>
       <span id="ruta-texto"></span>
       <button type="button" class="btn" id="ruta-no" title="El token vuelve a donde estaba y no gasta No2 (Esc)">↶ Deshacer</button>
@@ -1583,17 +1585,23 @@ $('#btn-rango-magico').onclick = () => alternarRango(true);
 
 let verZonas = false;          // modo lentes prendido
 let lentesFiltro = 'todos';    // 'todos' | 'aliados' | 'rivales' | 'npc'
+let lentesTodos = false;       // 👁 Ver todas las zonas (si no, hace falta seleccionar un token)
 try{
   verZonas = localStorage.getItem('mapa-ver-zonas') === '1';
   lentesFiltro = localStorage.getItem('mapa-lentes-filtro') || 'todos';
+  lentesTodos = localStorage.getItem('mapa-lentes-todos') === '1';
 }catch(e){}
 function lentesCategoria(t){
   const c = claseToken(t);
   return c === 'creep' ? 'rivales' : c === 'npc' ? 'npc' : 'aliados';
 }
 // Con un token seleccionado se ven solo sus zonas; sin selección, las del filtro elegido.
+// Con un token seleccionado, solo sus zonas. Sin selección, nada (el menú lo explica con un
+// cartel) salvo que se pida expresamente "Ver todas las zonas" (2026-09-22: antes se mostraban
+// todas apenas se prendía el modo, y quedaba caótico con varios tokens en el mapa).
 function lentesMuestra(id, t){
   if(seleccion) return id === seleccion;
+  if(!lentesTodos) return false;
   return lentesFiltro === 'todos' || lentesCategoria(t) === lentesFiltro;
 }
 function renderBotonZonas(){
@@ -1603,7 +1611,14 @@ function renderBotonZonas(){
   $('#lentes-activar').textContent = verZonas ? '👓 Modo lentes: sí' : '👓 Modo lentes: no';
   $('#lentes-activar').classList.toggle('primary', verZonas);
   $('#lentes-opciones').classList.toggle('apagado', !verZonas);
+  $('#lentes-todos').textContent = lentesTodos ? '👁 Ver todas las zonas: sí' : '👁 Ver todas las zonas';
+  $('#lentes-todos').classList.toggle('primary', lentesTodos);
   $('#lentes-filtros').querySelectorAll('[data-lentes-filtro]').forEach(x => x.classList.toggle('activo', x.dataset.lentesFiltro === lentesFiltro));
+}
+// Cartel fijo: con el modo prendido, nada seleccionado y "Ver todas" apagado, recuerda cómo ver algo.
+function actualizarAvisoLentes(){
+  const el = $('#lentes-aviso');
+  el.hidden = !(verZonas && !seleccion && !lentesTodos);
 }
 function zonasParaVer(){
   const rivales = [];
@@ -1625,6 +1640,7 @@ function zonasParaVer(){
    mapa solo cuenta y avisa en la Mesa. Solo cuenta lo efectivo (lo que se
    suelta), no lo que se arrastra para evaluar rutas. */
 const sigiloAvisosPendientes = new Map();   // tokenId -> [{rival, pasos}] a publicar cuando el movimiento se guarda
+const percepcionAvisosPendientes = new Map();   // tokenId (quien camina) -> Map(ocultoId -> pasos en su zona de alerta)
 const sigiloRompiendo = new Set();
 let sigiloFirmaRev = '';
 
@@ -3977,7 +3993,7 @@ function soltar(){
     // inmediata) o una trampa (pisarla, o quedar al lado si tiene Percepción aumentada).
     trampaPendiente = null;
     if(!a.libre && a.movio && t && a.ruta.length > 1){
-      const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.ruta, null) : null;
+      const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.id, a.ruta, null) : null;
       const trampa = trampasEvaluarRuta(a.id, t, a.ruta);
       const corteTrampa = trampa && (!corte || trampa.indice < corte.indice) ? trampa : null;
       const corteSigilo = corte && (!corteTrampa) ? corte : null;
@@ -4051,6 +4067,11 @@ function alternarLentes(){
   toast(verZonas ? '👓 Modo lentes prendido' : '👓 Modo lentes apagado');
 }
 $('#lentes-activar').onclick = alternarLentes;
+$('#lentes-todos').onclick = () => {
+  lentesTodos = !lentesTodos;
+  try{ localStorage.setItem('mapa-lentes-todos', lentesTodos ? '1' : '0'); }catch(err){}
+  renderBotonZonas(); actualizarAvisoLentes(); pedirDibujo();
+};
 $('#lentes-filtros').addEventListener('click', e => {
   const b = e.target.closest('[data-lentes-filtro]'); if(!b) return;
   lentesFiltro = b.dataset.lentesFiltro;
@@ -4775,14 +4796,16 @@ async function moverToken(id, col, fila, celdas){
   try{
     await doc.update(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot});
     sigiloPublicarAvisos(id);
+    percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); abrirGiroLibre(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
+    percepcionAvisosPendientes.delete(id);
     console.error('No se pudo mover el token:', err);
     toast(err.code === 'permission-denied' ? 'No podés mover ese token' : 'No se pudo mover el token');
   }
@@ -5075,23 +5098,42 @@ async function trampaResolver(){
   alertaRojaAnonima('⚠ Hace falta una tirada de percepción');
 }
 
-function percepcionEvaluarRuta(t, ruta, ignorar){
+// Quien camina (sin estar en sigilo) puede entrar en el CONO de un rival en sigilo (detección
+// inmediata: corta el movimiento y lo revela, ver más abajo) o en su ZONA DE ALERTA nomás — ahí no
+// se corta nada, pero cada paso adentro pide una tirada de percepción, igual que cuando es el
+// oculto el que camina (escenario 2 de detección, 2026-09-22: antes solo contaba el cono).
+function percepcionEvaluarRuta(t, id, ruta, ignorar){
   const ocultos = [];
   rivalesDe(t).forEach(r => {
     if(!enSigilo(r)) return;
-    let id = null;
-    for(const [k, x] of tokens) if(x === r){ id = k; break; }
-    if(id && !(ignorar && ignorar.has(id))) ocultos.push({id, tok: r});
+    let rid = null;
+    for(const [k, x] of tokens) if(x === r){ rid = k; break; }
+    if(rid && !(ignorar && ignorar.has(rid))) ocultos.push({id: rid, tok: r});
   });
+  percepcionAvisosPendientes.delete(id);
   if(!ocultos.length) return null;
+  const pasos = new Map();   // ocultoId -> pasos dados en su zona de alerta antes de detectarlo (o de llegar)
   for(let i = 1; i < ruta.length; i++){
     const pa = hexCentro(ruta[i - 1].col, ruta[i - 1].fila), pb = hexCentro(ruta[i].col, ruta[i].fila);
     const rot = (((Math.round(Math.atan2(-(pb.x - pa.x), pb.y - pa.y) * 180 / Math.PI / 60) * 60) % 360) + 360) % 360;
     const z = zonasClaves({col: ruta[i].col, fila: ruta[i].fila, rotacion: rot});
     const vistos = ocultos.filter(o => z.cono.has(nbPack(o.tok.col, o.tok.fila)));
-    if(vistos.length) return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
+    if(vistos.length){
+      if(pasos.size) percepcionAvisosPendientes.set(id, pasos);
+      return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
+    }
+    ocultos.forEach(o => { if(z.alerta.has(nbPack(o.tok.col, o.tok.fila))) pasos.set(o.id, (pasos.get(o.id) || 0) + 1); });
   }
+  if(pasos.size) percepcionAvisosPendientes.set(id, pasos);
   return null;
+}
+// Uno por oculto en cuya zona de alerta se caminó (sin decir quién es ninguno de los dos): la
+// Mesa solo pide la tirada, igual que sigiloPublicarAvisos del otro escenario.
+function percepcionPublicarAvisos(id){
+  const pasos = percepcionAvisosPendientes.get(id);
+  percepcionAvisosPendientes.delete(id);
+  if(!pasos) return;
+  pasos.forEach(n => alertaRojaAnonima(n === 1 ? '⚠ Hace falta una tirada de percepción' : `⚠ Hacen falta ${n} tiradas de percepción`));
 }
 
 async function confirmarRuta(){
@@ -6456,6 +6498,7 @@ function hudUbicar(){
   actualizarEtiquetaToken();
   actualizarEtiquetaElemento();
   actualizarAvisoColocacion();
+  actualizarAvisoLentes();
   const hud = $('#hud');
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !fbMiembro || creando){ hud.hidden = true; return; }

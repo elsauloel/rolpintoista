@@ -112,9 +112,10 @@ alias: [Aturdido, Aturdir, Stun (estado)]
 tags: [estado, control]
 estado: borrador
 +++
-**Stun** es un debuff de control ([[Crowd Control]]): **no tenés Nitros este turno.** Podés pensar pero no actuar.
+**Stun** es un debuff de control ([[Crowd Control]]): **no tenés Nitros** mientras dura. Podés pensar pero no actuar.
 
-- Dura pocos turnos.
+- **Dura 2 turnos** (no 1): si durara solo 1, el Mantenimiento podría gastarlo antes de que te toque jugar y no perderías nada de verdad. Con 2, siempre te agarra en tu próximo turno.
+- **Cualquier tirada de Evasión falla directo** mientras dura: ni hace falta tirar el dado. Es a mano — no lo calcula la herramienta.
 - Lo evita el estado **Inmunidad a CC**.
 - Tu resistencia a esto es [[Resistencias|Res. CC]].
 

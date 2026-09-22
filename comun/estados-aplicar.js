@@ -19,7 +19,7 @@ const EstadosAplicar = (() => {
     {nombre: 'Pajaritos', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, detalle: 'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
     {nombre: 'Cansado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, cansado: true, detalle: 'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
     {nombre: 'Exhausto', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, esCC: true, exhausto: true, detalle: 'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
-    {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 este turno.'},
+    {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
     {nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraRota: true, detalle: '−1 Defensa por cada acumulación (×N). Permanente y acumulable.'},
     {nombre: 'Armadura arruinada', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraArruinada: true, detalle: 'Anula lo que aportan las armaduras equipadas a Defensa y Res. a crítico. Permanente.'},
     {nombre: 'Veneno severo', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -1, stacksTurno: 1, permanente: true, esVeneno: true, detalle: 'Hace 1 de daño el primer turno y 1 más con cada mantenimiento. No caduca.'},

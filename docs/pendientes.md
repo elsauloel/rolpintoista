@@ -41,8 +41,9 @@
 
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
 - [x] **Veneno**: se acumula (suma stacks, turnos = stacks, sin tope); Veneno severo aparte y no se acumula.
-- [ ] **Mecánica "cura estados"** en consumibles y habilidades (el Antídoto debería quitar Veneno y Veneno severo; hoy se saca a mano).
+- [ ] **Mecánica "cura estados" en consumibles y habilidades — a propósito recién después de terminar todo el repaso** (decidido 2026-09-22): una vez repasados todos los debuffs y buffs, agruparlos por familia (venenos, controles físicos tipo Lisiado/Rengo, etc.) y ahí sí crear ítems curativos específicos por grupo — idea del usuario: el Antídoto cura **todos** los tipos de veneno (Veneno + Veneno severo), un vendaje cura Lisiado + Rengo. Hoy sacar cualquier estado sigue siendo a mano.
 - [ ] **Nube tóxica** del Debuffer: ¿sigue aplicando solo 1 stack a alguien ya envenenado?
+- [ ] **Sangrado, ¿se acumula?** (abierto desde el repaso de Sangrado, 2026-09-21): a diferencia de Veneno, no quedó definido si aplicarlo de nuevo sobre alguien ya sangrando suma un stack más (−2 por stack) o no hace nada.
 - [x] **Pajaritos**: sin cambios (PdG y Evasión a la mitad, redondeado abajo, 3 turnos).
 - [x] **Cansado**: cambió de −1 fijo a **corta los No2 máximos a 2/3** (pierde un tercio, redondeado hacia abajo). `cansado:true` en ficha, gm-tools e `comun/estados-aplicar.js`; ya no usa `mods`.
 - [x] **Exhausto**: cambió de un tope fijo (1 No2) a **corta el No2 máximo a un tercio del natural** (redondeado hacia abajo) — misma lógica que Cansado: 1 Acción de un máximo de ~3 era un tercio. `exhausto:true` en vez de `forzarNitros:1`; si Cansado y Exhausto están activos juntos, gana el más restrictivo (Exhausto, 1/3 < 2/3) sin necesidad de sumarlos.

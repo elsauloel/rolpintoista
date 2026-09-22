@@ -129,11 +129,14 @@ Tres estados que modifican tus [[Nitros (No2)|Nitros]]:
 | Estado | Efecto |
 |---|---|
 | **Cansado** (debuff) | Corta los Nitros máximos a 2/3 (pierde un tercio, redondeado hacia abajo) |
-| **Exhausto** (debuff, CC) | Como mucho **1 Nitro** por turno, sin importar tu máximo |
+| **Exhausto** (debuff, CC) | Corta los Nitros máximos a un tercio del natural (redondeado hacia abajo) |
 | **Hypeado** (buff) | +1 a los Nitros máximos |
 
-> [!warning] Valores provisorios
-> Los tres eran "−1 Acción / 1 Acción / +1 Acción" y se pasaron a Nitros **1 a 1 sin recalibrar**.
+> [!info] Cansado y Exhausto ya recalibrados (2026-09-21)
+> Los dos eran "−1 Acción / 1 Acción fijo" de la época en que las Acciones iban de 1 a 3 por turno (así que 1 Acción era, más o menos, un tercio de la capacidad del turno). Se recalibraron con esa misma lógica: Cansado te deja con 2/3 de tus Nitros (perdés un tercio) y Exhausto te deja con un tercio (perdés dos tercios). Si los dos están activos a la vez, gana el más restrictivo (Exhausto) — no se suman.
+
+> [!warning] Valor provisorio
+> **Hypeado** (+1 Acción) sigue **1 a 1 sin recalibrar**.
 
 > [!question] Causa fatiga
 > Existe una condición "Causa fatiga" pendiente que el dueño va a definir con el grupo.

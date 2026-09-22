@@ -210,8 +210,11 @@ nuevo de Rol Pintoísta. Paso 2 de
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
 - **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
-  izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20), visible
-  **solo en modo combate**. Vive en `campanas/{id}/mapa/iniciativa`
+  izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20) — **de
+  siempre** (decidido 2026-09-22: antes visible solo en modo combate y
+  quedaba escondido sin avisar; ahora aparece solo con cualquier miembro
+  conectado, en narrativo también — vacío, muestra "Sin orden todavía").
+  Vive en `campanas/{id}/mapa/iniciativa`
   (`{orden: [{id, valor}], turno, ronda}`): lo ven todos. El GM tiene
   "Traer tokens" (suma todos los del mapa conservando valores), carga la
   tirada de cada uno, "Ordenar" (de mayor a menor, empates en el orden

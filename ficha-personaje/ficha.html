@@ -1175,6 +1175,10 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
 .mesa-texto{color:var(--paper);font-size:11.5px;margin-top:2px}
+.mesa-estados{font-size:10.5px;color:var(--muted);margin-top:1px}
+.mesa-buff{color:#8EE6A8;font-weight:700}
+.mesa-debuff{color:#FF7E7E;font-weight:700}
+.mesa-otro{color:var(--muted);font-weight:700}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-entrar{margin-top:8px;align-self:flex-start}
 /* ---------- Ficha en vivo: estado de guardado y cartel de solo lectura ---------- */
@@ -3956,6 +3960,25 @@ function tirarPercepcion(){
   registrarTirada(mejor ? 'Percepción (aumentada)' : 'Percepción', {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod});
 }
 
+// Estados activos que afectaron una tirada de stat: un mod propio (compute()/collectMods lo suma al número) o una de las
+// mecánicas especiales (mitad de PdG/Evasión, mitad de PdG/Parry, Afortunado). Se publican en la Mesa en color — verde
+// buff, rojo debuff — para que se note por qué salió ese número, sin tener que abrir la lupa 🔍.
+function estadosQueAfectanStat(statId, conVentaja){
+  const activos = (S.efectos || []).filter(e => e.activo !== false);
+  const out = [];
+  activos.forEach(e => {
+    const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
+    if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
+    else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+  });
+  if(conVentaja){
+    const af = activos.find(e => e.afortunado);
+    if(af) out.push({n: af.nombre, p: 'buff'});
+  }
+  return out;
+}
+
 function tirarValorStat(nombre, valor, statId, extra){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -3971,8 +3994,9 @@ function tirarValorStat(nombre, valor, statId, extra){
     if(segundo.total > intento.total) intento = segundo;
   }
   const ex = num(extra);   // bono plano que no cambia los dados (ej. peso del arma en el Bloqueo)
-  const r = {formula: f.formula + (ex ? `+${ex}` : ''), rolls: intento.rolls, mod: f.mod + ex, total: intento.total + ex};
-  registrarTirada(conVentaja ? `${nombre} (Afortunado)` : nombre, r);
+  const estados = statId ? estadosQueAfectanStat(statId, conVentaja) : [];
+  const r = {formula: f.formula + (ex ? `+${ex}` : ''), rolls: intento.rolls, mod: f.mod + ex, total: intento.total + ex, estados};
+  registrarTirada(nombre, r);
 }
 
 /* =========================================================
@@ -4518,12 +4542,26 @@ function verHabInv(invId, habId){
 /* ---------- Ejecutar las acciones de una invocación: mismos costos y
    mecánica que un creep, publicado en la Mesa a su propio nombre
    ("Invocación · Acción", igual que gm-tools arma "Creep · Acción"). ---------- */
-function tirarValorStatInv(inv, nombre, valor){
+// Mismo criterio que estadosQueAfectanStat, sobre los estados de la invocación (inv.estados).
+function estadosQueAfectanStatInv(inv, statId){
+  const activos = (inv.estados || []).filter(e => e.activo !== false);
+  const out = [];
+  activos.forEach(e => {
+    const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
+    if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
+    else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    // Afortunado no está acá a propósito: la invocación todavía no tira dos veces como el PJ o un creep (P100).
+  });
+  return out;
+}
+function tirarValorStatInv(inv, nombre, valor, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
   const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
   const total = rolls.reduce((a,b)=>a+b,0) + f.mod;
-  registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula, rolls, mod: f.mod, total});
+  const estados = statId ? estadosQueAfectanStatInv(inv, statId) : [];
+  registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula, rolls, mod: f.mod, total, estados});
 }
 function invAtacar(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
@@ -4537,7 +4575,7 @@ function invAtacar(invId){
   inv.nitros = num(inv.nitros) - costo;
   inv.ataquesTurno = num(inv.ataquesTurno) + 1;
   renderInvocaciones();
-  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'));
+  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'), 'pdg');
   toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
 }
 function invDanio(invId){
@@ -4564,7 +4602,7 @@ function invDanio(invId){
 function invTirarStat(invId, statId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, invStatValor(inv, statId));
+  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, invStatValor(inv, statId), statId);
 }
 function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
 function mesaPublicarHabilidadInv(inv, nombre, detalle){
@@ -4585,7 +4623,7 @@ function anunciarHabilidadInv(inv, h){
 function tirarExtraDeHabInv(inv, h){
   let tiro = false;
   if(h.tiradaStat){
-    tirarValorStatInv(inv, `${h.nombre} · ${STAT_LABEL[h.tiradaStat]||h.tiradaStat}`, invStatValor(inv, h.tiradaStat));
+    tirarValorStatInv(inv, `${h.nombre} · ${STAT_LABEL[h.tiradaStat]||h.tiradaStat}`, invStatValor(inv, h.tiradaStat), h.tiradaStat);
     tiro = true;
   }
   const formula = (h.tiradaExtra||'').trim();

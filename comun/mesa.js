@@ -57,9 +57,18 @@ async function mesaPublicar(origen, r){
   };
   // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
   const estilo = typeof dadosEstiloTxt === 'function' ? dadosEstiloTxt() : '';
-  // Reglas viejas (no conocen "estilo" o "texto"): se reintenta con menos campos, la tirada sale igual.
+  // Estados que afectaron esta tirada (r.estados = [{n, p:'buff'|'debuff'}], lo arma cada herramienta al tirar):
+  // se pintan en la Mesa, verde los buffs y rojo los debuffs (mesaFilaContenido).
+  const estados = Array.isArray(r.estados) && r.estados.length
+    ? r.estados.slice(0, 8).map(e => ({
+        n: String((e && (e.n || e.nombre)) || '').slice(0, 40),
+        p: (e && (e.p || e.polaridad)) === 'buff' ? 'buff' : (e && (e.p || e.polaridad)) === 'debuff' ? 'debuff' : 'otro',
+      })).filter(e => e.n)
+    : [];
+  // Reglas viejas (no conocen "estados", "estilo" o "texto"): se reintenta con menos campos, la tirada sale igual.
   const intentos = [
-    {...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {})},
+    {...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {}), ...(estados.length ? {estados} : {})},
+    ...(estados.length ? [{...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {})}] : []),
     ...(estilo ? [{...doc, ...(texto ? {texto} : {})}] : []),
     ...(texto ? [doc] : []),
   ];
@@ -97,9 +106,16 @@ function mesaFilaContenido(t){
   const quien = t.quien || t.jugador || '?';
   const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
   const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
+  // Estados activos que afectaron esta tirada (comun/mesa.js los pinta; cada herramienta arma la lista al tirar):
+  // verde = buff, rojo = debuff.
+  const estados = Array.isArray(t.estados) ? t.estados.filter(e => e && e.n) : [];
+  const estadosHtml = estados.length
+    ? `<div class="mesa-estados">Afectada por ${estados.map(e => `<span class="mesa-${e.p === 'buff' || e.p === 'debuff' ? e.p : 'otro'}">${esc(e.n)}</span>`).join(', ')}</div>`
+    : '';
   return `<span class="mesa-total">${fmt(num(t.total))}</span>` +
     `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
     `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+    estadosHtml +
     (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
 }
 

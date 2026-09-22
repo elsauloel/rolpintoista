@@ -767,6 +767,10 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
 .mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
 .mesa-detalle{color:var(--muted);font-size:10.5px}
 .mesa-texto{color:var(--paper);font-size:11.5px;margin-top:2px}
+.mesa-estados{font-size:10.5px;color:var(--muted);margin-top:1px}
+.mesa-buff{color:#8EE6A8;font-weight:700}
+.mesa-debuff{color:#FF7E7E;font-weight:700}
+.mesa-otro{color:var(--muted);font-weight:700}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-entrar{margin-top:8px;align-self:flex-start}
 </style>
@@ -1277,6 +1281,23 @@ function renderHistorialSesion(){
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
 // con el total más alto. sc+statId son opcionales — solo importan para
 // esos tres stats de un creep con ese estado activo.
+// Mismo criterio que ficha.html (estadosQueAfectanStat), sobre los estados del creep (sc.estados) — código duplicado a
+// propósito, no importado (ver comun/CLAUDE.md). Se publica en la Mesa en color: verde buff, rojo debuff.
+function estadosQueAfectanStatCreep(sc, statId, conVentaja){
+  const activos = sc ? (sc.estados || []).filter(e => e.activo !== false) : [];
+  const out = [];
+  activos.forEach(e => {
+    const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
+    if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
+    else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    // Pajaritos no está acá a propósito: hoy no anula PdG/Evasión de un creep, solo lo hace en la ficha (P101).
+  });
+  if(conVentaja){
+    const af = activos.find(e => e.afortunado);
+    if(af) out.push({n: af.nombre, p: 'buff'});
+  }
+  return out;
+}
 function tirarValorStat(nombre, valor, sc, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -1291,7 +1312,8 @@ function tirarValorStat(nombre, valor, sc, statId){
     const segundo = tirar();
     if(segundo.total > intento.total) intento = segundo;
   }
-  registrarTirada(conVentaja ? `${nombre} (Afortunado)` : nombre, {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total});
+  const estados = statId ? estadosQueAfectanStatCreep(sc, statId, conVentaja) : [];
+  registrarTirada(nombre, {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total, estados});
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];

@@ -175,8 +175,10 @@ service cloud.firestore {
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo'])
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados'])
           && (!('estilo' in request.resource.data) || (request.resource.data.estilo is string && request.resource.data.estilo.size() <= 300))
+          // Estados que afectaron la tirada (comun/mesa.js, para pintarla en la Mesa): [{n, p}], sin validar cada uno adentro.
+          && (!('estados' in request.resource.data) || (request.resource.data.estados is list && request.resource.data.estados.size() <= 8))
           && request.resource.data.uid == request.auth.uid
           && request.resource.data.total is number
           && request.resource.data.rolls is list

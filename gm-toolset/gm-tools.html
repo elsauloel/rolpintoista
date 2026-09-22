@@ -5365,7 +5365,7 @@ function tarjetaDeFicha(doc){
   const d = doc.data({serverTimestamps: 'estimate'});
   const r = d.resumen || {};
   return {
-    nombre: d.nombre || 'Sin nombre', nivel: num(r.nivel), imagen: d.miniatura || '',
+    id: doc.id, nombre: d.nombre || 'Sin nombre', nivel: num(r.nivel), imagen: d.miniatura || '',
     // La barra de SP usa bonos/bonosMax; las fichas de la Iteración 2
     // publican sp/spMax (las viejas, bonos/bonosMax).
     hp: num(r.hp), hpMax: num(r.hpMax),
@@ -5377,6 +5377,8 @@ function tarjetaDeFicha(doc){
 function tableroCerrar(){
   tableroCortes.forEach(cortar => cortar());
   tableroCortes = [];
+  if(tableroMapaActivoCorte){ tableroMapaActivoCorte(); tableroMapaActivoCorte = null; }
+  tableroTokensMapa = new Set();
   tableroDatos.fichas = tableroDatos.creeps = null;
   $('#scrim-tablero').classList.remove('open');
 }
@@ -5394,6 +5396,7 @@ function tableroEscucharColeccion(coleccion, clave, aTarjeta){
 // En gm-tools los creeps salen de lo que tenés abierto (con números).
 function tableroCreepsLocales(){
   return creepsReales().map(sc => ({
+    id: sc.id,
     nombre: sc.nombre,
     nivel: num(sc.nivel),
     imagen: sc.imagen || '',
@@ -5401,6 +5404,32 @@ function tableroCreepsLocales(){
     hpMax: num(sc.hpMax),
     estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, detalle: es.detalle || ''})),
   }));
+}
+
+// El tablero solo muestra lo que tiene token en el mapa PUBLICADO (2026-09-22, a pedido del
+// dueño) — no todo lo que hay abierto en gm-tools, que puede incluir cosas de otro escenario
+// o todavía sin poner en el mapa. Mismo esquema de colecciones que vtt-hexgrid/mapa.html
+// (campanas/{id}/tokens para el mapa principal, campanas/{id}/mapas/{id}/tokens para uno
+// guardado); acá no hace falta filtrar oculto/sigilo, porque esto lo ve solo el GM.
+const TABLERO_MAPA_PRINCIPAL = '_principal';
+let tableroMapaActivo = TABLERO_MAPA_PRINCIPAL;
+let tableroMapaActivoCorte = null;
+let tableroTokensMapa = new Set();   // fichaId (de pj o creep) con token en el mapa publicado
+function tableroColeccionTokensDe(mapaId){
+  return mapaId === TABLERO_MAPA_PRINCIPAL
+    ? fbDb.collection(fbRutaCampana('tokens'))
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaId}/tokens`));
+}
+function tableroEscucharMapaPublicado(){
+  tableroCortes.push(fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {
+    tableroMapaActivo = (doc.exists && doc.data().mapaId) || TABLERO_MAPA_PRINCIPAL;
+    if(tableroMapaActivoCorte) tableroMapaActivoCorte();
+    tableroTokensMapa = new Set();
+    tableroMapaActivoCorte = tableroColeccionTokensDe(tableroMapaActivo).onSnapshot(snap => {
+      tableroTokensMapa = new Set(snap.docs.map(d => d.data().fichaId).filter(x => typeof x === 'string' && x));
+      renderTablero();
+    }, err => console.error('Error escuchando los tokens del mapa publicado:', err));
+  }, err => console.error('Error escuchando el mapa publicado:', err)));
 }
 
 function haceCuanto(iso){
@@ -5453,8 +5482,9 @@ function tableroCardHtml(x, tipo){
 
 function renderTablero(){
   if(!$('#scrim-tablero').classList.contains('open')) return;
-  const fichas = tableroDatos.fichas;
-  const creeps = tableroCreepsLocales();
+  const fichasTodas = tableroDatos.fichas;
+  const fichas = fichasTodas === null ? null : fichasTodas.filter(f => tableroTokensMapa.has(f.id));
+  const creeps = tableroCreepsLocales().filter(c => tableroTokensMapa.has(c.id));
   let html = '';
   if(fichas === null){
     html += `<div class="tablero-grupo">Personajes</div><div class="hint">${fbMiembro ? 'Cargando…' : 'Entrá a la mesa para ver los personajes de los jugadores.'}</div>`;
@@ -5463,7 +5493,7 @@ function renderTablero(){
     html += `<div class="tablero-grupo">Personajes · ${fmt(orden.length)} · en vivo</div>`;
     html += `<div class="tablero-grid">${orden.map(x => tableroCardHtml(x, 'pj')).join('')}</div>`;
   }else{
-    html += `<div class="tablero-grupo">Personajes</div><div class="hint">Ningún jugador creó personajes todavía.</div>`;
+    html += `<div class="tablero-grupo">Personajes</div><div class="hint">${fichasTodas && fichasTodas.length ? 'Ninguno tiene token en el mapa publicado todavía.' : 'Ningún jugador creó personajes todavía.'}</div>`;
   }
   if(creeps.length){
     html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)}</div>`;
@@ -5478,7 +5508,10 @@ function abrirTablero(){
   $('#scrim-tablero').classList.add('open');
   $('#tablero-refrescar').style.display = 'none';
   renderTablero();
-  if(fbDb && fbMiembro && !tableroCortes.length) tableroEscucharColeccion('fichas', 'fichas', tarjetaDeFicha);
+  if(fbDb && fbMiembro && !tableroCortes.length){
+    tableroEscucharColeccion('fichas', 'fichas', tarjetaDeFicha);
+    tableroEscucharMapaPublicado();
+  }
 }
 
 async function ghShaPorListado(ruta, cab){

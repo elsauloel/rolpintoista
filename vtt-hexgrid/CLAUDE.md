@@ -627,6 +627,20 @@ nuevo de Rol Pintoísta. Paso 2 de
   distinto del publicado. Sin límite de mapas guardados; se renombran y se
   borran (salvo el primero, `MAPA_PRINCIPAL`, que sigue siendo el que
   había antes de esta función — no se le movió ningún dato).
+- **📋 Tablero de combate** (botón fijo de la barra de herramientas de la
+  derecha, `#toolkit-tablero`, para cualquiera — GM o jugador, no se
+  esconde): tarjetas con HP/SP y estados de todo lo que tiene token en el
+  mapa **publicado** (`mapaActivo`, no `mapaMostrado` — sigue mostrando el
+  mismo tablero aunque el GM esté mirando/armando otro escenario,
+  `tableroTokensEscuchar`). Los datos salen de `fichasPub`/`creepsPub`
+  (ya en vivo); lo nuevo es solo saber quién tiene token ahí. A los
+  jugadores no les aparecen los personajes/creeps ocultos (`oculto`) ni
+  los que están en sigilo (`enSigilo`) — el GM los ve igual
+  (`tableroFichaIds`/`tableroCreepIds`); las invocaciones no entran (el
+  Tablero es de personajes y creeps). Mismo propósito que el panel
+  Tablero de `gm-toolset/gm-tools.html`, pero sin código compartido (ver
+  [`../gm-toolset/CLAUDE.md`](../gm-toolset/CLAUDE.md)) — acá además hace
+  falta el filtro de oculto/sigilo porque lo ve cualquiera, no solo el GM.
 - Fondo (botón 🖼 Fondo, solo GM): imagen en `mapa/fondo`, achicada sola;
   el GM ajusta el ancho en casillas y puede arrastrarla para alinearla con
   la grilla.

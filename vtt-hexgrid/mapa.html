@@ -58,6 +58,36 @@ button:disabled{opacity:.5;cursor:not-allowed}
 #nuevo-token-capa,#editar-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
 #nuevo-token-capa[hidden],#editar-token-capa[hidden]{display:none}
 #nuevo-token-ventana,#editar-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+
+/* 📋 Tablero de combate: solo lo que tiene token en el mapa PUBLICADO, filtrado por lo que
+   cada uno puede ver (oculto/sigilo) — ver comentario de tableroTokensEscuchar() en el JS. */
+#tablero-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#tablero-capa[hidden]{display:none}
+#tablero-ventana{width:760px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6)}
+#tablero-cab{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--panel2);border-bottom:1px solid var(--line-soft);z-index:1}
+#tablero-cab h3{margin:0;font-size:16px;flex:1;color:var(--brass)}
+#tablero-sello{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+#tablero-body{padding:14px 16px 18px}
+.tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
+.tablero-grupo:first-child{margin-top:0}
+.tablero-vacio{color:var(--muted);font-size:13px;padding:10px 2px}
+.tablero-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tablero-card{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+.tablero-card.caido{opacity:.55}
+.tablero-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tablero-foto{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+.tablero-nombre{font-weight:700;font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tablero-nivel{font-weight:400;color:var(--muted);font-size:11px}
+.tablero-hp-fila{display:flex;align-items:center;gap:6px;margin-top:3px}
+.tablero-hp-barra{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.tablero-hp-fill{height:100%;background:#B23B3B}
+.tablero-hp-fill.sp{background:#3F86E0}
+.tablero-hp-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);white-space:nowrap}
+.tablero-caido{font-size:11px;color:var(--danger);font-weight:700;margin-top:4px}
+.tablero-estados{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tablero-estado{font-size:10px;padding:2px 6px;border-radius:99px;border:1px solid var(--line);position:relative}
+.tablero-estado.con-tip:hover .tablero-estado-tip{display:block}
+.tablero-estado-tip{display:none;position:absolute;bottom:calc(100% + 4px);left:0;z-index:2;width:180px;background:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--paper);white-space:normal;box-shadow:0 6px 16px rgba(0,0,0,.5)}
 .nt-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .nt-cab button{font-size:16px;color:var(--muted);line-height:1}
 .nt-cab button:hover{color:var(--paper)}
@@ -277,29 +307,31 @@ aside{
   border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
 }
 #toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
-#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-botin,#toolkit-mapas{
+#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-tablero,#toolkit-botin,#toolkit-mapas{
   position:absolute;left:100%;top:50%;transform:translateY(-50%);
   width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
   background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
   box-shadow:4px 4px 14px rgba(0,0,0,.45)
 }
-#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-mapas:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
-/* 🎁 Despojos: arriba de 🎭, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
-#toolkit-botin{top:calc(50% - 231px);transform:none}
-#toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
-#toolkit-botin.pendiente{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
-@keyframes latidoBotin{50%{box-shadow:0 0 0 4px rgba(184,115,51,.35)}}
+#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-tablero:hover,#toolkit-mapas:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
 /* El botón de tokens va arriba de los dados, del mismo tamaño y forma; su menú se despliega al costado. */
 #toolkit-tokens{top:calc(50% - 154px);transform:none}
 #toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
+/* 📋 Tablero: arriba de 🎭, del mismo tamaño y forma; para cualquiera (GM o jugador). */
+#toolkit-tablero{top:calc(50% - 231px);transform:none}
+/* 🎁 Despojos: arriba del Tablero, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
+#toolkit-botin{top:calc(50% - 308px);transform:none}
+#toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
+#toolkit-botin.pendiente{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+@keyframes latidoBotin{50%{box-shadow:0 0 0 4px rgba(184,115,51,.35)}}
 /* 🗺 Mapas: arriba de 🎁, del mismo tamaño y forma; su menú se despliega al costado (mapas guardados + fondo). */
-#toolkit-mapas{top:calc(50% - 308px);transform:none}
+#toolkit-mapas{top:calc(50% - 385px);transform:none}
 #toolkit-mapas[hidden]{display:none}
 #toolkit-mapas.activo{color:var(--paper);border-color:var(--copper)}
 #toolkit-mapas.distinto{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
 #mapas-menu{
-  position:absolute;left:calc(100% + 56px);top:calc(50% - 308px);z-index:30;width:300px;max-height:78vh;overflow:auto;
+  position:absolute;left:calc(100% + 56px);top:calc(50% - 385px);z-index:30;width:300px;max-height:78vh;overflow:auto;
   padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
   box-shadow:6px 6px 22px rgba(0,0,0,.55)
 }
@@ -744,6 +776,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
       <button type="button" id="toolkit-botin" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate">🎁</button>
       <button type="button" id="toolkit-tokens" title="Tokens: poner uno nuevo (y, si sos GM, traer los de los jugadores y los de los creeps)">🎭</button>
+      <button type="button" id="toolkit-tablero" title="Tablero: el estado de todos los que tienen token en el mapa publicado">📋</button>
       <button type="button" id="toolkit-mapas" hidden title="Mapas: ver, publicar, crear o borrar mapas guardados, y el fondo">🗺</button>
       <div id="tokens-menu" hidden></div>
       <div id="mapas-menu" hidden></div>
@@ -782,6 +815,16 @@ body.con-ruta .toast{bottom:auto;top:74px}
 </main>
 
 <div id="nuevo-token-capa" hidden><div id="nuevo-token-ventana"></div></div>
+<div id="tablero-capa" hidden>
+  <div id="tablero-ventana">
+    <div id="tablero-cab">
+      <h3>📋 Tablero de combate</h3>
+      <span id="tablero-sello"></span>
+      <button type="button" class="btn ghost" id="tablero-x">Cerrar</button>
+    </div>
+    <div id="tablero-body"></div>
+  </div>
+</div>
 <div id="editar-token-capa" hidden><div id="editar-token-ventana"></div></div>
 
 <!-- Bitácora de la partida: flotante y arrastrable, como la Mesa de la
@@ -1184,6 +1227,7 @@ function escucharMapaActivo(){
   fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {
     mapaActivo = (doc.exists && doc.data().mapaId) || MAPA_PRINCIPAL;
     recalcularMapaMostrado();
+    if(tableroAbierto) tableroTokensEscuchar();   // el Tablero sigue al mapa publicado, cambie o no mientras está abierto
   }, err => console.error('Error escuchando el mapa activo:', err));
 }
 
@@ -4168,11 +4212,142 @@ document.addEventListener('keydown', e => {
 
 /* ---------- Tokens en Firestore ---------- */
 
-function coleccionTokens(){
-  return mapaMostrado === MAPA_PRINCIPAL
+function coleccionTokensDe(mapaId){
+  return mapaId === MAPA_PRINCIPAL
     ? fbDb.collection(fbRutaCampana('tokens'))
-    : fbDb.collection(fbRutaCampana(`mapas/${mapaMostrado}/tokens`));
+    : fbDb.collection(fbRutaCampana(`mapas/${mapaId}/tokens`));
 }
+function coleccionTokens(){
+  return coleccionTokensDe(mapaMostrado);
+}
+
+/* =========================================================
+   📋 TABLERO DE COMBATE (2026-09-22)
+   Para cualquiera (GM o jugador). Muestra solo lo que tiene token en el mapa
+   PUBLICADO (mapaActivo) — sea o no el que se está mirando ahora mismo — y,
+   a los jugadores, sin lo oculto ni lo que está en sigilo (el GM ve todo).
+   Los datos de cada ficha/creep (HP, estados…) ya están en vivo en
+   fichasPub/creepsPub; lo único que hace falta acá es saber quién tiene
+   token en ESE mapa, con un listener aparte que sigue a mapaActivo (no a
+   mapaMostrado, que puede ser otro mientras el GM arma otro escenario).
+   ========================================================= */
+let tableroAbierto = false;
+let tableroTokensActivo = new Map();   // tokenId -> {tipo, fichaId, oculto} del mapa publicado
+let tableroTokensCorte = null;
+let tableroTokensDe = null;            // qué mapaId está escuchando ahora mismo
+
+function tableroTokensEscuchar(){
+  if(tableroTokensDe === mapaActivo && tableroTokensCorte) return;   // ya es el que corresponde
+  if(tableroTokensCorte) tableroTokensCorte();
+  tableroTokensActivo = new Map();
+  tableroTokensDe = mapaActivo;
+  tableroTokensCorte = coleccionTokensDe(mapaActivo).onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ tableroTokensActivo.delete(ch.doc.id); return; }
+      const d = ch.doc.data();
+      tableroTokensActivo.set(ch.doc.id, {
+        tipo: d.tipo === 'creep' ? 'creep' : 'pj',
+        fichaId: typeof d.fichaId === 'string' ? d.fichaId : '',
+        oculto: d.oculto === true,
+      });
+    });
+    renderTablero();
+  }, err => {
+    console.error('Error escuchando los tokens del tablero:', err);
+    $('#tablero-body').innerHTML = '<div class="tablero-vacio">No se pudo leer el tablero.</div>';
+  });
+}
+function tableroTokensDejarDeEscuchar(){
+  if(tableroTokensCorte){ tableroTokensCorte(); tableroTokensCorte = null; }
+  tableroTokensActivo = new Map();
+  tableroTokensDe = null;
+}
+// Un token (mínimo: tipo/fichaId) alcanza para reusar enSigilo()/vinculo(), que solo miran eso.
+function tableroFichaIds(){
+  const set = new Set();
+  tableroTokensActivo.forEach(t => {
+    if(t.tipo !== 'pj' || !t.fichaId || t.fichaId.includes(SEP_INVOCACION)) return;   // el tablero es de personajes, no de invocaciones
+    if(!soyGM && (t.oculto || enSigilo(t))) return;
+    set.add(t.fichaId);
+  });
+  return set;
+}
+function tableroCreepIds(){
+  const set = new Set();
+  tableroTokensActivo.forEach(t => {
+    if(t.tipo !== 'creep' || !t.fichaId) return;
+    if(!soyGM && (t.oculto || enSigilo(t))) return;
+    set.add(t.fichaId);
+  });
+  return set;
+}
+function tableroCardHtml(nombre, imagen, nivel, r, tipo){
+  // De los creeps (resumen público) solo llega el porcentaje de vida: la barra va sin números.
+  const conNumeros = r.hpPct === undefined || r.hpPct === null;
+  const hp = num(r.hp), hpMax = num(r.hpMax);
+  const pct = conNumeros ? (hpMax > 0 ? Math.max(0, Math.min(100, hp / hpMax * 100)) : 0) : Math.max(0, Math.min(100, num(r.hpPct)));
+  const caido = conNumeros ? (hp <= 0 || r.muerto) : !!r.muerto;
+  const {sp, spMax} = spDeResumen(r);
+  const spPct = spMax > 0 ? Math.max(0, Math.min(100, sp / spMax * 100)) : 0;
+  const estados = (r.estados || []).filter(e => e && e.nombre);
+  return `<div class="tablero-card${caido ? ' caido' : ''}">
+    <div class="tablero-card-top">
+      ${imagen ? `<img class="tablero-foto" src="${esc(imagen)}" alt="">` : ''}
+      <div class="tablero-nombre">${esc(nombre)}${nivel ? ` <span class="tablero-nivel">Lv ${fmt(num(nivel))}</span>` : ''}</div>
+    </div>
+    <div class="tablero-hp-fila">
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill" style="width:${pct}%"></div></div>
+      ${conNumeros ? `<span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
+    </div>
+    ${tipo === 'pj' && spMax > 0 ? `<div class="tablero-hp-fila">
+      <div class="tablero-hp-barra"><div class="tablero-hp-fill sp" style="width:${spPct}%"></div></div>
+      <span class="tablero-hp-txt">${fmt(sp)}/${fmt(spMax)} SP</span>
+    </div>` : ''}
+    ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
+    ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
+      const det = String(e.detalle || '').trim();
+      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
+    }).join('')}</div>` : ''}
+  </div>`;
+}
+function renderTablero(){
+  if(!tableroAbierto) return;
+  const idsFichas = tableroFichaIds(), idsCreeps = tableroCreepIds();
+  const fichas = [...fichasPub.entries()].filter(([id]) => idsFichas.has(id))
+    .map(([id, f]) => ({nombre: f.nombre, imagen: f.miniatura, r: f.resumen || {}}))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  const creeps = [...creepsPub.entries()].filter(([id]) => idsCreeps.has(id))
+    .map(([id, c]) => ({nombre: c.nombre, imagen: c.miniatura, r: c.resumen || {}}))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  let html = '';
+  if(fichas.length){
+    html += `<div class="tablero-grupo">Personajes · ${fmt(fichas.length)}</div>`;
+    html += `<div class="tablero-grid">${fichas.map(x => tableroCardHtml(x.nombre, x.imagen, x.r.nivel, x.r, 'pj')).join('')}</div>`;
+  }
+  if(creeps.length){
+    html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)}</div>`;
+    html += `<div class="tablero-grid">${creeps.map(x => tableroCardHtml(x.nombre, x.imagen, null, x.r, 'creep')).join('')}</div>`;
+  }
+  $('#tablero-body').innerHTML = html || '<div class="tablero-vacio">Todavía no hay nadie con token en el mapa publicado.</div>';
+  const total = fichas.length + creeps.length;
+  $('#tablero-sello').textContent = total ? `${fmt(total)} en el tablero` : '';
+}
+function tableroAbrir(){
+  tableroAbierto = true;
+  $('#tablero-capa').hidden = false;
+  tableroTokensEscuchar();
+  renderTablero();
+}
+function tableroCerrar(){
+  tableroAbierto = false;
+  $('#tablero-capa').hidden = true;
+  tableroTokensDejarDeEscuchar();
+}
+$('#toolkit-tablero').onclick = tableroAbrir;
+$('#tablero-x').onclick = tableroCerrar;
+$('#tablero-capa').addEventListener('pointerdown', e => { if(e.target === $('#tablero-capa')) tableroCerrar(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && tableroAbierto) tableroCerrar(); });
+
 function coleccionTrazos(){
   return mapaMostrado === MAPA_PRINCIPAL
     ? fbDb.collection(fbRutaCampana('trazos'))
@@ -5426,6 +5601,7 @@ function escucharVinculables(){
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
     revisarAutoLentes();   // entrar en sigilo prende el modo lentes solo (no muestra todo de una)
+    if(tableroAbierto) renderTablero();   // el HP/estados de las fichas o creeps del tablero cambió
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);

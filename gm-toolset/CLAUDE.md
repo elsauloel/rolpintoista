@@ -121,9 +121,19 @@ hay trabajo reciente o en curso de otra conversación (ver
   Escape cierra solo la de más arriba.
 - "Cargar respaldo" reemplaza todos los creeps de la mesa por los del
   archivo (con confirmación).
-- El panel Tablero (mismo diseño que en la ficha, código duplicado)
-  arma tarjetas con los creeps abiertos (con números) + las fichas de los
-  jugadores en vivo desde Firebase.
+- El panel Tablero arma tarjetas con los creeps abiertos (con números) +
+  las fichas de los jugadores en vivo desde Firebase, pero **solo de
+  quien tiene token puesto en el mapa publicado** (2026-09-22, a pedido
+  del dueño — antes mostraba todo lo abierto, aunque no estuviera en el
+  mapa todavía o fuera de otro escenario): `tableroEscucharMapaPublicado()`
+  sigue `mapa/activo` y la colección de tokens que corresponda
+  (`tokens` o `mapas/{id}/tokens`, mismo esquema que `vtt-hexgrid/mapa.html`)
+  y arma `tableroTokensMapa` (los `fichaId` con token ahí); `renderTablero`
+  filtra por eso. Acá no hace falta filtrar oculto/sigilo: el Tablero de
+  gm-tools lo ve solo el GM, que ve todo. El mapa tiene su propio botón
+  📋 Tablero — ver [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md),
+  código no compartido (duplicado a propósito, como el resto de esta
+  sección).
 
 ### vendor-generator.html
 - **Barra superior unificada** (`../comun/barra.js`): `#tienda-identidad`

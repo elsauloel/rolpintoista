@@ -101,6 +101,19 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   `parry` o `rng`). Ningún dato viejo necesita migrarse: es un stat nuevo,
   no un renombre — una ficha sin `formulas.percepcion` guardado
   simplemente hereda el `'des'` por defecto al mezclarse con `DEFAULT`.
+- **Parry ahora cuesta Peso ÷ 2 (para arriba) y se puede parar con escudo**
+  (2026-09-22; antes era Tipo ÷ 2, y solo con arma): `costoParryNitros`
+  pasó de `IT2.redondeoPrimerAtaque(tipoAtaque(arma)/2)` a
+  `Math.ceil(num(arma ? arma.peso : 0)/2)` — sin nada equipado, Peso 0,
+  Parry gratis (ya no hace falta el "provisorio" de antes). El selector
+  de arma del botón 🎲 Parry (`elegirArmaDefensa('parry')`) usa una lista
+  nueva, `armasYEscudosParaParry()`: a diferencia de
+  `armasEquipadasConDano()` (Atacar/Daño Arma/Bloqueo), entra cualquier
+  arma **o escudo** equipado en mano (`ES_MANO`), tenga o no daño — un
+  escudo no ataca pero sí para. El Bloqueo que sigue a un Parry (mismo
+  arma o escudo, no vuelve a preguntar) no cambió. Resuelve la pregunta
+  abierta del manual ("Parry con escudo todavía no está definido" en
+  [`../manual-usuario/notas/06-combate.md`](../manual-usuario/notas/06-combate.md)).
 - **Escala de Tipos +2** (bloque al lado de `migrarEstadoIt2`): los Tipos de
   arma son 4/6/8/10/12 (`DADOS_ARMA`; default 8; sin arma sigue en
   `IT2.tipoSinArma` = 4). Los stats `tipo1..tipo5` son ahora la resistencia

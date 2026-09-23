@@ -5288,7 +5288,7 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma: cuesta siempre lo de un primer ataque (' + costoParryTxt() + ')')}">
+          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta la mitad del Peso, redondeado hacia arriba (' + costoParryTxt() + ')')}">
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
@@ -9052,21 +9052,35 @@ function pdgParaArma(arma, c){
   return {valor: v, excluidos};
 }
 
-/* ---------- Parry y Bloqueo con arma ----------
-   Parry: siempre cuesta No2 — lo mismo que un primer ataque con esa arma
-   (Tipo ÷ 2), sin importar cuántos ataques hiciste en el turno.
+/* ---------- Parry y Bloqueo con arma o escudo ----------
+   Parry: siempre cuesta No2 — el Peso del arma o escudo elegido dividido
+   dos, redondeado hacia arriba (2026-09-22; antes era el Tipo de daño ÷ 2,
+   pero un escudo no tiene Tipo), sin importar cuántos ataques hiciste en
+   el turno. Se puede parriar con cualquier arma o escudo equipado, no
+   solo con las que hacen daño (`armasYEscudosParaParry`).
    Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma.
-   Con más de un arma equipada, se elige con cuál. Sin arma: Parry cuesta
-   lo de un ataque sin arma (⚠ provisorio) y el Bloqueo no suma peso. */
+   Con más de un arma/escudo equipado, se elige con cuál. Sin nada
+   equipado: Peso 0, Parry sale gratis y el Bloqueo no suma peso. */
 // Arma con la que se hizo el último Parry (id, o '' si fue sin arma). El Bloqueo que
 // sigue (defensa: Parry y después Bloqueo) usa esa misma arma sin volver a preguntar.
 // null = no hay un Parry esperando su Bloqueo. Se limpia al bloquear, atacar o pasar el turno.
 let parryArmaPendiente = null;
-const costoParryNitros = arma => IT2.redondeoPrimerAtaque(tipoAtaque(arma) / 2);
+const costoParryNitros = arma => Math.ceil(num(arma ? arma.peso : 0) / 2);
+
+// A diferencia de armasEquipadasConDano() (para Atacar/Daño Arma/Bloqueo),
+// acá entra cualquier arma O ESCUDO equipado, tenga o no daño: para
+// parriar alcanza con la mano, el escudo no ataca pero sí para.
+function armasYEscudosParaParry(){
+  const manos = asignarManos();
+  return S.inventario
+    .filter(i => i.equipado && ES_MANO(i.tipoItem))
+    .map(i => ({item: i, mano: manos.get(i.id) || null}))
+    .sort((a, b) => (a.mano || 99) - (b.mano || 99));
+}
 
 function costoParryTxt(){
-  const armas = armasEquipadasConDano();
-  if(!armas.length) return `${fmt(costoParryNitros(null))} No2 (sin arma, provisorio)`;
+  const armas = armasYEscudosParaParry();
+  if(!armas.length) return `${fmt(costoParryNitros(null))} No2 (sin arma ni escudo)`;
   return armas.map(a => `${a.item.nombre}: ${fmt(costoParryNitros(a.item))} No2`).join(' · ');
 }
 
@@ -9113,11 +9127,11 @@ function elegirArmaDefensa(tipo){
     }
     parryArmaPendiente = null;   // el arma ya no está equipada: se elige de nuevo
   }
-  const armas = armasEquipadasConDano();
+  const armas = tipo === 'parry' ? armasYEscudosParaParry() : armasEquipadasConDano();
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta lo de un primer ataque con el arma que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta la mitad del Peso (redondeado hacia arriba) del arma o escudo que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}

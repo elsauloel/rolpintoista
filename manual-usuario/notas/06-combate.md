@@ -115,7 +115,6 @@ Si elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqu
 > [!question] Otras dudas
 > - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?
 > - ¿Esto aplica también a ataques a distancia?
-> - Los **escudos**, ¿suman a Parry, a Bloqueo o a ninguno? (El Parry *con escudo* todavía no está definido.)
 
 +++
 titulo: Evasión
@@ -138,16 +137,14 @@ alias: [Parada, Parar, Parry con arma]
 tags: [combate, stats]
 estado: borrador
 +++
-El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma**. Tirás Parry contra el PdG del atacante.
+El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.
 
-- **Cuesta [[Nitros (No2)|Nitros]] siempre:** lo mismo que un *primer ataque* con esa arma (Tipo ÷ 2), sin importar cuántos ataques hiciste en tu turno.
-- Con **dos armas** equipadas, elegís con cuál parar.
+- **Cuesta [[Nitros (No2)|Nitros]] siempre:** la mitad del **Peso** del arma o escudo con el que parás, redondeado hacia arriba, sin importar cuántos ataques hiciste en tu turno.
+- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — la mitad de su Peso.
+- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
-- **Sin arma:** el Parry cuesta lo que un ataque sin arma (valor provisorio).
+- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.
 - Estados como [[Lisiado]] te bajan el Parry a la mitad.
-
-> [!question] Parry con escudo
-> Es distinto al Parry con arma y todavía no está definido su paso a paso: costo, qué se tira y con qué se suma.
 
 +++
 titulo: Bloqueo
@@ -157,9 +154,9 @@ estado: borrador
 +++
 El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.
 
-- Se tira con tu stat Bloqueo **más el peso del arma** con la que hiciste el Parry.
-- Si tenés dos armas, se usa **la misma con la que hiciste el Parry** (no vuelve a preguntarte).
-- Sin arma, el Bloqueo no suma peso.
+- Se tira con tu stat Bloqueo **más el peso del arma o escudo** con la que hiciste el Parry.
+- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).
+- Sin nada equipado, el Bloqueo no suma peso.
 
 > [!question] ¿Contra qué se tira?
 > La regla original dice "bloque vs. bloqueo": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano.

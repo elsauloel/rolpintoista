@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-22T15:19:46Z",
+ "actualizado": "2026-09-23T01:44:41Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -691,7 +691,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!question] Cadena Parry → Bloqueo\n> Hoy cada tirada es suelta y la resuelve la mesa. Falta definir: ¿el Bloqueo es *tu Bloqueo contra el del atacante*? ¿Qué pasa si ganás el Parry pero **perdés** el Bloqueo (¿pasa el golpe entero, reducido, algo intermedio)?\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?\n> - Los **escudos**, ¿suman a Parry, a Bloqueo o a ninguno? (El Parry *con escudo* todavía no está definido.)"
+   "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!question] Cadena Parry → Bloqueo\n> Hoy cada tirada es suelta y la resuelve la mesa. Falta definir: ¿el Bloqueo es *tu Bloqueo contra el del atacante*? ¿Qué pasa si ganás el Parry pero **perdés** el Bloqueo (¿pasa el golpe entero, reducido, algo intermedio)?\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?"
   },
   {
    "id": "evasion",
@@ -723,7 +723,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** lo mismo que un *primer ataque* con esa arma (Tipo ÷ 2), sin importar cuántos ataques hiciste en tu turno.\n- Con **dos armas** equipadas, elegís con cuál parar.\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin arma:** el Parry cuesta lo que un ataque sin arma (valor provisorio).\n- Estados como [[Lisiado]] te bajan el Parry a la mitad.\n\n> [!question] Parry con escudo\n> Es distinto al Parry con arma y todavía no está definido su paso a paso: costo, qué se tira y con qué se suma."
+   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** la mitad del **Peso** del arma o escudo con el que parás, redondeado hacia arriba, sin importar cuántos ataques hiciste en tu turno.\n- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — la mitad de su Peso.\n- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.\n- Estados como [[Lisiado]] te bajan el Parry a la mitad."
   },
   {
    "id": "bloqueo",
@@ -739,7 +739,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se tira con tu stat Bloqueo **más el peso del arma** con la que hiciste el Parry.\n- Si tenés dos armas, se usa **la misma con la que hiciste el Parry** (no vuelve a preguntarte).\n- Sin arma, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
+   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se tira con tu stat Bloqueo **más el peso del arma o escudo** con la que hiciste el Parry.\n- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).\n- Sin nada equipado, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
   },
   {
    "id": "defensa",

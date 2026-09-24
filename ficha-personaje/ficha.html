@@ -1966,6 +1966,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/tokens-auto.js?v=3"></script>
+<script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -8442,6 +8444,7 @@ function drawEditorHabilidad(){
         </select></div>
       <div class="f"><label>Fórmula de dados (opcional)</label><input data-c="tiradaExtra" value="${esc(draft.tiradaExtra ?? '')}" placeholder="ej. 2d6+3 o 1d20" data-hab-enter="1"></div>`;
     html += htmlEstadoAlUsar('habilidades', draft);
+    html += trampaHtml(draft);
   }
   if(info.id === 'origen'){
     const conJob = draft.job !== false;
@@ -8550,6 +8553,70 @@ $('#modal-body').addEventListener('change', e => {
 });
 
 // Sección "Estado alterado al usar" (consumibles y habilidades).
+/* ---------- 🪤 Trampa de una habilidad (2026-09-24, pedido del dueño) ----------
+   Una habilidad del personaje puede colocar una trampa oculta en el mapa al ejecutarse: `h.trampaColocar = {nombre, detalle, dano,
+   ignoraDef, radio, cant}`. Se coloca sola al lado del token del personaje (comun/tokens-auto.js, igual que las de los creeps);
+   los demás no la ven hasta que la pisan. Sin trampa, la habilidad no toca el mapa. */
+const TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
+function trampaHtml(draft){
+  const t = draft.trampaColocar || null;
+  const campo = (k, etiqueta, tipo, extra) => `<div class="f"><label>${etiqueta}</label><input data-tr="${k}" type="${tipo}" value="${esc(t && t[k] !== undefined ? t[k] : '')}" ${extra || ''}></div>`;
+  return `<div class="f" style="margin-top:10px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 10px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10)">
+      <input type="checkbox" data-tr="on" ${t ? 'checked' : ''} style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0">Al ejecutarla deja sola una trampa oculta al lado de tu token, en el mapa que se está jugando.</span></span></label></div>
+    ${t ? `<button type="button" class="btn" id="hab-trampa-pre" style="width:100%;margin-bottom:8px">📚 Trampas preconstruidas</button>
+      ${campo('nombre', 'Nombre de la trampa', 'text', 'maxlength="40" placeholder="vacío = el nombre de la habilidad"')}
+      ${campo('detalle', 'Qué hace (lo que se lee cuando alguien la pisa)', 'text', 'maxlength="200" placeholder="ej. foso de púas: 2d6 de daño"')}
+      <div class="f2">
+        ${campo('dano', 'Daño automático', 'text', 'maxlength="12" placeholder="ej. 2d6+3"')}
+        ${campo('radio', 'Radio (0 = una casilla)', 'number', 'min="0" max="6"')}
+      </div>
+      <div class="f2">
+        ${campo('cant', 'Cantidad por ejecución', 'number', 'min="1" max="6"')}
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;align-self:end"><input type="checkbox" data-tr="ignoraDef" ${t.ignoraDef ? 'checked' : ''} style="width:auto"> <span>El daño ignora la Defensa</span></label>
+      </div>
+      <div class="hint">Daño: dados y modificador, ej. <b>2d6</b> o <b>1d8+3</b>. Sin tildar "ignora la Defensa", se le resta la Defensa de quien la pisa. Vacío = solo avisa.</div>` : ''}`;
+}
+function trampaGuardarCampo(el){
+  const d = editing.draft, k = el.dataset.tr;
+  if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, radio: 0, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; drawEditor(); return; }
+  const t = d.trampaColocar; if(!t) return;
+  if(k === 'ignoraDef') t[k] = el.checked;
+  else if(k === 'radio' || k === 'cant') t[k] = Math.max(k === 'cant' ? 1 : 0, Math.min(6, Math.round(num(el.value) || 0)));
+  else t[k] = el.value;
+}
+// Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
+async function colocarTrampaDeHab(h){
+  const t = h.trampaColocar;
+  if(!t || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id) return;
+  try{
+    const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
+    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', nombre: String(t.nombre || '').trim() || h.nombre, detalle: t.detalle || '',
+      dano, ignoraDef: !!t.ignoraDef, radio: t.radio || 0, cant: t.cant || 1});
+    if(r.colocadas) toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
+    else toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
+  }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
+}
+function trampaPreconstruidas(){
+  const ed = editing;
+  Biblioteca.abrir({
+    tipo: 'trampas', titulo: 'Trampa preconstruida',
+    base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}],
+    alElegir: async datos => {
+      const qs = [{clave: 'radio', min: 0, texto: '¿De qué tamaño es? (radio: 0 = una casilla, 1 = una flor de 1, 2 = una flor de 2…)'}];
+      if(datos.dano) qs.push({clave: 'dano', tipo: 'texto', texto: '¿Cuánto daño hace? (dados, ej. 2d6 o 1d8+3)', patron: TRAMPA_DANO_RE, error: 'Escribilo así: 2d6 o 1d8+3.', placeholder: 'ej. 2d6+3'});
+      qs.push({clave: 'cant', min: 1, texto: '¿Cuántas trampas coloca cada vez que la ejecutás?'});
+      const r = await EstadoPreguntas.preguntar({titulo: 'Trampa', nombre: datos.nombre}, qs, x => x);
+      if(!r || editing !== ed) return;
+      ed.draft.trampaColocar = {nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '', ignoraDef: false,
+        radio: Math.max(0, Math.min(6, r.radio)), cant: Math.max(1, Math.min(6, r.cant))};
+      drawEditor();
+      toast(`Trampa "${datos.nombre}" cargada`);
+    },
+  });
+}
+
 function htmlEstadoAlUsar(key, draft){
   let html = '';
     const personalizadosIt = S.efectosPersonalizados || [];
@@ -8876,6 +8943,7 @@ function setModVal(draft, statId, val){
 
 function handleModalFieldChange(e){
   const t = e.target;
+  if(t.dataset.tr){ trampaGuardarCampo(t); return; }
   if(t.dataset.c){
     const c = t.dataset.c;
     editing.draft[c] = t.type === "checkbox" ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===""?"":num(t.value)) : t.value);
@@ -8910,6 +8978,7 @@ $('#modal-body').addEventListener('click', e => {
   const b = e.target.closest('button'); if(!b) return;
   if(b.id === 'addmod'){ editing.draft.mods = editing.draft.mods||[]; editing.draft.mods.push({stat:'', val:0}); drawEditor(); }
   if(b.dataset.rmmod !== undefined){ editing.draft.mods.splice(+b.dataset.rmmod,1); drawEditor(); }
+  if(b.id === 'hab-trampa-pre'){ trampaPreconstruidas(); return; }
   if(b.id === 'addefectomod'){ editing.draft.efectoMods = editing.draft.efectoMods||[]; editing.draft.efectoMods.push({stat:'', val:0}); drawEditor(); }
   if(b.dataset.rmefectomod !== undefined){ editing.draft.efectoMods.splice(+b.dataset.rmefectomod,1); drawEditor(); }
   if(b.id === 'addestadoequipo'){ editing.estadoEquipoAbierto = true; drawEditor(); }
@@ -9662,6 +9731,7 @@ function ejecutarHabilidad(id, armaId, forzar){
   if(curaHp > 0) fijarHp(num(S.hp) + curaHp);   // cura sobre uno mismo, sin pasar del máximo
   const ataque = registrarAtaqueDeHabilidad(it, arma);
   const efecto = aplicarEfectoDeConsumo(it);
+  colocarTrampaDeHab(it);
   anunciarHabilidad(it);
   tirarPrimeraDeHab(it);
   renderList("habilidades");
@@ -9712,6 +9782,7 @@ function confirmarCostoVariable(){
   const ataque = registrarAtaqueDeHabilidad(it, pendingArmaHab === undefined ? null : pendingArmaHab);
   pendingArmaHab = undefined;
   const efecto = aplicarEfectoDeConsumo(it);
+  colocarTrampaDeHab(it);
   anunciarHabilidad(it);
   tirarPrimeraDeHab(it);
   $("#scrim-costox").classList.remove("open");

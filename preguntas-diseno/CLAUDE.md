@@ -13,7 +13,7 @@ sin depender de coincidir en el chat de WhatsApp:
 - **💬 Preguntas**: preguntas de diseño y sus respuestas/sugerencias. El
   dueño va tirando preguntas de a poco; cada uno responde o sugiere cuando
   tiene tiempo y ganas, y queda un historial.
-- **🎨 Desarrollo creativo** (sumada 2026-09-22): el log de lo que falta
+- **🎨 A desarrollar** (sumada 2026-09-22 como "Desarrollo creativo"; renombrada 2026-09-24): el log de lo que falta
   construir. El dueño anota ahí lo que va pensando que falta, pero
   **cualquiera puede proponer su propia idea de desarrollo también** — no
   es solo del dueño. Arriba de las propuestas hay un resumen plegable
@@ -33,8 +33,9 @@ GM" en el [`CLAUDE.md`](../CLAUDE.md) de la raíz.
 
 ## Estado actual
 
-Primera versión (2026-09-22, preguntas), con Desarrollo creativo y Falta
-testear sumadas el mismo día. Sin propuesta de aprobación como
+Primera versión (2026-09-22, preguntas), con A desarrollar y Falta
+testear sumadas el mismo día. El 2026-09-24 se sumaron **editar el texto** y
+**orden manual** (ver abajo). Sin propuesta de aprobación como
 `comun/biblioteca.js` — acá no hace falta: es solo el dueño y sus dos
 amigos, así que cualquiera lee y escribe.
 
@@ -102,13 +103,33 @@ volver a loguearse ahí una vez. Ver la memoria del asistente
   usuario). El link que apunta acá desde las demás herramientas dice
   "🛠 Herramientas de diseño" (`menuDibujar` en `comun/menu-sitio.js`).
 - **El resumen de "ya incorporado"** (`CAMBIOS_RECIENTES` en el JS, visible
-  solo en la pestaña Desarrollo creativo): es **texto fijo en el HTML, de
+  solo en la pestaña A desarrollar): es **texto fijo en el HTML, de
   solo lectura** — no vive en Firestore, no se puede sumar ni borrar desde
   la página. Es un resumen histórico que el asistente arma a mano cuando
   el dueño lo pide (no automático por cada commit); cada entrada es una
   frase corta en lenguaje llano ("se incorporó tal cosa, que sirve para
   tal cosa"), sin jerga técnica. Se actualiza editando el array
   directamente en `preguntas.html`.
+
+## Editar y ordenar (2026-09-24)
+
+- **✎ Editar**: en cada publicación y respuesta *propia* (junto al ✕ de
+  borrar) — abre una cajita en el lugar del texto con Guardar/Cancelar.
+  Solo el autor edita lo suyo (ya lo exigían las reglas). El borrador se
+  guarda en memoria (`borradorEdicion`) para que un cambio que llegue de
+  Firestore mientras se escribe no lo borre.
+- **Orden manual compartido** (solo las publicaciones, no las respuestas):
+  tres botones en cada una — **⤒** arriba de todo, **⤓** abajo de todo y
+  **⠿** (mantener apretado y arrastrar; eventos `pointer`, anda con dedo y
+  mouse). Se guarda en un campo opcional `orden` (número; menor = más
+  arriba) en el propio doc. Sin `orden` vale `-creadoMs` (lo más nuevo
+  primero, como antes), así que las publicaciones nuevas siguen apareciendo
+  arriba. Al arrastrar se escribe **un solo doc** con `orden` = punto medio
+  entre el vecino de arriba y el de abajo. Es un solo orden para todo el
+  grupo, y **cualquiera** con cuenta confirmada puede reordenar (mismo
+  criterio que tildar resuelto). **Requiere publicar las reglas nuevas** en
+  la consola de Firebase (`orden` en `entradaPregunta` y en la rama
+  "cualquiera") — sin eso, mover falla con un aviso.
 
 ## Dependencias con otras carpetas
 

@@ -96,7 +96,18 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 .cargando{color:var(--muted);text-align:center;padding:30px 10px}
 
 .mio{position:relative}
-.mio .p-borrar{position:absolute;top:10px;right:10px;background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+.mio .p-borrar,.mio .p-editar{position:absolute;top:10px;right:10px;background:none;border:0;color:var(--muted);font-size:16px;padding:2px 6px}
+.mio .p-editar{right:38px}
+.mio > .p-cab{padding-right:64px}
+
+.p-orden{display:flex;gap:6px;margin-left:auto}
+.p-arrastrar{touch-action:none;cursor:grab}
+.pregunta.arrastrando{opacity:.9;border-color:var(--brass);box-shadow:0 8px 24px rgba(0,0,0,.65);position:relative;z-index:3}
+body.arrastrando-body{user-select:none;-webkit-user-select:none;cursor:grabbing}
+
+.editar-caja{display:flex;flex-direction:column;gap:8px}
+.editar-caja textarea{min-height:64px}
+.editar-caja .fila{display:flex;gap:8px;justify-content:flex-end}
 
 #changelog-wrap{margin-bottom:16px}
 #btn-changelog{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center}
@@ -117,7 +128,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
   </div>
   <div class="tabs" id="tabs" hidden>
     <button type="button" class="tab" id="tab-preguntas" data-tab="pregunta">💬 Preguntas</button>
-    <button type="button" class="tab" id="tab-pendientes" data-tab="pendiente">🎨 Desarrollo creativo</button>
+    <button type="button" class="tab" id="tab-pendientes" data-tab="pendiente">🎨 A desarrollar</button>
     <button type="button" class="tab" id="tab-testeos" data-tab="testeo">🧪 Falta testear</button>
   </div>
 </header>
@@ -162,7 +173,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
    queda recordada sola en ese navegador.
 
    Dos pestañas, misma colección, filtradas por tipo (2026-09-22): "Preguntas"
-   (tipo 'pregunta') es lo de siempre; "Por desarrollar" (tipo 'pendiente')
+   (tipo 'pregunta') es lo de siempre; "A desarrollar" (tipo 'pendiente')
    es el log de lo que falta construir — el dueño anota ahí lo que va
    pensando y CUALQUIERA puede sumar su propia propuesta de desarrollo,
    no solo el dueño. Las respuestas (tipo 'respuesta') sirven para las dos
@@ -211,6 +222,13 @@ const CAMBIOS_RECIENTES = [
 let entradas = [];   // todo lo que llega de Firestore, tal cual
 let tabActiva = 'pregunta';
 let mostrarResueltas = false;
+let editandoId = null;        // id de la entrada/respuesta que se está editando (una a la vez)
+let borradorEdicion = '';     // lo que va escribiendo, para que un cambio de Firestore no lo borre
+let arrastre = null;          // {id, card, pointerId, y} mientras se arrastra una publicación
+
+// Orden manual (2026-09-24): campo opcional `orden` (número; menor = más arriba). Sin `orden`, vale -creadoMs, o sea
+// lo más nuevo primero, como era antes. Es un orden único y compartido: lo ve igual todo el grupo.
+const ordenEfectivo = e => typeof e.orden === 'number' ? e.orden : -(e.creadoMs || 0);
 
 function fechaTxt(ts){
   if(!ts || !ts.toDate) return 'ahora';
@@ -231,6 +249,19 @@ function renderChangelog(){
     </div>`).join('');
 }
 
+// El texto de una publicación o respuesta; si se está editando, en su lugar va la cajita con Guardar/Cancelar.
+function textoHtml(e){
+  if(editandoId !== e.id) return `<div class="p-texto">${esc(e.texto)}</div>`;
+  return `<div class="editar-caja">
+    <textarea data-borrador="${esc(e.id)}">${esc(borradorEdicion)}</textarea>
+    <div class="fila">
+      <button type="button" class="btn chico ghost" data-cancelar-edicion="${esc(e.id)}">Cancelar</button>
+      <button type="button" class="btn chico primary" data-guardar-edicion="${esc(e.id)}">Guardar</button>
+    </div>
+  </div>`;
+}
+const botonesPropios = id => `<button type="button" class="p-editar" data-editar="${esc(id)}" title="Editar">✎</button><button type="button" class="p-borrar" data-borrar="${esc(id)}" title="Borrar">✕</button>`;
+
 function render(){
   const t = TABS[tabActiva];
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('activo', b.dataset.tab === tabActiva));
@@ -241,7 +272,7 @@ function render(){
 
   const cont = $('#lista');
   const preguntas = entradas.filter(e => e.tipo === tabActiva && (mostrarResueltas || !e.resuelta))
-    .sort((a, b) => (b.creadoMs || 0) - (a.creadoMs || 0));
+    .sort((a, b) => ordenEfectivo(a) - ordenEfectivo(b));
   if(!preguntas.length){
     cont.innerHTML = `<div class="vacio">${mostrarResueltas ? 'Todavía no hay nada acá.' : t.vacioAbiertas}</div>`;
     return;
@@ -251,18 +282,23 @@ function render(){
     const respuestas = entradas.filter(e => e.tipo === 'respuesta' && e.padreId === p.id)
       .sort((a, b) => (a.creadoMs || 0) - (b.creadoMs || 0));
     return `<div class="pregunta${p.resuelta ? ' resuelta' : ''}${mias ? ' mio' : ''}" data-id="${esc(p.id)}">
-      ${mias ? `<button type="button" class="p-borrar" data-borrar="${esc(p.id)}" title="Borrar">✕</button>` : ''}
+      ${mias ? botonesPropios(p.id) : ''}
       <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? `<span class="p-badge">${t.badge}</span>` : ''}</div>
-      <div class="p-texto">${esc(p.texto)}</div>
+      ${textoHtml(p)}
       <div class="p-acciones">
         <button type="button" class="btn chico" data-responder="${esc(p.id)}">💬 Responder</button>
         <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? t.accionReabrir : t.accionHecha}</button>
+        <span class="p-orden">
+          <button type="button" class="btn chico ghost" data-arriba="${esc(p.id)}" title="Mandar arriba de todo">⤒</button>
+          <button type="button" class="btn chico ghost" data-abajo="${esc(p.id)}" title="Mandar abajo de todo">⤓</button>
+          <button type="button" class="btn chico ghost p-arrastrar" title="Mantené apretado y arrastrá para cambiar el lugar">⠿</button>
+        </span>
       </div>
       ${respuestas.length ? `<div class="respuestas">${respuestas.map(r => `
         <div class="respuesta${fbUsuario && r.autorUid === fbUsuario.uid ? ' mio' : ''}" data-id="${esc(r.id)}">
-          ${fbUsuario && r.autorUid === fbUsuario.uid ? `<button type="button" class="p-borrar" data-borrar="${esc(r.id)}" title="Borrar">✕</button>` : ''}
+          ${fbUsuario && r.autorUid === fbUsuario.uid ? botonesPropios(r.id) : ''}
           <div class="p-cab"><span class="p-autor">${esc(r.autorNombre)}</span><span class="p-fecha">${fechaTxt(r.creado)}</span></div>
-          <div class="p-texto">${esc(r.texto)}</div>
+          ${textoHtml(r)}
         </div>`).join('')}</div>` : ''}
       <div class="responder-caja" id="responder-${esc(p.id)}">
         <textarea placeholder="Escribí una respuesta o sugerencia…"></textarea>
@@ -281,6 +317,7 @@ function escuchar(){
       const x = d.data();
       return {id: d.id, ...x, creadoMs: x.creado && x.creado.toMillis ? x.creado.toMillis() : Date.now()};
     });
+    if(arrastre){ arrastre.renderPendiente = true; return; }   // no mover el piso mientras se arrastra
     render();
   }, err => {
     console.error('Error escuchando las preguntas:', err);
@@ -343,12 +380,103 @@ document.addEventListener('click', e => {
     if(p) fbDb.collection('preguntas_diseno').doc(p.id).update({resuelta: !p.resuelta}).catch(err => console.error(err));
     return;
   }
+  if(b.dataset.editar){
+    const x = entradas.find(v => v.id === b.dataset.editar);
+    if(!x) return;
+    editandoId = x.id; borradorEdicion = x.texto;
+    render();
+    const ta = document.querySelector('textarea[data-borrador]');
+    if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+    return;
+  }
+  if(b.dataset.cancelarEdicion){ editandoId = null; render(); return; }
+  if(b.dataset.guardarEdicion){
+    const id = b.dataset.guardarEdicion, t = borradorEdicion.trim();
+    if(!t) return;
+    b.disabled = true;
+    fbDb.collection('preguntas_diseno').doc(id).update({texto: t.slice(0, 4000)})
+      .then(() => { editandoId = null; render(); })
+      .catch(err => { console.error(err); alert('No se pudo guardar el cambio. Revisá la conexión e intentá de nuevo.'); b.disabled = false; });
+    return;
+  }
+  if(b.dataset.arriba || b.dataset.abajo){
+    const id = b.dataset.arriba || b.dataset.abajo, arriba = !!b.dataset.arriba;
+    const yo = entradas.find(v => v.id === id);
+    const otros = entradas.filter(v => v.tipo === tabActiva && v.id !== id).map(ordenEfectivo);   // toda la pestaña, se vea o no lo resuelto
+    if(!yo || !otros.length) return;
+    const menor = Math.min(...otros), mayor = Math.max(...otros);
+    if(arriba ? ordenEfectivo(yo) < menor : ordenEfectivo(yo) > mayor) return;   // ya está ahí
+    guardarOrden(id, arriba ? menor - 1000 : mayor + 1000);
+    return;
+  }
   if(b.dataset.borrar){
     if(!confirm('¿Borrar esto? No se puede deshacer.')) return;
     fbDb.collection('preguntas_diseno').doc(b.dataset.borrar).delete().catch(err => console.error(err));
     return;
   }
 });
+
+document.addEventListener('input', e => {
+  if(e.target.matches('textarea[data-borrador]')) borradorEdicion = e.target.value;
+});
+
+function guardarOrden(id, orden){
+  fbDb.collection('preguntas_diseno').doc(id).update({orden})
+    .catch(err => {
+      console.error('No se pudo cambiar el orden:', err);
+      alert('No se pudo cambiar el orden (¿están publicadas las reglas nuevas de Firestore?).');
+      render();
+    });
+}
+
+// Arrastrar: se mantiene apretado el ⠿ y se mueve la tarjeta entre las demás (sirve con dedo y con mouse, por eso
+// eventos "pointer" y no el drag&drop de HTML, que en el celular no anda). Al soltar se calcula un `orden` entre
+// el vecino de arriba y el de abajo, así se escribe UN solo documento.
+function pasoArrastre(){
+  if(!arrastre) return;
+  const y = arrastre.y, cont = $('#lista');
+  if(y < 150) window.scrollBy(0, -14); else if(y > window.innerHeight - 70) window.scrollBy(0, 14);
+  const otras = [...cont.children].filter(c => c.classList.contains('pregunta') && c !== arrastre.card);
+  const destino = otras.find(c => { const r = c.getBoundingClientRect(); return y < r.top + r.height / 2; });
+  if(destino){ if(arrastre.card.nextElementSibling !== destino) cont.insertBefore(arrastre.card, destino); }
+  else if(cont.lastElementChild !== arrastre.card) cont.appendChild(arrastre.card);
+  requestAnimationFrame(pasoArrastre);
+}
+document.addEventListener('pointerdown', e => {
+  const h = e.target.closest('.p-arrastrar');
+  const card = h && h.closest('.pregunta');
+  if(!card || arrastre) return;
+  e.preventDefault();
+  try{ h.setPointerCapture(e.pointerId); }catch(_){}
+  arrastre = {id: card.dataset.id, card, pointerId: e.pointerId, y: e.clientY, renderPendiente: false};
+  card.classList.add('arrastrando');
+  document.body.classList.add('arrastrando-body');
+  requestAnimationFrame(pasoArrastre);
+});
+document.addEventListener('pointermove', e => {
+  if(arrastre && e.pointerId === arrastre.pointerId) arrastre.y = e.clientY;
+});
+function soltarArrastre(e){
+  if(!arrastre || e.pointerId !== arrastre.pointerId) return;
+  const {id, card, renderPendiente} = arrastre;
+  arrastre = null;
+  card.classList.remove('arrastrando');
+  document.body.classList.remove('arrastrando-body');
+  const oe = el => { const x = el && entradas.find(v => v.id === el.dataset.id); return x ? ordenEfectivo(x) : null; };
+  const yo = oe(card), ant = oe(card.previousElementSibling), sig = oe(card.nextElementSibling);
+  if(yo !== null && (ant === null || ant < yo) && (sig === null || yo < sig)){
+    if(renderPendiente) render();   // no se movió: solo repintar lo que llegó mientras tanto
+    return;
+  }
+  let nuevo;
+  if(ant !== null && sig !== null) nuevo = (ant + sig) / 2;
+  else if(ant !== null) nuevo = ant + 1000;
+  else if(sig !== null) nuevo = sig - 1000;
+  else { render(); return; }
+  guardarOrden(id, nuevo);   // el cambio vuelve por Firestore y repinta solo
+}
+document.addEventListener('pointerup', soltarArrastre);
+document.addEventListener('pointercancel', soltarArrastre);
 
 $('#btn-nueva').onclick = () => {
   crear(tabActiva, $('#txt-nueva').value, '');

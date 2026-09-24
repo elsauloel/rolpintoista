@@ -648,19 +648,20 @@ service cloud.firestore {
 
     // Preguntas de diseño (preguntas-diseno/preguntas.html): el log donde el dueño del proyecto tira preguntas y
     // cualquier cuenta confirmada (los amigos con los que arma las reglas) suma preguntas o respuestas/sugerencias.
-    // Tres pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta'), "Desarrollo creativo" (tipo
+    // Tres pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta'), "A desarrollar" (tipo
     // 'pendiente', lo que falta construir) y "Falta testear" (tipo 'testeo', mecánicas para probar en mesa) —
     // las últimas dos, 2026-09-22, el dueño las tira pero cualquiera puede sumar o tildar también.
     // Fuera de las campañas a propósito: es sobre el sistema en general, no de una partida puntual. No hace falta
     // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'pendiente'|
     // 'testeo'|'respuesta', texto, padreId (una respuesta apunta a su entrada; '' si no es una respuesta), resuelta
-    // (solo en preguntas/pendientes/testeos, no en respuestas), autorUid, autorNombre, creado}.
+    // (solo en preguntas/pendientes/testeos, no en respuestas), orden (opcional, número: orden manual), autorUid, autorNombre, creado}.
     function entradaPregunta(d) {
-      return d.keys().hasOnly(['tipo', 'texto', 'padreId', 'resuelta', 'autorUid', 'autorNombre', 'creado'])
+      return d.keys().hasOnly(['tipo', 'texto', 'padreId', 'resuelta', 'orden', 'autorUid', 'autorNombre', 'creado'])
         && d.tipo in ['pregunta', 'respuesta', 'pendiente', 'testeo']
         && d.texto is string && d.texto.size() > 0 && d.texto.size() <= 4000
         && d.padreId is string && d.padreId.size() <= 64
         && d.resuelta is bool
+        && (!('orden' in d) || d.orden is number)
         && d.autorUid is string
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
@@ -670,9 +671,11 @@ service cloud.firestore {
         && entradaPregunta(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;
-      // Cualquiera puede marcar una pregunta resuelta (o reabrirla) sin tocar el resto; el autor edita su propio texto.
+      // Cualquiera puede marcar una pregunta resuelta (o reabrirla) o cambiarla de lugar (`orden`, orden manual compartido)
+      // sin tocar el resto; el autor edita su propio texto.
       allow update: if verificado()
-        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resuelta'])
+        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resuelta', 'orden'])
+            && (!('orden' in request.resource.data) || request.resource.data.orden is number)
             && request.resource.data.tipo == resource.data.tipo)
           || (resource.data.autorUid == request.auth.uid
             && entradaPregunta(request.resource.data)

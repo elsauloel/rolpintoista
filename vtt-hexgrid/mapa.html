@@ -3778,6 +3778,8 @@ lienzo.addEventListener('pointerdown', e => {
     if(herramientaActiva){ desactivarHerramienta(); return; }
     // Lo mismo con 🦶 Mover libre: el clic derecho lo apaga.
     if(moverLibre){ activarMoverLibre(moverLibre); return; }
+    // Con la caja de herramientas abierta, el clic derecho la cierra (no hace ping).
+    if(toolkitAbierto){ abrirToolkit(false); return; }
     const {px, py} = posEvento(e);
     const m = pantallaAMundo(px, py);
     guardarPing(m.x, m.y);
@@ -4384,6 +4386,7 @@ document.addEventListener('keydown', e => {
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
   if(herramientaActiva && e.key === 'Escape'){ desactivarHerramienta(); return; }
+  if(toolkitAbierto && e.key === 'Escape'){ abrirToolkit(false); return; }   // Esc cierra la caja de herramientas (2026-09-24)
   if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); elementoSeleccionar(null); }
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
   if((e.key === 'Delete' || e.key === 'Backspace') && trazoSeleccionado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){

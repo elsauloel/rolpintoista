@@ -1039,6 +1039,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <input type="hidden" id="hc-efecto-mods" value="[]">
       </div>
       <div class="hc-paso" data-hc-paso="4">
+        <button type="button" class="btn" id="hc-trampa-preconstruidas" style="width:100%;margin-bottom:10px" title="Elegir una trampa ya armada del catálogo (oso, foso, mina, red…) y decir su tamaño, daño y cantidad">📚 Trampas preconstruidas</button>
         <label class="hc-trampa-on" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
           <input type="checkbox" id="hc-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
         </label>
@@ -1265,6 +1266,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -7174,6 +7176,33 @@ $('#hc-efecto-preset').addEventListener('change', e => {
   $('#hc-efecto-mods').value = JSON.stringify(preset.mods || []);
 });
 $('#hc-trampa-on').onchange = hcTrampaRender;
+// 📚 Trampas preconstruidas (2026-09-24): se elige una del catálogo de trampas base (y las propuestas por el grupo) y, como con los
+// estados alterados, un cartelito pregunta sus cantidades — de qué tamaño, cuánto daño y cuántas — antes de cargarla en el editor.
+$('#hc-trampa-preconstruidas').onclick = () => {
+  Biblioteca.abrir({
+    tipo: 'trampas', titulo: 'Trampa preconstruida',
+    base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}, {nombre: 'Alcance', tags: ['área']}],
+    alElegir: async datos => {
+      const preguntas = [{clave: 'radio', min: 0, texto: '¿De qué tamaño es? (radio: 0 = una casilla, 1 = una flor de 1, 2 = una flor de 2…)'}];
+      if(datos.dano) preguntas.push({clave: 'dano', tipo: 'texto', texto: '¿Cuánto daño hace? (dados, ej. 2d6 o 1d8+3)', patron: HC_TRAMPA_DANO_RE, error: 'Escribilo así: 2d6 o 1d8+3.', placeholder: 'ej. 2d6+3'});
+      preguntas.push({clave: 'cant', min: 1, texto: '¿Cuántas trampas coloca cada vez que la ejecuta?'});
+      const r = await EstadoPreguntas.preguntar({titulo: 'Trampa', nombre: datos.nombre}, preguntas, x => x);
+      if(!r) return;
+      $('#hc-trampa-on').checked = true;
+      $('#hc-trampa-nombre').value = String(datos.nombre || '').slice(0, 40);
+      $('#hc-trampa-detalle').value = String(datos.detalle || '').slice(0, 200);
+      $('#hc-trampa-dano').value = r.dano || '';
+      $('#hc-trampa-radio').value = Math.max(0, Math.min(6, r.radio));
+      $('#hc-trampa-cant').value = Math.max(1, Math.min(6, r.cant));
+      $('#hc-trampa-estado').value = '';
+      $('#hc-trampa-estado-turnos').value = 0;
+      hcTrampaRender();
+      toast(`Trampa "${datos.nombre}" cargada: revisala y guardá la habilidad`);
+    },
+  });
+};
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-creep'){ editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); } });

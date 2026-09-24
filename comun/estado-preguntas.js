@@ -88,6 +88,13 @@ const EstadoPreguntas = (() => {
   function pedir(preset, cfg){
     const qs = preguntas(preset, cfg);
     if(!qs.length) return Promise.resolve(preset);
+    return preguntar({titulo: 'Estado alterado', nombre: preset.nombre}, qs, resp => aplicar(preset, resp, cfg));
+  }
+
+  // El cartelito genérico (2026-09-24): preguntas de a una con Siguiente/Atrás/Listo. cab = {titulo, nombre}. Cada pregunta:
+  // {clave, texto, min, tipo?: 'numero' (por defecto) | 'texto', patron?, error?, opcional?, turnos?, sinLimiteInicial?}.
+  // Al terminar llama a alTerminar(respuestas) y devuelve lo que ella devuelva (o null si se cancela).
+  function preguntar(cab, qs, alTerminar){
     estilos();
     return new Promise(resolver => {
       const resp = {};
@@ -107,11 +114,13 @@ const EstadoPreguntas = (() => {
         const previo = q.clave in resp ? resp[q.clave] : undefined;
         const sinLimite = q.turnos && (previo === null || (previo === undefined && q.sinLimiteInicial));
         caja.innerHTML = `
-          <div class="ep-titulo">Estado alterado</div>
-          <div class="ep-estado">${esc(preset.nombre)}</div>
+          <div class="ep-titulo">${esc(cab.titulo)}</div>
+          <div class="ep-estado">${esc(cab.nombre)}</div>
           <div class="ep-pregunta">${esc(q.texto)}</div>
-          <input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número"
-            value="${previo !== undefined && previo !== null ? previo : ''}"${sinLimite ? ' disabled' : ''}>
+          ${q.tipo === 'texto'
+            ? `<input type="text" id="ep-valor" placeholder="${esc(q.placeholder || 'Escribí acá')}" value="${previo !== undefined && previo !== null ? esc(previo) : ''}" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:18px">`
+            : `<input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número"
+            value="${previo !== undefined && previo !== null ? previo : ''}"${sinLimite ? ' disabled' : ''}>`}
           ${q.turnos ? `<label class="ep-sin"><input type="checkbox" id="ep-sin"${sinLimite ? ' checked' : ''}> Sin límite (no vence: dura hasta que se lo saquen)</label>` : ''}
           <div class="ep-error" id="ep-error"></div>
           <div class="ep-fila">
@@ -127,13 +136,18 @@ const EstadoPreguntas = (() => {
         const avanzar = () => {
           const error = msg => { caja.querySelector('#ep-error').textContent = msg; if(!campo.disabled) campo.focus(); };
           if(sin && sin.checked) resp[q.clave] = null;
-          else{
+          else if(q.tipo === 'texto'){
+            const t = campo.value.trim();
+            if(!t && !q.opcional) return error('Escribí algo.');
+            if(t && q.patron && !q.patron.test(t)) return error(q.error || 'No es válido.');
+            resp[q.clave] = t;
+          }else{
             const v = Math.round(num(campo.value));
             if(campo.value.trim() === '' || !Number.isFinite(Number(campo.value))) return error('Escribí un número.');
             if(v < q.min) return error(`Tiene que ser ${q.min} o más.`);
             resp[q.clave] = v;
           }
-          if(ultimo) cerrar(aplicar(preset, resp, cfg)); else{ i++; dibujar(); }
+          if(ultimo) cerrar(alTerminar(resp)); else{ i++; dibujar(); }
         };
         caja.querySelector('#ep-siguiente').onclick = avanzar;
         caja.querySelector('#ep-cancelar').onclick = () => cerrar(null);
@@ -146,5 +160,5 @@ const EstadoPreguntas = (() => {
     });
   }
 
-  return {preguntas, chips, aplicar, pedir};
+  return {preguntas, chips, aplicar, pedir, preguntar};
 })();

@@ -167,7 +167,7 @@ function histEstilos(){
 #historial-panel .hp-cab button:hover{color:#E0A458;border-color:#C98545}
 #historial-panel .hp-lista{overflow-y:auto;padding:4px 0}
 #historial-panel .hp-fila{display:flex;gap:8px;padding:4px 10px;border-bottom:1px solid #221A1E;align-items:baseline}
-#historial-panel .hp-hora{flex:none;font:11px "Space Mono",monospace;color:#9A867E;width:46px}
+#historial-panel .hp-hora{flex:none;font:11px "Space Mono",monospace;color:#9A867E;min-width:40px;white-space:nowrap}
 #historial-panel .hp-quien{flex:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#E0A458;font-weight:700}
 #historial-panel .hp-texto{flex:1;min-width:0;word-break:break-word}
 #historial-panel .hp-baja{color:#E27B72}
@@ -184,7 +184,7 @@ html.hist-on .hero > div:first-child{padding-left:160px}`;
 function histHora(ts){
   const d = ts && ts.toDate ? ts.toDate() : new Date();
   const hoy = new Date().toDateString() === d.toDateString();
-  const hm = d.toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'});
+  const hm = d.toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit', hour12: false});
   return hoy ? hm : d.toLocaleDateString('es-AR', {day: '2-digit', month: '2-digit'}) + ' ' + hm;
 }
 

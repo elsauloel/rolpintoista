@@ -172,6 +172,23 @@ service cloud.firestore {
         }
       }
 
+      // Historial de acciones menores del GM (comun/historial.js, botón "📜 Historial"): cambios de HP/SP, estados y el reporte
+      // del Mantenimiento de los creeps. Lo escribe y lo lee solo el GM (mirando los datos de la partida, los jugadores no
+      // escriben nada); no se edita; lo borra el GM. {uid, jugador, quien, tipo:'vital'|'mant', texto, campo?, delta?, cuando}
+      match /historial/{id} {
+        allow read, delete: if esGM(c);
+        allow create: if esGM(c)
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'tipo', 'texto', 'campo', 'delta', 'cuando'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.tipo in ['vital', 'mant']
+          && request.resource.data.quien is string && request.resource.data.quien.size() <= 60
+          && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 500
+          && (!('campo' in request.resource.data) || (request.resource.data.campo is string && request.resource.data.campo.size() <= 10))
+          && (!('delta' in request.resource.data) || request.resource.data.delta is number)
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+      }
+
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)

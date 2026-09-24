@@ -89,6 +89,12 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   cada partida; `nombre` es el apodo elegido al unirse. `gm: true` solo lo
   puede tener quien creó la partida; nadie cambia `gm` después. Cada uno
   cambia su nombre o se va; el GM puede sacar a alguien.
+- `campanas/{id}/historial/{auto}` — `{uid, jugador, quien, tipo: 'vital'|'mant', texto, campo?, delta?, cuando}`
+  (2026-09-24). El "📜 Historial" del GM ([`../comun/historial.js`](../comun/historial.js)): cambios de HP y SP,
+  estados que aparecen o se terminan, y el reporte del Mantenimiento de los creeps. **Solo el GM lo lee, lo escribe
+  y lo borra**: lo escribe la página del GM mirando los datos (el `resumen` público de cada ficha y los creeps que le
+  pasan gm-tools y el mapa), así queda anotado venga de donde venga el cambio y los jugadores no escriben nada. Se
+  borra solo lo de más de 48 h. Si no hay ninguna página del GM abierta, no se anota nada. Ver `comun/historial.js`.
 - `campanas/{id}/tiradas/{auto}` — `{uid, jugador, quien, origen, formula,
   rolls[], mod, total, desde: 'ficha'|'gm', cuando, estilo?}`. `estilo` (opcional, texto JSON ≤300) es el estilo de dados 3D de quien tiró (color, número, borde, textura, material): los demás animan esa tirada con su color. Una por tirada. La
   publica `registrarTirada()` (ficha.html y gm-tools.html, vía

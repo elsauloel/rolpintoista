@@ -58,6 +58,7 @@ async function mesaLimpiezaAutomatica(){
 
 // Se llama cuando ya se entró a la partida: muestra 🗑 al GM y limpia lo viejo.
 function mesaHistorialAlEntrar(){
+  if(typeof historialAlEntrar === 'function') historialAlEntrar();   // 📜 Historial de acciones menores (solo GM, comun/historial.js)
   if(!fbMiembro || !fbMiembro.gm) return;
   document.querySelectorAll('.mesa-borrar').forEach(b => {
     b.hidden = false;

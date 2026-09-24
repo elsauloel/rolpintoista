@@ -893,6 +893,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
+<script src="../comun/historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/tiradas.js"></script>
@@ -5993,6 +5994,16 @@ async function cambiarVidaPj(t, clave, texto){
     tx.update(base, cambios);
   });
 }
+
+// 📜 Historial (comun/historial.js): cada segundo se le pasan los creeps con token para que anote cambios de HP y de estados.
+// Si gm-tools está abierto en otra pestaña, solo una de las dos registra (turno en localStorage).
+setInterval(() => {
+  if(!soyGM || typeof historialObservarCreeps !== 'function' || window.parent !== window) return;
+  historialObservarCreeps([...creepsPriv.entries()].filter(([, e]) => e && e.sc).map(([id, e]) => ({
+    id, nombre: e.sc.nombre, hp: e.sc.hp,
+    estados: (Array.isArray(e.sc.estados) ? e.sc.estados : []).filter(x => x && x.activo !== false && x.nombre).map(x => ({nombre: x.nombre, turnos: num(x.turnos)})),
+  })));
+}, 1000);
 
 function creepPrivadoDe(creepId){
   const e = creepsPriv.get(creepId);

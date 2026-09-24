@@ -1229,6 +1229,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/respaldo.js"></script>
 <script src="../comun/dados3d.js"></script>
 <script src="../comun/mesa-historial.js"></script>
+<script src="../comun/historial.js"></script>
 <script src="../comun/grilla-dados.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/tiradas.js"></script>
@@ -5770,6 +5771,9 @@ function mantenimiento(){
   let vencidos = 0;
   creepsReales().forEach(sc => {
     sc.ataquesTurno = 0;
+    // Reporte para el 📜 Historial del GM (2026-09-24): qué le pasó a este creep en el pase de turno, con el antes y el después.
+    const rep = [];
+    const terminoPorTurnos = new Set();
     sc.habilidades.forEach(h => {
       if(num(h.cdActual) > 0){
         h.cdActual = Math.max(0, num(h.cdActual) - 1);
@@ -5784,26 +5788,44 @@ function mantenimiento(){
       if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos ni stacks
       // Escudo mágico funciona como una barra de HP secundaria: se recarga
       // entera cada Mantenimiento mientras el estado siga activo.
-      if(num(es.escudoMagico) > 0) es.escudoMagicoActual = num(es.escudoMagico);
+      if(num(es.escudoMagico) > 0){
+        const previo = num(es.escudoMagicoActual ?? es.escudoMagico);
+        if(previo < num(es.escudoMagico)) rep.push(`${es.nombre}: escudo mágico ${fmt(previo)} → ${fmt(num(es.escudoMagico))}`);
+        es.escudoMagicoActual = num(es.escudoMagico);
+      }
       const stacks = Math.max(1, num(es.stacks) || 1);
       let cambio = num(es.hpTurno) * stacks;
-      if(cambio < 0 && (esInvulnerableMant || (es.esVeneno && inmuneVenenoMant) || (es.esSangrado && inmuneSangradoMant))) cambio = 0;
+      if(cambio < 0 && (esInvulnerableMant || (es.esVeneno && inmuneVenenoMant) || (es.esSangrado && inmuneSangradoMant))){
+        rep.push(`${es.nombre}: no le hizo efecto (inmunidad)`);
+        cambio = 0;
+      }
       if(cambio){
         sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + cambio));
         hpAplicado++;
+        rep.push(`${es.nombre}: ${cambio > 0 ? '+' : '−'}${fmt(Math.abs(cambio))} HP${stacks > 1 ? ` (${fmt(stacks)} stacks)` : ''}`);
       }
       const ds = num(es.stacksTurno);
-      if(ds) es.stacks = Math.max(0, stacks + ds);
-      if(!es.permanente && num(es.turnos) > 0) es.turnos = Math.max(0, num(es.turnos) - 1);
+      if(ds){
+        es.stacks = Math.max(0, stacks + ds);
+        rep.push(`${es.nombre}: stacks ${fmt(stacks)} → ${fmt(es.stacks)}`);
+      }
+      if(!es.permanente && num(es.turnos) > 0){
+        const turnosAntes = num(es.turnos);
+        es.turnos = Math.max(0, turnosAntes - 1);
+        rep.push(es.turnos > 0 ? `${es.nombre}: ${fmt(turnosAntes)} → ${fmt(es.turnos)} turno${es.turnos === 1 ? '' : 's'}` : `${es.nombre}: ${fmt(turnosAntes)} → 0 turnos, se terminó`);
+        if(es.turnos === 0) terminoPorTurnos.add(es.id);
+      }
     });
     const antes = sc.estados.length;
     const sigue = es => es.activo === false || (es.permanente ? num(es.stacks) !== 0 : (es.turnos > 0 && num(es.stacks) !== 0));
     const vencenConHp = sc.estados.some(es => !sigue(es) && modsAfectanHp(es.mods));
+    sc.estados.filter(es => !sigue(es) && es.activo !== false && !terminoPorTurnos.has(es.id)).forEach(es => rep.push(`${es.nombre}: se terminó`));
     sc.estados = sc.estados.filter(sigue);
     if(vencenConHp) actualizarHpMaxPorCon(sc);
     vencidos += antes - sc.estados.length;
     // Se recargan después de los estados: un Stun que venció ya no los topea.
     sc.nitros = creepNitrosMax(sc);
+    if(rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(sc.nombre, rep);
   });
   renderAll();
   const detalle = [
@@ -7672,6 +7694,12 @@ async function gmMantenimientoRevisar(){
     if(gmMantenimientoOtraVez){ gmMantenimientoOtraVez = false; gmMantenimientoRevisar(); }
   }
 }
+
+// 📜 Historial (comun/historial.js): cada segundo se le pasa la lista de creeps para que anote cambios de HP y de estados.
+setInterval(() => {
+  if(typeof historialObservarCreeps !== 'function' || !gmVivo || !gmVivo.listo || !fbMiembro || !fbMiembro.gm || window.parent !== window) return;
+  historialObservarCreeps(creepsReales().map(sc => ({id: sc.id, nombre: sc.nombre, hp: sc.hp, estados: (sc.estados || []).filter(e => e && e.activo !== false).map(e => ({nombre: e.nombre, turnos: num(e.turnos)}))})));
+}, 1000);
 
 mesaIniciar(gmAlEntrar);
 </script>

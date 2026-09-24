@@ -966,7 +966,7 @@ $('#btn-borrar-definitivo').onclick = async () => {
       for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));
       await borrarDocumentos(snap.docs.map(d => d.ref));
     }
-    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas']]){
+    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['historial', 'historial del GM'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas']]){
       estado(`Borrando ${texto}…`);
       await borrarDocumentos((await base.collection(col).get()).docs.map(d => d.ref));
     }

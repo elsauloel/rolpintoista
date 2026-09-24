@@ -761,8 +761,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
           </div>
         </div>
       </div>
-      <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza): ver tu área alrededor tuyo. Apretá de vuelta para apagarlo. (R)">📏</button>
-      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial): ver tu área alrededor tuyo. Apretá de vuelta para apagarlo. (Shift + R)">🔮</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza) del token seleccionado. Apretá de vuelta para apagarlo. (R)">📏</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial) del token seleccionado. Apretá de vuelta para apagarlo. (Shift + R)">🔮</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -1640,9 +1640,31 @@ function renderBotonesRango(){
   if(b1) b1.classList.toggle('activo', rangoActivo);
   if(b2) b2.classList.toggle('activo', rangoMagicoActivo);
 }
+// Rango (Destreza) y Rango de casteo (Especial) de un token: los de un personaje salen de su ficha (resumen.rng/rangocasteo);
+// los de un creep, solo para el GM, de su Destreza y Especial más lo que los sube. null = no se sabe (invocación, todavía sin leer…).
+function rangoDeToken(t){
+  if(!t || !t.fichaId) return null;
+  if(t.tipo === 'creep'){
+    const sc = creepPrivadoDe(t.fichaId);
+    if(!sc) return null;
+    return {rng: num(sc.des) + creepModTotalMapa(sc, 'des') + creepModTotalMapa(sc, 'rng'), casteo: num(sc.esp) + creepModTotalMapa(sc, 'esp') + creepModTotalMapa(sc, 'rangocasteo')};
+  }
+  if(t.fichaId.includes(SEP_INVOCACION)) return null;
+  const f = fichasPub.get(t.fichaId);
+  return f && f.resumen ? {rng: num(f.resumen.rng), casteo: num(f.resumen.rangocasteo)} : null;
+}
+// R / Shift+R (o los botones 📏 🔮): muestran el rango del TOKEN SELECCIONADO (2026-09-24, cambio pedido por el dueño: antes
+// buscaba "tu" personaje y al GM no le mostraba nada). Sin token seleccionado avisa "Seleccioná un token". Prendido, sigue a
+// la selección: si elegís otro token, muestra el de ese.
 function alternarRango(magico){
+  const activo = magico ? rangoMagicoActivo : rangoActivo;
+  if(!activo){
+    const t = seleccion ? tokens.get(seleccion) : null;
+    if(!t){ toast('Seleccioná un token para ver su rango'); return; }
+    const r = rangoDeToken(t);
+    if(!r || !((magico ? r.casteo : r.rng) > 0)){ toast(`${nombreDe(t)} no tiene ${magico ? 'rango de casteo' : 'rango'} para mostrar`); return; }
+  }
   if(magico) rangoMagicoActivo = !rangoMagicoActivo; else rangoActivo = !rangoActivo;
-  if((magico ? rangoMagicoActivo : rangoActivo) && !miTokenPrincipal()) toast('No tenés un token tuyo en este mapa: no hay dónde mostrar el rango');
   renderBotonesRango();
   pedirDibujo();
 }
@@ -3515,11 +3537,11 @@ function dibujar(){
 
   // 📏🔮 Visualizador de rango: el área alrededor de tu propio token (nada de esto se guarda ni lo ven los demás).
   if(rangoActivo || rangoMagicoActivo){
-    const mt = miTokenPrincipal();
-    const f = mt && fichasPub.get(mt.fichaId);
-    if(mt && f && f.resumen){
-      if(rangoActivo && num(f.resumen.rng) > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(num(f.resumen.rng))), color: '#4FA8D8'}, z);
-      if(rangoMagicoActivo && num(f.resumen.rangocasteo) > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(num(f.resumen.rangocasteo))), color: '#9B7BD4'}, z);
+    const mt = seleccion ? tokens.get(seleccion) : null;   // el rango es del token seleccionado
+    const rr = mt && rangoDeToken(mt);
+    if(mt && rr){
+      if(rangoActivo && rr.rng > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(rr.rng)), color: '#4FA8D8'}, z);
+      if(rangoMagicoActivo && rr.casteo > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(rr.casteo)), color: '#9B7BD4'}, z);
     }
   }
 

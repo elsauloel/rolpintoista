@@ -9676,6 +9676,11 @@ function mantenimiento(){
   const log = [];
   let hpDelta = 0;
   const vencidos = [];
+  // Reporte para la Mesa (2026-09-24): lo que le pasó a este personaje en el pase de turno, en texto llano y con el antes y el
+  // después, para que todos vean si el veneno bajó, si la regeneración curó, etc. Se publica al final (mesaPublicarReporte).
+  const rep = [];
+  const terminados = new Set();
+  const hpAntes = num(S.hp);
 
   const efectosActivosMant = S.efectos.filter(e => e.activo !== false);
   const esInvulnerable = efectosActivosMant.some(e => e.invulnerable);
@@ -9690,31 +9695,44 @@ function mantenimiento(){
     // entera cada Mantenimiento mientras el estado siga activo.
     if(num(e.escudoMagico) > 0){
       const actual = num(e.escudoMagicoActual ?? e.escudoMagico);
-      if(actual < num(e.escudoMagico)) log.push(`<b>${esc(e.nombre)}</b> escudo recargado a ${fmt(num(e.escudoMagico))}`);
+      if(actual < num(e.escudoMagico)){
+        log.push(`<b>${esc(e.nombre)}</b> escudo recargado a ${fmt(num(e.escudoMagico))}`);
+        rep.push(`${e.nombre}: escudo mágico ${fmt(actual)} → ${fmt(num(e.escudoMagico))}`);
+      }
       e.escudoMagicoActual = num(e.escudoMagico);
     }
 
     let hp = num(e.hpturno) * stacks;
     if(hp < 0 && (esInvulnerable || (e.esVeneno && inmuneVenenoMant) || (e.esSangrado && inmuneSangradoMant))){
       log.push(`<b>${esc(e.nombre)}</b> <span class="heal">bloqueado por inmunidad</span>`);
+      rep.push(`${e.nombre}: no le hizo efecto (inmunidad)`);
       hp = 0;
     }
     if(hp){
       hpDelta += hp;
       log.push(`<b>${esc(e.nombre)}</b> <span class="${hp<0?'dmg':'heal'}">${hp>0?'+':''}${fmt(hp)} HP</span>`);
+      rep.push(`${e.nombre}: ${hp > 0 ? '+' : '−'}${fmt(Math.abs(hp))} HP${stacks > 1 ? ` (${fmt(stacks)} stacks)` : ''}`);
     }
 
     const ds = num(e.stacksturno);
     if(ds){
       e.stacks = Math.max(0, stacks + ds);
       log.push(`<b>${esc(e.nombre)}</b> stacks ${fmt(stacks)} &rarr; ${fmt(e.stacks)}`);
-      if(e.stacks === 0) vencidos.push(e.id);
+      rep.push(`${e.nombre}: stacks ${fmt(stacks)} → ${fmt(e.stacks)}`);
+      if(e.stacks === 0){ vencidos.push(e.id); terminados.add(e.id); rep.push(`${e.nombre}: se terminó`); }
     }
 
     if(!e.permanente && num(e.turnos) > 0){
-      e.turnos = num(e.turnos) - 1;
-      if(e.turnos === 0) vencidos.push(e.id);
-      else log.push(`<b>${esc(e.nombre)}</b> quedan ${fmt(e.turnos)}`);
+      const turnosAntes = num(e.turnos);
+      e.turnos = turnosAntes - 1;
+      if(e.turnos === 0){
+        if(!terminados.has(e.id)) rep.push(`${e.nombre}: ${fmt(turnosAntes)} → 0 turnos, se terminó`);
+        terminados.add(e.id);
+        vencidos.push(e.id);
+      }else{
+        log.push(`<b>${esc(e.nombre)}</b> quedan ${fmt(e.turnos)}`);
+        rep.push(`${e.nombre}: ${fmt(turnosAntes)} → ${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'}`);
+      }
     }
   });
 
@@ -9724,6 +9742,7 @@ function mantenimiento(){
     if(hp > 0 && num(S.hp) > 0){
       hpDelta += hp;
       log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(hp)} HP</span>`);
+      rep.push(`${p.nombre} (pasiva): +${fmt(hp)} HP`);
     }
   });
 
@@ -9731,6 +9750,8 @@ function mantenimiento(){
     // Pasa por fijarHp para que el veneno que te deja en 0 active el Ankh
     // antes de que se descuenten los turnos de muerte, más abajo.
     fijarHp(num(S.hp) + hpDelta);
+    if(num(S.hp) !== hpAntes) rep.push(`HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}`);
+    else rep.push(`HP total: sigue en ${fmt(hpAntes)}`);
   }
 
   if(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0){
@@ -9738,15 +9759,17 @@ function mantenimiento(){
     if(S.muerto.turnos === 0){
       S.muerto.definitivo = true;
       log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
+      rep.push('Murió: ya no hay vuelta atrás');
     }else{
       log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
+      rep.push(`Inconsciente: muere en ${fmt(S.muerto.turnos)} turno${S.muerto.turnos === 1 ? '' : 's'}`);
     }
     renderOverlayMuerte();
   }
 
   if(vencidos.length){
     S.efectos.filter(e => vencidos.includes(e.id))
-      .forEach(e => log.push(`<span class="gone">${esc(e.nombre)} se termin&oacute;</span>`));
+      .forEach(e => { log.push(`<span class="gone">${esc(e.nombre)} se termin&oacute;</span>`); if(!terminados.has(e.id)) rep.push(`${e.nombre}: se terminó`); });
     S.efectos = S.efectos.filter(e => !vencidos.includes(e.id));
   }
 
@@ -9757,7 +9780,10 @@ function mantenimiento(){
   // máximo (si ya estaba por encima, no se toca).
   const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
   const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
-  if(spRecuperado) S.spGastado = num(S.spGastado) - spRecuperado;
+  if(spRecuperado){
+    S.spGastado = num(S.spGastado) - spRecuperado;
+    rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
+  }
   S.nitros = nitrosMaximo();
   S.ataquesTurno = 0;
   S.ataquesArma = {};
@@ -9801,6 +9827,7 @@ function mantenimiento(){
   log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
   log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
   S.log = log;
+  mesaPublicarReporte(`Turno ${S.turno}`, rep);
 
   renderTurno();
   renderList('efectos');
@@ -9839,6 +9866,18 @@ function mesaPublicarHabilidad(nombre, detalle){
     rolls: [], mod: 0, total: 0, desde: 'habilidad',
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
+}
+
+// Reporte del Mantenimiento de este personaje a la Mesa (todos lo ven): una línea con un renglón por cosa que pasó. Si no pasó
+// nada que valga la pena contar, no se publica nada.
+function mesaPublicarReporte(titulo, lineas){
+  if(!lineas || !lineas.length || !fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: mesaQuien(),
+    origen: String(titulo || '').slice(0, 60), formula: lineas.join('\n').slice(0, 900),
+    rolls: [], mod: 0, total: 0, desde: 'reporte',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar el reporte del Mantenimiento:', err));
 }
 
 function publicarRecordatorios(avisos){

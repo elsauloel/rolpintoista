@@ -5000,7 +5000,7 @@ function cerrarGirosLibres(exceptoId){
 // Llega una tirada nueva a la Mesa (comun/mesa.js): un ataque, una habilidad, una tirada
 // cualquiera cuenta como acción; los avisos del sistema (sigilo, alerta, turno) no.
 function mesaAlAccionNueva(docs){
-  if(docs.some(d => !['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento'].includes(d.data().desde))) giroLibre.clear();
+  if(docs.some(d => !['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento', 'reporte'].includes(d.data().desde))) giroLibre.clear();
 }
 function abrirGiroLibre(id, celdas){
   // Desde 2026-09-24 girar no cuesta No2 (COSTO_GIRO_NO2 = 0): ya no hace falta abrir un "giro gratis" después de moverse.

@@ -174,7 +174,7 @@ function mesaRender(docs){
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa"].includes(d.data().desde));
+  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte"].includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
   // Resumen de esa misma última tirada: solo existe en la Mesa flotante
   // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
@@ -225,6 +225,18 @@ function mesaRender(docs){
       const div = document.createElement('div');
       div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
       div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Reporte del Mantenimiento de un personaje (2026-09-24): qué le pasó en el pase de turno (veneno, regeneración, estados
+    // que se terminan…). `origen` = título, `formula` = una línea por renglón.
+    if(t.desde === 'reporte'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-turno' + (nueva ? ' nueva' : '');
+      const lineas = String(t.formula || '').split('\n').filter(Boolean);
+      div.innerHTML = `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.quien || t.jugador || '?')}</span> <span class="mesa-usuario">${esc(t.origen)}</span>` +
+        lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('');
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

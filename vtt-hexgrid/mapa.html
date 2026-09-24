@@ -495,6 +495,8 @@ aside{
 .ini-quitar{color:var(--muted);font-size:12px;line-height:1;padding:0 2px;cursor:pointer}
 .ini-quitar:hover{color:var(--danger)}
 .ini-quitar[data-ini-ocultar]:hover{color:var(--brass)}
+.ini-quitar[data-ini-subir]:hover,.ini-quitar[data-ini-bajar]:hover{color:var(--brass)}
+.ini-quitar:disabled{opacity:.25;cursor:default;color:var(--muted)}
 #iniciativa-pie{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border-top:1px solid var(--line-soft)}
 #iniciativa-pie .btn{font-size:10px;padding:5px 8px}
 #iniciativa-vacio{padding:8px 10px;color:var(--muted)}
@@ -2627,6 +2629,73 @@ function iniciativaPonerTodos(){
   guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0});
 }
 
+// Mover a mano una fila del orden de turnos (▲ ▼, solo GM): para cuando algo del juego cambia a alguien de lugar. El turno
+// sigue con quien lo tenía (si el que se mueve es el que tiene el turno, el turno se va con él).
+function iniciativaMover(id, delta){
+  if(!soyGM) return;
+  const orden = iniciativa.orden.slice();
+  const i = orden.findIndex(o => o.id === id), j = i + delta;
+  if(i < 0 || j < 0 || j >= orden.length) return;
+  const activo = orden[iniciativa.turno] ? orden[iniciativa.turno].id : null;
+  [orden[i], orden[j]] = [orden[j], orden[i]];
+  const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
+  guardarIniciativa({orden, turno});
+}
+
+// Suma de los modificadores de un stat de un creep (equipo puesto, arma y estados activos): mismo criterio que gm-tools.
+function creepModTotalMapa(sc, statId){
+  let total = 0;
+  const fuentes = [...(sc.equipo || []), ...((sc.armaMods || []).length ? [{mods: sc.armaMods}] : [])];
+  fuentes.forEach(it => (it.mods || []).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+  (sc.estados || []).forEach(es => {
+    if(es.activo === false) return;
+    const stacks = Math.max(1, num(es.stacks) || 1);
+    (es.mods || []).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
+  });
+  return total;
+}
+// Iniciativa de un creep: Agilidad + lo que la sube (Agilidad o Iniciativa directa). null si todavía no se leyó el creep.
+function creepIniMapa(sc){
+  if(!sc) return null;
+  return num(sc.agl) + creepModTotalMapa(sc, 'agl') + creepModTotalMapa(sc, 'ini');
+}
+
+// 🎲 Tirar iniciativa (2026-09-24, pedido del dueño): un jugador tira la de sus personajes; el GM, la de todos los creeps de la
+// lista. El resultado se carga solo junto al nombre (no agrega ni saca filas: los tokens los trae el GM con "Traer tokens").
+// La tirada de un jugador queda en la Mesa; las de los creeps no, para no mostrar a los jugadores creeps que no ven (queda un aviso).
+async function iniciativaTirar(){
+  if(!fbMiembro) return;
+  const enLista = new Set(iniciativa.orden.map(o => o.id));
+  const propios = [...tokens.entries()].filter(([id, t]) => enLista.has(id) && (soyGM
+    ? t.tipo === 'creep'
+    : t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && t.fichaId && !t.fichaId.includes(SEP_INVOCACION)));
+  if(!propios.length){
+    toast(soyGM ? 'No hay creeps en la lista: tocá "Traer tokens" primero' : 'Tu personaje no está en la lista de turnos: pedile al GM que toque "Traer tokens"');
+    return;
+  }
+  const nuevos = new Map(), sinDato = [];
+  for(const [id, t] of propios){
+    const base = t.tipo === 'creep' ? creepIniMapa(creepPrivadoDe(t.fichaId)) : (() => { const f = fichasPub.get(t.fichaId); const r = f && f.resumen; return r && r.ini !== undefined ? num(r.ini) : null; })();
+    if(base === null){ sinDato.push(nombreDe(t)); continue; }
+    const fo = formulaParaValor(base);
+    const r = (fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0};
+    nuevos.set(id, r.total);
+    if(!soyGM) mesaPublicar(`Iniciativa · ${nombreDe(t)}`, r);
+  }
+  if(sinDato.length) toast(soyGM ? `Sin datos de: ${sinDato.join(', ')}` : 'Abrí tu ficha una vez para que se publique tu Iniciativa y volvé a tirar');
+  if(!nuevos.size) return;
+  await guardarIniciativa({orden: iniciativa.orden.map(o => nuevos.has(o.id) ? {...o, valor: nuevos.get(o.id)} : o)});
+  if(soyGM){
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: 'Orden de turnos · el GM tiró la iniciativa de los creeps',
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){ console.error('No se pudo avisar la iniciativa de los creeps en la Mesa:', err); }
+  }
+}
+let iniResaltado = null;   // {id, hasta}: el token al que se llegó desde la lista de turnos
+
 function iniciativaSiguiente(){
   if(!iniciativa.orden.length) return;
   const siguiente = iniciativa.turno + 1;
@@ -2678,16 +2747,18 @@ function renderIniciativa(){
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
+        (soyGM ? `<button type="button" class="ini-quitar" data-ini-subir="${esc(o.id)}" title="Subir un lugar en el orden"${i === 0 ? ' disabled' : ''}>▲</button><button type="button" class="ini-quitar" data-ini-bajar="${esc(o.id)}" title="Bajar un lugar en el orden"${i === iniciativa.orden.length - 1 ? ' disabled' : ''}>▼</button>` : '') +
         (soyGM ? `<button type="button" class="ini-quitar" data-ini-ocultar="${esc(o.id)}" title="${o.oculto ? 'Mostrarlo a los jugadores en la lista' : 'Ocultarlo a los jugadores en la lista'}">${o.oculto ? '🙈' : '👁'}</button><button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
       '</div>';
     }).join('');
   }
   $('#iniciativa-pie').innerHTML = soyGM
     ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +
+      '<button type="button" class="btn" id="ini-tirar" title="Tirar la iniciativa de todos los creeps de la lista y cargarla junto a cada nombre">🎲 Tirar iniciativa</button>' +
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
       '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>' +
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>'
-    : '';
+    : (fbMiembro ? '<button type="button" class="btn primary" id="ini-tirar" title="Tirar la iniciativa de tu personaje y cargarla junto a su nombre">🎲 Tirar iniciativa</button>' : '');
   conectarIniciativa();
   iniciativaEncuadrar();
 }
@@ -2696,10 +2767,20 @@ function conectarIniciativa(){
   const caja = $('#iniciativa');
   caja.querySelectorAll('[data-ini-fila]').forEach(f => f.onclick = e => {
     if(e.target.closest('input,button')) return;
-    seleccionar(f.dataset.iniFila);
-    const t = tokens.get(f.dataset.iniFila);
+    // Se selecciona el token igual que si se hubiera hecho clic sobre él (se despliega su menú alrededor), se centra la vista y
+    // un anillo pulsante lo marca unos segundos, para que quede clarísimo cuál es el token de ese nombre (2026-09-24).
+    const id = f.dataset.iniFila;
+    seleccionar(id);
+    hudCerrar();
+    const t = tokens.get(id);
     if(t) centrarEn(hexCentro(t.col, t.fila).x, hexCentro(t.col, t.fila).y);
+    iniResaltado = {id, hasta: Date.now() + 3000};
+    pedirDibujo();
   });
+  caja.querySelectorAll('[data-ini-subir]').forEach(b => b.onclick = () => iniciativaMover(b.dataset.iniSubir, -1));
+  caja.querySelectorAll('[data-ini-bajar]').forEach(b => b.onclick = () => iniciativaMover(b.dataset.iniBajar, 1));
+  const tirar = $('#ini-tirar');
+  if(tirar) tirar.onclick = iniciativaTirar;
   caja.querySelectorAll('[data-ini-valor]').forEach(inp => {
     inp.onchange = () => {
       const id = inp.dataset.iniValor;
@@ -3707,6 +3788,24 @@ function dibujar(){
     ctx.fillText(nombreMiembro(p.duenoUid), p.x, p.y - radio - 10 / z);
     ctx.restore();
   });
+
+  // Anillo pulsante sobre el token al que se llegó desde la lista de turnos (unos segundos).
+  if(iniResaltado){
+    const restante = iniResaltado.hasta - Date.now();
+    const tk = tokens.get(iniResaltado.id);
+    if(restante <= 0 || !tk){ iniResaltado = null; }
+    else{
+      const v = visibles.get(iniResaltado.id) || hexCentro(tk.col, tk.fila);
+      const pulso = 0.5 + 0.5 * Math.sin(Date.now() / 140);
+      const alfa = Math.min(1, restante / 700);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(v.x, v.y, HEX * (0.95 + 0.18 * pulso), 0, 2 * Math.PI);
+      ctx.strokeStyle = `rgba(15,8,10,${0.7 * alfa})`; ctx.lineWidth = 9 / z; ctx.stroke();
+      ctx.strokeStyle = `rgba(255,214,110,${alfa})`; ctx.lineWidth = 5 / z; ctx.stroke();
+      ctx.restore();
+      animando = true;
+    }
+  }
 
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
   // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).

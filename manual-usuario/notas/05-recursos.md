@@ -47,7 +47,7 @@ estado: confirmado
 > Hasta la Iteración 2 este recurso se llamaba **Bonos**. Si lo ves en material viejo, es lo mismo que SP. → [[Historial de versiones]]
 
 ## El sobrepeso lo baja
-Si el peso de tu equipo supera tu [[Carga máxima]], **por cada punto que te pasás perdés 1 de SP máximo**.
+Si el peso de tu equipo supera tu [[Carga máxima]], tenés el estado alterado **Sobrepeso**: **por cada punto que te pasás restás 1 a la Evasión** cuando la tirás. Antes de tirar, el juego te pregunta si querés **pagar 1 No2** para evitar esa penalidad en esa tirada. *(Regla en prueba, 2026-09-24; antes se perdía SP máximo.)*
 
 > [!question] Piso del sobrepeso
 > ¿Se puede llegar a 0 de SP por sobrepeso? ¿La penalidad afecta solo al SP, o también al movimiento?

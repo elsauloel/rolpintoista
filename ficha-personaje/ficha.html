@@ -1856,6 +1856,20 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-sobrepeso">
+  <div class="modal" style="max-width:440px">
+    <header><h3>Tenés sobrepeso</h3><button class="iconbtn" id="sobrepeso-x">Cancelar</button></header>
+    <div class="body">
+      <p id="sobrepeso-texto" style="margin:0 0 8px"></p>
+      <p class="hint" style="margin:0">Regla en prueba: por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada.</p>
+    </div>
+    <footer style="flex-wrap:wrap;gap:8px">
+      <button class="btn" id="sobrepeso-penal"></button>
+      <button class="btn primary" id="sobrepeso-pagar">Pagar 1 No2 y tirar sin penalidad</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-slot-lleno">
   <div class="modal" style="max-width:460px">
     <header><h3>Slot equipado</h3><button class="iconbtn" id="slot-lleno-x">Cerrar</button></header>
@@ -3670,7 +3684,7 @@ function renderVitals(){
   $('#v-spmax-vital').textContent = fmt(spMax);
   $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
   $('#equipo-over').innerHTML = c.sobrecarga > 0
-    ? `Te pasás por ${fmt(c.sobrecarga)}.${IT2.penalidadSobrecargaDefinida ? '' : ` ${IT2_PENDIENTE('la penalidad por sobrecarga todavía no está definida (antes restaba de Bonos)')}`}` : '';
+    ? `Te pasás por ${fmt(c.sobrecarga)}: −${fmt(c.sobrecarga)} a la Evasión al tirarla, o pagás 1 No2 para evitarlo. ${IT2_PENDIENTE('regla de sobrepeso en prueba')}` : '';
 }
 
 function spMaximo(c){
@@ -4045,9 +4059,40 @@ function estadosQueAfectanStat(statId, conVentaja){
   return out;
 }
 
-function tirarValorStat(nombre, valor, statId, extra){
+// Sobrepeso (regla en prueba, 2026-09-24): con el equipo pasado de Crg.Max, cada punto de más resta 1 a la Evasión al tirarla, salvo que
+// se pague 1 No2. Al tirar Evasión aparece un pop-up para elegir; el estado "Sobrepeso" se ve entre los estados alterados (derivado).
+let sobrepesoPendiente = null;
+function cerrarSobrepeso(){ sobrepesoPendiente = null; $('#scrim-sobrepeso').classList.remove('open'); }
+function sobrepesoElegir(pagar){
+  const p = sobrepesoPendiente; if(!p) return;
+  if(pagar){
+    if(num(S.nitros) < 1){ toast('No tenés Nitros para pagar: tirá con la penalidad o cancelá'); return; }
+    S.nitros = num(S.nitros) - 1;
+    renderNitros(); refresh();
+  }
+  cerrarSobrepeso();
+  tirarValorStat(p.nombre, p.valor, 'eva', p.extra, pagar ? 'pagado' : 'penal', p.sobre);
+}
+$('#sobrepeso-x').onclick = cerrarSobrepeso;
+$('#scrim-sobrepeso').addEventListener('mousedown', e => { if(e.target.id === 'scrim-sobrepeso') cerrarSobrepeso(); });
+$('#sobrepeso-pagar').onclick = () => sobrepesoElegir(true);
+$('#sobrepeso-penal').onclick = () => sobrepesoElegir(false);
+
+function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+  if(statId === 'eva' && !sobrepeso){
+    const s = compute().sobrecarga;
+    if(s > 0){
+      sobrepesoPendiente = {nombre, valor, extra, sobre: s};
+      $('#sobrepeso-texto').innerHTML = `Tu equipo pesa <b>${fmt(s)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(s)}</b>? (tenés ${fmt(Math.max(0, num(S.nitros)))} No2)`;
+      $('#sobrepeso-penal').textContent = `Tirar con −${fmt(s)}`;
+      $('#sobrepeso-pagar').disabled = num(S.nitros) < 1;
+      $('#scrim-sobrepeso').classList.add('open');
+      return;
+    }
+  }
+  if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
   const conVentaja = ['pdg','parry','eva'].includes(statId) &&
     (S.efectos||[]).some(e => e.activo !== false && e.afortunado);
   const tirar = () => {
@@ -4061,6 +4106,8 @@ function tirarValorStat(nombre, valor, statId, extra){
   }
   const ex = num(extra);   // bono plano que no cambia los dados (ej. peso del arma en el Bloqueo)
   const estados = statId ? estadosQueAfectanStat(statId, conVentaja) : [];
+  if(sobrepeso === 'penal') estados.push({n: 'Sobrepeso', p: 'debuff'});
+  else if(sobrepeso === 'pagado') estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
   const r = {formula: f.formula + (ex ? `+${ex}` : ''), rolls: intento.rolls, mod: f.mod + ex, total: intento.total + ex, estados};
   registrarTirada(nombre, r);
 }
@@ -5085,8 +5132,8 @@ const LISTS = {
         // De una pasiva: solo lectura (sin pausar ni abrir el editor).
         return `<div class="ef-chip de-equipo${i.detalle ? ' con-tip' : ''}"${i.detalle ? ` data-tip="${esc(i.detalle)}"` : ''}>
         <span class="ef-chip-cuerpo" style="cursor:help"><span class="ef-chip-nombre">${esc(i.nombre)}</span>
-          <span class="ef-chip-datos">∞ · +${fmt(num(i.hpturno))} HP</span></span>
-        <span class="ef-chip-equipo" title="Viene de una pasiva: se va si la sacás">✦</span>
+          <span class="ef-chip-datos">${i.sobrepeso ? `−${fmt(i.sobrepeso)} Eva` : `∞ · +${fmt(num(i.hpturno))} HP`}</span></span>
+        <span class="ef-chip-equipo" title="${i.sobrepeso ? 'Sale del peso de tu equipo: se va al sacarte equipo' : 'Viene de una pasiva: se va si la sacás'}">${i.sobrepeso ? '⚖' : '✦'}</span>
       </div>`;
       }
       const st = Math.max(1, num(i.stacks)||1);
@@ -5126,7 +5173,14 @@ function estadosDePasivas(){
       detalle: `Viene de tu pasiva "${p.nombre}": recupera ${fmt(hp)} HP en cada Mantenimiento.`};
   });
 }
-const estadosTodos = () => [...(S.efectos || []), ...estadosDePasivas()];
+// Sobrepeso: estado derivado (no se guarda): aparece solo mientras el equipo pasa la Crg.Max. La penalidad se decide al tirar Evasión.
+function estadoSobrepeso(){
+  const s = compute().sobrecarga;
+  if(!(s > 0)) return [];
+  return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
+    detalle: `Tu equipo pesa ${fmt(s)} de más: al tirar Evasión restás ${fmt(s)}, salvo que pagues 1 No2 para evitarlo.`}];
+}
+const estadosTodos = () => [...(S.efectos || []), ...estadosDePasivas(), ...estadoSobrepeso()];
 
 function renderList(key){
   const el = $('#list-'+key);

@@ -360,3 +360,7 @@ y la última posición vista se calculan en cada navegador y no se guardan.
   `trampaDetalle` (≤200) y `disparada` (bool). Las crea y edita su dueño o el GM; un
   rival que la pisa puede cambiar **solo** `disparada` a `true`. Hay que publicar
   las reglas nuevas.
+
+
+### Colisión del mapa (`elementos`, 2026-09-24)
+`campanas/{id}/elementos` (y `mapas/{id}/elementos`) aceptan el campo opcional `colision: bool`; solo el GM lo puede crear en `true`. Son formas libres sólidas y fijadas; el mapa las fusiona al pintarlas y dibuja un único contorno visible para todos. Ver `vtt-hexgrid/CLAUDE.md`, "Colisión del mapa".

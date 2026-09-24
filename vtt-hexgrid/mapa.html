@@ -1130,6 +1130,7 @@ try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(
 const elementos = new Map();  // id -> {tipo, origen, celdas:[{dq,dr}], rotacion, color, alfa, solido, invisible, imagen, imgZoom, imgDX, imgDY, fijado, duenoUid}
 let elementoSeleccionado = null;
 let dibujandoElemento = null;  // {tipo, origen:{col,fila}, celdas:Map("dq,dr"->{dq,dr})} mientras se arma
+let pintandoColision = null;   // {borrar, celdas:Map("col,fila"->{col,fila}), ultima} mientras el GM pinta o borra casilleros de Colisión
 // Lo ya dibujado que espera consolidarse (mismo formato): mientras tanto se
 // ajustan color, opacidad, etc. en el panel y se ve en vivo. Se crea de
 // verdad con un clic en otro lado del mapa, Enter, "✔ Crear" o al salir de
@@ -3009,8 +3010,10 @@ function dibujar(){
   const filaMin = Math.floor(a.y / (SQ3 * HEX)) - 1, filaMax = Math.ceil(b.y / (SQ3 * HEX)) + 1;
   const colMin = Math.floor(a.x / (1.5 * HEX)) - 1, colMax = Math.ceil(b.x / (1.5 * HEX)) + 1;
   ctx.beginPath();
+  const sinGrilla = colisionInfo().set;   // adentro de la Colisión no se dibujan las líneas de la grilla
   for(let f = filaMin; f <= filaMax; f++){
     for(let c = colMin; c <= colMax; c++){
+      if(sinGrilla.size && sinGrilla.has(c + ',' + f)) continue;
       const p = hexCentro(c, f);
       trazarHex(p.x, p.y);
     }
@@ -3060,9 +3063,28 @@ function dibujar(){
       imagen: elemImagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, duenoUid: fbUsuario.uid,
     }]);
   }
+  // Colisión: un solo contorno alrededor de todas las casillas pegadas (fusionadas), visible para todos.
+  const colI = colisionInfo();
+  if(colI.celdas.length){
+    trazarCeldas(colI.celdas);
+    ctx.fillStyle = 'rgba(216,82,75,.10)'; ctx.fill();
+    bordeCeldas(colI.celdas);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(15,8,10,.6)'; ctx.lineWidth = 6 / z; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,92,72,.95)'; ctx.lineWidth = 3 / z; ctx.stroke();
+  }
+  // Lo que el GM está pintando (o borrando) ahora mismo con la Colisión.
+  if(pintandoColision && pintandoColision.celdas.size){
+    const lista = [...pintandoColision.celdas.values()];
+    trazarCeldas(lista);
+    ctx.fillStyle = pintandoColision.borrar ? 'rgba(237,227,210,.35)' : 'rgba(255,92,72,.35)'; ctx.fill();
+    ctx.strokeStyle = pintandoColision.borrar ? 'rgba(237,227,210,.95)' : 'rgba(255,92,72,1)'; ctx.lineWidth = 2 / z; ctx.stroke();
+  }
   listaElementos.forEach(([id, el]) => {
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
     const celdas = celdasDeElemento(el);
+    const esColision = !!el.colision;   // su relleno y su contorno ya se dibujaron arriba, todos juntos
+    if(!esColision){
     const img = el.imagen ? imagenLista(el.imagen) : null;
     if(img){
       ctx.save();
@@ -3130,6 +3152,7 @@ function dibujar(){
       ctx.fillText(disp ? '✖' : '⚠', pT.x, pT.y);
       ctx.restore();
     }
+    }   // fin de lo que no es Colisión
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
       ctx.setLineDash([6 / z, 5 / z]);
@@ -3752,6 +3775,15 @@ lienzo.addEventListener('pointerdown', e => {
       }
     }
   }else{
+    // Colisión (solo GM): pintar casilleros arrastrando o de a uno; con Shift, borrar. No selecciona nada.
+    if(herramientaActiva === 'elemento' && elemTipo === 'colision' && soyGM){
+      const cc = mundoAHex(m.x, m.y);
+      elementoSeleccionar(null);
+      pintandoColision = {borrar: !!e.shiftKey, celdas: new Map([[colKey(cc), cc]]), ultima: cc};
+      lienzo.style.cursor = 'crosshair';
+      pedirDibujo();
+      return;
+    }
     // Handle de rotación del trazo ya seleccionado (si se puede manipular).
     if(trazoSeleccionado && trazos.has(trazoSeleccionado)){
       const ts = trazos.get(trazoSeleccionado);
@@ -3871,6 +3903,18 @@ lienzo.addEventListener('pointermove', e => {
       dibujando.puntos.push(pantallaAMundo(px, py));
     }
     pedirDibujo();
+    return;
+  }
+  if(pintandoColision){
+    const m = pantallaAMundo(px, py);
+    const cc = mundoAHex(m.x, m.y);
+    const p = pintandoColision;
+    if(cc.col !== p.ultima.col || cc.fila !== p.ultima.fila){
+      // Se completan los casilleros del medio, para que un arrastre rápido no deje huecos.
+      lineaHex(p.ultima, cc).forEach(c => p.celdas.set(colKey(c), c));
+      p.ultima = cc;
+      pedirDibujo();
+    }
     return;
   }
   if(dibujandoElemento){
@@ -4056,6 +4100,13 @@ function soltar(){
     const t = trazos.get(a.id);
     if(t) moverTrazo(a.id, {rotacion: t.rotacion});
     pedirDibujo();
+  }
+  if(pintandoColision){
+    const p = pintandoColision;
+    pintandoColision = null;
+    const lista = [...p.celdas.values()];
+    pedirDibujo();
+    if(p.borrar) colisionBorrar(lista); else colisionPintar(lista);
   }
   if(dibujandoElemento){
     // No se crea todavía: queda de borrador para ajustar opacidad, color, etc.
@@ -4573,12 +4624,109 @@ function escucharElementos(){
         trampaDetalle: typeof d.trampaDetalle === 'string' ? d.trampaDetalle : '',
         disparada: d.disparada === true,
         fuegoAmigo: d.fuegoAmigo === true,
+        colision: d.colision === true,
         trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
         trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
       });
     });
     pedirDibujo();
   }, err => console.error('Error escuchando los elementos del mapa:', err));
+}
+
+/* ---------- Colisión del mapa (2026-09-24, pedido del dueño) ----------
+   Una "forma" del creador de Terreno y Formas (solo GM) que ya viene configurada: forma libre, Sólida (bloquea el paso y la
+   vista), visible para todos y atada a la grilla. Se pinta casillero por casillero (arrastrando o con clic de a uno), y los
+   casilleros que quedan uno al lado del otro se FUSIONAN solos en una única forma libre (al crear, se juntan con las vecinas
+   que ya estaban y se reemplazan por una sola). Shift+arrastrar borra casilleros. Se dibuja UN solo contorno alrededor de todo
+   lo que está pegado, y adentro se borra la grilla (para que se vea el dibujo del fondo sin líneas). Vive en la misma
+   colección `elementos` con `colision: true`, `solido: true`, `tipo: 'libre'`, `fijado: true`. */
+let colisionCache = {firma: '', set: new Set(), celdas: []};
+// Todas las casillas de colisión juntas (de todos los elementos con colision), recalculadas solo si algo cambia.
+function colisionInfo(){
+  let f = '';
+  elementos.forEach((el, id) => { if(el.colision) f += `${id}:${el.origen.col},${el.origen.fila},${el.rotacion},${el.celdas.length};`; });
+  if(f !== colisionCache.firma){
+    const set = new Set(), celdas = [];
+    elementos.forEach(el => {
+      if(!el.colision) return;
+      celdasDeElemento(el).forEach(c => { const k = c.col + ',' + c.fila; if(!set.has(k)){ set.add(k); celdas.push(c); } });
+    });
+    colisionCache = {firma: f, set, celdas};
+  }
+  return colisionCache;
+}
+const colKey = c => c.col + ',' + c.fila;
+function vecinosDeCelda(c){
+  const q = hexACubo(c);
+  return VECINO_LADO.map(([vq, vr]) => ({col: cuboACol(q.q + vq, q.r + vr), fila: cuboAFila(q.q + vq, q.r + vr)}));
+}
+// Grupos de casillas pegadas entre sí (para no dejar una forma "partida en dos" al borrar del medio).
+function componentesConexos(celdas){
+  const pendientes = new Map(celdas.map(c => [colKey(c), c]));
+  const grupos = [];
+  while(pendientes.size){
+    const [k0, c0] = pendientes.entries().next().value;
+    pendientes.delete(k0);
+    const grupo = [c0], cola = [c0];
+    while(cola.length){
+      const c = cola.pop();
+      vecinosDeCelda(c).forEach(v => {
+        const k = colKey(v);
+        if(pendientes.has(k)){ grupo.push(pendientes.get(k)); cola.push(pendientes.get(k)); pendientes.delete(k); }
+      });
+    }
+    grupos.push(grupo);
+  }
+  return grupos;
+}
+async function colisionCrear(celdasAbs){
+  if(!celdasAbs.length) return false;
+  const origen = celdasAbs.reduce((a, c) => (c.col < a.col || (c.col === a.col && c.fila < a.fila)) ? c : a, celdasAbs[0]);
+  const c0 = hexACubo(origen);
+  const celdas = [];
+  celdasAbs.forEach(c => { const q = hexACubo(c); celdas.push(q.q - c0.q, q.r - c0.r); });
+  try{
+    await coleccionElementos().add({
+      tipo: 'libre', origen: {col: origen.col, fila: origen.fila}, celdas, rotacion: 0,
+      color: '#D8524B', alfa: 15, solido: true, invisible: false, imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
+      colision: true, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    return true;
+  }catch(err){
+    console.error('No se pudo crear la colisión:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear la colisión');
+    return false;
+  }
+}
+// Suma casilleros de colisión: se juntan con las formas de colisión vecinas en una sola (crea la nueva y borra las viejas).
+async function colisionPintar(nuevas){
+  if(!soyGM || !fbUsuario) return;
+  const S = new Map(nuevas.map(c => [colKey(c), c]));
+  const ya = colisionInfo().set;
+  [...S.keys()].forEach(k => { if(ya.has(k)) S.delete(k); });   // lo que ya es colisión no se repite
+  if(!S.size) return;
+  const tocan = [];
+  elementos.forEach((el, id) => {
+    if(!el.colision) return;
+    const cs = celdasDeElemento(el);
+    if(cs.some(c => vecinosDeCelda(c).some(v => S.has(colKey(v))))) tocan.push([id, cs]);
+  });
+  const union = new Map(S);
+  tocan.forEach(([, cs]) => cs.forEach(c => union.set(colKey(c), c)));
+  if(await colisionCrear([...union.values()])) for(const [id] of tocan) await borrarElemento(id);
+}
+// Saca casilleros de la colisión: cada forma tocada se reemplaza por las partes que quedan (una por cada grupo pegado).
+async function colisionBorrar(quitar){
+  if(!soyGM || !fbUsuario) return;
+  const Q = new Set(quitar.map(colKey));
+  const tocados = [];
+  elementos.forEach((el, id) => { if(el.colision && celdasDeElemento(el).some(c => Q.has(colKey(c)))) tocados.push([id, celdasDeElemento(el)]); });
+  for(const [id, cs] of tocados){
+    const quedan = cs.filter(c => !Q.has(colKey(c)));
+    let ok = true;
+    for(const grupo of componentesConexos(quedan)) ok = (await colisionCrear(grupo)) && ok;
+    if(ok) await borrarElemento(id);
+  }
 }
 
 async function guardarElemento(tipo, origen, celdasSet){
@@ -7555,6 +7703,7 @@ function desactivarHerramienta(){
   herramientaActiva = '';
   dibujando = null;
   dibujandoElemento = null;
+  pintandoColision = null;
   lienzo.style.cursor = 'default';
   renderToolkit();
 }
@@ -7612,13 +7761,20 @@ function renderHerramientaFlotante(){
       <p class="tk-lapiz-ayuda">Arrastrá sobre el mapa para ${nieblaModo === 'destapar' ? 'destapar' : 'volver a tapar'} zonas. ${nieblaActiva ? '' : 'La niebla está apagada: prendela con el botón de la cabecera.'}</p>
       <div class="fila"><button type="button" class="btn peligro" id="niebla-reiniciar">Reiniciar (tapar todo)</button></div>`;
   }else if(herramientaActiva === 'elemento'){
-    cuerpo = `
+    if(elemTipo === 'colision' && !soyGM) elemTipo = 'flor';   // la Colisión es solo del GM
+    const selectorForma = `
       <label class="etiqueta" style="margin-top:0">Forma</label>
       <select id="elem-tipo-select">
         <option value="flor"${elemTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
         <option value="linea"${elemTipo === 'linea' ? ' selected' : ''}>Línea</option>
         <option value="libre"${elemTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
-      </select>
+        ${soyGM ? `<option value="colision"${elemTipo === 'colision' ? ' selected' : ''}>🧱 Colisión del mapa</option>` : ''}
+      </select>`;
+    if(elemTipo === 'colision'){
+      cuerpo = selectorForma + `
+      <p class="tk-lapiz-ayuda" style="margin-top:8px"><b>Colisión del mapa</b>: ya viene configurada (sólida: bloquea el paso y la vista; visible para todos). Arrastrá para pintar los casilleros o hacé clic de a uno. Los casilleros que quedan pegados se <b>fusionan solos</b> en una sola forma. Mantené <b>Shift</b> para <b>borrar</b> casilleros. Todos ven el contorno, y adentro se borra la grilla para que se vea el dibujo del fondo sin líneas.</p>
+      <p class="tk-lapiz-ayuda">Hoy hay <b>${colisionInfo().celdas.length}</b> casillero${colisionInfo().celdas.length === 1 ? '' : 's'} de colisión en este mapa.</p>`;
+    }else cuerpo = selectorForma + `
       <label class="etiqueta">Color</label>
       <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === elemColor ? ' elegido' : ''}" data-elem-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
       <label class="etiqueta">Transparencia</label>

@@ -3868,6 +3868,36 @@ function tirarExtraDeItem(it){
   return tiro;
 }
 
+/* Ejecutar una habilidad tira SOLO la primera tirada que le corresponde: el stat vinculado (PdG, PdG.Mg u otro) o,
+   si no tiene, la fórmula. La segunda (la fórmula: el daño o el efecto) va aparte con el botón 🎲, igual que en las
+   armas (Atacar → Daño) — decidido 2026-09-24. */
+function habStatTirable(it){
+  const s = it.tiradaStat;
+  return !!(s && (ATTR_LIST.some(a => a.id === s) || STATS_CON_TIRADA().some(x => x.id === s)));
+}
+function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExtra || '').trim(); }
+function tirarPrimeraDeHab(it){
+  if(habStatTirable(it)){
+    tirarValorStat(`${it.nombre} · ${STAT_LABEL[it.tiradaStat]}`, compute().final[it.tiradaStat], it.tiradaStat);
+    return true;
+  }
+  const formula = (it.tiradaExtra || '').trim();
+  if(formula){
+    const r = tirarDados(formula);
+    if(r){ registrarTirada(it.nombre, r); return true; }
+  }
+  return false;
+}
+function tirarSegundaDeHab(id){
+  const it = S.habilidades.find(h => h.id === id);
+  if(!it) return;
+  const r = tirarDados((it.tiradaExtra || '').trim());
+  if(r) registrarTirada(`${it.nombre} · Efecto`, r);
+  else toast('La fórmula de la habilidad no es válida');
+}
+const botonSegundaHab = it => habTieneSegundaTirada(it)
+  ? `<button type="button" class="mini" data-danohab="${esc(it.id)}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(it.tiradaExtra).trim())}">🎲 ${esc(String(it.tiradaExtra).trim())}</button>` : '';
+
 function restaurarSpDeConsumo(it){
   const pct = num(it.curaspPct);
   if(pct <= 0) return 0;
@@ -4533,6 +4563,7 @@ function renderBotoneraInv(){
       <div class="bot-fila-btns">
         <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
         <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>Ejecutar${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
+        ${botonSegundaHabInv(inv, h)}
       </div>
     </div>`;
   }).join('');
@@ -4645,19 +4676,28 @@ function anunciarHabilidadInv(inv, h){
   if(habilidadInvTira(h)) mesaConTexto(detalle);
   else mesaPublicarHabilidadInv(inv, h.nombre, detalle);
 }
+// Igual que en el personaje (tirarPrimeraDeHab): al ejecutar se tira solo la primera; la fórmula, si hay stat, va con el botón 🎲.
 function tirarExtraDeHabInv(inv, h){
-  let tiro = false;
   if(h.tiradaStat){
     tirarValorStatInv(inv, `${h.nombre} · ${STAT_LABEL[h.tiradaStat]||h.tiradaStat}`, invStatValor(inv, h.tiradaStat), h.tiradaStat);
-    tiro = true;
+    return true;
   }
   const formula = (h.tiradaExtra||'').trim();
   if(formula){
     const r = tirarDados(formula);
-    if(r){ registrarTirada(`${inv.nombre} · ${h.nombre}${tiro?' (extra)':''}`, r); tiro = true; }
+    if(r){ registrarTirada(`${inv.nombre} · ${h.nombre}`, r); return true; }
   }
-  return tiro;
+  return false;
 }
+function tirarSegundaDeHabInv(invId, habId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const h = inv && inv.habilidades.find(x => x.id === habId);
+  if(!h) return;
+  const r = tirarDados((h.tiradaExtra||'').trim());
+  if(r) registrarTirada(`${inv.nombre} · ${h.nombre} · Efecto`, r); else toast('La fórmula de la habilidad no es válida');
+}
+const botonSegundaHabInv = (inv, h) => (h.tiradaStat && (h.tiradaExtra||'').trim())
+  ? `<button type="button" class="mini" data-danohabinv="${inv.id}:${h.id}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
 function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
@@ -5001,6 +5041,7 @@ const LISTS = {
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
+      ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}
       </div>`;
     }
   },
@@ -5197,6 +5238,7 @@ function renderTodasHabilidades(){
       <div class="habs-grid-btns">
         <button class="mini" data-view="habilidades:${i.id}">Ver</button>
         <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' : 'Anunciar'}</button>
+        ${botonSegundaHab(i)}
       </div>
       ${costoHabilidadTxt(i) ? `<div class="habs-grid-costo">${esc(costoHabilidadTxt(i))}</div>` : ''}
     </div>`;
@@ -5361,6 +5403,7 @@ function renderBotonera(){
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
               <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':""}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              ${botonSegundaHab(i)}
             </div>
           </div>`;
         }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
@@ -6099,6 +6142,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.sigilo){ alternarSigilo(); return; }
+  if(b.dataset.danohab){ tirarSegundaDeHab(b.dataset.danohab); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
   if(b.id === 'btn-invocar'){
     S.invocaciones.push(nuevaInvocacion());
@@ -6171,6 +6215,11 @@ document.addEventListener('click', e => {
   if(b.dataset.invtirarstat){
     const [invId, statId] = b.dataset.invtirarstat.split(':');
     invTirarStat(invId, statId);
+    return;
+  }
+  if(b.dataset.danohabinv){
+    const [invId, habId] = b.dataset.danohabinv.split(':');
+    tirarSegundaDeHabInv(invId, habId);
     return;
   }
   if(b.dataset.ejecutarhabinv){
@@ -9557,7 +9606,7 @@ function ejecutarHabilidad(id, armaId, forzar){
   const ataque = registrarAtaqueDeHabilidad(it, arma);
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
-  tirarExtraDeItem(it);
+  tirarPrimeraDeHab(it);
   renderList("habilidades");
   if(efecto) renderList('efectos');
   renderNitros();
@@ -9607,7 +9656,7 @@ function confirmarCostoVariable(){
   pendingArmaHab = undefined;
   const efecto = aplicarEfectoDeConsumo(it);
   anunciarHabilidad(it);
-  tirarExtraDeItem(it);
+  tirarPrimeraDeHab(it);
   $("#scrim-costox").classList.remove("open");
   pendingEjecucion = null;
   renderList('habilidades');

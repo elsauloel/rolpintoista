@@ -2035,6 +2035,18 @@ function migrarObjEspecial(o){
   });
 }
 
+// 2026-09-24: las habilidades de creep armadas por el programa que tiran daño ("⚙ Automatizado: ... tira 2d6+3 de daño")
+// ahora traen vinculada la tirada de PdG (o PdG.Mg si es mágica) para que Ejecutar tire primero la probabilidad de golpe.
+// A las ya guardadas se les agrega al cargar; a las que ya tienen un stat elegido a mano no se las toca.
+function migrarHabPdg(sc){
+  const U = window.CreepsBaseUtil;
+  (Array.isArray(sc.habilidades) ? sc.habilidades : []).forEach(h => {
+    if(!h || h.tiradaStat || !String(h.tiradaExtra || '').trim() || h.trampaColocar) return;
+    if(!/tira [^;]*? de daño/i.test(String(h.detalle || ''))) return;
+    h.tiradaStat = U && U.esHabMagica && U.esHabMagica(h.nombre, h.detalle) ? 'pdgmg' : 'pdg';
+  });
+}
+
 function migrarCreepEspecial(sc){
   if(sc.int !== undefined){
     if(sc.esp === undefined) sc.esp = sc.int;
@@ -2623,6 +2635,7 @@ function normalizarCreep(sc){
   sc.armaEfectos = Array.isArray(sc.armaEfectos) ? sc.armaEfectos : [];
   migrarCreepTipos(sc);
   migrarCreepEspecial(sc);
+  migrarHabPdg(sc);
   // Recompensas (2026-09-20): los creeps viejos no las traen.
   if(typeof sc.grupo !== 'string') sc.grupo = '';
   if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';
@@ -3188,7 +3201,7 @@ function renderAccionesCreep(){
     const partes = [costoHabCreepTxt(sc, h)];
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
     const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`};
+    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, segunda: botonSegundaHabCreep(h, sc)};
   });
 
   $('#acciones-creep-titulo').textContent = sc.nombre;
@@ -3201,6 +3214,7 @@ function renderAccionesCreep(){
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
+      ${f.segunda || ''}
     </div>`;
 
   $('#acciones-creep-lista').innerHTML = `
@@ -3478,6 +3492,7 @@ function habsMiniHtml(sc){
       <span class="hab-mini-nombre" title="${esc(titulo)}">${esc(h.nombre || 'Sin nombre')}</span>
       <button type="button" class="verbtn" data-verhabaccion="${sc.id}:${h.id}">Ver</button>
       <button type="button" class="hab-ejecutar" data-ejecutar="${sc.id}:${h.id}" title="${esc(titulo)}" ${bloqueo ? 'disabled' : ''}>Ejecutar</button>
+      ${botonSegundaHabCreep(h, sc)}
     </div>`;
   }).join('')}</div>`;
 }
@@ -3738,16 +3753,28 @@ function aplicarEfectoDeConsumoCreep(sc, h){
 function habCreepTira(h){
   return !!(h && (String(h.tiradaExtra || "").trim() || (h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat])));
 }
+// Ejecutar tira SOLO la primera tirada que le corresponde (PdG, PdG.Mg u otro stat vinculado; si no hay stat, la fórmula).
+// La fórmula (el daño o el efecto), si hay stat, va aparte con el botón 🎲 — igual que Atacar → Daño (2026-09-24).
+function habCreepStatTirable(h, sc){ return !!(sc && h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat]); }
+function habCreepTieneSegunda(h, sc){ return habCreepStatTirable(h, sc) && !!String(h.tiradaExtra || "").trim(); }
 function tirarExtraDeHab(h, sc){
   const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
-  if(h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat] && sc){
+  if(habCreepStatTirable(h, sc)){
     tirarValorStat(`${prefijo} · ${CREEP_STAT_LOOKUP[h.tiradaStat].label}`, creepStatValor(sc, h.tiradaStat), sc, h.tiradaStat);
+    return;
   }
   if(String(h.tiradaExtra || "").trim()){
     const r = tirarDados(h.tiradaExtra);
     if(r) registrarTirada(prefijo, r);
   }
 }
+function tirarSegundaDeHab(h, sc){
+  const r = tirarDados(String(h.tiradaExtra || "").trim());
+  if(r) registrarTirada(`${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"} · Efecto`, r);
+  else toast('La fórmula de la habilidad no es válida');
+}
+const botonSegundaHabCreep = (h, sc) => habCreepTieneSegunda(h, sc)
+  ? `<button type="button" class="verbtn" data-danohabcreep="${sc.id}:${h.id}" title="Segunda tirada (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
 
 let equipandoCreepId = null;
 
@@ -4868,6 +4895,7 @@ function habHtml(sc, h){
     <div class="hab-bottom">
       <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
       <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
+      ${botonSegundaHabCreep(h, S.creeps.find(x => x.id === scId))}
     </div>
   </div>`;
 }
@@ -5175,6 +5203,13 @@ document.addEventListener('click', e => {
     const [scId, habId] = b.dataset.rmhab.split(':');
     const sc = S.creeps.find(s=>s.id===scId);
     if(sc){ sc.habilidades = sc.habilidades.filter(h=>h.id!==habId); renderAll(); }
+    return;
+  }
+  if(b.dataset.danohabcreep){
+    const [scId, habId] = b.dataset.danohabcreep.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const h = sc && sc.habilidades.find(x=>x.id===habId);
+    if(sc && h) tirarSegundaDeHab(h, sc);
     return;
   }
   if(b.dataset.ejecutar){

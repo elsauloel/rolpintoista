@@ -134,10 +134,18 @@
     const {propias, manual} = frasesDe(sp, n);
     return `${propias.length ? propias.map(cierra).join(' ') + ' ' : ''}⚙ Automatizado: ${auto.join('; ')}. ✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`;
   }
+  // ¿La habilidad pega con magia (PdG.Mg) o con el cuerpo (PdG)? sp.magico lo dice si se sabe (rol mágico de la biblioteca de
+  // skills de creep); si no, se adivina por palabras del nombre y la descripción. Es solo el punto de partida: se edita.
+  const MAGICA_RE = /m[aá]gic|hechiz|arcan|conjur|rel[aá]mpago|rayo|bola de fuego|llamarada|escarcha|hielo|descarga el[eé]ctrica|misil|maldici|sagrad|espectral|ps[ií]quic|[ií]gne|flama|fuego/i;
+  const esHabMagica = (nombre, detalle) => MAGICA_RE.test(String(nombre || '') + ' ' + String(detalle || ''));
   function armarHab(sp, n, cd, lenta){
     const h = {nombre: sp.nombre, detalle: armarDetalle(sp, n, cd, lenta), cd, cdActual: lenta ? cd : 0, costo: '', nitrosCosto: sp.no2};
     if(lenta) h.cdArranca = true;
-    if(sp.dano) h.tiradaExtra = danoTxt(sp.dano, n);
+    // Con daño: Ejecutar tira primero la probabilidad de golpe (PdG o PdG.Mg) y el daño queda para el botón 🎲 aparte (2026-09-24).
+    if(sp.dano){
+      h.tiradaExtra = danoTxt(sp.dano, n);
+      h.tiradaStat = (sp.magico !== undefined ? sp.magico : esHabMagica(sp.nombre, sp.detalle)) ? 'pdgmg' : 'pdg';
+    }
     if(sp.cura) h.curaHp = sp.cura * n;
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);
@@ -1024,5 +1032,5 @@
     'Nunca falla; a veces solo avisa.', HC);
 
   window.CREEPS_BASE = lista;
-  window.CreepsBaseUtil = {armarHab, armarDetalle, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
+  window.CreepsBaseUtil = {armarHab, armarDetalle, esHabMagica, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
 })();

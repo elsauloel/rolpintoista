@@ -36,6 +36,7 @@
   // el objetivo (sí mismo / un enemigo / zona / aliados / terreno) se deduce de la descripción salvo que se pase en mec.
   function H(nombre, fn, razas, roles, cd, spBase, mec){
     const sp = {nombre, ...spBase};
+    if(sp.magico === undefined && roles.includes('g')) sp.magico = true;   // rol mágico: pega con PdG.Mg
     const lenta = cd >= 4;
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
     const aMano = U.hayManual(sp);

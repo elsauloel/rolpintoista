@@ -487,7 +487,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'colision'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -509,6 +509,8 @@ service cloud.firestore {
           && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
           && (!('disparada' in d) || d.disparada is bool)
           && (!('fuegoAmigo' in d) || d.fuegoAmigo is bool)
+          // La tirada de daño de la trampa ignora la Defensa de quien la pisa (daño directo).
+          && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
           // Colisión del mapa (2026-09-24): forma libre ya sólida y visible para todos que se fusiona con las vecinas; solo la crea el GM.
           && (!('colision' in d) || d.colision is bool)
           && d.duenoUid is string;

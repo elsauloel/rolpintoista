@@ -1159,7 +1159,7 @@ let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
-let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '';   // crear el elemento como trampa oculta (Amiga = fuego amigo)
+let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
 let trampasGuardadas = [];
 try{ const g = JSON.parse(localStorage.getItem('mapa-trampas-guardadas') || '[]'); if(Array.isArray(g)) trampasGuardadas = g.filter(x => x && typeof x.nombre === 'string').slice(0, 40); }catch(e){}
@@ -1791,7 +1791,7 @@ function trampasGuardadasHtml(){
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
   if(!g) return;
-  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || '';
+  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef;
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
   elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(g.tamano)) || 1));
   if(/^#[0-9a-fA-F]{6}$/.test(g.color || '')) elemColor = g.color;
@@ -4843,6 +4843,7 @@ function escucharElementos(){
         fuegoAmigo: d.fuegoAmigo === true,
         colision: d.colision === true,
         trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
+        trampaIgnoraDef: d.trampaIgnoraDef === true,
         trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
       });
     });
@@ -4957,7 +4958,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
-      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : ''} : {}),
+      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {})} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -5645,12 +5646,12 @@ async function trampaAplicarDano(t, el){
   for(const x of afectados){
     let hecho = false;
     try{
-      if(x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(tir.total)); hecho = true; }
-      else if(x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && puedoMover(x)){ await danioPj(x, String(tir.total)); hecho = true; }
+      if(x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(tir.total), !!el.trampaIgnoraDef); hecho = true; }
+      else if(x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && puedoMover(x)){ await danioPj(x, String(tir.total), !!el.trampaIgnoraDef); hecho = true; }
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
     partes.push(`${x.oculto ? 'Alguien' : nombreDe(x)}: ${hecho ? 'daño aplicado solo' : 'aplicalo a mano'}`);
   }
-  alertaRojaAnonima(`💥 ${el.trampaNombre || 'Trampa'}: ${tir.formula} = ${tir.total} de daño (menos la Defensa de cada uno)`, partes.join(' · '));
+  alertaRojaAnonima(`💥 ${el.trampaNombre || 'Trampa'}: ${tir.formula} = ${tir.total} de daño (${el.trampaIgnoraDef ? 'ignora la Defensa' : 'menos la Defensa de cada uno'})`, partes.join(' · '));
 }
 // Estado alterado de la trampa (Inmovilizado, Veneno, −2 Daño…): se aplica solo a quien la pisó y, si es de área, a todos los de adentro.
 // Un creep lo recibe directo (solo si mueve el GM); un personaje, por un aviso que su ficha aplica sola (comun/estados-aplicar.js).
@@ -6933,11 +6934,12 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(r.recibido)} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;
 }
 
-async function danioCreep(t, texto){
+// ignoraDef: daño directo (una trampa que ignora la Defensa): no se le resta; Invulnerable y el escudo siguen valiendo.
+async function danioCreep(t, texto, ignoraDef){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const res = await modificarCreep(t.fichaId, sc => {
-    const r = resolverGolpe(golpe, creepDefensaMapa(sc), sc.estados);
+    const r = resolverGolpe(golpe, ignoraDef ? 0 : creepDefensaMapa(sc), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     return {r, previo, nuevo: sc.hp};
@@ -6945,7 +6947,7 @@ async function danioCreep(t, texto){
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
 }
 
-async function danioPj(t, texto){
+async function danioPj(t, texto, ignoraDef){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
@@ -6957,7 +6959,7 @@ async function danioPj(t, texto){
     const datos = JSON.parse(parte.data().json || '{}');
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
-    const r = resolverGolpe(golpe, num(rs.def), datos.efectos);
+    const r = resolverGolpe(golpe, ignoraDef ? 0 : num(rs.def), datos.efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
@@ -8060,6 +8062,7 @@ function renderHerramientaFlotante(){
       ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-dano" maxlength="12" placeholder="Daño automático (ej. 2d6; vacío = solo avisa)" value="${esc(elemTrampaDano)}" style="margin-top:6px" title="Al dispararse, el mapa tira este daño solo y se lo aplica a quien la activa (restando su Defensa)">
+      <label class="tk-lapiz-check" title="Sí: el daño automático NO se reduce por la Defensa de quien la pisa (daño directo). No: se le resta su Defensa, como un golpe."><input type="checkbox" id="elem-trampa-ignora-def"${elemTrampaIgnoraDef ? ' checked' : ''}> El daño <b>${elemTrampaIgnoraDef ? 'IGNORA' : 'respeta'}</b> la Defensa (${elemTrampaIgnoraDef ? 'daño directo' : 'se le resta su Defensa'})</label>
       <label class="tk-lapiz-check" title="Sí: también la disparan tus aliados (y vos). No: solo los rivales."><input type="checkbox" id="elem-trampa-amiga"${elemTrampaAmiga ? ' checked' : ''}> Fuego amigo: <b>${elemTrampaAmiga ? 'SÍ' : 'NO'}</b> (la disparan también los aliados)</label>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
       ${trampasGuardadasHtml()}
@@ -8101,7 +8104,7 @@ $('#herramienta-flotante').addEventListener('click', e => {
     const nombre = elemTrampaNombre.trim();
     if(!nombre){ toast('Ponele un nombre a la trampa para guardarla'); return; }
     const g = {nombre: nombre.slice(0, 40), detalle: elemTrampaDetalle.trim().slice(0, 200), amiga: elemTrampaAmiga,
-      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : ''};
+      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', ignoraDef: elemTrampaIgnoraDef};
     guardarTrampaRecurrente(g);
     toast(`Trampa "${g.nombre}" guardada`);
     return;
@@ -8198,6 +8201,11 @@ $('#herramienta-flotante').addEventListener('change', e => {
   if(e.target.id === 'elem-solido-check'){
     elemSolido = e.target.checked;
     try{ localStorage.setItem('elem-solido', elemSolido ? '1' : ''); }catch(err){}
+    renderHerramientaFlotante();
+    return;
+  }
+  if(e.target.id === 'elem-trampa-ignora-def'){
+    elemTrampaIgnoraDef = e.target.checked;
     renderHerramientaFlotante();
     return;
   }

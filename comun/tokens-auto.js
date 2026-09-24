@@ -119,6 +119,7 @@ const TokensAuto = (() => {
         imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
+        ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
         ...(o.estado && JSON.stringify(o.estado).length <= 300 ? {trampaEstado: JSON.stringify(o.estado)} : {}),
         duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });

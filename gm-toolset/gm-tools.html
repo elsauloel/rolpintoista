@@ -1051,7 +1051,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
             <div class="mini-f"><label>Radio</label><input type="number" id="hc-trampa-radio" min="0" max="6" value="0" title="0 = una casilla; 1 = una flor de 1 (7 casillas)…"></div>
             <div class="mini-f"><label>Cantidad</label><input type="number" id="hc-trampa-cant" min="1" max="6" value="1" title="Cuántas trampas deja de una vez"></div>
           </div>
-          <div class="hint" style="margin-top:4px">Daño: dados y modificador, ej. <b>2d6</b> o <b>1d8+3</b>. Radio 0 = una casilla. Cantidad: cuántas trampas coloca por ejecución.</div>
+          <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer" title="Sí: el daño no se reduce por la Defensa de quien la pisa (daño directo). No: se le resta su Defensa, como un golpe."><input type="checkbox" id="hc-trampa-ignora-def" style="width:auto"> <span>El daño <b>ignora la Defensa</b> de quien la pisa (daño directo)</span></label>
+          <div class="hint" style="margin-top:4px">Daño: dados y modificador, ej. <b>2d6</b> o <b>1d8+3</b>. Sin tildar, se le resta la Defensa. Radio 0 = una casilla. Cantidad: cuántas trampas coloca por ejecución.</div>
           <div class="row3" style="margin-top:8px;grid-template-columns:2fr 1fr">
             <div class="mini-f"><label>Estado que deja a quien la pisa</label><select id="hc-trampa-estado"></select></div>
             <div class="mini-f"><label>Turnos</label><input type="number" id="hc-trampa-estado-turnos" min="0" value="0" title="0 = los turnos que trae el estado"></div>
@@ -4264,7 +4265,7 @@ function hcTrampaResumen(){
   const est = $('#hc-trampa-estado').value;
   const estNombre = est === '__orig__' && hcTrampaEstadoOriginal ? hcTrampaEstadoOriginal.nombre : est;
   return [$('#hc-trampa-nombre').value.trim() || $('#hc-nombre').value.trim() || 'trampa',
-    cant > 1 ? `×${cant}` : '', radio ? `radio ${radio}` : '', dano ? `${dano} de daño` : 'solo avisa', estNombre ? `deja ${estNombre}` : ''].filter(Boolean).join(' · ');
+    cant > 1 ? `×${cant}` : '', radio ? `radio ${radio}` : '', dano ? `${dano} de daño${$('#hc-trampa-ignora-def').checked ? ' (ignora Defensa)' : ''}` : 'solo avisa', estNombre ? `deja ${estNombre}` : ''].filter(Boolean).join(' · ');
 }
 function hcTrampaRender(){
   const on = $('#hc-trampa-on').checked;
@@ -4281,6 +4282,7 @@ function hcCargarTrampa(h){
   $('#hc-trampa-nombre').value = t ? (t.nombre || '') : '';
   $('#hc-trampa-detalle').value = t ? (t.detalle || '') : '';
   $('#hc-trampa-dano').value = t ? (t.dano || '') : '';
+  $('#hc-trampa-ignora-def').checked = !!(t && t.ignoraDef);
   $('#hc-trampa-radio').value = t ? Math.max(0, num(t.radio) || 0) : 0;
   $('#hc-trampa-cant').value = t ? Math.max(1, num(t.cant) || 1) : 1;
   const estados = ESTADOS_PRESET_GM.filter(p => p.polaridad === 'debuff').map(p => p.nombre);
@@ -4303,6 +4305,7 @@ function hcGuardarTrampa(h){
     nombre: $('#hc-trampa-nombre').value.trim().slice(0, 40) || h.nombre,
     detalle: $('#hc-trampa-detalle').value.trim().slice(0, 200),
     dano: HC_TRAMPA_DANO_RE.test(dano) ? dano : '',
+    ignoraDef: $('#hc-trampa-ignora-def').checked,
     radio: Math.max(0, Math.min(6, Math.round(num($('#hc-trampa-radio').value) || 0))),
     cant: Math.max(1, Math.min(6, Math.round(num($('#hc-trampa-cant').value) || 1))),
   };
@@ -7004,7 +7007,7 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 async function colocarTrampaDeHab(sc, h){
   const t = h.trampaColocar;
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', radio: t.radio || 0, cant: t.cant || 1, estado: t.estado || null});
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', ignoraDef: !!t.ignoraDef, radio: t.radio || 0, cant: t.cant || 1, estado: t.estado || null});
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');
@@ -7194,6 +7197,7 @@ $('#hc-trampa-preconstruidas').onclick = () => {
       $('#hc-trampa-nombre').value = String(datos.nombre || '').slice(0, 40);
       $('#hc-trampa-detalle').value = String(datos.detalle || '').slice(0, 200);
       $('#hc-trampa-dano').value = r.dano || '';
+      $('#hc-trampa-ignora-def').checked = false;
       $('#hc-trampa-radio').value = Math.max(0, Math.min(6, r.radio));
       $('#hc-trampa-cant').value = Math.max(1, Math.min(6, r.cant));
       $('#hc-trampa-estado').value = '';

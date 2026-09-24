@@ -213,7 +213,8 @@
   H('Volar en picada', 'DM', 'b', 'e', 4, zO('Cae desde arriba sobre el objetivo (a mano el movimiento).', 3, 'M'));
   H('Excavar', 'M', 'b', 'e', 4, tA('Se entierra y aparece 3 casilleros más allá (a mano).', 2));
   H('Trepar', 'M', 'bp', 'e', 2, tA('Sube por una pared o un árbol sin costo extra (a mano).', 1));
-  H('Trampa de raíces', 'K', 'p', 'x', 4, tA('Raíces que atrapan: el objetivo queda Inmovilizado 1 turno si falla Fuerza (a mano).', 2));
+  // Trampa de verdad (2026-09-24): deja una trampa oculta al lado del token y quien la pisa queda Inmovilizado (APLICA en creeps-base.js).
+  H('Trampa de raíces', 'K', 'p', 'x', 4, tS('Deja una trampa de raíces en una casilla adyacente: quien la pise queda Inmovilizado 2 turnos.', 2), 'trampas');
   H('Red', 'K', 'hd', 'x', 4, tA('Lanza una red: el objetivo queda Inmovilizado 1 turno si falla Agilidad (a mano).', 2));
   H('Congelar', 'K', 'e', 'gx', 5, tA('Encierra al objetivo en hielo: pierde su próximo turno si falla Res.Mt (a mano).', 3));
   H('Aturdir', 'K', 'hdb', 'mx', 5, tA('Golpe en la sien: el objetivo queda Stun 1 turno si falla Res.Mt (a mano).', 3));

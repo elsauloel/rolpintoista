@@ -762,7 +762,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         </div>
       </div>
       <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza) del token seleccionado. Apretá de vuelta para apagarlo. (R)">📏</button>
-      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial) del token seleccionado. Apretá de vuelta para apagarlo. (Shift + R)">🔮</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial) del token seleccionado. Apretá de vuelta para apagarlo. (T, o Shift + R)">🔮</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -4491,6 +4491,12 @@ document.addEventListener('keydown', e => {
   if((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault();
     alternarRango(e.shiftKey);
+    return;
+  }
+  // T (2026-09-24): 🔮 Rango de casteo, sin Shift (Shift+R con Ctrl a mano se confunde con recargar la página).
+  if((e.key === 't' || e.key === 'T') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
+    e.preventDefault();
+    alternarRango(true);
     return;
   }
   // F: prende o apaga Terreno y Formas.

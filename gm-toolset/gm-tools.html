@@ -7829,6 +7829,14 @@ function accionesModoAbrir(creepId){
 }
 
 if(MODO_ACCIONES){
+  // B (la tecla que abre las Acciones desde el mapa) también las cierra, con el foco adentro de esta ventana: se hace como Escape.
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'b' && e.key !== 'B') return;
+    if(e.ctrlKey || e.altKey || e.metaKey || e.isTrusted === false) return;
+    if(e.target && e.target.closest && e.target.closest('input,select,textarea,[contenteditable]')) return;
+    e.preventDefault();
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+  });
   const observador = new MutationObserver(() => {
     if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
   });

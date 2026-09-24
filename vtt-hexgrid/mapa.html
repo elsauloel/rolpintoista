@@ -3890,6 +3890,8 @@ function cancelarArrastreToken(){
 lienzo.addEventListener('mousedown', e => { if(e.button === 2) cancelarArrastreToken(); });
 lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
+    // Con la Botonera o las Acciones abiertas, el clic derecho sobre el mapa (afuera de la ventana) las cierra.
+    if(!$('#botonera-capa').hidden){ escapeABotonera(); return; }
     if(colocando){ cancelarColocacion(); return; }
     if(cancelarArrastreToken()) return;
     // Con una herramienta de dibujo activa, el clic derecho es "salir de

@@ -4425,8 +4425,8 @@ document.addEventListener('keydown', e => {
   // Con la Botonera o las Acciones abiertas, el teclado es de esa ventana:
   // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
   if(!$('#botonera-capa').hidden){
-    // Escape, o B (la tecla que la abre; solo jugadores), la cierra.
-    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && !soyGM)) escapeABotonera();
+    // Escape, o B (la tecla que la abre), la cierra.
+    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
@@ -4498,11 +4498,15 @@ document.addEventListener('keydown', e => {
     else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'elemento'; renderToolkit(); }
     return;
   }
-  // B: abre la Botonera del personaje principal (solo jugadores). Se cierra
-  // con Esc, como siempre.
-  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro && !soyGM){
+  // B (2026-09-24, pedido del dueño): abre la Botonera del TOKEN SELECCIONADO (jugador: su personaje o una invocación suya; GM: las
+  // Acciones del creep). Sin token seleccionado, un jugador abre la de su personaje principal, como siempre; el GM recibe un aviso.
+  // Se cierra con B o con Esc.
+  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
-    abrirBotoneraPrincipal();
+    if(abrirBotoneraDeSeleccion()) return;
+    if(seleccion){ toast('Ese token no tiene Botonera para vos'); return; }
+    if(soyGM) toast('Seleccioná un creep para abrir sus Acciones');
+    else abrirBotoneraPrincipal();
     return;
   }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
@@ -6192,11 +6196,14 @@ let firmaPanel = '';
 
 function seleccionar(id){
   if(seleccion === id && !creando) return;
+  const habiaBotonera = !$('#botonera-capa').hidden && botonera.lista && !botonera.completa;
   if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
   seleccion = id;
   if(id){ creando = false; trazoSeleccionado = null; elementoSeleccionado = null; }
   renderPanel();
   pedirDibujo();
+  // Botonera o Acciones abiertas y se elige otro token que también tiene la suya: la ventana cambia sola a ese token.
+  if(habiaBotonera && id && botoneraDeToken(tokens.get(id))) abrirBotoneraDeSeleccion();
 }
 
 function trazoSeleccionar(id){
@@ -7647,6 +7654,22 @@ function fichaPrincipalId(){
     for(const [id, f] of fichasPub.entries()){ if(f.duenoUid === fbUsuario.uid){ fichaId = id; break; } }
   }
   return fichaId;
+}
+// ¿Se puede abrir la Botonera (o las Acciones) de este token? Un jugador la de sus personajes e invocaciones; el GM, la de un creep.
+function botoneraDeToken(t){
+  if(!t || !t.fichaId || !fbUsuario) return null;
+  if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId) ? {creep: t.fichaId} : null;
+  const v = vinculo(t);
+  if(soyGM || !v || v.duenoUid !== fbUsuario.uid) return null;
+  const [ficha, inv] = t.fichaId.split(SEP_INVOCACION);
+  return {ficha, inv: inv || ''};
+}
+// Abre la del token seleccionado; devuelve false si no hay nada que abrir.
+function abrirBotoneraDeSeleccion(){
+  const b = botoneraDeToken(seleccion ? tokens.get(seleccion) : null);
+  if(!b) return false;
+  if(b.creep) abrirAcciones(b.creep); else abrirBotonera(b.ficha, undefined, b.inv);
+  return true;
 }
 function abrirBotoneraPrincipal(){
   const fichaId = fichaPrincipalId();

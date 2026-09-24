@@ -11128,7 +11128,8 @@ function botoneraModoAbrir(invId){
 
 if(MODO_BOTONERA){
   const revisarCerrada = () => {
-    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open')){
+    // El cartelito de cantidades de un estado (comun/estado-preguntas.js, #ep-fondo) cuenta como ventana abierta: si no, al elegir un preset se cerraba la Botonera.
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo')){
       if(fichaVivo.editaGM) fichaGuardarTick(true);   // el GM editó estados de otro personaje: se sube antes de cerrar
       botoneraAvisarMapa('botonera-cerrada');
     }
@@ -11144,6 +11145,7 @@ if(MODO_BOTONERA){
   });
   const observador = new MutationObserver(revisarCerrada);
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
+  window.addEventListener('ep-cerrado', () => setTimeout(revisarCerrada, 60));   // se cerró el cartelito de cantidades de un estado
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');

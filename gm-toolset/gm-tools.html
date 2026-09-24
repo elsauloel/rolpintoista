@@ -7685,7 +7685,7 @@ function accionesModoAbrir(creepId){
 
 if(MODO_ACCIONES){
   const observador = new MutationObserver(() => {
-    if(gmVivo.listo && !document.querySelector('.scrim.open')) gmAvisarMapa('acciones-cerrada');
+    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
   });
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {

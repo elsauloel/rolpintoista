@@ -97,7 +97,7 @@ const EstadoPreguntas = (() => {
       fondo.innerHTML = '<div id="ep-caja" role="dialog" aria-modal="true"></div>';
       document.body.appendChild(fondo);
       const caja = fondo.firstChild;
-      const cerrar = valor => { document.removeEventListener('keydown', teclas, true); fondo.remove(); resolver(valor); };
+      const cerrar = valor => { document.removeEventListener('keydown', teclas, true); fondo.remove(); resolver(valor); window.dispatchEvent(new Event('ep-cerrado')); };
       const teclas = e => { if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); cerrar(null); } };
       document.addEventListener('keydown', teclas, true);
       fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(null); });

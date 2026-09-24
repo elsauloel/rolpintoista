@@ -5074,6 +5074,14 @@ const LISTS = {
     // Chip: lo justo para leerlo de un vistazo en combate. El detalle, los
     // modificadores y el resto se abren con un clic en el nombre.
     row:i => {
+      if(i.derivado){
+        // De una pasiva: solo lectura (sin pausar ni abrir el editor).
+        return `<div class="ef-chip de-equipo${i.detalle ? ' con-tip' : ''}"${i.detalle ? ` data-tip="${esc(i.detalle)}"` : ''}>
+        <span class="ef-chip-cuerpo" style="cursor:help"><span class="ef-chip-nombre">${esc(i.nombre)}</span>
+          <span class="ef-chip-datos">∞ · +${fmt(num(i.hpturno))} HP</span></span>
+        <span class="ef-chip-equipo" title="Viene de una pasiva: se va si la sacás">✦</span>
+      </div>`;
+      }
       const st = Math.max(1, num(i.stacks)||1);
       const hp = num(i.hpturno)*st;
       const activo = i.activo !== false;
@@ -5100,6 +5108,19 @@ const LISTS = {
   }
 };
 
+// Estados que vienen de una pasiva (2026-09-24, pedido del dueño): hoy solo la regeneración (`regenHp`). No se guardan: se arman
+// cada vez a partir de las pasivas, aparecen entre los estados alterados activos y en el resumen que ve el mapa, pero son de
+// solo lectura (se sacan quitando la pasiva) y el Mantenimiento ya los aplica por su lado, así no se cuentan dos veces.
+// Qué efectos de ítems y pasivas deben mostrarse como estado y cuáles no es una pregunta abierta (docs/preguntas-abiertas.md).
+function estadosDePasivas(){
+  return (S.pasivas || []).filter(p => num(p.regenHp) > 0).map(p => {
+    const hp = num(p.regenHp) * pasivaCompras(p);
+    return {id: 'pasiva:' + p.id, nombre: p.nombre, polaridad: 'buff', permanente: true, stacks: 1, turnos: 0, hpturno: hp, activo: true, derivado: true,
+      detalle: `Viene de tu pasiva "${p.nombre}": recupera ${fmt(hp)} HP en cada Mantenimiento.`};
+  });
+}
+const estadosTodos = () => [...(S.efectos || []), ...estadosDePasivas()];
+
 function renderList(key){
   const el = $('#list-'+key);
   if(!el) return;
@@ -5113,11 +5134,14 @@ function renderList(key){
     });
   }else if(key === 'mochila'){
     arr = S.inventario.filter(i=>!i.equipado).slice().sort((a,b) => ordenEquipoDe(a) - ordenEquipoDe(b));
+  }else if(key === 'efectos'){
+    arr = estadosTodos();
   }else{
     arr = S[key];
   }
   el.innerHTML = arr.length ? arr.map(LISTS[key].row).join('') : `<div class="empty">${LISTS[key].empty}</div>`;
   if(key === 'efectos') ajustarEstados();
+  if(key === 'pasivas') renderList('efectos');   // una pasiva con regeneración cambia los estados que se ven
   if(key === 'habilidades' && $('#scrim-todas-habilidades').classList.contains('open')) renderTodasHabilidades();
   if(['habilidades','inventario','mochila','equipo','cinturon','sociales'].includes(key) && $('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
@@ -5157,7 +5181,7 @@ function ajustarEstados(){
   mas.onclick = () => { renderTodosEstados(); $('#scrim-todos-estados').classList.add('open'); };
 }
 function renderTodosEstados(){
-  $('#todos-estados-body').innerHTML = S.efectos.length ? S.efectos.map(LISTS.efectos.row).join('') : '<div class="hint">Sin estados alterados.</div>';
+  $('#todos-estados-body').innerHTML = estadosTodos().length ? estadosTodos().map(LISTS.efectos.row).join('') : '<div class="hint">Sin estados alterados.</div>';
 }
 $('#todos-estados-x').onclick = () => $('#scrim-todos-estados').classList.remove('open');
 $('#scrim-todos-estados').addEventListener('mousedown', e => { if(e.target.id === 'scrim-todos-estados') $('#scrim-todos-estados').classList.remove('open'); });
@@ -10213,13 +10237,14 @@ function fichaResumen(){
     costoMover: IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado') ? 0 : costoMoverCasillero(),
     muerto: !!(S.muerto && S.muerto.activo),
     muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
-    estados: (S.efectos || [])
+    estados: estadosTodos()
       .filter(e => e && e.activo !== false && e.nombre)
       .slice(0, 30)
       .map(e => ({
         nombre: String(e.nombre).slice(0, 60),
         turnos: num(e.turnos),
         permanente: !!e.permanente,
+        ...(e.derivado ? {derivado: true} : {}),
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         // Para el globito del mapa al pasar el mouse por el estado.
         detalle: String(e.detalle || '').slice(0, 300),

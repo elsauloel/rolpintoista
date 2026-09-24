@@ -6089,6 +6089,14 @@ function puedoCambiarVida(t){
   const v = vinculo(t);
   return !!v && !soyGM && v.duenoUid === fbUsuario.uid;
 }
+// Estados alterados (agregar, sacar, cambiar turnos, editar): el dueño en su personaje y el GM en TODOS (2026-09-24, pedido
+// del dueño); los creeps, el GM. La vida de un personaje sigue siendo solo de su dueño.
+function puedoCambiarEstados(t){
+  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
+  const v = vinculo(t);
+  return !!v && (soyGM || v.duenoUid === fbUsuario.uid);
+}
 
 // "12" fija el valor; "+5" / "-3" suma o resta. null si no se entiende.
 function leerValorVital(texto, actual){
@@ -6633,7 +6641,7 @@ function hudHtml(t){
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Girar no gasta No2">↻</div>' : '');
   let globo = '';
-  if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
+  if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puedoCambiarEstados(t));
   if(hudGlobo === 'tarjeta' && t.tipo === 'creep') globo = hudTarjetaHtml(t, d);
   if(hudGlobo === 'hp' && puede) globo = hudHpHtml(t, d);
   if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t, d);
@@ -7316,7 +7324,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);
   const lista = (v && v.resumen && v.resumen.estados) || [];
   const objetivo = lista[indice];
-  if(!objetivo || !puedoCambiarVida(t)) return;
+  if(!objetivo || !puedoCambiarEstados(t)) return;
   const tocar = arr => {
     const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
     if(i < 0) throw new Error('Ese estado ya no está');

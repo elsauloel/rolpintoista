@@ -362,6 +362,11 @@ input[type=file]{display:none}
 .hab-estado{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.05em;color:var(--muted);flex:1}
 .hab-estado.ok{color:var(--absenta)}
 .hab-estado.cd{color:var(--danger)}
+.cd-ctl{display:inline-flex;align-items:center;gap:2px;flex:none}
+.cd-ctl button{background:transparent;border:1px solid var(--line);border-radius:4px;color:var(--paper);cursor:pointer;padding:0 6px;font-size:12px;line-height:20px;min-width:22px}
+.cd-ctl button:hover{border-color:var(--copper);color:var(--brass)}
+.cd-ctl .cd-val{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);min-width:34px;text-align:center}
+.cd-ctl .cd-val.activo{color:#E27B72;font-weight:700}
 .hab-ejecutar{
   font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   padding:4px 10px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.14);color:var(--brass);flex:none
@@ -2609,6 +2614,20 @@ function costoAtaqueCreep(sc){
 }
 
 // Por qué no se puede ejecutar una habilidad ahora ('' = se puede).
+// Cooldown de una habilidad de creep, a mano (2026-09-24, pedido del dueño): el GM puede subirlo, bajarlo o resetearlo en cualquier
+// momento, por ejemplo después de ejecutar una habilidad para probar algo. − y + cambian los turnos que le quedan; ↺ (solo con
+// cooldown activo) lo deja en 0.
+function cdControlesHtml(sc, h){
+  const v = Math.max(0, num(h.cdActual));
+  const ref = `${sc.id}:${h.id}`;
+  return `<span class="cd-ctl" title="Cooldown: turnos que le quedan a esta habilidad">
+    <button type="button" data-cdmod="${ref}:-1" title="Un turno menos de cooldown">−</button>
+    <span class="cd-val${v > 0 ? ' activo' : ''}">CD ${fmt(v)}</span>
+    <button type="button" data-cdmod="${ref}:1" title="Un turno más de cooldown">+</button>
+    ${v > 0 ? `<button type="button" data-cdmod="${ref}:reset" title="Resetear el cooldown (queda listo para usarse)">↺</button>` : ''}
+  </span>`;
+}
+
 function bloqueoHabCreep(sc, h){
   if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
   if(num(sc.nitros) < costoNitrosHabCreep(sc, h)) return 'Sin No2';
@@ -3203,7 +3222,7 @@ function renderAccionesCreep(){
     const partes = [costoHabCreepTxt(sc, h)];
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
     const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, segunda: botonSegundaHabCreep(h, sc)};
+    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, segunda: botonSegundaHabCreep(h, sc), cdHtml: cdControlesHtml(sc, h)};
   });
 
   $('#acciones-creep-titulo').textContent = sc.nombre;
@@ -3217,6 +3236,7 @@ function renderAccionesCreep(){
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
       ${f.segunda || ''}
+      ${f.cdHtml || ''}
     </div>`;
 
   $('#acciones-creep-lista').innerHTML = `
@@ -3495,6 +3515,7 @@ function habsMiniHtml(sc){
       <button type="button" class="verbtn" data-verhabaccion="${sc.id}:${h.id}">Ver</button>
       <button type="button" class="hab-ejecutar" data-ejecutar="${sc.id}:${h.id}" title="${esc(titulo)}" ${bloqueo ? 'disabled' : ''}>Ejecutar</button>
       ${botonSegundaHabCreep(h, sc)}
+      ${cdControlesHtml(sc, h)}
     </div>`;
   }).join('')}</div>`;
 }
@@ -4911,6 +4932,7 @@ function habHtml(sc, h){
       <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
       <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
       ${botonSegundaHabCreep(h, S.creeps.find(x => x.id === scId))}
+      ${cdControlesHtml(S.creeps.find(x => x.id === scId) || {id: scId}, h)}
     </div>
   </div>`;
 }
@@ -5218,6 +5240,15 @@ document.addEventListener('click', e => {
     const [scId, habId] = b.dataset.rmhab.split(':');
     const sc = S.creeps.find(s=>s.id===scId);
     if(sc){ sc.habilidades = sc.habilidades.filter(h=>h.id!==habId); renderAll(); }
+    return;
+  }
+  if(b.dataset.cdmod){
+    const [scId, habId, accion] = b.dataset.cdmod.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const h = sc && sc.habilidades.find(x => x.id === habId);
+    if(!sc || !h) return;
+    h.cdActual = accion === 'reset' ? 0 : Math.max(0, Math.min(99, num(h.cdActual) + num(accion)));
+    renderAll();
     return;
   }
   if(b.dataset.danohabcreep){

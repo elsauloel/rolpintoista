@@ -767,6 +767,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
         <div class="desplegable-lista" id="ojo-menu" hidden>
           <button type="button" class="btn" id="btn-niebla" title="Prender o apagar la niebla de guerra en este mapa">🌫 Niebla: no</button>
           <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
+          <button type="button" class="btn" id="btn-vision-creeps" title="Ver lo que ven los creeps: una niebla semitransparente sobre lo que ningún creep alcanza a ver, y en naranja lo que verían si los objetos sólidos no les taparan la vista">👹 Visión de los creeps</button>
           <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente.">👁 Revelar lo oculto</button>
           <button type="button" class="btn peligro" id="btn-niebla-reiniciar" title="Volver a tapar todo lo descubierto de este mapa">↺ Restablecer niebla</button>
         </div>
@@ -1531,11 +1532,13 @@ let nieblaVista = new Set();         // lo que ven ahora los personajes jugadore
 let nieblaFirma = '';                // para recalcular solo cuando algo se movió
 let nieblaFantasmas = new Map();     // tokenId -> {col, fila}: última posición vista
 let nieblaComoJugador = false;       // solo GM, por navegador
+let visionCreepsActiva = false;      // solo GM, por navegador: ver lo que ven los creeps (niebla semitransparente + lo que tapan los sólidos)
 let nieblaPendientes = new Set(), nieblaTimer = null;
 let nieblaSeq = 0;                    // lotes de celdas que ESTA pantalla descubrió (para Ctrl+Z)
 const nieblaLog = [];
 let cortarNiebla = null;
 try{ nieblaComoJugador = localStorage.getItem('niebla-como-jugador') === '1'; }catch(e){}
+try{ visionCreepsActiva = localStorage.getItem('vision-creeps') === '1'; }catch(e){}
 
 const nbPack = (col, fila) => (col + NB_OFF) * NB_K + (fila + NB_OFF);
 const nbUnpack = k => ({col: Math.floor(k / NB_K) - NB_OFF, fila: (k % NB_K) - NB_OFF});
@@ -2185,10 +2188,10 @@ function offsetsVision(k){
   }
   return (visionOffsets[k] = res);
 }
-function celdasVisionDe(t){
+function celdasVisionDe(t, ignorarSolidos){
   const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
   const c0 = hexACubo({col: t.col, fila: t.fila});
-  const solidos = solidosSet();
+  const solidos = ignorarSolidos ? new Set() : solidosSet();
   const origen = {col: t.col, fila: t.fila};
   const res = [];
   offsetsVision(k).forEach(o => {
@@ -2291,7 +2294,10 @@ function renderNiebla(){
   j.hidden = !nieblaActiva;   // solo tiene sentido con la niebla prendida
   j.classList.toggle('primary', nieblaComoJugador);
   j.title = nieblaComoJugador ? 'Volver a verlo todo' : 'Ver el mapa como lo ven los jugadores';
-  $('#btn-ojo-menu').classList.toggle('activo', nieblaActiva || nieblaComoJugador);
+  $('#btn-ojo-menu').classList.toggle('activo', nieblaActiva || nieblaComoJugador || visionCreepsActiva);
+  const vc = $('#btn-vision-creeps');
+  vc.classList.toggle('primary', visionCreepsActiva);
+  vc.title = visionCreepsActiva ? 'Volver a verlo todo (apagar la visión de los creeps)' : 'Ver lo que ven los creeps: una niebla semitransparente sobre lo que ningún creep alcanza a ver, y en naranja lo que verían si los objetos sólidos no les taparan la vista';
 }
 $('#btn-niebla').onclick = async () => {
   if(!soyGM) return;
@@ -2311,6 +2317,31 @@ document.addEventListener('pointerdown', e => {
 });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#ojo-menu').hidden) abrirMenuOjo(false); });
 $('#btn-niebla-reiniciar').onclick = () => nieblaReiniciar();
+$('#btn-vision-creeps').onclick = () => {
+  visionCreepsActiva = !visionCreepsActiva;
+  try{ localStorage.setItem('vision-creeps', visionCreepsActiva ? '1' : ''); }catch(e){}
+  renderNiebla(); pedirDibujo();
+};
+
+// Visión de los creeps (solo GM): lo que ve cada creep con el mismo cono de visión que los personajes (celdasVisionDe: radio y punto
+// ciego, y los sólidos tapan la vista). `vistas` = casillas que algún creep alcanza a ver; `tapadas` = las que verían si no hubiera
+// sólidos (y ahora no ven). Se recalcula solo si se mueve o gira un creep, o cambian los sólidos.
+let visionCreepsCache = {firma: '', vistas: new Set(), tapadas: new Set()};
+function visionCreepsCalcular(){
+  const creeps = [...tokens.entries()].filter(([, t]) => t.tipo === 'creep');
+  const firma = creeps.map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0}`).join('|') + '#' + solidosFirma();
+  if(firma !== visionCreepsCache.firma){
+    const vistas = new Set(), sinSolidos = new Set();
+    creeps.forEach(([, t]) => {
+      celdasVisionDe(t).forEach(k => vistas.add(k));
+      celdasVisionDe(t, true).forEach(k => sinSolidos.add(k));
+    });
+    const tapadas = new Set();
+    sinSolidos.forEach(k => { if(!vistas.has(k)) tapadas.add(k); });
+    visionCreepsCache = {firma, vistas, tapadas};
+  }
+  return visionCreepsCache;
+}
 $('#btn-niebla-jugador').onclick = () => {
   nieblaComoJugador = !nieblaComoJugador;
   try{ localStorage.setItem('niebla-como-jugador', nieblaComoJugador ? '1' : ''); }catch(e){}
@@ -3238,6 +3269,34 @@ function dibujar(){
     ctx.globalAlpha = 1;
   };
   if(nieblaActiva && !nieblaAplica()) pintarNiebla();
+
+  // 👹 Visión de los creeps (solo GM): niebla semitransparente sobre lo que ningún creep ve, y en naranja lo que los sólidos les tapan.
+  if(visionCreepsActiva && soyGM){
+    const vc = visionCreepsCalcular();
+    const margen = HEX * 2;
+    const x0 = a.x - margen, y0 = a.y - margen, x1 = b.x + margen, y1 = b.y + margen;
+    const dentro = c => { const p = hexCentro(c.col, c.fila); return p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1; };
+    const vistasLista = [], tapadasLista = [];
+    vc.vistas.forEach(k => { const c = nbUnpack(k); if(dentro(c)) vistasLista.push(c); });
+    vc.tapadas.forEach(k => { const c = nbUnpack(k); if(dentro(c)) tapadasLista.push(c); });
+    const trazarLista = lista => lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    ctx.beginPath();
+    ctx.rect(x0, y0, x1 - x0, y1 - y0);
+    trazarLista(vistasLista);
+    ctx.fillStyle = 'rgba(20,24,44,.55)';
+    ctx.fill('evenodd');
+    if(tapadasLista.length){
+      ctx.beginPath();
+      trazarLista(tapadasLista);
+      ctx.fillStyle = 'rgba(255,150,40,.32)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,170,60,.85)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+    }
+    if(vistasLista.length){
+      ctx.beginPath();
+      trazarLista(vistasLista);
+      ctx.strokeStyle = 'rgba(214,69,69,.45)'; ctx.lineWidth = 1.5 / z; ctx.stroke();
+    }
+  }
 
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
   // de movimientos recientes (se desvanecen).

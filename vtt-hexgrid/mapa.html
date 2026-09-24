@@ -2042,7 +2042,7 @@ function sigiloPublicarAvisos(id){
     ? '⚠ Hace falta una tirada de percepción'
     : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
 }
-async function romperSigilo(id, detector){
+async function romperSigilo(id, detector, motivo){   // motivo (opcional): otra causa que no sea que lo detecten (una trampa)
   const t = tokens.get(id);
   const e = t && estadoDe(t);
   const idx = e ? e.estados.findIndex(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo') : -1;
@@ -2050,7 +2050,7 @@ async function romperSigilo(id, detector){
   sigiloRompiendo.add(id);
   try{
     await hudEstadoCambiar(t, idx, 'quitar');
-    sigiloAviso(`🕶 ${nombreDe(t)} perdió el sigilo`, `Lo detectó ${detector}: entró en su cono de detección`);
+    sigiloAviso(`🕶 ${nombreDe(t)} perdió el sigilo`, motivo || `Lo detectó ${detector}: entró en su cono de detección`);
   }finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
 }
 // Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo
@@ -5679,6 +5679,8 @@ async function trampaResolver(){
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
+    // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
+    if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
     await trampaAplicarDano(t, p.el);
     await trampaAplicarEstado(t, p.el);
     return;

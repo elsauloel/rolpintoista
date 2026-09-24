@@ -894,3 +894,5 @@ hexágono con otro sin importar bando. Todavía no está construido.
 - **T = 🔮 Rango de casteo** (2026-09-24): además de Shift+R, la tecla **T** prende y apaga el rango de casteo del token seleccionado (Ctrl+R/Ctrl+Shift+R son del navegador y recargan la página, por eso se evita depender de Shift+R). R sigue siendo el Rango (Destreza).
 
 - **C centra el mapa** (2026-09-24): la tecla **C** lleva la vista al token seleccionado (el GM, cualquiera, por ejemplo un creep; un jugador, uno suyo); sin selección, como el botón Centrar (tu personaje, o los tuyos). También quedó actualizada la lista de atajos ⌨ (R, T y C).
+
+- **Activar una trampa rompe el sigilo** (2026-09-24, regla dicha por el dueño): en `trampaResolver`, cuando un token en sigilo pisa una trampa y se dispara, pierde el estado Sigilo (`romperSigilo(id, "", motivo)`, con su aviso en la Mesa "activó una trampa") antes de aplicarle el daño y el estado de la trampa. Vale para personajes y creeps.

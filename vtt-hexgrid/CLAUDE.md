@@ -896,3 +896,5 @@ hexágono con otro sin importar bando. Todavía no está construido.
 - **C centra el mapa** (2026-09-24): la tecla **C** lleva la vista al token seleccionado (el GM, cualquiera, por ejemplo un creep; un jugador, uno suyo); sin selección, como el botón Centrar (tu personaje, o los tuyos). También quedó actualizada la lista de atajos ⌨ (R, T y C).
 
 - **Activar una trampa rompe el sigilo** (2026-09-24, regla dicha por el dueño): en `trampaResolver`, cuando un token en sigilo pisa una trampa y se dispara, pierde el estado Sigilo (`romperSigilo(id, "", motivo)`, con su aviso en la Mesa "activó una trampa") antes de aplicarle el daño y el estado de la trampa. Vale para personajes y creeps.
+
+- **Descubrir una trampa la hace visible** (2026-09-24, regla dicha por el dueño): cuando salta el aviso de percepción por quedar al lado de una trampa oculta, esa trampa pasa a verse para quien la descubrió (`descubrirTrampa`, `trampasVistas`, recordado en `localStorage` por partida; los elementos ahora traen `id`); no rompe el sigilo. Es solo para esa persona (no se sincroniza).

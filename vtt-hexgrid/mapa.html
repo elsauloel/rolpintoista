@@ -4739,9 +4739,18 @@ function puedeManipularElemento(el){
   return !!(el && fbUsuario && (soyGM || el.duenoUid === fbUsuario.uid));
 }
 // Un elemento invisible solo lo ven el GM y su creador (el resto, nada).
+// Trampas que ESTE navegador descubrió (por percepción, sin pisarlas): desde ahí las ve aunque no sean suyas (2026-09-24).
+const trampasVistas = new Set();
+try{ (JSON.parse(localStorage.getItem('trampas-vistas-' + FB_CAMPANA) || '[]')).forEach(id => trampasVistas.add(id)); }catch(e){}
+function descubrirTrampa(id){
+  if(!id || trampasVistas.has(id)) return;
+  trampasVistas.add(id);
+  try{ localStorage.setItem('trampas-vistas-' + FB_CAMPANA, JSON.stringify([...trampasVistas].slice(-300))); }catch(e){}
+  pedirDibujo();
+}
 function puedeVerElemento(el){
-  // Una trampa sin disparar solo la ven su dueño y el GM; disparada, todos.
-  if(el.trampa && !el.disparada && !puedeManipularElemento(el)) return false;
+  // Una trampa sin disparar solo la ven su dueño y el GM (y quien la descubrió); disparada, todos.
+  if(el.trampa && !el.disparada && !puedeManipularElemento(el) && !(el.id && trampasVistas.has(el.id))) return false;
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
@@ -4812,6 +4821,7 @@ function escucharElementos(){
       const celdas = [];
       for(let i = 0; i + 1 < crudo.length; i += 2) celdas.push({dq: num(crudo[i]), dr: num(crudo[i + 1])});
       elementos.set(ch.doc.id, {
+        id: ch.doc.id,
         tipo: d.tipo === 'linea' || d.tipo === 'libre' ? d.tipo : 'flor',
         origen: {col: Math.round(num(d.origen && d.origen.col)), fila: Math.round(num(d.origen && d.origen.fila))},
         celdas,
@@ -5686,7 +5696,9 @@ async function trampaResolver(){
     return;
   }
   trampasAvisadas.add(p.tokenId + ':' + p.id);
-  toast('🔎 Algo llama tu atención cerca: corresponde una tirada de percepción');
+  // Descubrir una trampa NO rompe el sigilo, pero la trampa se vuelve visible para quien la descubrió (2026-09-24, regla dicha por el dueño).
+  descubrirTrampa(p.id);
+  toast('🔎 Descubriste una trampa: ahora la ves (corresponde una tirada de percepción)');
   alertaRojaAnonima('⚠ Hace falta una tirada de percepción');
 }
 

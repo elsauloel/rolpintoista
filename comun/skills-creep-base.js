@@ -376,7 +376,7 @@
   H('Inmunidad total', 'T', 'ce', 't', 6, eS('Nada lo daña ni lo debilita un momento.', 3, 'Invulnerable', 'buff', 1), 'jefe');
   H('Voluntad de hierro', 'T', '*', 't', 5, eS('Ignora todo lo que quiera controlarlo: no lo aturden ni lo agotan.', 2, 'Inmunidad a CC', 'buff', 3), 'jefe');
   H('Espinas defensivas', 'T', 'bpc', 't', 4, eS('Sus púas devuelven el 50% del daño de los golpes cuerpo a cuerpo (se cobra a mano).', 2, 'Espinas', 'buff', 3));
-  H('Escudo arcano', 'T', 'ga', 'tg', 4, eS('Una barrera de energía absorbe daño de cualquier fuente.', 2, 'Escudo mágico', 'buff', 3));
+  H('Escudo arcano', 'T', 'ga', 'tg', 4, eS('Una barrera de energía absorbe daño de cualquier fuente.', 2, 'Escudo especial', 'buff', 3));
   H('Suerte del bribón', 'B', 'hdb', 'e', 4, eS('Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2));
   H('Sangre inmune', 'T', 'mpc', 't', 4, eS('Ningún veneno le hace efecto.', 1, 'Sangre pura', 'buff', 3));
   H('Coagulación rápida', 'T', 'bhd', 't', 4, eS('Sus heridas cierran al instante: inmune al sangrado.', 1, 'Coagulación extrema', 'buff', 3));

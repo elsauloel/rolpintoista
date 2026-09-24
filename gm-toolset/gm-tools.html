@@ -1146,7 +1146,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" id="ec-hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" id="ec-stacks" min="1" value="1"></div>
         <div class="mini-f"><label>Stacks por turno</label><input type="number" id="ec-stacksturno" value="0"></div>
-        <div class="mini-f"><label>Escudo mágico (HP secundario, se recarga cada Mantenimiento)</label><input type="number" id="ec-escudomagico" min="0" value="0"></div>
+        <div class="mini-f"><label>Escudo especial (HP secundario, se recarga cada Mantenimiento)</label><input type="number" id="ec-escudomagico" min="0" value="0"></div>
       </div>
       <div style="display:flex;gap:16px">
         <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
@@ -1235,6 +1235,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/tiradas.js"></script>
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
+<script src="../comun/estado-preguntas.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -2449,7 +2450,7 @@ function aplicarDanioCreep(input){
   if(critInput) critInput.checked = false;
 
   const extra = [];
-  if(absorbido) extra.push(`Escudo mágico absorbió ${fmt(absorbido)}${escudo.escudoMagicoActual ? ` (quedan ${fmt(escudo.escudoMagicoActual)}/${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
+  if(absorbido) extra.push(`Escudo especial absorbió ${fmt(absorbido)}${escudo.escudoMagicoActual ? ` (quedan ${fmt(escudo.escudoMagicoActual)}/${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
   if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
@@ -3506,7 +3507,7 @@ const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
-    detalle:'Pierde 1 HP por stack cada turno.'},
+    detalle:'Pierde HP por stack cada turno.'},
   {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mitadPdgEva:true,
@@ -3516,15 +3517,15 @@ const ESTADOS_PRESET_GM = [
   {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true, exhausto:true,
     detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
   {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, forzarNitros:0,
-    detalle:'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
+    detalle:'Sin No2 mientras dura (contá un turno de más para que te agarre de verdad en su próximo turno, aunque el Mantenimiento pase antes de que actúe). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
   {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:1}],
-    detalle:'+1 a los No2 máximos. ⚠ Valor provisorio (antes +1 Acción).'},
+    detalle:'Suma a los No2 máximos mientras dure. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
     detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
-    detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
+    detalle:'Hace daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente.'},
   {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:2, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
-    detalle:'Pierde 2 HP por turno. Permanente hasta curarse. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
+    detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true,
@@ -3537,8 +3538,8 @@ const ESTADOS_PRESET_GM = [
     detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
     detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante (avisa cuánto es, se cobra a mano).'},
-  {nombre:'Escudo mágico', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
-    detalle:'Durante 3 turnos, funciona como una barra de HP secundaria de 10 puntos: absorbe todo el daño de cualquier fuente —incluso true damage— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo (editable al elegir el preset).'},
+  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
+    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño de cualquier fuente —incluso true damage— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, sangrePura:true,
@@ -3569,8 +3570,19 @@ function optgroupsEstadosPersonalizadosHtml(){
 // ficha.html: clic en una tarjeta activa el estado directo sobre el
 // creep, sin pasar por el editor. "Estado personalizado" abre el
 // editor de siempre para armar uno de cero.
+const CFG_PREGUNTAS_GM = {hp: 'hpTurno', statLabel: id => ATTR_LABELS[id] || STAT_LABEL_GM[id] || id};
 function presetBtnHtmlCreep(p, valor, clase){
   const datos = [];
+  if(valor.startsWith('std:')){
+    // Los presets estándar ya traen el efecto pero no las cantidades: al activarlos se pregunta cada una.
+    EstadoPreguntas.chips(p, CFG_PREGUNTAS_GM).forEach(t => datos.push(`<span class="preset-dato">${esc(t)}: a elegir</span>`));
+    const detP = (p.detalle || '').trim();
+    return `<button type="button" class="preset-btn ${clase}" data-presetcreep="${esc(valor)}">
+    <span class="preset-nombre">${esc(p.nombre)}</span>
+    ${datos.length ? `<span class="preset-datos">${datos.join('')}</span>` : ''}
+    ${detP ? `<span class="preset-detalle">${esc(detP.length > 90 ? detP.slice(0, 88) + '…' : detP)}</span>` : ''}
+  </button>`;
+  }
   const hpTurno = num(p.hpTurno);
   if(hpTurno) datos.push(`<span class="preset-dato ${hpTurno > 0 ? 'bueno' : 'malo'}">${hpTurno > 0 ? '+' : ''}${fmt(hpTurno)} HP/turno</span>`);
   if(p.permanente) datos.push(`<span class="preset-dato">No vence</span>`);
@@ -3690,7 +3702,9 @@ function aplicarPresetEstadoCreep(valor){
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
   if(!preset) return;
-  activarEstadoPresetCreep(preset);
+  // Un preset estándar pregunta sus cantidades (HP, turnos…) antes de activarse; los propios ya traen las que se eligieron.
+  if(tipo === 'std') EstadoPreguntas.pedir(preset, CFG_PREGUNTAS_GM).then(armado => { if(armado) activarEstadoPresetCreep(armado); });
+  else activarEstadoPresetCreep(preset);
 }
 
 const ATTR_IDS = ['con','fue','agl','des','esp'];
@@ -3718,7 +3732,7 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   if(!nombre) return null;
   // La habilidad no sabe de categorías/inmunidades — se infiere buscando
   // un preset con el mismo nombre, igual que en ficha.html.
-  const preset = ESTADOS_PRESET_GM.find(p => p.nombre === nombre);
+  const preset = ESTADOS_PRESET_GM.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));   // "Escudo mágico" pasó a "Escudo especial" (2026-09-24)
   const turnos = num(h.efectoTurnos);
   const stacks = Math.max(1, num(h.efectoStacks) || 1);
   const hpTurno = num(h.efectoHpTurno);
@@ -3729,7 +3743,7 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   }
   const detalle = h.efectoDetalle || '';
   const mods = structuredClone(h.efectoMods || []);
-  // Con un preset conocido (Invulnerable, Espinas, Escudo mágico, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
+  // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
   const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
     stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
   if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
@@ -5790,7 +5804,7 @@ function mantenimiento(){
       // entera cada Mantenimiento mientras el estado siga activo.
       if(num(es.escudoMagico) > 0){
         const previo = num(es.escudoMagicoActual ?? es.escudoMagico);
-        if(previo < num(es.escudoMagico)) rep.push(`${es.nombre}: escudo mágico ${fmt(previo)} → ${fmt(num(es.escudoMagico))}`);
+        if(previo < num(es.escudoMagico)) rep.push(`${es.nombre}: escudo especial ${fmt(previo)} → ${fmt(num(es.escudoMagico))}`);
         es.escudoMagicoActual = num(es.escudoMagico);
       }
       const stacks = Math.max(1, num(es.stacks) || 1);

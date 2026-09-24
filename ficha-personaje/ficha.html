@@ -1965,6 +1965,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/tiradas.js"></script>
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
+<script src="../comun/estado-preguntas.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -3253,8 +3254,10 @@ async function estadosRevisar(){
     estadosAplicando = false;
   }
 }
+// Un preset se encuentra por su nombre o por un nombre viejo (alias): "Escudo mágico" pasó a llamarse "Escudo especial" (2026-09-24).
+const presetPorNombre = (lista, nombre) => lista.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
 function aplicarEstadoRecibido(spec, origen){
-  const preset = EFECTOS_PRESET.find(p => p.nombre === spec.nombre);
+  const preset = presetPorNombre(EFECTOS_PRESET, spec.nombre);
   let draft;
   if(preset){
     const {nombre, ...resto} = preset;
@@ -3813,8 +3816,8 @@ function aplicarEfectoDeConsumo(it){
   // el que declare en efectoPreset — para poder mostrar un nombre propio
   // ("Coagulación extrema (pergamino)") sin perder la mecánica real del
   // preset "Coagulación extrema" (mismo mecanismo que equipoEstadoPreset).
-  const nombrePresetEfectivo = EFECTOS_PRESET.some(p => p.nombre === nombre) ? nombre : (src.efectoPreset || '').trim();
-  const preset = EFECTOS_PRESET.find(p => p.nombre === nombrePresetEfectivo);
+  const nombrePresetEfectivo = presetPorNombre(EFECTOS_PRESET, nombre) ? nombre : (src.efectoPreset || '').trim();
+  const preset = presetPorNombre(EFECTOS_PRESET, nombrePresetEfectivo);
   if(estaBloqueadoElDebuff(preset)){
     toast(`Inmune ahora mismo — ${nombre} no hizo efecto`);
     return null;
@@ -5629,7 +5632,7 @@ const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
   'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'armaduraRota', 'escudoMagico', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
-  const p = EFECTOS_PRESET.find(x => x.nombre === (nombrePreset || '').trim());
+  const p = presetPorNombre(EFECTOS_PRESET, (nombrePreset || '').trim());
   if(!p) return {};
   const out = {polaridad: p.polaridad};
   EFECTO_FLAGS_ESPECIALES.forEach(f => { if(p[f] !== undefined) out[f] = p[f]; });
@@ -6686,7 +6689,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
-  escudoMagico:'Escudo mágico — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
+  escudoMagico:'Escudo especial — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
   armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
@@ -6696,7 +6699,7 @@ const CAMPO_NUM = ['curaHp','compras','regenHp','jobCosto','peso','ranuras','sta
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
 const EFECTOS_PRESET = [
   {nombre:'Veneno', polaridad:'debuff', stacks:4, turnos:4, hpturno:-1, stacksturno:-1, esVeneno:true,
-    detalle:'Pierde 1 HP por stack cada turno. Se agota junto con los stacks (y con los turnos, que arrancan igualados).'},
+    detalle:'Pierde HP por stack cada turno. Se agota junto con los stacks.'},
   {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpturno:5, stacksturno:0,
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true,
@@ -6709,15 +6712,15 @@ const EFECTOS_PRESET = [
   {nombre:'Exhausto', polaridad:'debuff', turnos:3, exhausto:true, esCC:true,
     detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
   {nombre:'Stun', polaridad:'debuff', turnos:2, forzarNitros:0, esCC:true,
-    detalle:'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
+    detalle:'Sin No2 mientras dura (contá un turno de más para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
   {nombre:'Hypeado', polaridad:'buff', turnos:3, mods:[{stat:'nitros', val:1}],
-    detalle:'+1 a los Nitros máximos. ⚠ Valor provisorio (antes +1 Acción).'},
+    detalle:'Suma a los Nitros máximos mientras dure. ⚠ Valor provisorio (antes +1 Acción).'},
   {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true, mods:[{stat:'def', val:-1}],
     detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada vez que te rompen la armadura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpturno:-1, stacksturno:1, permanente:true, esVeneno:true,
-    detalle:'Hace 1 de daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente. No caduca.'},
+    detalle:'Hace daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente.'},
   {nombre:'Sangrado', polaridad:'debuff', stacks:1, turnos:0, hpturno:-2, stacksturno:0, permanente:true, esSangrado:true,
-    detalle:'Pierde 2 HP por turno. Permanente hasta curarse.'},
+    detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true,
@@ -6730,10 +6733,10 @@ const EFECTOS_PRESET = [
     detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante. Ojo: el daño al atacante hay que cargarlo a mano en su ficha, esto solo avisa cuánto es.'},
-  {nombre:'Escudo mágico', polaridad:'buff', turnos:3, escudoMagico:10,
-    detalle:'Durante 3 turnos, funciona como una barra de HP secundaria de 10 puntos: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo (cantidad editable al elegir el preset).'},
+  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, escudoMagico:10,
+    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
   {nombre:'Barrera', polaridad:'buff', turnos:1, escudoMagico:8,
-    detalle:'Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
+    detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
@@ -6750,8 +6753,15 @@ const POLARIDAD_EFECTO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
 // Los presets en grilla: cada uno muestra lo que hace (turnos, HP por
 // turno, stacks) sin tener que abrirlo. Reemplaza al desplegable, donde
 // solo se veía el nombre y había que elegir a ciegas.
+const CFG_PREGUNTAS_FICHA = {hp: 'hpturno', statLabel: id => STAT_LABEL[id] || id};
 function presetBtnHtml(p, valor, clase){
   const datos = [];
+  if((presetDestino === 'directo' || presetDestino === 'inv') && valor.startsWith('std:')){
+    // Los presets estándar ya traen el efecto pero no las cantidades: al activarlos se pregunta cada una.
+    EstadoPreguntas.chips(p, CFG_PREGUNTAS_FICHA).forEach(t => datos.push(`<span class="preset-dato">${esc(t)}: a elegir</span>`));
+    const detP = (p.detalle || '').trim();
+    return presetTarjetaHtml(p, valor, clase, datos, detP);
+  }
   const hpturno = num(p.hpturno);
   if(hpturno) datos.push(`<span class="preset-dato ${hpturno > 0 ? 'bueno' : 'malo'}">${hpturno > 0 ? '+' : ''}${fmt(hpturno)} HP/turno</span>`);
   if(p.permanente) datos.push(`<span class="preset-dato">No vence</span>`);
@@ -6763,7 +6773,9 @@ function presetBtnHtml(p, valor, clase){
     const v = num(m.val);
     datos.push(`<span class="preset-dato ${v > 0 ? 'bueno' : 'malo'}">${esc(STAT_LABEL[m.stat] || m.stat)} ${v > 0 ? '+' : ''}${fmt(v)}</span>`);
   });
-  const det = (p.detalle || '').trim();
+  return presetTarjetaHtml(p, valor, clase, datos, (p.detalle || '').trim());
+}
+function presetTarjetaHtml(p, valor, clase, datos, det){
   const cuerpo = `
     <span class="preset-nombre">${esc(p.nombre)}</span>
     ${datos.length ? `<span class="preset-datos">${datos.join('')}</span>` : ''}
@@ -6945,12 +6957,11 @@ function aplicarPresetEfecto(valor){
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
   if(!preset) return;
-  if(presetDestino === 'directo'){
-    activarEfectoPreset(preset);
-    return;
-  }
-  if(presetDestino === 'inv'){
-    activarEfectoPresetInv(preset);
+  if(presetDestino === 'directo' || presetDestino === 'inv'){
+    const activar = presetDestino === 'directo' ? activarEfectoPreset : activarEfectoPresetInv;
+    // Un preset estándar pregunta sus cantidades (HP, turnos…) antes de activarse; los propios ya traen las que el jugador eligió.
+    if(tipo === 'std') EstadoPreguntas.pedir(preset, CFG_PREGUNTAS_FICHA).then(armado => { if(armado) activar(armado); });
+    else activar(preset);
     return;
   }
   if(!editing) return;
@@ -9698,7 +9709,7 @@ function mantenimiento(){
       const actual = num(e.escudoMagicoActual ?? e.escudoMagico);
       if(actual < num(e.escudoMagico)){
         log.push(`<b>${esc(e.nombre)}</b> escudo recargado a ${fmt(num(e.escudoMagico))}`);
-        rep.push(`${e.nombre}: escudo mágico ${fmt(actual)} → ${fmt(num(e.escudoMagico))}`);
+        rep.push(`${e.nombre}: escudo especial ${fmt(actual)} → ${fmt(num(e.escudoMagico))}`);
       }
       e.escudoMagicoActual = num(e.escudoMagico);
     }

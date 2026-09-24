@@ -6679,7 +6679,7 @@ function leerGolpe(texto){
 
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
-  if(r.absorbido) extra.push(`Escudo mágico absorbió ${fmt(r.absorbido)}`);
+  if(r.absorbido) extra.push(`Escudo especial absorbió ${fmt(r.absorbido)}`);
   if(r.espinas) extra.push(`Espinas: cobrale ${fmt(Math.ceil(r.recibido * 0.5))} al atacante`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;

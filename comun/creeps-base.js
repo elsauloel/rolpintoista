@@ -850,7 +850,7 @@
 
   /* ================= TRIBUS Y CLANES (2026-09-21): más variedad de kobolds, goblins y hombres cabra =================
      Cada uno con un rol distinto y mecánicas del juego distintas: sigilo, trampas (con y sin daño), estados propios
-     (Espinas, Regeneración, Blindado, Escudo mágico, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
+     (Espinas, Regeneración, Blindado, Escudo especial, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
      aplican solos (Veneno, Quemado, Rengo, Cegado, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito…). */
   // Un ataque o habilidad que además deja un estado sobre el objetivo (se aplica solo al usarla, o al pisar la trampa).
   const ap = (sp, estado) => ({...sp, aplica: estado});
@@ -906,7 +906,7 @@
     'Manda con un látigo y con un chillido que se oye en toda la galería.', KB);
   cr('minas', 4, 'Kobold devoto del dragón', 'apoyo', 'humanoide', 'Cetro de escama',
     bu('Escamas de fe', 'Reza a su dragón: +3 Res.Mg hasta el final de su turno.', 1, {resmg: 3}, 1),
-    [es('Bendición escamosa', 'Una barrera mágica en forma de escamas absorbe daño de cualquier fuente.', 3, 'Escudo mágico', 'buff', 3), 5],
+    [es('Bendición escamosa', 'Una barrera mágica en forma de escamas absorbe daño de cualquier fuente.', 3, 'Escudo especial', 'buff', 3), 5],
     'Reza tan fuerte que a veces le contestan.', KB);
 
   cr('minas', 5, 'Kobold guardia real', 'tanque', 'humanoide', 'Alabarda de cobre',

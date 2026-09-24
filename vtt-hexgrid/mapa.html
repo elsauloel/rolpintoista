@@ -2141,6 +2141,18 @@ function revisarAutoLentes(){
   sigiloPropioPrevio = ahora;
 }
 
+// ¿Puedo ver la estela (el rastro de movimiento) de este token? (2026-09-24, pedido del dueño): un token oculto por el GM
+// no deja rastro para los jugadores, y uno en sigilo solo lo dejan a la vista del propio usuario y sus aliados (los demás
+// personajes; nunca los creeps). El GM ve el rastro de sus creeps siempre; el de un personaje en sigilo, solo con el 👁.
+// Se decide al DIBUJAR (no al recibir la ruta), así un token que entra en sigilo justo después de moverse también pierde
+// su estela apenas se sabe.
+function estelaVisibleDe(t){
+  if(!t) return true;
+  if(t.oculto && !soyGM) return false;
+  if(enSigilo(t)) return soyGM ? (t.tipo === 'creep' || ojoRevelando) : t.tipo === 'pj';
+  return true;
+}
+
 // Aliados (personajes jugadores e invocaciones) se ven siempre; el resto,
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
@@ -3208,26 +3220,44 @@ function dibujar(){
   // de movimientos recientes (se desvanecen).
   let animando = false;
   const ahora = Date.now();
-  // pagables: casilleros que alcanzan los Nitros; los de más van en rojo.
-  const dibujarEstela = (celdas, alfa, pagables = Infinity) => {
+  // pagables: casilleros que alcanzan los Nitros; los de más van en magenta (antes en rojo: el rojo ahora es la estela normal,
+  // 2026-09-24, para que se destaque sobre la niebla). Cada casillero lleva su numerito: los Nitros que suma hasta ahí
+  // (porCasillero × pasos; en modo narrativo o en la estela de otro, solo la cuenta de pasos).
+  const dibujarEstela = (celdas, alfa, pagables = Infinity, porCasillero = 1) => {
     if(celdas.length < 2) return;
+    const ROJO = '255,38,38', IMPAGO = '226,40,214';
     const casillas = (color, lista) => {
       if(!lista.length) return;
       ctx.beginPath();
       lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
-      ctx.fillStyle = `rgba(${color},${0.2 * alfa})`; ctx.fill();
-      ctx.strokeStyle = `rgba(${color},${0.75 * alfa})`; ctx.lineWidth = 2 / z; ctx.stroke();
+      ctx.fillStyle = `rgba(${color},${0.26 * alfa})`; ctx.fill();
+      ctx.strokeStyle = `rgba(${color},${0.95 * alfa})`; ctx.lineWidth = 2.5 / z; ctx.stroke();
     };
-    casillas('224,164,88', celdas.slice(1, pagables + 1));
-    casillas('214,69,69', celdas.slice(pagables + 1));
-    ctx.beginPath();
-    celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
-    ctx.strokeStyle = `rgba(237,227,210,${0.85 * alfa})`; ctx.lineWidth = 4 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
-    celdas.slice(1).forEach(c => {
+    casillas(ROJO, celdas.slice(1, pagables + 1));
+    casillas(IMPAGO, celdas.slice(pagables + 1));
+    const trazarLinea = () => {
+      ctx.beginPath();
+      celdas.forEach((c, i) => { const p = hexCentro(c.col, c.fila); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
+    };
+    // Contorno oscuro debajo, para que el rojo se separe de la niebla y de fondos claros.
+    trazarLinea(); ctx.strokeStyle = `rgba(15,8,10,${0.7 * alfa})`; ctx.lineWidth = 8 / z; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+    trazarLinea(); ctx.strokeStyle = `rgba(255,52,52,${alfa})`; ctx.lineWidth = 4.5 / z; ctx.stroke();
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
+    celdas.slice(1).forEach((c, i) => {
       const p = hexCentro(c.col, c.fila);
-      ctx.beginPath(); ctx.arc(p.x, p.y, 5 / z, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(237,227,210,${alfa})`; ctx.fill();
+      const color = i < pagables ? ROJO : IMPAGO;
+      const n = porCasillero > 0 ? (i + 1) * porCasillero : i + 1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 9 / z, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(${color},${alfa})`; ctx.fill();
+      ctx.strokeStyle = `rgba(15,8,10,${0.9 * alfa})`; ctx.lineWidth = 1.8 / z; ctx.stroke();
+      ctx.fillStyle = `rgba(255,255,255,${alfa})`;
+      ctx.strokeStyle = `rgba(0,0,0,${0.8 * alfa})`; ctx.lineWidth = 2.5 / z;
+      ctx.strokeText(String(n), p.x, p.y + 0.5 / z);
+      ctx.fillText(String(n), p.x, p.y + 0.5 / z);
     });
+    ctx.restore();
   };
   // Marcador de trayectoria del lápiz por casilleros: como la estela, pero
   // de un color elegido y con todas las casillas (incluida la de partida).
@@ -3270,11 +3300,12 @@ function dibujar(){
     if(resta <= 0){ estelas.delete(id); return; }
     const tEstela = tokens.get(id);
     if(tEstela && !tokenVisiblePorNiebla(tEstela)) return;   // la estela de lo que no se ve tampoco
+    if(!estelaVisibleDe(tEstela)) return;                    // ni la de un oculto ni la de un sigiloso ajeno
     dibujarEstela(e.celdas, Math.min(1, resta / 1200));
     animando = true;
   });
-  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente));
-  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo));
+  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente), rutaPendiente.porCasillero || 1);
+  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo), arrastre.costo ? arrastre.costo.porCasillero : 1);
 
   // 👓 Ver conos: el cono de detección (azul) y la zona de alerta (naranja) de todos los tokens
   // que se ven (los ocultos o en sigilo que no ves, tampoco muestran sus zonas).
@@ -3594,6 +3625,25 @@ function dibujar(){
     ctx.fillText(nombreMiembro(p.duenoUid), p.x, p.y - radio - 10 / z);
     ctx.restore();
   });
+
+  // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
+  // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).
+  if(arrastre && arrastre.movio && !arrastre.libre && arrastre.costo && modoMapa === 'combate' && tokens.has(arrastre.id)){
+    const porCas = arrastre.costo.porCasillero, gastado = Math.max(0, arrastre.ruta.length - 1) * porCas;
+    const quedan = arrastre.costo.disponibles - gastado;
+    const bx = arrastre.x + HEX * 0.75, by = arrastre.y - HEX * 0.75, rad = 17 / z;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(bx, by, rad, 0, 2 * Math.PI);
+    ctx.fillStyle = quedan >= 0 ? 'rgba(20,70,36,.95)' : 'rgba(90,10,86,.95)'; ctx.fill();
+    ctx.strokeStyle = quedan >= 0 ? NO2_COLOR : 'rgb(226,40,214)'; ctx.lineWidth = 3 / z; ctx.stroke();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${14 / z}px "Space Mono", monospace`;
+    ctx.fillText(String(quedan), bx, by - 2 / z);
+    ctx.font = `700 ${8 / z}px "Space Mono", monospace`;
+    ctx.fillText('No2', bx, by + 9 / z);
+    ctx.restore();
+  }
 
   // Clima del sigilo: quien tiene un personaje en sigilo ve el mapa con un
   // filtro violáceo tenue.

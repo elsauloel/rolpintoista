@@ -88,7 +88,6 @@ Todo lo que se paga con [[Nitros (No2)|Nitros]] en combate:
 | Actividad | Costo |
 |---|---|
 | Mover 1 casillero | **1** (2 con [[Rengo]]; no se puede con [[Inmovilizado]]) |
-| Girar el token 60° (cambiar hacia dónde mirás) | **1** por giro, solo en combate |
 | Ejecutar una [[Habilidades\|habilidad]] | **1** por defecto; algunas cuestan más o tienen costo variable (X) |
 | Una habilidad "de ataque" | Lo que cuesta atacar con ese arma |
 | **Primer ataque con un arma en el turno** | **Tipo ÷ 2** (redondeado para arriba) |

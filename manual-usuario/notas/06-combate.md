@@ -342,7 +342,7 @@ alias: [Cono, Cono de detección, Zona de alerta, Detección, Punto ciego, Visi�
 tags: [sigilo, mapa]
 estado: borrador
 +++
-Cada token del mapa **mira hacia uno de los 6 lados** de su hexágono (por defecto, hacia abajo). Se gira arrastrando el asa celeste ↻. **Girar cuesta 1 No2 por cada giro de 60°** (solo en combate), y al moverte quedás mirando hacia donde caminaste.
+Cada token del mapa **mira hacia uno de los 6 lados** de su hexágono (por defecto, hacia abajo). Se gira arrastrando el asa celeste ↻. **Girar no cuesta No2**, y al moverte quedás mirando hacia donde caminaste.
 
 ## Las tres zonas
 | Zona | Qué es | Qué pasa |

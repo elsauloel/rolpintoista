@@ -158,7 +158,6 @@ Lo esencial en una pantalla. Para el detalle, seguí los enlaces.
 | Acción | Costo |
 |---|---|
 | Mover 1 casillero | 1 |
-| Girar 60° | 1 |
 | Habilidad | 1 (o lo indicado) |
 | 1.er ataque con un arma / Parry | Tipo ÷ 2 |
 | Ataques siguientes | Tipo |

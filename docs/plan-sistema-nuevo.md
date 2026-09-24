@@ -187,9 +187,8 @@ público").
 **Orientación y campo de visión:**
 - ✅ **Hecho en el mapa**: la grilla es "de lado arriba" y cada token es un
   hexágono que mira hacia **uno de los 6 lados**; por defecto mira abajo.
-  Se gira arrastrando un handle celeste. **Girar cuesta No2** (decidido,
-  1 por cambio de posición; todavía sin construir, con detalles por
-  confirmar: P14).
+  Se gira arrastrando un handle celeste. **Girar NO cuesta No2** (2026-09-24: se sacó la regla de
+  1 No2 por giro de 60° en combate, P14).
 - **Al moverse, el token queda mirando hacia donde caminó**, salvo que gaste
   más No2 en girarse (P15).
 - **Tienen orientación, cono, alerta y punto ciego atrás**: los personajes,
@@ -224,7 +223,7 @@ público").
    invocaciones.
 4. ✅ (2026-09-19) Ruptura automática por entrar al cono, y el aviso de tiradas por pasos
    en la alerta.
-5. ✅ (2026-09-19) Costo de girar: 1 No2 por giro de 60°, solo en combate.
+5. ✅ (2026-09-19) Costo de girar: 1 No2 por giro de 60°, solo en combate. **Sacado 2026-09-24: girar es gratis.**
 
 **Detección (decidido 2026-09-19):** la tirada es manual y **tiran los dos,
 cada uno con su stat** (P4, en principio Destreza contra Especial); también

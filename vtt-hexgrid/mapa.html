@@ -1045,8 +1045,8 @@ let rutaPendiente = null;     // {id, celdas: [{col, fila}], pasos, porCasillero
 const estelas = new Map();    // tokenId -> {celdas, hasta}
 const ESTELA_MS = 4000;
 const TRAZO_MS = 3000;  // cuánto dura un trazo temporal del lápiz (la estela de los tokens usa ESTELA_MS)
-const COSTO_GIRO_NO2 = 1;      // No2 por cada giro de 60° del token, solo en combate (decidido 2026-09-19, a debatir)
-const giroLibre = new Set();     // tokens que acaban de moverse en combate: su primer giro es gratis (elegir hacia dónde miran)
+const COSTO_GIRO_NO2 = 0;      // Girar el token NO cuesta No2 (2026-09-24: se sacó la regla de 1 No2 por giro de 60° en combate; dejar en 0 para no cobrar)
+const giroLibre = new Set();     // ya sin uso: con giro gratis el "primer giro gratis después de moverse" no tiene sentido (se conserva por el deshacer)
 const RUTA_MAX_CELDAS = 100;  // tope que aceptan las reglas (200 números)
 // Ping (clic derecho en el mapa, sin herramienta que lo use — libre para
 // esto): un anillo que se expande y se apaga solo, para todos.
@@ -5003,6 +5003,8 @@ function mesaAlAccionNueva(docs){
   if(docs.some(d => !['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento'].includes(d.data().desde))) giroLibre.clear();
 }
 function abrirGiroLibre(id, celdas){
+  // Desde 2026-09-24 girar no cuesta No2 (COSTO_GIRO_NO2 = 0): ya no hace falta abrir un "giro gratis" después de moverse.
+  if(COSTO_GIRO_NO2 <= 0) return;
   if(modoMapa !== 'combate' || !celdas || celdas.length < 2) return;
   giroLibre.add(id);
   const t = tokens.get(id);
@@ -6405,7 +6407,7 @@ function hudHtml(t){
   if(libreActivo){
     return '<div class="hud-anillo">' +
       '<button type="button" class="hud-circulo icono abierto libre-activo" data-hud-boton="libre" title="Mover libre ACTIVO: tocá para apagarlo (M, Esc o clic derecho)">🦶</button>' +
-      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Con Mover libre no gasta No2">↻</div>';
+      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Girar no gasta No2">↻</div>';
   }
   // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
   let html = '<div class="hud-anillo">' +
@@ -6420,7 +6422,7 @@ function hudHtml(t){
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     '</div>' +
-    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste)">↻</div>' : '');
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Girar no gasta No2">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puede);
   if(hudGlobo === 'tarjeta' && t.tipo === 'creep') globo = hudTarjetaHtml(t, d);

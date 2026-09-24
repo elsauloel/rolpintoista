@@ -119,12 +119,12 @@ nuevo de Rol Pintoísta. Paso 2 de
   **Sólidos tapan la vista** (`solidosSet`, `lineaLibre`): lo que queda detrás de uno
   no cuenta ni para las zonas ni para la visión de la niebla. **Al caminar el
   token queda mirando hacia donde fue** (último paso de la ruta, gratis;
-  `moverToken`). **Girar con el handle ↻ cuesta `COSTO_GIRO_NO2` (1) por cada
-  giro de 60° y solo en combate** (a debatir), y solo a quien tiene No2
-  cuenta (PJ vinculado o creep). Todavía falta: la ruptura automática del
+  `moverToken`). **Girar con el handle ↻ NO cuesta No2** (2026-09-24: se sacó la regla
+  anterior de 1 No2 por giro de 60° en combate; `COSTO_GIRO_NO2 = 0`, el código
+  de cobro quedó por si se quisiera volver a poner). Todavía falta: la ruptura automática del
   sigilo al entrar en un cono, el aviso de tiradas por pasos en la alerta y
   que el sigilo tenga en cuenta las invocaciones.
-  **Giro gratis después de moverse** (2026-09-19, en combate): al soltar un
+  **(Ya sin efecto desde 2026-09-24, girar es gratis siempre; `abrirGiroLibre` no hace nada con `COSTO_GIRO_NO2 = 0`.) Giro gratis después de moverse** (2026-09-19, en combate): al soltar un
   movimiento el token (personaje, creep o invocación) tiene **derecho a elegir
   hacia dónde queda mirando sin gastar No2** — su primer giro con el ↻ es
   gratis (`giroLibre`, `abrirGiroLibre`); una vez establecida esa dirección,

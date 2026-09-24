@@ -3831,6 +3831,9 @@ function aplicarEfectoDeConsumo(it){
   // estado, se usa el suyo, que es mejor que nada.
   const detalle = (src.efectoDetalle || '').trim() || (src.detalle || '').trim();
   const categorias = flagsDePreset(nombrePresetEfectivo);
+  // Cantidades propias de la habilidad/ítem (las que se eligieron en el asistente de estados): mandan sobre las del preset.
+  const escudo = num(src.efectoEscudo), stacks = Math.max(1, num(src.efectoStacks) || 1);
+  if(escudo > 0) categorias.escudoMagico = escudo;
   let ef = S.efectos.find(e => e.nombre === nombre);
   if(ef){
     ef.turnos = turnos;
@@ -3838,10 +3841,12 @@ function aplicarEfectoDeConsumo(it){
     ef.activo = true;
     ef.permanente = permanente;
     ef.mods = mods;
+    if(stacks > 1) ef.stacks = stacks;
     if(detalle) ef.detalle = detalle;
     Object.assign(ef, categorias);
+    if(num(ef.escudoMagico) > 0) ef.escudoMagicoActual = num(ef.escudoMagico);   // reaplicar recarga el escudo entero
   }else{
-    ef = {id:uid(), nombre, imagen:'', turnos, stacks:1, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
+    ef = {id:uid(), nombre, imagen:'', turnos, stacks, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
     S.efectos.push(ef);
   }
   return ef;
@@ -6709,7 +6714,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
   precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
   danoAmplificado:'Daño amplificado (dados extra sin sumar peso)', armaDeRango:'Arma de rango (el botón de Daño Arma no suma el stat Dmg)',
-  manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoDetalle:'Detalle del estado',
+  manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoEscudo:'HP del escudo del estado', efectoStacks:'Stacks del estado', efectoDetalle:'Detalle del estado',
   curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
@@ -6717,7 +6722,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
-const CAMPO_NUM = ['curaHp','compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
+const CAMPO_NUM = ['curaHp','compras','regenHp','jobCosto','peso','ranuras','stacks','turnos','hpturno','stacksturno','unidades','curahp','precioCompra','danoFijo','danoAmplificado','tipoDado','nitrosCosto','hpCosto','efectoTurnos','efectoHpTurno','efectoEscudo','efectoStacks','curaspPct','cargaMax','cargaActual','forzarNitros','equipoEstadoHpTurno','escudoMagico'];
 
 // Presets estándar de Estados alterados: configuración de base, 100% editable
 // una vez elegidos. Los campos coinciden con los del editor de 'efectos'.
@@ -6990,11 +6995,23 @@ function aplicarPresetEfecto(valor){
   }
   if(!editing) return;
   if(presetDestino === 'item'){
-    editing.draft.efectoNombre = preset.nombre;
-    editing.draft.efectoTurnos = preset.turnos ?? 0;
-    editing.draft.efectoHpTurno = preset.hpturno ?? 0;
-    editing.draft.efectoPermanente = !!preset.permanente;
-    if(preset.detalle && !(editing.draft.efectoDetalle || '').trim()) editing.draft.efectoDetalle = preset.detalle;
+    // Un preset estándar pregunta sus cantidades (HP, escudo, stacks, bonos, turnos / sin límite) y las guarda en la habilidad/ítem.
+    const cargar = p => {
+      const d = editing.draft;
+      d.efectoNombre = preset.nombre;
+      d.efectoTurnos = p.turnos ?? 0;
+      d.efectoHpTurno = p.hpturno ?? 0;
+      d.efectoPermanente = !!p.permanente;
+      d.efectoEscudo = num(p.escudoMagico);
+      d.efectoStacks = num(p.stacks) > 1 ? num(p.stacks) : 1;
+      if(tipo === 'std' && (p.mods || []).some(m => m && m.stat)) d.efectoMods = structuredClone(p.mods.filter(m => m && m.stat));
+      if(preset.detalle && !(d.efectoDetalle || '').trim()) d.efectoDetalle = preset.detalle;
+      drawEditor();
+    };
+    const ed = editing;
+    if(tipo === 'std') EstadoPreguntas.pedir(preset, CFG_PREGUNTAS_FICHA).then(armado => { if(armado && editing === ed) cargar(armado); });
+    else cargar(preset);
+    return;
   }else{
     const {nombre, ...resto} = preset;
     Object.assign(editing.draft, structuredClone(resto));
@@ -8293,7 +8310,7 @@ function openEditor(key, id, equipadoPreset, opciones){
     compras:1, regenHp:0,
     job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:8, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
     unidades:1, consumible:false, curahp:0, precioCompra:0,
-    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
+    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoEscudo:0, efectoStacks:1, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
     forzarNitros:'', mitadPdgEva:false, armaduraRota:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
     equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const op = opciones || {};
@@ -8547,6 +8564,10 @@ function htmlEstadoAlUsar(key, draft){
         <div class="f"><label>${CAMPO_LABEL.efectoTurnos}</label><input data-c="efectoTurnos" type="number" step="any" value="${esc(draft.efectoTurnos??0)}"></div>
         <div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>
       </div>` : `<div class="f"><label>${CAMPO_LABEL.efectoHpTurno}</label><input data-c="efectoHpTurno" type="number" step="any" value="${esc(draft.efectoHpTurno??0)}"></div>`}
+      ${num(draft.efectoEscudo) > 0 || num(draft.efectoStacks) > 1 ? `<div class="f2">
+        ${num(draft.efectoEscudo) > 0 ? `<div class="f"><label>${CAMPO_LABEL.efectoEscudo}</label><input data-c="efectoEscudo" type="number" step="any" value="${esc(draft.efectoEscudo)}"></div>` : ''}
+        ${num(draft.efectoStacks) > 1 ? `<div class="f"><label>${CAMPO_LABEL.efectoStacks}</label><input data-c="efectoStacks" type="number" step="any" value="${esc(draft.efectoStacks)}"></div>` : ''}
+      </div>` : ''}
       <div class="f"><label>${CAMPO_LABEL.efectoDetalle}</label><textarea data-c="efectoDetalle" rows="2" placeholder="Qué hace el estado, tal como lo va a leer el jugador. Si lo dejás vacío se usa el detalle del ítem.">${esc(draft.efectoDetalle??'')}</textarea></div>
       <div class="f"><label>Modificadores de atributo (opcional)</label>
         <div id="efectomods">${(draft.efectoMods||[]).map((m,i)=>`
@@ -8725,7 +8746,7 @@ function drawEditor(){
     if(c==='nombre') return false;
     if(c==='curahp') return false;
     // Los campos del estado alterado van juntos en su propia sección (más abajo).
-    if(['efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','curaspPct'].includes(c)) return false;
+    if(['efectoNombre','efectoTurnos','efectoHpTurno','efectoEscudo','efectoStacks','efectoDetalle','curaspPct'].includes(c)) return false;
     if(c==='forzarNitros') return false;
     if(c==='ranuras' && draft.equipado) return false;
     if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
@@ -8956,7 +8977,7 @@ function itemComoEntradaDeCatalogo(draft){
     unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
     consumible: !!draft.consumible, curahp: num(draft.curahp), curaspPct: num(draft.curaspPct),
     efectoNombre: draft.efectoNombre || '', efectoTurnos: num(draft.efectoTurnos),
-    efectoHpTurno: num(draft.efectoHpTurno), efectoPermanente: !!draft.efectoPermanente,
+    efectoHpTurno: num(draft.efectoHpTurno), efectoEscudo: num(draft.efectoEscudo), efectoStacks: Math.max(1, num(draft.efectoStacks) || 1), efectoPermanente: !!draft.efectoPermanente,
     efectoDetalle: draft.efectoDetalle || '', efectoMods: structuredClone(draft.efectoMods || []),
     equipoEstadoNombre: draft.equipoEstadoNombre || '', equipoEstadoHpTurno: num(draft.equipoEstadoHpTurno),
     equipoEstadoDetalle: draft.equipoEstadoDetalle || '',

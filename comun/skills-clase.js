@@ -53,7 +53,7 @@ const CLASES_SKILLS = [
   ]},
   {id: 'tanque', nombre: 'Tanque', habilidades: [
     {id: 'tanque-blindaje', nombre: 'Blindaje', costo: '1', nitrosCosto: 0,
-     efectoNombre: 'Barrera', efectoTurnos: 1,
+     efectoNombre: 'Escudo especial', efectoEscudo: 8, efectoTurnos: 1,
      efectoDetalle: 'Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal.',
      detalle: 'Flash (SP x 2: si la usás en turno ajeno, pagá 1 SP más a mano). Solo sobre vos: absorbe 8 de daño de la próxima fuente de daño este turno; si hace más, el resto entra normal.'},
     skillSA('tanque', 'Shockwave', 'SP 4. Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Todos los adyacentes al tanque quedan en Pajaritos (mitad de tiradas de DES, ESP y AGI) hasta el final de su próximo turno.'),

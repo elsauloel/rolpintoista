@@ -2971,7 +2971,7 @@
     "ranuras": 1,
     "precioCompra": 180,
     "detalle": "No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.). Dura 3 turnos. Al consumirla se activa el estado 'Invulnerable (poción)'.",
-    "descripcionNarrativa": "Blanca y opaca como leche. Guardarla ya se siente como hacer trampa.",
+    "descripcionNarrativa": "Blanca y opaca como leche. Guardarla ya se siente como jugar con ventaja.",
     "legacy": false,
     "unidades": 1,
     "cargaMax": 0,

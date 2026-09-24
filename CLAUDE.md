@@ -143,6 +143,8 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
 
 ## Cosas que hay que saber antes de tocar código acá
 
+- **La palabra "trampa" es solo para la mecánica de colocar trampas** (regla del dueño, 2026-09-24): un skill, ítem o texto que se llame "trampa" tiene que colocar una trampa real en el mapa (elemento con `trampa: true`, o `trampaColocar` en una habilidad de creep). Lo que no coloca ninguna se nombra distinto ("Raíces que atrapan", "jugar con ventaja" en lugar de "hacer trampa", etc.). Las habilidades que actúan sobre trampas (Desarmar trampa, Cazador de trampas…) y los creeps Tramperos sí pueden llevar la palabra.
+
 - **Evitar dos conversaciones tocando el mismo archivo grande a la vez**
   (sobre todo `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`,
   los que más cambian). Antes de un cambio grande ahí: `git status` y

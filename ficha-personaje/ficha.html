@@ -11152,6 +11152,10 @@ if(MODO_BOTONERA){
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
     if(e.data.tipo === 'abrir-botin' && fichaVivo && fichaVivo.cargada) botinModoAbrir();
+    if(e.data.tipo === 'abrir-tienda' && fichaVivo && fichaVivo.cargada){   // 🏪 del mapa
+      document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
+      abrirVendedor().then(() => botoneraAvisarMapa($('#scrim-catalogo').classList.contains('open') ? 'botonera-lista' : 'botonera-cerrada'));
+    }
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"

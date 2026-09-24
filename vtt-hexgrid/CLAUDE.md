@@ -892,3 +892,5 @@ hexágono con otro sin importar bando. Todavía no está construido.
 - **Cerrar la Botonera o las Acciones con B y con clic derecho** (2026-09-24): con la ventana abierta, **B** la cierra tanto con el foco en el mapa como adentro de la ventana (gm-tools en modo Acciones ahora lo maneja igual que la ficha: B se hace como Escape), y el **clic derecho sobre el mapa** (afuera de la ventana) también la cierra (`escapeABotonera`).
 
 - **T = 🔮 Rango de casteo** (2026-09-24): además de Shift+R, la tecla **T** prende y apaga el rango de casteo del token seleccionado (Ctrl+R/Ctrl+Shift+R son del navegador y recargan la página, por eso se evita depender de Shift+R). R sigue siendo el Rango (Destreza).
+
+- **C centra el mapa** (2026-09-24): la tecla **C** lleva la vista al token seleccionado (el GM, cualquiera, por ejemplo un creep; un jugador, uno suyo); sin selección, como el botón Centrar (tu personaje, o los tuyos). También quedó actualizada la lista de atajos ⌨ (R, T y C).

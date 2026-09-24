@@ -724,8 +724,9 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <kbd>L</kbd><span>Lápiz (prender / apagar)</span>
       <kbd>F</kbd><span>Terreno y Formas (prender / apagar)</span>
       <kbd>M</kbd><span>Mover libre del token seleccionado (otra <kbd>M</kbd> lo apaga)</span>
-      <kbd>R</kbd><span>📏 Ver tu Rango alrededor de tu token (otra <kbd>R</kbd> lo apaga)</span>
-      <span class="combo"><kbd>Shift</kbd> + <kbd>R</kbd></span><span>🔮 Ver tu Rango de casteo</span>
+      <kbd>R</kbd><span>📏 Ver el Rango del token seleccionado (otra <kbd>R</kbd> lo apaga)</span>
+      <kbd>T</kbd><span>🔮 Ver el Rango de casteo del token seleccionado (también <kbd>Shift</kbd> + <kbd>R</kbd>)</span>
+      <kbd>C</kbd><span>Centrar el mapa en tu token (o en el token seleccionado)</span>
       <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>L</kbd></span><span>Modo lentes: ver los conos de detección (prender / apagar)</span>
@@ -4497,6 +4498,15 @@ document.addEventListener('keydown', e => {
   if((e.key === 't' || e.key === 'T') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
     alternarRango(true);
+    return;
+  }
+  // C (2026-09-24): centra el mapa en el token seleccionado (un creep, si el GM tiene uno seleccionado); sin selección, en tu token
+  // propio (un jugador) o en los tuyos (GM), como el botón Centrar.
+  if((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
+    e.preventDefault();
+    const tc = seleccion ? tokens.get(seleccion) : null;
+    if(tc && (soyGM || puedoMover(tc))){ const cc = hexCentro(tc.col, tc.fila); centrarEn(cc.x, cc.y); }   // el GM en cualquiera; un jugador en un token suyo
+    else centrarEnMios();
     return;
   }
   // F: prende o apaga Terreno y Formas.

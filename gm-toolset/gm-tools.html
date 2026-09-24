@@ -1035,6 +1035,26 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <input type="hidden" id="hc-efecto-mods" value="[]">
       </div>
       <div class="hc-paso" data-hc-paso="4">
+        <label class="hc-trampa-on" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
+          <input type="checkbox" id="hc-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
+        </label>
+        <div id="hc-trampa-campos" style="margin-top:10px">
+          <div class="f"><label>Nombre de la trampa</label><input type="text" id="hc-trampa-nombre" maxlength="40" placeholder="vacío = el nombre de la habilidad"></div>
+          <div class="f" style="margin-top:8px"><label>Qué hace (lo que se lee cuando alguien la pisa)</label><input type="text" id="hc-trampa-detalle" maxlength="200" placeholder="ej. foso de púas: 2d6 de daño"></div>
+          <div class="row3" style="margin-top:8px">
+            <div class="mini-f"><label>Daño automático</label><input type="text" id="hc-trampa-dano" maxlength="12" placeholder="ej. 2d6+3" title="Al dispararse, el mapa tira este daño solo (restando la Defensa). Vacío = solo avisa."></div>
+            <div class="mini-f"><label>Radio</label><input type="number" id="hc-trampa-radio" min="0" max="6" value="0" title="0 = una casilla; 1 = una flor de 1 (7 casillas)…"></div>
+            <div class="mini-f"><label>Cantidad</label><input type="number" id="hc-trampa-cant" min="1" max="6" value="1" title="Cuántas trampas deja de una vez"></div>
+          </div>
+          <div class="hint" style="margin-top:4px">Daño: dados y modificador, ej. <b>2d6</b> o <b>1d8+3</b>. Radio 0 = una casilla. Cantidad: cuántas trampas coloca por ejecución.</div>
+          <div class="row3" style="margin-top:8px;grid-template-columns:2fr 1fr">
+            <div class="mini-f"><label>Estado que deja a quien la pisa</label><select id="hc-trampa-estado"></select></div>
+            <div class="mini-f"><label>Turnos</label><input type="number" id="hc-trampa-estado-turnos" min="0" value="0" title="0 = los turnos que trae el estado"></div>
+          </div>
+          <div class="hint" id="hc-trampa-ayuda" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <div class="hc-paso" data-hc-paso="5">
         <div class="resumen-hab" id="hc-resumen"></div>
       </div>
       <div class="paso-nav">
@@ -4164,6 +4184,8 @@ const PASOS_HAB_CREEP = [
    ayuda: "Podés vincularla a un stat del creep (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna. Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG."},
   {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
    ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
+  {corto: '🪤 Trampa', titulo: '¿Coloca una trampa en el mapa?',
+   ayuda: 'Al ejecutarla, la habilidad deja sola una trampa oculta a los jugadores al lado del token del creep. Acá elegís qué trampa es, cuánto daño hace y qué estado deja, o se la sacás.'},
   {corto: 'Listo', titulo: 'Revisá cómo quedó',
    ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
 ];
@@ -4221,6 +4243,68 @@ function hcOpcionesStat(elegido){
     `<optgroup label="Secundarios">${HC_STATS_SECUNDARIOS.filter(id => CREEP_STAT_LOOKUP[id]).map(op).join("")}</optgroup>`;
 }
 
+/* ---------- 🪤 Trampa de una habilidad de creep (2026-09-24, pedido del dueño) ----------
+   Un paso propio del editor de habilidades, con la trampa a la vista: la habilidad puede colocar una trampa oculta al ejecutarse
+   (`h.trampaColocar = {nombre, detalle, dano, radio, cant, estado}`). Las habilidades armadas por el programa ya traían una y no se
+   podía cambiar ni sacar; ahora se enciende, se configura o se apaga desde acá. Sacarla borra `trampaColocar`. */
+const HC_TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
+let hcTrampaEstadoOriginal = null;   // estado propio (no de la lista) que ya traía la trampa: se conserva si no se cambia
+function hcTrampaResumen(){
+  if(!$('#hc-trampa-on').checked) return 'no coloca';
+  const dano = $('#hc-trampa-dano').value.trim();
+  const cant = Math.max(1, num($('#hc-trampa-cant').value) || 1), radio = Math.max(0, num($('#hc-trampa-radio').value) || 0);
+  const est = $('#hc-trampa-estado').value;
+  const estNombre = est === '__orig__' && hcTrampaEstadoOriginal ? hcTrampaEstadoOriginal.nombre : est;
+  return [$('#hc-trampa-nombre').value.trim() || $('#hc-nombre').value.trim() || 'trampa',
+    cant > 1 ? `×${cant}` : '', radio ? `radio ${radio}` : '', dano ? `${dano} de daño` : 'solo avisa', estNombre ? `deja ${estNombre}` : ''].filter(Boolean).join(' · ');
+}
+function hcTrampaRender(){
+  const on = $('#hc-trampa-on').checked;
+  $('#hc-trampa-campos').style.opacity = on ? '1' : '.4';
+  $('#hc-trampa-campos').querySelectorAll('input,select').forEach(el => { el.disabled = !on; });
+  $('#hc-trampa-ayuda').textContent = on
+    ? 'La trampa se coloca sola en secreto, al lado del token del creep, en el mapa que estás mirando; los jugadores no la ven hasta que se dispara.'
+    : 'Sin trampa: la habilidad no coloca nada en el mapa.';
+}
+function hcCargarTrampa(h){
+  const t = h.trampaColocar || null;
+  hcTrampaEstadoOriginal = null;
+  $('#hc-trampa-on').checked = !!t;
+  $('#hc-trampa-nombre').value = t ? (t.nombre || '') : '';
+  $('#hc-trampa-detalle').value = t ? (t.detalle || '') : '';
+  $('#hc-trampa-dano').value = t ? (t.dano || '') : '';
+  $('#hc-trampa-radio').value = t ? Math.max(0, num(t.radio) || 0) : 0;
+  $('#hc-trampa-cant').value = t ? Math.max(1, num(t.cant) || 1) : 1;
+  const estados = ESTADOS_PRESET_GM.filter(p => p.polaridad === 'debuff').map(p => p.nombre);
+  const e = t && t.estado && typeof t.estado === 'object' ? t.estado : (t && t.estado ? {nombre: String(t.estado)} : null);
+  let opciones = '<option value="">— ninguno —</option>' + estados.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  let elegido = '';
+  if(e && e.nombre){
+    if(estados.includes(e.nombre) && !(e.mods && e.mods.length)) elegido = e.nombre;
+    else{ hcTrampaEstadoOriginal = e; elegido = '__orig__'; opciones += `<option value="__orig__">${esc(e.nombre)} (el que ya traía)</option>`; }
+  }
+  $('#hc-trampa-estado').innerHTML = opciones;
+  $('#hc-trampa-estado').value = elegido;
+  $('#hc-trampa-estado-turnos').value = e && e.turnos ? e.turnos : 0;
+  hcTrampaRender();
+}
+function hcGuardarTrampa(h){
+  if(!$('#hc-trampa-on').checked){ delete h.trampaColocar; return; }
+  const dano = $('#hc-trampa-dano').value.trim();
+  const t = {
+    nombre: $('#hc-trampa-nombre').value.trim().slice(0, 40) || h.nombre,
+    detalle: $('#hc-trampa-detalle').value.trim().slice(0, 200),
+    dano: HC_TRAMPA_DANO_RE.test(dano) ? dano : '',
+    radio: Math.max(0, Math.min(6, Math.round(num($('#hc-trampa-radio').value) || 0))),
+    cant: Math.max(1, Math.min(6, Math.round(num($('#hc-trampa-cant').value) || 1))),
+  };
+  if(dano && !t.dano) toast('El daño de la trampa no es válido (ej. 2d6+3): quedó sin daño automático');
+  const est = $('#hc-trampa-estado').value, turnos = Math.max(0, Math.round(num($('#hc-trampa-estado-turnos').value) || 0));
+  if(est === '__orig__' && hcTrampaEstadoOriginal) t.estado = turnos ? {...hcTrampaEstadoOriginal, turnos} : hcTrampaEstadoOriginal;
+  else if(est) t.estado = turnos ? {nombre: est, turnos} : {nombre: est};
+  h.trampaColocar = t;
+}
+
 function hcResumenHtml(){
   const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${esc(valor)}</b></div>`;
   const detalle = $('#hc-detalle').value.trim();
@@ -4233,7 +4317,8 @@ function hcResumenHtml(){
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
     ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
     ${fila("Tirada", [hcStatLabel($("#hc-tirada-stat").value), $("#hc-tirada").value.trim()].filter(Boolean).join(" + ") || "no tira")}
-    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
+    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}
+    ${fila('🪤 Trampa', hcTrampaResumen())}`;
 }
 
 /* Ver una habilidad de la biblioteca en detalle (👁 Ver): calculada con el nivel del creep. Desde ahí se puede Agregar,
@@ -4421,6 +4506,7 @@ function abrirEditorHabCreep(scId, habId, opc){
   $('#hc-efecto-detalle').value = h.efectoDetalle || '';
   $('#hc-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(h.efectoMods || []);
+  hcCargarTrampa(h);
   hcAplicarModoNitros();
   $('#scrim-hab-creep').classList.add('open');
   hcMostrarPaso(0);
@@ -4456,6 +4542,7 @@ function guardarEditorHabCreep(){
   h.efectoDetalle = $('#hc-efecto-detalle').value;
   h.efectoPolaridad = $('#hc-efecto-polaridad').value || 'otro';
   try{ h.efectoMods = JSON.parse($('#hc-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }
+  hcGuardarTrampa(h);
   const alGuardar = editingHabCreep.alGuardar;
   editingHabCreep = null;
   $('#scrim-hab-creep').classList.remove('open');
@@ -7071,6 +7158,7 @@ $('#hc-efecto-preset').addEventListener('change', e => {
   $('#hc-efecto-polaridad').value = preset.polaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(preset.mods || []);
 });
+$('#hc-trampa-on').onchange = hcTrampaRender;
 $('#habcreep-cancel').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#habcreep-x').onclick = () => { editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); };
 $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-creep'){ editingHabCreep = null; $('#scrim-hab-creep').classList.remove('open'); } });

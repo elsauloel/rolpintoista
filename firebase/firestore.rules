@@ -192,7 +192,9 @@ service cloud.firestore {
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados'])
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados', 'ventaja'])
+          // Afortunado: la tirada descartada {rolls, total, elegido} (comun/mesa.js, para mostrar las dos en la Mesa y en los dados 3D).
+          && (!('ventaja' in request.resource.data) || (request.resource.data.ventaja is map && request.resource.data.ventaja.rolls is list && request.resource.data.ventaja.rolls.size() <= 100))
           && (!('estilo' in request.resource.data) || (request.resource.data.estilo is string && request.resource.data.estilo.size() <= 300))
           // Estados que afectaron la tirada (comun/mesa.js, para pintarla en la Mesa): [{n, p}], sin validar cada uno adentro.
           && (!('estados' in request.resource.data) || (request.resource.data.estados is list && request.resource.data.estados.size() <= 8))

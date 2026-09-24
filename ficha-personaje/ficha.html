@@ -3113,14 +3113,7 @@ function compute(){
     .map(e => num(e.forzarNitros));
   if(efectosActivos.some(e => e.exhausto) && !Number.isNaN(nitrosNatural)) forzados.push(Math.floor(nitrosNatural / 3));
   if(forzados.length) final.nitros = Math.min(...forzados);  // Stun (tope fijo), Exhausto (un tercio del natural)
-  if(efectosActivos.some(e => e.mitadPdgEva)){
-    if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
-    if(!Number.isNaN(final.eva)) final.eva = Math.floor(final.eva / 2);
-  }
-  if(efectosActivos.some(e => e.lisiado)){
-    if(!Number.isNaN(final.pdg)) final.pdg = Math.floor(final.pdg / 2);
-    if(!Number.isNaN(final.parry)) final.parry = Math.floor(final.parry / 2);
-  }
+  // Pajaritos y Lisiado ya no achican el stat: parten el RESULTADO de la tirada (ver mitadesDeTirada / tirarValorStat).
   // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
   // Nitros, así que actúan al moverse (ver costoMoverCasillero).
   // Armadura arruinada se sacó (2026-09-21, repaso de debuffs): lo que la aplicaba pasó a sumar stacks de Armadura rota.
@@ -3511,7 +3504,8 @@ function formulasCombate(){
   if(armas.length === 1) danio = armaDanoTxt(armas[0], c.final.dmg);
   else if(armas.length > 1) danio = 'elegís arma';
   else danio = 'sin arma equipada';
-  return {pdg: fPdg ? fPdg.formula : '', eva: fEva ? fEva.formula : '', parry: fParry ? fParry.formula : '', bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
+  const conMit = (f, id) => f ? f.formula + ' ÷2'.repeat(mitadesDeTirada(S.efectos, id)) : '';
+  return {pdg: conMit(fPdg, 'pdg'), eva: conMit(fEva, 'eva'), parry: conMit(fParry, 'parry'), bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
 }
 
 // Los botones de Combate muestran qué van a tirar, para no tener que
@@ -4078,6 +4072,17 @@ $('#scrim-sobrepeso').addEventListener('mousedown', e => { if(e.target.id === 's
 $('#sobrepeso-pagar').onclick = () => sobrepesoElegir(true);
 $('#sobrepeso-penal').onclick = () => sobrepesoElegir(false);
 
+// Estados que parten la TIRADA a la mitad (2026-09-24, pedido del dueño): Pajaritos (PdG y Evasión) y Lisiado (PdG y Parry). No se achican
+// los dados: se tira el dado completo y al resultado se lo divide por 2, para abajo, con mínimo 1. Un estado por cada uno.
+function mitadesDeTirada(estados, statId){
+  const act = (estados || []).filter(e => e && e.activo !== false);
+  let n = 0;
+  if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
+  if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  return n;
+}
+function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
+
 function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -4100,15 +4105,19 @@ function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
     return {rolls, total: rolls.reduce((a,b)=>a+b,0) + f.mod};
   };
   let intento = tirar();
+  let ventaja = null;   // Afortunado: se tiran DOS veces y se queda la mejor; la otra viaja a la Mesa para que se vea (r.ventaja)
   if(conVentaja){
     const segundo = tirar();
-    if(segundo.total > intento.total) intento = segundo;
+    const gana = segundo.total > intento.total ? segundo : intento, pierde = gana === intento ? segundo : intento;
+    ventaja = {rolls: pierde.rolls, total: pierde.total, elegido: gana.total};
+    intento = gana;
   }
   const ex = num(extra);   // bono plano que no cambia los dados (ej. peso del arma en el Bloqueo)
   const estados = statId ? estadosQueAfectanStat(statId, conVentaja) : [];
   if(sobrepeso === 'penal') estados.push({n: 'Sobrepeso', p: 'debuff'});
   else if(sobrepeso === 'pagado') estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
-  const r = {formula: f.formula + (ex ? `+${ex}` : ''), rolls: intento.rolls, mod: f.mod + ex, total: intento.total + ex, estados};
+  const mit = statId ? mitadesDeTirada(S.efectos, statId) : 0;
+  const r = {formula: f.formula + (ex ? `+${ex}` : '') + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod + ex, total: mit ? aplicarMitades(intento.total + ex, mit) : intento.total + ex, estados, ...(ventaja ? {ventaja} : {})};
   registrarTirada(nombre, r);
 }
 
@@ -4219,7 +4228,6 @@ function invStatValor(inv, statId){
   const attr = INV_STAT_ATTR[statId] || statId;
   let v = num(inv[attr]) + invModTotal(inv, attr);
   if(statId !== attr) v += invModTotal(inv, statId);
-  if((statId === 'pdg' || statId === 'parry') && invEstadoActivo(inv, 'lisiado')) v = Math.floor(v / 2);
   return v;
 }
 function invNitrosMax(inv){
@@ -4673,9 +4681,10 @@ function tirarValorStatInv(inv, nombre, valor, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
   const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
-  const total = rolls.reduce((a,b)=>a+b,0) + f.mod;
+  const mit = statId ? mitadesDeTirada(inv.estados, statId) : 0;
+  const total = aplicarMitades(rolls.reduce((a,b)=>a+b,0) + f.mod, mit);
   const estados = statId ? estadosQueAfectanStatInv(inv, statId) : [];
-  registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula, rolls, mod: f.mod, total, estados});
+  registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula + ' ÷2'.repeat(mit), rolls, mod: f.mod, total, estados});
 }
 function invAtacar(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
@@ -9276,8 +9285,6 @@ function pdgParaArma(arma, c){
   if(!excluidos.length || Number.isNaN(c.final.pdg)) return {valor: c.final.pdg, excluidos: []};
   let v = c.base.pdg + c.modTotal.pdg - excluidos.reduce((a, m) => a + m.val, 0);
   const activos = (S.efectos || []).filter(e => e.activo !== false);
-  if(activos.some(e => e.mitadPdgEva)) v = Math.floor(v / 2);
-  if(activos.some(e => e.lisiado)) v = Math.floor(v / 2);
   return {valor: v, excluidos};
 }
 
@@ -9319,8 +9326,6 @@ function statParaArma(statId, arma){
   const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(m.itemId));
   if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
   let v = c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
-  const activos = (S.efectos || []).filter(e => e.activo !== false);
-  if(statId === 'parry' && activos.some(e => e.lisiado)) v = Math.floor(v / 2);
   return v;
 }
 
@@ -9439,7 +9444,7 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   const mitad = [];
   if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
   if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
-  mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(la mitad, para abajo)</span>`, '÷ 2'); });
+  mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>`, '÷ 2'); });
   if(id === 'nitros'){
     activos.filter(e => e.forzarNitros !== '' && e.forzarNitros != null).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(tope)</span>`, fmt(num(e.forzarNitros))); });
     activos.filter(e => e.cansado).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(2/3, para abajo)</span>`, '× 2/3'); });

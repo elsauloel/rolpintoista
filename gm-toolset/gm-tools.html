@@ -1332,6 +1332,16 @@ function estadosQueAfectanStatCreep(sc, statId, conVentaja){
   }
   return out;
 }
+// Estados que parten la TIRADA a la mitad (2026-09-24): se tira el dado completo y al resultado se lo divide por 2, para abajo, mínimo 1.
+// Igual que en ficha.html (código duplicado a propósito, ver comun/CLAUDE.md).
+function mitadesDeTirada(estados, statId){
+  const act = (estados || []).filter(e => e && e.activo !== false);
+  let n = 0;
+  if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
+  if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  return n;
+}
+function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
 function tirarValorStat(nombre, valor, sc, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -1342,12 +1352,16 @@ function tirarValorStat(nombre, valor, sc, statId){
     return {rolls, total: rolls.reduce((a,b)=>a+b,0) + f.mod};
   };
   let intento = tirar();
+  let ventaja = null;   // Afortunado: se tiran DOS veces y se queda la mejor; la otra viaja a la Mesa para que se vea (r.ventaja)
   if(conVentaja){
     const segundo = tirar();
-    if(segundo.total > intento.total) intento = segundo;
+    const gana = segundo.total > intento.total ? segundo : intento, pierde = gana === intento ? segundo : intento;
+    ventaja = {rolls: pierde.rolls, total: pierde.total, elegido: gana.total};
+    intento = gana;
   }
   const estados = statId ? estadosQueAfectanStatCreep(sc, statId, conVentaja) : [];
-  registrarTirada(nombre, {formula: f.formula, rolls: intento.rolls, mod: f.mod, total: intento.total, estados});
+  const mit = sc && statId ? mitadesDeTirada(sc.estados, statId) : 0;
+  registrarTirada(nombre, {formula: f.formula + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod, total: aplicarMitades(intento.total, mit), estados, ...(ventaja ? {ventaja} : {})});
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
@@ -3119,13 +3133,7 @@ function creepStatValor(sc, statId){
   // mod dos veces.
   let v = num(sc[d.attr]) + creepModTotal(sc, d.attr);
   if(statId !== d.attr) v += creepModTotal(sc, statId);
-  // Pajaritos (PdG/Eva) y Lisiado (PdG/Parry) son independientes: si un creep tiene los dos, el PdG se parte al medio dos veces.
-  if((statId === 'pdg' || statId === 'eva') && (sc.estados||[]).some(e => e.activo !== false && e.mitadPdgEva)){
-    v = Math.floor(v / 2);
-  }
-  if((statId === 'pdg' || statId === 'parry') && (sc.estados||[]).some(e => e.activo !== false && e.lisiado)){
-    v = Math.floor(v / 2);
-  }
+  // Pajaritos (PdG/Eva) y Lisiado (PdG/Parry) ya no achican el stat: parten el resultado de la tirada (mitadesDeTirada, en tirarValorStat).
   if(statId === 'resmg' && sc.jefe) v += 1;   // protección de jefe: +1 Res.Mg (la tirada contra los debuffs)
   if(statId === 'mov'){
     const activos = (sc.estados||[]).filter(e => e.activo !== false);
@@ -3148,8 +3156,8 @@ function lupaStatCreep(sc, statId, {sinTirada = false} = {}){
   aportesModCreep(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
   if(statId !== attr) aportesModCreep(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
   if(!aportesModCreep(sc, attr).length && (statId === attr || !aportesModCreep(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
-  if((statId === 'pdg' || statId === 'eva') && creepEstadoActivo(sc, 'mitadPdgEva')) h += lupaFila('Pajaritos <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
-  if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
+  if((statId === 'pdg' || statId === 'eva') && creepEstadoActivo(sc, 'mitadPdgEva')) h += lupaFila('Pajaritos <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
+  if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
   if(statId === 'resmg' && sc.jefe) h += lupaFila('Protección de jefe', '+1');
   const valor = creepStatValor(sc, statId);
   h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
@@ -3317,11 +3325,11 @@ function muertoBadgeHtml(sc){
 // Qué dado va a tirar cada botón de Combate, para no tener que
 // adivinarlo antes de apretar (igual que en la ficha).
 function formulasCombateCreep(sc){
-  const f = (v) => { const x = formulaParaValor(v); return x ? x.formula : ''; };
+  const f = (v, id) => { const x = formulaParaValor(v); return x ? x.formula + ' ÷2'.repeat(mitadesDeTirada(sc.estados, id)) : ''; };
   return {
-    pdg: f(creepStatValor(sc, 'pdg')),
-    eva: f(creepStatValor(sc, 'eva')),
-    parry: f(creepStatValor(sc, 'parry')),
+    pdg: f(creepStatValor(sc, 'pdg'), 'pdg'),
+    eva: f(creepStatValor(sc, 'eva'), 'eva'),
+    parry: f(creepStatValor(sc, 'parry'), 'parry'),
     bloqueo: f(creepStatValor(sc, 'bloqueo')),
   };
 }

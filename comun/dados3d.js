@@ -236,7 +236,33 @@ function dadosAnimarTirada(t){
   if(html.contains('modo-botonera') || html.contains('modo-mantenimiento') || html.contains('modo-acciones')) return;
   const notacion = dadosNotacion(t.formula, t.rolls);
   if(!notacion) return;
-  dadosTirar(notacion, dadosEstiloDe(t.estilo));
+  const estilo = dadosEstiloDe(t.estilo);
+  dadosTirar(notacion, estilo);
+  // Afortunado: ruedan los dos juegos de dados a la vez y un cartel dice cuál se eligió.
+  if(t.ventaja && Array.isArray(t.ventaja.rolls)){
+    const otra = dadosNotacion(t.formula, t.ventaja.rolls);
+    if(otra) dadosTirar(otra, estilo);
+    dadosCartelAfortunado(t);
+  }
+}
+
+// Cartel sobre la pantalla mientras ruedan los dados del Afortunado: la tirada elegida (verde, ✔) y la descartada (gris, tachada).
+function dadosCartelAfortunado(t){
+  try{
+    document.getElementById('dados-afortunado')?.remove();
+    const d = document.createElement('div');
+    d.id = 'dados-afortunado';
+    d.style.cssText = 'position:fixed;top:14%;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;background:rgba(20,14,18,.92);color:#EDE3D2;' +
+      'border:2px solid #E0A458;border-radius:10px;padding:10px 18px;font:600 16px "Space Grotesk",system-ui,sans-serif;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.6);' +
+      'opacity:0;transition:opacity .4s';
+    d.innerHTML = '🍀 Afortunado: tira dos veces y se queda con la mejor<br>' +
+      `<span style="color:#7fdc86;font-size:22px">✔ ${Math.round(Number(t.ventaja.elegido))}</span> &nbsp; ` +
+      `<span style="opacity:.55;text-decoration:line-through;font-size:20px">✘ ${Math.round(Number(t.ventaja.total))}</span>`;
+    document.body.appendChild(d);
+    setTimeout(() => { d.style.opacity = '1'; }, 1400);   // aparece cuando los dados ya casi frenaron
+    setTimeout(() => { d.style.opacity = '0'; }, 6500);
+    setTimeout(() => d.remove(), 7000);
+  }catch(e){}
 }
 
 

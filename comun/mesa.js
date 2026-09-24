@@ -65,13 +65,14 @@ async function mesaPublicar(origen, r){
         p: (e && (e.p || e.polaridad)) === 'buff' ? 'buff' : (e && (e.p || e.polaridad)) === 'debuff' ? 'debuff' : 'otro',
       })).filter(e => e.n)
     : [];
-  // Reglas viejas (no conocen "estados", "estilo" o "texto"): se reintenta con menos campos, la tirada sale igual.
-  const intentos = [
-    {...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {}), ...(estados.length ? {estados} : {})},
-    ...(estados.length ? [{...doc, ...(texto ? {texto} : {}), ...(estilo ? {estilo} : {})}] : []),
-    ...(estilo ? [{...doc, ...(texto ? {texto} : {})}] : []),
-    ...(texto ? [doc] : []),
-  ];
+  // Afortunado (2026-09-24): la otra tirada, la descartada, viaja aparte para que la Mesa y los dados 3D muestren las DOS.
+  // r.ventaja = {rolls, total, elegido}: los dados y el total de la descartada, y el total de la elegida (antes de mitades/bonos).
+  const ventaja = r.ventaja && Array.isArray(r.ventaja.rolls)
+    ? {rolls: r.ventaja.rolls.slice(0, 100).map(num), total: num(r.ventaja.total), elegido: num(r.ventaja.elegido)} : null;
+  // Reglas viejas (no conocen "ventaja", "estados", "estilo" o "texto"): se reintenta quitando campos de a uno, la tirada sale igual.
+  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja]].filter(x => x[1]);
+  const intentos = [];
+  for(let n = extras.length; n >= 0; n--) intentos.push({...doc, ...Object.fromEntries(extras.slice(0, n))});
   let err = null;
   for(const d of intentos){
     try{
@@ -114,7 +115,11 @@ function mesaFilaContenido(t){
     : '';
   return `<span class="mesa-total">${fmt(num(t.total))}</span>` +
     `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
-    `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>` +
+    (t.ventaja && Array.isArray(t.ventaja.rolls)
+      ? `<div class="mesa-detalle" style="line-height:1.7">🍀 <b>Afortunado</b>: tiró dos veces y se queda con la mejor<br>` +
+        `<span style="background:rgba(80,180,90,.28);border:1px solid #58b45f;border-radius:4px;padding:1px 6px">✔ ${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)} = <b>${fmt(num(t.ventaja.elegido))}</b></span> ` +
+        `<span style="opacity:.6;text-decoration:line-through;border:1px dashed #888;border-radius:4px;padding:1px 6px">✘ [${esc(t.ventaja.rolls.join(', '))}]${esc(mod)} = ${fmt(num(t.ventaja.total))}</span></div>`
+      : `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`) +
     estadosHtml +
     (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
 }

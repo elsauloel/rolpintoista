@@ -784,7 +784,7 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
    mapa y muestra solo la ventana de Acciones del creep (y las que se abren
    desde ahí), con fondo transparente. */
 html.modo-acciones, html.modo-acciones body{background:transparent!important;min-height:0}
-html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop){display:none!important}
+html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo){display:none!important}
 </style>
 <script>
 if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.search).get('modo'))) document.documentElement.classList.add('modo-acciones');   // finalizar y botín: el mapa los abre igual que las Acciones

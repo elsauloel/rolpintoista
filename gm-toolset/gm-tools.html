@@ -866,6 +866,10 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
   <div class="modal" style="max-width:420px">
     <header><h3 id="verhab-nombre">Habilidad</h3><button class="iconbtn" id="verhab-x">Cerrar</button></header>
     <div class="body" id="verhab-body"></div>
+    <footer>
+      <button class="btn ghost" id="verhab-reemplazar" title="Cambiar esta habilidad por otra de la biblioteca">↻ Reemplazar</button>
+      <button class="btn primary" id="verhab-editar" title="Abrir el editor paso a paso de esta habilidad">✎ Editar</button>
+    </footer>
   </div>
 </div>
 
@@ -3282,10 +3286,12 @@ function abrirAccionesCreep(scId){
   $('#scrim-acciones-creep').classList.add('open');
 }
 
+let verHabAccion = null;   // {scId, habId}: la habilidad que se está viendo (para Editar y Reemplazar)
 function abrirVerHabAccion(scId, habId){
   const sc = S.creeps.find(s => s.id === scId);
   const h = sc && sc.habilidades.find(x => x.id === habId);
   if(!h) return;
+  verHabAccion = {scId, habId};
   const costo = costoNitrosHabCreep(sc, h);
   const costoTxt = costoHabCreepTxt(sc, h);
   const cdTxt = num(h.cd) > 0 ? `${fmt(num(h.cd))} turno(s) de cooldown` : 'Sin cooldown';
@@ -4411,13 +4417,15 @@ function verHabDeCreep(scId, habId){
 
 /* Catálogo de habilidades para creeps (comun/skills-creep-base.js): se elige una, se calcula con el nivel del creep y se agrega.
    "Crear de cero" sigue abriendo el asistente paso a paso de siempre. */
-function abrirCatalogoHabilidades(scId){
+// reemplazarId: si viene, lo que se elige NO se suma sino que pisa esa habilidad del creep (botón ↻ Reemplazar del visor).
+function abrirCatalogoHabilidades(scId, reemplazarId){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
+  const vieja = reemplazarId ? sc.habilidades.find(x => x.id === reemplazarId) : null;
   Biblioteca.abrir({
-    tipo: 'habs_creep', titulo: `Habilidad para ${sc.nombre || 'el creep'}`,
-    textoCrearDeCero: '+ Crear de cero (paso a paso)',
-    alCrearDeCero: () => abrirEditorHabCreep(sc.id, null),
+    tipo: 'habs_creep', titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
+    textoCrearDeCero: vieja ? '✎ Mejor editar la actual (paso a paso)' : '+ Crear de cero (paso a paso)',
+    alCrearDeCero: () => abrirEditorHabCreep(sc.id, vieja ? vieja.id : null),
     base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
     subtitulo: e => e.datos.habilidad
       ? ` · ${e.datos.habilidad.cdArranca ? 'lenta' : 'rápida'} · versión propuesta, valores fijos`
@@ -4425,6 +4433,13 @@ function abrirCatalogoHabilidades(scId){
     alVer: (datos, ent) => verHabBiblioteca(sc.id, datos, ent),
     alElegir: datos => {
       const h = habDeBiblioteca(sc, datos);
+      const i = vieja ? sc.habilidades.indexOf(vieja) : -1;
+      if(i >= 0){
+        sc.habilidades[i] = h;   // en el mismo lugar de la lista
+        renderAll();
+        toast(`${vieja.nombre || 'La habilidad'} reemplazada por ${h.nombre}`);
+        return;
+      }
       sc.habilidades.push(h);
       renderAll();
       toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})`);
@@ -7165,6 +7180,19 @@ $('#scrim-hab-creep').addEventListener('mousedown', e => { if(e.target.id==='scr
 $('#acciones-creep-x').onclick = () => { accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); };
 $('#scrim-acciones-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-acciones-creep'){ accionesCreepId = null; $('#scrim-acciones-creep').classList.remove('open'); } });
 $('#verhab-x').onclick = () => $('#scrim-ver-hab').classList.remove('open');
+// Desde el visor de una habilidad del creep: ✎ Editar (editor paso a paso) y ↻ Reemplazar (elegir otra de la biblioteca).
+$('#verhab-editar').onclick = () => {
+  if(!verHabAccion) return;
+  const {scId, habId} = verHabAccion;
+  $('#scrim-ver-hab').classList.remove('open');
+  abrirEditorHabCreep(scId, habId, {encima: true});
+};
+$('#verhab-reemplazar').onclick = () => {
+  if(!verHabAccion) return;
+  const {scId, habId} = verHabAccion;
+  $('#scrim-ver-hab').classList.remove('open');
+  abrirCatalogoHabilidades(scId, habId);
+};
 $('#scrim-ver-hab').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-hab') $('#scrim-ver-hab').classList.remove('open'); });
 $('#verestado-eliminar').onclick = () => {
   if(!viendoEstadoCreep) return;

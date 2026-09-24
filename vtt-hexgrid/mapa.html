@@ -6366,6 +6366,7 @@ function renderPanel(forzar){
     const ventana = $('#nuevo-token-ventana');
     ventana.innerHTML =
       '<div class="nt-cab"><span>➕ Nuevo token</span><button type="button" id="nuevo-x" title="Cancelar (Esc o clic derecho)">✕</button></div>' +
+      (!soyGM ? '<div class="nt-campo"><button type="button" class="btn primary" id="nuevo-traer" style="width:100%" title="Pone en el mapa el token de tu personaje, ya vinculado a su ficha">⬇ Traer mi token al mapa</button></div>' : '') +
       (soyGM ? '<div class="nt-campo"><label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo mueve su dueño)</option></select></div>' : '') +
       `<div class="nt-campo"><label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
         '<p class="nt-pista">Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha' + (soyGM ? ' (creep: borde rojo). Sin vincular: NPC, borde gris.' : '.') + '</p></div>' +
@@ -6443,6 +6444,15 @@ function renderPanel(forzar){
     };
     $('#nuevo-crear').onclick = crear;
     $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
+    // Jugador: un solo botón para poner en el mapa a su personaje (el primero que todavía no tenga token), ya vinculado a su ficha.
+    if($('#nuevo-traer')) $('#nuevo-traer').onclick = () => {
+      const propias = [...fichasPub.entries()].filter(([, f]) => f.duenoUid === fbUsuario.uid).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+      if(!propias.length){ toast('Todavía no tenés personajes: creá uno en tu ficha'); return; }
+      const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
+      const libre = propias.find(([id]) => !enMapa.has(id));
+      if(!libre){ cancelarNuevoToken(); centrarEnMios(); toast('Tu token ya está en el mapa'); return; }
+      iniciarColocacion({nombre: String(libre[1].nombre || 'Personaje').slice(0, 40), color, tipo: 'pj', fichaId: libre[0], imagen: ''});
+    };
     $('#nuevo-cancelar').onclick = cancelarNuevoToken;
     $('#nuevo-x').onclick = cancelarNuevoToken;
     $('#nuevo-vinculo').focus();

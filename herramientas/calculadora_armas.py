@@ -27,6 +27,7 @@ CATALOGO = RAIZ / 'datos' / 'catalogo.json'
 
 # ---------------------------------------------------------------- tasas (a ajustar)
 K_EFECTO = 1.0            # PC por punto de peso de efecto al 100 %
+PESO_CRITPOT = 0.4       # el Crítico POTENTE vale ~0,4 de un punto de Frecuente (calculado con el multiplicador esperado del d20, ver docs/rework-armas.md)
 PESO_CRIT = 3.0           # peso de 1 punto de Crítico frecuente / potente / Ignora 1
 TASA_PESO = 0.2           # PC que resta cada punto de Peso del arma (relevancia intermedia)
 TASA_STAT = {'pdg': 1.0, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.5, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
@@ -90,8 +91,10 @@ def puntaje(arma):
     for m in arma.get('mods') or []:
         st, v = m.get('stat'), float(m.get('val') or 0)
         if st in ('crit', 'critpot'):
-            util = min(v, max(0, tipo - 2)) if st == 'crit' else min(v, 6)   # el rango no baja de 2 (Tipo 4 aprovecha 2 puntos) y el doble daño llega a 1 con 6 puntos de potente
-            crit += util * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
+            if st == 'crit':   # Frecuente: el rango no baja de 2 (Tipo 4 aprovecha 2 puntos) y su valor baja con el Tipo
+                crit += min(v, max(0, tipo - 2)) * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
+            else:              # Potente: vale menos por punto y no depende del Tipo; el doble daño llega a 1 con 6 puntos
+                crit += min(v, 6) * PESO_CRIT * PESO_CRITPOT * K_EFECTO
         elif st == 'dmg':
             bonos += v * TASA_STAT['dmg'] * factor_plano(tipo)
         else:

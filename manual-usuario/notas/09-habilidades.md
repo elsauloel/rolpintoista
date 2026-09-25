@@ -185,7 +185,7 @@ Shockwave, Aura de espinas (devuelve 1/4 del daño), Sonic Boom, Daño en área,
 
 ## Estados de la clase
 - [[Pajaritos]]: reduce a la mitad tiradas de Destreza, Especial y Agilidad.
-- **Sentado**: −2 a la evasión, no podés atacar; pararte cuesta 1 No2.
+- **Sentado**: la Evasión se parte a la mitad (al resultado de la tirada, para abajo), no podés hacer dodge roll y no vence solo: **levantarte cuesta 1 No2** (botón Levantarse de la Botonera). Ver [[Sentado]].
 
 > [!question] Sin confirmar
 > En *Piel resistente*, el +1 a las resistencias a crítico y la duración de 2 turnos completos son una propuesta, sin confirmar. En *Aura de espinas* faltan definir si el 1/4 se calcula sobre el daño que llega al HP o antes de la Defensa, si es solo melee o cualquier ataque, y cómo se redondea.

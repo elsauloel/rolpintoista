@@ -1339,6 +1339,7 @@ function mitadesDeTirada(estados, statId){
   let n = 0;
   if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
   if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  if(statId === 'eva' && act.some(e => e.sentado)) n++;
   return n;
 }
 function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
@@ -3236,7 +3237,16 @@ function renderAccionesCreep(){
     {nombre:'Parry', dado: fc.parry, lupa:'stat|parry', motivo:'Sin costo', attr:`data-parrycreep="${sc.id}"`},
     {nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:'Sin costo', attr:`data-bloqueocreep="${sc.id}"`},
   ];
-  const tilesCombate = combate.map(f => `
+  // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
+  const sentadoCreep = (sc.estados || []).some(e => e.activo !== false && e.sentado);
+  if(sentadoCreep){
+    const sinNitrosLev = num(sc.nitros) < 1;
+    combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
+  }
+  const tilesCombate = combate.map(f => f.soloTexto ? `
+    <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}" ${f.attr} title="${esc(f.motivo)}">
+      <span class="bt-label">${esc(f.nombre)}</span>
+    </button>` : `
     <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}" ${f.attr} title="${esc(f.motivo)}">
       ${lupaBotonHtml(`${sc.id}|${f.lupa}`)}
       <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>
@@ -3546,7 +3556,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
@@ -3575,6 +3585,8 @@ const ESTADOS_PRESET_GM = [
     detalle:'El Movimiento queda en 0 mientras dure.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true, esCC:true,
     detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, stacks:1, hpTurno:0, sentado:true, esCC:true,
+    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo) y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de sus Acciones).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
@@ -5234,6 +5246,16 @@ document.addEventListener('click', e => {
     const pdg = creepStatValor(sc, 'pdg');
     tirarValorStat(`${sc.nombre} · PdG`, pdg, sc, 'pdg');
     toast(`${sc.nombre}: −${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`);
+    return;
+  }
+  if(b.dataset.levantarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.levantarcreep);
+    if(!sc) return;
+    if(num(sc.nitros) < 1){ toast(`${sc.nombre}: no le alcanzan los No2 — levantarse cuesta 1`); return; }
+    sc.nitros = num(sc.nitros) - 1;
+    sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
+    renderAll();
+    toast(`${sc.nombre} se levantó · −1 No2 · quedan ${fmt(sc.nitros)}`);
     return;
   }
   if(b.dataset.daniocreep){

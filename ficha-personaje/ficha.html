@@ -2056,6 +2056,7 @@ const IT2 = {
   nitrosConsumirMochila: 2,
   nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
   nitrosSigilo: 1,              // entrar en sigilo (a revisar, P1)
+  nitrosLevantarse: 1,          // pararse estando Sentado (decidido 2026-09-24)
   nitrosEquipar: 1,             // equipar o desequipar un ítem, solo en modo combate del mapa
   // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
   // pasan a dar "+N × esto" de SP.
@@ -3818,6 +3819,23 @@ function alternarSigilo(forzar){
   toast(`Entraste en sigilo${costo ? ` · -${fmt(costo)} No2` : ''}`);
 }
 
+/* ---------- Sentado: levantarse cuesta 1 No2 ----------
+   El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
+const efectoSentado = () => S.efectos.find(e => e.activo !== false && e.sentado);
+function levantarse(forzar){
+  const actual = efectoSentado();
+  if(!actual) return;
+  const costo = num(IT2.nitrosLevantarse);
+  if(num(S.nitros) < costo && !forzar){
+    avisarSinNitros(costo, 'levantarte', () => levantarse(true));
+    return;
+  }
+  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, 'se levantó') : costo);
+  S.efectos = S.efectos.filter(e => e !== actual);
+  renderList('efectos'); renderNitros(); refresh();
+  toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
+}
+
 function aplicarEfectoDeConsumo(it){
   const src = configEfectoDe(it);
   const nombre = (src.efectoNombre || '').trim();
@@ -4081,6 +4099,7 @@ function mitadesDeTirada(estados, statId){
   let n = 0;
   if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
   if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  if(statId === 'eva' && act.some(e => e.sentado)) n++;
   return n;
 }
 function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
@@ -5396,6 +5415,12 @@ function renderBotonera(){
   // Percepción: tirada de Destreza (con dado más alto si tiene la pasiva Percepción aumentada).
   html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
 
+  // Sentado: levantarse cuesta 1 No2 (ver levantarse).
+  if(efectoSentado()){
+    const falta = num(S.nitros) < num(IT2.nitrosLevantarse);
+    html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🧍 Levantarse · ${fmt(num(IT2.nitrosLevantarse))} No2</button></div>`;
+  }
+
   // Sigilo: botón directo para quien tiene la habilidad (ver alternarSigilo).
   if(tieneSigilo()){
     const dentro = !!efectoSigilo();
@@ -5727,7 +5752,7 @@ function configEquipoEstadoDe(it){
 // mecánica real del preset "Afortunado".
 const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'armaduraRota', 'escudoMagico', 'forzarNitros'];
+  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
   const p = presetPorNombre(EFECTOS_PRESET, (nombrePreset || '').trim());
   if(!p) return {};
@@ -6243,6 +6268,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.sigilo){ alternarSigilo(); return; }
+  if(b.dataset.levantarse){ levantarse(); return; }
   if(b.dataset.danohab){ tirarSegundaDeHab(b.dataset.danohab); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
   if(b.id === 'btn-invocar'){
@@ -6824,6 +6850,8 @@ const EFECTOS_PRESET = [
     detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
+  {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
+    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo) y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
@@ -9447,6 +9475,7 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   const mitad = [];
   if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
   if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
+  if(id === 'eva') activos.filter(e => e.sentado).forEach(e => mitad.push(e.nombre));
   mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>`, '÷ 2'); });
   if(id === 'nitros'){
     activos.filter(e => e.forzarNitros !== '' && e.forzarNitros != null).forEach(e => { h += lupaFila(`${esc(e.nombre)} <span class="lupa-gris">(tope)</span>`, fmt(num(e.forzarNitros))); });

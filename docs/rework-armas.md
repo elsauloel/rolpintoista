@@ -66,3 +66,30 @@ propone y el dueño audita.
 - **2026-09-25 · P1 (tamaño del pool):** "Vamos con unas 300, no está mal. Respecto a la rareza, vamos con eso." → **~300 armas** con la pirámide propuesta: **Común ~90 · Buena calidad ~80 · Raro ~60 · Excepcional ~45 · Legendario ~25**.
 - **2026-09-25 · P2 (reparto por familia y Tipo):** "Repartir por familia está bien." → **Tipo 4 (punzantes) 20 % · Tipo 6 (cortantes) 25 % · Tipo 8 (hachas y pesadas) 20 % · Tipo 10 (contundentes) 15 % · Tipo 12 (explosivos) 5 % · de rango 15 %** (unas 45 armas de rango; contando ~300). Las **de rango**: todavía no está discutido su criterio de diseño; se rellenan sobre la marcha y **es muy probable que haya que reworkearlas específicamente** (ver P14).
 - **2026-09-25 · P3 (manos):** "Un arma de dos manos de por sí va a ser más poderosa, porque tiene una ventaja que es que te invalida una mano, entonces te quita posibilidad de acciones, pero vamos a reducirlo a un **10 %** de armas de dos manos." → **~10 % de armas de dos manos (~30 de 300)**, el resto de una mano. Sus implicaciones y su peso en el puntaje **no están evaluados** todavía (ver P15).
+
+## Elaboración de efectos (P4 en discusión)
+> Cada efecto se elabora acá con la propuesta del asistente y lo que responda el dueño. Cuando se cierra uno, pasa a "Respuestas y decisiones" y a la guía de diseño.
+
+### Knockdown (iniciativa) — propuesta 2026-09-25 (sin responder)
+- **Qué hace:** al golpear (con la probabilidad del arma), el golpeado **baja N lugares en el orden de turnos** (N = 1, 2 o "al fondo"). "Knockdown 1" = baja 1 lugar. Es el efecto de casa de los **contundentes**; habilitado en explosivos.
+- **Automatizable:** sí. Las reglas de Firestore ya dejan a cualquier miembro reordenar la lista de iniciativa (solo se prohíbe cambiar el turno, la ronda y el largo). Un botón "⬇ Knockdown" en la tabla, o que salga tras la tirada de efecto.
+- **Preguntas:** (a) ¿el cambio dura **solo esta ronda** (vuelve a su lugar al empezar la siguiente) o **queda** hasta que el GM reordene? *Propuesta:* solo esta ronda. (b) ¿Si le toca justo al golpeado, pierde el turno o solo pasa detrás? *Propuesta:* solo cambia el orden de la próxima vez; el turno en curso no se toca. (c) Nombre en español definitivo.
+- **Peso para el valor:** 4.
+
+### Derribar — propuesta 2026-09-25 (sin responder)
+- **Qué hace:** el golpeado **cae al suelo**: pasa a **Sentado** (Evasión a la mitad, no puede atacar ni hacer dodge roll; levantarse cuesta 1 No2; ya existe como estado). Es distinto de Knockdown (que solo mueve la iniciativa).
+- **Automatizable:** sí, con el estado Sentado ya existente (a mano hoy: "recordar y tirar").
+- **Preguntas:** (a) ¿la probabilidad basta o el defendido tira algo (Fuerza/Constitución) para no caer? *Propuesta:* solo probabilidad, más el efecto de casa contundentes/hachas pesadas/explosivos. (b) ¿Funciona contra criaturas grandes? *Propuesta:* sí, por ahora.
+- **Peso para el valor:** 3 (Sentado es un control fuerte pero lo deshace 1 No2).
+
+### Agarrar — propuesta 2026-09-25 (sin responder)
+- **Qué hace:** el golpeado queda **Agarrado**: **Inmovilizado** (su movimiento vale 0) mientras el atacante lo sostenga. Para zafarse, **paga 2 No2 y gana un Fuerza contra el Fuerza del atacante** (la regla vieja de la trampa "red": 2 No2 y Fuerza).
+- **Familias:** punzantes largos (lanzas, arpones), armas con cadena o gancho; excepcional en el resto.
+- **Preguntas:** (a) ¿el atacante queda "ocupado" también (no se mueve mientras agarra)? *Propuesta:* no, para no castigarlo; solo debe seguir adyacente. (b) ¿dura N turnos o hasta que se zafe? *Propuesta:* hasta que se zafe o el atacante se aleje.
+- **Peso para el valor:** 3.
+
+### Prende fuego — propuesta 2026-09-25 (sin responder)
+- **Qué hace (coherente con lo ya decidido del fuego):** no es un daño por turnos sobre la víctima. **Deja el terreno incendiado**: una forma **🔥 Terreno incendiado** de daño 5 (editable) en la casilla del golpeado (o en una flor de 1 si el arma es grande), por unos turnos. Daña al **entrar** y en cada **Mantenimiento** a quien esté adentro; directo a la vida (es daño mágico elemental). Ya existe el terreno incendiado en el mapa.
+- **Preguntas:** (a) ¿el tamaño (1 casilla o flor de 1) y el daño (3 a 5) dependen del tier del arma? *Propuesta:* sí: comunes 1 casilla y daño 3; legendarias flor de 1 y daño 5. (b) ¿además del terreno hace daño de fuego directo al golpeado? *Propuesta:* no, el terreno ya lo daña al Mantenimiento. (c) Que el **hielo** lo apague (pendiente).
+- **Automatizable:** sí (colocar la forma en el token golpeado con un botón tras la tirada de efecto).
+- **Peso para el valor:** 3 a 4.

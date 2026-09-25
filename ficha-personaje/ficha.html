@@ -1981,6 +1981,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
 <script src="../comun/asistente-estado.js"></script>
+<script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-item.js"></script>
@@ -4075,6 +4076,7 @@ function estadosQueAfectanStat(statId, conVentaja){
     if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
     else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
   });
   if(conVentaja){
     const af = activos.find(e => e.afortunado);
@@ -4640,17 +4642,20 @@ function renderBotoneraInv(){
 
   const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
   const combate = [
-    {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
+    {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
-    {nombre:'Esquivar', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    {nombre:`Parry · ${fmt(pesoArmaInv(inv))} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < pesoArmaInv(inv), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < pesoArmaInv(inv) ? 'Sin No2 · ' : ''}Cuesta ${fmt(pesoArmaInv(inv))} No2 (el Peso de su arma)`, attr:`data-invtirarstat="${inv.id}:parry"`},
-    {nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
+    {stat:'eva', nombre:'Esquivar', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
+    {stat:'parry', nombre:`Parry · ${fmt(pesoArmaInv(inv))} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < pesoArmaInv(inv), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < pesoArmaInv(inv) ? 'Sin No2 · ' : ''}Cuesta ${fmt(pesoArmaInv(inv))} No2 (el Peso de su arma)`, attr:`data-invtirarstat="${inv.id}:parry"`},
+    {stat:'bloqueo', nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
   ];
-  const tilesCombate = combate.map(c => `
-    <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}" ${c.attr} title="${esc(c.motivo)}">
+  const tilesCombate = combate.map(c => {
+    const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
+    return `
+    <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">
       ${lupaBotonHtml(c.clave)}
-      <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>
-    </button>`).join('');
+      <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>${mt.html}
+    </button>`;
+  }).join('');
 
   const filasHab = inv.habilidades.map(h => {
     const bloqueo = bloqueoHabInv(inv, h);
@@ -4707,6 +4712,7 @@ function estadosQueAfectanStatInv(inv, statId){
     if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
     else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
     // Afortunado no está acá a propósito: la invocación todavía no tira dos veces como el PJ o un creep (P100).
   });
   return out;
@@ -5446,6 +5452,8 @@ function renderBotonera(){
   const fCombate = formulasCombate();
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
+  // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
+  const mtEva = ModTirada.tile(S.efectos, 'eva'), mtParry = ModTirada.tile(S.efectos, 'parry'), mtBloqueo = ModTirada.tile(S.efectos, 'bloqueo');
 
   // Percepción: tirada de Destreza (con dado más alto si tiene la pasiva Percepción aumentada).
   html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
@@ -5474,11 +5482,12 @@ function renderBotonera(){
             const fPdg = formulaParaValor(pdgParaArma(arma, c).valor);
             const costo = costoAtaqueNitros(arma);
             const sinNitros = costo > num(S.nitros);
+            const mtP = ModTirada.tile(S.efectos, 'pdg');
             return `
-          <button type="button" class="botonera-tile${sinNitros ? ' bt-sin-nitros' : ''}" data-botoneraaccion="atacar" data-arma="${arma ? arma.id : ''}" title="Atacar${arma ? ` con ${esc(arma.nombre)}` : ''} · ${fmt(costo)} No2">
+          <button type="button" class="botonera-tile${sinNitros ? ' bt-sin-nitros' : ''}${mtP.clase}" data-botoneraaccion="atacar" data-arma="${arma ? arma.id : ''}" title="Atacar${arma ? ` con ${esc(arma.nombre)}` : ''} · ${fmt(costo)} No2${esc(mtP.titulo)}">
             ${lupaBotonHtml(`atacar:${arma ? arma.id : ''}`)}
             <span class="bt-label">Atacar (PdG)${nombre}</span><span class="bt-value bt-value-formula">🎲 ${esc(fPdg ? fPdg.formula : '')}</span>
-            <span class="bt-mod">${fmt(costo)} No2${ataquesConArma(arma) ? '' : ' · 1.º ataque'}</span>
+            <span class="bt-mod">${fmt(costo)} No2${ataquesConArma(arma) ? '' : ' · 1.º ataque'}</span>${mtP.html}
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="danio" data-arma="${arma ? arma.id : ''}" title="Daño${arma ? ` · ${esc(arma.nombre)}` : ''}" ${arma ? '' : 'disabled'}>
             ${arma ? lupaBotonHtml(`danio:${arma.id}`) : ''}
@@ -5487,17 +5496,17 @@ function renderBotonera(){
           }).join('')}
         </div>
         <div class="botonera-combate-grid botonera-combate-bottom">
-          <button type="button" class="botonera-tile" data-botoneraaccion="esquivar" title="Esquivar">
+          <button type="button" class="botonera-tile${mtEva.clase}" data-botoneraaccion="esquivar" title="Esquivar${esc(mtEva.titulo)}">
             ${lupaBotonHtml('stat:eva')}
-            <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
+            <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta tantos No2 como el Peso (' + costoParryTxt() + ')')}">
+          <button type="button" class="botonera-tile${mtParry.clase}" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta tantos No2 como el Peso (' + costoParryTxt() + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}
-            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
+            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>${mtParry.html}
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma; esa suma es el dado que tirás. Después de un Parry, es el arma del Parry">
+          <button type="button" class="botonera-tile${mtBloqueo.clase}" data-botoneraaccion="bloqueo" title="${esc('Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma; esa suma es el dado que tirás. Después de un Parry, es el arma del Parry' + mtBloqueo.titulo)}">
             ${lupaBotonHtml('stat:bloqueo')}
-            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
+            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>${mtBloqueo.html}
           </button>
         </div>
         <div class="botonera-defensa botonera-combate-bottom">

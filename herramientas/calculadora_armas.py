@@ -18,6 +18,7 @@ Uso:
   python calculadora_armas.py calibrar      # cómo caen las 137 armas actuales (tier actual vs calculado)
   python calculadora_armas.py ejemplos      # ejemplos por tier con puntaje y precio nuevos
   python calculadora_armas.py arma NOMBRE   # detalle de una arma del catálogo actual
+  python calculadora_armas.py hoja          # escribe docs/rework-armas-revision.md (para marcar conservar / reajustar / descartar)
 """
 import json, math, sys, pathlib, collections
 
@@ -183,6 +184,33 @@ def ejemplos(n=6):
             print(f"  {a['nombre'][:34]:34} T{a.get('tipoDado')} P{a.get('peso')} PC {pc:5.1f} → {tc:13} ${p:>5} (antes ${a.get('precioCompra')}){' EXCESO×'+str(ex) if ex else ''}  [{ef}]")
 
 
+def hoja():
+    """Escribe docs/rework-armas-revision.md: las armas actuales por familia y tier, para marcar conservar / reajustar / descartar."""
+    armas = cargar()
+    por = collections.defaultdict(list)
+    for a in armas:
+        por[familia(a)].append(a)
+    nombres = {'punzante': 'Punzantes (Tipo 4)', 'cortante': 'Cortantes (Tipo 6)', 'hacha': 'Hachas y pesadas (Tipo 8)', 'contundente': 'Contundentes (Tipo 10)',
+               'explosivo': 'Explosivos (Tipo 12)', 'rango': 'De rango'}
+    out = ['# Rework de armas — hoja de revisión del catálogo actual', '',
+           'Generada por `herramientas/calculadora_armas.py hoja` (2026-09-25). Es la pregunta **P11** de [`rework-armas.md`](rework-armas.md): para cada arma actual, la decisión del dueño:',
+           '**C** = conservar la idea y reajustar sus valores · **R** = reimaginar (mantener el nombre o el concepto pero cambiar lo que hace) · **D** = descartar. Se completa en la columna *Decisión*.',
+           'Los valores "Nuevo" salen de la fórmula v0 (`calculadora_armas.py`) y son solo una referencia: el catálogo viejo no seguía las reglas nuevas.', '']
+    for fam in ['punzante', 'cortante', 'hacha', 'contundente', 'explosivo', 'rango']:
+        lista = sorted(por.get(fam, []), key=lambda a: (ORDEN.index(a['tier']), a['nombre']))
+        out += [f"## {nombres[fam]} — {len(lista)} armas", '', '| Arma | Tier | Manos | Dado×Peso | Bonos | Efectos | Precio hoy | Nuevo (PC · tier · precio) | Decisión |', '|---|---|---|---|---|---|---|---|---|']
+        for a in lista:
+            pc, _ = puntaje(a)
+            p, tc, ex = precio(pc, a['tier'])
+            bonos = ', '.join(f"{m['stat']} {int(m['val']):+d}" for m in (a.get('mods') or [])) or '—'
+            ef = ', '.join(f"{e.get('nombre')} {int(100 * probabilidad(e))}%" for e in (a.get('efectosGolpe') or [])) or '—'
+            manos = '2' if a['tipoItem'] == 'arma_2m' else '1'
+            out.append(f"| {a['nombre']} | {a['tier']} | {manos} | d{a.get('tipoDado')}×{a.get('peso')}{'+' + str(int(a.get('danoFijo') or 0)) if (a.get('danoFijo') or 0) else ''} | {bonos} | {ef} | ${a.get('precioCompra')} | {pc:.1f} · {tc} · ${p} | |")
+        out.append('')
+    (RAIZ / 'docs' / 'rework-armas-revision.md').write_text(chr(10).join(out), encoding='utf-8')
+    print('escrito docs/rework-armas-revision.md', len(armas), 'armas')
+
+
 def detalle(nombre):
     for a in cargar():
         if nombre.lower() in a['nombre'].lower():
@@ -201,4 +229,5 @@ if __name__ == '__main__':
     if cmd == 'calibrar': calibrar()
     elif cmd == 'ejemplos': ejemplos()
     elif cmd == 'arma': detalle(' '.join(sys.argv[2:]))
+    elif cmd == 'hoja': hoja()
     else: print(__doc__)

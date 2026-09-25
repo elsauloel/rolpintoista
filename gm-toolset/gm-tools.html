@@ -1340,6 +1340,7 @@ function estadosQueAfectanStatCreep(sc, statId, conVentaja){
     if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
     else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
   });
   if(conVentaja){
@@ -1355,6 +1356,7 @@ function mitadesDeTirada(estados, statId){
   let n = 0;
   if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
   if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  if(['pdg', 'parry', 'eva'].includes(statId) && n === 0 && act.some(e => e.paralisis)) n++;   // Parálisis: una sola mitad por stat
   if(statId === 'eva' && act.some(e => e.sentado)) n++;
   return n;
 }
@@ -2270,6 +2272,7 @@ function statOrigenTxt(sc, statId, label){
   aportesModCreep(sc, statId).forEach(a => L.push(`${conSigno(a.val)} ${label} por ${a.nombre}`));
   if((statId === 'pdg' || statId === 'eva') && creepEstadoActivo(sc, 'mitadPdgEva')) L.push('Pajaritos: a la mitad');
   if((statId === 'pdg' || statId === 'parry') && creepEstadoActivo(sc, 'lisiado')) L.push('Lisiado: a la mitad');
+  if(['pdg', 'parry', 'eva'].includes(statId) && creepEstadoActivo(sc, 'paralisis')) L.push('Parálisis: a la mitad');
   L.push(`= ${fmt(creepStatValor(sc, statId))}`);
   return L.join('\n');
 }
@@ -3606,7 +3609,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
@@ -3635,8 +3638,10 @@ const ESTADOS_PRESET_GM = [
     detalle:'El Movimiento queda en 0 mientras dure.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true, esCC:true,
     detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:-1}],
-    detalle:'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
+  {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
+    detalle:'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
+  {nombre:'Parálisis', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, paralisis:true, esCC:true,
+    detalle:'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
   {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'crit', val:1}],
     detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   {nombre:'Crítico potente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'critpot', val:1}],
@@ -3776,7 +3781,7 @@ function activarEstadoPresetCreep(preset){
   const yaSangrado = acumularSangradoCreep(sc, datos);
   if(yaSangrado){
     renderAll();
-    toast(`${sc.nombre}: ${yaSangrado.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpTurno)) * num(yaSangrado.stacks))} ahora)`);
+    toast(yaSangrado.esEscarcha ? `${sc.nombre}: ${yaSangrado.nombre} ×${yaSangrado.stacks} (−${yaSangrado.stacks} No2 máx.)` : `${sc.nombre}: ${yaSangrado.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpTurno)) * num(yaSangrado.stacks))} ahora)`);
     return;
   }
   const es = {id: uid(), ...datos};
@@ -3803,11 +3808,14 @@ function acumularVenenoCreep(sc, nuevo){
 // Sangrado se acumula distinto: una reaplicación suma solo +1 stack (el daño por turno sube de a 1), no una tirada
 // nueva de stacks — mismo criterio que Armadura rota.
 function acumularSangradoCreep(sc, nuevo){
-  if(!nuevo.esSangrado) return null;
-  const ya = (sc.estados || []).find(e => e.esSangrado && e.nombre === nuevo.nombre);
+  // También acumula Escarcha (2026-09-25): cada reaplicación suma un stack y renueva la duración.
+  const clave = nuevo.esSangrado ? 'esSangrado' : nuevo.esEscarcha ? 'esEscarcha' : '';
+  if(!clave) return null;
+  const ya = (sc.estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
   if(!ya) return null;
   ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
   ya.activo = true;
+  if(clave === 'esEscarcha') ya.turnos = Math.max(num(ya.turnos), num(nuevo.turnos));
   return ya;
 }
 

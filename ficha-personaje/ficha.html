@@ -3353,11 +3353,14 @@ function acumularVeneno(lista, nuevo){
 // Sangrado se acumula distinto: una reaplicación no suma sus stacks enteros, solo +1 (el daño por turno sube de a 1:
 // 2, 3, 4…). Mismo mecanismo que Armadura rota (un stack más en el mismo estado), no una tirada nueva de stacks.
 function acumularSangrado(lista, nuevo){
-  if(!nuevo.esSangrado) return null;
-  const ya = (lista || []).find(e => e.esSangrado && e.nombre === nuevo.nombre);
+  // También acumula Escarcha (2026-09-25): cada reaplicación suma un stack y renueva la duración.
+  const clave = nuevo.esSangrado ? 'esSangrado' : nuevo.esEscarcha ? 'esEscarcha' : '';
+  if(!clave) return null;
+  const ya = (lista || []).find(e => e[clave] && e.nombre === nuevo.nombre);
   if(!ya) return null;
   ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
   ya.activo = true;
+  if(clave === 'esEscarcha') ya.turnos = Math.max(num(ya.turnos), num(nuevo.turnos));
   return ya;
 }
 
@@ -4097,6 +4100,7 @@ function estadosQueAfectanStat(statId, conVentaja){
     if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
     else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
   });
   if(conVentaja){
@@ -4132,6 +4136,7 @@ function mitadesDeTirada(estados, statId){
   let n = 0;
   if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
   if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
+  if(['pdg', 'parry', 'eva'].includes(statId) && n === 0 && act.some(e => e.paralisis)) n++;   // Parálisis: una sola mitad por stat, no se suma a Lisiado ni Pajaritos
   if(statId === 'eva' && act.some(e => e.sentado)) n++;
   return n;
 }
@@ -4747,6 +4752,7 @@ function estadosQueAfectanStatInv(inv, statId){
     if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
     else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
+    else if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
     else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
     // Afortunado no está acá a propósito: la invocación todavía no tira dos veces como el PJ o un creep (P100).
   });
@@ -5067,7 +5073,7 @@ function activarEfectoPresetInv(preset){
   const yaSangradoInv = acumularSangrado(inv.estados, datos);
   if(yaSangradoInv){
     renderInvocaciones();
-    toast(`${inv.nombre}: ${yaSangradoInv.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangradoInv.hpturno)) * num(yaSangradoInv.stacks))} ahora)`);
+    toast(yaSangradoInv.esEscarcha ? `${inv.nombre}: ${yaSangradoInv.nombre} ×${yaSangradoInv.stacks} (−${yaSangradoInv.stacks} No2 máx.)` : `${inv.nombre}: ${yaSangradoInv.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangradoInv.hpturno)) * num(yaSangradoInv.stacks))} ahora)`);
     return;
   }
   inv.estados.push(datos);
@@ -5869,7 +5875,7 @@ function configEquipoEstadoDe(it){
 // mecánica real del preset "Afortunado".
 const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];
+  'lisiado', 'paralisis', 'esEscarcha', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
   const p = presetPorNombre(EFECTOS_PRESET, (nombrePreset || '').trim());
   if(!p) return {};
@@ -6979,8 +6985,10 @@ const EFECTOS_PRESET = [
     detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
-  {nombre:'Escarcha', polaridad:'debuff', turnos:2, mods:[{stat:'nitros', val:-1}],
-    detalle:'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
+  {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
+    detalle:'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
+  {nombre:'Parálisis', polaridad:'debuff', turnos:2, paralisis:true, esCC:true,
+    detalle:'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
   {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, mods:[{stat:'crit', val:1}],
     detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:1}],
@@ -7204,7 +7212,7 @@ function activarEfectoPreset(preset){
   if(yaSangrado){
     renderList('efectos');
     refresh();
-    toast(`${yaSangrado.nombre}: +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpturno)) * num(yaSangrado.stacks))} ahora)`);
+    toast(yaSangrado.esEscarcha ? `${yaSangrado.nombre} ×${yaSangrado.stacks} (−${yaSangrado.stacks} No2 máx.)` : `${yaSangrado.nombre}: +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpturno)) * num(yaSangrado.stacks))} ahora)`);
     return;
   }
   S.efectos.push(draft);
@@ -9692,6 +9700,7 @@ function lupaStat(id, c, {valor, excluidos = [], sinTirada = false} = {}){
   const mitad = [];
   if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
   if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
+  if(['pdg', 'parry', 'eva'].includes(id)) activos.filter(e => e.paralisis).forEach(e => mitad.push(e.nombre));
   if(id === 'eva') activos.filter(e => e.sentado).forEach(e => mitad.push(e.nombre));
   mitad.forEach(n => { h += lupaFila(`${esc(n)} <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>`, '÷ 2'); });
   if(id === 'nitros'){

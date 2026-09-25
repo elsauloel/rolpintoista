@@ -25,6 +25,7 @@ const ModTirada = (() => {
       });
       if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
       if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
+      if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
       if(e.sentado && statId === 'eva') out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
       if(e.afortunado && ['pdg', 'parry', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ×2`, p: 'buff'});
     });

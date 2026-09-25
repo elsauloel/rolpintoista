@@ -26,7 +26,8 @@ const EstadosAplicar = (() => {
     {nombre: 'Lisiado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, lisiado: true, esCC: true, detalle: 'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
     {nombre: 'Inmovilizado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, inmovilizado: true, esCC: true, detalle: 'El Movimiento queda en 0 mientras dure.'},
     {nombre: 'Rengo', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, rengo: true, esCC: true, detalle: 'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Escarcha', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, mods: [{stat: 'nitros', val: -1}], detalle: 'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
+    {nombre: 'Escarcha', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esEscarcha: true, mods: [{stat: 'nitros', val: -1}], detalle: 'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
+    {nombre: 'Parálisis', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, paralisis: true, esCC: true, detalle: 'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
     {nombre: 'Sentado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: 0, permanente: true, sentado: true, esCC: true, detalle: 'Su Evasión se parte a la mitad, no puede atacar y no puede hacer dodge roll. No vence solo: levantarse cuesta 1 No2.'},
   ];
 
@@ -97,6 +98,11 @@ const EstadosAplicar = (() => {
     if(est.esSangrado){
       const ya = sc.estados.find(e => e.esSangrado && e.nombre === est.nombre);
       if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
+    }
+    // Escarcha se acumula (2026-09-25): cada reaplicación suma un stack (−1 No2 máx. por stack) y renueva la duración.
+    if(est.esEscarcha){
+      const ya = sc.estados.find(e => e.esEscarcha && e.nombre === est.nombre);
+      if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; ya.turnos = Math.max(Number(ya.turnos) || 0, Number(est.turnos) || 0); return {ok: true, estado: ya}; }
     }
     const igual = sc.estados.find(e => e.nombre === est.nombre);
     if(igual){ Object.assign(igual, {...est, id: igual.id}); return {ok: true, estado: igual}; }

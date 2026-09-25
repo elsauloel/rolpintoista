@@ -165,14 +165,14 @@ const AsistenteTrampa = (() => {
           <input type="range" id="at-alfa" min="10" max="100" step="5" value="${est.alfa}">`;
       }
       if(id === 'quien'){
-        return `<div class="at-preg">¿Quién la activa?</div>
-          <p class="at-ayuda">Una trampa está <b>oculta</b>: solo la ves vos (y el GM) hasta que alguien la pisa; ahí se muestra a todos y se dispara sola.</p>
-          <button type="button" class="at-op${!est.amiga ? ' on' : ''}" data-amiga="0"><span class="ico">🎯</span><span><b>Solo los rivales</b><small>La activan los enemigos de quien la puso. Los aliados pasan sin problemas.</small></span></button>
-          <button type="button" class="at-op${est.amiga ? ' on' : ''}" data-amiga="1"><span class="ico">🔥</span><span><b>Todos (fuego amigo)</b><small>La activa cualquiera que la pise: rivales, aliados y hasta quien la puso.</small></span></button>`;
+        return `<div class="at-preg">¿Su efecto alcanza a los aliados?</div>
+          <p class="at-ayuda">Una trampa está <b>oculta</b> y la activan <b>solo los rivales</b> de quien la puso: los aliados nunca la disparan. La pregunta es qué pasa con los aliados que queden <b>dentro del área</b> cuando salta. Regla general: lo <b>físico</b> (púas, cuchillas, derrumbes, gases, explosiones) daña a todos; lo <b>mágico</b> (arcano, relámpago, runas) distingue aliados de rivales.</p>
+          <button type="button" class="at-op${!est.amiga ? ' on' : ''}" data-amiga="0"><span class="ico">🎯</span><span><b>Solo a los rivales (mágica)</b><small>El efecto distingue: alcanza a quien la activó y a los rivales que estén dentro del área; los aliados salen ilesos.</small></span></button>
+          <button type="button" class="at-op${est.amiga ? ' on' : ''}" data-amiga="1"><span class="ico">🔥</span><span><b>A todos los del área (fuego amigo, física)</b><small>El efecto (daño y estado) alcanza a todos los que estén dentro del área, aliados incluidos. Igual la dispara un rival.</small></span></button>`;
       }
       if(id === 'dano'){
         return `<div class="at-preg">¿Hace daño?</div>
-          <label class="at-sin"><input type="checkbox" id="at-haceDano"${est.haceDano ? ' checked' : ''}> Sí, la trampa hace daño a quien la activa (y a los que están dentro si es de área)</label>
+          <label class="at-sin"><input type="checkbox" id="at-haceDano"${est.haceDano ? ' checked' : ''}> Sí, la trampa hace daño a quien la activa (y a los que están dentro si es de área, según lo elegido antes)</label>
           ${est.haceDano ? `<div class="at-preg">¿Cuánto?</div>
             <p class="at-ayuda">Se tira solo cuando se activa. Por ejemplo 2 dados de 6 caras más 1 fijo = 2d6+1.</p>
             <div class="at-fila"><input type="number" id="at-dados" min="1" max="20" value="${esc(est.dados)}" style="width:70px"><label>d</label>
@@ -206,7 +206,7 @@ const AsistenteTrampa = (() => {
       }
       const fr = frases();
       return `<div class="at-preg">Así queda tu trampa</div>
-        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 fuego amigo' : '🎯 solo rivales'}${editando ? '' : deHab ? ' · radio ' + est.radio + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
+        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 daña también a aliados en el área' : '🎯 efecto solo a rivales'}${editando ? '' : deHab ? ' · radio ' + est.radio + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
           <ul>${fr.map(x => `<li>${esc(x)}</li>`).join('')}<li>${est.dura ? `Se elimina sola tras ${est.turnos} turno${est.turnos === 1 ? '' : 's'}` : 'Queda hasta que alguien la borre'}</li></ul>
           ${est.descripcion.trim() ? `<div style="margin-top:8px;color:#B7A79E;font-size:13px">“${esc(est.descripcion.trim())}”</div>` : ''}</div>
         <p class="at-ayuda">${editando ? 'Al confirmar se guardan los cambios en la trampa.' : deHab ? 'Al confirmar se guarda en la habilidad; se coloca sola cada vez que la ejecutes.' : 'Al confirmar te queda la trampa lista: <b>hacé clic en el mapa y arrastrá</b> para dibujarla donde quieras.'}</p>

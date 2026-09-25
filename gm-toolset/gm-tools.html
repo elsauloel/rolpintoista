@@ -4328,7 +4328,7 @@ function hcTrampaRender(){
   const on = $('#hc-trampa-on').checked;
   const nom = $('#hc-trampa-nombre').value.trim();
   $('#hc-trampa-resumen').innerHTML = on
-    ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $('#hc-nombre').value.trim() || 'Sin nombre')}</b><br>${esc(hcTrampaResumen())} · ${$('#hc-trampa-amiga').checked ? 'fuego amigo: SÍ' : 'fuego amigo: NO'}</div>
+    ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $('#hc-nombre').value.trim() || 'Sin nombre')}</b><br>${esc(hcTrampaResumen())} · ${$('#hc-trampa-amiga').checked ? 'daña también a aliados en el área' : 'el efecto solo alcanza a rivales'}</div>
       <button type="button" class="btn primary" id="hc-trampa-asistente" style="width:100%">🪄 ${nom ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>`
     : '';
   $('#hc-trampa-campos').style.opacity = on ? '1' : '.4';
@@ -7328,7 +7328,7 @@ $('#hc-trampa-preconstruidas').onclick = () => {
   Biblioteca.abrir({
     tipo: 'trampas', titulo: 'Trampa preconstruida',
     base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
-    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}, {nombre: 'Alcance', tags: ['área']}],
     alElegir: async datos => {
       const preguntas = [{clave: 'radio', min: 0, texto: '¿De qué tamaño es? (radio: 0 = una casilla, 1 = una flor de 1, 2 = una flor de 2…)'}];

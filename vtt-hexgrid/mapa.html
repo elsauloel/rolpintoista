@@ -1859,7 +1859,7 @@ function trampaResumenFrase(nombre, dano, ignoraDef, estado, estadoTurnos, amiga
   if(dano) p.push(`${dano} de daño ${ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
   if(estado) p.push(`deja ${estado}${estadoTurnos ? ' ' + estadoTurnos + ' turnos' : ''}`);
   if(!p.length) p.push('solo avisa cuando se activa');
-  p.push(amiga ? 'fuego amigo: SÍ' : 'fuego amigo: NO');
+  p.push(amiga ? 'daña también a aliados en el área' : 'el efecto solo alcanza a rivales');
   return p.join(' · ');
 }
 function abrirAsistenteTrampaPanel(){
@@ -1929,7 +1929,7 @@ function abrirCatalogoTrampas(){
     textoCrearDeCero: '+ Crear una trampa custom (paso a paso)',
     alCrearDeCero: () => { elemTrampa = true; abrirAsistenteTrampaPanel(); },
     alElegir: cargarTrampaEnPanel,
-    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [
       {nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']},
       {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']},
@@ -5908,8 +5908,10 @@ function nieblaDeshacer(seq0, pend0){
 let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el}
 const trampasAvisadas = new Set();   // 'token:trampa' ya avisadas por cercanía
 
+// Criterio del dueño (2026-09-25): los aliados NUNCA disparan una trampa (solo la activan los rivales de quien la puso). "Fuego amigo"
+// es del EFECTO: si es de área y tiene fuego amigo (lo físico y explosivo), alcanza a todos los de adentro, aliados incluidos; si no
+// (lo mágico), solo a los rivales (`trampaAfectados`).
 function trampaDispara(t, el){
-  if(el.fuegoAmigo) return true;   // fuego amigo: la disparan todos, aliados incluidos
   const dueno = miembros.get(el.duenoUid);
   return dueno && dueno.gm ? t.tipo === 'pj' : t.tipo === 'creep';
 }
@@ -5939,15 +5941,20 @@ function trampasEvaluarRuta(tokId, t, ruta){
   }
   return null;
 }
+// Quiénes sufren el efecto: quien la activó y, si es de área, los de adentro (todos con fuego amigo; si no, solo los que ella considera rivales).
+function trampaAfectados(t, el){
+  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
+  const afectados = [t];
+  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila)) && (el.fuegoAmigo || trampaDispara(x, el))) afectados.push(x); });
+  return afectados;
+}
 // Daño automático de la trampa: se tira solo y se descuenta (con la Defensa) de quien la activó. En un área
 // también de los creeps de adentro si mueve el GM; a los personajes de otros jugadores solo se les avisa en la Mesa.
 async function trampaAplicarDano(t, el){
   if(!trampaDanoValido(el.trampaDano)) return;
   const tir = tirarDados(el.trampaDano.trim());
   if(!tir) return;
-  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
-  const afectados = [t];
-  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila))) afectados.push(x); });
+  const afectados = trampaAfectados(t, el);
   const partes = [];
   for(const x of afectados){
     let hecho = false;
@@ -5966,9 +5973,7 @@ async function trampaAplicarEstado(t, el){
   let spec = null;
   try{ spec = JSON.parse(el.trampaEstado); }catch(e){ return; }
   if(!spec || !spec.nombre) return;
-  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
-  const afectados = [t];
-  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila))) afectados.push(x); });
+  const afectados = trampaAfectados(t, el);
   const nombres = [];
   for(const x of afectados){
     if(!x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;

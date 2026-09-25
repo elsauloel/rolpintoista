@@ -8833,7 +8833,7 @@ function trampaResumenTexto(t){
   if(t.estado && t.estado.nombre) p.push(`deja ${t.estado.nombre}`);
   if(!p.length) p.push('solo avisa cuando se activa');
   p.push(`radio ${t.radio || 0}`); if((t.cant || 1) > 1) p.push(`×${t.cant}`);
-  p.push(t.amiga ? 'fuego amigo: SÍ' : 'fuego amigo: NO');
+  p.push(t.amiga ? 'daña también a aliados en el área' : 'el efecto solo alcanza a rivales');
   return p.join(' · ');
 }
 function trampaHtml(draft){

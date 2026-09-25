@@ -16,14 +16,19 @@
   const lista = [];
   // tr(nombre, nivel, etiquetas, forma, tamaño, color, daño automático ('' si no hace), qué hace (≤200), fuego amigo?, ignora la Defensa?, estado automático {nombre, turnos}?)
   // ignoraDef: el daño automático va DIRECTO a la vida (fuego, hielo, electricidad y explosiones, 2026-09-24); si no, se le resta la Defensa como a un golpe (lo físico).
+  // Criterio del dueño (2026-09-25): "fuego amigo" = el EFECTO también alcanza a los aliados que estén en el área. Lo físico y lo explosivo
+  // (púas, cuchillas, derrumbes, gases, minas…) sí; lo mágico (arcano, relámpago, runas) distingue aliados de rivales. Los aliados NUNCA disparan una trampa.
+  const FISICAS = new Set(['Trampa de oso', 'Foso con estacas', 'Red de caza', 'Brea pegajosa', 'Aceite resbaladizo', 'Dardos envenenados', 'Cuchillas de guadaña', 'Cable de alarma',
+    'Arena movediza', 'Derrumbe', 'Nube de veneno', 'Gas somnífero', 'Bomba de esporas', 'Mina explosiva', 'Barril de pólvora']);
   function tr(nombre, nivel, etiquetas, tipo, tamano, color, dano, detalle, amiga, ignoraDef, estado){
+    amiga = amiga || FISICAS.has(nombre);
     const auto = dano
       ? `tira ${dano} de daño y se lo aplica a quien la activa (${ignoraDef ? 'directo a la vida: ignora su Defensa' : 'restando su Defensa'})${tamano > 1 && tipo === 'flor' ? '; en el área, también a los creeps si mueve el GM, y a los demás se les avisa en la Mesa' : ''}`
       : 'solo avisa en la Mesa cuando se dispara';
     lista.push({
       poolId: 'trampa-' + slug(nombre), nombre, nivel,
       etiquetas: [...etiquetas, 'nivel ' + nivel, 'auditar'],
-      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: la disparan también los aliados.' : ''} ⚙ Automático: ${auto}${estado ? `; deja el estado ${estado.nombre} (los turnos los elegís al colocarla)` : ''}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
+      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: su efecto también alcanza a los aliados que estén en el área.' : ''} ⚙ Automático: ${auto}${estado ? `; deja el estado ${estado.nombre} (los turnos los elegís al colocarla)` : ''}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
       datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...(estado ? {estado: estado.nombre, estadoTurnos: estado.turnos} : {})},
     });
   }

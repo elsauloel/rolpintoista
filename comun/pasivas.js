@@ -55,7 +55,7 @@ const PASIVAS_BASE = [
   {poolId: 'punteria', nombre: 'Puntería', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 PdG (probabilidad de golpe).', mods: [{stat: 'pdg', val: 1}]},
   {poolId: 'ojo-critico', nombre: 'Ojo crítico', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
-   detalle: '+1 Crit. ⚠ A revisar.', mods: [{stat: 'crit', val: 1}]},
+   detalle: '+1 Crítico frecuente. ⚠ A revisar.', mods: [{stat: 'crit', val: 1}]},
   {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

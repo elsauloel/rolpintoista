@@ -2257,7 +2257,7 @@ const CREEP_DERIVADOS_POR_ATTR = {
   con: [['resmg', 'Res.Mg'], ['rescc', 'Res.CC']],
   fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
   agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
-  des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['parry', 'Parry'], ['percepcion', 'Percep.']],
+  des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.']],
   esp: [['pdgmg', 'PdG.Mg'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
 };
 const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
@@ -3130,7 +3130,7 @@ const CREEP_DERIVED_STATS = [
   {id:'resmg', label:'Res.Mg', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
   {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
   {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
-  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
+  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
   {id:'pdgmg', label:'PdG.Mg', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
 ];
 
@@ -3637,6 +3637,10 @@ const ESTADOS_PRESET_GM = [
     detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:-1}],
     detalle:'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
+  {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'crit', val:1}],
+    detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  {nombre:'Crítico potente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'critpot', val:1}],
+    detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, stacks:1, hpTurno:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de sus Acciones).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
@@ -3907,7 +3911,7 @@ const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
 const STAT_LABEL_GM = {
   tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
-  pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente',
+  pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
   bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
   resm:'Res.Mt', resmg:'Res.Mg', rescc:'Res.CC',
   con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
@@ -3915,7 +3919,7 @@ const STAT_LABEL_GM = {
 const STAT_FULL_GM = {
   tipo1:'Resistencia a crítico Tipo 4', tipo2:'Resistencia a crítico Tipo 6', tipo3:'Resistencia a crítico Tipo 8',
   tipo4:'Resistencia a crítico Tipo 10', tipo5:'Resistencia a crítico Tipo 12',
-  pdg:'Probabilidad de golpe', eva:'Evasión', ini:'Iniciativa', mov:'Movimiento', parry:'Parry', crit:'Crítico frecuente (baja el rango del crítico)',
+  pdg:'Probabilidad de golpe', eva:'Evasión', ini:'Iniciativa', mov:'Movimiento', parry:'Parry', crit:'Crítico frecuente (baja el rango del crítico)', critpot:'Crítico potente (baja los umbrales del d20)',
   bonos:'Bonos', rangocasteo:'Rango de casteo', accionesmax:'Acciones máximas', nitros:'Nitros',
   resm:'Resistencia mental', resmg:'Resistencia mágica', rescc:'Resistencia a CC',
   con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial',
@@ -3935,7 +3939,7 @@ function modsResumenHtmlGM(mods){
   return list.map(m => {
     const label = TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined ? `Res.Crít. ${STAT_LABEL_GM[m.stat]}` : (STAT_LABEL_GM[m.stat] || m.stat);
     const val = num(m.val);
-    const suf = m.stat === 'crit' ? '%' : '';
+    const suf = '';
     const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
     return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
   }).join(' · ');
@@ -7407,8 +7411,8 @@ function armarPresetDeAsistenteGM(res){
 $('#presets-creep-personalizado').onclick = () => {
   $('#scrim-presets-creep').classList.remove('open');
   const scId = presetsCreepScId, sc = S.creeps.find(x => x.id === scId);
-  const extra = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: null, eva: null, parry: null, nitros: null, resm: null, resmg: null, rescc: null, ini: null, crit: null};
-  const ids = ['def', 'dmg', 'pdg', 'eva', 'parry', 'nitros', 'con', 'fue', 'agl', 'des', 'esp', 'resm', 'resmg', 'rescc', 'ini', 'crit'];
+  const extra = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: null, eva: null, parry: null, nitros: null, resm: null, resmg: null, rescc: null, ini: null, crit: null, critpot: null};
+  const ids = ['def', 'dmg', 'pdg', 'eva', 'parry', 'nitros', 'con', 'fue', 'agl', 'des', 'esp', 'resm', 'resmg', 'rescc', 'ini', 'crit', 'critpot'];
   AsistenteEstado.abrir({
     titulo: 'Crear un estado alterado',
     para: sc ? sc.nombre : '',

@@ -17,7 +17,7 @@ CATALOGO_JSON = str(pathlib.Path(RAIZ) / "datos" / "catalogo.json")
 
 TIERS_OK = {'común':'Común', 'buena calidad':'Buena Calidad', 'raro':'Raro',
             'excepcional':'Excepcional', 'legendario':'Legendario'}
-STATS_OK = {'def','tipo1','tipo2','tipo3','tipo4','tipo5','mov','bonos','eva','ini','pdg','crit',
+STATS_OK = {'def','tipo1','tipo2','tipo3','tipo4','tipo5','mov','bonos','eva','ini','pdg','crit','critpot',
             'parry','fue','con','esp','agl','des','resm','resmg','rescc','rangocasteo','accionesmax',
             'dmg','bloqueo','hpmax','crgmax','rng','pdgmg','capcinturon','percepcion'}
 

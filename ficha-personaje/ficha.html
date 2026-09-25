@@ -2014,6 +2014,7 @@ const GRUPOS = [
   {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
     {id:'rng', label:'Rng', full:'Rango'},
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
+    {id:'critpot', label:'Crít.Pot.', full:'Crítico potente (baja los umbrales del d20: doble, triple y cuádruple daño)'},
     {id:'crit', label:'Crít.Frec.', full:'Crítico frecuente (baja el rango del crítico; ver Calculadora de crítico)'},
     {id:'parry', label:'Parry', full:'Parry'},
     {id:'percepcion', label:'Percep.', full:'Percepción'}]},
@@ -2131,6 +2132,7 @@ function migrarEstadoIt2(st){
     if(f.crit === 'des') f.crit = '0';
     st.critFrecuenteAuto = true;
   }
+  if(f.critpot === undefined) f.critpot = '0';   // Crítico potente (2026-09-25)
   if(f.vision === undefined) f.vision = '6';
   Object.keys(f).forEach(k => {
     if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
@@ -2329,7 +2331,7 @@ const DEFAULT = {
     resmg:'con', rescc:'con', hpmax:'con*5',
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
-    rng:'des', pdg:'des', crit:'0', parry:'des', percepcion:'des',   // crit = Crítico frecuente (2026-09-25): ya no sale de la Destreza, solo lo suman equipo, skills y estados
+    rng:'des', pdg:'des', crit:'0', critpot:'0', parry:'des', percepcion:'des',   // crit = Crítico frecuente (2026-09-25): ya no sale de la Destreza, solo lo suman equipo, skills y estados
     pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'floor(esp/2)', rangocasteo:'esp',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', vision:'6'
   },
@@ -3088,6 +3090,16 @@ function evalFormula(expr, ctx){
   }catch(e){ return NaN; }
 }
 
+// Datos de partida de la Calculadora de crítico (comun/critico.js): el Crítico frecuente y potente de este personaje y el Tipo de su arma equipada.
+function criticoDatosIniciales(){
+  const c = compute();
+  const arma = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado)));
+  const d = {};
+  if(!Number.isNaN(c.final.crit)) d.frecuente = Math.max(0, Math.round(c.final.crit));
+  if(!Number.isNaN(c.final.critpot)) d.potente = Math.max(0, Math.round(c.final.critpot));
+  if(arma) d.tipo = num(arma.tipoDado);
+  return d;
+}
 function compute(){
   const mods = collectMods();
   const modTotal = {};
@@ -4047,7 +4059,7 @@ function renderHistorialSesion(){
 
 /* ---------- Tirar dados a partir del valor de un stat (formulaParaValor: comun/tiradas.js) ---------- */
 
-const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'rangocasteo', 'def', 'capcinturon'];
+const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'critpot', 'rangocasteo', 'def', 'capcinturon'];
 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
@@ -6969,6 +6981,10 @@ const EFECTOS_PRESET = [
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, mods:[{stat:'nitros', val:-1}],
     detalle:'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
+  {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, mods:[{stat:'crit', val:1}],
+    detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:1}],
+    detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
@@ -7394,7 +7410,7 @@ function modsResumenHtml(item){
   return mods.map(m => {
     const label = TIPOS_IDS.includes(m.stat) ? `Res.Crít. ${STAT_LABEL[m.stat]}` : (STAT_LABEL[m.stat] || m.stat);
     const val = num(m.val);
-    const suf = m.stat === 'crit' ? '%' : '';
+    const suf = '';
     const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
     return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
   }).join(' · ');

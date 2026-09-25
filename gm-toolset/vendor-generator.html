@@ -419,7 +419,8 @@ const GRUPOS = [
   {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
     {id:'rng', label:'Rng', full:'Rango'},
     {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
-    {id:'crit', label:'Crit', full:'Crítico'},
+    {id:'critpot', label:'Crít.Pot.', full:'Crítico potente'},
+    {id:'crit', label:'Crít.Frec.', full:'Crítico frecuente'},
     {id:'parry', label:'Parry', full:'Parry'},
     {id:'percepcion', label:'Percep.', full:'Percepción'}]},
   {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
@@ -1261,7 +1262,7 @@ function modsResumenHtml(item){
   return mods.map(m => {
     const label = TIPOS_IDS.includes(m.stat) ? `Res.Crít. ${STAT_LABEL[m.stat]}` : (STAT_LABEL[m.stat] || m.stat);
     const val = num(m.val);
-    const suf = m.stat === 'crit' ? '%' : '';
+    const suf = '';
     const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';
     return `<span class="${cls}">${esc(label)} ${val>0?'+':''}${fmt(val)}${suf}</span>`;
   }).join(' · ');

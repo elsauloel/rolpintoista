@@ -77,7 +77,10 @@ const Critico = (() => {
   function abrir(inicial){
     estilos();
     const previo = document.getElementById('cr-fondo'); if(previo) previo.remove();
-    const v = Object.assign({pdg: '', eva: '', tipo: 6, frecuente: 0, potente: 0, resistencia: 0, dano: '', defensa: 0}, inicial || {});
+    // Si la herramienta define criticoDatosIniciales() (la ficha lo hace: su Crítico frecuente/potente y el Tipo de su arma equipada), se usa de partida.
+    let auto = {};
+    try{ if(typeof criticoDatosIniciales === 'function') auto = criticoDatosIniciales() || {}; }catch(err){ console.error('criticoDatosIniciales:', err); }
+    const v = Object.assign({pdg: '', eva: '', tipo: 6, frecuente: 0, potente: 0, resistencia: 0, dano: '', defensa: 0}, auto, inicial || {});
     let tirada = null;   // {rolls, mejor, mult} del último "Tirar d20"
     const fondo = document.createElement('div');
     fondo.id = 'cr-fondo';

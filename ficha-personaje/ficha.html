@@ -8709,7 +8709,7 @@ function trampaPreconstruidas(){
       qs.push({clave: 'cant', min: 1, texto: '¿Cuántas trampas coloca cada vez que la ejecutás?'});
       const r = await EstadoPreguntas.preguntar({titulo: 'Trampa', nombre: datos.nombre}, qs, x => x);
       if(!r || editing !== ed) return;
-      ed.draft.trampaColocar = {nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '', ignoraDef: false,
+      ed.draft.trampaColocar = {nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '', ignoraDef: !!datos.ignoraDef,
         radio: Math.max(0, Math.min(6, r.radio)), cant: Math.max(1, Math.min(6, r.cant))};
       drawEditor();
       toast(`Trampa "${datos.nombre}" cargada`);

@@ -7213,7 +7213,7 @@ $('#hc-trampa-preconstruidas').onclick = () => {
       $('#hc-trampa-nombre').value = String(datos.nombre || '').slice(0, 40);
       $('#hc-trampa-detalle').value = String(datos.detalle || '').slice(0, 200);
       $('#hc-trampa-dano').value = r.dano || '';
-      $('#hc-trampa-ignora-def').checked = false;
+      $('#hc-trampa-ignora-def').checked = !!datos.ignoraDef;   // fuego, hielo, electricidad y explosiones van directo a la vida
       $('#hc-trampa-radio').value = Math.max(0, Math.min(6, r.radio));
       $('#hc-trampa-cant').value = Math.max(1, Math.min(6, r.cant));
       $('#hc-trampa-estado').value = '';

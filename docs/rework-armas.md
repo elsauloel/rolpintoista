@@ -39,7 +39,7 @@ propone y el dueño audita.
 3. ✅ **¿Una mano y dos manos?** *Propuesta:* ~80 % una mano, ~20 % dos manos (más Peso y más efectos a cambio de ocupar las dos manos).
 
 ### B · Efectos
-4. ⬜ **¿Cuántos efectos distintos habrá y cuáles?** *Propuesta:* los de la guía (Rompe armadura, Knockdown, Aturdir, Lisiado, Sangrado, Envenenar, Derribar, Agarrar, Prende fuego, Drena vida) + un puñado de "modificadores" (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). Repartirlos parejo: hoy uno solo (Rompe armadura) está en 13 % de las armas.
+4. 🟡 **¿Cuántos efectos distintos habrá y cuáles?** *(en curso: ver "Elaboración de efectos")* *Propuesta:* los de la guía (Rompe armadura, Knockdown, Aturdir, Lisiado, Sangrado, Envenenar, Derribar, Agarrar, Prende fuego, Drena vida) + un puñado de "modificadores" (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). Repartirlos parejo: hoy uno solo (Rompe armadura) está en 13 % de las armas.
 5. ⬜ **¿Cuántos efectos lleva un arma según su tier?** *Propuesta:* Común 0 (algunas 1) · Buena calidad 0–1 · Raro 1 · Excepcional 1–2 · Legendario 2–3.
 6. ⬜ **¿Con qué probabilidad se aplican?** *Propuesta:* Común/Buena 25 % · Raro 50 % · Excepcional 75 % · Legendario 100 % (o efectos extra del 100 %). Se tira con moneda/d4 como hoy.
 7. ⬜ **¿Qué peso tiene cada efecto para valorizar el arma?** *Propuesta (escala 1 a 5, provisoria):* Aturdir 5 · Rompe armadura 4 · Knockdown 4 · Drena vida 4 · Lisiado 3 · Sangrado 3 · Envenenar 3 · Agarrar 3 · Prende fuego 3 · Derribar 2 · Ignora 1 de Res. crítico 2. Se multiplica por un factor según sea **de casa** (×1), **habilitado** (×1,25) o **excepcional** (×1,5) para la familia.
@@ -70,26 +70,33 @@ propone y el dueño audita.
 ## Elaboración de efectos (P4 en discusión)
 > Cada efecto se elabora acá con la propuesta del asistente y lo que responda el dueño. Cuando se cierra uno, pasa a "Respuestas y decisiones" y a la guía de diseño.
 
-### Knockdown (iniciativa) — propuesta 2026-09-25 (sin responder)
+### Demora (antes "Knockdown", iniciativa) — ✅ decidido 2026-09-25
 - **Qué hace:** al golpear (con la probabilidad del arma), el golpeado **baja N lugares en el orden de turnos** (N = 1, 2 o "al fondo"). "Knockdown 1" = baja 1 lugar. Es el efecto de casa de los **contundentes**; habilitado en explosivos.
 - **Automatizable:** sí. Las reglas de Firestore ya dejan a cualquier miembro reordenar la lista de iniciativa (solo se prohíbe cambiar el turno, la ronda y el largo). Un botón "⬇ Knockdown" en la tabla, o que salga tras la tirada de efecto.
 - **Preguntas:** (a) ¿el cambio dura **solo esta ronda** (vuelve a su lugar al empezar la siguiente) o **queda** hasta que el GM reordene? *Propuesta:* solo esta ronda. (b) ¿Si le toca justo al golpeado, pierde el turno o solo pasa detrás? *Propuesta:* solo cambia el orden de la próxima vez; el turno en curso no se toca. (c) Nombre en español definitivo.
 - **Peso para el valor:** 4.
 
-### Derribar — propuesta 2026-09-25 (sin responder)
+### Derribar — ✅ aceptado como se propuso (2026-09-25)
 - **Qué hace:** el golpeado **cae al suelo**: pasa a **Sentado** (Evasión a la mitad, no puede atacar ni hacer dodge roll; levantarse cuesta 1 No2; ya existe como estado). Es distinto de Knockdown (que solo mueve la iniciativa).
 - **Automatizable:** sí, con el estado Sentado ya existente (a mano hoy: "recordar y tirar").
 - **Preguntas:** (a) ¿la probabilidad basta o el defendido tira algo (Fuerza/Constitución) para no caer? *Propuesta:* solo probabilidad, más el efecto de casa contundentes/hachas pesadas/explosivos. (b) ¿Funciona contra criaturas grandes? *Propuesta:* sí, por ahora.
 - **Peso para el valor:** 3 (Sentado es un control fuerte pero lo deshace 1 No2).
 
-### Agarrar — propuesta 2026-09-25 (sin responder)
+### Agarrar — ❌ FUERA por ahora (2026-09-25): "no me cierra", a evaluar en el futuro. (Se conserva la propuesta de abajo solo como referencia.)
 - **Qué hace:** el golpeado queda **Agarrado**: **Inmovilizado** (su movimiento vale 0) mientras el atacante lo sostenga. Para zafarse, **paga 2 No2 y gana un Fuerza contra el Fuerza del atacante** (la regla vieja de la trampa "red": 2 No2 y Fuerza).
 - **Familias:** punzantes largos (lanzas, arpones), armas con cadena o gancho; excepcional en el resto.
 - **Preguntas:** (a) ¿el atacante queda "ocupado" también (no se mueve mientras agarra)? *Propuesta:* no, para no castigarlo; solo debe seguir adyacente. (b) ¿dura N turnos o hasta que se zafe? *Propuesta:* hasta que se zafe o el atacante se aleje.
 - **Peso para el valor:** 3.
 
-### Prende fuego — propuesta 2026-09-25 (sin responder)
+### Prende fuego — ✅ aceptado como se propuso (2026-09-25)
 - **Qué hace (coherente con lo ya decidido del fuego):** no es un daño por turnos sobre la víctima. **Deja el terreno incendiado**: una forma **🔥 Terreno incendiado** de daño 5 (editable) en la casilla del golpeado (o en una flor de 1 si el arma es grande), por unos turnos. Daña al **entrar** y en cada **Mantenimiento** a quien esté adentro; directo a la vida (es daño mágico elemental). Ya existe el terreno incendiado en el mapa.
 - **Preguntas:** (a) ¿el tamaño (1 casilla o flor de 1) y el daño (3 a 5) dependen del tier del arma? *Propuesta:* sí: comunes 1 casilla y daño 3; legendarias flor de 1 y daño 5. (b) ¿además del terreno hace daño de fuego directo al golpeado? *Propuesta:* no, el terreno ya lo daña al Mantenimiento. (c) Que el **hielo** lo apague (pendiente).
 - **Automatizable:** sí (colocar la forma en el token golpeado con un botón tras la tirada de efecto).
 - **Peso para el valor:** 3 a 4.
+
+## Respuestas y decisiones (continuación: efectos)
+- **2026-09-25 · P4 (efectos), Demora:** "A knockdown lo vamos a llamar **demora**, que al mover la ubicación en la tabla de iniciativa **en uno para abajo sea definitivo**." → **Demora**: el golpeado **baja 1 lugar en la tabla de iniciativa** y el cambio es **definitivo** (queda así hasta que el GM reordene o se vuelva a ordenar la tabla; no vuelve solo). No toca el turno en curso. Efecto de casa de los **contundentes** (habilitado en explosivos). Peso propuesto: 4.
+- **2026-09-25 · P4, Agarrar:** "Agarrar no me cierra, lo vamos a dejar por ahora afuera, a evaluar en el futuro." → **Agarrar queda fuera del catálogo de efectos por ahora.**
+- **2026-09-25 · P4, Prende fuego:** "Vamos a dejarlo así, así como proponemos." → **Prende fuego** como propuesto: deja **terreno incendiado** (daño 5 editable; tamaño y daño suben con el tier: comunes 1 casilla y daño 3, legendarias flor de 1 y daño 5); sin daño directo extra al golpeado; que el hielo lo apague queda pendiente. Peso 3 a 4.
+- **2026-09-25 · P4, Derribar:** sin objeciones → como propuesto: deja **Sentado** (Evasión a la mitad, no ataca, levantarse cuesta 1 No2), solo con probabilidad. Peso 3.
+- **Lista de efectos vigente (P4):** Rompe armadura · **Demora** · Aturdir · Lisiado · Sangrado · Envenenar · Derribar · Prende fuego · Drena vida + modificadores (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). *(Agarrar fuera.)* Falta elaborar los demás y confirmar la lista completa.

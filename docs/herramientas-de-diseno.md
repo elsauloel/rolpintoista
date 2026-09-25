@@ -20,7 +20,7 @@ buffs y el equipo puedan moverla:
 
 - **Bajar al fondo** (nombre en español a elegir: *Derribo de iniciativa*, *Retrasar*, *Al fondo de la fila*): manda a un personaje o creep
   al último lugar de la tabla. Ej.: una skill que "tira al fondo" al rival; un efecto de arma que lo hace **al golpear** con cierta
-  probabilidad (`efectosGolpe`, p. ej. "Knockdown 1").
+  probabilidad (`efectosGolpe`, p. ej. "Demora": baja 1 lugar, definitivo; ex "Knockdown").
 - **Subir** (*Aceleración*, *Adelantar*, *Speed up*): sube al objetivo N lugares (o al primer lugar). Ej.: un buff que sube la iniciativa.
 - Variantes a definir: cuántos lugares (N o "hasta el fondo/el tope"), si es una vez o dura N turnos, si afecta a uno mismo o a otros, y si
   se aplica al pasar el turno o de inmediato.

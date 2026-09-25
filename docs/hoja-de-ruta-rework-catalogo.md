@@ -21,7 +21,7 @@
 ## Decidido hasta ahora (resumen; el detalle está en las preguntas)
 - **Nitros = recurso muy preciado**; peso = relevancia intermedia; SP barato para magos (regulador de la magia); la magia no tiene defensa: daño mágico directo a la vida y, por eso, caro (guía §0).
 - **Crítico (P113/P115):** PdG − Evasión ≥ rango (= Tipo) → N = diferencia ÷ rango; Resistencia resta niveles; N − R d20 y vale el mejor; multiplicador **doble/triple/cuádruple daño** (7+/17+/20) sobre todo el daño; menos de 7 solo ignora armadura; **frecuente** baja el rango (mín. 2), **potente** baja los umbrales (1 a 1, 1 a 2, 1 a 3; piso 1). Universo: Tipo 4 más frecuente, Tipo 6 más potente, ambos con las dos.
-- **Familias de arma (guía §1):** hachas → Rompe armadura, contundentes → Knockdown, punzantes → Lisiado, cortantes → Sangrado; efectos en tres niveles (casa / habilitado / excepcional).
+- **Familias de arma (guía §1):** hachas → Rompe armadura, contundentes → Demora (ex Knockdown), punzantes → Lisiado, cortantes → Sangrado; efectos en tres niveles (casa / habilitado / excepcional).
 - **Resistencia a crítico (P114):** más escasa cuanto más alto el Tipo, regulada por slots (Tipo 10 solo cascos; Tipo 8 dos slots; Tipo 6 tres; Tipo 4 más).
 - **Armas mágicas (P116):** de daño y de efecto; varita básica 1d4 por 1 Nitro (calidad baja), buena calidad 1d6 por 1 Nitro; efectos de arma 1–3 SP; elementos: arcano, fuego (área + terreno incendiado), hielo (Escarcha acumulable), rayo (Parálisis); fuego y hielo se cancelan.
 - **Chispazo** ya rebalanceado (SP 1, No2 1, 1d6; a auditar).

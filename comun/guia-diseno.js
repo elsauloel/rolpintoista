@@ -103,7 +103,7 @@ const GuiaDiseno = (() => {
   ];
   const FAMILIAS = [
     {id: 'hacha', ico: '🪓', n: 'Hachas', resumen: 'Cortantes pesadas que abren la armadura.', dado: 'Tipo 8 (cortante pesado), orientativo', casa: 'Rompe armadura'},
-    {id: 'contundente', ico: '🔨', n: 'Contundentes', resumen: 'Mazas y martillos: golpes que aturden y desordenan.', dado: 'Tipo 8–10 (contundente liviano / pesado)', casa: 'Knockdown (bajar en la iniciativa)'},
+    {id: 'contundente', ico: '🔨', n: 'Contundentes', resumen: 'Mazas y martillos: golpes que aturden y desordenan.', dado: 'Tipo 8–10 (contundente liviano / pesado)', casa: 'Demora (baja 1 lugar en la iniciativa)'},
     {id: 'punzante', ico: '🔱', n: 'Punzantes', resumen: 'Lanzas, dagas y estoques: precisión que lisia.', dado: 'Tipo 4 (perforante)', casa: 'Lisiado'},
     {id: 'cortante', ico: '🗡️', n: 'Cortantes', resumen: 'Espadas y sables: cortes que sangran.', dado: 'Tipo 6', casa: 'Sangrado'},
     {id: 'explosivo', ico: '💣', n: 'Explosivos', resumen: 'Daño en área de alto riesgo.', dado: 'Tipo 12', casa: 'por definir'},
@@ -115,13 +115,12 @@ const GuiaDiseno = (() => {
   //   peso = relevancia del efecto en combate (1 a 5, PROVISORIO): la idea es usarlo después para calcular calidad y precio de un arma.
   const EFECTOS_ARMA = [
     {n: 'Rompe armadura', d: 'Quita Defensa al golpeado (estado Armadura rota, se acumula de a 1 y se puede reparar).', e: 'auto', casa: ['hacha'], comp: ['contundente'], peso: 4},
-    {n: 'Knockdown (a la fila de atrás)', d: 'Baja al golpeado al fondo de la iniciativa. Con probabilidad si querés (ej. "Knockdown 1" = siempre 1 lugar).', e: 'falta', casa: ['contundente'], comp: ['explosivo'], peso: 4},
+    {n: 'Demora (baja 1 lugar en la iniciativa)', d: 'Baja al golpeado 1 lugar en la tabla de iniciativa, y el cambio es definitivo (queda hasta que el GM reordene). Antes se llamaba Knockdown.', e: 'falta', casa: ['contundente'], comp: ['explosivo'], peso: 4},
     {n: 'Aturdir', d: 'Deja al rival sin acciones (Stun: sin No2 por 2 turnos).', e: 'auto', casa: ['contundente'], comp: ['explosivo'], peso: 5},
     {n: 'Lisiado', d: 'PdG y Parry a la mitad por unos turnos.', e: 'auto', casa: ['punzante'], comp: ['cortante'], peso: 3},
     {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante'], comp: ['punzante', 'hacha'], peso: 3},
     {n: 'Envenenar', d: 'Veneno: pierde 1 HP por stack cada turno.', e: 'auto', casa: [], comp: ['hacha', 'cortante', 'punzante', 'rango'], peso: 3},
     {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: [], comp: ['contundente', 'hacha', 'explosivo'], peso: 2},
-    {n: 'Agarrar', d: 'Inmoviliza al objetivo agarrado.', e: 'mano', casa: [], comp: ['punzante'], peso: 3},
     {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: [], comp: ['explosivo', 'rango'], peso: 3},
     {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Excedente de vida).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
   ];
@@ -187,7 +186,7 @@ const GuiaDiseno = (() => {
   }
 
   const chipEst = e => e && EST[e] ? `<span class="gd-chip" title="${esc(EST[e][1])}">${EST[e][0]} ${e === 'auto' ? 'automático' : e === 'mano' ? 'a mano' : 'por construir'}</span>` : '';
-  const AVISO = '<div class="gd-aviso">📐 Todo esto son <b>guías orientativas, no reglas estrictas</b>. Podés salirte cuando quieras: un punzón con Knockdown se puede, solo que va a ser raro. Cada efecto tiene tres niveles según la familia: <b>🏠 de casa</b> (le da identidad), <b>🤝 habilitado</b> (se comparte por contexto: por ejemplo Envenenar sirve en todo lo que tiene filo) y <b>✨ excepcional</b> (va contra el concepto: un martillo que envenena se puede, pero es raro).</div>';
+  const AVISO = '<div class="gd-aviso">📐 Todo esto son <b>guías orientativas, no reglas estrictas</b>. Podés salirte cuando quieras: un punzón con Demora se puede, solo que va a ser raro. Cada efecto tiene tres niveles según la familia: <b>🏠 de casa</b> (le da identidad), <b>🤝 habilitado</b> (se comparte por contexto: por ejemplo Envenenar sirve en todo lo que tiene filo) y <b>✨ excepcional</b> (va contra el concepto: un martillo que envenena se puede, pero es raro).</div>';
 
   function abrir(seccion){
     estilos();

@@ -38,7 +38,7 @@ Para calcular calidad, tier y precio (P112), cada elemento del diseño tiene una
 | Familia | Mecánica de casa | Otras (excepcional) | Estado en el juego |
 |---|---|---|---|
 | **Hachas** | **Rompe armadura** (baja la Defensa del rival) | — | ✅ existe el efecto y el estado *Armadura rota* (se acumula, editable) |
-| **Contundentes** (mazas, martillos…) | **Knockdown**: bajar al golpeado al fondo de la iniciativa | Aturdir | 🔲 el efecto sobre la iniciativa no existe todavía (ver `herramientas-de-diseno.md` §2) |
+| **Contundentes** (mazas, martillos…) | **Demora**: baja al golpeado 1 lugar en la tabla de iniciativa (definitivo) | Aturdir | 🔲 el efecto sobre la iniciativa no existe todavía (ver `herramientas-de-diseno.md` §2) |
 | **Punzantes** (lanzas, estoques, dagas…) | **Lisiado** (PdG y Parry a la mitad) | Sangrado, Envenenar | ✅ el estado *Lisiado* existe; como efecto de arma se recuerda y se tira |
 | **Cortantes** (espadas, sables…) | **Sangrado** (pierde HP por turno; se acumula de a 1) | Lisiado | ✅ estado *Sangrado* |
 | Explosivos, de rango, escudos, armas naturales, mágicas | *por definir* | | 🔲 |

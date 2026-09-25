@@ -6938,7 +6938,7 @@ function resolverGolpe(golpe, defensa, efectos){
     escudo.escudoMagicoActual = actual - absorbido;
     recibido -= absorbido;
   }
-  return {recibido, absorbido, defensa, espinas: recibido > 0 && activos.some(e => e.espinas)};
+  return {recibido, absorbido, defensa};
 }
 
 function leerGolpe(texto){
@@ -6949,7 +6949,6 @@ function leerGolpe(texto){
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
   if(r.absorbido) extra.push(`Escudo especial absorbió ${fmt(r.absorbido)}`);
-  if(r.espinas) extra.push(`Espinas: cobrale ${fmt(Math.ceil(r.recibido * 0.5))} al atacante`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;

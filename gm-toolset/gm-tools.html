@@ -1377,7 +1377,7 @@ const CATALOGO_EQUIPO = [
   {nombre:'Elixir de piedra eterna', tipoItem:'consumibles', tier:'Legendario', tipoDado:0, danoFijo:0, peso:0, precioCompra:440, def:0, consumible:true, detalle:'Otorga Defensa +6, Resistencia a CC +3 y Resistencia mágica +4 durante 3 turnos. Al usarlo se activa el estado "Piedra eterna (elixir)".', descripcionNarrativa:'Un jarabe gris y pesado que raspa la garganta. Después la piel no siente nada.'},
   {nombre:'Moneda Re-Roll', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:100, def:0, consumible:true, legacy:true, detalle:'Permite repetir una tirada. Se conserva si gana tirando una moneda.', descripcionNarrativa:'Una moneda gastada de tanto pasar de mano en mano. Siempre vuelve al que la necesita.'},
   {nombre:'Oleo reparador', tipoItem:'consumibles', tier:'Común', tipoDado:0, danoFijo:0, peso:0, precioCompra:25, def:0, consumible:true, legacy:true, detalle:'Repara armadura', descripcionNarrativa:'Aceite denso con olor a taller. Devuelve las placas a su lugar.'},
-  {nombre:'Pergamino de Blindaje', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Inmune a golpes críticos: al cargar el daño entrante, tildá \'Fue crítico\' y se anula solo. Dura todo el combate. Al usarlo se activa el estado \'Blindado (pergamino)\'.', descripcionNarrativa:'Cubierto de escamas dibujadas, superpuestas hasta tapar todo el papel.'},
+  {nombre:'Pergamino de Blindaje', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura todo el combate. Al usarlo se activa el estado \'Blindado (pergamino)\'.', descripcionNarrativa:'Cubierto de escamas dibujadas, superpuestas hasta tapar todo el papel.'},
   {nombre:'Pergamino de Buena Fortuna', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor. Dura todo el combate. Al usarlo se activa el estado \'Afortunado (pergamino)\'.', descripcionNarrativa:'Tiene dos versiones del mismo hechizo escritas al lado. Se usa la que salga mejor.'},
   {nombre:'Pergamino de Coagulación Extrema', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure. Dura todo el combate. Al usarlo se activa el estado \'Coagulación extrema (pergamino)\'.', descripcionNarrativa:'La tinta se seca apenas toca el papel. Ninguna línea llegó a correrse nunca.'},
   {nombre:'Pergamino de Escudo Arcano', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:60, def:0, consumible:true, detalle:'Otorga +1 a Resistencia mágica durante todo el combate. Al usarlo se activa el estado \'Escudo Arcano (pergamino)\'.', descripcionNarrativa:'Círculos concéntricos dibujados a compás, sin un solo error de pulso.'},
@@ -1394,7 +1394,7 @@ const CATALOGO_EQUIPO = [
   {nombre:'Pergamino de Furia de Combate', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:60, def:0, consumible:true, detalle:'Otorga +1 a Daño durante todo el combate. Al usarlo se activa el estado \'Furia de Combate (pergamino)\'.', descripcionNarrativa:'Letras torcidas, apretadas, con la tinta salpicada alrededor.'},
   {nombre:'Pergamino de Furia de Combate mayor', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:120, def:0, consumible:true, detalle:'Otorga +2 a Daño durante todo el combate. Al usarlo se activa el estado \'Furia de Combate mayor (pergamino)\'.', descripcionNarrativa:'Letras torcidas, apretadas, con la tinta salpicada alrededor. La versión concentrada: pega más fuerte y se nota antes.'},
   {nombre:'Pergamino de Furia de Combate superior', tipoItem:'consumibles', tier:'Excepcional', tipoDado:0, danoFijo:0, peso:0, precioCompra:180, def:0, consumible:true, detalle:'Otorga +3 a Daño durante todo el combate. Al usarlo se activa el estado \'Furia de Combate superior (pergamino)\'.', descripcionNarrativa:'Letras torcidas, apretadas, con la tinta salpicada alrededor. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.'},
-  {nombre:'Pergamino de Hypeado', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Acciones máximas +1 durante el turno. Dura todo el combate. Al usarlo se activa el estado \'Hypeado (pergamino)\'.', descripcionNarrativa:'Escrito en mayúsculas y subrayado tres veces.'},
+  {nombre:'Pergamino de Hypeado', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura todo el combate. Al usarlo se activa el estado \'Hypeado (pergamino)\'.', descripcionNarrativa:'Escrito en mayúsculas y subrayado tres veces.'},
   {nombre:'Pergamino de Inmunidad a CC', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:125, def:0, consumible:true, detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar. Dura todo el combate. Al usarlo se activa el estado \'Inmunidad a CC (pergamino)\'.', descripcionNarrativa:'Las letras están clavadas al papel, no se corren ni con agua.'},
   {nombre:'Pergamino de Muralla Personal', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:60, def:0, consumible:true, detalle:'Otorga +1 a Bloqueo durante todo el combate. Al usarlo se activa el estado \'Muralla Personal (pergamino)\'.', descripcionNarrativa:'Cada línea está encerrada en un recuadro. Ninguna se sale del molde.'},
   {nombre:'Pergamino de Muralla Personal mayor', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:120, def:0, consumible:true, detalle:'Otorga +2 a Bloqueo durante todo el combate. Al usarlo se activa el estado \'Muralla Personal mayor (pergamino)\'.', descripcionNarrativa:'Cada línea está encerrada en un recuadro. Ninguna se sale del molde. La versión concentrada: pega más fuerte y se nota antes.'},
@@ -1440,7 +1440,7 @@ const CATALOGO_EQUIPO = [
   {nombre:'Poción de Alcance Extendido', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:30, def:0, consumible:true, detalle:'Otorga +1 a Rango durante 4 turnos. Al consumirla se activa el estado \'Alcance Extendido (poción)\'.', descripcionNarrativa:'Se ve más lejos de lo que el frasco permite. Un truco de la óptica, dicen.'},
   {nombre:'Poción de Alcance Extendido mayor', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:60, def:0, consumible:true, detalle:'Otorga +2 a Rango durante 4 turnos. Al consumirla se activa el estado \'Alcance Extendido mayor (poción)\'.', descripcionNarrativa:'Se ve más lejos de lo que el frasco permite. Un truco de la óptica, dicen. La versión concentrada: pega más fuerte y se nota antes.'},
   {nombre:'Poción de Alcance Extendido superior', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:90, def:0, consumible:true, detalle:'Otorga +3 a Rango durante 4 turnos. Al consumirla se activa el estado \'Alcance Extendido superior (poción)\'.', descripcionNarrativa:'Se ve más lejos de lo que el frasco permite. Un truco de la óptica, dicen. Destilada hasta el fondo. De esta no quedan muchas dando vueltas.'},
-  {nombre:'Poción de Blindaje', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Inmune a golpes críticos: al cargar el daño entrante, tildá \'Fue crítico\' y se anula solo. Dura 3 turnos. Al consumirla se activa el estado \'Blindado (poción)\'.', descripcionNarrativa:'Metálica y pesada, se siente bajar como una placa por la garganta.'},
+  {nombre:'Poción de Blindaje', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura 3 turnos. Al consumirla se activa el estado \'Blindado (poción)\'.', descripcionNarrativa:'Metálica y pesada, se siente bajar como una placa por la garganta.'},
   {nombre:'Poción de Bonos', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:30, def:0, consumible:true, legacy:true, detalle:'Restaura la mitad de tu total de Bonos (redondeado hacia arriba).', descripcionNarrativa:'Amarilla y chispeante. Devuelve las ganas de seguir tirando el dado.'},
   {nombre:'Poción de Bonos grande', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:60, def:0, consumible:true, legacy:true, detalle:'Restaura todos tus Bonos.', descripcionNarrativa:'Amarilla y chispeante. Devuelve las ganas de seguir tirando el dado. Frasco grande, para repartir en varias cargas.'},
   {nombre:'Poción de Buena Fortuna', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor. Dura 3 turnos. Al consumirla se activa el estado \'Afortunado (poción)\'.', descripcionNarrativa:'Dorada y burbujeante. Cada burbuja que sube trae una segunda oportunidad.'},
@@ -1468,7 +1468,7 @@ const CATALOGO_EQUIPO = [
   {nombre:'Poción de HP grande', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:80, def:0, consumible:true, curahp:25, legacy:true, detalle:'3 Cargas. Recupera 25 HP por carga.', descripcionNarrativa:'El clásico rojo de siempre. Todo el mundo lleva una, nadie la elogia. Frasco grande, para repartir en varias cargas.'},
   {nombre:'Poción de HP mayor', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:100, def:0, consumible:true, curahp:100, legacy:true, detalle:'Recupera 100 HP.', descripcionNarrativa:'El clásico rojo de siempre. Todo el mundo lleva una, nadie la elogia. La versión concentrada: pega más fuerte y se nota antes.'},
   {nombre:'Poción de HP mayor grande', tipoItem:'consumibles', tier:'Excepcional', tipoDado:0, danoFijo:0, peso:0, precioCompra:130, def:0, consumible:true, curahp:100, legacy:true, detalle:'3 Cargas. Recupera 100 HP por carga.', descripcionNarrativa:'El clásico rojo de siempre. Todo el mundo lleva una, nadie la elogia. El formato caro: varias cargas y cada una vale por tres.'},
-  {nombre:'Poción de Hypeado', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Acciones máximas +1 durante el turno. Dura 3 turnos. Al consumirla se activa el estado \'Hypeado (poción)\'.', descripcionNarrativa:'Sabe a energizante barato y hace exactamente lo que promete el envase.'},
+  {nombre:'Poción de Hypeado', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura 3 turnos. Al consumirla se activa el estado \'Hypeado (poción)\'.', descripcionNarrativa:'Sabe a energizante barato y hace exactamente lo que promete el envase.'},
   {nombre:'Poción de Inmunidad a CC', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar. Dura 3 turnos. Al consumirla se activa el estado \'Inmunidad a CC (poción)\'.', descripcionNarrativa:'Fría y firme. Después de tomarla, cuesta que algo lo mueva a uno de donde está.'},
   {nombre:'Poción de Invulnerabilidad', tipoItem:'consumibles', tier:'Raro', tipoDado:0, danoFijo:0, peso:0, precioCompra:180, def:0, consumible:true, detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.). Dura 3 turnos. Al consumirla se activa el estado \'Invulnerable (poción)\'.', descripcionNarrativa:'Blanca y opaca como leche. Guardarla ya se siente como jugar con ventaja.'},
   {nombre:'Poción de Manos Ligeras', tipoItem:'consumibles', tier:'Buena Calidad', tipoDado:0, danoFijo:0, peso:0, precioCompra:75, def:0, consumible:true, detalle:'Otorga +1 a Destreza durante 4 turnos. Al consumirla se activa el estado \'Manos Ligeras (poción)\'.', descripcionNarrativa:'Aceite finito que no deja rastro en los dedos. Los objetos empiezan a pesar menos.'},
@@ -2461,20 +2461,11 @@ function aplicarDanioCreep(input){
     return;
   }
   const golpe = parseFloat(crudo.replace(',', '.'));
-  const critInput = document.querySelector(`[data-danocreepcritico="${sc.id}"]`);
-  const fueCritico = !!(critInput && critInput.checked);
   const activos = (sc.estados||[]).filter(e => e.activo !== false);
 
   if(activos.some(e => e.invulnerable)){
     input.value = '';
-    if(critInput) critInput.checked = false;
     toast(`${sc.nombre || 'Creep'}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`);
-    return;
-  }
-  if(fueCritico && activos.some(e => e.blindado)){
-    input.value = '';
-    critInput.checked = false;
-    toast(`${sc.nombre || 'Creep'}: Blindado, el golpe crítico de ${fmt(golpe)} no hizo nada`);
     return;
   }
 
@@ -2493,11 +2484,9 @@ function aplicarDanioCreep(input){
   const previo = num(sc.hp);
   sc.hp = previo - recibido;
   input.value = '';
-  if(critInput) critInput.checked = false;
 
   const extra = [];
   if(absorbido) extra.push(`Escudo especial absorbió ${fmt(absorbido)}${escudo.escudoMagicoActual ? ` (quedan ${fmt(escudo.escudoMagicoActual)}/${fmt(escudo.escudoMagico)})` : ' (se agotó)'}`);
-  if(recibido > 0 && activos.some(e => e.espinas)) extra.push(`Espinas: cobrale ${fmt(Math.ceil(recibido * 0.5))} al atacante`);
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
   if(recibido <= 0){
@@ -2609,6 +2598,8 @@ function creepNitrosMax(sc){
   const nitrosNatural = v;
   // Cansado y Exhausto son proporcionales al máximo NATURAL: Cansado lo deja en 2/3, Exhausto en un tercio.
   if((sc.estados || []).some(e => e.activo !== false && e.cansado)) v = Math.floor(v * 2 / 3);
+  // Hypeado suma un tercio del natural, redondeado hacia arriba (buff).
+  if((sc.estados || []).some(e => e.activo !== false && e.hypeado)) v += Math.ceil(nitrosNatural / 3);
   // Stun (tope fijo), Exhausto (un tercio del natural): el más bajo activo gana.
   const forzados = (sc.estados || [])
     .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
@@ -3368,9 +3359,6 @@ function cardHtml(sc){
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
-            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
-              <input type="checkbox" data-danocreepcritico="${sc.id}">Crít
-            </label>
           </div>
         </div>
         <div class="vital-mini acc" title="Nitros: se gastan al atacar, moverse y usar habilidades. Máximo = Agilidad + mods; se recargan en cada Mantenimiento">
@@ -3520,9 +3508,6 @@ function cardCompactoHtml(sc){
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
-            <label class="dano-critico-check" title="Tildá esto si el golpe que estás por cargar fue un crítico (para que Blindado, si está activo, lo anule)">
-              <input type="checkbox" data-danocreepcritico="${sc.id}">Crít
-            </label>
           </div>
         </div>
         <div class="vital-mini acc" title="Nitros: se gastan al atacar, moverse y usar habilidades. Máximo = Agilidad + mods; se recargan en cada Mantenimiento">
@@ -3561,14 +3546,14 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 const ESTADOS_PRESET_GM = [
   {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
     detalle:'Pierde HP por stack cada turno.'},
   {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
     detalle:'Cura HP cada turno.'},
-  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mitadPdgEva:true,
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mitadPdgEva:true, esCC:true,
     detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, cansado:true,
     detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
@@ -3576,26 +3561,26 @@ const ESTADOS_PRESET_GM = [
     detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
   {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, forzarNitros:0,
     detalle:'Sin No2 mientras dura (contá un turno de más para que te agarre de verdad en su próximo turno, aunque el Mantenimiento pase antes de que actúe). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, mods:[{stat:'nitros', val:1}],
-    detalle:'Suma a los No2 máximos mientras dure. ⚠ Valor provisorio (antes +1 Acción).'},
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, hypeado:true,
+    detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
   {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
     detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
   {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente.'},
   {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:2, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
     detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
-  {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true,
+  {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true, esCC:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true,
+  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true, esCC:true,
     detalle:'El Movimiento queda en 0 mientras dure.'},
-  {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true,
+  {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true, esCC:true,
     detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
-    detalle:'Inmune a estados de control (Stun, Exhausto): no se le pueden aplicar mientras dure.'},
+    detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
-    detalle:'Cada golpe físico cuerpo a cuerpo recibido le devuelve un 50% del daño al atacante (avisa cuánto es, se cobra a mano).'},
+    detalle:'✋ A mano: cada golpe físico cuerpo a cuerpo que recibe le devuelve un 50% del daño al atacante. El GM y la mesa lo aplican; el estado solo recuerda que está activo y cuántos turnos dura.'},
   {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
     detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño de cualquier fuente —incluso true damage— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
@@ -3605,7 +3590,7 @@ const ESTADOS_PRESET_GM = [
   {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, coagulacionExtrema:true,
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, blindado:true,
-    detalle:'Inmune a golpes críticos: al cargar el daño, tildá "Crít" y se anula solo.'},
+    detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},
   {nombre:'Sigilo', polaridad:'buff', permanente:true, stacks:1, hpTurno:0,
     detalle:'Oculto: los jugadores no lo ven en el mapa. Se rompe si entra en el cono de detección de un personaje o si hace una acción hostil. Cada paso dentro de la zona de alerta de un personaje pide una tirada de detección.'},
 ];

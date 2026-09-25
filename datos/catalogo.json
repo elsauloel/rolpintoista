@@ -204,7 +204,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 125,
-    "detalle": "Inmune a golpes críticos: al cargar el daño entrante, tildá 'Fue crítico' y se anula solo. Dura todo el combate. Al usarlo se activa el estado 'Blindado (pergamino)'.",
+    "detalle": "Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura todo el combate. Al usarlo se activa el estado 'Blindado (pergamino)'.",
     "descripcionNarrativa": "Cubierto de escamas dibujadas, superpuestas hasta tapar todo el papel.",
     "legacy": false,
     "unidades": 1,
@@ -216,7 +216,7 @@
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": true,
-    "efectoDetalle": "Inmune a golpes críticos: al cargar el daño entrante, tildá 'Fue crítico' y se anula solo. Dura hasta el fin del combate (bórralo a mano al terminar).",
+    "efectoDetalle": "Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura hasta el fin del combate (bórralo a mano al terminar).",
     "consumible": true,
     "imagen": ""
   },
@@ -698,12 +698,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "accionesmax",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pergamino-de-hypeado",
     "nombre": "Pergamino de Hypeado",
     "tier": "Raro",
@@ -711,7 +706,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 125,
-    "detalle": "Acciones máximas +1 durante el turno. Dura todo el combate. Al usarlo se activa el estado 'Hypeado (pergamino)'.",
+    "detalle": "Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura todo el combate. Al usarlo se activa el estado 'Hypeado (pergamino)'.",
     "descripcionNarrativa": "Escrito en mayúsculas y subrayado tres veces.",
     "legacy": false,
     "unidades": 1,
@@ -719,11 +714,11 @@
     "curahp": 0,
     "curabonosPct": 0,
     "efectoNombre": "Hypeado (pergamino)",
-    "efectoPreset": "",
+    "efectoPreset": "Hypeado",
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": true,
-    "efectoDetalle": "Acciones máximas +1 durante el turno. Dura hasta el fin del combate (bórralo a mano al terminar).",
+    "efectoDetalle": "Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura hasta el fin del combate (bórralo a mano al terminar).",
     "consumible": true,
     "imagen": ""
   },
@@ -2095,7 +2090,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 75,
-    "detalle": "Inmune a golpes críticos: al cargar el daño entrante, tildá 'Fue crítico' y se anula solo. Dura 3 turnos. Al consumirla se activa el estado 'Blindado (poción)'.",
+    "detalle": "Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura 3 turnos. Al consumirla se activa el estado 'Blindado (poción)'.",
     "descripcionNarrativa": "Metálica y pesada, se siente bajar como una placa por la garganta.",
     "legacy": false,
     "unidades": 1,
@@ -2107,7 +2102,7 @@
     "efectoTurnos": 3,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
-    "efectoDetalle": "Inmune a golpes críticos: al cargar el daño entrante, tildá 'Fue crítico' y se anula solo. Dura 3 turnos.",
+    "efectoDetalle": "Inmune a golpes críticos (a mano: cuando le pegan con un crítico, la mesa lo anula). Dura 3 turnos.",
     "consumible": true,
     "imagen": ""
   },
@@ -2905,12 +2900,7 @@
   },
   {
     "mods": [],
-    "efectoMods": [
-      {
-        "stat": "accionesmax",
-        "val": 1
-      }
-    ],
+    "efectoMods": [],
     "id": "new-pocion-de-hypeado",
     "nombre": "Poción de Hypeado",
     "tier": "Raro",
@@ -2918,7 +2908,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 75,
-    "detalle": "Acciones máximas +1 durante el turno. Dura 3 turnos. Al consumirla se activa el estado 'Hypeado (poción)'.",
+    "detalle": "Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura 3 turnos. Al consumirla se activa el estado 'Hypeado (poción)'.",
     "descripcionNarrativa": "Sabe a energizante barato y hace exactamente lo que promete el envase.",
     "legacy": false,
     "unidades": 1,
@@ -2926,11 +2916,11 @@
     "curahp": 0,
     "curabonosPct": 0,
     "efectoNombre": "Hypeado (poción)",
-    "efectoPreset": "",
+    "efectoPreset": "Hypeado",
     "efectoTurnos": 3,
     "efectoHpTurno": 0,
     "efectoPermanente": false,
-    "efectoDetalle": "Acciones máximas +1 durante el turno. Dura 3 turnos.",
+    "efectoDetalle": "Suma a los No2 máximos un tercio del natural (redondeado hacia arriba). Dura 3 turnos.",
     "consumible": true,
     "imagen": ""
   },

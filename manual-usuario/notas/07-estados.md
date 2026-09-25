@@ -45,7 +45,7 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 | [[Sigilo (estado)\|Sigilo]] | buff | Estás oculto |
 
 > [!warning] Provisorios
-> Varios valores de la lista (Cansado, Exhausto, Hypeado, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).
+> Varios valores de la lista (Cansado, Exhausto, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).
 
 > [!question] Repaso pendiente
 > Falta revisar **uno por uno** todos los buffs y debuffs (qué hace cada uno exactamente, duración, si es acumulable). Esta lista es lo que hoy hace la ficha.
@@ -135,13 +135,13 @@ Tres estados que modifican tus [[Nitros (No2)|Nitros]]:
 |---|---|
 | **Cansado** (debuff) | Corta los Nitros máximos a 2/3 (pierde un tercio, redondeado hacia abajo) |
 | **Exhausto** (debuff, CC) | Corta los Nitros máximos a un tercio del natural (redondeado hacia abajo) |
-| **Hypeado** (buff) | +1 a los Nitros máximos |
+| **Hypeado** (buff) | Suma a los Nitros máximos un tercio del natural (redondeado hacia arriba): con 9 llegás a 12, con 7 a 10 |
 
 > [!info] Cansado y Exhausto ya recalibrados (2026-09-21)
 > Los dos eran "−1 Acción / 1 Acción fijo" de la época en que las Acciones iban de 1 a 3 por turno (así que 1 Acción era, más o menos, un tercio de la capacidad del turno). Se recalibraron con esa misma lógica: Cansado te deja con 2/3 de tus Nitros (perdés un tercio) y Exhausto te deja con un tercio (perdés dos tercios). Si los dos están activos a la vez, gana el más restrictivo (Exhausto) — no se suman.
 
-> [!warning] Valor provisorio
-> **Hypeado** (+1 Acción) sigue **1 a 1 sin recalibrar**.
+> [!info] Hypeado recalibrado (2026-09-24)
+> Antes era "+1 Acción", que en la época de las Acciones (de 1 a 3 por turno) era más o menos un tercio del turno. Con la misma lógica que Cansado y Exhausto, ahora suma un tercio de tus Nitros naturales, redondeado hacia arriba (es un buff). Si tenés Cansado y Hypeado a la vez, se compensan; Stun y Exhausto siguen poniendo su tope.
 
 > [!question] Causa fatiga
 > Existe una condición "Causa fatiga" pendiente que el dueño va a definir con el grupo.
@@ -200,8 +200,9 @@ estado: borrador
 **Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.
 
 Parientes más limitados:
-- **Blindado:** inmune a [[Golpe crítico|golpes críticos]].
-- **Inmunidad a CC:** inmune a estados de control ([[Stun]], Exhausto).
+- **Blindado:** inmune a [[Golpe crítico|golpes críticos]]. **A mano**: la herramienta solo recuerda que está activo y cuántos turnos dura; el que lleva la mesa anula el crítico.
+- **Espinas:** devuelven un 50 % del daño de un golpe físico cuerpo a cuerpo al atacante. **A mano**, igual que Blindado.
+- **Inmunidad a CC:** inmune a los estados de control: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos (Veneno y Sangrado no cuentan como control).
 - **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].
 
 > [!info] Inmunidades sin mecanismo
@@ -221,7 +222,7 @@ alias: [CC, Control, Estados de control, Res.CC]
 tags: [estado, control]
 estado: borrador
 +++
-**Crowd Control (CC)** agrupa a los estados que **te quitan control sobre lo que hacés**: [[Stun]], Exhausto, [[Inmovilizado]] y similares. Los identifica una marca especial en la ficha.
+**Crowd Control (CC)** agrupa a los estados que **te quitan control sobre lo que hacés**: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos — todo lo que te imposibilita actuar. Veneno y Sangrado no cuentan. Los identifica una marca especial en la ficha.
 
 - Tu defensa contra ellos es la [[Resistencias|Res. CC]] (de [[Constitución]]).
 - **Inmunidad a CC** los bloquea.

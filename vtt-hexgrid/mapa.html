@@ -7227,11 +7227,15 @@ function hudAjustesHtml(t, d){
   // Caja "actual / máximo" debajo de cada barra: el actual se edita ahí
   // mismo (mismo mecanismo que tocar el círculo del anillo); el máximo es
   // de lectura, sale de la ficha (fórmula) o del creep.
-  const recurso = (clave, valor, maximo) => {
+  // El máximo del SP de un personaje también se edita acá (a mano, sin tocar la fórmula de la ficha): número, +N / -N o "auto".
+  const recurso = (clave, valor, maximo, maxEditable) => {
     if(valor === null || valor === undefined) return '<div class="hud-recurso vacio">—</div>';
+    const maxHtml = maxEditable && maximo !== null && maximo !== undefined
+      ? `<span class="hud-recurso-max">/</span><input type="text" inputmode="decimal" class="hud-recurso-actual" style="width:44px" data-hud-recurso-max="${clave}" value="${fmt(maximo)}" title="Máximo: escribí el valor nuevo, +N / -N, o «auto» para volver al cálculo de la ficha, y apretá Enter">`
+      : `<span class="hud-recurso-max">/ ${maximo === null || maximo === undefined ? '—' : fmt(maximo)}</span>`;
     return `<div class="hud-recurso">` +
       `<input type="text" inputmode="decimal" class="hud-recurso-actual" data-hud-recurso="${clave}" value="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">` +
-      `<span class="hud-recurso-max">/ ${maximo === null || maximo === undefined ? '—' : fmt(maximo)}</span>` +
+      maxHtml +
     '</div>';
   };
   const seccion = (titulo, cuerpo) => `<div class="hud-seccion"><h3>${titulo}</h3>${cuerpo}</div>`;
@@ -7259,7 +7263,7 @@ function hudAjustesHtml(t, d){
       '</div>' +
       '<div class="hud-recursos">' +
         recurso('hp', d.hp, d.hpMax) +
-        recurso('sp', d.sp, d.spMax) +
+        recurso('sp', d.sp, d.spMax, t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION)) +
         recurso('no2', d.no2, d.no2Max) +
       '</div>') +
     seccion('Aura',
@@ -7521,6 +7525,13 @@ function hudConectar(t){
     };
     inp.onblur = () => { inp.value = inp.defaultValue; };
   });
+  hud.querySelectorAll('[data-hud-recurso-max]').forEach(inp => {
+    inp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicarMax(inp.dataset.hudRecursoMax, inp.value); }
+      if(e.key === 'Escape'){ inp.value = inp.defaultValue; inp.blur(); }
+    };
+    inp.onblur = () => { inp.value = inp.defaultValue; };
+  });
   const handleRotar = hud.querySelector('[data-hud-rotar]');
   if(handleRotar) handleRotar.onpointerdown = e => {
     e.preventDefault();
@@ -7631,6 +7642,54 @@ async function hudAplicar(clave, texto){
     hudEditando = '';
     pedirDibujo();
   }
+}
+
+// SP máximo a mano desde el HUD (2026-09-24, pedido de los jugadores): se guarda como un ajuste `meta.spMaxExtra` sobre el máximo que
+// calcula la ficha (Especial × 3 + bonos), así "auto" (o el mismo valor calculado) lo deja como estaba. El SP que ya se gastó se
+// conserva: subir el máximo suma SP disponible, bajarlo lo resta (sin quedar por debajo de 0).
+async function hudAplicarMax(clave, texto){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || clave !== 'sp' || t.tipo !== 'pj' || !puedoCambiarVida(t) || !String(texto).trim()){ pedirDibujo(); return; }
+  try{
+    await cambiarSpMaxPj(t, texto);
+  }catch(err){
+    console.error('No se pudo cambiar el SP máximo:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí un número, +5 / -3 o «auto»'
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
+  }finally{
+    pedirDibujo();
+  }
+}
+async function cambiarSpMaxPj(t, texto){
+  const fichaId = t.fichaId.split(SEP_INVOCACION)[0];
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    if(r.spMax === undefined) throw new Error('abrí tu ficha una vez para que se actualice');
+    const spMax = num(r.spMax);
+    datos.meta = datos.meta || {};
+    const extraViejo = num(datos.meta.spMaxExtra);
+    const calculado = spMax - extraViejo;   // lo que da la fórmula de la ficha
+    const crudo = String(texto).trim().toLowerCase();
+    let nuevoMax;
+    if(crudo === 'auto') nuevoMax = calculado;
+    else{
+      const v = leerValorVital(texto, spMax);
+      if(v === null) throw new Error(ERROR_TIPEO);
+      nuevoMax = v;
+    }
+    nuevoMax = Math.max(1, Math.round(nuevoMax * 100) / 100);
+    datos.meta.spMaxExtra = nuevoMax - calculado === 0 ? 0 : nuevoMax - calculado;
+    const gastado = Math.min(nuevoMax, Math.max(0, num(datos.spGastado)));
+    datos.spGastado = gastado;
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.spMax': nuevoMax, 'resumen.sp': nuevoMax - gastado});
+  });
 }
 
 // No2 desde el HUD (los PJ en su ficha, los creeps en su parte privada).

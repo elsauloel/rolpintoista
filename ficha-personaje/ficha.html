@@ -2293,7 +2293,7 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, inteligenciaManual:null, imagen:'', miniatura:''},
+        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, inteligenciaManual:null, spMaxExtra:0, imagen:'', miniatura:''},
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
@@ -3684,9 +3684,12 @@ function renderVitals(){
     ? `Te pasás por ${fmt(c.sobrecarga)}: −${fmt(c.sobrecarga)} a la Evasión al tirarla, o pagás 1 No2 para evitarlo. ${IT2_PENDIENTE('regla de sobrepeso en prueba')}` : '';
 }
 
+// SP máximo = el calculado (Especial × 3 + bonos) + un ajuste a mano (`S.meta.spMaxExtra`, puede ser negativo) que se fija desde el
+// token del mapa (2026-09-24, pedido de los jugadores): así se puede subir o bajar el máximo sin tocar la fórmula.
 function spMaximo(c){
   c = c || compute();
-  return Number.isNaN(c.final.sp) ? 0 : c.final.sp;
+  if(Number.isNaN(c.final.sp)) return 0;
+  return Math.max(0, c.final.sp + num(S.meta.spMaxExtra));
 }
 
 function nitrosMaximo(c){
@@ -10489,7 +10492,7 @@ function fichaAplicarParte(parte, datos){
 function fichaResumen(){
   const c = compute();
   const n = v => (typeof v === 'number' && !Number.isNaN(v)) ? v : num(v);
-  const spMax = n(c.final.sp);
+  const spMax = n(spMaximo(c));
   return {
     nivel: num(S.meta.nivel),
     hp: num(S.hp),

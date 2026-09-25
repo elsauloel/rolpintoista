@@ -3896,7 +3896,7 @@ function tirarExtraDeItem(it){
   let tiro = false;
   const stat = it.tiradaStat;
   if(stat && (ATTR_LIST.some(a => a.id === stat) || STATS_CON_TIRADA().some(s => s.id === stat))){
-    tirarValorStat(`${it.nombre} · ${STAT_LABEL[stat]}`, compute().final[stat], stat);
+    tirarValorStat(`${it.nombre} · ${STAT_LABEL[stat]}`, compute().final[stat] + num(it.tiradaBono), stat);
     tiro = true;
   }
   const formula = (it.tiradaExtra || '').trim();
@@ -3917,7 +3917,7 @@ function habStatTirable(it){
 function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExtra || '').trim(); }
 function tirarPrimeraDeHab(it){
   if(habStatTirable(it)){
-    tirarValorStat(`${it.nombre} · ${STAT_LABEL[it.tiradaStat]}`, compute().final[it.tiradaStat], it.tiradaStat);
+    tirarValorStat(`${it.nombre} · ${STAT_LABEL[it.tiradaStat]}`, compute().final[it.tiradaStat] + num(it.tiradaBono), it.tiradaStat);   // tiradaBono: bono fijo de la habilidad al stat (ej. Takle: +1 PdG)
     return true;
   }
   const formula = (it.tiradaExtra || '').trim();
@@ -9687,6 +9687,7 @@ function lupaHtml(clave){
     let out = lupaSeccion('Costo', costo);
     const stat = h0.tiradaStat;
     if(stat && c.final[stat] !== undefined) out += lupaSeccion(`Tira ${esc(STAT_LABEL[stat] || stat)}`, lupaStat(stat, c));
+    if(stat && num(h0.tiradaBono)) out += lupaSeccion('Bono de la habilidad', lupaFila(`Suma al ${esc(STAT_LABEL[stat] || stat)} de esta tirada`, lupaSigno(num(h0.tiradaBono))));
     if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada extra', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
     return {titulo: h0.nombre, html: out};
   }

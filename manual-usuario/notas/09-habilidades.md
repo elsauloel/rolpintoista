@@ -181,11 +181,12 @@ El que aguanta: defensa, cura propia y control de tropa. Pool de [[Clases|clase]
 | **Piel resistente** | SP 5 · No2 1 | 2 turnos sobre vos: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico. |
 | **Aura de espinas** | SP 1 · No2 1 | 1 turno sobre vos: estado **Espinas**, cada ataque cuerpo a cuerpo que recibís le devuelve al atacante 1/4 del daño crudo (redondeado hacia arriba, como daño directo). El daño de vuelta se aplica a mano. |
 | **Daño en área** | SP 2 · No2 como un ataque | Atacás con tu arma y golpeás a **todos los enemigos adyacentes** (flor de 1 centrada en vos; vos no te afectás). Tirás PdG, el mapa dibuja la zona 3 segundos y el daño va con el 🎲. Los afectados pueden esquivar con dodge roll (a mano). |
+| **Takle** | SP 3 · Flash (SP ×2 en turno ajeno) | Te desplazás hasta 2 casillas (cada una gasta sus No2) y atacás con **PdG +1**; el objetivo puede esquivar pero **no parrear**. Si conecta y ganás **Constitución contra Constitución**, el objetivo pierde 2 No2 y es empujado 2 casillas; si lo hiciste en el turno del enemigo, se interrumpe su turno y pasa al final de la iniciativa. Cobrar el SP y tirar la PdG es automático; el resto, a mano. |
 | **Sonic Boom** | SP 2 · Flash (SP ×2 en turno ajeno) | Golpeás el piso: tirás **Fuerza** y el mapa dibuja 3 segundos el cono al frente (el mismo del sigilo). Cada enemigo del cono tira **Constitución**; si ganás, pierde 1 + la diferencia en No2, y si se queda sin ninguno queda [[Sentado]]. Empate o pérdida: nada. Lo de Constitución y los No2 se resuelve a mano. |
 | **Shockwave** | SP 4 · Flash (SP ×2 en turno ajeno) | Onda expansiva: tirás **Fuerza**; cada enemigo adyacente tira **Constitución** y el que pierde queda en [[Pajaritos]] 2 turnos. La tirada de Fuerza es automática; el resto se resuelve a mano. |
 
 ## En revisión
-Takle, Taunt y Miti-Miti (comparte la mitad del daño con un protegido).
+Taunt y Miti-Miti (comparte la mitad del daño con un protegido).
 
 ## Estados de la clase
 - [[Pajaritos]]: PdG y Evasión a la mitad.

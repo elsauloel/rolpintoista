@@ -149,11 +149,7 @@ Estados que define la clase:
 5. ✅ **Sonic Boom** — SP 2, No2 0 (Flash: SP x 2 = el doble, 4 SP en turno ajeno, a mano; ¿tiene sentido en turno ajeno? → pregunta P109). Golpea el piso: al ejecutar tira **Fuerza** (automático) y el mapa **dibuja 3 segundos el cono al frente** (el mismo de 16 casillas de la detección del sigilo, `zonaMapa: 'cono'`). Cada **enemigo** del cono tira **Constitución** (a mano); si el atacante gana, el defensor pierde **1 + la diferencia** en No2 (a mano) y, si se queda sin No2, queda **Sentado**. Empate o pérdida: no pasa nada. (2026-09-24)
 6. ✅ **Piel resistente** — SP 5, No2 1 (regla general). Estado de 2 turnos sobre uno mismo: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (Tipo 4 a 12). Confirmado por el dueño el 2026-09-24 (el +1 a los críticos y los 2 turnos).
 7. ✅ **Daño en área** — SP 2, No2 = **un ataque** (`ATAQUE`, cuenta como ese ataque). Ataque con el arma que golpea a **todos los enemigos adyacentes al tanque** (flor de radio 1 centrada en quien la ejecuta; el ejecutor no se afecta; solo enemigos). Automático: costo, tirada de PdG y el mapa dibuja la flor 3 segundos (`zonaMapa: 'flor'`, `zonaRadio: 1`); el daño va con el 🎲 (a mano). Los afectados pueden **esquivar con dodge roll** (a mano). ¿Se esquiva normal o exige dodge roll? ¿Se puede parrear? → P110. (2026-09-24)
-8. **Takle** [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque
-   con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2
-   Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final
-   de la tabla de iniciativa. Si ya era último en iniciativa, en vez de
-   eso pierde el turno.
+8. ✅ **Takle** — SP 3, No2 0 en el ataque (Flash; el desplazamiento **sí gasta** los No2 normales: 1 por casillero, hasta 2). Automático: cobra el SP y tira **PdG +1** (`tiradaStat: 'pdg'`, `tiradaBono: 1`). Ataque normal: el objetivo puede **esquivar pero no parrear**. Si conecta y el tanque gana **Constitución vs Constitución** (a mano): el objetivo pierde 2 No2 y es empujado 2 casillas; si Takle se usó **durante el turno del enemigo**, además se interrumpe su turno y pasa al final de la iniciativa (si ya era el último, lo pierde). Lo demás, a mano. (2026-09-24; el 'si conecta' es interpretación, confirmar)
 9. **Taunt** [1] — Tira Especial + 1 contra Especial para obligar a
    un enemigo a atacarlo hasta el final de su próximo turno.
 10. **Miti-Miti** [2] — Marca un personaje como protegido. El protegido

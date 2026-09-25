@@ -35,6 +35,10 @@ BANDA_PRECIO = {'Común': (30, 90), 'Buena Calidad': (80, 160), 'Raro': (150, 35
 SOBREPRECIO = 1.5
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
+# Dos stats "de casa" por familia (P16, propuesta a confirmar); fuera de casa el bono cuesta ×1,25. Dmg, daño fijo y crítico valen para todas las familias (su valor ya depende del Tipo).
+STATS_CASA = {'punzante': {'pdg', 'rng'}, 'cortante': {'parry', 'ini'}, 'hacha': {'bloqueo', 'rng'}, 'contundente': {'bloqueo', 'parry'},
+              'explosivo': {'rng', 'pdg'}, 'rango': {'rng', 'pdg'}}
+STATS_UNIVERSALES = {'dmg', 'crit', 'critpot'}
 FACTOR_CRIT = {4: 1.75, 6: 1.0, 8: 0.75, 10: 0.6, 12: 0.5}
 
 
@@ -90,7 +94,8 @@ def puntaje(arma):
         elif st == 'dmg':
             bonos += v * TASA_STAT['dmg'] * factor_plano(tipo)
         else:
-            bonos += v * TASA_STAT.get(st, TASA_STAT_DEFECTO)
+            fuera = 1.0 if st in STATS_UNIVERSALES or st in STATS_CASA.get(fam, ()) else 1.25
+            bonos += v * TASA_STAT.get(st, TASA_STAT_DEFECTO) * fuera
     d['bonos'] = bonos
     d['crítico'] = crit
     ef = 0.0

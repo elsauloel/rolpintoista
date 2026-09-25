@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T09:52:46Z",
+ "actualizado": "2026-09-25T10:39:07Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1148,7 +1148,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n| Estado | Cuánto absorbe | Duración |\n|---|---|---|\n| **Escudo mágico** | 10 (editable) | 3 turnos; es un **valor neto**, sin tope ni recarga automática: baja al absorber daño y se sube o baja a mano (chip del estado o token) |\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\nSe ve como una barra 🛡 sobre tu token."
+   "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n| Estado | Cuánto absorbe | Duración |\n|---|---|---|\n| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\nSe ve como una barra 🛡 sobre tu token."
   },
   {
    "id": "invulnerable",
@@ -1215,7 +1215,7 @@
    ],
    "estado": "pendiente",
    "capitulo": "estados",
-   "cuerpo": "Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:\n\n| Resistencia | Sale de | Se usa contra |\n|---|---|---|\n| **Res. Mágica** (Res.Mg) | [[Constitución]] | Daño y efectos mágicos |\n| **Res. CC** | Constitución | Estados de [[Crowd Control]] |\n| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |\n\n> [!question] En pausa: están mezcladas\n> Las tres todavía están en **terreno ambiguo** entre sí (incluso si \"Res.M\" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora."
+   "cuerpo": "Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:\n\n| Resistencia | Sale de | Se usa contra |\n|---|---|---|\n| **Res. Mágica** (Res.Mg) | [[Constitución]] | Daño y efectos mágicos |\n| **Res. CC** | Constitución | Estados de [[Crowd Control]] |\n| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |\n\n> [!question] En pausa: están mezcladas\n> Las tres todavía están en **terreno ambiguo** entre sí (incluso si \"Res.M\" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora.\n\n## Excedente de vida\n\nEstado para una habilidad excepcional que deja tener **más vida que el máximo** (por ejemplo, drenar vida). Es un valor neto: **sin tope y sin recarga**; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan."
   },
   {
    "id": "equipo-y-ranuras",

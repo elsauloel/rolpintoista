@@ -24,7 +24,7 @@ const EstadoPreguntas = (() => {
       qs.push({clave: 'hp', etiqueta: hp > 0 ? 'HP que cura' : 'Daño (HP)', min: 1,
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }
-    if(num(p.escudoMagico) > 0) qs.push({clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
+    if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, texto: '¿Cuántos HP de excedente de vida tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
     if(num(p.stacks) > 1) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir
       (p.mods || []).forEach((m, i) => {

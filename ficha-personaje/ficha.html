@@ -5228,7 +5228,7 @@ const LISTS = {
           <span class="ef-chip-nombre">${esc(i.nombre)}</span>
           ${partes.length ? `<span class="ef-chip-datos">${esc(partes.join(' · '))}</span>` : ''}
         </button>
-        ${(i.escudoMagicoActual !== undefined || num(i.escudoMagico) > 0) ? `<button type="button" class="ef-chip-toggle" data-escudo="${i.id}:-1" title="Un punto menos de escudo">−</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor del escudo (número, +N, -N; sin tope)">🛡${fmt(num(i.escudoMagicoActual ?? i.escudoMagico))}</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:1" title="Un punto más de escudo">+</button>` : ''}
+        ${(i.escudoMagicoActual !== undefined || num(i.escudoMagico) > 0) ? `<button type="button" class="ef-chip-toggle" data-escudo="${i.id}:-1" title="Un punto menos de escudo">−</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor (número, +N, -N; en un escudo, «max N» cambia el máximo)">${i.excedenteVida ? '❤+' + fmt(num(i.escudoMagicoActual ?? i.escudoMagico)) : '🛡' + fmt(num(i.escudoMagicoActual ?? i.escudoMagico)) + '/' + fmt(num(i.escudoMagico))}</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:1" title="Un punto más de escudo">+</button>` : ''}
         ${deEquipo ? '<span class="ef-chip-equipo" title="Viene de un ítem equipado: se va al sacártelo">⚙</span>' : ''}
         ${i.popup ? '<span class="ef-chip-pop" title="Avisa en el mantenimiento">◆</span>' : ''}
       </div>`;
@@ -5237,13 +5237,21 @@ const LISTS = {
 };
 
 // Escudo especial: cambiar su valor sin abrir el editor de estados (2026-09-24, pedido del dueño). El texto puede ser un número
-// (valor actual nuevo), +N / -N (sumar o restar) (sin tope: el escudo es un valor neto). Duplicado en ficha y gm-tools a propósito.
-function escudoParsear(txt, actual){
+// (valor actual nuevo), +N / -N (sumar o restar) o «max N» (cambia el máximo; en un excedente de vida no hay máximo). Duplicado en ficha y gm-tools a propósito.
+function escudoParsear(txt, actual, max){
+  // max === null: excedente de vida (valor neto, sin tope ni «max N»); si no, un escudo con máximo.
   const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
   if(!t) return null;
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return Math.max(0, actual + parseFloat(t));
-  if(/^\d+(?:\.\d+)?$/.test(t)) return Math.max(0, parseFloat(t));
-  return null;
+  const neto = max === null;
+  if(!neto){
+    const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+    if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+  }
+  let v;
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
+  else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
+  else return null;
+  return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
 }
 
 // Estados que vienen de una pasiva (2026-09-24, pedido del dueño): hoy solo la regeneración (`regenHp`). No se guardan: se arman
@@ -5840,7 +5848,7 @@ function configEquipoEstadoDe(it){
 // mecánica real del preset "Afortunado".
 const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
   'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'forzarNitros'];
+  'lisiado', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];
 function flagsDePreset(nombrePreset){
   const p = presetPorNombre(EFECTOS_PRESET, (nombrePreset || '').trim());
   if(!p) return {};
@@ -6222,11 +6230,11 @@ document.addEventListener('click', e => {
     const [erId, acc] = b.dataset.escudo.split(':');
     const er = S.efectos.find(x => x.id === erId);
     if(er){
-      const actual = num(er.escudoMagicoActual ?? er.escudoMagico);
-      const txt = acc === 'set' ? prompt(`${er.nombre}: escudo ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
-      const nuevo = txt === null ? null : escudoParsear(txt, actual);
-      if(nuevo !== null){ er.escudoMagico = nuevo; er.escudoMagicoActual = nuevo; renderList('efectos'); refresh(); }
-      else if(txt !== null) toast('Escribí un número, +N o -N');
+      const neto = !!er.excedenteVida, max = neto ? null : num(er.escudoMagico), actual = num(er.escudoMagicoActual ?? er.escudoMagico);
+      const txt = acc === 'set' ? prompt(neto ? `${er.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
+      const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
+      if(nuevo){ er.escudoMagico = neto ? nuevo.actual : nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); }
+      else if(txt !== null) toast(neto ? 'Escribí un número, +N o -N' : 'Escribí un número, +N, -N o "max N"');
     }
     return;
   }
@@ -6912,7 +6920,7 @@ const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está
   curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
   cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
   forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
-  escudoMagico:'Escudo especial — HP de una barra secundaria que absorbe daño antes que el HP real; es un valor neto, sin tope y sin recarga automática (dejalo en 0 si no aplica)',
+  escudoMagico:'Escudo especial — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
   armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)',
   tiradaExtra:'Tirada de dados automática (opcional, ej. 1d20+5 o 2d6+1d4)',
   tiradaStat:'Tirar un stat al ejecutar (opcional)'};
@@ -6961,9 +6969,11 @@ const EFECTOS_PRESET = [
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'✋ A mano: mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño CRUDO del golpe (antes de Defensa y escudos), redondeado hacia arriba, como daño directo (ignora Defensa). El GM o la mesa lo aplican; el estado solo recuerda que está activo y cuántos turnos dura.'},
   {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, escudoMagico:10,
-    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, Es un valor neto, sin tope ni recarga automática: se sube o se baja a mano desde el chip del estado o desde el token.'},
+    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
   {nombre:'Barrera', polaridad:'buff', turnos:1, escudoMagico:8,
     detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
+  {nombre:'Excedente de vida', polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
+    detalle:'HP extra por encima de tu máximo (por ejemplo, lo que drenás de más). Es un valor neto: sin tope y sin recarga; absorbe el daño antes que tu vida y se sube o baja a mano desde el chip. Por defecto no vence por turnos, pero podés ponerle turnos.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
@@ -10071,7 +10081,16 @@ function mantenimiento(){
     if(e.activo === false) return;
     const stacks = Math.max(1, num(e.stacks) || 1);
 
-    // Escudo especial (2026-09-25): es un valor NETO, sin tope y sin recarga automática: solo baja al absorber daño y se sube o baja a mano.
+    // Escudo especial funciona como una barra de HP secundaria: se recarga
+    // entera cada Mantenimiento mientras el estado siga activo. (El Excedente de vida NO: es un valor neto, sin tope ni recarga.)
+    if(num(e.escudoMagico) > 0 && !e.excedenteVida){
+      const actual = num(e.escudoMagicoActual ?? e.escudoMagico);
+      if(actual < num(e.escudoMagico)){
+        log.push(`<b>${esc(e.nombre)}</b> escudo recargado a ${fmt(num(e.escudoMagico))}`);
+        rep.push(`${e.nombre}: escudo especial ${fmt(actual)} → ${fmt(num(e.escudoMagico))}`);
+      }
+      e.escudoMagicoActual = num(e.escudoMagico);
+    }
 
     let hp = num(e.hpturno) * stacks;
     if(hp < 0 && (esInvulnerable || (e.esVeneno && inmuneVenenoMant) || (e.esSangrado && inmuneSangradoMant))){
@@ -10574,7 +10593,7 @@ function fichaResumen(){
         nombre: String(e.nombre).slice(0, 60),
         turnos: num(e.turnos),
         permanente: !!e.permanente,
-        ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+        ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
         ...(e.derivado ? {derivado: true} : {}),
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         // Para el globito del mapa al pasar el mouse por el estado.
@@ -10601,7 +10620,7 @@ function fichaResumen(){
             nombre: String(e.nombre).slice(0, 60),
             turnos: num(e.turnos),
             permanente: !!e.permanente,
-            ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 300),
           })),

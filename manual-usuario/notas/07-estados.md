@@ -195,7 +195,7 @@ Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fu
 
 | Estado | Cuánto absorbe | Duración |
 |---|---|---|
-| **Escudo mágico** | 10 (editable) | 3 turnos; es un **valor neto**, sin tope ni recarga automática: baja al absorber daño y se sube o baja a mano (chip del estado o token) |
+| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |
 | **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |
 
 Se ve como una barra 🛡 sobre tu token.
@@ -252,3 +252,7 @@ Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:
 
 > [!question] En pausa: están mezcladas
 > Las tres todavía están en **terreno ambiguo** entre sí (incluso si "Res.M" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora.
+
+## Excedente de vida
+
+Estado para una habilidad excepcional que deja tener **más vida que el máximo** (por ejemplo, drenar vida). Es un valor neto: **sin tope y sin recarga**; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan.

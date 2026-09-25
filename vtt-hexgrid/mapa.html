@@ -6619,7 +6619,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,
@@ -7156,13 +7156,15 @@ function resolverGolpe(golpe, defensa, efectos){
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
   let recibido = Math.max(0, golpe - defensa);
   let absorbido = 0;
-  const escudo = activos.find(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
-  if(escudo && recibido > 0){
-    const actual = num(escudo.escudoMagicoActual ?? escudo.escudoMagico);
-    absorbido = Math.min(recibido, actual);
-    escudo.escudoMagicoActual = actual - absorbido; escudo.escudoMagico = escudo.escudoMagicoActual;   // valor neto: no hay máximo
-    recibido -= absorbido;
-  }
+  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0)
+    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final el excedente de vida
+  capas.forEach(c => {
+    if(recibido <= 0) return;
+    const actual = num(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
+    c.escudoMagicoActual = actual - tomado;
+    if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;   // valor neto: no hay máximo
+    absorbido += tomado; recibido -= tomado;
+  });
   return {recibido, absorbido, defensa};
 }
 
@@ -7300,8 +7302,8 @@ function hudEstadosHtml(t, estados, puede){
           : `<span class="turnos" title="Puntos de armadura rota">×${fmt(num(e.stacks) || 1)}</span>`) : '') +
       (e.escudo !== undefined && (puede || t.tipo !== 'creep')
         ? (puede && !e.derivado
-          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos de escudo">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor del escudo (número, +N, -N; sin tope)">🛡${fmt(num(e.escudo))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Un punto más de escudo">+</button>`
-          : `<span class="turnos" title="Escudo">🛡${fmt(num(e.escudo))}</span>`) : '') +
+          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor (número, +N, -N${e.excedente ? '' : '; «max N» cambia el máximo'})">${e.excedente ? '❤+' + fmt(num(e.escudo)) : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Uno más">+</button>`
+          : `<span class="turnos" title="${e.excedente ? 'Excedente de vida' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
       (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
@@ -7639,7 +7641,7 @@ Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, fmt(stacks)) 
     const v = vinculo(t);
     const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
     if(!e) return;
-    const txt = acc === 'set' ? prompt(`${e.nombre}: escudo ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
+    const txt = acc === 'set' ? prompt(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'escudo', txt);
   });
@@ -7900,13 +7902,21 @@ function abrirEditarEstado(t, nombre){
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
-// Escudo especial: el texto puede ser un número (el valor nuevo) o +N / -N; no hay máximo (es un valor neto). Igual que en ficha y gm-tools.
-function escudoParsear(txt, actual){
+// Escudo especial: el texto puede ser un número, +N / -N o «max N» (cambia el máximo; en un excedente de vida no hay máximo). Igual que en ficha y gm-tools.
+function escudoParsear(txt, actual, max){
+  // max === null: excedente de vida (valor neto, sin tope ni «max N»); si no, un escudo con máximo.
   const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
   if(!t) return null;
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return Math.max(0, actual + parseFloat(t));
-  if(/^\d+(?:\.\d+)?$/.test(t)) return Math.max(0, parseFloat(t));
-  return null;
+  const neto = max === null;
+  if(!neto){
+    const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+    if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+  }
+  let v;
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
+  else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
+  else return null;
+  return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
 }
 async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);
@@ -7925,10 +7935,10 @@ async function hudEstadoCambiar(t, indice, accion, delta){
       if(Math.round(n) <= 0) arr.splice(i, 1); else e.stacks = Math.round(n);
     }
     else if(accion === 'escudo'){
-      const e = arr[i], actual = num(e.escudoMagicoActual ?? e.escudoMagico);
-      const n = escudoParsear(delta, actual);
-      if(n === null) throw new Error('escribí un número, +N o -N');
-      e.escudoMagico = n; e.escudoMagicoActual = n;   // valor neto: sin máximo
+      const e = arr[i], neto = !!e.excedenteVida, actual = num(e.escudoMagicoActual ?? e.escudoMagico);
+      const n = escudoParsear(delta, actual, neto ? null : num(e.escudoMagico));
+      if(!n) throw new Error(neto ? 'escribí un número, +N o -N' : 'escribí un número, +N, -N o "max N"');
+      e.escudoMagico = neto ? n.actual : n.max; e.escudoMagicoActual = n.actual;
     }
     else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
     return arr;
@@ -7952,7 +7962,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           if(!inv) throw new Error('La invocación ya no existe');
           inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));
@@ -7960,7 +7970,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         }else{
           datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));

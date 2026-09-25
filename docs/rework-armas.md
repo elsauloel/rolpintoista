@@ -243,3 +243,29 @@ Dueño: "Mirando las armas de tipo 4 a 10, vamos a empezar a imaginar las armas 
 **Preguntas:** (1) ¿Te cierra el mapa elemento ↔ familia? (2) ¿El dado del arma mágica es el daño (sin sumar Especial) y el Especial solo da el PG mágico / potencia de efectos? (3) ¿La magia tiene crítico, o el crítico queda para lo físico? (4) ¿Los báculos también pegan cuerpo a cuerpo (híbrido con Alcance) o son solo de casteo? (5) ¿Costo base: 1 Nitro + SP según el efecto, y el SP sube con el tier?
 
 - **2026-09-25 · Respuesta (P3 de arriba):** **El daño mágico NO hace crítico** (dicho por el dueño, 2026-09-25, "mucho, muy importante"): el daño **arcano, eléctrico (rayo) y de fuego no hacen crítico**. **Solo hacen crítico los ataques físicos**, incluso los que nacen de un hechizo: p. ej. una **estaca de hielo** (daño físico con potencia por Especial). Consecuencia: las armas mágicas de daño **no llevan Crítico frecuente/potente** ni resistencia a crítico que las afecte; su valor viene del dado, los elementos, los efectos y el costo. (Hielo: el daño de hielo puro tampoco crítica; solo lo hace la versión física, como la estaca.) Queda corregida la propuesta: el arcano ya no lleva crítico potente.
+
+## Armas mágicas — banco de ideas (2026-09-25, carta blanca del dueño)
+Dueño: "que no todo esté centrado en el daño, sino en efectos. Valete de las herramientas e inventá mecánicas; yo las sumo, las ajustaré." Criterio: **no critican** (regla de arriba), el daño va directo a la vida, así que **el valor está en la forma y el efecto**. Cada idea se apoya en algo que el mapa/Mesa ya tiene (⚙ = ya automatizable hoy, 🔧 = pide un pequeño desarrollo, ✋ = a mano). Nombres y números son sugerencias.
+**Forma y terreno**
+1. **Vara del sendero** (Excepcional): deja una **línea de 4 casillas de terreno** (fuego, hielo o hierba) que dura 3 turnos. Fuego: daña al entrar; hielo: casillas resbaladizas (⚙ terreno con efecto de estado, 🔧 forma línea).
+2. **Báculo del muro** (Raro): levanta un **muro de 3 casillas** que bloquea paso y visión 2 turnos; se rompe con daño. ⚙ elementos de mapa bloqueantes.
+3. **Bastón de la marea** (Excepcional): **empuja o atrae** a todos los que estén en un cono 1–2 casillas. ✋ mover fichas (el GM/jugador mueve), ⚙ el aviso.
+**Portales y espacio (aprovechan lo ya hecho)**
+4. **Varita del dintel** (Raro): abre **dos portales** (entrada y salida) a ≤ 4 casillas; sirve a aliados, dura 2 turnos. ⚙ portales aliados con turnos.
+5. **Anillo de trueque** (Excepcional, 1 por mano): **intercambia de lugar** a dos aliados (o a vos y un aliado) en rango. 🔧
+6. **Cetro del ancla** (Raro): planta una **trampa de teleport de regreso**: al gastar un Nitro volvés a ella. ⚙ trampa con destino.
+**Visibilidad y niebla**
+7. **Vara de bruma** (Buena): **flor de niebla** radio 1 durante 2 turnos: dentro no se ve ni se apunta a más de 2 casillas. ⚙ niebla/visibilidad.
+8. **Lente del vidente** (Raro): revela **casillas ocultas y trampas** en radio 3; el aliado marcado ve a través de la niebla. ⚙/✋.
+**Iniciativa y turnos**
+9. **Reloj de arena** (Excepcional): sube 1 lugar a un aliado o baja 1 a un rival en la tabla de iniciativa (una vez por combate). ⚙ tabla de iniciativa (Demora).
+10. **Bastón de la pausa** (Raro): 25 % de dejar al golpeado **sin acción de movimiento** este turno. ✋ aviso.
+**Estados y elementos**
+11. **Vara del deshielo/pira** (Raro): **hielo y fuego se cancelan**: apaga un terreno incendiado y quita 1 stack de Escarcha a un aliado (o al revés). ⚙ Escarcha acumulable, terreno incendiado.
+12. **Cetro del rayo cíclico** (Excepcional): rayo en cadena que **vuelve al lanzador** y cura 1 HP de Excedente por salto (⚙ rayo en cadena, Excedente de vida; no critica).
+13. **Aguja de estalactita** (Raro): **daño FÍSICO** de hielo con potencia por Especial → **sí critica** y la armadura lo reduce; deja Escarcha con 25 %. (El ejemplo que el dueño dio.)
+**Utilidad y sandbox**
+14. **Varita de la marca** (Común/Buena): marca al objetivo: el próximo aliado que lo golpee ignora 1 de Defensa. 🔧 estado con `usoEn`.
+15. **Bastón del ecualizador** (Legendario): al golpear, **copia** el estado más fuerte del objetivo a un aliado o a vos (Excedente, Crítico frecuente…). ✋/🔧.
+16. **Flauta del eco** (Raro): repite el último hechizo sin gastar Nitro, pero cuesta el doble de SP y solo una vez por combate. ✋.
+**Preguntas:** ¿cuáles de estas te gustan como punto de partida? ¿Cuánto SP por hechizo en el primer escalón (1–3, como los efectos de arma)? ¿Hechizos con límite por combate (como el reloj, el eco) o por SP solamente?

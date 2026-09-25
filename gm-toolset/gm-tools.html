@@ -5634,7 +5634,7 @@ function tableroCreepsLocales(){
     imagen: sc.imagen || '',
     hp: num(sc.hp),
     hpMax: num(sc.hpMax),
-    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, detalle: es.detalle || ''})),
+    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, ...(num(es.escudoMagico) > 0 ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), escudoMax: num(es.escudoMagico)} : {}), detalle: es.detalle || ''})),
   }));
 }
 
@@ -7536,6 +7536,7 @@ function creepPublico(sc, orden){
           nombre: String(es.nombre).slice(0, 60),
           turnos: num(es.turnos),
           permanente: !!es.permanente,
+          ...(num(es.escudoMagico) > 0 ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), escudoMax: num(es.escudoMagico)} : {}),
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(es.detalle || '').slice(0, 300),

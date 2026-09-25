@@ -6500,7 +6500,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,
@@ -7173,6 +7173,10 @@ function hudEstadosHtml(t, estados, puede){
       <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>
       ${det ? `<span class="estado-tip"><b>${esc(e.nombre)}</b>${esc(det)}</span>` : ""}
       <span class="turnos">${turnos}</span>` +
+      (num(e.escudoMax) > 0 && (puede || t.tipo !== 'creep')
+        ? (puede && !e.derivado
+          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos de escudo">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor del escudo (número, +N, -N; o 'max N' para cambiar el máximo)">🛡${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Un punto más de escudo">+</button>`
+          : `<span class="turnos" title="Escudo actual / máximo">🛡${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}</span>`) : '') +
       (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
@@ -7490,6 +7494,15 @@ function hudConectar(t){
     if(e) abrirEditarEstado(t, e.nombre);
   });
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
+  hud.querySelectorAll('[data-hud-escudo]').forEach(b => b.onclick = () => {
+    const [i, acc] = b.dataset.hudEscudo.split(':');
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
+    if(!e) return;
+    const txt = acc === 'set' ? prompt(`${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
+    if(txt === null) return;
+    hudEstadoCambiar(t, num(i), 'escudo', txt);
+  });
   hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
     const [i, delta] = b.dataset.hudTurnos.split(':');
     hudEstadoCambiar(t, num(i), 'turnos', num(delta));
@@ -7688,6 +7701,16 @@ function abrirEditarEstado(t, nombre){
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
+// Escudo especial: el texto puede ser un número (valor actual nuevo), +N / -N o "max N" (cambia el máximo). Igual que en ficha y gm-tools.
+function escudoParsear(txt, actual, max){
+  const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
+  if(!t) return null;
+  const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+  if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, actual + parseFloat(t)))};
+  if(/^\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, parseFloat(t)))};
+  return null;
+}
 async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);
   const lista = (v && v.resumen && v.resumen.estados) || [];
@@ -7697,6 +7720,12 @@ async function hudEstadoCambiar(t, indice, accion, delta){
     const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
     if(i < 0) throw new Error('Ese estado ya no está');
     if(accion === 'quitar') arr.splice(i, 1);
+    else if(accion === 'escudo'){
+      const e = arr[i], max = num(e.escudoMagico), actual = num(e.escudoMagicoActual ?? e.escudoMagico);
+      const n = escudoParsear(delta, actual, max);
+      if(!n) throw new Error('escribí un número, +N, -N o "max N"');
+      e.escudoMagico = n.max; e.escudoMagicoActual = n.actual;
+    }
     else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
     return arr;
   };
@@ -7719,7 +7748,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           if(!inv) throw new Error('La invocación ya no existe');
           inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));
@@ -7727,7 +7756,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         }else{
           datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente,
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));

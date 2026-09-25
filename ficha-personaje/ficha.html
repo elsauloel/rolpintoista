@@ -10466,6 +10466,7 @@ function fichaResumen(){
         nombre: String(e.nombre).slice(0, 60),
         turnos: num(e.turnos),
         permanente: !!e.permanente,
+        ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
         ...(e.derivado ? {derivado: true} : {}),
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         // Para el globito del mapa al pasar el mouse por el estado.
@@ -10492,6 +10493,7 @@ function fichaResumen(){
             nombre: String(e.nombre).slice(0, 60),
             turnos: num(e.turnos),
             permanente: !!e.permanente,
+            ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 300),
           })),

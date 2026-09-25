@@ -25,6 +25,14 @@
 - El daño elemental (fuego, hielo, electricidad, veneno) suele ir por su lado: *Prende fuego*, *Escarcha*, *Stun*, *Envenenar*.
 - Hay que decidir qué pasa con los nombres: en el juego **"Derribar"** ya es un efecto de arma (cae al suelo, a mano). *Knockdown* como efecto de iniciativa necesita un nombre que no se pise con ese.
 
+## 1b. Tres niveles de efecto por familia (aclaración del dueño, 2026-09-25)
+Para cada efecto de arma, cada familia lo tiene en uno de tres niveles:
+- 🏠 **De casa**: le da *identidad* a la familia (hacha → Rompe armadura).
+- 🤝 **Habilitado por contexto / compartido**: tiene sentido en varias familias. Ej.: **Envenenar** lo puede llevar cualquier arma con filo (hachas, cortantes, punzantes) y las de rango (flechas, dardos).
+- ✨ **Excepcional**: va contra el concepto (un martillo que envenena). Siempre se puede hacer la excepción; solo va a ser raro.
+
+**Peso de cada efecto** (idea): cada efecto va a tener un peso según cuán relevante sea en combate, para poder calcular después la **calidad y el precio** de un arma (y, eventualmente, diseñar una mecánica de balance). Hoy los pesos (1–5) en `comun/guia-diseno.js` son **provisorios**; falta definir la fórmula (ver P112 en `preguntas-abiertas.md`).
+
 ## 2. Inventario de mecánicas disponibles (para jugar "acá o allá")
 
 **Estados sobre el golpeado o el objetivo** (existen; ver Estados en el manual): Veneno, Veneno severo, Sangrado, Armadura rota, Lisiado, Inmovilizado, Rengo, Pajaritos,

@@ -109,18 +109,21 @@ const GuiaDiseno = (() => {
     {id: 'explosivo', ico: '💣', n: 'Explosivos', resumen: 'Daño en área de alto riesgo.', dado: 'Tipo 12', casa: 'por definir'},
     {id: 'rango', ico: '🏹', n: 'De rango', resumen: 'Arcos, ballestas y armas de fuego: pegan de lejos.', dado: 'según el arma', casa: 'por definir'},
   ];
-  // Efectos de arma: casa = qué familias lo tienen "de casa"; en el resto es posible pero excepcional.
+  // Efectos de arma, con TRES niveles por familia (aclaración del dueño, 2026-09-25):
+  //   casa = le da identidad a la familia (🏠); comp = habilitado por contexto / compartido con otras familias (🤝, ej. Envenenar en todo lo que tiene filo);
+  //   el resto es una excepción que va contra el concepto (✨, ej. un martillo que envenena: se puede, pero es raro).
+  //   peso = relevancia del efecto en combate (1 a 5, PROVISORIO): la idea es usarlo después para calcular calidad y precio de un arma.
   const EFECTOS_ARMA = [
-    {n: 'Rompe armadura', d: 'Quita Defensa al golpeado (estado Armadura rota, se acumula de a 1 y se puede reparar).', e: 'auto', casa: ['hacha']},
-    {n: 'Knockdown (a la fila de atrás)', d: 'Baja al golpeado al fondo de la iniciativa. Con probabilidad si querés (ej. "Knockdown 1" = siempre 1 lugar).', e: 'falta', casa: ['contundente']},
-    {n: 'Aturdir', d: 'Deja al rival sin acciones (Stun: sin No2 por 2 turnos).', e: 'auto', casa: ['contundente']},
-    {n: 'Lisiado', d: 'PdG y Parry a la mitad por unos turnos.', e: 'auto', casa: ['punzante']},
-    {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante']},
-    {n: 'Envenenar', d: 'Veneno: pierde 1 HP por stack cada turno.', e: 'auto', casa: []},
-    {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: []},
-    {n: 'Agarrar', d: 'Inmoviliza al objetivo agarrado.', e: 'mano', casa: []},
-    {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: []},
-    {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Excedente de vida).', e: 'mano', casa: []},
+    {n: 'Rompe armadura', d: 'Quita Defensa al golpeado (estado Armadura rota, se acumula de a 1 y se puede reparar).', e: 'auto', casa: ['hacha'], comp: ['contundente'], peso: 4},
+    {n: 'Knockdown (a la fila de atrás)', d: 'Baja al golpeado al fondo de la iniciativa. Con probabilidad si querés (ej. "Knockdown 1" = siempre 1 lugar).', e: 'falta', casa: ['contundente'], comp: ['explosivo'], peso: 4},
+    {n: 'Aturdir', d: 'Deja al rival sin acciones (Stun: sin No2 por 2 turnos).', e: 'auto', casa: ['contundente'], comp: ['explosivo'], peso: 5},
+    {n: 'Lisiado', d: 'PdG y Parry a la mitad por unos turnos.', e: 'auto', casa: ['punzante'], comp: ['cortante'], peso: 3},
+    {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante'], comp: ['punzante', 'hacha'], peso: 3},
+    {n: 'Envenenar', d: 'Veneno: pierde 1 HP por stack cada turno.', e: 'auto', casa: [], comp: ['hacha', 'cortante', 'punzante', 'rango'], peso: 3},
+    {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: [], comp: ['contundente', 'hacha', 'explosivo'], peso: 2},
+    {n: 'Agarrar', d: 'Inmoviliza al objetivo agarrado.', e: 'mano', casa: [], comp: ['punzante'], peso: 3},
+    {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: [], comp: ['explosivo', 'rango'], peso: 3},
+    {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Excedente de vida).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
   ];
   const ESTADOS = [
     ['Veneno', 'debuff', 'Pierde 1 HP por stack cada turno.'], ['Sangrado', 'debuff', 'Pierde HP por turno; se acumula.'],
@@ -174,7 +177,7 @@ const GuiaDiseno = (() => {
 #gd-caja .gd-card .ej{color:#8FAFA0;font-size:12px}
 #gd-caja .gd-card.buff{border-color:#3D6B57}#gd-caja .gd-card.debuff{border-color:#7A3B3B}
 #gd-caja .gd-chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid #3B2E34;color:#B7A79E;margin-right:4px}
-#gd-caja .gd-chip.casa{border-color:#C98545;color:#E0A458}#gd-caja .gd-chip.exc{border-color:#6E5A8A;color:#B7A6D6}
+#gd-caja .gd-chip.casa{border-color:#C98545;color:#E0A458}#gd-caja .gd-chip.exc{border-color:#6E5A8A;color:#B7A6D6}#gd-caja .gd-chip.comp{border-color:#4F8A78;color:#8FD1BC}#gd-caja .gd-peso{font-size:11.5px;color:#9A867E}
 #gd-caja .gd-filtros{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
 #gd-caja .gd-filtros button{background:none;border:1px solid #3B2E34;border-radius:14px;color:#B7A79E;padding:3px 11px;cursor:pointer;font:inherit;font-size:12.5px}
 #gd-caja .gd-filtros button.on{border-color:#E0A458;color:#E0A458;background:rgba(224,164,88,.12)}
@@ -184,7 +187,7 @@ const GuiaDiseno = (() => {
   }
 
   const chipEst = e => e && EST[e] ? `<span class="gd-chip" title="${esc(EST[e][1])}">${EST[e][0]} ${e === 'auto' ? 'automático' : e === 'mano' ? 'a mano' : 'por construir'}</span>` : '';
-  const AVISO = '<div class="gd-aviso">📐 Todo esto son <b>guías orientativas, no reglas estrictas</b>. Podés salirte cuando quieras: un punzón con Knockdown se puede, solo que va a ser raro. Lo de <b>🏠 casa</b> es lo que se espera de cada familia; lo <b>✨ excepcional</b> es lo que la vuelve especial.</div>';
+  const AVISO = '<div class="gd-aviso">📐 Todo esto son <b>guías orientativas, no reglas estrictas</b>. Podés salirte cuando quieras: un punzón con Knockdown se puede, solo que va a ser raro. Cada efecto tiene tres niveles según la familia: <b>🏠 de casa</b> (le da identidad), <b>🤝 habilitado</b> (se comparte por contexto: por ejemplo Envenenar sirve en todo lo que tiene filo) y <b>✨ excepcional</b> (va contra el concepto: un martillo que envenena se puede, pero es raro).</div>';
 
   function abrir(seccion){
     estilos();
@@ -226,15 +229,16 @@ const GuiaDiseno = (() => {
         <h3>3 · ¿Qué otros efectos puede tener?</h3><div class="gd-grid"><button class="gd-card" data-ir="efectosArma"><span class="ico">🎁</span><b>Ver todos los efectos</b><small>La grilla completa de efectos al golpear, con cuáles son de casa de cada familia.</small></button></div>`;
       if(r.p === 'familia'){
         const f = FAMILIAS.find(x => x.id === r.x);
-        const casa = EFECTOS_ARMA.filter(e => e.casa.includes(f.id)), otras = EFECTOS_ARMA.filter(e => !e.casa.includes(f.id));
+        const casa = EFECTOS_ARMA.filter(e => e.casa.includes(f.id)), comp = EFECTOS_ARMA.filter(e => !e.casa.includes(f.id) && e.comp.includes(f.id)), otras = EFECTOS_ARMA.filter(e => !e.casa.includes(f.id) && !e.comp.includes(f.id));
         return `<h2>${f.ico} ${esc(f.n)}</h2><p>${esc(f.resumen)} Dado orientativo: <b>${esc(f.dado)}</b>.</p>${AVISO}
           <h3>🏠 Efecto de casa</h3>${casa.length ? `<div class="gd-grid">${casa.map(carta(f.id)).join('')}</div>` : '<p>Todavía sin definir: se decide entre todos. Podés usar cualquiera de los de abajo.</p>'}
-          <h3>✨ Otros efectos posibles (excepcionales en esta familia)</h3><div class="gd-grid">${otras.map(carta(f.id)).join('')}</div>`;
+          <h3>🤝 Efectos habilitados por contexto (compartidos con otras familias)</h3>${comp.length ? `<div class="gd-grid">${comp.map(carta(f.id)).join('')}</div>` : '<p>Ninguno por ahora.</p>'}
+          <h3>✨ Excepcionales (van contra el concepto de esta familia)</h3><div class="gd-grid">${otras.map(carta(f.id)).join('')}</div>`;
       }
       if(r.p === 'efectosArma'){
-        const lista = filtroEfecto ? EFECTOS_ARMA.filter(e => e.casa.includes(filtroEfecto)) : EFECTOS_ARMA;
-        return `<h2>🎁 Efectos para un arma</h2><p>Todo lo que un arma puede dejar en el golpeado. Filtrá por familia para ver cuáles son de casa.</p>${AVISO}
-          <div class="gd-filtros"><button data-filtro="" class="${!filtroEfecto ? 'on' : ''}">Todos</button>${FAMILIAS.filter(f => EFECTOS_ARMA.some(e => e.casa.includes(f.id))).map(f => `<button data-filtro="${f.id}" class="${filtroEfecto === f.id ? 'on' : ''}">${f.ico} ${esc(f.n)}</button>`).join('')}</div>
+        const lista = filtroEfecto ? EFECTOS_ARMA.filter(e => e.casa.includes(filtroEfecto) || e.comp.includes(filtroEfecto)) : EFECTOS_ARMA;
+        return `<h2>🎁 Efectos para un arma</h2><p>Todo lo que un arma puede dejar en el golpeado. Filtrá por familia para ver cuáles son de casa (🏠) o están habilitados en ella (🤝). El <b>peso</b> mide cuánto pesa el efecto en combate: servirá para calcular la calidad y el precio de un arma (por ahora son valores provisorios).</p>${AVISO}
+          <div class="gd-filtros"><button data-filtro="" class="${!filtroEfecto ? 'on' : ''}">Todos</button>${FAMILIAS.filter(f => EFECTOS_ARMA.some(e => e.casa.includes(f.id) || e.comp.includes(f.id))).map(f => `<button data-filtro="${f.id}" class="${filtroEfecto === f.id ? 'on' : ''}">${f.ico} ${esc(f.n)}</button>`).join('')}</div>
           <div class="gd-grid">${lista.map(carta(filtroEfecto)).join('')}</div>
           <div class="gd-leyenda">Los efectos de arma se <b>recuerdan y se tiran</b> en la Mesa; aplicarlos sobre el rival sigue siendo a mano, a propósito.</div>`;
       }
@@ -246,10 +250,13 @@ const GuiaDiseno = (() => {
       return '';
     }
     // Carta de efecto de arma. `fam` = familia que se está mirando (para marcar de casa / excepcional).
+    const estrellas = p => '★'.repeat(p) + '☆'.repeat(5 - p);
     const carta = fam => e => {
-      const marca = !fam ? (e.casa.length ? e.casa.map(id => `<span class="gd-chip casa">🏠 ${esc(FAMILIAS.find(f => f.id === id).n)}</span>`).join('') : '<span class="gd-chip">libre</span>')
-        : e.casa.includes(fam) ? '<span class="gd-chip casa">🏠 de casa</span>' : '<span class="gd-chip exc">✨ excepcional aquí</span>';
-      return `<div class="gd-card"><b>${esc(e.n)}</b><small>${esc(e.d)}</small><span>${marca}${chipEst(e.e)}</span></div>`;
+      const nom = id => esc(FAMILIAS.find(f => f.id === id).n);
+      const marca = !fam
+        ? e.casa.map(id => `<span class="gd-chip casa">🏠 ${nom(id)}</span>`).join('') + e.comp.map(id => `<span class="gd-chip comp">🤝 ${nom(id)}</span>`).join('') || '<span class="gd-chip">libre</span>'
+        : e.casa.includes(fam) ? '<span class="gd-chip casa">🏠 de casa</span>' : e.comp.includes(fam) ? '<span class="gd-chip comp">🤝 habilitado</span>' : '<span class="gd-chip exc">✨ excepcional aquí</span>';
+      return `<div class="gd-card"><b>${esc(e.n)}</b><small>${esc(e.d)}</small><span>${marca}${chipEst(e.e)}</span><span class="gd-peso" title="Relevancia del efecto en combate (provisorio); servirá para calcular calidad y precio del arma">⚖ peso ${estrellas(e.peso)}</span></div>`;
     };
 
     function dibujar(){

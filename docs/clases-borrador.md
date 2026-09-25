@@ -160,8 +160,7 @@ Estados que define la clase:
 
 Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 
-1. **Chispazo** [1] — NO2: (3). Dispara un proyectil T4 P1 que ignora
-   armadura.
+1. **Chispazo** [1] — NO2: (1). Dispara un proyectil T6 P1 (1d6) que ignora armadura. *(Rebalanceado 2026-09-25 por el dueño: antes NO2 3 y T4; equiparado a la Varita de proyectil mágico de buena calidad, 1d6 por 1 Nitro. ⚖ A auditar con el grupo.)*
 2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
    tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
    Especial.

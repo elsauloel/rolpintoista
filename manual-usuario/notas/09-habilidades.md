@@ -203,7 +203,7 @@ estado: pendiente
 +++
 Hechizos de daño y control, movidos por [[Especial]]. Pool de [[Clases|clase]]. Casi todos son **Hechizo (PG: Esp · Daño: Esp)**.
 
-**Skills del borrador:** Chispazo (proyectil T4 P1 que ignora armadura), Rayo Mágico, Orbe arcano (área de flor de 1), Tormenta arcana (1d20 proyectiles en flor de 2), Ráfaga arcana (cono de 3), Toque mágico, Carga Elemental (fuego +50%, frío −1 No2 cada 5 de daño, eléctrico se propaga), Armadura Mágica (−50% daño hasta 10), Telekinesis y Control Mental.
+**Skills del borrador:** Chispazo (proyectil T6 P1 que ignora armadura, 1 No2 y 1 SP; a auditar), Rayo Mágico, Orbe arcano (área de flor de 1), Tormenta arcana (1d20 proyectiles en flor de 2), Ráfaga arcana (cono de 3), Toque mágico, Carga Elemental (fuego +50%, frío −1 No2 cada 5 de daño, eléctrico se propaga), Armadura Mágica (−50% daño hasta 10), Telekinesis y Control Mental.
 
 > [!question] Sin auditar
 > Todavía no hay skills automatizadas de Mago. Falta revisar costos (No2 y SP) una por una.

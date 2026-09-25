@@ -1281,6 +1281,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/guia-diseno.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -2933,7 +2934,7 @@ document.addEventListener('click', e => {
    Trabaja sobre el creep real: "crear" lo agrega al empezar y lo quita si se cancela.
    ========================================================= */
 const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Recompensas', 'Resumen'];
-const ROLES_CREEP = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (emboscador)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
+const ROLES_CREEP = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (asalto)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
 const PESOS_ROL = {brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .12, .16], rapido: [.16, .18, .30, .24, .12],
   rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36], debuffer: [.22, .08, .18, .14, .38]};
 const RAREZA_ARMA = ['Común', 'Común', 'Común (o Buena Calidad)', 'Buena Calidad', 'Buena Calidad (o Raro)'];
@@ -4522,7 +4523,7 @@ const HABS_CREEP_GRUPOS = [
   {nombre: 'Mecánica del juego', tags: ['sigilo', 'trampas', 'terreno y formas', 'niebla y visión', 'iniciativa', 'aura', 'estados alterados', 'orientación', 'percepción', 'movimiento', 'botín', 'jefe']},
   {nombre: 'A quién apunta', tags: ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno']},
   {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
-  {nombre: 'Rol', tags: ['melee', 'tanque', 'emboscador', 'rango', 'mágico', 'apoyo', 'debuffer']},
+  {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
   {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
   {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
 ];
@@ -4530,7 +4531,7 @@ const HABS_CREEP_GRUPOS = [
 const CREEPS_GRUPOS = [
   {nombre: 'Escenario', tags: ['minas', 'bosque', 'montañas', 'templo alienígena']},
   {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']},
-  {nombre: 'Rol', tags: ['melee', 'tanque', 'emboscador', 'rango', 'mágico', 'apoyo', 'debuffer']},
+  {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
   {nombre: 'Tipo', tags: ['humano', 'humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena']},
   {nombre: 'Facción', tags: ['bandidos', 'bárbaros', 'guardia de la ciudad', 'piratas espaciales', 'cultistas', 'mercenarios']},
   {nombre: 'Tribu', tags: ['goblin', 'tribu goblin', 'kobold', 'tribu kobold', 'hombre cabra', 'clan cabruno']},

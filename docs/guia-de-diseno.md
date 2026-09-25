@@ -5,6 +5,8 @@
 > lista para ir completando. Complementa a [`herramientas-de-diseno.md`](herramientas-de-diseno.md) (ingredientes nuevos a construir) y a las
 > reglas del manual (`manual-usuario/notas/`).
 >
+> **Versión visual dentro del juego:** `comun/guia-diseno.js` (☰ → 📐 Guía de diseño) presenta esto como grillas de tarjetas, paso a paso; sus datos espejan este documento. La clase se llama **Asalto** (no "emboscador").
+>
 > **Cómo leerla (esencia del proyecto).** Todo esto son **territorios sugeridos, no leyes**: la mesa puede salirse de ellos siempre. La idea es que cada
 > familia tenga *su sabor* propio; que **otra familia use esa mecánica es posible pero excepcional** (una hacha que sangra por ser especial, no porque
 > sí). Si algo se puede automatizar, se automatiza; si no, se aclara (⚙ / ✋). Y "equipo" incluye **las armas**, no solo lo defensivo.

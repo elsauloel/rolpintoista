@@ -913,6 +913,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/guia-diseno.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1858,11 +1859,11 @@ function destinoParsear(txt){
   const m = /^(-?\d+),(-?\d+)$/.exec(String(txt || ''));
   return m ? {col: parseInt(m[1], 10), fila: parseInt(m[2], 10)} : null;
 }
-function elegirDestino(cb){
+function elegirDestino(cb, texto){
   elegirDestinoCb = cb;
   lienzo.style.cursor = 'crosshair';
   const av = $('#colocando-aviso');
-  if(av){ av.hidden = false; av.innerHTML = '<b>🌀 Elegí el destino del teleport</b> <span>clic en una casilla transitable a pie (sin Sólido ni pared) adonde va a parar quien la pise · Esc o clic derecho cancelan</span>'; }
+  if(av){ av.hidden = false; av.innerHTML = texto || '<b>🌀 Elegí el destino del teleport</b> <span>clic en una casilla transitable a pie (sin Sólido ni pared) adonde va a parar quien la pise · Esc o clic derecho cancelan</span>'; }
   pedirDibujo();
 }
 function elegirDestinoTerminar(){
@@ -1888,7 +1889,7 @@ function casillaLibreCerca(d){
   }
   return d;   // sin lugar cerca: lo deja en el destino
 }
-async function trampaTeleportar(id, t, el){
+async function trampaTeleportar(id, t, el, avisar){
   const d = destinoParsear(el.trampaDestino);
   if(!d || !t) return;
   const c = casillaLibreCerca(d);
@@ -1899,7 +1900,7 @@ async function trampaTeleportar(id, t, el){
   renderPanel(); pedirDibujo();
   try{
     await coleccionTokens().doc(id).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
-    alertaRojaAnonima(`🌀 ${el.trampaNombre || 'Trampa de teleport'}`, `${t.oculto ? 'Alguien' : nombreDe(t)} fue teletransportado a otro punto del mapa`);
+    if(avisar !== false) alertaRojaAnonima(`🌀 ${el.trampaNombre || 'Trampa de teleport'}`, `${t.oculto ? 'Alguien' : nombreDe(t)} fue teletransportado a otro punto del mapa`);
   }catch(err){
     console.error('No se pudo teletransportar el token:', err);
     Object.assign(t, antes); visibles.delete(id); pedirDibujo();
@@ -3499,6 +3500,16 @@ function dibujar(){
         ctx.fillText('🌀', pD.x, pD.y);
         ctx.restore();
       }
+    }
+    if(el.portal){
+      // Portal: anillo morado con remolino en su casilla (lo ven todos).
+      const cP = celdas[0], pP = hexCentro(cP.col, cP.fila);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(186,140,255,.95)'; ctx.lineWidth = 4 / z; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(pP.x, pP.y, HEX * 0.62, 0, Math.PI * 2); ctx.stroke();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `700 ${22 / z}px system-ui, sans-serif`; ctx.fillStyle = '#C9A3FF';
+      ctx.fillText('🌀', pP.x, pP.y);
+      ctx.restore();
     }
     }   // fin de lo que no es Colisión
     if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
@@ -5269,6 +5280,7 @@ function copiarElementoSeleccionado(){
   const el = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
   if(!el){ return; }
   if(el.colision){ toast('La Colisión del mapa no se copia: se pinta con su herramienta'); return; }
+  if(el.portal){ toast('Los portales no se copian: se invocan con su habilidad'); return; }
   const celdas = [];
   el.celdas.forEach(c => celdas.push(c.dq, c.dr));
   portapapelesElemento = {...el, celdas};
@@ -6011,15 +6023,17 @@ function trampasEvaluarRuta(tokId, t, ruta){
   const trampas = [];
   elementos.forEach((el, id) => {
     if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
+    // Portal (Invocar portal): lo usan solo los ALIADOS de quien lo invocó (los rivales pasan de largo); no se "dispara", queda hasta que venza.
+    else if(el.portal && destinoParsear(el.portalDestino) && !trampaDispara(t, el)) trampas.push({id, el, portal: true, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
   });
   if(!trampas.length) return null;
   const atento = tokenPercepcionAumentada(t);
   for(let i = 1; i < ruta.length; i++){
     const pisa = trampas.find(x => x.set.has(nbPack(ruta[i].col, ruta[i].fila)));
-    if(pisa) return {indice: i, tipo: 'pisa', id: pisa.id, el: pisa.el};
+    if(pisa) return {indice: i, tipo: pisa.portal ? 'portal' : 'pisa', id: pisa.id, el: pisa.el};
     if(atento){
       const vec = vecinosDeCasilla(ruta[i]).map(v => nbPack(v.col, v.fila));
-      const cerca = trampas.find(x => !trampasAvisadas.has(tokId + ':' + x.id) && vec.some(k => x.set.has(k)));
+      const cerca = trampas.find(x => !x.portal && !trampasAvisadas.has(tokId + ':' + x.id) && vec.some(k => x.set.has(k)));
       if(cerca) return {indice: i, tipo: 'cerca', id: cerca.id, el: cerca.el};
     }
   }
@@ -6080,6 +6094,10 @@ async function trampaResolver(){
   if(!p) return;
   const t = tokens.get(p.tokenId);
   if(!t) return;
+  if(p.tipo === 'portal'){   // pisó un portal aliado: pasa al otro, gratis y sin alertas
+    await trampaTeleportar(p.tokenId, t, {trampaDestino: p.el.portalDestino}, false);
+    return;
+  }
   if(p.tipo === 'pisa'){
     try{ await coleccionElementos().doc(p.id).update({disparada: true}); }
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
@@ -8439,6 +8457,41 @@ function cerrarBotonera(){
 
 // Una habilidad con zona (Sonic Boom: 'cono') le pide al mapa que la dibuje: el MISMO cono de 16 casillas de la detección del
 // sigilo, delante del token, como un trazo por casilleros temporal (lo ven todos y se borra solo a los 3 segundos).
+/* ---------- Invocar portal (Mago, 2026-09-25) ----------
+   La habilidad le avisa al mapa (`portal-habilidad`): se piden DOS clics (dentro del rango de casteo del token, en casillas transitables a pie)
+   y se crean dos elementos `portal` que se apuntan entre sí (`portalDestino`), con turnos (se van solos al vencer). Solo los ALIADOS los usan. */
+async function portalDeHabilidad(msg){
+  const t = [...tokens.values()].find(x => x.fichaId === msg.fichaId);
+  if(!t){ toast(`${msg.nombre || 'Invocar portal'}: tu personaje no tiene token en el mapa, no se pueden colocar los portales`); return; }
+  const rg = rangoDeToken(t), alcance = rg ? Math.floor(num(rg.casteo)) : 0;
+  if(alcance < 1){ toast('Tu rango de casteo es 0: los portales no alcanzan a ningún punto (abrí la ficha una vez para que se publique)'); return; }
+  if(!$('#botonera-capa').hidden) escapeABotonera();
+  const puntos = [];
+  const pedir = () => elegirDestino(h => {
+    const yo = {col: t.col, fila: t.fila};
+    if(distanciaHex(h, yo) > alcance){ toast(`Ese punto queda a más de ${alcance} casilleros (tu rango de casteo)`); pedir(); return; }
+    if(puntos.some(p => p.col === h.col && p.fila === h.fila)){ toast('Elegí otra casilla: los dos portales no pueden estar en el mismo punto'); pedir(); return; }
+    puntos.push(h);
+    if(puntos.length < 2){ toast('Primer portal marcado: elegí el segundo'); pedir(); return; }
+    portalesCrear(puntos, msg.turnos, msg.nombre);
+  }, `<b>🌀 ${esc(msg.nombre || 'Invocar portal')}: elegí el portal ${puntos.length + 1} de 2</b> <span>clic en una casilla transitable a pie dentro de tu rango de casteo (${alcance}) · Esc o clic derecho cancelan</span>`);
+  pedir();
+}
+async function portalesCrear(puntos, turnos, nombre){
+  const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n;
+  try{
+    await Promise.all(puntos.map((p, i) => coleccionElementos().add({
+      tipo: 'flor', origen: {col: p.col, fila: p.fila}, celdas: [0, 0], rotacion: 0, color: '#9B5FD0', alfa: 45, solido: false, invisible: false,
+      imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, turnos: n, venceMant: vence,
+      portal: true, portalDestino: puntos[1 - i].col + ',' + puntos[1 - i].fila,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    })));
+    toast(`🌀 ${nombre || 'Portales'} listos: duran ${n} turno${n === 1 ? '' : 's'} y solo los usan tus aliados`);
+  }catch(err){
+    console.error('No se pudieron crear los portales:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudieron crear los portales');
+  }
+}
 function zonaDeHabilidad(msg){
   if(msg.forma !== 'cono' && msg.forma !== 'flor') return;
   const t = [...tokens.values()].find(x => x.fichaId === msg.fichaId);
@@ -8469,6 +8522,7 @@ window.addEventListener('message', e => {
   }
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
+  if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
 });
 
 $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herramienta: '', fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };

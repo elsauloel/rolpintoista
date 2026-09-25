@@ -15,7 +15,7 @@
   const U = window.CreepsBaseUtil;
   if(!U) return;
   const RZ = {'*': 'cualquiera', b: 'bestia', h: 'humano', d: 'humanoide', p: 'planta', e: 'elemental', m: 'no-muerto', c: 'constructo', a: 'alienígena'};
-  const RO = {m: 'melee', t: 'tanque', e: 'emboscador', r: 'rango', g: 'mágico', a: 'apoyo', x: 'debuffer'};
+  const RO = {m: 'melee', t: 'tanque', e: 'asalto', r: 'rango', g: 'mágico', a: 'apoyo', x: 'debuffer'};
   const FN = {D: 'daño', T: 'defensa', B: 'buff', X: 'debuff', C: 'curación', K: 'control', M: 'movilidad', I: 'invocación', A: 'área'};
   const aT = (detalle, dano) => ({detalle, no2: 'ATAQUE', dano});
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});

@@ -31,7 +31,7 @@ const Biblioteca = (() => {
     habs_creep: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'área', 'rápida', 'lenta', 'sigilo', 'trampas'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',
-      'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'emboscador', 'debuffer'],
+      'melee', 'rango', 'mágico', 'tanque', 'apoyo', 'asalto', 'debuffer'],
   };
 
   const estado = {};   // tipo -> {oficial, propuestas, vista, filtros:Set, texto, opts}

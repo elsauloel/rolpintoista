@@ -21,7 +21,7 @@
     rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36],
     debuffer: [.22, .08, .18, .14, .38],
   };
-  const ROL_TXT = {brutal: 'melee', tanque: 'tanque', rapido: 'emboscador', rango: 'rango', mago: 'mágico', apoyo: 'apoyo', debuffer: 'debuffer'};
+  const ROL_TXT = {brutal: 'melee', tanque: 'tanque', rapido: 'asalto', rango: 'rango', mago: 'mágico', apoyo: 'apoyo', debuffer: 'debuffer'};
   const TIPO_ARMA = [4, 6, 6, 8, 10];   // por nivel 1..5
   const PESO_ARMA = [1, 1, 2, 2, 2];
 

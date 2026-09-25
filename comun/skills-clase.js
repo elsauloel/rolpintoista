@@ -79,6 +79,8 @@ const CLASES_SKILLS = [
     skillSA('tanque', 'Miti-Miti', 'SP 2. Marca un personaje como protegido: comparte con el tanque la mitad del daño que recibe. Dura 1 turno.'),
   ]},
   {id: 'mago', nombre: 'Mago', habilidades: [
+    {id: 'mago-invocar-portal', nombre: 'Invocar portal', costo: '6', nitrosCosto: 3, portalMapa: {turnos: 3},
+     detalle: 'Invocás DOS portales de teletransporte en dos puntos dentro de tu rango de casteo (transitables a pie). Duran 3 turnos (X, a definir en mesa). Solo los ALIADOS los usan: al pisar uno, aparecen en el otro. ⚙ Automatizado: al ejecutarla el mapa te pide hacer clic en los dos puntos, crea los portales y los quita solos al terminar los turnos; el teleport es gratis. ✋ A mano: elegir bien los puntos. ⚖ A definir en mesa: costos (SP 6, No2 3) y duración.'},
     skillSA('mago', 'Chispazo', 'SP 1. No2 3. Hechizo (PG: Esp · Daño: Esp). Dispara un proyectil T4 P1 que ignora armadura.'),
     skillSA('mago', 'Rayo Mágico', 'SP X. No2 5. Hechizo. Rayo arcano de daño tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a Especial.'),
     skillSA('mago', 'Orbe arcano', 'SP 4. No2 5. Hechizo. Orbe arcano de daño en área tipo 5, amplifica el daño en 4. Área: flor de 1.'),

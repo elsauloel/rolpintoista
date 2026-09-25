@@ -1986,6 +1986,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/guia-diseno.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -8856,7 +8857,14 @@ function trampaGuardarCampo(el){
 // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
 // Habilidad con zona en el mapa (zonaMapa: 'cono'): le avisa al mapa (la ficha corre en su iframe) para que dibuje el área 3 segundos.
 function avisarZonaAlMapa(h){
-  if(!h || !h.zonaMapa || window.parent === window || !fichaVivo || !fichaVivo.id) return;
+  if(!h || window.parent === window || !fichaVivo || !fichaVivo.id) return;
+  // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del rango de casteo) y cree los portales.
+  if(h.portalMapa){
+    try{ window.parent.postMessage({tipo: 'portal-habilidad', fichaId: fichaVivo.id, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}, location.origin); }
+    catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+    return;
+  }
+  if(!h.zonaMapa) return;
   try{ window.parent.postMessage({tipo: 'zona-habilidad', fichaId: fichaVivo.id, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}, location.origin); }
   catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
 }

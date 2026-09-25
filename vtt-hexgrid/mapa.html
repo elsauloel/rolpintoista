@@ -1889,8 +1889,8 @@ function trampaEstadoSpec(){
 // Pulsos de la trampa de teleport: unos segundos, en los dos puntos, con un hilo entre ellos (violeta donde se activó, azul donde llegó).
 const efectosTeleport = [];
 const TELEPORT_FX_MS = 4200;
-function teleportEfecto(el){
-  const celdas = celdasDeElemento(el), d = destinoParsear(el.trampaDestino);
+function teleportEfecto(el, destinoTxt){
+  const celdas = celdasDeElemento(el), d = destinoParsear(destinoTxt || el.trampaDestino);
   if(!celdas.length || !d) return;
   const c = celdas[Math.floor(celdas.length / 2)];
   efectosTeleport.push({a: hexCentro(c.col, c.fila), b: hexCentro(d.col, d.fila), desde: Date.now()});
@@ -5260,6 +5260,7 @@ function escucharElementos(){
         trampaDestino: typeof d.trampaDestino === 'string' ? d.trampaDestino : '',   // trampa de teleport ("col,fila")
         portal: d.portal === true,   // Invocar portal (Mago)
         portalDestino: typeof d.portalDestino === 'string' ? d.portalDestino : '',
+        usoEn: Number.isFinite(d.usoEn) ? d.usoEn : 0,   // último uso de un portal (hora local de quien lo usó): dispara los pulsos en todas las pantallas
         fuego: d.fuego === true,   // terreno incendiado
         fuegoDano: Math.max(1, Math.min(999, Math.round(num(d.fuegoDano)) || 5)),
         turnos: Math.round(num(d.turnos)) || 0,
@@ -5268,6 +5269,10 @@ function escucharElementos(){
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
         teleportEfecto(elementos.get(ch.doc.id));
+      }
+      // Portal usado por un aliado: los mismos pulsos (violeta donde entró, azul donde salió) en todas las pantallas.
+      if(ch.type === 'modified' && previoElem && d.portal === true && Number.isFinite(d.usoEn) && d.usoEn !== previoElem.usoEn && destinoParsear(d.portalDestino)){
+        teleportEfecto(elementos.get(ch.doc.id), d.portalDestino);
       }
     });
     pedirDibujo();
@@ -6282,6 +6287,7 @@ async function trampaResolver(){
   if(!t) return;
   if(p.tipo === 'portal'){   // pisó un portal aliado: pasa al otro, gratis y sin alertas
     await trampaTeleportar(p.tokenId, t, {trampaDestino: p.el.portalDestino}, false);
+    try{ await coleccionElementos().doc(p.id).update({usoEn: Date.now()}); }catch(err){ console.error('No se pudo marcar el uso del portal (sin pulsos para los demás):', err); }
     return;
   }
   if(p.tipo === 'pisa'){

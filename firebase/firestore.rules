@@ -505,7 +505,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -530,6 +530,7 @@ service cloud.firestore {
           // La tirada de daño de la trampa ignora la Defensa de quien la pisa (daño directo).
           && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
           && (!('portal' in d) || d.portal is bool)
+          && (!('usoEn' in d) || d.usoEn is number)
           && (!('fuego' in d) || d.fuego is bool)
           && (!('fuegoDano' in d) || (d.fuegoDano is int && d.fuegoDano >= 1 && d.fuegoDano <= 999))
           && (!('portalDestino' in d) || (d.portalDestino is string && d.portalDestino.matches('^-?[0-9]+,-?[0-9]+$')))
@@ -557,7 +558,11 @@ service cloud.firestore {
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
           || (resource.data.get('trampa', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
-            && request.resource.data.disparada == true));
+            && request.resource.data.disparada == true)
+          // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
+          || (resource.data.get('portal', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+            && request.resource.data.usoEn is number));
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -646,7 +651,11 @@ service cloud.firestore {
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
-              && request.resource.data.disparada == true));
+              && request.resource.data.disparada == true)
+            // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
+            || (resource.data.get('portal', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+              && request.resource.data.usoEn is number));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

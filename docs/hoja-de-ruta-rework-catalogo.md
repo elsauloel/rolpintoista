@@ -26,6 +26,8 @@
 - **Armas mágicas (P116):** de daño y de efecto; varita básica 1d4 por 1 Nitro (calidad baja), buena calidad 1d6 por 1 Nitro; efectos de arma 1–3 SP; elementos: arcano, fuego (área + terreno incendiado), hielo (Escarcha acumulable), rayo (Parálisis); fuego y hielo se cancelan.
 - **Chispazo** ya rebalanceado (SP 1, No2 1, 1d6; a auditar).
 
+- **Armas híbridas (P117):** físicas de tier alto con efectos y daño mágico por elemento; raras como mínimo.
+
 ## Pendiente de definir (para las próximas conversaciones)
 - Slots exactos por Tipo de resistencia a crítico; el Tipo 12.
 - Fórmula de calidad/tier/precio y la tabla de relevancias (varias filas "por definir").

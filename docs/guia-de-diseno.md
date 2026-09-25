@@ -103,6 +103,8 @@ Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (
 
 - **Armas mágicas (P116, en elaboración):** se dividen en **armas de daño** y **armas de efecto**. Las de efecto dan pequeños hechizos que se castean con el arma, tiran PG mágico y cuestan generalmente 1 Nitro y SP según el efecto.
 
+- **Armas híbridas (P117):** armas físicas de tier alto con efectos mágicos y daño mágico ligado a un elemento (arcano, fuego, hielo, rayo). Tienen que ser **raras como mínimo** (mejor excepcionales o legendarias); nunca comunes ni de buena calidad.
+
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).

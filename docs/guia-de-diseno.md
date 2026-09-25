@@ -84,6 +84,7 @@ El dueño va dando herramientas de diseño para que, cuando pida un catálogo, s
 - **Dos formas de mejorar el crítico (P115, cerrada):** **Crítico frecuente** (baja el rango del crítico: Tipo 4 pasa a 3; mínimo 2; también cambia el nivel de doble crítico) y **Crítico potente** (baja los umbrales del d20: doble daño con 6+, triple 16+, cuádruple 19+; se pueden afinar por separado). Vocabulario: **doble crítico** = diferencia doble (2d20); **doble / triple / cuádruple daño** = el multiplicador del d20.
 
 ## Propuesta de skills de crítico (para que el dueño las audite; costos provisorios)
+**Cargadas en `comun/skills-clase.js` el 2026-09-25 (sujetas a revisión con el uso):** Ojo de asesino (Asalto, automatizada sobre uno), Golpe brutal (Warrior, automatizada sobre uno), Temple (Tanque, automatizada sobre uno), Marca del cazador (Support, a mano) y Punto débil (Debuffer, a mano); y se actualizaron Apuntar, Headshot, Lisiar, Tajear y Degollar para hablar de Crítico frecuente / potente.
 Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico frecuente ×N** (baja el rango N puntos, mínimo 2) y **Crítico potente ×N** (baja N puntos todos los umbrales del d20), con turnos o "próximo ataque".
 | Skill | Clase | Costo | Qué hace |
 |---|---|---|---|

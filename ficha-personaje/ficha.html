@@ -1354,8 +1354,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
               <div class="dv"><span id="v-vision">6</span> <small style="font-size:11px">hex</small></div>
             </button>
             <div id="vision-breakdown"></div>
-            <div class="counter calc" id="c-inteligencia" title="Se calcula sola: 6 al crear el personaje, +3 por nivel">
-              <label>Inteligencia</label>
+            <div class="counter calc" id="c-inteligencia" style="cursor:pointer" title="Se calcula sola (6 al crear el personaje, +3 por nivel); tocá para cambiar el total a mano">
+              <label>Inteligencia ✎</label>
               <div class="val" id="v-inteligencia">6</div>
               <div class="sub" id="v-inteligencia-sub"></div>
             </div>
@@ -2293,7 +2293,7 @@ const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, imagen:'', miniatura:''},
+        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, inteligenciaManual:null, imagen:'', miniatura:''},
   bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
   bitacoraActiva:'j1',
   loot:{normal:0, magico:0, especial:[]},
@@ -5597,9 +5597,37 @@ function jobCostoDe(x){
 // Se "invierte" en habilidades sociales (ver más abajo): el total no baja,
 // es un presupuesto igual que el de Job (jobBudget) — lo gastado queda
 // funcionando, "resto" es lo que falta repartir.
-function inteligenciaValor(){
+function inteligenciaAuto(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
   return 6 + 3 * (nivel - 1);
+}
+// Total de Inteligencia: el automático (6 + 3 por nivel) o, si se fijó a mano (2026-09-24, pedido del dueño), ese valor libre.
+function inteligenciaManual(){
+  const m = S.meta.inteligenciaManual;
+  return (m !== null && m !== undefined && m !== '' && Number.isFinite(Number(m))) ? Number(m) : null;
+}
+function inteligenciaValor(){
+  const m = inteligenciaManual();
+  return m !== null ? m : inteligenciaAuto();
+}
+// Editar a mano el total: número (el total nuevo), +N / -N (sumar o restar) o "auto" (vuelve al cálculo automático).
+function editarInteligencia(){
+  if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cambiarle la Inteligencia'); return; }
+  const b = inteligenciaBudget(), auto = inteligenciaAuto();
+  const txt = prompt(`Inteligencia — total ahora: ${fmt(b.total)}${inteligenciaManual() !== null ? ' (fijado a mano)' : ' (automático)'}; ${fmt(b.gastado)} invertidos; automático sería ${fmt(auto)}.
+Escribí el total nuevo, +N o -N, o "auto" para volver al cálculo automático.`, fmt(b.total));
+  if(txt === null) return;
+  const t = String(txt).trim().replace(',', '.').replace('−', '-').toLowerCase();
+  let nuevo;
+  if(t === 'auto' || t === '') nuevo = null;
+  else if(/^[+-]\d+(?:\.\d+)?$/.test(t)) nuevo = b.total + parseFloat(t);
+  else if(/^\d+(?:\.\d+)?$/.test(t)) nuevo = parseFloat(t);
+  else { toast('Escribí un número, +N, -N o "auto"'); return; }
+  S.meta.inteligenciaManual = nuevo === null ? null : Math.max(0, nuevo);
+  renderInteligencia();
+  renderList('sociales');
+  refresh();
+  toast(nuevo === null ? `Inteligencia automática: ${fmt(inteligenciaAuto())}` : `Inteligencia fijada a mano: ${fmt(S.meta.inteligenciaManual)}`);
 }
 function inteligenciaBudget(){
   const total = inteligenciaValor();
@@ -5609,12 +5637,16 @@ function inteligenciaBudget(){
 function renderInteligencia(){
   const b = inteligenciaBudget();
   $('#v-inteligencia').textContent = fmt(b.resto);
-  $('#v-inteligencia-sub').textContent = `${fmt(b.gastado)} invertidos de ${fmt(b.total)}`;
+  $('#v-inteligencia-sub').textContent = `${fmt(b.gastado)} invertidos de ${fmt(b.total)}${inteligenciaManual() !== null ? ' · a mano' : ''}`;
   const invertidos = S.sociales.filter(x => num(x.puntosInt) > 0);
   const detalle = invertidos.length
     ? invertidos.map(x => `· ${x.nombre}: ${fmt(num(x.puntosInt))}`).join('\n')
     : 'Sin puntos invertidos todavía.';
-  $('#c-inteligencia').title = `${fmt(b.total)} en total (6 al crear, +3 por nivel) − ${fmt(b.gastado)} invertidos = ${fmt(b.resto)} sin usar.\n\n${detalle}`;
+  $('#c-inteligencia').title = `${fmt(b.total)} en total (${inteligenciaManual() !== null ? 'fijado a mano; automático sería ' + fmt(inteligenciaAuto()) : '6 al crear, +3 por nivel'}) - ${fmt(b.gastado)} invertidos = ${fmt(b.resto)} sin usar.
+
+${detalle}
+
+Tocá para cambiar el total a mano.`;
 }
 
 /* ---------- Habilidades sociales: nivel por Inteligencia invertida o por
@@ -10218,6 +10250,7 @@ $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scri
 $('#btn-atacar-pdg').onclick = atacar;
 $('#btn-danio-arma').onclick = pedirArmaYTirar;
 $('#btn-esquivar').onclick = () => tirarValorStat('Evasión', compute().final.eva, 'eva');
+$('#c-inteligencia').onclick = editarInteligencia;
 $('#btn-parry').onclick = () => elegirArmaDefensa('parry');
 $('#btn-bloqueo').onclick = () => elegirArmaDefensa('bloqueo');
 $('#elegir-arma-x').onclick = () => $('#scrim-elegir-arma').classList.remove('open');

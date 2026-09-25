@@ -1886,6 +1886,45 @@ function trampaEstadoSpec(){
 /* ---------- Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25) ----------
    Se abre al tildar "Trampa" en Terreno y Formas, desde el botón "Armar paso a paso" del panel, desde el catálogo ("crear custom") y
    desde el ⚙ de una trampa ya colocada (modo edición: la forma no cambia). Devuelve un resultado neutro que acá se convierte en campos. */
+// Pulsos de la trampa de teleport: unos segundos, en los dos puntos, con un hilo entre ellos (violeta donde se activó, azul donde llegó).
+const efectosTeleport = [];
+const TELEPORT_FX_MS = 4200;
+function teleportEfecto(el){
+  const celdas = celdasDeElemento(el), d = destinoParsear(el.trampaDestino);
+  if(!celdas.length || !d) return;
+  const c = celdas[Math.floor(celdas.length / 2)];
+  efectosTeleport.push({a: hexCentro(c.col, c.fila), b: hexCentro(d.col, d.fila), desde: Date.now()});
+  pedirDibujo();
+}
+function dibujarEfectosTeleport(){
+  const ahora = Date.now();
+  let activo = false;
+  for(let i = efectosTeleport.length - 1; i >= 0; i--){
+    const fx = efectosTeleport[i], edad = ahora - fx.desde;
+    if(edad > TELEPORT_FX_MS){ efectosTeleport.splice(i, 1); continue; }
+    const apagar = Math.min(1, (TELEPORT_FX_MS - edad) / 900);
+    ctx.save();
+    // hilo punteado entre los dos puntos
+    ctx.setLineDash([10 / vista.zoom, 8 / vista.zoom]);
+    ctx.strokeStyle = `rgba(160,140,255,${0.55 * apagar})`; ctx.lineWidth = 3 / vista.zoom;
+    ctx.beginPath(); ctx.moveTo(fx.a.x, fx.a.y); ctx.lineTo(fx.b.x, fx.b.y); ctx.stroke();
+    ctx.setLineDash([]);
+    [[fx.a, '150,110,255'], [fx.b, '90,170,255']].forEach(([p, rgb]) => {
+      // brillo central + tres ondas que se expanden y se desvanecen
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, HEX * 0.9);
+      g.addColorStop(0, `rgba(${rgb},${0.55 * apagar})`); g.addColorStop(1, `rgba(${rgb},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, HEX * 0.9, 0, 2 * Math.PI); ctx.fill();
+      [0, 1 / 3, 2 / 3].forEach(desfase => {
+        const fase = ((edad / 1100) + desfase) % 1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, HEX * (0.35 + 2.1 * fase), 0, 2 * Math.PI);
+        ctx.strokeStyle = `rgba(${rgb},${(1 - fase) * 0.95 * apagar})`; ctx.lineWidth = 4 / vista.zoom; ctx.stroke();
+      });
+    });
+    ctx.restore();
+    activo = true;
+  }
+  return activo;   // true mientras haya pulsos: el dibujo tiene que seguir animándose
+}
 // Trampa de TELEPORT (2026-09-25): al saltar, mueve a quien la pisó a la casilla libre más cercana al destino (`trampaDestino`: "col,fila").
 function destinoParsear(txt){
   const m = /^(-?\d+),(-?\d+)$/.exec(String(txt || ''));
@@ -4174,6 +4213,8 @@ function dibujar(){
     }
   }
 
+  if(dibujarEfectosTeleport()) animando = true;
+
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
   // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).
   if(arrastre && arrastre.movio && !arrastre.libre && arrastre.costo && modoMapa === 'combate' && tokens.has(arrastre.id)){
@@ -5190,6 +5231,7 @@ function escucharElementos(){
       const crudo = Array.isArray(d.celdas) ? d.celdas : [];
       const celdas = [];
       for(let i = 0; i + 1 < crudo.length; i += 2) celdas.push({dq: num(crudo[i]), dr: num(crudo[i + 1])});
+      const previoElem = elementos.get(ch.doc.id);
       elementos.set(ch.doc.id, {
         id: ch.doc.id,
         tipo: d.tipo === 'linea' || d.tipo === 'libre' ? d.tipo : 'flor',
@@ -5223,6 +5265,10 @@ function escucharElementos(){
         turnos: Math.round(num(d.turnos)) || 0,
         venceMant: Number.isFinite(d.venceMant) ? Math.round(d.venceMant) : null,
       });
+      // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
+      if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
+        teleportEfecto(elementos.get(ch.doc.id));
+      }
     });
     pedirDibujo();
     elementosVencidosBarrer();

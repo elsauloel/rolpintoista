@@ -55,9 +55,12 @@ const Critico = (() => {
     const s = document.createElement('style');
     s.id = 'cr-css';
     s.textContent = `
-#cr-fondo{position:fixed;inset:0;z-index:99975;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:14px}
-#cr-caja{width:min(560px,100%);max-height:calc(100vh - 28px);overflow:auto;background:#1A1418;border:1px solid #C98545;border-radius:6px;box-shadow:0 16px 40px rgba(0,0,0,.7);
-  font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left;padding:14px 18px 16px}
+#cr-fondo{position:fixed;right:16px;top:64px;z-index:99975;width:min(400px,calc(100vw - 24px))}
+#cr-caja{max-height:calc(100vh - 80px);overflow:auto;background:#1A1418;border:1px solid #C98545;border-radius:6px;box-shadow:0 16px 40px rgba(0,0,0,.7);
+  font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left;padding:0 14px 14px}
+#cr-caja .cr-cab{display:flex;align-items:center;gap:8px;padding:10px 0 6px;cursor:move;user-select:none;position:sticky;top:0;background:#1A1418;z-index:1}
+#cr-caja .cr-cab h2{flex:1;margin:0;font-size:16px;color:#E0A458}
+#cr-caja .cr-cab button{padding:2px 9px}
 #cr-caja h2{margin:0 0 4px;font-size:18px;color:#E0A458}
 #cr-caja p{margin:0 0 10px;font-size:13px;line-height:1.45;color:#B7A79E}
 #cr-caja .cr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:8px 0}
@@ -85,9 +88,39 @@ const Critico = (() => {
     const fondo = document.createElement('div');
     fondo.id = 'cr-fondo';
     document.body.appendChild(fondo);
-    const cerrar = () => { fondo.remove(); document.removeEventListener('keydown', teclas, true); };
-    const teclas = e => { if(e.key === 'Escape'){ e.stopPropagation(); cerrar(); } };
+    // Es un panel FLOTANTE, sin fondo que tape nada: se puede dejar abierto mientras se usa la Botonera. Esc solo lo cierra si el foco está adentro.
+    let aMano = false;   // si la movieron con el mouse, no se reubica sola
+    const cerrar = () => { clearInterval(vigia); removeEventListener('resize', reubicar); fondo.remove(); document.removeEventListener('keydown', teclas, true); };
+    const teclas = e => { if(e.key === 'Escape' && fondo.contains(document.activeElement)){ e.stopPropagation(); cerrar(); } };
     document.addEventListener('keydown', teclas, true);
+    // Con la Botonera abierta (en el mapa va en un iframe; en la ficha es una ventana), si la calculadora quedó encima se corre al espacio libre de al lado.
+    function rectBotonera(){
+      try{
+        const marco = document.getElementById('botonera-marco'), capa = document.getElementById('botonera-capa');
+        if(marco && capa && !capa.hidden && marco.contentDocument){
+          const m = marco.contentDocument.querySelector('.scrim.open .modal');
+          if(m){ const r = m.getBoundingClientRect(), o = marco.getBoundingClientRect(); return {left: r.left + o.left, right: r.right + o.left, top: r.top + o.top, bottom: r.bottom + o.top}; }
+        }
+        const m2 = document.querySelector('.scrim.open .botonera-modal');
+        if(m2) return m2.getBoundingClientRect();
+      }catch(err){}
+      return null;
+    }
+    function reubicar(){
+      if(!fondo.isConnected){ clearInterval(vigia); return; }
+      if(aMano) return;
+      const b = rectBotonera(), m = 12, MAX = 400, MIN = 300;
+      fondo.style.top = '64px';
+      if(!b){ fondo.style.width = ''; fondo.style.left = 'auto'; fondo.style.right = m + 'px'; return; }
+      const libreDer = innerWidth - b.right - m * 2, libreIzq = b.left - m * 2;
+      const ancho = Math.min(MAX, Math.max(libreDer, libreIzq));
+      if(ancho < MIN){ fondo.style.width = ''; fondo.style.left = 'auto'; fondo.style.right = m + 'px'; return; }   // no hay lugar libre: se queda a la derecha (se puede arrastrar)
+      fondo.style.width = ancho + 'px';
+      if(libreDer >= libreIzq){ fondo.style.left = (b.right + m) + 'px'; fondo.style.right = 'auto'; }
+      else{ fondo.style.left = Math.max(m, b.left - ancho - m) + 'px'; fondo.style.right = 'auto'; }
+    }
+    const vigia = setInterval(reubicar, 700);
+    addEventListener('resize', reubicar);
 
     const campo = (id, etiqueta, valor, extra) => `<div><label for="cr-${id}">${etiqueta}</label><input id="cr-${id}" type="number" step="1" value="${esc(valor)}" ${extra || ''}></div>`;
     const ev = () => evaluar({pdg: v.pdg, eva: v.eva, tipo: v.tipo, frecuente: v.frecuente, potente: v.potente, resistencia: v.resistencia});
@@ -114,7 +147,7 @@ const Critico = (() => {
 
     function dibujar(soloResultado){
       if(soloResultado){ const r = fondo.querySelector('#cr-resultado'); if(r){ r.innerHTML = resultadoHtml(); botones(); return; } }
-      fondo.innerHTML = `<div id="cr-caja" role="dialog" aria-modal="true"><h2>🎯 Calculadora de golpe crítico</h2>
+      fondo.innerHTML = `<div id="cr-caja" role="dialog"><div class="cr-cab" id="cr-cab" title="Arrastrala para moverla"><h2>🎯 Calculadora de crítico</h2><button type="button" id="cr-x" title="Cerrar">✕</button></div>
         <p>La PdG contra la Evasión se compara a mano en la mesa. Acá ponés esos dos números y el arma, y te calculo el crítico. Es una <b>ayuda</b>, no una obligación.</p>
         <div class="cr-grid">
           ${campo('pdg', 'PdG del atacante', v.pdg)}${campo('eva', 'Evasión del defensor', v.eva)}
@@ -124,7 +157,7 @@ const Critico = (() => {
           ${campo('dano', 'Daño del golpe (opcional, total con bonos)', v.dano, 'min="0"')}${campo('defensa', 'Defensa del defensor (si no es crítico)', v.defensa, 'min="0"')}
         </div>
         <div id="cr-resultado">${resultadoHtml()}</div>
-        <div class="cr-fila"><button type="button" id="cr-cerrar">Cerrar</button><button type="button" id="cr-tirar" class="prim">🎲 Tirar los d20</button><button type="button" id="cr-publicar">📣 Publicar en la Mesa</button></div></div>`;
+        <div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar los d20</button><button type="button" id="cr-publicar">📣 Publicar en la Mesa</button></div></div>`;
       botones();
     }
     function botones(){
@@ -156,7 +189,15 @@ const Critico = (() => {
       else mesaPublicar('Golpe crítico', {formula: 'sin crítico', rolls: [], mod: 0, total: 0});
     }
 
-    fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(); });
+    fondo.addEventListener('mousedown', e => {   // arrastrar desde la cabecera
+      const cab = e.target.closest('#cr-cab');
+      if(!cab || e.target.closest('button')) return;
+      e.preventDefault();
+      const r = fondo.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      const mover = ev => { aMano = true; fondo.style.right = 'auto'; fondo.style.left = Math.max(0, Math.min(innerWidth - 60, ev.clientX - dx)) + 'px'; fondo.style.top = Math.max(0, Math.min(innerHeight - 40, ev.clientY - dy)) + 'px'; };
+      const soltar = () => { removeEventListener('mousemove', mover); removeEventListener('mouseup', soltar); };
+      addEventListener('mousemove', mover); addEventListener('mouseup', soltar);
+    });
     fondo.addEventListener('input', e => {
       const id = e.target.id && e.target.id.startsWith('cr-') ? e.target.id.slice(3) : '';
       if(!id || !(id in v)) return;
@@ -167,11 +208,12 @@ const Critico = (() => {
     fondo.addEventListener('change', e => { if(e.target.id === 'cr-tipo'){ v.tipo = num(e.target.value); tirada = null; dibujar(true); } });
     fondo.addEventListener('click', e => {
       const b = e.target.closest('button'); if(!b) return;
-      if(b.id === 'cr-cerrar') cerrar();
+      if(b.id === 'cr-x') cerrar();
       else if(b.id === 'cr-tirar') tirar();
       else if(b.id === 'cr-publicar') publicar();
     });
     dibujar(false);
+    reubicar();
   }
 
   return {abrir, rango, umbrales, multiplicador, evaluar, resolverDano, TIPOS};

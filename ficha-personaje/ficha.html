@@ -1203,7 +1203,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo){display:none!important}
+html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#grilla-dados){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
@@ -1702,7 +1702,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <span class="botonera-badge" id="botonera-badge-sp">SP 0/0</span>
         <span class="botonera-badge" id="botonera-badge-def" title="Defensa">Def 0</span>
       </div>
-      <button class="iconbtn" id="botonera-x">Cerrar</button>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonera-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonera-x">Cerrar</button></div>
     </header>
     <div class="body" id="botonera-body"></div>
   </div>
@@ -1722,7 +1722,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <h3 id="botonerainv-titulo">Invocación</h3>
         <span class="botonera-badge" id="botonerainv-badge">No2 0/0</span>
       </div>
-      <button class="iconbtn" id="botonerainv-x">Cerrar</button>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonerainv-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonerainv-x">Cerrar</button></div>
     </header>
     <div class="body" id="botonerainv-body"></div>
   </div>
@@ -10401,6 +10401,8 @@ $('#todas-habilidades-x').onclick = () => $('#scrim-todas-habilidades').classLis
 $('#scrim-todas-habilidades').addEventListener('mousedown', e => { if(e.target.id==='scrim-todas-habilidades') $('#scrim-todas-habilidades').classList.remove('open'); });
 $('#btn-botonera').onclick = () => { renderBotonera(); $('#scrim-botonera').classList.add('open'); };
 $('#botonera-x').onclick = () => $('#scrim-botonera').classList.remove('open');
+// 🎲 Dados libres dentro de la Botonera (2026-09-25, pedido del dueño): en el mapa la Mesa flotante queda tapada, así que la grilla de dados se abre desde acá.
+['#botonera-dados', '#botonerainv-dados'].forEach(sel => { const b = $(sel); if(b && typeof grillaConectar === 'function') grillaConectar(b, {ancla: b, lado: 'abajo', alTirar: f => registrarTirada('Tirada libre', tirarDados(f))}); });
 $('#scrim-botonera').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera') $('#scrim-botonera').classList.remove('open'); });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });
 $('#btn-atacar-pdg').onclick = atacar;

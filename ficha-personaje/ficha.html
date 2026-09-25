@@ -1455,7 +1455,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
             <div class="dv"><span id="v-def">0</span></div>
           </button>
           <div class="combate-defensa">
-            <button type="button" class="btn" id="btn-esquivar">🎲 Esquivar</button>
+            <button type="button" class="btn" id="btn-esquivar">🎲 Esquivar (Eva)</button>
             <button type="button" class="btn" id="btn-parry">🎲 Parry</button>
             <button type="button" class="btn" id="btn-bloqueo">🎲 Bloqueo</button>
           </div>
@@ -3524,7 +3524,7 @@ function formulasCombate(){
 function actualizarTextosCombate(){
   const f = formulasCombate();
   $('#btn-atacar-pdg').textContent = `🎲 Atacar (PdG)${f.pdg ? ` · ${f.pdg}` : ''}`;
-  $('#btn-esquivar').textContent = `🎲 Esquivar${f.eva ? ` · ${f.eva}` : ''}`;
+  $('#btn-esquivar').textContent = `🎲 Esquivar (Eva)${f.eva ? ` · ${f.eva}` : ''}`;
   $('#btn-parry').textContent = `🎲 Parry${f.parry ? ` · ${f.parry}` : ''}`;
   $('#btn-bloqueo').textContent = `🎲 Bloqueo${f.bloqueo ? ` · ${f.bloqueo}` : ''}`;
   $('#btn-danio-arma').textContent = `🎲 Daño Arma · ${f.danio}`;
@@ -4644,7 +4644,7 @@ function renderBotoneraInv(){
   const combate = [
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
-    {stat:'eva', nombre:'Esquivar', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
+    {stat:'eva', nombre:'Esquivar (Eva)', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
     {stat:'parry', nombre:`Parry · ${fmt(pesoArmaInv(inv))} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < pesoArmaInv(inv), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < pesoArmaInv(inv) ? 'Sin No2 · ' : ''}Cuesta ${fmt(pesoArmaInv(inv))} No2 (el Peso de su arma)`, attr:`data-invtirarstat="${inv.id}:parry"`},
     {stat:'bloqueo', nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
   ];
@@ -4678,6 +4678,20 @@ function renderBotoneraInv(){
       <div class="botonera-caja">
         <div class="cat-grouphead" style="margin-top:0"><span>Combate</span></div>
         <div class="botonera-combate-grid">${tilesCombate}</div>
+        <div class="botonera-defensa botonera-combate-bottom" style="margin-top:6px">
+          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
+            <span class="bt-label">Defensa</span><span class="bt-value">${fmt(invDefensaEfectiva(inv))}</span>
+          </div>
+          <div class="botonera-crit">
+            <div class="botonera-crit-t">Resistencia a críticos</div>
+            <div class="botonera-crit-grid">
+              ${[0, 1, 2, 3, 4].map(i => `
+              <div class="botonera-tile bt-info" title="Resistencia a crítico Tipo ${4 + 2 * i} (no se tira)">
+                <span class="bt-label">Tipo ${4 + 2 * i}</span><span class="bt-value">${fmt(invCritEfectivo(inv, i))}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
       </div>
       <div class="botonera-caja">
         <div class="cat-grouphead" style="margin-top:0"><span>Tiradas de stats</span></div>
@@ -5498,7 +5512,7 @@ function renderBotonera(){
         <div class="botonera-combate-grid botonera-combate-bottom">
           <button type="button" class="botonera-tile${mtEva.clase}" data-botoneraaccion="esquivar" title="Esquivar${esc(mtEva.titulo)}">
             ${lupaBotonHtml('stat:eva')}
-            <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
+            <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
           </button>
           <button type="button" class="botonera-tile${mtParry.clase}" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta tantos No2 como el Peso (' + costoParryTxt() + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}

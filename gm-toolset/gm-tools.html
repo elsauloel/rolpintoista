@@ -7487,6 +7487,7 @@ const GM_GUARDAR_QUIETO_MS = 1200;
 const GM_GUARDAR_MAX_MS = 5000;
 const GM_LOTE_MAX_BYTES = 8 * 1024 * 1024;  // tope de Firebase por lote: 10 MB
 const CREEP_MINIATURA_PX = 96;
+const CREEP_TARJETA_PX = 400;   // imagen más grande para la tarjeta 🪪 que ven los jugadores en el mapa (la miniatura de 96 px se veía muy borrosa)
 
 const gmVivo = {
   activo: false,       // entró a la mesa como GM
@@ -7545,7 +7546,7 @@ function creepPublico(sc, orden){
   };
 }
 
-function creepMiniatura(dataUrl){
+function creepMiniatura(dataUrl, px, calidad){
   return new Promise(res => {
     if(!dataUrl){ res(''); return; }
     const img = new Image();
@@ -7553,9 +7554,10 @@ function creepMiniatura(dataUrl){
       const lado = Math.min(img.naturalWidth, img.naturalHeight);
       if(!lado){ res(''); return; }
       const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = CREEP_MINIATURA_PX;
-      canvas.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, CREEP_MINIATURA_PX, CREEP_MINIATURA_PX);
-      try{ res(canvas.toDataURL('image/jpeg', 0.8)); }catch(e){ res(''); }
+      const salida = Math.min(px || CREEP_MINIATURA_PX, lado);   // nunca se agranda más que la foto original
+      canvas.width = canvas.height = salida;
+      canvas.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, salida, salida);
+      try{ res(canvas.toDataURL('image/jpeg', calidad || 0.8)); }catch(e){ res(''); }
     };
     img.onerror = () => res('');
     img.src = dataUrl;
@@ -7581,6 +7583,21 @@ function gmEstadoAlDia(){
 }
 
 /* ---------- Guardado ---------- */
+
+// Los creeps que ya estaban en la mesa antes de que existiera la imagen de la tarjeta no la tienen: se les arma una vez, en segundo plano,
+// desde su imagen original (privada del GM). Solo la pestaña principal del GM, no los iframes del mapa.
+async function gmTarjetasFaltantes(docs, creeps){
+  const cl = document.documentElement.classList;
+  if(cl.contains('modo-mantenimiento') || cl.contains('modo-acciones')) return;
+  for(let i = 0; i < docs.length; i++){
+    const sc = creeps[i];
+    if(!sc || !sc.imagen || docs[i].data().tarjeta) continue;
+    try{
+      const t = await creepMiniatura(sc.imagen, CREEP_TARJETA_PX, 0.82);
+      if(t) await docs[i].ref.set({tarjeta: t}, {merge: true});
+    }catch(err){ console.warn('No se pudo armar la imagen de tarjeta de ' + sc.nombre, err); }
+  }
+}
 
 async function gmGuardarTick(forzar){
   const g = gmVivo;
@@ -7622,7 +7639,7 @@ async function gmGuardarTick(forzar){
     bytes += peso; ops += 3;
     const firma = gmHash(a.json) + '-' + gmHash(a.imagen);
     const doc = {...JSON.parse(a.publico), firma, actualizado: ts};
-    if(imagenCambio) doc.miniatura = await creepMiniatura(a.imagen);
+    if(imagenCambio){ doc.miniatura = await creepMiniatura(a.imagen); doc.tarjeta = await creepMiniatura(a.imagen, CREEP_TARJETA_PX, 0.82); }
     const base = col.doc(id);
     batch.set(base, doc, {mergeFields: Object.keys(doc)});  // reemplaza el resumen entero, conserva la miniatura
     batch.set(base.collection('privado').doc('ficha'), {json: a.json});
@@ -7725,6 +7742,7 @@ async function gmProcesarSnapshot(snap){
         if(!r || r.hpPct === undefined || r.hp !== undefined) gmVivo.ultimo[sc.id].publico = '';
       });
       toast(`${creeps.length} creep(s) cargados de la mesa`);
+      gmTarjetasFaltantes(docs, creeps);
     }
     // Si la mesa no tenía creeps, se suben los que haya en pantalla.
     try{

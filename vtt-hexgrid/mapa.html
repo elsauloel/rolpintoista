@@ -6192,7 +6192,7 @@ function escucharVinculables(){
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
-  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'grupo', 'color']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'grupo', 'color']);
 }
 
 function componerFondo(){
@@ -7192,7 +7192,7 @@ function hudEstadosHtml(t, estados, puede){
 // lectura — para editar sigue siendo GM Tools.
 function hudTarjetaHtml(t, d){
   const v = vinculo(t);
-  const mini = v && v.miniatura;
+  const mini = v && (v.tarjeta || v.miniatura);   // la tarjeta usa una imagen más grande (400 px) si el GM ya la publicó
   const img = mini
     ? `<img src="${esc(mini)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin-bottom:10px">`
     : '';

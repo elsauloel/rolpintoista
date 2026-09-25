@@ -144,6 +144,7 @@ El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de es
 - Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
 - **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.
+- **Los creeps y las invocaciones** funcionan igual: su Parry cuesta tantos Nitros como el Peso de su arma (mínimo 1) y su Bloqueo suma su Bloqueo + el Peso de su arma.
 - Estados como [[Lisiado]] te bajan el Parry a la mitad.
 
 +++

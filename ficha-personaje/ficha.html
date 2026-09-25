@@ -4267,6 +4267,8 @@ function invNitrosMax(inv){
 // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
 // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
 function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
+// Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta el Peso de su arma en No2; el Bloqueo = su Bloqueo + ese Peso.
+function pesoArmaInv(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
 function costoAtaqueInv(inv){
   const tipo = num(inv.armaTipo) || 8;
   return num(inv.ataquesTurno) === 0 ? IT2_INV.redondeoPrimerAtaque(tipo / 2) : tipo;
@@ -4631,8 +4633,8 @@ function renderBotoneraInv(){
     {nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
     {nombre:'Esquivar', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    {nombre:'Parry', dado: f(invStatValor(inv,'parry')), clave:`inv:${inv.id}:stat:parry`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:parry"`},
-    {nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo')), clave:`inv:${inv.id}:stat:bloqueo`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:bloqueo"`},
+    {nombre:`Parry · ${fmt(pesoArmaInv(inv))} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < pesoArmaInv(inv), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < pesoArmaInv(inv) ? 'Sin No2 · ' : ''}Cuesta ${fmt(pesoArmaInv(inv))} No2 (el Peso de su arma)`, attr:`data-invtirarstat="${inv.id}:parry"`},
+    {nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
   ];
   const tilesCombate = combate.map(c => `
     <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}" ${c.attr} title="${esc(c.motivo)}">
@@ -4747,7 +4749,18 @@ function invDanio(invId){
 function invTirarStat(invId, statId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, invStatValor(inv, statId), statId);
+  if(statId === 'parry'){
+    const costo = pesoArmaInv(inv);
+    if(costo > num(inv.nitros)){
+      toast(`${inv.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} (el Peso de su arma) y tiene ${fmt(num(inv.nitros))}`);
+      return;
+    }
+    inv.nitros = num(inv.nitros) - costo;
+    renderInvocaciones();
+    toast(`${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`);
+  }
+  const valor = statId === 'bloqueo' ? invStatValor(inv, 'bloqueo') + pesoArmaInv(inv) : invStatValor(inv, statId);
+  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, valor, statId);
 }
 function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
 function mesaPublicarHabilidadInv(inv, nombre, detalle){

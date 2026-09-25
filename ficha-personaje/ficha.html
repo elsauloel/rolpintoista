@@ -8682,7 +8682,7 @@ function trampaGuardarCampo(el){
 // Habilidad con zona en el mapa (zonaMapa: 'cono'): le avisa al mapa (la ficha corre en su iframe) para que dibuje el área 3 segundos.
 function avisarZonaAlMapa(h){
   if(!h || !h.zonaMapa || window.parent === window || !fichaVivo || !fichaVivo.id) return;
-  try{ window.parent.postMessage({tipo: 'zona-habilidad', fichaId: fichaVivo.id, forma: h.zonaMapa, nombre: h.nombre}, location.origin); }
+  try{ window.parent.postMessage({tipo: 'zona-habilidad', fichaId: fichaVivo.id, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}, location.origin); }
   catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
 }
 async function colocarTrampaDeHab(h){

@@ -148,8 +148,7 @@ Estados que define la clase:
 4. ✅ **Recuperación** — SP 1, No2 2. Cura **9 HP fijos** sobre uno mismo, sin pasar el HP máximo; se puede usar con el HP lleno (gasta igual). Automatizada con el campo `curaHp` de la habilidad (2026-09-20).
 5. ✅ **Sonic Boom** — SP 2, No2 0 (Flash: SP x 2 = el doble, 4 SP en turno ajeno, a mano; ¿tiene sentido en turno ajeno? → pregunta P109). Golpea el piso: al ejecutar tira **Fuerza** (automático) y el mapa **dibuja 3 segundos el cono al frente** (el mismo de 16 casillas de la detección del sigilo, `zonaMapa: 'cono'`). Cada **enemigo** del cono tira **Constitución** (a mano); si el atacante gana, el defensor pierde **1 + la diferencia** en No2 (a mano) y, si se queda sin No2, queda **Sentado**. Empate o pérdida: no pasa nada. (2026-09-24)
 6. ✅ **Piel resistente** — SP 5, No2 1 (regla general). Estado de 2 turnos sobre uno mismo: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (Tipo 4 a 12). Confirmado por el dueño el 2026-09-24 (el +1 a los críticos y los 2 turnos).
-7. **Daño en área** [2] — Ataque con daño en área de flor. No afecta al
-   tanque.
+7. ✅ **Daño en área** — SP 2, No2 = **un ataque** (`ATAQUE`, cuenta como ese ataque). Ataque con el arma que golpea a **todos los enemigos adyacentes al tanque** (flor de radio 1 centrada en quien la ejecuta; el ejecutor no se afecta; solo enemigos). Automático: costo, tirada de PdG y el mapa dibuja la flor 3 segundos (`zonaMapa: 'flor'`, `zonaRadio: 1`); el daño va con el 🎲 (a mano). Los afectados pueden **esquivar con dodge roll** (a mano). ¿Se esquiva normal o exige dodge roll? ¿Se puede parrear? → P110. (2026-09-24)
 8. **Takle** [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque
    con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2
    Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final

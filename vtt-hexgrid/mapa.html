@@ -7952,11 +7952,19 @@ function cerrarBotonera(){
 // Una habilidad con zona (Sonic Boom: 'cono') le pide al mapa que la dibuje: el MISMO cono de 16 casillas de la detección del
 // sigilo, delante del token, como un trazo por casilleros temporal (lo ven todos y se borra solo a los 3 segundos).
 function zonaDeHabilidad(msg){
-  if(msg.forma !== 'cono') return;
+  if(msg.forma !== 'cono' && msg.forma !== 'flor') return;
   const t = [...tokens.values()].find(x => x.fichaId === msg.fichaId);
   if(!t){ toast(`${msg.nombre || 'La habilidad'}: tu personaje no tiene token en el mapa, no se dibuja la zona`); return; }
-  const cono = zonasSigilo(t).cono;
-  if(cono.length) guardarTrazoHex(cono, false, {color: '#6EAAFF', grosor: TRAZO_ZONA_GROSOR});
+  if(msg.forma === 'cono'){
+    const cono = zonasSigilo(t).cono;
+    if(cono.length) guardarTrazoHex(cono, false, {color: '#6EAAFF', grosor: TRAZO_ZONA_GROSOR});
+    return;
+  }
+  // 'flor': los casilleros alrededor del token hasta `radio` (sin el propio: el que la ejecuta no se afecta), en naranja.
+  const R = Math.max(1, Math.min(6, Math.round(Number(msg.radio) || 1)));
+  const c0 = hexACubo({col: t.col, fila: t.fila});
+  const flor = celdasFlor(R).filter(o => o.dq || o.dr).map(o => ({col: cuboACol(c0.q + o.dq, c0.r + o.dr), fila: cuboAFila(c0.q + o.dq, c0.r + o.dr)}));
+  if(flor.length) guardarTrazoHex(flor, false, {color: '#E88C32', grosor: TRAZO_ZONA_GROSOR});
 }
 
 window.addEventListener('message', e => {

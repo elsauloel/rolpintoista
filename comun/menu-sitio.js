@@ -54,6 +54,8 @@ function menuEstilos(){
 #menu-sitio .ms-cuenta{padding:4px 14px 8px;font-size:12px;color:#9A867E;border-bottom:1px solid #2A2126;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #menu-sitio a,#menu-sitio button.ms-item{display:flex;align-items:center;gap:9px;width:100%;padding:7px 14px;color:#EDE3D2;
   text-decoration:none;background:none;border:0;border-radius:0;font:inherit;text-align:left;cursor:pointer;text-transform:none;letter-spacing:0}
+#menu-sitio a,#menu-sitio button.ms-item{box-sizing:border-box;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden}
+#menu-sitio a > span:not(.ms-ico):not(.ms-extra),#menu-sitio button.ms-item > span:not(.ms-ico){min-width:0;overflow:hidden;text-overflow:ellipsis}
 #menu-sitio a:hover,#menu-sitio button.ms-item:hover{background:#2A2126;color:#E0A458}
 #menu-sitio a.actual{color:#E0A458;box-shadow:inset 3px 0 0 #E0A458}
 #menu-sitio .ms-ico{width:18px;text-align:center;flex:none}

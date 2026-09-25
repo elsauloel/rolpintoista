@@ -1165,6 +1165,8 @@ let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
+let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport: destino "col,fila" (se elige con un clic en el mapa)
+let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
@@ -1851,11 +1853,65 @@ function trampaEstadoSpec(){
 /* ---------- Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25) ----------
    Se abre al tildar "Trampa" en Terreno y Formas, desde el botón "Armar paso a paso" del panel, desde el catálogo ("crear custom") y
    desde el ⚙ de una trampa ya colocada (modo edición: la forma no cambia). Devuelve un resultado neutro que acá se convierte en campos. */
+// Trampa de TELEPORT (2026-09-25): al saltar, mueve a quien la pisó a la casilla libre más cercana al destino (`trampaDestino`: "col,fila").
+function destinoParsear(txt){
+  const m = /^(-?\d+),(-?\d+)$/.exec(String(txt || ''));
+  return m ? {col: parseInt(m[1], 10), fila: parseInt(m[2], 10)} : null;
+}
+function elegirDestino(cb){
+  elegirDestinoCb = cb;
+  lienzo.style.cursor = 'crosshair';
+  const av = $('#colocando-aviso');
+  if(av){ av.hidden = false; av.innerHTML = '<b>🌀 Elegí el destino del teleport</b> <span>clic en una casilla transitable a pie (sin Sólido ni pared) adonde va a parar quien la pise · Esc o clic derecho cancelan</span>'; }
+  pedirDibujo();
+}
+function elegirDestinoTerminar(){
+  elegirDestinoCb = null;
+  lienzo.style.cursor = 'default';
+  const av = $('#colocando-aviso'); if(av && !colocando){ av.hidden = true; av.innerHTML = ''; }
+  pedirDibujo();
+}
+function casillaLibreCerca(d){
+  const ocupada = c => elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila);
+  if(!ocupada(d)) return d;
+  const vistos = new Set([d.col + ',' + d.fila]);
+  let borde = [d];
+  for(let r = 0; r < 4; r++){
+    const sig = [];
+    for(const c of borde) for(const v of vecinosDeCasilla(c)){
+      const k = v.col + ',' + v.fila;
+      if(vistos.has(k)) continue;
+      vistos.add(k); sig.push(v);
+      if(!ocupada(v)) return v;
+    }
+    borde = sig;
+  }
+  return d;   // sin lugar cerca: lo deja en el destino
+}
+async function trampaTeleportar(id, t, el){
+  const d = destinoParsear(el.trampaDestino);
+  if(!d || !t) return;
+  const c = casillaLibreCerca(d);
+  if(elementoSolidoEn(d.col, d.fila)) toast('El destino del teleport ya no es transitable a pie: se usó la casilla libre más cercana');
+  const antes = {col: t.col, fila: t.fila, rutaJson: t.rutaJson};
+  t.col = c.col; t.fila = c.fila; t.rutaJson = '[]';
+  estelas.delete(id);
+  renderPanel(); pedirDibujo();
+  try{
+    await coleccionTokens().doc(id).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
+    alertaRojaAnonima(`🌀 ${el.trampaNombre || 'Trampa de teleport'}`, `${t.oculto ? 'Alguien' : nombreDe(t)} fue teletransportado a otro punto del mapa`);
+  }catch(err){
+    console.error('No se pudo teletransportar el token:', err);
+    Object.assign(t, antes); visibles.delete(id); pedirDibujo();
+    toast('No se pudo teletransportar el token (¿faltan publicar las reglas?)');
+  }
+}
 function trampaEstadosParaAsistente(){
   return trampaEstadoPresets().map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: !!p.permanente}));
 }
-function trampaResumenFrase(nombre, dano, ignoraDef, estado, estadoTurnos, amiga){
+function trampaResumenFrase(nombre, dano, ignoraDef, estado, estadoTurnos, amiga, destino){
   const p = [];
+  if(destino) p.push('🌀 teletransporta a ' + destino);
   if(dano) p.push(`${dano} de daño ${ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
   if(estado) p.push(`deja ${estado}${estadoTurnos ? ' ' + estadoTurnos + ' turnos' : ''}`);
   if(!p.length) p.push('solo avisa cuando se activa');
@@ -1866,7 +1922,7 @@ function abrirAsistenteTrampaPanel(){
   AsistenteTrampa.abrir({
     contexto: 'mapa', editando: false, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: elemTrampaNombre, descripcion: elemTrampaDetalle, forma: elemTipo, color: elemColor, alfa: elemAlfa, amiga: elemTrampaAmiga,
-      dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos},
+      dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos, teleport: elemTrampaTeleport},
     alTerminar: res => {
       elemTrampa = true; elemTrampaNombre = res.nombre.trim().slice(0, 40); elemTrampaDetalle = AsistenteTrampa.detalleFinal(res); elemTrampaAmiga = !!res.amiga;
       elemTrampaDano = res.dano || ''; elemTrampaIgnoraDef = !res.contemplaArmadura; elemTrampaEstado = res.estado || ''; elemTrampaEstadoTurnos = num(res.estadoTurnos);
@@ -1874,10 +1930,13 @@ function abrirAsistenteTrampaPanel(){
       if(/^#[0-9a-fA-F]{6}$/.test(res.color || '')) elemColor = res.color;
       if(Number.isFinite(res.alfa)) elemAlfa = Math.max(0, Math.min(100, res.alfa));
       elemTurnos = Math.max(0, Math.min(99, num(res.turnos)));
+      elemTrampaTeleport = !!res.teleport;
+      if(!elemTrampaTeleport) elemTrampaDestino = '';
       if(res.guardar) guardarTrampaRecurrente({nombre: elemTrampaNombre, detalle: elemTrampaDetalle, amiga: elemTrampaAmiga, tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa,
         dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos});
       renderHerramientaFlotante(); pedirDibujo();
-      toast(`Trampa "${elemTrampaNombre}" lista: elegí dónde ponerla`);
+      if(elemTrampaTeleport && !elemTrampaDestino) elegirDestino(h => { elemTrampaDestino = h.col + ',' + h.fila; renderHerramientaFlotante(); toast(`Destino marcado: ahora elegí dónde poner la trampa`); });
+      else toast(`Trampa "${elemTrampaNombre}" lista: elegí dónde ponerla`);
     },
     alCancelar: () => { if(!elemTrampaNombre.trim()){ elemTrampa = false; renderHerramientaFlotante(); pedirDibujo(); } },   // si nunca se armó, se destilda
   });
@@ -1893,18 +1952,19 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
     contexto: 'mapa', editando: true, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: el.trampaNombre || '', descripcion: el.trampaDetalle || '', forma: el.tipo, color: el.color, alfa: el.alfa, amiga: !!el.fuegoAmigo,
       dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
-      estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan},
+      estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino},
     alTerminar: res => {
       const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
         trampaDano: res.dano || '', trampaIgnoraDef: !res.contemplaArmadura,
         trampaEstado: res.estado ? JSON.stringify({nombre: res.estado, turnos: res.estadoTurnos > 0 ? res.estadoTurnos : trampaEstadoTurnosPreset(res.estado)}) : '',
-        color: res.color, alfa: res.alfa};
+        trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa};
       const n = Math.max(0, Math.min(99, num(res.turnos)));
       Object.assign(cambios, n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null});
       Object.assign(el, cambios);
       pedirDibujo();
       if(editandoElemento && editandoElemento.id === id) renderEditorElemento();
-      toast('Trampa actualizada: tocá Guardar para dejarla así');
+      if(res.teleport && !el.trampaDestino) elegirDestino(h => { el.trampaDestino = h.col + ',' + h.fila; pedirDibujo(); if(editandoElemento && editandoElemento.id === id) renderEditorElemento(); toast('Destino marcado: tocá Guardar para dejarla así'); });
+      else toast('Trampa actualizada: tocá Guardar para dejarla así');
     },
     alCancelar: alCancelar || (() => {}),
   });
@@ -1912,6 +1972,7 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
   if(!g) return;
+  elemTrampaTeleport = !!g.teleport; if(!g.teleport) elemTrampaDestino = '';
   elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef; elemTrampaEstado = g.estado || ''; elemTrampaEstadoTurnos = Math.max(0, Math.round(num(g.estadoTurnos)) || 0);
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
   elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(g.tamano)) || 1));
@@ -1919,7 +1980,8 @@ function cargarTrampaEnPanel(g){
   if(Number.isFinite(g.alfa)) elemAlfa = Math.max(0, Math.min(100, g.alfa));
   renderHerramientaFlotante();
   pedirDibujo();
-  toast(`Trampa "${g.nombre}" cargada: elegí dónde ponerla`);
+  if(elemTrampaTeleport) elegirDestino(h => { elemTrampaDestino = h.col + ',' + h.fila; renderHerramientaFlotante(); toast('Destino marcado: ahora elegí dónde poner la trampa'); });
+  else toast(`Trampa "${g.nombre}" cargada: elegí dónde ponerla`);
 }
 // Catálogo de trampas (comun/biblioteca.js, tipo 'trampas'): las oficiales que aprobó el dueño del proyecto.
 function abrirCatalogoTrampas(){
@@ -3427,6 +3489,16 @@ function dibujar(){
       ctx.fillStyle = disp ? '#FF6A60' : '#FFC46B';
       ctx.fillText(disp ? '✖' : '⚠', pT.x, pT.y);
       ctx.restore();
+      const dst = destinoParsear(el.trampaDestino);
+      if(dst){   // trampa de teleport: se marca el destino (lo ve quien ve la trampa)
+        const pD = hexCentro(dst.col, dst.fila);
+        ctx.save();
+        ctx.setLineDash([6 / z, 4 / z]); ctx.strokeStyle = 'rgba(186,140,255,.95)'; ctx.lineWidth = 3 / z;
+        ctx.beginPath(); ctx.arc(pD.x, pD.y, HEX * 0.7, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `700 ${20 / z}px system-ui, sans-serif`; ctx.fillStyle = '#C9A3FF';
+        ctx.fillText('🌀', pD.x, pD.y);
+        ctx.restore();
+      }
     }
     }   // fin de lo que no es Colisión
     if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
@@ -4086,6 +4158,7 @@ lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
     // Con la Botonera o las Acciones abiertas, el clic derecho sobre el mapa (afuera de la ventana) las cierra.
     if(!$('#botonera-capa').hidden){ escapeABotonera(); return; }
+    if(elegirDestinoCb){ elegirDestinoTerminar(); toast('Destino cancelado'); return; }
     if(colocando){ cancelarColocacion(); return; }
     if(cancelarArrastreToken()) return;
     // Con una herramienta de dibujo activa, el clic derecho es "salir de
@@ -4109,6 +4182,12 @@ lienzo.addEventListener('pointerdown', e => {
   if(borradorElemento){ consolidarBorradorElemento(); return; }
   // Colocando un token nuevo: el clic elige la casilla y después la orientación.
   if(colocando){ const pc = posEvento(e); colocacionClic(pc.px, pc.py); return; }
+  if(elegirDestinoCb){
+    const pc = posEvento(e), mw = pantallaAMundo(pc.px, pc.py), h = mundoAHex(mw.x, mw.y), cb = elegirDestinoCb;
+    // Regla: el destino tiene que ser un punto transitable a pie (una casilla que no ocupa un Sólido ni la Colisión del mapa).
+    if(elementoSolidoEn(h.col, h.fila)){ toast('Ese punto no es transitable a pie (hay un Sólido o una pared): elegí otra casilla'); return; }
+    elegirDestinoTerminar(); cb(h); return;
+  }
   // Pincel de niebla (GM): destapa o tapa lo que se arrastra.
   if(herramientaActiva === 'niebla' && soyGM){
     lienzo.setPointerCapture(e.pointerId);
@@ -4625,6 +4704,7 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
+  if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoTerminar(); toast('Destino cancelado'); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
@@ -5203,7 +5283,7 @@ async function pegarElemento(){
     color: c.color, alfa: c.alfa, solido: !!c.solido, invisible: !!(soyGM && c.invisible), imagen: c.imagen || '',
     imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
     ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
-      trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {})} : {}),
+      trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {})} : {}),
     ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos} : {}),
     duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -5230,6 +5310,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
+      ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -5280,7 +5361,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, trampaDano: el.trampaDano, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
   };
   renderEditorElemento();
 }
@@ -5338,8 +5419,9 @@ function renderEditorElemento(){
     <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
     <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
-    ${el.trampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(el.trampaNombre || 'Sin nombre')}</b><br>${esc((() => { let es = null; try{ es = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){} return trampaResumenFrase(el.trampaNombre, trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', !!el.trampaIgnoraDef, es && es.nombre || '', es ? num(es.turnos) : 0, !!el.fuegoAmigo); })())}</div>
+    ${el.trampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(el.trampaNombre || 'Sin nombre')}</b><br>${esc((() => { let es = null; try{ es = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){} return trampaResumenFrase(el.trampaNombre, trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', !!el.trampaIgnoraDef, es && es.nombre || '', es ? num(es.turnos) : 0, !!el.fuegoAmigo, el.trampaDestino || ''); })())}</div>
     <button type="button" class="btn primary" id="elem-edit-trampa-asistente" style="margin-top:6px;width:100%">🪄 Editar la trampa paso a paso</button>
+    ${el.trampaDestino ? '<button type="button" class="btn" id="elem-edit-trampa-destino" style="margin-top:6px;width:100%">🌀 Cambiar el destino del teleport</button>' : ''}
         ${el.disparada ? '<div class="fila" style="margin-top:6px"><span class="hint">Disparada: la ven todos.</span><button type="button" class="btn" id="elem-edit-rearmar">Rearmar</button></div>' : ''}` : ''}
     ${tieneImagen && V ? `
       <label class="etiqueta">Imagen (arrastrar para mover, rueda del mouse para zoom)</label>
@@ -5364,7 +5446,7 @@ function renderEditorElemento(){
     const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
-      ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaEstado: String(el.trampaEstado || '').slice(0, 300)} : {})};
+      ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300)} : {})};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
     moverElemento(id, cambios);
@@ -5386,6 +5468,8 @@ function renderEditorElemento(){
   };
   const trAsist = caja.querySelector('#elem-edit-trampa-asistente');
   if(trAsist) trAsist.onclick = () => abrirAsistenteTrampaEditar(id);
+  const trDest = caja.querySelector('#elem-edit-trampa-destino');
+  if(trDest) trDest.onclick = () => elegirDestino(h => { el.trampaDestino = h.col + ',' + h.fila; pedirDibujo(); if(editandoElemento && editandoElemento.id === id) renderEditorElemento(); toast('Destino marcado: tocá Guardar'); });
   const trRearmar = caja.querySelector('#elem-edit-rearmar');
   if(trRearmar) trRearmar.onclick = () => { vivo({disparada: false}); renderEditorElemento(); };
 
@@ -6005,6 +6089,7 @@ async function trampaResolver(){
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
     await trampaAplicarDano(t, p.el);
     await trampaAplicarEstado(t, p.el);
+    if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
     return;
   }
   trampasAvisadas.add(p.tokenId + ':' + p.id);
@@ -8518,7 +8603,8 @@ function renderHerramientaFlotante(){
       <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
       <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
       <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
-      ${elemTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga))}</div>
+      ${elemTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga, elemTrampaTeleport ? (elemTrampaDestino || 'un destino (falta marcarlo)') : ''))}</div>
+      ${elemTrampaTeleport ? `<button type="button" class="btn" id="trampa-destino" style="margin-top:6px;width:100%">🌀 ${elemTrampaDestino ? 'Cambiar' : 'Elegir'} el destino en el mapa</button>` : ''}
       <button type="button" class="btn primary" id="trampa-asistente" style="margin-top:6px;width:100%" title="Nombre, superficie, daño, estado y más, paso a paso">🪄 ${elemTrampaNombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
       ${trampasGuardadasHtml()}
@@ -8697,6 +8783,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
 });
 $('#herramienta-flotante').addEventListener('click', e => {
   if(e.target.closest('#trampa-asistente')) abrirAsistenteTrampaPanel();
+  if(e.target.closest('#trampa-destino')) elegirDestino(h => { elemTrampaDestino = h.col + ',' + h.fila; renderHerramientaFlotante(); toast('Destino marcado'); });
 });
 $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-turnos'){ elemTurnos = Math.max(0, Math.min(99, Math.round(num(e.target.value)) || 0)); return; }

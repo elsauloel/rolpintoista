@@ -33,6 +33,14 @@
     });
   }
 
+  // ---- Teleport (2026-09-25): al pisarla, mueve a quien la activa al destino que se marque con un clic en el mapa ----
+  lista.push({
+    poolId: 'trampa-trampa-de-teleport', nombre: 'Trampa de teleport', nivel: 3,
+    etiquetas: ['control', 'mágica', 'nivel 3', 'auditar'],
+    detalle: `${AVISO} Un glifo que, al pisarlo, teletransporta a quien lo activa a otro punto del mapa. ⚙ Automático: al colocarla te pide hacer clic en el mapa para marcar el destino, y al dispararse mueve a quien la pisó a la casilla libre más cercana a ese punto (que tiene que ser un punto transitable a pie: sin Sólido ni pared) (se puede cambiar el destino con el ⚙ de la trampa). Es mágica: no alcanza a los aliados del área. ✋ A mano: lo demás (estados, tiradas para evitarla).`,
+    datos: {nombre: 'Trampa de teleport', detalle: 'Glifo que teletransporta a quien lo pisa a otro punto del mapa (el destino se marca al colocarla).', amiga: false, teleport: true, tipo: 'flor', tamano: 1, color: '#9B5FD0', alfa: 45, dano: ''},
+  });
+
   // ---- Mecánicas clásicas ----
   tr('Trampa de oso', 2, ['daño', 'inmoviliza', 'mecánica'], 'flor', 1, '#8A8A8A', '2d6',
     '2d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8.');

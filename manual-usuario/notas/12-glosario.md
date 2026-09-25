@@ -59,7 +59,8 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 | **Critical Matters** | El efecto cambia si es crítico | [[Golpe crítico]] |
 | **Cono / alerta** | Zonas de detección | [[Campo de visión]] |
 | **Sigilo** | Estar oculto | [[Sigilo]] |
-| **Fuego amigo** | Una trampa que afecta a aliados | [[Trampas]] |
+| **Fuego amigo** | El efecto de una trampa de área (daño y estado) alcanza también a los aliados que estén dentro; lo físico y explosivo lo tiene, lo mágico distingue aliados de rivales. Los aliados nunca disparan una trampa | [[Trampas]] |
+| **Punto transitable a pie** | Una casilla del mapa donde un personaje podría pararse caminando: **no está ocupada por un Sólido ni por la Colisión del mapa** (paredes, columnas, obstáculos). No hace falta que haya un camino hasta ahí (es un teleport), pero la casilla en sí tiene que poder pisarse. El destino de una trampa de teleport tiene que ser uno | [[Trampas]] |
 
 ## Equipo
 | Término | Significa | Ver |

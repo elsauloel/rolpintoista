@@ -102,9 +102,10 @@ const AsistenteTrampa = (() => {
       aplicaEstado: !!ini.estado, estado: ini.estado || '', estadoTurnos: num(ini.estadoTurnos) || 0,
       seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && ini.salvacion.stat) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
+      teleport: !!ini.teleport,
       guardar: false,
     };
-    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'dura', 'resumen'];
+    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'teleport', 'evita', 'dura', 'resumen'];
     const danoTxt = () => est.haceDano ? `${Math.max(1, est.dados)}d${est.caras}${est.fijo ? (est.fijo > 0 ? '+' : '') + est.fijo : ''}` : '';
     const preset = () => estadosDisp.find(p => p.nombre === est.estado) || null;
     const durEstado = () => { const p = preset(); if(!p) return 0; if(p.permanente) return 0; return est.estadoTurnos > 0 ? est.estadoTurnos : num(p.turnos); };
@@ -113,6 +114,7 @@ const AsistenteTrampa = (() => {
       const f = [];
       if(danoTxt()) f.push(`Hace ${danoTxt()} de daño ${est.contemplaArmadura ? '(contempla la armadura: se le resta la Defensa)' : '(directo a la vida: ignora la armadura)'}`);
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
+      if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
       if(est.seEvita) f.push(`Se evita con ${est.salStat} contra ${est.salDif} (a mano)`);
       if(!f.length) f.push('No hace daño ni deja estados: solo avisa en la Mesa cuando se activa');
       return f;
@@ -191,6 +193,11 @@ const AsistenteTrampa = (() => {
               <p class="at-ayuda">Cada ⟳ Mantenimiento del GM cuenta un turno.</p>
               <input type="number" id="at-estadoTurnos" min="1" max="20" value="${esc(est.estadoTurnos || num(preset().turnos))}">` : ''}` : ''}`;
       }
+      if(id === 'teleport'){
+        return `<div class="at-preg">¿Teletransporta a quien la pisa?</div>
+          <p class="at-ayuda">Al saltar, mueve a quien la activó a <b>otro punto del mapa</b>, que tiene que ser un <b>punto transitable a pie</b> (una casilla donde un personaje podría pararse: sin Sólido ni pared; no hace falta que haya camino hasta ahí). Si la casilla está ocupada, va a la libre más cercana. Después de confirmar te pide hacer clic en el mapa para marcar el destino; se puede cambiar desde el ⚙ de la trampa. Puede combinarse con daño o estado.</p>
+          <label class="at-sin"><input type="checkbox" id="at-teleport"${est.teleport ? ' checked' : ''}> Sí: teletransporta a quien la activa</label>`;
+      }
       if(id === 'evita'){
         return `<div class="at-preg">¿Se puede evitar con una tirada?</div>
           <p class="at-ayuda">Solo queda escrito en la descripción para que la mesa la resuelva a mano (la tirada no es automática).</p>
@@ -231,6 +238,7 @@ const AsistenteTrampa = (() => {
       radio: est.radio, cant: est.cant,
       dano: danoTxt(), contemplaArmadura: est.contemplaArmadura,
       estado: est.aplicaEstado && preset() ? est.estado : '', estadoTurnos: est.aplicaEstado && preset() ? durEstado() : 0,
+      teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif} : null,
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
     });
@@ -274,6 +282,7 @@ const AsistenteTrampa = (() => {
       if(t.id === 'at-haceDano'){ est.haceDano = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'at-caras'){ est.caras = num(t.value); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-armadura') est.contemplaArmadura = t.checked;
+      else if(t.id === 'at-teleport'){ est.teleport = t.checked; }
       else if(t.id === 'at-seEvita'){ est.seEvita = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'at-salStat') est.salStat = t.value;
       else if(t.id === 'at-dura'){ est.dura = t.checked; est.error = ''; dibujar(); }
@@ -293,6 +302,7 @@ const AsistenteTrampa = (() => {
     else{
       if(r.dano) partes.push(`${r.dano} de daño${r.contemplaArmadura ? '' : ' directo'}`);
       if(r.estado) partes.push(`deja ${r.estado}${r.estadoTurnos ? ' ' + r.estadoTurnos + ' turnos' : ''}`);
+      if(r.teleport) partes.push('teletransporta a quien la pisa');
       if(!partes.length) partes.push('solo avisa cuando se activa');
     }
     if(r.salvacion) partes.push(`${r.salvacion.stat} contra ${r.salvacion.dif} la evita (a mano)`);

@@ -1160,6 +1160,7 @@ let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
+let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
 let trampasGuardadas = [];
@@ -2463,6 +2464,7 @@ function escucharMantenimiento(){
     const numero = doc.exists ? Math.round(num(doc.data().numero)) : 0;
     const antes = mantenimientoNumero;
     mantenimientoNumero = numero;
+    elementosVencidosBarrer();   // pasó el turno: las formas con turnos que se acabaron se eliminan
     giroLibre.clear();   // pasó el turno: se acaba el giro gratis
     pedirDibujo();   // las marcas del sigilo duran por turnos
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
@@ -3327,6 +3329,20 @@ function dibujar(){
       ctx.restore();
     }
     }   // fin de lo que no es Colisión
+    if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
+      // Contador de turnos que le quedan a la forma (se elimina sola al llegar a 0).
+      const quedan = Math.max(0, el.venceMant - mantenimientoNumero);
+      const cm = celdas[Math.floor(celdas.length / 2)], pm = hexCentro(cm.col, cm.fila);
+      ctx.save();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `700 ${12 / z}px "Space Mono", monospace`;
+      const txt = `⏳${quedan}`, w = ctx.measureText(txt).width + 10 / z, h = 17 / z;
+      ctx.fillStyle = 'rgba(15,12,14,.85)';
+      ctx.beginPath(); ctx.rect(pm.x - w / 2, pm.y - h / 2, w, h); ctx.fill();
+      ctx.strokeStyle = 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
+      ctx.fillStyle = '#EDE3D2'; ctx.fillText(txt, pm.x, pm.y + 0.5 / z);
+      ctx.restore();
+    }
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
       ctx.setLineDash([6 / z, 5 / z]);
@@ -4914,10 +4930,28 @@ function escucharElementos(){
         trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
         trampaIgnoraDef: d.trampaIgnoraDef === true,
         trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
+        turnos: Math.round(num(d.turnos)) || 0,
+        venceMant: Number.isFinite(d.venceMant) ? Math.round(d.venceMant) : null,
       });
     });
     pedirDibujo();
+    elementosVencidosBarrer();
   }, err => console.error('Error escuchando los elementos del mapa:', err));
+}
+
+/* ---------- Formas con turnos (2026-09-24, pedido del dueño) ----------
+   Una forma de Terreno y Formas puede llevar `turnos: N` y `venceMant: (Mantenimiento actual) + N`: para efectos que afectan
+   un área durante X turnos. Cada ⟳ Mantenimiento del GM cuenta un turno; cuando el número de Mantenimiento llega a `venceMant`
+   la forma se elimina sola. Lo borra SIEMPRE el GM (las reglas dejan borrar a su dueño o al GM, y así no se borra dos veces):
+   al llegar el Mantenimiento y al cargar los elementos (por si el GM no estaba conectado). Solo barre el mapa que el GM mira. */
+const elementosVencidosBorrando = new Set();
+function elementosVencidosBarrer(){
+  if(!soyGM || mantenimientoNumero === null) return;
+  elementos.forEach((el, id) => {
+    if(el.venceMant === null || el.venceMant === undefined || mantenimientoNumero < el.venceMant || elementosVencidosBorrando.has(id)) return;
+    elementosVencidosBorrando.add(id);
+    borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
+  });
 }
 
 /* ---------- Colisión del mapa (2026-09-24, pedido del dueño) ----------
@@ -5027,6 +5061,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
+      ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {})} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -5078,7 +5113,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo},
   };
   renderEditorElemento();
 }
@@ -5132,6 +5167,8 @@ function renderEditorElemento(){
     <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === el.color ? ' elegido' : ''}" data-eled-color="${c}" style="background:${c}"></button>`).join('')}</div>
     <label class="etiqueta">Transparencia</label>
     <input type="range" id="elem-edit-alfa" min="0" max="100" step="5" value="${el.alfa}">
+    <label class="etiqueta">Turnos que le quedan (0 = sin límite)</label>
+    <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
     <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
     ${el.trampa ? `<input type="text" id="elem-edit-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(el.trampaNombre || '')}" style="margin-top:6px">
@@ -5157,7 +5194,9 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-x').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-guardar').onclick = () => {
-    const cambios = {color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
+    const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
+    const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
+      color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
@@ -5168,6 +5207,8 @@ function renderEditorElemento(){
     caja.querySelectorAll('[data-eled-color]').forEach(x => x.classList.toggle('elegido', x === b));
   });
   caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
+  const inTurnos = caja.querySelector('#elem-edit-turnos');
+  if(inTurnos) inTurnos.oninput = () => { const n = Math.max(0, Math.min(99, Math.round(num(inTurnos.value)) || 0)); vivo(n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null}); };
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
   if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
   const chkTrampa = caja.querySelector('#elem-edit-trampa');
@@ -8145,6 +8186,8 @@ function renderHerramientaFlotante(){
       ${imagenElementoOpcionHtml(elemImagen)}
       <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+      <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
+      <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
       <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
       ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">
@@ -8320,6 +8363,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
   }
 });
 $('#herramienta-flotante').addEventListener('input', e => {
+  if(e.target.id === 'elem-turnos'){ elemTurnos = Math.max(0, Math.min(99, Math.round(num(e.target.value)) || 0)); return; }
   if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }

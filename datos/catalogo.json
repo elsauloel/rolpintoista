@@ -5214,12 +5214,7 @@
     "imagen": ""
   },
   {
-    "mods": [
-      {
-        "stat": "crit",
-        "val": 5
-      }
-    ],
+    "mods": [],
     "efectoMods": [],
     "id": "new-cachiporra",
     "nombre": "Cachiporra",
@@ -5228,7 +5223,7 @@
     "peso": 1,
     "ranuras": 1,
     "precioCompra": 40,
-    "detalle": "Arma de una mano, Tipo 10: 1 dado de daño. Crítico frecuente +5.",
+    "detalle": "Arma de una mano, Tipo 10: 1 dado de daño.",
     "descripcionNarrativa": "Cuero cosido sobre plomo. Discreta, fácil de esconder bajo el saco.",
     "tipoDado": 10,
     "danoFijo": 0,
@@ -7781,10 +7776,6 @@
   {
     "mods": [
       {
-        "stat": "crit",
-        "val": 5
-      },
-      {
         "stat": "parry",
         "val": 1
       }
@@ -7797,7 +7788,7 @@
     "peso": 4,
     "ranuras": 1,
     "precioCompra": 140,
-    "detalle": "Arma de una mano, Tipo 10: 4 dados de daño. Crítico frecuente +5. Parry +1.",
+    "detalle": "Arma de una mano, Tipo 10: 4 dados de daño. Parry +1.",
     "descripcionNarrativa": "Cabeza enorme y mango corto. Autoridad hecha herramienta.",
     "tipoDado": 10,
     "danoFijo": 0,

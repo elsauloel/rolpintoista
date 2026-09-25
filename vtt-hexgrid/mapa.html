@@ -7332,6 +7332,7 @@ function hudHtml(t){
    cambian ahí mismo: 1) "Recibe daño" (por defecto): se escribe el daño del
    golpe y se le resta la Defensa; 2) "HP directo": el número de siempre
    (valor, +5, -3) sin tener en cuenta la Defensa. */
+let hpCritMult = 1;   // multiplicador de crítico de "Recibe daño" (1 = sin crítico; 2 doble daño, 3 triple, 4 cuádruple). Un crítico multiplica TODO el daño y NO resta la Defensa (Comun/critico.js).
 let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
 
 function creepDefensaMapa(sc){
@@ -7422,8 +7423,13 @@ function hudHpHtml(t, d){
     <div class="hud-hp-expl">${danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
+        : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
       : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
+    ${danio ? `<div class="hud-hp-modos" title="Si el golpe fue crítico, elegí el multiplicador que dio el d20: el daño se multiplica y NO se resta la Defensa">
+      ${[[1, 'Sin crítico'], [2, 'Doble ×2'], [3, 'Triple ×3'], [4, 'Cuádruple ×4']].map(([k, r]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}">${r}</button>`).join('')}
+      ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
+    </div>` : ''}
     <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>
     <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
@@ -7446,6 +7452,12 @@ function hudHpPrevia(t, d, texto){
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
   if(d.def === null || d.def === undefined) return '—';
   const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  if(hpCritMult > 1){   // crítico: todo el daño × multiplicador, sin restar la Defensa
+    const total = golpe * hpCritMult;
+    const rc = resolverGolpe(total, 0, sc ? structuredClone(sc.estados || []) : []);
+    if(rc.invulnerable) return 'Invulnerable: no recibe daño';
+    return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${rc.absorbido ? ` (escudo −${fmt(rc.absorbido)})` : ''} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
+  }
   const r = resolverGolpe(golpe, num(d.def), sc ? structuredClone(sc.estados || []) : []);
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);
@@ -7462,7 +7474,10 @@ async function hudHpAplicar(t, texto){
     }
     if(/^[+\-−]/.test(String(texto).trim())){ toast('Para curar o ajustar sin Defensa, usá 2 · HP directo'); return; }
     const idTok = seleccion, antes = vitalActual(t, 'hp');
-    if(t.tipo === 'creep') await danioCreep(t, texto); else await danioPj(t, texto);
+    const golpe = leerGolpe(texto);
+    const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
+    const txtDanio = crit ? String(golpe * hpCritMult) : texto;
+    if(t.tipo === 'creep') await danioCreep(t, txtDanio, crit); else await danioPj(t, txtDanio, crit);
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){
@@ -7740,7 +7755,7 @@ function hudConectar(t){
   hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
     // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
     if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
-      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; }
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; hpCritMult = 1; }
       hudEditando = ''; pedirDibujo();
       return;
     }
@@ -7749,6 +7764,8 @@ function hudConectar(t){
   });
   // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
   hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-critmult]').forEach(b => b.onclick = () => { hpCritMult = Math.max(1, Math.min(4, num(b.dataset.hudCritmult))); pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir(); });
   const campoHp = hud.querySelector('[data-hud-hp-in]');
   if(campoHp){
     const dHp = hudDatos(t);

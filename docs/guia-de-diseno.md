@@ -75,7 +75,9 @@ Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico fre
 | Marca del cazador | Support | SP 3 · No2 1 | Un aliado en tu rango de casteo recibe **frecuente ×1** durante 2 turnos |
 | Punto débil | Debuffer | SP 3 (Esp / Res.M) | El objetivo pierde **1 punto de Resistencia a crítico** (todos los Tipos) durante 2 turnos |
 | Temple (o Piel resistente, existente) | Tanque | SP 2 | +1 de Resistencia a crítico a todos los Tipos durante 2 turnos |
-Y del lado del equipo: armas con **frecuente ×1** (estoques, dagas: punzantes precisas) o **potente ×1** (hachas y mazas pesadas), con el peso de cada una en el precio (P112).
+Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (punzantes y cortantes, las precisas): pueden llevar **frecuente y potente**, con el peso de cada una en el precio (P112). Las pesadas (Tipo 8 o más) se identifican por otros efectos (Rompe armadura, Knockdown…).
+
+**Reglas de estos estados (dichas por el dueño):** se pueden dar **a otros o a uno mismo**; el **rango nunca baja de 2** y el **umbral del doble daño nunca baja de 2**. **Aprobadas:** Punto débil y Temple. Marca del cazador, Golpe brutal y Ojo de asesino siguen a revisar.
 
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).

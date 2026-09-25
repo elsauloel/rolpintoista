@@ -7735,11 +7735,14 @@ function hudAcomodarGlobo(globos, r){
   const hud = $('#hud').getBoundingClientRect();
   const px = hud.left - caja.left, py = hud.top - caja.top;   // centro del token
   const margen = 8;
+  // Con la Botonera abierta (ocupa la mitad izquierda del mapa) el globo se acomoda solo en la mitad libre, sin quedar tapado ni cortado.
+  const capaBot = $('#botonera-capa');
+  const minX = capaBot && !capaBot.hidden && !botonera.completa && botoneraEnMitad() ? Math.round(caja.width / 2) + margen : margen;
   globos.style.maxHeight = Math.max(120, caja.height - margen * 2) + 'px';
   const w = globos.offsetWidth, h = globos.offsetHeight;
   const lado = r + 26;
   let x, y;
-  if(px + lado + w <= caja.width - margen || px - lado - w >= margen){
+  if(px + lado + w <= caja.width - margen || px - lado - w >= minX){
     x = px + lado + w <= caja.width - margen ? px + lado : px - lado - w;
     y = py - h / 2;
   }else{
@@ -7748,7 +7751,7 @@ function hudAcomodarGlobo(globos, r){
     y = py + lado;
     if(y + h > caja.height - margen) y = py - lado - h;
   }
-  x = Math.max(margen, Math.min(x, caja.width - w - margen));
+  x = Math.max(minX, Math.min(x, caja.width - w - margen));
   y = Math.max(margen, Math.min(y, caja.height - h - margen));
   globos.style.left = Math.round(x - px) + 'px';
   globos.style.top = Math.round(y - py) + 'px';

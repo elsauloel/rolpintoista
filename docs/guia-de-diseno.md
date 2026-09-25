@@ -60,6 +60,8 @@ El dueño va dando herramientas de diseño para que, cuando pida un catálogo, s
 
 - **Anillos:** mágicos, uno por mano (2 slots). Más libertad de efectos, pero más escasos y caros. Los preceptos de esta guía son la base de un futuro **rework del catálogo**.
 
+- **Dos formas de mejorar el crítico (P115):** (1) **bajar el rango** (el Tipo contra el que se compara la diferencia; mínimo 2) — nombre propuesto *Crítico frecuente*; (2) **bajar el umbral de los efectos del d20** (ej. ×2 desde 6 en vez de 7) — *Crítico feroz*. Sirven para diseñar armas, ítems y skills de crítico mejorado.
+
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).

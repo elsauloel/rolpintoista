@@ -4829,5 +4829,488 @@
     "peso del arma": -0.4
    }
   }
+ },
+ {
+  "id": "nuevo-cuchillo-de-cocina-reconvertido",
+  "nombre": "Cuchillo de cocina reconvertido",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": null,
+  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar.",
+  "nuevo": {
+   "pc": 2.3,
+   "tier": "Común",
+   "precio": 50,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-estilete-de-practica",
+  "nombre": "Estilete de práctica",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": null,
+  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza.",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-lezna-de-zapatero",
+  "nombre": "Lezna de zapatero",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "Pincha justo en el tendón. PdG +1 y 25 % de Lisiado.",
+  "nuevo": {
+   "pc": 4.0,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.8,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-daga-de-duelo",
+  "nombre": "Daga de duelo",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": null,
+  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1.",
+  "nuevo": {
+   "pc": 10.8,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 1.0,
+    "crítico": 5.2,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-lanza-de-leva",
+  "nombre": "Lanza de leva",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 2,
+  "tipo": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado.",
+  "nuevo": {
+   "pc": 8.2,
+   "tier": "Buena Calidad",
+   "precio": 95,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.8,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-aguja-de-acupunturista",
+  "nombre": "Aguja de acupunturista",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 33,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "Fina como un pelo: +2 de daño fijo, PdG +1 y 33 % de Sangrado.",
+  "nuevo": {
+   "pc": 8.1,
+   "tier": "Buena Calidad",
+   "precio": 95,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.8,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-estoque-de-esgrima",
+  "nombre": "Estoque de esgrima",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": null,
+  "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1.",
+  "nuevo": {
+   "pc": 12.3,
+   "tier": "Raro",
+   "precio": 200,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 2.5,
+    "crítico": 5.2,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-lanza-de-lisiar",
+  "nombre": "Lanza de lisiar",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 33,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado.",
+  "nuevo": {
+   "pc": 15.2,
+   "tier": "Raro",
+   "precio": 290,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.5,
+    "bonos": 2.0,
+    "crítico": 5.2,
+    "efectos": 1.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-punal-envenenado",
+  "nombre": "Puñal envenenado",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe.",
+  "nuevo": {
+   "pc": 14.3,
+   "tier": "Raro",
+   "precio": 260,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 5.2,
+    "efectos": 2.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-aguijon-de-la-reina-avispa",
+  "nombre": "Aguijón de la Reina Avispa",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Veneno severo por 4 turnos en cada golpe."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe.",
+  "nuevo": {
+   "pc": 22.9,
+   "tier": "Excepcional",
+   "precio": 700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 10.5,
+    "efectos": 3.8,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-lanza-del-alba",
+  "nombre": "Lanza del alba",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 4,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 50,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado.",
+  "nuevo": {
+   "pc": 18.9,
+   "tier": "Excepcional",
+   "precio": 500,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 3.0,
+    "crítico": 5.2,
+    "efectos": 1.5,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "nuevo-colmillo-de-la-reina-arana",
+  "nombre": "Colmillo de la Reina Araña",
+  "origen": "nuevo · tanda 1",
+  "familia": "punzante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 3,
+  "danoFijo": 3,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Veneno severo por 6 turnos en cada golpe."
+   },
+   {
+    "nombre": "Drena vida",
+    "prob": 100,
+    "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
+   }
+  ],
+  "precioHoy": null,
+  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida).",
+  "nuevo": {
+   "pc": 34.1,
+   "tier": "Legendario",
+   "precio": 1800,
+   "exceso": 0,
+   "desglose": {
+    "daño": 13.5,
+    "bonos": 2.0,
+    "crítico": 10.5,
+    "efectos": 8.8,
+    "peso del arma": -0.6
+   }
+  }
  }
 ]

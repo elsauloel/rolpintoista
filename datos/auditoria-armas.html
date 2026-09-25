@@ -52,6 +52,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
     <input type="search" id="buscar" placeholder="Buscar por nombre o efecto…">
     <select id="f-familia"><option value="">Todas las familias</option></select>
     <select id="f-tier"><option value="">Todos los tiers</option></select>
+    <select id="f-origen"><option value="">Todo (actuales y nuevas)</option><option value="actual">Solo catálogo actual</option><option value="nuevo">Solo armas nuevas</option></select>
     <select id="f-decision">
       <option value="">Todas</option><option value="_sin">Sin marcar</option><option value="confirmar">✅ Confirmar</option>
       <option value="reajustar">🔧 Reajustar</option><option value="reimaginar">🔄 Reimaginar</option><option value="descartar">🗑 Descartar</option><option value="_nota">Con nota</option>
@@ -68,7 +69,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   </div>
 </header>
 <main>
-  <p class="leyenda">Para cada arma: <b>✅ Confirmar</b> (queda como está, con los valores nuevos) · <b>🔧 Reajustar</b> (mismo concepto, corregir algo: escribilo en la nota) · <b>🔄 Reimaginar</b> (cambiar lo que hace) · <b>🗑 Descartar</b>. Podés escribir una nota en cualquiera. Se guarda solo en este navegador; con <b>💾 Guardar en el proyecto</b> lo sube para que el asistente lo lea.</p>
+  <p class="leyenda">Para cada arma: <b>✅ Confirmar</b> (queda como está, con los valores nuevos) · <b>🔧 Reajustar</b> (mismo concepto, corregir algo: escribilo en la nota) · <b>🔄 Reimaginar</b> (cambiar lo que hace) · <b>🗑 Descartar</b>. Podés escribir una nota en cualquiera. Las armas que ya revisé y apliqué desaparecen de la lista. Se guarda solo en este navegador; con <b>💾 Guardar en el proyecto</b> lo sube para que el asistente lo lea.</p>
   <div id="lista"></div>
 </main>
 <script>
@@ -130,11 +131,13 @@ function tarjeta(a){
 }
 
 function filtradas(){
-  const q = $('#buscar').value.trim().toLowerCase(), ff = $('#f-familia').value, ft = $('#f-tier').value, fd = $('#f-decision').value, o = $('#orden').value;
+  const q = $('#buscar').value.trim().toLowerCase(), ff = $('#f-familia').value, ft = $('#f-tier').value, fd = $('#f-decision').value, o = $('#orden').value, fo = $('#f-origen').value;
   let l = armas.filter(a => {
     const d = dec.decisiones[a.id] || {};
     if(ff && a.familia !== ff) return false;
     if(ft && a.tier !== ft) return false;
+    if(fo === 'actual' && a.origen !== 'catálogo actual') return false;
+    if(fo === 'nuevo' && a.origen === 'catálogo actual') return false;
     if(fd === '_sin' && d.d) return false;
     if(fd === '_nota' && !(d.nota || '').trim()) return false;
     if(fd && !fd.startsWith('_') && d.d !== fd) return false;
@@ -178,7 +181,7 @@ $('#lista').addEventListener('input', e => {
   (dec.decisiones[id] = dec.decisiones[id] || {}).nota = e.target.value;
   clearTimeout(temporizador); temporizador = setTimeout(() => { guardarLocal(); $('#cont').innerHTML = `${filtradas().length} a la vista · ${contadores()}`; }, 400);
 });
-['#buscar', '#f-familia', '#f-tier', '#f-decision', '#orden'].forEach(s => $(s).addEventListener('input', dibujar));
+['#buscar', '#f-familia', '#f-tier', '#f-origen', '#f-decision', '#orden'].forEach(s => $(s).addEventListener('input', dibujar));
 
 function paquete(){
   // Solo lo marcado o con nota; con el nombre para que el asistente no dependa del id.

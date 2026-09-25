@@ -215,14 +215,29 @@ def hoja():
     print('escrito docs/rework-armas-revision.md', len(armas), 'armas')
 
 
+def cargar_nuevas():
+    ruta = RAIZ / 'datos' / 'armas-nuevas.json'
+    return json.load(open(ruta, encoding='utf-8')) if ruta.exists() else []
+
+
+def ids_procesados():
+    ruta = RAIZ / 'datos' / 'auditoria-armas-procesadas.json'
+    if not ruta.exists():
+        return set()
+    return {x['id'] for x in json.load(open(ruta, encoding='utf-8'))}
+
+
 def datos_auditoria():
     """Escribe datos/auditoria-armas-datos.json: las armas con sus valores nuevos, para la herramienta datos/auditoria-armas.html."""
     out = []
-    for a in cargar():
+    procesadas = ids_procesados()
+    for a in [dict(x, _origen='catálogo actual') for x in cargar()] + [dict(x, _origen='nuevo · tanda %s' % x.get('tanda', '?')) for x in cargar_nuevas()]:
+        if (a.get('id') or a['nombre']) in procesadas:
+            continue
         pc, desglose = puntaje(a)
         p, tc, ex = precio(pc, a['tier'])
         out.append({
-            'id': a.get('id') or a['nombre'], 'nombre': a['nombre'], 'origen': 'catálogo actual', 'familia': familia(a), 'tier': a['tier'],
+            'id': a.get('id') or a['nombre'], 'nombre': a['nombre'], 'origen': a['_origen'], 'familia': familia(a), 'tier': a['tier'],
             'manos': 2 if a['tipoItem'] == 'arma_2m' else 1, 'tipo': a.get('tipoDado'), 'peso': a.get('peso'), 'danoFijo': a.get('danoFijo') or 0,
             'rango': bool(a.get('armaDeRango')),
             'bonos': [{'stat': m['stat'], 'val': m['val']} for m in (a.get('mods') or [])],

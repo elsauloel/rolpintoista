@@ -5472,7 +5472,7 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) más el peso del arma. Después de un Parry, es la del Parry">
+          <button type="button" class="botonera-tile" data-botoneraaccion="bloqueo" title="Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma; esa suma es el dado que tirás. Después de un Parry, es el arma del Parry">
             ${lupaBotonHtml('stat:bloqueo')}
             <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>
           </button>
@@ -9389,7 +9389,7 @@ function pdgParaArma(arma, c){
    pero un escudo no tiene Tipo), sin importar cuántos ataques hiciste en
    el turno. Se puede parriar con cualquier arma o escudo equipado, no
    solo con las que hacen daño (`armasYEscudosParaParry`).
-   Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma.
+   Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma, y la SUMA es el dado (`bloqueoValorConArma`, 2026-09-24).
    Con más de un arma/escudo equipado, se elige con cuál. Sin nada
    equipado: Peso 0, Parry sale gratis y el Bloqueo no suma peso. */
 // Arma con la que se hizo el último Parry (id, o '' si fue sin arma). El Bloqueo que
@@ -9440,9 +9440,13 @@ function parryConArma(arma, forzar){
   refresh();
 }
 
+// El Bloqueo se calcula así (2026-09-24, pedido del dueño): tu Bloqueo (que sale de la Fuerza, con lo que le suma tu equipo) MÁS el
+// peso del arma elegida; ESA SUMA es el valor que se convierte en dado (antes el peso se sumaba aparte, como número fijo).
+function bloqueoValorConArma(arma){
+  return statParaArma('bloqueo', arma) + (arma ? num(arma.peso) : 0);
+}
 function bloqueoConArma(arma){
-  const peso = arma ? num(arma.peso) : 0;
-  tirarValorStat(arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', statParaArma('bloqueo', arma), 'bloqueo', peso);
+  tirarValorStat(arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', bloqueoValorConArma(arma), 'bloqueo');
 }
 
 // Botones 🎲 Parry y 🎲 Bloqueo: con dos o más armas equipadas se elige con cuál.
@@ -9461,7 +9465,7 @@ function elegirArmaDefensa(tipo){
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta tantos No2 como el Peso del arma o escudo que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta tantos No2 como el Peso del arma o escudo que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}

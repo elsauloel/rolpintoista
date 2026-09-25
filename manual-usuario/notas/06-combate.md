@@ -154,7 +154,7 @@ estado: borrador
 +++
 El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.
 
-- Se tira con tu stat Bloqueo **más el peso del arma o escudo** con la que hiciste el Parry.
+- Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).
 - Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).
 - Sin nada equipado, el Bloqueo no suma peso.
 

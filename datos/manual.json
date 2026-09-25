@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T02:33:44Z",
+ "actualizado": "2026-09-25T02:34:41Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -739,7 +739,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se tira con tu stat Bloqueo **más el peso del arma o escudo** con la que hiciste el Parry.\n- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).\n- Sin nada equipado, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
+   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).\n- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).\n- Sin nada equipado, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
   },
   {
    "id": "defensa",

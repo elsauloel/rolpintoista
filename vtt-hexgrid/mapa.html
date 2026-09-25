@@ -2924,12 +2924,17 @@ async function iniciativaTirar(){
 }
 let iniResaltado = null;   // {id, hasta}: el token al que se llegó desde la lista de turnos
 
-// Un personaje caído (HP en 0) queda FUERA del orden de turnos mientras lo esté (2026-09-25, pedido del dueño): ▶ Siguiente lo saltea y la lista
-// lo muestra apagado con 💀. Si lo curan (HP > 0) vuelve solo a jugar. Solo personajes; los creeps derrotados los saca el GM.
+// Un personaje caído o un creep derrotado (HP en 0) queda FUERA del orden de turnos mientras lo esté (2026-09-25, pedido del dueño): ▶ Siguiente lo
+// saltea y la lista lo muestra apagado con 💀. Si lo curan (HP > 0) vuelve solo a jugar.
 function iniciativaFueraDeJuego(id){
   const t = tokens.get(id);
-  if(!t || t.tipo !== 'pj') return false;
+  if(!t) return false;
   const v = vinculo(t), r = v && v.resumen;
+  if(t.tipo === 'creep'){   // creep derrotado: el resumen público trae `muerto`; el GM además ve su HP exacto
+    const sc = soyGM ? creepPrivadoDe(t.fichaId) : null;
+    return !!(r && r.muerto) || !!(sc && num(sc.hp) <= 0 && num(sc.hpMax) > 0);
+  }
+  if(t.tipo !== 'pj') return false;
   return !!r && (!!r.muerto || (r.hp !== undefined && num(r.hpMax) > 0 && num(r.hp) <= 0));
 }
 function iniciativaSiguiente(){
@@ -2984,7 +2989,7 @@ function renderIniciativa(){
       // siendo solo del GM.
       const puede = puedeEditarIniciativa(t);
       const fuera = iniciativaFueraDeJuego(o.id);
-      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído: fuera del orden de turnos hasta que lo curen' : ''}">
+      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede

@@ -77,7 +77,7 @@ Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico fre
 | Temple (o Piel resistente, existente) | Tanque | SP 2 | +1 de Resistencia a crítico a todos los Tipos durante 2 turnos |
 Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (punzantes y cortantes): **ambas juegan con las dos herramientas (frecuente y potente), con distinto acento**: las de **Tipo 4** acentúan el crítico **frecuente** y las de **Tipo 6** el **potente** (no es exclusivo: pueden aparecer en otras armas), con el peso de cada una en el precio (P112). Las pesadas (Tipo 8 o más) se identifican por otros efectos (Rompe armadura, Knockdown…).
 
-**Reglas de estos estados (dichas por el dueño):** se pueden dar **a otros o a uno mismo**; el **rango nunca baja de 2**. **Crítico potente ×P:** doble daño baja 1 por punto (7 − P), triple daño 1 cada 2 puntos (17 − P÷2) y cuádruple daño 1 cada 3 puntos (20 − P÷3); piso del doble daño a confirmar (2 o 1, ver P115). **Aprobadas:** Punto débil y Temple. Marca del cazador, Golpe brutal y Ojo de asesino siguen a revisar.
+**Reglas de estos estados (dichas por el dueño):** se pueden dar **a otros o a uno mismo**; el **rango nunca baja de 2**. **Crítico potente ×P:** doble daño baja 1 por punto (7 − P), triple daño 1 cada 2 puntos (17 − P÷2) y cuádruple daño 1 cada 3 puntos (20 − P÷3); el piso del doble daño es 1 y, después de eso, los otros dos umbrales siguen bajando a su propia escala (ver P115). **Aprobadas:** Punto débil y Temple. Marca del cazador, Golpe brutal y Ojo de asesino siguen a revisar.
 
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).

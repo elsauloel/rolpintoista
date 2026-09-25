@@ -269,3 +269,25 @@ Dueño: "que no todo esté centrado en el daño, sino en efectos. Valete de las 
 15. **Bastón del ecualizador** (Legendario): al golpear, **copia** el estado más fuerte del objetivo a un aliado o a vos (Excedente, Crítico frecuente…). ✋/🔧.
 16. **Flauta del eco** (Raro): repite el último hechizo sin gastar Nitro, pero cuesta el doble de SP y solo una vez por combate. ✋.
 **Preguntas:** ¿cuáles de estas te gustan como punto de partida? ¿Cuánto SP por hechizo en el primer escalón (1–3, como los efectos de arma)? ¿Hechizos con límite por combate (como el reloj, el eco) o por SP solamente?
+
+## Armas mágicas — las 16 ideas con usos por combate (2026-09-25, borrador para que el dueño evalúe)
+Dueño: "Diseñalos por combate y yo después me fijo si vale la pena." **Regla propuesta:** cada hechizo del arma tiene **usos por combate** (se recuperan al terminar el combate) además de costar Nitros y SP. **Más potente = menos usos:** Común/Buena 3 · Raro 2 · Excepcional 1–2 · Legendario 1. **Nitros:** 1 en casi todos (recurso muy preciado; los de 2 son los que cambian el combate). **SP:** 1–3 según el efecto. Los usos son **recordatorio/contador** (⚙ en la ficha si se puede; si no, ✋). Todo lo de aquí son números de partida.
+| # | Arma (tier) | Peso/manos | Usos | Nitros | SP | Forma y alcance | Efecto | Dura |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Vara del sendero (Exc.) | 1 · 1m | 2 | 1 | 3 | Línea de 4 casillas, alcance 4 | Terreno de fuego (daño 5 al entrar), hielo (resbala: Demora al cruzar) o hierba (Cobertura) | 3 turnos |
+| 2 | Báculo del muro (Raro) | 3 · 2m | 2 | 1 | 2 | 3 casillas en fila, alcance 3 | Bloquea paso y visión; se rompe con 10 de daño | 2 turnos |
+| 3 | Bastón de la marea (Exc.) | 3 · 2m | 1 | 1 | 3 | Cono de 2 casillas | Empuja o atrae 2 casillas a cada uno; si choca contra algo, 1d4 de daño físico | instantáneo |
+| 4 | Varita del dintel (Raro) | 1 · 1m | 2 | 1 | 2 | 2 portales aliados a ≤ 4 casillas | Aliados pasan gratis (sin costo de movimiento) | 2 turnos |
+| 5 | Anillo de trueque (Exc., 1 por mano) | 0 | 1 | 1 | 2 | Alcance 5 | Intercambia de lugar a dos aliados (o vos y uno) | instantáneo |
+| 6 | Cetro del ancla (Raro) | 2 · 1m | 2 | 1 (volver: 1) | 2 | Se planta donde estás | Marca un punto; con 1 Nitro volvés a él desde ≤ 8 casillas | hasta fin de combate |
+| 7 | Vara de bruma (Buena) | 1 · 1m | 3 | 1 | 1 | Flor radio 1, alcance 3 | Niebla: dentro, no se ve ni se apunta más allá de 2 casillas | 2 turnos |
+| 8 | Lente del vidente (Raro) | 1 · 1m | 2 | 1 | 1 | Radio 3 | Revela casillas ocultas y trampas; un aliado marcado ve a través de niebla | 2 turnos |
+| 9 | Reloj de arena (Exc.) | 1 · 1m | 1 | 2 | 3 | Alcance 6 | Sube 1 lugar a un aliado **o** baja 1 a un rival en la iniciativa (definitivo) | instantáneo |
+| 10 | Bastón de la pausa (Raro) | 2 · 1m | 2 | 1 | 2 | Alcance 4 | 25 % de dejar al golpeado sin movimiento (0 casillas) en su próximo turno | 1 turno |
+| 11 | Vara de la pira y el deshielo (Raro) | 1 · 1m | 3 | 1 | 1 | Casilla/flor radio 1 | Apaga fuego y quita 1 stack de Escarcha a un aliado (modo pira: al revés, pone fuego y quita 1 stack a un rival) | instantáneo |
+| 12 | Cetro del rayo cíclico (Exc.) | 2 · 1m | 1 | 1 | 3 | Rayo en cadena (hasta 3 casillas entre saltos) | Cada salto: 15 % de Parálisis (no critica); vuelve al lanzador y le da 1 HP de Excedente por salto | instantáneo |
+| 13 | Aguja de estalactita (Raro) | 2 · 1m | 2 | 1 | 2 | Alcance 5 | Daño **físico** (Especial + 1d6): critica y la armadura lo reduce; 25 % de 1 stack de Escarcha | instantáneo |
+| 14 | Varita de la marca (Buena) | 1 · 1m | 3 | 1 | 1 | Alcance 4 | El próximo aliado que golpee al marcado ignora 1 de Defensa (consume la marca) | 2 turnos |
+| 15 | Bastón del ecualizador (Leg.) | 3 · 2m | 1 | 2 | 3 | Alcance 3 | Copia el estado más fuerte del objetivo a un aliado o a vos (mismo tiempo restante) | instantáneo |
+| 16 | Flauta del eco (Raro) | 1 · 1m | 1 | 0 (el eco) | doble | — | Repite el último hechizo lanzado en el combate sin pagar Nitros, pagando el doble de SP | instantáneo |
+**Notas de balance (mías, a revisar):** los de 2 Nitros (Reloj, Ecualizador) son los que cambian el combate: 1 uso y solo Exc./Leg. Los de terreno/niebla/muro pesan por duración: 2–3 turnos. Anillos: uno por mano; el trueque cuenta como hechizo, no como bono. Conviene decidir **cómo se recuperan los usos** (¿al terminar el combate y punto? ¿o por descanso?). El costo en **PC/precio** de estas armas todavía no está calibrado (el motor v0 solo valúa armas físicas): habría que sumar una tabla de "valor de hechizo" (forma × usos × duración).

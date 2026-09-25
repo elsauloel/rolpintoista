@@ -140,13 +140,11 @@ Estados que define la clase:
   puede gastar 1 No2 para pararse.
 
 1. ✅ **Blindaje** — **Flash (SP x 2:** cargada con SP 1; en turno ajeno
-   se suma 1 SP a mano). **No2:** 0. **SP:** 1. Solo sobre sí mismo. Aplica
+   cuesta el doble, 2 SP, a mano). **No2:** 0. **SP:** 1. Solo sobre sí mismo. Aplica
    el estado **Barrera** (barra 🛡 de 8, como el Escudo mágico, hasta el
    próximo Mantenimiento): absorbe 8 de la próxima fuente de daño; si hace
    más, el resto entra normal.
-2. **Shockwave** [4] — Onda expansiva (Fuerza / Constitución). Flash (SP
-   x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos
-   hasta el final de su próximo turno.
+2. ✅ **Shockwave** — SP 4, No2 0 (Flash: SP x 2 = **el doble**, 8 SP en turno ajeno, a mano). Onda expansiva: el atacante tira **Fuerza** (automático, `tiradaStat: 'fue'`); cada **enemigo** adyacente tira **Constitución** (a mano) y **quien pierde** queda en **Pajaritos** (el de siempre: PdG y Evasión a la mitad) por **2 turnos** (a mano hasta que exista "aplicar estado a otros" para personajes). Solo afecta a enemigos. (2026-09-24)
 3. **Aura de espinas** [1] — Devuelve 1/4 del daño del ataque como true
    damage hasta el comienzo del próximo turno.
 4. ✅ **Recuperación** — SP 1, No2 2. Cura **9 HP fijos** sobre uno mismo, sin pasar el HP máximo; se puede usar con el HP lleno (gasta igual). Automatizada con el campo `curaHp` de la habilidad (2026-09-20).
@@ -154,7 +152,7 @@ Estados que define la clase:
    x 2). Golpea el piso creando una onda de choque en un cono al frente,
    que hace perder una cantidad de No2 igual a 1 + la diferencia en la
    tirada. Si perdiera todos los No2 de este modo, queda Sentado.
-6. ✅ **Piel resistente** — SP 5, No2 1 (regla general). Estado de 2 turnos sobre uno mismo: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (Tipo 4 a 12). ⚠ El +1 a los críticos y la duración de 2 turnos completos son propuesta mía, sin confirmar.
+6. ✅ **Piel resistente** — SP 5, No2 1 (regla general). Estado de 2 turnos sobre uno mismo: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (Tipo 4 a 12). Confirmado por el dueño el 2026-09-24 (el +1 a los críticos y los 2 turnos).
 7. **Daño en área** [2] — Ataque con daño en área de flor. No afecta al
    tanque.
 8. **Takle** [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque

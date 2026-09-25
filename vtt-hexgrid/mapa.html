@@ -558,6 +558,9 @@ aside{
   pointer-events:auto;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
   border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
 }
+#hud .hud-globo{user-select:none}
+#hud .hud-globo input{user-select:text}
+#hud .hud-globo h3{cursor:move}
 #hud .hud-hp-modos{display:flex;gap:6px;margin-bottom:8px}
 #hud .hud-hp-modos .hud-mini{flex:1;padding:4px 6px}
 #hud .hud-crit-fila{display:flex;gap:5px;margin-bottom:8px}
@@ -1695,6 +1698,28 @@ function renderBotonesRango(){
 }
 // Rango (Destreza) y Rango de casteo (Especial) de un token: los de un personaje salen de su ficha (resumen.rng/rangocasteo);
 // los de un creep, solo para el GM, de su Destreza y Especial más lo que los sube. null = no se sabe (invocación, todavía sin leer…).
+// Calculadora de crítico (comun/critico.js): los tokens con sus datos de crítico, para elegir quién ataca y quién defiende y que se complete solo.
+// Personajes: lo que publica su ficha (resumen.crit, critpot, armaTipo, rescrit, def); creeps (solo el GM): su parte privada.
+function criticoFuentes(){
+  const lista = [];
+  tokens.forEach((t, id) => {
+    if(!t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return;
+    if(t.oculto && !soyGM) return;
+    if(t.tipo === 'creep'){
+      if(!soyGM) return;
+      const sc = creepPrivadoDe(t.fichaId);
+      if(!sc) return;
+      lista.push({id, nombre: nombreDe(t) + ' (creep)', tipo: num(sc.armaTipo) || 0, frecuente: creepModTotalMapa(sc, 'crit'), potente: creepModTotalMapa(sc, 'critpot'),
+        resistencias: [0, 1, 2, 3, 4].map(i => num((sc.crit || [])[i])), defensa: creepDefensaMapa(sc)});
+      return;
+    }
+    const f = fichasPub.get(t.fichaId), r = f && f.resumen;
+    if(!r) return;
+    lista.push({id, nombre: nombreDe(t), tipo: num(r.armaTipo) || 0, frecuente: r.crit === undefined ? undefined : num(r.crit), potente: r.critpot === undefined ? undefined : num(r.critpot),
+      resistencias: Array.isArray(r.rescrit) ? r.rescrit.map(num) : undefined, defensa: r.def === undefined ? undefined : num(r.def)});
+  });
+  return lista;
+}
 function rangoDeToken(t){
   if(!t || !t.fichaId) return null;
   if(t.tipo === 'creep'){
@@ -7730,6 +7755,30 @@ function hudAcomodarAnillo(radioToken){
 // El panel que se abre (estados o ajustes) va al costado del anillo, sin
 // tapar el token: a la derecha, o a la izquierda si no entra. Siempre dentro
 // del mapa y, si es más alto que la pantalla, con scroll.
+// Los globos del HUD (vida, estados, ajustes) se pueden ARRASTRAR desde su título y dejar donde mejor convenga (2026-09-25, pedido del dueño):
+// queda en esa posición de la pantalla (no sigue al token) y se recuerda por navegador. Doble clic en el título: vuelve a acomodarse solo.
+let globoPos = null;   // {x, y} respecto de la caja del mapa, o null = automático
+try{ const g = JSON.parse(localStorage.getItem('hud-globo-pos') || 'null'); if(g && Number.isFinite(g.x) && Number.isFinite(g.y)) globoPos = {x: g.x, y: g.y}; }catch(e){}
+function hudGloboGuardarPos(){ try{ if(globoPos) localStorage.setItem('hud-globo-pos', JSON.stringify(globoPos)); else localStorage.removeItem('hud-globo-pos'); }catch(e){} }
+document.addEventListener('pointerdown', e => {
+  const h3 = e.target.closest && e.target.closest('#hud .hud-globo h3');
+  if(!h3 || e.button !== 0) return;
+  const globos = h3.closest('.hud-globos'), caja = $('#lienzo-caja');
+  if(!globos || !caja) return;
+  e.preventDefault(); e.stopPropagation();
+  const cr = caja.getBoundingClientRect(), gr = globos.getBoundingClientRect();
+  const dx = e.clientX - gr.left, dy = e.clientY - gr.top;
+  const mover = ev => {
+    const w = globos.offsetWidth, h = globos.offsetHeight;
+    globoPos = {x: Math.max(0, Math.min(ev.clientX - dx - cr.left, cr.width - w)), y: Math.max(0, Math.min(ev.clientY - dy - cr.top, cr.height - h))};
+    pedirDibujo();
+  };
+  const soltar = () => { removeEventListener('pointermove', mover); removeEventListener('pointerup', soltar); hudGloboGuardarPos(); };
+  addEventListener('pointermove', mover); addEventListener('pointerup', soltar);
+}, true);
+document.addEventListener('dblclick', e => {
+  if(e.target.closest && e.target.closest('#hud .hud-globo h3')){ globoPos = null; hudGloboGuardarPos(); pedirDibujo(); }
+});
 function hudAcomodarGlobo(globos, r){
   const caja = $('#lienzo-caja').getBoundingClientRect();
   const hud = $('#hud').getBoundingClientRect();
@@ -7753,6 +7802,7 @@ function hudAcomodarGlobo(globos, r){
   }
   x = Math.max(minX, Math.min(x, caja.width - w - margen));
   y = Math.max(margen, Math.min(y, caja.height - h - margen));
+  if(globoPos){ x = Math.max(0, Math.min(globoPos.x, caja.width - w)); y = Math.max(0, Math.min(globoPos.y, caja.height - h)); }   // lo puso el usuario a mano
   globos.style.left = Math.round(x - px) + 'px';
   globos.style.top = Math.round(y - py) + 'px';
 }
@@ -7772,7 +7822,7 @@ function hudConectar(t){
   // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
   hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
   hud.querySelectorAll('[data-hud-critmult]').forEach(b => b.onclick = () => { hpCritMult = Math.max(1, Math.min(4, num(b.dataset.hudCritmult))); pedirDibujo(); });
-  hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir(); });
+  hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir({defensor: seleccion || ''}); });
   const campoHp = hud.querySelector('[data-hud-hp-in]');
   if(campoHp){
     const dHp = hudDatos(t);

@@ -73,21 +73,50 @@ const Critico = (() => {
 #cr-caja button{background:none;border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:8px 14px;cursor:pointer;font:inherit}
 #cr-caja button:hover{border-color:#C98545;color:#E0A458}
 #cr-caja button.prim{background:#C98545;border-color:#C98545;color:#1A1418;font-weight:700}
-#cr-caja button:disabled{opacity:.4;cursor:default}`;
+#cr-caja button:disabled{opacity:.4;cursor:default}
+#cr-caja .cr-sup{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9A867E}
+#cr-caja .cr-pasos{display:flex;gap:4px;margin:6px 0 4px}
+#cr-caja .cr-pasos i{flex:1;height:4px;border-radius:2px;background:#3B2E34}
+#cr-caja .cr-pasos i.hecho{background:#8A6236}#cr-caja .cr-pasos i.ahora{background:#E0A458}
+#cr-caja .cr-preg{font-size:16px;font-weight:600;margin:8px 0 4px}
+#cr-caja .cr-grid{grid-template-columns:1fr}
+#cr-caja .cr-error{min-height:16px;color:#E27B72;font-size:13px}`;
     document.head.appendChild(s);
   }
 
   function abrir(inicial){
     estilos();
     const previo = document.getElementById('cr-fondo'); if(previo) previo.remove();
-    // Si la herramienta define criticoDatosIniciales() (la ficha lo hace: su Crítico frecuente/potente y el Tipo de su arma equipada), se usa de partida.
-    let auto = {};
+    inicial = inicial || {};
+    // Datos de partida: si la herramienta define criticoDatosIniciales() (la ficha: su Crítico frecuente/potente y el Tipo de su arma equipada) se usan;
+    // y si define criticoFuentes() (el mapa: los tokens con sus datos) se puede elegir quién ataca y quién defiende y se completa solo.
+    let auto = {}, fuentes = [];
     try{ if(typeof criticoDatosIniciales === 'function') auto = criticoDatosIniciales() || {}; }catch(err){ console.error('criticoDatosIniciales:', err); }
-    const v = Object.assign({pdg: '', eva: '', tipo: 6, frecuente: 0, potente: 0, resistencia: 0, dano: '', defensa: 0}, auto, inicial || {});
-    let tirada = null;   // {rolls, mejor, mult} del último "Tirar d20"
+    try{ if(typeof criticoFuentes === 'function') fuentes = criticoFuentes() || []; }catch(err){ console.error('criticoFuentes:', err); }
+    if(Array.isArray(inicial.fuentes)) fuentes = inicial.fuentes;
+    const v = Object.assign({pdg: '', eva: '', tipo: 6, frecuente: 0, potente: 0, resistencia: 0, dano: '', defensa: 0, atacante: '', defensor: ''}, auto, inicial);
+    delete v.fuentes;
+    const fuente = id => fuentes.find(f => f.id === id) || null;
+    // Completa lo que se puede desde el token elegido (atacante: arma, frecuente y potente; defensor: resistencia a ese Tipo y Defensa).
+    function cargarAtacante(){
+      const f = fuente(v.atacante); if(!f) return;
+      if(f.tipo) v.tipo = num(f.tipo);
+      if(f.frecuente !== undefined) v.frecuente = Math.max(0, Math.round(num(f.frecuente)));
+      if(f.potente !== undefined) v.potente = Math.max(0, Math.round(num(f.potente)));
+    }
+    function cargarDefensor(){
+      const f = fuente(v.defensor); if(!f) return;
+      const i = TIPOS.indexOf(num(v.tipo));
+      if(Array.isArray(f.resistencias) && i >= 0) v.resistencia = Math.max(0, Math.round(num(f.resistencias[i])));
+      if(f.defensa !== undefined && f.defensa !== null) v.defensa = Math.max(0, num(f.defensa));
+    }
+    cargarAtacante(); cargarDefensor();
+    let tirada = null;   // {rolls, mejor, mult, dados} del último "Tirar d20"
+    let paso = 0, error = '';
     const fondo = document.createElement('div');
     fondo.id = 'cr-fondo';
     document.body.appendChild(fondo);
+
     // Es un panel FLOTANTE, sin fondo que tape nada: se puede dejar abierto mientras se usa la Botonera. Esc solo lo cierra si el foco está adentro.
     let aMano = false;   // si la movieron con el mouse, no se reubica sola
     const cerrar = () => { clearInterval(vigia); removeEventListener('resize', reubicar); fondo.remove(); document.removeEventListener('keydown', teclas, true); };
@@ -122,49 +151,91 @@ const Critico = (() => {
     const vigia = setInterval(reubicar, 700);
     addEventListener('resize', reubicar);
 
-    const campo = (id, etiqueta, valor, extra) => `<div><label for="cr-${id}">${etiqueta}</label><input id="cr-${id}" type="number" step="1" value="${esc(valor)}" ${extra || ''}></div>`;
+    const campo = (id, etiqueta, valor, extra) => `<div class="cr-campo"><label for="cr-${id}">${etiqueta}</label><input id="cr-${id}" type="number" step="1" value="${esc(valor)}" ${extra || ''}></div>`;
+    const selFuente = (id, etiqueta, actual) => fuentes.length
+      ? `<div class="cr-campo"><label for="cr-${id}">${etiqueta}</label><select id="cr-${id}"><option value="">— a mano —</option>${fuentes.map(f => `<option value="${esc(f.id)}"${f.id === actual ? ' selected' : ''}>${esc(f.nombre)}</option>`).join('')}</select></div>` : '';
     const ev = () => evaluar({pdg: v.pdg, eva: v.eva, tipo: v.tipo, frecuente: v.frecuente, potente: v.potente, resistencia: v.resistencia});
 
-    function resultadoHtml(){
-      if(v.pdg === '' || v.eva === '') return '<div class="cr-res">Poné la <b>PdG</b> del atacante y la <b>Evasión</b> del defensor (las dos tiradas ya hechas) y te digo si hay crítico.</div>';
-      const e = ev();
-      const u = e.umbrales;
-      const lineas = [`Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)} con frecuente ×${num(v.frecuente)})` : ''}`];
-      if(e.diferencia <= 0) return `<div class="cr-res">${lineas[0]}<br>La PdG no supera a la Evasión: <b>no hay golpe</b> (se resuelve a mano) ni crítico.</div>`;
-      if(e.nivel === 0) return `<div class="cr-res">${lineas[0]}<br><b>No es crítico</b>: la diferencia no llega al rango. Daño normal (se resta la Defensa).</div>`;
-      lineas.push(`Nivel del crítico: <b>${e.nivel}</b>${num(v.resistencia) > 0 ? ` − resistencia ${num(v.resistencia)} = <b>${e.dados}</b>` : ''}`);
-      if(!e.critico) return `<div class="cr-res">${lineas.join('<br>')}<br>La Resistencia a crítico del defensor <b>anula el crítico</b>. Daño normal (se resta la Defensa).</div>`;
-      lineas.push(`<b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor. Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`);
-      if(tirada){
-        lineas.push(`d20: ${tirada.rolls.join(', ')} → mejor <b>${tirada.mejor}</b> → <b>${NOMBRE_MULT[tirada.mult]}</b> (×${tirada.mult})`);
-        if(v.dano !== ''){
-          const r = resolverDano({dano: v.dano, critico: true, mult: tirada.mult});
-          lineas.push(`Daño: ${num(v.dano)} × ${tirada.mult} = <b>${r.final}</b> (ignora la Defensa)`);
+    /* Pasos, en el orden de las tiradas:
+       1 el arma del atacante · 2 la PdG del atacante · 3 la Evasión del defensor · 4 el crítico (nivel y d20; se saltea si no hay) · 5 el daño y el resultado */
+    const PASOS = ['arma', 'pdg', 'eva', 'critico', 'dano'];
+    const TITULOS = {arma: 'El arma del atacante', pdg: 'La PdG del atacante', eva: 'La Evasión del defensor', critico: '¿Hay crítico?', dano: 'El daño'};
+    const hayCritico = () => !!(v.pdg !== '' && v.eva !== '' && ev().critico);
+    const tieneAuto = () => Object.keys(auto).length > 0 || !!fuente(v.atacante);
+
+    function cuerpo(id){
+      if(id === 'arma') return `<div class="cr-preg">¿Con qué arma ataca?</div>
+        <p>El <b>Tipo</b> del arma es el rango del crítico: cuanto más bajo, más fácil. Con <b>Crítico frecuente</b> el rango baja (mínimo 2); con <b>Crítico potente</b> los multiplicadores salen con menos en el d20. ${tieneAuto() ? '<b>Ya los completé</b> con lo que tiene equipado y activo (equipo, habilidades y estados): cambialos si hace falta.' : ''}</p>
+        <div class="cr-grid">${selFuente('atacante', '¿Quién ataca?', v.atacante)}<div class="cr-campo"><label for="cr-tipo">Tipo del arma</label><select id="cr-tipo">${TIPOS.map(t => `<option value="${t}"${num(v.tipo) === t ? ' selected' : ''}>Tipo ${t}</option>`).join('')}</select></div>
+        ${campo('frecuente', 'Crítico frecuente ×', v.frecuente, 'min="0"')}${campo('potente', 'Crítico potente ×', v.potente, 'min="0"')}</div>`;
+      if(id === 'pdg') return `<div class="cr-preg">¿Cuánto sacó de PdG?</div>
+        <p>La tirada de <b>probabilidad de golpe</b> del atacante, con todo sumado (el total que quedó en la Mesa).</p>
+        <div class="cr-grid">${campo('pdg', 'PdG del atacante', v.pdg)}</div>`;
+      if(id === 'eva') return `<div class="cr-preg">¿Cuánto sacó de Evasión el defensor?</div>
+        <p>Su tirada de <b>Evasión</b>. Su equipo puede tener <b>Resistencia a crítico</b> contra armas de Tipo ${num(v.tipo)}: cada punto le quita un nivel al crítico. ${fuente(v.defensor) ? '<b>Ya la completé</b> con la del defensor.' : ''}</p>
+        <div class="cr-grid">${selFuente('defensor', '¿Quién defiende?', v.defensor)}${campo('eva', 'Evasión del defensor', v.eva)}${campo('resistencia', `Resistencia a crítico (Tipo ${num(v.tipo)})`, v.resistencia, 'min="0"')}</div>
+        <div id="cr-vista"></div>`;
+      if(id === 'critico'){
+        const e = ev(), u = e.umbrales;
+        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)} con frecuente ×${num(v.frecuente)})` : ''}`;
+        let r;
+        if(e.diferencia <= 0) r = `La PdG no supera a la Evasión: <b>no hay golpe</b> (se resuelve a mano) ni crítico.`;
+        else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango.`;
+        else if(!e.critico) r = `Nivel del crítico ${e.nivel} − resistencia ${num(v.resistencia)}: la Resistencia a crítico del defensor <b>anula el crítico</b>.`;
+        else{
+          r = `Nivel del crítico: <b>${e.nivel}</b>${num(v.resistencia) > 0 ? ` − resistencia ${num(v.resistencia)} = <b>${e.dados}</b>` : ''}.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor. Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
+          if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → mejor <b>${tirada.mejor}</b> → <b>${NOMBRE_MULT[tirada.mult]}</b> (×${tirada.mult})`;
+          else r += `<div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar ${e.dados}d20</button></div>`;
         }
+        return `<div class="cr-preg">¿Hay crítico?</div><div class="cr-res${e.critico ? ' si' : ''}">${cab}<br>${r}</div>`;
       }
-      return `<div class="cr-res si">${lineas.join('<br>')}</div>`;
+      // dano
+      const e = ev(), crit = e.critico && tirada;
+      return `<div class="cr-preg">¿Cuánto daño hace el golpe?</div>
+        <p>El daño total del arma con todos los bonos (Fuerza incluida). ${e.critico ? 'Como es crítico, <b>no se resta la Defensa</b>: se multiplica y listo.' : 'Como no es crítico, se resta la Defensa del defensor.'}</p>
+        <div class="cr-grid">${campo('dano', 'Daño del golpe', v.dano, 'min="0"')}${e.critico ? '' : campo('defensa', 'Defensa del defensor', v.defensa, 'min="0"')}</div>
+        <div id="cr-resdano" class="cr-res${crit ? ' si' : ''}">${textoDano()}</div>
+        <div class="cr-fila"><button type="button" id="cr-publicar">📣 Publicar en la Mesa</button><button type="button" id="cr-nuevo">↺ Otro golpe</button></div>`;
+    }
+    function textoDano(){
+      if(v.dano === '') return 'Poné el daño y te calculo el resultado.';
+      const e = ev(), crit = e.critico && tirada;
+      const r = resolverDano({dano: v.dano, defensa: v.defensa, critico: !!crit, mult: crit ? tirada.mult : 1});
+      if(crit) return `Daño: ${num(v.dano)} × ${tirada.mult} = <b>${r.final}</b> (ignora la Defensa)`;
+      return `Daño: ${num(v.dano)} − Defensa ${num(v.defensa)} = <b>${r.final}</b>${e.critico ? '<br><i>Falta tirar los d20 del crítico (volvé al paso anterior).</i>' : ''}`;
+    }
+    function vistaEva(){
+      const c = fondo.querySelector('#cr-vista'); if(!c) return;
+      if(v.pdg === '' || v.eva === ''){ c.innerHTML = ''; return; }
+      const e = ev();
+      c.innerHTML = `<div class="cr-res">Diferencia: <b>${e.diferencia}</b> · rango <b>${e.rango}</b> → ${e.diferencia <= 0 ? 'no hay golpe' : e.critico ? `<b>crítico${e.dados > 1 ? ' ×' + e.dados : ''}</b>` : e.nivel > 0 ? 'la resistencia lo anula' : 'no es crítico'}</div>`;
     }
 
-    function dibujar(soloResultado){
-      if(soloResultado){ const r = fondo.querySelector('#cr-resultado'); if(r){ r.innerHTML = resultadoHtml(); botones(); return; } }
-      fondo.innerHTML = `<div id="cr-caja" role="dialog"><div class="cr-cab" id="cr-cab" title="Arrastrala para moverla"><h2>🎯 Calculadora de crítico</h2><button type="button" id="cr-x" title="Cerrar">✕</button></div>
-        <p>La PdG contra la Evasión se compara a mano en la mesa. Acá ponés esos dos números y el arma, y te calculo el crítico. Es una <b>ayuda</b>, no una obligación.</p>
-        <div class="cr-grid">
-          ${campo('pdg', 'PdG del atacante', v.pdg)}${campo('eva', 'Evasión del defensor', v.eva)}
-          <div><label for="cr-tipo">Tipo del arma (rango)</label><select id="cr-tipo">${TIPOS.map(t => `<option value="${t}"${num(v.tipo) === t ? ' selected' : ''}>Tipo ${t}</option>`).join('')}</select></div>
-          ${campo('resistencia', 'Resistencia a crítico del defensor (a ese Tipo)', v.resistencia, 'min="0"')}
-          ${campo('frecuente', 'Crítico frecuente ×', v.frecuente, 'min="0"')}${campo('potente', 'Crítico potente ×', v.potente, 'min="0"')}
-          ${campo('dano', 'Daño del golpe (opcional, total con bonos)', v.dano, 'min="0"')}${campo('defensa', 'Defensa del defensor (si no es crítico)', v.defensa, 'min="0"')}
-        </div>
-        <div id="cr-resultado">${resultadoHtml()}</div>
-        <div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar los d20</button><button type="button" id="cr-publicar">📣 Publicar en la Mesa</button></div></div>`;
-      botones();
+    function validar(id){
+      if(id === 'pdg' && v.pdg === '') return 'Escribí la PdG del atacante.';
+      if(id === 'eva' && v.eva === '') return 'Escribí la Evasión del defensor.';
+      if(id === 'critico' && hayCritico() && !tirada) return 'Tirá los d20 del crítico (o volvé y cambiá los números).';
+      return '';
     }
-    function botones(){
-      const e = v.pdg !== '' && v.eva !== '' ? ev() : null;
-      const t = fondo.querySelector('#cr-tirar'), p = fondo.querySelector('#cr-publicar');
-      if(t) t.disabled = !(e && e.critico);
-      if(p) p.disabled = !e || e.nivel === 0;
+    function siguientePaso(){
+      const p = validar(PASOS[paso]);
+      if(p){ error = p; dibujar(); return; }
+      error = '';
+      paso++;
+      dibujar();
+    }
+    function pasoAtras(){ error = ''; paso = Math.max(0, paso - 1); dibujar(); }
+
+    function dibujar(){
+      const id = PASOS[paso], ultimo = paso === PASOS.length - 1;
+      fondo.innerHTML = `<div id="cr-caja" role="dialog"><div class="cr-cab" id="cr-cab" title="Arrastrala para moverla"><h2>🎯 Calculadora de crítico</h2><button type="button" id="cr-x" title="Cerrar">✕</button></div>
+        <div class="cr-sup">Paso ${paso + 1} de ${PASOS.length} · ${TITULOS[id]}</div>
+        <div class="cr-pasos">${PASOS.map((_, i) => `<i class="${i < paso ? 'hecho' : i === paso ? 'ahora' : ''}"></i>`).join('')}</div>
+        <div class="cr-cuerpo">${cuerpo(id)}<div class="cr-error">${esc(error)}</div></div>
+        <div class="cr-fila">${paso > 0 ? '<button type="button" id="cr-atras">◀ Volver</button>' : ''}${ultimo ? '' : '<button type="button" id="cr-sigue" class="prim">Siguiente ▶</button>'}</div></div>`;
+      vistaEva();
+      const foco = fondo.querySelector('#cr-pdg, #cr-eva, #cr-dano');
+      if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30);
     }
     function tirar(){
       const e = ev();
@@ -172,14 +243,15 @@ const Critico = (() => {
       const rolls = Array.from({length: e.dados}, () => 1 + Math.floor(Math.random() * 20));
       const mejor = Math.max(...rolls);
       tirada = {rolls, mejor, mult: multiplicador(mejor, v.potente), dados: e.dados};
-      dibujar(true);
+      error = '';
+      dibujar();
     }
     function publicar(){
       const e = ev();
-      if(typeof mesaPublicar !== 'function' || !e || e.nivel === 0) return;
+      if(typeof mesaPublicar !== 'function' || e.nivel === 0){ if(typeof toast === 'function') toast('No hay crítico que publicar'); return; }
       const t = tirada && tirada.dados === e.dados ? tirada : null;
       const partes = [`PdG ${num(v.pdg)} − Evasión ${num(v.eva)} = ${e.diferencia} (rango ${e.rango})`];
-      if(!e.critico) partes.push(e.nivel > 0 ? 'la Resistencia a crítico lo anula' : 'no es crítico');
+      if(!e.critico) partes.push('la Resistencia a crítico lo anula');
       else if(t){
         partes.push(`${NOMBRE_MULT[t.mult]} (×${t.mult})`);
         if(v.dano !== '') partes.push(`daño ${num(v.dano)} × ${t.mult} = ${num(v.dano) * t.mult}, ignora la Defensa`);
@@ -194,25 +266,36 @@ const Critico = (() => {
       if(!cab || e.target.closest('button')) return;
       e.preventDefault();
       const r = fondo.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
-      const mover = ev => { aMano = true; fondo.style.right = 'auto'; fondo.style.left = Math.max(0, Math.min(innerWidth - 60, ev.clientX - dx)) + 'px'; fondo.style.top = Math.max(0, Math.min(innerHeight - 40, ev.clientY - dy)) + 'px'; };
+      const mover = ev2 => { aMano = true; fondo.style.right = 'auto'; fondo.style.left = Math.max(0, Math.min(innerWidth - 60, ev2.clientX - dx)) + 'px'; fondo.style.top = Math.max(0, Math.min(innerHeight - 40, ev2.clientY - dy)) + 'px'; };
       const soltar = () => { removeEventListener('mousemove', mover); removeEventListener('mouseup', soltar); };
       addEventListener('mousemove', mover); addEventListener('mouseup', soltar);
     });
     fondo.addEventListener('input', e => {
       const id = e.target.id && e.target.id.startsWith('cr-') ? e.target.id.slice(3) : '';
-      if(!id || !(id in v)) return;
+      if(!id || !(id in v) || id === 'atacante' || id === 'defensor' || id === 'tipo') return;
       v[id] = e.target.value === '' && (id === 'pdg' || id === 'eva' || id === 'dano') ? '' : num(e.target.value);
-      tirada = null;
-      dibujar(true);
+      if(id !== 'dano' && id !== 'defensa') tirada = null;   // cambiar los números del crítico invalida los d20 ya tirados; el daño no
+      error = '';
+      if(id === 'pdg' || id === 'eva' || id === 'resistencia') vistaEva();
+      if(id === 'dano' || id === 'defensa'){ const r = fondo.querySelector('#cr-resdano'); if(r) r.innerHTML = textoDano(); }
     });
-    fondo.addEventListener('change', e => { if(e.target.id === 'cr-tipo'){ v.tipo = num(e.target.value); tirada = null; dibujar(true); } });
+    fondo.addEventListener('change', e => {
+      const id = e.target.id;
+      if(id === 'cr-tipo'){ v.tipo = num(e.target.value); tirada = null; cargarDefensor(); }
+      else if(id === 'cr-atacante'){ v.atacante = e.target.value; tirada = null; cargarAtacante(); cargarDefensor(); dibujar(); }
+      else if(id === 'cr-defensor'){ v.defensor = e.target.value; tirada = null; cargarDefensor(); dibujar(); }
+    });
     fondo.addEventListener('click', e => {
       const b = e.target.closest('button'); if(!b) return;
       if(b.id === 'cr-x') cerrar();
+      else if(b.id === 'cr-sigue') siguientePaso();
+      else if(b.id === 'cr-atras') pasoAtras();
       else if(b.id === 'cr-tirar') tirar();
       else if(b.id === 'cr-publicar') publicar();
+      else if(b.id === 'cr-nuevo'){ v.pdg = ''; v.eva = ''; v.dano = ''; tirada = null; error = ''; paso = 1; dibujar(); }
     });
-    dibujar(false);
+    fondo.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.tagName === 'INPUT'){ e.preventDefault(); if(paso < PASOS.length - 1) siguientePaso(); } });
+    dibujar();
     reubicar();
   }
 

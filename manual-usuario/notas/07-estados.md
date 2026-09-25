@@ -38,7 +38,7 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 | [[Cansado y Exhausto\|Cansado / Exhausto]] | debuff | Menos Nitros |
 | [[Rengo]] | debuff | Moverse cuesta el doble |
 | [[Inmovilizado]] | debuff | No te podés mover |
-| [[Sentado]] | debuff (CC) | Evasión a la mitad, sin dodge roll; levantarte cuesta 1 No2 |
+| [[Sentado]] | debuff (CC) | Evasión a la mitad, no podés atacar ni hacer dodge roll; levantarte cuesta 1 No2 |
 | [[Armadura rota]] | debuff | −1 Defensa por acumulación |
 | [[Escudo mágico]] | buff | Barra extra de HP |
 | [[Invulnerable]] | buff | No recibís daño |
@@ -160,7 +160,7 @@ titulo: Sentado
 tags: [estado, control]
 estado: pendiente
 +++
-**Sentado** es un debuff de control: estás en el piso. Tu **Evasión se parte a la mitad** (se tira el dado completo y al resultado se lo divide por 2, para abajo, mínimo 1) y **no podés hacer dodge roll** (a mano, hasta que exista esa tirada). No vence solo: **levantarte cuesta 1 No2** (botón *Levantarse* de la Botonera, o de las Acciones de un creep), y con eso se saca el estado.
+**Sentado** es un debuff de control: estás en el piso. Tu **Evasión se parte a la mitad** (se tira el dado completo y al resultado se lo divide por 2, para abajo, mínimo 1) **no podés atacar** (la ficha te avisa y te deja seguir si querés) y **no podés hacer dodge roll** (a mano, hasta que exista esa tirada). No vence solo: **levantarte cuesta 1 No2** (botón *Levantarse* de la Botonera, o de las Acciones de un creep), y con eso se saca el estado.
 
 +++
 titulo: Inmovilizado

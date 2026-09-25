@@ -3586,7 +3586,7 @@ const ESTADOS_PRESET_GM = [
   {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true, esCC:true,
     detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, stacks:1, hpTurno:0, sentado:true, esCC:true,
-    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo) y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de sus Acciones).'},
+    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de sus Acciones).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
@@ -5234,6 +5234,7 @@ document.addEventListener('click', e => {
   if(b.dataset.atacarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.atacarcreep);
     if(!sc) return;
+    if((sc.estados || []).some(e => e.activo !== false && e.sentado) && !confirm(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
     const costo = costoAtaqueCreep(sc);
     if(costo > num(sc.nitros)){
       toast(`${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);

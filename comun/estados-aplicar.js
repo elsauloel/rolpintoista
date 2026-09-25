@@ -26,7 +26,7 @@ const EstadosAplicar = (() => {
     {nombre: 'Lisiado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, lisiado: true, esCC: true, detalle: 'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
     {nombre: 'Inmovilizado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, inmovilizado: true, esCC: true, detalle: 'El Movimiento queda en 0 mientras dure.'},
     {nombre: 'Rengo', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, rengo: true, esCC: true, detalle: 'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Sentado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: 0, permanente: true, sentado: true, esCC: true, detalle: 'Su Evasión se parte a la mitad y no puede hacer dodge roll. No vence solo: levantarse cuesta 1 No2.'},
+    {nombre: 'Sentado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: 0, permanente: true, sentado: true, esCC: true, detalle: 'Su Evasión se parte a la mitad, no puede atacar y no puede hacer dodge roll. No vence solo: levantarse cuesta 1 No2.'},
   ];
 
   function limpiarSpec(spec){

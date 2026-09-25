@@ -6851,7 +6851,7 @@ const EFECTOS_PRESET = [
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
-    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo) y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera).'},
+    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
@@ -8679,6 +8679,12 @@ function trampaGuardarCampo(el){
   else t[k] = el.value;
 }
 // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
+// Habilidad con zona en el mapa (zonaMapa: 'cono'): le avisa al mapa (la ficha corre en su iframe) para que dibuje el área 3 segundos.
+function avisarZonaAlMapa(h){
+  if(!h || !h.zonaMapa || window.parent === window || !fichaVivo || !fichaVivo.id) return;
+  try{ window.parent.postMessage({tipo: 'zona-habilidad', fichaId: fichaVivo.id, forma: h.zonaMapa, nombre: h.nombre}, location.origin); }
+  catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
+}
 async function colocarTrampaDeHab(h){
   const t = h.trampaColocar;
   if(!t || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id) return;
@@ -9703,6 +9709,8 @@ function lupaHtml(clave){
 
 
 function atacar(){
+  // Sentado no puede atacar: se avisa y se deja seguir (las herramientas ayudan, no prohíben).
+  if(efectoSentado() && !confirm('Estás Sentado: no podés atacar. ¿Atacar igual?')) return;
   const armas = armasEquipadasConDano();
   if(armas.length <= 1){ atacarConArma(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML = armas.map(a => `
@@ -9824,6 +9832,7 @@ function ejecutarHabilidad(id, armaId, forzar){
   const ataque = registrarAtaqueDeHabilidad(it, arma);
   const efecto = aplicarEfectoDeConsumo(it);
   colocarTrampaDeHab(it);
+  avisarZonaAlMapa(it);
   anunciarHabilidad(it);
   tirarPrimeraDeHab(it);
   renderList("habilidades");
@@ -9875,6 +9884,7 @@ function confirmarCostoVariable(){
   pendingArmaHab = undefined;
   const efecto = aplicarEfectoDeConsumo(it);
   colocarTrampaDeHab(it);
+  avisarZonaAlMapa(it);
   anunciarHabilidad(it);
   tirarPrimeraDeHab(it);
   $("#scrim-costox").classList.remove("open");

@@ -6,6 +6,8 @@
 > Recordar la esencia del proyecto ([`../CLAUDE.md`](../CLAUDE.md)): todo esto son **sugerencias e invitaciones**, y si se puede automatizar se
 > automatiza; si no, se aclara (⚙ / ✋).
 
+> Ver también la [`guia-de-diseno.md`](guia-de-diseno.md): qué mecánica "le pertenece" a cada familia de arma o elemento.
+
 ## 1. Efectos sobre la niebla y la visibilidad (mencionado antes)
 Skills, estados o equipo que jueguen con lo que se ve: ampliar o achicar el radio de visión, ver a través de un Sólido, destapar o volver a
 tapar niebla, ceguera, visión en la oscuridad, detectar lo oculto o romper el sigilo. Ya existe la base en el mapa (doble niebla, cono de

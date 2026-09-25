@@ -6455,6 +6455,9 @@ function puedoCambiarEstados(t){
 }
 
 // "12" fija el valor; "+5" / "-3" suma o resta. null si no se entiende.
+// Firebase (plan gratis) corta todo cuando se pasa de la cuota del día (20.000 escrituras / 50.000 lecturas): el error crudo dice "quota exceeded".
+const CUOTA_AGOTADA_TXT = 'Se acabó la cuota gratis de Firebase por hoy (se renueva sola de madrugada, ~4 a.m. de Argentina). Hasta entonces no se puede guardar nada.';
+function esCuotaAgotada(err){ return !!err && (err.code === 'resource-exhausted' || /quota/i.test(String(err.message || ''))); }
 function leerValorVital(texto, actual){
   const crudo = String(texto || '').trim().replace(',', '.').replace('−', '-');
   const m = crudo.match(/^([+-])\s*(\d+(?:\.\d+)?)$/);
@@ -7637,6 +7640,7 @@ async function hudAplicar(clave, texto){
   }catch(err){
     console.error('No se pudo cambiar el valor:', err);
     toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
+      : esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT
       : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
   }finally{
     hudEditando = '';
@@ -7655,6 +7659,7 @@ async function hudAplicarMax(clave, texto){
   }catch(err){
     console.error('No se pudo cambiar el SP máximo:', err);
     toast(err.message === ERROR_TIPEO ? 'Escribí un número, +5 / -3 o «auto»'
+      : esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT
       : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
   }finally{
     pedirDibujo();
@@ -7826,7 +7831,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
     }
   }catch(err){
     console.error('No se pudo cambiar el estado:', err);
-    toast(err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo cambiar el estado: ' + err.message);
+    toast(esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo cambiar el estado: ' + err.message);
   }
 }
 

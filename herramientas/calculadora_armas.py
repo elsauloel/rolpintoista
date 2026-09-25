@@ -33,6 +33,14 @@ TASA_STAT_DEFECTO = 1.0
 UMBRAL_TIER = [('Común', 0), ('Buena Calidad', 7.5), ('Raro', 11), ('Excepcional', 17), ('Legendario', 26)]
 BANDA_PRECIO = {'Común': (30, 90), 'Buena Calidad': (80, 160), 'Raro': (150, 350), 'Excepcional': (400, 900), 'Legendario': (1000, 2000)}
 SOBREPRECIO = 1.5
+# El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
+# se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
+FACTOR_CRIT = {4: 1.75, 6: 1.0, 8: 0.75, 10: 0.6, 12: 0.5}
+
+
+def factor_plano(tipo):
+    return 4 / max(2, math.ceil(int(tipo or 8) / 2))
+
 ORDEN = [t for t, _ in UMBRAL_TIER]
 
 # Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
@@ -71,13 +79,16 @@ def probabilidad(e):
 def puntaje(arma):
     """Devuelve (PC total, desglose)."""
     tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
-    d = {'daño': peso * (tipo + 1) / 2 + fijo}
+    d = {'daño': peso * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
     fam = familia(arma)
     bonos = crit = 0.0
     for m in arma.get('mods') or []:
         st, v = m.get('stat'), float(m.get('val') or 0)
         if st in ('crit', 'critpot'):
-            crit += v * PESO_CRIT * K_EFECTO
+            util = min(v, max(0, tipo - 2)) if st == 'crit' else min(v, 6)   # el rango no baja de 2 (Tipo 4 aprovecha 2 puntos) y el doble daño llega a 1 con 6 puntos de potente
+            crit += util * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
+        elif st == 'dmg':
+            bonos += v * TASA_STAT['dmg'] * factor_plano(tipo)
         else:
             bonos += v * TASA_STAT.get(st, TASA_STAT_DEFECTO)
     d['bonos'] = bonos
@@ -90,7 +101,7 @@ def puntaje(arma):
         if str(nombre).startswith('Ignora'):   # "Ignora N de Res. crítico" ≈ N puntos de Frecuente (convención 1:1), solo si es Tipo 4/6
             try: n = int(str(nombre).split()[1])
             except Exception: n = 1
-            ef += n * PESO_CRIT * K_EFECTO * probabilidad(e)
+            ef += n * PESO_CRIT * K_EFECTO * probabilidad(e) * FACTOR_CRIT.get(tipo, 1.0)
             continue
         base = PESO_EFECTO[nombre]
         if nombre == 'Envenenar' and 'severo' in str(e.get('detalle', '')).lower():

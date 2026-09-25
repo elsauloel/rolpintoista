@@ -54,7 +54,7 @@ Afortunado, Sangre pura, Coagulación extrema, Blindado, Sigilo.
 
 ## Objetivo: calcular calidad y tier de ítems y armar catálogos por grupo
 El dueño va dando herramientas de diseño para que, cuando pida un catálogo, se pueda **calcular la calidad y el tier de cada ítem** e **imaginar ítems en grupo** (sets, familias) que él después **audita**. Piezas: los tres niveles de efecto por familia (§1b), el peso de cada efecto (P112) y las reglas de combate de las que depende el valor de cada número. Reglas base ya dadas:
-- **Golpe crítico (P113, en elaboración):** PdG − Evasión ≥ Tipo del arma → crítico; ignora armadura y tira 1d20 para el multiplicador de daño (7+ ×2, 17+ ×3, 20 ×4). El nivel del crítico es N = diferencia ÷ Tipo (hacia abajo): se tiran **N d20 y vale el mejor** (2 × Tipo = doble crítico = 2d20…). La **Resistencia a crítico resta niveles** (un punto = un crítico anulado, por Tipo de arma): se tiran N − R dados. La **Resistencia a crítico** se define después de esto.
+- **Golpe crítico (P113, en elaboración):** PdG − Evasión ≥ Tipo del arma → crítico; ignora armadura y tira 1d20 para el multiplicador de daño (menos de 7 ×1, 7+ ×2, 17+ ×3, 20 ×4) sobre **todo** el daño del golpe (dados, Fuerza y demás bonos). El nivel del crítico es N = diferencia ÷ Tipo (hacia abajo): se tiran **N d20 y vale el mejor** (2 × Tipo = doble crítico = 2d20…). La **Resistencia a crítico resta niveles** (un punto = un crítico anulado, por Tipo de arma): se tiran N − R dados. La **Resistencia a crítico** se define después de esto.
 
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).

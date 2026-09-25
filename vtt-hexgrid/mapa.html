@@ -728,6 +728,9 @@ body.con-ruta .toast{bottom:auto;top:74px}
       <kbd>T</kbd><span>🔮 Ver el Rango de casteo del token seleccionado (también <kbd>Shift</kbd> + <kbd>R</kbd>)</span>
       <kbd>C</kbd><span>Centrar el mapa en tu token (o en el token seleccionado)</span>
       <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
+      <kbd>E</kbd><span>Estados alterados del token seleccionado (abrir / cerrar)</span>
+      <span class="combo"><kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>V</kbd></span><span>Copiar la forma seleccionada y pegarla donde está el mouse</span>
+      <span class="combo"><kbd>Ctrl</kbd> + <kbd>Z</kbd></span><span>Deshacer paso a paso (movimientos, giros y cambios de HP, SP y No2) hasta el próximo Mantenimiento</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>L</kbd></span><span>Modo lentes: ver los conos de detección (prender / apagar)</span>
       <kbd>Enter</kbd><span>Crear la forma en borrador · confirmar un movimiento</span>
@@ -4655,6 +4658,26 @@ document.addEventListener('keydown', e => {
     else abrirBotoneraPrincipal();
     return;
   }
+  // E (2026-09-25, pedido del dueño): abre o cierra el globo de ESTADOS ALTERADOS del token seleccionado.
+  if((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
+    e.preventDefault();
+    if(!seleccion || !tokens.get(seleccion)){ toast('Seleccioná un token para ver sus estados alterados'); return; }
+    hudGlobo = hudGlobo === 'estados' ? '' : 'estados';
+    hudEditando = '';
+    pedirDibujo();
+    return;
+  }
+  // Ctrl+C / Ctrl+V (2026-09-25, pedido del dueño): copian la forma seleccionada y la pegan donde está el mouse.
+  if((e.key === 'c' || e.key === 'C') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && fbMiembro && elementoSeleccionado){
+    e.preventDefault();
+    copiarElementoSeleccionado();
+    return;
+  }
+  if((e.key === 'v' || e.key === 'V') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && fbMiembro && portapapelesElemento){
+    e.preventDefault();
+    pegarElemento();
+    return;
+  }
   if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
@@ -5090,6 +5113,45 @@ async function colisionBorrar(quitar){
     let ok = true;
     for(const grupo of componentesConexos(quedan)) ok = (await colisionCrear(grupo)) && ok;
     if(ok) await borrarElemento(id);
+  }
+}
+
+/* ---------- Copiar y pegar formas (Ctrl+C / Ctrl+V) ----------
+   Copia la forma seleccionada (tal como está: color, tamaño, imagen, sólido, trampa, turnos…) y la pega centrada en la casilla
+   donde está el mouse; se puede pegar las veces que se quiera. Las de Colisión no se copian (se pintan). Un rearmado de trampa
+   vuelve a quedar sin disparar, y los turnos empiezan a contar de nuevo desde el Mantenimiento actual. */
+let portapapelesElemento = null;
+let punteroMundo = null;   // último punto del mapa donde estuvo el mouse (para pegar ahí)
+lienzo.addEventListener('pointermove', e => { const p = posEvento(e); punteroMundo = pantallaAMundo(p.px, p.py); });
+function copiarElementoSeleccionado(){
+  const el = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
+  if(!el){ return; }
+  if(el.colision){ toast('La Colisión del mapa no se copia: se pinta con su herramienta'); return; }
+  const celdas = [];
+  el.celdas.forEach(c => celdas.push(c.dq, c.dr));
+  portapapelesElemento = {...el, celdas};
+  toast('Forma copiada: Ctrl+V la pega donde tengas el mouse');
+}
+async function pegarElemento(){
+  const c = portapapelesElemento;
+  if(!c || !fbUsuario) return;
+  const destino = punteroMundo ? mundoAHex(punteroMundo.x, punteroMundo.y) : c.origen;
+  const datos = {
+    tipo: c.tipo, origen: {col: destino.col, fila: destino.fila}, celdas: c.celdas, rotacion: c.rotacion,
+    color: c.color, alfa: c.alfa, solido: !!c.solido, invisible: !!(soyGM && c.invisible), imagen: c.imagen || '',
+    imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
+    ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
+      trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {})} : {}),
+    ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos} : {}),
+    duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    const ref = await coleccionElementos().add(datos);
+    elementoSeleccionar(ref.id);
+    toast('Forma pegada');
+  }catch(err){
+    console.error('No se pudo pegar la forma:', err);
+    toast(esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT : err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo pegar');
   }
 }
 
@@ -5675,26 +5737,55 @@ function gastarNitrosCreep(creepId, costo){
   });
 }
 
-/* ---------- Deshacer (Ctrl+Z): solo el último movimiento o giro ----------
-   Se anota cada movimiento (casilleros con No2, mover libre) y cada giro
-   del token propio. Ctrl+Z lo vuelve a su lugar y orientación, devuelve los
-   No2 que costó y vuelve a tapar la niebla que ese paso descubrió. Un solo
-   paso hacia atrás, y no después de un Mantenimiento (los No2 ya se
-   recargaron). */
-let deshacerUltimo = null;
+/* ---------- Deshacer (Ctrl+Z), encadenado (2026-09-25, pedido del dueño) ----------
+   Se anota cada movimiento (casilleros con No2, mover libre), cada giro del token propio y cada cambio de HP, SP o No2 hecho
+   desde el token. Ctrl+Z los va deshaciendo de a uno, del más nuevo al más viejo: un movimiento vuelve a su lugar y orientación
+   (devuelve los No2 que costó y vuelve a tapar la niebla que descubrió) y un cambio de HP, SP o No2 vuelve al valor de antes.
+   Límite: los últimos DESHACER_MAX pasos de ESTA pantalla, y solo dentro del mismo turno — tras un Mantenimiento se pierde la
+   pila (los No2 ya se recargaron y el resto cambió). No se recupera nada que haya hecho otro (un daño de trampa, un estado). */
+const DESHACER_MAX = 30;
+const deshacerPila = [];
 
 function deshacerRegistrar(e){
-  deshacerUltimo = {...e, mant: mantenimientoNumero};
+  deshacerPila.push({...e, mant: mantenimientoNumero});
+  if(deshacerPila.length > DESHACER_MAX) deshacerPila.shift();
+}
+
+// Cambio de HP, SP o No2 desde el token: se anota el valor de ANTES para poder volver a él.
+function vitalActual(t, clave){
+  const d = hudDatos(t);
+  const v = clave === 'hp' ? d.hp : clave === 'sp' ? d.sp : d.no2;
+  return v === null || v === undefined ? null : num(v);
+}
+function vitalRegistrar(id, clave, antes){
+  if(antes === null || antes === undefined) return;
+  deshacerRegistrar({tipo: 'vital', id, clave, antes});
+}
+async function deshacerVital(u){
+  const t = tokens.get(u.id);
+  if(!t || !puedoCambiarVida(t)) return;
+  const txt = String(u.antes);
+  const nombre = u.clave === 'hp' ? 'HP' : u.clave === 'sp' ? 'SP' : 'No2';
+  try{
+    if(u.clave === 'no2') await cambiarNitros(t, txt);
+    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, txt);
+    else await cambiarVidaPj(t, u.clave, txt);
+    pedirDibujo();
+    toast(`Deshecho: ${nombre} vuelve a ${fmt(u.antes)}`);
+  }catch(err){
+    console.error('No se pudo deshacer:', err);
+    toast(esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT : err.code === 'permission-denied' ? 'No podés deshacer eso' : 'No se pudo deshacer');
+  }
 }
 
 async function deshacerUltimoMovimiento(){
-  const u = deshacerUltimo;
-  if(!u){ toast('No hay nada para deshacer'); return; }
+  if(!deshacerPila.length){ toast('No hay nada para deshacer'); return; }
   if(rutaPendiente) return;   // hay un movimiento marcado sin confirmar: primero eso
-  if(u.mant !== mantenimientoNumero){ deshacerUltimo = null; toast('Ya pasó el turno: no se puede deshacer'); return; }
+  if(deshacerPila[deshacerPila.length - 1].mant !== mantenimientoNumero){ deshacerPila.length = 0; toast('Ya pasó el turno: no se puede deshacer'); return; }
+  const u = deshacerPila.pop();
+  if(u.tipo === 'vital'){ await deshacerVital(u); return; }
   const t = tokens.get(u.id);
-  if(!t){ deshacerUltimo = null; return; }
-  deshacerUltimo = null;
+  if(!t) return;
   try{
     if(u.costo > 0){
       if(u.esCreep) await gastarNitrosCreep(u.fichaId, -u.costo);
@@ -5715,7 +5806,7 @@ async function deshacerUltimoMovimiento(){
     nieblaDeshacer(u.seq0, u.pend0);
     renderPanel();
     pedirDibujo();
-    toast(`Deshecho${u.costo > 0 ? ` · +${fmt(u.costo)} No2` : ''}`);
+    toast(`Deshecho${u.costo > 0 ? ` · +${fmt(u.costo)} No2` : ''}${deshacerPila.length ? ` · quedan ${deshacerPila.length} para deshacer` : ''}`);
   }catch(err){
     console.error('No se pudo deshacer:', err);
     toast(err.code === 'permission-denied' ? 'No podés deshacer eso' : 'No se pudo deshacer');
@@ -6528,7 +6619,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,
@@ -7065,11 +7156,11 @@ function resolverGolpe(golpe, defensa, efectos){
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
   let recibido = Math.max(0, golpe - defensa);
   let absorbido = 0;
-  const escudo = activos.find(e => num(e.escudoMagico) > 0 && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
+  const escudo = activos.find(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0);
   if(escudo && recibido > 0){
     const actual = num(escudo.escudoMagicoActual ?? escudo.escudoMagico);
     absorbido = Math.min(recibido, actual);
-    escudo.escudoMagicoActual = actual - absorbido;
+    escudo.escudoMagicoActual = actual - absorbido; escudo.escudoMagico = escudo.escudoMagicoActual;   // valor neto: no hay máximo
     recibido -= absorbido;
   }
   return {recibido, absorbido, defensa};
@@ -7175,7 +7266,9 @@ async function hudHpAplicar(t, texto){
       return;
     }
     if(/^[+\-−]/.test(String(texto).trim())){ toast('Para curar o ajustar sin Defensa, usá 2 · HP directo'); return; }
+    const idTok = seleccion, antes = vitalActual(t, 'hp');
     if(t.tipo === 'creep') await danioCreep(t, texto); else await danioPj(t, texto);
+    vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){
     console.error('No se pudo aplicar el daño:', err);
@@ -7201,10 +7294,14 @@ function hudEstadosHtml(t, estados, puede){
       <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>
       ${det ? `<span class="estado-tip"><b>${esc(e.nombre)}</b>${esc(det)}</span>` : ""}
       <span class="turnos">${turnos}</span>` +
-      (num(e.escudoMax) > 0 && (puede || t.tipo !== 'creep')
+      (e.armaduraRota && (puede || t.tipo !== 'creep')
         ? (puede && !e.derivado
-          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos de escudo">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor del escudo (número, +N, -N; o 'max N' para cambiar el máximo)">🛡${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Un punto más de escudo">+</button>`
-          : `<span class="turnos" title="Escudo actual / máximo">🛡${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}</span>`) : '') +
+          ? `<button type="button" class="hud-mini" data-hud-armrota="${i}:-1" title="Un punto menos de armadura rota (al llegar a 0, se repara)">−</button><button type="button" class="hud-mini" data-hud-armrota="${i}:set" title="Escribir cuántos puntos de armadura rota (número, +N, -N; 0 la repara)">×${fmt(num(e.stacks) || 1)}</button><button type="button" class="hud-mini" data-hud-armrota="${i}:1" title="Un punto más de armadura rota">+</button>`
+          : `<span class="turnos" title="Puntos de armadura rota">×${fmt(num(e.stacks) || 1)}</span>`) : '') +
+      (e.escudo !== undefined && (puede || t.tipo !== 'creep')
+        ? (puede && !e.derivado
+          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos de escudo">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor del escudo (número, +N, -N; sin tope)">🛡${fmt(num(e.escudo))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Un punto más de escudo">+</button>`
+          : `<span class="turnos" title="Escudo">🛡${fmt(num(e.escudo))}</span>`) : '') +
       (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
@@ -7526,12 +7623,23 @@ function hudConectar(t){
     if(e) abrirEditarEstado(t, e.nombre);
   });
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
+  hud.querySelectorAll('[data-hud-armrota]').forEach(b => b.onclick = () => {
+    const [i, acc] = b.dataset.hudArmrota.split(':');
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
+    if(!e) return;
+    const stacks = Math.max(1, num(e.stacks) || 1);
+    const txt = acc === 'set' ? prompt(`${e.nombre}: ×${fmt(stacks)}
+Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, fmt(stacks)) : (num(acc) > 0 ? '+' : '') + acc;
+    if(txt === null) return;
+    hudEstadoCambiar(t, num(i), 'armadura', txt);
+  });
   hud.querySelectorAll('[data-hud-escudo]').forEach(b => b.onclick = () => {
     const [i, acc] = b.dataset.hudEscudo.split(':');
     const v = vinculo(t);
     const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
     if(!e) return;
-    const txt = acc === 'set' ? prompt(`${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
+    const txt = acc === 'set' ? prompt(`${e.nombre}: escudo ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'escudo', txt);
   });
@@ -7658,10 +7766,12 @@ function hudConectar(t){
 async function hudAplicar(clave, texto){
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !puedoCambiarVida(t) || !String(texto).trim()){ hudEditando = ''; pedirDibujo(); return; }
+  const idTok = seleccion, antes = vitalActual(t, clave);
   try{
     if(clave === 'no2') await cambiarNitros(t, texto);
     else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
     else await cambiarVidaPj(t, clave, texto);
+    vitalRegistrar(idTok, clave, antes);
   }catch(err){
     console.error('No se pudo cambiar el valor:', err);
     toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
@@ -7790,14 +7900,12 @@ function abrirEditarEstado(t, nombre){
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
-// Escudo especial: el texto puede ser un número (valor actual nuevo), +N / -N o "max N" (cambia el máximo). Igual que en ficha y gm-tools.
-function escudoParsear(txt, actual, max){
-  const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
+// Escudo especial: el texto puede ser un número (el valor nuevo) o +N / -N; no hay máximo (es un valor neto). Igual que en ficha y gm-tools.
+function escudoParsear(txt, actual){
+  const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
   if(!t) return null;
-  const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
-  if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, actual + parseFloat(t)))};
-  if(/^\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, parseFloat(t)))};
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return Math.max(0, actual + parseFloat(t));
+  if(/^\d+(?:\.\d+)?$/.test(t)) return Math.max(0, parseFloat(t));
   return null;
 }
 async function hudEstadoCambiar(t, indice, accion, delta){
@@ -7809,11 +7917,18 @@ async function hudEstadoCambiar(t, indice, accion, delta){
     const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
     if(i < 0) throw new Error('Ese estado ya no está');
     if(accion === 'quitar') arr.splice(i, 1);
+    else if(accion === 'armadura'){
+      // Armadura rota: -1 de Defensa por punto (stacks). Al llegar a 0 se repara (el estado se saca), igual que en la ficha.
+      const e = arr[i], actual = Math.max(1, num(e.stacks) || 1);
+      const n = leerValorVital(delta, actual);
+      if(n === null) throw new Error('escribí un número, +N o -N');
+      if(Math.round(n) <= 0) arr.splice(i, 1); else e.stacks = Math.round(n);
+    }
     else if(accion === 'escudo'){
-      const e = arr[i], max = num(e.escudoMagico), actual = num(e.escudoMagicoActual ?? e.escudoMagico);
-      const n = escudoParsear(delta, actual, max);
-      if(!n) throw new Error('escribí un número, +N, -N o "max N"');
-      e.escudoMagico = n.max; e.escudoMagicoActual = n.actual;
+      const e = arr[i], actual = num(e.escudoMagicoActual ?? e.escudoMagico);
+      const n = escudoParsear(delta, actual);
+      if(n === null) throw new Error('escribí un número, +N o -N');
+      e.escudoMagico = n; e.escudoMagicoActual = n;   // valor neto: sin máximo
     }
     else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
     return arr;
@@ -7837,7 +7952,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           if(!inv) throw new Error('La invocación ya no existe');
           inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));
@@ -7845,7 +7960,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         }else{
           datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(num(e.escudoMagico) > 0 ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), escudoMax: num(e.escudoMagico)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico)} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));

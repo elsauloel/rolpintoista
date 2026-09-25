@@ -195,7 +195,7 @@ Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fu
 
 | Estado | Cuánto absorbe | Duración |
 |---|---|---|
-| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |
+| **Escudo mágico** | 10 (editable) | 3 turnos; es un **valor neto**, sin tope ni recarga automática: baja al absorber daño y se sube o baja a mano (chip del estado o token) |
 | **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |
 
 Se ve como una barra 🛡 sobre tu token.

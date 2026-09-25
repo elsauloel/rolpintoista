@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T04:10:25Z",
+ "actualizado": "2026-09-25T09:52:46Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1148,7 +1148,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n| Estado | Cuánto absorbe | Duración |\n|---|---|---|\n| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\nSe ve como una barra 🛡 sobre tu token."
+   "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n| Estado | Cuánto absorbe | Duración |\n|---|---|---|\n| **Escudo mágico** | 10 (editable) | 3 turnos; es un **valor neto**, sin tope ni recarga automática: baja al absorber daño y se sube o baja a mano (chip del estado o token) |\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\nSe ve como una barra 🛡 sobre tu token."
   },
   {
    "id": "invulnerable",

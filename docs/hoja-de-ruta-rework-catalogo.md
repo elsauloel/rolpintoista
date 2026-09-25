@@ -10,7 +10,7 @@
 | # | Fase | Estado |
 |---|---|---|
 | 0 | **Parámetros de diseño** (criterios generales, crítico, escasez de resistencias, familias de arma, magia) | 🟢 En marcha: la mayor parte dictada, ver "Decidido" |
-| 1 | **Armas no mágicas, elemento por elemento**: Tipo y Peso con costo en Nitros → empuñadura y mano izquierda → Rango/Alcance → bonos → efectos al golpear por familia → crítico frecuente/potente → estado al equipar → tier/calidad/precio | 🔲 Próximo |
+| 1 | **Armas no mágicas, elemento por elemento**: Tipo y Peso con costo en Nitros → empuñadura y mano izquierda → Rango/Alcance → bonos → efectos al golpear por familia → crítico frecuente/potente → estado al equipar → tier/calidad/precio | 🟢 **Arrancó (2026-09-25):** hoja de trabajo en [`rework-armas.md`](rework-armas.md) |
 | 2 | **Equipo defensivo**: Defensa, resistencias a crítico por slots (P114), resistencias elementales, anillos (mágicos, uno por mano, escasos y caros) | 🔲 |
 | 3 | **Magia**: armas de daño y de efecto, paralelismos con las físicas usando matemática (daño en función de Nitros, SP, peso); tipos de daño arcano/fuego/hielo/rayo (P116). El dueño pidió ayuda para pensar los paralelismos | 🔲 Después de la fase 1 |
 | 4 | **Motor de calidad, tier y precio** (P112): relevancia de cada elemento (tabla en la guía §0b), peso de los efectos, fórmula | 🔲 |

@@ -560,6 +560,10 @@ aside{
 }
 #hud .hud-hp-modos{display:flex;gap:6px;margin-bottom:8px}
 #hud .hud-hp-modos .hud-mini{flex:1;padding:4px 6px}
+#hud .hud-crit-fila{display:flex;gap:5px;margin-bottom:8px}
+#hud .hud-crit-fila .hud-mini{flex:1 1 0;min-width:0;padding:4px 2px;white-space:nowrap;text-align:center}
+#hud .hud-crit-fila .hud-mini:first-child{flex:1.7 1 0}
+#hud .hud-crit-fila .hud-mini.calc{flex:0 0 30px}
 #hud .hud-mini.activo{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
 #hud .hud-hp-expl{color:var(--muted);line-height:1.4;margin-bottom:8px}
 #hud .hud-hp-expl b{color:var(--paper)}
@@ -7426,9 +7430,9 @@ function hudHpHtml(t, d){
         : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
       : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
-    ${danio ? `<div class="hud-hp-modos" title="Si el golpe fue crítico, elegí el multiplicador que dio el d20: el daño se multiplica y NO se resta la Defensa">
-      ${[[1, 'Sin crítico'], [2, 'Doble ×2'], [3, 'Triple ×3'], [4, 'Cuádruple ×4']].map(([k, r]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}">${r}</button>`).join('')}
-      ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
+    ${danio ? `<div class="hud-crit-fila" title="Si el golpe fue crítico, elegí el multiplicador que dio el d20: el daño se multiplica y NO se resta la Defensa">
+      ${[[1, 'Normal', 'Sin crítico'], [2, '×2', 'Doble daño'], [3, '×3', 'Triple daño'], [4, '×4', 'Cuádruple daño']].map(([k, r, t2]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}" title="${t2}">${r}</button>`).join('')}
+      ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini calc" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
     </div>` : ''}
     <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>

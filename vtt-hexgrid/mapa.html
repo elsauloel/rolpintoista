@@ -2662,6 +2662,20 @@ let iniciativa = {orden: [], turno: 0, ronda: 1};
 let iniciativaPlegada = false;
 try{ iniciativaPlegada = localStorage.getItem('mapa-iniciativa-plegada') === '1'; }catch(e){}
 
+// Aviso de quién actúa (2026-09-25, pedido del dueño): cuando el GM aprieta ▶ Siguiente (o cambia el turno), el token al que le toca
+// se rodea unos segundos de un anillo que pulsa y de ondas que se expanden, en la pantalla de TODOS. Respeta lo que cada uno puede
+// ver: si ese token está oculto, en sigilo para vos o fuera de tu visión, no se marca (no delata nada).
+let iniciativaCargada = false;   // el primer snapshot no anuncia nada (solo es "lo que ya había")
+function anunciarTurnoEnMapa(){
+  const o = iniciativa.orden[iniciativa.turno];
+  if(!o) return;
+  const t = tokens.get(o.id);
+  if(!t) return;
+  if(!soyGM && (t.oculto || o.oculto)) return;
+  if(ocultoPorSigiloParaMi(t) || !tokenVisiblePorNiebla(t)) return;
+  iniResaltado = {id: o.id, hasta: Date.now() + 5000, turno: true};
+  pedirDibujo();
+}
 function escucharIniciativa(){
   cortarIniciativa = fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
@@ -2671,8 +2685,11 @@ function escucharIniciativa(){
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
     };
-    if(iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda) giroLibre.clear();   // avanzó el turno: acción de otro
+    const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
+    if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
     renderIniciativa();
+    if(iniciativaCargada && cambioTurno && iniciativa.orden.length) anunciarTurnoEnMapa();
+    iniciativaCargada = true;
   }, err => console.error('Error escuchando la iniciativa:', err));
 }
 
@@ -3930,6 +3947,14 @@ function dibujar(){
       ctx.beginPath(); ctx.arc(v.x, v.y, HEX * (0.95 + 0.18 * pulso), 0, 2 * Math.PI);
       ctx.strokeStyle = `rgba(15,8,10,${0.7 * alfa})`; ctx.lineWidth = 9 / z; ctx.stroke();
       ctx.strokeStyle = `rgba(255,214,110,${alfa})`; ctx.lineWidth = 5 / z; ctx.stroke();
+      // Aviso de turno: además, dos ondas que se expanden desde el token y se desvanecen (para que se note a lo lejos).
+      if(iniResaltado.turno){
+        [0, 0.5].forEach(desfase => {
+          const fase = ((Date.now() / 1400) + desfase) % 1;
+          ctx.beginPath(); ctx.arc(v.x, v.y, HEX * (0.9 + 2.2 * fase), 0, 2 * Math.PI);
+          ctx.strokeStyle = `rgba(255,214,110,${(1 - fase) * 0.85 * alfa})`; ctx.lineWidth = 4 / z; ctx.stroke();
+        });
+      }
       ctx.restore();
       animando = true;
     }

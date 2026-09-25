@@ -2112,9 +2112,14 @@ function migrarEstadoIt2(st){
     }
   });
   ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'esp*3' : 'agl'; });
-  // SP Regen: base 0 (solo lo dan habilidades, equipo o estados). Las fichas
-  // que quedaron con la base vieja (floor(int/2)) vuelven a 0.
-  if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = '0';
+  // SP Regen (2026-09-24, regla por defecto del dueño): TODOS los personajes regeneran, en el Mantenimiento, la mitad de su
+  // Especial redondeada hacia abajo (base floor(esp/2)) + lo que sumen habilidades, equipo o estados. Las fichas que tenían la base
+  // vieja (0, o floor(int/2)) pasan a la nueva UNA sola vez (marca spRegenAuto); si después alguien la deja a mano en 0, se respeta.
+  if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = 'floor(esp/2)';
+  if(!st.spRegenAuto){
+    if(f.spregen === '0') f.spregen = 'floor(esp/2)';
+    st.spRegenAuto = true;
+  }
   if(f.vision === undefined) f.vision = '6';
   Object.keys(f).forEach(k => {
     if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
@@ -2308,12 +2313,13 @@ const DEFAULT = {
   muerto:{activo:false, turnos:5, definitivo:false},
   caps:{mochila:20, cinturon:5},
   armadura:{nota:''},
+  spRegenAuto:false,   // ya se pasó la base de SP Regen a la regla por defecto (mitad del Especial); ver migrarEstadoIt2
   formulas:{
     resmg:'con', rescc:'con', hpmax:'con*5',
     dmg:'fue', bloqueo:'fue', crgmax:'fue',
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'des', parry:'des', percepcion:'des',
-    pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'0', rangocasteo:'esp',
+    pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'floor(esp/2)', rangocasteo:'esp',
     def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', vision:'6'
   },
   inventario:[],
@@ -9992,6 +9998,16 @@ function mantenimiento(){
   const terminados = new Set();
   const hpAntes = num(S.hp);
 
+  // SP Regen: AL PRINCIPIO del Mantenimiento (2026-09-24), con los números de antes de que venza o cambie ningún estado.
+  // Por defecto es la mitad del Especial, redondeada hacia abajo (fórmula base del stat), más lo que sumen habilidades, equipo o estados.
+  // Recupera SP sin pasar del máximo (si ya estaba por encima, no se toca).
+  const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
+  const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
+  if(spRecuperado){
+    S.spGastado = num(S.spGastado) - spRecuperado;
+    rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
+  }
+
   const efectosActivosMant = S.efectos.filter(e => e.activo !== false);
   const esInvulnerable = efectosActivosMant.some(e => e.invulnerable);
   const inmuneVenenoMant = efectosActivosMant.some(e => e.sangrePura);
@@ -10086,14 +10102,7 @@ function mantenimiento(){
   S.turno = (S.turno || 1) + 1;
   parryArmaPendiente = null;
   // Nitros se recargan al máximo y el primer ataque vuelve a costar la
-  // mitad. El SP no se recarga entero: recupera SP Regen, sin pasar del
-  // máximo (si ya estaba por encima, no se toca).
-  const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
-  const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
-  if(spRecuperado){
-    S.spGastado = num(S.spGastado) - spRecuperado;
-    rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
-  }
+  // mitad (el SP ya se regeneró al principio del Mantenimiento, ver arriba).
   S.nitros = nitrosMaximo();
   S.ataquesTurno = 0;
   S.ataquesArma = {};

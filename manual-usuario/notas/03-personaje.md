@@ -160,7 +160,7 @@ De cada [[Atributos|atributo]] se desprenden varios **stats derivados**. Todos s
 ## Stats sin atributo "padre"
 - **[[Defensa]] (Def):** viene del equipo, de habilidades o de efectos. Resta al daño físico.
 - **Resistencia a crítico** (por [[Daño y Tipo de arma|Tipo]] de arma: 4, 6, 8, 10, 12): ver [[Resistencia a crítico]].
-- **SP Regen:** los [[SP]] que recuperás en cada [[Mantenimiento]] (por defecto, 0).
+- **SP Regen:** los [[SP]] que recuperás en cada [[Mantenimiento]] (por defecto, la mitad de tu Especial, redondeada hacia abajo).
 
 > [!tip] Dónde ver de dónde sale cada número
 > En la ficha, pasá el mouse por un stat: te dice **qué atributo, qué ítem y qué estado** lo modifican. Y la 🔍 de la [[La Botonera|Botonera]] lo desglosa.

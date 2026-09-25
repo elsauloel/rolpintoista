@@ -60,7 +60,7 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
 - 🔲 **P26. Penalidad por sobrecarga.** Llevar más peso del que se puede no resta nada hoy (antes restaba de Bonos). ¿Qué penaliza? *(código)*
 - 🔲 **P27. Conversión de Bonos viejos a SP.** Equipo, estados y catálogo que daban "+N Bonos" hoy dan "+N SP" (1 a 1, `IT2.spPorBono`). ¿Es la conversión correcta? *(código)*
 - 🔲 **P28. Estados que tocaban Acciones/Movimiento.** Stun, Hypeado, Inmovilizado y Rengo pasaron a Nitros 1 a 1, sin recalibrar. ¿Qué valores llevan? *(código)* **Ya recalibrados (2026-09-21):** Cansado corta los No2 máximos a 2/3 (pierde un tercio, redondeado hacia abajo, sobre el modificador sumable); Exhausto los corta a un tercio del máximo natural (redondeado hacia abajo, con tope — no se acumula con Cansado, gana el más restrictivo), la misma lógica de cuando 1 Acción (de un máximo de ~3) equivalía a un tercio de la capacidad del turno.
-- 🔲 **P29. SP Regen como stat.** Hoy existe con base 0 (solo lo dan habilidades, equipo o estados). ¿Se deja así o se saca el stat? *(2026-09-16)*
+- ✅ **P29. SP Regen como stat.** Decidido 2026-09-24 (regla por defecto del dueño): **todos los jugadores regeneran SP en el Mantenimiento, automatizado, al principio del Mantenimiento y por la mitad del Especial redondeada hacia abajo** (base `floor(esp/2)`, sigue sumando lo de habilidades, equipo y estados). Las fichas con la base vieja (0) pasan a la nueva una sola vez (`spRegenAuto`). *(2026-09-16)*
 - 🔲 **P43. Mecánica de armas de dos manos.** El asistente de ítems
   (`comun/asistente-item.js`) ya deja elegir "Arma de dos manos" (ocupa las
   dos manos: no se puede llevar escudo ni segunda arma), pero no tiene

@@ -37,7 +37,7 @@ estado: confirmado
 - **SP máximo = [[Especial]] × 3.**
 - Cada [[Habilidades|habilidad]] cuesta cierta cantidad de SP (algunas, un costo variable *X*).
 - **No se recarga entero cada turno**: se va consumiendo a lo largo de la pelea.
-- Cada [[Mantenimiento]] recuperás tu **SP Regen** (por defecto es **0**: los personajes no regeneran SP solos). Lo dan habilidades, la [[Pasivas|pasiva]] *Recuperación mental*, consumibles y ciertos ítems.
+- **Todos los personajes regeneran SP solos:** al **principio** de cada [[Mantenimiento]] recuperás tu **SP Regen**, que por defecto es **la mitad de tu Especial, redondeada hacia abajo** (Especial 7 → 3 SP). Habilidades, la [[Pasivas|pasiva]] *Recuperación mental*, consumibles y ciertos ítems te suman más.
 - También se recupera con **descanso**.
 
 > [!warning] SP no es "Esp"
@@ -118,7 +118,7 @@ El **mantenimiento** es la fase que ocurre **cuando ya actuó el último del ord
 
 ## Qué pasa en el mantenimiento
 - **Tus [[Nitros (No2)|Nitros]] se recargan** al máximo, y vuelve tu "primer ataque barato".
-- **Recuperás SP** igual a tu *SP Regen* (si tenés), sin pasar del máximo. Ver [[SP]].
+- **Recuperás SP** igual a tu *SP Regen* (por defecto, la mitad de tu Especial, para abajo), **al principio** del Mantenimiento y sin pasar del máximo. Ver [[SP]].
 - **Regeneración** y curación por turno ([[Regeneración]], pasivas).
 - **Veneno**, sangrado y otros daños por turno ([[Veneno]], [[Sangrado]]).
 - **Se descuentan los turnos** de cada [[Estados alterados|estado alterado]]: los que llegan a 0 se van.

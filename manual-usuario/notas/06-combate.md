@@ -139,8 +139,8 @@ estado: borrador
 +++
 El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.
 
-- **Cuesta [[Nitros (No2)|Nitros]] siempre:** la mitad del **Peso** del arma o escudo con el que parás, redondeado hacia arriba, sin importar cuántos ataques hiciste en tu turno.
-- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — la mitad de su Peso.
+- **Cuesta [[Nitros (No2)|Nitros]] siempre:** tantos Nitros como el **Peso** del arma o escudo con el que parás (Peso 3 = 3 No2), sin importar cuántos ataques hiciste en tu turno.
+- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — su Peso.
 - Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
 - **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.

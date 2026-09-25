@@ -5468,7 +5468,7 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta la mitad del Peso, redondeado hacia arriba (' + costoParryTxt() + ')')}">
+          <button type="button" class="botonera-tile" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta tantos No2 como el Peso (' + costoParryTxt() + ')')}">
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>
           </button>
@@ -9396,7 +9396,8 @@ function pdgParaArma(arma, c){
 // sigue (defensa: Parry y después Bloqueo) usa esa misma arma sin volver a preguntar.
 // null = no hay un Parry esperando su Bloqueo. Se limpia al bloquear, atacar o pasar el turno.
 let parryArmaPendiente = null;
-const costoParryNitros = arma => Math.ceil(num(arma ? arma.peso : 0) / 2);
+// El Parry cuesta tantos No2 como el Peso del arma o escudo con el que se para (2026-09-24, pedido del dueño; antes la mitad, para arriba).
+const costoParryNitros = arma => Math.max(0, num(arma ? arma.peso : 0));
 
 // A diferencia de armasEquipadasConDano() (para Atacar/Daño Arma/Bloqueo),
 // acá entra cualquier arma O ESCUDO equipado, tenga o no daño: para
@@ -9460,7 +9461,7 @@ function elegirArmaDefensa(tipo){
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta la mitad del Peso (redondeado hacia arriba) del arma o escudo que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta tantos No2 como el Peso del arma o escudo que elijas.' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}

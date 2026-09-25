@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T01:41:56Z",
+ "actualizado": "2026-09-25T02:33:44Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -723,7 +723,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** la mitad del **Peso** del arma o escudo con el que parás, redondeado hacia arriba, sin importar cuántos ataques hiciste en tu turno.\n- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — la mitad de su Peso.\n- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.\n- Estados como [[Lisiado]] te bajan el Parry a la mitad."
+   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** tantos Nitros como el **Peso** del arma o escudo con el que parás (Peso 3 = 3 No2), sin importar cuántos ataques hiciste en tu turno.\n- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — su Peso.\n- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.\n- Estados como [[Lisiado]] te bajan el Parry a la mitad."
   },
   {
    "id": "bloqueo",

@@ -79,6 +79,8 @@ Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (
 
 **Reglas de estos estados (dichas por el dueño):** se pueden dar **a otros o a uno mismo**; el **rango nunca baja de 2**. **Crítico potente ×P:** doble daño baja 1 por punto (7 − P), triple daño 1 cada 2 puntos (17 − P÷2) y cuádruple daño 1 cada 3 puntos (20 − P÷3); el piso del doble daño es 1 y, después de eso, los otros dos umbrales siguen bajando a su propia escala (ver P115). **Aprobadas:** Punto débil y Temple. Marca del cazador, Golpe brutal y Ojo de asesino siguen a revisar.
 
+- **Armas mágicas (P116, en elaboración):** se dividen en **armas de daño** y **armas de efecto**. Las de efecto dan pequeños hechizos que se castean con el arma, tiran PG mágico y cuestan generalmente 1 Nitro y SP según el efecto.
+
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).

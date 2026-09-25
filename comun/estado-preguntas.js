@@ -20,7 +20,8 @@ const EstadoPreguntas = (() => {
     cfg = conf(cfg);
     const qs = [];
     const hp = num(p[cfg.hp]);
-    if(hp){
+    // Veneno (regla del dueño, 2026-09-25): el daño por stack es SIEMPRE 1 HP, así que no se pregunta: solo cuántos stacks (y los turnos).
+    if(hp && !p.esVeneno){
       qs.push({clave: 'hp', etiqueta: hp > 0 ? 'HP que cura' : 'Daño (HP)', min: 1,
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }

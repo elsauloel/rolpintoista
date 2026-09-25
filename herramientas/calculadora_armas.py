@@ -257,6 +257,16 @@ def reajustar(arma):
         if n in PESO_EFECTO and n not in CASA.get(fam, ()) and fam not in HABILITADO.get(n, ()):
             avisos.append(f"«{n}» está fuera del universo de la familia ({fam}): caso excepcional, solo si es puntual")
         nuevos.append(e)
+    # si después de reemplazar quedan dos efectos iguales, se deja uno (el de mayor probabilidad) y se avisa
+    únicos = {}
+    for e in nuevos:
+        k = e.get('nombre')
+        if k in únicos:
+            cambios.append(f"«{k}» estaba repetido: queda uno solo")
+            if probabilidad(e) > probabilidad(únicos[k]): únicos[k] = e
+        else:
+            únicos[k] = e
+    nuevos = list(únicos.values())
     a['efectosGolpe'] = nuevos
     # 2) bonos: Frecuente hasta el rango mínimo, máx. +3 por stat (el Alcance de las de rango no cuenta), total por tier
     mods = []

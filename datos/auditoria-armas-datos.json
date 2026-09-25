@@ -2186,15 +2186,11 @@
     "nombre": "Ignora 1 de Res. crítico",
     "prob": 100,
     "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   },
-   {
-    "nombre": "Sangrado",
-    "prob": 100,
-    "detalle": "El primer golpe a cada enemigo es doble crítico garantizado."
    }
   ],
   "cambios": [
    "«Primera sangre» pasa a «Sangrado»",
+   "«Sangrado» estaba repetido: queda uno solo",
    "Crítico frecuente +4 → +2 (el rango del crítico no baja de 2: un Tipo 4 aprovecha 2 puntos)"
   ],
   "avisos": [],
@@ -2202,15 +2198,15 @@
   "precioHoy": 1300,
   "detalle": "Crítico frecuente +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.",
   "nuevo": {
-   "pc": 23.1,
+   "pc": 20.6,
    "tier": "Excepcional",
-   "precio": 750,
+   "precio": 600,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
     "bonos": 0.0,
     "crítico": 10.5,
-    "efectos": 10.2,
+    "efectos": 7.8,
     "peso del arma": -0.2
    }
   }

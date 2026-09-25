@@ -5176,7 +5176,6 @@ const LISTS = {
       if(st > 1) partes.push(`×${fmt(st)}`);
       if(dur) partes.push(dur);
       if(hp) partes.push(`${hp > 0 ? '+' : ''}${fmt(hp)} HP`);
-      if(num(i.escudoMagico) > 0) partes.push(`🛡${fmt(num(i.escudoMagicoActual ?? i.escudoMagico))}/${fmt(num(i.escudoMagico))}`);
       const det = (i.detalle || '').trim();
       const deEquipo = !!i.origenItem;
       return `<div class="ef-chip${activo ? '' : ' pausado'}${urgente ? ' urgente' : ''}${det ? ' con-tip' : ''}${deEquipo ? ' de-equipo' : ''}"${det ? ` data-tip="${esc(det)}"` : ''}>
@@ -5186,12 +5185,25 @@ const LISTS = {
           <span class="ef-chip-nombre">${esc(i.nombre)}</span>
           ${partes.length ? `<span class="ef-chip-datos">${esc(partes.join(' · '))}</span>` : ''}
         </button>
+        ${num(i.escudoMagico) > 0 ? `<button type="button" class="ef-chip-toggle" data-escudo="${i.id}:-1" title="Un punto menos de escudo">−</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor del escudo (número, +N, -N; o 'max N' para cambiar el máximo)">🛡${fmt(num(i.escudoMagicoActual ?? i.escudoMagico))}/${fmt(num(i.escudoMagico))}</button><button type="button" class="ef-chip-toggle" data-escudo="${i.id}:1" title="Un punto más de escudo">+</button>` : ''}
         ${deEquipo ? '<span class="ef-chip-equipo" title="Viene de un ítem equipado: se va al sacártelo">⚙</span>' : ''}
         ${i.popup ? '<span class="ef-chip-pop" title="Avisa en el mantenimiento">◆</span>' : ''}
       </div>`;
     }
   }
 };
+
+// Escudo especial: cambiar su valor sin abrir el editor de estados (2026-09-24, pedido del dueño). El texto puede ser un número
+// (valor actual nuevo), +N / -N (sumar o restar) o "max N" (cambiar el máximo). Duplicado en ficha y gm-tools a propósito.
+function escudoParsear(txt, actual, max){
+  const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
+  if(!t) return null;
+  const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+  if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, actual + parseFloat(t)))};
+  if(/^\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, parseFloat(t)))};
+  return null;
+}
 
 // Estados que vienen de una pasiva (2026-09-24, pedido del dueño): hoy solo la regeneración (`regenHp`). No se guardan: se arman
 // cada vez a partir de las pasivas, aparecen entre los estados alterados activos y en el resumen que ve el mapa, pero son de
@@ -6130,6 +6142,18 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.nivelsocial){ abrirNivelSocial(b.dataset.nivelsocial); return; }
+  if(b.dataset.escudo){
+    const [erId, acc] = b.dataset.escudo.split(':');
+    const er = S.efectos.find(x => x.id === erId);
+    if(er){
+      const max = num(er.escudoMagico), actual = num(er.escudoMagicoActual ?? er.escudoMagico);
+      const txt = acc === 'set' ? prompt(`${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
+      const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
+      if(nuevo){ er.escudoMagico = nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); }
+      else if(txt !== null) toast('Escribí un número, +N, -N o "max N"');
+    }
+    return;
+  }
   if(b.dataset.armrota){
     const [erId, d] = b.dataset.armrota.split(':');
     const er = S.efectos.find(x => x.id === erId);

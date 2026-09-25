@@ -5009,16 +5009,29 @@ function guardarEditorEstadoCreep(){
   toast(`${nombre} guardado`);
 }
 
+// Escudo especial: cambiar su valor sin abrir el editor de estados (2026-09-24, pedido del dueño). El texto puede ser un número
+// (valor actual nuevo), +N / -N (sumar o restar) o "max N" (cambiar el máximo). Duplicado en ficha y gm-tools a propósito.
+function escudoParsear(txt, actual, max){
+  const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
+  if(!t) return null;
+  const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+  if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, actual + parseFloat(t)))};
+  if(/^\d+(?:\.\d+)?$/.test(t)) return {max, actual: Math.max(0, Math.min(max, parseFloat(t)))};
+  return null;
+}
+
 function estadoHtml(scId, es){
   const stacks = Math.max(1, num(es.stacks) || 1);
   const hpTotal = num(es.hpTurno) * stacks;
   const efectoTxt = es.detalle ? es.detalle : (hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)} HP/turno` : 'Sin efecto numérico');
-  const escudoTxt = num(es.escudoMagico) > 0 ? ` · 🛡${fmt(num(es.escudoMagicoActual ?? es.escudoMagico))}/${fmt(num(es.escudoMagico))}` : '';
+  const escudoBtns = num(es.escudoMagico) > 0 ? `<button class="rm" data-escudo="${scId}:${es.id}:-1" title="Un punto menos de escudo">−</button><button class="rm" data-escudo="${scId}:${es.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor del escudo (número, +N, -N; o 'max N' para cambiar el máximo)">🛡${fmt(num(es.escudoMagicoActual ?? es.escudoMagico))}/${fmt(num(es.escudoMagico))}</button><button class="rm" data-escudo="${scId}:${es.id}:1" title="Un punto más de escudo">+</button>` : '';
   return `<div class="estado-compacto estado-${es.polaridad||'otro'}">
     <div class="estado-compacto-info">
       <div class="estado-compacto-nombre">${esc(es.nombre || '(sin nombre)')}</div>
-      <div class="estado-compacto-meta">${esc(efectoTxt)} · ${fmt(num(es.turnos))} turno(s)${escudoTxt}</div>
+      <div class="estado-compacto-meta">${esc(efectoTxt)} · ${fmt(num(es.turnos))} turno(s)</div>
     </div>
+    ${escudoBtns}
     <button class="rm" data-editarestado="${scId}:${es.id}" title="Editar">✎</button>
     <button class="rm" data-rmestado="${scId}:${es.id}">×</button>
   </div>`;
@@ -5337,6 +5350,19 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.presetcreep){
     aplicarPresetEstadoCreep(b.dataset.presetcreep);
+    return;
+  }
+  if(b.dataset.escudo){
+    const [scId, esId, acc] = b.dataset.escudo.split(':');
+    const sc = S.creeps.find(x => x.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      const max = num(es.escudoMagico), actual = num(es.escudoMagicoActual ?? es.escudoMagico);
+      const txt = acc === 'set' ? prompt(`${es.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
+      const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
+      if(nuevo){ es.escudoMagico = nuevo.max; es.escudoMagicoActual = nuevo.actual; renderAll(); }
+      else if(txt !== null) toast('Escribí un número, +N, -N o "max N"');
+    }
     return;
   }
   if(b.dataset.editarestado){

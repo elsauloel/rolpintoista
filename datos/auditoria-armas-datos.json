@@ -5384,8 +5384,8 @@
     "val": 1
    },
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 2
    }
   ],
   "efectos": [],
@@ -5393,16 +5393,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1.",
+  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico potente +2.",
   "nuevo": {
-   "pc": 10.8,
+   "pc": 8.0,
    "tier": "Buena Calidad",
-   "precio": 160,
+   "precio": 90,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
     "bonos": 1.0,
-    "crítico": 5.2,
+    "crítico": 2.4,
     "efectos": 0.0,
     "peso del arma": -0.4
    }
@@ -5511,11 +5511,15 @@
     "val": 2
    },
    {
-    "stat": "crit",
+    "stat": "rng",
     "val": 1
    },
    {
-    "stat": "rng",
+    "stat": "critpot",
+    "val": 3
+   },
+   {
+    "stat": "crit",
     "val": 1
    }
   ],
@@ -5524,16 +5528,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1.",
+  "detalle": "El arma de los duelistas: PdG +2, Alcance +1, Crítico potente +3 y Crítico frecuente +1.",
   "nuevo": {
-   "pc": 12.3,
+   "pc": 16.0,
    "tier": "Raro",
-   "precio": 200,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
     "bonos": 2.5,
-    "crítico": 5.2,
+    "crítico": 8.8,
     "efectos": 0.0,
     "peso del arma": -0.4
    }
@@ -5560,8 +5564,8 @@
     "val": 1
    },
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 3
    }
   ],
   "efectos": [
@@ -5575,16 +5579,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado.",
+  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico potente +3 y 33 % de Lisiado.",
   "nuevo": {
-   "pc": 15.2,
+   "pc": 13.5,
    "tier": "Raro",
-   "precio": 290,
+   "precio": 230,
    "exceso": 0,
    "desglose": {
     "daño": 7.5,
     "bonos": 2.0,
-    "crítico": 5.2,
+    "crítico": 3.6,
     "efectos": 1.0,
     "peso del arma": -0.6
    }
@@ -5603,8 +5607,8 @@
   "rango": false,
   "bonos": [
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 3
    }
   ],
   "efectos": [
@@ -5618,16 +5622,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe.",
+  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico potente +3 y Veneno de 3 stacks en cada golpe.",
   "nuevo": {
-   "pc": 14.3,
+   "pc": 12.7,
    "tier": "Raro",
-   "precio": 260,
+   "precio": 210,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 0.0,
-    "crítico": 5.2,
+    "crítico": 3.6,
     "efectos": 2.5,
     "peso del arma": -0.4
    }
@@ -5646,8 +5650,12 @@
   "rango": false,
   "bonos": [
    {
+    "stat": "critpot",
+    "val": 4
+   },
+   {
     "stat": "crit",
-    "val": 2
+    "val": 1
    }
   ],
   "efectos": [
@@ -5661,16 +5669,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe.",
+  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico potente +4, Crítico frecuente +1 y Veneno severo por 4 turnos en cada golpe.",
   "nuevo": {
-   "pc": 22.9,
+   "pc": 22.4,
    "tier": "Excepcional",
    "precio": 700,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
     "bonos": 0.0,
-    "crítico": 10.5,
+    "crítico": 10.1,
     "efectos": 3.8,
     "peso del arma": -0.4
    }
@@ -5697,6 +5705,10 @@
     "val": 2
    },
    {
+    "stat": "critpot",
+    "val": 2
+   },
+   {
     "stat": "crit",
     "val": 1
    }
@@ -5712,16 +5724,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado.",
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado.",
   "nuevo": {
-   "pc": 18.9,
+   "pc": 21.3,
    "tier": "Excepcional",
-   "precio": 500,
+   "precio": 650,
    "exceso": 0,
    "desglose": {
     "daño": 10.0,
     "bonos": 3.0,
-    "crítico": 5.2,
+    "crítico": 7.7,
     "efectos": 1.5,
     "peso del arma": -0.8
    }
@@ -5740,11 +5752,15 @@
   "rango": false,
   "bonos": [
    {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
     "stat": "crit",
     "val": 2
    },
    {
-    "stat": "pdg",
+    "stat": "critpot",
     "val": 2
    }
   ],
@@ -5764,16 +5780,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida).",
+  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Crítico potente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida).",
   "nuevo": {
-   "pc": 34.1,
+   "pc": 36.5,
    "tier": "Legendario",
-   "precio": 1800,
+   "precio": 2000,
    "exceso": 0,
    "desglose": {
     "daño": 13.5,
     "bonos": 2.0,
-    "crítico": 10.5,
+    "crítico": 12.9,
     "efectos": 8.8,
     "peso del arma": -0.6
    }
@@ -5978,7 +5994,7 @@
     "val": 1
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 1
    }
   ],
@@ -5987,16 +6003,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Entregada con el uniforme. Parry +1 y Crítico potente +1.",
+  "detalle": "Entregada con el uniforme. Parry +1 y Crítico frecuente +1.",
   "nuevo": {
-   "pc": 8.8,
+   "pc": 10.6,
    "tier": "Buena Calidad",
-   "precio": 110,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 1.0,
-    "crítico": 1.2,
+    "crítico": 3.0,
     "efectos": 0.0,
     "peso del arma": -0.4
    }
@@ -6070,7 +6086,7 @@
     "val": 1
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 1
    }
   ],
@@ -6085,16 +6101,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico potente +1 y Sangrado en cada golpe.",
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe.",
   "nuevo": {
-   "pc": 13.5,
+   "pc": 15.3,
    "tier": "Raro",
-   "precio": 230,
+   "precio": 290,
    "exceso": 0,
    "desglose": {
     "daño": 9.7,
     "bonos": 1.0,
-    "crítico": 1.2,
+    "crítico": 3.0,
     "efectos": 2.0,
     "peso del arma": -0.4
    }
@@ -6160,7 +6176,7 @@
     "val": 2
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 2
    }
   ],
@@ -6175,16 +6191,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico potente +2 y Sangrado en cada golpe.",
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe.",
   "nuevo": {
-   "pc": 19.6,
+   "pc": 23.2,
    "tier": "Excepcional",
-   "precio": 550,
+   "precio": 750,
    "exceso": 0,
    "desglose": {
     "daño": 14.0,
     "bonos": 2.0,
-    "crítico": 2.4,
+    "crítico": 6.0,
     "efectos": 2.0,
     "peso del arma": -0.8
    }
@@ -6263,11 +6279,11 @@
    },
    {
     "stat": "crit",
-    "val": 3
+    "val": 4
    },
    {
     "stat": "critpot",
-    "val": 2
+    "val": 1
    }
   ],
   "efectos": [
@@ -6286,16 +6302,16 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +3, Crítico potente +2, Sangrado y Veneno severo por 5 turnos en cada golpe.",
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe.",
   "nuevo": {
-   "pc": 34.5,
+   "pc": 36.4,
    "tier": "Legendario",
-   "precio": 1900,
+   "precio": 2000,
    "exceso": 0,
    "desglose": {
     "daño": 14.5,
     "bonos": 3.5,
-    "crítico": 11.4,
+    "crítico": 13.2,
     "efectos": 5.8,
     "peso del arma": -0.6
    }

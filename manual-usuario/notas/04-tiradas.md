@@ -109,7 +109,7 @@ Hay dos formas, con estos nombres:
 
 También hay **estados** para darlos con habilidades o a mano: **Crítico frecuente** y **Crítico potente** (buffs de +1 que se pueden editar y durar unos turnos).
 
-Las armas de **Tipo 4** acentúan el crítico frecuente y las de **Tipo 6** el potente, pero ambas pueden usar las dos herramientas (es una guía, no una regla).
+Las armas de **Tipo 6** acentúan el crítico frecuente y las de **Tipo 4** el potente, pero ambas pueden usar las dos herramientas (es una guía, no una regla).
 
 ## Cómo se protege uno
 Con la [[Resistencia a crítico]]: **cada punto contra el Tipo del arma atacante te quita un nivel de crítico.** Un doble crítico contra 1 punto cuenta como crítico simple; un crítico simple contra 1 punto no es crítico.

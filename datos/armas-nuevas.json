@@ -65,12 +65,12 @@
     "val": 1
    },
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 2
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1."
+  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico potente +2."
  },
  {
   "id": "nuevo-lanza-de-leva",
@@ -137,16 +137,20 @@
     "val": 2
    },
    {
-    "stat": "crit",
+    "stat": "rng",
     "val": 1
    },
    {
-    "stat": "rng",
+    "stat": "critpot",
+    "val": 3
+   },
+   {
+    "stat": "crit",
     "val": 1
    }
   ],
   "efectosGolpe": [],
-  "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1."
+  "detalle": "El arma de los duelistas: PdG +2, Alcance +1, Crítico potente +3 y Crítico frecuente +1."
  },
  {
   "id": "nuevo-lanza-de-lisiar",
@@ -167,8 +171,8 @@
     "val": 1
    },
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -179,7 +183,7 @@
     "detalle": "33 % de dejar Lisiado 3 turnos."
    }
   ],
-  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado."
+  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico potente +3 y 33 % de Lisiado."
  },
  {
   "id": "nuevo-punal-envenenado",
@@ -192,8 +196,8 @@
   "danoFijo": 1,
   "mods": [
    {
-    "stat": "crit",
-    "val": 1
+    "stat": "critpot",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -204,7 +208,7 @@
     "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
    }
   ],
-  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe."
+  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico potente +3 y Veneno de 3 stacks en cada golpe."
  },
  {
   "id": "nuevo-aguijon-de-la-reina-avispa",
@@ -217,8 +221,12 @@
   "danoFijo": 2,
   "mods": [
    {
+    "stat": "critpot",
+    "val": 4
+   },
+   {
     "stat": "crit",
-    "val": 2
+    "val": 1
    }
   ],
   "efectosGolpe": [
@@ -229,7 +237,7 @@
     "detalle": "Veneno severo por 4 turnos en cada golpe."
    }
   ],
-  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe."
+  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico potente +4, Crítico frecuente +1 y Veneno severo por 4 turnos en cada golpe."
  },
  {
   "id": "nuevo-lanza-del-alba",
@@ -250,6 +258,10 @@
     "val": 2
    },
    {
+    "stat": "critpot",
+    "val": 2
+   },
+   {
     "stat": "crit",
     "val": 1
    }
@@ -262,7 +274,7 @@
     "detalle": "50 % de dejar Lisiado 3 turnos."
    }
   ],
-  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado."
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado."
  },
  {
   "id": "nuevo-colmillo-de-la-reina-arana",
@@ -275,11 +287,15 @@
   "danoFijo": 3,
   "mods": [
    {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
     "stat": "crit",
     "val": 2
    },
    {
-    "stat": "pdg",
+    "stat": "critpot",
     "val": 2
    }
   ],
@@ -297,7 +313,7 @@
     "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
    }
   ],
-  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida)."
+  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Crítico potente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida)."
  },
  {
   "id": "nuevo-espada-de-entrenamiento",
@@ -403,12 +419,12 @@
     "val": 1
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 1
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Entregada con el uniforme. Parry +1 y Crítico potente +1."
+  "detalle": "Entregada con el uniforme. Parry +1 y Crítico frecuente +1."
  },
  {
   "id": "nuevo-katana-de-maestro",
@@ -458,7 +474,7 @@
     "val": 1
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 1
    }
   ],
@@ -470,7 +486,7 @@
     "detalle": "Cada golpe deja Sangrado."
    }
   ],
-  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico potente +1 y Sangrado en cada golpe."
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe."
  },
  {
   "id": "nuevo-espada-vampirica-menor",
@@ -512,7 +528,7 @@
     "val": 2
    },
    {
-    "stat": "critpot",
+    "stat": "crit",
     "val": 2
    }
   ],
@@ -524,7 +540,7 @@
     "detalle": "Cada golpe deja Sangrado."
    }
   ],
-  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico potente +2 y Sangrado en cada golpe."
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe."
  },
  {
   "id": "nuevo-katana-del-viento",
@@ -579,11 +595,11 @@
    },
    {
     "stat": "crit",
-    "val": 3
+    "val": 4
    },
    {
     "stat": "critpot",
-    "val": 2
+    "val": 1
    }
   ],
   "efectosGolpe": [
@@ -600,6 +616,6 @@
     "detalle": "Veneno severo por 5 turnos en cada golpe."
    }
   ],
-  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +3, Crítico potente +2, Sangrado y Veneno severo por 5 turnos en cada golpe."
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe."
  }
 ]

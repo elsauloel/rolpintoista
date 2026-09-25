@@ -58,6 +58,8 @@ El dueño va dando herramientas de diseño para que, cuando pida un catálogo, s
 
 - **Escasez de la Resistencia a crítico por slots (P114, en elaboración):** los Tipos altos solo los dan pocos slots (ej.: Tipo 10 solo cascos; Tipo 8 dos slots sin casco; Tipo 6 tres slots; Tipo 4 en más). El máximo que se puede juntar equipado = la cantidad de slots elegibles.
 
+- **Anillos:** mágicos, uno por mano (2 slots). Más libertad de efectos, pero más escasos y caros. Los preceptos de esta guía son la base de un futuro **rework del catálogo**.
+
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).

@@ -62,6 +62,21 @@ El dueño va dando herramientas de diseño para que, cuando pida un catálogo, s
 
 - **Dos formas de mejorar el crítico (P115, cerrada):** **Crítico frecuente** (baja el rango del crítico: Tipo 4 pasa a 3; mínimo 2; también cambia el nivel de doble crítico) y **Crítico potente** (baja los umbrales del d20: doble daño con 6+, triple 16+, cuádruple 19+; se pueden afinar por separado). Vocabulario: **doble crítico** = diferencia doble (2d20); **doble / triple / cuádruple daño** = el multiplicador del d20.
 
+## Propuesta de skills de crítico (para que el dueño las audite; costos provisorios)
+Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico frecuente ×N** (baja el rango N puntos, mínimo 2) y **Crítico potente ×N** (baja N puntos todos los umbrales del d20), con turnos o "próximo ataque".
+| Skill | Clase | Costo | Qué hace |
+|---|---|---|---|
+| Apuntar (existente) | Shooter | X No2 | +X a la PG y **frecuente ×X** en el próximo ataque a distancia (X ≤ 3) |
+| Ojo de asesino | Asalto | SP 2 · No2 1 | Tu próximo ataque del turno con **frecuente ×1** |
+| Lisiar / Tajear (existentes) | Asalto | SP 2 / 3 | Ataque con **frecuente ×1**; si es crítico, el efecto se refuerza |
+| Headshot (existente) | Shooter | SP 4 | **frecuente ×1 + potente ×1**, +5 de daño, falla si no es crítico |
+| Degollar (existente) | Asalto | SP 7 | **frecuente ×1 + potente ×1**, +7 de daño (con su costo de quedar expuesto) |
+| Golpe brutal | Warrior | SP 3 · ataque | Ataque con **potente ×1**; a cambio, −2 a tu Evasión hasta tu próximo turno |
+| Marca del cazador | Support | SP 3 · No2 1 | Un aliado en tu rango de casteo recibe **frecuente ×1** durante 2 turnos |
+| Punto débil | Debuffer | SP 3 (Esp / Res.M) | El objetivo pierde **1 punto de Resistencia a crítico** (todos los Tipos) durante 2 turnos |
+| Temple (o Piel resistente, existente) | Tanque | SP 2 | +1 de Resistencia a crítico a todos los Tipos durante 2 turnos |
+Y del lado del equipo: armas con **frecuente ×1** (estoques, dagas: punzantes precisas) o **potente ×1** (hachas y mazas pesadas), con el peso de cada una en el precio (P112).
+
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).

@@ -57,6 +57,8 @@ propone y el dueño audita.
 14. ⬜ **Diseño de las armas de rango** (arcos, ballestas, armas de fuego): todavía no se discutió su criterio de diseño (Rango, munición, Nitros, crítico, efectos). Por ahora se rellenan sobre la marcha con lo que surja y se espera **reworkearlas específicamente después**. *Propuesta:* dedicarles una tanda propia cuando terminen las familias cuerpo a cuerpo.
 15. ⬜ **Peso de usar las dos manos:** ¿cuánto vale en el puntaje de calidad que un arma ocupe las dos manos? El dueño aclaró que **de por sí es más poderosa** (a cambio invalida una mano, o sea que resta posibilidades de acción: escudo, segunda arma, accesorio). *Propuesta:* darle a las de dos manos un **bono al puntaje** (más Peso de dados o un efecto extra sin subir el precio proporcionalmente) y evaluar qué cuesta perder la mano libre.
 
+16. ⬜ **Bonos a stats en las armas** (aparecieron al revisar: "más uno al Parry, más uno al Bloqueo… hay todo un universo de efectos de armas que dejamos afuera"). Ver "Universo de bonos" abajo. ¿Qué stats puede dar un arma, cuántos puntos según el tier y cuáles son "de casa" de cada familia? *Propuesta:* ver abajo.
+
 ### E · Método
 13. ⬜ **¿En qué orden y qué tamaño de tanda?** *Propuesta:* por familia (punzantes → cortantes → hachas → contundentes → rango → explosivos → híbridas), de ~12 armas por tanda, en 3 pasos: (a) lista de ideas/nombres, (b) números, (c) carga al editor de catálogo tras tu auditoría.
 
@@ -159,3 +161,25 @@ Herramienta: [`../herramientas/calculadora_armas.py`](../herramientas/calculador
 - **Precio** (dentro de la banda del tier, redondo): Común $30–90 · Buena $80–160 · Raro $150–350 · Excepcional $400–900 · Legendario $1000–2000; ×1,5 por tier de exceso.
 - **Pendiente de la fórmula:** el peso de las **dos manos** (P15), las armas de **rango** (P14), el costo en Nitros del ataque, y ajustar las tasas.
 - **Calibración inicial con las 137 armas actuales** (el catálogo viejo no seguía estas reglas, así que no coincide del todo): por ejemplo Común 39 de 47 quedan Común; Legendario 4 de 11 quedan Legendario (varias legendarias viejas dependían de efectos que ya no existen). Sirve de referencia, no de meta.
+
+## Universo de bonos y otras propiedades de las armas (detectado 2026-09-25, catálogo actual)
+82 de las 137 armas actuales llevan **bonos a stats** (que la calculadora v0 ya suma con tasa 1, pero que no se evaluaron ni se repartieron por familia):
+| Stat | Armas | Valores que aparecen |
+|---|---|---|
+| Rango / Alcance (`rng`) | 35 | +1 (20), +3 (6), +4 (3), +5 (4), +7, +8 |
+| Bloqueo | 20 | +1 (12), +2 (3), +3 (5) |
+| Parry | 16 | +1 (7), +2 (8), +3 (1) |
+| PdG | 15 | +1 (8), +2 (7) |
+| Crítico (ahora Frecuente) | 11 | +1 (7), +2 (3), +4 (1) |
+| Iniciativa | 4 | +1 |
+| Dmg | 2 | +2 |
+| Especial / Rango de casteo / Bonos (SP) | 1 c/u | (armas mágicas: fase 3) |
+
+Además: **daño fijo** en 40 armas (+1: 28, +2: 11, +3: 1); **1 arma con daño amplificado**; **16 armas de rango**; **ninguna con estado al equipar ni con estados propios** (aunque el juego lo permite: candidatos a "efectos raros" de tiers altos).
+
+**Propuesta del asistente (P16, sin responder):**
+- **Bonos por tier (suma de puntos):** Común 0–1 · Buena calidad 1–2 · Raro 2–3 · Excepcional 3–4 · Legendario 4–6; máximo +3 por stat en un arma.
+- **Stats "de casa" por familia** (para modular el precio como los efectos): **Parry** → cortantes; **Bloqueo** → contundentes y hachas; **PdG** → punzantes; **Rango/Alcance** → punzantes largos (lanzas), alabardas y armas de rango; **Iniciativa** → armas livianas (Tipo 4); **Dmg** → armas pesadas (Tipo 8+). Fuera de casa, más caro (×1,25 habilitado, ×1,5 excepcional).
+- **Tasas de valor (PC por punto):** PdG 1 · Dmg 1 · Parry 1 · Bloqueo 1 · Eva 1 · Rango/Alcance 0,5 · Iniciativa 0,5 · Nitros máx. 4 (rarísimo, solo Legendario).
+- **Daño fijo:** parte del daño esperado (ya cuenta como PC).
+- **Estados al equipar y estados propios:** reservados para Excepcional/Legendario, valorados como un efecto de peso a definir.

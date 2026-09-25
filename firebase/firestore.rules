@@ -189,6 +189,22 @@ service cloud.firestore {
         allow update: if false;
       }
 
+      // Historial de los jugadores (comun/historial.js): lo que ven los jugadores en su 📜 (personajes: HP/SP/estados; creeps visibles:
+      // "recibió N de daño", sin HP). Lo escribe la página del GM; lo lee cualquier miembro; lo borra el GM.
+      match /historial_jugadores/{id} {
+        allow read: if esMiembro(c);
+        allow delete: if esGM(c);
+        allow create: if esGM(c)
+          && request.resource.data.keys().hasOnly(['uid', 'quien', 'texto', 'campo', 'delta', 'cuando'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.quien is string && request.resource.data.quien.size() <= 60
+          && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 300
+          && (!('campo' in request.resource.data) || (request.resource.data.campo is string && request.resource.data.campo.size() <= 10))
+          && (!('delta' in request.resource.data) || request.resource.data.delta is number)
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+      }
+
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)

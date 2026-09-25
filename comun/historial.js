@@ -1,5 +1,8 @@
 /* =========================================================
-   HISTORIAL DE ACCIONES MENORES (solo el GM)
+   HISTORIAL DE ACCIONES MENORES (GM completo; jugadores, una versión acotada — 2026-09-25)
+   Los jugadores ven su propio 📜 Historial (colección historial_jugadores, que escribe también la página del GM): cambios de HP,
+   SP y estados de los personajes, y de los creeps SOLO lo que ya se ve en el mapa (que recibió N de daño, se curó N, un estado
+   que le cayó), nunca su HP actual ni máximo; un creep oculto o en sigilo no aparece (lo decide el mapa con `publico`).
    Un botón "📜 Historial" fijo arriba, al lado del ☰ del sitio, que abre una lista con las cosas chicas que no ameritan
    una línea en la Mesa: quién se bajó o se subió el HP o el SP, qué estado le cayó o se le terminó, y el reporte del
    Mantenimiento de los creeps. Sirve para que el GM chequee cosas sin tener que ir clic por clic en los tokens
@@ -57,17 +60,38 @@ function historialRegistrar(tipo, quien, texto, campo, delta){
     .catch(err => console.error('No se pudo escribir en el historial:', err));
 }
 
+// Lo mismo, pero en el historial de los JUGADORES (campanas/<partida>/historial_jugadores): solo lo que ya ven en el mapa.
+// Lo escribe también el GM (mirando los datos); la línea de un creep no lleva HP actual ni máximo.
+function historialPublicar(tipo, quien, texto, campo, delta){
+  if(!fbDb || !fbUsuario || !fbMiembro || !fbMiembro.gm || !texto) return;
+  const d = {
+    uid: fbUsuario.uid, quien: String(quien || '').slice(0, 60), texto: String(texto).slice(0, 300),
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  if(campo){ d.campo = String(campo).slice(0, 10); d.delta = histNum(delta); }
+  fbDb.collection(fbRutaCampana('historial_jugadores')).add(d)
+    .catch(err => console.error('No se pudo escribir en el historial de jugadores:', err));
+}
+const histAmbos = (tipo, quien, texto, campo, delta) => { historialRegistrar(tipo, quien, texto, campo, delta); historialPublicar(tipo, quien, texto, campo, delta); };
+
 // HP/SP: una línea por cada valor que cambió.
-function histLineasVital(nombre, campo, antes, despues){
+function histLineasVital(nombre, campo, antes, despues, emit, creep){
   if(antes === despues) return;
   const d = despues - antes;
-  historialRegistrar('vital', nombre, `${campo} ${histFmt(antes)} → ${histFmt(despues)} (${histSigno(d)})${campo === 'HP' && despues <= 0 ? ' · a 0' : ''}`, campo, d);
+  (emit || historialRegistrar)('vital', nombre, `${campo} ${histFmt(antes)} → ${histFmt(despues)} (${histSigno(d)})${campo === 'HP' && despues <= 0 ? ' · a 0' : ''}`, campo, d);
+}
+// Versión para los jugadores, sobre un creep: sin HP actual ni máximo, solo cuánto daño recibió o cuánto se curó.
+function histLineaCreepPublica(nombre, antes, despues){
+  if(antes === despues) return;
+  const d = despues - antes;
+  historialPublicar('vital', nombre, d < 0 ? `recibió ${histFmt(-d)} de daño${despues <= 0 ? ' · cayó' : ''}` : `se curó ${histFmt(d)}`, 'HP', d);
 }
 // Estados: los que aparecieron y los que ya no están.
-function histLineasEstados(nombre, antes, ahora){
-  ahora.forEach(e => { if(!antes.has(e.nombre)) historialRegistrar('vital', nombre, `+ ${e.nombre}${e.turnos ? ` (${histFmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}`, 'estado', 1); });
+function histLineasEstados(nombre, antes, ahora, emit){
+  const w = emit || historialRegistrar;
+  ahora.forEach(e => { if(!antes.has(e.nombre)) w('vital', nombre, `+ ${e.nombre}${e.turnos ? ` (${histFmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}`, 'estado', 1); });
   const siguen = new Set(ahora.map(e => e.nombre));
-  antes.forEach(n => { if(!siguen.has(n)) historialRegistrar('vital', nombre, `− ${n}`, 'estado', -1); });
+  antes.forEach(n => { if(!siguen.has(n)) w('vital', nombre, `− ${n}`, 'estado', -1); });
 }
 
 /* ---------- Personajes: se mira el resumen público de cada ficha ---------- */
@@ -85,19 +109,20 @@ function histObservarFichas(){
       histBase.fichas.set(id, {hp: nuevo.hp, sp: nuevo.sp, estados: new Set(nuevo.estados.map(e => e.nombre))});
       if(!previo || !lider) return;   // la primera vez solo se toma nota (línea base)
       const quien = String(x.nombre || 'Personaje');
-      histLineasVital(quien, 'HP', previo.hp, nuevo.hp);
-      histLineasVital(quien, 'SP', previo.sp, nuevo.sp);
-      histLineasEstados(quien, previo.estados, nuevo.estados);
+      histLineasVital(quien, 'HP', previo.hp, nuevo.hp, histAmbos);
+      histLineasVital(quien, 'SP', previo.sp, nuevo.sp, histAmbos);
+      histLineasEstados(quien, previo.estados, nuevo.estados, histAmbos);
     });
   }, err => console.error('Historial: no se pudieron leer los personajes:', err));
 }
 
 /* ---------- Creeps: cada herramienta que los tiene en memoria los pasa acá (una vez por segundo) ----------
-   lista = [{id, nombre, hp, estados: [{nombre, turnos}]}]. La primera vez de cada creep solo toma nota. */
+   lista = [{id, nombre, hp, estados: [{nombre, turnos}], publico?}] (publico: true = los jugadores lo ven; solo entonces va al historial de ellos). La primera vez de cada creep solo toma nota. */
 function historialObservarCreeps(lista){
   histCreepsActivo = true;
   if(!fbMiembro || !fbMiembro.gm) return;
   const lider = historialEsLider('creeps');
+  const liderPub = historialEsLider('creepspub');   // el que escribe lo público (solo lo hace quien sabe qué creeps se ven: el mapa)
   const vistos = new Set();
   (lista || []).forEach(c => {
     vistos.add(c.id);
@@ -105,9 +130,15 @@ function historialObservarCreeps(lista){
     const nuevo = {hp: histNum(c.hp), estados: new Set(estados.map(e => e.nombre))};
     const previo = histBase.creeps.get(c.id);
     histBase.creeps.set(c.id, nuevo);
-    if(!previo || !lider) return;
-    histLineasVital(c.nombre, 'HP', previo.hp, nuevo.hp);
-    histLineasEstados(c.nombre, previo.estados, estados);
+    if(!previo) return;
+    if(lider){
+      histLineasVital(c.nombre, 'HP', previo.hp, nuevo.hp);
+      histLineasEstados(c.nombre, previo.estados, estados);
+    }
+    if(c.publico === true && liderPub){   // visible para los jugadores (ni oculto ni en sigilo)
+      histLineaCreepPublica(c.nombre, previo.hp, nuevo.hp);
+      histLineasEstados(c.nombre, previo.estados, estados, historialPublicar);
+    }
   });
   [...histBase.creeps.keys()].forEach(id => { if(!vistos.has(id)) histBase.creeps.delete(id); });
 }
@@ -119,7 +150,10 @@ function historialReporteMantenimiento(quien, lineas){
 
 /* ---------- Borrado ---------- */
 async function histBorrar(antesDe){
-  const col = fbDb.collection(fbRutaCampana('historial'));
+  return (await histBorrarCol('historial', antesDe)) + (await histBorrarCol('historial_jugadores', antesDe));
+}
+async function histBorrarCol(nombre, antesDe){
+  const col = fbDb.collection(fbRutaCampana(nombre));
   let total = 0;
   for(;;){
     const consulta = antesDe
@@ -212,7 +246,7 @@ function histAbrir(panel, boton){
   let docs = [];
   const filtro = document.getElementById('hp-filtro');
   filtro.oninput = () => histDibujar(docs, filtro.value);
-  histCorte = fbDb.collection(fbRutaCampana('historial')).orderBy('cuando', 'desc').limit(HIST_MAX).onSnapshot(snap => {
+  histCorte = fbDb.collection(fbRutaCampana(fbMiembro.gm ? 'historial' : 'historial_jugadores')).orderBy('cuando', 'desc').limit(HIST_MAX).onSnapshot(snap => {
     docs = snap.docs;
     histDibujar(docs, filtro.value);
   }, err => {
@@ -232,21 +266,22 @@ function histArmarBoton(){
   const boton = document.createElement('button');
   boton.id = 'historial-boton';
   boton.type = 'button';
-  boton.title = 'Historial de acciones menores: cambios de HP y SP, estados y el reporte del Mantenimiento (solo el GM)';
+  boton.title = fbMiembro.gm ? 'Historial de acciones menores: cambios de HP y SP, estados y el reporte del Mantenimiento (solo el GM)' : 'Historial: cambios de HP, SP y estados de los personajes, y qué daño recibieron o se curaron los creeps que ves';
   boton.innerHTML = '📜 Historial';
   const panel = document.createElement('div');
   panel.id = 'historial-panel';
   panel.hidden = true;
   panel.innerHTML =
     '<div class="hp-cab"><b>📜 Historial</b><input id="hp-filtro" placeholder="Filtrar por nombre o texto…" autocomplete="off">' +
-    '<button type="button" id="hp-borrar" title="Borrar todo el historial">🗑</button><button type="button" id="hp-cerrar" title="Cerrar">✕</button></div>' +
+    (fbMiembro.gm ? '<button type="button" id="hp-borrar" title="Borrar todo el historial">🗑</button>' : '') + '<button type="button" id="hp-cerrar" title="Cerrar">✕</button></div>' +
     '<div class="hp-lista" id="hp-lista"></div>';
   document.body.appendChild(boton);
   document.body.appendChild(panel);
   document.documentElement.classList.add('hist-on');
   boton.onclick = () => panel.hidden ? histAbrir(panel, boton) : histCerrar(panel, boton);
   panel.querySelector('#hp-cerrar').onclick = () => histCerrar(panel, boton);
-  panel.querySelector('#hp-borrar').onclick = async e => {
+  const bBorrar = panel.querySelector('#hp-borrar');
+  if(bBorrar) bBorrar.onclick = async e => {
     if(!confirm('¿Borrar todo el historial?\n\nSe borra para siempre.')) return;
     e.target.disabled = true;
     try{ await histBorrar(null); }
@@ -258,10 +293,11 @@ function histArmarBoton(){
 
 // Se llama (desde mesa-historial.js) cuando ya se entró a la partida. Solo el GM, y no dentro de los iframes del mapa.
 function historialAlEntrar(){
-  if(histIniciado || !fbMiembro || !fbMiembro.gm || !fbDb) return;
+  if(histIniciado || !fbMiembro || !fbDb) return;
   if(window.parent !== window) return;
   histIniciado = true;
   histArmarBoton();
+  if(!fbMiembro.gm) return;   // el jugador solo lee (historial_jugadores)
   histLimpiezaAutomatica();
   histObservarFichas();
   setInterval(() => { historialEsLider('pj'); if(histCreepsActivo) historialEsLider('creeps'); }, 3000);   // renueva el "turno"

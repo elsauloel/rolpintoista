@@ -19,6 +19,19 @@
 - **Tipos de daño mágico:** **arcano** (el más puro: directo a la vida, sin efectos adicionales) y elementales **fuego, hielo y rayo** por ahora; también dan espacio de diseño para ítems defensivos. Efectos: **hielo → Escarcha** (−1 No2 máx.), **rayo → Parálisis** (debuff nuevo: PdG, Parry y Evasión a la mitad; mezcla de Lisiado y Pajaritos), **fuego → área que deja el terreno incendiado** (bola de fuego = flor, llamarada = cono; no es daño por turnos sobre la víctima). **Escarcha es acumulable** (cada stack congela más) y **fuego y hielo se cancelan entre sí**. Candidatos futuros: ácido, veneno, sagrado, sombra.
 - **No existe la "defensa mágica"** (dicho por el dueño, 2026-09-25): no hay un equipo que reste daño mágico como la Defensa resta el físico. **El daño mágico va DIRECTO a la vida.** Por eso hay que ser **cauteloso con las skills que hacen daño mágico usando el Especial como daño**: existen, pero tienen que ser **muy caras**. La otra vía, más barata y equilibrada, es que un efecto mágico **use el Especial del usuario para calcular la potencia pero haga daño FÍSICO** (ejemplo del dueño: una estalactita de hielo): el defensor sí tiene armadura y esta lo protege. (La Res. mágica es resistencia a *efectos*, no reduce daño.)
 
+## 0b. Relevancia de cada elemento en la calidad de un ítem (tabla viva, el dueño la va completando)
+Para calcular calidad, tier y precio (P112), cada elemento del diseño tiene una **relevancia**. Lo dicho hasta ahora:
+| Elemento | Relevancia | Nota |
+|---|---|---|
+| **Costo en Nitros** | **Muy alta** | Recurso muy preciado: ahorrar Nitros es una ventaja grande |
+| **Peso** (drawback) | **Intermedia** (ni baja ni alta) | El Sobrepeso hoy es un castigo moderado (P108) |
+| **SP** | *(por definir)* | Barato para los magos (mucho SP y más regeneración): regula la magia |
+| **Efectos de arma** | según su peso 1–5 (provisorio, P112) | Los de casa de la familia, habilitados y excepcionales cuentan distinto |
+| **Resistencia a crítico** | *(por definir)* | Más escasa cuanto más alto el Tipo (P114) |
+| **Crítico frecuente / potente** | *(por definir)* | Universo de las armas Tipo 4 y 6 (P115) |
+| **Tipo y cantidad de dados** | *(por definir)* | |
+| **Defensa** | *(por definir)* | |
+
 ## 1. Familias de arma y su mecánica "de casa"
 
 | Familia | Mecánica de casa | Otras (excepcional) | Estado en el juego |

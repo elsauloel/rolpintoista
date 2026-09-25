@@ -231,3 +231,13 @@ Hoy hay solo **2 armas de Tipo 12** (Lanzallamas Raro, Martillo del Titán Excep
 **Preguntas para el dueño (P14):** (1) ¿El Rango es la identidad de la familia y se topea por tier como propongo? (2) ¿Las armas de **pólvora** van con las de rango (yo digo que sí)? (3) ¿Querés una **mecánica de recarga/cooldown** o la dejamos afuera por ahora? (4) ¿Los **arcos** siempre a dos manos? (5) ¿Munición? (propuesta: **sin munición**, es un recurso de más).
 
 - **2026-09-25 · Armas de rango: en pausa, criterio confirmado a grandes rasgos.** Dueño: "Las armas de rango las vamos a trabajar en otro momento, pero sí, vas bien. Hay que contemplar que **el rango vale mucho por sí mismo, tiene mucha ventaja. Entonces tienen que hacer menos daño que las armas melee porque quedan menos expuestos.**" → al retomar: (1) el Rango es la identidad de la familia (va bien); (2) **penalizar el daño respecto de las cuerpo a cuerpo** (menos daño esperado por tier, a calibrar en la fórmula, p. ej. con un descuento por Rango); (3) las preguntas 2–5 de arriba (pólvora, cooldown, arcos a dos manos, munición) siguen abiertas. No hacer tanda 5 todavía.
+
+## Armas mágicas — primera propuesta (2026-09-25), sin responder
+Dueño: "Mirando las armas de tipo 4 a 10, vamos a empezar a imaginar las armas mágicas." Base ya decidida (P116/P117, guía §0): armas de **daño** y de **efecto**; varita básica 1d4 por 1 Nitro (calidad baja), buena calidad 1d6 por 1 Nitro; el daño mágico va **directo a la vida** (por eso caro); el SP regula; elementos arcano/fuego/hielo/rayo.
+**Propuesta: cada elemento hereda la "casa" de una familia física.**
+- **Arcano ↔ punzante (Tipo 4):** el más puro, sin efectos; va directo. Varitas y dardos arcanos: dado chico, barato en Nitros, alta chance de crítico potente.
+- **Rayo ↔ cortante (Tipo 6):** rápido; Iniciativa, cadena, chance de Parálisis.
+- **Fuego ↔ hacha (Tipo 8):** pesado, área y terreno incendiado (flor o cono); rompe cosas.
+- **Hielo ↔ contundente (Tipo 10):** control; chance de Escarcha (como Demora/Aturdir).
+**El dado sube con el Tipo** (varita d4 → báculo d10) y el **peso también** (varita 1, báculo grande mucho).
+**Preguntas:** (1) ¿Te cierra el mapa elemento ↔ familia? (2) ¿El dado del arma mágica es el daño (sin sumar Especial) y el Especial solo da el PG mágico / potencia de efectos? (3) ¿La magia tiene crítico, o el crítico queda para lo físico? (4) ¿Los báculos también pegan cuerpo a cuerpo (híbrido con Alcance) o son solo de casteo? (5) ¿Costo base: 1 Nitro + SP según el efecto, y el SP sube con el tier?

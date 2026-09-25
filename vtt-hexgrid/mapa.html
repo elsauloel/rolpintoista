@@ -530,7 +530,7 @@ aside{
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
 #hud .hud-rotar{
   position:absolute;transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;
-  width:22px;height:22px;border-radius:50%;background:var(--frente,#4FA8E0);color:#fff;
+  width:22px;height:22px;border-radius:50%;background:var(--frente,#00D0FF);color:#fff;
   border:2px solid rgba(15,12,14,.65);box-shadow:0 2px 8px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;font-size:12px;cursor:grab
 }
@@ -1372,7 +1372,43 @@ function claseToken(t){
 }
 const SP_COLOR = '#3F86E0';
 const NO2_COLOR = '#3E9B5B';
-const FRENTE_COLOR = '#4FA8E0';  // marca el lado que mira el token (rotación)
+const FRENTE_COLOR = '#00D0FF';  // marca el lado que mira el token (rotación): celeste eléctrico, bien saturado (2026-09-24)
+const FRENTE_CONTORNO = 'rgba(0,0,0,.92)';   // contorno negro SOLO de esa línea, para que se lea sobre cualquier borde o fondo
+// Dibuja la línea del frente de un token de (x1,y1) a (x2,y2): primero una más ancha en negro y encima la de color.
+// Alternativa propuesta por el dueño (2026-09-24): un triangulito que flota justo por FUERA de la línea, apuntando hacia
+// donde mira, del mismo color saturado y con contorno negro. Se puede prender/apagar (y sacar la línea) con estas dos constantes.
+const FRENTE_LINEA = true;
+const FRENTE_TRIANGULO = true;
+function trazarFrente(x1, y1, x2, y2, rad, z, cx, cy){
+  const grosor = Math.max(3.5 / z, rad * 0.19);
+  ctx.save();
+  ctx.lineCap = 'round';
+  if(FRENTE_LINEA){
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  ctx.strokeStyle = FRENTE_CONTORNO; ctx.lineWidth = grosor + Math.max(2.5 / z, rad * 0.09); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = grosor; ctx.stroke();
+  }
+  if(FRENTE_TRIANGULO && cx !== undefined){
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    let dx = mx - cx, dy = my - cy;
+    const largo = Math.hypot(dx, dy) || 1;
+    dx /= largo; dy /= largo;                       // hacia afuera, hacia donde mira
+    const px = -dy, py = dx;                        // perpendicular
+    const base = Math.max(2.5 / z, rad * 0.09) + grosor / 2 + Math.max(2 / z, rad * 0.06);   // justo por fuera de la línea
+    const alto = Math.max(10 / z, rad * 0.38), ancho = Math.max(9 / z, rad * 0.36);
+    const bx = mx + dx * base, by = my + dy * base;
+    ctx.beginPath();
+    ctx.moveTo(bx + px * ancho / 2, by + py * ancho / 2);
+    ctx.lineTo(bx - px * ancho / 2, by - py * ancho / 2);
+    ctx.lineTo(bx + dx * alto, by + dy * alto);
+    ctx.closePath();
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = FRENTE_COLOR; ctx.fill();
+    ctx.strokeStyle = FRENTE_CONTORNO; ctx.lineWidth = Math.max(2 / z, rad * 0.08); ctx.stroke();
+  }
+  ctx.restore();
+}
 const ESTADO_COLOR = {buff: '#3E9B5B', debuff: '#8E3FB0', '': '#6F625C'};
 const ANCHO_CASILLA = HEX * 1.5;  // ancho de una casilla (hex de lado arriba)
 
@@ -3593,10 +3629,9 @@ function dibujar(){
     if(mini){
       ctx.save();
       trazarPuntos(puntos); ctx.clip();
-      // La ilustración mira "abajo" con rotación 0 (así vienen casi todas);
-      // rotar el token solo gira la imagen adentro del hexágono fijo.
+      // La foto NO gira con el token (2026-09-24): se ve siempre de arriba para abajo, como en la ficha.
+      // Lo que rota es el marco: el lado que mira se marca con la línea de FRENTE_COLOR.
       ctx.translate(x, y);
-      ctx.rotate(num(t.rotacion || 0) * Math.PI / 180);
       ctx.drawImage(mini, -rad, -rad, rad * 2, rad * 2);
       ctx.restore();
     }
@@ -3609,14 +3644,13 @@ function dibujar(){
     ctx.lineWidth = Math.max(2.5 / z, rad * 0.13);
     ctx.strokeStyle = BORDE[claseToken(t)];
     ctx.stroke();
-    // Frente: el lado que mira la ilustración (abajo con rotación 0) se
-    // resalta en celeste, para ubicarlo de un vistazo sin seleccionar el
-    // token. El lado 1 del hexágono (ver ESQUINAS) es "abajo".
+    // Frente: el lado hacia el que mira el token (abajo con rotación 0) se resalta con una línea gruesa
+    // saturada y con contorno negro, para ubicarlo de un vistazo sin seleccionar el token.
+    // El lado 1 del hexágono (ver ESQUINAS) es "abajo".
     {
       const frenteI = (Math.round(num(t.rotacion || 0) / 60) + 1) % 6;
       const [fx1, fy1] = puntos[frenteI], [fx2, fy2] = puntos[(frenteI + 1) % 6];
-      ctx.beginPath(); ctx.moveTo(fx1, fy1); ctx.lineTo(fx2, fy2);
-      ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = Math.max(3 / z, rad * 0.16); ctx.lineCap = 'round'; ctx.stroke();
+      trazarFrente(fx1, fy1, fx2, fy2, rad, z, x, y);
     }
 
     if(seleccion === d.id){
@@ -3805,16 +3839,15 @@ function dibujar(){
       ctx.globalAlpha = 0.75;
       trazarPuntos(pts);
       ctx.fillStyle = colocando.datos.color || '#9A867E'; ctx.fill();
-      if(imgPrev){ ctx.save(); trazarPuntos(pts); ctx.clip(); ctx.translate(c.x, c.y); ctx.rotate(colocando.rotacion * Math.PI / 180); ctx.drawImage(imgPrev, -rad, -rad, rad * 2, rad * 2); ctx.restore(); }
+      if(imgPrev){ ctx.save(); trazarPuntos(pts); ctx.clip(); ctx.translate(c.x, c.y); ctx.drawImage(imgPrev, -rad, -rad, rad * 2, rad * 2); ctx.restore(); }
       trazarPuntos(pts);
       ctx.setLineDash([6 / z, 4 / z]);
       ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
       ctx.setLineDash([]);
-      // Frente (celeste): el lado hacia el que mira; 0° = abajo.
+      // Frente: el lado hacia el que mira; 0° = abajo.
       const fi = (Math.round(colocando.rotacion / 60) + 1) % 6;
       const [f1x, f1y] = pts[fi], [f2x, f2y] = pts[(fi + 1) % 6];
-      ctx.beginPath(); ctx.moveTo(f1x, f1y); ctx.lineTo(f2x, f2y);
-      ctx.strokeStyle = FRENTE_COLOR; ctx.lineWidth = Math.max(3 / z, rad * 0.16); ctx.lineCap = 'round'; ctx.stroke();
+      trazarFrente(f1x, f1y, f2x, f2y, rad, z, c.x, c.y);
       if(!imgPrev){
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
         ctx.font = `700 ${rad * 0.95}px "Space Grotesk", system-ui, sans-serif`;
@@ -6899,7 +6932,7 @@ function hudHtml(t){
   if(libreActivo){
     return '<div class="hud-anillo">' +
       '<button type="button" class="hud-circulo icono abierto libre-activo" data-hud-boton="libre" title="Mover libre ACTIVO: tocá para apagarlo (M, Esc o clic derecho)">🦶</button>' +
-      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Girar no gasta No2">↻</div>';
+      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>';
   }
   // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
   let html = '<div class="hud-anillo">' +
@@ -6914,7 +6947,7 @@ function hudHtml(t){
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     '</div>' +
-    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (celeste). Girar no gasta No2">↻</div>' : '');
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puedoCambiarEstados(t));
   if(hudGlobo === 'tarjeta' && t.tipo === 'creep') globo = hudTarjetaHtml(t, d);

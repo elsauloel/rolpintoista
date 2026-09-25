@@ -1,0 +1,188 @@
+# -*- coding: utf-8 -*-
+"""Calculadora de calidad, tier y precio de armas (rework del catálogo, 2026-09-25).
+
+Fórmula v0 (TASAS INICIALES: se ajustan con ejemplos junto al dueño; ver docs/rework-armas.md, preguntas 8 a 10).
+Unidad: 1 PUNTO DE CALIDAD (PC) = 1 punto de daño esperado por ataque.
+
+  PC = daño esperado                 Peso × (Tipo + 1) / 2 + daño fijo
+     + bonos                         cada +1 a un stat × su tasa (TASA_STAT)
+     + efectos al golpear            Σ peso del efecto × probabilidad × K_EFECTO × modulación por familia × escala propia
+     + crítico mejorado              puntos de Crítico frecuente / potente / Ignora N × PESO_CRIT × K_EFECTO
+     − peso del arma                 relevancia intermedia (TASA_PESO por punto de Peso)
+
+  Tier = por umbrales de PC (UMBRAL_TIER). Precio = interpolación dentro de la banda del tier, redondeado a números redondos.
+  Si el arma tiene MÁS poder del que admite su tier asignado (p. ej. una Común con poder de Buena calidad), el precio sube ×1,5 por cada
+  tier de exceso (SOBREPRECIO): el precio compensa (regla de "calidad–precio" del dueño).
+
+Uso:
+  python calculadora_armas.py calibrar      # cómo caen las 137 armas actuales (tier actual vs calculado)
+  python calculadora_armas.py ejemplos      # ejemplos por tier con puntaje y precio nuevos
+  python calculadora_armas.py arma NOMBRE   # detalle de una arma del catálogo actual
+"""
+import json, math, sys, pathlib, collections
+
+RAIZ = pathlib.Path(__file__).resolve().parent.parent
+CATALOGO = RAIZ / 'datos' / 'catalogo.json'
+
+# ---------------------------------------------------------------- tasas (a ajustar)
+K_EFECTO = 1.0            # PC por punto de peso de efecto al 100 %
+PESO_CRIT = 3.0           # peso de 1 punto de Crítico frecuente / potente / Ignora 1
+TASA_PESO = 0.2           # PC que resta cada punto de Peso del arma (relevancia intermedia)
+TASA_STAT = {'pdg': 1.0, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.5, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
+TASA_STAT_DEFECTO = 1.0
+UMBRAL_TIER = [('Común', 0), ('Buena Calidad', 7.5), ('Raro', 11), ('Excepcional', 17), ('Legendario', 26)]
+BANDA_PRECIO = {'Común': (30, 90), 'Buena Calidad': (80, 160), 'Raro': (150, 350), 'Excepcional': (400, 900), 'Legendario': (1000, 2000)}
+SOBREPRECIO = 1.5
+ORDEN = [t for t, _ in UMBRAL_TIER]
+
+# Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
+PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
+               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4}
+CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}}
+HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango'},
+              'Sangrado': {'punzante', 'hacha'}, 'Lisiado': {'cortante'}, 'Rompe armadura': {'contundente'}, 'Aturdir': {'explosivo'},
+              'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo'}, 'Prende fuego': {'explosivo', 'rango'},
+              'Drena vida': {'cortante', 'punzante'}}
+FAMILIA_POR_TIPO = {4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente', 12: 'explosivo'}
+# efectos del catálogo actual que ya no existen en el diseño nuevo (no suman)
+DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Explosión', 'Estruendo', 'Empuje', 'Pajaritos'}
+ALIAS = {'Knockdown': 'Demora'}
+
+
+def familia(arma):
+    if arma.get('armaDeRango'):
+        return 'rango'
+    return FAMILIA_POR_TIPO.get(int(arma.get('tipoDado') or 0), 'cortante')
+
+
+def modulacion(efecto, fam):
+    if efecto in CASA.get(fam, ()):
+        return 1.0
+    if fam in HABILITADO.get(efecto, ()):
+        return 1.25
+    return 1.5
+
+
+def probabilidad(e):
+    caras, exitos = int(e.get('caras') or 1), int(e.get('exitos') or 1)
+    return min(1.0, max(0.05, exitos / max(1, caras)))
+
+
+def puntaje(arma):
+    """Devuelve (PC total, desglose)."""
+    tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
+    d = {'daño': peso * (tipo + 1) / 2 + fijo}
+    fam = familia(arma)
+    bonos = crit = 0.0
+    for m in arma.get('mods') or []:
+        st, v = m.get('stat'), float(m.get('val') or 0)
+        if st in ('crit', 'critpot'):
+            crit += v * PESO_CRIT * K_EFECTO
+        else:
+            bonos += v * TASA_STAT.get(st, TASA_STAT_DEFECTO)
+    d['bonos'] = bonos
+    d['crítico'] = crit
+    ef = 0.0
+    for e in arma.get('efectosGolpe') or []:
+        nombre = ALIAS.get(e.get('nombre'), e.get('nombre'))
+        if nombre in DESCARTADOS or nombre not in PESO_EFECTO and not str(nombre).startswith('Ignora'):
+            continue
+        if str(nombre).startswith('Ignora'):   # "Ignora N de Res. crítico" ≈ N puntos de Frecuente (convención 1:1), solo si es Tipo 4/6
+            try: n = int(str(nombre).split()[1])
+            except Exception: n = 1
+            ef += n * PESO_CRIT * K_EFECTO * probabilidad(e)
+            continue
+        base = PESO_EFECTO[nombre]
+        if nombre == 'Envenenar' and 'severo' in str(e.get('detalle', '')).lower():
+            base = PESO_EFECTO['Veneno severo']
+        ef += base * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
+    d['efectos'] = ef
+    d['peso del arma'] = -TASA_PESO * peso
+    return sum(d.values()), d
+
+
+def tier_de(pc):
+    t = ORDEN[0]
+    for nombre, umbral in UMBRAL_TIER:
+        if pc >= umbral:
+            t = nombre
+    return t
+
+
+def redondo(x):
+    if x < 100: paso = 5
+    elif x < 300: paso = 10
+    elif x < 1000: paso = 50
+    else: paso = 100
+    return int(round(x / paso) * paso)
+
+
+def precio(pc, tier_asignado=None):
+    t = tier_de(pc)
+    i = ORDEN.index(t)
+    lo = UMBRAL_TIER[i][1]
+    hi = UMBRAL_TIER[i + 1][1] if i + 1 < len(UMBRAL_TIER) else lo + 10
+    pos = 0.0 if hi == lo else min(1.0, max(0.0, (pc - lo) / (hi - lo)))
+    a, b = BANDA_PRECIO[t]
+    p = a + (b - a) * pos
+    exceso = 0
+    if tier_asignado in ORDEN:
+        exceso = max(0, i - ORDEN.index(tier_asignado))
+        p *= SOBREPRECIO ** exceso
+    return redondo(p), t, exceso
+
+
+def cargar():
+    d = json.load(open(CATALOGO, encoding='utf-8'))
+    return [i for i in d if i.get('tipoItem') in ('arma_1m', 'arma_2m')]
+
+
+def calibrar():
+    armas = cargar()
+    tabla = collections.defaultdict(lambda: collections.Counter())
+    pcs = collections.defaultdict(list)
+    for a in armas:
+        pc, _ = puntaje(a)
+        tabla[a['tier']][tier_de(pc)] += 1
+        pcs[a['tier']].append(pc)
+    print('Tier actual → tier calculado (cuántas armas)   [PC mín / mediana / máx]')
+    for t in ORDEN:
+        v = sorted(pcs[t]) or [0]
+        print(f"  {t:14} {dict(tabla[t])}   [{v[0]:.1f} / {v[len(v)//2]:.1f} / {v[-1]:.1f}]")
+
+
+def ejemplos(n=6):
+    armas = cargar()
+    por = collections.defaultdict(list)
+    for a in armas:
+        por[a['tier']].append(a)
+    for t in ORDEN:
+        print(f"\n== {t} (precio actual → nuevo) ==")
+        lista = sorted(por[t], key=lambda a: puntaje(a)[0])
+        paso = max(1, len(lista) // n)
+        for a in lista[::paso][:n]:
+            pc, d = puntaje(a)
+            p, tc, ex = precio(pc, a['tier'])
+            ef = ', '.join(f"{e.get('nombre')} {int(100*probabilidad(e))}%" for e in (a.get('efectosGolpe') or [])) or '—'
+            print(f"  {a['nombre'][:34]:34} T{a.get('tipoDado')} P{a.get('peso')} PC {pc:5.1f} → {tc:13} ${p:>5} (antes ${a.get('precioCompra')}){' EXCESO×'+str(ex) if ex else ''}  [{ef}]")
+
+
+def detalle(nombre):
+    for a in cargar():
+        if nombre.lower() in a['nombre'].lower():
+            pc, d = puntaje(a)
+            p, tc, ex = precio(pc, a['tier'])
+            print(a['nombre'], a['tier'], '→', tc, '$', p, 'exceso', ex)
+            for k, v in d.items():
+                print(f"   {k:14} {v:6.2f}")
+            print(f"   {'TOTAL':14} {pc:6.2f}")
+            return
+    print('no encontrada')
+
+
+if __name__ == '__main__':
+    cmd = sys.argv[1] if len(sys.argv) > 1 else 'calibrar'
+    if cmd == 'calibrar': calibrar()
+    elif cmd == 'ejemplos': ejemplos()
+    elif cmd == 'arma': detalle(' '.join(sys.argv[2:]))
+    else: print(__doc__)

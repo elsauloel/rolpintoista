@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T19:00:18Z",
+ "actualizado": "2026-09-25T19:16:13Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -977,7 +977,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure) que cambia cómo funciona tu personaje. Puede ser bueno (**buff**) o malo (**debuff**).\n\n## Cómo se ven y cómo duran\n- Aparecen como **chips** en la ficha y como íconos en tu token del mapa. Pasá el mouse: te dicen qué hacen.\n- Tienen **turnos restantes** (o son *permanentes*), y a veces **stacks** (acumulaciones).\n- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van.\n- Pueden dar bonos o penalidades a stats (por ejemplo, +5 Defensa), o tener reglas propias (por ejemplo, \"no podés moverte\").\n\n## Cómo se aplican\n- Una **habilidad** o un **consumible** puede aplicarse un estado a sí mismo (esto sí se automatiza).\n- Los estados que un ataque aplica a un **rival** ([[Efectos al golpear]]) **los pone la mesa a mano**: el GM elige el estado en la ficha del creep, o el jugador en la suya.\n- Podés crear estados propios (personalizados) para lo que se te ocurra.\n\n> [!tip] Regla de redondeo (2026-09-22)\n> Cuando un debuff o un buff tiene que redondear un número: **los debuffs redondean hacia abajo** (menos favorable) y **los buffs redondean hacia arriba** (más favorable), salvo que se diga lo contrario en ese estado puntual. Por eso Cansado, Exhausto, Pajaritos y Lisiado usan `floor` — son debuffs.\n\n## Los estados base\n| Estado | Tipo | En una línea |\n|---|---|---|\n| [[Veneno]] | debuff | Pierde HP por stack cada turno |\n| [[Sangrado]] | debuff | Pierde 2 HP por turno hasta curarse |\n| [[Regeneración]] | buff | Cura HP cada turno |\n| [[Pajaritos]] | debuff | PdG y Evasión a la mitad |\n| [[Lisiado]] | debuff | PdG y Parry a la mitad |\n| [[Stun]] | debuff (CC) | Sin Nitros |\n| [[Cansado y Exhausto\\|Cansado / Exhausto]] | debuff | Menos Nitros |\n| [[Rengo]] | debuff | Moverse cuesta el doble |\n| [[Inmovilizado]] | debuff | No te podés mover |\n| Escarcha | debuff | −1 a los No2 máximos; la duración la elige quien coloca la trampa |\n| [[Sentado]] | debuff (CC) | Evasión a la mitad, no podés atacar ni hacer dodge roll; levantarte cuesta 1 No2 |\n| [[Armadura rota]] | debuff | −1 Defensa por acumulación |\n| [[Escudo mágico]] | buff | Barra extra de HP |\n| [[Invulnerable]] | buff | No recibís daño |\n| [[Afortunado]] | buff | Tirás dos veces y te quedás con la mejor |\n| [[Sigilo (estado)\\|Sigilo]] | buff | Estás oculto |\n\n> [!warning] Provisorios\n> Varios valores de la lista (Cansado, Exhausto, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).\n\n> [!question] Repaso pendiente\n> Falta revisar **uno por uno** todos los buffs y debuffs (qué hace cada uno exactamente, duración, si es acumulable). Esta lista es lo que hoy hace la ficha."
+   "cuerpo": "Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure) que cambia cómo funciona tu personaje. Puede ser bueno (**buff**) o malo (**debuff**).\n\n## Cómo se ven y cómo duran\n- Aparecen como **chips** en la ficha y como íconos en tu token del mapa. Pasá el mouse: te dicen qué hacen.\n- Tienen **turnos restantes** (o son *permanentes*), y a veces **stacks** (acumulaciones).\n- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van.\n- Pueden dar bonos o penalidades a stats (por ejemplo, +5 Defensa), o tener reglas propias (por ejemplo, \"no podés moverte\").\n\n## Cómo se aplican\n- Una **habilidad** o un **consumible** puede aplicarse un estado a sí mismo (esto sí se automatiza).\n- Los estados que un ataque aplica a un **rival** ([[Efectos al golpear]]) **los pone la mesa a mano**: el GM elige el estado en la ficha del creep, o el jugador en la suya.\n- Podés crear estados propios (personalizados) para lo que se te ocurra.\n\n> [!tip] Regla de redondeo (2026-09-22)\n> Cuando un debuff o un buff tiene que redondear un número: **los debuffs redondean hacia abajo** (menos favorable) y **los buffs redondean hacia arriba** (más favorable), salvo que se diga lo contrario en ese estado puntual. Por eso Cansado, Exhausto, Pajaritos y Lisiado usan `floor` — son debuffs.\n\n## Los estados base\n| Estado | Tipo | En una línea |\n|---|---|---|\n| [[Veneno]] | debuff | Pierde HP por stack cada turno |\n| [[Sangrado]] | debuff | Pierde 2 HP por turno hasta curarse |\n| [[Regeneración]] | buff | Cura HP cada turno |\n| [[Pajaritos]] | debuff | PdG y Evasión a la mitad |\n| [[Lisiado]] | debuff | PdG y Parry a la mitad |\n| [[Stun]] | debuff (CC) | Sin Nitros |\n| [[Cansado y Exhausto\\|Cansado / Exhausto]] | debuff | Menos Nitros |\n| [[Rengo]] | debuff | Moverse cuesta el doble |\n| [[Inmovilizado]] | debuff | No te podés mover |\n| Escarcha | debuff | −1 a los No2 máximos **por stack** (se acumula: cada aplicación suma uno y renueva la duración) |\n| Parálisis | debuff (CC) | PdG, Parry y Evasión a la mitad (una sola vez por stat; no se suma a Lisiado ni a Pajaritos) |\n| [[Sentado]] | debuff (CC) | Evasión a la mitad, no podés atacar ni hacer dodge roll; levantarte cuesta 1 No2 |\n| [[Armadura rota]] | debuff | −1 Defensa por acumulación |\n| [[Escudo mágico]] | buff | Barra extra de HP |\n| [[Invulnerable]] | buff | No recibís daño |\n| [[Afortunado]] | buff | Tirás dos veces y te quedás con la mejor |\n| [[Sigilo (estado)\\|Sigilo]] | buff | Estás oculto |\n\n> [!warning] Provisorios\n> Varios valores de la lista (Cansado, Exhausto, Rengo, Inmovilizado) están marcados en la ficha como **provisorios** (ex Acciones/Movimiento pasados a Nitros 1 a 1 sin recalibrar).\n\n> [!question] Repaso pendiente\n> Falta revisar **uno por uno** todos los buffs y debuffs (qué hace cada uno exactamente, duración, si es acumulable). Esta lista es lo que hoy hace la ficha."
   },
   {
    "id": "veneno",
@@ -1034,6 +1034,39 @@
    "estado": "borrador",
    "capitulo": "estados",
    "cuerpo": "**Pajaritos** es un debuff (típico del [[Tanque]] y de golpes fuertes en la cabeza): **tu PdG y tu Evasión quedan a la mitad** (redondeado hacia abajo) mientras dure.\n\n> [!question] Definición de clase\n> El *Tanque* lo define como \"reduce a la mitad todas las tiradas de DES, ESP y AGI\". ¿Cuál vale: solo PdG y Evasión (lo que hace la ficha) o todos los stats de esos atributos?"
+  },
+  {
+   "id": "escarcha-y-paralisis",
+   "titulo": "Escarcha y Parálisis",
+   "alias": [
+    "Escarcha",
+    "Parálisis",
+    "Congelado"
+   ],
+   "tags": [
+    "estado",
+    "elemental"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).\n\n- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).\n- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.\n\nLos dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM."
+  },
+  {
+   "id": "terreno-incendiado",
+   "titulo": "Terreno incendiado",
+   "alias": [
+    "Fuego",
+    "Incendio",
+    "Terreno en llamas"
+   ],
+   "tags": [
+    "estado",
+    "mapa",
+    "elemental"
+   ],
+   "estado": "borrador",
+   "capitulo": "estados",
+   "cuerpo": "El **fuego** trabaja en **área** y deja el terreno **incendiado**: en el mapa, en *Terreno y Formas*, se marca la forma como **🔥 Terreno incendiado** (una flor para una bola de fuego, una forma libre para una llamarada). Tiene un **daño de fuego** (valor inicial **5**, se puede cambiar al crearla y después desde el ⚙).\n\n- **Al entrar** en el terreno incendiado (viniendo de afuera) recibís el daño. Si el recorrido cruza el fuego más de una vez, cuenta cada entrada.\n- **En cada ⟳ Mantenimiento**, todo el que **siga adentro** lo recibe de nuevo.\n- El daño es **directo a la vida** (el fuego es daño mágico elemental: no hay defensa mágica).\n- Con **\"Turnos que dura\"** el fuego se apaga solo.\n\nLo aplica solo el que maneja al token (cada jugador a sus personajes, el GM a los creeps); las invocaciones se avisan en la Mesa para aplicarlas a mano. [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora)."
   },
   {
    "id": "lisiado",

@@ -38,7 +38,8 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 | [[Cansado y Exhausto\|Cansado / Exhausto]] | debuff | Menos Nitros |
 | [[Rengo]] | debuff | Moverse cuesta el doble |
 | [[Inmovilizado]] | debuff | No te podés mover |
-| Escarcha | debuff | −1 a los No2 máximos; la duración la elige quien coloca la trampa |
+| Escarcha | debuff | −1 a los No2 máximos **por stack** (se acumula: cada aplicación suma uno y renueva la duración) |
+| Parálisis | debuff (CC) | PdG, Parry y Evasión a la mitad (una sola vez por stat; no se suma a Lisiado ni a Pajaritos) |
 | [[Sentado]] | debuff (CC) | Evasión a la mitad, no podés atacar ni hacer dodge roll; levantarte cuesta 1 No2 |
 | [[Armadura rota]] | debuff | −1 Defensa por acumulación |
 | [[Escudo mágico]] | buff | Barra extra de HP |
@@ -103,6 +104,34 @@ estado: borrador
 
 > [!question] Definición de clase
 > El *Tanque* lo define como "reduce a la mitad todas las tiradas de DES, ESP y AGI". ¿Cuál vale: solo PdG y Evasión (lo que hace la ficha) o todos los stats de esos atributos?
+
++++
+titulo: Escarcha y Parálisis
+alias: [Escarcha, Parálisis, Congelado]
+tags: [estado, elemental]
+estado: borrador
++++
+Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).
+
+- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).
+- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.
+
+Los dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM.
+
++++
+titulo: Terreno incendiado
+alias: [Fuego, Incendio, Terreno en llamas]
+tags: [estado, mapa, elemental]
+estado: borrador
++++
+El **fuego** trabaja en **área** y deja el terreno **incendiado**: en el mapa, en *Terreno y Formas*, se marca la forma como **🔥 Terreno incendiado** (una flor para una bola de fuego, una forma libre para una llamarada). Tiene un **daño de fuego** (valor inicial **5**, se puede cambiar al crearla y después desde el ⚙).
+
+- **Al entrar** en el terreno incendiado (viniendo de afuera) recibís el daño. Si el recorrido cruza el fuego más de una vez, cuenta cada entrada.
+- **En cada ⟳ Mantenimiento**, todo el que **siga adentro** lo recibe de nuevo.
+- El daño es **directo a la vida** (el fuego es daño mágico elemental: no hay defensa mágica).
+- Con **"Turnos que dura"** el fuego se apaga solo.
+
+Lo aplica solo el que maneja al token (cada jugador a sus personajes, el GM a los creeps); las invocaciones se avisan en la Mesa para aplicarlas a mano. [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora).
 
 +++
 titulo: Lisiado

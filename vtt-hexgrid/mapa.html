@@ -1175,6 +1175,7 @@ let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
+let elemFuego = false, elemFuegoDano = 5;   // Terreno incendiado (2026-09-25): daño al entrar y en cada Mantenimiento (directo a la vida), valor inicial 5 y editable
 let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport: destino "col,fila" (se elige con un clic en el mapa)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
@@ -2646,6 +2647,7 @@ function escucharMantenimiento(){
     pedirDibujo();   // las marcas del sigilo duran por turnos
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
+    fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
     const base = '../';
     if(soyGM){
       mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
@@ -3551,6 +3553,19 @@ function dibujar(){
         ctx.fillText('🌀', pD.x, pD.y);
         ctx.restore();
       }
+    }
+    if(el.fuego && celdas.length){
+      // Terreno incendiado: llamitas en las casillas y el daño en el medio.
+      ctx.save();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `${Math.max(10, 16 / z)}px system-ui, sans-serif`;
+      celdas.slice(0, 60).forEach(c => { const p = hexCentro(c.col, c.fila); ctx.fillText('🔥', p.x, p.y); });
+      const cm = celdas[Math.floor(celdas.length / 2)], pm = hexCentro(cm.col, cm.fila);
+      ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
+      const txt = `${num(el.fuegoDano) || 5}`, w = ctx.measureText(txt).width + 8 / z, h = 15 / z;
+      ctx.fillStyle = 'rgba(15,12,14,.85)'; ctx.fillRect(pm.x - w / 2, pm.y + 10 / z, w, h);
+      ctx.fillStyle = '#FFB070'; ctx.fillText(txt, pm.x, pm.y + 10 / z + h / 2);
+      ctx.restore();
     }
     if(el.portal){
       // Portal: anillo morado con remolino en su casilla (lo ven todos).
@@ -5200,6 +5215,11 @@ function escucharElementos(){
         trampaDano: typeof d.trampaDano === 'string' ? d.trampaDano : '',
         trampaIgnoraDef: d.trampaIgnoraDef === true,
         trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
+        trampaDestino: typeof d.trampaDestino === 'string' ? d.trampaDestino : '',   // trampa de teleport ("col,fila")
+        portal: d.portal === true,   // Invocar portal (Mago)
+        portalDestino: typeof d.portalDestino === 'string' ? d.portalDestino : '',
+        fuego: d.fuego === true,   // terreno incendiado
+        fuegoDano: Math.max(1, Math.min(999, Math.round(num(d.fuegoDano)) || 5)),
         turnos: Math.round(num(d.turnos)) || 0,
         venceMant: Number.isFinite(d.venceMant) ? Math.round(d.venceMant) : null,
       });
@@ -5347,6 +5367,7 @@ async function pegarElemento(){
     imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
     ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
       trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {})} : {}),
+    ...(c.fuego ? {fuego: true, fuegoDano: c.fuegoDano || 5} : {}),
     ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos} : {}),
     duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -5374,6 +5395,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
+      ...(elemFuego ? {fuego: true, fuegoDano: Math.max(1, Math.min(999, Math.round(elemFuegoDano) || 5))} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -5424,7 +5446,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, fuegoDano: el.fuegoDano, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
   };
   renderEditorElemento();
 }
@@ -5478,6 +5500,8 @@ function renderEditorElemento(){
     <div class="tk-lapiz-colores">${COLORES.map(c => `<button type="button" class="tk-color${c === el.color ? ' elegido' : ''}" data-eled-color="${c}" style="background:${c}"></button>`).join('')}</div>
     <label class="etiqueta">Transparencia</label>
     <input type="range" id="elem-edit-alfa" min="0" max="100" step="5" value="${el.alfa}">
+    ${el.fuego ? `<label class="etiqueta">🔥 Daño de fuego (al entrar y en cada Mantenimiento)</label>
+    <input type="number" id="elem-edit-fuego" min="1" max="999" step="1" value="${el.fuegoDano || 5}">` : ''}
     <label class="etiqueta">Turnos que le quedan (0 = sin límite)</label>
     <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
@@ -5507,6 +5531,7 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-guardar').onclick = () => {
     const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
     const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
+      ...(el.fuego ? {fuegoDano: Math.max(1, Math.min(999, Math.round(num(el.fuegoDano)) || 5))} : {}),
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
       ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300)} : {})};
@@ -5519,6 +5544,8 @@ function renderEditorElemento(){
     caja.querySelectorAll('[data-eled-color]').forEach(x => x.classList.toggle('elegido', x === b));
   });
   caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
+  const inFuego = caja.querySelector('#elem-edit-fuego');
+  if(inFuego) inFuego.oninput = () => vivo({fuegoDano: Math.max(1, Math.min(999, Math.round(num(inFuego.value)) || 1))});
   const inTurnos = caja.querySelector('#elem-edit-turnos');
   if(inTurnos) inTurnos.oninput = () => { const n = Math.max(0, Math.min(99, Math.round(num(inTurnos.value)) || 0)); vivo(n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null}); };
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
@@ -5818,11 +5845,12 @@ async function moverToken(id, col, fila, celdas){
     sigiloPublicarAvisos(id);
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
+    fuegoEntrada(id, celdas);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);
@@ -6089,6 +6117,67 @@ function trampasEvaluarRuta(tokId, t, ruta){
     }
   }
   return null;
+}
+/* ---------- Terreno incendiado (2026-09-25, pedido del dueño) ----------
+   Una forma con `fuego: true` y `fuegoDano` (valor inicial 5, editable). Hace daño (DIRECTO a la vida: el fuego es daño mágico elemental y no hay
+   defensa mágica) (1) cada vez que un token ENTRA en el fuego viniendo de afuera (lo aplica quien mueve el token: su dueño o el GM en los creeps) y
+   (2) en cada ⟳ Mantenimiento a todos los que sigan adentro (cada cliente aplica lo suyo: el GM a los creeps, cada jugador a sus personajes).
+   Las invocaciones y los personajes sin dueño conectado se avisan en la Mesa para aplicarlo a mano. Con "Turnos que dura" se apaga solo. */
+function fuegoCeldas(){
+  const m = new Map();   // "col,fila" → daño (el mayor si se superponen)
+  elementos.forEach(el => {
+    if(!el.fuego) return;
+    const d = Math.max(1, num(el.fuegoDano) || 5);
+    celdasDeElemento(el).forEach(c => { const k = nbPack(c.col, c.fila); if(!m.has(k) || m.get(k) < d) m.set(k, d); });
+  });
+  return m;
+}
+async function fuegoAplicarA(t, dano, cuando){
+  let hecho = false;
+  try{
+    if(t.tipo === 'creep' && t.fichaId && soyGM){ await danioCreep(t, String(dano), true); hecho = true; }
+    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ await danioPj(t, String(dano), true); hecho = true; }
+  }catch(err){ console.error('No se pudo aplicar el daño de fuego:', err); }
+  return hecho;
+}
+// Al soltar un movimiento: cada casilla del recorrido que es fuego y viene de una que no lo es cuenta como una entrada.
+async function fuegoEntrada(id, celdas){
+  const t = tokens.get(id);
+  if(!t || !celdas || celdas.length < 2) return;
+  const fuego = fuegoCeldas();
+  if(!fuego.size) return;
+  let total = 0, entradas = 0;
+  for(let i = 1; i < celdas.length; i++){
+    const k = nbPack(celdas[i].col, celdas[i].fila), previa = nbPack(celdas[i - 1].col, celdas[i - 1].fila);
+    if(fuego.has(k) && !fuego.has(previa)){ total += fuego.get(k); entradas++; }
+  }
+  if(!total) return;
+  const hecho = await fuegoAplicarA(t, total);
+  alertaRojaAnonima(`🔥 Terreno incendiado`, `${t.oculto ? 'Alguien' : nombreDe(t)} entró en el fuego${entradas > 1 ? ` (${entradas} veces)` : ''}: ${total} de daño de fuego (directo a la vida) — ${hecho ? 'aplicado solo' : 'aplicalo a mano'}`);
+}
+// Al pasar el turno (⟳ Mantenimiento): todo el que siga en el fuego lo recibe de nuevo. Los fuegos que se apagan justo ahora no cuentan.
+async function fuegoMantenimiento(numero){
+  const fuego = new Map();
+  elementos.forEach(el => {
+    if(!el.fuego || (el.venceMant !== null && el.venceMant !== undefined && el.venceMant <= numero)) return;
+    const d = Math.max(1, num(el.fuegoDano) || 5);
+    celdasDeElemento(el).forEach(c => { const k = nbPack(c.col, c.fila); if(!fuego.has(k) || fuego.get(k) < d) fuego.set(k, d); });
+  });
+  if(!fuego.size) return;
+  const propios = [], ajenos = [];
+  tokens.forEach(t => {
+    const d = fuego.get(nbPack(t.col, t.fila));
+    if(!d || !t.fichaId) return;
+    const mio = (t.tipo === 'creep' && soyGM) || (t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t));
+    (mio ? propios : ajenos).push({t, d});
+  });
+  const hechos = [];
+  for(const {t, d} of propios){ if(await fuegoAplicarA(t, d)) hechos.push(`${t.oculto ? 'Alguien' : nombreDe(t)}: ${d}`); }
+  if(hechos.length) alertaRojaAnonima('🔥 Terreno incendiado (Mantenimiento)', `${hechos.join(' · ')} de daño de fuego, directo a la vida (aplicado solo)`);
+  if(soyGM){   // el GM avisa lo que no se pudo aplicar solo (invocaciones o personajes que no están conectados no se detectan: revisar el mapa)
+    const manual = ajenos.filter(({t}) => t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION));
+    if(manual.length) alertaRojaAnonima('🔥 Terreno incendiado (a mano)', `${manual.map(({t, d}) => `${nombreDe(t)}: ${d}`).join(' · ')} de daño de fuego: aplicalo a mano`);
+  }
 }
 // Quiénes sufren el efecto: quien la activó y, si es de área, los de adentro (todos con fuego amigo; si no, solo los que ella considera rivales).
 function trampaAfectados(t, el){
@@ -8752,6 +8841,9 @@ function renderHerramientaFlotante(){
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
       <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
       <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
+      <label class="tk-lapiz-check" title="Terreno incendiado: quien entra recibe el daño (directo a la vida, el fuego ignora la Defensa) y después, en cada Mantenimiento, todo el que siga adentro lo vuelve a recibir"><input type="checkbox" id="elem-fuego-check"${elemFuego ? ' checked' : ''}> 🔥 Terreno incendiado</label>
+      ${elemFuego ? `<label class="etiqueta">Daño de fuego (al entrar y en cada Mantenimiento)</label>
+      <input type="number" id="elem-fuego-dano" min="1" max="999" step="1" value="${elemFuegoDano}" title="Valor inicial 5; se puede cambiar acá o después con el ⚙ de la forma. Con Turnos que dura el fuego se apaga solo.">` : ''}
       <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
       ${elemTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga, elemTrampaTeleport ? (elemTrampaDestino || 'un destino (falta marcarlo)') : ''))}</div>
       ${elemTrampaTeleport ? `<button type="button" class="btn" id="trampa-destino" style="margin-top:6px;width:100%">🌀 ${elemTrampaDestino ? 'Cambiar' : 'Elegir'} el destino en el mapa</button>` : ''}
@@ -8912,6 +9004,13 @@ $('#herramienta-flotante').addEventListener('change', e => {
     renderHerramientaFlotante();
     return;
   }
+  if(e.target.id === 'elem-fuego-check'){
+    elemFuego = e.target.checked;
+    if(elemFuego){ elemColor = '#E25822'; try{ localStorage.setItem('elem-color', elemColor); }catch(err){} }   // el fuego arranca en rojo anaranjado (se puede cambiar)
+    renderHerramientaFlotante();
+    pedirDibujo();
+    return;
+  }
   if(e.target.id === 'elem-trampa-check'){
     elemTrampa = e.target.checked;
     renderHerramientaFlotante();
@@ -8937,6 +9036,7 @@ $('#herramienta-flotante').addEventListener('click', e => {
 });
 $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-turnos'){ elemTurnos = Math.max(0, Math.min(99, Math.round(num(e.target.value)) || 0)); return; }
+  if(e.target.id === 'elem-fuego-dano'){ elemFuegoDano = Math.max(1, Math.min(999, Math.round(num(e.target.value)) || 1)); return; }
   if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }

@@ -912,6 +912,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
+<script src="../comun/asistente-trampa.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1847,6 +1848,67 @@ function trampaEstadoSpec(){
   if(!elemTrampaEstado || !trampaEstadoPresets().some(p => p.nombre === elemTrampaEstado)) return '';
   return JSON.stringify({nombre: elemTrampaEstado, turnos: elemTrampaEstadoTurnos > 0 ? elemTrampaEstadoTurnos : trampaEstadoTurnosPreset(elemTrampaEstado)});
 }
+/* ---------- Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25) ----------
+   Se abre al tildar "Trampa" en Terreno y Formas, desde el botón "Armar paso a paso" del panel, desde el catálogo ("crear custom") y
+   desde el ⚙ de una trampa ya colocada (modo edición: la forma no cambia). Devuelve un resultado neutro que acá se convierte en campos. */
+function trampaEstadosParaAsistente(){
+  return trampaEstadoPresets().map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: !!p.permanente}));
+}
+function trampaResumenFrase(nombre, dano, ignoraDef, estado, estadoTurnos, amiga){
+  const p = [];
+  if(dano) p.push(`${dano} de daño ${ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
+  if(estado) p.push(`deja ${estado}${estadoTurnos ? ' ' + estadoTurnos + ' turnos' : ''}`);
+  if(!p.length) p.push('solo avisa cuando se activa');
+  p.push(amiga ? 'fuego amigo: SÍ' : 'fuego amigo: NO');
+  return p.join(' · ');
+}
+function abrirAsistenteTrampaPanel(){
+  AsistenteTrampa.abrir({
+    contexto: 'mapa', editando: false, colores: COLORES, estados: trampaEstadosParaAsistente(),
+    inicial: {nombre: elemTrampaNombre, descripcion: elemTrampaDetalle, forma: elemTipo, color: elemColor, alfa: elemAlfa, amiga: elemTrampaAmiga,
+      dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos},
+    alTerminar: res => {
+      elemTrampa = true; elemTrampaNombre = res.nombre.trim().slice(0, 40); elemTrampaDetalle = AsistenteTrampa.detalleFinal(res); elemTrampaAmiga = !!res.amiga;
+      elemTrampaDano = res.dano || ''; elemTrampaIgnoraDef = !res.contemplaArmadura; elemTrampaEstado = res.estado || ''; elemTrampaEstadoTurnos = num(res.estadoTurnos);
+      if(['flor', 'linea', 'libre'].includes(res.forma)) elemTipo = res.forma;
+      if(/^#[0-9a-fA-F]{6}$/.test(res.color || '')) elemColor = res.color;
+      if(Number.isFinite(res.alfa)) elemAlfa = Math.max(0, Math.min(100, res.alfa));
+      elemTurnos = Math.max(0, Math.min(99, num(res.turnos)));
+      if(res.guardar) guardarTrampaRecurrente({nombre: elemTrampaNombre, detalle: elemTrampaDetalle, amiga: elemTrampaAmiga, tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa,
+        dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos});
+      renderHerramientaFlotante(); pedirDibujo();
+      toast(`Trampa "${elemTrampaNombre}" lista: elegí dónde ponerla`);
+    },
+    alCancelar: () => { if(!elemTrampaNombre.trim()){ elemTrampa = false; renderHerramientaFlotante(); pedirDibujo(); } },   // si nunca se armó, se destilda
+  });
+}
+// ⚙ de una trampa ya colocada: mismo menú, en modo edición. Los cambios se aplican en vivo al elemento y se guardan con "Guardar".
+function abrirAsistenteTrampaEditar(id, alCancelar){
+  const el = elementos.get(id);
+  if(!el) return;
+  let est = null;
+  try{ est = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
+  const restan = el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(1, el.venceMant - mantenimientoNumero) : 0;
+  AsistenteTrampa.abrir({
+    contexto: 'mapa', editando: true, colores: COLORES, estados: trampaEstadosParaAsistente(),
+    inicial: {nombre: el.trampaNombre || '', descripcion: el.trampaDetalle || '', forma: el.tipo, color: el.color, alfa: el.alfa, amiga: !!el.fuegoAmigo,
+      dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
+      estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan},
+    alTerminar: res => {
+      const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
+        trampaDano: res.dano || '', trampaIgnoraDef: !res.contemplaArmadura,
+        trampaEstado: res.estado ? JSON.stringify({nombre: res.estado, turnos: res.estadoTurnos > 0 ? res.estadoTurnos : trampaEstadoTurnosPreset(res.estado)}) : '',
+        color: res.color, alfa: res.alfa};
+      const n = Math.max(0, Math.min(99, num(res.turnos)));
+      Object.assign(cambios, n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null});
+      Object.assign(el, cambios);
+      pedirDibujo();
+      if(editandoElemento && editandoElemento.id === id) renderEditorElemento();
+      toast('Trampa actualizada: tocá Guardar para dejarla así');
+    },
+    alCancelar: alCancelar || (() => {}),
+  });
+}
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
   if(!g) return;
@@ -1865,7 +1927,7 @@ function abrirCatalogoTrampas(){
     tipo: 'trampas', titulo: 'Catálogo de trampas',
     base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
     textoCrearDeCero: '+ Crear una trampa custom (paso a paso)',
-    alCrearDeCero: abrirAsistenteTrampa,
+    alCrearDeCero: () => { elemTrampa = true; abrirAsistenteTrampaPanel(); },
     alElegir: cargarTrampaEnPanel,
     subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 fuego amigo' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [
@@ -5218,7 +5280,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, trampaDano: el.trampaDano, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
   };
   renderEditorElemento();
 }
@@ -5276,10 +5338,9 @@ function renderEditorElemento(){
     <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
     <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
-    ${el.trampa ? `<input type="text" id="elem-edit-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(el.trampaNombre || '')}" style="margin-top:6px">
-    <input type="text" id="elem-edit-trampa-detalle" maxlength="200" placeholder="Qué hace" value="${esc(el.trampaDetalle || '')}" style="margin-top:6px">
-    <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa-amiga"${el.fuegoAmigo ? ' checked' : ''}> Fuego amigo (la disparan también los aliados)</label>
-    ${el.disparada ? '<div class="fila" style="margin-top:6px"><span class="hint">Disparada: la ven todos.</span><button type="button" class="btn" id="elem-edit-rearmar">Rearmar</button></div>' : ''}` : ''}
+    ${el.trampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(el.trampaNombre || 'Sin nombre')}</b><br>${esc((() => { let es = null; try{ es = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){} return trampaResumenFrase(el.trampaNombre, trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', !!el.trampaIgnoraDef, es && es.nombre || '', es ? num(es.turnos) : 0, !!el.fuegoAmigo); })())}</div>
+    <button type="button" class="btn primary" id="elem-edit-trampa-asistente" style="margin-top:6px;width:100%">🪄 Editar la trampa paso a paso</button>
+        ${el.disparada ? '<div class="fila" style="margin-top:6px"><span class="hint">Disparada: la ven todos.</span><button type="button" class="btn" id="elem-edit-rearmar">Rearmar</button></div>' : ''}` : ''}
     ${tieneImagen && V ? `
       <label class="etiqueta">Imagen (arrastrar para mover, rueda del mouse para zoom)</label>
       <div class="elem-edit-visor" id="elem-edit-visor" style="width:${V.w}px;height:${V.h}px"><img id="elem-edit-img" src="${el.imagen}"></div>
@@ -5302,7 +5363,8 @@ function renderEditorElemento(){
     const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
     const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
-      trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo};
+      trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
+      ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaEstado: String(el.trampaEstado || '').slice(0, 300)} : {})};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
     moverElemento(id, cambios);
@@ -5317,13 +5379,13 @@ function renderEditorElemento(){
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
   if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
   const chkTrampa = caja.querySelector('#elem-edit-trampa');
-  if(chkTrampa) chkTrampa.onchange = () => { vivo({trampa: chkTrampa.checked, disparada: false}); renderEditorElemento(); };
-  const trNombre = caja.querySelector('#elem-edit-trampa-nombre');
-  if(trNombre) trNombre.oninput = () => vivo({trampaNombre: trNombre.value});
-  const trDetalle = caja.querySelector('#elem-edit-trampa-detalle');
-  if(trDetalle) trDetalle.oninput = () => vivo({trampaDetalle: trDetalle.value});
-  const trAmiga = caja.querySelector('#elem-edit-trampa-amiga');
-  if(trAmiga) trAmiga.onchange = () => vivo({fuegoAmigo: trAmiga.checked});
+  if(chkTrampa) chkTrampa.onchange = () => {
+    vivo({trampa: chkTrampa.checked, disparada: false});
+    renderEditorElemento();
+    if(chkTrampa.checked && !String(el.trampaNombre || '').trim()) abrirAsistenteTrampaEditar(id, () => { vivo({trampa: false}); if(editandoElemento && editandoElemento.id === id) renderEditorElemento(); });
+  };
+  const trAsist = caja.querySelector('#elem-edit-trampa-asistente');
+  if(trAsist) trAsist.onclick = () => abrirAsistenteTrampaEditar(id);
   const trRearmar = caja.querySelector('#elem-edit-rearmar');
   if(trRearmar) trRearmar.onclick = () => { vivo({disparada: false}); renderEditorElemento(); };
 
@@ -8451,15 +8513,8 @@ function renderHerramientaFlotante(){
       <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
       <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
       <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
-      ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
-      <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">
-      <input type="text" id="elem-trampa-dano" maxlength="12" placeholder="Daño automático (ej. 2d6; vacío = solo avisa)" value="${esc(elemTrampaDano)}" style="margin-top:6px" title="Al dispararse, el mapa tira este daño solo y se lo aplica a quien la activa (restando su Defensa)">
-      <label class="etiqueta" style="margin-top:8px">Estado que deja (automático)</label>
-      <select id="elem-trampa-estado">${trampaEstadoOpcionesHtml(elemTrampaEstado)}</select>
-      ${elemTrampaEstado ? `<label class="etiqueta">Duración del estado (turnos)</label>
-      <input type="number" id="elem-trampa-estado-turnos" min="0" max="20" step="1" value="${elemTrampaEstadoTurnos || ''}" placeholder="${trampaEstadoTurnosPreset(elemTrampaEstado)} (el del estado)" title="Cuántos turnos dura el estado en quien pise la trampa; lo elegís vos al colocarla">` : ''}
-      <label class="tk-lapiz-check" title="Sí: el daño automático NO se reduce por la Defensa de quien la pisa (daño directo). No: se le resta su Defensa, como un golpe."><input type="checkbox" id="elem-trampa-ignora-def"${elemTrampaIgnoraDef ? ' checked' : ''}> El daño <b>${elemTrampaIgnoraDef ? 'IGNORA' : 'respeta'}</b> la Defensa (${elemTrampaIgnoraDef ? 'daño directo' : 'se le resta su Defensa'})</label>
-      <label class="tk-lapiz-check" title="Sí: también la disparan tus aliados (y vos). No: solo los rivales."><input type="checkbox" id="elem-trampa-amiga"${elemTrampaAmiga ? ' checked' : ''}> Fuego amigo: <b>${elemTrampaAmiga ? 'SÍ' : 'NO'}</b> (la disparan también los aliados)</label>
+      ${elemTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga))}</div>
+      <button type="button" class="btn primary" id="trampa-asistente" style="margin-top:6px;width:100%" title="Nombre, superficie, daño, estado y más, paso a paso">🪄 ${elemTrampaNombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
       ${trampasGuardadasHtml()}
       <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
@@ -8620,6 +8675,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
     elemTrampa = e.target.checked;
     renderHerramientaFlotante();
     pedirDibujo();
+    if(elemTrampa && !elemTrampaNombre.trim()) abrirAsistenteTrampaPanel();   // al tildarla se abre el menú paso a paso
     return;
   }
   if(e.target.id === 'elem-invisible-check'){
@@ -8633,6 +8689,9 @@ $('#herramienta-flotante').addEventListener('change', e => {
     try{ localStorage.setItem('elem-tamano', elemTamano); }catch(err){}
     renderHerramientaFlotante();
   }
+});
+$('#herramienta-flotante').addEventListener('click', e => {
+  if(e.target.closest('#trampa-asistente')) abrirAsistenteTrampaPanel();
 });
 $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-turnos'){ elemTurnos = Math.max(0, Math.min(99, Math.round(num(e.target.value)) || 0)); return; }

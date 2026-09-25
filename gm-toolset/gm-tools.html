@@ -1051,7 +1051,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <label class="hc-trampa-on" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
           <input type="checkbox" id="hc-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
         </label>
-        <div id="hc-trampa-campos" style="margin-top:10px">
+        <div id="hc-trampa-resumen" style="margin-top:10px"></div>
+        <input type="checkbox" id="hc-trampa-amiga" style="display:none">
+        <div id="hc-trampa-campos" style="display:none">
           <div class="f"><label>Nombre de la trampa</label><input type="text" id="hc-trampa-nombre" maxlength="40" placeholder="vacío = el nombre de la habilidad"></div>
           <div class="f" style="margin-top:8px"><label>Qué hace (lo que se lee cuando alguien la pisa)</label><input type="text" id="hc-trampa-detalle" maxlength="200" placeholder="ej. foso de púas: 2d6 de daño"></div>
           <div class="row3" style="margin-top:8px">
@@ -1278,6 +1280,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/trampas-base.js"></script>
+<script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -4323,6 +4326,11 @@ function hcTrampaResumen(){
 }
 function hcTrampaRender(){
   const on = $('#hc-trampa-on').checked;
+  const nom = $('#hc-trampa-nombre').value.trim();
+  $('#hc-trampa-resumen').innerHTML = on
+    ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $('#hc-nombre').value.trim() || 'Sin nombre')}</b><br>${esc(hcTrampaResumen())} · ${$('#hc-trampa-amiga').checked ? 'fuego amigo: SÍ' : 'fuego amigo: NO'}</div>
+      <button type="button" class="btn primary" id="hc-trampa-asistente" style="width:100%">🪄 ${nom ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>`
+    : '';
   $('#hc-trampa-campos').style.opacity = on ? '1' : '.4';
   $('#hc-trampa-campos').querySelectorAll('input,select').forEach(el => { el.disabled = !on; });
   $('#hc-trampa-ayuda').textContent = on
@@ -4337,6 +4345,7 @@ function hcCargarTrampa(h){
   $('#hc-trampa-detalle').value = t ? (t.detalle || '') : '';
   $('#hc-trampa-dano').value = t ? (t.dano || '') : '';
   $('#hc-trampa-ignora-def').checked = !!(t && t.ignoraDef);
+  $('#hc-trampa-amiga').checked = !!(t && t.amiga);
   $('#hc-trampa-radio').value = t ? Math.max(0, num(t.radio) || 0) : 0;
   $('#hc-trampa-cant').value = t ? Math.max(1, num(t.cant) || 1) : 1;
   const estados = ESTADOS_PRESET_GM.filter(p => p.polaridad === 'debuff').map(p => p.nombre);
@@ -4360,6 +4369,7 @@ function hcGuardarTrampa(h){
     detalle: $('#hc-trampa-detalle').value.trim().slice(0, 200),
     dano: HC_TRAMPA_DANO_RE.test(dano) ? dano : '',
     ignoraDef: $('#hc-trampa-ignora-def').checked,
+    amiga: $('#hc-trampa-amiga').checked,
     radio: Math.max(0, Math.min(6, Math.round(num($('#hc-trampa-radio').value) || 0))),
     cant: Math.max(1, Math.min(6, Math.round(num($('#hc-trampa-cant').value) || 1))),
   };
@@ -7111,7 +7121,7 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 async function colocarTrampaDeHab(sc, h){
   const t = h.trampaColocar;
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', ignoraDef: !!t.ignoraDef, radio: t.radio || 0, cant: t.cant || 1, estado: t.estado || null});
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', nombre: t.nombre || h.nombre, detalle: t.detalle || '', dano: t.dano || '', ignoraDef: !!t.ignoraDef, radio: t.radio || 0, cant: t.cant || 1, estado: t.estado || null, fuegoAmigo: !!t.amiga});
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');
@@ -7282,7 +7292,36 @@ $('#hc-efecto-preset').addEventListener('change', e => {
   $('#hc-efecto-polaridad').value = preset.polaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(preset.mods || []);
 });
-$('#hc-trampa-on').onchange = hcTrampaRender;
+$('#hc-trampa-on').onchange = () => { hcTrampaRender(); if($('#hc-trampa-on').checked && !$('#hc-trampa-nombre').value.trim() && !$('#hc-trampa-dano').value.trim()) hcAbrirAsistenteTrampa(); };
+document.addEventListener('click', e => { if(e.target.closest('#hc-trampa-asistente')) hcAbrirAsistenteTrampa(); });
+// Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25): los campos de siempre quedan escondidos y se llenan desde acá.
+function hcAbrirAsistenteTrampa(){
+  const sel = $('#hc-trampa-estado');
+  const estAct = sel.value === '__orig__' && hcTrampaEstadoOriginal ? hcTrampaEstadoOriginal.nombre : sel.value;
+  const lista = EstadosAplicar.DEBUFFS.filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: false}));
+  const dano = $('#hc-trampa-dano').value.trim();
+  AsistenteTrampa.abrir({
+    contexto: 'habilidad', editando: false, estados: lista,
+    inicial: {nombre: $('#hc-trampa-nombre').value, descripcion: $('#hc-trampa-detalle').value, radio: num($('#hc-trampa-radio').value), cant: num($('#hc-trampa-cant').value) || 1,
+      amiga: $('#hc-trampa-amiga').checked, dano: HC_TRAMPA_DANO_RE.test(dano) ? dano : '', contemplaArmadura: !$('#hc-trampa-ignora-def').checked,
+      estado: lista.some(x => x.nombre === estAct) ? estAct : '', estadoTurnos: num($('#hc-trampa-estado-turnos').value)},
+    alTerminar: res => {
+      $('#hc-trampa-on').checked = true;
+      $('#hc-trampa-nombre').value = res.nombre.trim().slice(0, 40);
+      $('#hc-trampa-detalle').value = AsistenteTrampa.detalleFinal(res);
+      $('#hc-trampa-dano').value = res.dano || '';
+      $('#hc-trampa-ignora-def').checked = !res.contemplaArmadura;
+      $('#hc-trampa-amiga').checked = !!res.amiga;
+      $('#hc-trampa-radio').value = Math.max(0, Math.min(6, res.radio));
+      $('#hc-trampa-cant').value = Math.max(1, Math.min(6, res.cant));
+      if(res.estado && ![...sel.options].some(o => o.value === res.estado)) sel.insertAdjacentHTML('beforeend', `<option value="${esc(res.estado)}">${esc(res.estado)}</option>`);
+      sel.value = res.estado || '';
+      $('#hc-trampa-estado-turnos').value = res.estado ? num(res.estadoTurnos) : 0;
+      hcTrampaRender();
+    },
+    alCancelar: () => { if(!$('#hc-trampa-nombre').value.trim() && !$('#hc-trampa-dano').value.trim()){ $('#hc-trampa-on').checked = false; hcTrampaRender(); } },
+  });
+}
 // 📚 Trampas preconstruidas (2026-09-24): se elige una del catálogo de trampas base (y las propuestas por el grupo) y, como con los
 // estados alterados, un cartelito pregunta sus cantidades — de qué tamaño, cuánto daño y cuántas — antes de cargarla en el editor.
 $('#hc-trampa-preconstruidas').onclick = () => {
@@ -7301,6 +7340,7 @@ $('#hc-trampa-preconstruidas').onclick = () => {
       $('#hc-trampa-nombre').value = String(datos.nombre || '').slice(0, 40);
       $('#hc-trampa-detalle').value = String(datos.detalle || '').slice(0, 200);
       $('#hc-trampa-dano').value = r.dano || '';
+      $('#hc-trampa-amiga').checked = !!datos.amiga;
       $('#hc-trampa-ignora-def').checked = !!datos.ignoraDef;   // fuego, hielo, electricidad y explosiones van directo a la vida
       $('#hc-trampa-radio').value = Math.max(0, Math.min(6, r.radio));
       $('#hc-trampa-cant').value = Math.max(1, Math.min(6, r.cant));

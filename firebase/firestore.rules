@@ -547,7 +547,7 @@ service cloud.firestore {
         allow update: if esMiembro(c) && (
           ((resource.data.duenoUid == request.auth.uid || esGM(c))
             && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant'])
             && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
           || (resource.data.get('trampa', false) == true
@@ -637,7 +637,7 @@ service cloud.firestore {
           allow update: if esMiembro(c) && (
             ((resource.data.duenoUid == request.auth.uid || esGM(c))
               && elementoValido(request.resource.data)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant'])
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])

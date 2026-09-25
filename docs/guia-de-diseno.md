@@ -54,13 +54,13 @@ Afortunado, Sangre pura, Coagulación extrema, Blindado, Sigilo.
 
 ## Objetivo: calcular calidad y tier de ítems y armar catálogos por grupo
 El dueño va dando herramientas de diseño para que, cuando pida un catálogo, se pueda **calcular la calidad y el tier de cada ítem** e **imaginar ítems en grupo** (sets, familias) que él después **audita**. Piezas: los tres niveles de efecto por familia (§1b), el peso de cada efecto (P112) y las reglas de combate de las que depende el valor de cada número. Reglas base ya dadas:
-- **Golpe crítico (P113, en elaboración):** PdG − Evasión ≥ Tipo del arma → crítico; ignora armadura y tira 1d20 para el multiplicador de daño (menos de 7 ×1, 7+ ×2, 17+ ×3, 20 ×4) sobre **todo** el daño del golpe (dados, Fuerza y demás bonos). El nivel del crítico es N = diferencia ÷ Tipo (hacia abajo): se tiran **N d20 y vale el mejor** (2 × Tipo = doble crítico = 2d20…). La **Resistencia a crítico resta niveles** (un punto = un crítico anulado, por Tipo de arma): se tiran N − R dados. La **Resistencia a crítico** se define después de esto.
+- **Golpe crítico (P113, en elaboración):** PdG − Evasión ≥ Tipo del arma → crítico; ignora armadura y tira 1d20 para el multiplicador de daño (menos de 7 ×1, 7+ doble daño, 17+ triple daño, 20 cuádruple daño) sobre **todo** el daño del golpe (dados, Fuerza y demás bonos). El nivel del crítico es N = diferencia ÷ Tipo (hacia abajo): se tiran **N d20 y vale el mejor** (2 × Tipo = doble crítico = 2d20…). La **Resistencia a crítico resta niveles** (un punto = un crítico anulado, por Tipo de arma): se tiran N − R dados. La **Resistencia a crítico** se define después de esto.
 
 - **Escasez de la Resistencia a crítico por slots (P114, en elaboración):** los Tipos altos solo los dan pocos slots (ej.: Tipo 10 solo cascos; Tipo 8 dos slots sin casco; Tipo 6 tres slots; Tipo 4 en más). El máximo que se puede juntar equipado = la cantidad de slots elegibles.
 
 - **Anillos:** mágicos, uno por mano (2 slots). Más libertad de efectos, pero más escasos y caros. Los preceptos de esta guía son la base de un futuro **rework del catálogo**.
 
-- **Dos formas de mejorar el crítico (P115):** (1) **bajar el rango** (el Tipo contra el que se compara la diferencia; mínimo 2) — nombre propuesto *Crítico frecuente*; (2) **bajar el umbral de los efectos del d20** (ej. ×2 desde 6 en vez de 7) — *Crítico feroz*. Sirven para diseñar armas, ítems y skills de crítico mejorado.
+- **Dos formas de mejorar el crítico (P115, cerrada):** **Crítico frecuente** (baja el rango del crítico: Tipo 4 pasa a 3; mínimo 2; también cambia el nivel de doble crítico) y **Crítico potente** (baja los umbrales del d20: doble daño con 6+, triple 16+, cuádruple 19+; se pueden afinar por separado). Vocabulario: **doble crítico** = diferencia doble (2d20); **doble / triple / cuádruple daño** = el multiplicador del d20.
 
 ## Para completar (a medida que el dueño las defina)
 - Mecánica de casa de las demás familias de arma (explosivos, rango, escudos, armas naturales).

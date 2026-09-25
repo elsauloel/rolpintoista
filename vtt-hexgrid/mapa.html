@@ -74,6 +74,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .tablero-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .tablero-card{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
 .tablero-card.caido{opacity:.55}
+.ini-fila.fuera{opacity:.45}.ini-fila.fuera .ini-nombre{text-decoration:line-through}
 .tablero-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .tablero-foto{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
 .tablero-nombre{font-weight:700;font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2923,11 +2924,25 @@ async function iniciativaTirar(){
 }
 let iniResaltado = null;   // {id, hasta}: el token al que se llegó desde la lista de turnos
 
+// Un personaje caído (HP en 0) queda FUERA del orden de turnos mientras lo esté (2026-09-25, pedido del dueño): ▶ Siguiente lo saltea y la lista
+// lo muestra apagado con 💀. Si lo curan (HP > 0) vuelve solo a jugar. Solo personajes; los creeps derrotados los saca el GM.
+function iniciativaFueraDeJuego(id){
+  const t = tokens.get(id);
+  if(!t || t.tipo !== 'pj') return false;
+  const v = vinculo(t), r = v && v.resumen;
+  return !!r && (!!r.muerto || (r.hp !== undefined && num(r.hpMax) > 0 && num(r.hp) <= 0));
+}
 function iniciativaSiguiente(){
-  if(!iniciativa.orden.length) return;
-  const siguiente = iniciativa.turno + 1;
-  if(siguiente >= iniciativa.orden.length) guardarIniciativa({turno: 0, ronda: iniciativa.ronda + 1});
-  else guardarIniciativa({turno: siguiente});
+  const n = iniciativa.orden.length;
+  if(!n) return;
+  let i = iniciativa.turno, ronda = iniciativa.ronda;
+  for(let paso = 0; paso < n; paso++){
+    i++;
+    if(i >= n){ i = 0; ronda++; }
+    if(!iniciativaFueraDeJuego(iniciativa.orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
+  }
+  if(ronda !== iniciativa.ronda) guardarIniciativa({turno: i, ronda});
+  else guardarIniciativa({turno: i});
 }
 
 function renderIniciativa(){
@@ -2968,9 +2983,10 @@ function renderIniciativa(){
       // pudo habérselo cambiado a mitad de combate. Sacar de la lista sigue
       // siendo solo del GM.
       const puede = puedeEditarIniciativa(t);
-      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
+      const fuera = iniciativaFueraDeJuego(o.id);
+      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído: fuera del orden de turnos hasta que lo curen' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
+        <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +

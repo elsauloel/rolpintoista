@@ -205,7 +205,8 @@
     "nombre": "Envenenar",
     "caras": 1,
     "exitos": 1,
-    "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
+    "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno).",
+    "stacks": 3
    }
   ],
   "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico potente +3 y Veneno de 3 stacks en cada golpe."
@@ -617,5 +618,288 @@
    }
   ],
   "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe."
+ },
+ {
+  "id": "nuevo-hachuela-de-lenador",
+  "nombre": "Hachuela de leñador",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más."
+ },
+ {
+  "id": "nuevo-hacha-de-mano",
+  "nombre": "Hacha de mano",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "+1 de daño fijo y 25 % de romper armadura."
+ },
+ {
+  "id": "nuevo-tomahawk-de-pantano",
+  "nombre": "Tomahawk de pantano",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con el mango largo se engancha la espada del otro. Bloqueo +1."
+ },
+ {
+  "id": "nuevo-hacha-de-guerra",
+  "nombre": "Hacha de guerra",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "La de las milicias. 25 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-de-abordaje",
+  "nombre": "Hacha de abordaje",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Para trepar y para pelear en el pasamanos. Bloqueo +1 y Alcance +1."
+ },
+ {
+  "id": "nuevo-hachon-de-minero",
+  "nombre": "Hachón de minero",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Hecho para la piedra: +1 de daño fijo y 33 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-del-jefe-de-guerra",
+  "nombre": "Hacha del Jefe de Guerra",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Cada golpe abre la armadura. Bloqueo +1 y Rompe armadura en cada golpe."
+ },
+ {
+  "id": "nuevo-segur-de-verdugo",
+  "nombre": "Segur de verdugo",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 3,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Pesada y de mango largo: +1 de daño fijo, Alcance +1 y 50 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-arrojadiza",
+  "nombre": "Hacha arrojadiza",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Se tira y vuelve (a veces). Alcance +2, PdG +1 y 50 % de Sangrado."
+ },
+ {
+  "id": "nuevo-gran-hacha-de-doble-filo",
+  "nombre": "Gran hacha de doble filo",
+  "tanda": 3,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "A dos manos, con filo de los dos lados: Bloqueo +2 y Rompe armadura en cada golpe."
+ },
+ {
+  "id": "nuevo-hacha-del-cazador-de-armaduras",
+  "nombre": "Hacha del Cazador de Armaduras",
+  "tanda": 3,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 2 stacks de Armadura rota.",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Nació para desarmar caballeros: +2 de daño fijo, Bloqueo +2, Alcance +1 y 2 stacks de Armadura rota en cada golpe."
+ },
+ {
+  "id": "nuevo-hacha-del-fin-de-la-veta",
+  "nombre": "Hacha del Fin de la Veta",
+  "tanda": 3,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 4,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 2 stacks de Armadura rota.",
+    "stacks": 2
+   },
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "Se dice que cortó la última veta del mundo. A dos manos: +3 de daño fijo, Bloqueo +3, Alcance +1, 2 stacks de Armadura rota y Sangrado en cada golpe."
  }
 ]

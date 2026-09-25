@@ -116,7 +116,11 @@ def puntaje(arma):
         base = PESO_EFECTO[nombre]
         if nombre == 'Envenenar' and 'severo' in str(e.get('detalle', '')).lower():
             base = PESO_EFECTO['Veneno severo']
-        ef += base * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
+        escala = 1.0
+        st = float(e.get('stacks') or 0)
+        if nombre == 'Rompe armadura' and st > 1: escala = 1 + 0.5 * (st - 1)      # cada stack extra de Armadura rota por golpe suma +50 %
+        if nombre == 'Envenenar' and st and 'severo' not in str(e.get('detalle', '')).lower(): escala = st / 2   # el peso 2 del Veneno es a 2 stacks
+        ef += base * escala * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
     d['efectos'] = ef
     d['peso del arma'] = -TASA_PESO * peso
     return sum(d.values()), d

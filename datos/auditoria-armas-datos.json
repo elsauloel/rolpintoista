@@ -1,0 +1,4833 @@
+[
+ {
+  "id": "new-aguijon-de-esgrima",
+  "nombre": "Aguijón de esgrima",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 110,
+  "detalle": "parry +2, pdg +1",
+  "nuevo": {
+   "pc": 8.1,
+   "tier": "Buena Calidad",
+   "precio": 95,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 3.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-aguijon-de-manticora",
+  "nombre": "Aguijón de mantícora",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "dmg",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Veneno severo."
+   }
+  ],
+  "precioHoy": 1100,
+  "detalle": "critico +2, dza +2, aplica veneno severo",
+  "nuevo": {
+   "pc": 19.0,
+   "tier": "Excepcional",
+   "precio": 500,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.7,
+    "crítico": 6.0,
+    "efectos": 3.8,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-alabarda-de-guardia",
+  "nombre": "Alabarda de guardia",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Derribar",
+    "prob": 25,
+    "detalle": "Si entra, el objetivo cae al suelo (recordatorio: aplicarlo a mano)."
+   }
+  ],
+  "precioHoy": 230,
+  "detalle": "Arma de dos manos, Tipo 8. Alcance +1. Puede Derribar (25%).",
+  "nuevo": {
+   "pc": 11.0,
+   "tier": "Raro",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.9,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-arcabuz-de-cubierta",
+  "nombre": "Arcabuz de cubierta",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 130,
+  "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-arco-compuesto-elfico",
+  "nombre": "Arco compuesto élfico",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 7
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 900,
+  "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +7. PdG +2.",
+  "nuevo": {
+   "pc": 15.4,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.5,
+    "bonos": 5.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-arco-corto",
+  "nombre": "Arco corto",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 70,
+  "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-arco-del-cazador-de-eclipses",
+  "nombre": "Arco del cazador de eclipses",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 8
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
+   }
+  ],
+  "precioHoy": 1850,
+  "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +8. Crítico frecuente +2. Provoca Sangrado (50%).",
+  "nuevo": {
+   "pc": 24.9,
+   "tier": "Excepcional",
+   "precio": 850,
+   "exceso": 0,
+   "desglose": {
+    "daño": 15.5,
+    "bonos": 4.0,
+    "crítico": 4.5,
+    "efectos": 1.5,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-arco-del-rastreador",
+  "nombre": "Arco del rastreador",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 70,
+  "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-arco-largo-de-tejo",
+  "nombre": "Arco largo de tejo",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 160,
+  "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +5.",
+  "nuevo": {
+   "pc": 9.1,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-ballesta-de-almenara",
+  "nombre": "Ballesta de almenara",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 130,
+  "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-ballesta-de-mano",
+  "nombre": "Ballesta de mano",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 130,
+  "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-ballesta-del-arbusto",
+  "nombre": "Ballesta del arbusto",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 130,
+  "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-ballesta-pesada",
+  "nombre": "Ballesta pesada",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 25,
+    "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
+   }
+  ],
+  "precioHoy": 260,
+  "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +5. Puede Romper armadura (25%).",
+  "nuevo": {
+   "pc": 14.6,
+   "tier": "Raro",
+   "precio": 270,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 1.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-baston-de-monje",
+  "nombre": "Bastón de monje",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 6.7,
+   "tier": "Común",
+   "precio": 85,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-baston-del-trueno",
+  "nombre": "Bastón del trueno",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 6.7,
+   "tier": "Común",
+   "precio": 85,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-baston-ferrado",
+  "nombre": "Bastón ferrado",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "Arma de dos manos, Tipo 6. Parry +1.",
+  "nuevo": {
+   "pc": 5.6,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-bate-de-baseball",
+  "nombre": "Bate de Baseball",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "Arma de una mano, Tipo 10: 1 dado de daño +1 fijo.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-baculo-shao-lin",
+  "nombre": "Báculo Shao Lin",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 800,
+  "detalle": "parry+2, bloqueo +1, alcance +1",
+  "nuevo": {
+   "pc": 15.0,
+   "tier": "Raro",
+   "precio": 280,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.8,
+    "bonos": 3.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-baculo-de-batalla",
+  "nombre": "Báculo de batalla",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 140,
+  "detalle": "alcance +1, bloqueo +1",
+  "nuevo": {
+   "pc": 12.2,
+   "tier": "Raro",
+   "precio": 290,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 1.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-baculo-del-sumo-profeta",
+  "nombre": "Báculo del Sumo Profeta",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 140,
+  "detalle": "alcance +1, bloqueo +1",
+  "nuevo": {
+   "pc": 12.2,
+   "tier": "Raro",
+   "precio": 290,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 1.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-baculo-del-inquisidor",
+  "nombre": "Báculo del inquisidor",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 140,
+  "detalle": "alcance +1, bloqueo +1",
+  "nuevo": {
+   "pc": 12.2,
+   "tier": "Raro",
+   "precio": 290,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 1.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-baculo-magico",
+  "nombre": "Báculo mágico",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "esp",
+    "val": 2
+   },
+   {
+    "stat": "rangocasteo",
+    "val": 5
+   },
+   {
+    "stat": "bonos",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 200,
+  "detalle": "+2 a Especial, +5 a Rango de Casteo, +2 Bonos.",
+  "nuevo": {
+   "pc": 12.7,
+   "tier": "Raro",
+   "precio": 210,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 8.1,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-cachiporra",
+  "nombre": "Cachiporra",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano, Tipo 10: 1 dado de daño.",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-cimitarra",
+  "nombre": "Cimitarra",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 69,
+  "detalle": "parry +1",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-cimitarra-de-guardia",
+  "nombre": "Cimitarra de guardia",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "Parry +2",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-cimitarra-del-contramaestre",
+  "nombre": "Cimitarra del contramaestre",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "Parry +2",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-colmillo-dientes-de-sable",
+  "nombre": "Colmillo dientes de sable",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Sangrado de 2 HP por turno."
+   }
+  ],
+  "precioHoy": 900,
+  "detalle": "Deja sangrando x2hp",
+  "nuevo": {
+   "pc": 9.1,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 2.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-cuchilla-de-carnicero",
+  "nombre": "Cuchilla de carnicero",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 110,
+  "detalle": "Rompe armadura",
+  "nuevo": {
+   "pc": 12.6,
+   "tier": "Raro",
+   "precio": 200,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 6.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-cuchillo-de-cazador",
+  "nombre": "Cuchillo de cazador",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 30,
+  "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
+  "nuevo": {
+   "pc": 2.3,
+   "tier": "Común",
+   "precio": 50,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-cuchillo-del-grumete-polizon",
+  "nombre": "Cuchillo del grumete polizón",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 30,
+  "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
+  "nuevo": {
+   "pc": 2.3,
+   "tier": "Común",
+   "precio": 50,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-daga",
+  "nombre": "Daga",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-daga-de-capitan",
+  "nombre": "Daga de Capitán",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "pdg +1",
+  "nuevo": {
+   "pc": 3.3,
+   "tier": "Común",
+   "precio": 55,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-daga-de-guardia",
+  "nombre": "Daga de guardia",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 60,
+  "detalle": "Ignora 1 punto de resistencia al crítico",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 5.2,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-daga-de-la-viuda-verde",
+  "nombre": "Daga de la viuda verde",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 60,
+  "detalle": "Ignora 1 punto de resistencia al crítico",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 5.2,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-daga-del-sacrificio",
+  "nombre": "Daga del sacrificio",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "pdg +1",
+  "nuevo": {
+   "pc": 3.3,
+   "tier": "Común",
+   "precio": 55,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "cat-espada-ancha",
+  "nombre": "Espada ancha",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 70,
+  "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
+  "nuevo": {
+   "pc": 4.6,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-bastarda",
+  "nombre": "Espada bastarda",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 120,
+  "detalle": "parry+1, bloqueo+1",
+  "nuevo": {
+   "pc": 10.2,
+   "tier": "Buena Calidad",
+   "precio": 140,
+   "exceso": 0,
+   "desglose": {
+    "daño": 8.3,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espada-bastarda-del-espectro",
+  "nombre": "Espada bastarda del Espectro",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 120,
+  "detalle": "parry+1, bloqueo+1",
+  "nuevo": {
+   "pc": 10.2,
+   "tier": "Buena Calidad",
+   "precio": 140,
+   "exceso": 0,
+   "desglose": {
+    "daño": 8.3,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "cat-espada-corta",
+  "nombre": "Espada corta",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 30,
+  "detalle": "Arma de una mano, Tipo 6: 1 dado de daño.",
+  "nuevo": {
+   "pc": 3.3,
+   "tier": "Común",
+   "precio": 55,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-corta-de-instruccion",
+  "nombre": "Espada corta de instrucción",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
+  "nuevo": {
+   "pc": 6.6,
+   "tier": "Común",
+   "precio": 85,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espada-corta-oxidada",
+  "nombre": "Espada corta oxidada",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 50,
+    "detalle": "Aplicale Veneno al objetivo."
+   }
+  ],
+  "precioHoy": 70,
+  "detalle": "envenena x 50% de chances",
+  "nuevo": {
+   "pc": 4.5,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-de-nosferatu",
+  "nombre": "Espada de Nosferatu",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora armadura",
+    "prob": 50,
+    "detalle": "Si entra, el golpe ignora la Defensa del objetivo."
+   },
+   {
+    "nombre": "Drena vida",
+    "prob": 100,
+    "detalle": "Te curás tanto HP como el daño que hiciste."
+   }
+  ],
+  "precioHoy": 1300,
+  "detalle": "50% de chances de ignorar armadura. Drena hp igual al daño ejercido",
+  "nuevo": {
+   "pc": 14.3,
+   "tier": "Raro",
+   "precio": 260,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.7,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 5.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espada-de-alquiler-oxidada",
+  "nombre": "Espada de alquiler oxidada",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 50,
+    "detalle": "Aplicale Veneno al objetivo."
+   }
+  ],
+  "precioHoy": 70,
+  "detalle": "envenena x 50% de chances",
+  "nuevo": {
+   "pc": 4.5,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-de-recluta-de-la-guardia",
+  "nombre": "Espada de recluta de la guardia",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
+  "nuevo": {
+   "pc": 6.6,
+   "tier": "Común",
+   "precio": 85,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espada-de-taberna",
+  "nombre": "Espada de taberna",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 70,
+  "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
+  "nuevo": {
+   "pc": 4.6,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-del-jefe-de-los-mil-caminos",
+  "nombre": "Espada del Jefe de los Mil Caminos",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "pdg +2",
+  "nuevo": {
+   "pc": 5.8,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-del-veterano-de-mil-batallas",
+  "nombre": "Espada del veterano de mil batallas",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "pdg +2",
+  "nuevo": {
+   "pc": 5.8,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "cat-espada-larga",
+  "nombre": "Espada larga",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "pdg +2",
+  "nuevo": {
+   "pc": 5.8,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-espada-larga-de-dorne",
+  "nombre": "Espada larga de Dorne",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Aplicale Veneno al objetivo."
+   }
+  ],
+  "precioHoy": 500,
+  "detalle": "pdg+2, envenena",
+  "nuevo": {
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 170,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 2.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espadon",
+  "nombre": "Espadón",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 500,
+  "detalle": "parry +2, bloqueo +3",
+  "nuevo": {
+   "pc": 18.9,
+   "tier": "Excepcional",
+   "precio": 500,
+   "exceso": 0,
+   "desglose": {
+    "daño": 14.0,
+    "bonos": 5.8,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "new-espadon-de-batalla",
+  "nombre": "Espadón de batalla",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 170,
+  "detalle": "Arma de dos manos, Tipo 8.",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-espadon-del-titan-caido",
+  "nombre": "Espadón del Titán caído",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "dmg",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 50,
+    "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
+   }
+  ],
+  "precioHoy": 1900,
+  "detalle": "Arma de dos manos, Tipo 10. Daño +2. Puede Romper armadura (50%).",
+  "nuevo": {
+   "pc": 26.9,
+   "tier": "Legendario",
+   "precio": 1100,
+   "exceso": 0,
+   "desglose": {
+    "daño": 23.6,
+    "bonos": 1.6,
+    "crítico": 0.0,
+    "efectos": 2.5,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "new-estilete-de-competencia",
+  "nombre": "Estilete de competencia",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "Crítico frecuente +1",
+  "nuevo": {
+   "pc": 9.8,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.0,
+    "crítico": 5.2,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-estileto-comun",
+  "nombre": "Estileto común",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "crítico +1",
+  "nuevo": {
+   "pc": 7.5,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 1,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 5.2,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-estileto-ritual-del-acolito",
+  "nombre": "Estileto ritual del acólito",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "crítico +1",
+  "nuevo": {
+   "pc": 7.5,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 1,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 5.2,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "cat-estoque",
+  "nombre": "Estoque",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 60,
+  "detalle": "Modificador: +1 a iniciativa",
+  "nuevo": {
+   "pc": 5.2,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-estoque-de-duelista",
+  "nombre": "Estoque de duelista",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora 2 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 2 menos de resistencia."
+   }
+  ],
+  "precioHoy": 80,
+  "detalle": "Ingora 2 de resistencia al crítico",
+  "nuevo": {
+   "pc": 16.8,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 10.5,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-facon-de-martin-fierro",
+  "nombre": "Facón de Martín Fierro",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 4
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Aplicale Sangrado al objetivo."
+   },
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   },
+   {
+    "nombre": "Primera sangre",
+    "prob": 100,
+    "detalle": "El primer golpe a cada enemigo es doble crítico garantizado."
+   }
+  ],
+  "precioHoy": 1300,
+  "detalle": "Crítico frecuente +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.",
+  "nuevo": {
+   "pc": 20.6,
+   "tier": "Excepcional",
+   "precio": 600,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.0,
+    "crítico": 10.5,
+    "efectos": 7.8,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-falchion",
+  "nombre": "Falchion",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 75,
+  "detalle": "Ingora 1 de resistencia al crítico",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 3.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-flamberge",
+  "nombre": "Flamberge",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Aplicale Sangrado al objetivo."
+   }
+  ],
+  "precioHoy": 550,
+  "detalle": "sangrado, +1 pdg",
+  "nuevo": {
+   "pc": 9.2,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.2,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 2.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-garra-de-fafner",
+  "nombre": "Garra de Fafner",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora armadura",
+    "prob": 100,
+    "detalle": "El golpe ignora la Defensa del objetivo."
+   },
+   {
+    "nombre": "Golpes seguidos",
+    "prob": 100,
+    "detalle": "Cada golpe seguido al mismo enemigo suma +1 al daño fijo."
+   }
+  ],
+  "precioHoy": 1100,
+  "detalle": "Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "cat-maza",
+  "nombre": "Garrote",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 60,
+  "detalle": "Arma de una mano, Tipo 10: 2 dados de daño.",
+  "nuevo": {
+   "pc": 10.6,
+   "tier": "Buena Calidad",
+   "precio": 230,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-gladius",
+  "nombre": "Gladius",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 400,
+  "detalle": "parry +2, bloqueo +2",
+  "nuevo": {
+   "pc": 14.4,
+   "tier": "Raro",
+   "precio": 260,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.5,
+    "bonos": 4.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-guadana-del-segador",
+  "nombre": "Guadaña del segador",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
+   }
+  ],
+  "precioHoy": 880,
+  "detalle": "Arma de dos manos, Tipo 10. Crítico frecuente +1. Provoca Sangrado (50%).",
+  "nuevo": {
+   "pc": 19.2,
+   "tier": "Excepcional",
+   "precio": 500,
+   "exceso": 0,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 0.0,
+    "crítico": 1.8,
+    "efectos": 1.5,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "cat-hacha",
+  "nombre": "Hacha",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 60,
+  "detalle": "Rompe armadura.",
+  "nuevo": {
+   "pc": 8.3,
+   "tier": "Buena Calidad",
+   "precio": 150,
+   "exceso": 1,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-hacha-con-pico",
+  "nombre": "Hacha con pico",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 110,
+  "detalle": "ignora 1 de resistencia al crítico",
+  "nuevo": {
+   "pc": 10.8,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 2.2,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-danesa",
+  "nombre": "Hacha danesa",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 130,
+  "detalle": "alcance +1. Rompe armadura. ",
+  "nuevo": {
+   "pc": 13.1,
+   "tier": "Raro",
+   "precio": 220,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-durin",
+  "nombre": "Hacha de Durin",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 4,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Arruina armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo (suma 3 stacks)."
+   },
+   {
+    "nombre": "Lisiado",
+    "prob": 100,
+    "detalle": "Aplicale Lisiado al objetivo."
+   }
+  ],
+  "precioHoy": 1200,
+  "detalle": "Arruina armadura. +2 a la fuerza. deja lisiado",
+  "nuevo": {
+   "pc": 22.7,
+   "tier": "Excepcional",
+   "precio": 700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 19.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.5,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "cat-hacha-de-batalla",
+  "nombre": "Hacha de batalla",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 110,
+  "detalle": "Rompe armadura. +1 al bloqueo",
+  "nuevo": {
+   "pc": 13.6,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 1,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-batalla-a-dos-manos",
+  "nombre": "Hacha de batalla a dos manos",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 250,
+  "detalle": "Arma de dos manos, Tipo 10.",
+  "nuevo": {
+   "pc": 15.9,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-constructor",
+  "nombre": "Hacha de constructor",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 90,
+  "detalle": "Rompe armadura",
+  "nuevo": {
+   "pc": 12.6,
+   "tier": "Raro",
+   "precio": 450,
+   "exceso": 2,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-doble-filo",
+  "nombre": "Hacha de doble filo",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 100,
+  "detalle": "Rompe armadura.",
+  "nuevo": {
+   "pc": 9.3,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "cat-hacha-de-mano",
+  "nombre": "Hacha de doble filo",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   },
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 120,
+  "detalle": "Rompe armadura. Ignora 1 resistencia al crítico",
+  "nuevo": {
+   "pc": 19.1,
+   "tier": "Excepcional",
+   "precio": 800,
+   "exceso": 1,
+   "desglose": {
+    "daño": 13.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 6.2,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-guardia-real",
+  "nombre": "Hacha de guardia real",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 500,
+  "detalle": "parry +2, bloqueo +3",
+  "nuevo": {
+   "pc": 15.1,
+   "tier": "Raro",
+   "precio": 290,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 5.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-guerra-ligera",
+  "nombre": "Hacha de guerra ligera",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 100,
+  "detalle": "Arma de una mano, Tipo 8: 2 dados de daño +1 fijo.",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-guerra-pesada",
+  "nombre": "Hacha de guerra pesada",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Arruina armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo (suma 1 stack)."
+   }
+  ],
+  "precioHoy": 130,
+  "detalle": "Arruina armadura",
+  "nuevo": {
+   "pc": 8.6,
+   "tier": "Buena Calidad",
+   "precio": 110,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-la-furia-roja",
+  "nombre": "Hacha de la furia roja",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 110,
+  "detalle": "Rompe armadura. +1 al bloqueo",
+  "nuevo": {
+   "pc": 13.6,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 1,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-lenador",
+  "nombre": "Hacha de leñador",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 60,
+  "detalle": "Arma de una mano, Tipo 8: 2 dados de daño.",
+  "nuevo": {
+   "pc": 8.6,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 1,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-de-madera-mistica",
+  "nombre": "Hacha de madera mística",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   },
+   {
+    "nombre": "Drena vida",
+    "prob": 100,
+    "detalle": "Te curás la mitad del daño que hiciste."
+   }
+  ],
+  "precioHoy": 600,
+  "detalle": "Rompe armadura. Drena 50% del daño.",
+  "nuevo": {
+   "pc": 18.6,
+   "tier": "Excepcional",
+   "precio": 500,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 10.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-del-jefe-de-guerra",
+  "nombre": "Hacha del Jefe de Guerra",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 130,
+  "detalle": "alcance +1. Rompe armadura. ",
+  "nuevo": {
+   "pc": 13.1,
+   "tier": "Raro",
+   "precio": 220,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-del-clan",
+  "nombre": "Hacha del clan",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 60,
+  "detalle": "Rompe armadura.",
+  "nuevo": {
+   "pc": 8.3,
+   "tier": "Buena Calidad",
+   "precio": 150,
+   "exceso": 1,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-hacha-dentada",
+  "nombre": "Hacha dentada",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "Aplicale Sangrado al objetivo."
+   }
+  ],
+  "precioHoy": 115,
+  "detalle": "50% de dejar sangrando",
+  "nuevo": {
+   "pc": 9.8,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-hacha-filo-de-diamante",
+  "nombre": "Hacha filo de diamante",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Arruina armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo (suma 2 stacks)."
+   }
+  ],
+  "precioHoy": 450,
+  "detalle": "Crítico aumentado. Arruina armadura.",
+  "nuevo": {
+   "pc": 12.9,
+   "tier": "Raro",
+   "precio": 210,
+   "exceso": 0,
+   "desglose": {
+    "daño": 13.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-hacha-oxidada",
+  "nombre": "Hacha oxidada",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 50,
+    "detalle": "Aplicale Veneno al objetivo."
+   }
+  ],
+  "precioHoy": 50,
+  "detalle": "50% de chances de envenenar",
+  "nuevo": {
+   "pc": 5.5,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-hachuela",
+  "nombre": "Hachuela",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano, Tipo 8: 1 dado de daño.",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-honda-de-cuero",
+  "nombre": "Honda de cuero",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-honda-del-cazador-de-jabalies",
+  "nombre": "Honda del cazador de jabalíes",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 1.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-horquilla",
+  "nombre": "Horquilla",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 2.8,
+   "tier": "Común",
+   "precio": 50,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-hoz",
+  "nombre": "Hoz",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "Aplicale Sangrado al objetivo."
+   }
+  ],
+  "precioHoy": 75,
+  "detalle": "sangrado 50%",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-hoz-ceremonial",
+  "nombre": "Hoz ceremonial",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "Aplicale Sangrado al objetivo."
+   }
+  ],
+  "precioHoy": 75,
+  "detalle": "sangrado 50%",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-katana",
+  "nombre": "Katana",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 120,
+  "detalle": "pdg+2, crítico +1",
+  "nuevo": {
+   "pc": 12.1,
+   "tier": "Raro",
+   "precio": 190,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.5,
+    "crítico": 3.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-katana-del-cazarrecompensas",
+  "nombre": "Katana del cazarrecompensas",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 120,
+  "detalle": "pdg+2, crítico +1",
+  "nuevo": {
+   "pc": 12.1,
+   "tier": "Raro",
+   "precio": 190,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.5,
+    "crítico": 3.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-lanza-corta",
+  "nombre": "Lanza corta",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 5.1,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-lanza-de-caza",
+  "nombre": "Lanza de caza",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 65,
+  "detalle": "Arma de dos manos, Tipo 8. Alcance +1.",
+  "nuevo": {
+   "pc": 4.8,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-lanza-de-guardia-de-puerta",
+  "nombre": "Lanza de guardia de puerta",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 5.1,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-lanza-militar",
+  "nombre": "Lanza militar",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 110,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 9.1,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-lanzallamas",
+  "nombre": "Lanzallamas",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Prende fuego",
+    "prob": 100,
+    "detalle": "Prende fuego al objetivo: 1d8 por cada stack de fuego."
+   }
+  ],
+  "precioHoy": 2000,
+  "detalle": "Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.",
+  "nuevo": {
+   "pc": 29.6,
+   "tier": "Legendario",
+   "precio": 3100,
+   "exceso": 2,
+   "desglose": {
+    "daño": 26.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 4.4,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "new-lucero-del-alba",
+  "nombre": "Lucero del alba",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Ignora 1 de Res. crítico",
+    "prob": 100,
+    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
+   }
+  ],
+  "precioHoy": 150,
+  "detalle": "Ignora 1 de res al crítico, alcance +1",
+  "nuevo": {
+   "pc": 13.0,
+   "tier": "Raro",
+   "precio": 220,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 1.8,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-machete",
+  "nombre": "Machete",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 50,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 60,
+  "detalle": "romper armadura 50%",
+  "nuevo": {
+   "pc": 6.3,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 3.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-mandoble",
+  "nombre": "Mandoble",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 110,
+  "detalle": "Parry+2, bloqueo+1",
+  "nuevo": {
+   "pc": 9.8,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 3.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "cat-mangual",
+  "nombre": "Mangual",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 160,
+  "detalle": "Alcance +1.",
+  "nuevo": {
+   "pc": 12.0,
+   "tier": "Raro",
+   "precio": 180,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.8,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-mangual",
+  "nombre": "Mangual",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 150,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 21.8,
+   "tier": "Excepcional",
+   "precio": 1000,
+   "exceso": 1,
+   "desglose": {
+    "daño": 22.0,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "cat-martillo",
+  "nombre": "Martillo",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 100,
+  "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
+  "nuevo": {
+   "pc": 15.9,
+   "tier": "Raro",
+   "precio": 450,
+   "exceso": 1,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-vulcano",
+  "nombre": "Martillo de Vulcano",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 5,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Explosión",
+    "prob": 100,
+    "detalle": "Daño explosivo en un cono de 3 hex detrás del objetivo."
+   }
+  ],
+  "precioHoy": 1600,
+  "detalle": "Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado",
+  "nuevo": {
+   "pc": 26.5,
+   "tier": "Legendario",
+   "precio": 1000,
+   "exceso": 0,
+   "desglose": {
+    "daño": 27.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -1.0
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-bola",
+  "nombre": "Martillo de bola",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 115,
+  "detalle": "bloqueo +1",
+  "nuevo": {
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 400,
+   "exceso": 2,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-cabeza-plana",
+  "nombre": "Martillo de cabeza plana",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 135,
+  "detalle": "bloqueo +2",
+  "nuevo": {
+   "pc": 12.6,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-cantero",
+  "nombre": "Martillo de cantero",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 70,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 5.9,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 0.6,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-guerra-runico",
+  "nombre": "Martillo de guerra rúnico",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Pajaritos",
+    "prob": 100,
+    "detalle": "El objetivo queda aturdido (pajaritos)."
+   }
+  ],
+  "precioHoy": 850,
+  "detalle": "Deja en pajaritos",
+  "nuevo": {
+   "pc": 16.7,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 0,
+   "desglose": {
+    "daño": 17.3,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-martillo-de-sargento",
+  "nombre": "Martillo de sargento",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 140,
+  "detalle": "Arma de una mano, Tipo 10: 4 dados de daño. Parry +1.",
+  "nuevo": {
+   "pc": 22.2,
+   "tier": "Excepcional",
+   "precio": 1000,
+   "exceso": 1,
+   "desglose": {
+    "daño": 22.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "new-martillo-del-titan",
+  "nombre": "Martillo del Titán",
+  "origen": "catálogo actual",
+  "familia": "explosivo",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 25,
+    "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
+   }
+  ],
+  "precioHoy": 950,
+  "detalle": "Arma de dos manos, Tipo 12. Puede Aturdir (25%).",
+  "nuevo": {
+   "pc": 20.5,
+   "tier": "Excepcional",
+   "precio": 600,
+   "exceso": 0,
+   "desglose": {
+    "daño": 19.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.6,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-martillo-ergonomico",
+  "nombre": "Martillo ergonómico",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 130,
+  "detalle": "bloqueo +3",
+  "nuevo": {
+   "pc": 8.3,
+   "tier": "Buena Calidad",
+   "precio": 100,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-maza",
+  "nombre": "Maza",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 50,
+  "detalle": "Daño amplificado.",
+  "nuevo": {
+   "pc": 10.6,
+   "tier": "Buena Calidad",
+   "precio": 230,
+   "exceso": 1,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-maza-de-acero",
+  "nombre": "Maza de acero",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 160,
+  "detalle": "Bloqueo +3",
+  "nuevo": {
+   "pc": 18.9,
+   "tier": "Excepcional",
+   "precio": 750,
+   "exceso": 1,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-maza-de-guardia",
+  "nombre": "Maza de guardia",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
+  "nuevo": {
+   "pc": 15.9,
+   "tier": "Raro",
+   "precio": 450,
+   "exceso": 1,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "new-maza-de-hierro",
+  "nombre": "Maza de hierro",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 90,
+  "detalle": "bloqueo +1",
+  "nuevo": {
+   "pc": 6.3,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-maza-de-vibranium",
+  "nombre": "Maza de vibranium",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Media armadura",
+    "prob": 100,
+    "detalle": "La mitad del daño ignora la Defensa del objetivo."
+   }
+  ],
+  "precioHoy": 1400,
+  "detalle": "La mitad del daño ignora armadura. bloqueo +3",
+  "nuevo": {
+   "pc": 25.8,
+   "tier": "Excepcional",
+   "precio": 900,
+   "exceso": 0,
+   "desglose": {
+    "daño": 23.6,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "new-pica-hielos",
+  "nombre": "Pica Hielos",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano, Tipo 4: 2 dados de daño.",
+  "nuevo": {
+   "pc": 4.6,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-pico-de-guerra",
+  "nombre": "Pico de guerra",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 50,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 90,
+  "detalle": "alcance +1, 50% de romper armadura",
+  "nuevo": {
+   "pc": 8.1,
+   "tier": "Buena Calidad",
+   "precio": 95,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 3.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-pistola-de-chispa",
+  "nombre": "Pistola de chispa",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Estruendo",
+    "prob": 100,
+    "detalle": "El disparo se oye a la redonda: avisale al GM para que los cercanos se alerten."
+   }
+  ],
+  "precioHoy": 210,
+  "detalle": "Arma de una mano a distancia, Tipo 8. Rango +4. El disparo hace ruido: alerta a los que estén cerca.",
+  "nuevo": {
+   "pc": 10.6,
+   "tier": "Buena Calidad",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-pistola-de-duelo-de-plata",
+  "nombre": "Pistola de duelo de plata",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 780,
+  "detalle": "Arma de una mano a distancia, Tipo 8. Rango +5. Crítico frecuente +1.",
+  "nuevo": {
+   "pc": 15.3,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 2.5,
+    "crítico": 2.2,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-punzon-del-ladronzuelo",
+  "nombre": "Punzón del ladronzuelo",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
+  "nuevo": {
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-punal-aserrado",
+  "nombre": "Puñal aserrado",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 100,
+  "detalle": "Rompe armadura.",
+  "nuevo": {
+   "pc": 10.6,
+   "tier": "Buena Calidad",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 6.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-punal-de-dorne",
+  "nombre": "Puñal de Dorne",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Veneno de 4 stacks."
+   }
+  ],
+  "precioHoy": 850,
+  "detalle": "Veneno stock 4",
+  "nuevo": {
+   "pc": 11.1,
+   "tier": "Raro",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 2.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-reflejo-de-acero",
+  "nombre": "Reflejo de Acero",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 3,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 3
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 1400,
+  "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones",
+  "nuevo": {
+   "pc": 12.8,
+   "tier": "Raro",
+   "precio": 210,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.5,
+    "bonos": 5.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-revolver-del-pistolero",
+  "nombre": "Revólver del pistolero",
+  "origen": "catálogo actual",
+  "familia": "rango",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 50,
+    "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
+   }
+  ],
+  "precioHoy": 1500,
+  "detalle": "Arma de una mano a distancia, Tipo 10. Rango +5. Crítico frecuente +2. Cada golpe puede dejar al objetivo Aturdido (50%).",
+  "nuevo": {
+   "pc": 22.1,
+   "tier": "Excepcional",
+   "precio": 700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 12.6,
+    "bonos": 2.5,
+    "crítico": 3.6,
+    "efectos": 3.8,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-rompefilas",
+  "nombre": "Rompefilas",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Empuje",
+    "prob": 100,
+    "detalle": "Lo empuja 2 casilleros (FUE vs CON). Si choca contra algo, daño directo igual a la diferencia."
+   }
+  ],
+  "precioHoy": 900,
+  "detalle": "Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia",
+  "nuevo": {
+   "pc": 21.2,
+   "tier": "Excepcional",
+   "precio": 650,
+   "exceso": 0,
+   "desglose": {
+    "daño": 22.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "cat-rompemalla",
+  "nombre": "Rompemalla",
+  "origen": "catálogo actual",
+  "familia": "punzante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 50,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   }
+  ],
+  "precioHoy": 75,
+  "detalle": "50% chance de Romper armadura.",
+  "nuevo": {
+   "pc": 7.6,
+   "tier": "Buena Calidad",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 3.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-sable-comun",
+  "nombre": "Sable común",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "iniciativa +1",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-sable-de-abordaje",
+  "nombre": "Sable de abordaje",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "iniciativa +1",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-sable-de-caballeria",
+  "nombre": "Sable de caballería",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "pdg +1, parry +1",
+  "nuevo": {
+   "pc": 5.5,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-sable-de-mando-del-capitan",
+  "nombre": "Sable de mando del capitán",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 75,
+  "detalle": "pdg +1, parry +1",
+  "nuevo": {
+   "pc": 5.5,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-sable-del-sargento",
+  "nombre": "Sable del sargento",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 80,
+  "detalle": "pdg +1",
+  "nuevo": {
+   "pc": 7.8,
+   "tier": "Buena Calidad",
+   "precio": 90,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-sable-mellado-del-camino-real",
+  "nombre": "Sable mellado del camino real",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 40,
+  "detalle": "iniciativa +1",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-sable-militar",
+  "nombre": "Sable militar",
+  "origen": "catálogo actual",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 80,
+  "detalle": "pdg +1",
+  "nuevo": {
+   "pc": 7.8,
+   "tier": "Buena Calidad",
+   "precio": 90,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-sagaris",
+  "nombre": "Sagaris",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 100,
+    "detalle": "Aplicale el estado Armadura rota al objetivo."
+   },
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Aplicale Sangrado al objetivo."
+   }
+  ],
+  "precioHoy": 130,
+  "detalle": "Rompe armadura. Sangrado.",
+  "nuevo": {
+   "pc": 16.1,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 6.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "new-tomahawk",
+  "nombre": "Tomahawk",
+  "origen": "catálogo actual",
+  "familia": "hacha",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 60,
+  "detalle": "alcance +1",
+  "nuevo": {
+   "pc": 4.8,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "new-garrote-de-hueso",
+  "nombre": "garrote de hueso",
+  "origen": "catálogo actual",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "precioHoy": 120,
+  "detalle": "bloqueo +1",
+  "nuevo": {
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 400,
+   "exceso": 2,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ }
+]

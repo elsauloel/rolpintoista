@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditoría de armas — Rol Pintoísta</title>
+<style>
+:root{--bg:#120E10;--panel:#1A1418;--panel2:#221A1E;--line:#3B2E34;--paper:#EDE3D2;--muted:#9A867E;--brass:#E0A458;--copper:#C98545;--ok:#6FBF73;--warn:#E0A458;--bad:#D4574E;--info:#6FA8D8}
+@media (prefers-color-scheme: light){:root{--bg:#F4EEE3;--panel:#FFFFFF;--panel2:#F1E9DA;--line:#D8CBB4;--paper:#2A2126;--muted:#7A6A62;--brass:#9A5F14;--copper:#A5622A;--ok:#2F7D3A;--warn:#9A5F14;--bad:#B23A32;--info:#2A6AA8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--paper);font:15px/1.4 "Space Grotesk",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px}
+h1{margin:0 0 6px;font-size:18px;color:var(--brass)}
+.barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.barra input,.barra select{background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:6px 9px;font:inherit;font-size:14px}
+.barra input[type=search]{min-width:200px;flex:1}
+button{font:inherit;cursor:pointer;color:var(--paper);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:6px 11px}
+button:hover{border-color:var(--copper)}
+button.prim{background:var(--copper);border-color:var(--copper);color:#1A1418;font-weight:700}
+.cont{color:var(--muted);font-size:13px}
+.cont b{color:var(--paper)}
+#estado{font-size:13px;min-height:18px;color:var(--muted)}
+#estado.ok{color:var(--ok)}#estado.err{color:var(--bad)}
+main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
+.tarjeta{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:10px}
+.tarjeta.confirmar{border-left-color:var(--ok)}.tarjeta.reajustar{border-left-color:var(--warn)}.tarjeta.reimaginar{border-left-color:var(--info)}.tarjeta.descartar{border-left-color:var(--bad);opacity:.7}
+.cab{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.cab b{font-size:16px}
+.chip{font-size:11.5px;padding:1px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.tier{color:var(--brass);border-color:var(--copper)}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:6px 18px;margin:8px 0}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+.dato{font-size:13.5px}.dato span{color:var(--muted)}
+.val{font-size:13.5px}
+.val .ex{color:var(--warn)}
+.det{font-size:12.5px;color:var(--muted);margin:2px 0 6px}
+.decision{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.decision button.on{background:var(--copper);color:#1A1418;border-color:var(--copper);font-weight:700}
+.decision button[data-d=confirmar].on{background:var(--ok);border-color:var(--ok)}
+.decision button[data-d=reimaginar].on{background:var(--info);border-color:var(--info)}
+.decision button[data-d=descartar].on{background:var(--bad);border-color:var(--bad)}
+textarea{width:100%;min-height:44px;margin-top:6px;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:inherit;font-size:14px;resize:vertical}
+details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+.vacio{padding:30px;text-align:center;color:var(--muted)}
+.leyenda{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🗡 Auditoría de armas</h1>
+  <div class="barra">
+    <input type="search" id="buscar" placeholder="Buscar por nombre o efecto…">
+    <select id="f-familia"><option value="">Todas las familias</option></select>
+    <select id="f-tier"><option value="">Todos los tiers</option></select>
+    <select id="f-decision">
+      <option value="">Todas</option><option value="_sin">Sin marcar</option><option value="confirmar">✅ Confirmar</option>
+      <option value="reajustar">🔧 Reajustar</option><option value="reimaginar">🔄 Reimaginar</option><option value="descartar">🗑 Descartar</option><option value="_nota">Con nota</option>
+    </select>
+    <select id="orden"><option value="familia">Orden: familia y tier</option><option value="nombre">Nombre</option><option value="precio">Precio nuevo</option><option value="pc">Puntaje nuevo</option></select>
+    <span class="cont" id="cont"></span>
+  </div>
+  <div class="barra" style="margin-top:6px">
+    <button class="prim" id="btn-guardar" title="Sube tus decisiones y notas al proyecto para que el asistente las lea">💾 Guardar en el proyecto</button>
+    <button id="btn-bajar" title="Descarga un archivo con tus decisiones">⬇ Descargar</button>
+    <button id="btn-cargar" title="Carga un archivo de decisiones guardado antes">⬆ Cargar archivo</button>
+    <input type="file" id="archivo" accept=".json" hidden>
+    <span id="estado"></span>
+  </div>
+</header>
+<main>
+  <p class="leyenda">Para cada arma: <b>✅ Confirmar</b> (queda como está, con los valores nuevos) · <b>🔧 Reajustar</b> (mismo concepto, corregir algo: escribilo en la nota) · <b>🔄 Reimaginar</b> (cambiar lo que hace) · <b>🗑 Descartar</b>. Podés escribir una nota en cualquiera. Se guarda solo en este navegador; con <b>💾 Guardar en el proyecto</b> lo sube para que el asistente lo lea.</p>
+  <div id="lista"></div>
+</main>
+<script>
+const GH_REPO = 'elsauloel/rolpintoista', GH_BRANCH = 'nueva-version';
+const RUTA_DECISIONES = 'datos/auditoria-armas.json';
+const LS = 'auditoria-armas';
+const NOMBRES_FAMILIA = {punzante: 'Punzantes (T4)', cortante: 'Cortantes (T6)', hacha: 'Hachas y pesadas (T8)', contundente: 'Contundentes (T10)', explosivo: 'Explosivos (T12)', rango: 'De rango'};
+const ORDEN_FAMILIA = Object.keys(NOMBRES_FAMILIA);
+const ORDEN_TIER = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+const STAT = {rng: 'Alcance/Rango', pdg: 'PdG', parry: 'Parry', bloqueo: 'Bloqueo', crit: 'Crít. frecuente', critpot: 'Crít. potente', ini: 'Iniciativa', dmg: 'Dmg', eva: 'Evasión', esp: 'Especial', rangocasteo: 'Rango casteo', bonos: 'SP', nitros: 'Nitros'};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+let armas = [], dec = {actualizado: 0, decisiones: {}};
+
+function estado(t, cls){ const e = $('#estado'); e.textContent = t || ''; e.className = cls || ''; }
+function leerLocal(){ try{ const g = JSON.parse(localStorage.getItem(LS) || 'null'); if(g && g.decisiones) return g; }catch(e){} return null; }
+function guardarLocal(){ dec.actualizado = Date.now(); try{ localStorage.setItem(LS, JSON.stringify(dec)); }catch(e){} }
+
+async function cargar(){
+  try{
+    armas = await (await fetch('auditoria-armas-datos.json?v=' + Date.now())).json();
+  }catch(e){ $('#lista').innerHTML = '<div class="vacio">No se pudieron cargar las armas. Abrí esta página desde el sitio publicado.</div>'; return; }
+  let remoto = null;
+  try{ const r = await fetch('auditoria-armas.json?v=' + Date.now()); if(r.ok) remoto = await r.json(); }catch(e){}
+  const local = leerLocal();
+  dec = (local && (!remoto || (local.actualizado || 0) >= (remoto.actualizado || 0))) ? local : (remoto || {actualizado: 0, decisiones: {}});
+  if(!dec.decisiones) dec.decisiones = {};
+  $('#f-familia').insertAdjacentHTML('beforeend', ORDEN_FAMILIA.map(f => `<option value="${f}">${NOMBRES_FAMILIA[f]}</option>`).join(''));
+  $('#f-tier').insertAdjacentHTML('beforeend', ORDEN_TIER.map(t => `<option>${t}</option>`).join(''));
+  dibujar();
+}
+
+function tarjeta(a){
+  const d = dec.decisiones[a.id] || {};
+  const bonos = a.bonos.length ? a.bonos.map(b => `${STAT[b.stat] || b.stat} ${b.val > 0 ? '+' : ''}${b.val}`).join(' · ') : '—';
+  const efectos = a.efectos.length ? a.efectos.map(e => `${e.nombre}${e.prob < 100 ? ' ' + e.prob + '%' : ''}`).join(' · ') : '—';
+  const n = a.nuevo, ex = n.exceso ? ` <span class="ex">(exceso ×${n.exceso}: sobreprecio)</span>` : '';
+  const desg = Object.entries(n.desglose).map(([k, v]) => `${k} ${v}`).join(' · ');
+  const botones = [['confirmar', '✅ Confirmar'], ['reajustar', '🔧 Reajustar'], ['reimaginar', '🔄 Reimaginar'], ['descartar', '🗑 Descartar']]
+    .map(([k, t]) => `<button data-d="${k}" class="${d.d === k ? 'on' : ''}">${t}</button>`).join('');
+  return `<div class="tarjeta ${d.d || ''}" data-id="${esc(a.id)}">
+    <div class="cab"><b>${esc(a.nombre)}</b><span class="chip tier">${esc(a.tier)}</span><span class="chip">${esc(NOMBRES_FAMILIA[a.familia] || a.familia)}</span><span class="chip">${a.manos} mano${a.manos > 1 ? 's' : ''}</span>${a.origen !== 'catálogo actual' ? `<span class="chip">${esc(a.origen)}</span>` : ''}</div>
+    <div class="grid">
+      <div>
+        <div class="dato"><span>Daño:</span> d${a.tipo} × ${a.peso}${a.danoFijo ? ' +' + a.danoFijo : ''}${a.rango ? ' · de rango' : ''}</div>
+        <div class="dato"><span>Bonos:</span> ${esc(bonos)}</div>
+        <div class="dato"><span>Efectos:</span> ${esc(efectos)}</div>
+      </div>
+      <div class="val">
+        <div><span class="cont">Hoy:</span> <b>${a.precioHoy != null ? '$' + a.precioHoy : '—'}</b> (${esc(a.tier)})</div>
+        <div><span class="cont">Nuevo:</span> <b>$${n.precio}</b> · ${esc(n.tier)} · ${n.pc} pts${ex}</div>
+        <details><summary>cómo se calculó</summary><div class="det">${esc(desg)}</div></details>
+      </div>
+    </div>
+    ${a.detalle ? `<div class="det">${esc(a.detalle)}</div>` : ''}
+    <div class="decision">${botones}</div>
+    <textarea data-nota placeholder="Nota (ej.: está bien pero muy cara; le quitaría el efecto; cambiar el nombre…)">${esc(d.nota || '')}</textarea>
+  </div>`;
+}
+
+function filtradas(){
+  const q = $('#buscar').value.trim().toLowerCase(), ff = $('#f-familia').value, ft = $('#f-tier').value, fd = $('#f-decision').value, o = $('#orden').value;
+  let l = armas.filter(a => {
+    const d = dec.decisiones[a.id] || {};
+    if(ff && a.familia !== ff) return false;
+    if(ft && a.tier !== ft) return false;
+    if(fd === '_sin' && d.d) return false;
+    if(fd === '_nota' && !(d.nota || '').trim()) return false;
+    if(fd && !fd.startsWith('_') && d.d !== fd) return false;
+    if(q && !(a.nombre + ' ' + a.efectos.map(e => e.nombre).join(' ')).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const cmp = {
+    familia: (a, b) => ORDEN_FAMILIA.indexOf(a.familia) - ORDEN_FAMILIA.indexOf(b.familia) || ORDEN_TIER.indexOf(a.tier) - ORDEN_TIER.indexOf(b.tier) || a.nombre.localeCompare(b.nombre, 'es'),
+    nombre: (a, b) => a.nombre.localeCompare(b.nombre, 'es'),
+    precio: (a, b) => a.nuevo.precio - b.nuevo.precio,
+    pc: (a, b) => a.nuevo.pc - b.nuevo.pc,
+  }[o];
+  return l.sort(cmp);
+}
+
+function contadores(){
+  const c = {confirmar: 0, reajustar: 0, reimaginar: 0, descartar: 0};
+  armas.forEach(a => { const d = dec.decisiones[a.id]; if(d && d.d) c[d.d]++; });
+  const marcadas = Object.values(c).reduce((x, y) => x + y, 0);
+  return `<b>${marcadas}</b>/${armas.length} marcadas · ✅ ${c.confirmar} · 🔧 ${c.reajustar} · 🔄 ${c.reimaginar} · 🗑 ${c.descartar}`;
+}
+
+function dibujar(){
+  const l = filtradas();
+  $('#lista').innerHTML = l.length ? l.map(tarjeta).join('') : '<div class="vacio">Ninguna arma con esos filtros.</div>';
+  $('#cont').innerHTML = `${l.length} a la vista · ${contadores()}`;
+}
+
+$('#lista').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if(!b) return;
+  const id = b.closest('.tarjeta').dataset.id, cur = dec.decisiones[id] || {};
+  cur.d = cur.d === b.dataset.d ? '' : b.dataset.d;   // otro clic en el mismo botón lo desmarca
+  dec.decisiones[id] = cur;
+  guardarLocal();
+  const y = scrollY; dibujar(); scrollTo(0, y);
+});
+let temporizador = null;
+$('#lista').addEventListener('input', e => {
+  if(!e.target.matches('textarea[data-nota]')) return;
+  const id = e.target.closest('.tarjeta').dataset.id;
+  (dec.decisiones[id] = dec.decisiones[id] || {}).nota = e.target.value;
+  clearTimeout(temporizador); temporizador = setTimeout(() => { guardarLocal(); $('#cont').innerHTML = `${filtradas().length} a la vista · ${contadores()}`; }, 400);
+});
+['#buscar', '#f-familia', '#f-tier', '#f-decision', '#orden'].forEach(s => $(s).addEventListener('input', dibujar));
+
+function paquete(){
+  // Solo lo marcado o con nota; con el nombre para que el asistente no dependa del id.
+  const decisiones = {};
+  armas.forEach(a => { const d = dec.decisiones[a.id]; if(d && (d.d || (d.nota || '').trim())) decisiones[a.id] = {nombre: a.nombre, d: d.d || '', nota: (d.nota || '').trim()}; });
+  return {version: 1, actualizado: dec.actualizado || Date.now(), decisiones};
+}
+$('#btn-bajar').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(paquete(), null, 1)], {type: 'application/json'}));
+  a.download = 'auditoria-armas.json'; a.click();
+};
+$('#btn-cargar').onclick = () => $('#archivo').click();
+$('#archivo').onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{ const j = JSON.parse(await f.text()); if(!j.decisiones) throw 0; Object.entries(j.decisiones).forEach(([id, v]) => { dec.decisiones[id] = {d: v.d || '', nota: v.nota || ''}; }); guardarLocal(); dibujar(); estado('Archivo cargado ✓', 'ok'); }
+  catch(err){ estado('Ese archivo no es una auditoría válida.', 'err'); }
+  e.target.value = '';
+};
+
+// ---- Guardar en el proyecto (GitHub, mismo token que el editor de catálogo: localStorage "gh-token")
+async function token(nuevo){
+  let t = nuevo ? '' : localStorage.getItem('gh-token');
+  if(!t){
+    t = prompt('Para guardar en el proyecto hace falta el token de GitHub (el mismo del editor de catálogo).\n\nSi no lo tenés: github.com/settings/tokens/new → marcá "public_repo" → generar, y pegalo acá:');
+    if(t) localStorage.setItem('gh-token', t.trim());
+  }
+  return t && t.trim();
+}
+function b64(txt){ const bytes = new TextEncoder().encode(txt); let s = ''; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s); }
+async function subir(t){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${RUTA_DECISIONES}`;
+  const cab = {Authorization: 'Bearer ' + t, Accept: 'application/vnd.github+json'};
+  let sha;
+  const g = await fetch(url + '?ref=' + GH_BRANCH, {headers: cab, cache: 'no-store'});
+  if(g.ok) sha = (await g.json()).sha; else if(g.status === 401 || g.status === 403) throw {auth: true};
+  const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: 'Auditoría de armas: decisiones y notas del dueño', content: b64(JSON.stringify(paquete(), null, 1)), branch: GH_BRANCH, ...(sha ? {sha} : {})})});
+  if(r.status === 401 || r.status === 403) throw {auth: true};
+  if(!r.ok) throw new Error('GitHub respondió ' + r.status);
+}
+$('#btn-guardar').onclick = async () => {
+  let t = await token(false); if(!t) return;
+  estado('Guardando…');
+  try{ await subir(t); estado('Guardado en el proyecto ✓ (' + new Date().toLocaleTimeString('es-AR') + ')', 'ok'); }
+  catch(err){
+    if(err && err.auth){ localStorage.removeItem('gh-token'); estado('GitHub no aceptó el token: probá de nuevo.', 'err'); }
+    else{ console.error(err); estado('No se pudo guardar. Usá ⬇ Descargar y pasale el archivo al asistente.', 'err'); }
+  }
+};
+cargar();
+</script>
+</body>
+</html>

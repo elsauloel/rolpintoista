@@ -18,6 +18,7 @@ Uso:
   python calculadora_armas.py calibrar      # cómo caen las 137 armas actuales (tier actual vs calculado)
   python calculadora_armas.py ejemplos      # ejemplos por tier con puntaje y precio nuevos
   python calculadora_armas.py arma NOMBRE   # detalle de una arma del catálogo actual
+  python calculadora_armas.py auditoria     # escribe datos/auditoria-armas-datos.json (los datos de la herramienta de auditoría datos/auditoria-armas.html)
   python calculadora_armas.py hoja          # escribe docs/rework-armas-revision.md (para marcar conservar / reajustar / descartar)
 """
 import json, math, sys, pathlib, collections
@@ -214,6 +215,26 @@ def hoja():
     print('escrito docs/rework-armas-revision.md', len(armas), 'armas')
 
 
+def datos_auditoria():
+    """Escribe datos/auditoria-armas-datos.json: las armas con sus valores nuevos, para la herramienta datos/auditoria-armas.html."""
+    out = []
+    for a in cargar():
+        pc, desglose = puntaje(a)
+        p, tc, ex = precio(pc, a['tier'])
+        out.append({
+            'id': a.get('id') or a['nombre'], 'nombre': a['nombre'], 'origen': 'catálogo actual', 'familia': familia(a), 'tier': a['tier'],
+            'manos': 2 if a['tipoItem'] == 'arma_2m' else 1, 'tipo': a.get('tipoDado'), 'peso': a.get('peso'), 'danoFijo': a.get('danoFijo') or 0,
+            'rango': bool(a.get('armaDeRango')),
+            'bonos': [{'stat': m['stat'], 'val': m['val']} for m in (a.get('mods') or [])],
+            'efectos': [{'nombre': e.get('nombre'), 'prob': round(100 * probabilidad(e)), 'detalle': e.get('detalle', '')} for e in (a.get('efectosGolpe') or [])],
+            'precioHoy': a.get('precioCompra'), 'detalle': (a.get('detalle') or a.get('descripcionNarrativa') or '')[:220],
+            'nuevo': {'pc': round(pc, 1), 'tier': tc, 'precio': p, 'exceso': ex, 'desglose': {k: round(v, 1) for k, v in desglose.items()}},
+        })
+    ruta = RAIZ / 'datos' / 'auditoria-armas-datos.json'
+    ruta.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+    print('escrito', ruta.relative_to(RAIZ), len(out), 'armas')
+
+
 def detalle(nombre):
     for a in cargar():
         if nombre.lower() in a['nombre'].lower():
@@ -233,4 +254,5 @@ if __name__ == '__main__':
     elif cmd == 'ejemplos': ejemplos()
     elif cmd == 'arma': detalle(' '.join(sys.argv[2:]))
     elif cmd == 'hoja': hoja()
+    elif cmd == 'auditoria': datos_auditoria()
     else: print(__doc__)

@@ -150,6 +150,7 @@ async function menuDibujar(){
     if(typeof GuiaDiseno !== 'undefined') h += '<button type="button" class="ms-item" id="menu-sitio-guia"><span class="ms-ico">📐</span><span>Guía de diseño</span></button>';
     h += menuLink(menuUrl('manual-usuario/manual.html', enPartida ? FB_CAMPANA : ''), '📖', 'Manual');
     h += menuLink(menuUrl('preguntas-diseno/preguntas.html', ''), '🛠', 'Herramientas de diseño');
+    h += menuLink(menuUrl('datos/auditoria-armas.html', ''), '🗡', 'Auditoría de armas');
     if(error) h += `<div class="ms-nota" style="padding-left:14px;color:#D4574E">${menuEsc(error)}</div>`;
     if(conCuenta) h += '<hr><button type="button" class="ms-item" id="menu-sitio-salir"><span class="ms-ico">⎋</span><span>Cerrar sesión</span></button>';
     p.innerHTML = h;

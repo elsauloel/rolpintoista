@@ -32,7 +32,10 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 | **Parry** | Desviar con el arma | [[Parry]] |
 | **Bloqueo** | Segunda tirada tras un Parry | [[Bloqueo]] |
 | **Ini** | Iniciativa: orden de turnos | [[Iniciativa]] |
-| **Crit** | Chance de golpe crítico | [[Golpe crítico]] |
+| **Crít.Frec.** | Crítico frecuente: baja el rango del crítico (mínimo 2) | [[Golpe crítico]] |
+| **Crít.Pot.** | Crítico potente: baja los umbrales del d20 de los multiplicadores | [[Golpe crítico]] |
+| **Doble crítico** | La diferencia PdG − Evasión es el doble del rango: 2d20, vale el mejor | [[Golpe crítico]] |
+| **Doble / triple / cuádruple daño** | El multiplicador que da el d20 del crítico (×2 / ×3 / ×4) | [[Golpe crítico]] |
 | **Rng** | Rango: alcance a distancia | [[Ataques a distancia]] |
 | **Crg.Max** | Carga máxima | [[Carga máxima]] |
 | **Res.Mg / Res.CC / Res.Mt** | Resistencias mágica, a CC y mental | [[Resistencias]] |

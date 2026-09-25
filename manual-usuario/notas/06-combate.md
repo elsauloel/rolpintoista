@@ -79,7 +79,7 @@ Así se resuelve un ataque cuerpo a cuerpo estándar:
 3. Es una [[Tirada enfrentada]]: si el atacante gana, **conecta**.
 4. El atacante tira el **daño**: los dados de su arma ([[Daño y Tipo de arma]]) **+ su stat Daño** ([[Fuerza]]).
 5. Al resultado se le **resta la [[Defensa]]** del objetivo. La diferencia se descuenta de su [[HP]].
-6. Si el golpe fue [[Golpe crítico|crítico]], se ignora la Defensa: el daño pasa entero.
+6. Si el golpe fue [[Golpe crítico|crítico]] (la diferencia PdG − Evasión llega al Tipo del arma), se ignora la Defensa y **todo el daño se multiplica** según el d20 (doble, triple o cuádruple daño).
 7. Si el arma tiene [[Efectos al golpear]], aparecen resaltados en la Mesa (y se tiran, si tienen porcentaje).
 
 > [!example] Con números

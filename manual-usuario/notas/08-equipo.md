@@ -43,7 +43,7 @@ Un arma se define por su **[[Daño y Tipo de arma|Tipo y peso]]** (cuánto y có
 
 - **Una mano** (`arma_1m`): dejás la otra mano libre para un [[Escudos|escudo]] o una segunda arma.
 - **Dos manos** (`arma_2m`): ocupa las dos manos. Suelen ser más pesadas o de rango largo (arcos, ballestas, espadones).
-- **Bonos:** muchas dan modificadores (Crítico +1, Parry +2, Rango +3).
+- **Bonos:** muchas dan modificadores (Crítico frecuente +1, Parry +2, Rango +3).
 - **[[Efectos al golpear]]:** Envenenar, Rompe armadura, Aturdir…
 - Cada arma paga **su propio primer ataque barato** por turno ([[Costos en Nitros]]).
 

@@ -48,7 +48,7 @@ Todo personaje tiene **cinco atributos**. Son el "esqueleto" del personaje: de c
 | [[Fuerza]] | FUE | [[Daño y Tipo de arma\|Daño]], [[Bloqueo]], [[Carga máxima]] |
 | [[Constitución]] | CON | [[HP]] máximo, [[Resistencias\|Res. Mágica y Res. CC]] |
 | [[Especial]] | ESP | [[SP]], PdG.Mg, Res. Mental, Rango de casteo |
-| [[Destreza]] | DES | [[Atacar\|PdG]], [[Golpe crítico\|Crítico]], [[Parry]], [[Ataques a distancia\|Rango]] |
+| [[Destreza]] | DES | [[Atacar\|PdG]], [[Golpe crítico\|Crítico frecuente y potente]], [[Parry]], [[Ataques a distancia\|Rango]] |
 | [[Agilidad]] | AGL | [[Evasión]], [[Iniciativa]], [[Nitros (No2)]] |
 
 Cada atributo, además, cambia el **dado** que tirás: ver [[Cómo se tira un stat]].
@@ -112,7 +112,7 @@ estado: borrador
 La precisión y la técnica. De ella salen:
 
 - **PdG (Probabilidad de Golpe):** lo que tirás para conectar un [[Atacar|ataque]].
-- **[[Golpe crítico|Crítico (%)]]:** tu chance de crítico.
+- **[[Golpe crítico|Crítico frecuente y potente]]:** mejoran el crítico (parten de 0: los suman el equipo, las habilidades y los estados).
 - **[[Parry]]:** la alternativa a la [[Evasión]] para defenderte con tu arma.
 - **Rng (Rango):** hasta dónde llegan tus [[Ataques a distancia]].
 - **[[Percepción]]:** lo que tirás para notar algo (trampas, alguien en [[Sigilo]]).
@@ -151,7 +151,7 @@ De cada [[Atributos|atributo]] se desprenden varios **stats derivados**. Todos s
 | Ini | Agilidad | [[Iniciativa]] |
 | No2 | Agilidad | [[Nitros (No2)]] |
 | PdG | [[Destreza]] | [[Atacar]] |
-| Crit | Destreza | [[Golpe crítico]] |
+| Crít.Frec. / Crít.Pot. | Destreza (base 0) | [[Golpe crítico]] |
 | Parry | Destreza | [[Parry]] |
 | Rng | Destreza | [[Ataques a distancia]] |
 | SP | [[Especial]] × 3 | [[SP]] |

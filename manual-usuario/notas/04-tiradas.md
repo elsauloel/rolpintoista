@@ -73,22 +73,54 @@ La mecánica base del juego es la **tirada enfrentada**: una parte tira a favor 
 
 +++
 titulo: Golpe crítico
-alias: [Crítico, Críticos, Crit, Crit%]
+alias: [Crítico, Críticos, Crit, Crit%, Crítico frecuente, Crítico potente, Doble crítico]
 tags: [tiradas, combate]
-estado: pendiente
+estado: borrador
 +++
-Un **golpe crítico** es un ataque especialmente certero. Tu chance viene del stat **Crítico (Crit)**, que sale de [[Destreza]] y se modifica con equipo y habilidades (algunas armas suman "Crítico +1", "+2").
+Un **golpe crítico** es un ataque especialmente certero. **No sale de un porcentaje: sale de comparar las dos tiradas.** El crítico lo determina el **Tipo del arma** ([[Daño y Tipo de arma]]).
 
-## Qué cambia si conectás un crítico
-- **Ignora la [[Defensa]]**: el daño pasa íntegro.
-- Algunas habilidades tienen un efecto distinto si el golpe es crítico (en la descripción figura como *"Critical Matters"*).
-- Algunos ítems y estados lo anulan: el estado [[Invulnerable]] bloquea cualquier daño, y "Blindado" hace inmune a críticos.
+## Cuándo hay crítico
+Después de que el atacante tira su [[Atacar|PdG]] y el defensor su [[Evasión]]:
+
+- Se calcula la **diferencia** = PdG − Evasión.
+- El **rango del crítico** es el **Tipo del arma** (4, 6, 8, 10 o 12). Si la diferencia es **igual o mayor** al rango, es un crítico.
+- **Nivel del crítico** = diferencia ÷ rango (hacia abajo). Con una diferencia del **doble** del rango es un **doble crítico**, del triple un triple crítico, y así.
+
+> [!example] Ejemplo
+> Arma **Tipo 4**. Con una diferencia de 4 a 7 es un crítico; de 8 a 11, un doble crítico; de 12 en adelante, triple.
+
+## Qué pasa al conectar un crítico
+1. **Ignora la [[Defensa]]** (la armadura no resta).
+2. Se tira **un d20 por cada nivel del crítico** (un doble crítico tira 2d20) y **vale el mejor**. Ese dado da el multiplicador de **todo** el daño del golpe (dados del arma, bono de Fuerza y demás bonos):
+
+| Mejor d20 | Multiplicador |
+|---|---|
+| Menos de 7 | ×1 (solo ignora la armadura) |
+| 7 o más | **doble daño** (×2) |
+| 17 o más | **triple daño** (×3) |
+| 20 | **cuádruple daño** (×4) |
+
+Algunas habilidades tienen un efecto distinto si el golpe es crítico (en la descripción figura como *"Critical Matters"*).
+
+## Cómo se mejora el crítico
+Hay dos formas, con estos nombres:
+- **Crítico frecuente ×N:** baja el rango del crítico N puntos (un arma Tipo 4 con frecuente ×1 hace crítico con diferencia 3 y doble crítico con 6). **El rango nunca baja de 2.** Es el stat "Crít.Frec." de la ficha.
+- **Crítico potente ×N:** baja los umbrales del d20. El **doble daño baja 1 por punto** (7 − N, hasta 1), el **triple daño 1 cada 2 puntos** y el **cuádruple daño 1 cada 3 puntos**. Es el stat "Crít.Pot." de la ficha.
+
+También hay **estados** para darlos con habilidades o a mano: **Crítico frecuente** y **Crítico potente** (buffs de +1 que se pueden editar y durar unos turnos).
+
+Las armas de **Tipo 4** acentúan el crítico frecuente y las de **Tipo 6** el potente, pero ambas pueden usar las dos herramientas (es una guía, no una regla).
 
 ## Cómo se protege uno
-Con la [[Resistencia a crítico]]: se acumula en la armadura y se aplica según el [[Daño y Tipo de arma|Tipo]] del arma atacante.
+Con la [[Resistencia a crítico]]: **cada punto contra el Tipo del arma atacante te quita un nivel de crítico.** Un doble crítico contra 1 punto cuenta como crítico simple; un crítico simple contra 1 punto no es crítico.
 
-> [!question] Cómo funciona exactamente
-> Este sistema está **en pausa**: falta definir cómo se determina un crítico más allá del porcentaje, qué efecto tiene exactamente al conectar y cómo se aplica la Resistencia a crítico por tipo. Todo lo de esta nota es lo que hoy hace la ficha; se ajusta cuando esté cerrado.
+Algunos ítems y estados lo anulan: el estado [[Invulnerable]] bloquea cualquier daño, y "Blindado" hace inmune a críticos.
+
+## En las herramientas
+La comparación de PdG contra Evasión sigue siendo **a mano** en la mesa. Para el crítico hay una **🎯 Calculadora de crítico** (menú ☰, o el 🎯 del menú de vida de un token): un asistente paso a paso que pide el arma, la PdG, la Evasión y el daño, calcula el nivel, tira los d20 y publica el resultado en la Mesa. Se completa sola con los datos de los tokens. En "Recibe daño" del token se elige el multiplicador (×2, ×3, ×4) y el daño se aplica sin restar la Defensa.
+
+> [!question] En revisión
+> Reglas nuevas del 2026-09-25 (P113 y P115 en las preguntas de diseño). Falta llevarlas a todas las habilidades y al catálogo: los ítems con "crítico +N" pasaron a ser Crítico frecuente +N (de 1 a 5) como parche.
 
 +++
 titulo: Resistencia a crítico
@@ -98,11 +130,16 @@ estado: borrador
 +++
 La **resistencia a crítico** es un stat que da la armadura (y otros ítems) para **reducir los golpes críticos** de un cierto [[Daño y Tipo de arma|Tipo]] de arma. Hay cinco, una por Tipo: **4, 6, 8, 10 y 12**.
 
+**Cada punto de resistencia contra el Tipo del arma atacante te quita un nivel de [[Golpe crítico|crítico]].** Contra un doble crítico, 1 punto lo deja en crítico simple; contra un crítico simple, 1 punto lo anula.
+
 > [!example] En un ítem
 > "Resistencia a críticos tipo 4 y 6: +1" significa que, contra armas de Tipo 4 y de Tipo 6, tu resistencia vale +1.
 
-## Convención de diseño del catálogo
-Para que las armaduras no vuelvan a un personaje inmune, el [[Catálogo de ítems]] sigue una regla suave según la [[Rareza]]:
+## Escasez de diseño
+Para que nadie sea inmune a los críticos, **cuanto más alto el Tipo, más escasa la resistencia**: la de Tipo 10 tiene que ser muy rara comparada con la de Tipo 4. La idea en estudio es regularlo **por ranuras**: cada Tipo solo lo dan ciertos slots de equipo (por ejemplo, el Tipo 10 solo los cascos, el Tipo 8 dos slots, el Tipo 6 tres, y el Tipo 4 más), así el máximo que se puede juntar queda limitado por diseño. Los **anillos** (mágicos, uno por mano) tienen más libertad de efectos pero son más escasos y caros.
+
+## Convención actual del catálogo (en revisión)
+El [[Catálogo de ítems]] sigue hoy una regla suave según la [[Rareza]] (se va a rehacer con los criterios de arriba):
 
 | Rareza | Resistencias que suele dar |
 |---|---|

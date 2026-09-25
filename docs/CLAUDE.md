@@ -11,7 +11,7 @@ todas por igual, y cualquier otra nota de workflow que no encaje en el
 
 [`preguntas-abiertas.md`](preguntas-abiertas.md) junta todas las preguntas
 de diseño sin decidir (regla general: toda pregunta abierta se anota ahí).
-[`guia-de-diseno.md`](guia-de-diseno.md) es la guía de campos de juego y mecánicas por familia de arma / elemento (borrador vivo, para diseñar skills y equipos). [`herramientas-de-diseno.md`](herramientas-de-diseno.md) lista los tipos de efecto y conceptos a tener a mano para el rework de skills y equipos (niebla y visibilidad, efectos sobre la iniciativa, "equipo" incluye armas).
+[`hoja-de-ruta-rework-catalogo.md`](hoja-de-ruta-rework-catalogo.md) es la hoja de ruta del rework del catálogo (fases, lo decidido y lo pendiente). [`guia-de-diseno.md`](guia-de-diseno.md) es la guía de campos de juego y mecánicas por familia de arma / elemento (borrador vivo, para diseñar skills y equipos). [`herramientas-de-diseno.md`](herramientas-de-diseno.md) lista los tipos de efecto y conceptos a tener a mano para el rework de skills y equipos (niebla y visibilidad, efectos sobre la iniciativa, "equipo" incluye armas).
 [`plan-sistema-nuevo.md`](plan-sistema-nuevo.md) tiene las decisiones y el estado del
 sistema nuevo; [`workflow-firebase.md`](workflow-firebase.md), cómo está armado Firebase.
 

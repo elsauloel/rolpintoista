@@ -14,6 +14,8 @@
 ## 0. Criterios generales de diseño (dichos por el dueño)
 - **Los Nitros (No2) son un recurso MUY preciado** (2026-09-25). Se usan para acciones ofensivas, defensivas y para moverse, así que cada turno el jugador **optimiza y maximiza** su uso. Al diseñar **skills y objetos**, un costo en Nitros pesa mucho: 1 Nitro no es "casi gratis". Un arma o skill que cuesta pocos Nitros es barata *de verdad* y suele ser de calidad baja; los costos bajos hay que ganárselos con calidad o con límites. Ver también P112 (peso de los efectos) y P116 (armas mágicas).
 
+- **No existe la "defensa mágica"** (dicho por el dueño, 2026-09-25): no hay un equipo que reste daño mágico como la Defensa resta el físico. **El daño mágico va DIRECTO a la vida.** Por eso hay que ser **cauteloso con las skills que hacen daño mágico usando el Especial como daño**: existen, pero tienen que ser **muy caras**. La otra vía, más barata y equilibrada, es que un efecto mágico **use el Especial del usuario para calcular la potencia pero haga daño FÍSICO** (ejemplo del dueño: una estalactita de hielo): el defensor sí tiene armadura y esta lo protege. (La Res. mágica es resistencia a *efectos*, no reduce daño.)
+
 ## 1. Familias de arma y su mecánica "de casa"
 
 | Familia | Mecánica de casa | Otras (excepcional) | Estado en el juego |

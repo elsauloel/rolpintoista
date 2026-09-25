@@ -54,7 +54,7 @@ const GuiaDiseno = (() => {
     {id: 'mago', ico: '🔮', n: 'Mago', resumen: 'Hechizos con Especial: daño mágico, áreas, control y armaduras arcanas.',
       idea: 'El Mago lanza hechizos (PG y Daño con Especial) pagando SP. Sus opciones van del daño puro y el área al control mental y la defensa mágica.',
       m: [
-        {n: 'Proyectiles y rayos', d: 'Ataques mágicos a distancia: algunos ignoran la armadura y se amplifican con Especial.', ej: 'Chispazo, Rayo mágico, Ráfaga arcana', e: 'mano'},
+        {n: 'Proyectiles y rayos', d: 'Ataques mágicos a distancia. Ojo: no hay defensa mágica, así que el daño mágico va directo a la vida (los que usan el Especial como daño tienen que ser muy caros). La alternativa: usar el Especial para la potencia pero con daño físico, que la armadura sí reduce (ej. estalactita de hielo).', ej: 'Chispazo, Rayo mágico, Ráfaga arcana', e: 'mano'},
         {n: 'Áreas', d: 'Explosiones y lluvias de proyectiles en una flor del mapa.', ej: 'Orbe arcano, Tormenta arcana', e: 'mano'},
         {n: 'Elementos', d: 'Modificar un hechizo de daño para darle un elemento (fuego, hielo…).', ej: 'Carga Elemental', e: 'mano'},
         {n: 'Defensa mágica', d: 'Una armadura que reduce el daño recibido.', ej: 'Armadura Mágica', e: 'mano'},

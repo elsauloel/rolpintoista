@@ -4,6 +4,15 @@
 > [`guia-de-diseno.md`](guia-de-diseno.md) y en las preguntas P112–P118 de [`preguntas-abiertas.md`](preguntas-abiertas.md). Cada pregunta trae una **propuesta del asistente** para poder
 > responder rápido (sí / no / cambiá esto). Estado: ⬜ sin responder · ✅ respondida.
 
+## Cómo retomar este trabajo (para otra conversación o cuenta de Claude)
+Este documento **es la memoria del proceso**: todo lo que se pregunta y se decide queda acá, en el repositorio (rama `nueva-version`), no en la conversación. Para seguir desde cero:
+1. Leer [`../CLAUDE.md`](../CLAUDE.md) (esencia del proyecto: guías, no reglas; sandbox; automatizar o aclarar) y este archivo completo.
+2. Leer [`guia-de-diseno.md`](guia-de-diseno.md) (criterios generales, familias, tres niveles de efecto, tabla de relevancias, skills de crítico) y las preguntas **P112 a P118** de [`preguntas-abiertas.md`](preguntas-abiertas.md) (peso de efectos, crítico, resistencia por slots, armas mágicas, híbridas, rayo en cadena).
+3. Mirar el estado de la [hoja de ruta](hoja-de-ruta-rework-catalogo.md) y de [`pendientes.md`](pendientes.md) (§8).
+4. **Método de trabajo:** el asistente propone en tandas y el dueño audita. Cada pregunta trae una propuesta; cuando el dueño responde, **se anota acá en "Respuestas y decisiones"** (fecha, número de pregunta, respuesta textual y lo que se decidió), se marca ✅ y **se sube al repo** (commit + push a `nueva-version`) sin esperar. Si una respuesta cambia una regla de fondo, se actualiza también la guía de diseño y `preguntas-abiertas.md`.
+5. El catálogo se edita **solo** con `datos/catalogo-editor.html` o los scripts de `herramientas/` (ver `datos/CLAUDE.md`), nunca a mano; sin imágenes; y nada entra al catálogo sin la auditoría del dueño.
+6. El dueño no es técnico: explicar sin jerga, en español, con el objetivo antes que la arquitectura.
+
 ## Objetivo
 Un **catálogo amplio y diverso de armas** de distintos tipos y efectos, con un **pool muy grande** para que el **randomizador de tiendas** tenga sentido. Se **preservan conceptualmente** algunos objetos
 del catálogo anterior (ej.: el **set completo de Martín Fierro**, muy raro y poderoso de coleccionar) y se **reajustan sus valores** con los parámetros nuevos. Se trabaja en **tandas** por familia; el asistente

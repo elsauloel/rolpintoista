@@ -14,6 +14,8 @@
 > marca ✅ ahí. Antes de preguntarle algo de diseño al usuario, mirar si ya
 > está en esa lista.
 >
+> **Rework del catálogo (en curso) → [`docs/rework-armas.md`](docs/rework-armas.md)** (hoja de trabajo con las preguntas, propuestas y respuestas, pensada para retomarla desde otra conversación) y [`docs/hoja-de-ruta-rework-catalogo.md`](docs/hoja-de-ruta-rework-catalogo.md). Criterios de diseño: [`docs/guia-de-diseno.md`](docs/guia-de-diseno.md).
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

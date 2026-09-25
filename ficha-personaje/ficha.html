@@ -1203,7 +1203,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo){display:none!important}
+html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
@@ -1641,7 +1641,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <header>
       <h3 id="presets-titulo">Elegir estado</h3>
       <div style="display:flex;gap:8px">
-        <button class="iconbtn iconbtn-add" id="presets-personalizado" style="display:none">Estado personalizado</button>
+        <button class="iconbtn iconbtn-add" id="presets-personalizado" style="display:none" title="Un menú paso a paso para armar un estado desde cero">＋ Crear estado nuevo (paso a paso)</button>
         <button class="iconbtn" id="presets-x">Cerrar</button>
       </div>
     </header>
@@ -1980,6 +1980,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/asistente-estado.js"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-item.js"></script>
@@ -6826,7 +6827,7 @@ function ghCabeceras(accept){
 $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
-$('#presets-personalizado').onclick = () => { $('#scrim-presets').classList.remove('open'); openEditor('efectos', null); };
+$('#presets-personalizado').onclick = () => { const destino = presetDestino; $('#scrim-presets').classList.remove('open'); abrirAsistenteEstadoFicha(destino); };
 $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
 $('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
 $('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
@@ -7105,7 +7106,7 @@ function abrirPresetsEfecto(destino){
     html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtml(p, `custom:${i}`, 'propio')).join('')}</div>`;
   }
   $('#presets-body').innerHTML = html;
-  $('#presets-personalizado').style.display = presetDestino === 'directo' ? '' : 'none';
+  $('#presets-personalizado').style.display = (presetDestino === 'directo' || presetDestino === 'inv') ? '' : 'none';
   $('#presets-titulo').textContent = presetDestino === 'inv' ? `Estado para ${(S.invocaciones.find(x=>x.id===presetInvId)||{}).nombre||'la invocación'}` : 'Estado alterado';
   $('#scrim-presets').classList.add('open');
 }
@@ -7154,6 +7155,38 @@ function activarEfectoPreset(preset){
   renderList('efectos');
   refresh();
   toast(`${draft.nombre} activado`);
+}
+
+// Menú paso a paso para crear un estado alterado de cero (comun/asistente-estado.js): reemplaza al botón "Estado personalizado"
+// que abría el formulario completo (el formulario sigue disponible desde el último paso). destino: 'directo' (el personaje) o 'inv'.
+function armarPresetDeAsistente(res){
+  return {nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
+    escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags,
+    ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})};
+}
+function abrirAsistenteEstadoFicha(destino){
+  const inv = destino === 'inv' ? S.invocaciones.find(x => x.id === presetInvId) : null;
+  AsistenteEstado.abrir({
+    titulo: 'Crear un estado alterado',
+    para: inv ? inv.nombre : (S.meta.nombre || ''),
+    stats: MOD_TARGETS.filter(s => !['sp', 'spregen', 'crgmax', 'capcinturon'].includes(s.id)).map(s => ({id: s.id, label: STAT_LABEL[s.id] || s.id, full: STAT_FULL[s.id] || ''})),
+    alTerminar: res => {
+      const preset = armarPresetDeAsistente(res);
+      if(res.guardar){
+        S.efectosPersonalizados = S.efectosPersonalizados || [];
+        const i = S.efectosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+        if(i >= 0) S.efectosPersonalizados[i] = preset; else S.efectosPersonalizados.push(preset);
+      }
+      (destino === 'inv' ? activarEfectoPresetInv : activarEfectoPreset)(preset);
+    },
+    alFormulario: destino === 'inv' ? null : (res => {
+      openEditor('efectos', null);
+      const {nombre, ...resto} = armarPresetDeAsistente(res);
+      Object.assign(editing.draft, structuredClone(resto));
+      editing.draft.nombre = nombre;
+      drawEditor();
+    }),
+  });
 }
 
 function aplicarPresetEfecto(valor){
@@ -11416,7 +11449,7 @@ function botoneraModoAbrir(invId){
 if(MODO_BOTONERA){
   const revisarCerrada = () => {
     // El cartelito de cantidades de un estado (comun/estado-preguntas.js, #ep-fondo) cuenta como ventana abierta: si no, al elegir un preset se cerraba la Botonera.
-    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo')){
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo')){
       if(fichaVivo.editaGM) fichaGuardarTick(true);   // el GM editó estados de otro personaje: se sube antes de cerrar
       botoneraAvisarMapa('botonera-cerrada');
     }

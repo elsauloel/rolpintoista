@@ -784,7 +784,7 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
    mapa y muestra solo la ventana de Acciones del creep (y las que se abren
    desde ahí), con fondo transparente. */
 html.modo-acciones, html.modo-acciones body{background:transparent!important;min-height:0}
-html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo){display:none!important}
+html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo){display:none!important}
 </style>
 <script>
 if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.search).get('modo'))) document.documentElement.classList.add('modo-acciones');   // finalizar y botín: el mapa los abre igual que las Acciones
@@ -1157,7 +1157,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <header>
       <h3>Elegir estado</h3>
       <div style="display:flex;gap:8px">
-        <button class="iconbtn iconbtn-add" id="presets-creep-personalizado">Estado personalizado</button>
+        <button class="iconbtn iconbtn-add" id="presets-creep-personalizado" title="Un menú paso a paso para armar un estado desde cero">＋ Crear estado nuevo (paso a paso)</button>
         <button class="iconbtn" id="presets-creep-x">Cerrar</button>
       </div>
     </header>
@@ -1267,6 +1267,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/asistente-estado.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
@@ -7309,7 +7310,47 @@ $('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-
 $('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#scrim-estado-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-estado-creep'){ editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); } });
 $('#presets-creep-x').onclick = () => $('#scrim-presets-creep').classList.remove('open');
-$('#presets-creep-personalizado').onclick = () => { $('#scrim-presets-creep').classList.remove('open'); abrirEditorEstadoCreep(presetsCreepScId, null); };
+// Menú paso a paso para crear un estado de cero (comun/asistente-estado.js); el formulario completo sigue en el último paso.
+function armarPresetDeAsistenteGM(res){
+  return {nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
+    escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})};
+}
+$('#presets-creep-personalizado').onclick = () => {
+  $('#scrim-presets-creep').classList.remove('open');
+  const scId = presetsCreepScId, sc = S.creeps.find(x => x.id === scId);
+  const extra = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: null, eva: null, parry: null, nitros: null, resm: null, resmg: null, rescc: null, ini: null, crit: null};
+  const ids = ['def', 'dmg', 'pdg', 'eva', 'parry', 'nitros', 'con', 'fue', 'agl', 'des', 'esp', 'resm', 'resmg', 'rescc', 'ini', 'crit'];
+  AsistenteEstado.abrir({
+    titulo: 'Crear un estado alterado',
+    para: sc ? sc.nombre : '',
+    stats: ids.map(id => ({id, label: (extra[id] && extra[id][0]) || STAT_LABEL_GM[id] || id, full: (extra[id] && extra[id][1]) || STAT_FULL_GM[id] || ''})),
+    alTerminar: res => {
+      const preset = armarPresetDeAsistenteGM(res);
+      if(res.guardar){
+        S.estadosPersonalizados = S.estadosPersonalizados || [];
+        const i = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+        if(i >= 0) S.estadosPersonalizados[i] = preset; else S.estadosPersonalizados.push(preset);
+      }
+      presetsCreepScId = scId;
+      activarEstadoPresetCreep(preset);
+    },
+    alFormulario: res => {
+      abrirEditorEstadoCreep(scId, null);
+      $('#ec-nombre').value = res.nombre;
+      $('#ec-detalle').value = res.detalle;
+      $('#ec-turnos').value = res.turnos;
+      $('#ec-permanente').checked = !!res.permanente;
+      $('#ec-hpturno').value = res.hp;
+      $('#ec-escudomagico').value = res.escudo;
+      ecMods = structuredClone(res.mods.filter(m => [...ATTR_IDS, 'nitros'].includes(m.stat)));
+      renderEcMods();
+      $('#ec-preset').dataset.polaridad = res.polaridad;
+      FLAGS_ESTADO_CREEP.forEach(f => { $('#ec-preset').dataset[f.toLowerCase()] = res.flags[f] ? '1' : ''; });
+      $('#ec-preset').dataset.forzarnitros = res.forzarNitros !== undefined ? String(res.forzarNitros) : '';
+      actualizarBotonesPresetEc();
+    },
+  });
+};
 $('#scrim-presets-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets-creep') $('#scrim-presets-creep').classList.remove('open'); });
 $('#ec-nombre').addEventListener('input', actualizarBotonesPresetEc);
 $('#ec-preset').addEventListener('change', e => {
@@ -7917,7 +7958,7 @@ if(MODO_ACCIONES){
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
   });
   const observador = new MutationObserver(() => {
-    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
+    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
   });
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {

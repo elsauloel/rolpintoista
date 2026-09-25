@@ -34,9 +34,9 @@ propone y el dueño audita.
 
 ## Preguntas (en orden)
 ### A · Tamaño y reparto del pool
-1. ⬜ **¿Cuántas armas en total?** *Propuesta:* ~**300** (más del doble), en forma de pirámide: Común ~90 · Buena calidad ~80 · Raro ~60 · Excepcional ~45 · Legendario ~25.
-2. ⬜ **¿Cómo se reparten por familia y Tipo?** *Propuesta:* Tipo 4 (punzantes) 20 % · Tipo 6 (cortantes) 25 % · Tipo 8 (hachas y armas pesadas) 20 % · Tipo 10 (contundentes) 15 % · Tipo 12 (explosivos) 5 % · **de rango** 15 %; y por cada familia, pesos de 1 a 4 (dados) según el tier.
-3. ⬜ **¿Una mano y dos manos?** *Propuesta:* ~80 % una mano, ~20 % dos manos (más Peso y más efectos a cambio de ocupar las dos manos).
+1. ✅ **¿Cuántas armas en total?** *Propuesta:* ~**300** (más del doble), en forma de pirámide: Común ~90 · Buena calidad ~80 · Raro ~60 · Excepcional ~45 · Legendario ~25.
+2. ✅ **¿Cómo se reparten por familia y Tipo?** *Propuesta:* Tipo 4 (punzantes) 20 % · Tipo 6 (cortantes) 25 % · Tipo 8 (hachas y armas pesadas) 20 % · Tipo 10 (contundentes) 15 % · Tipo 12 (explosivos) 5 % · **de rango** 15 %; y por cada familia, pesos de 1 a 4 (dados) según el tier.
+3. ✅ **¿Una mano y dos manos?** *Propuesta:* ~80 % una mano, ~20 % dos manos (más Peso y más efectos a cambio de ocupar las dos manos).
 
 ### B · Efectos
 4. ⬜ **¿Cuántos efectos distintos habrá y cuáles?** *Propuesta:* los de la guía (Rompe armadura, Knockdown, Aturdir, Lisiado, Sangrado, Envenenar, Derribar, Agarrar, Prende fuego, Drena vida) + un puñado de "modificadores" (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). Repartirlos parejo: hoy uno solo (Rompe armadura) está en 13 % de las armas.
@@ -53,8 +53,16 @@ propone y el dueño audita.
 11. ⬜ **¿Qué armas del catálogo actual se conservan conceptualmente?** *Propuesta:* el asistente arma una **hoja con las 137 armas** (nombre, tier, Tipo, efectos) y vos marcás **conservar / reajustar / descartar**.
 12. ⬜ **Sets (ej.: Martín Fierro completo).** ¿Cuántas piezas tiene un set y qué bonus da tener **el set completo** (o 2 de 3)? *Propuesta:* sets de 3 a 5 piezas (arma + 2–4 de defensa), con un estado extra al tenerlas todas equipadas. **Ojo:** hoy el juego no tiene bonus de set; habría que construirlo.
 
+### F · Preguntas nuevas que aparecieron al responder
+14. ⬜ **Diseño de las armas de rango** (arcos, ballestas, armas de fuego): todavía no se discutió su criterio de diseño (Rango, munición, Nitros, crítico, efectos). Por ahora se rellenan sobre la marcha con lo que surja y se espera **reworkearlas específicamente después**. *Propuesta:* dedicarles una tanda propia cuando terminen las familias cuerpo a cuerpo.
+15. ⬜ **Peso de usar las dos manos:** ¿cuánto vale en el puntaje de calidad que un arma ocupe las dos manos? El dueño aclaró que **de por sí es más poderosa** (a cambio invalida una mano, o sea que resta posibilidades de acción: escudo, segunda arma, accesorio). *Propuesta:* darle a las de dos manos un **bono al puntaje** (más Peso de dados o un efecto extra sin subir el precio proporcionalmente) y evaluar qué cuesta perder la mano libre.
+
 ### E · Método
 13. ⬜ **¿En qué orden y qué tamaño de tanda?** *Propuesta:* por familia (punzantes → cortantes → hachas → contundentes → rango → explosivos → híbridas), de ~12 armas por tanda, en 3 pasos: (a) lista de ideas/nombres, (b) números, (c) carga al editor de catálogo tras tu auditoría.
 
 ## Respuestas y decisiones
-*(se completan a medida que se responden)*
+*(se completan a medida que se responden; formato: fecha · pregunta · respuesta del dueño · decisión)*
+
+- **2026-09-25 · P1 (tamaño del pool):** "Vamos con unas 300, no está mal. Respecto a la rareza, vamos con eso." → **~300 armas** con la pirámide propuesta: **Común ~90 · Buena calidad ~80 · Raro ~60 · Excepcional ~45 · Legendario ~25**.
+- **2026-09-25 · P2 (reparto por familia y Tipo):** "Repartir por familia está bien." → **Tipo 4 (punzantes) 20 % · Tipo 6 (cortantes) 25 % · Tipo 8 (hachas y pesadas) 20 % · Tipo 10 (contundentes) 15 % · Tipo 12 (explosivos) 5 % · de rango 15 %** (unas 45 armas de rango; contando ~300). Las **de rango**: todavía no está discutido su criterio de diseño; se rellenan sobre la marcha y **es muy probable que haya que reworkearlas específicamente** (ver P14).
+- **2026-09-25 · P3 (manos):** "Un arma de dos manos de por sí va a ser más poderosa, porque tiene una ventaja que es que te invalida una mano, entonces te quita posibilidad de acciones, pero vamos a reducirlo a un **10 %** de armas de dos manos." → **~10 % de armas de dos manos (~30 de 300)**, el resto de una mano. Sus implicaciones y su peso en el puntaje **no están evaluados** todavía (ver P15).

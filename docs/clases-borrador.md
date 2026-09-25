@@ -145,8 +145,7 @@ Estados que define la clase:
    próximo Mantenimiento): absorbe 8 de la próxima fuente de daño; si hace
    más, el resto entra normal.
 2. ✅ **Shockwave** — SP 4, No2 0 (Flash: SP x 2 = **el doble**, 8 SP en turno ajeno, a mano). Onda expansiva: el atacante tira **Fuerza** (automático, `tiradaStat: 'fue'`); cada **enemigo** adyacente tira **Constitución** (a mano) y **quien pierde** queda en **Pajaritos** (el de siempre: PdG y Evasión a la mitad) por **2 turnos** (a mano hasta que exista "aplicar estado a otros" para personajes). Solo afecta a enemigos. (2026-09-24)
-3. **Aura de espinas** [1] — Devuelve 1/4 del daño del ataque como true
-   damage hasta el comienzo del próximo turno.
+3. ✅ **Aura de espinas** — SP 1, No2 1 (regla general: sin dato, 1). Deja sobre uno mismo el estado **Espinas** por 1 turno (hasta el comienzo del próximo turno). Espinas (2026-09-24): devuelve al atacante **1/4 (25 %) del daño CRUDO** del golpe (antes de Defensa y escudos), **solo cuerpo a cuerpo**, **redondeado hacia arriba**, como daño directo (true damage); aplicarlo es **a mano**. Reemplaza al 50 % que tenía el estado.
 4. ✅ **Recuperación** — SP 1, No2 2. Cura **9 HP fijos** sobre uno mismo, sin pasar el HP máximo; se puede usar con el HP lleno (gasta igual). Automatizada con el campo `curaHp` de la habilidad (2026-09-20).
 5. **Sonic Boom** [2] — Onda expansiva (Fuerza / Constitución). Flash (SP
    x 2). Golpea el piso creando una onda de choque en un cono al frente,

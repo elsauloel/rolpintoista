@@ -179,10 +179,11 @@ El que aguanta: defensa, cura propia y control de tropa. Pool de [[Clases|clase]
 | **Blindaje** | SP 1 · Flash (SP ×2: 2 SP en turno ajeno) | Solo sobre uno mismo: estado **Barrera**, absorbe 8 de la próxima fuente de daño ([[Escudo mágico]]). |
 | **Recuperación** | SP 1 · No2 2 | Curás **9 HP** fijos sobre vos (sin pasar el máximo). Se puede usar con la vida llena: gasta igual. |
 | **Piel resistente** | SP 5 · No2 1 | 2 turnos sobre vos: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico. |
+| **Aura de espinas** | SP 1 · No2 1 | 1 turno sobre vos: estado **Espinas**, cada ataque cuerpo a cuerpo que recibís le devuelve al atacante 1/4 del daño crudo (redondeado hacia arriba, como daño directo). El daño de vuelta se aplica a mano. |
 | **Shockwave** | SP 4 · Flash (SP ×2 en turno ajeno) | Onda expansiva: tirás **Fuerza**; cada enemigo adyacente tira **Constitución** y el que pierde queda en [[Pajaritos]] 2 turnos. La tirada de Fuerza es automática; el resto se resuelve a mano. |
 
 ## En revisión
-Aura de espinas (devuelve 1/4 del daño), Sonic Boom, Daño en área, Takle, Taunt y Miti-Miti (comparte la mitad del daño con un protegido).
+Sonic Boom, Daño en área, Takle, Taunt y Miti-Miti (comparte la mitad del daño con un protegido).
 
 ## Estados de la clase
 - [[Pajaritos]]: PdG y Evasión a la mitad.

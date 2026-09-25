@@ -209,7 +209,7 @@ estado: borrador
 
 Parientes más limitados:
 - **Blindado:** inmune a [[Golpe crítico|golpes críticos]]. **A mano**: la herramienta solo recuerda que está activo y cuántos turnos dura; el que lleva la mesa anula el crítico.
-- **Espinas:** devuelven un 50 % del daño de un golpe físico cuerpo a cuerpo al atacante. **A mano**, igual que Blindado.
+- **Espinas:** devuelven al atacante **1/4 (25 %) del daño crudo** de cada golpe **cuerpo a cuerpo** (antes de Defensa y escudos, redondeado hacia arriba, como daño directo). **A mano**, igual que Blindado.
 - **Inmunidad a CC:** inmune a los estados de control: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos (Veneno y Sangrado no cuentan como control).
 - **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].
 

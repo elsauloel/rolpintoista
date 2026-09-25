@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T19:16:13Z",
+ "actualizado": "2026-09-25T19:26:52Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1049,7 +1049,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).\n\n- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).\n- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.\n\nLos dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM."
+   "cuerpo": "Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).\n\n- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).\n- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.\n\nLos dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM.\n\nEl **rayo** además puede **saltar en cadena**: hasta **3 casillas** de distancia, **una sola vez por objetivo**, y cada salto hace la **mitad del daño** del anterior (redondeado hacia arriba). Es daño mágico, así que va **directo a la vida**. En el mapa, el menú de vida de un token tiene el botón **⚡ Rayo en cadena**."
   },
   {
    "id": "terreno-incendiado",

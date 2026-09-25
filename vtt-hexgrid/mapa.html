@@ -7502,6 +7502,7 @@ function hudHtml(t){
    cambian ahí mismo: 1) "Recibe daño" (por defecto): se escribe el daño del
    golpe y se le resta la Defensa; 2) "HP directo": el número de siempre
    (valor, +5, -3) sin tener en cuenta la Defensa. */
+let hpRayo = false;   // ⚡ Rayo en cadena en "Recibe daño" (P118): daño directo y salta a los rivales cercanos
 let hpCritMult = 1;   // multiplicador de crítico de "Recibe daño" (1 = sin crítico; 2 doble daño, 3 triple, 4 cuádruple). Un crítico multiplica TODO el daño y NO resta la Defensa (Comun/critico.js).
 let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
 
@@ -7593,6 +7594,7 @@ function hudHpHtml(t, d){
     <div class="hud-hp-expl">${danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
+        : hpRayo ? '<b>⚡ Rayo</b>: daño mágico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto.'
         : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
       : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
@@ -7600,6 +7602,7 @@ function hudHpHtml(t, d){
       ${[[1, 'Normal', 'Sin crítico'], [2, '×2', 'Doble daño'], [3, '×3', 'Triple daño'], [4, '×4', 'Cuádruple daño']].map(([k, r, t2]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}" title="${t2}">${r}</button>`).join('')}
       ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini calc" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
     </div>` : ''}
+    ${danio ? `<div class="hud-crit-fila"><button type="button" class="hud-mini${hpRayo ? ' activo' : ''}" data-hud-rayo="1" title="Rayo: daño mágico directo a la vida (no se resta la Defensa) que salta a otros del mismo bando hasta 3 casillas de distancia, una sola vez por objetivo, con la mitad del daño en cada salto (redondeado hacia arriba)">⚡ Rayo en cadena</button></div>` : ''}
     <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>
     <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
@@ -7622,6 +7625,13 @@ function hudHpPrevia(t, d, texto){
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
   if(d.def === null || d.def === undefined) return '—';
   const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  if(hpRayo){   // rayo: directo a la vida + cadena
+    const sc0 = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+    const r0 = resolverGolpe(golpe, 0, sc0 ? structuredClone(sc0.estados || []) : []);
+    if(r0.invulnerable) return 'Invulnerable: no recibe daño';
+    const cad = rayoCadena(seleccion, golpe);
+    return `⚡ ${fmt(golpe)} directo → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - r0.recibido))}` + (cad.length > 1 ? ` · salta a ${cad.slice(1).map(c => `${nombreDe(c.t)} ${c.dano}`).join(' → ')}` : ' · no hay a quién saltar');
+  }
   if(hpCritMult > 1){   // crítico: todo el daño × multiplicador, sin restar la Defensa
     const total = golpe * hpCritMult;
     const rc = resolverGolpe(total, 0, sc ? structuredClone(sc.estados || []) : []);
@@ -7632,6 +7642,49 @@ function hudHpPrevia(t, d, texto){
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);
   return `${fmt(golpe)} − Def ${fmt(num(d.def))} = ${fmt(Math.max(0, golpe - num(d.def)))}${r.absorbido ? ` (escudo −${fmt(r.absorbido)})` : ''} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+}
+
+/* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------
+   El rayo salta a otros personajes: hasta 3 casillas de distancia del último golpeado, UNA sola vez por objetivo, y cada salto hace la MITAD del
+   daño del anterior (redondeado hacia arriba). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
+   creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida. */
+const RAYO_SALTO_MAX = 3;
+function rayoCadena(idInicial, dano){
+  const t0 = tokens.get(idInicial);
+  if(!t0) return [];
+  const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
+  const usados = new Set([idInicial]);
+  let actual = t0, d = cadena[0].dano;
+  for(let i = 0; i < 12; i++){
+    let mejor = null, mejorDist = Infinity;
+    tokens.forEach((x, id) => {
+      if(usados.has(id) || x.tipo !== t0.tipo || !x.fichaId || (x.oculto && !soyGM)) return;
+      const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
+      if(dist <= RAYO_SALTO_MAX && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
+    });
+    if(!mejor) break;
+    d = Math.ceil(d / 2);
+    usados.add(mejor.id);
+    cadena.push({id: mejor.id, t: mejor.x, dano: d});
+    actual = mejor.x;
+  }
+  return cadena;
+}
+// Aplica los saltos que este cliente puede (creeps si es el GM, sus propios personajes) y avisa en la Mesa lo demás para hacerlo a mano.
+async function rayoCadenaAplicar(cadena){
+  const saltos = cadena.slice(1);
+  if(!saltos.length) return;
+  const hechos = [], manual = [];
+  for(const s of saltos){
+    const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
+    let ok = false;
+    try{
+      if(s.t.tipo === 'creep' && s.t.fichaId && soyGM){ await danioCreep(s.t, String(s.dano), true); ok = true; }
+      else if(s.t.tipo === 'pj' && s.t.fichaId && !String(s.t.fichaId).includes(SEP_INVOCACION) && puedoMover(s.t)){ await danioPj(s.t, String(s.dano), true); ok = true; }
+    }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
+    (ok ? hechos : manual).push(`${nombre}: ${s.dano}`);
+  }
+  alertaRojaAnonima('⚡ Rayo en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeado hacia arriba). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
 }
 
 async function hudHpAplicar(t, texto){
@@ -7647,7 +7700,9 @@ async function hudHpAplicar(t, texto){
     const golpe = leerGolpe(texto);
     const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
     const txtDanio = crit ? String(golpe * hpCritMult) : texto;
-    if(t.tipo === 'creep') await danioCreep(t, txtDanio, crit); else await danioPj(t, txtDanio, crit);
+    const directo = crit || (hpRayo && golpe !== null);   // el rayo también va directo a la vida
+    if(t.tipo === 'creep') await danioCreep(t, txtDanio, directo); else await danioPj(t, txtDanio, directo);
+    if(hpRayo && golpe !== null) rayoCadenaAplicar(rayoCadena(idTok, golpe));   // salta a los cercanos (no espera: se avisa en la Mesa)
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){
@@ -7953,7 +8008,7 @@ function hudConectar(t){
   hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
     // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
     if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
-      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; hpCritMult = 1; }
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; hpCritMult = 1; hpRayo = false; }
       hudEditando = ''; pedirDibujo();
       return;
     }
@@ -7962,6 +8017,7 @@ function hudConectar(t){
   });
   // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
   hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-rayo]').forEach(b => b.onclick = () => { hpRayo = !hpRayo; if(hpRayo) hpCritMult = 1; pedirDibujo(); });
   hud.querySelectorAll('[data-hud-critmult]').forEach(b => b.onclick = () => { hpCritMult = Math.max(1, Math.min(4, num(b.dataset.hudCritmult))); pedirDibujo(); });
   hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir({defensor: seleccion || ''}); });
   const campoHp = hud.querySelector('[data-hud-hp-in]');

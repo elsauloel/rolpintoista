@@ -41,6 +41,7 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 .decision button[data-d=descartar].on{background:var(--bad);border-color:var(--bad)}
 textarea{width:100%;min-height:44px;margin-top:6px;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:inherit;font-size:14px;resize:vertical}
 details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+.camb,.avis{font-size:12.5px;margin:4px 0;border-left:3px solid var(--copper);padding:2px 10px;background:var(--panel2);border-radius:0 4px 4px 0}.avis{border-left-color:var(--warn)}.camb ul,.avis ul{margin:2px 0 2px 16px;padding:0}
 .vacio{padding:30px;text-align:center;color:var(--muted)}
 .leyenda{font-size:12.5px;color:var(--muted);margin:0 0 10px}
 </style>
@@ -120,10 +121,12 @@ function tarjeta(a){
       </div>
       <div class="val">
         <div><span class="cont">Hoy:</span> <b>${a.precioHoy != null ? '$' + a.precioHoy : '—'}</b> (${esc(a.tier)})</div>
-        <div><span class="cont">Nuevo:</span> <b>$${n.precio}</b> · ${esc(n.tier)} · ${n.pc} pts${ex}</div>
+        <div><span class="cont">Nuevo:</span> <b>$${n.precio}</b> · <b>${esc(n.tier)}</b>${n.tier !== a.tier ? ` <span class="ex">(hoy ${esc(a.tier)})</span>` : ''} · ${n.pc} pts${ex}</div>
         <details><summary>cómo se calculó</summary><div class="det">${esc(desg)}</div></details>
       </div>
     </div>
+    ${(a.cambios || []).length ? `<div class="camb"><b>Cambios propuestos por las reglas nuevas:</b><ul>${a.cambios.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${(a.avisos || []).length ? `<div class="avis"><b>A decidir:</b><ul>${a.avisos.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
     ${a.detalle ? `<div class="det">${esc(a.detalle)}</div>` : ''}
     <div class="decision">${botones}</div>
     <textarea data-nota placeholder="Nota (ej.: está bien pero muy cara; le quitaría el efecto; cambiar el nombre…)">${esc(d.nota || '')}</textarea>

@@ -21,6 +21,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "parry +2, pdg +1",
   "nuevo": {
@@ -65,6 +68,9 @@
     "detalle": "Veneno severo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1100,
   "detalle": "critico +2, dza +2, aplica veneno severo",
   "nuevo": {
@@ -105,6 +111,9 @@
     "detalle": "Si entra, el objetivo cae al suelo (recordatorio: aplicarlo a mano)."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 230,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1. Puede Derribar (25%).",
   "nuevo": {
@@ -139,6 +148,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
@@ -177,6 +189,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 900,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +7. PdG +2.",
   "nuevo": {
@@ -211,6 +226,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
   "nuevo": {
@@ -255,6 +273,11 @@
     "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Sangrado» está fuera del universo de la familia (rango): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 1850,
   "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +8. Crítico frecuente +2. Provoca Sangrado (50%).",
   "nuevo": {
@@ -289,6 +312,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
   "nuevo": {
@@ -323,6 +349,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 160,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +5.",
   "nuevo": {
@@ -357,6 +386,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
@@ -391,6 +423,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
@@ -425,6 +460,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
@@ -465,6 +503,11 @@
     "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (rango): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 260,
   "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +5. Puede Romper armadura (25%).",
   "nuevo": {
@@ -499,6 +542,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
@@ -533,6 +579,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
@@ -567,6 +616,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Arma de dos manos, Tipo 6. Parry +1.",
   "nuevo": {
@@ -596,6 +648,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "Arma de una mano, Tipo 10: 1 dado de daño +1 fijo.",
   "nuevo": {
@@ -638,6 +693,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 800,
   "detalle": "parry+2, bloqueo +1, alcance +1",
   "nuevo": {
@@ -676,6 +734,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
@@ -714,6 +775,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
@@ -752,6 +816,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
@@ -786,7 +853,7 @@
    },
    {
     "stat": "rangocasteo",
-    "val": 5
+    "val": 3
    },
    {
     "stat": "bonos",
@@ -794,16 +861,23 @@
    }
   ],
   "efectos": [],
+  "cambios": [
+   "rangocasteo +5 → +3 (máximo +3 por stat)"
+  ],
+  "avisos": [
+   "Tiene 7 puntos de bonos y un Excepcional admite hasta 4: recortar o subir de tier"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 200,
   "detalle": "+2 a Especial, +5 a Rango de Casteo, +2 Bonos.",
   "nuevo": {
-   "pc": 12.7,
+   "pc": 11.5,
    "tier": "Raro",
-   "precio": 210,
+   "precio": 170,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 8.1,
+    "bonos": 6.9,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -823,6 +897,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 10: 1 dado de daño.",
   "nuevo": {
@@ -857,6 +934,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 69,
   "detalle": "parry +1",
   "nuevo": {
@@ -891,6 +971,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "Parry +2",
   "nuevo": {
@@ -925,6 +1008,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "Parry +2",
   "nuevo": {
@@ -960,6 +1046,9 @@
     "detalle": "Sangrado de 2 HP por turno."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 900,
   "detalle": "Deja sangrando x2hp",
   "nuevo": {
@@ -995,6 +1084,11 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (cortante): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "Rompe armadura",
   "nuevo": {
@@ -1024,6 +1118,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 30,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
   "nuevo": {
@@ -1053,6 +1150,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 30,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
   "nuevo": {
@@ -1082,6 +1182,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
   "nuevo": {
@@ -1116,6 +1219,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +1",
   "nuevo": {
@@ -1144,25 +1250,24 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Ignora 1 punto de resistencia al crítico",
   "nuevo": {
-   "pc": 9.6,
-   "tier": "Buena Calidad",
-   "precio": 130,
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 5.2,
+    "efectos": 0.0,
     "peso del arma": -0.2
    }
   }
@@ -1179,25 +1284,24 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Ignora 1 punto de resistencia al crítico",
   "nuevo": {
-   "pc": 9.6,
-   "tier": "Buena Calidad",
-   "precio": 130,
+   "pc": 4.3,
+   "tier": "Común",
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 5.2,
+    "efectos": 0.0,
     "peso del arma": -0.2
    }
   }
@@ -1220,6 +1324,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +1",
   "nuevo": {
@@ -1249,6 +1356,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
   "nuevo": {
@@ -1287,6 +1397,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "parry+1, bloqueo+1",
   "nuevo": {
@@ -1325,6 +1438,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "parry+1, bloqueo+1",
   "nuevo": {
@@ -1354,6 +1470,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 30,
   "detalle": "Arma de una mano, Tipo 6: 1 dado de daño.",
   "nuevo": {
@@ -1383,6 +1502,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
   "nuevo": {
@@ -1418,6 +1540,9 @@
     "detalle": "Aplicale Veneno al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "envenena x 50% de chances",
   "nuevo": {
@@ -1448,16 +1573,16 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Ignora armadura",
-    "prob": 50,
-    "detalle": "Si entra, el golpe ignora la Defensa del objetivo."
-   },
-   {
     "nombre": "Drena vida",
     "prob": 100,
     "detalle": "Te curás tanto HP como el daño que hiciste."
    }
   ],
+  "cambios": [
+   "Quitar «Ignora armadura» (ya no existe en el diseño nuevo)"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1300,
   "detalle": "50% de chances de ignorar armadura. Drena hp igual al daño ejercido",
   "nuevo": {
@@ -1493,6 +1618,9 @@
     "detalle": "Aplicale Veneno al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "envenena x 50% de chances",
   "nuevo": {
@@ -1522,6 +1650,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
   "nuevo": {
@@ -1551,6 +1682,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
   "nuevo": {
@@ -1585,6 +1719,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +2",
   "nuevo": {
@@ -1619,6 +1756,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +2",
   "nuevo": {
@@ -1653,6 +1793,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +2",
   "nuevo": {
@@ -1693,6 +1836,9 @@
     "detalle": "Aplicale Veneno al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 500,
   "detalle": "pdg+2, envenena",
   "nuevo": {
@@ -1731,6 +1877,11 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [
+   "Tiene 5 puntos de bonos y un Excepcional admite hasta 4: recortar o subir de tier"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 500,
   "detalle": "parry +2, bloqueo +3",
   "nuevo": {
@@ -1760,6 +1911,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 170,
   "detalle": "Arma de dos manos, Tipo 8.",
   "nuevo": {
@@ -1800,6 +1954,9 @@
     "detalle": "Si entra, la armadura del objetivo se rompe (recordatorio: aplicarlo a mano)."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1900,
   "detalle": "Arma de dos manos, Tipo 10. Daño +2. Puede Romper armadura (50%).",
   "nuevo": {
@@ -1834,6 +1991,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "Crítico frecuente +1",
   "nuevo": {
@@ -1868,6 +2028,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "crítico +1",
   "nuevo": {
@@ -1902,6 +2065,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "crítico +1",
   "nuevo": {
@@ -1936,6 +2102,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Modificador: +1 a iniciativa",
   "nuevo": {
@@ -1971,6 +2140,9 @@
     "detalle": "Al calcular el crítico, el objetivo tiene 2 menos de resistencia."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 80,
   "detalle": "Ingora 2 de resistencia al crítico",
   "nuevo": {
@@ -2001,7 +2173,7 @@
   "bonos": [
    {
     "stat": "crit",
-    "val": 4
+    "val": 2
    }
   ],
   "efectos": [
@@ -2016,23 +2188,29 @@
     "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
    },
    {
-    "nombre": "Primera sangre",
+    "nombre": "Sangrado",
     "prob": 100,
     "detalle": "El primer golpe a cada enemigo es doble crítico garantizado."
    }
   ],
+  "cambios": [
+   "«Primera sangre» pasa a «Sangrado»",
+   "Crítico frecuente +4 → +2 (el rango del crítico no baja de 2: un Tipo 4 aprovecha 2 puntos)"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1300,
   "detalle": "Crítico frecuente +4. Deja Sangrado. Ignora 1 de resistencia al crítico. Primera sangre: el primer golpe asestado a cada enemigo, es doble crítico garantizado. Efecto secreto por set completo.",
   "nuevo": {
-   "pc": 20.6,
+   "pc": 23.1,
    "tier": "Excepcional",
-   "precio": 600,
+   "precio": 750,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
     "bonos": 0.0,
     "crítico": 10.5,
-    "efectos": 7.8,
+    "efectos": 10.2,
     "peso del arma": -0.2
    }
   }
@@ -2049,25 +2227,24 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "Ingora 1 de resistencia al crítico",
   "nuevo": {
-   "pc": 9.6,
-   "tier": "Buena Calidad",
-   "precio": 130,
+   "pc": 6.6,
+   "tier": "Común",
+   "precio": 85,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 3.0,
+    "efectos": 0.0,
     "peso del arma": -0.4
    }
   }
@@ -2096,6 +2273,9 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 550,
   "detalle": "sangrado, +1 pdg",
   "nuevo": {
@@ -2124,18 +2304,13 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Ignora armadura",
-    "prob": 100,
-    "detalle": "El golpe ignora la Defensa del objetivo."
-   },
-   {
-    "nombre": "Golpes seguidos",
-    "prob": 100,
-    "detalle": "Cada golpe seguido al mismo enemigo suma +1 al daño fijo."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora armadura» (ya no existe en el diseño nuevo)",
+   "Quitar «Golpes seguidos» (ya no existe en el diseño nuevo)"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1100,
   "detalle": "Ignora armadura. Cada golpe consecutivo al mismo enemigo aumenta en 1 el daño fijo del hacha.",
   "nuevo": {
@@ -2165,6 +2340,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Arma de una mano, Tipo 10: 2 dados de daño.",
   "nuevo": {
@@ -2203,6 +2381,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 400,
   "detalle": "parry +2, bloqueo +2",
   "nuevo": {
@@ -2243,6 +2424,11 @@
     "detalle": "Aplicale Sangrado al objetivo (recordatorio: aplicarlo a mano)."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Sangrado» está fuera del universo de la familia (contundente): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 880,
   "detalle": "Arma de dos manos, Tipo 10. Crítico frecuente +1. Provoca Sangrado (50%).",
   "nuevo": {
@@ -2274,22 +2460,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 25,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (25 %) en tier Común"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Rompe armadura.",
   "nuevo": {
-   "pc": 8.3,
-   "tier": "Buena Calidad",
-   "precio": 150,
-   "exceso": 1,
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -2306,25 +2497,24 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "ignora 1 de resistencia al crítico",
   "nuevo": {
-   "pc": 10.8,
+   "pc": 8.6,
    "tier": "Buena Calidad",
-   "precio": 160,
+   "precio": 110,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 2.2,
+    "efectos": 0.0,
     "peso del arma": -0.4
    }
   }
@@ -2353,6 +2543,9 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
@@ -2383,28 +2576,36 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Arruina armadura",
+    "nombre": "Rompe armadura",
     "prob": 100,
     "detalle": "Aplicale el estado Armadura rota al objetivo (suma 3 stacks)."
    },
    {
     "nombre": "Lisiado",
-    "prob": 100,
+    "prob": 75,
     "detalle": "Aplicale Lisiado al objetivo."
    }
   ],
+  "cambios": [
+   "«Arruina armadura» pasa a «Rompe armadura»",
+   "«Lisiado» ya no es 100 %: 75 % (Legendario)"
+  ],
+  "avisos": [
+   "«Lisiado» está fuera del universo de la familia (hacha): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 1200,
   "detalle": "Arruina armadura. +2 a la fuerza. deja lisiado",
   "nuevo": {
-   "pc": 22.7,
+   "pc": 25.6,
    "tier": "Excepcional",
-   "precio": 700,
+   "precio": 900,
    "exceso": 0,
    "desglose": {
     "daño": 19.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 4.5,
+    "efectos": 7.4,
     "peso del arma": -0.8
    }
   }
@@ -2429,22 +2630,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 33,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "Rompe armadura. +1 al bloqueo",
   "nuevo": {
-   "pc": 13.6,
-   "tier": "Raro",
-   "precio": 350,
-   "exceso": 1,
+   "pc": 10.9,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 0,
    "desglose": {
     "daño": 9.0,
     "bonos": 1.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.3,
     "peso del arma": -0.4
    }
   }
@@ -2462,6 +2668,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 250,
   "detalle": "Arma de dos manos, Tipo 10.",
   "nuevo": {
@@ -2493,22 +2702,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 25,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (25 %) en tier Común"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "Rompe armadura",
   "nuevo": {
-   "pc": 12.6,
-   "tier": "Raro",
-   "precio": 450,
-   "exceso": 2,
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 190,
+   "exceso": 1,
    "desglose": {
     "daño": 9.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.0,
     "peso del arma": -0.4
    }
   }
@@ -2528,22 +2742,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 33,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 100,
   "detalle": "Rompe armadura.",
   "nuevo": {
-   "pc": 9.3,
-   "tier": "Buena Calidad",
-   "precio": 120,
+   "pc": 6.6,
+   "tier": "Común",
+   "precio": 85,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.3,
     "peso del arma": -0.2
    }
   }
@@ -2565,25 +2784,25 @@
     "nombre": "Rompe armadura",
     "prob": 100,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
-   },
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
    }
   ],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "Rompe armadura. Ignora 1 resistencia al crítico",
   "nuevo": {
-   "pc": 19.1,
-   "tier": "Excepcional",
-   "precio": 800,
-   "exceso": 1,
+   "pc": 16.9,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 0,
    "desglose": {
     "daño": 13.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 6.2,
+    "efectos": 4.0,
     "peso del arma": -0.6
    }
   }
@@ -2610,6 +2829,11 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [
+   "Tiene 5 puntos de bonos y un Excepcional admite hasta 4: recortar o subir de tier"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 500,
   "detalle": "parry +2, bloqueo +3",
   "nuevo": {
@@ -2639,6 +2863,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 100,
   "detalle": "Arma de una mano, Tipo 8: 2 dados de daño +1 fijo.",
   "nuevo": {
@@ -2669,23 +2896,28 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Arruina armadura",
+    "nombre": "Rompe armadura",
     "prob": 100,
     "detalle": "Aplicale el estado Armadura rota al objetivo (suma 1 stack)."
    }
   ],
+  "cambios": [
+   "«Arruina armadura» pasa a «Rompe armadura»"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arruina armadura",
   "nuevo": {
-   "pc": 8.6,
-   "tier": "Buena Calidad",
-   "precio": 110,
+   "pc": 12.6,
+   "tier": "Raro",
+   "precio": 200,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 4.0,
     "peso del arma": -0.4
    }
   }
@@ -2710,22 +2942,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 33,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "Rompe armadura. +1 al bloqueo",
   "nuevo": {
-   "pc": 13.6,
-   "tier": "Raro",
-   "precio": 350,
-   "exceso": 1,
+   "pc": 10.9,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 0,
    "desglose": {
     "daño": 9.0,
     "bonos": 1.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.3,
     "peso del arma": -0.4
    }
   }
@@ -2743,6 +2980,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Arma de una mano, Tipo 8: 2 dados de daño.",
   "nuevo": {
@@ -2783,6 +3023,11 @@
     "detalle": "Te curás la mitad del daño que hiciste."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Drena vida» está fuera del universo de la familia (hacha): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 600,
   "detalle": "Rompe armadura. Drena 50% del daño.",
   "nuevo": {
@@ -2823,6 +3068,9 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
@@ -2854,22 +3102,27 @@
   "efectos": [
    {
     "nombre": "Rompe armadura",
-    "prob": 100,
+    "prob": 25,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [
+   "«Rompe armadura» con porcentaje (25 %) en tier Común"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "Rompe armadura.",
   "nuevo": {
-   "pc": 8.3,
-   "tier": "Buena Calidad",
-   "precio": 150,
-   "exceso": 1,
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 4.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -2893,6 +3146,9 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 115,
   "detalle": "50% de dejar sangrando",
   "nuevo": {
@@ -2923,23 +3179,28 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Arruina armadura",
+    "nombre": "Rompe armadura",
     "prob": 100,
     "detalle": "Aplicale el estado Armadura rota al objetivo (suma 2 stacks)."
    }
   ],
+  "cambios": [
+   "«Arruina armadura» pasa a «Rompe armadura»"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 450,
   "detalle": "Crítico aumentado. Arruina armadura.",
   "nuevo": {
-   "pc": 12.9,
+   "pc": 16.9,
    "tier": "Raro",
-   "precio": 210,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 13.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 4.0,
     "peso del arma": -0.6
    }
   }
@@ -2963,6 +3224,9 @@
     "detalle": "Aplicale Veneno al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "50% de chances de envenenar",
   "nuevo": {
@@ -2992,6 +3256,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 8: 1 dado de daño.",
   "nuevo": {
@@ -3026,6 +3293,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
   "nuevo": {
@@ -3060,6 +3330,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
   "nuevo": {
@@ -3094,6 +3367,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3129,6 +3405,9 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "sangrado 50%",
   "nuevo": {
@@ -3164,6 +3443,9 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "sangrado 50%",
   "nuevo": {
@@ -3202,6 +3484,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "pdg+2, crítico +1",
   "nuevo": {
@@ -3240,6 +3525,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "pdg+2, crítico +1",
   "nuevo": {
@@ -3274,6 +3562,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3308,6 +3599,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 65,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1.",
   "nuevo": {
@@ -3342,6 +3636,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3376,6 +3673,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3411,6 +3711,9 @@
     "detalle": "Prende fuego al objetivo: 1d8 por cada stack de fuego."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 2000,
   "detalle": "Lanzallamas basico a dos manos, Rango 4. Prende fuego. 1d8 por stack de fuego.",
   "nuevo": {
@@ -3444,25 +3747,24 @@
     "val": 1
    }
   ],
-  "efectos": [
-   {
-    "nombre": "Ignora 1 de Res. crítico",
-    "prob": 100,
-    "detalle": "Al calcular el crítico, el objetivo tiene 1 menos de resistencia."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 150,
   "detalle": "Ignora 1 de res al crítico, alcance +1",
   "nuevo": {
-   "pc": 13.0,
+   "pc": 11.2,
    "tier": "Raro",
-   "precio": 220,
+   "precio": 160,
    "exceso": 0,
    "desglose": {
     "daño": 11.0,
     "bonos": 0.6,
     "crítico": 0.0,
-    "efectos": 1.8,
+    "efectos": 0.0,
     "peso del arma": -0.4
    }
   }
@@ -3486,6 +3788,11 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (cortante): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "romper armadura 50%",
   "nuevo": {
@@ -3524,6 +3831,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "Parry+2, bloqueo+1",
   "nuevo": {
@@ -3558,6 +3868,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 160,
   "detalle": "Alcance +1.",
   "nuevo": {
@@ -3592,6 +3905,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 150,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3621,6 +3937,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 100,
   "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
   "nuevo": {
@@ -3649,13 +3968,12 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [
-   {
-    "nombre": "Explosión",
-    "prob": 100,
-    "detalle": "Daño explosivo en un cono de 3 hex detrás del objetivo."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Explosión» (ya no existe en el diseño nuevo)"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1600,
   "detalle": "Hace daño explosivo en forma de cono de 3 hex detrás del objetivo golpeado",
   "nuevo": {
@@ -3690,6 +4008,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 115,
   "detalle": "bloqueo +1",
   "nuevo": {
@@ -3724,6 +4045,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 135,
   "detalle": "bloqueo +2",
   "nuevo": {
@@ -3758,6 +4082,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "alcance +1",
   "nuevo": {
@@ -3788,23 +4115,31 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Pajaritos",
-    "prob": 100,
+    "nombre": "Lisiado",
+    "prob": 50,
     "detalle": "El objetivo queda aturdido (pajaritos)."
    }
   ],
+  "cambios": [
+   "«Pajaritos» pasa a «Lisiado»",
+   "«Lisiado» ya no es 100 %: 50 % (Excepcional)"
+  ],
+  "avisos": [
+   "«Lisiado» está fuera del universo de la familia (contundente): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 850,
   "detalle": "Deja en pajaritos",
   "nuevo": {
-   "pc": 16.7,
-   "tier": "Raro",
-   "precio": 350,
+   "pc": 18.9,
+   "tier": "Excepcional",
+   "precio": 500,
    "exceso": 0,
    "desglose": {
     "daño": 17.3,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 2.2,
     "peso del arma": -0.6
    }
   }
@@ -3827,6 +4162,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "Arma de una mano, Tipo 10: 4 dados de daño. Parry +1.",
   "nuevo": {
@@ -3862,6 +4200,9 @@
     "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 950,
   "detalle": "Arma de dos manos, Tipo 12. Puede Aturdir (25%).",
   "nuevo": {
@@ -3896,6 +4237,11 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [
+   "Tiene 3 puntos de bonos y un Buena Calidad admite hasta 2: recortar o subir de tier"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "bloqueo +3",
   "nuevo": {
@@ -3925,6 +4271,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Daño amplificado.",
   "nuevo": {
@@ -3959,6 +4308,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 160,
   "detalle": "Bloqueo +3",
   "nuevo": {
@@ -3988,6 +4340,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
   "nuevo": {
@@ -4022,6 +4377,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "bloqueo +1",
   "nuevo": {
@@ -4057,23 +4415,28 @@
   ],
   "efectos": [
    {
-    "nombre": "Media armadura",
+    "nombre": "Rompe armadura",
     "prob": 100,
     "detalle": "La mitad del daño ignora la Defensa del objetivo."
    }
   ],
+  "cambios": [
+   "«Media armadura» pasa a «Rompe armadura»"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1400,
   "detalle": "La mitad del daño ignora armadura. bloqueo +3",
   "nuevo": {
-   "pc": 25.8,
-   "tier": "Excepcional",
-   "precio": 900,
+   "pc": 30.8,
+   "tier": "Legendario",
+   "precio": 1500,
    "exceso": 0,
    "desglose": {
     "daño": 23.6,
     "bonos": 3.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 5.0,
     "peso del arma": -0.8
    }
   }
@@ -4091,6 +4454,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 4: 2 dados de daño.",
   "nuevo": {
@@ -4131,6 +4497,11 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (punzante): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "alcance +1, 50% de romper armadura",
   "nuevo": {
@@ -4164,13 +4535,12 @@
     "val": 4
    }
   ],
-  "efectos": [
-   {
-    "nombre": "Estruendo",
-    "prob": 100,
-    "detalle": "El disparo se oye a la redonda: avisale al GM para que los cercanos se alerten."
-   }
+  "efectos": [],
+  "cambios": [
+   "Quitar «Estruendo» (ya no existe en el diseño nuevo)"
   ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 210,
   "detalle": "Arma de una mano a distancia, Tipo 8. Rango +4. El disparo hace ruido: alerta a los que estén cerca.",
   "nuevo": {
@@ -4209,6 +4579,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 780,
   "detalle": "Arma de una mano a distancia, Tipo 8. Rango +5. Crítico frecuente +1.",
   "nuevo": {
@@ -4238,6 +4611,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
   "nuevo": {
@@ -4273,6 +4649,11 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (punzante): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 100,
   "detalle": "Rompe armadura.",
   "nuevo": {
@@ -4308,6 +4689,9 @@
     "detalle": "Veneno de 4 stacks."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 850,
   "detalle": "Veneno stock 4",
   "nuevo": {
@@ -4346,6 +4730,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 1400,
   "detalle": "Parry +3, bloqueo +2, si bloquea con éxito, Gana derecho a un contraataque que no cuesta acciones",
   "nuevo": {
@@ -4390,6 +4777,11 @@
     "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Aturdir» está fuera del universo de la familia (rango): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 1500,
   "detalle": "Arma de una mano a distancia, Tipo 10. Rango +5. Crítico frecuente +2. Cada golpe puede dejar al objetivo Aturdido (50%).",
   "nuevo": {
@@ -4420,23 +4812,28 @@
   "bonos": [],
   "efectos": [
    {
-    "nombre": "Empuje",
+    "nombre": "Demora",
     "prob": 100,
     "detalle": "Lo empuja 2 casilleros (FUE vs CON). Si choca contra algo, daño directo igual a la diferencia."
    }
   ],
+  "cambios": [
+   "«Empuje» pasa a «Demora»"
+  ],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 900,
   "detalle": "Expulsa 2 casilleros para atrás + FUERZA vs CONST. Si choca contra algo, daño directo igual a la diferencia",
   "nuevo": {
-   "pc": 21.2,
+   "pc": 25.2,
    "tier": "Excepcional",
-   "precio": 650,
+   "precio": 850,
    "exceso": 0,
    "desglose": {
     "daño": 22.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 4.0,
     "peso del arma": -0.8
    }
   }
@@ -4460,6 +4857,11 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "«Rompe armadura» está fuera del universo de la familia (punzante): caso excepcional, solo si es puntual"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "50% chance de Romper armadura.",
   "nuevo": {
@@ -4494,6 +4896,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "iniciativa +1",
   "nuevo": {
@@ -4528,6 +4933,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "iniciativa +1",
   "nuevo": {
@@ -4566,6 +4974,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "pdg +1, parry +1",
   "nuevo": {
@@ -4604,6 +5015,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "pdg +1, parry +1",
   "nuevo": {
@@ -4638,6 +5052,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 80,
   "detalle": "pdg +1",
   "nuevo": {
@@ -4672,6 +5089,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "iniciativa +1",
   "nuevo": {
@@ -4706,6 +5126,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 80,
   "detalle": "pdg +1",
   "nuevo": {
@@ -4746,6 +5169,11 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
+  "cambios": [],
+  "avisos": [
+   "Lleva 2 efectos y un Raro admite 1"
+  ],
+  "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Rompe armadura. Sangrado.",
   "nuevo": {
@@ -4780,6 +5208,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 60,
   "detalle": "alcance +1",
   "nuevo": {
@@ -4814,6 +5245,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "bloqueo +1",
   "nuevo": {
@@ -4843,6 +5277,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar.",
   "nuevo": {
@@ -4872,6 +5309,9 @@
   "rango": false,
   "bonos": [],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza.",
   "nuevo": {
@@ -4912,6 +5352,9 @@
     "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Pincha justo en el tendón. PdG +1 y 25 % de Lisiado.",
   "nuevo": {
@@ -4950,6 +5393,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1.",
   "nuevo": {
@@ -4990,6 +5436,9 @@
     "detalle": "25 % de dejar Lisiado 3 turnos."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado.",
   "nuevo": {
@@ -5030,6 +5479,9 @@
     "detalle": "33 % de dejar Sangrado."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Fina como un pelo: +2 de daño fijo, PdG +1 y 33 % de Sangrado.",
   "nuevo": {
@@ -5072,6 +5524,9 @@
    }
   ],
   "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1.",
   "nuevo": {
@@ -5120,6 +5575,9 @@
     "detalle": "33 % de dejar Lisiado 3 turnos."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado.",
   "nuevo": {
@@ -5160,6 +5618,9 @@
     "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe.",
   "nuevo": {
@@ -5200,6 +5661,9 @@
     "detalle": "Veneno severo por 4 turnos en cada golpe."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe.",
   "nuevo": {
@@ -5248,6 +5712,9 @@
     "detalle": "50 % de dejar Lisiado 3 turnos."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado.",
   "nuevo": {
@@ -5297,6 +5764,9 @@
     "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
    }
   ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
   "precioHoy": null,
   "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida).",
   "nuevo": {
@@ -5309,6 +5779,528 @@
     "bonos": 2.0,
     "crítico": 10.5,
     "efectos": 8.8,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-espada-de-entrenamiento",
+  "nombre": "Espada de entrenamiento",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta.",
+  "nuevo": {
+   "pc": 3.3,
+   "tier": "Común",
+   "precio": 55,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-machete-de-chacarero",
+  "nombre": "Machete de chacarero",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo.",
+  "nuevo": {
+   "pc": 4.6,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.8,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-sable-de-abordaje-oxidado",
+  "nombre": "Sable de abordaje oxidado",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Herrumbre en el filo: 25 % de Sangrado.",
+  "nuevo": {
+   "pc": 3.8,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.5,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-espada-larga-de-infanteria",
+  "nombre": "Espada larga de infantería",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "La espada del soldado raso, bien balanceada. Parry +1.",
+  "nuevo": {
+   "pc": 7.6,
+   "tier": "Buena Calidad",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-cimitarra-del-desierto",
+  "nombre": "Cimitarra del desierto",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 33,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado.",
+  "nuevo": {
+   "pc": 9.1,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 8.3,
+    "bonos": 0.5,
+    "crítico": 0.0,
+    "efectos": 0.7,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-espada-de-la-guardia",
+  "nombre": "Espada de la guardia",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Entregada con el uniforme. Parry +1 y Crítico potente +1.",
+  "nuevo": {
+   "pc": 8.8,
+   "tier": "Buena Calidad",
+   "precio": 110,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 1.0,
+    "crítico": 1.2,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-katana-de-maestro",
+  "nombre": "Katana de maestro",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado.",
+  "nuevo": {
+   "pc": 13.1,
+   "tier": "Raro",
+   "precio": 220,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 2.5,
+    "crítico": 3.0,
+    "efectos": 1.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-sable-del-capitan-pirata",
+  "nombre": "Sable del capitán pirata",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico potente +1 y Sangrado en cada golpe.",
+  "nuevo": {
+   "pc": 13.5,
+   "tier": "Raro",
+   "precio": 230,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.7,
+    "bonos": 1.0,
+    "crítico": 1.2,
+    "efectos": 2.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-espada-vampirica-menor",
+  "nombre": "Espada vampírica menor",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Drena vida",
+    "prob": 100,
+    "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño).",
+  "nuevo": {
+   "pc": 12.6,
+   "tier": "Raro",
+   "precio": 200,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 5.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-espadon-de-acero-de-toledo",
+  "nombre": "Espadón de acero de Toledo",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico potente +2 y Sangrado en cada golpe.",
+  "nuevo": {
+   "pc": 19.6,
+   "tier": "Excepcional",
+   "precio": 550,
+   "exceso": 0,
+   "desglose": {
+    "daño": 14.0,
+    "bonos": 2.0,
+    "crítico": 2.4,
+    "efectos": 2.0,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "nuevo-katana-del-viento",
+  "nombre": "Katana del viento",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 50,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado.",
+  "nuevo": {
+   "pc": 20.8,
+   "tier": "Excepcional",
+   "precio": 600,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.5,
+    "bonos": 3.0,
+    "crítico": 6.0,
+    "efectos": 1.9,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-filo-del-capitan-sin-nombre",
+  "nombre": "Filo del Capitán Sin Nombre",
+  "origen": "nuevo · tanda 2",
+  "familia": "cortante",
+  "tier": "Legendario",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 3,
+  "danoFijo": 3,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 3
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 3
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 100,
+    "detalle": "Cada golpe deja Sangrado."
+   },
+   {
+    "nombre": "Envenenar",
+    "prob": 100,
+    "detalle": "Veneno severo por 5 turnos en cada golpe."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +3, Crítico potente +2, Sangrado y Veneno severo por 5 turnos en cada golpe.",
+  "nuevo": {
+   "pc": 34.5,
+   "tier": "Legendario",
+   "precio": 1900,
+   "exceso": 0,
+   "desglose": {
+    "daño": 14.5,
+    "bonos": 3.5,
+    "crítico": 11.4,
+    "efectos": 5.8,
     "peso del arma": -0.6
    }
   }

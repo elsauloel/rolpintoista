@@ -1,35 +1,605 @@
 [
- {"id": "nuevo-cuchillo-de-cocina-reconvertido", "nombre": "Cuchillo de cocina reconvertido", "tanda": 1, "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0,
-  "mods": [], "efectosGolpe": [], "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar."},
- {"id": "nuevo-estilete-de-practica", "nombre": "Estilete de práctica", "tanda": 1, "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 1,
-  "mods": [], "efectosGolpe": [], "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza."},
- {"id": "nuevo-lezna-de-zapatero", "nombre": "Lezna de zapatero", "tanda": 1, "tier": "Común", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 0,
-  "mods": [{"stat": "pdg", "val": 1}], "efectosGolpe": [{"nombre": "Lisiado", "caras": 4, "exitos": 1, "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."}],
-  "detalle": "Pincha justo en el tendón. PdG +1 y 25 % de Lisiado."},
- {"id": "nuevo-daga-de-duelo", "nombre": "Daga de duelo", "tanda": 1, "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 2, "danoFijo": 0,
-  "mods": [{"stat": "pdg", "val": 1}, {"stat": "crit", "val": 1}], "efectosGolpe": [], "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1."},
- {"id": "nuevo-lanza-de-leva", "nombre": "Lanza de leva", "tanda": 1, "tier": "Buena Calidad", "tipoItem": "arma_2m", "tipoDado": 4, "peso": 3, "danoFijo": 0,
-  "mods": [{"stat": "rng", "val": 1}], "efectosGolpe": [{"nombre": "Lisiado", "caras": 4, "exitos": 1, "detalle": "25 % de dejar Lisiado 3 turnos."}],
-  "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado."},
- {"id": "nuevo-aguja-de-acupunturista", "nombre": "Aguja de acupunturista", "tanda": 1, "tier": "Buena Calidad", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 1, "danoFijo": 2,
-  "mods": [{"stat": "pdg", "val": 1}], "efectosGolpe": [{"nombre": "Sangrado", "caras": 6, "exitos": 2, "detalle": "33 % de dejar Sangrado."}],
-  "detalle": "Fina como un pelo: +2 de daño fijo, PdG +1 y 33 % de Sangrado."},
- {"id": "nuevo-estoque-de-esgrima", "nombre": "Estoque de esgrima", "tanda": 1, "tier": "Raro", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 2, "danoFijo": 0,
-  "mods": [{"stat": "pdg", "val": 2}, {"stat": "crit", "val": 1}, {"stat": "rng", "val": 1}], "efectosGolpe": [],
-  "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1."},
- {"id": "nuevo-lanza-de-lisiar", "nombre": "Lanza de lisiar", "tanda": 1, "tier": "Raro", "tipoItem": "arma_2m", "tipoDado": 4, "peso": 3, "danoFijo": 0,
-  "mods": [{"stat": "rng", "val": 2}, {"stat": "pdg", "val": 1}, {"stat": "crit", "val": 1}], "efectosGolpe": [{"nombre": "Lisiado", "caras": 6, "exitos": 2, "detalle": "33 % de dejar Lisiado 3 turnos."}],
-  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado."},
- {"id": "nuevo-punal-envenenado", "nombre": "Puñal envenenado", "tanda": 1, "tier": "Raro", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 2, "danoFijo": 1,
-  "mods": [{"stat": "crit", "val": 1}], "efectosGolpe": [{"nombre": "Envenenar", "caras": 1, "exitos": 1, "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."}],
-  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe."},
- {"id": "nuevo-aguijon-de-la-reina-avispa", "nombre": "Aguijón de la Reina Avispa", "tanda": 1, "tier": "Excepcional", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 2, "danoFijo": 2,
-  "mods": [{"stat": "crit", "val": 2}], "efectosGolpe": [{"nombre": "Envenenar", "caras": 1, "exitos": 1, "detalle": "Veneno severo por 4 turnos en cada golpe."}],
-  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe."},
- {"id": "nuevo-lanza-del-alba", "nombre": "Lanza del alba", "tanda": 1, "tier": "Excepcional", "tipoItem": "arma_2m", "tipoDado": 4, "peso": 4, "danoFijo": 0,
-  "mods": [{"stat": "rng", "val": 2}, {"stat": "pdg", "val": 2}, {"stat": "crit", "val": 1}], "efectosGolpe": [{"nombre": "Lisiado", "caras": 2, "exitos": 1, "detalle": "50 % de dejar Lisiado 3 turnos."}],
-  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado."},
- {"id": "nuevo-colmillo-de-la-reina-arana", "nombre": "Colmillo de la Reina Araña", "tanda": 1, "tier": "Legendario", "tipoItem": "arma_1m", "tipoDado": 4, "peso": 3, "danoFijo": 3,
-  "mods": [{"stat": "crit", "val": 2}, {"stat": "pdg", "val": 2}], "efectosGolpe": [{"nombre": "Envenenar", "caras": 1, "exitos": 1, "detalle": "Veneno severo por 6 turnos en cada golpe."}, {"nombre": "Drena vida", "caras": 1, "exitos": 1, "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."}],
-  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida)."}
+ {
+  "id": "nuevo-cuchillo-de-cocina-reconvertido",
+  "nombre": "Cuchillo de cocina reconvertido",
+  "tanda": 1,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar."
+ },
+ {
+  "id": "nuevo-estilete-de-practica",
+  "nombre": "Estilete de práctica",
+  "tanda": 1,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza."
+ },
+ {
+  "id": "nuevo-lezna-de-zapatero",
+  "nombre": "Lezna de zapatero",
+  "tanda": 1,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."
+   }
+  ],
+  "detalle": "Pincha justo en el tendón. PdG +1 y 25 % de Lisiado."
+ },
+ {
+  "id": "nuevo-daga-de-duelo",
+  "nombre": "Daga de duelo",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico frecuente +1."
+ },
+ {
+  "id": "nuevo-lanza-de-leva",
+  "nombre": "Lanza de leva",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado."
+ },
+ {
+  "id": "nuevo-aguja-de-acupunturista",
+  "nombre": "Aguja de acupunturista",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Fina como un pelo: +2 de daño fijo, PdG +1 y 33 % de Sangrado."
+ },
+ {
+  "id": "nuevo-estoque-de-esgrima",
+  "nombre": "Estoque de esgrima",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "El arma de los duelistas: PdG +2, Crítico frecuente +1 y Alcance +1."
+ },
+ {
+  "id": "nuevo-lanza-de-lisiar",
+  "nombre": "Lanza de lisiar",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico frecuente +1 y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-punal-envenenado",
+  "nombre": "Puñal envenenado",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
+   }
+  ],
+  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico frecuente +1 y Veneno de 3 stacks en cada golpe."
+ },
+ {
+  "id": "nuevo-aguijon-de-la-reina-avispa",
+  "nombre": "Aguijón de la Reina Avispa",
+  "tanda": 1,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 4 turnos en cada golpe."
+   }
+  ],
+  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico frecuente +2 y Veneno severo por 4 turnos en cada golpe."
+ },
+ {
+  "id": "nuevo-lanza-del-alba",
+  "nombre": "Lanza del alba",
+  "tanda": 1,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico frecuente +1 y 50 % de Lisiado."
+ },
+ {
+  "id": "nuevo-colmillo-de-la-reina-arana",
+  "nombre": "Colmillo de la Reina Araña",
+  "tanda": 1,
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 6 turnos en cada golpe."
+   },
+   {
+    "nombre": "Drena vida",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
+   }
+  ],
+  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida)."
+ },
+ {
+  "id": "nuevo-espada-de-entrenamiento",
+  "nombre": "Espada de entrenamiento",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta."
+ },
+ {
+  "id": "nuevo-machete-de-chacarero",
+  "nombre": "Machete de chacarero",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo."
+ },
+ {
+  "id": "nuevo-sable-de-abordaje-oxidado",
+  "nombre": "Sable de abordaje oxidado",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Herrumbre en el filo: 25 % de Sangrado."
+ },
+ {
+  "id": "nuevo-espada-larga-de-infanteria",
+  "nombre": "Espada larga de infantería",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La espada del soldado raso, bien balanceada. Parry +1."
+ },
+ {
+  "id": "nuevo-cimitarra-del-desierto",
+  "nombre": "Cimitarra del desierto",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado."
+ },
+ {
+  "id": "nuevo-espada-de-la-guardia",
+  "nombre": "Espada de la guardia",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Entregada con el uniforme. Parry +1 y Crítico potente +1."
+ },
+ {
+  "id": "nuevo-katana-de-maestro",
+  "nombre": "Katana de maestro",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado."
+ },
+ {
+  "id": "nuevo-sable-del-capitan-pirata",
+  "nombre": "Sable del capitán pirata",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico potente +1 y Sangrado en cada golpe."
+ },
+ {
+  "id": "nuevo-espada-vampirica-menor",
+  "nombre": "Espada vampírica menor",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Drena vida",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
+   }
+  ],
+  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño)."
+ },
+ {
+  "id": "nuevo-espadon-de-acero-de-toledo",
+  "nombre": "Espadón de acero de Toledo",
+  "tanda": 2,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico potente +2 y Sangrado en cada golpe."
+ },
+ {
+  "id": "nuevo-katana-del-viento",
+  "nombre": "Katana del viento",
+  "tanda": 2,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado."
+ },
+ {
+  "id": "nuevo-filo-del-capitan-sin-nombre",
+  "nombre": "Filo del Capitán Sin Nombre",
+  "tanda": 2,
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 3
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 3
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   },
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 5 turnos en cada golpe."
+   }
+  ],
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +3, Crítico potente +2, Sangrado y Veneno severo por 5 turnos en cada golpe."
+ }
 ]

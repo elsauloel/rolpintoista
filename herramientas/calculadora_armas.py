@@ -215,6 +215,70 @@ def hoja():
     print('escrito docs/rework-armas-revision.md', len(armas), 'armas')
 
 
+# ---------------------------------------------------------------- reajuste de las armas ACTUALES a las reglas nuevas (propuesta automática, el dueño audita)
+MAPA_EFECTOS = {'Arruina armadura': 'Rompe armadura', 'Media armadura': 'Rompe armadura', 'Primera sangre': 'Sangrado', 'Empuje': 'Demora', 'Pajaritos': 'Lisiado', 'Knockdown': 'Demora'}
+DESCARTAR_EFECTOS = {'Ignora armadura', 'Golpes seguidos', 'Explosión', 'Estruendo', 'Agarrar'}
+MAX_BONOS = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 6}
+PROB_POR_TIER = {'Aturdir': {'Raro': (1, 6), 'Excepcional': (1, 4), 'Legendario': (1, 2)}, 'Lisiado': {'Común': (1, 4), 'Buena Calidad': (1, 4), 'Raro': (1, 3), 'Excepcional': (1, 2), 'Legendario': (3, 4)}}
+PROB_BAJA = {'Común': (1, 4), 'Buena Calidad': (1, 3)}   # Sangrado / Envenenar / Rompe armadura por debajo de Raro: con porcentaje
+TIER_MIN = {'Aturdir': 'Raro', 'Drena vida': 'Raro', 'Veneno severo': 'Excepcional'}
+
+
+def reajustar(arma):
+    """Copia del arma con las reglas nuevas aplicadas + lista de cambios/avisos (texto)."""
+    import copy
+    a = copy.deepcopy(arma)
+    cambios, avisos = [], []
+    tipo, tier = int(a.get('tipoDado') or 0), a['tier']
+    fam = familia(a)
+    # 1) efectos
+    nuevos = []
+    for e in a.get('efectosGolpe') or []:
+        n = e.get('nombre') or ''
+        if n.startswith('Ignora') and ('crít' in n.lower() or n.startswith('Ignora 1') or n.startswith('Ignora 2')):
+            if tipo in (4, 6) and ORDEN.index(tier) >= ORDEN.index('Raro'):
+                nuevos.append(e)
+            else:
+                cambios.append(f"Quitar «{n}»: solo va en armas de Tipo 4 y 6 desde Raro"); 
+            continue
+        if n in DESCARTAR_EFECTOS:
+            cambios.append(f"Quitar «{n}» (ya no existe en el diseño nuevo)"); continue
+        if n in MAPA_EFECTOS:
+            cambios.append(f"«{n}» pasa a «{MAPA_EFECTOS[n]}»"); e = dict(e, nombre=MAPA_EFECTOS[n]); n = e['nombre']
+        if n in ('Aturdir', 'Lisiado') and probabilidad(e) >= 0.99:
+            ce = PROB_POR_TIER.get(n, {}).get(tier)
+            if ce: e = dict(e, caras=ce[1], exitos=ce[0]); cambios.append(f"«{n}» ya no es 100 %: {round(100 * ce[0] / ce[1])} % ({tier})")
+        if n in ('Sangrado', 'Envenenar', 'Rompe armadura') and probabilidad(e) >= 0.99 and tier in PROB_BAJA and not (n == 'Rompe armadura' and fam == 'hacha' and False):
+            ce = PROB_BAJA[tier]; e = dict(e, caras=ce[1], exitos=ce[0]); cambios.append(f"«{n}» con porcentaje ({round(100 * ce[0] / ce[1])} %) en tier {tier}")
+        minimo = TIER_MIN.get(n)
+        if minimo and ORDEN.index(tier) < ORDEN.index(minimo):
+            avisos.append(f"«{n}» solo desde {minimo} (el arma es {tier}): decidir si sube de tier o pierde el efecto")
+        if n in PESO_EFECTO and fam not in CASA and False: pass
+        if n in PESO_EFECTO and n not in CASA.get(fam, ()) and fam not in HABILITADO.get(n, ()):
+            avisos.append(f"«{n}» está fuera del universo de la familia ({fam}): caso excepcional, solo si es puntual")
+        nuevos.append(e)
+    a['efectosGolpe'] = nuevos
+    # 2) bonos: Frecuente hasta el rango mínimo, máx. +3 por stat (el Alcance de las de rango no cuenta), total por tier
+    mods = []
+    for m in a.get('mods') or []:
+        m = dict(m); st, v = m['stat'], m['val']
+        if st == 'crit' and v > max(0, tipo - 2):
+            nv = max(0, tipo - 2)
+            if nv: m['val'] = nv; cambios.append(f"Crítico frecuente +{v} → +{nv} (el rango del crítico no baja de 2: un Tipo {tipo} aprovecha {nv} puntos)")
+            else: cambios.append(f"Quitar Crítico frecuente +{v} (no rinde en Tipo {tipo})"); continue
+        elif st not in ('crit', 'critpot') and v > 3 and not (st == 'rng' and a.get('armaDeRango')):
+            m['val'] = 3; cambios.append(f"{st} +{v} → +3 (máximo +3 por stat)")
+        mods.append(m)
+    total = sum(m['val'] for m in mods if m['stat'] not in ('crit', 'critpot') and not (m['stat'] == 'rng' and a.get('armaDeRango')))
+    if total > MAX_BONOS[tier]:
+        avisos.append(f"Tiene {total} puntos de bonos y un {tier} admite hasta {MAX_BONOS[tier]}: recortar o subir de tier")
+    a['mods'] = mods
+    tope_ef = {'Común': 1, 'Buena Calidad': 1, 'Raro': 1, 'Excepcional': 2, 'Legendario': 3}[tier]
+    if len(a['efectosGolpe']) > tope_ef:
+        avisos.append(f"Lleva {len(a['efectosGolpe'])} efectos y un {tier} admite {tope_ef}")
+    return a, cambios, avisos
+
+
 def cargar_nuevas():
     ruta = RAIZ / 'datos' / 'armas-nuevas.json'
     return json.load(open(ruta, encoding='utf-8')) if ruta.exists() else []
@@ -227,6 +291,10 @@ def ids_procesados():
     return {x['id'] for x in json.load(open(ruta, encoding='utf-8'))}
 
 
+def arma_original_tier(a):
+    return a['tier']
+
+
 def datos_auditoria():
     """Escribe datos/auditoria-armas-datos.json: las armas con sus valores nuevos, para la herramienta datos/auditoria-armas.html."""
     out = []
@@ -234,14 +302,18 @@ def datos_auditoria():
     for a in [dict(x, _origen='catálogo actual') for x in cargar()] + [dict(x, _origen='nuevo · tanda %s' % x.get('tanda', '?')) for x in cargar_nuevas()]:
         if (a.get('id') or a['nombre']) in procesadas:
             continue
+        cambios, avisos = [], []
+        if a['_origen'] == 'catálogo actual':
+            a, cambios, avisos = reajustar(a)   # las armas actuales se muestran ya con las reglas nuevas aplicadas
         pc, desglose = puntaje(a)
-        p, tc, ex = precio(pc, a['tier'])
+        p, tc, ex = precio(pc, arma_original_tier(a))
         out.append({
             'id': a.get('id') or a['nombre'], 'nombre': a['nombre'], 'origen': a['_origen'], 'familia': familia(a), 'tier': a['tier'],
             'manos': 2 if a['tipoItem'] == 'arma_2m' else 1, 'tipo': a.get('tipoDado'), 'peso': a.get('peso'), 'danoFijo': a.get('danoFijo') or 0,
             'rango': bool(a.get('armaDeRango')),
             'bonos': [{'stat': m['stat'], 'val': m['val']} for m in (a.get('mods') or [])],
             'efectos': [{'nombre': e.get('nombre'), 'prob': round(100 * probabilidad(e)), 'detalle': e.get('detalle', '')} for e in (a.get('efectosGolpe') or [])],
+            'cambios': cambios, 'avisos': avisos, 'bonos_hoy': None,
             'precioHoy': a.get('precioCompra'), 'detalle': (a.get('detalle') or a.get('descripcionNarrativa') or '')[:220],
             'nuevo': {'pc': round(pc, 1), 'tier': tc, 'precio': p, 'exceso': ex, 'desglose': {k: round(v, 1) for k, v in desglose.items()}},
         })

@@ -1160,6 +1160,7 @@ let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
+let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
@@ -1826,10 +1827,27 @@ function trampasGuardadasHtml(){
   if(!trampasGuardadas.length) return `<label class="etiqueta">Trampas</label><button type="button" class="btn chico" id="trampas-catalogo" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button>`;
   return `<label class="etiqueta">Trampas guardadas</label><button type="button" class="btn chico" id="trampas-catalogo" style="margin-bottom:4px" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button><div class="trampas-guardadas">${trampasGuardadas.map((g, i) => `<div class="tg-fila"><button type="button" class="btn chico tg-usar" data-tg-usar="${i}" title="${esc(g.detalle || '')}">${esc(g.nombre)}${g.amiga ? ' · 🔥' : ''}</button><button type="button" class="btn chico" data-tg-proponer="${i}" title="Proponerla al catálogo de trampas para que el dueño la evalúe">📤</button><button type="button" class="btn chico peligro" data-tg-borrar="${i}" title="Borrar de las guardadas">✕</button></div>`).join('')}</div>`;
 }
+// Estado automático de una trampa (2026-09-24): los debuffs de EstadosAplicar con duración (Escarcha, Pajaritos, Rengo, Stun…).
+// Al pisarla se aplica solo a quien la activa (y a los de adentro si es de área), con los turnos que se elijan al colocarla.
+function trampaEstadoPresets(){
+  return (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.DEBUFFS : []).filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno);
+}
+function trampaEstadoTurnosPreset(nombre){
+  const p = trampaEstadoPresets().find(x => x.nombre === nombre);
+  return p ? num(p.turnos) : 0;
+}
+function trampaEstadoOpcionesHtml(elegido){
+  return `<option value="">Ninguno</option>` + trampaEstadoPresets().map(p => `<option value="${esc(p.nombre)}"${p.nombre === elegido ? ' selected' : ''}>${esc(p.nombre)}</option>`).join('');
+}
+// El JSON que se guarda en la trampa (trampaEstado): {nombre, turnos}. '' si no deja ningún estado.
+function trampaEstadoSpec(){
+  if(!elemTrampaEstado || !trampaEstadoPresets().some(p => p.nombre === elemTrampaEstado)) return '';
+  return JSON.stringify({nombre: elemTrampaEstado, turnos: elemTrampaEstadoTurnos > 0 ? elemTrampaEstadoTurnos : trampaEstadoTurnosPreset(elemTrampaEstado)});
+}
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
 function cargarTrampaEnPanel(g){
   if(!g) return;
-  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef;
+  elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef; elemTrampaEstado = g.estado || ''; elemTrampaEstadoTurnos = Math.max(0, Math.round(num(g.estadoTurnos)) || 0);
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
   elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(g.tamano)) || 1));
   if(/^#[0-9a-fA-F]{6}$/.test(g.color || '')) elemColor = g.color;
@@ -5062,7 +5080,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
-      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {})} : {}),
+      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -8192,6 +8210,10 @@ function renderHerramientaFlotante(){
       ${elemTrampa ? `<input type="text" id="elem-trampa-nombre" maxlength="40" placeholder="Nombre de la trampa" value="${esc(elemTrampaNombre)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-detalle" maxlength="200" placeholder="Qué hace (ej. foso: 2d6 de daño)" value="${esc(elemTrampaDetalle)}" style="margin-top:6px">
       <input type="text" id="elem-trampa-dano" maxlength="12" placeholder="Daño automático (ej. 2d6; vacío = solo avisa)" value="${esc(elemTrampaDano)}" style="margin-top:6px" title="Al dispararse, el mapa tira este daño solo y se lo aplica a quien la activa (restando su Defensa)">
+      <label class="etiqueta" style="margin-top:8px">Estado que deja (automático)</label>
+      <select id="elem-trampa-estado">${trampaEstadoOpcionesHtml(elemTrampaEstado)}</select>
+      ${elemTrampaEstado ? `<label class="etiqueta">Duración del estado (turnos)</label>
+      <input type="number" id="elem-trampa-estado-turnos" min="0" max="20" step="1" value="${elemTrampaEstadoTurnos || ''}" placeholder="${trampaEstadoTurnosPreset(elemTrampaEstado)} (el del estado)" title="Cuántos turnos dura el estado en quien pise la trampa; lo elegís vos al colocarla">` : ''}
       <label class="tk-lapiz-check" title="Sí: el daño automático NO se reduce por la Defensa de quien la pisa (daño directo). No: se le resta su Defensa, como un golpe."><input type="checkbox" id="elem-trampa-ignora-def"${elemTrampaIgnoraDef ? ' checked' : ''}> El daño <b>${elemTrampaIgnoraDef ? 'IGNORA' : 'respeta'}</b> la Defensa (${elemTrampaIgnoraDef ? 'daño directo' : 'se le resta su Defensa'})</label>
       <label class="tk-lapiz-check" title="Sí: también la disparan tus aliados (y vos). No: solo los rivales."><input type="checkbox" id="elem-trampa-amiga"${elemTrampaAmiga ? ' checked' : ''}> Fuego amigo: <b>${elemTrampaAmiga ? 'SÍ' : 'NO'}</b> (la disparan también los aliados)</label>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
@@ -8234,7 +8256,7 @@ $('#herramienta-flotante').addEventListener('click', e => {
     const nombre = elemTrampaNombre.trim();
     if(!nombre){ toast('Ponele un nombre a la trampa para guardarla'); return; }
     const g = {nombre: nombre.slice(0, 40), detalle: elemTrampaDetalle.trim().slice(0, 200), amiga: elemTrampaAmiga,
-      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', ignoraDef: elemTrampaIgnoraDef};
+      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos};
     guardarTrampaRecurrente(g);
     toast(`Trampa "${g.nombre}" guardada`);
     return;
@@ -8334,6 +8356,12 @@ $('#herramienta-flotante').addEventListener('change', e => {
     renderHerramientaFlotante();
     return;
   }
+  if(e.target.id === 'elem-trampa-estado'){
+    elemTrampaEstado = e.target.value;
+    if(!elemTrampaEstado) elemTrampaEstadoTurnos = 0;
+    renderHerramientaFlotante();
+    return;
+  }
   if(e.target.id === 'elem-trampa-ignora-def'){
     elemTrampaIgnoraDef = e.target.checked;
     renderHerramientaFlotante();
@@ -8367,6 +8395,7 @@ $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }
+  if(e.target.id === 'elem-trampa-estado-turnos'){ elemTrampaEstadoTurnos = Math.max(0, Math.min(20, Math.round(num(e.target.value)) || 0)); return; }
   if(e.target.id === 'niebla-radio'){
     nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
     const et = e.target.previousElementSibling;

@@ -6850,6 +6850,8 @@ const EFECTOS_PRESET = [
     detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
+  {nombre:'Escarcha', polaridad:'debuff', turnos:2, mods:[{stat:'nitros', val:-1}],
+    detalle:'Escarcha: se le congela el impulso, −1 a sus No2 máximos mientras dure. La duración la elige quien la coloca.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,

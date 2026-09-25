@@ -38,6 +38,7 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 | [[Cansado y Exhausto\|Cansado / Exhausto]] | debuff | Menos Nitros |
 | [[Rengo]] | debuff | Moverse cuesta el doble |
 | [[Inmovilizado]] | debuff | No te podés mover |
+| Escarcha | debuff | −1 a los No2 máximos; la duración la elige quien coloca la trampa |
 | [[Sentado]] | debuff (CC) | Evasión a la mitad, no podés atacar ni hacer dodge roll; levantarte cuesta 1 No2 |
 | [[Armadura rota]] | debuff | −1 Defensa por acumulación |
 | [[Escudo mágico]] | buff | Barra extra de HP |

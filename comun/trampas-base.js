@@ -14,17 +14,17 @@
   const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const AVISO = '(Trampa creada automáticamente: requiere auditar.)';
   const lista = [];
-  // tr(nombre, nivel, etiquetas, forma, tamaño, color, daño automático ('' si no hace), qué hace (≤200), fuego amigo?, ignora la Defensa?)
+  // tr(nombre, nivel, etiquetas, forma, tamaño, color, daño automático ('' si no hace), qué hace (≤200), fuego amigo?, ignora la Defensa?, estado automático {nombre, turnos}?)
   // ignoraDef: el daño automático va DIRECTO a la vida (fuego, hielo, electricidad y explosiones, 2026-09-24); si no, se le resta la Defensa como a un golpe (lo físico).
-  function tr(nombre, nivel, etiquetas, tipo, tamano, color, dano, detalle, amiga, ignoraDef){
+  function tr(nombre, nivel, etiquetas, tipo, tamano, color, dano, detalle, amiga, ignoraDef, estado){
     const auto = dano
       ? `tira ${dano} de daño y se lo aplica a quien la activa (${ignoraDef ? 'directo a la vida: ignora su Defensa' : 'restando su Defensa'})${tamano > 1 && tipo === 'flor' ? '; en el área, también a los creeps si mueve el GM, y a los demás se les avisa en la Mesa' : ''}`
       : 'solo avisa en la Mesa cuando se dispara';
     lista.push({
       poolId: 'trampa-' + slug(nombre), nombre, nivel,
       etiquetas: [...etiquetas, 'nivel ' + nivel, 'auditar'],
-      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: la disparan también los aliados.' : ''} ⚙ Automático: ${auto}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
-      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {})},
+      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: la disparan también los aliados.' : ''} ⚙ Automático: ${auto}${estado ? `; deja el estado ${estado.nombre} (los turnos los elegís al colocarla)` : ''}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
+      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...(estado ? {estado: estado.nombre, estadoTurnos: estado.turnos} : {})},
     });
   }
 
@@ -74,7 +74,7 @@
   tr('Niebla de confusión', 3, ['control', 'mágica', 'área'], 'flor', 2, '#B784E0', '',
     'Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita.');
   tr('Trampa de escarcha', 3, ['daño', 'debuff', 'mágica'], 'flor', 1, '#7FB3D5', '2d6',
-    'Hielo repentino: 2d6 de daño (automático), pierde 2 No2 y queda Rengo 2 turnos (a mano). Res.Mg contra 12 evita lo último.', false, true);
+    'Hielo repentino: 2d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano).', false, true, {nombre: 'Escarcha', turnos: 2});
   tr('Descarga eléctrica', 3, ['daño', 'control', 'mágica'], 'flor', 1, '#E6D84A', '3d6',
     '3d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun.', false, true);
   tr('Succión arcana', 3, ['debuff', 'mágica'], 'flor', 1, '#5B7FA6', '',

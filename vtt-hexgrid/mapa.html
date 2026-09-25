@@ -2768,7 +2768,7 @@ function renderIniciativa(){
       const puede = puedeEditarIniciativa(t);
       return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${oculto ? '🙈 ' : ''}${esc(nombre)}</span>` +
+        <span class="ini-nombre">${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
@@ -3627,6 +3627,28 @@ function dibujar(){
       ctx.strokeStyle = HP_COLOR; ctx.lineWidth = Math.max(2 / z, rad * 0.14);
       const k = rad * 0.45;
       ctx.beginPath(); ctx.moveTo(x - k, y - k); ctx.lineTo(x + k, y + k); ctx.moveTo(x + k, y - k); ctx.lineTo(x - k, y + k); ctx.stroke();
+    }
+
+    // Insignia en la esquina de arriba a la derecha: 🙈 = oculto por el GM, 🥷 = en sigilo
+    // (los dos bajan a media transparencia y se confundían). Con los dos a la vez, el 🥷 va al lado.
+    {
+      const marcas = [];
+      if(t.oculto) marcas.push('🙈');
+      if(enSigilo(t)) marcas.push('🥷');
+      if(marcas.length){
+        const alfaPrevio = ctx.globalAlpha;
+        ctx.globalAlpha = 1;
+        const rm = Math.max(6 / z, rad * 0.3);
+        marcas.forEach((m, i) => {
+          const mx = x + rad * 0.62 - i * rm * 2.1, my = y - rad * 0.62;
+          ctx.beginPath(); ctx.arc(mx, my, rm, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(15,12,14,.8)'; ctx.fill();
+          ctx.font = `${rm * 1.35}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+          ctx.fillStyle = '#fff';
+          ctx.fillText(m, mx, my + rm * 0.08);
+        });
+        ctx.globalAlpha = alfaPrevio;
+      }
     }
 
     // Barras: vida (roja) y, en los PJ, SP (azul), justo debajo del token.

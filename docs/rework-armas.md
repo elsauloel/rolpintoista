@@ -39,7 +39,7 @@ propone y el dueño audita.
 3. ✅ **¿Una mano y dos manos?** *Propuesta:* ~80 % una mano, ~20 % dos manos (más Peso y más efectos a cambio de ocupar las dos manos).
 
 ### B · Efectos
-4. 🟡 **¿Cuántos efectos distintos habrá y cuáles?** *(en curso: ver "Elaboración de efectos")* *Propuesta:* los de la guía (Rompe armadura, Knockdown, Aturdir, Lisiado, Sangrado, Envenenar, Derribar, Agarrar, Prende fuego, Drena vida) + un puñado de "modificadores" (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). Repartirlos parejo: hoy uno solo (Rompe armadura) está en 13 % de las armas.
+4. ✅ **¿Cuántos efectos distintos habrá y cuáles?** *(cerrada 2026-09-25: ver "Respuestas y decisiones")* *Propuesta:* los de la guía (Rompe armadura, Knockdown, Aturdir, Lisiado, Sangrado, Envenenar, Derribar, Agarrar, Prende fuego, Drena vida) + un puñado de "modificadores" (Ignora N de Res. crítico, Ignora armadura, Crítico frecuente/potente). Repartirlos parejo: hoy uno solo (Rompe armadura) está en 13 % de las armas.
 5. ⬜ **¿Cuántos efectos lleva un arma según su tier?** *Propuesta:* Común 0 (algunas 1) · Buena calidad 0–1 · Raro 1 · Excepcional 1–2 · Legendario 2–3.
 6. ⬜ **¿Con qué probabilidad se aplican?** *Propuesta:* Común/Buena 25 % · Raro 50 % · Excepcional 75 % · Legendario 100 % (o efectos extra del 100 %). Se tira con moneda/d4 como hoy.
 7. ⬜ **¿Qué peso tiene cada efecto para valorizar el arma?** *Propuesta (escala 1 a 5, provisoria):* Aturdir 5 · Rompe armadura 4 · Knockdown 4 · Drena vida 4 · Lisiado 3 · Sangrado 3 · Envenenar 3 · Agarrar 3 · Prende fuego 3 · Derribar 2 · Ignora 1 de Res. crítico 2. Se multiplica por un factor según sea **de casa** (×1), **habilitado** (×1,25) o **excepcional** (×1,5) para la familia.
@@ -124,3 +124,25 @@ Pregunta del dueño: "¿los puntos de +1 se pueden manifestar como Crítico frec
 - **Comparación:** contra **R=0** gana Frecuente (Ignora vale 0). Contra **R=1** gana Ignora (T4 +0,75 vs +0,50; T6 +0,73 vs +0,28; T10 +0,70 vs +0,17). Contra **R=2** también Ignora, por menos margen.
 - **Consecuencia:** el valor de "Ignora N" depende de **cuánta resistencia haya en el mundo**, o sea del diseño de la defensa (fase 2) y de la escasez por slots (P114). Como la resistencia es más común en Tipo 4 y 6, "Ignora N" rinde sobre todo ahí.
 - **Convención de precio propuesta:** **1 punto de Frecuente ≈ 1 punto de Ignora** al calcular el puntaje de calidad, pero **son dos efectos distintos** (no se puede cambiar uno por otro sin cambiar cómo se comporta el arma). Se revisa cuando esté diseñada la defensa.
+- **2026-09-25 · P4 (cierre), modificadores:** "Está bien, los dejamos así." → **Crítico frecuente/potente en las armas** (puntos por tier): **Común 0 · Buena calidad +1 · Raro +1 o +2 · Excepcional +2 o +3 · Legendario hasta +5** (el tope). **Ignora N de Res. crítico:** solo en armas de **Tipo 4 y 6**; **"Ignora 1" desde tier Raro**; **peso 3**; convención de precio **1 punto de Frecuente ≈ 1 punto de Ignora** (son efectos distintos). **La pregunta 4 queda cerrada.**
+- **Lista FINAL de efectos de arma (P4):** **Rompe armadura** (hachas) · **Demora** (contundentes) · **Aturdir** (contundentes) · **Lisiado** (punzantes) · **Sangrado** (cortantes) · **Envenenar** (habilitado en lo que tiene filo y en las de rango; también **Veneno severo** en Excepcionales y Legendarias) · **Derribar** · **Prende fuego** · **Drena vida** · modificadores: **Crítico frecuente**, **Crítico potente**, **Ignora N de Res. crítico**. *(Fuera: Agarrar, Arruina armadura, Media armadura, Ignora armadura.)*
+
+### Propuesta de cierre de P5, P6 y P7 (2026-09-25; sin responder)
+Con todo lo decidido para cada efecto, queda armada una tabla resumen para confirmar o ajustar:
+
+| Efecto | Peso | Probabilidad / aplicación por tier | Tier mínimo |
+|---|---|---|---|
+| Aturdir | 5 | Raro 10–15 % · Excepcional 25 % · Legendario 33–50 % (nunca 100 %) | Raro |
+| Rompe armadura | 4 | 100 % solo en armas buenas (tier alto); con % en tiers bajos; 1 stack/golpe (Excepcional+ puede 2; Rara con % de 2) | Común (con %) |
+| Demora | 4 | por definir (propuesta: Raro 25 % · Excepcional 50 % · Legendario 75 %) | Buena calidad |
+| Drena vida | 4 | % del daño como palanca de valor (propuesta: 25 % Raro · 40 % Excepcional · 50 % Legendario); legendaria con Excedente | Raro |
+| Lisiado | 3 | Buena 25 % · Raro 33 % · Excepcional 50 % · Legendario 75 % (alguna única 100 %) | Buena calidad |
+| Derribar | 3 | solo probabilidad (propuesta: como Lisiado) | Buena calidad |
+| Prende fuego | 3–4 | terreno incendiado: común daño 3 en 1 casilla; legendaria daño 5 en flor de 1 | Buena calidad |
+| Veneno severo | 3 | 100 % o % en Excepcional y Legendario, X turnos (Exc 3–4, Leg 4–6) | Excepcional |
+| Sangrado | 2 | 100 % desde Raro; Común/Buena con % | Común (con %) |
+| Envenenar | 2 | 100 % desde Raro (stacks: Común 2 · Buena 2–3 · Raro 3–4 · Excepcional 4–5 · Legendario 5–8); Común/Buena con % | Común (con %) |
+| Ignora 1 Res. crítico | 3 | según crítico | Raro (Tipo 4 y 6) |
+| Crítico frecuente/potente (por punto) | 3 | Común 0 · Buena +1 · Raro +1/+2 · Exc +2/+3 · Leg hasta +5 | Buena calidad |
+
+**Cantidad de efectos por arma (P5, propuesta):** Común 0 (algunas 1 con %) · Buena calidad 0–1 · Raro 1 · Excepcional 1–2 · Legendario 2–3. **Modulación por familia (P7):** multiplicar el peso por ×1 (efecto de casa), ×1,25 (habilitado) o ×1,5 (excepcional para esa familia).

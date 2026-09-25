@@ -11,6 +11,9 @@
 > familia tenga *su sabor* propio; que **otra familia use esa mecánica es posible pero excepcional** (una hacha que sangra por ser especial, no porque
 > sí). Si algo se puede automatizar, se automatiza; si no, se aclara (⚙ / ✋). Y "equipo" incluye **las armas**, no solo lo defensivo.
 
+## 0. Criterios generales de diseño (dichos por el dueño)
+- **Los Nitros (No2) son un recurso MUY preciado** (2026-09-25). Se usan para acciones ofensivas, defensivas y para moverse, así que cada turno el jugador **optimiza y maximiza** su uso. Al diseñar **skills y objetos**, un costo en Nitros pesa mucho: 1 Nitro no es "casi gratis". Un arma o skill que cuesta pocos Nitros es barata *de verdad* y suele ser de calidad baja; los costos bajos hay que ganárselos con calidad o con límites. Ver también P112 (peso de los efectos) y P116 (armas mágicas).
+
 ## 1. Familias de arma y su mecánica "de casa"
 
 | Familia | Mecánica de casa | Otras (excepcional) | Estado en el juego |

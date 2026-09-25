@@ -6815,5 +6815,493 @@
     "peso del arma": -0.8
    }
   }
+ },
+ {
+  "id": "nuevo-garrote-de-pastor",
+  "nombre": "Garrote de pastor",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren.",
+  "nuevo": {
+   "pc": 5.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-mazo-de-carnicero",
+  "nombre": "Mazo de carnicero",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo.",
+  "nuevo": {
+   "pc": 6.1,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-porra-de-guardia",
+  "nombre": "Porra de guardia",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Reglamentaria. Bloqueo +1.",
+  "nuevo": {
+   "pc": 6.3,
+   "tier": "Común",
+   "precio": 80,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-maza-de-guerra",
+  "nombre": "Maza de guerra",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Cabeza de hierro y mucha convicción.",
+  "nuevo": {
+   "pc": 10.6,
+   "tier": "Buena Calidad",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-martillo-de-herrero",
+  "nombre": "Martillo de herrero",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "El que da forma al acero: +1 de daño fijo, Bloqueo +1, Parry +1 y 25 % de Demora.",
+  "nuevo": {
+   "pc": 9.1,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 1.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-estrella-del-alba",
+  "nombre": "Estrella del alba",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 33,
+    "detalle": "33 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Bola con púas en cadena. +1 de daño fijo y 33 % de romper armadura.",
+  "nuevo": {
+   "pc": 7.8,
+   "tier": "Buena Calidad",
+   "precio": 85,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.3,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.7,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-martillo-de-sargento",
+  "nombre": "Martillo de sargento",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 17,
+    "detalle": "17 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Ordena a golpes: Bloqueo +1, Parry +1 y algo menos de 1 chance en 5 de Aturdir.",
+  "nuevo": {
+   "pc": 13.4,
+   "tier": "Raro",
+   "precio": 230,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 0.8,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-maza-de-justicia",
+  "nombre": "Maza de justicia",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Pesada y solemne. 25 % de Demora.",
+  "nuevo": {
+   "pc": 16.9,
+   "tier": "Raro",
+   "precio": 350,
+   "exceso": 0,
+   "desglose": {
+    "daño": 16.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 1.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-cachiporra-reforzada",
+  "nombre": "Cachiporra reforzada",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Con anillos de hierro: +2 de daño fijo, Bloqueo +1 y 25 % de Demora.",
+  "nuevo": {
+   "pc": 14.2,
+   "tier": "Raro",
+   "precio": 260,
+   "exceso": 0,
+   "desglose": {
+    "daño": 12.6,
+    "bonos": 1.0,
+    "crítico": 0.0,
+    "efectos": 1.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-martillo-de-guerra-a-dos-manos",
+  "nombre": "Martillo de guerra a dos manos",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 25,
+    "detalle": "25 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Se levanta con los dos brazos y baja con la ley: Bloqueo +2 y 25 % de Aturdir.",
+  "nuevo": {
+   "pc": 24.4,
+   "tier": "Excepcional",
+   "precio": 800,
+   "exceso": 0,
+   "desglose": {
+    "daño": 22.0,
+    "bonos": 2.0,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "nuevo-maza-del-penasco",
+  "nombre": "Maza del Peñasco",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Excepcional",
+  "manos": 1,
+  "tipo": 10,
+  "peso": 3,
+  "danoFijo": 2,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 50,
+    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Una piedra con mango: +2 de daño fijo, Bloqueo +2, Parry +1 y 50 % de Demora.",
+  "nuevo": {
+   "pc": 22.5,
+   "tier": "Excepcional",
+   "precio": 700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 18.1,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 2.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-mazo-del-juicio-final",
+  "nombre": "Mazo del Juicio Final",
+  "origen": "nuevo · tanda 4",
+  "familia": "contundente",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 4,
+  "danoFijo": 3,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 33,
+    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   },
+   {
+    "nombre": "Demora",
+    "prob": 75,
+    "detalle": "75 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Dicen que suena una sola vez. A dos manos: +3 de daño fijo, Bloqueo +3, Parry +2, 33 % de Aturdir y 75 % de Demora.",
+  "nuevo": {
+   "pc": 33.3,
+   "tier": "Legendario",
+   "precio": 1700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 24.4,
+    "bonos": 5.0,
+    "crítico": 0.0,
+    "efectos": 4.7,
+    "peso del arma": -0.8
+   }
+  }
  }
 ]

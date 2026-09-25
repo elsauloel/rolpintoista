@@ -901,5 +901,274 @@
    }
   ],
   "detalle": "Se dice que cortó la última veta del mundo. A dos manos: +3 de daño fijo, Bloqueo +3, Alcance +1, 2 stacks de Armadura rota y Sangrado en cada golpe."
+ },
+ {
+  "id": "nuevo-garrote-de-pastor",
+  "nombre": "Garrote de pastor",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren."
+ },
+ {
+  "id": "nuevo-mazo-de-carnicero",
+  "nombre": "Mazo de carnicero",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo."
+ },
+ {
+  "id": "nuevo-porra-de-guardia",
+  "nombre": "Porra de guardia",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Reglamentaria. Bloqueo +1."
+ },
+ {
+  "id": "nuevo-maza-de-guerra",
+  "nombre": "Maza de guerra",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Cabeza de hierro y mucha convicción."
+ },
+ {
+  "id": "nuevo-martillo-de-herrero",
+  "nombre": "Martillo de herrero",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "El que da forma al acero: +1 de daño fijo, Bloqueo +1, Parry +1 y 25 % de Demora."
+ },
+ {
+  "id": "nuevo-estrella-del-alba",
+  "nombre": "Estrella del alba",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Bola con púas en cadena. +1 de daño fijo y 33 % de romper armadura."
+ },
+ {
+  "id": "nuevo-martillo-de-sargento",
+  "nombre": "Martillo de sargento",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 6,
+    "exitos": 1,
+    "detalle": "17 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "detalle": "Ordena a golpes: Bloqueo +1, Parry +1 y algo menos de 1 chance en 5 de Aturdir."
+ },
+ {
+  "id": "nuevo-maza-de-justicia",
+  "nombre": "Maza de justicia",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Pesada y solemne. 25 % de Demora."
+ },
+ {
+  "id": "nuevo-cachiporra-reforzada",
+  "nombre": "Cachiporra reforzada",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Con anillos de hierro: +2 de daño fijo, Bloqueo +1 y 25 % de Demora."
+ },
+ {
+  "id": "nuevo-martillo-de-guerra-a-dos-manos",
+  "nombre": "Martillo de guerra a dos manos",
+  "tanda": 4,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "detalle": "Se levanta con los dos brazos y baja con la ley: Bloqueo +2 y 25 % de Aturdir."
+ },
+ {
+  "id": "nuevo-maza-del-penasco",
+  "nombre": "Maza del Peñasco",
+  "tanda": 4,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 3,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Una piedra con mango: +2 de daño fijo, Bloqueo +2, Parry +1 y 50 % de Demora."
+ },
+ {
+  "id": "nuevo-mazo-del-juicio-final",
+  "nombre": "Mazo del Juicio Final",
+  "tanda": 4,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 4,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   },
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Dicen que suena una sola vez. A dos manos: +3 de daño fijo, Bloqueo +3, Parry +2, 33 % de Aturdir y 75 % de Demora."
  }
 ]

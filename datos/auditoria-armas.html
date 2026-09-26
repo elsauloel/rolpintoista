@@ -153,7 +153,10 @@ function filtradas(){
     precio: (a, b) => a.nuevo.precio - b.nuevo.precio,
     pc: (a, b) => a.nuevo.pc - b.nuevo.pc,
   }[o];
-  return l.sort(cmp);
+  l.sort(cmp);
+  // Lo ya marcado (cualquier botón) va al final, en el orden en que se marcó: lo pendiente queda siempre arriba.
+  const marcada = a => (dec.decisiones[a.id] || {}).d ? 1 : 0, cuando = a => (dec.decisiones[a.id] || {}).t || 0;
+  return [...l.filter(a => !marcada(a)), ...l.filter(marcada).sort((a, b) => cuando(a) - cuando(b))];
 }
 
 function contadores(){
@@ -173,6 +176,7 @@ $('#lista').addEventListener('click', e => {
   const b = e.target.closest('button[data-d]'); if(!b) return;
   const id = b.closest('.tarjeta').dataset.id, cur = dec.decisiones[id] || {};
   cur.d = cur.d === b.dataset.d ? '' : b.dataset.d;   // otro clic en el mismo botón lo desmarca
+  cur.t = cur.d ? Date.now() : 0;   // la pieza marcada pasa al final de la lista, en el orden en que se fue marcando
   dec.decisiones[id] = cur;
   guardarLocal();
   const y = scrollY; dibujar(); scrollTo(0, y);

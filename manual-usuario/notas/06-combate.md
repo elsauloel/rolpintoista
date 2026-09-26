@@ -109,8 +109,8 @@ Si elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqu
 > - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].
 > - **Defensa activa** (esta nota): la elección Evasión / Parry.
 
-> [!question] Cadena Parry → Bloqueo
-> Hoy cada tirada es suelta y la resuelve la mesa. Falta definir: ¿el Bloqueo es *tu Bloqueo contra el del atacante*? ¿Qué pasa si ganás el Parry pero **perdés** el Bloqueo (¿pasa el golpe entero, reducido, algo intermedio)?
+> [!success] Cadena Parry → Bloqueo (cerrada 2026-09-26)
+> Con arma **o con escudo**: el **Parry** se tira contra el **PdG** del atacante y cuesta el **Peso** de lo que usás. Si ganás, el **Bloqueo** es un **enfrentamiento de sumas**: **tu Bloqueo (Fuerza) + Peso del arma o escudo** contra **la Fuerza del atacante + Peso de su arma** (cada uno convierte su suma en dado; el atacante usa 🎲 *Fuerza del golpe*). Si ganás el Bloqueo, el golpe queda anulado. *A confirmar:* si perdés el Bloqueo, el golpe entra completo.
 
 > [!question] Otras dudas
 > - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?
@@ -159,8 +159,8 @@ El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Par
 - Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).
 - Sin nada equipado, el Bloqueo no suma peso.
 
-> [!question] ¿Contra qué se tira?
-> La regla original dice "bloque vs. bloqueo": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano.
+> [!success] ¿Contra qué se tira? (cerrada 2026-09-26)
+> Es un **enfrentamiento de sumas**: tu Bloqueo (Fuerza) + Peso del arma o escudo del Parry **contra** la Fuerza del atacante + Peso de su arma. El atacante tira con el botón 🎲 **Fuerza del golpe**.
 
 +++
 titulo: Defensa

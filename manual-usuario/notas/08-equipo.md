@@ -61,8 +61,18 @@ Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bl
 > [!example] Del catálogo
 > *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).
 
-> [!question] Escudos en la defensa
-> El **Parry con escudo** todavía no está definido ([[Defenderse de un ataque]]).
+## Cómo se usa un escudo (regla cerrada por el dueño, 2026-09-26)
+Un escudo hace **dos cosas**:
+1. **Protege por lo que trae puesto:** da **[[Defensa]]** y, a veces, **[[Resistencia a crítico]]** de algún Tipo (dentro de sus características base, como cualquier pieza).
+2. **Sirve para parar**, **casi igual que parar con un arma** ([[Defenderse de un ataque]]):
+   - Tirás **Parry contra el PdG del atacante** (una sola tirada enfrentada, de golpe).
+   - **Cuesta tantos Nitros como el Peso del escudo.**
+   - Si el **Parry sale bien**, se tira el **Bloqueo**: **Peso del escudo + tu Fuerza** contra **Peso del arma del atacante + su Fuerza** (cada lado convierte esa suma en dado). Si **ganás el Bloqueo, el golpe queda anulado**.
+   - El atacante hace su parte con el botón **🎲 Fuerza del golpe** (Fuerza + peso de su arma), en la ficha y en las tarjetas de los creeps.
+
+> [!question] Lo que sigue abierto
+> - Si ganás el Parry pero **perdés el Bloqueo**: propuesta (a confirmar) **el golpe entra completo** (con tu Defensa como siempre) y los Nitros del Parry ya se gastaron.
+> - Se descarta por ahora la idea de **darles HP a los escudos** (no forma parte de esta regla).
 
 +++
 titulo: Armaduras y piezas de defensa

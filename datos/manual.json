@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-25T21:50:27Z",
+ "actualizado": "2026-09-26T11:46:17Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -694,7 +694,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!question] Cadena Parry → Bloqueo\n> Hoy cada tirada es suelta y la resuelve la mesa. Falta definir: ¿el Bloqueo es *tu Bloqueo contra el del atacante*? ¿Qué pasa si ganás el Parry pero **perdés** el Bloqueo (¿pasa el golpe entero, reducido, algo intermedio)?\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?"
+   "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!success] Cadena Parry → Bloqueo (cerrada 2026-09-26)\n> Con arma **o con escudo**: el **Parry** se tira contra el **PdG** del atacante y cuesta el **Peso** de lo que usás. Si ganás, el **Bloqueo** es un **enfrentamiento de sumas**: **tu Bloqueo (Fuerza) + Peso del arma o escudo** contra **la Fuerza del atacante + Peso de su arma** (cada uno convierte su suma en dado; el atacante usa 🎲 *Fuerza del golpe*). Si ganás el Bloqueo, el golpe queda anulado. *A confirmar:* si perdés el Bloqueo, el golpe entra completo.\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?"
   },
   {
    "id": "evasion",
@@ -742,7 +742,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).\n- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).\n- Sin nada equipado, el Bloqueo no suma peso.\n\n> [!question] ¿Contra qué se tira?\n> La regla original dice \"bloque vs. bloqueo\": ¿es tu Bloqueo contra el Bloqueo del atacante, o contra otra cosa? Hoy la mesa lo resuelve a mano."
+   "cuerpo": "El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Parry]]: si ganaste el Parry, tirás Bloqueo; si ganás también esa, **el golpe queda completamente anulado**.\n\n- Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).\n- Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).\n- Sin nada equipado, el Bloqueo no suma peso.\n\n> [!success] ¿Contra qué se tira? (cerrada 2026-09-26)\n> Es un **enfrentamiento de sumas**: tu Bloqueo (Fuerza) + Peso del arma o escudo del Parry **contra** la Fuerza del atacante + Peso de su arma. El atacante tira con el botón 🎲 **Fuerza del golpe**."
   },
   {
    "id": "defensa",
@@ -1303,7 +1303,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bloqueo]]** o **[[Parry]]**. Los hay de **una mano** (podés combinarlos con un arma) y de **dos manos** (más grandes: con uno equipado no llevás arma).\n\n> [!example] Del catálogo\n> *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).\n\n> [!question] Escudos en la defensa\n> El **Parry con escudo** todavía no está definido ([[Defenderse de un ataque]])."
+   "cuerpo": "Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bloqueo]]** o **[[Parry]]**. Los hay de **una mano** (podés combinarlos con un arma) y de **dos manos** (más grandes: con uno equipado no llevás arma).\n\n> [!example] Del catálogo\n> *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).\n\n## Cómo se usa un escudo (regla cerrada por el dueño, 2026-09-26)\nUn escudo hace **dos cosas**:\n1. **Protege por lo que trae puesto:** da **[[Defensa]]** y, a veces, **[[Resistencia a crítico]]** de algún Tipo (dentro de sus características base, como cualquier pieza).\n2. **Sirve para parar**, **casi igual que parar con un arma** ([[Defenderse de un ataque]]):\n   - Tirás **Parry contra el PdG del atacante** (una sola tirada enfrentada, de golpe).\n   - **Cuesta tantos Nitros como el Peso del escudo.**\n   - Si el **Parry sale bien**, se tira el **Bloqueo**: **Peso del escudo + tu Fuerza** contra **Peso del arma del atacante + su Fuerza** (cada lado convierte esa suma en dado). Si **ganás el Bloqueo, el golpe queda anulado**.\n   - El atacante hace su parte con el botón **🎲 Fuerza del golpe** (Fuerza + peso de su arma), en la ficha y en las tarjetas de los creeps.\n\n> [!question] Lo que sigue abierto\n> - Si ganás el Parry pero **perdés el Bloqueo**: propuesta (a confirmar) **el golpe entra completo** (con tu Defensa como siempre) y los Nitros del Parry ya se gastaron.\n> - Se descarta por ahora la idea de **darles HP a los escudos** (no forma parte de esta regla)."
   },
   {
    "id": "armaduras-y-piezas-de-defensa",

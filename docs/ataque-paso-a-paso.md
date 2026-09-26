@@ -84,8 +84,8 @@ Solo aparecen esos botones (no la Botonera).
 Cada tirada usa la misma regla de empate (gana la que no lleva «+»; si no, par o impar), y todo se anuncia con su veredicto grande y en la Mesa.
 
 **Preguntas abiertas (propuesta entre paréntesis):**
-1. ¿El defensor elige la defensa **antes** de ver el PdG? (sí, a ciegas)
-2. Gana el Parry pero **pierde el Bloqueo**: ¿el golpe entra completo? (sí; queda a confirmar si se reduce)
+1. ✅ (dueño, 2026-09-26) El defensor elige la defensa **antes** de ver el PdG (a ciegas).
+2. ✅ (dueño, 2026-09-26) Gana el Parry pero **pierde el Bloqueo**: **pasa la mitad del daño y se consume 1 punto de durabilidad** del arma o escudo con el que bloqueó. Nace la mecánica de **durabilidad** (armas y escudos = 2 por punto de Peso; las armaduras también se rompen): ver [`durabilidad.md`](durabilidad.md).
 3. **Crítico con Parry:** hoy el crítico se calcula con PdG − Evasión. ¿Contra un Parry se usa PdG − Parry? (sí, contra la defensa que usó; y si el Bloqueo frena el golpe, no hay crítico)
 4. ¿El **contraataque** se ofrece con cualquier Parry ganado o solo si además se ganó el Bloqueo? (con cualquier Parry ganado, como dice la regla)
 5. ¿Hay un **tiempo límite** para elegir defensa (por ejemplo, si no elige en X segundos, el GM decide)? (no, el GM puede elegir por él)

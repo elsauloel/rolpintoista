@@ -99,3 +99,4 @@
 - [ ] **Ataque paso a paso (duelo en vivo)**: propuesta en `ataque-paso-a-paso.md`; falta que el dueño responda las preguntas y decida cuándo (P-Duelo).
 - [~] (2026-09-26, falta probar) **Duelo, etapa 1** hecha (`comun/duelo.js`): elegir objetivo, aviso al defensor, PdG vs Evasión con veredicto. **Hay que pegar las reglas de Firestore (`duelos`).** Sigue: clic en el token del mapa, Parry/Bloqueo, crítico, daño, efectos con «Aplicar». Ver `ataque-paso-a-paso.md`.
 - [ ] **Duelo de hechizos** (Especial contra Resistencia mágica/mental, con el cuadro compartido y solo los botones que corresponden): pedido del dueño 2026-09-26; ver `ataque-paso-a-paso.md`.
+- [ ] **Durabilidad** de armas, escudos y armaduras en todo el catálogo (2 por punto de Peso; se gasta 1 al perder el Bloqueo): diseño en `durabilidad.md`, faltan las preguntas del dueño (P-Durabilidad); después, campo en el inventario, ficha y cuadro del duelo.

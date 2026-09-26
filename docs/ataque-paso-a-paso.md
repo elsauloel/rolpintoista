@@ -80,12 +80,12 @@ Solo aparecen esos botones (no la Botonera).
 **Camino B · Parry:** PdG contra Parry.
 1. Si **gana el atacante**: el Parry falló y el golpe **entra** (los No2 del Parry ya se gastaron). Sigue a crítico y daño.
 2. Si **gana el defensor**: se abre el **paso 3 · Bloqueo**: el atacante tira su **Fuerza del golpe** (Fue + peso de su arma) y el defensor su **Bloqueo** (Bloqueo + peso de su arma o escudo), las dos como suma. Si gana el defensor: **«🛡 ¡BLOQUEADO!»**, el golpe queda anulado. Si gana el atacante: el golpe entra (propuesta: completo).
-3. Después de un Parry ganado, el cuadro le **ofrece al defensor «⚔ Contraatacar»**, que abre un **duelo nuevo con los roles invertidos** (cuesta lo de un primer ataque, Tipo ÷ 2, y suma su `pdgcontra`).
+3. Después de **ganar el Bloqueo**, el cuadro le **ofrece al defensor «⚔ Contraatacar»** (decidido: solo si se gana el Bloqueo), que abre un **duelo nuevo con los roles invertidos** (cuesta lo de un primer ataque, Tipo ÷ 2, y suma su `pdgcontra`).
 Cada tirada usa la misma regla de empate (gana la que no lleva «+»; si no, par o impar), y todo se anuncia con su veredicto grande y en la Mesa.
 
 **Preguntas abiertas (propuesta entre paréntesis):**
 1. ✅ (dueño, 2026-09-26) El defensor elige la defensa **antes** de ver el PdG (a ciegas).
 2. ✅ (dueño, 2026-09-26) Gana el Parry pero **pierde el Bloqueo**: **pasa la mitad del daño y se consume 1 punto de durabilidad** del arma o escudo con el que bloqueó. Nace la mecánica de **durabilidad** (armas y escudos = 2 por punto de Peso; las armaduras también se rompen): ver [`durabilidad.md`](durabilidad.md).
-3. **Crítico con Parry:** hoy el crítico se calcula con PdG − Evasión. ¿Contra un Parry se usa PdG − Parry? (sí, contra la defensa que usó; y si el Bloqueo frena el golpe, no hay crítico)
-4. ¿El **contraataque** se ofrece con cualquier Parry ganado o solo si además se ganó el Bloqueo? (con cualquier Parry ganado, como dice la regla)
-5. ¿Hay un **tiempo límite** para elegir defensa (por ejemplo, si no elige en X segundos, el GM decide)? (no, el GM puede elegir por él)
+3. ✅ (dueño, 2026-09-26) **Crítico contra Parry: se calcula igual, solo que con el Parry en lugar de la Evasión** (PdG − Parry).
+4. ✅ (dueño, 2026-09-26) **El contraataque solo se ofrece si se gana el Bloqueo** (no basta con ganar el Parry).
+5. ✅ (dueño, 2026-09-26) **No hay tiempo límite** para elegir la defensa (el GM igual puede tirar por el defensor si no está).

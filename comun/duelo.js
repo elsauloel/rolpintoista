@@ -1,17 +1,22 @@
-/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 y 2: contacto, defensa, Parry y Bloqueo; 1 contra 1).
+/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 3: contacto, defensa, Parry, Bloqueo y crítico; 1 contra 1).
    Diseño: docs/ataque-paso-a-paso.md. Idea del dueño, 2026-09-26.
 
    Un duelo es un documento de Firestore (campanas/<partida>/duelos/<id>) que los dos lados ven y escriben en vivo:
-     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'fin',
+     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'fin',
       atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
       defensa: {modo:'evasion'|'parry', itemId, itemNombre, costo}|null,      ← la elige el defensor A CIEGAS (antes de ver el PdG)
       pdg, eva (la tirada de defensa: Evasión o Parry), fuerza (Fuerza del golpe), bloqueo: {total,formula,rolls,mod}|null,
+      critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
+      crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
       contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
       resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
    Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
      · Evasión: gana el atacante → «pegó»; gana el defensor → «falló».
      · Parry: gana el atacante → el Parry falló y «pegó»; gana el defensor → Bloqueo: si el defensor lo gana, «bloqueado» (se anula el golpe y puede
        contraatacar); si lo pierde, «mitad» (pasa la mitad del daño, redondeada para arriba, y el objeto con el que bloqueó pierde 1 de durabilidad).
+   CRÍTICO (etapa 3, `comun/critico.js`): si el golpe pega, se compara PdG − la tirada de defensa (Evasión o Parry) con el rango del crítico (Tipo del arma − Crítico
+   frecuente): nivel N; la Resistencia a crítico del defensor lo baja; se tiran N − R d20 y el mejor da el multiplicador (×2 / ×3 / ×4, con Crítico potente).
+   El crítico ignora la Defensa. El daño llega en la etapa 4.
    EMPATE (regla del dueño): si empatan y solo UNA de las dos tiradas lleva un «+» fijo, gana la que NO lo lleva; si las dos (o ninguna), par o impar.
    TODOS los conectados ven el cuadro (se abre solo); se puede minimizar («⚔ Ver duelo»). Cada uno solo ve los botones que le tocan.
 
@@ -30,7 +35,7 @@ const Duelo = (() => {
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate'];
+  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit'];
 
   let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
   let revelado = {};         // id:clave → true: ya se animó en esta pestaña
@@ -107,6 +112,12 @@ const Duelo = (() => {
 .duelo-veredicto.bloqueado{background:linear-gradient(180deg,#1f3f5a,#172c3d);border:2px solid #5aa7e8;color:#cfe6fb}
 .duelo-veredicto.mitad{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-veredicto.critico{background:radial-gradient(circle at 50% 30%,#8a5a12,#4a2a08 70%);border:3px solid #ffd25a;color:#fff3c9;box-shadow:0 0 40px rgba(255,190,60,.55),inset 0 0 30px rgba(255,210,90,.25);animation:duelo-brillo 1.4s ease-in-out infinite alternate}
+.duelo-veredicto.critico .grande{font-size:64px;letter-spacing:.06em;text-shadow:0 0 18px #ffb400,0 3px 0 #7a4a00}
+.duelo-veredicto.critico .mult{font-size:34px;font-weight:900;color:#ffd25a;margin-top:2px}
+.duelo-veredicto.critico .chispas{font-size:26px}
+.duelo-veredicto.critico.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both,duelo-brillo 1.4s ease-in-out .55s infinite alternate}
+@keyframes duelo-brillo{0%{box-shadow:0 0 22px rgba(255,190,60,.35),inset 0 0 20px rgba(255,210,90,.15)}100%{box-shadow:0 0 60px rgba(255,190,60,.8),inset 0 0 40px rgba(255,210,90,.35)}}
 .duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-motivo{margin-top:10px;background:rgba(0,0,0,.28);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:600;letter-spacing:0}
 .duelo-par{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:15px;font-weight:600;letter-spacing:0}
@@ -238,7 +249,7 @@ const Duelo = (() => {
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado)},
-      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, contra: null,
+      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, contra: null,
       contraDe: contraDe || '',
       creadoPor: yo(),
       creado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -267,13 +278,58 @@ const Duelo = (() => {
     if(par === 'contacto'){
       m.contacto = info;
       if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
-      else{ m.resultado = r.gana === 'atacante' ? 'pego' : 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
+      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
     }else{
       m.bloq = info;
       m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
       m.fase = 'fin';
       m.estado = 'resuelto';
     }
+  }
+
+  // El golpe pegó (por Evasión o por un Parry perdido): se evalúa el crítico con la misma regla, contra la tirada de defensa que se usó.
+  function entrarCritico(m){
+    const dd = m.critDatos || {};
+    let e = null;
+    if(typeof Critico !== 'undefined' && m.pdg && m.eva){
+      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia)});
+    }
+    if(e && e.critico){
+      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia), d20: null, mejor: 0, mult: 1};
+      m.fase = 'critico';
+      m.estado = 'esperando';
+    }else{
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia), d20: null, mejor: 0, mult: 1} : null;
+      m.fase = 'fin';
+      m.estado = 'resuelto';
+    }
+  }
+
+  // Tira los d20 del crítico (los tira el atacante o el GM): el mejor da el multiplicador.
+  async function tirarCritico(id){
+    const ref = col().doc(id);
+    let anuncio = '', publicar = null;
+    await fbDb.runTransaction(async tx => {
+      anuncio = ''; publicar = null;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'critico' || !m.crit || m.crit.d20) return;
+      const n = Math.max(1, _num(m.crit.dados));
+      const rolls = Array.from({length: n}, () => 1 + Math.floor(Math.random() * 20));
+      const mejor = Math.max(...rolls);
+      const mult = Critico.multiplicador(mejor, m.crit.potente);
+      m.crit = {...m.crit, d20: rolls, mejor, mult};
+      m.fase = 'fin';
+      m.estado = 'resuelto';
+      tx.update(ref, cambiosDe(m));
+      const NOMBRE_MULT = {1: 'sin multiplicador: el golpe pega normal', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor}};
+      anuncio = mult > 1 ? `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa` : `${m.atacante.nombre} tiró el crítico contra ${m.defensor.nombre} y no salió multiplicador: el golpe pega normal`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
   }
 
   // Si ya están las dos tiradas del par de la fase, lo resuelve (o abre el desempate).
@@ -317,7 +373,7 @@ const Duelo = (() => {
   const cambiosDe = m => { const c = {}; CAMPOS_ESCRIBIBLES.forEach(k => { c[k] = m[k] === undefined ? null : m[k]; }); return c; };
 
   // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
-  async function guardarTiro(id, campo, r, defensa){
+  async function guardarTiro(id, campo, r, defensa, extra){
     const tiro = {total: Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod)};
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
@@ -330,6 +386,7 @@ const Duelo = (() => {
       if(m.estado !== 'esperando' || m.fase !== fase || m[campo]) return;   // ya resuelto, otra fase o ya tiró
       m[campo] = tiro;
       if(campo === 'eva' && defensa) m.defensa = defensa;
+      if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
       tx.update(ref, cambiosDe(m));
     });
@@ -482,7 +539,10 @@ const Duelo = (() => {
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
     let caja;
-    if(d.resultado === 'pego'){
+    if(d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1){
+      const porParry = d.defensa && d.defensa.modo === 'parry';
+      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">¡CRÍTICO!</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida <span style="opacity:.8">(el número del daño aparece en la próxima etapa)</span></div>${mot}</div>`;
+    }else if(d.resultado === 'pego'){
       const porParry = d.defensa && d.defensa.modo === 'parry';
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
     }else if(d.resultado === 'fallo'){
@@ -500,6 +560,28 @@ const Duelo = (() => {
     return caja + contra;
   }
 
+  const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+  // Paso 4 · Crítico: la cuenta, los d20 y (si sale) la celebración.
+  function criticoHtml(d){
+    const c = d.crit;
+    const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
+    const cuenta = `PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} · rango del crítico ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crít. frecuente ' + _fmt(c.frecuente) : ''}) → nivel ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − resistencia ${_fmt(c.resistencia)}` : ''}`;
+    let cuerpo;
+    if(!c.critico){
+      cuerpo = `<div class="duelo-mini">Sin crítico: ${_esc(cuenta)}${c.nivel > 0 && c.dados <= 0 ? ' (la Resistencia a crítico lo anuló)' : ''}</div>`;
+    }else if(!c.d20){
+      const puede = esMio(d.atacante) || soyGM();
+      cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
+        <div class="duelo-mini g">💥 ¡Hay posibilidad de crítico! Se tiran <b>${_fmt(c.dados)} d20</b> y vale el mejor</div>
+        <div class="duelo-nota" style="text-align:center">7 o más: doble daño · 17 o más: triple · 20: cuádruple${_num(c.potente) ? ` (con Crítico potente ${_fmt(c.potente)} los números bajan)` : ''}</div>
+        <div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
+    }else{
+      cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
+        <div class="duelo-mini">d20: ${c.d20.map(x => x === c.mejor ? `<b>${x}</b>` : x).join(' · ')} → mejor <b>${_fmt(c.mejor)}</b> · ${c.mult > 1 ? `×${_fmt(c.mult)} ${NOMBRE_MULT[c.mult]}` : 'sin multiplicador'}</div>`;
+    }
+    return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
+  }
+
   function dibujar(){
     const d = actual && actual.dato;
     const f = document.getElementById('duelo-fondo');
@@ -512,7 +594,7 @@ const Duelo = (() => {
     const nuevoBloqueo = bloqueoListo ? nuevaClave('bloqueo') : false;
     let cierre = '';
     if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
-    else if(d.resultado) cierre = veredictoHtml(d, nuevaClave('resultado'));
+    else if(d.resultado && d.estado === 'resuelto') cierre = veredictoHtml(d, nuevaClave('resultado'));
     else if(d.estado === 'cancelado') cierre = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
@@ -534,6 +616,7 @@ const Duelo = (() => {
           <div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
           ${miniHtml(d, 'bloqueo')}
         </div>` : ''}
+        ${d.crit ? criticoHtml(d) : ''}
         ${cierre}
         <div class="duelo-pie">
           ${puedoCancelar ? '<button type="button" class="sec" data-cancelarduelo>Cancelar duelo</button>' : ''}
@@ -568,6 +651,8 @@ const Duelo = (() => {
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
     });
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
+    const bcr = f.querySelector('[data-critico]');
+    if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
   }
@@ -609,7 +694,10 @@ const Duelo = (() => {
         if(!op || op.motivoNo) return;
         defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo)};
       }
-      esperaTiro = {id: d.id, campo, re: campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo], defensa};
+      let extra = null;
+      if(campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
+      if(campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
+      esperaTiro = {id: d.id, campo, re: campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo], defensa, extra};
       if(campo === 'pdg') h.atacar(d);
       else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
       else if(campo === 'fuerza') h.fuerza(d);
@@ -627,9 +715,9 @@ const Duelo = (() => {
     if(!esperaTiro) return;
     const det = e.detail || {}, r = det.r || {};
     if(!esperaTiro.re.test(String(det.origen || ''))) return;
-    const {id, campo, defensa} = esperaTiro;
+    const {id, campo, defensa, extra} = esperaTiro;
     esperaTiro = null;
-    guardarTiro(id, campo, r, defensa).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
+    guardarTiro(id, campo, r, defensa, extra).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
       .then(() => avisarMapaUi());
   });
 
@@ -694,9 +782,11 @@ const Duelo = (() => {
     if(actual && actual.min && actual.dato && !mostrar.has(actual.id)) mostrar.set(actual.id, actual.dato);
     [...chips.keys()].forEach(id => { if(!mostrar.has(id)){ chips.get(id).remove(); chips.delete(id); } });
     const RES = {pego: '⚔ Pegó', fallo: '🛡 Falló', bloqueado: '🛡 Bloqueó', mitad: '⚠ Pasó la mitad'};
+    const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
     mostrar.forEach((d, id) => {
       const txt = d.estado === 'resuelto'
-        ? `${RES[d.resultado] || 'Resuelto'}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
+        ? `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
+        : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
         : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);

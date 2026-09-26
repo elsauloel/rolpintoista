@@ -10248,6 +10248,22 @@ window.DUELO_HOOKS = {
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
   },
+  // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa) y la Resistencia a crítico del defensor contra el Tipo del arma.
+  statsCritico: d => {
+    const inv = dueloInvDe(d.atacante);
+    if(inv) return {frecuente: 0, potente: 0};
+    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
+    const f = statParaArma('crit', arma), p = statParaArma('critpot', arma);
+    return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};
+  },
+  resistenciaCritico: d => {
+    const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
+    if(i < 0) return 0;
+    const inv = dueloInvDe(d.defensor);
+    if(inv) return num((inv.crit || [])[i]);
+    const v = compute().final['tipo' + (i + 1)];
+    return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v));
+  },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
     const inv = dueloInvDe(d.defensor);

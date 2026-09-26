@@ -8357,6 +8357,16 @@ window.DUELO_HOOKS = {
     if(!sc) return;
     if(d.ataque.tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, d.ataque.tipo);
   },
+  // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
+  statsCritico: d => {
+    const sc = S.creeps.find(c => c.id === d.atacante.ref);
+    return sc ? {frecuente: Math.max(0, Math.round(creepModTotal(sc, 'crit'))), potente: Math.max(0, Math.round(creepModTotal(sc, 'critpot')))} : {frecuente: 0, potente: 0};
+  },
+  resistenciaCritico: d => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
+    return sc && i >= 0 ? num((sc.crit || [])[i]) : 0;
+  },
   // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
   opcionesDefensa: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);

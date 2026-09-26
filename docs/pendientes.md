@@ -108,3 +108,4 @@
 - [~] (2026-09-26, falta probar) **Duelo: resumen final en la Mesa** (una línea con todo lo que pasó, publicada por el atacante). Reglas: campo `resumido`.
 - [~] (2026-09-26, falta probar) **Dados 3D: destacar el más alto** (crecer, subir, brillar, ondas) y **el duelo muestra el resultado después de que los dados quedan a la vista**. Recurso reutilizable: `destacar: 'max'`. Reglas: campo `destacar` en `tiradas`.
 - [~] (2026-09-26, falta probar) **Durabilidad en las fichas**: 3 por Peso (mín. 3), Armadura rota por pieza, Rompe armadura al azar, desgaste del arma o escudo al perder el Bloqueo, ítem roto sin efectos, avisos, botones − / + a mano. Falta: reparar (herrero, talento, Óleo), tienda y catálogo, prohibir reparar en combate.
+- [~] (2026-09-26, falta probar) **Reparación con el herrero**: casilla «Herrero» + precio por punto en el generador de tiendas, botón «🔧 Reparación» en la ficha (no en combate). Falta: reparar por talento con despojos.

@@ -296,6 +296,13 @@ input[type=checkbox]{width:auto}
         <input type="number" id="f-ajuste" step="5" value="0" title="Lo que pagan los jugadores: porcentaje sobre el precio de catálogo (negativo descuenta, positivo recarga)">
         <span class="hint">%</span>
       </div>
+      <div class="ajuste-grupo" title="Si está tildado, los jugadores ven el botón 🔧 Reparación en esta tienda y pueden reparar la durabilidad de su equipo pagando por punto">
+        <label for="f-herrero">🔨 Herrero</label>
+        <input type="checkbox" id="f-herrero">
+        <label for="f-precio-rep" style="margin-left:6px">Repara a</label>
+        <input type="number" id="f-precio-rep" step="1" min="0" value="1" style="width:60px" title="DDE que cobra por cada punto de durabilidad reparado">
+        <span class="hint">DDE/punto</span>
+      </div>
       <div class="ajuste-grupo">
         <label for="f-ajuste-venta">Al vender</label>
         <input type="number" id="f-ajuste-venta" step="5" value="0" title="Lo que cobran los jugadores al venderle a esta tienda (ítems y despojos): porcentaje sobre el valor de venta. Negativo paga menos, positivo paga más.">
@@ -2207,6 +2214,8 @@ function marcarAjuste(){
   const n = ajusteActual();
   $('#f-ajuste').value = n;
   $('#f-ajuste-venta').value = ajusteVentaActual();
+  $('#f-herrero').checked = !!(tiendaActual && tiendaActual.herrero);
+  $('#f-precio-rep').value = tiendaActual && tiendaActual.precioReparacion !== undefined ? tiendaActual.precioReparacion : 1;
   document.querySelectorAll('.ajuste-preset[data-ajuste]').forEach(b =>
     b.classList.toggle('activo', Number(b.dataset.ajuste) === n));
 }
@@ -2735,6 +2744,12 @@ $('#agregar-rubro').addEventListener('change', renderAgregarLista);
 $('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
 $('#f-ajuste-venta').addEventListener('change', e => aplicarAjusteVenta(e.target.value));
+$('#f-herrero').addEventListener('change', e => { if(!tiendaActual) return; tiendaActual.herrero = e.target.checked; tiendaCambio(); });
+$('#f-precio-rep').addEventListener('change', e => {
+  if(!tiendaActual) return;
+  const n = Math.max(0, Number(e.target.value) || 0);
+  tiendaActual.precioReparacion = n; e.target.value = n; tiendaCambio();
+});
 $('#f-orden').addEventListener('change', e => { ordenActual = e.target.value; renderPreview(); renderAgregarLista(); });
 $('#btn-orden-dir').addEventListener('click', () => { ordenDesc = !ordenDesc; renderOrdenControles(); renderPreview(); renderAgregarLista(); });
 $('#ver-x').addEventListener('click', () => $('#scrim-ver').classList.remove('open'));

@@ -54,3 +54,10 @@ El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y
 **Falta:** reparar con el herrero y el talento (y el Óleo reparador), mostrar la durabilidad en la tienda y el catálogo, el bloqueo de reparar durante el combate, y probarlo en mesa.
 
 **Óleo reparador quitado del catálogo (dueño, 2026-09-26):** se sacó el ítem (catálogo: 889) **hasta que se defina cómo funciona**. La ficha conserva el código viejo que lo reconocía por nombre (para personajes ya guardados que lo tengan); no hace falta tocarlo.
+
+## Reparación con el herrero (2026-09-26, hecha, sin probar en mesa)
+- **Tienda con herrero:** en el generador de tiendas (`vendor-generator.html`) hay una casilla **«🔨 Herrero»** y el precio **«Repara a N DDE/punto»** (por defecto **1 DDE por punto**, como decidió el dueño). Se guarda con la tienda.
+- **En la ficha**, al abrir una tienda con herrero aparece el botón **«🔧 Reparación»** (al lado de «💰 Vender»). Abre un menú con **cada pieza dañada** (equipada o en la mochila): su durabilidad, la Armadura rota, cuántos puntos faltan y botones **«+1»** y **«Todo»** con su costo, más **«Reparar todo»** abajo. Cada punto reparado **también devuelve 1 de Armadura rota** de esa pieza. Se cobra en DDE de la ficha (avisa si no alcanza).
+- **No se puede reparar en combate:** con el mapa en modo combate los botones quedan apagados con el aviso.
+- **Vender** ya existía en toda tienda («💰 Vender»: mochila, cinturón y despojos; lo equipado no se vende; el ajuste «Al vender» lo fija cada tienda).
+**Falta:** la reparación por **talento con despojos** (2 despojos por punto) y el destino del Óleo reparador; mostrar la durabilidad al comprar.

@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-26T23:28:38Z",
+ "actualizado": "2026-09-26T23:37:52Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1041,7 +1041,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "**Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**\n\n- **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.\n- **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico no rompe armadura**, ni siquiera el de un arma con Rompe armadura: el crítico justamente evita la armadura.\n- **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.\n- Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).\n- **No se puede reparar durante el combate.** Reparar: **herrero** (1 de oro por punto) y **habilidades de talento** con despojos (2 despojos por punto). El Óleo reparador queda en revisión."
+   "cuerpo": "**Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**\n\n- **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.\n- **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico no rompe armadura**, ni siquiera el de un arma con Rompe armadura: el crítico justamente evita la armadura.\n- **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.\n- Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).\n- **No se puede reparar durante el combate.** Reparar: **herrero** (en las tiendas con herrero hay un botón **🔧 Reparación**; cobra **1 DDE por punto** salvo que la tienda diga otra cosa) y **habilidades de talento** con despojos (2 despojos por punto, todavía sin automatizar). Cada punto reparado devuelve 1 de Armadura rota de esa pieza. El Óleo reparador se quitó del catálogo hasta definirlo."
   },
   {
    "id": "estados-alterados",

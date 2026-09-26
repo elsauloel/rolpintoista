@@ -1565,6 +1565,17 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-reparar">
+  <div class="modal" style="max-width:680px">
+    <header><h3>🔧 Reparación · herrero</h3><button class="iconbtn" id="reparar-x">Cerrar</button></header>
+    <div class="body" id="reparar-cuerpo"></div>
+    <footer style="justify-content:space-between">
+      <span class="hint" id="reparar-total" style="font-size:14px;color:var(--paper)"></span>
+      <button class="btn primary" id="reparar-todo">Reparar todo</button>
+    </footer>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-catalogo">
   <div class="modal catalogo-modal botonera-modal">
     <header>
@@ -1572,6 +1583,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <div style="display:flex;gap:8px;align-items:center">
         <span class="tienda-badge" id="tienda-badge" style="display:none"></span>
         <button class="iconbtn" id="tienda-vender" style="display:none" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
+        <button class="iconbtn" id="tienda-reparar" style="display:none" title="Reparar tu equipo con el herrero (se paga por punto de durabilidad)">🔧 Reparación</button>
         <button class="iconbtn" id="tienda-salir" style="display:none">Ver catálogo completo</button>
         <span class="catalogo-dde-badge">DDE disponibles: <b id="catalogo-dde">0</b></span>
         <button class="iconbtn iconbtn-add" id="btn-catalogo-nuevo">+ Ítem al catálogo</button>
@@ -8691,12 +8703,14 @@ function renderCabeceraTienda(){
   const nuevo = $('#btn-catalogo-nuevo');
   const verCompleto = $('#catalogo-ver-completo');
   if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
+  if($('#tienda-reparar')) $('#tienda-reparar').style.display = 'none';
   if(tiendaCargada){
     const pct = Number(tiendaCargada.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
     const pv = Number(tiendaCargada.ajusteVenta) || 0;
     badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}`;
     if($('#tienda-vender')) $('#tienda-vender').style.display = '';
+    if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';
     salir.style.display = '';
     if(nuevo) nuevo.style.display = 'none';
@@ -8835,6 +8849,67 @@ function confirmarVender(){
   $('#scrim-vender').classList.remove('open');
   toast(`Vendiste ${nombres.join(', ')} · +${fmt(total)} DDE (tenés ${fmt(num(S.meta.dde))})`);
 }
+/* ---------- Reparación con el herrero (2026-09-26, pedido del dueño) ----------
+   Las tiendas que el GM marca como «herrero» tienen el botón 🔧 Reparación. Se repara por punto de durabilidad (por defecto 1 DDE por punto; lo fija la tienda) y cada
+   punto reparado también devuelve 1 de Armadura rota de esa pieza. NO se puede reparar durante el combate (cuando el mapa está en modo combate). */
+function precioReparacion(){ return tiendaCargada ? Math.max(0, num(tiendaCargada.precioReparacion === undefined ? 1 : tiendaCargada.precioReparacion)) : 1; }
+function itemsAReparar(){
+  return S.inventario.filter(i => durableItem(i) && (durActual(i) < durMax(i) || armRotaDe(i) > 0))
+    .map(i => ({it: i, faltan: Math.max(0, durMax(i) - durActual(i))}));
+}
+const enCombateAhora = () => !!(typeof modoMapaListo !== 'undefined' && modoMapaListo && modoMapa === 'combate');
+function renderReparar(){
+  const p = precioReparacion(), lista = itemsAReparar(), dde = num(S.meta.dde);
+  const totalPts = lista.reduce((a, x) => a + x.faltan, 0);
+  const bloqueado = enCombateAhora();
+  $('#reparar-cuerpo').innerHTML = `
+    <p class="hint" style="margin:0 0 8px">${p > 0 ? `El herrero cobra <b>${fmt(p)} DDE por punto</b> de durabilidad.` : 'Este herrero repara gratis.'} Cada punto reparado también devuelve 1 de Armadura rota de esa pieza. Tenés <b>${fmt(dde)} DDE</b>.</p>
+    ${bloqueado ? '<p class="hint" style="margin:0 0 8px;color:#FF9E7E">⚔ No se puede reparar durante el combate: esperá a que el GM pase el mapa a modo narrativo.</p>' : ''}
+    ${lista.length ? lista.map(({it, faltan}) => `<div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)">
+        <div><b>${esc(it.nombre)}</b> ${it.equipado ? '<span class="tag">equipado</span>' : ''}<div class="hint">🔧 ${fmt(durActual(it))}/${fmt(durMax(it))}${armRotaDe(it) ? ` · Armadura rota ×${fmt(armRotaDe(it))}` : ''}${itemRoto(it) ? ' · <b style="color:#FF7E7E">ROTO</b>' : ''} · faltan ${fmt(faltan)} punto${faltan === 1 ? '' : 's'}</div></div>
+        <button class="mini" data-rep="${esc(it.id)}:1"${bloqueado || faltan < 1 ? ' disabled' : ''}>+1 · ${fmt(p)} DDE</button>
+        <button class="mini" data-rep="${esc(it.id)}:${faltan}"${bloqueado || faltan < 1 ? ' disabled' : ''}>Todo · ${fmt(Math.round(faltan * p * 100) / 100)} DDE</button>
+      </div>`).join('') : '<div class="hint">No tenés nada para reparar: todo tu equipo está entero.</div>'}`;
+  $('#reparar-total').innerHTML = `Reparar todo cuesta: <b>${fmt(Math.round(totalPts * p * 100) / 100)} DDE</b> (${fmt(totalPts)} punto${totalPts === 1 ? '' : 's'})`;
+  $('#reparar-todo').disabled = bloqueado || !totalPts;
+}
+function repararItems(pares){   // pares: [{it, pts}]
+  if(enCombateAhora()){ toast('No se puede reparar durante el combate'); return; }
+  const p = precioReparacion();
+  const pts = pares.reduce((a, x) => a + Math.min(x.pts, Math.max(0, durMax(x.it) - durActual(x.it))), 0);
+  if(!pts){ toast('No hay nada para reparar'); return; }
+  const costo = Math.round(pts * p * 100) / 100;
+  if(costo > num(S.meta.dde) + 1e-9){ toast(`No te alcanza: reparar ${fmt(pts)} punto${pts === 1 ? '' : 's'} cuesta ${fmt(costo)} DDE y tenés ${fmt(num(S.meta.dde))}`); return; }
+  pares.forEach(({it, pts: n}) => {
+    const q = Math.min(n, Math.max(0, durMax(it) - durActual(it)));
+    if(q <= 0) return;
+    it.dur = durActual(it) + q;
+    it.armRota = Math.max(0, armRotaDe(it) - q);
+  });
+  S.meta.dde = Math.round((num(S.meta.dde) - costo) * 100) / 100;
+  $('#f-dde').value = fmt(S.meta.dde);
+  renderInventario();
+  refresh();
+  renderReparar();
+  toast(`🔧 Reparaste ${fmt(pts)} punto${pts === 1 ? '' : 's'} por ${fmt(costo)} DDE (te quedan ${fmt(num(S.meta.dde))})`);
+}
+function abrirReparar(){
+  if(!tiendaCargada || !tiendaCargada.herrero){ toast('Esta tienda no tiene herrero'); return; }
+  renderReparar();
+  $('#scrim-reparar').classList.add('open');
+}
+$('#tienda-reparar').onclick = abrirReparar;
+$('#reparar-x').onclick = () => $('#scrim-reparar').classList.remove('open');
+$('#scrim-reparar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-reparar') $('#scrim-reparar').classList.remove('open'); });
+$('#reparar-todo').onclick = () => repararItems(itemsAReparar().map(x => ({it: x.it, pts: x.faltan})));
+$('#reparar-cuerpo').addEventListener('click', e => {
+  const b = e.target.closest('[data-rep]');
+  if(!b) return;
+  const [id, n] = b.dataset.rep.split(':');
+  const it = S.inventario.find(x => x.id === id);
+  if(it) repararItems([{it, pts: Math.max(1, Math.round(num(n)))}]);
+});
+
 $('#tienda-vender').onclick = abrirVender;
 $('#vender-x').onclick = () => $('#scrim-vender').classList.remove('open');
 $('#vender-confirmar').onclick = confirmarVender;
@@ -8888,7 +8963,7 @@ function escucharTienda(){
     let nueva = tiendaDesdeDoc(snap);
     if(nueva && !nueva.abierta){   // el GM la cerró: se sale de la tienda
       tiendaCargada = null; carritoCatalogo = []; dejarDeEscucharTienda();
-      $('#scrim-catalogo').classList.remove('open'); $('#scrim-vender').classList.remove('open');
+      $('#scrim-catalogo').classList.remove('open'); $('#scrim-vender').classList.remove('open'); $('#scrim-reparar').classList.remove('open');
       toast('El GM cerró la tienda');
       return;
     }

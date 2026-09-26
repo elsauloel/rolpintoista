@@ -1,13 +1,14 @@
-/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 3: contacto, defensa, Parry, Bloqueo y crítico; 1 contra 1).
+/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 4: contacto, defensa, Parry, Bloqueo, crítico y daño; 1 contra 1).
    Diseño: docs/ataque-paso-a-paso.md. Idea del dueño, 2026-09-26.
 
    Un duelo es un documento de Firestore (campanas/<partida>/duelos/<id>) que los dos lados ven y escriben en vivo:
-     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'fin',
+     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'dano'|'fin',
       atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
       defensa: {modo:'evasion'|'parry', itemId, itemNombre, costo}|null,      ← la elige el defensor A CIEGAS (antes de ver el PdG)
       pdg, eva (la tirada de defensa: Evasión o Parry), fuerza (Fuerza del golpe), bloqueo: {total,formula,rolls,mod}|null,
       critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
       crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
+      dano:{crudo,formula,rolls,mod,reclamado,aplicado,mult,golpe,ignoraDef,mitad,defensa,recibido,absorbido,hpAntes,hpDespues,manual}|null,
       contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
       resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
    Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
@@ -16,7 +17,10 @@
        contraatacar); si lo pierde, «mitad» (pasa la mitad del daño, redondeada para arriba, y el objeto con el que bloqueó pierde 1 de durabilidad).
    CRÍTICO (etapa 3, `comun/critico.js`): si el golpe pega, se compara PdG − la tirada de defensa (Evasión o Parry) con el rango del crítico (Tipo del arma − Crítico
    frecuente): nivel N; la Resistencia a crítico del defensor lo baja; se tiran N − R d20 y el mejor da el multiplicador (×2 / ×3 / ×4, con Crítico potente).
-   El crítico ignora la Defensa. El daño llega en la etapa 4.
+   El crítico ignora la Defensa.
+   DAÑO (etapa 4): si el golpe pega (o pasa la mitad), el atacante tira el daño de su arma (sin los efectos del golpe: son la etapa 5). Crítico: daño × multiplicador, derecho a
+   la vida (sin restar la Defensa). Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba. El HP lo baja el mapa del GM
+   (`escuchar({aplicar})`: reutiliza «Recibe daño» del mapa, con Invulnerable y Escudo mágico) y el resultado queda en el duelo.
    EMPATE (regla del dueño): si empatan y solo UNA de las dos tiradas lleva un «+» fijo, gana la que NO lo lleva; si las dos (o ninguna), par o impar.
    TODOS los conectados ven el cuadro (se abre solo); se puede minimizar («⚔ Ver duelo»). Cada uno solo ve los botones que le tocan.
 
@@ -35,7 +39,7 @@ const Duelo = (() => {
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit'];
+  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano'];
 
   let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
   let revelado = {};         // id:clave → true: ya se animó en esta pestaña
@@ -50,6 +54,7 @@ const Duelo = (() => {
   let pendienteSuelto = null;
   let opciones = {};         // id → opciones de defensa del defensor (las pide al iframe o a los hooks)
   let opcionesPedidas = new Set();
+  let aplicando = new Set();   // duelos cuyo daño está aplicando esta pestaña (GM)
 
   const hooks = () => (typeof window !== 'undefined' && window.DUELO_HOOKS) || null;
   const yo = () => (typeof fbUsuario !== 'undefined' && fbUsuario ? fbUsuario.uid : '');
@@ -112,6 +117,13 @@ const Duelo = (() => {
 .duelo-veredicto.bloqueado{background:linear-gradient(180deg,#1f3f5a,#172c3d);border:2px solid #5aa7e8;color:#cfe6fb}
 .duelo-veredicto.mitad{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-danobox{margin-top:10px;text-align:center;border-radius:12px;padding:14px;background:rgba(0,0,0,.25);border:1px solid #39435c}
+.duelo-danobox.crit{border-color:#ff5a5a;background:radial-gradient(circle at 50% 30%,rgba(120,20,20,.55),rgba(40,8,8,.6))}
+.duelo-danonum{font-size:96px;font-weight:900;line-height:1;animation:duelo-num .6s ease-out both}
+.duelo-danonum.rojo{color:#ff4d4d;text-shadow:0 0 24px rgba(255,60,60,.7)}
+.duelo-danonum.inv{font-size:40px;color:#9ad0ff}
+.duelo-danosub{font-size:14px;color:#cfd6ea;margin-top:4px}
+.duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
@@ -254,7 +266,7 @@ const Duelo = (() => {
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado)},
-      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, contra: null,
+      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, contra: null,
       contraDe: contraDe || '',
       creadoPor: yo(),
       creado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -276,6 +288,9 @@ const Duelo = (() => {
   }
 
   // Aplica el resultado de un par de tiradas al documento `m` (una copia), y avanza de fase.
+  // El golpe pasa (entero o a la mitad): sigue el daño.
+  function entrarDano(m){ m.fase = 'dano'; m.estado = 'esperando'; }
+
   function cerrarPar(m, par, r){
     const info = {gana: r.gana, dif: r.dif, desempate: r.desempate || null, moneda: r.moneda || null};
     m.empate = null;
@@ -288,8 +303,8 @@ const Duelo = (() => {
     }else{
       m.bloq = info;
       m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
-      m.fase = 'fin';
-      m.estado = 'resuelto';
+      if(m.resultado === 'mitad') entrarDano(m);
+      else{ m.fase = 'fin'; m.estado = 'resuelto'; }
     }
   }
 
@@ -306,8 +321,7 @@ const Duelo = (() => {
       m.estado = 'esperando';
     }else{
       m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia), d20: null, mejor: 0, mult: 1} : null;
-      m.fase = 'fin';
-      m.estado = 'resuelto';
+      entrarDano(m);
     }
   }
 
@@ -326,8 +340,7 @@ const Duelo = (() => {
       const mejor = Math.max(...rolls);
       const mult = Critico.multiplicador(mejor, m.crit.potente);
       m.crit = {...m.crit, d20: rolls, mejor, mult};
-      m.fase = 'fin';
-      m.estado = 'resuelto';
+      entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el golpe pega normal', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
       publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor}};
@@ -394,6 +407,58 @@ const Duelo = (() => {
       if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
       tx.update(ref, cambiosDe(m));
+    });
+    anunciarMesa(anuncio);
+  }
+
+  // El atacante tiró el daño de su arma.
+  async function guardarDano(id, r){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
+      m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+
+  // El GM (en el mapa) aplica el daño al HP: primero se «reclama» para que, con varias pestañas del GM, solo una lo aplique.
+  async function reclamarAplicacion(id){
+    const ref = col().doc(id);
+    let mio = false;
+    await fbDb.runTransaction(async tx => {
+      mio = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.reclamado) return;
+      m.dano = {...m.dano, reclamado: yo()};
+      tx.update(ref, cambiosDe(m));
+      mio = true;
+    });
+    return mio;
+  }
+  async function guardarAplicacion(id, info){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado) return;
+      m.dano = {...m.dano, ...info, aplicado: true};
+      m.fase = 'fin';
+      m.estado = 'resuelto';
+      tx.update(ref, cambiosDe(m));
+      const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.mult > 1;
+      anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
+        : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
+        : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − Defensa ${dn.defensa} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
     });
     anunciarMesa(anuncio);
   }
@@ -470,7 +535,7 @@ const Duelo = (() => {
     if(actual && actual.id === id && actual.dato) dibujar();
   }
 
-  const ETIQ = {pdg: 'PdG', eva: 'Defensa', fuerza: 'Fuerza del golpe', bloqueo: 'Bloqueo'};
+  const ETIQ = {pdg: 'PdG', eva: 'Defensa', fuerza: 'Fuerza del golpe', bloqueo: 'Bloqueo', dano: 'Daño'};
   const nombreDefensa = d => d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
   function numerosHtml(tiro, esNuevo, que, quien){
@@ -566,6 +631,41 @@ const Duelo = (() => {
   }
 
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+
+  // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
+  function danoHtml(d){
+    const dn = d.dano;
+    const crit = d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
+    const mult = crit ? d.crit.mult : 1;
+    const arma = d.ataque.armaNombre ? ` · ${_esc(d.ataque.armaNombre)}` : '';
+    let cuerpo;
+    if(!dn){
+      const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}</button><div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : 'Se le resta la Defensa del defensor.'}</div></div>`;
+      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
+        <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>`;
+      else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
+    }else{
+      const tiro = `<div class="duelo-mini">Daño${arma}: <b>${_fmt(dn.crudo)}</b> <span style="opacity:.7">(${_esc(dn.formula || '')}${dn.rolls && dn.rolls.length ? ' → ' + dn.rolls.join(' + ') : ''}${_num(dn.mod) ? ' ' + (_num(dn.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(dn.mod)) : ''})</span></div>`;
+      if(!dn.aplicado){
+        cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>
+          <div class="duelo-nota" style="text-align:center">${soyGM() ? 'Aplicando el daño al HP…' : 'El GM aplica el daño al HP.'}</div>
+          ${soyGM() ? `<div class="duelo-man"><input type="number" min="0" data-manual="recibido" placeholder="daño recibido" value="${_esc(manual.recibido || '')}"><button type="button" class="sec" data-aplicar-mano>Ya lo apliqué a mano</button></div>` : ''}`;
+      }else{
+        const golpe = _num(dn.golpe);
+        let grande;
+        if(dn.invulnerable) grande = `<div class="duelo-danonum inv">INVULNERABLE</div><div class="duelo-danosub">El golpe no hizo nada</div>`;
+        else if(dn.manual) grande = `<div class="duelo-danonum">${_fmt(golpe)}</div><div class="duelo-danosub">de daño — <b>aplicalo a mano</b> (${_esc(dn.motivoManual || 'no se pudo aplicar solo')})</div>`;
+        else if(dn.ignoraDef) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">${_fmt(dn.crudo)} × ${_fmt(dn.mult)} · el crítico ignora la Defensa</div>`;
+        else if(dn.mitad) grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (la mitad de ${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)}, redondeada para arriba)</div>`;
+        else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)})</div>`;
+        const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
+          ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}</div>` : '';
+        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}`;
+      }
+    }
+    return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;
+  }
   // Tabla de valores del d20 para el multiplicador, a la vista ANTES de tirar. Si hay Crítico potente, dice cuánto se movió cada umbral y por qué.
   function tablaCriticoHtml(c, d, mejor){
     const P = Math.max(0, Math.round(_num(c.potente)));
@@ -613,7 +713,7 @@ const Duelo = (() => {
     const nuevoBloqueo = bloqueoListo ? nuevaClave('bloqueo') : false;
     let cierre = '';
     if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
-    else if(d.resultado && d.estado === 'resuelto') cierre = veredictoHtml(d, nuevaClave('resultado'));
+    else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano')) cierre = veredictoHtml(d, nuevaClave('resultado'));
     else if(d.estado === 'cancelado') cierre = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
@@ -636,6 +736,7 @@ const Duelo = (() => {
           ${miniHtml(d, 'bloqueo')}
         </div>` : ''}
         ${d.crit ? criticoHtml(d) : ''}
+        ${(d.fase === 'dano' || d.dano) ? danoHtml(d) : ''}
         ${cierre}
         <div class="duelo-pie">
           ${puedoCancelar ? '<button type="button" class="sec" data-cancelarduelo>Cancelar duelo</button>' : ''}
@@ -670,6 +771,10 @@ const Duelo = (() => {
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
     });
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
+    const bdt = f.querySelector('[data-dano-tirar]');
+    if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano'}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
+    const bam = f.querySelector('[data-aplicar-mano]');
+    if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
     if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
     const bcon = f.querySelector('[data-contra]');
@@ -677,7 +782,7 @@ const Duelo = (() => {
   }
 
   /* ---------- las tiradas: lo que corre en la página del dueño (iframe del mapa o página suelta) ---------- */
-  const RE_CAMPO = {pdg: /pdg/i, eva: /evasi|parry/i, fuerza: /fuerza/i, bloqueo: /bloqueo/i};
+  const RE_CAMPO = {pdg: /pdg/i, eva: /evasi|parry/i, fuerza: /fuerza/i, bloqueo: /bloqueo/i, dano: /da[ñn]o/i};
 
   async function ejecutar(m){
     const h = hooks();
@@ -703,8 +808,8 @@ const Duelo = (() => {
       }
       if(m.tipo !== 'duelo-tirar') return;
       const campo = m.campo;
-      const lado = (campo === 'pdg' || campo === 'fuerza') ? d.atacante : d.defensor;
-      const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
+      const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+      const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : campo === 'dano' ? 'dano' : 'bloqueo';
       if(!h.soy || !h.soy(lado) || d[campo] || d.estado !== 'esperando' || d.fase !== fase) return;
       document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
       let defensa = null;
@@ -720,6 +825,7 @@ const Duelo = (() => {
       if(campo === 'pdg') h.atacar(d);
       else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
       else if(campo === 'fuerza') h.fuerza(d);
+      else if(campo === 'dano') h.dano(d);
       else h.bloquear(d);
       setTimeout(avisarMapaUi, 350);
     }catch(err){
@@ -736,7 +842,7 @@ const Duelo = (() => {
     if(!esperaTiro.re.test(String(det.origen || ''))) return;
     const {id, campo, defensa, extra} = esperaTiro;
     esperaTiro = null;
-    guardarTiro(id, campo, r, defensa, extra).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
+    (campo === 'dano' ? guardarDano(id, r) : guardarTiro(id, campo, r, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
       .then(() => avisarMapaUi());
   });
 
@@ -767,14 +873,14 @@ const Duelo = (() => {
     if(!f){ _toast('Escribí el valor del stat (un número mayor que 0)'); return; }
     const rolls = f.combo.map(x => 1 + Math.floor(Math.random() * x));
     const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
-    const lado = (campo === 'pdg' || campo === 'fuerza') ? d.atacante : d.defensor;
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     const selModo = document.querySelector('[data-manual-modo]');
     const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
     const defensa = campo === 'eva' ? {modo, itemId: '', itemNombre: '', costo: 0} : null;
     const etiqueta = campo === 'eva' ? (modo === 'parry' ? 'Parry' : 'Evasión') : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};
     if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }
-    guardarTiro(d.id, campo, r, defensa).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+    (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
   /* ---------- botones «Ver duelo» y apertura automática ---------- */
@@ -821,6 +927,7 @@ const Duelo = (() => {
     });
   }
 
+  // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
   // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.
   function escuchar(cfg){
     if(escuchando || !disponible()) return;
@@ -837,6 +944,21 @@ const Duelo = (() => {
         if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
       });
       dibujarChips();
+      // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
+      if(cfgEscuchar.aplicar && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || d.dano.reclamado || aplicando.has(d.id)) return;
+          aplicando.add(d.id);
+          reclamarAplicacion(d.id).then(async mio => {
+            if(!mio) return;
+            let info;
+            try{ info = await cfgEscuchar.aplicar(d); }
+            catch(err){ console.error('Duelo: no se pudo aplicar el daño', err); info = {manual: true, motivoManual: 'no se pudo aplicar solo'}; }
+            const crit = d.resultado === 'pego' && d.crit && d.crit.mult > 1;
+            await guardarAplicacion(d.id, {golpe: 0, ...info});
+          }).catch(err => console.error('Duelo: error al aplicar el daño', err));
+        });
+      }
     }, err => console.error('Duelo: error escuchando los duelos', err));
     limpiarViejos();
   }

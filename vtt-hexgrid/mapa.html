@@ -7687,6 +7687,7 @@ async function danioCreep(t, texto, ignoraDef){
     return {r, previo, nuevo: sc.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  return res;
 }
 
 async function danioPj(t, texto, ignoraDef){
@@ -7709,6 +7710,7 @@ async function danioPj(t, texto, ignoraDef){
     return {r, previo, nuevo: datos.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  return res;
 }
 
 function hudHpHtml(t, d){
@@ -8980,6 +8982,29 @@ function dueloElegirObjetivoMapa(msg){
   };
   pedir();
 }
+// Aplica el daño de un duelo al HP del defensor (solo corre en el mapa del GM, ver comun/duelo.js). Reutiliza «Recibe daño»: Invulnerable y Escudo mágico valen.
+// Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
+async function dueloAplicarDano(d){
+  const dn = d.dano, t = tokens.get(d.defensor.tokenId);
+  const crit = d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
+  const mult = crit ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo)), golpe = crudo * mult;
+  const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
+  if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
+  if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return {...base, manual: true, motivoManual: 'es una invocación'};
+  let def = 0;
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; }
+  else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; }
+  let aplicar = golpe, ignoraDef = crit;
+  if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
+  try{
+    const res = t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef) : await danioPj(t, String(aplicar), ignoraDef);
+    return {...base, defensa: crit ? 0 : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo)};
+  }catch(err){
+    console.error('No se pudo aplicar el daño del duelo:', err);
+    return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
+  }
+}
+
 // Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.
 function dueloRelayMapa(l, msg){
   const creep = l.tipo === 'creep';
@@ -9763,7 +9788,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa});
+  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

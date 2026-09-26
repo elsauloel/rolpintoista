@@ -5080,13 +5080,13 @@ function invAtacarSuelto(invId){
   tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'), 'pdg');
   toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
 }
-function invDanio(invId){
+function invDanio(invId, sinEfectos){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   const r = tirarDados(invDanoTxt(inv, invStatValor(inv, 'dmg')));
   if(!r) return;
   registrarTirada(`${inv.nombre} · Daño Arma`, r);
-  if((inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
+  if(!sinEfectos && (inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
     arma: inv.armaNombre || 'el arma',
     efectos: inv.armaEfectos,
     publicar: linea => {
@@ -10266,6 +10266,15 @@ window.DUELO_HOOKS = {
     if(inv) return num((inv.crit || [])[i]);
     const v = compute().final['tipo' + (i + 1)];
     return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v));
+  },
+  // El daño del arma del ataque (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
+  dano: d => {
+    const inv = dueloInvDe(d.atacante);
+    if(inv){ invDanio(inv.id, true); return; }
+    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
+    if(!arma){ toast('No hay un arma equipada con daño para tirar'); return; }
+    const r = tirarDados(armaDanoTxt(arma, compute().final.dmg));
+    if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
   },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {

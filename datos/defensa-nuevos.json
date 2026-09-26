@@ -1105,5 +1105,642 @@
   "revelaOculto": true,
   "equipoEstadoNombre": "Ojo que todo lo ve",
   "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: personajes en sigilo, trampas y elementos escondidos se ven. ✋ A mano: el GM usa 👁 Revelar lo oculto dentro de ese radio (todavía no se hace solo desde el mapa)."
+ },
+ {
+  "id": "nuevo-correa-con-bolsitas",
+  "nombre": "Correa con bolsitas",
+  "tier": "Común",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 55,
+  "mods": [
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de cinturón +2",
+  "descripcionNarrativa": "Una correa de cuero con dos bolsitas cosidas a mano. Sirve para llevar lo que hay que sacar rápido.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinto-de-hebilla-ancha",
+  "nombre": "Cinto de hebilla ancha",
+  "tier": "Común",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Una hebilla de bronce del tamaño de un puño protege el vientre mejor de lo que parece.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-aprendiz-de-boticario",
+  "nombre": "Cinturón de aprendiz de boticario",
+  "tier": "Buena Calidad",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 110,
+  "mods": [
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de cinturón +3",
+  "descripcionNarrativa": "Tres frasquitos con corchos numerados y un pañuelo para limpiar los dedos. Todavía huele a lavanda.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-guardia-de-puerta",
+  "nombre": "Cinturón de guardia de puerta",
+  "tier": "Buena Calidad",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Ancho, con refuerzos de cuero doble y dos cartucheras. Lo entregan con el uniforme.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-doble-hilera",
+  "nombre": "Cinturón de doble hilera",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 220,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de cinturón +5",
+  "descripcionNarrativa": "Dos hileras de bolsillos cosidos uno sobre otro, con broches de latón. Cada cosa tiene su lugar y su orden.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-cazador-de-alimanas",
+  "nombre": "Cinturón del cazador de alimañas",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 230,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Con ganchos para cebos y cajitas para cepos. Huele a monte y a sudor viejo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-bandolero",
+  "nombre": "Cinturón de bandolero",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 240,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Evasión +1 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Cruzado al pecho y ajustado en la cintura: todo a mano y nada que estorbe al correr.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-gran-boticario",
+  "nombre": "Cinturón del gran boticario",
+  "tier": "Excepcional",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 620,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 7
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +7",
+  "descripcionNarrativa": "Tubos de vidrio, ampollas y polvos en bolsillos con forro de corcho. Los movimientos bruscos están mal vistos.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-blindado-de-sargento",
+  "nombre": "Cinturón blindado de sargento",
+  "tier": "Excepcional",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 650,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Placas de acero bajo el cuero y cartucheras de bronce. Un cinturón de los que sirven para no perder la compostura.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-coleccionista",
+  "nombre": "Cinturón del Coleccionista",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1500,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "capcinturon",
+    "val": 10
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Ranuras de cinturón +10",
+  "descripcionNarrativa": "Lo llevó alguien que no podía dejar nada atrás: diez bolsillos de tamaños distintos y ninguno vacío.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-titan",
+  "nombre": "Cinturón del Titán",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 6
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 12 +1 · Ranuras de cinturón +6",
+  "descripcionNarrativa": "Un cinturón de un tamaño imposible, recortado para humanos. Aguanta lo que reviente cerca.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-morral-de-tela",
+  "nombre": "Morral de tela",
+  "tier": "Común",
+  "tipoItem": "mochila",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 50,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +4",
+  "descripcionNarrativa": "Un saco con correas, remendado dos veces. Alcanza para lo justo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-cuero",
+  "nombre": "Mochila de cuero",
+  "tier": "Común",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 70,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 6
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +6",
+  "descripcionNarrativa": "Cuero grueso y costuras dobles. Cuando llueve, huele a establo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-campamento",
+  "nombre": "Mochila de campamento",
+  "tier": "Buena Calidad",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 8
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +8",
+  "descripcionNarrativa": "Con soporte de madera y correas para la manta. La usan los que duermen donde caen.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-alforja-de-mula",
+  "nombre": "Alforja de mula",
+  "tier": "Buena Calidad",
+  "tipoItem": "mochila",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 150,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 10
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +10 · Movimiento -1",
+  "descripcionNarrativa": "Dos bolsas grandes cruzadas: cabe de todo, pero el paso se hace lento.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-explorador",
+  "nombre": "Mochila de explorador",
+  "tier": "Raro",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 12
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +12",
+  "descripcionNarrativa": "Cada bolsillo tiene un dueño y una etiqueta. Los exploradores no pierden nada, ni siquiera el tiempo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-viaje-reforzada",
+  "nombre": "Mochila de viaje reforzada",
+  "tier": "Raro",
+  "tipoItem": "mochila",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 320,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 10
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de mochila +10",
+  "descripcionNarrativa": "Con placas de cuero duro en la espalda: sirve de almohada y de escudo al mismo tiempo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-del-mago-de-camino",
+  "nombre": "Mochila del mago de camino",
+  "tier": "Excepcional",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 800,
+  "mods": [
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 16
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Especial +1 · Ranuras de mochila +16",
+  "descripcionNarrativa": "Por fuera parece pequeña. Por dentro, no se sabe.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-del-buhonero",
+  "nombre": "Mochila del buhonero",
+  "tier": "Excepcional",
+  "tipoItem": "mochila",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 850,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 18
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +18 · Movimiento -1",
+  "descripcionNarrativa": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-zurron-del-gigante",
+  "nombre": "Zurrón del gigante",
+  "tier": "Legendario",
+  "tipoItem": "mochila",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 1800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capmochila",
+    "val": 24
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de mochila +24",
+  "descripcionNarrativa": "Cuero de un animal que nadie logró volver a ver. Se ata con una cuerda que da tres vueltas al cuerpo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-sin-fondo",
+  "nombre": "Mochila sin fondo",
+  "tier": "Legendario",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 2000,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 30
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +30",
+  "descripcionNarrativa": "Se mete la mano y no se encuentra el fondo. A veces vuelve con algo que no se había guardado.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-delantal-de-boticario",
+  "nombre": "Delantal de boticario",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Manchado de mil recetas, con un bolsillo para cada frasco. Los boticarios dicen que se pierde menos con las manos ocupadas.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-chaleco-de-mil-bolsillos",
+  "nombre": "Chaleco de mil bolsillos",
+  "tier": "Raro",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 260,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Nadie los contó jamás: siempre aparece uno más. El chaleco ideal para quien no sabe dónde dejó algo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-gabardina-del-contrabandista",
+  "nombre": "Gabardina del contrabandista",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 780,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Evasión +1 · Ranuras de cinturón +3",
+  "descripcionNarrativa": "El forro interior es un hormiguero de bolsillos secretos. Un guardia hurgó una vez y se fue con las manos vacías.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-capa-de-mil-pliegues",
+  "nombre": "Capa de mil pliegues",
+  "tier": "Legendario",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +3 · Especial +1 · Ranuras de cinturón +5",
+  "descripcionNarrativa": "Cada pliegue guarda algo: una poción, una carta, un secreto. Quien la lleva sonríe como si supiera algo que vos no.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-guantes-de-prestidigitador",
+  "nombre": "Guantes de prestidigitador",
+  "tier": "Raro",
+  "tipoItem": "manos",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 230,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "des",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1 · Des +1 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Un bolsillito en cada puño y un truco en cada dedo. Con ellos siempre hay algo por sacar.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-sombrero-de-copa-del-mago",
+  "nombre": "Sombrero de copa del mago",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 280,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Res. crítico Tipo 4 +1 · Especial +1 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Por dentro es más grande que por fuera, y de vez en cuando se asoma un conejo. Nadie sabe por qué.",
+  "categoria": "contenedores"
  }
 ]

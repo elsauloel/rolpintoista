@@ -59,6 +59,7 @@ const AsistenteItem = (() => {
     {id: 'piernas', label: 'Piernas', grupo: 'defensa'},
     {id: 'pies', label: 'Pies', grupo: 'defensa'},
     {id: 'cinturon', label: 'Cinturón', grupo: 'accesorio'},
+    {id: 'mochila', label: 'Mochila', grupo: 'accesorio'},
     {id: 'anillos', label: 'Anillo', grupo: 'accesorio'},
     {id: 'otros', label: 'Otro', grupo: 'otro'},
     {id: 'consumibles', label: 'Consumible', grupo: 'consumible'},
@@ -67,13 +68,13 @@ const AsistenteItem = (() => {
   const RAPIDOS = {
     arma: [['pdg', 'PdG'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
     defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento']],
-    accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón']],
+    accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón'], ['capmochila', 'Ranuras de mochila']],
     otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']],
   };
   const EXPLICA_BONO = {
     pdg: 'probabilidad de golpe', crit: 'Crítico frecuente: baja el rango del crítico (cada punto = 1 menos de diferencia PdG − Evasión; mínimo 2)', critpot: 'Crítico potente: baja los umbrales del d20 (doble, triple y cuádruple daño)',
     parry: 'desviar golpes', bloqueo: 'frenar daño', dmg: 'suma al daño de los golpes cuerpo a cuerpo',
-    eva: 'esquivar', hpmax: 'vida máxima', mov: 'casilleros de movimiento', capcinturon: 'lugares extra en el cinturón',
+    eva: 'esquivar', hpmax: 'vida máxima', mov: 'casilleros de movimiento', capcinturon: 'lugares extra en el cinturón', capmochila: 'lugares extra en la mochila',
   };
   const CRIT_IDS = ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'];
   const CRIT_TIPO = {tipo1: 4, tipo2: 6, tipo3: 8, tipo4: 10, tipo5: 12};
@@ -398,7 +399,7 @@ const AsistenteItem = (() => {
       const aparte = g === 'arma' ? ['rng'] : g === 'defensa' ? ['def', ...CRIT_IDS] : [];
       const ids = new Set((cfg.stats || []).map(s => s.id));
       const opciones = sel => (cfg.stats || []).map(s => `<option value="${e(s.id)}" ${sel === s.id ? 'selected' : ''}>${e(s.label)}</option>`).join('');
-      const rapidos = (RAPIDOS[g] || []).filter(([id]) => ids.has(id) && (id !== 'capcinturon' || d.tipoItem === 'cinturon'));
+      const rapidos = (RAPIDOS[g] || []).filter(([id]) => ids.has(id) && (id !== 'capcinturon' || d.tipoItem === 'cinturon') && (id !== 'capmochila' || d.tipoItem === 'mochila'));
       h += `<div class="aa-campo"><label>Bonos</label>
         ${d.mods.map((m, i) => aparte.includes(m.stat) ? '' : `<div class="aa-mod">
           <select data-aa-modstat="${i}"><option value="">— elegir stat —</option>${opciones(m.stat)}</select>
@@ -539,6 +540,7 @@ const AsistenteItem = (() => {
     if(g === 'arma') return `<b>Arma</b>: tiene Tipo, daño y ${q.ctx === 'creep' ? 'reemplaza el arma del creep' : 'aparece en la Botonera para atacar'}. ${id === 'arma_2m' ? 'Ocupa las dos manos.' : 'Ocupa una mano.'}`;
     if(g === 'defensa') return `<b>Defensa</b>: da Defensa y resistencia a críticos. ${/^escudo/.test(id) ? `Va en ${id === 'escudo_2m' ? 'las dos manos' : 'una mano'}.` : `Ocupa el lugar de ${labelDe(id).toLowerCase()}.`}`;
     if(id === 'cinturon') return '<b>Cinturón</b>: puede dar lugares extra para consumibles, además de bonos.';
+    if(id === 'mochila') return '<b>Mochila</b>: da lugares extra en la mochila (solo una puesta a la vez).';
     if(id === 'anillos') return '<b>Anillo</b>: se pueden llevar dos. Da bonos y estados.';
     return '<b>Otro</b>: cualquier cosa que no entra en las demás. Si se equipa, sus bonos cuentan.';
   }

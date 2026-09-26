@@ -16991,6 +16991,956 @@
   "detalle": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es."
  },
  {
+  "id": "nuevo-correa-con-bolsitas",
+  "nombre": "Correa con bolsitas",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Común",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 55,
+  "detalle": "Una correa de cuero con dos bolsitas cosidas a mano. Sirve para llevar lo que hay que sacar rápido."
+ },
+ {
+  "id": "nuevo-cinto-de-hebilla-ancha",
+  "nombre": "Cinto de hebilla ancha",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Común",
+  "peso": 0,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 60,
+  "detalle": "Una hebilla de bronce del tamaño de un puño protege el vientre mejor de lo que parece."
+ },
+ {
+  "id": "nuevo-cinturon-de-aprendiz-de-boticario",
+  "nombre": "Cinturón de aprendiz de boticario",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Buena Calidad",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 110,
+  "detalle": "Tres frasquitos con corchos numerados y un pañuelo para limpiar los dedos. Todavía huele a lavanda."
+ },
+ {
+  "id": "nuevo-cinturon-de-guardia-de-puerta",
+  "nombre": "Cinturón de guardia de puerta",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Buena Calidad",
+  "peso": 1,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 120,
+  "detalle": "Ancho, con refuerzos de cuero doble y dos cartucheras. Lo entregan con el uniforme."
+ },
+ {
+  "id": "nuevo-cinturon-de-doble-hilera",
+  "nombre": "Cinturón de doble hilera",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 220,
+  "detalle": "Dos hileras de bolsillos cosidos uno sobre otro, con broches de latón. Cada cosa tiene su lugar y su orden."
+ },
+ {
+  "id": "nuevo-cinturon-del-cazador-de-alimanas",
+  "nombre": "Cinturón del cazador de alimañas",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Raro",
+  "peso": 1,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 230,
+  "detalle": "Con ganchos para cebos y cajitas para cepos. Huele a monte y a sudor viejo."
+ },
+ {
+  "id": "nuevo-cinturon-de-bandolero",
+  "nombre": "Cinturón de bandolero",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 240,
+  "detalle": "Cruzado al pecho y ajustado en la cintura: todo a mano y nada que estorbe al correr."
+ },
+ {
+  "id": "nuevo-cinturon-del-gran-boticario",
+  "nombre": "Cinturón del gran boticario",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Excepcional",
+  "peso": 0,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 7
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 7
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 620,
+  "detalle": "Tubos de vidrio, ampollas y polvos en bolsillos con forro de corcho. Los movimientos bruscos están mal vistos."
+ },
+ {
+  "id": "nuevo-cinturon-blindado-de-sargento",
+  "nombre": "Cinturón blindado de sargento",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Excepcional",
+  "peso": 1,
+  "def": 4,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 650,
+  "detalle": "Placas de acero bajo el cuero y cartucheras de bronce. Un cinturón de los que sirven para no perder la compostura."
+ },
+ {
+  "id": "nuevo-cinturon-del-coleccionista",
+  "nombre": "Cinturón del Coleccionista",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Legendario",
+  "peso": 1,
+  "def": 3,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "capcinturon",
+    "val": 10
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "capcinturon",
+    "val": 10
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1500,
+  "detalle": "Lo llevó alguien que no podía dejar nada atrás: diez bolsillos de tamaños distintos y ninguno vacío."
+ },
+ {
+  "id": "nuevo-cinturon-del-titan",
+  "nombre": "Cinturón del Titán",
+  "origen": "nuevo · defensa",
+  "slot": "cinturón",
+  "tipoItem": "cinturon",
+  "tier": "Legendario",
+  "peso": 1,
+  "def": 5,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 6
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 6
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1700,
+  "detalle": "Un cinturón de un tamaño imposible, recortado para humanos. Aguanta lo que reviente cerca."
+ },
+ {
+  "id": "nuevo-morral-de-tela",
+  "nombre": "Morral de tela",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Común",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 4
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 4
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 50,
+  "detalle": "Un saco con correas, remendado dos veces. Alcanza para lo justo."
+ },
+ {
+  "id": "nuevo-mochila-de-cuero",
+  "nombre": "Mochila de cuero",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Común",
+  "peso": 1,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 6
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 6
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 70,
+  "detalle": "Cuero grueso y costuras dobles. Cuando llueve, huele a establo."
+ },
+ {
+  "id": "nuevo-mochila-de-campamento",
+  "nombre": "Mochila de campamento",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Buena Calidad",
+  "peso": 1,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 8
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 8
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 130,
+  "detalle": "Con soporte de madera y correas para la manta. La usan los que duermen donde caen."
+ },
+ {
+  "id": "nuevo-alforja-de-mula",
+  "nombre": "Alforja de mula",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Buena Calidad",
+  "peso": 2,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 10
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 10
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 150,
+  "detalle": "Dos bolsas grandes cruzadas: cabe de todo, pero el paso se hace lento."
+ },
+ {
+  "id": "nuevo-mochila-de-explorador",
+  "nombre": "Mochila de explorador",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Raro",
+  "peso": 1,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 12
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 12
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 300,
+  "detalle": "Cada bolsillo tiene un dueño y una etiqueta. Los exploradores no pierden nada, ni siquiera el tiempo."
+ },
+ {
+  "id": "nuevo-mochila-de-viaje-reforzada",
+  "nombre": "Mochila de viaje reforzada",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Raro",
+  "peso": 2,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 10
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 10
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 320,
+  "detalle": "Con placas de cuero duro en la espalda: sirve de almohada y de escudo al mismo tiempo."
+ },
+ {
+  "id": "nuevo-mochila-del-mago-de-camino",
+  "nombre": "Mochila del mago de camino",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Excepcional",
+  "peso": 1,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 16
+   }
+  ],
+  "despues": [
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 16
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 800,
+  "detalle": "Por fuera parece pequeña. Por dentro, no se sabe."
+ },
+ {
+  "id": "nuevo-mochila-del-buhonero",
+  "nombre": "Mochila del buhonero",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Excepcional",
+  "peso": 3,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 18
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 18
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 850,
+  "detalle": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar."
+ },
+ {
+  "id": "nuevo-zurron-del-gigante",
+  "nombre": "Zurrón del gigante",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Legendario",
+  "peso": 3,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capmochila",
+    "val": 24
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capmochila",
+    "val": 24
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1800,
+  "detalle": "Cuero de un animal que nadie logró volver a ver. Se ata con una cuerda que da tres vueltas al cuerpo."
+ },
+ {
+  "id": "nuevo-mochila-sin-fondo",
+  "nombre": "Mochila sin fondo",
+  "origen": "nuevo · defensa",
+  "slot": "mochila",
+  "tipoItem": "mochila",
+  "tier": "Legendario",
+  "peso": 1,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "capmochila",
+    "val": 30
+   }
+  ],
+  "despues": [
+   {
+    "stat": "capmochila",
+    "val": 30
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 2000,
+  "detalle": "Se mete la mano y no se encuentra el fondo. A veces vuelve con algo que no se había guardado."
+ },
+ {
+  "id": "nuevo-delantal-de-boticario",
+  "nombre": "Delantal de boticario",
+  "origen": "nuevo · defensa",
+  "slot": "torso",
+  "tipoItem": "armadura_blanda",
+  "tier": "Buena Calidad",
+  "peso": 1,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 120,
+  "detalle": "Manchado de mil recetas, con un bolsillo para cada frasco. Los boticarios dicen que se pierde menos con las manos ocupadas."
+ },
+ {
+  "id": "nuevo-chaleco-de-mil-bolsillos",
+  "nombre": "Chaleco de mil bolsillos",
+  "origen": "nuevo · defensa",
+  "slot": "torso",
+  "tipoItem": "armadura_blanda",
+  "tier": "Raro",
+  "peso": 1,
+  "def": 4,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 260,
+  "detalle": "Nadie los contó jamás: siempre aparece uno más. El chaleco ideal para quien no sabe dónde dejó algo."
+ },
+ {
+  "id": "nuevo-gabardina-del-contrabandista",
+  "nombre": "Gabardina del contrabandista",
+  "origen": "nuevo · defensa",
+  "slot": "torso",
+  "tipoItem": "armadura_blanda",
+  "tier": "Excepcional",
+  "peso": 2,
+  "def": 5,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 780,
+  "detalle": "El forro interior es un hormiguero de bolsillos secretos. Un guardia hurgó una vez y se fue con las manos vacías."
+ },
+ {
+  "id": "nuevo-capa-de-mil-pliegues",
+  "nombre": "Capa de mil pliegues",
+  "origen": "nuevo · defensa",
+  "slot": "torso",
+  "tipoItem": "armadura_blanda",
+  "tier": "Legendario",
+  "peso": 1,
+  "def": 6,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1900,
+  "detalle": "Cada pliegue guarda algo: una poción, una carta, un secreto. Quien la lleva sonríe como si supiera algo que vos no."
+ },
+ {
+  "id": "nuevo-guantes-de-prestidigitador",
+  "nombre": "Guantes de prestidigitador",
+  "origen": "nuevo · defensa",
+  "slot": "manos",
+  "tipoItem": "manos",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "des",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "des",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 230,
+  "detalle": "Un bolsillito en cada puño y un truco en cada dedo. Con ellos siempre hay algo por sacar."
+ },
+ {
+  "id": "nuevo-sombrero-de-copa-del-mago",
+  "nombre": "Sombrero de copa del mago",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 280,
+  "detalle": "Por dentro es más grande que por fuera, y de vez en cuando se asoma un conejo. Nadie sabe por qué."
+ },
+ {
   "id": "nuevo-polvora-de-destello",
   "nombre": "Pólvora de destello",
   "origen": "nuevo · consumible",

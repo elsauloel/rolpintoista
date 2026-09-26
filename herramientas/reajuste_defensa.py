@@ -28,7 +28,7 @@ TOPE = {  # tier -> {Tipo: tope por pieza}
     'Legendario': {4: 3, 6: 2, 8: 2, 10: 2, 12: 1},
 }
 SLOT_DE = {'cabeza': 'cabeza', 'armadura_blanda': 'torso', 'armadura_rigida': 'torso', 'manos': 'manos', 'piernas': 'piernas', 'pies': 'pies',
-           'escudo_1m': 'escudo', 'escudo_2m': 'escudo', 'cinturon': 'cinturón', 'anillos': 'anillo'}
+           'escudo_1m': 'escudo', 'escudo_2m': 'escudo', 'cinturon': 'cinturón', 'mochila': 'mochila', 'anillos': 'anillo'}
 
 
 VARIACIONES = {   # nombre -> [(stat, valor)]: piezas idénticas a otra del catálogo (pedido del dueño, 2026-09-25); la primera del grupo queda como está

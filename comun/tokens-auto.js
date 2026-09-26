@@ -91,7 +91,7 @@ const TokensAuto = (() => {
     }
     return out;
   }
-  /* o: {fichaId, tipoToken?, nombre, detalle, dano, radio, cant, fuegoAmigo, color, mapaId?}
+  /* o: {fichaId, tipoToken?, nombre, detalle, dano, radio, cant, fuegoAmigo, color, mapaId?, forma?: 'flor'|'linea', largo? (solo la línea)}
      Devuelve {colocadas, mapaId, motivo?} (motivo: 'sin-token' | 'sin-lugar'). */
   async function colocarTrampas(o){
     const mapaId = o.mapaId || await mapaQueMiraElGM();
@@ -108,13 +108,15 @@ const TokensAuto = (() => {
     [0, 1, 5, 2, 4, 3].forEach(k => {
       const d = rotarCubo(0, 1, frente + k);
       const c = deCubo(base.q + d.dq, base.r + d.dr);
-      if(elegidas.length < (o.cant || 1) && !ocupadas.has(`${c.col},${c.fila}`)) elegidas.push(c);
+      if(elegidas.length < (o.cant || 1) && !ocupadas.has(`${c.col},${c.fila}`)){ c.dir = (frente + k) % 6; elegidas.push(c); }   // dir: hacia dónde apunta (la línea se extiende hacia afuera del token)
     });
     if(!elegidas.length) return {colocadas: 0, mapaId, motivo: 'sin-lugar'};
     const lote = fbDb.batch();
     elegidas.forEach(c => {
+      const linea = o.forma === 'linea';
+      const celdasLinea = []; for(let i = 0; i < Math.max(1, Math.min(20, o.largo || 3)); i++) celdasLinea.push(0, i);   // recta hacia afuera: (0,0), (0,1), (0,2)…, rotada según hacia dónde mira
       lote.set(elCol.doc(), {
-        tipo: 'flor', origen: {col: c.col, fila: c.fila}, celdas: celdasFlor(o.radio || 0), rotacion: 0,
+        tipo: linea ? 'linea' : 'flor', origen: {col: c.col, fila: c.fila}, celdas: linea ? celdasLinea : celdasFlor(o.radio || 0), rotacion: linea ? ((c.dir % 6) + 6) % 6 * 60 : 0,
         color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#D9A21B', alfa: 45, solido: false, invisible: false,
         imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),

@@ -110,7 +110,7 @@ def main():
             detalle = ('Trampa %s: al usarla se coloca en el mapa una trampa en %s. %s' % (GRADO[p], forma, texto))
             if p != 2:
                 detalle += ' Dificultades y duraciones %s.' % ('−2 respecto de la trampa común' if p == 1 else '+2 respecto de la trampa común')
-            detalle += ' ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («%s», radio %d); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.' % (b['nombre'], tamano)
+            detalle += ' ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.'
             datos = {'nombre': nombre[:40], 'detalle': (texto[:190]), 'amiga': bool(b['amiga'] or b['nombre'] in FISICAS), 'tipo': b['tipo'], 'tamano': tamano, 'color': b['color'], 'alfa': 45, 'dano': dano}
             if b['ignoraDef']:
                 datos['ignoraDef'] = True

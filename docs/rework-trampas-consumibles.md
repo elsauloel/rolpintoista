@@ -12,5 +12,5 @@
 - El ítem lleva `trampaDatos` (lo que el mapa carga: forma, radio, daño, estado…), listo para automatizar.
 
 ## Automatización (regla ⚙ / ✋)
-- ✋ **Hoy se coloca a mano**: con 📚 Catálogo de trampas del mapa (la misma trampa, en el radio elegido). Ver pendiente "Trampas para jugadores".
-- Pendiente: **que usar la trampa desde la mochila la coloque sola en el mapa** (pide la casilla, descuenta 1 unidad, arma la trampa con `trampaDatos`, del bando del jugador; los aliados nunca la disparan). Teleport y Portal cósmico quedan afuera por ahora (necesitan destino).
+- ⚙ **Automático (2026-09-25, pedido del dueño):** al **consumir** la trampa desde la mochila o el cinturón, la ficha llama a `TokensAuto.colocarTrampas` (`colocarTrampaDeItem`, `ficha.html`): aparece **junto a tu token** (la casilla libre al frente) el elemento-trampa con sus cifras (forma y radio/largo, daño, estado, fuego amigo, color) y **la arrastrás en el mapa a donde quieras** (owner o GM pueden moverla; solo la ven vos y el GM; la disparan los rivales, los aliados nunca). **Si no hay token en el mapa en juego o no hay lugar libre, no se gasta la unidad ni los Nitros.** Las líneas (dardos, cuchillas, cable) se extienden hacia afuera del token (`forma: 'linea'`, `largo`).
+- ✋ A mano quedan los estados, las tiradas para evitarla y lo demás que dice el texto de cada trampa (como en las trampas de creep). Teleport y Portal cósmico quedan afuera por ahora (necesitan destino).

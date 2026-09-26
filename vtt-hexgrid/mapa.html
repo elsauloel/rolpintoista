@@ -2357,7 +2357,7 @@ const sigiloFantasmas = new Map();     // tokenId -> {col, fila, hasta}
 // personajes, salvo con su 👁).
 function ocultoPorSigiloParaMi(t){
   if(!enSigilo(t)) return false;
-  return soyGM ? (t.tipo === 'pj' && !ojoRevelando) : t.tipo === 'creep';
+  return soyGM ? (t.tipo === 'pj' && !ojoRevelando) : (t.tipo === 'creep' && !reveladaCasilla(t));   // «Ve lo oculto» de un aliado lo deja ver
 }
 function sigiloFantasmasActualizar(){
   tokens.forEach((t, id) => {
@@ -2453,7 +2453,7 @@ function estelaVisibleDe(t){
 // Aliados (personajes jugadores e invocaciones) se ven siempre; el resto,
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
-  if(!soyGM && t.tipo === 'creep' && enSigilo(t)) return false;   // creep en sigilo: los jugadores no lo ven
+  if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
   if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
   return nieblaVista.has(nbPack(t.col, t.fila));
@@ -2483,6 +2483,20 @@ function offsetsVision(k, R){
   }
   return (visionOffsets[clave] = res);
 }
+// Luz que lleva un token (stat «Luz portada» de su ficha: farol, bengala, lámpara) y radio en que ve lo oculto (stat «Ve lo oculto»).
+function statPjDe(t, campo){
+  if(!t || t.tipo !== 'pj') return 0;
+  const v = vinculo(t), r = v && v.resumen;
+  return r && Number.isFinite(r[campo]) && r[campo] > 0 ? Math.min(30, Math.round(r[campo])) : 0;
+}
+const luzPortadaDe = t => statPjDe(t, 'luz'), veOcultoDe = t => statPjDe(t, 'veoculto');
+const offsetsDisco = [];   // flor completa de radio R (la luz que se lleva encima ilumina para todos lados, sin punto ciego)
+function celdasDisco(R){
+  if(offsetsDisco[R]) return offsetsDisco[R];
+  const res = [];
+  for(let dq = -R; dq <= R; dq++) for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++) res.push({dq, dr});
+  return (offsetsDisco[R] = res);
+}
 // Radio de visión de un token: la luz de la escena + lo que suman sus ítems y pasivas (Visión de la ficha: base 6, ej. Ojo avizor +1).
 function radioVisionDe(t){
   let bonus = 0;
@@ -2504,8 +2518,37 @@ function celdasVisionDe(t, ignorarSolidos){
     if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
     res.push(nbPack(col, fila));
   });
+  // Luz portada: un disco completo alrededor (sin punto ciego), también tapado por los Sólidos.
+  const luz = luzPortadaDe(t);
+  if(luz > 0){
+    const vistas = new Set(res);
+    celdasDisco(luz).forEach(o => {
+      const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
+      if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
+      vistas.add(nbPack(col, fila));
+    });
+    return [...vistas];
+  }
   return res;
 }
+// Lo oculto que ven los personajes con «Ve lo oculto» (radio) dentro de su campo de visión: creeps en sigilo y trampas escondidas.
+let revelaFirma = '', reveladas = new Set();
+function revelarActualizar(){
+  const firma = [...tokens.entries()].filter(([, t]) => veOcultoDe(t) > 0 && !t.oculto).map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${veOcultoDe(t)},${luzPortadaDe(t)},${radioVisionDe(t)}`).join('|') + '#' + solidosSet().size;
+  if(firma === revelaFirma) return;
+  revelaFirma = firma;
+  reveladas = new Set();
+  tokens.forEach(t => {
+    const R = veOcultoDe(t);
+    if(!R || t.oculto) return;
+    celdasVisionDe(t).forEach(k => { if(distanciaHex({col: t.col, fila: t.fila}, nbUnpack(k)) <= R) reveladas.add(k); });
+  });
+  if(!reveladas.size) return;
+  elementos.forEach((el, id) => {
+    if(el.trampa && !el.disparada && !trampasVistas.has(id) && celdasDeElemento(el).some(c => reveladas.has(nbPack(c.col, c.fila)))) descubrirTrampa(id);
+  });
+}
+const reveladaCasilla = t => reveladas.has(nbPack(t.col, t.fila));
 
 // ¿Este token descubre niebla? Los personajes sí; sus invocaciones también,
 // mientras estén invocadas y vivas.
@@ -2524,7 +2567,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) : 0}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma();
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
@@ -3461,6 +3504,7 @@ function calcularDisposicion(){
 
 // Devuelve true si todavía hay algo animándose.
 function dibujar(){
+  revelarActualizar();
   nieblaActualizar();
   sigiloRevisar();
   sigiloFantasmasActualizar();

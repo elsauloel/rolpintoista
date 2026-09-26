@@ -19,7 +19,7 @@ TIERS_OK = {'común':'Común', 'buena calidad':'Buena Calidad', 'raro':'Raro',
             'excepcional':'Excepcional', 'legendario':'Legendario'}
 STATS_OK = {'def','tipo1','tipo2','tipo3','tipo4','tipo5','mov','bonos','eva','ini','pdg','crit','critpot',
             'parry','fue','con','esp','agl','des','resm','resmg','rescc','rangocasteo','accionesmax',
-            'dmg','bloqueo','hpmax','crgmax','rng','pdgmg','capcinturon','capmochila','percepcion'}
+            'dmg','bloqueo','hpmax','crgmax','rng','pdgmg','capcinturon','capmochila','vision','luz','veoculto','percepcion'}
 
 # Nombres en español completo que se usan en "Otros modificadores" (sobre
 # todo en Accesorios) y no coinciden con el id interno del stat. Sin este

@@ -111,14 +111,19 @@
     "ranuras": 1,
     "precioCompra": 20,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 3 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 3 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (antorcha de brea)» y el mapa lo lee.",
     "descripcionNarrativa": "Arde rápido y humea mucho. Sirve para los pasillos y para hacerse notar.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (antorcha de brea)",
     "efectoTurnos": 3,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 3 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 3 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (antorcha de brea)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 3
+      }
+    ],
     "mods": []
   },
   {
@@ -314,11 +319,19 @@
     "ranuras": 1,
     "precioCompra": 30,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 3 (37 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 3 (37 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de mano)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Chisporrotea rojo y lo deja todo a la vista por un instante. Los marineros las llevan siempre en el bolsillo.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (bengala de mano)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 3
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 3 (37 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de mano)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -329,11 +342,19 @@
     "ranuras": 1,
     "precioCompra": 65,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 5 (91 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 5 (91 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de señales)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Sube haciendo un silbido y estalla en una luz blanca que se ve desde el otro lado de la colina.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (bengala de señales)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 5
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 5 (91 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de señales)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -581,11 +602,19 @@
     "ranuras": 1,
     "precioCompra": 140,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 8 (217 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 8 (217 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (cohete de luz)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Se lanza al cielo y deja el paisaje entero a la vista por un segundo eterno. Ideal para saber qué te espera.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (cohete de luz)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 8
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 8 (217 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (cohete de luz)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -596,13 +625,13 @@
     "ranuras": 1,
     "precioCompra": 120,
     "peso": 0,
-    "detalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ✋ A mano: el GM lo aplica en la mesa.",
+    "detalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ⚙ Automático: aplica el estado.",
     "descripcionNarrativa": "Un frasquito de un líquido azul que pica mucho. Después de unos segundos, el mundo se ve más nítido y más lleno de detalles.",
     "unidades": 1,
     "consumible": true,
-    "efectoNombre": "Colirio del vidente",
+    "efectoNombre": "Percepción aumentada",
     "efectoTurnos": 5,
-    "efectoDetalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ✋ A mano: el GM lo aplica en la mesa.",
+    "efectoDetalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ⚙ Automático: aplica el estado.",
     "efectoMods": [],
     "mods": []
   },
@@ -1020,14 +1049,19 @@
     "ranuras": 1,
     "precioCompra": 160,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (esfera de luz fría)» y el mapa lo lee.",
     "descripcionNarrativa": "Una bolita de cristal que late con una luz azulada sin calor ni humo. Flota apenas sobre la mano.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (esfera de luz fría)",
     "efectoTurnos": 5,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (esfera de luz fría)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 6
+      }
+    ],
     "mods": []
   },
   {
@@ -1116,14 +1150,23 @@
     "ranuras": 1,
     "precioCompra": 350,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (faro de la revelación)» y el mapa lo lee.",
     "descripcionNarrativa": "Un pequeño faro de bolsillo, con su lente y su espejo. Barre el lugar con un haz que desnuda hasta los secretos.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (faro de la revelación)",
     "efectoTurnos": 4,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (faro de la revelación)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 6
+      },
+      {
+        "stat": "veoculto",
+        "val": 6
+      }
+    ],
     "mods": []
   },
   {
@@ -1134,14 +1177,19 @@
     "ranuras": 1,
     "precioCompra": 30,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (farol de aceite)» y el mapa lo lee.",
     "descripcionNarrativa": "Con su cristal ahumado y su llama estable, es la luz de todo viajero prevenido.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (farol de aceite)",
     "efectoTurnos": 5,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (farol de aceite)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 3
+      }
+    ],
     "mods": []
   },
   {
@@ -1308,14 +1356,19 @@
     "ranuras": 1,
     "precioCompra": 60,
     "peso": 0,
-    "detalle": "Ves lo oculto (personajes en sigilo, trampas y elementos escondidos) en un radio 2 alrededor tuyo durante 3 turnos. ✋ A mano: el GM lo aplica en la mesa.",
+    "detalle": "Ves lo oculto (creeps en sigilo y trampas escondidas) en un radio 2 dentro de tu campo de visión durante 3 turnos. ⚙ Automático: aplica el estado y el mapa lo lee.",
     "descripcionNarrativa": "Un colirio amargo que dilata la pupila hasta el borde del ojo. Se ve en la penumbra y se descubre al que se esconde.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Gotas de ojo de gato",
     "efectoTurnos": 3,
-    "efectoDetalle": "Ves lo oculto (personajes en sigilo, trampas y elementos escondidos) en un radio 2 alrededor tuyo durante 3 turnos. ✋ A mano: el GM lo aplica en la mesa.",
-    "efectoMods": [],
+    "efectoDetalle": "Ves lo oculto (creeps en sigilo y trampas escondidas) en un radio 2 dentro de tu campo de visión durante 3 turnos. ⚙ Automático: aplica el estado y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "veoculto",
+        "val": 2
+      }
+    ],
     "mods": []
   },
   {
@@ -1407,11 +1460,23 @@
     "ranuras": 1,
     "precioCompra": 140,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 4 (61 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 4 (61 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (luz de la verdad)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Un destello limpio que no proyecta sombras: nada, ni nadie, puede esconderse de ella.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (luz de la verdad)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 4
+      },
+      {
+        "stat": "veoculto",
+        "val": 4
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 4 (61 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (luz de la verdad)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -1422,14 +1487,19 @@
     "ranuras": 1,
     "precioCompra": 70,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien lo usa durante 6 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien la usa durante 6 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara de minero)» y el mapa lo lee.",
     "descripcionNarrativa": "Los mineros aprendieron a fuerza de derrumbes que una buena luz vale más que una buena pica.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (lámpara de minero)",
     "efectoTurnos": 6,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien lo usa durante 6 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien la usa durante 6 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara de minero)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 4
+      }
+    ],
     "mods": []
   },
   {
@@ -1440,14 +1510,23 @@
     "ranuras": 1,
     "precioCompra": 75,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara del inquisidor)» y el mapa lo lee.",
     "descripcionNarrativa": "Los inquisidores la usan de noche. Dicen que la llama parpadea cuando algo miente cerca.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (lámpara del inquisidor)",
     "efectoTurnos": 4,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara del inquisidor)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 3
+      },
+      {
+        "stat": "veoculto",
+        "val": 3
+      }
+    ],
     "mods": []
   },
   {
@@ -5872,11 +5951,23 @@
     "ranuras": 1,
     "precioCompra": 45,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (polvo de revelación)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Un polvillo plateado que se posa sobre todo lo que se esconde y lo marca con un brillo delator.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (polvo de revelación)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 2
+      },
+      {
+        "stat": "veoculto",
+        "val": 2
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (polvo de revelación)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -5965,11 +6056,19 @@
     "ranuras": 1,
     "precioCompra": 15,
     "peso": 0,
-    "detalle": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (pólvora de destello)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "descripcionNarrativa": "Un puñadito en el fuego y el cuarto entero se ve por un parpadeo. No sirve para mucho más, pero es lo más barato que hay.",
     "unidades": 1,
     "consumible": true,
-    "efectoMods": [],
+    "efectoNombre": "Destello (pólvora de destello)",
+    "efectoTurnos": 1,
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 2
+      }
+    ],
+    "efectoDetalle": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (pólvora de destello)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
     "mods": []
   },
   {
@@ -6596,14 +6695,19 @@
     "ranuras": 1,
     "precioCompra": 15,
     "peso": 0,
-    "detalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "detalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (vela de sebo)» y el mapa lo lee.",
     "descripcionNarrativa": "Huele a grasa y a cuarto viejo. Alumbra poco, dura bastante y hasta se puede llevar en la mano sin quemarse.",
     "unidades": 1,
     "consumible": true,
     "efectoNombre": "Iluminado (vela de sebo)",
     "efectoTurnos": 5,
-    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
-    "efectoMods": [],
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (vela de sebo)» y el mapa lo lee.",
+    "efectoMods": [
+      {
+        "stat": "luz",
+        "val": 2
+      }
+    ],
     "mods": []
   },
   {
@@ -15782,7 +15886,12 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 1200,
-    "mods": [],
+    "mods": [
+      {
+        "stat": "vision",
+        "val": 1
+      }
+    ],
     "efectoMods": [],
     "detalle": "Visión +1",
     "descripcionNarrativa": "Un aro sencillo de cobre con una gota de cristal. Dicen que se le abren los ojos a quien lo lleva."
@@ -15795,7 +15904,12 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 2000,
-    "mods": [],
+    "mods": [
+      {
+        "stat": "vision",
+        "val": 2
+      }
+    ],
     "efectoMods": [],
     "detalle": "Visión +2",
     "descripcionNarrativa": "Una alianza de plata con una piedra ámbar que sigue con la vista a quien la lleva. La distancia se vuelve un asunto de opinión."
@@ -15808,7 +15922,12 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 3000,
-    "mods": [],
+    "mods": [
+      {
+        "stat": "vision",
+        "val": 3
+      }
+    ],
     "efectoMods": [],
     "detalle": "Visión +3",
     "descripcionNarrativa": "Un anillo que ya no parece de metal: más bien un ojo diminuto que mira por dos. El horizonte deja de ser un límite."
@@ -15995,6 +16114,10 @@
       {
         "stat": "eva",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -18035,6 +18158,10 @@
       {
         "stat": "eva",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -18334,6 +18461,10 @@
       },
       {
         "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "vision",
         "val": 1
       }
     ],
@@ -19077,6 +19208,10 @@
       {
         "stat": "pdg",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 3
       }
     ],
     "efectoMods": [],
@@ -19146,6 +19281,10 @@
       {
         "stat": "tipo4",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 2
       }
     ],
     "efectoMods": [],
@@ -21022,6 +21161,10 @@
     "mods": [
       {
         "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "vision",
         "val": 1
       }
     ],
@@ -23534,6 +23677,10 @@
         "val": 1
       },
       {
+        "stat": "vision",
+        "val": 1
+      },
+      {
         "stat": "esp",
         "val": 1
       }
@@ -25716,6 +25863,10 @@
       {
         "stat": "tipo1",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 1
       }
     ],
     "efectoMods": [],
@@ -25777,13 +25928,21 @@
       {
         "stat": "esp",
         "val": 1
+      },
+      {
+        "stat": "vision",
+        "val": 3
+      },
+      {
+        "stat": "veoculto",
+        "val": 30
       }
     ],
     "efectoMods": [],
-    "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Revela lo oculto en todo tu campo de visión (✋ a mano)",
+    "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Ve lo oculto (todo tu campo de visión)",
     "descripcionNarrativa": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es.",
     "equipoEstadoNombre": "Ojo que todo lo ve",
-    "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: personajes en sigilo, trampas y elementos escondidos se ven. ✋ A mano: el GM usa 👁 Revelar lo oculto dentro de ese radio (todavía no se hace solo desde el mapa)."
+    "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: los creeps en sigilo y las trampas escondidas se ven. ⚙ Automático: el mapa lo lee (stat «Ve lo oculto»)."
   },
   {
     "id": "nuevo-yelmo-del-penasco",

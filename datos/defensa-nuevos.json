@@ -1096,15 +1096,19 @@
    {
     "stat": "vision",
     "val": 3
+   },
+   {
+    "stat": "veoculto",
+    "val": 30
    }
   ],
   "efectoMods": [],
-  "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Revela lo oculto en todo tu campo de visión (✋ a mano)",
+  "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Ve lo oculto (todo tu campo de visión)",
   "descripcionNarrativa": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es.",
   "categoria": "vision",
   "revelaOculto": true,
   "equipoEstadoNombre": "Ojo que todo lo ve",
-  "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: personajes en sigilo, trampas y elementos escondidos se ven. ✋ A mano: el GM usa 👁 Revelar lo oculto dentro de ese radio (todavía no se hace solo desde el mapa)."
+  "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: los creeps en sigilo y las trampas escondidas se ven. ⚙ Automático: el mapa lo lee (stat «Ve lo oculto»)."
  },
  {
   "id": "nuevo-correa-con-bolsitas",

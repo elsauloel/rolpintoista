@@ -81,7 +81,7 @@ const NOMBRES_FAMILIA = {cabeza: 'Cabeza', torso: 'Torso', manos: 'Manos', piern
 const ORDEN_FAMILIA = Object.keys(NOMBRES_FAMILIA);
 const ORDEN_TIER = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 const TIPO_CRIT = {tipo1: 'Res. crít. Tipo 4', tipo2: 'Res. crít. Tipo 6', tipo3: 'Res. crít. Tipo 8', tipo4: 'Res. crít. Tipo 10', tipo5: 'Res. crít. Tipo 12'};
-const STAT = {...TIPO_CRIT, def: 'Defensa', mov: 'Movimiento', resm: 'Res. Mt', resmg: 'Res. Mg', hpmax: 'HP máx.', capcinturon: 'Cinturón', con: 'Con', fue: 'Fue', agl: 'Agi', des: 'Des', accionesmax: 'Acciones', pdgmg: 'PdG.Mg', rng: 'Alcance', vision: 'Visión', capcinturon: 'Ranuras de cinturón', capmochila: 'Ranuras de mochila', pdg: 'PdG', parry: 'Parry', bloqueo: 'Bloqueo', crit: 'Crít. frecuente', critpot: 'Crít. potente', ini: 'Iniciativa', dmg: 'Dmg', eva: 'Evasión', esp: 'Especial', rangocasteo: 'Rango casteo', bonos: 'SP', nitros: 'Nitros'};
+const STAT = {...TIPO_CRIT, def: 'Defensa', mov: 'Movimiento', resm: 'Res. Mt', resmg: 'Res. Mg', hpmax: 'HP máx.', capcinturon: 'Cinturón', con: 'Con', fue: 'Fue', agl: 'Agi', des: 'Des', accionesmax: 'Acciones', pdgmg: 'PdG.Mg', rng: 'Alcance', vision: 'Visión', capcinturon: 'Ranuras de cinturón', capmochila: 'Ranuras de mochila', luz: 'Luz portada', veoculto: 'Ve lo oculto', pdg: 'PdG', parry: 'Parry', bloqueo: 'Bloqueo', crit: 'Crít. frecuente', critpot: 'Crít. potente', ini: 'Iniciativa', dmg: 'Dmg', eva: 'Evasión', esp: 'Especial', rangocasteo: 'Rango casteo', bonos: 'SP', nitros: 'Nitros'};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 let armas = [], dec = {actualizado: 0, decisiones: {}};

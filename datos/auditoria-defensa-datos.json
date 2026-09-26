@@ -16988,6 +16988,10 @@
    {
     "stat": "vision",
     "val": 3
+   },
+   {
+    "stat": "veoculto",
+    "val": 30
    }
   ],
   "despues": [
@@ -17010,6 +17014,10 @@
    {
     "stat": "vision",
     "val": 3
+   },
+   {
+    "stat": "veoculto",
+    "val": 30
    }
   ],
   "cambios": [],
@@ -17983,7 +17991,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (pólvora de destello)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Un puñadito en el fuego y el cuarto entero se ve por un parpadeo. No sirve para mucho más, pero es lo más barato que hay."
  },
  {
@@ -18000,7 +18008,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Destello: destapa la niebla en un radio 3 (37 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 3 (37 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de mano)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Chisporrotea rojo y lo deja todo a la vista por un instante. Los marineros las llevan siempre en el bolsillo."
  },
  {
@@ -18017,7 +18025,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 65,
-  "reglas": "Destello: destapa la niebla en un radio 5 (91 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 5 (91 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (bengala de señales)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Sube haciendo un silbido y estalla en una luz blanca que se ve desde el otro lado de la colina."
  },
  {
@@ -18034,7 +18042,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 140,
-  "reglas": "Destello: destapa la niebla en un radio 8 (217 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 8 (217 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). No revela lo oculto. ⚙ Automático: al consumirlo aplica el estado «Destello (cohete de luz)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Se lanza al cielo y deja el paisaje entero a la vista por un segundo eterno. Ideal para saber qué te espera."
  },
  {
@@ -18051,7 +18059,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (vela de sebo)» y el mapa lo lee.",
   "detalle": "Huele a grasa y a cuarto viejo. Alumbra poco, dura bastante y hasta se puede llevar en la mano sin quemarse."
  },
  {
@@ -18068,7 +18076,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 20,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 3 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 3 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (antorcha de brea)» y el mapa lo lee.",
   "detalle": "Arde rápido y humea mucho. Sirve para los pasillos y para hacerse notar."
  },
  {
@@ -18085,7 +18093,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (farol de aceite)» y el mapa lo lee.",
   "detalle": "Con su cristal ahumado y su llama estable, es la luz de todo viajero prevenido."
  },
  {
@@ -18102,7 +18110,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien lo usa durante 6 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien la usa durante 6 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara de minero)» y el mapa lo lee.",
   "detalle": "Los mineros aprendieron a fuerza de derrumbes que una buena luz vale más que una buena pica."
  },
  {
@@ -18119,7 +18127,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 160,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 5 turnos, sin punto ciego, y destapa la niebla por donde te movés. No revela lo oculto. ⚙ Automático: al consumirla aplica el estado «Iluminado (esfera de luz fría)» y el mapa lo lee.",
   "detalle": "Una bolita de cristal que late con una luz azulada sin calor ni humo. Flota apenas sobre la mano."
  },
  {
@@ -18136,7 +18144,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (polvo de revelación)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Un polvillo plateado que se posa sobre todo lo que se esconde y lo marca con un brillo delator."
  },
  {
@@ -18153,7 +18161,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 140,
-  "reglas": "Destello: destapa la niebla en un radio 4 (61 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+  "reglas": "Destello: ilumina un radio 4 (61 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (luz de la verdad)» y el mapa lo lee (tokens de los creeps iluminados incluidos).",
   "detalle": "Un destello limpio que no proyecta sombras: nada, ni nadie, puede esconderse de ella."
  },
  {
@@ -18170,7 +18178,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 75,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (lámpara del inquisidor)» y el mapa lo lee.",
   "detalle": "Los inquisidores la usan de noche. Dicen que la llama parpadea cuando algo miente cerca."
  },
  {
@@ -18187,7 +18195,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 350,
-  "reglas": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+  "reglas": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien la usa durante 4 turnos, sin punto ciego, y destapa la niebla por donde te movés. Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirla aplica el estado «Iluminado (faro de la revelación)» y el mapa lo lee.",
   "detalle": "Un pequeño faro de bolsillo, con su lente y su espejo. Barre el lugar con un haz que desnuda hasta los secretos."
  },
  {
@@ -18204,7 +18212,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 60,
-  "reglas": "Ves lo oculto (personajes en sigilo, trampas y elementos escondidos) en un radio 2 alrededor tuyo durante 3 turnos. ✋ A mano: el GM lo aplica en la mesa.",
+  "reglas": "Ves lo oculto (creeps en sigilo y trampas escondidas) en un radio 2 dentro de tu campo de visión durante 3 turnos. ⚙ Automático: aplica el estado y el mapa lo lee.",
   "detalle": "Un colirio amargo que dilata la pupila hasta el borde del ojo. Se ve en la penumbra y se descubre al que se esconde."
  },
  {
@@ -18221,7 +18229,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 120,
-  "reglas": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ✋ A mano: el GM lo aplica en la mesa.",
+  "reglas": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ⚙ Automático: aplica el estado.",
   "detalle": "Un frasquito de un líquido azul que pica mucho. Después de unos segundos, el mundo se ve más nítido y más lleno de detalles."
  },
  {

@@ -68,8 +68,9 @@ La mecánica base del juego es la **tirada enfrentada**: una parte tira a favor 
 > [!warning] Ojo con los nombres
 > "Defensa" a secas es un stat que resta daño ([[Defensa]]). Lo que tira el defensor contra un ataque es su [[Evasión]] o su [[Parry]].
 
-> [!question] ¿Es el patrón universal?
-> ¿Todas las resoluciones son "dos tiradas, gana la mayor", o hay también tiradas contra una dificultad fija (por ejemplo, forzar una cerradura)? ¿Cómo se resuelve un **empate**? ¿Hay márgenes o grados de éxito?
+> [!info] Empates (regla del dueño, 2026-09-26)
+> Si las dos tiradas empatan y **solo una lleva un «+» fijo** (el +1 de los stats impares), **gana la que no lo lleva**. Si **las dos lo llevan** (o ninguna), se elige **par o impar**: cualquiera de los dos elige, el que elige primero decide, se tira un dado y gana el que acierta. Automatizado en el [[Atacar|duelo]].
+> ¿Todas las resoluciones son "dos tiradas, gana la mayor", o hay también tiradas contra una dificultad fija (por ejemplo, forzar una cerradura)? ¿Hay márgenes o grados de éxito?
 
 +++
 titulo: Golpe crítico

@@ -2,8 +2,11 @@
    Diseño: docs/ataque-paso-a-paso.md. Idea del dueño, 2026-09-26.
 
    Un duelo es un documento de Firestore (campanas/<partida>/duelos/<id>) que los dos lados ven y escriben en vivo:
-     {estado: 'esperando'|'resuelto'|'cancelado', atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
-      pdg:{total,formula,rolls,mod}|null, eva:{…}|null, veredicto:'pego'|'fallo'|null, dif, creado, creadoPor}
+     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
+      pdg:{total,formula,rolls,mod}|null, eva:{…}|null, veredicto:'pego'|'fallo'|null, dif, desempate:'mas1'|'moneda'|null,
+      moneda:{quien:'atacante'|'defensor', eleccion:'par'|'impar', resultado, gana}|null, creado, creadoPor}
+   EMPATE (regla del dueño, 2026-09-26): si empatan y solo UNA de las dos tiradas lleva un «+» fijo (el +1 de los stats impares), gana la que NO lo lleva;
+   si las dos lo llevan (o ninguna), se resuelve con par o impar: cualquiera de los dos elige, el que elige primero, se tira el dado y gana el que acierta.
    TODOS los que están conectados ven el cuadro del duelo (se les abre solo); cualquiera lo puede minimizar («⚔ Ver duelo») y volver a abrir.
    El cuadro solo muestra los botones que le tocan a cada uno (no la Botonera entera).
 
@@ -19,7 +22,6 @@
    Depende de sesion.js (fbDb, fbUsuario, fbMiembro, fbRutaCampana) y de las globals esc, num, fmt, toast, formulaParaValor de cada herramienta. */
 const Duelo = (() => {
   const MAPA_PRINCIPAL = '_principal';
-  const EMPATE_GANA_DEFENSOR = true;   // PLACEHOLDER: el manual no define el empate de una tirada enfrentada (preguntas-abiertas.md, P-Empate)
   const VIGENCIA_MS = 30 * 60 * 1000;      // un duelo sin resolver deja de avisar a los 30 minutos
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
@@ -87,6 +89,10 @@ const Duelo = (() => {
 .duelo-veredicto{border-radius:14px;padding:18px;text-align:center;font-weight:900;letter-spacing:.04em}
 .duelo-veredicto .grande{font-size:48px;line-height:1.1}
 .duelo-veredicto .chico{font-size:14px;font-weight:500;letter-spacing:0;margin-top:6px;opacity:.92}
+.duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-par{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:15px;font-weight:600;letter-spacing:0}
+.duelo-par button{background:#c9a24a;color:#1b1608;border:0;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:800;cursor:pointer}
+.duelo-par button:disabled{opacity:.5}
 .duelo-veredicto.pego{background:linear-gradient(180deg,#1f5a34,#173f27);border:2px solid #4fce7c;color:#c9f5d6}
 .duelo-veredicto.fallo{background:linear-gradient(180deg,#5a2530,#3d181f);border:2px solid #d95a6e;color:#fbd0d7}
 .duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
@@ -262,10 +268,10 @@ const Duelo = (() => {
     const nombreLado = lado === 'pdg' ? 'PdG' : 'Evasión';
     const ladoDato = lado === 'pdg' ? d.atacante : d.defensor;
     const tiro = d[lado];
-    const cerrado = d.estado !== 'esperando';
+    const cerrado = d.estado !== 'esperando' && d.estado !== 'empate';
     const quien = _esc(ladoDato.nombre);
     let cuerpo;
-    if(d.veredicto && tiro){
+    if((d.veredicto || d.estado === 'empate') && tiro){
       return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${nombreLado} · ${quien}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${num(tiro.mod) ? ' ' + (num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(tiro.mod)) : ''}</div></div>`;
     }
     if(tiro){
@@ -292,18 +298,32 @@ const Duelo = (() => {
     f.querySelectorAll('[data-manual]').forEach(i => { manual[i.dataset.manual] = i.value; });   // conservar lo tipeado por el GM
     const nombreAtaque = NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque';
     const dif = num(d.dif);
-    const esNuevo = !!d.veredicto && !revelado[d.id];   // el veredicto se anima una sola vez por pestaña
+    const esNuevo = !!(d.veredicto || d.estado === 'empate') && !revelado[d.id];   // el veredicto se anima una sola vez por pestaña
     let veredicto = '';
-    if(d.veredicto){
+    const detalleContacto = d.pdg && d.eva ? `PdG ${_fmt(d.pdg.total)} contra Evasión ${_fmt(d.eva.total)}` : '';
+    if(d.estado === 'empate'){
+      // Empate con «+» en las dos (o en ninguna): elige par o impar cualquiera de los dos; el primero que elige decide.
+      const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => soyGM() || l.uid === yo());
+      veredicto = `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${detalleContacto} · las dos llevan «+» fijo (o ninguna): se resuelve con par o impar</div>
+        ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button></div>`).join('') : '<div class="chico">esperando que uno de los dos elija par o impar…</div>'}
+        <div class="chico">el primero que elige decide: se tira un dado y gana el que acierta</div></div>`;
+      revelado[d.id] = true;
+    }else if(d.veredicto){
       const nuevo = esNuevo ? ' nuevo' : '';
+      let como = '';
+      if(d.desempate === 'mas1') como = ' · empate: gana la tirada que no llevaba «+» fijo';
+      else if(d.desempate === 'moneda' && d.moneda){
+        const gan = d.moneda.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
+        como = ` · empate: ${_esc(d.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${d.moneda.eleccion}, salió ${d.moneda.resultado} (${d.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(gan)}`;
+      }
       veredicto = d.veredicto === 'pego'
-        ? `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">PdG ${_fmt(d.pdg.total)} contra Evasión ${_fmt(d.eva.total)} · le gana por ${_fmt(dif)}</div></div>`
-        : `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">PdG ${_fmt(d.pdg.total)} contra Evasión ${_fmt(d.eva.total)} · ${dif === 0 && EMPATE_GANA_DEFENSOR ? 'empate: gana el que defiende' : 'esquivó por ' + _fmt(Math.abs(dif))}</div></div>`;
+        ? `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · le gana por ' + _fmt(dif) : ''}${como}</div></div>`
+        : `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · esquivó por ' + _fmt(Math.abs(dif)) : ''}${como}</div></div>`;
       revelado[d.id] = true;
     }else if(d.estado === 'cancelado'){
       veredicto = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
     }
-    const puedoCancelar = d.estado === 'esperando' && (soyGM() || d.creadoPor === yo());
+    const puedoCancelar = (d.estado === 'esperando' || d.estado === 'empate') && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>⚔ ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «Ver duelo»)">—</button><button type="button" data-x title="Cerrar">✕</button></div></div>
@@ -332,6 +352,7 @@ const Duelo = (() => {
     f.querySelector('[data-x2]').onclick = cerrar;
     const bc = f.querySelector('[data-cancelarduelo]');
     if(bc) bc.onclick = () => col().doc(d.id).update({estado: 'cancelado'}).catch(err => console.error(err));
+    f.querySelectorAll('[data-par]').forEach(b => b.onclick = () => { const [q, e] = b.dataset.par.split(':'); f.querySelectorAll('[data-par]').forEach(x => x.disabled = true); elegirParidad(d.id, q, e).catch(err => { console.error(err); _toast('No se pudo tirar el desempate'); }); });
     f.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => tirarPropio(d, b.dataset.tirar, b));
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
   }
@@ -434,10 +455,39 @@ const Duelo = (() => {
       if(pdg && eva){
         const dif = pdg.total - eva.total;
         cambios.dif = dif;
-        cambios.veredicto = (dif > 0 || (dif === 0 && !EMPATE_GANA_DEFENSOR)) ? 'pego' : 'fallo';
-        cambios.estado = 'resuelto';
+        if(dif !== 0){
+          cambios.veredicto = dif > 0 ? 'pego' : 'fallo';
+          cambios.estado = 'resuelto';
+        }else{
+          // Empate: si solo una de las dos lleva un «+» fijo, gana la que NO lo lleva; si las dos (o ninguna), par o impar.
+          const masA = num(pdg.mod) > 0, masD = num(eva.mod) > 0;
+          if(masA !== masD){
+            cambios.veredicto = masA ? 'fallo' : 'pego';
+            cambios.desempate = 'mas1';
+            cambios.estado = 'resuelto';
+          }else{
+            cambios.desempate = 'moneda';
+            cambios.estado = 'empate';
+          }
+        }
       }
       tx.update(ref, cambios);
+    });
+  }
+
+  // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un dado y gana el que acierta.
+  async function elegirParidad(id, quien, eleccion){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const d = doc.data();
+      if(d.estado !== 'empate' || d.moneda) return;   // ya lo eligió el otro
+      const resultado = 1 + Math.floor(Math.random() * 6);
+      const par = resultado % 2 === 0;
+      const acierta = (eleccion === 'par') === par;
+      const gana = acierta ? quien : (quien === 'atacante' ? 'defensor' : 'atacante');
+      tx.update(ref, {moneda: {quien, eleccion, resultado, gana}, veredicto: gana === 'atacante' ? 'pego' : 'fallo', estado: 'resuelto'});
     });
   }
 
@@ -455,7 +505,7 @@ const Duelo = (() => {
     listaDuelos.forEach(d => {
       if(descartados.has(d.id)) return;
       const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
-      if(d.estado === 'esperando' && ahora - t > VIGENCIA_MS) return;
+      if((d.estado === 'esperando' || d.estado === 'empate') && ahora - t > VIGENCIA_MS) return;
       if(d.estado === 'resuelto' && ahora - t > RESUELTO_VISIBLE_MS) return;
       if(d.estado === 'cancelado') return;
       const abiertoAhora = actual && actual.id === d.id && !actual.min;
@@ -468,6 +518,7 @@ const Duelo = (() => {
     mostrar.forEach((d, id) => {
       const txt = d.estado === 'resuelto'
         ? `${d.veredicto === 'pego' ? '⚔ Pegó' : '🛡 Falló'}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
+        : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
         : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);
       if(!el){
@@ -486,7 +537,7 @@ const Duelo = (() => {
   function escuchar(cfg){
     if(escuchando || !disponible()) return;
     cfgEscuchar = cfg || {};
-    escuchando = col().where('estado', 'in', ['esperando', 'resuelto']).onSnapshot(snap => {
+    escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot(snap => {
       listaDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
       const ahora = Date.now();
       // Un duelo nuevo se abre solo para todos (los que están conectados), salvo que ya haya otro abierto (entonces queda el botón).
@@ -512,5 +563,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar};
+  return {disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, elegirParidad};
 })();

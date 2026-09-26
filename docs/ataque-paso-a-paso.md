@@ -68,3 +68,24 @@ Un documento de Firestore por duelo (`duelos/{id}`) con el estado del paso, las 
 
 ## Resumen final en la Mesa (confirmado por el dueño, 2026-09-26)
 Cuando el duelo termina (se resolvieron todos los pasos y efectos), **se arma un texto resumen y se vuelca a la Mesa como una sola línea** (paso 8): quién atacó a quién y con qué, PdG contra Evasión (y cómo se resolvió un empate), Parry/Bloqueo si hubo, si fue crítico y con qué multiplicador, el daño y la Defensa, cuánta vida perdió y de cuánto quedó, y los efectos aplicados. Las tiradas sueltas (los dados que ruedan) **siguen apareciendo en la Mesa mientras pasan**, como siempre; el resumen es el cierre. Hoy (etapa 1) solo se anuncia el desempate; el resumen completo se agrega cuando estén hechas las etapas de daño y efectos.
+
+## Etapa 2 (propuesta, 2026-09-26): la defensa desde el punto de vista del defensor
+**Paso 2 se abre en dos: el atacante tira su PdG y el defensor ELIGE cómo se defiende, a ciegas** (el PdG sigue escondido, como en la mesa real):
+- **🏃 Evasión** (sin costo; con el aviso de sobrepeso si corresponde).
+- **🗡 Parry con arma / 🛡 Parry con escudo** (uno por cada arma o escudo equipado, cada uno con su costo en No2 = su Peso). Si no le alcanzan los No2, el botón sale apagado con el motivo.
+- Si el defensor está Sentado, sin No2, etc., el cuadro **apaga solo lo que no puede** y lo dice.
+Solo aparecen esos botones (no la Botonera).
+
+**Camino A · Evasión:** PdG contra Evasión → «¡PEGÓ!» (sigue a crítico y daño) o «FALLÓ» (fin del duelo).
+**Camino B · Parry:** PdG contra Parry.
+1. Si **gana el atacante**: el Parry falló y el golpe **entra** (los No2 del Parry ya se gastaron). Sigue a crítico y daño.
+2. Si **gana el defensor**: se abre el **paso 3 · Bloqueo**: el atacante tira su **Fuerza del golpe** (Fue + peso de su arma) y el defensor su **Bloqueo** (Bloqueo + peso de su arma o escudo), las dos como suma. Si gana el defensor: **«🛡 ¡BLOQUEADO!»**, el golpe queda anulado. Si gana el atacante: el golpe entra (propuesta: completo).
+3. Después de un Parry ganado, el cuadro le **ofrece al defensor «⚔ Contraatacar»**, que abre un **duelo nuevo con los roles invertidos** (cuesta lo de un primer ataque, Tipo ÷ 2, y suma su `pdgcontra`).
+Cada tirada usa la misma regla de empate (gana la que no lleva «+»; si no, par o impar), y todo se anuncia con su veredicto grande y en la Mesa.
+
+**Preguntas abiertas (propuesta entre paréntesis):**
+1. ¿El defensor elige la defensa **antes** de ver el PdG? (sí, a ciegas)
+2. Gana el Parry pero **pierde el Bloqueo**: ¿el golpe entra completo? (sí; queda a confirmar si se reduce)
+3. **Crítico con Parry:** hoy el crítico se calcula con PdG − Evasión. ¿Contra un Parry se usa PdG − Parry? (sí, contra la defensa que usó; y si el Bloqueo frena el golpe, no hay crítico)
+4. ¿El **contraataque** se ofrece con cualquier Parry ganado o solo si además se ganó el Bloqueo? (con cualquier Parry ganado, como dice la regla)
+5. ¿Hay un **tiempo límite** para elegir defensa (por ejemplo, si no elige en X segundos, el GM decide)? (no, el GM puede elegir por él)

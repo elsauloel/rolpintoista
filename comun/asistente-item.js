@@ -66,12 +66,13 @@ const AsistenteItem = (() => {
   ];
   const GRUPO_TITULO = {arma: 'Armas', defensa: 'Defensa', accesorio: 'Accesorios', otro: 'Otros', consumible: 'Consumibles'};
   const RAPIDOS = {
-    arma: [['pdg', 'PdG'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'], ['pdgcontra', 'PdG en contraataque'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
+    arma: [['pdg', 'PdG'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'], ['pdgcontra', 'PdG en contraataque'], ['pdgopor', 'PdG en oportunidad'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
     defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento']],
     accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón'], ['capmochila', 'Ranuras de mochila']],
     otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']],
   };
   const EXPLICA_BONO = {
+    pdgopor: 'PdG solo en ataques de oportunidad: vale mucho menos que un PdG normal porque es circunstancial',
     pdgcontra: 'PdG solo al contraatacar (tras un Parry): vale mucho menos que un PdG normal porque es circunstancial',
     pdg: 'probabilidad de golpe', crit: 'Crítico frecuente: baja el rango del crítico (cada punto = 1 menos de diferencia PdG − Evasión; mínimo 2)', critpot: 'Crítico potente: baja los umbrales del d20 (doble, triple y cuádruple daño)',
     parry: 'desviar golpes', bloqueo: 'frenar daño', dmg: 'suma al daño de los golpes cuerpo a cuerpo',

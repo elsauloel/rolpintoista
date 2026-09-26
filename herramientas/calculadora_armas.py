@@ -31,7 +31,7 @@ K_EFECTO = 1.0            # PC por punto de peso de efecto al 100 %
 PESO_CRITPOT = 0.4       # el Crítico POTENTE vale ~0,4 de un punto de Frecuente (calculado con el multiplicador esperado del d20, ver docs/rework-armas.md)
 PESO_CRIT = 3.0           # peso de 1 punto de Crítico frecuente / potente / Ignora 1
 TASA_PESO = 0.2           # PC que resta cada punto de Peso del arma (relevancia intermedia)
-TASA_STAT = {'pdg': 3.5, 'pdgcontra': 0.8, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.75, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
+TASA_STAT = {'pdg': 3.5, 'pdgcontra': 0.8, 'pdgopor': 0.8, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.75, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
 TASA_STAT_DEFECTO = 1.0
 RANGO_TOPE = {'Común': (3, 4), 'Buena Calidad': (4, 5), 'Raro': (5, 6), 'Excepcional': (6, 7), 'Legendario': (8, 8)}   # Rango de las armas de rango por tier: (mínimo, máximo); vale 0,75 PC por punto (la identidad de la familia)
 ALCANCE_PRIMERO = 3.0     # PC del primer punto de Alcance de un arma cuerpo a cuerpo (pegar sin estar adyacente); el 'rng' de las armas de rango es su identidad y va aparte (0,5)
@@ -42,7 +42,7 @@ SOBREPRECIO = 1.5
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
 # Dos stats "de casa" por familia (P16, propuesta a confirmar); fuera de casa el bono cuesta ×1,25. Dmg, daño fijo y crítico valen para todas las familias (su valor ya depende del Tipo).
-STATS_CASA = {'punzante': {'pdg', 'rng'}, 'cortante': {'parry', 'ini', 'pdgcontra'}, 'hacha': {'bloqueo', 'rng'}, 'contundente': {'bloqueo', 'parry'},
+STATS_CASA = {'punzante': {'pdg', 'rng', 'pdgopor'}, 'cortante': {'parry', 'ini', 'pdgcontra'}, 'hacha': {'bloqueo', 'rng'}, 'contundente': {'bloqueo', 'parry'},
               'explosivo': {'rng', 'pdg'}, 'rango': {'rng', 'pdg'}}
 STATS_UNIVERSALES = {'dmg', 'crit', 'critpot'}
 FACTOR_CRIT = {4: 1.75, 6: 1.0, 8: 0.75, 10: 0.6, 12: 0.5}

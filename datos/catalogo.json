@@ -6882,6 +6882,36 @@
     "consumible": false
   },
   {
+    "id": "nuevo-aguja-de-la-vigilia",
+    "nombre": "Aguja de la vigilia",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "pdgopor",
+        "val": 3
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "detalle": "PdG en oportunidad +3 · Crít. frecuente +1",
+    "precioCompra": 140,
+    "descripcionNarrativa": "Casi no se ve venir, y casi siempre acierta al que se descuida.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "rng",
@@ -8483,6 +8513,32 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-daga-de-vigia",
+    "nombre": "Daga de vigía",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "pdgopor",
+        "val": 1
+      }
+    ],
+    "detalle": "PdG en oportunidad +1",
+    "precioCompra": 45,
+    "descripcionNarrativa": "La daga de quien vigila la puerta y ataca al que se quiere escabullir.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "pdg",
@@ -9196,6 +9252,32 @@
     ]
   },
   {
+    "id": "nuevo-estilete-de-centinela",
+    "nombre": "Estilete de centinela",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "pdgopor",
+        "val": 2
+      }
+    ],
+    "detalle": "PdG en oportunidad +2",
+    "precioCompra": 50,
+    "descripcionNarrativa": "Fino y rápido para el que pasa a su lado.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "crit",
@@ -9388,6 +9470,36 @@
     "ranuras": 0,
     "danoAmplificado": 0,
     "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-estoque-de-guardia",
+    "nombre": "Estoque de guardia",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "pdgopor",
+        "val": 2
+      }
+    ],
+    "detalle": "Iniciativa +1 · PdG en oportunidad +2",
+    "precioCompra": 55,
+    "descripcionNarrativa": "Punta rápida, hecha para castigar el descuido.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
     "efectoMods": [],
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -11188,6 +11300,36 @@
     "armaDeRango": false
   },
   {
+    "id": "nuevo-lanza-de-centinela",
+    "nombre": "Lanza de centinela",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      },
+      {
+        "stat": "pdgopor",
+        "val": 1
+      }
+    ],
+    "detalle": "Alcance +1 · PdG en oportunidad +1",
+    "precioCompra": 100,
+    "descripcionNarrativa": "Con el asta llega al que intenta pasar de largo.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "rng",
@@ -11289,6 +11431,53 @@
     "consumible": false
   },
   {
+    "id": "nuevo-lanza-del-paso-de-las-tres-puertas",
+    "nombre": "Lanza del Paso de las Tres Puertas",
+    "tier": "Legendario",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 3
+      },
+      {
+        "stat": "pdgopor",
+        "val": 3
+      },
+      {
+        "stat": "pdg",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 4,
+        "exitos": 3,
+        "dado": "",
+        "detalle": "75 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +3 · PdG en oportunidad +3 · PdG +2 · Crít. frecuente +2 · 75 % de dejar Lisiado 3 turnos",
+    "precioCompra": 1800,
+    "descripcionNarrativa": "Tres puertas custodió y por ninguna pasó un enemigo sin sangrar.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "id": "nuevo-lanza-del-alba",
     "nombre": "Lanza del alba",
     "tier": "Excepcional",
@@ -11329,6 +11518,75 @@
     "ranuras": 0,
     "danoAmplificado": 0,
     "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-lanza-del-guardian-del-paso",
+    "nombre": "Lanza del guardián del paso",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      },
+      {
+        "stat": "pdgopor",
+        "val": 3
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +1 · PdG en oportunidad +3 · 33 % de dejar Lisiado 3 turnos",
+    "precioCompra": 150,
+    "descripcionNarrativa": "Quien intenta cruzar el paso lo hace cojeando.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-lanza-del-porton",
+    "nombre": "Lanza del portón",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      },
+      {
+        "stat": "pdgopor",
+        "val": 2
+      }
+    ],
+    "detalle": "Alcance +1 · PdG en oportunidad +2",
+    "precioCompra": 120,
+    "descripcionNarrativa": "La lanza de quien custodia una entrada: nadie pasa sin recibir un pinchazo.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
     "efectoMods": [],
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12435,6 +12693,79 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-pica-de-retaguardia",
+    "nombre": "Pica de retaguardia",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      },
+      {
+        "stat": "pdgopor",
+        "val": 2
+      }
+    ],
+    "detalle": "Alcance +2 · PdG en oportunidad +2",
+    "precioCompra": 200,
+    "descripcionNarrativa": "Larga como una escalera: cubre la retirada de los suyos y frena a los que persiguen.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-pica-del-muro-eterno",
+    "nombre": "Pica del Muro Eterno",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      },
+      {
+        "stat": "pdgopor",
+        "val": 3
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +2 · PdG en oportunidad +3 · PdG +1 · 50 % de dejar Lisiado 3 turnos",
+    "precioCompra": 450,
+    "descripcionNarrativa": "Dicen que ningún ejército pasó nunca del otro lado de esta pica.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "id": "nuevo-pico-de-demolicion",
     "nombre": "Pico de demolición",
     "tier": "Común",
@@ -12686,6 +13017,49 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-punal-del-sereno",
+    "nombre": "Puñal del sereno",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "armaDeRango": false,
+    "mods": [
+      {
+        "stat": "pdgopor",
+        "val": 3
+      },
+      {
+        "stat": "critpot",
+        "val": 3
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "PdG en oportunidad +3 · Crít. potente +3 · Crít. frecuente +1 · 33 % de dejar Lisiado 3 turnos",
+    "precioCompra": 270,
+    "descripcionNarrativa": "Sale de la oscuridad cuando alguien baja la guardia.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "id": "nuevo-punal-envenenado",

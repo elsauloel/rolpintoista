@@ -1803,5 +1803,294 @@
    }
   ],
   "detalle": "Dicen que sigue apuntando aunque nadie lo tenga en la mano. +2 de daño fijo, Rango +8, PdG +2, Crítico potente +3 y 50 % de Sangrado."
+ },
+ {
+  "id": "nuevo-daga-de-vigia",
+  "nombre": "Daga de vigía",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La daga de quien vigila la puerta y ataca al que se quiere escabullir. PdG +1 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-estilete-de-centinela",
+  "nombre": "Estilete de centinela",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Fino y rápido para el que pasa a su lado. PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-de-centinela",
+  "nombre": "Lanza de centinela",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con el asta llega al que intenta pasar de largo. Alcance +1 y PdG +1 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-estoque-de-guardia",
+  "nombre": "Estoque de guardia",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Punta rápida, hecha para castigar el descuido. Iniciativa +1 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-del-porton",
+  "nombre": "Lanza del portón",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La lanza de quien custodia una entrada: nadie pasa sin recibir un pinchazo. Alcance +1 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-aguja-de-la-vigilia",
+  "nombre": "Aguja de la vigilia",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Casi no se ve venir, y casi siempre acierta al que se descuida. PdG +3 en ataques de oportunidad y Crítico +1."
+ },
+ {
+  "id": "nuevo-pica-de-retaguardia",
+  "nombre": "Pica de retaguardia",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Larga como una escalera: cubre la retirada de los suyos y frena a los que persiguen. Alcance +2 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-del-guardian-del-paso",
+  "nombre": "Lanza del guardián del paso",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Quien intenta cruzar el paso lo hace cojeando. Alcance +1, PdG +3 en ataques de oportunidad y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-punal-del-sereno",
+  "nombre": "Puñal del sereno",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Sale de la oscuridad cuando alguien baja la guardia. PdG +3 en ataques de oportunidad, Crítico +1, Crítico potente +3 y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-lanza-del-paso-de-las-tres-puertas",
+  "nombre": "Lanza del Paso de las Tres Puertas",
+  "tanda": 7,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Tres puertas custodió y por ninguna pasó un enemigo sin sangrar. Alcance +3, PdG +2, PdG +3 en ataques de oportunidad, Crítico +2 y 75 % de Lisiado."
+ },
+ {
+  "id": "nuevo-pica-del-muro-eterno",
+  "nombre": "Pica del Muro Eterno",
+  "tanda": 7,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Dicen que ningún ejército pasó nunca del otro lado de esta pica. Alcance +2, PdG +1, PdG +3 en ataques de oportunidad y 50 % de Lisiado."
  }
 ]

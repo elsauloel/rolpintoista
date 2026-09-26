@@ -80,7 +80,7 @@ const LS = 'auditoria-armas';
 const NOMBRES_FAMILIA = {punzante: 'Punzantes (T4)', cortante: 'Cortantes (T6)', hacha: 'Hachas y pesadas (T8)', contundente: 'Contundentes (T10)', explosivo: 'Explosivos (T12)', rango: 'De rango'};
 const ORDEN_FAMILIA = Object.keys(NOMBRES_FAMILIA);
 const ORDEN_TIER = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
-const STAT = {rng: 'Alcance', pdg: 'PdG', parry: 'Parry', bloqueo: 'Bloqueo', crit: 'Crít. frecuente', critpot: 'Crít. potente', pdgcontra: 'PdG en contraataque', ini: 'Iniciativa', dmg: 'Dmg', eva: 'Evasión', esp: 'Especial', rangocasteo: 'Rango casteo', bonos: 'SP', nitros: 'Nitros'};
+const STAT = {rng: 'Alcance', pdg: 'PdG', parry: 'Parry', bloqueo: 'Bloqueo', crit: 'Crít. frecuente', critpot: 'Crít. potente', pdgcontra: 'PdG en contraataque', pdgopor: 'PdG en oportunidad', ini: 'Iniciativa', dmg: 'Dmg', eva: 'Evasión', esp: 'Especial', rangocasteo: 'Rango casteo', bonos: 'SP', nitros: 'Nitros'};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 let armas = [], dec = {actualizado: 0, decisiones: {}};

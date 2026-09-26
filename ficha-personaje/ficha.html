@@ -5056,7 +5056,16 @@ function tirarValorStatInv(inv, nombre, valor, statId){
   const estados = statId ? estadosQueAfectanStatInv(inv, statId) : [];
   registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula + ' ÷2'.repeat(mit), rolls, mod: f.mod, total, estados});
 }
+// Atacar con una invocación: igual que el personaje, primero se elige el token al que ataca (duelo, comun/duelo.js).
 function invAtacar(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
+    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre},
+      ataque: {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8}, suelto: () => invAtacarSuelto(invId)});
+  }else invAtacarSuelto(invId);
+}
+function invAtacarSuelto(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   const costo = costoAtaqueInv(inv);
@@ -10224,13 +10233,27 @@ $('#tipo-ataque-lista').addEventListener('click', e => {
 });
 
 // Lo que el duelo necesita de esta página (comun/duelo.js): si el lado del duelo es este personaje, y cómo tira su PdG y su Evasión de siempre.
+// El lado puede ser el personaje (ref = id de la ficha) o una de sus invocaciones (ref = «fichaId~invId»).
+const dueloInvDe = lado => {
+  const [f, invId] = String(lado.ref || '').split('~');
+  return invId && f === (fichaVivo && fichaVivo.id) ? S.invocaciones.find(x => x.id === invId) || null : null;
+};
 window.DUELO_HOOKS = {
-  soy: lado => !!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && lado.ref === fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM),
+  soy: lado => {
+    if(!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)) return false;
+    return lado.ref === fichaVivo.id || !!dueloInvDe(lado);
+  },
   atacar: d => {
+    const inv = dueloInvDe(d.atacante);
+    if(inv){ invAtacarSuelto(inv.id); return; }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
   },
-  evadir: () => tirarValorStat('Evasión', compute().final.eva, 'eva'),
+  evadir: d => {
+    const inv = dueloInvDe(d.defensor);
+    if(inv){ tirarValorStatInv(inv, 'Evasión', invStatValor(inv, 'eva'), 'eva'); return; }
+    tirarValorStat('Evasión', compute().final.eva, 'eva');
+  },
 };
 
 // Fuerza del golpe (2026-09-26, reglas del escudo): la tirada del ATACANTE contra el Bloqueo del defensor. Si el defensor gana el Parry (con arma o escudo),
@@ -12220,11 +12243,6 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
-    if(e.data.tipo === 'abrir-duelo' && fichaVivo && fichaVivo.cargada){   // «te están atacando → Abrir» del mapa
-      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
-      Duelo.abrir(e.data.id);
-      botoneraAvisarMapa('botonera-lista');
-    }
     if(e.data.tipo === 'abrir-botin' && fichaVivo && fichaVivo.cargada) botinModoAbrir();
     if(e.data.tipo === 'abrir-tienda' && fichaVivo && fichaVivo.cargada){   // 🏪 del mapa
       document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));

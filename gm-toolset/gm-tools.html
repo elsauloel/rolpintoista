@@ -8389,11 +8389,6 @@ if(MODO_ACCIONES){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
-    if(e.data.tipo === 'abrir-duelo' && gmVivo.listo){   // «te están atacando → Abrir» del mapa (un creep defiende)
-      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
-      Duelo.abrir(e.data.id);
-      gmAvisarMapa('acciones-lista');
-    }
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".

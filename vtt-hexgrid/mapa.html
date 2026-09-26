@@ -173,6 +173,7 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
   background:rgba(26,20,24,.94);border:1px solid var(--copper);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.55);
   padding:8px 16px;font-size:13px;color:var(--paper)
 }
+#colocando-aviso button{pointer-events:auto;margin-left:8px}
 #colocando-aviso b{color:var(--brass)}
 #colocando-aviso span{color:var(--muted)}
 /* (⌨) de los atajos de teclado: a la derecha de todo de la cabecera; el globo se abre hacia la izquierda. */
@@ -1942,15 +1943,27 @@ function destinoParsear(txt){
   const m = /^(-?\d+),(-?\d+)$/.exec(String(txt || ''));
   return m ? {col: parseInt(m[1], 10), fila: parseInt(m[2], 10)} : null;
 }
-function elegirDestino(cb, texto){
+let elegirDestinoLibre = false;   // true: vale cualquier casilla (elegir un token, no un destino a pie)
+let elegirDestinoCancel = null;   // qué hacer si se cancela con Esc o clic derecho
+function elegirDestino(cb, texto, libre, alCancelar){
   elegirDestinoCb = cb;
+  elegirDestinoLibre = !!libre;
+  elegirDestinoCancel = alCancelar || null;
   lienzo.style.cursor = 'crosshair';
   const av = $('#colocando-aviso');
   if(av){ av.hidden = false; av.innerHTML = texto || '<b>🌀 Elegí el destino del teleport</b> <span>clic en una casilla transitable a pie (sin Sólido ni pared) adonde va a parar quien la pise · Esc o clic derecho cancelan</span>'; }
   pedirDibujo();
 }
+function elegirDestinoCancelar(){
+  const cb = elegirDestinoCancel;
+  elegirDestinoTerminar();
+  toast('Cancelado');
+  if(cb) cb();
+}
 function elegirDestinoTerminar(){
   elegirDestinoCb = null;
+  elegirDestinoLibre = false;
+  elegirDestinoCancel = null;
   lienzo.style.cursor = 'default';
   const av = $('#colocando-aviso'); if(av && !colocando){ av.hidden = true; av.innerHTML = ''; }
   pedirDibujo();
@@ -4392,7 +4405,7 @@ lienzo.addEventListener('pointerdown', e => {
   if(e.pointerType === 'mouse' && e.button === 2){
     // Con la Botonera o las Acciones abiertas, el clic derecho sobre el mapa (afuera de la ventana) las cierra.
     if(!$('#botonera-capa').hidden){ escapeABotonera(); return; }
-    if(elegirDestinoCb){ elegirDestinoTerminar(); toast('Destino cancelado'); return; }
+    if(elegirDestinoCb){ elegirDestinoCancelar(); return; }
     if(colocando){ cancelarColocacion(); return; }
     if(cancelarArrastreToken()) return;
     // Con una herramienta de dibujo activa, el clic derecho es "salir de
@@ -4419,7 +4432,7 @@ lienzo.addEventListener('pointerdown', e => {
   if(elegirDestinoCb){
     const pc = posEvento(e), mw = pantallaAMundo(pc.px, pc.py), h = mundoAHex(mw.x, mw.y), cb = elegirDestinoCb;
     // Regla: el destino tiene que ser un punto transitable a pie (una casilla que no ocupa un Sólido ni la Colisión del mapa).
-    if(elementoSolidoEn(h.col, h.fila)){ toast('Ese punto no es transitable a pie (hay un Sólido o una pared): elegí otra casilla'); return; }
+    if(!elegirDestinoLibre && elementoSolidoEn(h.col, h.fila)){ toast('Ese punto no es transitable a pie (hay un Sólido o una pared): elegí otra casilla'); return; }
     elegirDestinoTerminar(); cb(h); return;
   }
   // Pincel de niebla (GM): destapa o tapa lo que se arrastra.
@@ -4938,7 +4951,7 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
-  if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoTerminar(); toast('Destino cancelado'); return; }
+  if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoCancelar(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
@@ -8932,7 +8945,56 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
+  if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
+  if(e.data.tipo === 'duelo-ui-visible'){   // la ficha tirando para un duelo necesita mostrar un cartelito (Nitros, sobrepeso…)
+    $('#botonera-capa').hidden = false;
+    ubicarBotoneraCapa();
+    enfocarBotonera();
+  }
 });
+
+/* ---------- Duelo paso a paso (comun/duelo.js) ----------
+   Atacar desde la Botonera/Acciones le pide al mapa que elija el objetivo con un CLIC sobre el token (reutiliza elegirDestino: se toca la casilla
+   del token). El duelo se crea y su cuadro se abre solo para todos. Cada uno tira desde su iframe: el mapa se lo pide sin mostrarlo. */
+function dueloElegirObjetivoMapa(msg){
+  const yo = msg.yo, ataque = msg.ataque;
+  cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
+  const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
+  const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  const pedir = () => {
+    elegirDestino(h => {
+      const cand = [...tokens.values()].filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
+      if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
+      const t = cand[0];
+      const mio = [...tokens.values()].find(propio);
+      Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+        .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo'); });
+    }, `<b>⚔ ${esc(yo.nombre || 'Atacar')}: elegí a quién atacás</b> <span>clic sobre el token · Esc o clic derecho cancelan</span>${msg.conSuelto ? ' <button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`, true, cancelado);
+    const b = $('#colocando-aviso [data-duelo-suelto]');
+    if(b) b.onclick = () => {
+      elegirDestinoTerminar();
+      $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
+      try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-suelto'}, location.origin); }catch(e){}
+    };
+  };
+  pedir();
+}
+// Pide la tirada (PdG del atacante / Evasión del defensor) al iframe de su ficha o de las Acciones de su creep, sin mostrarlo.
+function dueloTirarPorIframe(d, lado){
+  const l = lado === 'pdg' ? d.atacante : d.defensor;
+  const msg = {tipo: 'duelo-tirar', id: d.id, lado};
+  const creep = l.tipo === 'creep';
+  const id = creep ? l.ref : String(l.ref).split(SEP_INVOCACION)[0];
+  const marco = $('#botonera-marco');
+  if(botonera.herramienta === (creep ? 'gm' : 'ficha') && botonera.fichaId === id && botonera.lista){
+    marco.contentWindow.postMessage(msg, location.origin);
+    return;
+  }
+  botonera = {herramienta: creep ? 'gm' : 'ficha', fichaId: id, invId: '', lista: false, pendiente: msg, completa: false};
+  marco.src = sinCache(creep
+    ? `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(id)}`
+    : `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(id)}`);
+}
 
 $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herramienta: '', fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
 
@@ -9701,11 +9763,8 @@ function arrancarEnVivo(){
   escucharBotinParaJugador();
   mesaEscuchar();
   mesaHistorialAlEntrar();
-  // Duelo paso a paso (comun/duelo.js): «te están atacando → Abrir» abre la Botonera de la ficha (o las Acciones del creep) del defensor.
-  Duelo.escuchar({abrir: d => {
-    if(d.defensor.tipo === 'creep') abrirAcciones(d.defensor.ref, {tipo: 'abrir-duelo', id: d.id});
-    else abrirBotonera(String(d.defensor.ref).split(SEP_INVOCACION)[0], {tipo: 'abrir-duelo', id: d.id});
-  }});
+  // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
+  Duelo.escuchar({tirar: dueloTirarPorIframe});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

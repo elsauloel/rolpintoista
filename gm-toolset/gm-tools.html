@@ -1293,6 +1293,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
+<script src="../comun/duelo.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -1312,6 +1313,7 @@ const esc = s => String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;'
 // Toda tirada va a la Mesa (la tirada libre por fórmula también está ahí).
 function registrarTirada(origen, r){
   mesaPublicar(origen, r);
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));   // el duelo (comun/duelo.js) recoge su PdG / Evasión de acá
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
 }
 
@@ -5673,7 +5675,12 @@ document.addEventListener('click', e => {
     $('#scrim-tipo-ataque-creep').classList.remove('open');
     const sc = S.creeps.find(s=>s.id===scId);
     if(!sc) return;
-    if(tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, tipo);
+    const hacer = () => { if(tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, tipo); };
+    // Duelo paso a paso (comun/duelo.js): se elige el token al que ataca; su PdG (y los No2) se tiran adentro del duelo.
+    if(typeof Duelo !== 'undefined' && Duelo.disponible()){
+      Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre},
+        ataque: {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8}, suelto: hacer});
+    }else hacer();
     return;
   }
   if(b.dataset.fuerzacreep){
@@ -8272,6 +8279,7 @@ function gmEscuchar(){
 
 // Se llama cuando ya se entró a la mesa.
 function gmAlEntrar(){
+  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar();   // aviso «te están atacando» / duelos que ve el GM (en el mapa lo escucha el propio mapa)
   $('#gm-identidad').textContent = '⚔ GM Tools · ' + barraTexto();
   mesaEscuchar();
   mesaHistorialAlEntrar();
@@ -8341,6 +8349,20 @@ function estadosModoAbrir(creepId){
   gmAvisarMapa('acciones-lista');
 }
 
+// Lo que el duelo necesita de esta página (comun/duelo.js): si el lado del duelo es uno de estos creeps, y cómo tira su PdG y su Evasión.
+window.DUELO_HOOKS = {
+  soy: lado => !!(lado && lado.tipo === 'creep' && gmVivo.activo && S.creeps.some(c => c.id === lado.ref)),
+  atacar: d => {
+    const sc = S.creeps.find(c => c.id === d.atacante.ref);
+    if(!sc) return;
+    if(d.ataque.tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, d.ataque.tipo);
+  },
+  evadir: d => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    if(sc) tirarValorStat(`${sc.nombre} · Evasión`, creepStatValor(sc, 'eva'), sc, 'eva');
+  },
+};
+
 function accionesModoAbrir(creepId){
   if(!S.creeps.some(sc => sc.id === creepId)){
     toast('Ese creep ya no está en gm-tools');
@@ -8361,12 +8383,17 @@ if(MODO_ACCIONES){
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
   });
   const observador = new MutationObserver(() => {
-    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
+    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #duelo-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
   });
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
+    if(e.data.tipo === 'abrir-duelo' && gmVivo.listo){   // «te están atacando → Abrir» del mapa (un creep defiende)
+      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+      Duelo.abrir(e.data.id);
+      gmAvisarMapa('acciones-lista');
+    }
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".

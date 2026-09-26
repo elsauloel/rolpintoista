@@ -931,6 +931,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
+<script src="../comun/duelo.js"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -9700,6 +9701,11 @@ function arrancarEnVivo(){
   escucharBotinParaJugador();
   mesaEscuchar();
   mesaHistorialAlEntrar();
+  // Duelo paso a paso (comun/duelo.js): «te están atacando → Abrir» abre la Botonera de la ficha (o las Acciones del creep) del defensor.
+  Duelo.escuchar({abrir: d => {
+    if(d.defensor.tipo === 'creep') abrirAcciones(d.defensor.ref, {tipo: 'abrir-duelo', id: d.id});
+    else abrirBotonera(String(d.defensor.ref).split(SEP_INVOCACION)[0], {tipo: 'abrir-duelo', id: d.id});
+  }});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

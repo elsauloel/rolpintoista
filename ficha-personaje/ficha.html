@@ -2006,6 +2006,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
+<script src="../comun/duelo.js"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -4326,6 +4327,7 @@ let dadosHistorial = [];
 function registrarTirada(origen, r){
   dadosHistorial.unshift({origen, ...r, hora: new Date()});
   mesaPublicar(origen, r);
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));   // el duelo (comun/duelo.js) recoge su PdG / Evasión de acá
   dadosHistorial = dadosHistorial.slice(0, 20);
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
 }
@@ -10212,8 +10214,24 @@ $('#tipo-ataque-lista').addEventListener('click', e => {
   const [tipo, armaId] = b.dataset.tipoataque.split(':');
   $('#scrim-tipo-ataque').classList.remove('open');
   const arma = S.inventario.find(x => x.id === armaId) || null;
-  if(tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, tipo);
+  const hacer = () => { if(tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, tipo); };
+  // Duelo paso a paso (comun/duelo.js, 2026-09-26): primero se elige el token al que se ataca; el PdG (y sus No2) se tiran adentro del duelo.
+  // «Sin objetivo» deja el ataque suelto de siempre.
+  if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
+    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
+      ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma)}, suelto: hacer});
+  }else hacer();
 });
+
+// Lo que el duelo necesita de esta página (comun/duelo.js): si el lado del duelo es este personaje, y cómo tira su PdG y su Evasión de siempre.
+window.DUELO_HOOKS = {
+  soy: lado => !!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && lado.ref === fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM),
+  atacar: d => {
+    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
+    if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
+  },
+  evadir: () => tirarValorStat('Evasión', compute().final.eva, 'eva'),
+};
 
 // Fuerza del golpe (2026-09-26, reglas del escudo): la tirada del ATACANTE contra el Bloqueo del defensor. Si el defensor gana el Parry (con arma o escudo),
 // su Bloqueo (Fuerza + peso de lo que usó) se enfrenta a tu Fuerza + el peso de tu arma; esa suma es el dado. Sin costo.
@@ -12123,6 +12141,7 @@ bitacoraRender();  // estado inicial: sin conexión hasta entrar a la partida
 // Se llama cuando ya se entró a la mesa: arranca las tiradas y abre el
 // último personaje de esta pestaña (o de este navegador).
 async function fbAlEntrar(){
+  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar();   // aviso «te están atacando» (en el mapa lo escucha el propio mapa)
   bitacoraEscuchar();
   fichaIdentidadRender();
   mesaEscuchar();
@@ -12180,7 +12199,7 @@ function botoneraModoAbrir(invId){
 if(MODO_BOTONERA){
   const revisarCerrada = () => {
     // El cartelito de cantidades de un estado (comun/estado-preguntas.js, #ep-fondo) cuenta como ventana abierta: si no, al elegir un preset se cerraba la Botonera.
-    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo')){
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #duelo-fondo')){
       if(fichaVivo.editaGM) fichaGuardarTick(true);   // el GM editó estados de otro personaje: se sube antes de cerrar
       botoneraAvisarMapa('botonera-cerrada');
     }
@@ -12201,6 +12220,11 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
+    if(e.data.tipo === 'abrir-duelo' && fichaVivo && fichaVivo.cargada){   // «te están atacando → Abrir» del mapa
+      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+      Duelo.abrir(e.data.id);
+      botoneraAvisarMapa('botonera-lista');
+    }
     if(e.data.tipo === 'abrir-botin' && fichaVivo && fichaVivo.cargada) botinModoAbrir();
     if(e.data.tipo === 'abrir-tienda' && fichaVivo && fichaVivo.cargada){   // 🏪 del mapa
       document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));

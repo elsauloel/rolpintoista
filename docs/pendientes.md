@@ -97,3 +97,4 @@
 - [x] (2026-09-26, falta probar) **PdG en oportunidad** (`pdgopor`, +1 a +3, 0,8 PC por punto, casa de los punzantes T4) en 11 armas nuevas (tanda 7); suma solo al Ataque de oportunidad. Ver `guia-de-diseno.md`.
 - [x] (2026-09-26) **Tipo 12 = Explosión, en pausa:** Martillo del Titán quitado, Lanzallamas Excepcional, tanda 6 retirada. Se retoma (definir la Explosión, P-Explosión) cuando el resto esté consolidado.
 - [ ] **Ataque paso a paso (duelo en vivo)**: propuesta en `ataque-paso-a-paso.md`; falta que el dueño responda las preguntas y decida cuándo (P-Duelo).
+- [~] (2026-09-26, falta probar) **Duelo, etapa 1** hecha (`comun/duelo.js`): elegir objetivo, aviso al defensor, PdG vs Evasión con veredicto. **Hay que pegar las reglas de Firestore (`duelos`).** Sigue: clic en el token del mapa, Parry/Bloqueo, crítico, daño, efectos con «Aplicar». Ver `ataque-paso-a-paso.md`.

@@ -332,6 +332,21 @@ service cloud.firestore {
         allow delete: if esMiembro(c) && (resource.data.ofrecidoPor == request.auth.uid || esGM(c));
       }
 
+      // Duelos (ataque paso a paso, comun/duelo.js): un documento por ataque, que atacante y defensor escriben en vivo (sus tiradas y el veredicto).
+      // Relajado a propósito (juego entre amigos): cualquier miembro lo lee y lo actualiza; solo su autor o el GM lo borra.
+      match /duelos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['estado', 'atacante', 'defensor', 'ataque', 'pdg', 'eva', 'veredicto', 'dif', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['estado', 'atacante', 'defensor', 'ataque', 'pdg', 'eva', 'veredicto', 'dif', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
       // Estados que te deja otro (una habilidad de un creep, una trampa): un documento por aviso, {fichaId, duenoUid, spec, origen,
       // aplicada, creado}. Cualquier miembro lo crea (el GM, o el jugador que pisa una trampa); la ficha del dueño lo marca como
       // aplicado UNA vez (solo ese campo, de false a true) y agrega el estado a su ficha. Nadie escribe en la ficha de otro.

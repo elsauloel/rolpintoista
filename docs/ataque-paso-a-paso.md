@@ -1,6 +1,6 @@
 # Ataque paso a paso (duelo en vivo entre atacante y defensor)
 
-> Idea del dueño, 2026-09-26. **Estado: propuesta, sin implementar.** Las preguntas están al final y también en `preguntas-abiertas.md` (P-Duelo).
+> Idea del dueño, 2026-09-26. **Estado: etapa 1 hecha (2026-09-26, sin probar en mesa): pasos 1 a 3 — declarar, aviso al defensor y PdG contra Evasión con veredicto.** Código en `comun/duelo.js`; falta pegar las reglas de Firestore (`duelos`). Las preguntas están al final y también en `preguntas-abiertas.md` (P-Duelo).
 
 ## La idea
 Al tocar **Atacar** se elige el **token objetivo** en el mapa y se abre un **menú paso a paso compartido**: los dos involucrados ven el mismo duelo, en vivo. Al defensor le llega un aviso («te están atacando · abrir menú») y ve **las botoneras que le tocan**. Cada paso se muestra en pantalla con su resultado, para que se sienta que **está sucediendo ahora** y no sea solo hacer clics y tramitar.
@@ -53,3 +53,8 @@ Un documento de Firestore por duelo (`duelos/{id}`) con el estado del paso, las 
 6. ✅ (dueño, 2026-09-26) **Se empieza en 1 contra 1**; los efectos de área y los ataques de un creep a varios quedan para después.
 7. **¿Se puede usar la tirada suelta de siempre?** Propuesta: sí, los botones actuales siguen para tiradas sueltas y para mesas sin mapa.
 8. ✅ (dueño, 2026-09-26) **Se hace ya**, por etapas. El dueño lo va definiendo conceptualmente y lo revisa cuando esté en la compu.
+
+## Estado de la implementación (2026-09-26)
+**Etapa 1 hecha:** Atacar → menú de tipo de ataque → **lista de tokens del mapa** para elegir el objetivo (o «Sin objetivo», la tirada suelta de siempre) → se abre el cuadro del duelo en la pantalla del atacante y le llega el aviso «⚔ X te ataca — Abrir» al defensor (en el mapa abre su Botonera, o las Acciones del creep). El atacante toca «Pagar y tirar PdG» (paga los No2 y tira con su código de siempre); el defensor, «Tirar Evasión». Los números se esconden hasta que tiran los dos y entonces se revelan con animación y el veredicto grande **¡PEGÓ!** / **FALLÓ**. Si el defensor no responde, el GM (o el dueño, si es una invocación) tira «a mano» escribiendo el valor del stat. El GM ve un aviso de cada duelo ajeno.
+**Falta de la etapa 1:** elegir el objetivo **con un clic en el token del mapa** (hoy es una lista por nombre); Parry en el duelo; que las **invocaciones** ataquen por acá (hoy solo el personaje y los creeps); empate: gana el defensor (a confirmar). **Sin probar en mesa** (solo con un Firestore simulado): pegar las reglas y probar con dos personas.
+**Próximas etapas:** Parry y Bloqueo → crítico (con `critico.js`) y su festejo → daño y defensa (baja de HP) → efectos del golpe con «Aplicar» (y la distinción «solo si hace daño»).

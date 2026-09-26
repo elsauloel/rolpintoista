@@ -10295,7 +10295,11 @@ window.DUELO_HOOKS = {
           info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(invStatValor(inv, 'bloqueo') + pesoArmaInv(inv))}`]}];
     }
     const sobre = compute().sobrecarga;
-    const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}${sobre > 0 ? ` (sobrepeso: −${fmt(sobre)} o pagás 1 No2)` : ''}`]}];
+    // Con sobrepeso (el equipo pasa el Crg.Max) la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
+    const ops = sobre > 0
+      ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: num(S.nitros) < 1 ? 'no te alcanzan los No2' : '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`]},
+         {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)} −${fmt(sobre)}`, 'no gastás No2']}]
+      : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`]}];
     const armas = armasYEscudosParaParry();
     if(!armas.length) ops.push({modo: 'parry', itemId: '', itemNombre: '', etiqueta: '🗡 Parry (sin arma ni escudo)', costo: costoParryNitros(null), motivoNo: '', info: [`Parry 🎲 ${fx(statParaArma('parry', null), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorConArma(null))}`]});
     armas.forEach(a => {
@@ -10312,6 +10316,14 @@ window.DUELO_HOOKS = {
       return;
     }
     if(modo === 'parry') parryConArma(itemId ? S.inventario.find(x => x.id === itemId) || null : null);
+    else if(itemId === 'pagado' || itemId === 'penal'){   // Evasión con sobrepeso: la elección ya se hizo en el cuadro del duelo
+      const sobre = compute().sobrecarga;
+      if(itemId === 'pagado'){
+        if(num(S.nitros) < 1){ toast('No tenés No2 para pagar: elegí tirar con la penalidad'); return; }
+        S.nitros = num(S.nitros) - 1; renderNitros(); refresh();
+      }
+      tirarValorStat('Evasión', compute().final.eva, 'eva', undefined, itemId === 'pagado' ? 'pagado' : 'penal', sobre);
+    }
     else tirarValorStat('Evasión', compute().final.eva, 'eva');
   },
   // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).

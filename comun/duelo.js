@@ -537,6 +537,63 @@ const Duelo = (() => {
     });
   }
 
+  /* ---------- resumen final en la Mesa ---------- */
+  // Un renglón por cosa que pasó, para la línea de reporte de la Mesa.
+  function lineasResumen(d){
+    const L = [];
+    const arma = d.ataque.armaNombre ? d.ataque.armaNombre : 'sin arma';
+    L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque'} con ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})`);
+    const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
+    if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defTxt} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
+    if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
+    if(d.crit && d.crit.critico) L.push(d.crit.mult > 1 ? `¡Crítico ×${d.crit.mult}! (d20: ${(d.crit.d20 || []).join(', ')})` : `Crítico posible pero sin multiplicador (d20: ${(d.crit.d20 || []).join(', ')})`);
+    const dn = d.dano;
+    if(dn && dn.aplicado){
+      const crit = d.resultado === 'pego' && d.crit && d.crit.mult > 1;
+      if(dn.invulnerable) L.push('Daño: era Invulnerable, no hizo nada');
+      else if(dn.manual) L.push(`Daño: ${dn.golpe} (se aplicó a mano)`);
+      else if(crit) L.push(`Daño: ${dn.crudo} × ${dn.mult} = ${dn.golpe} derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+    }
+    if(d.resultado === 'mitad') L.push(`Durabilidad: ${d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto que bloqueó'} pierde 1 punto`);
+    (d.efectos || []).forEach(ef => {
+      if(ef.omitido) L.push(`— ${ef.nombre}: no entró (${ef.motivo || 'sin daño'})`);
+      else if(ef.res && !ef.res.exito) L.push(`✘ ${ef.nombre} (${pctEf(ef)} %): no funcionó`);
+      else if(ef.aplicado) L.push(`✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + ' %)'}: aplicado${ef.nota ? ' · ' + ef.nota : ''}`);
+      else L.push(`? ${ef.nombre}: quedó sin resolver`);
+    });
+    const fin = {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño'}[d.resultado];
+    if(fin) L.push(`Resultado: ${fin}`);
+    return L;
+  }
+
+  // Cuando un duelo termina, quien lo creó publica UNA línea de resumen en la Mesa (se «reclama» con `resumido`).
+  async function publicarResumenSiCorresponde(d){
+    if(d.estado !== 'resuelto' || d.resumido || d.creadoPor !== yo() || aplicando.has(d.id + ':resumen')) return;
+    aplicando.add(d.id + ':resumen');
+    const ref = col().doc(d.id);
+    let datos = null;
+    try{
+      await fbDb.runTransaction(async tx => {
+        datos = null;
+        const doc = await tx.get(ref);
+        if(!doc.exists) return;
+        const m = {id: d.id, ...doc.data()};
+        if(m.resumido || m.estado !== 'resuelto') return;
+        tx.update(ref, {resumido: true});
+        datos = m;
+      });
+      if(datos){
+        await fbDb.collection(fbRutaCampana('tiradas')).add({
+          uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: `⚔ Resumen del duelo · ${datos.atacante.nombre} → ${datos.defensor.nombre}`,
+          formula: lineasResumen(datos).join('\n').slice(0, 900), rolls: [], mod: 0, total: 0, desde: 'reporte',
+          cuando: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    }catch(err){ console.error('Duelo: no se pudo publicar el resumen', err); }
+  }
+
   // Reclamar un pedido de «Aplicar» para que, con varias pestañas del GM, solo una lo ejecute.
   async function reclamarEfecto(id, i){
     const ref = col().doc(id);
@@ -1120,6 +1177,7 @@ const Duelo = (() => {
         if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
       });
       dibujarChips();
+      listaDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
       if(cfgEscuchar.aplicar && soyGM()){
         listaDuelos.forEach(d => {

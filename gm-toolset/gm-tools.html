@@ -1031,10 +1031,13 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). "Otro costo" es un recordatorio libre: vida, un objeto, etc.</div>
       </div>
       <div class="hc-paso" data-hc-paso="2">
-        <div class="f"><label>Tirar un stat del creep</label><select id="hc-tirada-stat"></select></div>
-        <div class="f" style="margin-top:8px"><label>Fórmula de dados (opcional)</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3" data-hc-enter="1"></div>
+        <div class="f"><label>Tirada al ejecutar: stat del creep</label><select id="hc-tirada-stat"></select></div>
       </div>
       <div class="hc-paso" data-hc-paso="3">
+        <div class="f"><label>Tirada de efecto: fórmula de dados (opcional)</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3" data-hc-enter="1"></div>
+        <div class="hint" style="margin-top:6px">Si hay un stat en el paso anterior, esta fórmula queda en el botón 🎲 de la tarjeta; sin stat, Ejecutar la tira directamente.</div>
+      </div>
+      <div class="hc-paso" data-hc-paso="4">
         <div class="f"><label>Elegir de la lista</label><select id="hc-efecto-preset"></select></div>
         <div class="f" style="margin-top:8px"><label>Nombre del estado</label><input type="text" id="hc-efecto-nombre" placeholder="vacío = no aplica ninguno"></div>
         <div class="row3" style="margin-top:8px">
@@ -1046,7 +1049,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
         <input type="hidden" id="hc-efecto-polaridad" value="otro">
         <input type="hidden" id="hc-efecto-mods" value="[]">
       </div>
-      <div class="hc-paso" data-hc-paso="4">
+      <div class="hc-paso" data-hc-paso="5">
         <button type="button" class="btn" id="hc-trampa-preconstruidas" style="width:100%;margin-bottom:10px" title="Elegir una trampa ya armada del catálogo (oso, foso, mina, red…) y decir su tamaño, daño y cantidad">📚 Trampas preconstruidas</button>
         <label class="hc-trampa-on" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
           <input type="checkbox" id="hc-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
@@ -1070,7 +1073,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
           <div class="hint" id="hc-trampa-ayuda" style="margin-top:6px"></div>
         </div>
       </div>
-      <div class="hc-paso" data-hc-paso="5">
+      <div class="hc-paso" data-hc-paso="6">
         <div class="resumen-hab" id="hc-resumen"></div>
       </div>
       <div class="paso-nav">
@@ -4489,8 +4492,10 @@ const PASOS_HAB_CREEP = [
    ayuda: 'Esta descripción se lee en la Mesa cada vez que el creep la usa.'},
   {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto la puede usar?',
    ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
-  {corto: 'Tirada', titulo: '¿Tira dados al usarla?',
-   ayuda: "Podés vincularla a un stat del creep (se tira con su valor del momento, con equipo y estados activos), escribir una fórmula, las dos cosas o ninguna. Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG."},
+  {corto: 'Tirada al ejecutar', titulo: '¿Qué se tira al tocar Ejecutar?',
+   ayuda: "Lo que se tira apenas tocás Ejecutar: elegí el stat del golpe o de la prueba (por ejemplo PdG para un ataque). Es la PRIMERA tirada, de golpe. Si no elegís ninguno, Ejecutar no tira un stat (y si en el paso siguiente hay una fórmula, Ejecutar tira esa fórmula directamente). Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG."},
+  {corto: 'Tirada de efecto', titulo: '¿Tiene una tirada de efecto (daño, curación…)?',
+   ayuda: "La tirada interna de la habilidad: daño, curación, duración… (por ejemplo 2d6+3). Aparece como un botoncito 🎲 en la misma tarjeta, al lado de Ejecutar, y solo si esta tirada existe y hay un stat en el paso anterior. Sin stat, Ejecutar tira esta fórmula directamente y no hay botón aparte. Se puede dejar vacía."},
   {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
    ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
   {corto: '🪤 Trampa', titulo: '¿Coloca una trampa en el mapa?',
@@ -4634,7 +4639,8 @@ function hcResumenHtml(){
     ${fila("No2", $("#hc-nitros-modo").value === "ataque" ? "como un ataque" : fmt(Math.max(0, num($("#hc-acciones").value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
     ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
-    ${fila("Tirada", [hcStatLabel($("#hc-tirada-stat").value), $("#hc-tirada").value.trim()].filter(Boolean).join(" + ") || "no tira")}
+    ${fila("Al ejecutar", hcStatLabel($("#hc-tirada-stat").value) || $("#hc-tirada").value.trim() || "no tira")}
+    ${fila("Efecto", $("#hc-tirada-stat").value && $("#hc-tirada").value.trim() ? $("#hc-tirada").value.trim() + " (botón 🎲)" : "sin tirada de efecto")}
     ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}
     ${fila('🪤 Trampa', hcTrampaResumen())}`;
 }

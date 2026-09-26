@@ -117,6 +117,21 @@ Si elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqu
 > - ¿Esto aplica también a ataques a distancia?
 
 +++
+titulo: Contraataque
+alias: [Contraatacar, Contraataque tras Parry]
+tags: [combate, regla, a-prueba]
+estado: borrador
++++
+**Regla a prueba** (dueño, 2026-09-26). Un **[[Parry]]** —**con arma o con escudo**— le permite al personaje **contraatacar**.
+- **Costo:** el contraataque **siempre cuesta lo mismo que un primer ataque** con esa arma (Tipo ÷ 2, redondeado como el primer ataque), **sin importar cuántos ataques hiciste en tu turno**.
+- **Cómo se tira:** botón **⚔ Contraatacar** (en la ficha, en la Botonera y en las tarjetas de creeps): tira el **PdG** con el arma elegida y descuenta esos Nitros. **No suma al conteo de ataques del turno**, así que no encarece tus demás ataques.
+- **Con escudo:** el escudo solo sirve para parar; el golpe sale de **otra arma equipada** (la de la otra mano). Sin arma equipada se contraataca con los puños (Tipo provisorio).
+> [!question] Lo que se decide probando
+> - ¿El contraataque exige haber **ganado** el Parry (y/o el Bloqueo), o basta con **haber parado**? Hoy es un botón libre: la mesa lo usa cuando corresponde.
+> - ¿Se puede **contraatacar más de una vez** por turno (cada Parry abre uno)? Hoy nada lo limita: solo lo limitan los Nitros.
+> - ¿Cómo se relaciona con el [[Ataque de oportunidad]]?
+
++++
 titulo: Evasión
 alias: [Eva, Esquivar, Esquiva]
 tags: [combate, stats]
@@ -145,6 +160,7 @@ El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de es
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
 - **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.
 - **Los creeps y las invocaciones** funcionan igual: su Parry cuesta tantos Nitros como el Peso de su arma (mínimo 1) y su Bloqueo suma su Bloqueo + el Peso de su arma.
+- **Contraataque** (regla a prueba): un Parry, con arma o con escudo, permite contraatacar por lo de un primer ataque: ver [[Contraataque]].
 - Estados como [[Lisiado]] te bajan el Parry a la mitad.
 
 +++

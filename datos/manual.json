@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-26T11:49:18Z",
+ "actualizado": "2026-09-26T11:51:05Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -697,6 +697,22 @@
    "cuerpo": "Cuando te atacan cuerpo a cuerpo **elegís cómo defenderte**:\n\n1. **[[Evasión]]:** esquivás por completo. Tirás Evasión contra el PdG del atacante.\n2. **[[Parry]]:** desviás el golpe con tu arma. Tirás Parry contra el PdG del atacante.\n\nSi elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqueo]]. Si la ganás también, **el golpe queda anulado**.\n\n> [!warning] \"Defensa\" son dos cosas\n> - **Defensa** (el stat): lo que se resta del daño → [[Defensa]].\n> - **Defensa activa** (esta nota): la elección Evasión / Parry.\n\n> [!success] Cadena Parry → Bloqueo (cerrada 2026-09-26)\n> Con arma **o con escudo**: el **Parry** se tira contra el **PdG** del atacante y cuesta el **Peso** de lo que usás. Si ganás, el **Bloqueo** es un **enfrentamiento de sumas**: **tu Bloqueo (Fuerza) + Peso del arma o escudo** contra **la Fuerza del atacante + Peso de su arma** (cada uno convierte su suma en dado; el atacante usa 🎲 *Fuerza del golpe*). Si ganás el Bloqueo, el golpe queda anulado. *A confirmar:* si perdés el Bloqueo, el golpe entra completo.\n\n> [!question] Otras dudas\n> - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?\n> - ¿Esto aplica también a ataques a distancia?"
   },
   {
+   "id": "contraataque",
+   "titulo": "Contraataque",
+   "alias": [
+    "Contraatacar",
+    "Contraataque tras Parry"
+   ],
+   "tags": [
+    "combate",
+    "regla",
+    "a-prueba"
+   ],
+   "estado": "borrador",
+   "capitulo": "combate",
+   "cuerpo": "**Regla a prueba** (dueño, 2026-09-26). Un **[[Parry]]** —**con arma o con escudo**— le permite al personaje **contraatacar**.\n- **Costo:** el contraataque **siempre cuesta lo mismo que un primer ataque** con esa arma (Tipo ÷ 2, redondeado como el primer ataque), **sin importar cuántos ataques hiciste en tu turno**.\n- **Cómo se tira:** botón **⚔ Contraatacar** (en la ficha, en la Botonera y en las tarjetas de creeps): tira el **PdG** con el arma elegida y descuenta esos Nitros. **No suma al conteo de ataques del turno**, así que no encarece tus demás ataques.\n- **Con escudo:** el escudo solo sirve para parar; el golpe sale de **otra arma equipada** (la de la otra mano). Sin arma equipada se contraataca con los puños (Tipo provisorio).\n> [!question] Lo que se decide probando\n> - ¿El contraataque exige haber **ganado** el Parry (y/o el Bloqueo), o basta con **haber parado**? Hoy es un botón libre: la mesa lo usa cuando corresponde.\n> - ¿Se puede **contraatacar más de una vez** por turno (cada Parry abre uno)? Hoy nada lo limita: solo lo limitan los Nitros.\n> - ¿Cómo se relaciona con el [[Ataque de oportunidad]]?"
+  },
+  {
    "id": "evasion",
    "titulo": "Evasión",
    "alias": [
@@ -726,7 +742,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** tantos Nitros como el **Peso** del arma o escudo con el que parás (Peso 3 = 3 No2), sin importar cuántos ataques hiciste en tu turno.\n- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — su Peso.\n- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.\n- **Los creeps y las invocaciones** funcionan igual: su Parry cuesta tantos Nitros como el Peso de su arma (mínimo 1) y su Bloqueo suma su Bloqueo + el Peso de su arma.\n- Estados como [[Lisiado]] te bajan el Parry a la mitad."
+   "cuerpo": "El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.\n\n- **Cuesta [[Nitros (No2)|Nitros]] siempre:** tantos Nitros como el **Peso** del arma o escudo con el que parás (Peso 3 = 3 No2), sin importar cuántos ataques hiciste en tu turno.\n- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — su Peso.\n- Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).\n- Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].\n- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.\n- **Los creeps y las invocaciones** funcionan igual: su Parry cuesta tantos Nitros como el Peso de su arma (mínimo 1) y su Bloqueo suma su Bloqueo + el Peso de su arma.\n- **Contraataque** (regla a prueba): un Parry, con arma o con escudo, permite contraatacar por lo de un primer ataque: ver [[Contraataque]].\n- Estados como [[Lisiado]] te bajan el Parry a la mitad."
   },
   {
    "id": "bloqueo",

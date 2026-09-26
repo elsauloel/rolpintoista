@@ -2901,6 +2901,8 @@ function costoParryCreep(sc){ return pesoArmaCreep(sc); }
 function bloqueoValorCreep(sc){ return creepStatValor(sc, 'bloqueo') + pesoArmaCreep(sc); }
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
+// Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
+function costoContraataqueCreep(sc){ return IT2_CREEP.redondeoPrimerAtaque((num(sc.armaTipo) || 8) / 2); }
 function costoAtaqueCreep(sc){
   const tipo = num(sc.armaTipo) || 8;
   return num(sc.ataquesTurno) === 0 ? IT2_CREEP.redondeoPrimerAtaque(tipo / 2) : tipo;
@@ -3503,6 +3505,7 @@ function renderAccionesCreep(){
     {stat:'eva', nombre:'Esquivar (Eva)', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
     {stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2 (el Peso de su arma)`, attr:`data-parrycreep="${sc.id}"`},
     {stat:'bloqueo', nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`},
+    {nombre:`Contraataque · ${fmt(costoContraataqueCreep(sc))} No2`, dado: fc.pdg, sinNitros: num(sc.nitros) < costoContraataqueCreep(sc), motivo:`${num(sc.nitros) < costoContraataqueCreep(sc) ? 'Sin No2 · ' : ''}Tras un Parry: siempre cuesta lo de un primer ataque (${fmt(costoContraataqueCreep(sc))} No2) y no suma al conteo de ataques`, attr:`data-contraatacarcreep="${sc.id}"`},
     {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
   ];
   // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
@@ -5620,6 +5623,20 @@ document.addEventListener('click', e => {
     const parry = creepStatValor(sc, 'parry');
     tirarValorStat(`${sc.nombre} · Parry`, parry, sc, 'parry');
     toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}`);
+    return;
+  }
+  if(b.dataset.contraatacarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.contraatacarcreep);
+    if(!sc) return;
+    const costo = costoContraataqueCreep(sc);
+    if(costo > num(sc.nitros)){
+      toast(`${sc.nombre}: no le alcanzan los No2 — el contraataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);
+      return;
+    }
+    sc.nitros = num(sc.nitros) - costo;
+    renderAll();
+    tirarValorStat(`${sc.nombre} · Contraataque (PdG)`, creepStatValor(sc, 'pdg'), sc, 'pdg');
+    toast(`${sc.nombre}: contraataque −${fmt(costo)} No2 (lo de un primer ataque) · quedan ${fmt(sc.nitros)}`);
     return;
   }
   if(b.dataset.fuerzacreep){

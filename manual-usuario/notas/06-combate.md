@@ -529,7 +529,7 @@ alias: [Durabilidad de armas, Armadura rota por ítem, Reparar]
 tags: [combate, equipo]
 estado: borrador
 +++
-**Regla nueva, todavía sin implementar en las fichas.** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**
+**Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**
 
 - **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.
 - **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico no rompe armadura**, ni siquiera el de un arma con Rompe armadura: el crítico justamente evita la armadura.

@@ -337,6 +337,10 @@ a{color:var(--brass)}
 .item .ihead{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
 .item .iname{font-weight:700;font-size:13.5px;line-height:1.3}
 .item .idesc{font-size:12px;color:#C9B8AD;margin-top:5px;white-space:pre-wrap}
+.item .idur{font-size:11.5px;color:#9EB4C9;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.item .idur.aviso{color:#E0A458}
+.item .idur.roto{color:#FF7E7E;font-weight:700}
+.item .idur .mini{padding:0 7px;line-height:18px}
 .item .istat{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--brass);margin-top:4px}
 .item .imeta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .tag{
@@ -3306,6 +3310,60 @@ function fileToDataURL(file, maxDim=480, quality=0.85){
    CÁLCULO
    ========================================================= */
 
+/* ---------- Durabilidad (2026-09-26, reglas del dueño en docs/durabilidad.md) ----------
+   Armas, escudos y piezas de armadura: 3 puntos de durabilidad por punto de Peso (mínimo 3). Cada ítem guarda `dur` (actual; sin él vale el máximo) y, las piezas de
+   armadura, `armRota` (puntos de Armadura rota: cada uno baja 1 la Defensa de ESA pieza y sigue aunque se la saque). Un ítem con 0 de durabilidad está ROTO: ocupa el
+   slot pero no aporta ningún efecto (es como si no lo tuvieras equipado). Rompe armadura elige una pieza equipada al azar; un Bloqueo perdido gasta 1 punto del arma o escudo
+   con el que se bloqueó. Los creeps y las invocaciones no llevan. */
+const DUR_POR_PESO = 3, DUR_MIN = 3;
+const SLOTS_DURABLES = ['mano', 'escudo', 'armadura', 'cabeza', 'manos', 'piernas', 'pies'];
+const SLOTS_ARMADURA = ['armadura', 'cabeza', 'manos', 'piernas', 'pies'];
+const durableItem = i => !!i && !i.consumible && SLOTS_DURABLES.includes(slotDe(i.tipoItem));
+const esArmaduraItem = i => durableItem(i) && SLOTS_ARMADURA.includes(slotDe(i.tipoItem));
+const durMax = i => Math.max(DUR_MIN, DUR_POR_PESO * Math.max(0, Math.round(num(i.peso))));
+const durActual = i => (i.dur === undefined || i.dur === null) ? durMax(i) : Math.max(0, Math.min(durMax(i), Math.round(num(i.dur))));
+const itemRoto = i => durableItem(i) && durActual(i) <= 0;
+const armRotaDe = i => Math.max(0, Math.min(durMax(i), Math.round(num(i.armRota))));
+
+// Aviso al quedar en 1 punto y al romperse: cartel y una línea en la Mesa para todos.
+function durAviso(i){
+  const a = durActual(i), quien = ((S.meta && S.meta.nombre) || '').trim();
+  const txt = a <= 0 ? `💥 ${i.nombre} se rompió: sigue ocupando el lugar pero no da ningún efecto hasta que se repare` : a === 1 ? `⚠ ${i.nombre} está a punto de romperse (queda 1 punto de durabilidad)` : '';
+  if(!txt) return;
+  toast(txt);
+  try{ publicarRecordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${txt}`, detalle: ''}]); }catch(e){}
+}
+function desgastarItem(i, n){
+  const antes = durActual(i);
+  i.dur = Math.max(0, antes - Math.max(1, n || 1));
+  if(durActual(i) !== antes) durAviso(i);
+}
+// Rompe armadura: una pieza de armadura equipada (que todavía no esté rota) elegida AL AZAR, sin distinguir por ninguna característica.
+function rompeArmaduraAlAzar(veces){
+  const tocadas = [];
+  for(let k = 0; k < Math.max(1, veces || 1); k++){
+    const pool = S.inventario.filter(i => i.equipado && esArmaduraItem(i) && durActual(i) > 0);
+    if(!pool.length) break;
+    const it = pool[Math.floor(Math.random() * pool.length)];
+    it.armRota = Math.min(durMax(it), armRotaDe(it) + 1);
+    desgastarItem(it, 1);
+    tocadas.push(it.nombre);
+  }
+  if(!tocadas.length){ toast('Rompe armadura: no tenés piezas de armadura equipadas que se puedan romper'); return 0; }
+  toast(`💥 Rompe armadura: se dañó ${[...new Set(tocadas)].join(', ')}`);
+  renderList('equipo'); renderList('mochila');
+  refresh();
+  return tocadas.length;
+}
+function durLineaHtml(i){
+  if(!durableItem(i)) return '';
+  const max = durMax(i), act = durActual(i), ar = armRotaDe(i);
+  const cls = act <= 0 ? 'roto' : act <= 1 ? 'aviso' : '';
+  const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
+  return `<div class="idur ${cls}" title="Durabilidad: 3 puntos por cada punto de Peso (mínimo 3). Reparar solo fuera de combate: herrero (1 de oro por punto) o talento con despojos (2 por punto).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)}` : ''}${est}
+    <button class="mini" data-durmod="${i.id}:-1" title="Un punto menos (a mano)">−</button><button class="mini" data-durmod="${i.id}:1" title="Reparar 1 punto (solo fuera de combate)">+</button></div>`;
+}
+
 function collectMods(){
   const out = {};
   // tipo: de dónde viene (lo muestra la 🔍); itemId: para el PdG propio de cada arma.
@@ -3313,7 +3371,17 @@ function collectMods(){
     if(!m || !m.stat) return;
     (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen, tipo, itemId});
   };
-  S.inventario.filter(i=>i.equipado).forEach(i => (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id)));
+  S.inventario.filter(i=>i.equipado).forEach(i => {
+    if(itemRoto(i)) return;   // roto: ocupa el lugar pero no da ningún efecto
+    (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id));
+    // Armadura rota de la pieza: cada punto baja 1 su Defensa (sin pasar de lo que la pieza da).
+    const ar = esArmaduraItem(i) ? armRotaDe(i) : 0;
+    if(ar > 0){
+      const defPieza = (i.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+      const r = Math.min(ar, Math.max(0, defPieza));
+      if(r > 0) push({stat: 'def', val: -r}, `${i.nombre} · Armadura rota ×${ar}`, 'equipado', i.id);
+    }
+  });
   S.pasivas.forEach(p => {
     const compras = pasivaCompras(p);
     (p.mods||[]).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));
@@ -3580,6 +3648,14 @@ async function estadosRevisar(){
 // Un preset se encuentra por su nombre o por un nombre viejo (alias): "Escudo especial" pasó a llamarse "Escudo especial" (2026-09-24).
 const presetPorNombre = (lista, nombre) => lista.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
 function aplicarEstadoRecibido(spec, origen){
+  // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
+  if(spec.nombre === 'Desgaste'){
+    const it = S.inventario.find(x => x.id === spec.item);
+    if(it && durableItem(it)){ desgastarItem(it, 1); renderList('equipo'); renderList('mochila'); refresh(); }
+    else toast(`Desgaste: no encuentro ese ítem en tu inventario`);
+    return;
+  }
+  if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(Math.max(1, num(spec.stacks) || 1)); return; }
   const preset = presetPorNombre(EFECTOS_PRESET, spec.nombre);
   let draft;
   if(preset){
@@ -3839,7 +3915,7 @@ function actualizarTextosCombate(){
 function armasEquipadasConDano(){
   const manos = asignarManos();
   return S.inventario
-    .filter(i => i.equipado && ES_MANO(i.tipoItem) && armaDanoTxt(i))
+    .filter(i => i.equipado && !itemRoto(i) && ES_MANO(i.tipoItem) && armaDanoTxt(i))
     .map(i => ({item: i, mano: manos.get(i.id) || null}))
     .sort((a, b) => (a.mano || 99) - (b.mano || 99));
 }
@@ -5443,6 +5519,7 @@ function invRow(i, contexto){
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${pesoTag}</div>
+          ${durLineaHtml(i)}
           ${statTxt ? `<div class="istat">${statTxt} ${dano ? `<button class="mini" data-tirararma="${i.id}" title="Tirar el daño de esta arma">🎲 ${atacarTxt}</button>` : ''}</div>` : ''}
           ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
         </div>
@@ -6568,6 +6645,20 @@ document.addEventListener('click', async e => {
       const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
       if(nuevo){ er.escudoMagico = neto ? nuevo.actual : nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); }
       else if(txt !== null) toast(neto ? 'Escribí un número, +N o -N' : 'Escribí un número, +N, -N o "max N"');
+    }
+    return;
+  }
+  if(b.dataset.durmod){   // durabilidad a mano: −1 (desgaste) o +1 (reparar: también devuelve un punto de Armadura rota de la pieza)
+    const [itId, d] = b.dataset.durmod.split(':');
+    const it = S.inventario.find(x => x.id === itId);
+    if(it && durableItem(it)){
+      if(num(d) < 0) desgastarItem(it, 1);
+      else{
+        it.dur = Math.min(durMax(it), durActual(it) + 1);
+        if(armRotaDe(it) > 0) it.armRota = armRotaDe(it) - 1;
+      }
+      renderList('equipo'); renderList('mochila');
+      refresh();
     }
     return;
   }
@@ -10139,7 +10230,7 @@ const costoParryNitros = () => 1;   // 2026-09-26 (dueño): el Parry SIEMPRE cue
 function armasYEscudosParaParry(){
   const manos = asignarManos();
   return S.inventario
-    .filter(i => i.equipado && ES_MANO(i.tipoItem))
+    .filter(i => i.equipado && !itemRoto(i) && ES_MANO(i.tipoItem))
     .map(i => ({item: i, mano: manos.get(i.id) || null}))
     .sort((a, b) => (a.mano || 99) - (b.mano || 99));
 }

@@ -869,7 +869,7 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'mitad'){
       caja = `<div class="duelo-veredicto mitad${nuevo}"><div class="grande">⚠ PASA LA MITAD</div><div class="chico">Paró el golpe pero no lo frenó del todo: pasa la mitad del daño (redondeada para arriba)</div>
-        <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad <span style="font-weight:400">(la durabilidad todavía no está en la ficha: anotalo a mano)</span></div>${mot}</div>`;
+        <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha)</span>' : ''}</div>${mot}</div>`;
     }else return '';
     let contra = '';
     if(d.resultado === 'bloqueado' && !d.contra && esMio(d.defensor)) contra = `<div class="duelo-contra"><button type="button" data-contra>⚔ Contraatacar</button></div>`;

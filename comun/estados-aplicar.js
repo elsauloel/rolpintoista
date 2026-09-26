@@ -40,6 +40,7 @@ const EstadosAplicar = (() => {
     if(s.hp) out.hp = Math.round(Number(s.hp) || 0);
     if(s.detalle) out.detalle = String(s.detalle).slice(0, 200);
     if(s.polaridad) out.polaridad = s.polaridad;
+    if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     return out;
   }

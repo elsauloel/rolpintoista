@@ -41,3 +41,14 @@ El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y
 1. ✅ **Cómo conviven Armadura rota y la durabilidad de la pieza** (propuesta aceptada por el dueño, 2026-09-26; el tope con varias piezas es la suma): (un golpe con Rompe armadura hace **las dos cosas**: suma 1 stack de Armadura rota —baja 1 la Defensa total, como hoy— y baja 1 la durabilidad de una pieza elegida al azar; una pieza en 0 deja de dar su Defensa; al **reparar** una pieza se le devuelven puntos y se quita un stack de Armadura rota.)
 2. **¿Un arma o escudo de Peso 0 tiene el mínimo de 3, como las armaduras?** (sí, mínimo 3 para todo.)
 4. *(en stand-by)* Óleo reparador (qué es y cuántos puntos repara).
+
+## Estado de la implementación (2026-09-26, hecha, sin probar en mesa)
+**En la ficha** (`ficha-personaje/ficha.html`, bloque «Durabilidad» antes de `collectMods`):
+- Cada **arma, escudo y pieza de armadura** (cabeza, torso, manos, piernas, pies) guarda `dur` (actual; sin él vale el máximo) y, las piezas de armadura, `armRota`. **Máximo = 3 × Peso, mínimo 3** (también para armas y escudos de Peso 0). Consumibles, anillos, cinturones y mochilas no llevan.
+- **Pieza rota (0):** ocupa el lugar pero **no aporta ningún efecto** (ni bonos ni Defensa) y un arma o escudo roto **no ataca ni para**. **Armadura rota de la pieza:** cada punto baja 1 la Defensa **de esa pieza** (sin pasar de lo que da), sigue aunque se la saque, y **su tope es la durabilidad de la pieza**.
+- **Rompe armadura** (`rompeArmaduraAlAzar`): elige **una pieza equipada al azar** que no esté rota, le suma 1 de Armadura rota y le baja 1 de durabilidad (si no queda ninguna, avisa y no pasa nada). Llega por el mismo camino de siempre (el aviso que la ficha aplica sola): **el estado «Armadura rota» del personaje deja de crearse** desde los duelos, las trampas y las habilidades de creeps; el que ya tenían las fichas viejas sigue funcionando hasta que se lo saque.
+- **Bloqueo perdido** (duelo, «pasa la mitad»): el mapa del GM le pide a la ficha un **«Desgaste»** del arma o escudo con el que se bloqueó (−1 punto).
+- **Avisos:** al quedar en **1 punto** («a punto de romperse») y al **romperse**: cartel y una línea en la Mesa.
+- **A mano:** en cada ítem, la línea «🔧 6/9 · Armadura rota ×2» con **−** (un punto menos) y **+** (reparar 1 punto: también devuelve 1 de Armadura rota de esa pieza). La reparación real (herrero 1 de oro por punto, talento con despojos) sigue sin automatizar.
+- **Creeps e invocaciones:** sin durabilidad (Rompe armadura les baja la Defensa con el estado de siempre).
+**Falta:** reparar con el herrero y el talento (y el Óleo reparador), mostrar la durabilidad en la tienda y el catálogo, el bloqueo de reparar durante el combate, y probarlo en mesa.

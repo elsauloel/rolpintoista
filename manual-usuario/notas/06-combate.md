@@ -117,6 +117,20 @@ Si elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqu
 > - ¿Esto aplica también a ataques a distancia?
 
 +++
+titulo: Ataque, tipos de ataque
+alias: [Botón Atacar, Tipos de ataque, Ataque normal, Menú de ataque]
+tags: [combate, regla, nitros]
+estado: borrador
++++
+Regla del dueño (2026-09-26). **El botón Atacar no tira directo: te pregunta qué ataque es** (en la ficha, en la Botonera y en las tarjetas de creeps), para poder **automatizar el costo en [[Nitros (No2)|Nitros]] de cada uno**. Con más de un arma, primero elegís con cuál.
+| Ataque | Costo en Nitros | ¿Suma al conteo de ataques? |
+|---|---|---|
+| **Ataque normal** | **el primero del turno con esa arma: la mitad de su Tipo** (redondeo del primer ataque); **el segundo y los siguientes: el Tipo completo** | **Sí** |
+| **Ataque de oportunidad** | **siempre la mitad del Tipo** de tu arma | No |
+| **[[Contraataque]]** (tras un [[Parry]]) | **siempre la mitad del Tipo** de tu arma | No |
+Los tres tiran el **PdG** del arma. Los dos especiales no encarecen tus demás ataques del turno.
+
++++
 titulo: Contraataque
 alias: [Contraatacar, Contraataque tras Parry]
 tags: [combate, regla, a-prueba]
@@ -124,7 +138,7 @@ estado: borrador
 +++
 **Regla a prueba** (dueño, 2026-09-26). Un **[[Parry]]** —**con arma o con escudo**— le permite al personaje **contraatacar**.
 - **Costo:** el contraataque **siempre cuesta lo mismo que un primer ataque** con esa arma (Tipo ÷ 2, redondeado como el primer ataque), **sin importar cuántos ataques hiciste en tu turno**.
-- **Cómo se tira:** botón **⚔ Contraatacar** (en la ficha, en la Botonera y en las tarjetas de creeps): tira el **PdG** con el arma elegida y descuenta esos Nitros. **No suma al conteo de ataques del turno**, así que no encarece tus demás ataques.
+- **Cómo se tira:** desde el botón **Atacar** (ver [[Ataque, tipos de ataque]]): eligís **Contraataque** en el menú; tira el **PdG** con el arma elegida y descuenta esos Nitros. **No suma al conteo de ataques del turno**, así que no encarece tus demás ataques.
 - **Con escudo:** el escudo solo sirve para parar; el golpe sale de **otra arma equipada** (la de la otra mano). Sin arma equipada se contraataca con los puños (Tipo provisorio).
 > [!question] Lo que se decide probando
 > - ¿El contraataque exige haber **ganado** el Parry (y/o el Bloqueo), o basta con **haber parado**? Hoy es un botón libre: la mesa lo usa cuando corresponde.

@@ -366,9 +366,9 @@ const Duelo = (() => {
       m.crit = {...m.crit, d20: rolls, mejor, mult};
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
-      const NOMBRE_MULT = {1: 'sin multiplicador: el golpe pega normal', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
+      const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
       publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor}};
-      anuncio = mult > 1 ? `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa` : `${m.atacante.nombre} tiró el crítico contra ${m.defensor.nombre} y no salió multiplicador: el golpe pega normal`;
+      anuncio = `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
     anunciarMesa(anuncio);
@@ -563,10 +563,10 @@ const Duelo = (() => {
     const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
     if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defTxt} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
-    if(d.crit && d.crit.critico) L.push(d.crit.mult > 1 ? `¡Crítico ×${d.crit.mult}! (d20: ${(d.crit.d20 || []).join(', ')})` : `Crítico posible pero sin multiplicador (d20: ${(d.crit.d20 || []).join(', ')})`);
+    if(d.crit && d.crit.critico) L.push(`¡Crítico ×${d.crit.mult}!${d.crit.mult > 1 ? '' : ' (el d20 no alcanzó a multiplicar, pero ignora la Defensa)'} (d20: ${(d.crit.d20 || []).join(', ')})`);
     const dn = d.dano;
     if(dn && dn.aplicado){
-      const crit = d.resultado === 'pego' && d.crit && d.crit.mult > 1;
+      const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
       if(dn.invulnerable) L.push('Daño: era Invulnerable, no hizo nada');
       else if(dn.manual) L.push(`Daño: ${dn.golpe} (se aplicó a mano)`);
       else if(crit) L.push(`Daño: ${dn.crudo} × ${dn.mult} = ${dn.golpe} derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`);
@@ -662,7 +662,7 @@ const Duelo = (() => {
       if((m.efectos || []).length){ m.fase = 'efectos'; m.estado = 'esperando'; cerrarSiListo(m); }
       else{ m.fase = 'fin'; m.estado = 'resuelto'; }
       tx.update(ref, cambiosDe(m));
-      const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.mult > 1;
+      const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.critico;
       anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
         : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
         : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
@@ -838,9 +838,9 @@ const Duelo = (() => {
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
     let caja;
-    if(d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1){
+    if(d.resultado === 'pego' && d.crit && d.crit.critico){
       const porParry = d.defensa && d.defensa.modo === 'parry';
-      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">¡CRÍTICO!</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida <span style="opacity:.8">(el número del daño aparece en la próxima etapa)</span></div>${mot}</div>`;
+      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">¡CRÍTICO!</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
     }else if(d.resultado === 'pego'){
       const porParry = d.defensa && d.defensa.modo === 'parry';
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
@@ -859,7 +859,7 @@ const Duelo = (() => {
     return caja + contra;
   }
 
-  const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+  const NOMBRE_MULT = {1: 'SIN MULTIPLICADOR', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
 
   // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
   function efectosHtml(d){
@@ -897,7 +897,7 @@ const Duelo = (() => {
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
   function danoHtml(d){
     const dn = d.dano;
-    const crit = d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
+    const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
     const mult = crit ? d.crit.mult : 1;
     const arma = d.ataque.armaNombre ? ` · ${_esc(d.ataque.armaNombre)}` : '';
     let cuerpo;
@@ -964,8 +964,8 @@ const Duelo = (() => {
         + tablaCriticoHtml(c, d, 0)
         + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
-      cuerpo = (c.mult > 1 ? titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`) : titulo('no', '✘ NO ES CRÍTICO'))
-        + explica([`d20: ${c.d20.join(' · ')} → el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ', y no alcanza ningún multiplicador'}.`, ...lCuenta])
+      cuerpo = titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
+        + explica([`d20: ${c.d20.join(' · ')} → el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
         + tablaCriticoHtml(c, d, c.mejor);
     }
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
@@ -1188,7 +1188,7 @@ const Duelo = (() => {
     if(actual && actual.min && actual.dato && !mostrar.has(actual.id)) mostrar.set(actual.id, actual.dato);
     [...chips.keys()].forEach(id => { if(!mostrar.has(id)){ chips.get(id).remove(); chips.delete(id); } });
     const RES = {pego: '⚔ Pegó', fallo: '🛡 Falló', bloqueado: '🛡 Bloqueó', mitad: '⚠ Pasó la mitad'};
-    const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
+    const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico;
     mostrar.forEach((d, id) => {
       const txt = d.estado === 'resuelto'
         ? `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
@@ -1238,7 +1238,7 @@ const Duelo = (() => {
             let info;
             try{ info = await cfgEscuchar.aplicar(d); }
             catch(err){ console.error('Duelo: no se pudo aplicar el daño', err); info = {manual: true, motivoManual: 'no se pudo aplicar solo'}; }
-            const crit = d.resultado === 'pego' && d.crit && d.crit.mult > 1;
+            const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
             await guardarAplicacion(d.id, {golpe: 0, ...info});
           }).catch(err => console.error('Duelo: error al aplicar el daño', err));
         });

@@ -9020,7 +9020,7 @@ async function dueloVincularSiFalta(t){
 // Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
 async function dueloAplicarDano(d){
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
-  const crit = d.resultado === 'pego' && d.crit && d.crit.critico && d.crit.mult > 1;
+  const crit = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
   const mult = crit ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo)), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};

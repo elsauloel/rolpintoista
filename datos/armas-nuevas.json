@@ -8,9 +8,14 @@
   "tipoDado": 4,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
   "efectosGolpe": [],
-  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar."
+  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar. Variación: pdg +1."
  },
  {
   "id": "nuevo-estilete-de-practica",
@@ -21,9 +26,14 @@
   "tipoDado": 4,
   "peso": 1,
   "danoFijo": 1,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
   "efectosGolpe": [],
-  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza."
+  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza. Variación: pdg +1."
  },
  {
   "id": "nuevo-lezna-de-zapatero",
@@ -134,7 +144,7 @@
   "mods": [
    {
     "stat": "pdg",
-    "val": 2
+    "val": 1
    },
    {
     "stat": "rng",
@@ -150,7 +160,7 @@
    }
   ],
   "efectosGolpe": [],
-  "detalle": "El arma de los duelistas: PdG +2, Alcance +1, Crítico potente +3 y Crítico frecuente +1."
+  "detalle": "El arma de los duelistas: PdG +1, Alcance +1, Crítico potente +3 y Crítico frecuente +1."
  },
  {
   "id": "nuevo-lanza-de-lisiar",
@@ -325,9 +335,14 @@
   "tipoDado": 6,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
   "efectosGolpe": [],
-  "detalle": "La de madera forrada en lata. Corta, mal, pero corta."
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. Variación: parry +1."
  },
  {
   "id": "nuevo-machete-de-chacarero",
@@ -338,9 +353,14 @@
   "tipoDado": 6,
   "peso": 1,
   "danoFijo": 1,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
   "efectosGolpe": [],
-  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo."
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo. Variación: ini +1."
  },
  {
   "id": "nuevo-sable-de-abordaje-oxidado",
@@ -629,8 +649,15 @@
   "peso": 1,
   "danoFijo": 0,
   "mods": [],
-  "efectosGolpe": [],
-  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más."
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Variación: Rompe armadura 25 %."
  },
  {
   "id": "nuevo-hacha-de-mano",
@@ -701,16 +728,12 @@
   "danoFijo": 0,
   "mods": [
    {
-    "stat": "bloqueo",
-    "val": 1
-   },
-   {
     "stat": "rng",
     "val": 1
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Para trepar y para pelear en el pasamanos. Bloqueo +1 y Alcance +1."
+  "detalle": "Para trepar y pelear en el pasamanos. Alcance +1."
  },
  {
   "id": "nuevo-hachon-de-minero",
@@ -733,8 +756,8 @@
   "detalle": "Hecho para la piedra: +1 de daño fijo y 33 % de romper armadura."
  },
  {
-  "id": "nuevo-hacha-del-jefe-de-guerra",
-  "nombre": "Hacha del Jefe de Guerra",
+  "id": "nuevo-hacha-del-caudillo",
+  "nombre": "Hacha del Caudillo",
   "tanda": 3,
   "tier": "Raro",
   "tipoItem": "arma_1m",
@@ -765,7 +788,7 @@
   "tipoItem": "arma_1m",
   "tipoDado": 8,
   "peso": 3,
-  "danoFijo": 1,
+  "danoFijo": 0,
   "mods": [
    {
     "stat": "rng",
@@ -780,7 +803,7 @@
     "detalle": "50 % de dejar 1 stack de Armadura rota."
    }
   ],
-  "detalle": "Pesada y de mango largo: +1 de daño fijo, Alcance +1 y 50 % de romper armadura."
+  "detalle": "Pesada y de mango largo: Alcance +1 y 50 % de romper armadura."
  },
  {
   "id": "nuevo-hacha-arrojadiza",
@@ -911,9 +934,14 @@
   "tipoDado": 10,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [],
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "efectosGolpe": [],
-  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren."
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. Variación: bloqueo +1."
  },
  {
   "id": "nuevo-mazo-de-carnicero",
@@ -925,8 +953,15 @@
   "peso": 1,
   "danoFijo": 1,
   "mods": [],
-  "efectosGolpe": [],
-  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo."
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo. Variación: Demora 25 %."
  },
  {
   "id": "nuevo-porra-de-guardia",
@@ -943,8 +978,15 @@
     "val": 1
    }
   ],
-  "efectosGolpe": [],
-  "detalle": "Reglamentaria. Bloqueo +1."
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Reglamentaria. Bloqueo +1. Variación: Demora 25 %."
  },
  {
   "id": "nuevo-maza-de-guerra",
@@ -1009,8 +1051,8 @@
   "detalle": "Bola con púas en cadena. +1 de daño fijo y 33 % de romper armadura."
  },
  {
-  "id": "nuevo-martillo-de-sargento",
-  "nombre": "Martillo de sargento",
+  "id": "nuevo-martillo-del-sargento-mayor",
+  "nombre": "Martillo del sargento mayor",
   "tanda": 4,
   "tier": "Raro",
   "tipoItem": "arma_1m",

@@ -33,8 +33,10 @@ PESO_CRIT = 3.0           # peso de 1 punto de Crítico frecuente / potente / Ig
 TASA_PESO = 0.2           # PC que resta cada punto de Peso del arma (relevancia intermedia)
 TASA_STAT = {'pdg': 1.0, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.5, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
 TASA_STAT_DEFECTO = 1.0
+ALCANCE_PRIMERO = 2.0     # PC del primer punto de Alcance de un arma cuerpo a cuerpo (pegar sin estar adyacente); el 'rng' de las armas de rango es su identidad y va aparte (0,5)
+ALCANCE_EXTRA = 1.0       # PC de cada punto de Alcance siguiente
 UMBRAL_TIER = [('Común', 0), ('Buena Calidad', 7.5), ('Raro', 11), ('Excepcional', 17), ('Legendario', 26)]
-BANDA_PRECIO = {'Común': (30, 90), 'Buena Calidad': (80, 160), 'Raro': (150, 350), 'Excepcional': (400, 900), 'Legendario': (1000, 2000)}
+BANDA_PRECIO = {'Común': (20, 80), 'Buena Calidad': (80, 160), 'Raro': (150, 350), 'Excepcional': (400, 900), 'Legendario': (1000, 2000)}
 SOBREPRECIO = 1.5
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
@@ -98,6 +100,9 @@ def puntaje(arma):
                 crit += min(v, 6) * PESO_CRIT * PESO_CRITPOT * K_EFECTO
         elif st == 'dmg':
             bonos += v * TASA_STAT['dmg'] * factor_plano(tipo)
+        elif st == 'rng' and not arma.get('armaDeRango'):   # Alcance cuerpo a cuerpo: el 1.º punto deja pegar sin estar adyacente (vale mucho); los siguientes, menos
+            fuera = 1.0 if 'rng' in STATS_CASA.get(fam, ()) else 1.25
+            bonos += (ALCANCE_PRIMERO + max(0.0, v - 1) * ALCANCE_EXTRA) * fuera if v > 0 else v * ALCANCE_EXTRA
         else:
             fuera = 1.0 if st in STATS_UNIVERSALES or st in STATS_CASA.get(fam, ()) else 1.25
             bonos += v * TASA_STAT.get(st, TASA_STAT_DEFECTO) * fuera
@@ -231,7 +236,8 @@ TIER_MIN = {'Aturdir': 'Raro', 'Drena vida': 'Raro', 'Veneno severo': 'Excepcion
 def reajustar(arma):
     """Copia del arma con las reglas nuevas aplicadas + lista de cambios/avisos (texto)."""
     import copy
-    a = copy.deepcopy(arma)
+    from variaciones_armas import variar
+    a, texto_var = variar(copy.deepcopy(arma))   # armas idénticas a otra: se les suma una variación leve
     cambios, avisos = [], []
     tipo, tier = int(a.get('tipoDado') or 0), a['tier']
     fam = familia(a)
@@ -290,6 +296,7 @@ def reajustar(arma):
     tope_ef = {'Común': 1, 'Buena Calidad': 1, 'Raro': 1, 'Excepcional': 2, 'Legendario': 3}[tier]
     if len(a['efectosGolpe']) > tope_ef:
         avisos.append(f"Lleva {len(a['efectosGolpe'])} efectos y un {tier} admite {tope_ef}")
+    if texto_var: cambios.insert(0, texto_var)
     return a, cambios, avisos
 
 

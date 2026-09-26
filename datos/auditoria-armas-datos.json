@@ -117,13 +117,13 @@
   "precioHoy": 230,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1. Puede Derribar (25%).",
   "nuevo": {
-   "pc": 11.0,
+   "pc": 12.5,
    "tier": "Raro",
-   "precio": 150,
+   "precio": 200,
    "exceso": 0,
    "desglose": {
     "daño": 10.0,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.9,
     "peso del arma": -0.4
@@ -156,7 +156,7 @@
   "nuevo": {
    "pc": 6.1,
    "tier": "Común",
-   "precio": 80,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
@@ -234,7 +234,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -311,22 +311,30 @@
     "val": 4
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 25,
+    "detalle": "25 % de dejar Veneno (2 stacks)."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Envenenar 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 5.9,
    "tier": "Común",
-   "precio": 70,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
     "bonos": 2.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.6,
     "peso del arma": -0.2
    }
   }
@@ -383,22 +391,28 @@
    {
     "stat": "rng",
     "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: pdg +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.1,
+   "pc": 7.1,
    "tier": "Común",
-   "precio": 80,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 1.5,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -422,22 +436,30 @@
     "val": 3
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 25,
+    "detalle": "25 % de dejar Veneno (2 stacks)."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Envenenar 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.1,
+   "pc": 6.8,
    "tier": "Común",
-   "precio": 80,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
     "bonos": 1.5,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.6,
     "peso del arma": -0.2
    }
   }
@@ -456,23 +478,25 @@
   "bonos": [
    {
     "stat": "rng",
-    "val": 3
+    "val": 4
    }
   ],
   "efectos": [],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: rng +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.1,
+   "pc": 6.6,
    "tier": "Común",
-   "precio": 80,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 1.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -548,13 +572,13 @@
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 6.7,
-   "tier": "Común",
-   "precio": 85,
-   "exceso": 0,
+   "pc": 8.6,
+   "tier": "Buena Calidad",
+   "precio": 160,
+   "exceso": 1,
    "desglose": {
     "daño": 6.3,
-    "bonos": 0.6,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -576,22 +600,30 @@
    {
     "stat": "rng",
     "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: ini +1."
+  ],
+  "avisos": [
+   "Tiene 2 puntos de bonos y un Común admite hasta 1: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 6.7,
-   "tier": "Común",
-   "precio": 85,
-   "exceso": 0,
+   "pc": 9.2,
+   "tier": "Buena Calidad",
+   "precio": 180,
+   "exceso": 1,
    "desglose": {
     "daño": 6.3,
-    "bonos": 0.6,
+    "bonos": 3.1,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -624,7 +656,7 @@
   "nuevo": {
    "pc": 5.6,
    "tier": "Común",
-   "precio": 75,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
@@ -656,7 +688,7 @@
   "nuevo": {
    "pc": 6.1,
    "tier": "Común",
-   "precio": 80,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 6.3,
@@ -699,13 +731,13 @@
   "precioHoy": 800,
   "detalle": "parry+2, bloqueo +1, alcance +1",
   "nuevo": {
-   "pc": 15.0,
+   "pc": 16.9,
    "tier": "Raro",
-   "precio": 280,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 11.8,
-    "bonos": 3.6,
+    "bonos": 5.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -740,13 +772,13 @@
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 12.2,
+   "pc": 14.1,
    "tier": "Raro",
-   "precio": 290,
+   "precio": 400,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 1.6,
+    "bonos": 3.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -771,23 +803,27 @@
    },
    {
     "stat": "rng",
-    "val": 1
+    "val": 2
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: rng +1."
+  ],
+  "avisos": [
+   "Tiene 3 puntos de bonos y un Buena Calidad admite hasta 2: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 12.2,
+   "pc": 15.3,
    "tier": "Raro",
-   "precio": 290,
+   "precio": 450,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 1.6,
+    "bonos": 4.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -815,22 +851,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Demora 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 12.2,
+   "pc": 15.1,
    "tier": "Raro",
-   "precio": 290,
+   "precio": 450,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 1.6,
+    "bonos": 3.5,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.4
    }
   }
@@ -905,7 +949,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
@@ -942,7 +986,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -979,7 +1023,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -1005,22 +1049,30 @@
    {
     "stat": "parry",
     "val": 2
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: ini +1."
+  ],
+  "avisos": [
+   "Tiene 3 puntos de bonos y un Buena Calidad admite hasta 2: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "Parry +2",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 5.8,
    "tier": "Común",
-   "precio": 70,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 2.0,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -1126,7 +1178,7 @@
   "nuevo": {
    "pc": 2.3,
    "tier": "Común",
-   "precio": 50,
+   "precio": 40,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
@@ -1149,22 +1201,30 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 30,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño.",
   "nuevo": {
-   "pc": 2.3,
+   "pc": 2.9,
    "tier": "Común",
-   "precio": 50,
+   "precio": 45,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.6,
     "peso del arma": -0.2
    }
   }
@@ -1190,7 +1250,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -1227,7 +1287,7 @@
   "nuevo": {
    "pc": 3.3,
    "tier": "Común",
-   "precio": 55,
+   "precio": 45,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
@@ -1261,7 +1321,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -1284,8 +1344,15 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 25,
+    "detalle": "25 % de dejar Veneno (2 stacks)."
+   }
+  ],
   "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Envenenar 25 %.",
    "Quitar «Ignora 1 de Res. crítico»: solo va en armas de Tipo 4 y 6 desde Raro"
   ],
   "avisos": [],
@@ -1293,15 +1360,15 @@
   "precioHoy": 60,
   "detalle": "Ignora 1 punto de resistencia al crítico",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 4.9,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.6,
     "peso del arma": -0.2
    }
   }
@@ -1323,14 +1390,22 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 33,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 33 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +1",
   "nuevo": {
-   "pc": 3.3,
+   "pc": 4.1,
    "tier": "Común",
    "precio": 55,
    "exceso": 0,
@@ -1338,7 +1413,7 @@
     "daño": 2.5,
     "bonos": 1.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.8,
     "peso del arma": -0.2
    }
   }
@@ -1364,7 +1439,7 @@
   "nuevo": {
    "pc": 4.6,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
@@ -1437,22 +1512,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Lisiado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "parry+1, bloqueo+1",
   "nuevo": {
-   "pc": 10.2,
-   "tier": "Buena Calidad",
-   "precio": 140,
+   "pc": 11.1,
+   "tier": "Raro",
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 8.3,
     "bonos": 2.2,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.9,
     "peso del arma": -0.4
    }
   }
@@ -1478,7 +1561,7 @@
   "nuevo": {
    "pc": 3.3,
    "tier": "Común",
-   "precio": 55,
+   "precio": 45,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -1510,7 +1593,7 @@
   "nuevo": {
    "pc": 6.6,
    "tier": "Común",
-   "precio": 85,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
@@ -1548,7 +1631,7 @@
   "nuevo": {
    "pc": 4.5,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -1616,23 +1699,32 @@
     "nombre": "Envenenar",
     "prob": 50,
     "detalle": "Aplicale Veneno al objetivo."
+   },
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
+  "avisos": [
+   "Lleva 2 efectos y un Común admite 1"
+  ],
   "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "envenena x 50% de chances",
   "nuevo": {
-   "pc": 4.5,
+   "pc": 5.0,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 1.2,
+    "efectos": 1.8,
     "peso del arma": -0.2
    }
   }
@@ -1649,22 +1741,30 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Arma de una mano, Tipo 6: 2 dados de daño.",
   "nuevo": {
-   "pc": 6.6,
+   "pc": 7.1,
    "tier": "Común",
-   "precio": 85,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.5,
     "peso del arma": -0.4
    }
   }
@@ -1681,22 +1781,30 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 70,
   "detalle": "Arma de una mano, Tipo 6: 1 dado de daño +1 fijo.",
   "nuevo": {
-   "pc": 4.6,
+   "pc": 5.1,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.5,
     "peso del arma": -0.2
    }
   }
@@ -1716,22 +1824,30 @@
    {
     "stat": "pdg",
     "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: parry +1."
+  ],
+  "avisos": [
+   "Tiene 3 puntos de bonos y un Buena Calidad admite hasta 2: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +2",
   "nuevo": {
-   "pc": 5.8,
+   "pc": 6.8,
    "tier": "Común",
    "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 2.5,
+    "bonos": 3.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -1753,23 +1869,29 @@
    {
     "stat": "pdg",
     "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: crit +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "pdg +2",
   "nuevo": {
-   "pc": 5.8,
-   "tier": "Común",
-   "precio": 75,
+   "pc": 8.8,
+   "tier": "Buena Calidad",
+   "precio": 110,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
     "bonos": 2.5,
-    "crítico": 0.0,
+    "crítico": 3.0,
     "efectos": 0.0,
     "peso del arma": -0.2
    }
@@ -1801,7 +1923,7 @@
   "nuevo": {
    "pc": 5.8,
    "tier": "Común",
-   "precio": 75,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -2064,22 +2186,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "crítico +1",
   "nuevo": {
-   "pc": 7.5,
+   "pc": 8.2,
    "tier": "Buena Calidad",
-   "precio": 120,
+   "precio": 140,
    "exceso": 1,
    "desglose": {
     "daño": 2.5,
     "bonos": 0.0,
     "crítico": 5.2,
-    "efectos": 0.0,
+    "efectos": 0.6,
     "peso del arma": -0.2
    }
   }
@@ -2110,7 +2240,7 @@
   "nuevo": {
    "pc": 5.2,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
@@ -2234,7 +2364,7 @@
   "nuevo": {
    "pc": 6.6,
    "tier": "Común",
-   "precio": 85,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
@@ -2312,7 +2442,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
@@ -2470,7 +2600,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -2545,13 +2675,13 @@
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
-   "pc": 13.1,
+   "pc": 14.6,
    "tier": "Raro",
-   "precio": 220,
+   "precio": 270,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 4.0,
     "peso del arma": -0.4
@@ -2752,7 +2882,7 @@
   "nuevo": {
    "pc": 6.6,
    "tier": "Común",
-   "precio": 85,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
@@ -2943,7 +3073,9 @@
    }
   ],
   "cambios": [
-   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad"
+   "Variación para que no sea idéntica a otra arma del catálogo: Rompe armadura 25 %.",
+   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad",
+   "«Rompe armadura» estaba repetido: queda uno solo"
   ],
   "avisos": [],
   "bonos_hoy": null,
@@ -3055,6 +3187,10 @@
    {
     "stat": "rng",
     "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
   "efectos": [
@@ -3064,19 +3200,21 @@
     "detalle": "Aplicale el estado Armadura rota al objetivo."
    }
   ],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: bloqueo +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
-   "pc": 13.1,
+   "pc": 15.6,
    "tier": "Raro",
-   "precio": 220,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 0.5,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 4.0,
     "peso del arma": -0.4
@@ -3094,7 +3232,12 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "efectos": [
    {
     "nombre": "Rompe armadura",
@@ -3103,6 +3246,7 @@
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: bloqueo +1.",
    "«Rompe armadura» con porcentaje (25 %) en tier Común"
   ],
   "avisos": [],
@@ -3110,13 +3254,13 @@
   "precioHoy": 60,
   "detalle": "Rompe armadura.",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 6.3,
    "tier": "Común",
    "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 1.0,
     "peso del arma": -0.2
@@ -3228,7 +3372,7 @@
   "nuevo": {
    "pc": 5.5,
    "tier": "Común",
-   "precio": 75,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -3260,7 +3404,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -3297,7 +3441,7 @@
   "nuevo": {
    "pc": 3.8,
    "tier": "Común",
-   "precio": 60,
+   "precio": 50,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
@@ -3323,22 +3467,28 @@
    {
     "stat": "rng",
     "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 1
    }
   ],
   "efectos": [],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: pdg +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
   "nuevo": {
-   "pc": 3.8,
+   "pc": 4.8,
    "tier": "Común",
    "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 1.5,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3369,13 +3519,13 @@
   "precioHoy": 50,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 2.8,
+   "pc": 4.3,
    "tier": "Común",
-   "precio": 50,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3409,7 +3559,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -3439,7 +3589,10 @@
     "detalle": "Aplicale Sangrado al objetivo."
    }
   ],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %.",
+   "«Sangrado» estaba repetido: queda uno solo"
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 75,
@@ -3447,7 +3600,7 @@
   "nuevo": {
    "pc": 4.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -3520,22 +3673,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 33,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 33 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "pdg+2, crítico +1",
   "nuevo": {
-   "pc": 12.1,
+   "pc": 12.8,
    "tier": "Raro",
-   "precio": 190,
+   "precio": 210,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 2.5,
     "crítico": 3.0,
-    "efectos": 0.0,
+    "efectos": 0.7,
     "peso del arma": -0.4
    }
   }
@@ -3564,13 +3725,13 @@
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 5.1,
+   "pc": 6.6,
    "tier": "Común",
-   "precio": 70,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3601,13 +3762,13 @@
   "precioHoy": 65,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1.",
   "nuevo": {
-   "pc": 4.8,
+   "pc": 6.3,
    "tier": "Común",
    "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3628,23 +3789,27 @@
   "bonos": [
    {
     "stat": "rng",
-    "val": 1
+    "val": 2
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: rng +1."
+  ],
+  "avisos": [
+   "Tiene 2 puntos de bonos y un Común admite hasta 1: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 5.1,
-   "tier": "Común",
-   "precio": 70,
-   "exceso": 0,
+   "pc": 7.6,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 1,
    "desglose": {
     "daño": 5.0,
-    "bonos": 0.5,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3675,13 +3840,13 @@
   "precioHoy": 110,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 9.1,
+   "pc": 10.6,
    "tier": "Buena Calidad",
-   "precio": 120,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3752,13 +3917,13 @@
   "precioHoy": 150,
   "detalle": "Ignora 1 de res al crítico, alcance +1",
   "nuevo": {
-   "pc": 11.2,
+   "pc": 13.1,
    "tier": "Raro",
-   "precio": 160,
+   "precio": 220,
    "exceso": 0,
    "desglose": {
     "daño": 11.0,
-    "bonos": 0.6,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3794,7 +3959,7 @@
   "nuevo": {
    "pc": 6.3,
    "tier": "Común",
-   "precio": 80,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -3870,13 +4035,13 @@
   "precioHoy": 160,
   "detalle": "Alcance +1.",
   "nuevo": {
-   "pc": 12.0,
+   "pc": 13.9,
    "tier": "Raro",
-   "precio": 180,
+   "precio": 250,
    "exceso": 0,
    "desglose": {
     "daño": 11.8,
-    "bonos": 0.6,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3907,13 +4072,13 @@
   "precioHoy": 150,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 21.8,
+   "pc": 23.7,
    "tier": "Excepcional",
-   "precio": 1000,
+   "precio": 1200,
    "exceso": 1,
    "desglose": {
     "daño": 22.0,
-    "bonos": 0.6,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.8
@@ -4084,13 +4249,13 @@
   "precioHoy": 70,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 5.9,
-   "tier": "Común",
-   "precio": 75,
-   "exceso": 0,
+   "pc": 7.8,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 1,
    "desglose": {
     "daño": 5.5,
-    "bonos": 0.6,
+    "bonos": 2.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -4266,22 +4431,30 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Demora 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 50,
   "detalle": "Daño amplificado.",
   "nuevo": {
-   "pc": 10.6,
-   "tier": "Buena Calidad",
-   "precio": 230,
-   "exceso": 1,
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 400,
+   "exceso": 2,
    "desglose": {
     "daño": 11.0,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.4
    }
   }
@@ -4334,21 +4507,28 @@
   "peso": 3,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
   "efectos": [],
-  "cambios": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: parry +1."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 90,
   "detalle": "Arma de una mano, Tipo 10: 3 dados de daño.",
   "nuevo": {
-   "pc": 15.9,
+   "pc": 16.9,
    "tier": "Raro",
-   "precio": 450,
+   "precio": 500,
    "exceso": 1,
    "desglose": {
     "daño": 16.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.6
@@ -4381,7 +4561,7 @@
   "nuevo": {
    "pc": 6.3,
    "tier": "Común",
-   "precio": 80,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
@@ -4458,7 +4638,7 @@
   "nuevo": {
    "pc": 4.6,
    "tier": "Común",
-   "precio": 65,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
@@ -4501,13 +4681,13 @@
   "precioHoy": 90,
   "detalle": "alcance +1, 50% de romper armadura",
   "nuevo": {
-   "pc": 8.1,
+   "pc": 9.6,
    "tier": "Buena Calidad",
-   "precio": 95,
+   "precio": 130,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 3.0,
     "peso del arma": -0.4
@@ -4606,22 +4786,30 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Lisiado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano, Tipo 4: 1 dado de daño +1 fijo.",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 5.0,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.8,
     "peso del arma": -0.2
    }
   }
@@ -4900,7 +5088,7 @@
   "nuevo": {
    "pc": 3.8,
    "tier": "Común",
-   "precio": 60,
+   "precio": 50,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -4925,23 +5113,27 @@
   "bonos": [
    {
     "stat": "ini",
-    "val": 1
+    "val": 2
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: ini +1."
+  ],
+  "avisos": [
+   "Tiene 2 puntos de bonos y un Común admite hasta 1: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "iniciativa +1",
   "nuevo": {
-   "pc": 3.8,
+   "pc": 4.3,
    "tier": "Común",
-   "precio": 60,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 0.5,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -4978,7 +5170,7 @@
   "nuevo": {
    "pc": 5.5,
    "tier": "Común",
-   "precio": 75,
+   "precio": 65,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -5007,23 +5199,27 @@
    },
    {
     "stat": "parry",
-    "val": 1
+    "val": 2
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: parry +1."
+  ],
+  "avisos": [
+   "Tiene 3 puntos de bonos y un Buena Calidad admite hasta 2: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "pdg +1, parry +1",
   "nuevo": {
-   "pc": 5.5,
+   "pc": 6.5,
    "tier": "Común",
-   "precio": 75,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 2.2,
+    "bonos": 3.2,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5047,22 +5243,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 80,
   "detalle": "pdg +1",
   "nuevo": {
-   "pc": 7.8,
+   "pc": 8.3,
    "tier": "Buena Calidad",
-   "precio": 90,
+   "precio": 100,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
     "bonos": 1.2,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.5,
     "peso del arma": -0.4
    }
   }
@@ -5084,22 +5288,30 @@
     "val": 1
    }
   ],
-  "efectos": [],
-  "cambios": [],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %."
+  ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "iniciativa +1",
   "nuevo": {
-   "pc": 3.8,
+   "pc": 4.3,
    "tier": "Común",
-   "precio": 60,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
     "bonos": 0.5,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.5,
     "peso del arma": -0.2
    }
   }
@@ -5210,13 +5422,13 @@
   "precioHoy": 60,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 4.8,
+   "pc": 6.3,
    "tier": "Común",
    "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5237,23 +5449,27 @@
   "bonos": [
    {
     "stat": "bloqueo",
-    "val": 1
+    "val": 2
    }
   ],
   "efectos": [],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra arma del catálogo: bloqueo +1."
+  ],
+  "avisos": [
+   "Tiene 2 puntos de bonos y un Común admite hasta 1: recortar o subir de tier"
+  ],
   "bonos_hoy": null,
   "precioHoy": 120,
   "detalle": "bloqueo +1",
   "nuevo": {
-   "pc": 11.6,
+   "pc": 12.6,
    "tier": "Raro",
-   "precio": 400,
+   "precio": 450,
    "exceso": 2,
    "desglose": {
     "daño": 11.0,
-    "bonos": 1.0,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -5271,21 +5487,26 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
   "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar.",
+  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar. Variación: pdg +1.",
   "nuevo": {
-   "pc": 2.3,
+   "pc": 3.3,
    "tier": "Común",
-   "precio": 50,
+   "precio": 45,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5303,21 +5524,26 @@
   "peso": 1,
   "danoFijo": 1,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
   "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza.",
+  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza. Variación: pdg +1.",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 5.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5356,7 +5582,7 @@
   "nuevo": {
    "pc": 4.0,
    "tier": "Común",
-   "precio": 60,
+   "precio": 50,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
@@ -5438,13 +5664,13 @@
   "precioHoy": null,
   "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado.",
   "nuevo": {
-   "pc": 8.2,
+   "pc": 9.7,
    "tier": "Buena Calidad",
-   "precio": 95,
+   "precio": 130,
    "exceso": 0,
    "desglose": {
     "daño": 7.5,
-    "bonos": 0.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.8,
     "peso del arma": -0.6
@@ -5508,7 +5734,7 @@
   "bonos": [
    {
     "stat": "pdg",
-    "val": 2
+    "val": 1
    },
    {
     "stat": "rng",
@@ -5528,15 +5754,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "El arma de los duelistas: PdG +2, Alcance +1, Crítico potente +3 y Crítico frecuente +1.",
+  "detalle": "El arma de los duelistas: PdG +1, Alcance +1, Crítico potente +3 y Crítico frecuente +1.",
   "nuevo": {
-   "pc": 16.0,
+   "pc": 16.5,
    "tier": "Raro",
-   "precio": 300,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 2.5,
+    "bonos": 3.0,
     "crítico": 8.8,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -5581,13 +5807,13 @@
   "precioHoy": null,
   "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico potente +3 y 33 % de Lisiado.",
   "nuevo": {
-   "pc": 13.5,
+   "pc": 15.5,
    "tier": "Raro",
-   "precio": 230,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 7.5,
-    "bonos": 2.0,
+    "bonos": 4.0,
     "crítico": 3.6,
     "efectos": 1.0,
     "peso del arma": -0.6
@@ -5726,13 +5952,13 @@
   "precioHoy": null,
   "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado.",
   "nuevo": {
-   "pc": 21.3,
+   "pc": 23.3,
    "tier": "Excepcional",
-   "precio": 650,
+   "precio": 750,
    "exceso": 0,
    "desglose": {
     "daño": 10.0,
-    "bonos": 3.0,
+    "bonos": 5.0,
     "crítico": 7.7,
     "efectos": 1.5,
     "peso del arma": -0.8
@@ -5806,21 +6032,26 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
   "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La de madera forrada en lata. Corta, mal, pero corta.",
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. Variación: parry +1.",
   "nuevo": {
-   "pc": 3.3,
+   "pc": 4.3,
    "tier": "Común",
    "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5838,21 +6069,26 @@
   "peso": 1,
   "danoFijo": 1,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
   "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo.",
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo. Variación: ini +1.",
   "nuevo": {
-   "pc": 4.6,
+   "pc": 5.1,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 0.0,
+    "bonos": 0.5,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5886,7 +6122,7 @@
   "nuevo": {
    "pc": 3.8,
    "tier": "Común",
-   "precio": 60,
+   "precio": 50,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
@@ -6329,22 +6565,28 @@
   "danoFijo": 0,
   "rango": false,
   "bonos": [],
-  "efectos": [],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 25,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más.",
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Variación: Rompe armadura 25 %.",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 5.3,
    "tier": "Común",
-   "precio": 65,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -6376,7 +6618,7 @@
   "nuevo": {
    "pc": 6.3,
    "tier": "Común",
-   "precio": 80,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
@@ -6413,7 +6655,7 @@
   "nuevo": {
    "pc": 5.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
@@ -6475,10 +6717,6 @@
   "rango": false,
   "bonos": [
    {
-    "stat": "bloqueo",
-    "val": 1
-   },
-   {
     "stat": "rng",
     "val": 1
    }
@@ -6488,15 +6726,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Para trepar y para pelear en el pasamanos. Bloqueo +1 y Alcance +1.",
+  "detalle": "Para trepar y pelear en el pasamanos. Alcance +1.",
   "nuevo": {
-   "pc": 10.1,
+   "pc": 10.6,
    "tier": "Buena Calidad",
-   "precio": 140,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 1.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -6542,8 +6780,8 @@
   }
  },
  {
-  "id": "nuevo-hacha-del-jefe-de-guerra",
-  "nombre": "Hacha del Jefe de Guerra",
+  "id": "nuevo-hacha-del-caudillo",
+  "nombre": "Hacha del Caudillo",
   "origen": "nuevo · tanda 3",
   "familia": "hacha",
   "tier": "Raro",
@@ -6593,7 +6831,7 @@
   "manos": 1,
   "tipo": 8,
   "peso": 3,
-  "danoFijo": 1,
+  "danoFijo": 0,
   "rango": false,
   "bonos": [
    {
@@ -6612,15 +6850,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Pesada y de mango largo: +1 de daño fijo, Alcance +1 y 50 % de romper armadura.",
+  "detalle": "Pesada y de mango largo: Alcance +1 y 50 % de romper armadura.",
   "nuevo": {
-   "pc": 16.4,
+   "pc": 16.9,
    "tier": "Raro",
    "precio": 350,
    "exceso": 0,
    "desglose": {
-    "daño": 14.5,
-    "bonos": 0.5,
+    "daño": 13.5,
+    "bonos": 2.0,
     "crítico": 0.0,
     "efectos": 2.0,
     "peso del arma": -0.6
@@ -6661,13 +6899,13 @@
   "precioHoy": null,
   "detalle": "Se tira y vuelve (a veces). Alcance +2, PdG +1 y 50 % de Sangrado.",
   "nuevo": {
-   "pc": 12.1,
+   "pc": 14.1,
    "tier": "Raro",
-   "precio": 190,
+   "precio": 250,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 2.2,
+    "bonos": 4.2,
     "crítico": 0.0,
     "efectos": 1.2,
     "peso del arma": -0.4
@@ -6751,13 +6989,13 @@
   "precioHoy": null,
   "detalle": "Nació para desarmar caballeros: +2 de daño fijo, Bloqueo +2, Alcance +1 y 2 stacks de Armadura rota en cada golpe.",
   "nuevo": {
-   "pc": 23.4,
+   "pc": 24.9,
    "tier": "Excepcional",
-   "precio": 750,
+   "precio": 850,
    "exceso": 0,
    "desglose": {
     "daño": 15.5,
-    "bonos": 2.5,
+    "bonos": 4.0,
     "crítico": 0.0,
     "efectos": 6.0,
     "peso del arma": -0.6
@@ -6803,13 +7041,13 @@
   "precioHoy": null,
   "detalle": "Se dice que cortó la última veta del mundo. A dos manos: +3 de daño fijo, Bloqueo +3, Alcance +1, 2 stacks de Armadura rota y Sangrado en cada golpe.",
   "nuevo": {
-   "pc": 32.2,
+   "pc": 33.7,
    "tier": "Legendario",
-   "precio": 1600,
+   "precio": 1800,
    "exceso": 0,
    "desglose": {
     "daño": 21.0,
-    "bonos": 3.5,
+    "bonos": 5.0,
     "crítico": 0.0,
     "efectos": 8.5,
     "peso del arma": -0.8
@@ -6827,21 +7065,26 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
   "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren.",
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. Variación: bloqueo +1.",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 6.3,
    "tier": "Común",
    "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
-    "bonos": 0.0,
+    "bonos": 1.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -6860,22 +7103,28 @@
   "danoFijo": 1,
   "rango": false,
   "bonos": [],
-  "efectos": [],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo.",
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo. Variación: Demora 25 %.",
   "nuevo": {
-   "pc": 6.1,
+   "pc": 7.1,
    "tier": "Común",
-   "precio": 80,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 6.3,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -6897,14 +7146,20 @@
     "val": 1
    }
   ],
-  "efectos": [],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Reglamentaria. Bloqueo +1.",
+  "detalle": "Reglamentaria. Bloqueo +1. Variación: Demora 25 %.",
   "nuevo": {
-   "pc": 6.3,
+   "pc": 7.3,
    "tier": "Común",
    "precio": 80,
    "exceso": 0,
@@ -6912,7 +7167,7 @@
     "daño": 5.5,
     "bonos": 1.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -7035,8 +7290,8 @@
   }
  },
  {
-  "id": "nuevo-martillo-de-sargento",
-  "nombre": "Martillo de sargento",
+  "id": "nuevo-martillo-del-sargento-mayor",
+  "nombre": "Martillo del sargento mayor",
   "origen": "nuevo · tanda 4",
   "familia": "contundente",
   "tier": "Raro",

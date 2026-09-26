@@ -11,6 +11,17 @@
 6. **Reparar:** **no se puede reparar durante el combate.** Formas de reparar: **Óleo reparador**, **un herrero** (con precio) y **habilidades por talento que reparan usando despojos** (loot). Como es solo fuera de combate, **el Óleo reparador deja de ser un consumible de cinturón** (hoy es un consumible común "Repara armadura", Común $25).
 7. **Creeps:** **no llevan durabilidad.** Pero Rompe armadura **sí les baja la Defensa** (con el estado Armadura rota que ya existe).
 
+## Cambio de modelo (dueño, 2026-09-26): la durabilidad y la Armadura rota son de LOS ÍTEMS, no un estado del personaje
+- **Cada ítem lleva su propia durabilidad** (y, las piezas de defensa, su propia **Armadura rota**). **No es un estado que tenga el personaje**: si se saca la armadura, **la armadura sigue rota** (y conserva su estado de Armadura rota).
+- **Rompe armadura** le pega a **una pieza equipada elegida al azar** y le suma Armadura rota **a esa pieza** (cada punto le baja 1 la Defensa a esa pieza). El «Armadura rota» del personaje deja de ser un estado suyo: **se calcula sumando el de sus piezas equipadas** (y solo cuenta lo que lleva puesto).
+- **El tope de Armadura rota es la durabilidad total de ESA pieza** (antes se decía «la suma de las piezas»: se reemplaza por este tope por ítem).
+- **Los creeps** siguen igual: no llevan durabilidad, y Rompe armadura les baja la Defensa con su estado Armadura rota (nivel del creep, no de ítems).
+- Cambia el diseño técnico: el inventario de cada ítem guarda su desgaste (durabilidad actual y Armadura rota); hay que **migrar el estado Armadura rota que hoy es del personaje** al ítem.
+- **Pregunta abierta (propuesta entre paréntesis):** ¿la Armadura rota de una pieza y su durabilidad son **el mismo número**? (sí, en las armaduras: cada punto de Armadura rota es un punto de durabilidad perdido, así la pieza queda rota cuando la Armadura rota llega a su durabilidad total; en armas y escudos la durabilidad se gasta solo por Bloqueo perdido.)
+
+## Parry siempre cuesta 1 Nitro (dueño, 2026-09-26)
+El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y también sin arma). Ya cambiado en la ficha, en los creeps, en las invocaciones y en el cuadro del duelo. (El Peso sigue sumando al Bloqueo y a la Fuerza del golpe, y define la durabilidad.)
+
 ## Confirmado después (dueño, 2026-09-26)
 - **Al llegar a 0 la pieza queda rota** (sin efectos, no se destruye): ✅ interpretación correcta.
 - **El estado Armadura rota sigue para TODOS**, también para los personajes de los jugadores (se les puede romper la armadura y bajar la Defensa). No queda «solo para creeps»: lo dije mal.

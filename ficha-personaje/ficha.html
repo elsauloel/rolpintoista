@@ -4594,7 +4594,7 @@ function invNitrosMax(inv){
 // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
 // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
 function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
-// Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta el Peso de su arma en No2; el Bloqueo = su Bloqueo + ese Peso.
+// Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta 1 No2 (2026-09-26); el Bloqueo = su Bloqueo + el Peso de su arma.
 function pesoArmaInv(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
 function costoAtaqueInv(inv){
   const tipo = num(inv.armaTipo) || 8;
@@ -4960,7 +4960,7 @@ function renderBotoneraInv(){
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
     {stat:'eva', nombre:'Esquivar (Eva)', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    {stat:'parry', nombre:`Parry · ${fmt(pesoArmaInv(inv))} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < pesoArmaInv(inv), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < pesoArmaInv(inv) ? 'Sin No2 · ' : ''}Cuesta ${fmt(pesoArmaInv(inv))} No2 (el Peso de su arma)`, attr:`data-invtirarstat="${inv.id}:parry"`},
+    {stat:'parry', nombre:`Parry · 1 No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < 1, clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < 1 ? 'Sin No2 · ' : ''}Cuesta 1 No2`, attr:`data-invtirarstat="${inv.id}:parry"`},
     {stat:'bloqueo', nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
   ];
   const tilesCombate = combate.map(c => {
@@ -5105,9 +5105,9 @@ function invTirarStat(invId, statId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   if(statId === 'parry'){
-    const costo = pesoArmaInv(inv);
+    const costo = 1;   // el Parry siempre cuesta 1 No2
     if(costo > num(inv.nitros)){
-      toast(`${inv.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} (el Peso de su arma) y tiene ${fmt(num(inv.nitros))}`);
+      toast(`${inv.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(inv.nitros))}`);
       return;
     }
     inv.nitros = num(inv.nitros) - costo;
@@ -5849,7 +5849,7 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
           </button>
-          <button type="button" class="botonera-tile${mtParry.clase}" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: cuesta tantos No2 como el Peso (' + costoParryTxt() + ')' + mtParry.titulo)}">
+          <button type="button" class="botonera-tile${mtParry.clase}" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>${mtParry.html}
           </button>
@@ -10120,20 +10120,18 @@ function pdgParaArma(arma, c){
 }
 
 /* ---------- Parry y Bloqueo con arma o escudo ----------
-   Parry: siempre cuesta No2 — el Peso del arma o escudo elegido dividido
-   dos, redondeado hacia arriba (2026-09-22; antes era el Tipo de daño ÷ 2,
-   pero un escudo no tiene Tipo), sin importar cuántos ataques hiciste en
+   Parry: siempre cuesta 1 No2 (2026-09-26, dueño; antes el Peso del arma o escudo), sin importar el arma o escudo ni cuántos ataques hiciste en
    el turno. Se puede parriar con cualquier arma o escudo equipado, no
    solo con las que hacen daño (`armasYEscudosParaParry`).
    Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma, y la SUMA es el dado (`bloqueoValorConArma`, 2026-09-24).
    Con más de un arma/escudo equipado, se elige con cuál. Sin nada
-   equipado: Peso 0, Parry sale gratis y el Bloqueo no suma peso. */
+   equipado: el Parry igual cuesta 1 No2 y el Bloqueo no suma peso. */
 // Arma con la que se hizo el último Parry (id, o '' si fue sin arma). El Bloqueo que
 // sigue (defensa: Parry y después Bloqueo) usa esa misma arma sin volver a preguntar.
 // null = no hay un Parry esperando su Bloqueo. Se limpia al bloquear, atacar o pasar el turno.
 let parryArmaPendiente = null;
-// El Parry cuesta tantos No2 como el Peso del arma o escudo con el que se para (2026-09-24, pedido del dueño; antes la mitad, para arriba).
-const costoParryNitros = arma => Math.max(0, num(arma ? arma.peso : 0));
+// El Parry siempre cuesta 1 No2 (2026-09-26, dueño). Antes: el Peso del arma o escudo (2026-09-24) y antes la mitad.
+const costoParryNitros = () => 1;   // 2026-09-26 (dueño): el Parry SIEMPRE cuesta 1 No2, sin importar el peso del arma o escudo (antes costaba su Peso)
 
 // A diferencia de armasEquipadasConDano() (para Atacar/Daño Arma/Bloqueo),
 // acá entra cualquier arma O ESCUDO equipado, tenga o no daño: para
@@ -10250,11 +10248,11 @@ window.DUELO_HOOKS = {
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
   },
-  // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (cuesta su Peso en No2).
+  // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
     const inv = dueloInvDe(d.defensor);
     if(inv){
-      const c = pesoArmaInv(inv);
+      const c = 1;
       return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
         {modo: 'parry', itemId: '', itemNombre: inv.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${inv.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : ''}];
     }
@@ -10326,7 +10324,7 @@ function elegirArmaDefensa(tipo){
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : tipo === 'fuerza' ? fuerzaGolpeConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: cuesta tantos No2 como el Peso del arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}

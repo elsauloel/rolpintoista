@@ -110,7 +110,7 @@ Si elegiste Parry **y ganás**, se dispara una **segunda tirada** con tu [[Bloqu
 > - **Defensa activa** (esta nota): la elección Evasión / Parry.
 
 > [!success] Cadena Parry → Bloqueo (cerrada 2026-09-26)
-> Con arma **o con escudo**: el **Parry** se tira contra el **PdG** del atacante y cuesta el **Peso** de lo que usás. Si ganás, el **Bloqueo** es un **enfrentamiento de sumas**: **tu Bloqueo (Fuerza) + Peso del arma o escudo** contra **la Fuerza del atacante + Peso de su arma** (cada uno convierte su suma en dado; el atacante usa 🎲 *Fuerza del golpe*). Si ganás el Bloqueo, el golpe queda anulado. *A confirmar:* si perdés el Bloqueo, el golpe entra completo.
+> Con arma **o con escudo**: el **Parry** se tira contra el **PdG** del atacante y **siempre cuesta 1 Nitro** (sin importar el Peso de lo que usás). Si ganás, el **Bloqueo** es un **enfrentamiento de sumas**: **tu Bloqueo (Fuerza) + Peso del arma o escudo** contra **la Fuerza del atacante + Peso de su arma** (cada uno convierte su suma en dado; el atacante usa 🎲 *Fuerza del golpe*). Si ganás el Bloqueo, el golpe queda anulado. Si perdés el Bloqueo, **pasa la mitad del daño** (redondeada para arriba) y el arma o escudo con el que bloqueaste **pierde 1 punto de durabilidad**.
 
 > [!question] Otras dudas
 > - ¿Elegir Evasión o Parry es libre en cada ataque, o Parry exige tener un arma equipada?
@@ -169,11 +169,11 @@ estado: borrador
 El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de esquivar, **desviás el golpe con tu arma o tu escudo**. Tirás Parry contra el PdG del atacante.
 
 - **Cuesta [[Nitros (No2)|Nitros]] siempre:** tantos Nitros como el **Peso** del arma o escudo con el que parás (Peso 3 = 3 No2), sin importar cuántos ataques hiciste en tu turno.
-- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma — su Peso.
+- **También parás con escudo** (2026-09-22): misma mecánica y mismo costo que con un arma: 1 Nitro.
 - Con **más de un arma o escudo** equipados, elegís con cuál parar (igual que al atacar con dos armas).
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
-- **Sin nada equipado:** Peso 0, el Parry no cuesta Nitros.
-- **Los creeps y las invocaciones** funcionan igual: su Parry cuesta tantos Nitros como el Peso de su arma (mínimo 1) y su Bloqueo suma su Bloqueo + el Peso de su arma.
+- **Sin nada equipado:** el Parry igual cuesta 1 Nitro.
+- **Los creeps y las invocaciones** funcionan igual: su Parry cuesta 1 Nitro y su Bloqueo suma su Bloqueo + el Peso de su arma.
 - **Contraataque** (regla a prueba): un Parry, con arma o con escudo, permite contraatacar por lo de un primer ataque: ver [[Contraataque]].
 - Estados como [[Lisiado]] te bajan el Parry a la mitad.
 

@@ -2901,10 +2901,10 @@ function costoHabCreepTxt(sc, h){
 }
 
 // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
-// Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta tantos No2 como el Peso de su arma;
+// Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
 // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
 function pesoArmaCreep(sc){ return Math.max(1, num(sc.armaPeso) || 1); }
-function costoParryCreep(sc){ return pesoArmaCreep(sc); }
+function costoParryCreep(sc){ return 1; }   // 2026-09-26 (dueño): el Parry siempre cuesta 1 No2, sin importar el peso del arma
 function bloqueoValorCreep(sc){ return creepStatValor(sc, 'bloqueo') + pesoArmaCreep(sc); }
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
@@ -3547,7 +3547,7 @@ function renderAccionesCreep(){
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), lupa:'danio', motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {stat:'eva', nombre:'Esquivar (Eva)', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
-    {stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2 (el Peso de su arma)`, attr:`data-parrycreep="${sc.id}"`},
+    {stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2`, attr:`data-parrycreep="${sc.id}"`},
     {stat:'bloqueo', nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`},
     {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
   ];
@@ -5646,7 +5646,7 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const costo = costoParryCreep(sc);
     if(costo > num(sc.nitros)){
-      toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} (el Peso de su arma) y tiene ${fmt(num(sc.nitros))}`);
+      toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(sc.nitros))}`);
       return;
     }
     sc.nitros = num(sc.nitros) - costo;
@@ -8357,7 +8357,7 @@ window.DUELO_HOOKS = {
     if(!sc) return;
     if(d.ataque.tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, d.ataque.tipo);
   },
-  // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (cuesta su Peso en No2).
+  // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
   opcionesDefensa: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
     if(!sc) return [];

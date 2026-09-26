@@ -71,7 +71,7 @@ Un escudo hace **dos cosas**:
    - El atacante hace su parte con el botón **🎲 Fuerza del golpe** (Fuerza + peso de su arma), en la ficha y en las tarjetas de los creeps.
 
 > [!question] Lo que sigue abierto
-> - Si ganás el Parry pero **perdés el Bloqueo**: propuesta (a confirmar) **el golpe entra completo** (con tu Defensa como siempre) y los Nitros del Parry ya se gastaron.
+> - Si ganás el Parry pero **perdés el Bloqueo**: **pasa la mitad del daño** (redondeada para arriba) y el escudo (o arma) con el que bloqueaste **pierde 1 punto de durabilidad**. El Parry siempre cuesta **1 Nitro**.
 > - Se descarta por ahora la idea de **darles HP a los escudos** (no forma parte de esta regla).
 
 +++

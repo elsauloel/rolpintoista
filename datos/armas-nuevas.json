@@ -1240,279 +1240,6 @@
   "detalle": "Dicen que suena una sola vez. A dos manos: +3 de daño fijo, Bloqueo +3, Parry +2, 33 % de Aturdir y 75 % de Demora."
  },
  {
-  "id": "nuevo-almadena-de-cantero",
-  "nombre": "Almádena de cantero",
-  "tanda": 6,
-  "tier": "Común",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 0,
-  "armaDeRango": false,
-  "mods": [],
-  "efectosGolpe": [],
-  "detalle": "Parte roca y, cuando hace falta, otras cosas duras. Muy pesada para lo que da."
- },
- {
-  "id": "nuevo-pico-de-demolicion",
-  "nombre": "Pico de demolición",
-  "tanda": 6,
-  "tier": "Común",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 1,
-  "armaDeRango": false,
-  "mods": [],
-  "efectosGolpe": [],
-  "detalle": "Con la punta se abre un muro. +1 de daño fijo."
- },
- {
-  "id": "nuevo-mazo-de-demolicion",
-  "nombre": "Mazo de demolición",
-  "tanda": 6,
-  "tier": "Buena Calidad",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 1,
-  "armaDeRango": false,
-  "mods": [
-   {
-    "stat": "bloqueo",
-    "val": 1
-   }
-  ],
-  "efectosGolpe": [],
-  "detalle": "Cae como un derrumbe y, de canto, frena lo que venga. +1 de daño fijo y Bloqueo +1."
- },
- {
-  "id": "nuevo-canon-de-mano",
-  "nombre": "Cañón de mano",
-  "tanda": 6,
-  "tier": "Buena Calidad",
-  "tipoItem": "arma_1m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 0,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 3
-   }
-  ],
-  "efectosGolpe": [],
-  "detalle": "Un caño corto que hace mucho ruido y bastante daño. Rango +3."
- },
- {
-  "id": "nuevo-hacha-de-derribo",
-  "nombre": "Hacha de derribo",
-  "tanda": 6,
-  "tier": "Raro",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 2,
-  "danoFijo": 0,
-  "armaDeRango": false,
-  "mods": [
-   {
-    "stat": "bloqueo",
-    "val": 1
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Derribar",
-    "caras": 4,
-    "exitos": 1,
-    "detalle": "25 % de derribar al golpeado (cae al suelo)."
-   }
-  ],
-  "detalle": "Hecha para tumbar puertas y a quien esté detrás. Bloqueo +1 y 25 % de Derribar."
- },
- {
-  "id": "nuevo-bombarda-portatil",
-  "nombre": "Bombarda portátil",
-  "tanda": 6,
-  "tier": "Raro",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 1,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 5
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Prende fuego",
-    "caras": 4,
-    "exitos": 1,
-    "detalle": "25 % de dejar terreno incendiado en la casilla del golpeado."
-   }
-  ],
-  "detalle": "Una bombarda de asedio recortada para cargar al hombro. +1 de daño fijo, Rango +5 y 25 % de Prende fuego."
- },
- {
-  "id": "nuevo-lanzabombas",
-  "nombre": "Lanzabombas",
-  "tanda": 6,
-  "tier": "Raro",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 1,
-  "danoFijo": 1,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 4
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Derribar",
-    "caras": 4,
-    "exitos": 1,
-    "detalle": "25 % de derribar al golpeado (cae al suelo)."
-   }
-  ],
-  "detalle": "Lanza una bomba corta que hace saltar al que la recibe. +1 de daño fijo, Rango +4 y 25 % de Derribar."
- },
- {
-  "id": "nuevo-espadon-colosal-del-asedio",
-  "nombre": "Espadón colosal del asedio",
-  "tanda": 6,
-  "tier": "Excepcional",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 3,
-  "danoFijo": 0,
-  "armaDeRango": false,
-  "mods": [
-   {
-    "stat": "parry",
-    "val": 1
-   }
-  ],
-  "efectosGolpe": [],
-  "detalle": "Más un ariete que una espada; se maneja con los dos brazos y con todo el cuerpo. Parry +1."
- },
- {
-  "id": "nuevo-lanzallamas-de-asalto",
-  "nombre": "Lanzallamas de asalto",
-  "tanda": 6,
-  "tier": "Excepcional",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 2,
-  "danoFijo": 1,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 3
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Prende fuego",
-    "caras": 2,
-    "exitos": 1,
-    "detalle": "50 % de dejar terreno incendiado en la casilla del golpeado."
-   }
-  ],
-  "detalle": "Un chorro de fuego líquido que no se apaga con nada. +1 de daño fijo, Rango +3 y 50 % de Prende fuego."
- },
- {
-  "id": "nuevo-canon-de-campana-de-mano",
-  "nombre": "Cañón de campaña de mano",
-  "tanda": 6,
-  "tier": "Excepcional",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 2,
-  "danoFijo": 0,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 5
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Demora",
-    "caras": 4,
-    "exitos": 1,
-    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
-   }
-  ],
-  "detalle": "Un cañón de campaña con correa de hombro: sacude a quien lo recibe. Rango +5 y 25 % de Demora."
- },
- {
-  "id": "nuevo-maza-del-fin-del-mundo",
-  "nombre": "Maza del Fin del Mundo",
-  "tanda": 6,
-  "tier": "Legendario",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 4,
-  "danoFijo": 0,
-  "armaDeRango": false,
-  "mods": [
-   {
-    "stat": "bloqueo",
-    "val": 2
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Aturdir",
-    "caras": 6,
-    "exitos": 2,
-    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
-   },
-   {
-    "nombre": "Demora",
-    "caras": 2,
-    "exitos": 1,
-    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
-   }
-  ],
-  "detalle": "Cuando cae, se oye en todo el reino. Bloqueo +2, 33 % de Aturdir y 50 % de Demora."
- },
- {
-  "id": "nuevo-canon-del-dragon",
-  "nombre": "Cañón del Dragón",
-  "tanda": 6,
-  "tier": "Legendario",
-  "tipoItem": "arma_2m",
-  "tipoDado": 12,
-  "peso": 3,
-  "danoFijo": 3,
-  "armaDeRango": true,
-  "mods": [
-   {
-    "stat": "rng",
-    "val": 6
-   }
-  ],
-  "efectosGolpe": [
-   {
-    "nombre": "Prende fuego",
-    "caras": 4,
-    "exitos": 3,
-    "detalle": "75 % de dejar terreno incendiado en la casilla del golpeado."
-   }
-  ],
-  "detalle": "Dicen que el bronce se fundió con el aliento de un dragón. +3 de daño fijo, Rango +6 y 75 % de Prende fuego."
- },
- {
   "id": "nuevo-honda-de-pastor",
   "nombre": "Honda de pastor",
   "tanda": 5,
@@ -2092,5 +1819,158 @@
    }
   ],
   "detalle": "Dicen que ningún ejército pasó nunca del otro lado de esta pica. Alcance +2, PdG +1, PdG +3 en ataques de oportunidad y 50 % de Lisiado."
+ },
+ {
+  "id": "nuevo-bombarda-portatil",
+  "nombre": "Bombarda portátil",
+  "tanda": 6,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Explosión",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar).",
+    "stacks": 1
+   }
+  ],
+  "detalle": "Una bombarda de asedio recortada para cargar al hombro: el proyectil estalla donde cae. Rango +4 y Explosión de radio 1."
+ },
+ {
+  "id": "nuevo-lanzabombas",
+  "nombre": "Lanzabombas",
+  "tanda": 6,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Explosión",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar).",
+    "stacks": 1
+   },
+   {
+    "nombre": "Derribar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "detalle": "Lanza una bomba corta que estalla y hace saltar a los de alrededor. Rango +4, Explosión de radio 1 y 25 % de Derribar."
+ },
+ {
+  "id": "nuevo-lanzallamas-de-asalto",
+  "nombre": "Lanzallamas de asalto",
+  "tanda": 6,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Explosión",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar).",
+    "stacks": 1
+   },
+   {
+    "nombre": "Prende fuego",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Un chorro de fuego líquido que revienta al llegar. Rango +3, Explosión de radio 1 y 50 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-canon-de-campana-de-mano",
+  "nombre": "Cañón de campaña de mano",
+  "tanda": 6,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Explosión",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar).",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Un cañón de campaña con correa de hombro: lo que toca, lo levanta por el aire. Rango +4 y Explosión de radio 2."
+ },
+ {
+  "id": "nuevo-canon-del-dragon",
+  "nombre": "Cañón del Dragón",
+  "tanda": 6,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 3,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Explosión",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar).",
+    "stacks": 2
+   },
+   {
+    "nombre": "Prende fuego",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Dicen que el bronce se fundió con el aliento de un dragón. +2 de daño fijo, Rango +6, Explosión de radio 2 y 75 % de Prende fuego."
  }
 ]

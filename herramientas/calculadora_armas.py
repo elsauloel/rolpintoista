@@ -55,15 +55,15 @@ ORDEN = [t for t, _ in UMBRAL_TIER]
 
 # Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
 PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
-               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4}
-CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}}
+               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6}   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
+CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
 HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango'},
               'Sangrado': {'punzante', 'hacha'}, 'Lisiado': {'cortante'}, 'Rompe armadura': {'contundente'}, 'Aturdir': {'explosivo'},
               'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo'}, 'Prende fuego': {'explosivo', 'rango'},
               'Drena vida': {'cortante', 'punzante'}}
 FAMILIA_POR_TIPO = {4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente', 12: 'explosivo'}
 # efectos del catálogo actual que ya no existen en el diseño nuevo (no suman)
-DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Explosión', 'Estruendo', 'Empuje', 'Pajaritos'}
+DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Estruendo', 'Empuje', 'Pajaritos'}
 ALIAS = {'Knockdown': 'Demora'}
 
 
@@ -124,6 +124,7 @@ def puntaje(arma):
             base = PESO_EFECTO['Veneno severo']
         escala = 1.0
         st = float(e.get('stacks') or 0)
+        if nombre == 'Explosión' and st > 1: escala = 1 + 0.5 * (st - 1)      # radio de la Explosión (stacks): radio 2 = ×1,5; radio 3 = ×2
         if nombre == 'Rompe armadura' and st > 1: escala = 1 + 0.5 * (st - 1)      # cada stack extra de Armadura rota por golpe suma +50 %
         if nombre == 'Envenenar' and st and 'severo' not in str(e.get('detalle', '')).lower(): escala = st / 2   # el peso 2 del Veneno es a 2 stacks
         ef += base * escala * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
@@ -227,7 +228,7 @@ def hoja():
 
 # ---------------------------------------------------------------- reajuste de las armas ACTUALES a las reglas nuevas (propuesta automática, el dueño audita)
 MAPA_EFECTOS = {'Arruina armadura': 'Rompe armadura', 'Media armadura': 'Rompe armadura', 'Primera sangre': 'Sangrado', 'Empuje': 'Demora', 'Pajaritos': 'Lisiado', 'Knockdown': 'Demora'}
-DESCARTAR_EFECTOS = {'Ignora armadura', 'Golpes seguidos', 'Explosión', 'Estruendo', 'Agarrar'}
+DESCARTAR_EFECTOS = {'Ignora armadura', 'Golpes seguidos', 'Estruendo', 'Agarrar'}
 MAX_BONOS = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 6}
 PROB_POR_TIER = {'Aturdir': {'Raro': (1, 6), 'Excepcional': (1, 4), 'Legendario': (1, 2)}, 'Lisiado': {'Común': (1, 4), 'Buena Calidad': (1, 4), 'Raro': (1, 3), 'Excepcional': (1, 2), 'Legendario': (3, 4)}}
 PROB_BAJA = {'Común': (1, 4), 'Buena Calidad': (1, 3)}   # Sangrado / Envenenar / Rompe armadura por debajo de Raro: con porcentaje
@@ -242,6 +243,8 @@ def reajustar(arma):
     cambios, avisos = [], []
     tipo, tier = int(a.get('tipoDado') or 0), a['tier']
     fam = familia(a)
+    if tipo == 12 and not any((e.get('nombre') or '') == 'Explosión' for e in a.get('efectosGolpe') or []):
+        avisos.append('Tipo 12 = efecto Explosión (regla del dueño 2026-09-26): un arma T12 sin Explosión no corresponde; rediseñar o pasarla a otro Tipo. Muy rara y circunstancial.')
     # 1) efectos
     nuevos = []
     for e in a.get('efectosGolpe') or []:

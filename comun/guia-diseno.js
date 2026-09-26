@@ -106,7 +106,7 @@ const GuiaDiseno = (() => {
     {id: 'contundente', ico: '🔨', n: 'Contundentes', resumen: 'Mazas y martillos: golpes que aturden y desordenan.', dado: 'Tipo 8–10 (contundente liviano / pesado)', casa: 'Demora (baja 1 lugar en la iniciativa)'},
     {id: 'punzante', ico: '🔱', n: 'Punzantes', resumen: 'Lanzas, dagas y estoques: precisión que lisia.', dado: 'Tipo 4 (perforante)', casa: 'Lisiado'},
     {id: 'cortante', ico: '🗡️', n: 'Cortantes', resumen: 'Espadas y sables: cortes que sangran.', dado: 'Tipo 6', casa: 'Sangrado'},
-    {id: 'explosivo', ico: '💣', n: 'Explosivos', resumen: 'Daño en área de alto riesgo.', dado: 'Tipo 12', casa: 'por definir'},
+    {id: 'explosivo', ico: '💣', n: 'Explosivos', resumen: 'Muy raros: el Tipo 12 es solo del efecto Explosión (daño en área).', dado: 'Tipo 12 (solo con Explosión)', casa: 'Explosión'},
     {id: 'rango', ico: '🏹', n: 'De rango', resumen: 'Arcos, ballestas y armas de fuego: pegan de lejos.', dado: 'según el arma', casa: 'por definir'},
   ];
   // Efectos de arma, con TRES niveles por familia (aclaración del dueño, 2026-09-25):
@@ -121,6 +121,7 @@ const GuiaDiseno = (() => {
     {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante'], comp: ['punzante', 'hacha'], peso: 3},
     {n: 'Envenenar', d: 'Veneno: pierde 1 HP por stack cada turno.', e: 'auto', casa: [], comp: ['hacha', 'cortante', 'punzante', 'rango'], peso: 3},
     {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: [], comp: ['contundente', 'hacha', 'explosivo'], peso: 2},
+    {n: 'Explosión', d: 'El golpe estalla en flor de radio 1 o 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar). Es la razón de ser del Tipo 12: muy raro y circunstancial.', e: 'falta', casa: ['explosivo'], comp: [], peso: 6},
     {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: [], comp: ['explosivo', 'rango'], peso: 3},
     {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Excedente de vida).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
   ];

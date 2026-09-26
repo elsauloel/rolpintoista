@@ -6953,27 +6953,6 @@
     ]
   },
   {
-    "id": "nuevo-almadena-de-cantero",
-    "nombre": "Almádena de cantero",
-    "tier": "Común",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 1,
-    "danoFijo": 0,
-    "armaDeRango": false,
-    "mods": [],
-    "detalle": "Sin bonos ni efectos.",
-    "precioCompra": 70,
-    "descripcionNarrativa": "Parte roca y, cuando hace falta, otras cosas duras. Muy pesada para lo que da.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
     "mods": [
       {
         "stat": "rng",
@@ -7686,30 +7665,30 @@
   {
     "id": "nuevo-bombarda-portatil",
     "nombre": "Bombarda portátil",
-    "tier": "Raro",
+    "tier": "Excepcional",
     "tipoItem": "arma_2m",
     "tipoDado": 12,
     "peso": 1,
-    "danoFijo": 1,
+    "danoFijo": 0,
     "armaDeRango": true,
     "mods": [
       {
         "stat": "rng",
-        "val": 5
+        "val": 4
       }
     ],
     "efectosGolpe": [
       {
-        "nombre": "Prende fuego",
-        "caras": 4,
+        "nombre": "Explosión",
+        "caras": 1,
         "exitos": 1,
         "dado": "",
-        "detalle": "25 % de dejar terreno incendiado en la casilla del golpeado."
+        "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)."
       }
     ],
-    "detalle": "+1 de daño fijo · Alcance +5 · 25 % de dejar terreno incendiado en la casilla del golpeado",
-    "precioCompra": 180,
-    "descripcionNarrativa": "Una bombarda de asedio recortada para cargar al hombro.",
+    "detalle": "Alcance +4 · Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)",
+    "precioCompra": 450,
+    "descripcionNarrativa": "Una bombarda de asedio recortada para cargar al hombro: el proyectil estalla donde cae.",
     "ranuras": 0,
     "danoAmplificado": 0,
     "efectoMods": [],
@@ -7941,7 +7920,7 @@
   {
     "id": "nuevo-canon-de-campana-de-mano",
     "nombre": "Cañón de campaña de mano",
-    "tier": "Excepcional",
+    "tier": "Legendario",
     "tipoItem": "arma_2m",
     "tipoDado": 12,
     "peso": 2,
@@ -7950,47 +7929,21 @@
     "mods": [
       {
         "stat": "rng",
-        "val": 5
+        "val": 4
       }
     ],
     "efectosGolpe": [
       {
-        "nombre": "Demora",
-        "caras": 4,
+        "nombre": "Explosión",
+        "caras": 1,
         "exitos": 1,
         "dado": "",
-        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+        "detalle": "Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)."
       }
     ],
-    "detalle": "Alcance +5 · 25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
-    "precioCompra": 450,
-    "descripcionNarrativa": "Un cañón de campaña con correa de hombro: sacude a quien lo recibe.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
-    "id": "nuevo-canon-de-mano",
-    "nombre": "Cañón de mano",
-    "tier": "Buena Calidad",
-    "tipoItem": "arma_1m",
-    "tipoDado": 12,
-    "peso": 1,
-    "danoFijo": 0,
-    "armaDeRango": true,
-    "mods": [
-      {
-        "stat": "rng",
-        "val": 3
-      }
-    ],
-    "detalle": "Alcance +3",
-    "precioCompra": 100,
-    "descripcionNarrativa": "Un caño corto que hace mucho ruido y bastante daño.",
+    "detalle": "Alcance +4 · Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)",
+    "precioCompra": 1300,
+    "descripcionNarrativa": "Un cañón de campaña con correa de hombro: lo que toca, lo levanta por el aire.",
     "ranuras": 0,
     "danoAmplificado": 0,
     "efectoMods": [],
@@ -8006,7 +7959,7 @@
     "tipoItem": "arma_2m",
     "tipoDado": 12,
     "peso": 3,
-    "danoFijo": 3,
+    "danoFijo": 2,
     "armaDeRango": true,
     "mods": [
       {
@@ -8016,6 +7969,13 @@
     ],
     "efectosGolpe": [
       {
+        "nombre": "Explosión",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)."
+      },
+      {
         "nombre": "Prende fuego",
         "caras": 4,
         "exitos": 3,
@@ -8023,8 +7983,8 @@
         "detalle": "75 % de dejar terreno incendiado en la casilla del golpeado."
       }
     ],
-    "detalle": "+3 de daño fijo · Alcance +6 · 75 % de dejar terreno incendiado en la casilla del golpeado",
-    "precioCompra": 1300,
+    "detalle": "+2 de daño fijo · Alcance +6 · Explosión de radio 2: el golpe estalla en flor de radio 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar) · 75 % de dejar terreno incendiado en la casilla del golpeado",
+    "precioCompra": 2000,
     "descripcionNarrativa": "Dicen que el bronce se fundió con el aliento de un dragón.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -9115,32 +9075,6 @@
     "imagen": ""
   },
   {
-    "id": "nuevo-espadon-colosal-del-asedio",
-    "nombre": "Espadón colosal del asedio",
-    "tier": "Excepcional",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 3,
-    "danoFijo": 0,
-    "armaDeRango": false,
-    "mods": [
-      {
-        "stat": "parry",
-        "val": 1
-      }
-    ],
-    "detalle": "Parry +1",
-    "precioCompra": 600,
-    "descripcionNarrativa": "Más un ariete que una espada; se maneja con los dos brazos y con todo el cuerpo.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
     "id": "nuevo-espadon-de-acero-de-toledo",
     "nombre": "Espadón de acero de Toledo",
     "tier": "Excepcional",
@@ -10202,41 +10136,6 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
-  },
-  {
-    "id": "nuevo-hacha-de-derribo",
-    "nombre": "Hacha de derribo",
-    "tier": "Raro",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 2,
-    "danoFijo": 0,
-    "armaDeRango": false,
-    "mods": [
-      {
-        "stat": "bloqueo",
-        "val": 1
-      }
-    ],
-    "efectosGolpe": [
-      {
-        "nombre": "Derribar",
-        "caras": 4,
-        "exitos": 1,
-        "dado": "",
-        "detalle": "25 % de derribar al golpeado (cae al suelo)."
-      }
-    ],
-    "detalle": "Bloqueo +1 · 25 % de derribar al golpeado (cae al suelo)",
-    "precioCompra": 280,
-    "descripcionNarrativa": "Hecha para tumbar puertas y a quien esté detrás.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
   },
   {
     "mods": [],
@@ -11623,11 +11522,11 @@
   {
     "id": "nuevo-lanzabombas",
     "nombre": "Lanzabombas",
-    "tier": "Raro",
+    "tier": "Excepcional",
     "tipoItem": "arma_2m",
     "tipoDado": 12,
     "peso": 1,
-    "danoFijo": 1,
+    "danoFijo": 0,
     "armaDeRango": true,
     "mods": [
       {
@@ -11637,6 +11536,13 @@
     ],
     "efectosGolpe": [
       {
+        "nombre": "Explosión",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)."
+      },
+      {
         "nombre": "Derribar",
         "caras": 4,
         "exitos": 1,
@@ -11644,9 +11550,9 @@
         "detalle": "25 % de derribar al golpeado (cae al suelo)."
       }
     ],
-    "detalle": "+1 de daño fijo · Alcance +4 · 25 % de derribar al golpeado (cae al suelo)",
-    "precioCompra": 150,
-    "descripcionNarrativa": "Lanza una bomba corta que hace saltar al que la recibe.",
+    "detalle": "Alcance +4 · Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar) · 25 % de derribar al golpeado (cae al suelo)",
+    "precioCompra": 550,
+    "descripcionNarrativa": "Lanza una bomba corta que estalla y hace saltar a los de alrededor.",
     "ranuras": 0,
     "danoAmplificado": 0,
     "efectoMods": [],
@@ -11689,11 +11595,11 @@
   {
     "id": "nuevo-lanzallamas-de-asalto",
     "nombre": "Lanzallamas de asalto",
-    "tier": "Excepcional",
+    "tier": "Legendario",
     "tipoItem": "arma_2m",
     "tipoDado": 12,
     "peso": 2,
-    "danoFijo": 1,
+    "danoFijo": 0,
     "armaDeRango": true,
     "mods": [
       {
@@ -11703,6 +11609,13 @@
     ],
     "efectosGolpe": [
       {
+        "nombre": "Explosión",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar)."
+      },
+      {
         "nombre": "Prende fuego",
         "caras": 2,
         "exitos": 1,
@@ -11710,9 +11623,9 @@
         "detalle": "50 % de dejar terreno incendiado en la casilla del golpeado."
       }
     ],
-    "detalle": "+1 de daño fijo · Alcance +3 · 50 % de dejar terreno incendiado en la casilla del golpeado",
-    "precioCompra": 450,
-    "descripcionNarrativa": "Un chorro de fuego líquido que no se apaga con nada.",
+    "detalle": "Alcance +3 · Explosión de radio 1: el golpe estalla en flor de radio 1 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar) · 50 % de dejar terreno incendiado en la casilla del golpeado",
+    "precioCompra": 1000,
+    "descripcionNarrativa": "Un chorro de fuego líquido que revienta al llegar.",
     "ranuras": 0,
     "danoAmplificado": 0,
     "efectoMods": [],
@@ -12488,48 +12401,6 @@
     "imagen": ""
   },
   {
-    "id": "nuevo-maza-del-fin-del-mundo",
-    "nombre": "Maza del Fin del Mundo",
-    "tier": "Legendario",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 4,
-    "danoFijo": 0,
-    "armaDeRango": false,
-    "mods": [
-      {
-        "stat": "bloqueo",
-        "val": 2
-      }
-    ],
-    "efectosGolpe": [
-      {
-        "nombre": "Aturdir",
-        "caras": 6,
-        "exitos": 2,
-        "dado": "",
-        "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
-      },
-      {
-        "nombre": "Demora",
-        "caras": 2,
-        "exitos": 1,
-        "dado": "",
-        "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
-      }
-    ],
-    "detalle": "Bloqueo +2 · 33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1) · 50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
-    "precioCompra": 1600,
-    "descripcionNarrativa": "Cuando cae, se oye en todo el reino.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
     "id": "nuevo-maza-del-penasco",
     "nombre": "Maza del Peñasco",
     "tier": "Excepcional",
@@ -12592,32 +12463,6 @@
     "ranuras": 0,
     "danoAmplificado": 0,
     "armaDeRango": false,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
-    "id": "nuevo-mazo-de-demolicion",
-    "nombre": "Mazo de demolición",
-    "tier": "Buena Calidad",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 1,
-    "danoFijo": 1,
-    "armaDeRango": false,
-    "mods": [
-      {
-        "stat": "bloqueo",
-        "val": 1
-      }
-    ],
-    "detalle": "+1 de daño fijo · Bloqueo +1",
-    "precioCompra": 95,
-    "descripcionNarrativa": "Cae como un derrumbe y, de canto, frena lo que venga.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
     "efectoMods": [],
     "equipoEstadoNombre": "",
     "equipoEstadoHpTurno": 0,
@@ -12757,27 +12602,6 @@
     "detalle": "Alcance +2 · PdG en oportunidad +3 · PdG +1 · 50 % de dejar Lisiado 3 turnos",
     "precioCompra": 450,
     "descripcionNarrativa": "Dicen que ningún ejército pasó nunca del otro lado de esta pica.",
-    "ranuras": 0,
-    "danoAmplificado": 0,
-    "efectoMods": [],
-    "equipoEstadoNombre": "",
-    "equipoEstadoHpTurno": 0,
-    "equipoEstadoDetalle": "",
-    "consumible": false
-  },
-  {
-    "id": "nuevo-pico-de-demolicion",
-    "nombre": "Pico de demolición",
-    "tier": "Común",
-    "tipoItem": "arma_2m",
-    "tipoDado": 12,
-    "peso": 1,
-    "danoFijo": 1,
-    "armaDeRango": false,
-    "mods": [],
-    "detalle": "+1 de daño fijo",
-    "precioCompra": 75,
-    "descripcionNarrativa": "Con la punta se abre un muro.",
     "ranuras": 0,
     "danoAmplificado": 0,
     "efectoMods": [],

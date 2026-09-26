@@ -166,7 +166,7 @@ def main():
         if tier not in TIERS or it.get('consumible') or it.get('ocultoEnCatalogo'):
             continue
         if ti in ('arma_1m', 'arma_2m'):
-            if it.get('tipoDado') not in (4, 6, 8, 10, 12):
+            if it.get('tipoDado') not in (4, 6, 8, 10):   # el Tipo 12 es solo del efecto Explosión (muy raro): los creeps no lo llevan de equipo base
                 continue
             grupos[('arma', 'rango' if it.get('armaDeRango') else 'melee', it['tipoDado'], tier)].append(it)
         elif ti in SLOTS:

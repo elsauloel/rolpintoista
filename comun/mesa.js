@@ -22,6 +22,8 @@
 const MESA_MAX = 30;
 
 let mesaIdsVistos = null;
+let mesaAnimadas = new Set();   // tiradas cuyo dado 3D ya se lanzó (la Mesa espera a que queden quietos antes de mostrar el resultado)
+let mesaRetenida = null;         // {snap, fin}: la última lista de tiradas, esperando a los dados
 
 function mesaEstado(texto){
   const el = document.getElementById('mesa-estado');
@@ -276,11 +278,41 @@ function mesaRender(docs){
   }
   // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
   if(!primeraVez && typeof dadosAnimarTirada === 'function'){
-    docs.filter(d => nuevasIds.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
+    docs.filter(d => nuevasIds.has(d.id) && !mesaAnimadas.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
   }
   // Cajita flotante achicada: avisa que llegó una tirada de otro.
   const mesa = document.getElementById('mesa');
   if(hayAjena && mesa && mesa.classList.contains('colapsada')) mesa.classList.add('aviso');
+}
+
+/* Primero los dados, después el resultado (dueño, 2026-09-26, para todo el juego): cuando llega una tirada que se va a animar en 3D, la Mesa lanza los dados
+   enseguida pero NO muestra la línea hasta que quedan quietos (máximo 7 segundos; sin espera si las animaciones están apagadas o la pestaña está oculta). */
+function mesaProcesar(snap){
+  const docs = snap.docs;
+  const primeraVez = mesaIdsVistos === null;
+  const puedeEsperar = !primeraVez && typeof dadosAnimarTirada === 'function' && typeof dadosAnimara === 'function';
+  const nuevas = puedeEsperar ? docs.filter(d => !mesaIdsVistos.has(d.id) && !mesaAnimadas.has(d.id)) : [];
+  const animables = nuevas.filter(d => { try{ return dadosAnimara(d.data()); }catch(e){ return false; } });
+  if(!animables.length && !mesaRetenida){ mesaRender(docs); return; }
+  const lanzar = () => animables.reverse().forEach(d => { mesaAnimadas.add(d.id); dadosAnimarTirada(d.data()); });
+  if(mesaRetenida){ mesaRetenida.snap = snap; lanzar(); return; }   // ya se está esperando: solo se guarda lo último
+  const ret = {snap};
+  mesaRetenida = ret;
+  let empezo = typeof dados !== 'undefined' && dados.rodando > 0, hecho = false, tMax, tMin;
+  const ini = () => { empezo = true; };
+  const fin = () => {
+    if(hecho) return;
+    hecho = true;
+    window.removeEventListener('dados-inicio', ini); window.removeEventListener('dados-quietos', quietos);
+    clearTimeout(tMax); clearTimeout(tMin);
+    setTimeout(() => { if(mesaRetenida === ret){ mesaRetenida = null; mesaRender(ret.snap.docs); } }, 350);   // un instante para verlos quietos
+  };
+  const quietos = () => { if(empezo) fin(); };
+  window.addEventListener('dados-inicio', ini);
+  window.addEventListener('dados-quietos', quietos);
+  tMin = setTimeout(() => { if(!empezo) fin(); }, 2200);   // los dados no llegaron a empezar
+  tMax = setTimeout(fin, 7000);
+  lanzar();   // se lanzan DESPUÉS de escuchar los eventos, así no se pierde el «empezaron»
 }
 
 function mesaEscuchar(){
@@ -289,7 +321,7 @@ function mesaEscuchar(){
     .orderBy('cuando', 'desc').limit(MESA_MAX)
     .onSnapshot(snap => {
       mesaEstado(`${fbPartida.nombre} · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
-      mesaRender(snap.docs);
+      mesaProcesar(snap);
     }, err => {
       console.error('Error escuchando la mesa:', err);
       mesaEstado('desconectada');

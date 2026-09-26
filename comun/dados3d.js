@@ -291,6 +291,14 @@ async function dadosTirar(notacion, estilo, opts){
   }
 }
 
+// ¿Esta tirada se va a animar en esta pantalla? (mismas condiciones que dadosAnimarTirada; la Mesa la usa para esperar a los dados antes de mostrar el resultado)
+function dadosAnimara(t){
+  if(!t || !dadosActivos() || document.hidden) return false;
+  const html = document.documentElement.classList;
+  if(html.contains('modo-botonera') || html.contains('modo-mantenimiento') || html.contains('modo-acciones')) return false;
+  return !!dadosNotacion(t.formula, t.rolls);
+}
+
 // Punto de entrada: una tirada de la Mesa ({formula, rolls, estilo?}).
 function dadosAnimarTirada(t){
   if(!t || !dadosActivos() || document.hidden) return;

@@ -999,7 +999,7 @@ const Duelo = (() => {
 
   // Espera a que los dados 3D rueden y queden quietos (o un máximo, por si no hay animación) y llama a cb.
   function esperarDados(cb){
-    let hecho = false, empezo = false, tMax, tMin;
+    let hecho = false, empezo = typeof dados !== 'undefined' && dados.rodando > 0, tMax, tMin;   // si los dados ya están rodando, no hace falta esperar a que «empiecen»
     const t0 = Date.now();
     const fin = () => {
       if(hecho) return;

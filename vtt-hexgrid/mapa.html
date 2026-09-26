@@ -8959,28 +8959,46 @@ window.addEventListener('message', e => {
 /* ---------- Duelo paso a paso (comun/duelo.js) ----------
    Atacar desde la Botonera/Acciones le pide al mapa que elija el objetivo con un CLIC sobre el token (reutiliza elegirDestino: se toca la casilla
    del token). El duelo se crea y su cuadro se abre solo para todos. Cada uno tira desde su iframe: el mapa se lo pide sin mostrarlo. */
+// Cartel flotante (donde salen los avisos) mientras hay que elegir el objetivo: se ve hasta que se elige, se cancela o se toca «Sin objetivo».
+function dueloAvisoObjetivo(nombre, conSuelto, alSuelto){
+  let el = $('#duelo-objetivo');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'duelo-objetivo';
+    el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:96;background:var(--bottle,#1f3d2f);color:#EAF3E6;border:2px solid var(--brass,#E0A458);border-radius:var(--r,3px);padding:12px 18px;font-family:"Space Mono",monospace;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center;max-width:92vw;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center';
+    document.body.appendChild(el);
+  }
+  el.hidden = false;
+  el.innerHTML = `<span>⚔ <b>${esc(nombre || 'Atacar')}</b>: elegí a quién atacás — <b>clic sobre el token</b> <span style="opacity:.75">(Esc o clic derecho cancelan)</span></span>${conSuelto ? '<button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`;
+  const b = el.querySelector('[data-duelo-suelto]');
+  if(b) b.onclick = alSuelto;
+}
+function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; }
+
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
+  seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
-  const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  const alSuelto = () => {
+    elegirDestinoTerminar(); dueloAvisoObjetivoOcultar();
+    $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
+    try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-suelto'}, location.origin); }catch(e){}
+  };
   const pedir = () => {
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
       const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
       if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
+      dueloAvisoObjetivoOcultar();
       let t = cand[0];
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
       Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
-    }, `<b>⚔ ${esc(yo.nombre || 'Atacar')}: elegí a quién atacás</b> <span>clic sobre el token · Esc o clic derecho cancelan</span>${msg.conSuelto ? ' <button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`, true, cancelado);
-    const b = $('#colocando-aviso [data-duelo-suelto]');
-    if(b) b.onclick = () => {
-      elegirDestinoTerminar();
-      $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
-      try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-suelto'}, location.origin); }catch(e){}
-    };
+    }, `<b>⚔ ${esc(yo.nombre || 'Atacar')}: elegí a quién atacás</b> <span>clic sobre el token · Esc o clic derecho cancelan</span>`, true, cancelado);
+    dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto);
   };
   pedir();
 }

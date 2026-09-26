@@ -762,7 +762,7 @@ const Duelo = (() => {
     const etiqueta = campo === 'eva' ? nombreDefensa(d) : ETIQ[campo];
     const parCompleto = !!(tiro && d[otro]);
     if(parCompleto) return numerosHtml(tiro, esNuevo, etiqueta, lado.nombre);
-    if(tiro) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="listo">✔ Ya tiró</div><div class="det">el resultado se muestra cuando tiren los dos</div></div>`;
+    if(tiro) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="listo">✔ ${_esc(lado.nombre)} ya tiró <b>${_esc(tiro.formula || 'los dados')}</b></div><div class="det">el resultado se muestra cuando tiren los dos</div></div>`;
     const vivo = d.estado === 'esperando' && d.fase === fase;
     if(!vivo) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="espera">no llegó a tirar</div></div>`;
     const quien = _esc(lado.nombre);

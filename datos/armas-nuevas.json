@@ -335,14 +335,16 @@
   "tipoDado": 6,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [
+  "mods": [],
+  "efectosGolpe": [
    {
-    "stat": "parry",
-    "val": 1
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
    }
   ],
-  "efectosGolpe": [],
-  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. Variación: parry +1."
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. 25 % de Lisiado (los moretones también cuentan)."
  },
  {
   "id": "nuevo-machete-de-chacarero",
@@ -360,7 +362,7 @@
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo. Variación: ini +1."
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo."
  },
  {
   "id": "nuevo-sable-de-abordaje-oxidado",
@@ -648,16 +650,14 @@
   "tipoDado": 8,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [],
-  "efectosGolpe": [
+  "mods": [
    {
-    "nombre": "Rompe armadura",
-    "caras": 4,
-    "exitos": 1,
-    "detalle": "25 % de dejar 1 stack de Armadura rota."
+    "stat": "ini",
+    "val": 1
    }
   ],
-  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Variación: Rompe armadura 25 %."
+  "efectosGolpe": [],
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Iniciativa +1."
  },
  {
   "id": "nuevo-hacha-de-mano",
@@ -934,14 +934,16 @@
   "tipoDado": 10,
   "peso": 1,
   "danoFijo": 0,
-  "mods": [
+  "mods": [],
+  "efectosGolpe": [
    {
-    "stat": "bloqueo",
-    "val": 1
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
    }
   ],
-  "efectosGolpe": [],
-  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. Variación: bloqueo +1."
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. 25 % de Demora."
  },
  {
   "id": "nuevo-mazo-de-carnicero",
@@ -961,7 +963,7 @@
     "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
    }
   ],
-  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo. Variación: Demora 25 %."
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo."
  },
  {
   "id": "nuevo-porra-de-guardia",
@@ -986,7 +988,7 @@
     "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
    }
   ],
-  "detalle": "Reglamentaria. Bloqueo +1. Variación: Demora 25 %."
+  "detalle": "Reglamentaria. Bloqueo +1."
  },
  {
   "id": "nuevo-maza-de-guerra",

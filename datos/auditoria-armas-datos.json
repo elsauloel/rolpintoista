@@ -3070,27 +3070,33 @@
     "nombre": "Rompe armadura",
     "prob": 33,
     "detalle": "Aplicale el estado Armadura rota al objetivo."
+   },
+   {
+    "nombre": "Sangrado",
+    "prob": 25,
+    "detalle": "25 % de dejar Sangrado."
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra arma del catálogo: Rompe armadura 25 %.",
-   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad",
-   "«Rompe armadura» estaba repetido: queda uno solo"
+   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %.",
+   "«Rompe armadura» con porcentaje (33 %) en tier Buena Calidad"
   ],
-  "avisos": [],
+  "avisos": [
+   "Lleva 2 efectos y un Buena Calidad admite 1"
+  ],
   "bonos_hoy": null,
   "precioHoy": 110,
   "detalle": "Rompe armadura. +1 al bloqueo",
   "nuevo": {
-   "pc": 10.9,
-   "tier": "Buena Calidad",
-   "precio": 160,
-   "exceso": 0,
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 250,
+   "exceso": 1,
    "desglose": {
     "daño": 9.0,
     "bonos": 1.0,
     "crítico": 0.0,
-    "efectos": 1.3,
+    "efectos": 2.0,
     "peso del arma": -0.4
    }
   }
@@ -3587,26 +3593,32 @@
     "nombre": "Sangrado",
     "prob": 50,
     "detalle": "Aplicale Sangrado al objetivo."
+   },
+   {
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra arma del catálogo: Sangrado 25 %.",
-   "«Sangrado» estaba repetido: queda uno solo"
+   "Variación para que no sea idéntica a otra arma del catálogo: Lisiado 25 %."
   ],
-  "avisos": [],
+  "avisos": [
+   "Lleva 2 efectos y un Común admite 1"
+  ],
   "bonos_hoy": null,
   "precioHoy": 75,
   "detalle": "sangrado 50%",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 5.2,
    "tier": "Común",
-   "precio": 55,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
     "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 1.0,
+    "efectos": 1.9,
     "peso del arma": -0.2
    }
   }
@@ -6032,28 +6044,29 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [
+  "bonos": [],
+  "efectos": [
    {
-    "stat": "parry",
-    "val": 1
+    "nombre": "Lisiado",
+    "prob": 25,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
    }
   ],
-  "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. Variación: parry +1.",
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. 25 % de Lisiado (los moretones también cuentan).",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 4.2,
    "tier": "Común",
    "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 1.0,
+    "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 0.9,
     "peso del arma": -0.2
    }
   }
@@ -6080,7 +6093,7 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo. Variación: ini +1.",
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo.",
   "nuevo": {
    "pc": 5.1,
    "tier": "Común",
@@ -6564,29 +6577,28 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [],
-  "efectos": [
+  "bonos": [
    {
-    "nombre": "Rompe armadura",
-    "prob": 25,
-    "detalle": "25 % de dejar 1 stack de Armadura rota."
+    "stat": "ini",
+    "val": 1
    }
   ],
+  "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Variación: Rompe armadura 25 %.",
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Iniciativa +1.",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 4.9,
    "tier": "Común",
    "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 0.0,
+    "bonos": 0.6,
     "crítico": 0.0,
-    "efectos": 1.0,
+    "efectos": 0.0,
     "peso del arma": -0.2
    }
   }
@@ -7065,18 +7077,19 @@
   "peso": 1,
   "danoFijo": 0,
   "rango": false,
-  "bonos": [
+  "bonos": [],
+  "efectos": [
    {
-    "stat": "bloqueo",
-    "val": 1
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
    }
   ],
-  "efectos": [],
   "cambios": [],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. Variación: bloqueo +1.",
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. 25 % de Demora.",
   "nuevo": {
    "pc": 6.3,
    "tier": "Común",
@@ -7084,9 +7097,9 @@
    "exceso": 0,
    "desglose": {
     "daño": 5.5,
-    "bonos": 1.0,
+    "bonos": 0.0,
     "crítico": 0.0,
-    "efectos": 0.0,
+    "efectos": 1.0,
     "peso del arma": -0.2
    }
   }
@@ -7114,7 +7127,7 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo. Variación: Demora 25 %.",
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo.",
   "nuevo": {
    "pc": 7.1,
    "tier": "Común",
@@ -7157,7 +7170,7 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Reglamentaria. Bloqueo +1. Variación: Demora 25 %.",
+  "detalle": "Reglamentaria. Bloqueo +1.",
   "nuevo": {
    "pc": 7.3,
    "tier": "Común",

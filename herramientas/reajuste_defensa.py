@@ -31,6 +31,50 @@ SLOT_DE = {'cabeza': 'cabeza', 'armadura_blanda': 'torso', 'armadura_rigida': 't
            'escudo_1m': 'escudo', 'escudo_2m': 'escudo', 'cinturon': 'cinturón', 'anillos': 'anillo'}
 
 
+VARIACIONES = {   # nombre -> [(stat, valor)]: piezas idénticas a otra del catálogo (pedido del dueño, 2026-09-25); la primera del grupo queda como está
+    'Escudo grande': [('bloqueo', 1)],
+    'Escudo de taberna': [('parry', 1)],
+    'soquetes de lona': [('eva', 1)],
+    'Pieles del berserker': [('ini', 1)],
+    'Coraza de cuero del clan': [('bloqueo', 1)],
+    'Jogging de gimnasia con rayas laterales': [('mov', 1)],
+    'Botines de cuero fino': [('eva', 1)],
+    'Botines de soldado raso': [('mov', 1)],
+    'Canilleras de milicia': [('parry', 1)],
+    'Polainas de cuero remendado': [('mov', 1)],
+    'Campera de marinero espacial': [('mov', 1)],
+    'Capucha de emboscada': [('eva', 1)],
+    'Capucha de lana del culto': [('esp', 1)],
+    'Gorro de fieltro de feria': [('eva', 1)],
+    'Capuz del Sumo Profeta': [('esp', 1)],
+    'Peto de cuero curtido': [('parry', 1)],
+    'Casco de cuero endurecido': [('eva', 1)],
+    'Casco de muralla': [('bloqueo', 1)],
+    'Gorra reglamentaria de la Policía Federal': [('ini', 1)],
+    'Casco de moto vintage pintado a mano': [('ini', 1)],
+    'Cota de escamas de cuero': [('parry', 1)],
+    'Cota de escamas del jefe de guerra': [('bloqueo', 1)],
+    'Faja de tela cruda': [('ini', 1)],
+    'Coraza de puerta': [('bloqueo', 1)],
+    'Coraza del capitán de la ciudad': [('parry', 1)],
+    'Cota de malla de contramaestre': [('eva', 1)],
+    'Cota del cazarrecompensas': [('mov', 1)],
+    'Gambesón del capitán del Espectro': [('eva', 1)],
+    'Gambesón del veterano de frontera': [('parry', 1)],
+    'Polainas tachonadas de taller': [('parry', 1)],
+    'Grebas del rastreador': [('mov', 1)],
+    'Pantalón acolchado de aprendiz': [('eva', 1)],
+    'Media armadura de sargento': [('parry', 1)],
+    'Polainas de seda valyria': [('eva', 1)],
+    'Pasamontañas de tejido basto': [('ini', 1)],
+    'alpargatas de cuero': [('eva', 1)],
+    'Sombrero humectante': [('resm', 1)],
+    'Túnica de nubarrón': [('esp', 1)],
+    'Túnica del sacerdote oscuro': [('resm', 1)],
+}
+NOMBRE_STAT = {'eva': 'Evasión', 'mov': 'Movimiento', 'ini': 'Iniciativa', 'parry': 'Parry', 'bloqueo': 'Bloqueo', 'esp': 'Especial', 'resm': 'Res. Mt'}
+
+
 def tier_norm(t):
     for x in TIERS:
         if t and t[:3] == x[:3]:
@@ -59,6 +103,15 @@ def reajustar(item):
     it = json.loads(json.dumps(item))
     tier = tier_norm(it.get('tier'))
     cambios, avisos, mods = [], [], []
+    for stat, v in VARIACIONES.get(it.get('nombre'), []):   # variación para que no sea idéntica a otra pieza
+        it['mods'] = list(it.get('mods') or [])
+        for m in it['mods']:
+            if m['stat'] == stat:
+                m['val'] += v
+                break
+        else:
+            it['mods'].append({'stat': stat, 'val': v})
+        cambios.append('Variación para que no sea idéntica a otra pieza del catálogo: %s +%d.' % (NOMBRE_STAT.get(stat, stat), v))
     for m in it.get('mods') or []:
         if m['stat'] not in T_CRIT:
             mods.append(m)

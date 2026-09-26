@@ -534,9 +534,14 @@
    {
     "stat": "def",
     "val": 5
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -613,11 +618,15 @@
    },
    {
     "stat": "bloqueo",
-    "val": 2
+    "val": 3
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Bloqueo +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 90,
   "detalle": "Cobertura de rodilla a hombro. Cansa el brazo a los diez minutos."
  },
@@ -5016,10 +5025,18 @@
    {
     "stat": "def",
     "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 40,
   "detalle": "Cuero blando cosido a mano, de vestir más que de campo."
  },
@@ -5046,9 +5063,14 @@
    {
     "stat": "def",
     "val": 2
+   },
+   {
+    "stat": "mov",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -5704,9 +5726,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "mov",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -5776,10 +5803,18 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 50,
   "detalle": "Reglamentarias, incómodas y todas iguales."
  },
@@ -6016,10 +6051,18 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 70,
   "detalle": "Igual que «Capucha de cuero acolchada» del catálogo, pero con historia propia: lo lleva «Ballestero emboscado». Cuero blando con relleno en la coronilla. Simple y efectiva."
  },
@@ -6102,10 +6145,18 @@
    {
     "stat": "def",
     "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Especial +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 40,
   "detalle": "Igual que «Capucha de lana cruda» del catálogo, pero con historia propia: lo lleva «Cultista encapuchado». Lana sin teñir de oveja de descarte. Pica un poco."
  },
@@ -6354,15 +6405,19 @@
    },
    {
     "stat": "esp",
-    "val": 1
+    "val": 2
    },
    {
     "stat": "rangocasteo",
     "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Especial +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 150,
   "detalle": "Igual que «Capuz de vidente de feria» del catálogo, pero con historia propia: lo lleva «Sumo profeta del culto». Terciopelo con lunas bordadas, del carromato de una adivina que nunca se equivoca."
  },
@@ -6805,9 +6860,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -6944,9 +7004,14 @@
    {
     "stat": "eva",
     "val": -1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -6978,9 +7043,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Bloqueo +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -7892,10 +7962,18 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Bloqueo +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 110,
   "detalle": "Igual que «Armadura de cuero rígido» del catálogo, pero con historia propia: lo lleva «Guerrero de clan». Cuero hervido y moldeado al torso. El puente entre lo blando y lo duro."
  },
@@ -8207,10 +8285,18 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Bloqueo +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 110,
   "detalle": "Igual que «Coraza de guardia de cuartel» del catálogo, pero con historia propia: lo lleva «Guardia de puerta». Reglamentaria, pesada, con el número de inventario grabado atrás."
  },
@@ -8393,9 +8479,14 @@
    {
     "stat": "tipo3",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1.",
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
@@ -8431,9 +8522,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1.",
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
@@ -8470,9 +8566,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Bloqueo +1.",
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
@@ -8666,9 +8767,14 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
@@ -8860,9 +8966,14 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
@@ -8975,10 +9086,18 @@
    {
     "stat": "capcinturon",
     "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 65,
   "detalle": "Una tira de tela enrollada a la cintura. Lo más básico que hay."
  },
@@ -9089,9 +9208,14 @@
    {
     "stat": "def",
     "val": 4
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -9139,9 +9263,14 @@
    {
     "stat": "rescc",
     "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1.",
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -9219,10 +9348,18 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 40,
   "detalle": "Visera rígida y escudo dorado. Impone más de lo que protege."
  },
@@ -9275,9 +9412,14 @@
    {
     "stat": "def",
     "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -10062,9 +10204,14 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
@@ -11170,11 +11317,15 @@
    },
    {
     "stat": "mov",
-    "val": 1
+    "val": 2
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 60,
   "detalle": "Tres rayas al costado. Cómodo hasta lo sospechoso."
  },
@@ -11548,9 +11699,14 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1.",
    "Quitar Res. crítico Tipo 8 (+1): no la dan piezas de tier Buena Calidad."
   ],
   "avisos": [
@@ -12064,10 +12220,18 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 60,
   "detalle": "Relleno desparejo pero abundante. Lo que le falta de prolijo le sobra de grueso."
  },
@@ -12425,10 +12589,18 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 50,
   "detalle": "Tejido grueso que cubre cabeza y cuello. Abriga tanto que da calor de más."
  },
@@ -12860,10 +13032,18 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 90,
   "detalle": "Curtido en corteza de quebracho. Duro y oscuro."
  },
@@ -13010,9 +13190,14 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -13048,10 +13233,18 @@
    {
     "stat": "tipo1",
     "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 60,
   "detalle": "Retazos de cuero cosidos entre sí. Cada parche cuenta una historia."
  },
@@ -13131,7 +13324,7 @@
    },
    {
     "stat": "eva",
-    "val": 3
+    "val": 4
    },
    {
     "stat": "esp",
@@ -13142,8 +13335,12 @@
     "val": 2
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 450,
   "detalle": "Tela liviana como el aire, tejida con un patrón que ningún telar común puede repetir."
  },
@@ -13182,10 +13379,18 @@
    {
     "stat": "tipo2",
     "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Parry +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 110,
   "detalle": "Remaches de bronce parejos en rodilla y espinilla."
  },
@@ -13866,10 +14071,18 @@
    {
     "stat": "bonos",
     "val": 1
+   },
+   {
+    "stat": "resm",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Res. Mt +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 120,
   "detalle": "Ala ancha, siempre húmedo. Nadie preguntó por qué y funciona."
  },
@@ -14238,10 +14451,18 @@
    {
     "stat": "bonos",
     "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Especial +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 100,
   "detalle": "Igual que «Túnica de acólito» del catálogo, pero con historia propia: lo lleva «Chamán de la tormenta». Tela áspera, sin adornos. La primera prenda de cualquiera que empieza a estudiar."
  },
@@ -14290,10 +14511,18 @@
    {
     "stat": "def",
     "val": 1
+   },
+   {
+    "stat": "resm",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Res. Mt +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 110,
   "detalle": "Igual que «Túnica de sanador» del catálogo, pero con historia propia: lo lleva «Sacerdote oscuro». Lino blanco que no se mancha de sangre, por más que debería."
  },
@@ -14935,9 +15164,14 @@
    {
     "stat": "def",
     "val": 3
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
   "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -14973,10 +15207,18 @@
    {
     "stat": "mov",
     "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
    }
   ],
-  "cambios": [],
-  "avisos": [],
+  "cambios": [
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1."
+  ],
+  "avisos": [
+   "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
+  ],
   "precioHoy": 60,
   "detalle": "Lona cruda con la costura por fuera. Lo mínimo indispensable."
  },

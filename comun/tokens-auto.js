@@ -122,12 +122,41 @@ const TokensAuto = (() => {
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
+        ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma y vuelve a su dueño
         ...(o.estado && JSON.stringify(o.estado).length <= 300 ? {trampaEstado: JSON.stringify(o.estado)} : {}),
         duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
     });
     await lote.commit();
     return {colocadas: elegidas.length, mapaId};
+  }
+
+  /* ---------- Trampas consumibles sin disparar (2026-09-26, pedido del dueño) ----------
+     Al cerrar el botín (el GM reparte XP y despoja lo que nadie tomó), las trampas que un jugador puso desde un consumible y que NO se
+     dispararon se desarman solas y vuelven a su dueño: se borra el elemento y se deja un aviso en `recompensas` con el ítem en `devolver`;
+     la ficha del dueño lo suma a la mochila (o al cinturón si la mochila no tiene lugar). Devuelve cuántas trampas se desarmaron. */
+  async function desarmarTrampasConsumibles(mapaId){
+    mapaId = mapaId || await mapaQueMiraElGM();
+    const col = fbDb.collection(fbRutaCampana(mapaId === MAPA_PRINCIPAL_ID ? 'elementos' : `mapas/${mapaId}/elementos`));
+    const snap = await col.get();
+    const lote = fbDb.batch(), porFicha = new Map();
+    let n = 0;
+    snap.docs.forEach(d => {
+      const e = d.data();
+      if(!e.trampaItem || e.disparada || !e.duenoUid || !e.trampaFicha) return;
+      lote.delete(d.ref);
+      n++;
+      const g = porFicha.get(e.trampaFicha) || {duenoUid: e.duenoUid, nombre: '', items: []};
+      g.items.push(e.trampaItem);
+      porFicha.set(e.trampaFicha, g);
+    });
+    if(!n) return 0;
+    porFicha.forEach((g, fichaId) => lote.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {
+      fichaId, duenoUid: g.duenoUid, nombre: g.nombre, xp: 0, dde: 0, despojos: 0, estado: 'trampas', aplicada: false, devolver: g.items,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    }));
+    await lote.commit();
+    return n;
   }
 
   /* ---------- Grupos de creeps ↔ mapas ----------
@@ -151,5 +180,5 @@ const TokensAuto = (() => {
   const mapaDeGrupo = (lista, grupo) => { const e = lista.find(x => x.grupo === grupo); return e ? e.mapaId : ''; };
   const gruposDeMapa = (lista, mapaId) => lista.filter(e => e.mapaId === mapaId).map(e => e.grupo);
 
-  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, enlacesEscuchar, enlacesGuardar, vincular, mapaDeGrupo, gruposDeMapa};
+  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, enlacesEscuchar, enlacesGuardar, vincular, mapaDeGrupo, gruposDeMapa};
 })();

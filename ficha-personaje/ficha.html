@@ -3472,6 +3472,29 @@ function recompensasEscuchar(){
     recompensasRevisar();
   }, err => console.error('Error escuchando las recompensas:', err));
 }
+// Trampas consumibles que no se dispararon: vuelven a la MOCHILA (se apilan con las iguales, que no ocupan ranura nueva) y, si la mochila no tiene lugar, al CINTURÓN.
+// Si tampoco hay lugar allá, se dejan en la mochila igual (que quede de más) antes que perderlas.
+function devolverTrampasAlJugador(items){
+  let aMochila = 0, aCinturon = 0;
+  items.forEach(js => {
+    let it = null;
+    try{ it = JSON.parse(js); }catch(e){}
+    if(!it) return;
+    const pila = S.inventario.find(x => !x.equipado && x.consumible && x.nombre === it.nombre);
+    if(pila){ pila.unidades = num(pila.unidades) + 1; aMochila++; return; }
+    const cap = capMochilaEfectivo();
+    if(!(cap > 0) || mochilaUsada() + ranurasDe(it) <= cap){ agregarConsumibleAInventario(it, 1); aMochila++; return; }
+    const pilaC = S.cinturon.find(x => x.consumible && x.nombre === it.nombre);
+    if(pilaC){ pilaC.unidades = num(pilaC.unidades) + 1; aCinturon++; return; }
+    if(S.cinturon.length < capCinturonEfectivo()){
+      const c = structuredClone(it); c.id = uid(); c.unidades = 1; c.ranuras = 1; c.equipado = false;
+      S.cinturon.push(c); aCinturon++; return;
+    }
+    agregarConsumibleAInventario(it, 1); aMochila++;   // sin lugar en ningún lado: mejor de más que perdida
+  });
+  renderInventario(); renderList('cinturon');
+  return {total: aMochila + aCinturon, aMochila, aCinturon};
+}
 async function recompensasRevisar(){
   const f = fichaVivo;
   if(!f || !f.cargada || f.soloLectura || f.editaGM || recompensasAplicando) return;
@@ -3492,12 +3515,15 @@ async function recompensasRevisar(){
       if(num(r.xp) > 0) applyExp(num(S.meta.exp) + num(r.xp));
       if(num(r.dde) > 0){ S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); }
       if(num(r.despojos) > 0){ S.loot.normal = num(S.loot.normal) + num(r.despojos); $('#f-loot-normal').value = S.loot.normal; }
+      let vueltas = null;
+      if(Array.isArray(r.devolver) && r.devolver.length) vueltas = devolverTrampasAlJugador(r.devolver);
       refresh();
       const partes = [];
       if(num(r.xp) > 0) partes.push(`+${fmt(num(r.xp))} XP`);
       if(num(r.dde) > 0) partes.push(`+${fmt(num(r.dde))} DDE`);
       if(num(r.despojos) > 0) partes.push(`+${fmt(num(r.despojos))} despojos`);
       if(partes.length) toast(`🎁 ${partes.join(' · ')}`);
+      if(vueltas && vueltas.total) toast(`🪤 ${vueltas.total} trampa${vueltas.total === 1 ? '' : 's'} sin disparar ${vueltas.total === 1 ? 'se desarmó' : 'se desarmaron'} y volvió${vueltas.total === 1 ? '' : 'eron'} ${vueltas.aCinturon ? (vueltas.aMochila ? 'a tu mochila y al cinturón' : 'a tu cinturón') : 'a tu mochila'}`);
     }
   }catch(err){
     console.error('No se pudieron aplicar las recompensas:', err);
@@ -9422,7 +9448,8 @@ async function colocarTrampaDeItem(it){
     const linea = d.tipo === 'linea';
     const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', nombre: String(d.nombre || it.nombre).slice(0, 40), detalle: d.detalle || '', dano, ignoraDef: !!d.ignoraDef,
       forma: linea ? 'linea' : 'flor', radio: linea ? 0 : (num(d.tamano) || 1), largo: linea ? (num(d.tamano) || 3) : 0, color: d.color, cant: 1, fuegoAmigo: !!d.amiga,
-      estado: d.estado ? {nombre: d.estado, turnos: num(d.estadoTurnos)} : null});
+      estado: d.estado ? {nombre: d.estado, turnos: num(d.estadoTurnos)} : null,
+      item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
     if(r.colocadas){ toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
     toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
     return false;

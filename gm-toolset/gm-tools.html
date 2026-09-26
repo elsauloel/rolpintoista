@@ -7010,7 +7010,10 @@ async function despojarBotin(){
     batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
     await batch.commit();
     await mesaLineaVerde('🏁 Botín cerrado', `${libres.length ? `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} c/u a ${elegidos.map(j => j.nombre).join(', ')} · ` : ''}XP y oro cargados en las fichas`);
-    toast('Botín cerrado ✓ — XP, oro y despojos cargados en las fichas');
+    let desarmadas = 0;
+    try{ desarmadas = await TokensAuto.desarmarTrampasConsumibles(); }catch(err){ console.error('No se pudieron desarmar las trampas consumibles:', err); }
+    if(desarmadas) await mesaLineaVerde('🪤 Trampas desarmadas', `${desarmadas} trampa${desarmadas === 1 ? '' : 's'} de consumible sin disparar ${desarmadas === 1 ? 'volvió' : 'volvieron'} a la mochila o al cinturón de su dueño`);
+    toast('Botín cerrado ✓ — XP, oro y despojos cargados en las fichas' + (desarmadas ? ` · ${desarmadas} trampa${desarmadas === 1 ? '' : 's'} desarmada${desarmadas === 1 ? '' : 's'}` : ''));
     $('#scrim-botin-gm').classList.remove('open');
   }catch(err){
     console.error('No se pudo despojar:', err);

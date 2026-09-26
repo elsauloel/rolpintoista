@@ -31,6 +31,13 @@ Al tocar **Atacar** se elige el **token objetivo** en el mapa y se abre un **men
 ## Efectos del golpe: se tiran solos, se aplican con un botón (dueño, 2026-09-26)
 Al pegar, los `efectosGolpe` del arma se **tiran en pantalla** (con su probabilidad) y, si entran, aparece un botón **«Aplicar»** para cargarlos al defensor (Envenenar, Sangrado, Rompe armadura, Lisiado, Aturdir…), con su estado ya armado y una línea en el resumen. **Aplicar es un gesto del jugador, a propósito**: la automatización ayuda pero no le quita la sensación de estar jugando un rol de mesa. Deshacer y salida manual del GM, como siempre.
 
+### Cada efecto con probabilidad es un momento propio (dueño, 2026-09-26)
+Si el arma **o la habilidad** tiene un efecto con porcentaje (por ejemplo **Lisiado 25 %**), al impactar **no se resuelve en silencio**: el paso de efectos le dedica **un momento a cada uno**, a la vista de todos:
+1. Un cartel con el efecto y su chance: **«🦵 Lisiado · 25 %»** (con lo que hace, en una línea).
+2. Un botón **«🎲 Tirar»** (lo toca el atacante; el GM puede tirar por él): **el dado aparece y rueda** (el mismo dado 3D de la Mesa, con la moneda/d4 que corresponda a la probabilidad).
+3. El veredicto grande: **«✔ ¡FUNCIONÓ!»** (y aparece el botón **«Aplicar»** sobre el defensor) o **«✘ No funcionó»**. Si el efecto necesita daño y el golpe no lo hizo, en lugar de tirar se muestra tachado con el motivo.
+Un efecto sin porcentaje (100 %) no pide tirada: muestra directamente «Aplicar». Cada tirada queda también en la Mesa y en el resumen final. (Reutiliza la lógica de `comun/efectos-golpe.js`, que ya sabe qué dado tirar para cada porcentaje.)
+
 ### Distinción nueva: efectos que necesitan daño y efectos que no (dueño, 2026-09-26)
 Hay efectos que **solo se aplican si el golpe hace daño** (ej.: una cuchilla envenenada acierta el PdG, pero si la armadura absorbe todo, no hay veneno) y otros que **se aplican aunque no pase el daño**. Cada efecto de golpe, en un ítem o en una habilidad, lleva un dato **«Se aplica: ☑ solo si hace daño / ☐ aunque no pase el daño»**, que se elige en el asistente paso a paso (con un valor por defecto según el efecto, editable).
 *Propuesta de valores por defecto (a confirmar):*

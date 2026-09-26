@@ -1,0 +1,770 @@
+[
+ {
+  "id": "nuevo-gorro-acolchado",
+  "nombre": "Gorro acolchado",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 40,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Lo cosió la abuela de alguien con lo que había: lana, trapos y mucha paciencia. Nadie lo confunde con un casco, pero más de un ladrón de callejón se quedó con la daga atascada en el relleno."
+ },
+ {
+  "id": "nuevo-yelmo-de-guardia",
+  "nombre": "Yelmo de guardia",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 100,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Sale del mismo molde que miles de otros, con la barbuda algo abollada de tanto uso. Quien lo lleva puesto sabe que tiene detrás a toda una guardia, aunque esté solo."
+ },
+ {
+  "id": "nuevo-casco-de-hierro-batido",
+  "nombre": "Casco de hierro batido",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 220,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Evasión -1",
+  "descripcionNarrativa": "Un herrero terco lo martilló durante una noche entera, golpe a golpe, hasta que sonó como una campana. Todavía suena: se lo oye venir de lejos y casi nadie se anima a pegarle."
+ },
+ {
+  "id": "nuevo-yelmo-del-penasco",
+  "nombre": "Yelmo del Peñasco",
+  "tier": "Excepcional",
+  "tipoItem": "cabeza",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 600,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Iniciativa -1",
+  "descripcionNarrativa": "Cuentan que nació de una piedra de río que un escultor ahuecó y le dio rostro. Es tan pesado que obliga a caminar con la frente alta, y los golpes le resbalan como al agua."
+ },
+ {
+  "id": "nuevo-corona-del-alfil-sordo",
+  "nombre": "Corona del Alfil Sordo",
+  "tier": "Legendario",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1400,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1",
+  "descripcionNarrativa": "Perteneció a un rey que se quedó sordo de tanto oír mentiras, y nunca más volvió a sobresaltarse. Cuando alguien se la pone, el mundo se acalla y los golpes llegan de a uno y de frente."
+ },
+ {
+  "id": "nuevo-jubon-de-cuero-curtido",
+  "nombre": "Jubón de cuero curtido",
+  "tier": "Común",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Cuero de vaca curtido con corteza de roble y cosido dos veces, por si acaso. Huele a establo y a viaje, y salvó a más de un cuerpo de una mala tarde."
+ },
+ {
+  "id": "nuevo-casaca-de-guardia-costera",
+  "nombre": "Casaca de la guardia costera",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 110,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +1 · Evasión +1",
+  "descripcionNarrativa": "Encerada contra la sal y cortada para trepar por el cordaje sin enredarse. Los guardias costeros juran que el mar se traga mejor a los que van muy abrigados."
+ },
+ {
+  "id": "nuevo-coleto-de-jabali",
+  "nombre": "Coleto de piel de jabalí",
+  "tier": "Raro",
+  "tipoItem": "armadura_blanda",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 200,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Evasión +1",
+  "descripcionNarrativa": "El cazador que la hizo se dejó las cerdas por dentro, así que cada movimiento erizado avisa al que quiera acercarse. No es fina, pero es de las que no fallan."
+ },
+ {
+  "id": "nuevo-capa-de-seda-de-arana",
+  "nombre": "Capa de seda de araña",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 650,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Evasión +2",
+  "descripcionNarrativa": "Tejida por una araña que aprendió a hilar a la luz de la luna. Pesa menos que un suspiro y casi nada la corta: los cuchillos se cansan antes de pasar."
+ },
+ {
+  "id": "nuevo-cota-de-malla-fina",
+  "nombre": "Cota de malla fina",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_rigida",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Miles de anillos pequeños, remachados uno a uno por manos pacientes. Suena un poco al caminar, como un río de monedas, y guarda al cuerpo mejor que cualquier promesa."
+ },
+ {
+  "id": "nuevo-coraza-de-placas",
+  "nombre": "Coraza de placas",
+  "tier": "Raro",
+  "tipoItem": "armadura_rigida",
+  "peso": 5,
+  "ranuras": 0,
+  "precioCompra": 250,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 9
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +9 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Res. crítico Tipo 8 +1 · Movimiento -1",
+  "descripcionNarrativa": "Peto y espaldar de acero bien pulido, con correas que crujen en cada paso. Quien la lleva es una pequeña fortaleza que camina, a paso lento y seguro."
+ },
+ {
+  "id": "nuevo-armadura-de-placas-de-campeon",
+  "nombre": "Armadura de placas de campeón",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_rigida",
+  "peso": 5,
+  "ranuras": 0,
+  "precioCompra": 900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 11
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +11 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +1 · Movimiento -1",
+  "descripcionNarrativa": "La encargó un noble a un maestro armero que tardó un año en terminarla; después el noble murió y la armadura siguió esperando dueño. Calza tan justa que parece una segunda piel de acero."
+ },
+ {
+  "id": "nuevo-coraza-del-titan-caido",
+  "nombre": "Coraza del Titán caído",
+  "tier": "Legendario",
+  "tipoItem": "armadura_rigida",
+  "peso": 4,
+  "ranuras": 0,
+  "precioCompra": 1800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 12
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 2
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +12 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +2 · Movimiento -1",
+  "descripcionNarrativa": "Dicen que un gigante cayó en la montaña y que con su peto se forjó ésta. Cada placa tiene la marca de una mano enorme y en el pecho todavía se escucha, si se apoya la oreja, un latido lejano."
+ },
+ {
+  "id": "nuevo-guantes-de-trabajo-reforzados",
+  "nombre": "Guantes de trabajo reforzados",
+  "tier": "Común",
+  "tipoItem": "manos",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 40,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Nacieron para cargar barriles y terminaron peleando por costumbre. Los nudillos reforzados tienen más historias que dientes el que los recibió."
+ },
+ {
+  "id": "nuevo-manoplas-de-cota",
+  "nombre": "Manoplas de cota",
+  "tier": "Buena Calidad",
+  "tipoItem": "manos",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 100,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Malla fina hasta la muñeca, con un forro de gamuza para que no pellizque. Una mano bien cubierta es media pelea ganada."
+ },
+ {
+  "id": "nuevo-guanteletes-del-duelista",
+  "nombre": "Guanteletes del duelista",
+  "tier": "Raro",
+  "tipoItem": "manos",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 200,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Parry +1",
+  "descripcionNarrativa": "Los duelistas de la costa desvían el acero con la mano libre, y ésta es su mano. Están tan gastados en la palma que ya toman la forma de quien los usa."
+ },
+ {
+  "id": "nuevo-manoplas-del-desollador",
+  "nombre": "Manoplas del Desollador",
+  "tier": "Excepcional",
+  "tipoItem": "manos",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · PdG +1",
+  "descripcionNarrativa": "Terminan en garras cortas y curvas, como de ave rapaz. Su primer dueño las usaba para trabajar cueros; el segundo, no tanto."
+ },
+ {
+  "id": "nuevo-grebas-de-cuero",
+  "nombre": "Grebas de cuero",
+  "tier": "Común",
+  "tipoItem": "piernas",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 50,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Cuero endurecido al fuego sobre las espinillas, atado con tiras. Protege de las patadas y de esas piedras que siempre aparecen en el peor momento."
+ },
+ {
+  "id": "nuevo-perneras-de-malla",
+  "nombre": "Perneras de malla",
+  "tier": "Buena Calidad",
+  "tipoItem": "piernas",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Malla sobre acolchado, ideal para quien pelea en pie y no piensa retroceder. Hacen un ruido característico que anuncia que alguien llega para quedarse."
+ },
+ {
+  "id": "nuevo-grebas-de-escamas-de-dragon-menor",
+  "nombre": "Grebas de escamas de dragón menor",
+  "tier": "Excepcional",
+  "tipoItem": "piernas",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2",
+  "descripcionNarrativa": "Cada escama fue cosida una por una, sobre el cuero, por manos cuidadosas. Vienen de un dragón pequeño que cometió el error de creerse grande."
+ },
+ {
+  "id": "nuevo-botas-de-suela-ferrada",
+  "nombre": "Botas de suela ferrada",
+  "tier": "Buena Calidad",
+  "tipoItem": "pies",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 90,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "La suela lleva clavos de hierro que muerden la piedra mojada y el barro. Sirven para pisar fuerte, y para que el otro lo sepa."
+ },
+ {
+  "id": "nuevo-botas-del-caminante-de-viento",
+  "nombre": "Botas del Caminante de Viento",
+  "tier": "Raro",
+  "tipoItem": "pies",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 240,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Movimiento +1 · Evasión +1",
+  "descripcionNarrativa": "Livianas como una idea: el que las calza siente que la tierra le empuja los pies hacia adelante. Nadie recuerda quién las hizo, pero todos saben adónde llevan."
+ },
+ {
+  "id": "nuevo-rodela-de-madera",
+  "nombre": "Rodela de madera",
+  "tier": "Común",
+  "tipoItem": "escudo_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 45,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Bloqueo +1",
+  "descripcionNarrativa": "Tablas de roble unidas con un cuero y un asa clavada a mano. Tiene más astillas que años, pero cuando hace falta, hace de pared."
+ },
+ {
+  "id": "nuevo-escudo-de-torre",
+  "nombre": "Escudo de torre",
+  "tier": "Raro",
+  "tipoItem": "escudo_2m",
+  "peso": 6,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 8
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +8 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Movimiento -1",
+  "descripcionNarrativa": "Es tan alto que se apoya en el suelo, y tras él caben dos personas y una excusa. Cuando se lo planta, el mundo se detiene a pensarlo."
+ },
+ {
+  "id": "nuevo-broquel-del-rompeolas",
+  "nombre": "Broquel del Rompeolas",
+  "tier": "Excepcional",
+  "tipoItem": "escudo_1m",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Parry +1",
+  "descripcionNarrativa": "Se fue forjando en el muelle, a golpes de mar, hasta aprender a aguantar lo que llegue. Los hachazos rebotan como olas contra el espigón."
+ },
+ {
+  "id": "nuevo-egida-del-ultimo-bastion",
+  "nombre": "Égida del Último Bastión",
+  "tier": "Legendario",
+  "tipoItem": "escudo_2m",
+  "peso": 6,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 10
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo3",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "resm",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +10 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 8 +2 · Bloqueo +3 · Res. Mt +2",
+  "descripcionNarrativa": "Se levantó una sola vez para defender lo indefendible, y desde entonces lleva la marca de cada golpe que le ahorró a otro. Dicen que sigue esperando ese último frente."
+ },
+ {
+  "id": "nuevo-faja-del-estallido",
+  "nombre": "Faja del Estallido",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 8,
+  "precioCompra": 1300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 12 +1",
+  "descripcionNarrativa": "Una faja ancha, reforzada con tiras de lona alquitranada y placas de plomo. Quien la usa aprendió a aguantar lo que revienta cerca sin perder el equilibrio."
+ },
+ {
+  "id": "nuevo-anillo-de-polvora-mansa",
+  "nombre": "Anillo de Pólvora Mansa",
+  "tier": "Legendario",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 3000,
+  "mods": [
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "resm",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Res. crítico Tipo 12 +1 · Res. Mt +1",
+  "descripcionNarrativa": "Un aro ennegrecido por mil chispas que jamás llegaron a prender. Quien lo lleva se asombra de lo poco que le explota alrededor."
+ }
+]

@@ -1032,5 +1032,14 @@
     'Nunca falla; a veces solo avisa.', HC);
 
   window.CREEPS_BASE = lista;
-  window.CreepsBaseUtil = {armarHab, armarDetalle, esHabMagica, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
+  // Revisa que cada creep de la lista tenga TODOS los puntos de atributo de su nivel (33 + 3 por nivel sobre 1, repartidos entre Con, Fue, Agi, Des y Esp)
+  // y HP = Con × 5. Devuelve los que no cumplen: [{nombre, nivel, suma, meta, hp, hpEsperado}]. Se corre desde la consola: CreepsBaseUtil.verificarPresupuesto().
+  function verificarPresupuesto(creeps){
+    return (creeps || window.CREEPS_BASE || []).map(c => {
+      const d = c.datos || c, nivel = Number(c.nivel || d.nivel) || 1;
+      const suma = ['con', 'fue', 'agl', 'des', 'esp'].reduce((a, k) => a + (Number(d[k]) || 0), 0), meta = 33 + 3 * (nivel - 1);
+      return {nombre: c.nombre || d.nombre, nivel, suma, meta, hp: Number(d.hp) || 0, hpEsperado: (Number(d.con) || 0) * 5};
+    }).filter(x => x.suma !== x.meta || x.hp !== x.hpEsperado);
+  }
+  window.CreepsBaseUtil = {verificarPresupuesto, armarHab, armarDetalle, esHabMagica, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
 })();

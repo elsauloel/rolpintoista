@@ -11,7 +11,7 @@
 |---|---|---|
 | 0 | **Parámetros de diseño** (criterios generales, crítico, escasez de resistencias, familias de arma, magia) | 🟢 En marcha: la mayor parte dictada, ver "Decidido" |
 | 1 | **Armas no mágicas, elemento por elemento**: Tipo y Peso con costo en Nitros → empuñadura y mano izquierda → Rango/Alcance → bonos → efectos al golpear por familia → crítico frecuente/potente → estado al equipar → tier/calidad/precio | 🟢 **Arrancó (2026-09-25):** hoja de trabajo en [`rework-armas.md`](rework-armas.md) |
-| 2 | **Equipo defensivo** (después de las armas; ojo: equiparar en frecuencia la Resistencia a crítico con las armas de crítico mejorado): Defensa, resistencias a crítico por slots (P114), resistencias elementales, anillos (mágicos, uno por mano, escasos y caros) | 🔲 |
+| 2 | **Equipo defensivo** (después de las armas; ojo: equiparar en frecuencia la Resistencia a crítico con las armas de crítico mejorado): Defensa, resistencias a crítico por slots (P114), resistencias elementales, anillos (mágicos, uno por mano, escasos y caros) | 🟡 propuesta de slots en [`rework-defensa.md`](rework-defensa.md) |
 | 3 | **Magia**: armas de daño y de efecto, paralelismos con las físicas usando matemática (daño en función de Nitros, SP, peso); tipos de daño arcano/fuego/hielo/rayo (P116). El dueño pidió ayuda para pensar los paralelismos | 🔲 Después de la fase 1 |
 | 4 | **Motor de calidad, tier y precio** (P112): relevancia de cada elemento (tabla en la guía §0b), peso de los efectos, fórmula | 🔲 |
 | 5 | **Crítico nuevo en el código** (ficha y mapa): PdG − Evasión ≥ rango, niveles, N − Resistencia d20, doble/triple/cuádruple daño; nuevos estados Crítico frecuente/potente, Parálisis, Escarcha acumulable | 🔲 (cambio grande, en pasos chicos) |

@@ -90,6 +90,7 @@ const Duelo = (() => {
 .duelo-veredicto .grande{font-size:48px;line-height:1.1}
 .duelo-veredicto .chico{font-size:14px;font-weight:500;letter-spacing:0;margin-top:6px;opacity:.92}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-motivo{margin-top:10px;background:rgba(0,0,0,.28);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:600;letter-spacing:0}
 .duelo-par{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:15px;font-weight:600;letter-spacing:0}
 .duelo-par button{background:#c9a24a;color:#1b1608;border:0;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:800;cursor:pointer}
 .duelo-par button:disabled{opacity:.5}
@@ -310,15 +311,16 @@ const Duelo = (() => {
       revelado[d.id] = true;
     }else if(d.veredicto){
       const nuevo = esNuevo ? ' nuevo' : '';
-      let como = '';
-      if(d.desempate === 'mas1') como = ' · empate: gana la tirada que no llevaba «+» fijo';
+      let como = '', motivo = '';
+      if(d.desempate === 'mas1'){ como = ' · empate'; motivo = `Se resolvió el empate: gana ${d.veredicto === 'pego' ? _esc(d.atacante.nombre) : _esc(d.defensor.nombre)} porque la tirada del otro llevaba un «+» fijo y ella no.`; }
       else if(d.desempate === 'moneda' && d.moneda){
         const gan = d.moneda.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
-        como = ` · empate: ${_esc(d.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${d.moneda.eleccion}, salió ${d.moneda.resultado} (${d.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(gan)}`;
+        como = ' · empate';
+        motivo = `Se resolvió el empate con par o impar: ${_esc(d.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${d.moneda.eleccion}, salió ${d.moneda.resultado} (${d.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(gan)}.`;
       }
       veredicto = d.veredicto === 'pego'
-        ? `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · le gana por ' + _fmt(dif) : ''}${como}</div></div>`
-        : `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · esquivó por ' + _fmt(Math.abs(dif)) : ''}${como}</div></div>`;
+        ? `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · le gana por ' + _fmt(dif) : ''}${como}</div>${motivo ? `<div class="duelo-motivo">⚖ ${motivo}</div>` : ''}</div>`
+        : `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${detalleContacto}${dif !== 0 ? ' · esquivó por ' + _fmt(Math.abs(dif)) : ''}${como}</div>${motivo ? `<div class="duelo-motivo">⚖ ${motivo}</div>` : ''}</div>`;
       revelado[d.id] = true;
     }else if(d.estado === 'cancelado'){
       veredicto = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
@@ -441,11 +443,24 @@ const Duelo = (() => {
     guardarTiro(d.id, lado, r).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
+  // Cuando un empate se resuelve, se avisa en la Mesa para que quede escrito por qué (línea de sistema 🔔, como los avisos del mapa).
+  async function anunciarEmpate(texto){
+    if(!texto) return;
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: texto.slice(0, 200), formula: '', rolls: [], mod: 0, total: 0,
+        desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){ console.error('Duelo: no se pudo anunciar el empate en la Mesa', err); }
+  }
+
   // Anota la tirada de un lado; si ya está la del otro, calcula el veredicto en la misma transacción.
   async function guardarTiro(id, lado, r){
     const tiro = {total: Math.round(num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(num), mod: num(r.mod)};
     const ref = col().doc(id);
+    let anuncio = '';
     await fbDb.runTransaction(async tx => {
+      anuncio = '';
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const d = doc.data();
@@ -465,6 +480,7 @@ const Duelo = (() => {
             cambios.veredicto = masA ? 'fallo' : 'pego';
             cambios.desempate = 'mas1';
             cambios.estado = 'resuelto';
+            anuncio = `⚖ Empate ${d.atacante.nombre} contra ${d.defensor.nombre} (${pdg.total} a ${eva.total}): gana ${masA ? d.defensor.nombre : d.atacante.nombre} porque la tirada de ${masA ? d.atacante.nombre : d.defensor.nombre} llevaba un «+» fijo y la otra no`;
           }else{
             cambios.desempate = 'moneda';
             cambios.estado = 'empate';
@@ -473,12 +489,15 @@ const Duelo = (() => {
       }
       tx.update(ref, cambios);
     });
+    anunciarEmpate(anuncio);
   }
 
   // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un dado y gana el que acierta.
   async function elegirParidad(id, quien, eleccion){
     const ref = col().doc(id);
+    let anuncio = '';
     await fbDb.runTransaction(async tx => {
+      anuncio = '';
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const d = doc.data();
@@ -488,7 +507,10 @@ const Duelo = (() => {
       const acierta = (eleccion === 'par') === par;
       const gana = acierta ? quien : (quien === 'atacante' ? 'defensor' : 'atacante');
       tx.update(ref, {moneda: {quien, eleccion, resultado, gana}, veredicto: gana === 'atacante' ? 'pego' : 'fallo', estado: 'resuelto'});
+      const nom = q => (q === 'atacante' ? d.atacante : d.defensor).nombre;
+      anuncio = `⚖ Empate ${d.atacante.nombre} contra ${d.defensor.nombre} (${d.pdg.total} a ${d.eva.total}, las dos con «+» fijo o ninguna): ${nom(quien)} eligió ${eleccion}, salió ${resultado} (${par ? 'par' : 'impar'}) → gana ${nom(gana)}`;
     });
+    anunciarEmpate(anuncio);
   }
 
   /* ---------- botones «Ver duelo» y apertura automática ---------- */

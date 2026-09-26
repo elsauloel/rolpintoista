@@ -15,6 +15,7 @@
 - **Al llegar a 0 la pieza queda rota** (sin efectos, no se destruye): ✅ interpretación correcta.
 - **El estado Armadura rota sigue para TODOS**, también para los personajes de los jugadores (se les puede romper la armadura y bajar la Defensa). No queda «solo para creeps»: lo dije mal.
 - **Parry sin perder el Bloqueo: no se baja la durabilidad** del objeto (solo se gasta cuando se pierde el Bloqueo).
+- **Elección al azar de la pieza (dueño, 2026-09-26):** cuando Rompe armadura impacta a alguien con varias piezas defensivas, el sistema elige **una al azar, sin distinguir por ninguna característica del ítem** (ni peso, ni Defensa, ni tier): todas tienen la misma chance.
 - **Precios de reparación (dueño, 2026-09-26):** **herrero: 1 de oro por cada punto de durabilidad reparado**; **talento: 2 de despojos (loot) por cada punto reparado**. (Recordatorio: solo fuera de combate.)
 - **Tope de Armadura rota (dueño, 2026-09-26):** el valor de **Armadura rota nunca puede ser mayor que la durabilidad total del objeto** (los stacks no pasan de lo que la armadura puede aguantar). *Falta aclarar con varias piezas equipadas: propuesta, el tope es la suma de las durabilidades máximas de las piezas que dan Defensa.*
 - **Pieza rota (durabilidad 0) = sin efectos (dueño, 2026-09-26):** **se anulan todos sus efectos**, pero **sigue ocupando el slot** («ocupa el lugar, pero es como si no lo tuvieras equipado»). Qué pasa con los **efectos adicionales** (bonos a stats, efectos al golpear, estados que da…) **queda pendiente de revisión con el equipo del dueño**: se cargó como pregunta en 🛠 Herramientas de diseño (pestaña Preguntas).
@@ -28,5 +29,4 @@
 ## Preguntas abiertas (propuesta entre paréntesis)
 1. **¿Cómo conviven el estado Armadura rota y la durabilidad de la pieza en un personaje?** (un golpe con Rompe armadura hace **las dos cosas**: suma 1 stack de Armadura rota —baja 1 la Defensa total, como hoy— y baja 1 la durabilidad de una pieza elegida al azar; una pieza en 0 deja de dar su Defensa; al **reparar** una pieza se le devuelven puntos y se quita un stack de Armadura rota.)
 2. **¿Un arma o escudo de Peso 0 tiene el mínimo de 3, como las armaduras?** (sí, mínimo 3 para todo.)
-3. **¿La pieza al azar es pareja entre las equipadas que dan Defensa?** (sí, pareja.)
 4. *(en stand-by)* Óleo reparador (qué es y cuántos puntos repara).

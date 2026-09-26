@@ -6721,6 +6721,10 @@
   "rango": false,
   "bonos": [
    {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
     "stat": "rng",
     "val": 1
    }
@@ -6730,15 +6734,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Para trepar y pelear en el pasamanos. Alcance +1.",
+  "detalle": "Para trepar y pelear en el pasamanos. Bloqueo +1 y Alcance +1.",
   "nuevo": {
-   "pc": 7.3,
-   "tier": "Común",
-   "precio": 80,
+   "pc": 8.3,
+   "tier": "Buena Calidad",
+   "precio": 100,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 3.0,
+    "bonos": 4.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2

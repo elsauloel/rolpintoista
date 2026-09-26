@@ -720,12 +720,16 @@
   "danoFijo": 0,
   "mods": [
    {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
     "stat": "rng",
     "val": 1
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Para trepar y pelear en el pasamanos. Alcance +1."
+  "detalle": "Para trepar y pelear en el pasamanos. Bloqueo +1 y Alcance +1."
  },
  {
   "id": "nuevo-hachon-de-minero",

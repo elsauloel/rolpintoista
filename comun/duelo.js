@@ -143,6 +143,11 @@ const Duelo = (() => {
 #duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
 #duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
 #duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
+.duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
+.duelo-crit-titulo.no{color:#9aa4bd}
+.duelo-crit-titulo.posible{color:#ffd25a}
+.duelo-crit-titulo.si{color:#ffd25a;text-shadow:0 0 14px rgba(255,190,60,.7)}
+.duelo-crit-explica{text-align:center;font-size:13px;color:#aab3ca;line-height:1.5;margin-bottom:6px}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
@@ -935,19 +940,27 @@ const Duelo = (() => {
     const c = d.crit;
     const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
     const cuenta = `PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} · rango del crítico ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crít. frecuente ' + _fmt(c.frecuente) : ''}) → nivel ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − resistencia ${_fmt(c.resistencia)}` : ''}`;
+    // Lo primero que se lee es el veredicto en grande; la cuenta que lo explica va debajo, en renglones.
+    const titulo = (clase, txt) => `<div class="duelo-crit-titulo ${clase}">${txt}</div>`;
+    const explica = lineas => `<div class="duelo-crit-explica">${lineas.map(l => `<div>${_esc(l)}</div>`).join('')}</div>`;
+    const lCuenta = [`PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} de diferencia`,
+      `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''})`,
+      `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
     if(!c.critico){
-      cuerpo = `<div class="duelo-mini">Sin crítico: ${_esc(cuenta)}${c.nivel > 0 && c.dados <= 0 ? ' (la Resistencia a crítico lo anuló)' : ''}</div>`;
+      const anulado = c.nivel > 0 && c.dados <= 0;
+      cuerpo = titulo('no', '✘ NO ES CRÍTICO')
+        + explica([anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta]);
     }else if(!c.d20){
       const puede = esMio(d.atacante) || soyGM();
-      cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
-        <div class="duelo-mini g">💥 ¡Hay posibilidad de crítico! Se tiran <b>${_fmt(c.dados)} d20</b> y vale el mejor</div>
-        ${tablaCriticoHtml(c, d, 0)}
-        <div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
+      cuerpo = titulo('posible', '⚡ HAY POSIBILIDAD DE CRÍTICO')
+        + explica([`Se tiran ${_fmt(c.dados)} d20 y vale el mejor.`, ...lCuenta])
+        + tablaCriticoHtml(c, d, 0)
+        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
-      cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
-        <div class="duelo-mini">d20: ${c.d20.map(x => x === c.mejor ? `<b>${x}</b>` : x).join(' · ')} → mejor <b>${_fmt(c.mejor)}</b> · ${c.mult > 1 ? `×${_fmt(c.mult)} ${NOMBRE_MULT[c.mult]}` : 'sin multiplicador'}</div>
-        ${tablaCriticoHtml(c, d, c.mejor)}`;
+      cuerpo = (c.mult > 1 ? titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`) : titulo('no', '✘ NO ES CRÍTICO'))
+        + explica([`d20: ${c.d20.join(' · ')} → el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ', y no alcanza ningún multiplicador'}.`, ...lCuenta])
+        + tablaCriticoHtml(c, d, c.mejor);
     }
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }

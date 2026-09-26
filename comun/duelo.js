@@ -148,6 +148,14 @@ const Duelo = (() => {
 .duelo-crit-titulo.posible{color:#ffd25a}
 .duelo-crit-titulo.si{color:#ffd25a;text-shadow:0 0 14px rgba(255,190,60,.7)}
 .duelo-crit-explica{text-align:center;font-size:13px;color:#aab3ca;line-height:1.5;margin-bottom:6px}
+.duelo-d20s{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:12px 0 8px}
+.duelo-d20{width:44px;height:44px;border-radius:10px;background:#12172a;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#9aa4bd;position:relative}
+.duelo-d20.nuevo{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-d20.mejor{width:58px;height:58px;font-size:28px;color:#fff3c9;background:radial-gradient(circle,#8a5a12,#4a2a08);border:2px solid #ffd25a;z-index:1;box-shadow:0 0 18px rgba(255,190,60,.7)}
+.duelo-d20.mejor::before,.duelo-d20.mejor::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #ffd25a;opacity:0;pointer-events:none;animation:duelo-onda 1.8s ease-out infinite}
+.duelo-d20.mejor::after{animation-delay:.9s}
+@keyframes duelo-onda{0%{transform:scale(.7);opacity:.95}100%{transform:scale(2.6);opacity:0}}
+@keyframes duelo-d20in{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:none;opacity:1}}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
@@ -964,8 +972,13 @@ const Duelo = (() => {
         + tablaCriticoHtml(c, d, 0)
         + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
+      // Los d20 como fichas: el más alto destaca con ondas concéntricas.
+      const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
+      const iMejor = c.d20.indexOf(c.mejor);
+      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${i === iMejor ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
       cuerpo = titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
-        + explica([`d20: ${c.d20.join(' · ')} → el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
+        + fichas
+        + explica([`d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
         + tablaCriticoHtml(c, d, c.mejor);
     }
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;

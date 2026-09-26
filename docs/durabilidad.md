@@ -16,6 +16,8 @@
 - **El estado Armadura rota sigue para TODOS**, también para los personajes de los jugadores (se les puede romper la armadura y bajar la Defensa). No queda «solo para creeps»: lo dije mal.
 - **Parry sin perder el Bloqueo: no se baja la durabilidad** del objeto (solo se gasta cuando se pierde el Bloqueo).
 - **Precios de reparación (dueño, 2026-09-26):** **herrero: 1 de oro por cada punto de durabilidad reparado**; **talento: 2 de despojos (loot) por cada punto reparado**. (Recordatorio: solo fuera de combate.)
+- **Tope de Armadura rota (dueño, 2026-09-26):** el valor de **Armadura rota nunca puede ser mayor que la durabilidad total del objeto** (los stacks no pasan de lo que la armadura puede aguantar). *Falta aclarar con varias piezas equipadas: propuesta, el tope es la suma de las durabilidades máximas de las piezas que dan Defensa.*
+- **Pieza rota (durabilidad 0) = sin efectos (dueño, 2026-09-26):** **se anulan todos sus efectos**, pero **sigue ocupando el slot** («ocupa el lugar, pero es como si no lo tuvieras equipado»). Qué pasa con los **efectos adicionales** (bonos a stats, efectos al golpear, estados que da…) **queda pendiente de revisión con el equipo del dueño**: se cargó como pregunta en 🛠 Herramientas de diseño (pestaña Preguntas).
 - **En stand-by:** el **Óleo reparador** (qué es y cuánto repara).
 
 ## Cómo encaja con lo que ya hay

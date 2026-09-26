@@ -770,7 +770,13 @@ const Duelo = (() => {
     const etiqueta = campo === 'eva' ? nombreDefensa(d) : ETIQ[campo];
     const parCompleto = !!(tiro && d[otro]);
     if(parCompleto) return numerosHtml(tiro, esNuevo, etiqueta, lado.nombre);
-    if(tiro) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="listo">✔ ${_esc(lado.nombre)} ya tiró <b>${_esc(tiro.formula || 'los dados')}</b></div><div class="det">el resultado se muestra cuando tiren los dos</div></div>`;
+    if(tiro){
+      // Quien tiró ve SU propia tirada mientras espera al otro (para el resto queda secreta hasta que tiren los dos).
+      const propia = esMio(lado)
+        ? `<div class="num" style="font-size:52px">${_fmt(tiro.total)}</div><div class="det">tu tirada · ${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div><div class="det">🔒 los demás no la ven hasta que tiren los dos</div>`
+        : `<div class="listo">✔ ${_esc(lado.nombre)} ya tiró <b>${_esc(tiro.formula || 'los dados')}</b></div><div class="det">el resultado se muestra cuando tiren los dos</div>`;
+      return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div>${propia}</div>`;
+    }
     const vivo = d.estado === 'esperando' && d.fase === fase;
     if(!vivo) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="espera">no llegó a tirar</div></div>`;
     const quien = _esc(lado.nombre);

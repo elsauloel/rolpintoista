@@ -10251,7 +10251,10 @@ window.DUELO_HOOKS = {
   // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa) y la Resistencia a crítico del defensor contra el Tipo del arma.
   statsCritico: d => {
     const inv = dueloInvDe(d.atacante);
-    if(inv) return {frecuente: 0, potente: 0};
+    if(inv){   // las invocaciones siguen las mismas reglas que los creeps
+      const f = invStatValor(inv, 'crit'), p = invStatValor(inv, 'critpot');
+      return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};
+    }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     const f = statParaArma('crit', arma), p = statParaArma('critpot', arma);
     return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};

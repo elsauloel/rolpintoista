@@ -17224,11 +17224,11 @@
   {
     "id": "nuevo-botas-del-caminante-de-viento",
     "nombre": "Botas del Caminante de Viento",
-    "tier": "Raro",
+    "tier": "Excepcional",
     "tipoItem": "pies",
     "peso": 1,
     "ranuras": 0,
-    "precioCompra": 240,
+    "precioCompra": 650,
     "mods": [
       {
         "stat": "def",

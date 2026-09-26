@@ -37,12 +37,12 @@ VARIACIONES = {   # nombre -> [(stat, valor)]: piezas idénticas a otra del cat�
     'soquetes de lona': [('eva', 1)],
     'Pieles del berserker': [('ini', 1)],
     'Coraza de cuero del clan': [('bloqueo', 1)],
-    'Jogging de gimnasia con rayas laterales': [('mov', 1)],
+    'Jogging de gimnasia con rayas laterales': [('ini', 1)],
     'Botines de cuero fino': [('eva', 1)],
-    'Botines de soldado raso': [('mov', 1)],
+    'Botines de soldado raso': [('ini', 1)],
     'Canilleras de milicia': [('parry', 1)],
-    'Polainas de cuero remendado': [('mov', 1)],
-    'Campera de marinero espacial': [('mov', 1)],
+    'Polainas de cuero remendado': [('ini', 1)],
+    'Campera de marinero espacial': [('ini', 1)],
     'Capucha de emboscada': [('eva', 1)],
     'Capucha de lana del culto': [('esp', 1)],
     'Gorro de fieltro de feria': [('eva', 1)],
@@ -58,11 +58,11 @@ VARIACIONES = {   # nombre -> [(stat, valor)]: piezas idénticas a otra del cat�
     'Coraza de puerta': [('bloqueo', 1)],
     'Coraza del capitán de la ciudad': [('parry', 1)],
     'Cota de malla de contramaestre': [('eva', 1)],
-    'Cota del cazarrecompensas': [('mov', 1)],
+    'Cota del cazarrecompensas': [('ini', 1)],
     'Gambesón del capitán del Espectro': [('eva', 1)],
     'Gambesón del veterano de frontera': [('parry', 1)],
     'Polainas tachonadas de taller': [('parry', 1)],
-    'Grebas del rastreador': [('mov', 1)],
+    'Grebas del rastreador': [('eva', 1)],
     'Pantalón acolchado de aprendiz': [('eva', 1)],
     'Media armadura de sargento': [('parry', 1)],
     'Polainas de seda valyria': [('eva', 1)],
@@ -130,7 +130,7 @@ def reajustar(item):
             m = dict(m, val=tope)
         mods.append(m)
     if any(m['stat'] == 'mov' and m['val'] < 0 for m in mods):
-        avisos.append('Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.')
+        avisos.append('Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.')
     if cambios:
         avisos.append('Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono).')
     it['mods'] = mods

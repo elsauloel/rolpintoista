@@ -68,7 +68,7 @@
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1700,
@@ -807,7 +807,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 900,
@@ -958,7 +958,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 260,
@@ -1017,7 +1017,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 140,
@@ -4134,7 +4134,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 180,
@@ -4185,7 +4185,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 90,
@@ -4857,7 +4857,7 @@
    "Quitar Res. crítico Tipo 12 (+1): el Tipo 12 solo va en cinturón y anillos."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1650,
@@ -5072,12 +5072,12 @@
     "val": 2
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -5735,12 +5735,12 @@
     "val": 3
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
@@ -7929,7 +7929,7 @@
    "Quitar Res. crítico Tipo 8 (+1): no la dan piezas de tier Buena Calidad."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 130,
@@ -8245,7 +8245,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 750,
@@ -8977,12 +8977,12 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1.",
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
@@ -9720,7 +9720,7 @@
   ],
   "cambios": [],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
   ],
   "precioHoy": 70,
   "detalle": "Aros de metal remachados sobre cuero grueso. Pesan una barbaridad."
@@ -9812,7 +9812,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 100,
@@ -10064,7 +10064,7 @@
    "Quitar Res. crítico Tipo 12 (+1): el Tipo 12 solo va en cinturón y anillos."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1350,
@@ -10139,7 +10139,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 220,
@@ -10220,12 +10220,12 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "eva",
     "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1.",
+   "Variación para que no sea idéntica a otra pieza del catálogo: Evasión +1.",
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
@@ -11331,11 +11331,15 @@
    },
    {
     "stat": "mov",
-    "val": 2
+    "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1."
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1."
   ],
   "avisos": [
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
@@ -11493,7 +11497,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 600,
@@ -13015,7 +13019,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 450,
@@ -13251,12 +13255,12 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": 1
    }
   ],
   "cambios": [
-   "Variación para que no sea idéntica a otra pieza del catálogo: Movimiento +1."
+   "Variación para que no sea idéntica a otra pieza del catálogo: Iniciativa +1."
   ],
   "avisos": [
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
@@ -13657,7 +13661,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 70,
@@ -13849,7 +13853,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 900,
@@ -13900,7 +13904,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 220,
@@ -13990,7 +13994,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 90,
@@ -14777,7 +14781,7 @@
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 190,
@@ -15834,7 +15838,7 @@
   ],
   "cambios": [],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
   ],
   "precioHoy": 1800,
   "detalle": "Dicen que un gigante cayó en la montaña y que con su peto se forjó ésta. Cada placa tiene la marca de una mano enorme y en el pecho todavía se escucha, si se apoya la oreja, un latido lejano."
@@ -16173,7 +16177,7 @@
   "origen": "nuevo · defensa",
   "slot": "pies",
   "tipoItem": "pies",
-  "tier": "Raro",
+  "tier": "Excepcional",
   "peso": 1,
   "def": 3,
   "antes": [
@@ -16214,7 +16218,7 @@
   ],
   "cambios": [],
   "avisos": [],
-  "precioHoy": 240,
+  "precioHoy": 650,
   "detalle": "Livianas como una idea: el que las calza siente que la tierra le empuja los pies hacia adelante. Nadie recuerda quién las hizo, pero todos saben adónde llevan."
  },
  {
@@ -17624,7 +17628,7 @@
   ],
   "cambios": [],
   "avisos": [
-   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+   "Movimiento (±): −1 Mov equivale a −1 Nitro (un drawback MUY grande, y +1 Mov = +1 Nitro, un beneficio muy caro); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
   ],
   "precioHoy": 1100,
   "detalle": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar."

@@ -164,7 +164,7 @@ def precio(pc, tier_asignado=None):
 
 def cargar():
     d = json.load(open(CATALOGO, encoding='utf-8'))
-    return [i for i in d if i.get('tipoItem') in ('arma_1m', 'arma_2m')]
+    return [i for i in d if i.get('tipoItem') in ('arma_1m', 'arma_2m') and not str(i.get('id', '')).startswith('nuevo-')]   # los 'nuevo-' vienen de armas-nuevas.json (ya publicados o no)
 
 
 def calibrar():

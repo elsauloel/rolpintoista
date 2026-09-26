@@ -16195,8 +16195,8 @@
   "detalle": "Livianas como una idea: el que las calza siente que la tierra le empuja los pies hacia adelante. Nadie recuerda quién las hizo, pero todos saben adónde llevan."
  },
  {
-  "id": "nuevo-rodela-de-madera",
-  "nombre": "Rodela de madera",
+  "id": "nuevo-rodela-de-tablas",
+  "nombre": "Rodela de tablas",
   "origen": "nuevo · defensa",
   "slot": "escudo",
   "tipoItem": "escudo_1m",
@@ -16237,8 +16237,8 @@
   "detalle": "Tablas de roble unidas con un cuero y un asa clavada a mano. Tiene más astillas que años, pero cuando hace falta, hace de pared."
  },
  {
-  "id": "nuevo-escudo-de-torre",
-  "nombre": "Escudo de torre",
+  "id": "nuevo-escudo-de-asedio",
+  "nombre": "Escudo de asedio",
   "origen": "nuevo · defensa",
   "slot": "escudo",
   "tipoItem": "escudo_2m",

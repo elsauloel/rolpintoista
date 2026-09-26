@@ -43,7 +43,7 @@ def main():
     informe = {
         'armas': grupos([(firma_arma(C.reajustar(a)[0]), a['nombre']) for a in C.cargar()] + [(firma_arma(a), a['nombre'] + ' [nuevo]') for a in C.cargar_nuevas()]),
         'defensa': grupos([(firma_defensa(D.reajustar(a)[0]), a['nombre']) for a in D.cargar()] + [(firma_defensa(a), a['nombre'] + ' [nuevo]') for a in D.cargar_nuevos()]),
-        'consumibles': grupos([(firma_consumible(a), a['nombre']) for a in cat if a.get('tipoItem') == 'consumibles']),
+        'consumibles': grupos([(firma_consumible(a), a['nombre']) for a in cat if a.get('tipoItem') == 'consumibles' and not str(a.get('id', '')).startswith('nuevo-')]),
     }
     for k, v in informe.items():
         print(k, '->', len(v), 'grupos duplicados')

@@ -138,7 +138,7 @@ def reajustar(item):
 def cargar():
     c = json.load(open(RAIZ / 'datos' / 'catalogo.json', encoding='utf-8'))
     c = c['items'] if isinstance(c, dict) and 'items' in c else c
-    return [i for i in c if i['tipoItem'] in SLOT_DE]
+    return [i for i in c if i['tipoItem'] in SLOT_DE and not str(i.get('id', '')).startswith('nuevo-')]
 
 
 def cargar_nuevos():

@@ -26,6 +26,24 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-antorcha-de-brea",
+    "nombre": "Antorcha de brea",
+    "tier": "Común",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 20,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 3 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Arde rápido y humea mucho. Sirve para los pasillos y para hacerse notar.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (antorcha de brea)",
+    "efectoTurnos": 3,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 3 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "cat-antidoto",
@@ -50,6 +68,69 @@
     "efectoDetalle": "",
     "consumible": true,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-bengala-de-mano",
+    "nombre": "Bengala de mano",
+    "tier": "Común",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 30,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 3 (37 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Chisporrotea rojo y lo deja todo a la vista por un instante. Los marineros las llevan siempre en el bolsillo.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-bengala-de-senales",
+    "nombre": "Bengala de señales",
+    "tier": "Buena Calidad",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 65,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 5 (91 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Sube haciendo un silbido y estalla en una luz blanca que se ve desde el otro lado de la colina.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-cohete-de-luz",
+    "nombre": "Cohete de luz",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 140,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 8 (217 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Se lanza al cielo y deja el paisaje entero a la vista por un segundo eterno. Ideal para saber qué te espera.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-colirio-del-vidente",
+    "nombre": "Colirio del vidente",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 120,
+    "peso": 0,
+    "detalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ✋ A mano: el GM lo aplica en la mesa.",
+    "descripcionNarrativa": "Un frasquito de un líquido azul que pica mucho. Después de unos segundos, el mundo se ve más nítido y más lleno de detalles.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Colirio del vidente",
+    "efectoTurnos": 5,
+    "efectoDetalle": "Percepción aumentada durante 5 turnos: tus tiradas de percepción usan un dado más alto y las trampas ocultas cercanas te avisan (el mismo efecto que la pasiva «Percepción aumentada» del Job). ✋ A mano: el GM lo aplica en la mesa.",
+    "efectoMods": [],
+    "mods": []
   },
   {
     "mods": [],
@@ -141,6 +222,129 @@
     "efectoHpTurno": 0,
     "efectoPermanente": false,
     "efectoDetalle": "Defensa +6, Resistencia a CC +3, Resistencia mágica +4. Dura 3 turnos."
+  },
+  {
+    "id": "nuevo-esfera-de-luz-fria",
+    "nombre": "Esfera de luz fría",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 160,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Una bolita de cristal que late con una luz azulada sin calor ni humo. Flota apenas sobre la mano.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (esfera de luz fría)",
+    "efectoTurnos": 5,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-faro-de-la-revelacion",
+    "nombre": "Faro de la revelación",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 350,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Un pequeño faro de bolsillo, con su lente y su espejo. Barre el lugar con un haz que desnuda hasta los secretos.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (faro de la revelación)",
+    "efectoTurnos": 4,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 6 (127 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-farol-de-aceite",
+    "nombre": "Farol de aceite",
+    "tier": "Común",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 30,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Con su cristal ahumado y su llama estable, es la luz de todo viajero prevenido.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (farol de aceite)",
+    "efectoTurnos": 5,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-gotas-de-ojo-de-gato",
+    "nombre": "Gotas de ojo de gato",
+    "tier": "Buena Calidad",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 60,
+    "peso": 0,
+    "detalle": "Ves lo oculto (personajes en sigilo, trampas y elementos escondidos) en un radio 2 alrededor tuyo durante 3 turnos. ✋ A mano: el GM lo aplica en la mesa.",
+    "descripcionNarrativa": "Un colirio amargo que dilata la pupila hasta el borde del ojo. Se ve en la penumbra y se descubre al que se esconde.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Gotas de ojo de gato",
+    "efectoTurnos": 3,
+    "efectoDetalle": "Ves lo oculto (personajes en sigilo, trampas y elementos escondidos) en un radio 2 alrededor tuyo durante 3 turnos. ✋ A mano: el GM lo aplica en la mesa.",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-luz-de-la-verdad",
+    "nombre": "Luz de la verdad",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 140,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 4 (61 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Un destello limpio que no proyecta sombras: nada, ni nadie, puede esconderse de ella.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-lampara-de-minero",
+    "nombre": "Lámpara de minero",
+    "tier": "Buena Calidad",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 70,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien lo usa durante 6 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Los mineros aprendieron a fuerza de derrumbes que una buena luz vale más que una buena pica.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (lámpara de minero)",
+    "efectoTurnos": 6,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 4 (61 casilleros) alrededor de quien lo usa durante 6 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-lampara-del-inquisidor",
+    "nombre": "Lámpara del inquisidor",
+    "tier": "Raro",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 75,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Los inquisidores la usan de noche. Dicen que la llama parpadea cuando algo miente cerca.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (lámpara del inquisidor)",
+    "efectoTurnos": 4,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 3 (37 casilleros) alrededor de quien lo usa durante 4 turnos. Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
   },
   {
     "mods": [],
@@ -4320,6 +4524,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-polvo-de-revelacion",
+    "nombre": "Polvo de revelación",
+    "tier": "Buena Calidad",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 45,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). Además revela lo oculto (personajes en sigilo, trampas y elementos escondidos) dentro de esa zona mientras dure. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla y usa 👁 Revelar lo oculto sobre ella (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Un polvillo plateado que se posa sobre todo lo que se esconde y lo marca con un brillo delator.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
+    "id": "nuevo-polvora-de-destello",
+    "nombre": "Pólvora de destello",
+    "tier": "Común",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 15,
+    "peso": 0,
+    "detalle": "Destello: destapa la niebla en un radio 2 (19 casilleros) alrededor de quien lo usa, una sola vez (lo destapado queda como zona ya vista). No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Un puñadito en el fuego y el cuarto entero se ve por un parpadeo. No sirve para mucho más, pero es lo más barato que hay.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoMods": [],
+    "mods": []
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "cat-raciones",
@@ -4459,6 +4693,24 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-vela-de-sebo",
+    "nombre": "Vela de sebo",
+    "tier": "Común",
+    "tipoItem": "consumibles",
+    "ranuras": 1,
+    "precioCompra": 15,
+    "peso": 0,
+    "detalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "descripcionNarrativa": "Huele a grasa y a cuarto viejo. Alumbra poco, dura bastante y hasta se puede llevar en la mano sin quemarse.",
+    "unidades": 1,
+    "consumible": true,
+    "efectoNombre": "Iluminado (vela de sebo)",
+    "efectoTurnos": 5,
+    "efectoDetalle": "Luz sostenida: mantiene iluminado un radio 2 (19 casilleros) alrededor de quien lo usa durante 5 turnos. No revela lo oculto. ✋ A mano: el GM destapa la zona con la herramienta 🌫 Niebla (todavía no se hace solo desde el mapa).",
+    "efectoMods": [],
+    "mods": []
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-vendas",
@@ -4516,6 +4768,45 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-aguijon-de-la-reina-avispa",
+    "nombre": "Aguijón de la Reina Avispa",
+    "tier": "Excepcional",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "critpot",
+        "val": 4
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Envenenar",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Veneno severo por 4 turnos en cada golpe."
+      }
+    ],
+    "detalle": "+2 de daño fijo · Crít. potente +4 · Crít. frecuente +1 · Veneno severo por 4 turnos en cada golpe",
+    "precioCompra": 700,
+    "descripcionNarrativa": "Sacado del nido de la reina.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "crit",
@@ -4554,6 +4845,41 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-aguja-de-acupunturista",
+    "nombre": "Aguja de acupunturista",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Sangrado."
+      }
+    ],
+    "detalle": "+2 de daño fijo · PdG +1 · 33 % de dejar Sangrado",
+    "precioCompra": 150,
+    "descripcionNarrativa": "Fina como un pelo.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -5236,6 +5562,41 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-cachiporra-reforzada",
+    "nombre": "Cachiporra reforzada",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 2,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "+2 de daño fijo · Bloqueo +1 · 25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 260,
+    "descripcionNarrativa": "Con anillos de hierro.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "parry",
@@ -5315,6 +5676,91 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-cimitarra-del-desierto",
+    "nombre": "Cimitarra del desierto",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 1,
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Sangrado."
+      }
+    ],
+    "detalle": "+1 de daño fijo · Iniciativa +1 · 33 % de dejar Sangrado",
+    "precioCompra": 120,
+    "descripcionNarrativa": "Curva y ligera.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-colmillo-de-la-reina-arana",
+    "nombre": "Colmillo de la Reina Araña",
+    "tier": "Legendario",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 3,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      },
+      {
+        "stat": "critpot",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Envenenar",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Veneno severo por 6 turnos en cada golpe."
+      },
+      {
+        "nombre": "Drena vida",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
+      }
+    ],
+    "detalle": "+3 de daño fijo · PdG +2 · Crít. frecuente +2 · Crít. potente +2 · Veneno severo por 6 turnos en cada golpe · Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida",
+    "precioCompra": 2000,
+    "descripcionNarrativa": "El colmillo de una reina que ya no está.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [],
@@ -5401,6 +5847,32 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-cuchillo-de-cocina-reconvertido",
+    "nombre": "Cuchillo de cocina reconvertido",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "detalle": "PdG +1",
+    "precioCompra": 65,
+    "descripcionNarrativa": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar. Variación.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-cuchillo-del-grumete-polizon",
@@ -5470,6 +5942,36 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-daga-de-duelo",
+    "nombre": "Daga de duelo",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      },
+      {
+        "stat": "critpot",
+        "val": 2
+      }
+    ],
+    "detalle": "PdG +1 · Crít. potente +2",
+    "precioCompra": 150,
+    "descripcionNarrativa": "Equilibrada para encontrar el hueco.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [],
@@ -5789,6 +6291,66 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-espada-de-entrenamiento",
+    "nombre": "Espada de entrenamiento",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "25 % de dejar Lisiado 3 turnos",
+    "precioCompra": 55,
+    "descripcionNarrativa": "La de madera forrada en lata. Corta, mal, pero corta.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-espada-de-la-guardia",
+    "nombre": "Espada de la guardia",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "detalle": "Parry +1 · Crít. frecuente +1",
+    "precioCompra": 150,
+    "descripcionNarrativa": "Entregada con el uniforme.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-espada-de-recluta-de-la-guardia",
@@ -5950,6 +6512,67 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-espada-larga-de-infanteria",
+    "nombre": "Espada larga de infantería",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "detalle": "Parry +1",
+    "precioCompra": 80,
+    "descripcionNarrativa": "La espada del soldado raso, bien balanceada.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-espada-vampirica-menor",
+    "nombre": "Espada vampírica menor",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Drena vida",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
+      }
+    ],
+    "detalle": "Parry +1 · Recupera el 25 % del daño hecho (no pasa el máximo de HP)",
+    "precioCompra": 200,
+    "descripcionNarrativa": "Se bebe un poco de lo que corta.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "parry",
@@ -5979,6 +6602,45 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-espadon-de-acero-de-toledo",
+    "nombre": "Espadón de acero de Toledo",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "tipoDado": 6,
+    "peso": 4,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja Sangrado."
+      }
+    ],
+    "detalle": "Parry +2 · Crít. frecuente +2 · Cada golpe deja Sangrado",
+    "precioCompra": 750,
+    "descripcionNarrativa": "A dos manos y de otro siglo.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [],
@@ -6074,6 +6736,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-estilete-de-practica",
+    "nombre": "Estilete de práctica",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "detalle": "+1 de daño fijo · PdG +1",
+    "precioCompra": 85,
+    "descripcionNarrativa": "Punta afilada de más. El arma del que recién empieza, y por eso la usa con cuidado.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -6188,6 +6876,70 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-estoque-de-esgrima",
+    "nombre": "Estoque de esgrima",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      },
+      {
+        "stat": "critpot",
+        "val": 3
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "detalle": "Alcance +1 · Crít. potente +3 · Crít. frecuente +1",
+    "precioCompra": 350,
+    "descripcionNarrativa": "El arma de los duelistas.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-estrella-del-alba",
+    "nombre": "Estrella del alba",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "+1 de daño fijo · 33 % de dejar 1 stack de Armadura rota",
+    "precioCompra": 85,
+    "descripcionNarrativa": "Bola con púas en cadena.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "crit",
@@ -6267,6 +7019,60 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-filo-del-capitan-sin-nombre",
+    "nombre": "Filo del Capitán Sin Nombre",
+    "tier": "Legendario",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 3,
+    "danoFijo": 3,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 3
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "crit",
+        "val": 4
+      },
+      {
+        "stat": "critpot",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja Sangrado."
+      },
+      {
+        "nombre": "Envenenar",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Veneno severo por 5 turnos en cada golpe."
+      }
+    ],
+    "detalle": "+3 de daño fijo · Parry +3 · Iniciativa +1 · Crít. frecuente +4 · Crít. potente +1 · Cada golpe deja Sangrado · Veneno severo por 5 turnos en cada golpe",
+    "precioCompra": 2000,
+    "descripcionNarrativa": "De un capitán que nadie recuerda.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -6365,6 +7171,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-garrote-de-pastor",
+    "nombre": "Garrote de pastor",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 70,
+    "descripcionNarrativa": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "parry",
@@ -6394,6 +7230,41 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-gran-hacha-de-doble-filo",
+    "nombre": "Gran hacha de doble filo",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "tipoDado": 8,
+    "peso": 4,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "Bloqueo +2 · Cada golpe deja 1 stack de Armadura rota",
+    "precioCompra": 750,
+    "descripcionNarrativa": "A dos manos, con filo de los dos lados.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -6466,6 +7337,41 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-hacha-arrojadiza",
+    "nombre": "Hacha arrojadiza",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar Sangrado."
+      }
+    ],
+    "detalle": "Alcance +2 · 50 % de dejar Sangrado",
+    "precioCompra": 240,
+    "descripcionNarrativa": "Se tira y vuelve (a veces).",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [],
@@ -6571,6 +7477,36 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-hacha-de-abordaje",
+    "nombre": "Hacha de abordaje",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "detalle": "Bloqueo +1 · Alcance +1",
+    "precioCompra": 100,
+    "descripcionNarrativa": "Para trepar y pelear en el pasamanos.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -6767,6 +7703,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-hacha-de-guerra",
+    "nombre": "Hacha de guerra",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "25 % de dejar 1 stack de Armadura rota",
+    "precioCompra": 130,
+    "descripcionNarrativa": "La de las milicias.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-hacha-de-guerra-ligera",
@@ -6914,6 +7880,156 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-hacha-de-mano",
+    "nombre": "Hacha de mano",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "+1 de daño fijo · 25 % de dejar 1 stack de Armadura rota",
+    "precioCompra": 70,
+    "descripcionNarrativa": "",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-hacha-del-caudillo",
+    "nombre": "Hacha del Caudillo",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "Bloqueo +1 · Cada golpe deja 1 stack de Armadura rota",
+    "precioCompra": 240,
+    "descripcionNarrativa": "Cada golpe abre la armadura.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-hacha-del-cazador-de-armaduras",
+    "nombre": "Hacha del Cazador de Armaduras",
+    "tier": "Excepcional",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 3,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja 2 stacks de Armadura rota."
+      }
+    ],
+    "detalle": "+2 de daño fijo · Bloqueo +2 · Alcance +1 · Cada golpe deja 2 stacks de Armadura rota",
+    "precioCompra": 900,
+    "descripcionNarrativa": "Nació para desarmar caballeros.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-hacha-del-fin-de-la-veta",
+    "nombre": "Hacha del Fin de la Veta",
+    "tier": "Legendario",
+    "tipoItem": "arma_2m",
+    "tipoDado": 8,
+    "peso": 4,
+    "danoFijo": 3,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 3
+      },
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja 2 stacks de Armadura rota."
+      },
+      {
+        "nombre": "Sangrado",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja Sangrado."
+      }
+    ],
+    "detalle": "+3 de daño fijo · Bloqueo +3 · Alcance +1 · Cada golpe deja 2 stacks de Armadura rota · Cada golpe deja Sangrado",
+    "precioCompra": 1900,
+    "descripcionNarrativa": "Se dice que cortó la última veta del mundo. A dos manos.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7096,6 +8212,62 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-hachuela-de-lenador",
+    "nombre": "Hachuela de leñador",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "detalle": "Iniciativa +1",
+    "precioCompra": 60,
+    "descripcionNarrativa": "La del rincón del taller. Parte leña y, con suerte, algo más.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-hachon-de-minero",
+    "nombre": "Hachón de minero",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 2,
+    "danoFijo": 1,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "+1 de daño fijo · 33 % de dejar 1 stack de Armadura rota",
+    "precioCompra": 160,
+    "descripcionNarrativa": "Hecho para la piedra.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7282,6 +8454,49 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-katana-de-maestro",
+    "nombre": "Katana de maestro",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "ini",
+        "val": 1
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar Sangrado."
+      }
+    ],
+    "detalle": "Parry +2 · Iniciativa +1 · Crít. frecuente +1 · 50 % de dejar Sangrado",
+    "precioCompra": 220,
+    "descripcionNarrativa": "Forjada por quien enseña a forjar.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "pdg",
@@ -7311,6 +8526,49 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-katana-del-viento",
+    "nombre": "Katana del viento",
+    "tier": "Excepcional",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 3,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 2
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Iniciativa +2 · Parry +2 · Crít. frecuente +2 · 50 % de dejar Lisiado 3 turnos",
+    "precioCompra": 600,
+    "descripcionNarrativa": "Corta antes de que llegue el sonido.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7399,6 +8657,127 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-lanza-de-leva",
+    "nombre": "Lanza de leva",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +1 · 25 % de dejar Lisiado 3 turnos",
+    "precioCompra": 150,
+    "descripcionNarrativa": "La lanza de todo recluta.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-lanza-de-lisiar",
+    "nombre": "Lanza de lisiar",
+    "tier": "Raro",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 3,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      },
+      {
+        "stat": "critpot",
+        "val": 3
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +2 · Crít. potente +3 · 33 % de dejar Lisiado 3 turnos",
+    "precioCompra": 300,
+    "descripcionNarrativa": "Larga y traicionera.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-lanza-del-alba",
+    "nombre": "Lanza del alba",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "tipoDado": 4,
+    "peso": 4,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      },
+      {
+        "stat": "critpot",
+        "val": 2
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar Lisiado 3 turnos."
+      }
+    ],
+    "detalle": "Alcance +2 · PdG +1 · Crít. potente +2 · Crít. frecuente +1 · 50 % de dejar Lisiado 3 turnos",
+    "precioCompra": 900,
+    "descripcionNarrativa": "Brilla al primer sol. A dos manos.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "rng",
@@ -7455,6 +8834,41 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-lezna-de-zapatero",
+    "nombre": "Lezna de zapatero",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Lisiado",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."
+      }
+    ],
+    "detalle": "PdG +1 · 25 % de dejar Lisiado 3 turnos (pincha donde duele)",
+    "precioCompra": 70,
+    "descripcionNarrativa": "Pincha justo en el tendón.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7522,6 +8936,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-machete-de-chacarero",
+    "nombre": "Machete de chacarero",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [
+      {
+        "stat": "ini",
+        "val": 1
+      }
+    ],
+    "detalle": "+1 de daño fijo · Iniciativa +1",
+    "precioCompra": 60,
+    "descripcionNarrativa": "Para abrir yuyo y, si hace falta, otras cosas.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7743,6 +9183,41 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-martillo-de-guerra-a-dos-manos",
+    "nombre": "Martillo de guerra a dos manos",
+    "tier": "Excepcional",
+    "tipoItem": "arma_2m",
+    "tipoDado": 10,
+    "peso": 4,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Aturdir",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+      }
+    ],
+    "detalle": "Bloqueo +2 · 25 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)",
+    "precioCompra": 800,
+    "descripcionNarrativa": "Se levanta con los dos brazos y baja con la ley.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-martillo-de-guerra-runico",
@@ -7772,6 +9247,45 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-martillo-de-herrero",
+    "nombre": "Martillo de herrero",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "+1 de daño fijo · Bloqueo +1 · Parry +1 · 25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 120,
+    "descripcionNarrativa": "El que da forma al acero.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7835,6 +9349,45 @@
         "detalle": "Si entra, el objetivo queda Aturdido hasta su próximo turno."
       }
     ]
+  },
+  {
+    "id": "nuevo-martillo-del-sargento-mayor",
+    "nombre": "Martillo del sargento mayor",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Aturdir",
+        "caras": 6,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "17 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+      }
+    ],
+    "detalle": "Bloqueo +1 · Parry +1 · 17 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)",
+    "precioCompra": 230,
+    "descripcionNarrativa": "Ordena a golpes.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7935,6 +9488,27 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-maza-de-guerra",
+    "nombre": "Maza de guerra",
+    "tier": "Buena Calidad",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [],
+    "detalle": "Sin bonos ni efectos.",
+    "precioCompra": 150,
+    "descripcionNarrativa": "Cabeza de hierro y mucha convicción.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "bloqueo",
@@ -7960,6 +9534,36 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-maza-de-justicia",
+    "nombre": "Maza de justicia",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 3,
+    "danoFijo": 0,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 350,
+    "descripcionNarrativa": "Pesada y solemne.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -7996,6 +9600,121 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-maza-del-penasco",
+    "nombre": "Maza del Peñasco",
+    "tier": "Excepcional",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 3,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "+2 de daño fijo · Bloqueo +2 · Parry +1 · 50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 700,
+    "descripcionNarrativa": "Una piedra con mango.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-mazo-de-carnicero",
+    "nombre": "Mazo de carnicero",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 1,
+    "danoFijo": 1,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "+1 de daño fijo · 25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 75,
+    "descripcionNarrativa": "Ablanda carne y otras cosas.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
+    "id": "nuevo-mazo-del-juicio-final",
+    "nombre": "Mazo del Juicio Final",
+    "tier": "Legendario",
+    "tipoItem": "arma_2m",
+    "tipoDado": 10,
+    "peso": 4,
+    "danoFijo": 3,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 3
+      },
+      {
+        "stat": "parry",
+        "val": 2
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Aturdir",
+        "caras": 6,
+        "exitos": 2,
+        "dado": "",
+        "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+      },
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 3,
+        "dado": "",
+        "detalle": "75 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "+3 de daño fijo · Bloqueo +3 · Parry +2 · 33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1) · 75 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 1700,
+    "descripcionNarrativa": "Dicen que suena una sola vez. A dos manos.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [],
@@ -8133,6 +9852,41 @@
     "armaDeRango": true
   },
   {
+    "id": "nuevo-porra-de-guardia",
+    "nombre": "Porra de guardia",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 10,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Demora",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+      }
+    ],
+    "detalle": "Bloqueo +1 · 25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)",
+    "precioCompra": 80,
+    "descripcionNarrativa": "Reglamentaria.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-punzon-del-ladronzuelo",
@@ -8215,6 +9969,41 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-punal-envenenado",
+    "nombre": "Puñal envenenado",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 4,
+    "peso": 2,
+    "danoFijo": 1,
+    "mods": [
+      {
+        "stat": "critpot",
+        "val": 3
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Envenenar",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)."
+      }
+    ],
+    "detalle": "+1 de daño fijo · Crít. potente +3 · Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno)",
+    "precioCompra": 250,
+    "descripcionNarrativa": "La hoja siempre húmeda.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -8409,6 +10198,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-sable-de-abordaje-oxidado",
+    "nombre": "Sable de abordaje oxidado",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 4,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "25 % de dejar Sangrado."
+      }
+    ],
+    "detalle": "25 % de dejar Sangrado",
+    "precioCompra": 50,
+    "descripcionNarrativa": "Herrumbre en el filo.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "pdg",
@@ -8469,6 +10288,45 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-sable-del-capitan-pirata",
+    "nombre": "Sable del capitán pirata",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 6,
+    "peso": 2,
+    "danoFijo": 2,
+    "mods": [
+      {
+        "stat": "parry",
+        "val": 1
+      },
+      {
+        "stat": "crit",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Sangrado",
+        "caras": 1,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "Cada golpe deja Sangrado."
+      }
+    ],
+    "detalle": "+2 de daño fijo · Parry +1 · Crít. frecuente +1 · Cada golpe deja Sangrado",
+    "precioCompra": 290,
+    "descripcionNarrativa": "Muchas cubiertas, muchas heridas.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -8590,6 +10448,41 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-segur-de-verdugo",
+    "nombre": "Segur de verdugo",
+    "tier": "Raro",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 2,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "rng",
+        "val": 1
+      }
+    ],
+    "efectosGolpe": [
+      {
+        "nombre": "Rompe armadura",
+        "caras": 2,
+        "exitos": 1,
+        "dado": "",
+        "detalle": "50 % de dejar 1 stack de Armadura rota."
+      }
+    ],
+    "detalle": "Alcance +1 · 50 % de dejar 1 stack de Armadura rota",
+    "precioCompra": 240,
+    "descripcionNarrativa": "De mango largo y filo ancho.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
+  },
+  {
     "mods": [
       {
         "stat": "rng",
@@ -8615,6 +10508,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-tomahawk-de-pantano",
+    "nombre": "Tomahawk de pantano",
+    "tier": "Común",
+    "tipoItem": "arma_1m",
+    "tipoDado": 8,
+    "peso": 1,
+    "danoFijo": 0,
+    "mods": [
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "detalle": "Bloqueo +1",
+    "precioCompra": 60,
+    "descripcionNarrativa": "Con el mango largo se engancha la espada del otro.",
+    "ranuras": 0,
+    "danoAmplificado": 0,
+    "armaDeRango": false,
+    "efectoMods": [],
+    "equipoEstadoNombre": "",
+    "equipoEstadoHpTurno": 0,
+    "equipoEstadoDetalle": "",
+    "consumible": false
   },
   {
     "mods": [
@@ -8834,6 +10753,40 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-broquel-del-rompeolas",
+    "nombre": "Broquel del Rompeolas",
+    "tier": "Excepcional",
+    "tipoItem": "escudo_1m",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 800,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Parry +1",
+    "descripcionNarrativa": "Se fue forjando en el muelle, a golpes de mar, hasta aprender a aguantar lo que llegue. Los hachazos rebotan como olas contra el espigón."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -8948,6 +10901,40 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-escudo-de-asedio",
+    "nombre": "Escudo de asedio",
+    "tier": "Raro",
+    "tipoItem": "escudo_2m",
+    "peso": 6,
+    "ranuras": 0,
+    "precioCompra": 300,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 8
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "bloqueo",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +8 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Movimiento -1",
+    "descripcionNarrativa": "Es tan alto que se apoya en el suelo, y tras él caben dos personas y una excusa. Cuando se lo planta, el mundo se detiene a pensarlo."
   },
   {
     "mods": [
@@ -9516,6 +11503,32 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-rodela-de-tablas",
+    "nombre": "Rodela de tablas",
+    "tier": "Común",
+    "tipoItem": "escudo_1m",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 45,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "bloqueo",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Bloqueo +1",
+    "descripcionNarrativa": "Tablas de roble unidas con un cuero y un asa clavada a mano. Tiene más astillas que años, pero cuando hace falta, hace de pared."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -9586,6 +11599,40 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-egida-del-ultimo-bastion",
+    "nombre": "Égida del Último Bastión",
+    "tier": "Legendario",
+    "tipoItem": "escudo_2m",
+    "peso": 6,
+    "ranuras": 0,
+    "precioCompra": 1900,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 10
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "bloqueo",
+        "val": 3
+      },
+      {
+        "stat": "resm",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +10 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 8 +2 · Bloqueo +3 · Res. Mt +2",
+    "descripcionNarrativa": "Se levantó una sola vez para defender lo indefendible, y desde entonces lleva la marca de cada golpe que le ahorró a otro. Dicen que sigue esperando ese último frente."
   },
   {
     "mods": [
@@ -11081,6 +13128,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-anillo-de-polvora-mansa",
+    "nombre": "Anillo de Pólvora Mansa",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "mods": [
+      {
+        "stat": "tipo5",
+        "val": 1
+      },
+      {
+        "stat": "resm",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Res. crítico Tipo 12 +1 · Res. Mt +1",
+    "descripcionNarrativa": "Un aro ennegrecido por mil chispas que jamás llegaron a prender. Quien lo lleva se asombra de lo poco que le explota alrededor."
+  },
+  {
     "mods": [
       {
         "stat": "parry",
@@ -11698,6 +13767,21 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-anillo-de-percepcion-aumentada",
+    "nombre": "Anillo de percepción aumentada",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "mods": [],
+    "efectoMods": [],
+    "detalle": "Percepción aumentada mientras lo llevás puesto (el mismo efecto que la pasiva del Job).",
+    "descripcionNarrativa": "Un aro de plata con una piedra clara en forma de ojo. Al ponérselo, los sonidos se afinan y los rincones oscuros dejan de guardar secretos: cada detalle fuera de lugar salta a la vista.",
+    "equipoEstadoNombre": "Percepción aumentada",
+    "equipoEstadoDetalle": "Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón) y las trampas ocultas cercanas te avisan. Es el mismo efecto que la pasiva «Percepción aumentada» del Job."
+  },
+  {
     "mods": [],
     "efectoMods": [],
     "id": "new-anillo-de-superlinfocitos",
@@ -11771,6 +13855,45 @@
     "equipoEstadoPreset": "Inmunidad a CC",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-anillo-de-vista-aguda",
+    "nombre": "Anillo de vista aguda",
+    "tier": "Común",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 1200,
+    "mods": [],
+    "efectoMods": [],
+    "detalle": "Visión +1",
+    "descripcionNarrativa": "Un aro sencillo de cobre con una gota de cristal. Dicen que se le abren los ojos a quien lo lleva."
+  },
+  {
+    "id": "nuevo-anillo-de-vista-aguda-mayor",
+    "nombre": "Anillo de vista aguda mayor",
+    "tier": "Raro",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 2000,
+    "mods": [],
+    "efectoMods": [],
+    "detalle": "Visión +2",
+    "descripcionNarrativa": "Una alianza de plata con una piedra ámbar que sigue con la vista a quien la lleva. La distancia se vuelve un asunto de opinión."
+  },
+  {
+    "id": "nuevo-anillo-de-vista-aguda-superior",
+    "nombre": "Anillo de vista aguda superior",
+    "tier": "Legendario",
+    "tipoItem": "anillos",
+    "peso": 0,
+    "ranuras": 1,
+    "precioCompra": 3000,
+    "mods": [],
+    "efectoMods": [],
+    "detalle": "Visión +3",
+    "descripcionNarrativa": "Un anillo que ya no parece de metal: más bien un ojo diminuto que mira por dos. El horizonte deja de ser un límite."
   },
   {
     "mods": [
@@ -11937,6 +14060,28 @@
     "equipoEstadoPreset": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-antifaz-del-ave-nocturna",
+    "nombre": "Antifaz del ave nocturna",
+    "tier": "Raro",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 250,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +2 · Evasión +1 · Visión +2",
+    "descripcionNarrativa": "Cuero negro y plumas de lechuza cosidas al borde. Con él puesto, la oscuridad parece una idea que otros tienen."
   },
   {
     "mods": [
@@ -12169,6 +14314,40 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-armadura-de-placas-de-campeon",
+    "nombre": "Armadura de placas de campeón",
+    "tier": "Excepcional",
+    "tipoItem": "armadura_rigida",
+    "peso": 5,
+    "ranuras": 0,
+    "precioCompra": 900,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 11
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +11 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +1 · Movimiento -1",
+    "descripcionNarrativa": "La encargó un noble a un maestro armero que tardó un año en terminarla; después el noble murió y la armadura siguió esperando dueño. Calza tan justa que parece una segunda piel de acero."
   },
   {
     "mods": [
@@ -13001,6 +15180,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-botas-de-suela-ferrada",
+    "nombre": "Botas de suela ferrada",
+    "tier": "Buena Calidad",
+    "tipoItem": "pies",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 90,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "La suela lleva clavos de hierro que muerden la piedra mojada y el barro. Sirven para pisar fuerte, y para que el otro lo sepa."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -13101,6 +15302,36 @@
     "equipoEstadoDetalle": "Mientras estén equipadas, la armadura rota o arruinada no le hace nada.",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-botas-del-caminante-de-viento",
+    "nombre": "Botas del Caminante de Viento",
+    "tier": "Raro",
+    "tipoItem": "pies",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 240,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Movimiento +1 · Evasión +1",
+    "descripcionNarrativa": "Livianas como una idea: el que las calza siente que la tierra le empuja los pies hacia adelante. Nadie recuerda quién las hizo, pero todos saben adónde llevan."
   },
   {
     "mods": [
@@ -13811,6 +16042,58 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-capa-de-seda-de-arana",
+    "nombre": "Capa de seda de araña",
+    "tier": "Excepcional",
+    "tipoItem": "armadura_blanda",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 650,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Evasión +2",
+    "descripcionNarrativa": "Tejida por una araña que aprendió a hilar a la luz de la luna. Pesa menos que un suspiro y casi nada la corta: los cuchillos se cansan antes de pasar."
+  },
+  {
+    "id": "nuevo-capa-del-explorador",
+    "nombre": "Capa del explorador",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Evasión +1 · Visión +1",
+    "descripcionNarrativa": "Lleva un forro de bolsillos para brújulas y catalejos. No abriga demasiado, pero acostumbra a mirar hacia adelante."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -14089,6 +16372,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-capucha-de-vigia",
+    "nombre": "Capucha de vigía",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 55,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +2 · Res. crítico Tipo 4 +1 · Visión +1",
+    "descripcionNarrativa": "Con visera larga para el sol de la muralla y una ranura ancha para los ojos. Los vigías de garita juran que con ella se ve hasta el día siguiente."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -14312,6 +16617,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-casaca-de-guardia-costera",
+    "nombre": "Casaca de la guardia costera",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 110,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +5 · Res. crítico Tipo 4 +1 · Evasión +1",
+    "descripcionNarrativa": "Encerada contra la sal y cortada para trepar por el cordaje sin enredarse. Los guardias costeros juran que el mar se traga mejor a los que van muy abrigados."
   },
   {
     "mods": [
@@ -14621,6 +16952,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-casco-de-hierro-batido",
+    "nombre": "Casco de hierro batido",
+    "tier": "Raro",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 220,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "eva",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Evasión -1",
+    "descripcionNarrativa": "Un herrero terco lo martilló durante una noche entera, golpe a golpe, hasta que sonó como una campana. Todavía suena: se lo oye venir de lejos y casi nadie se anima a pegarle."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -14745,6 +17106,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-casco-de-ojos-de-aguila",
+    "nombre": "Casco de ojos de águila",
+    "tier": "Excepcional",
+    "tipoItem": "cabeza",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 750,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · PdG +1 · Visión +3",
+    "descripcionNarrativa": "Forjado con dos ojos de bronce sobre la frente y una visera que parece pico. Ve lo que ve un águila y golpea cuando el águila golpea."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -14786,6 +17177,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-casco-del-centinela",
+    "nombre": "Casco del centinela",
+    "tier": "Raro",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 300,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Visión +2",
+    "descripcionNarrativa": "Un casco cerrado, con mira de rendija que afila la vista en lugar de estrecharla. Los centinelas dicen que no se sienten las horas de guardia."
   },
   {
     "mods": [
@@ -15244,6 +17661,32 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-coleto-de-jabali",
+    "nombre": "Coleto de piel de jabalí",
+    "tier": "Raro",
+    "tipoItem": "armadura_blanda",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 200,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "eva",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Evasión +1",
+    "descripcionNarrativa": "El cazador que la hizo se dejó las cerdas por dentro, así que cada movimiento erizado avisa al que quiera acercarse. No es fina, pero es de las que no fallan."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -15564,6 +18007,40 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-coraza-de-placas",
+    "nombre": "Coraza de placas",
+    "tier": "Raro",
+    "tipoItem": "armadura_rigida",
+    "peso": 5,
+    "ranuras": 0,
+    "precioCompra": 250,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 9
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "tipo3",
+        "val": 1
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +9 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Res. crítico Tipo 8 +1 · Movimiento -1",
+    "descripcionNarrativa": "Peto y espaldar de acero bien pulido, con correas que crujen en cada paso. Quien la lleva es una pequeña fortaleza que camina, a paso lento y seguro."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -15685,6 +18162,40 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-coraza-del-titan-caido",
+    "nombre": "Coraza del Titán caído",
+    "tier": "Legendario",
+    "tipoItem": "armadura_rigida",
+    "peso": 4,
+    "ranuras": 0,
+    "precioCompra": 1800,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 12
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "tipo3",
+        "val": 2
+      },
+      {
+        "stat": "mov",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +12 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +2 · Movimiento -1",
+    "descripcionNarrativa": "Dicen que un gigante cayó en la montaña y que con su peto se forjó ésta. Cada placa tiene la marca de una mano enorme y en el pecho todavía se escucha, si se apoya la oreja, un latido lejano."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -15722,6 +18233,36 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-corona-del-alfil-sordo",
+    "nombre": "Corona del Alfil Sordo",
+    "tier": "Legendario",
+    "tipoItem": "cabeza",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 1400,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 5
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "esp",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +5 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1",
+    "descripcionNarrativa": "Perteneció a un rey que se quedó sordo de tanto oír mentiras, y nunca más volvió a sobresaltarse. Cuando alguien se la pone, el mundo se acalla y los golpes llegan de a uno y de frente."
   },
   {
     "mods": [
@@ -15996,6 +18537,32 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-cota-de-malla-fina",
+    "nombre": "Cota de malla fina",
+    "tier": "Buena Calidad",
+    "tipoItem": "armadura_rigida",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+    "descripcionNarrativa": "Miles de anillos pequeños, remachados uno a uno por manos pacientes. Suena un poco al caminar, como un río de monedas, y guarda al cuerpo mejor que cualquier promesa."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -16153,6 +18720,46 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-faja-del-estallido",
+    "nombre": "Faja del Estallido",
+    "tier": "Legendario",
+    "tipoItem": "cinturon",
+    "peso": 1,
+    "ranuras": 8,
+    "precioCompra": 1300,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo5",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +2 · Res. crítico Tipo 12 +1",
+    "descripcionNarrativa": "Una faja ancha, reforzada con tiras de lona alquitranada y placas de plomo. Quien la usa aprendió a aguantar lo que revienta cerca sin perder el equilibrio."
+  },
+  {
+    "id": "nuevo-gafas-de-aviador",
+    "nombre": "Gafas de aviador",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +1 · Visión +1",
+    "descripcionNarrativa": "Cristales ahumados y cuero gastado; alguien las trajo de una cabina que ya no existe. Con ellas se ve un poco más lejos y se llora un poco menos con el viento."
   },
   {
     "mods": [
@@ -16335,6 +18942,28 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-gorro-acolchado",
+    "nombre": "Gorro acolchado",
+    "tier": "Común",
+    "tipoItem": "cabeza",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "Lo cosió la abuela de alguien con lo que había: lana, trapos y mucha paciencia. Nadie lo confunde con un casco, pero más de un ladrón de callejón se quedó con la daga atascada en el relleno."
   },
   {
     "mods": [
@@ -16700,6 +19329,54 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-grebas-de-cuero",
+    "nombre": "Grebas de cuero",
+    "tier": "Común",
+    "tipoItem": "piernas",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 50,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 2
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "Cuero endurecido al fuego sobre las espinillas, atado con tiras. Protege de las patadas y de esas piedras que siempre aparecen en el peor momento."
+  },
+  {
+    "id": "nuevo-grebas-de-escamas-de-dragon-menor",
+    "nombre": "Grebas de escamas de dragón menor",
+    "tier": "Excepcional",
+    "tipoItem": "piernas",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 700,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2",
+    "descripcionNarrativa": "Cada escama fue cosida una por una, sobre el cuero, por manos cuidadosas. Vienen de un dragón pequeño que cometió el error de creerse grande."
   },
   {
     "mods": [
@@ -17209,6 +19886,36 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-guanteletes-del-duelista",
+    "nombre": "Guanteletes del duelista",
+    "tier": "Raro",
+    "tipoItem": "manos",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 200,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      },
+      {
+        "stat": "parry",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Parry +1",
+    "descripcionNarrativa": "Los duelistas de la costa desvían el acero con la mano libre, y ésta es su mano. Están tan gastados en la palma que ya toman la forma de quien los usa."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -17681,6 +20388,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-guantes-de-trabajo-reforzados",
+    "nombre": "Guantes de trabajo reforzados",
+    "tier": "Común",
+    "tipoItem": "manos",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 40,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +1 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "Nacieron para cargar barriles y terminaron peleando por costumbre. Los nudillos reforzados tienen más historias que dientes el que los recibió."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -17752,6 +20481,54 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-jubon-de-cuero-curtido",
+    "nombre": "Jubón de cuero curtido",
+    "tier": "Común",
+    "tipoItem": "armadura_blanda",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 60,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "Cuero de vaca curtido con corteza de roble y cosido dos veces, por si acaso. Huele a establo y a viaje, y salvó a más de un cuerpo de una mala tarde."
+  },
+  {
+    "id": "nuevo-manoplas-de-cota",
+    "nombre": "Manoplas de cota",
+    "tier": "Buena Calidad",
+    "tipoItem": "manos",
+    "peso": 1,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 3
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+    "descripcionNarrativa": "Malla fina hasta la muñeca, con un forro de gamuza para que no pellizque. Una mano bien cubierta es media pelea ganada."
   },
   {
     "mods": [
@@ -17884,6 +20661,36 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-manoplas-del-desollador",
+    "nombre": "Manoplas del Desollador",
+    "tier": "Excepcional",
+    "tipoItem": "manos",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 700,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo2",
+        "val": 2
+      },
+      {
+        "stat": "pdg",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +4 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · PdG +1",
+    "descripcionNarrativa": "Terminan en garras cortas y curvas, como de ave rapaz. Su primer dueño las usaba para trabajar cueros; el segundo, no tanto."
   },
   {
     "mods": [
@@ -18276,6 +21083,28 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-monoculo-del-cartografo",
+    "nombre": "Monóculo del cartógrafo",
+    "tier": "Buena Calidad",
+    "tipoItem": "cabeza",
+    "peso": 0,
+    "ranuras": 0,
+    "precioCompra": 130,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 1
+      },
+      {
+        "stat": "esp",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +1 · Visión +1 · Especial +1",
+    "descripcionNarrativa": "Un cristal fino en marco de bronce, con una escala grabada en el borde. Hace que el mundo parezca ya dibujado y medido."
   },
   {
     "mods": [
@@ -18951,6 +21780,32 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-perneras-de-malla",
+    "nombre": "Perneras de malla",
+    "tier": "Buena Calidad",
+    "tipoItem": "piernas",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      },
+      {
+        "stat": "tipo2",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+    "descripcionNarrativa": "Malla sobre acolchado, ideal para quien pelea en pie y no piensa retroceder. Hacen un ruido característico que anuncia que alguien llega para quedarse."
   },
   {
     "mods": [
@@ -20301,6 +23156,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-yelmo-de-guardia",
+    "nombre": "Yelmo de guardia",
+    "tier": "Buena Calidad",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 100,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +4 · Res. crítico Tipo 4 +1",
+    "descripcionNarrativa": "Sale del mismo molde que miles de otros, con la barbuda algo abollada de tanto uso. Quien lo lleva puesto sabe que tiene detrás a toda una guardia, aunque esté solo."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -20340,6 +23217,28 @@
     "imagen": ""
   },
   {
+    "id": "nuevo-yelmo-de-vigia",
+    "nombre": "Yelmo de vigía",
+    "tier": "Buena Calidad",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 120,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 4
+      },
+      {
+        "stat": "tipo1",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Visión +1",
+    "descripcionNarrativa": "Un yelmo abierto por delante, con una pequeña visera móvil. Quien lo usa aprendió a mirar sin que le moleste la cabeza que lleva puesta."
+  },
+  {
     "mods": [
       {
         "stat": "def",
@@ -20369,6 +23268,68 @@
     "equipoEstadoDetalle": "",
     "consumible": false,
     "imagen": ""
+  },
+  {
+    "id": "nuevo-yelmo-del-ojo-que-todo-lo-ve",
+    "nombre": "Yelmo del Ojo Que Todo Lo Ve",
+    "tier": "Legendario",
+    "tipoItem": "cabeza",
+    "peso": 2,
+    "ranuras": 0,
+    "precioCompra": 1900,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 7
+      },
+      {
+        "stat": "tipo1",
+        "val": 3
+      },
+      {
+        "stat": "tipo4",
+        "val": 2
+      },
+      {
+        "stat": "esp",
+        "val": 1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Revela lo oculto en todo tu campo de visión (✋ a mano)",
+    "descripcionNarrativa": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es.",
+    "equipoEstadoNombre": "Ojo que todo lo ve",
+    "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: personajes en sigilo, trampas y elementos escondidos se ven. ✋ A mano: el GM usa 👁 Revelar lo oculto dentro de ese radio (todavía no se hace solo desde el mapa)."
+  },
+  {
+    "id": "nuevo-yelmo-del-penasco",
+    "nombre": "Yelmo del Peñasco",
+    "tier": "Excepcional",
+    "tipoItem": "cabeza",
+    "peso": 3,
+    "ranuras": 0,
+    "precioCompra": 600,
+    "mods": [
+      {
+        "stat": "def",
+        "val": 6
+      },
+      {
+        "stat": "tipo1",
+        "val": 2
+      },
+      {
+        "stat": "tipo4",
+        "val": 1
+      },
+      {
+        "stat": "ini",
+        "val": -1
+      }
+    ],
+    "efectoMods": [],
+    "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Iniciativa -1",
+    "descripcionNarrativa": "Cuentan que nació de una piedra de río que un escultor ahuecó y le dio rostro. Es tan pesado que obliga a caminar con la frente alta, y los golpes le resbalan como al agua."
   },
   {
     "mods": [

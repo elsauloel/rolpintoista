@@ -1031,6 +1031,279 @@
     [tr('Alud en el paso', 'Deja una carga de rocas lista en el sendero: al pisarla se desata un alud en flor de 1 con {T}.', 4, 'H'), 6],
     'Nunca falla; a veces solo avisa.', HC);
 
+  /* ================= AMPLIACIÓN DE FACCIONES (2026-09-26, pedido del dueño): goblins del bosque, kobolds y una colmena de insectos =================
+     Regla: en cada facción hay al menos DOS opciones de cada rol (y tres en los roles que estaban flojos). Los atributos salen de cr(): 33 + 3 por nivel sobre 1
+     (verificable con CreepsBaseUtil.verificarPresupuesto()). Todos quedan como «(auditar)». */
+
+  /* ---- Goblins del bosque (+12): apoyo (había 1), mágico, tanque, debuffer, melee y asalto ---- */
+  cr('bosque', 1, 'Goblin cocinero de sopa', 'apoyo', 'humanoide', 'Cucharón de hierro',
+    cu('Probar la sopa', 'Prueba su propio caldo y se cura.', 1, 3),
+    [es('Sopa de la tribu', 'Reparte un caldo caliente: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 2}), 4],
+    'Su sopa lleva de todo y nadie pregunta de qué.', TG);
+  cr('bosque', 2, 'Goblin portaestandarte', 'apoyo', 'humanoide', 'Estandarte de trapos',
+    bu('¡Por la tribu!', 'Agita el estandarte: +2 Daño hasta el final de su turno (los goblins cercanos también, a mano).', 1, {dmg: 2}, 1),
+    [es('Grito de guerra', 'Un aullido que los pone a todos de pie: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 4],
+    'Donde va el trapo, va la tribu.', TG);
+  cr('bosque', 4, 'Goblin curandero de la ciénaga', 'apoyo', 'humanoide', 'Cayado de musgo',
+    cu('Emplasto de musgo', 'Se aplica un emplasto de la ciénaga y se cura.', 1, 4),
+    [es('Barro medicinal', 'Se unta barro curativo: recupera vida cada turno y gana +2 Defensa.', 2, 'Regeneración', 'buff', 3, {hp: 3, mods: {def: 2}}), 5],
+    'Cura cualquier cosa, menos el olor.', TG);
+  cr('bosque', 1, 'Goblin aprendiz de brujo', 'mago', 'humanoide', 'Varita de rama',
+    at('Chispa', 'Un destello de magia torpe.', 'L'),
+    [zo('Chispazo descontrolado', 'Un estallido en flor de 1: daño a los de adentro (algún goblin también, a mano).', 2, 'M'), 4],
+    'Todavía no sabe qué hace la mitad de sus hechizos.', TG);
+  cr('bosque', 2, 'Goblin adivino de huesos', 'mago', 'humanoide', 'Bastón de huesos',
+    at('Rayo de huesos', 'Una descarga de energía verde.', 'M'),
+    [ap(ta('Mala suerte', 'Tira los huesos y augura desgracia: el objetivo queda Maldito (-2 Res.Mg, -1 Defensa) 3 turnos.', 2), A('Maldito', 3, {resmg: -2, def: -1})), 4],
+    'Siempre acierta, sobre todo cuando predice cosas malas.', TG);
+  cr('bosque', 4, 'Goblin invocador de luciérnagas', 'mago', 'humanoide', 'Farol de vidrio',
+    at('Luciérnaga ardiente', 'Una luciérnaga que estalla al chocar.', 'M'),
+    [ap(ta('Nube de luciérnagas', 'Una nube de luces: los cercanos quedan Cegados (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    'Vive de noche y ve mejor que nadie.', TG);
+  cr('bosque', 2, 'Goblin barricada', 'tanque', 'humanoide', 'Tablón claveteado',
+    bu('Levantar el tablón', 'Se cubre con un tablón: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Firme como un árbol', 'Clava los pies en la tierra: ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3), 4],
+    'Se planta en el camino y ahí se queda.', TG);
+  cr('bosque', 3, 'Goblin coraza de tortuga', 'tanque', 'humanoide', 'Maza de piedra',
+    bu('Meterse en el caparazón', 'Se encierra en su caparazón: +4 Defensa hasta el final de su turno.', 1, {def: 4}, 1),
+    [es('Carapacho espinoso', 'Se cubre de espinas: devuelve daño en cuerpo a cuerpo (se cobra a mano) y gana +2 Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 2}}), 5],
+    'Se pasó a la vida lenta y a la armadura de caparazón.', TG);
+  cr('bosque', 1, 'Goblin escupidor de ají', 'debuffer', 'humanoide', 'Cuchillo de leña',
+    ap(at('Escupitajo de ají', 'Escupe ají picante: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
+    [ap(ta('Polvo de picante', 'Tira polvo picante en la cara: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    'Todas sus armas pican.', TG);
+  cr('bosque', 2, 'Goblin leñador', 'brutal', 'humanoide', 'Hacha de leñador',
+    at('Hachazo', 'Un hachazo de leñador.', 'M'),
+    [ap(zo('Tronco al hombro', 'Un golpe desde arriba: daño y el objetivo queda con Armadura rota.', 2, 'M'), A('Armadura rota')), 4],
+    'Tala árboles y, cuando puede, otras cosas.', TG);
+  cr('bosque', 3, 'Goblin cazador de jabalíes', 'brutal', 'humanoide', 'Lanza de caza',
+    at('Lanzazo', 'Una estocada larga.', 'M'),
+    [ap(zo('Herida de jabalí', 'Un lanzazo profundo: daño y el objetivo queda Sangrando.', 2, 'M'), A('Sangrado')), 4],
+    'Le tiene más miedo al jabalí que al aventurero, y por eso ataca primero.', TG);
+  cr('bosque', 5, 'Goblin sombra del bosque', 'rapido', 'humanoide', 'Puñal de corteza',
+    at('Puñalada por la espalda', 'Un ataque rápido; +3 al daño si el objetivo no lo vio (a mano).', 'H'),
+    [es('Entre las hojas', 'Se funde con el follaje y desaparece de la vista.', 2, 'Sigilo', 'buff', 0), 3],
+    'Solo se ve cuando ya es tarde.', TG);
+
+  /* ---- Kobolds de las minas (+6): debuffer (había 1) y mágico (había 1) ---- */
+  cr('minas', 1, 'Kobold soltador de murciélagos', 'debuffer', 'humanoide', 'Bolsa de murciélagos',
+    ap(at('Murciélago en la cara', 'Le suelta un murciélago: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
+    [ap(ta('Cortina de murciélagos', 'Suelta toda la bolsa: los cercanos quedan Pajaritos hasta el final de su próximo turno.', 2), A('Pajaritos', 1)), 4],
+    'Los murciélagos lo quieren: le deben plata.', KB);
+  cr('minas', 3, 'Kobold envenenador de galerías', 'debuffer', 'humanoide', 'Aguja de veneno',
+    ap(at('Aguja untada', 'Un pinchazo con veneno: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [ap(tr('Pozo de estacas untadas', 'Deja una trampa de estacas venenosas en una casilla: {T} al que la pise, que queda Envenenado.', 3, 'M'), A('Veneno')), 5],
+    'Sus galerías tienen más trampas que salidas.', KB);
+  cr('minas', 4, 'Kobold susurrador', 'debuffer', 'humanoide', 'Vara de eco',
+    at('Eco doloroso', 'Un grito que rebota en la roca.', 'M'),
+    [ap(ta('Susurros de la mina', 'Le susurra dudas al objetivo: queda con Susurros (-2 Res.Mt) 3 turnos.', 3), A('Susurros', 3, {resm: -2})), 5],
+    'Nadie sabe qué les dice; todos vuelven distintos.', KB);
+  cr('minas', 1, 'Kobold aprendiz de dragón', 'mago', 'humanoide', 'Vara de escamas chica',
+    at('Chispa de dragón', 'Un chispazo de fuego mágico.', 'L'),
+    [zo('Bocanada de humo', 'Una nube de humo caliente en flor de 1: daño a los de adentro.', 2, 'M'), 4],
+    'Todavía tose más humo del que escupe.', KB);
+  cr('minas', 2, 'Kobold del cristal resonante', 'mago', 'humanoide', 'Cristal que vibra',
+    at('Rayo de cristal', 'Un rayo de luz que sale del cristal.', 'M'),
+    [bu('Foco de cristal', 'Se concentra en el cristal: +2 Daño y +1 No2 durante 2 turnos.', 2, {dmg: 2, nitros: 1}, 2), 5],
+    'Vive cerca del cristal más grande de la mina y se le nota.', KB);
+  cr('minas', 4, 'Kobold ígneo de las profundidades', 'mago', 'humanoide', 'Bastón de lava',
+    at('Chorro de lava', 'Lava mágica a distancia.', 'M'),
+    [ap(zo('Erupción', 'Una erupción en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    'Bajó tanto que salió del otro lado, hecho de fuego.', KB);
+
+  /* ---- Kobolds de las cumbres (kobolds de montaña, +14): al menos dos de cada rol ---- */
+  const KM = ['kobold', 'tribu kobold', 'kobold de montaña'];
+  cr('montañas', 2, 'Kobold picacumbres', 'brutal', 'humanoide', 'Piolet',
+    at('Piolazo', 'Un golpe de piolet.', 'M'),
+    [ap(zo('Piolet en la rodilla', 'Un piolazo bajo: daño y el objetivo queda Rengo.', 2, 'M'), A('Rengo')), 4],
+    'Trepa las paredes con el mismo piolet con el que pega.', KM);
+  cr('montañas', 4, 'Kobold guerrero de escarcha', 'brutal', 'humanoide', 'Hacha de hielo',
+    at('Hachazo helado', 'Un hachazo con filo de hielo.', 'M'),
+    [ap(zo('Golpe congelante', 'Un golpe que enfría hasta los huesos: daño y el objetivo queda con Escarcha (-1 No2) 1 turno.', 3, 'M'), A('Escarcha', 1, {nitros: -1})), 5],
+    'Los kobolds del hielo también saben pelear.', KM);
+  cr('montañas', 2, 'Kobold escudo de roca', 'tanque', 'humanoide', 'Martillo de piedra',
+    bu('Pared de piedra', 'Se cubre con una losa: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Piel de granito', 'Se endurece como una roca: ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3), 4],
+    'Más peñasco que kobold.', KM);
+  cr('montañas', 5, 'Kobold guardián del glaciar', 'tanque', 'humanoide', 'Maza de hielo azul',
+    bu('Muro de hielo', 'Levanta una pared helada: +5 Defensa hasta el final de su turno.', 2, {def: 5}, 1),
+    [es('Coraza de hielo', 'Una armadura de escarcha con púas: devuelve daño en cuerpo a cuerpo (se cobra a mano) y gana +3 Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 3}}), 5],
+    'Lleva siglos guardando un glaciar que nadie quiere.', KM);
+  cr('montañas', 3, 'Kobold saltarrocas', 'rapido', 'humanoide', 'Cuchillos gemelos',
+    at('Doble cuchillada', 'Dos tajos rápidos seguidos.', 'M'),
+    [bu('Salto entre riscos', 'Salta de risco en risco: +4 Evasión hasta su próximo turno.', 2, {eva: 4}, 1), 3],
+    'Nunca toca el suelo si puede evitarlo.', KM);
+  cr('montañas', 5, 'Kobold acechador de nieve', 'rapido', 'humanoide', 'Puñal de escarcha',
+    at('Puñalada en la ventisca', 'Un ataque rápido; +3 al daño si el objetivo no lo vio (a mano).', 'H'),
+    [es('Ventisca a su favor', 'Se pierde entre la nieve y desaparece de la vista.', 2, 'Sigilo', 'buff', 0), 3],
+    'Blanco sobre blanco, hasta que pincha.', KM);
+  cr('montañas', 1, 'Kobold hondero de riscos', 'rango', 'humanoide', 'Honda de cuero',
+    at('Piedra lanzada', 'Una piedra bien puesta.', 'L'),
+    [ap(zo('Lluvia de piedras', 'Hace caer piedras en flor de 1: daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 2, 'M'), A('Pajaritos', 1)), 4],
+    'Siempre tiene una piedra más.', KM);
+  cr('montañas', 4, 'Kobold arquero del viento', 'rango', 'humanoide', 'Arco de cuerno',
+    at('Flecha con viento', 'Una flecha que aprovecha la ráfaga.', 'M'),
+    [es('Ojo de águila', 'Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2), 4],
+    'Dispara desde donde nadie puede llegar.', KM);
+  cr('montañas', 2, 'Kobold curandero de nieve', 'apoyo', 'humanoide', 'Cucharón de madera',
+    cu('Té de nieve', 'Toma una infusión caliente y se cura.', 1, 3),
+    [es('Sopa de altura', 'Un caldo espeso de altura: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 2}), 4],
+    'Sus infusiones huelen a pino y a lana mojada.', KM);
+  cr('montañas', 5, 'Kobold anciano de la cumbre', 'apoyo', 'humanoide', 'Cayado de hielo',
+    cu('Té de las nevadas', 'Bebe su infusión más vieja y se cura.', 1, 5),
+    [es('Aullido de la montaña', 'Un aullido que pone a todos de pie: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 5],
+    'Lleva más años que la nieve que lo cubre.', KM);
+  cr('montañas', 1, 'Kobold soplanieve', 'debuffer', 'humanoide', 'Fuelle roto',
+    ap(at('Soplo de nieve', 'Sopla nieve en los ojos: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
+    [ap(ta('Ventisquero', 'Levanta una nube de nieve: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    'Nadie sabe de dónde saca tanta nieve.', KM);
+  cr('montañas', 3, 'Kobold tejedor de ventiscas', 'debuffer', 'humanoide', 'Bastón de trapos',
+    at('Golpe de viento', 'Una ráfaga que golpea.', 'M'),
+    [ap(ta('Ventisca', 'Envuelve al objetivo en una ventisca: queda Cegado (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    'Amarra el viento en nudos y lo suelta cuando le conviene.', KM);
+  cr('montañas', 3, 'Kobold chamán de la tormenta', 'mago', 'humanoide', 'Vara de cobre',
+    at('Rayito', 'Un rayo chico desde la vara.', 'M'),
+    [ap(zo('Trueno', 'Un trueno en flor de 1: daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
+    'Cuando truena, siempre está cerca.', KM);
+  cr('montañas', 5, 'Kobold vidente del hielo', 'mago', 'humanoide', 'Esfera de cristal helado',
+    at('Rayo de escarcha', 'Un rayo helado desde la esfera.', 'H'),
+    [ap(zo('Congelar el aire', 'Congela el aire en flor de 2: daño y los golpeados quedan con Escarcha (-1 No2) 1 turno.', 3, 'H'), A('Escarcha', 1, {nitros: -1})), 6],
+    'Ve el futuro congelado y por eso nunca cambia.', KM);
+
+  /* ---- Colmena: un universo de insectos y bichos (30): cuatro o cinco de cada rol, de nivel 1 a 5 ---- */
+  const IN = ['insecto', 'colmena'];
+  Object.assign(TROFEOS, {'Hormiga soldado': 'Mandíbula de hormiga', 'Escarabajo cornudo': 'Cuerno de escarabajo', 'Mantis religiosa': 'Garra de mantis', 'Escarabajo Hércules': 'Cuerno de Hércules',
+    'Escarabajo pelotero': 'Bola de estiércol dura', 'Cucaracha acorazada': 'Élitro de cucaracha', 'Ciempiés blindado': 'Placa de ciempiés', 'Escarabajo titán': 'Coraza de titán',
+    'Grillo saltarín': 'Pata de grillo', 'Libélula veloz': 'Ala de libélula', 'Avispa cazadora': 'Aguijón de avispa', 'Avispón gigante': 'Aguijón de avispón',
+    'Hormiga escupidora': 'Glándula de ácido', 'Abeja lanzadora': 'Aguijón de abeja', 'Escarabajo bombardero': 'Glándula de bombardero', 'Escorpión de cola larga': 'Aguijón de escorpión',
+    'Luciérnaga chispeante': 'Luz de luciérnaga', 'Polilla de polvo hipnótico': 'Polvo hipnótico', 'Cigarra de tormenta': 'Timbal de cigarra', 'Mantis oracular': 'Ojo de mantis',
+    'Abeja obrera': 'Panal pequeño', 'Hormiga cuidadora': 'Huevo de hormiga', 'Abeja curandera de miel': 'Miel curativa', 'Zángano de la reina': 'Ala de zángano',
+    'Mosquito chupasangre': 'Trompa de mosquito', 'Mosca de la peste': 'Ala de mosca', 'Araña tejedora': 'Seda de araña', 'Termita corroedora': 'Mandíbula de termita', 'Avispa parásita': 'Larva parásita'});
+
+  // melee
+  cr('bosque', 1, 'Hormiga soldado', 'brutal', 'bestia', 'Mandíbulas de hormiga',
+    at('Mordisco de hormiga', 'Una mordida fuerte.', 'L'),
+    [bu('Cerrar filas', 'Se pone a la par de sus hermanas: +2 Daño hasta el final de su turno (las demás hormigas cercanas también, a mano).', 1, {dmg: 2}, 1), 4],
+    'Nunca pelea sola: siempre hay otras cuarenta detrás.', IN);
+  cr('bosque', 2, 'Escarabajo cornudo', 'brutal', 'bestia', 'Cuerno de escarabajo',
+    at('Cornada', 'Un golpe de cuerno.', 'M'),
+    [ap(zo('Embestida de cuerno', 'Carga con el cuerno: daño y el objetivo queda Rengo.', 2, 'M'), A('Rengo')), 4],
+    'Levanta troncos de veinte veces su peso, y también aventureros.', IN);
+  cr('bosque', 3, 'Mantis religiosa', 'brutal', 'bestia', 'Garras segadoras',
+    at('Zarpazo', 'Un tajo rápido con las patas delanteras.', 'M'),
+    [ap(zo('Segadora', 'Dos tajos a la vez: daño y el objetivo queda Sangrando.', 2, 'M'), A('Sangrado')), 4],
+    'Reza mientras acecha, y después no.', IN);
+  cr('bosque', 5, 'Escarabajo Hércules', 'brutal', 'bestia', 'Cuerno de Hércules',
+    at('Cornada demoledora', 'Un golpe enorme de cuerno.', 'H'),
+    [ap(zo('Lanzamiento', 'Levanta al objetivo con el cuerno y lo tira: daño y queda Stun hasta el final de su próximo turno.', 3, 'H'), A('Stun', 1)), 6],
+    'El bicho más fuerte del bosque, si se mide por lo que levanta.', IN);
+  // tanque
+  cr('bosque', 1, 'Escarabajo pelotero', 'tanque', 'bestia', 'Bola de estiércol',
+    bu('Rodar la bola', 'Se protege detrás de su bola: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Bola de estiércol dura', 'Se cubre con una bola seca: ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3), 4],
+    'Se toma su trabajo muy en serio y su bola, más.', IN);
+  cr('bosque', 2, 'Cucaracha acorazada', 'tanque', 'bestia', 'Élitros afilados',
+    bu('Cerrar los élitros', 'Cierra las alas duras sobre el cuerpo: +4 Defensa hasta el final de su turno.', 1, {def: 4}, 1),
+    [es('Sobrevive a todo', 'Nada la detiene: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 2}), 4],
+    'Dicen que sobrevivirá a los aventureros, a la campaña y a la tienda.', IN);
+  cr('bosque', 4, 'Ciempiés blindado', 'tanque', 'bestia', 'Pinzas de ciempiés',
+    bu('Enrollarse', 'Se enrolla sobre sí mismo: +5 Defensa hasta el final de su turno.', 2, {def: 5}, 1),
+    [es('Cien patas, cien púas', 'Se eriza con cien púas: devuelve daño en cuerpo a cuerpo (se cobra a mano) y gana +2 Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 2}}), 5],
+    'Cada segmento es una armadura.', IN);
+  cr('bosque', 5, 'Escarabajo titán', 'tanque', 'bestia', 'Mandíbulas de titán',
+    bu('Coraza de titán', 'Cierra su caparazón: +6 Defensa hasta el final de su turno.', 2, {def: 6}, 1),
+    [es('Inmune al miedo', 'Nada lo mueve: inmune a controles.', 3, 'Inmunidad a CC', 'buff', 3), 6],
+    'Las flechas rebotan y las espadas se doblan.', IN);
+  // asalto
+  cr('bosque', 1, 'Grillo saltarín', 'rapido', 'bestia', 'Patas traseras',
+    at('Patada', 'Una patada corta.', 'L'),
+    [bu('Salto', 'Salta lejos: +4 Evasión hasta su próximo turno.', 1, {eva: 4}, 1), 3],
+    'Nunca está donde lo golpean.', IN);
+  cr('bosque', 2, 'Libélula veloz', 'rapido', 'bestia', 'Pinzas de libélula',
+    at('Picada', 'Cae en picada con las pinzas.', 'M'),
+    [es('Vuelo veloz', 'Un torrente de energía: +1 No2 máximo.', 1, 'Hypeado', 'buff', 3), 4],
+    'Vuela en zigzag y no se deja ver quieta.', IN);
+  cr('bosque', 3, 'Avispa cazadora', 'rapido', 'bestia', 'Aguijón de avispa',
+    ap(at('Picadura', 'Un aguijonazo rápido: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [bu('Pasada rasante', 'Se aleja de un salto: +4 Evasión hasta su próximo turno.', 2, {eva: 4}, 1), 3],
+    'No caza por hambre, sino para el nido.', IN);
+  cr('bosque', 5, 'Avispón gigante', 'rapido', 'bestia', 'Aguijón de avispón',
+    ap(at('Aguijonazo feroz', 'Un aguijonazo enorme: daño y el objetivo queda Envenenado.', 'H'), A('Veneno')),
+    [ap(zo('Enjambre de avispones', 'Llama a su nido: nube en flor de 1 con daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
+    'Un solo avispón; todo un enjambre de problemas.', IN);
+  // rango
+  cr('bosque', 1, 'Hormiga escupidora', 'rango', 'bestia', 'Ácido fórmico',
+    ap(at('Escupitajo de ácido', 'Un chorro de ácido fórmico: daño y el objetivo queda Corroído (-1 Defensa) 2 turnos.', 'L'), A('Corroído', 2, {def: -1})),
+    [ap(ts('Rastro de ácido', 'Deja un charco de ácido oculto: quien lo pise queda Corroído. Es una trampa sin daño.', 1), A('Corroído', 2, {def: -1})), 4],
+    'Escupe a los que pisan su hormiguero.', IN);
+  cr('bosque', 2, 'Abeja lanzadora', 'rango', 'bestia', 'Aguijones sueltos',
+    at('Aguijón lanzado', 'Lanza un aguijón.', 'M'),
+    [es('Zumbido concentrado', 'Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2), 4],
+    'Sabe que el aguijón solo se usa una vez, y lo aprovecha.', IN);
+  cr('bosque', 3, 'Escarabajo bombardero', 'rango', 'bestia', 'Gas caliente',
+    at('Bomba de gas', 'Un chorro de gas hirviente.', 'M'),
+    [ap(zo('Descarga explosiva', 'Un estallido de gas caliente en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'M'), A('Quemado', 2, {}, -2)), 4],
+    'Combina dos químicos en el abdomen y dispara.', IN);
+  cr('bosque', 4, 'Escorpión de cola larga', 'rango', 'bestia', 'Aguijón de cola',
+    ap(at('Cola arrojada', 'Lanza el aguijón de la cola: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [ap(tr('Nido de arena', 'Entierra un nido de aguijones en una casilla: {T} al que lo pise, que queda Envenenado.', 3, 'M'), A('Veneno')), 5],
+    'Pica primero y pregunta después.', IN);
+  // mágico
+  cr('bosque', 1, 'Luciérnaga chispeante', 'mago', 'bestia', 'Luz de luciérnaga',
+    at('Chispa de luz', 'Un chispazo de luz.', 'L'),
+    [ap(ta('Destello cegador', 'Un destello brutal: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    'De noche, encandila; de día, se duerme.', IN);
+  cr('bosque', 3, 'Polilla de polvo hipnótico', 'mago', 'bestia', 'Polvo de alas',
+    at('Polvo de alas', 'Una nube de polvo que raspa.', 'M'),
+    [ap(zo('Polvo hipnótico', 'Sacude las alas: daño en flor de 1 y los golpeados quedan Stun 1 turno.', 3, 'M'), A('Stun', 1)), 5],
+    'Sus alas tienen dibujos que mareaban antes de que cayera el polvo.', IN);
+  cr('bosque', 4, 'Cigarra de tormenta', 'mago', 'bestia', 'Timbal de cigarra',
+    at('Chillido eléctrico', 'Un chillido que descarga electricidad.', 'M'),
+    [ap(zo('Descarga en el timbal', 'Un chillido en flor de 2: daño y los golpeados quedan con Descarga (-1 No2) 1 turno.', 3, 'H'), A('Descarga', 1, {nitros: -1})), 5],
+    'Canta antes de la tormenta y la tormenta obedece.', IN);
+  cr('bosque', 5, 'Mantis oracular', 'mago', 'bestia', 'Garras de mantis',
+    at('Rayo del oráculo', 'Un rayo azul desde los ojos.', 'H'),
+    [ap(ta('Ve tu final', 'Predice el final del objetivo: queda Maldito (-2 Res.Mg, -1 Defensa) 3 turnos.', 3), A('Maldito', 3, {resmg: -2, def: -1})), 5],
+    'Reza y ve, en ese orden.', IN);
+  // apoyo
+  cr('bosque', 1, 'Abeja obrera', 'apoyo', 'bestia', 'Aguijón de abeja',
+    cu('Miel del panal', 'Prueba un poco de miel y se cura.', 1, 3),
+    [bu('Zumbido de trabajo', 'Se pone a trabajar más rápido: +1 No2 hasta el final de su turno.', 1, {nitros: 1}, 1), 4],
+    'Trabaja mucho y queja poco, sobre todo poco.', IN);
+  cr('bosque', 2, 'Hormiga cuidadora', 'apoyo', 'bestia', 'Mandíbulas cuidadoras',
+    cu('Lamer las heridas', 'Se lame las heridas y se cura.', 1, 3),
+    [es('Cuidar el hormiguero', 'Se pone a cuidar: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 2}), 4],
+    'Cuida a las hermanas y las cría.', IN);
+  cr('bosque', 4, 'Abeja curandera de miel', 'apoyo', 'bestia', 'Aguijón dulce',
+    cu('Miel curativa', 'Se unta con miel curativa y se cura.', 1, 4),
+    [es('Panal reparador', 'Una miel espesa que cierra las heridas: recupera vida cada turno y gana +2 Defensa.', 2, 'Regeneración', 'buff', 3, {hp: 3, mods: {def: 2}}), 5],
+    'Sus panales curan lo que tocan.', IN);
+  cr('bosque', 5, 'Zángano de la reina', 'apoyo', 'bestia', 'Zumbido de mando',
+    cu('Beber jalea', 'Bebe jalea real y se cura.', 1, 5),
+    [es('Orden de la reina', 'Transmite el mandato de la reina: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 5],
+    'No hace nada, y todos lo obedecen.', IN);
+  // debuffer
+  cr('bosque', 1, 'Mosquito chupasangre', 'debuffer', 'bestia', 'Trompa de mosquito',
+    ap(at('Picadura', 'Una picadura que drena.', 'L'), A('Sangrado')),
+    [ap(ta('Zumbido insoportable', 'Un zumbido que no deja concentrarse: el objetivo queda con Susurros (-2 Res.Mt) 2 turnos.', 1), A('Susurros', 2, {resm: -2})), 4],
+    'No mata: molesta.', IN);
+  cr('bosque', 2, 'Mosca de la peste', 'debuffer', 'bestia', 'Patas sucias',
+    ap(at('Contagio', 'Un roce contagioso: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [ap(ta('Peste', 'Contagia una peste: el objetivo queda Podrido (-2 Defensa, -1 Daño) 3 turnos.', 2), A('Podrido', 3, {def: -2, dmg: -1})), 4],
+    'Donde se posa, algo se pudre.', IN);
+  cr('bosque', 3, 'Araña tejedora', 'debuffer', 'bestia', 'Colmillos de araña',
+    ap(at('Mordisco de tejedora', 'Un mordisco con veneno: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
+    [ap(ts('Telaraña oculta', 'Extiende una telaraña oculta en una casilla: quien la pise queda Inmovilizado 1 turno. Es una trampa sin daño.', 2), A('Inmovilizado', 1)), 5],
+    'Teje por encargo y cobra en presas.', IN);
+  cr('bosque', 4, 'Termita corroedora', 'debuffer', 'bestia', 'Mandíbulas de termita',
+    ap(at('Roer la armadura', 'Roe el metal: daño y el objetivo queda con Armadura rota.', 'M'), A('Armadura rota')),
+    [ap(ta('Devorar madera', 'Devora todo lo de madera del objetivo: queda Oxidado (-2 Daño) 3 turnos.', 3), A('Oxidado', 3, {dmg: -2})), 5],
+    'No descansa hasta que lo que mordió se rompe.', IN);
+  cr('bosque', 5, 'Avispa parásita', 'debuffer', 'bestia', 'Ovipositor',
+    ap(at('Inyectar larva', 'Inyecta una larva: daño y el objetivo queda Envenenado.', 'H'), A('Veneno severo')),
+    [ap(ta('Larva voraz', 'La larva le come las fuerzas: el objetivo queda Exhausto.', 3), A('Exhausto')), 5],
+    'Pone sus huevos en lo que aún respira.', IN);
+
   window.CREEPS_BASE = lista;
   // Revisa que cada creep de la lista tenga TODOS los puntos de atributo de su nivel (33 + 3 por nivel sobre 1, repartidos entre Con, Fue, Agi, Des y Esp)
   // y HP = Con × 5. Devuelve los que no cumplen: [{nombre, nivel, suma, meta, hp, hpEsperado}]. Se corre desde la consola: CreepsBaseUtil.verificarPresupuesto().

@@ -8966,12 +8966,13 @@ function dueloElegirObjetivoMapa(msg){
   const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
   const pedir = () => {
     elegirDestino(h => {
-      const cand = [...tokens.values()].filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
+      const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
       if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       const t = cand[0];
-      const mio = [...tokens.values()].find(propio);
+      const mio = todos.find(propio);
       Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
-        .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo'); });
+        .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>⚔ ${esc(yo.nombre || 'Atacar')}: elegí a quién atacás</b> <span>clic sobre el token · Esc o clic derecho cancelan</span>${msg.conSuelto ? ' <button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`, true, cancelado);
     const b = $('#colocando-aviso [data-duelo-suelto]');
     if(b) b.onclick = () => {

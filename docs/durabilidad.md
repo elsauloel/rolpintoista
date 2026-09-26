@@ -52,3 +52,5 @@ El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y
 - **A mano:** en cada ítem, la línea «🔧 6/9 · Armadura rota ×2» con **−** (un punto menos) y **+** (reparar 1 punto: también devuelve 1 de Armadura rota de esa pieza). La reparación real (herrero 1 de oro por punto, talento con despojos) sigue sin automatizar.
 - **Creeps e invocaciones:** sin durabilidad (Rompe armadura les baja la Defensa con el estado de siempre).
 **Falta:** reparar con el herrero y el talento (y el Óleo reparador), mostrar la durabilidad en la tienda y el catálogo, el bloqueo de reparar durante el combate, y probarlo en mesa.
+
+**Óleo reparador quitado del catálogo (dueño, 2026-09-26):** se sacó el ítem (catálogo: 889) **hasta que se defina cómo funciona**. La ficha conserva el código viejo que lo reconocía por nombre (para personajes ya guardados que lo tengan); no hace falta tocarlo.

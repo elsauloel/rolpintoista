@@ -364,3 +364,8 @@ y la última posición vista se calculan en cada navegador y no se guardan.
 
 ### Colisión del mapa (`elementos`, 2026-09-24)
 `campanas/{id}/elementos` (y `mapas/{id}/elementos`) aceptan el campo opcional `colision: bool`; solo el GM lo puede crear en `true`. Son formas libres sólidas y fijadas; el mapa las fusiona al pintarlas y dibuja un único contorno visible para todos. Ver `vtt-hexgrid/CLAUDE.md`, "Colisión del mapa".
+
+## Mesa común (2026-09-25)
+`campanas/{id}/mesaComun/{docId}` — un doc por oferta de un jugador: `{tipo: 'item'|'dde'|'despojos', nombre, json (el ítem, si es ítem), itemId, fichaId, cantidad, despojo ('normal'|'magico'|'especial'), despojoNombre, ofrecidoPor (uid), ofrecidoNombre, tomadoPor, tomadoNombre, creado}`. Reglas: la lee cualquier miembro; la crea el que ofrece (a su nombre, `tomadoPor: ''`); la toma otro miembro (transacción: `tomadoPor` de '' a su uid); la borra el que la ofreció o el GM. **Hay que volver a pegar `firebase/firestore.rules` en la consola** (sin eso la mesa común da "sin permiso").
+- **Ítems:** no salen de la mochila del dueño (siguen ocupando sus ranuras, marcados `enMesa` en su ficha) hasta que otro los toma; entonces la ficha del dueño los quita sola y borra la oferta. **DDE y despojos:** se descuentan al ofrecerlos y se devuelven al retirar la oferta.
+- Código: `ficha.html`, sección "Mesa común" (`mesaComunEscuchar`, `mesaComunPublicarItem/Dde/Despojos`, `mesaComunTomar`, `mesaComunRetirar`, `mesaComunReconciliar`); botón **🤝 Mesa** en la cabecera de la Mochila y **🤝 A la mesa** en cada ítem.

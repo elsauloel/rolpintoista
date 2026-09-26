@@ -1369,7 +1369,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <section class="card card--mochila">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="mochila" title="Contraer/expandir">👁</button><h2>Mochila</h2></div>
-          <button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button>
+          <div style="display:flex;gap:6px"><button class="iconbtn" id="btn-mesa-comun" title="Mesa común: ítems, DDE y despojos que se comparten entre los jugadores">🤝 Mesa <b id="mesa-comun-n"></b></button><button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button></div>
         </header>
         <div class="body">
           <div class="cap"><span>Ranuras usadas</span><span><b id="cap-mochila-n">0</b> / <input id="f-capmochila" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"><span id="cap-mochila-bonus-txt" class="hint"></span></span></div>
@@ -1881,6 +1881,13 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <div class="modal" style="max-width:920px;width:94vw">
     <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" id="botin-loot-x">Cerrar</button></header>
     <div class="body" id="botin-loot-body"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-mesa-comun">
+  <div class="modal" style="max-width:760px;width:94vw">
+    <header><h3>🤝 Mesa común</h3><button class="iconbtn" id="mesa-comun-x">Cerrar</button></header>
+    <div class="body" id="mesa-comun-body"></div>
   </div>
 </div>
 
@@ -5363,6 +5370,7 @@ function invRow(i, contexto){
         </div>
         <div class="rowbtns">
           ${!i.consumible ? `<button class="mini ${i.equipado?'on':''}" data-toggle="${i.id}" title="${i.equipado?'Pasar a mochila':'Equipar'}">${i.equipado?'← Mochila':'Equipar'}</button>` : ''}
+          ${(contexto === 'mochila') ? (i.enMesa ? `<button class="mini" data-mesa-ret-item="${i.enMesa}" title="Sacarlo de la mesa común">🤝 En la mesa · retirar</button>` : `<button class="mini" data-mesa-pub="${i.id}" title="Ofrecerlo en la mesa común: sigue en tu mochila hasta que otro jugador se lo lleve">🤝 A la mesa</button>`) : ''}
           ${(contexto === 'mochila' && i.consumible) ? `<button class="mini" data-tocinturon="${i.id}" ${num(i.unidades)<=0?'disabled':''} title="Mover 1 unidad de esta pila al cinturón">→ Cinturón</button>` : ''}
           <button class="mini" data-view="inventario:${i.id}">Ver</button><button class="mini" data-edit="inventario:${i.id}">Editar</button>
           <button class="mini danger" data-rmitem="inventario:${i.id}" title="Eliminar">×</button>
@@ -6495,6 +6503,7 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
+    { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
     let it = S.inventario.find(x=>x.id===id);
     if(it){
       if(!it.equipado && it.trofeo){ toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return; }
@@ -6558,9 +6567,12 @@ document.addEventListener('click', async e => {
     if(it) atacarConArma(it);
     return;
   }
+  if(b.dataset.mesaPub){ mesaComunPublicarItem(b.dataset.mesaPub); return; }
+  if(b.dataset.mesaRetItem){ mesaComunRetirar(b.dataset.mesaRetItem); return; }
   if(b.dataset.tocinturon){
     const it = S.inventario.find(x=>x.id===b.dataset.tocinturon);
     if(!it || num(it.unidades) <= 0) return;
+    if(it.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; }
     if(S.cinturon.length >= capCinturonEfectivo()){
       toast('No hay lugar en el cinturón');
       return;
@@ -6717,6 +6729,7 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.consume){
     const id = b.dataset.consume;
+    { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
     let it = S.inventario.find(x=>x.id===id);
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
@@ -7970,6 +7983,234 @@ $('#botin-loot-body').addEventListener('click', e => {
   const c = e.target.closest('[data-botin-comparar]');
   if(c){ abrirComparar(c.dataset.botinComparar); return; }
   if(e.target.closest('#botin-loot-mochila')){ $('#scrim-botin-loot').classList.remove('open'); renderEquipo(); $('#scrim-equipo').classList.add('open'); }
+});
+
+/* ---------- Mesa común (2026-09-25, pedido del dueño) ----------
+   Cualquier jugador ofrece desde su mochila un ítem, DDE o despojos; cualquier otro jugador los ve y se los lleva. Vive en
+   campanas/<id>/mesaComun (un doc por oferta: {tipo: 'item'|'dde'|'despojos', nombre, json (el ítem), itemId, fichaId, cantidad,
+   despojo ('normal'|'magico'|'especial'), despojoNombre, ofrecidoPor, ofrecidoNombre, tomadoPor, tomadoNombre, creado}).
+   - ÍTEM: no sale de la mochila del dueño (sigue ocupando sus ranuras, marcado `enMesa`) hasta que otro lo toma; ahí el dueño lo pierde solo.
+   - DDE y despojos: se descuentan al ofrecerlos (quedan en la mesa) y se devuelven si se retira la oferta.
+   - Se toma con una transacción (el primero se lo lleva), igual que el botín. */
+let mesaComun = [], mesaReintentos = 0;
+const mcQuien = () => String(S.meta.nombre || (fbMiembro && fbMiembro.nombre) || '').slice(0, 60);
+function mesaComunEscuchar(){
+  if(!fbUsuario) return;
+  fbDb.collection(fbRutaCampana('mesaComun')).onSnapshot(snap => {
+    mesaComun = snap.docs.map(d => {
+      const x = d.data();
+      let item = null;
+      if(x.tipo === 'item'){ try{ item = JSON.parse(x.json || 'null'); }catch(e){} }
+      return {docId: d.id, tipo: x.tipo || 'item', nombre: x.nombre || (item && item.nombre) || '', item, cantidad: num(x.cantidad), despojo: x.despojo || '', despojoNombre: x.despojoNombre || '',
+        ofrecidoPor: x.ofrecidoPor || '', ofrecidoNombre: x.ofrecidoNombre || '', itemId: x.itemId || '', tomadoPor: x.tomadoPor || '', tomadoNombre: x.tomadoNombre || ''};
+    });
+    if(!snap.metadata.fromCache) mesaComunReconciliar();   // con solo la caché puede faltar lo publicado: no se toca nada
+    mesaComunRender();
+  }, err => console.error('Error escuchando la mesa común:', err));
+}
+const mesaComunLista = () => mesaComun.filter(x => !x.tomadoPor);
+function mesaComunReconciliar(){
+  if(!botinPuedeTomar()){ if(mesaReintentos++ < 30) setTimeout(mesaComunReconciliar, 1500); return; }
+  let cambio = false;
+  mesaComun.filter(x => x.ofrecidoPor === fbUsuario.uid && x.tomadoPor).forEach(x => {
+    if(x.tipo === 'item'){
+      const i = S.inventario.findIndex(v => v.id === x.itemId && v.enMesa === x.docId);
+      if(i >= 0){ S.inventario.splice(i, 1); cambio = true; }
+    }
+    toast(`🤝 ${x.tomadoNombre || 'Alguien'} se llevó ${x.nombre} de la mesa común`);
+    fbDb.collection(fbRutaCampana('mesaComun')).doc(x.docId).delete().catch(err => console.error('No se pudo limpiar la mesa común:', err));
+  });
+  S.inventario.forEach(i => { if(i.enMesa && !mesaComun.some(x => x.docId === i.enMesa)){ delete i.enMesa; cambio = true; } });   // la oferta ya no existe
+  if(cambio){ renderInventario(); refresh(); }
+}
+async function mesaComunCrear(datos){
+  const ref = fbDb.collection(fbRutaCampana('mesaComun')).doc();
+  await ref.set({tomadoPor: '', tomadoNombre: '', fichaId: (fichaVivo && fichaVivo.id) || '', ofrecidoPor: fbUsuario.uid, ofrecidoNombre: mcQuien(), ...datos, creado: firebase.firestore.FieldValue.serverTimestamp()});
+  return ref.id;
+}
+function mesaComunPuede(){
+  if(botinPuedeTomar()) return true;
+  toast('Abrí tu personaje (con permiso de edición) para usar la mesa común');
+  return false;
+}
+async function mesaComunPublicarItem(id){
+  if(!mesaComunPuede()) return;
+  const it = S.inventario.find(x => x.id === id);
+  if(!it || it.equipado || it.enMesa) return;
+  const copia = structuredClone(it);
+  delete copia.enMesa; delete copia.equipado;
+  if(String(copia.imagen || '').length > 40000) copia.imagen = '';
+  const json = JSON.stringify(copia);
+  if(json.length > 200000){ toast('El ítem es demasiado grande para ofrecerlo'); return; }
+  try{
+    it.enMesa = await mesaComunCrear({tipo: 'item', nombre: String(it.nombre || '').slice(0, 80), json, itemId: it.id});
+  }catch(err){
+    console.error('No se pudo ofrecer el ítem:', err);
+    toast('No se pudo ofrecer' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
+    return;
+  }
+  renderInventario(); refresh();
+  toast(`🤝 ${it.nombre} está en la mesa común (sigue en tu mochila hasta que alguien se lo lleve)`);
+}
+function mesaDespojoRef(tipo, nombre){
+  if(tipo === 'normal') return {get: () => num(S.loot.normal), set: v => { S.loot.normal = v; $('#f-loot-normal').value = v; }};
+  if(tipo === 'magico') return {get: () => num(S.loot.magico), set: v => { S.loot.magico = v; $('#f-loot-magico').value = v; }};
+  const buscar = () => (S.loot.especial || []).find(l => String(l.nombre).trim().toLowerCase() === String(nombre).trim().toLowerCase());
+  return {get: () => { const l = buscar(); return l ? num(l.cantidad) : 0; }, set: v => {
+    let l = buscar();
+    if(!l){ l = {id: uid(), nombre: String(nombre), cantidad: 0}; (S.loot.especial = S.loot.especial || []).push(l); }
+    l.cantidad = v; renderLootEspecial();
+  }};
+}
+async function mesaComunPublicarDde(n){
+  if(!mesaComunPuede()) return;
+  n = Math.floor(num(n) * 100) / 100;
+  if(!(n > 0)) return;
+  if(n > num(S.meta.dde)){ toast(`No tenés tantos DDE (tenés ${fmt(num(S.meta.dde))})`); return; }
+  S.meta.dde = Math.round((num(S.meta.dde) - n) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); refresh();
+  try{ await mesaComunCrear({tipo: 'dde', nombre: `${fmt(n)} DDE`, cantidad: n}); toast(`🤝 ${fmt(n)} DDE en la mesa común`); }
+  catch(err){
+    console.error('No se pudo ofrecer el oro:', err);
+    S.meta.dde = Math.round((num(S.meta.dde) + n) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); refresh();
+    toast('No se pudo ofrecer' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
+  }
+}
+async function mesaComunPublicarDespojos(tipo, nombre, n){
+  if(!mesaComunPuede()) return;
+  n = Math.floor(num(n));
+  if(!(n > 0)) return;
+  const r = mesaDespojoRef(tipo, nombre);
+  if(n > r.get()){ toast(`No tenés tantos despojos (tenés ${fmt(r.get())})`); return; }
+  r.set(r.get() - n); refresh();
+  const etiqueta = tipo === 'normal' ? 'normales' : tipo === 'magico' ? 'mágicos' : String(nombre);
+  try{ await mesaComunCrear({tipo: 'despojos', nombre: `${fmt(n)} despojos ${etiqueta}`, cantidad: n, despojo: tipo, despojoNombre: tipo === 'especial' ? String(nombre).slice(0, 60) : ''}); toast(`🤝 ${fmt(n)} despojos en la mesa común`); }
+  catch(err){
+    console.error('No se pudieron ofrecer los despojos:', err);
+    r.set(r.get() + n); refresh();
+    toast('No se pudo ofrecer' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
+  }
+}
+// Retira una oferta propia si nadie se la llevó todavía: el ítem se libera y el oro / los despojos vuelven.
+async function mesaComunRetirar(docId){
+  if(!mesaComunPuede()) return;
+  const x = mesaComun.find(v => v.docId === docId);
+  if(!x) return;
+  const ref = fbDb.collection(fbRutaCampana('mesaComun')).doc(docId);
+  let ok = false;
+  try{
+    ok = await fbDb.runTransaction(async tx => {
+      const d = await tx.get(ref);
+      if(!d.exists || d.data().tomadoPor) return false;
+      tx.delete(ref);
+      return true;
+    });
+  }catch(err){ console.error('No se pudo retirar:', err); toast('No se pudo retirar'); return; }
+  if(!ok){ toast('Ya se lo llevaron'); return; }
+  if(x.tipo === 'item'){ const i = S.inventario.find(v => v.id === x.itemId); if(i) delete i.enMesa; renderInventario(); }
+  else if(x.tipo === 'dde'){ S.meta.dde = Math.round((num(S.meta.dde) + x.cantidad) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); }
+  else{ const r = mesaDespojoRef(x.despojo, x.despojoNombre); r.set(r.get() + x.cantidad); }
+  refresh();
+  toast(`${x.nombre}: retirado de la mesa común`);
+}
+async function mesaComunTomar(docId){
+  if(!mesaComunPuede()) return;
+  const x = mesaComun.find(v => v.docId === docId);
+  if(!x || x.tomadoPor) return;
+  if(x.ofrecidoPor === fbUsuario.uid){ toast('Es tuyo: si no lo querés en la mesa, retiralo'); return; }
+  if(x.tipo === 'item' && x.item){
+    const cap = capMochilaEfectivo();
+    if(cap > 0 && mochilaUsada() + ranurasDe(x.item) > cap){ toast(`Mochila llena: ${x.nombre} no entra`); return; }
+  }
+  const ref = fbDb.collection(fbRutaCampana('mesaComun')).doc(docId);
+  let ok = false, quien = '';
+  try{
+    ok = await fbDb.runTransaction(async tx => {
+      const d = await tx.get(ref);
+      if(!d.exists) return false;
+      if(d.data().tomadoPor){ quien = d.data().tomadoNombre || ''; return false; }
+      tx.update(ref, {tomadoPor: fbUsuario.uid, tomadoNombre: mcQuien()});
+      return true;
+    });
+  }catch(err){
+    console.error('No se pudo tomar de la mesa común:', err);
+    toast('No se pudo tomar' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
+    return;
+  }
+  if(!ok){ toast(quien ? `${x.nombre} ya lo tomó ${quien}` : `${x.nombre} ya no está`); return; }
+  if(x.tipo === 'item' && x.item){
+    const nuevo = structuredClone(x.item);
+    nuevo.id = uid(); nuevo.equipado = false; delete nuevo.enMesa;
+    nuevo.unidades = num(nuevo.unidades) || 1; nuevo.ranuras = nuevo.ranuras ?? 1;
+    S.inventario.push(nuevo);
+    renderInventario();
+  }else if(x.tipo === 'dde'){ S.meta.dde = Math.round((num(S.meta.dde) + x.cantidad) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); }
+  else{ const r = mesaDespojoRef(x.despojo, x.despojoNombre); r.set(r.get() + x.cantidad); }
+  refresh();
+  toast(`🤝 ${x.nombre} → tuyo`);
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(S.meta.nombre || ''), origen: `🤝 ${S.meta.nombre || fbMiembro.nombre} tomó ${x.nombre} de la mesa común`, formula: '',
+      rolls: [], mod: 0, total: 0, desde: 'recompensa', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo escribir en la Mesa:', err); }
+}
+function mesaComunRender(){
+  const n = mesaComunLista().length, b = $('#mesa-comun-n');
+  if(b) b.textContent = n ? `(${n})` : '';
+  if($('#scrim-mesa-comun').classList.contains('open')) mesaComunCuerpo();
+}
+function mesaComunCuerpo(){
+  const cuerpo = $('#mesa-comun-body');
+  const previo = {dde: (cuerpo.querySelector('#mesa-dde') || {}).value || '', dn: (cuerpo.querySelector('#mesa-desp-n') || {}).value || '', dt: (cuerpo.querySelector('#mesa-desp-tipo') || {}).value || 'normal'};
+  const yo = fbUsuario && fbUsuario.uid, puede = botinPuedeTomar();
+  const cap = capMochilaEfectivo(), usado = mochilaUsada();
+  const lista = mesaComunLista();
+  const linea = x => {
+    const mio = x.ofrecidoPor === yo;
+    const icono = x.tipo === 'item' ? '🎒' : x.tipo === 'dde' ? '💰' : '🦴';
+    const texto = x.tipo === 'item' && x.item ? botinTextoItem(x.item) : '';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
+      <div style="flex:1;min-width:0" title="${esc(texto)}">
+        <div style="font-weight:600">${icono} ${esc(x.nombre)}${x.tipo === 'item' && x.item && num(x.item.unidades) > 1 ? ` <span class="hint">(×${fmt(num(x.item.unidades))})</span>` : ''}</div>
+        <div class="hint">de ${mio ? 'vos' : esc(x.ofrecidoNombre || '—')}${texto ? ' · ' + esc(texto.slice(0, 140)) : ''}</div>
+      </div>
+      ${mio ? `<button type="button" class="mini danger" data-mesa-retirar="${esc(x.docId)}">Retirar</button>`
+            : `<button type="button" class="btn primary" data-mesa-tomar="${esc(x.docId)}"${puede ? '' : ' disabled'}>Llevármelo</button>`}
+    </div>`;
+  };
+  const especiales = (S.loot.especial || []).filter(l => num(l.cantidad) > 0);
+  cuerpo.innerHTML = `
+    <div class="hint" style="margin-bottom:10px">Lo que ofrecés no se pierde: los ítems siguen ocupando tu mochila hasta que otro jugador se los lleva; el oro y los despojos quedan acá y volvés a recibirlos si retirás la oferta.</div>
+    <div class="hint" style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px"><span>Tu mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras</span><span>Tenés <b>${fmt(num(S.meta.dde))}</b> DDE</span></div>
+    ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para ofrecer o llevarte cosas.</div>'}
+    <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">En la mesa ahora</div>
+    ${lista.length ? lista.map(linea).join('') : '<div class="hint" style="margin-bottom:8px">No hay nada ofrecido todavía.</div>'}
+    <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px">Ofrecer</div>
+    <div class="hint" style="margin-bottom:8px">Un ítem: usá el botón <b>🤝 A la mesa</b> de su tarjeta en la mochila.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px">
+      <span>💰 DDE</span><input id="mesa-dde" type="number" min="0" step="1" value="${esc(previo.dde)}" style="width:100px"><button type="button" class="mini" id="mesa-dde-pub"${puede ? '' : ' disabled'}>Ofrecer DDE</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <span>🦴 Despojos</span>
+      <select id="mesa-desp-tipo"><option value="normal">Normales (${fmt(num(S.loot.normal))})</option><option value="magico">Mágicos (${fmt(num(S.loot.magico))})</option>${especiales.map(l => `<option value="esp:${esc(l.nombre)}">${esc(l.nombre)} (${fmt(num(l.cantidad))})</option>`).join('')}</select>
+      <input id="mesa-desp-n" type="number" min="0" step="1" value="${esc(previo.dn)}" style="width:100px"><button type="button" class="mini" id="mesa-desp-pub"${puede ? '' : ' disabled'}>Ofrecer despojos</button>
+    </div>`;
+  const sel = cuerpo.querySelector('#mesa-desp-tipo');
+  if(sel && [...sel.options].some(o => o.value === previo.dt)) sel.value = previo.dt;
+}
+$('#btn-mesa-comun').onclick = () => { mesaComunCuerpo(); $('#scrim-mesa-comun').classList.add('open'); };
+$('#mesa-comun-x').onclick = () => $('#scrim-mesa-comun').classList.remove('open');
+$('#scrim-mesa-comun').addEventListener('mousedown', e => { if(e.target.id === 'scrim-mesa-comun') $('#scrim-mesa-comun').classList.remove('open'); });
+$('#mesa-comun-body').addEventListener('click', e => {
+  const t = e.target.closest('[data-mesa-tomar]');
+  if(t){ mesaComunTomar(t.dataset.mesaTomar); return; }
+  const r = e.target.closest('[data-mesa-retirar]');
+  if(r){ mesaComunRetirar(r.dataset.mesaRetirar); return; }
+  if(e.target.closest('#mesa-dde-pub')){ mesaComunPublicarDde($('#mesa-dde').value).then(() => { $('#mesa-dde').value = ''; }); return; }
+  if(e.target.closest('#mesa-desp-pub')){
+    const v = $('#mesa-desp-tipo').value;
+    mesaComunPublicarDespojos(v.startsWith('esp:') ? 'especial' : v, v.startsWith('esp:') ? v.slice(4) : '', $('#mesa-desp-n').value).then(() => { $('#mesa-desp-n').value = ''; });
+  }
 });
 
 $('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
@@ -11755,6 +11996,7 @@ async function fbAlEntrar(){
   estadosEscuchar();
   combateEscuchar();
   botinLootEscuchar();
+  mesaComunEscuchar();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

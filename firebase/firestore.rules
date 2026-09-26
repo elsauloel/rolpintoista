@@ -313,6 +313,25 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
       }
 
+      // Mesa común (2026-09-25): los jugadores ofrecen ítems, DDE y despojos y otro jugador se los lleva. Un doc por oferta.
+      // Cualquier miembro la lee; la crea el que ofrece (a su nombre); otro miembro la toma (`tomadoPor` de '' a su uid, solo esos campos);
+      // la borra el que la ofreció (retirarla, o limpiar lo que ya se llevaron) o el GM.
+      match /mesaComun/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'itemId', 'fichaId', 'cantidad', 'despojo', 'despojoNombre', 'ofrecidoPor', 'ofrecidoNombre', 'tomadoPor', 'tomadoNombre', 'creado'])
+          && request.resource.data.ofrecidoPor == request.auth.uid
+          && request.resource.data.tomadoPor == ''
+          && request.resource.data.tipo in ['item', 'dde', 'despojos']
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && resource.data.tomadoPor == ''
+          && resource.data.ofrecidoPor != request.auth.uid
+          && request.resource.data.tomadoPor == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
+        allow delete: if esMiembro(c) && (resource.data.ofrecidoPor == request.auth.uid || esGM(c));
+      }
+
       // Estados que te deja otro (una habilidad de un creep, una trampa): un documento por aviso, {fichaId, duenoUid, spec, origen,
       // aplicada, creado}. Cualquier miembro lo crea (el GM, o el jugador que pisa una trampa); la ficha del dueño lo marca como
       // aplicado UNA vez (solo ese campo, de false a true) y agrega el estado a su ficha. Nadie escribe en la ficha de otro.

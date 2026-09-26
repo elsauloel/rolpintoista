@@ -8946,6 +8946,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
+  if(e.data.tipo === 'duelo-opciones-res') Duelo.recibirOpciones(e.data.id, e.data.opciones);   // las opciones de defensa que calculó la ficha del defensor
   if(e.data.tipo === 'duelo-ui-visible'){   // la ficha tirando para un duelo necesita mostrar un cartelito (Nitros, sobrepeso…)
     $('#botonera-capa').hidden = false;
     ubicarBotoneraCapa();
@@ -8979,10 +8980,8 @@ function dueloElegirObjetivoMapa(msg){
   };
   pedir();
 }
-// Pide la tirada (PdG del atacante / Evasión del defensor) al iframe de su ficha o de las Acciones de su creep, sin mostrarlo.
-function dueloTirarPorIframe(d, lado){
-  const l = lado === 'pdg' ? d.atacante : d.defensor;
-  const msg = {tipo: 'duelo-tirar', id: d.id, lado};
+// Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.
+function dueloRelayMapa(l, msg){
   const creep = l.tipo === 'creep';
   const id = creep ? l.ref : String(l.ref).split(SEP_INVOCACION)[0];
   const marco = $('#botonera-marco');
@@ -9764,7 +9763,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({tirar: dueloTirarPorIframe});
+  Duelo.escuchar({relay: dueloRelayMapa});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

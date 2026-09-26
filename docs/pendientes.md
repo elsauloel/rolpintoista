@@ -101,3 +101,4 @@
 - [ ] **Duelo de hechizos** (Especial contra Resistencia mágica/mental, con el cuadro compartido y solo los botones que corresponden): pedido del dueño 2026-09-26; ver `ataque-paso-a-paso.md`.
 - [ ] **Durabilidad** de armas, escudos y armaduras en todo el catálogo (2 por punto de Peso; se gasta 1 al perder el Bloqueo): diseño en `durabilidad.md`, faltan las preguntas del dueño (P-Durabilidad); después, campo en el inventario, ficha y cuadro del duelo.
 - [ ] **Óleo reparador**: pasa a ser un ítem de uso solo fuera de combate (deja de ser de cinturón) y a repararse también con herrero y con habilidades de talento que usan despojos. Depende de `durabilidad.md`.
+- [~] (2026-09-26, falta probar) **Duelo, etapa 2**: defensa a ciegas (Evasión / Parry con cada arma o escudo), Bloqueo, «pasa la mitad» y contraataque. **Hay que volver a pegar las reglas de Firestore.** Sigue: durabilidad en la ficha, crítico, daño, efectos.

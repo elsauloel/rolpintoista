@@ -10243,16 +10243,61 @@ window.DUELO_HOOKS = {
     if(!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)) return false;
     return lado.ref === fichaVivo.id || !!dueloInvDe(lado);
   },
+  // El ataque de siempre (paga los No2 y tira el PdG).
   atacar: d => {
     const inv = dueloInvDe(d.atacante);
     if(inv){ invAtacarSuelto(inv.id); return; }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
   },
-  evadir: d => {
+  // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (cuesta su Peso en No2).
+  opcionesDefensa: d => {
     const inv = dueloInvDe(d.defensor);
-    if(inv){ tirarValorStatInv(inv, 'Evasión', invStatValor(inv, 'eva'), 'eva'); return; }
-    tirarValorStat('Evasión', compute().final.eva, 'eva');
+    if(inv){
+      const c = pesoArmaInv(inv);
+      return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
+        {modo: 'parry', itemId: '', itemNombre: inv.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${inv.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : ''}];
+    }
+    const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', motivoNo: ''}];
+    const armas = armasYEscudosParaParry();
+    if(!armas.length) ops.push({modo: 'parry', itemId: '', itemNombre: '', etiqueta: '🗡 Parry (sin arma ni escudo)', costo: costoParryNitros(null), motivoNo: ''});
+    armas.forEach(a => {
+      const c = costoParryNitros(a.item);
+      ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo: c, motivoNo: c > num(S.nitros) ? 'no te alcanzan los No2' : ''});
+    });
+    return ops;
+  },
+  defender: (d, modo, itemId) => {
+    const inv = dueloInvDe(d.defensor);
+    if(inv){
+      if(modo === 'parry') invTirarStat(inv.id, 'parry'); else tirarValorStatInv(inv, 'Evasión', invStatValor(inv, 'eva'), 'eva');
+      return;
+    }
+    if(modo === 'parry') parryConArma(itemId ? S.inventario.find(x => x.id === itemId) || null : null);
+    else tirarValorStat('Evasión', compute().final.eva, 'eva');
+  },
+  // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
+  fuerza: d => {
+    const inv = dueloInvDe(d.atacante);
+    if(inv){ tirarValorStatInv(inv, 'Fuerza del golpe', invStatValor(inv, 'fue') + pesoArmaInv(inv), 'fue'); return; }
+    fuerzaGolpeConArma(d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null);
+  },
+  // El Bloqueo del defensor con el mismo arma o escudo con el que hizo Parry.
+  bloquear: d => {
+    const inv = dueloInvDe(d.defensor);
+    if(inv){ invTirarStat(inv.id, 'bloqueo'); return; }
+    const it = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) || null : null;
+    parryArmaPendiente = null;
+    bloqueoConArma(it);
+  },
+  // Con qué arma contraataca (la del Parry si es un arma con daño; si no, la primera arma equipada con daño).
+  armaContra: d => {
+    const inv = dueloInvDe(d.defensor);
+    if(inv) return {armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8};
+    const usada = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null;
+    const conDano = armasEquipadasConDano();
+    const it = (usada && conDano.some(a => a.item.id === usada.id)) ? usada : (conDano.length ? conDano[0].item : null);
+    return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: tipoAtaque(it)};
   },
 };
 

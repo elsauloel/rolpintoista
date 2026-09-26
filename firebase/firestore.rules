@@ -337,11 +337,11 @@ service cloud.firestore {
       match /duelos/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['estado', 'atacante', 'defensor', 'ataque', 'pdg', 'eva', 'veredicto', 'dif', 'desempate', 'moneda', 'creadoPor', 'creado'])
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'contra', 'contraDe', 'creadoPor', 'creado'])
           && request.resource.data.creadoPor == request.auth.uid
           && request.resource.data.creado == request.time;
         allow update: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['estado', 'atacante', 'defensor', 'ataque', 'pdg', 'eva', 'veredicto', 'dif', 'desempate', 'moneda', 'creadoPor', 'creado'])
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'contra', 'contraDe', 'creadoPor', 'creado'])
           && request.resource.data.creadoPor == resource.data.creadoPor
           && request.resource.data.creado == resource.data.creado;
         allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));

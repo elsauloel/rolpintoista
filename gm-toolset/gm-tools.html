@@ -8357,9 +8357,37 @@ window.DUELO_HOOKS = {
     if(!sc) return;
     if(d.ataque.tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, d.ataque.tipo);
   },
-  evadir: d => {
+  // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (cuesta su Peso en No2).
+  opcionesDefensa: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
-    if(sc) tirarValorStat(`${sc.nombre} · Evasión`, creepStatValor(sc, 'eva'), sc, 'eva');
+    if(!sc) return [];
+    const c = costoParryCreep(sc);
+    return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
+      {modo: 'parry', itemId: '', itemNombre: sc.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${sc.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : ''}];
+  },
+  defender: (d, modo) => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    if(!sc) return;
+    if(modo === 'parry'){
+      const costo = costoParryCreep(sc);
+      if(costo > num(sc.nitros)){ toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`); return; }
+      sc.nitros = num(sc.nitros) - costo;
+      renderAll();
+      tirarValorStat(`${sc.nombre} · Parry`, creepStatValor(sc, 'parry'), sc, 'parry');
+      toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}`);
+    }else tirarValorStat(`${sc.nombre} · Evasión`, creepStatValor(sc, 'eva'), sc, 'eva');
+  },
+  fuerza: d => {
+    const sc = S.creeps.find(c => c.id === d.atacante.ref);
+    if(sc) tirarValorStat(`${sc.nombre} · Fuerza del golpe`, fuerzaGolpeValorCreep(sc));
+  },
+  bloquear: d => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    if(sc) tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueoValorCreep(sc));
+  },
+  armaContra: d => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    return {armaId: '', armaNombre: (sc && sc.armaNombre) || '', tipoDado: (sc && num(sc.armaTipo)) || 8};
   },
 };
 

@@ -959,8 +959,8 @@ const Duelo = (() => {
         + explica([anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta]);
     }else if(!c.d20){
       const puede = esMio(d.atacante) || soyGM();
-      cuerpo = titulo('posible', '⚡ HAY POSIBILIDAD DE CRÍTICO')
-        + explica([`Se tiran ${_fmt(c.dados)} d20 y vale el mejor.`, ...lCuenta])
+      cuerpo = titulo('posible', '💥 ¡ES CRÍTICO!')
+        + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
         + tablaCriticoHtml(c, d, 0)
         + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{

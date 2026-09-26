@@ -149,18 +149,20 @@
   ],
   "efectos": [],
   "cambios": [],
-  "avisos": [],
+  "avisos": [
+   "Rango +3: un arma de rango Buena Calidad tiene entre +4 y +5"
+  ],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.1,
+   "pc": 6.9,
    "tier": "Común",
-   "precio": 70,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 1.5,
+    "bonos": 2.2,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -195,13 +197,13 @@
   "precioHoy": 900,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +7. PdG +2.",
   "nuevo": {
-   "pc": 20.4,
+   "pc": 22.1,
    "tier": "Excepcional",
-   "precio": 600,
+   "precio": 700,
    "exceso": 0,
    "desglose": {
     "daño": 10.5,
-    "bonos": 10.5,
+    "bonos": 12.2,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.6
@@ -232,13 +234,13 @@
   "precioHoy": 70,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
   "nuevo": {
-   "pc": 5.3,
+   "pc": 6.3,
    "tier": "Común",
-   "precio": 60,
+   "precio": 70,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -281,13 +283,13 @@
   "precioHoy": 1850,
   "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +8. Crítico frecuente +2. Provoca Sangrado (50%).",
   "nuevo": {
-   "pc": 24.9,
-   "tier": "Excepcional",
-   "precio": 850,
+   "pc": 26.9,
+   "tier": "Legendario",
+   "precio": 1100,
    "exceso": 0,
    "desglose": {
     "daño": 15.5,
-    "bonos": 4.0,
+    "bonos": 6.0,
     "crítico": 4.5,
     "efectos": 1.5,
     "peso del arma": -0.6
@@ -326,13 +328,13 @@
   "precioHoy": 70,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +4.",
   "nuevo": {
-   "pc": 5.9,
+   "pc": 6.9,
    "tier": "Común",
-   "precio": 65,
+   "precio": 75,
    "exceso": 0,
    "desglose": {
     "daño": 3.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.6,
     "peso del arma": -0.2
@@ -363,13 +365,13 @@
   "precioHoy": 160,
   "detalle": "Arma de dos manos a distancia, Tipo 6. Rango +5.",
   "nuevo": {
-   "pc": 9.1,
+   "pc": 10.3,
    "tier": "Buena Calidad",
-   "precio": 120,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -401,18 +403,20 @@
   "cambios": [
    "Variación para que no sea idéntica a otra arma del catálogo: pdg +1."
   ],
-  "avisos": [],
+  "avisos": [
+   "Rango +3: un arma de rango Buena Calidad tiene entre +4 y +5"
+  ],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 9.6,
+   "pc": 10.4,
    "tier": "Buena Calidad",
-   "precio": 130,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 5.0,
+    "bonos": 5.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -446,18 +450,20 @@
   "cambios": [
    "Variación para que no sea idéntica a otra arma del catálogo: Envenenar 25 %."
   ],
-  "avisos": [],
+  "avisos": [
+   "Rango +3: un arma de rango Buena Calidad tiene entre +4 y +5"
+  ],
   "bonos_hoy": null,
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.8,
-   "tier": "Común",
-   "precio": 75,
+   "pc": 7.5,
+   "tier": "Buena Calidad",
+   "precio": 80,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 1.5,
+    "bonos": 2.2,
     "crítico": 0.0,
     "efectos": 0.6,
     "peso del arma": -0.2
@@ -490,13 +496,13 @@
   "precioHoy": 130,
   "detalle": "Arma de una mano a distancia, Tipo 6. Rango +3.",
   "nuevo": {
-   "pc": 6.6,
-   "tier": "Común",
-   "precio": 75,
+   "pc": 7.6,
+   "tier": "Buena Calidad",
+   "precio": 85,
    "exceso": 0,
    "desglose": {
     "daño": 4.8,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -535,13 +541,13 @@
   "precioHoy": 260,
   "detalle": "Arma de dos manos a distancia, Tipo 8. Rango +5. Puede Romper armadura (25%).",
   "nuevo": {
-   "pc": 14.6,
+   "pc": 15.8,
    "tier": "Raro",
-   "precio": 270,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 11.0,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 1.5,
     "peso del arma": -0.4
@@ -3445,13 +3451,13 @@
   "precioHoy": 40,
   "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
   "nuevo": {
-   "pc": 3.8,
+   "pc": 4.5,
    "tier": "Común",
-   "precio": 50,
+   "precio": 55,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 1.5,
+    "bonos": 2.2,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3475,26 +3481,26 @@
     "val": 3
    },
    {
-    "stat": "pdg",
+    "stat": "ini",
     "val": 1
    }
   ],
   "efectos": [],
   "cambios": [
-   "Variación para que no sea idéntica a otra arma del catálogo: pdg +1."
+   "Variación para que no sea idéntica a otra arma del catálogo: ini +1."
   ],
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": 40,
   "detalle": "Arma de una mano a distancia, Tipo 4. Rango +3.",
   "nuevo": {
-   "pc": 7.3,
+   "pc": 5.2,
    "tier": "Común",
-   "precio": 80,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 5.0,
+    "bonos": 2.9,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -4727,18 +4733,20 @@
   "cambios": [
    "Quitar «Estruendo» (ya no existe en el diseño nuevo)"
   ],
-  "avisos": [],
+  "avisos": [
+   "Rango +4: un arma de rango Raro tiene entre +5 y +6"
+  ],
   "bonos_hoy": null,
   "precioHoy": 210,
   "detalle": "Arma de una mano a distancia, Tipo 8. Rango +4. El disparo hace ruido: alerta a los que estén cerca.",
   "nuevo": {
-   "pc": 10.6,
-   "tier": "Buena Calidad",
-   "precio": 150,
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 170,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -4768,18 +4776,20 @@
   ],
   "efectos": [],
   "cambios": [],
-  "avisos": [],
+  "avisos": [
+   "Rango +5: un arma de rango Excepcional tiene entre +6 y +7"
+  ],
   "bonos_hoy": null,
   "precioHoy": 780,
   "detalle": "Arma de una mano a distancia, Tipo 8. Rango +5. Crítico frecuente +1.",
   "nuevo": {
-   "pc": 15.3,
+   "pc": 16.6,
    "tier": "Raro",
-   "precio": 300,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 11.0,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 2.2,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -4975,19 +4985,20 @@
   ],
   "cambios": [],
   "avisos": [
-   "«Aturdir» está fuera del universo de la familia (rango): caso excepcional, solo si es puntual"
+   "«Aturdir» está fuera del universo de la familia (rango): caso excepcional, solo si es puntual",
+   "Rango +5: un arma de rango Legendario tiene entre +8 y +8"
   ],
   "bonos_hoy": null,
   "precioHoy": 1500,
   "detalle": "Arma de una mano a distancia, Tipo 10. Rango +5. Crítico frecuente +2. Cada golpe puede dejar al objetivo Aturdido (50%).",
   "nuevo": {
-   "pc": 22.1,
+   "pc": 23.3,
    "tier": "Excepcional",
-   "precio": 700,
+   "precio": 750,
    "exceso": 0,
    "desglose": {
     "daño": 12.6,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 3.6,
     "efectos": 3.8,
     "peso del arma": -0.4
@@ -7561,6 +7572,987 @@
     "crítico": 0.0,
     "efectos": 4.7,
     "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "nuevo-almadena-de-cantero",
+  "nombre": "Almádena de cantero",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Parte roca y, cuando hace falta, otras cosas duras. Muy pesada para lo que da.",
+  "nuevo": {
+   "pc": 6.3,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.5,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-pico-de-demolicion",
+  "nombre": "Pico de demolición",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Con la punta se abre un muro. +1 de daño fijo.",
+  "nuevo": {
+   "pc": 7.0,
+   "tier": "Común",
+   "precio": 75,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.2,
+    "bonos": 0.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-mazo-de-demolicion",
+  "nombre": "Mazo de demolición",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Buena Calidad",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Cae como un derrumbe y, de canto, frena lo que venga. +1 de daño fijo y Bloqueo +1.",
+  "nuevo": {
+   "pc": 8.2,
+   "tier": "Buena Calidad",
+   "precio": 95,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.2,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-canon-de-mano",
+  "nombre": "Cañón de mano",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un caño corto que hace mucho ruido y bastante daño. Rango +3.",
+  "nuevo": {
+   "pc": 8.6,
+   "tier": "Buena Calidad",
+   "precio": 100,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-hacha-de-derribo",
+  "nombre": "Hacha de derribo",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Derribar",
+    "prob": 25,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Hecha para tumbar puertas y a quien esté detrás. Bloqueo +1 y 25 % de Derribar.",
+  "nuevo": {
+   "pc": 14.8,
+   "tier": "Raro",
+   "precio": 280,
+   "exceso": 0,
+   "desglose": {
+    "daño": 13.0,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 0.9,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-bombarda-portatil",
+  "nombre": "Bombarda portátil",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Prende fuego",
+    "prob": 25,
+    "detalle": "25 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Una bombarda de asedio recortada para cargar al hombro. +1 de daño fijo, Rango +5 y 25 % de Prende fuego.",
+  "nuevo": {
+   "pc": 11.8,
+   "tier": "Raro",
+   "precio": 180,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.2,
+    "bonos": 3.8,
+    "crítico": 0.0,
+    "efectos": 1.1,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-lanzabombas",
+  "nombre": "Lanzabombas",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Derribar",
+    "prob": 25,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Lanza una bomba corta que hace saltar al que la recibe. +1 de daño fijo, Rango +4 y 25 % de Derribar.",
+  "nuevo": {
+   "pc": 11.1,
+   "tier": "Raro",
+   "precio": 150,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.2,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 1.1,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-espadon-colosal-del-asedio",
+  "nombre": "Espadón colosal del asedio",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Más un ariete que una espada; se maneja con los dos brazos y con todo el cuerpo. Parry +1.",
+  "nuevo": {
+   "pc": 20.1,
+   "tier": "Excepcional",
+   "precio": 600,
+   "exceso": 0,
+   "desglose": {
+    "daño": 19.5,
+    "bonos": 1.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-lanzallamas-de-asalto",
+  "nombre": "Lanzallamas de asalto",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Prende fuego",
+    "prob": 50,
+    "detalle": "50 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un chorro de fuego líquido que no se apaga con nada. +1 de daño fijo, Rango +3 y 50 % de Prende fuego.",
+  "nuevo": {
+   "pc": 17.7,
+   "tier": "Excepcional",
+   "precio": 450,
+   "exceso": 0,
+   "desglose": {
+    "daño": 13.7,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 2.2,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-canon-de-campana-de-mano",
+  "nombre": "Cañón de campaña de mano",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Demora",
+    "prob": 25,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un cañón de campaña con correa de hombro: sacude a quien lo recibe. Rango +5 y 25 % de Demora.",
+  "nuevo": {
+   "pc": 17.9,
+   "tier": "Excepcional",
+   "precio": 450,
+   "exceso": 0,
+   "desglose": {
+    "daño": 13.0,
+    "bonos": 3.8,
+    "crítico": 0.0,
+    "efectos": 1.5,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-maza-del-fin-del-mundo",
+  "nombre": "Maza del Fin del Mundo",
+  "origen": "nuevo · tanda 6",
+  "familia": "explosivo",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 4,
+  "danoFijo": 0,
+  "rango": false,
+  "bonos": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Aturdir",
+    "prob": 33,
+    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   },
+   {
+    "nombre": "Demora",
+    "prob": 50,
+    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Cuando cae, se oye en todo el reino. Bloqueo +2, 33 % de Aturdir y 50 % de Demora.",
+  "nuevo": {
+   "pc": 32.3,
+   "tier": "Legendario",
+   "precio": 1600,
+   "exceso": 0,
+   "desglose": {
+    "daño": 26.0,
+    "bonos": 2.5,
+    "crítico": 0.0,
+    "efectos": 4.6,
+    "peso del arma": -0.8
+   }
+  }
+ },
+ {
+  "id": "nuevo-canon-del-dragon",
+  "nombre": "Cañón del Dragón",
+  "origen": "nuevo · tanda 6",
+  "familia": "rango",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 12,
+  "peso": 3,
+  "danoFijo": 3,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 6
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Prende fuego",
+    "prob": 75,
+    "detalle": "75 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Dicen que el bronce se fundió con el aliento de un dragón. +3 de daño fijo, Rango +6 y 75 % de Prende fuego.",
+  "nuevo": {
+   "pc": 28.7,
+   "tier": "Legendario",
+   "precio": 1300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 21.5,
+    "bonos": 4.5,
+    "crítico": 0.0,
+    "efectos": 3.3,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-honda-de-pastor",
+  "nombre": "Honda de pastor",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Con ella se cuidan las ovejas y se espantan lobos. +1 de daño fijo y Rango +3.",
+  "nuevo": {
+   "pc": 6.5,
+   "tier": "Común",
+   "precio": 70,
+   "exceso": 0,
+   "desglose": {
+    "daño": 4.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-arco-de-rama",
+  "nombre": "Arco de rama",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Una rama flexible y una cuerda de tripa. Rango +3.",
+  "nuevo": {
+   "pc": 5.5,
+   "tier": "Común",
+   "precio": 65,
+   "exceso": 0,
+   "desglose": {
+    "daño": 3.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-cerbatana",
+  "nombre": "Cerbatana",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Común",
+  "manos": 1,
+  "tipo": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 25,
+    "detalle": "25 % de dejar Veneno (2 stacks)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un tubo largo y dardos untados. Rango +3 y 25 % de Veneno.",
+  "nuevo": {
+   "pc": 5.2,
+   "tier": "Común",
+   "precio": 60,
+   "exceso": 0,
+   "desglose": {
+    "daño": 2.5,
+    "bonos": 2.2,
+    "crítico": 0.0,
+    "efectos": 0.6,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-arco-de-cuerno",
+  "nombre": "Arco de cuerno",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Cuerno de carnero laminado: tira lejos y con fuerza. Rango +4.",
+  "nuevo": {
+   "pc": 9.6,
+   "tier": "Buena Calidad",
+   "precio": 130,
+   "exceso": 0,
+   "desglose": {
+    "daño": 7.0,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-ballesta-de-repeticion",
+  "nombre": "Ballesta de repetición",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 6,
+  "peso": 1,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un cargador de madera con seis virotes. +2 de daño fijo y Rango +4.",
+  "nuevo": {
+   "pc": 9.0,
+   "tier": "Buena Calidad",
+   "precio": 110,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.2,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-arcabuz-de-mecha",
+  "nombre": "Arcabuz de mecha",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Buena Calidad",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Pólvora, mecha y mucho humo. +1 de daño fijo y Rango +4.",
+  "nuevo": {
+   "pc": 8.3,
+   "tier": "Buena Calidad",
+   "precio": 100,
+   "exceso": 0,
+   "desglose": {
+    "daño": 5.5,
+    "bonos": 3.0,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-arco-del-cazador-de-viboras",
+  "nombre": "Arco del cazador de víboras",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Envenenar",
+    "prob": 50,
+    "detalle": "50 % de dejar Veneno (2 stacks)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Flechas con punta de colmillo. +1 de daño fijo, Rango +5 y 50 % de Veneno.",
+  "nuevo": {
+   "pc": 12.9,
+   "tier": "Raro",
+   "precio": 210,
+   "exceso": 0,
+   "desglose": {
+    "daño": 8.3,
+    "bonos": 3.8,
+    "crítico": 0.0,
+    "efectos": 1.2,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-ballesta-de-asedio",
+  "nombre": "Ballesta de asedio",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Rompe armadura",
+    "prob": 50,
+    "detalle": "50 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Un virote del largo de un brazo: atraviesa placas. Rango +5 y 50 % de romper armadura.",
+  "nuevo": {
+   "pc": 15.3,
+   "tier": "Raro",
+   "precio": 300,
+   "exceso": 0,
+   "desglose": {
+    "daño": 9.0,
+    "bonos": 3.8,
+    "crítico": 0.0,
+    "efectos": 3.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-trabuco-del-contrabandista",
+  "nombre": "Trabuco del contrabandista",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Raro",
+  "manos": 1,
+  "tipo": 8,
+  "peso": 1,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 4
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Derribar",
+    "prob": 25,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Boca ancha y cañón corto: a corta distancia derriba a cualquiera. +2 de daño fijo, Rango +4, PdG +1 y 25 % de Derribar.",
+  "nuevo": {
+   "pc": 13.9,
+   "tier": "Raro",
+   "precio": 250,
+   "exceso": 0,
+   "desglose": {
+    "daño": 6.5,
+    "bonos": 6.5,
+    "crítico": 0.0,
+    "efectos": 1.1,
+    "peso del arma": -0.2
+   }
+  }
+ },
+ {
+  "id": "nuevo-arco-de-fuego-del-centinela",
+  "nombre": "Arco de fuego del centinela",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Prende fuego",
+    "prob": 33,
+    "detalle": "33 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Flechas con estopa embreada: encienden lo que tocan. Rango +6, PdG +1 y 33 % de Prende fuego.",
+  "nuevo": {
+   "pc": 19.4,
+   "tier": "Excepcional",
+   "precio": 550,
+   "exceso": 0,
+   "desglose": {
+    "daño": 10.5,
+    "bonos": 8.0,
+    "crítico": 0.0,
+    "efectos": 1.5,
+    "peso del arma": -0.6
+   }
+  }
+ },
+ {
+  "id": "nuevo-rifle-de-cerrojo-del-cazador",
+  "nombre": "Rifle de cerrojo del cazador",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Excepcional",
+  "manos": 2,
+  "tipo": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectos": [],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Largo, pesado y silencioso de tan preciso. Rango +6 y PdG +2.",
+  "nuevo": {
+   "pc": 22.1,
+   "tier": "Excepcional",
+   "precio": 700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 11.0,
+    "bonos": 11.5,
+    "crítico": 0.0,
+    "efectos": 0.0,
+    "peso del arma": -0.4
+   }
+  }
+ },
+ {
+  "id": "nuevo-arco-del-ultimo-halcon",
+  "nombre": "Arco del Último Halcón",
+  "origen": "nuevo · tanda 5",
+  "familia": "rango",
+  "tier": "Legendario",
+  "manos": 2,
+  "tipo": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "rango": true,
+  "bonos": [
+   {
+    "stat": "rng",
+    "val": 8
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   }
+  ],
+  "efectos": [
+   {
+    "nombre": "Sangrado",
+    "prob": 50,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "bonos_hoy": null,
+  "precioHoy": null,
+  "detalle": "Dicen que sigue apuntando aunque nadie lo tenga en la mano. +2 de daño fijo, Rango +8, PdG +2, Crítico potente +3 y 50 % de Sangrado.",
+  "nuevo": {
+   "pc": 33.0,
+   "tier": "Legendario",
+   "precio": 1700,
+   "exceso": 0,
+   "desglose": {
+    "daño": 15.5,
+    "bonos": 13.0,
+    "crítico": 3.6,
+    "efectos": 1.5,
+    "peso del arma": -0.6
    }
   }
  }

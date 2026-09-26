@@ -31,8 +31,9 @@ K_EFECTO = 1.0            # PC por punto de peso de efecto al 100 %
 PESO_CRITPOT = 0.4       # el Crítico POTENTE vale ~0,4 de un punto de Frecuente (calculado con el multiplicador esperado del d20, ver docs/rework-armas.md)
 PESO_CRIT = 3.0           # peso de 1 punto de Crítico frecuente / potente / Ignora 1
 TASA_PESO = 0.2           # PC que resta cada punto de Peso del arma (relevancia intermedia)
-TASA_STAT = {'pdg': 3.5, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.5, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
+TASA_STAT = {'pdg': 3.5, 'dmg': 1.0, 'parry': 1.0, 'bloqueo': 1.0, 'eva': 1.0, 'rng': 0.75, 'ini': 0.5, 'nitros': 4.0, 'esp': 1.0, 'rangocasteo': 0.5}
 TASA_STAT_DEFECTO = 1.0
+RANGO_TOPE = {'Común': (3, 4), 'Buena Calidad': (4, 5), 'Raro': (5, 6), 'Excepcional': (6, 7), 'Legendario': (8, 8)}   # Rango de las armas de rango por tier: (mínimo, máximo); vale 0,75 PC por punto (la identidad de la familia)
 ALCANCE_PRIMERO = 3.0     # PC del primer punto de Alcance de un arma cuerpo a cuerpo (pegar sin estar adyacente); el 'rng' de las armas de rango es su identidad y va aparte (0,5)
 ALCANCE_EXTRA = 1.0       # PC de cada punto de Alcance siguiente
 UMBRAL_TIER = [('Común', 0), ('Buena Calidad', 7.5), ('Raro', 11), ('Excepcional', 17), ('Legendario', 26)]
@@ -289,6 +290,13 @@ def reajustar(arma):
         elif st not in ('crit', 'critpot') and v > 3 and not (st == 'rng' and a.get('armaDeRango')):
             m['val'] = 3; cambios.append(f"{st} +{v} → +3 (máximo +3 por stat)")
         mods.append(m)
+    if a.get('armaDeRango'):
+        lo, hi = RANGO_TOPE[tier]
+        for m in mods:
+            if m['stat'] == 'rng' and m['val'] > hi:
+                cambios.append(f"Rango +{m['val']} → +{hi} (tope de un arma de rango {tier})"); m['val'] = hi
+            elif m['stat'] == 'rng' and m['val'] < lo:
+                avisos.append(f"Rango +{m['val']}: un arma de rango {tier} tiene entre +{lo} y +{hi}")
     total = sum(m['val'] for m in mods if m['stat'] not in ('crit', 'critpot') and not (m['stat'] == 'rng' and a.get('armaDeRango')))
     if total > MAX_BONOS[tier]:
         avisos.append(f"Tiene {total} puntos de bonos y un {tier} admite hasta {MAX_BONOS[tier]}: recortar o subir de tier")

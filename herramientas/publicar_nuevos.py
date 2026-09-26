@@ -44,7 +44,7 @@ def arma(a):
     it['descripcionNarrativa'] = narrativa(a.get('detalle', ''))
     it['detalle'] = (' · '.join(partes) if partes else 'Sin bonos ni efectos.')
     it['efectosGolpe'] = [dict(e, dado=e.get('dado', '')) for e in a.get('efectosGolpe') or []]
-    it.update({'ranuras': 0, 'danoAmplificado': 0, 'armaDeRango': False, 'efectoMods': [], 'equipoEstadoNombre': '', 'equipoEstadoHpTurno': 0, 'equipoEstadoDetalle': '', 'consumible': False})
+    it.update({'ranuras': 0, 'danoAmplificado': 0, 'armaDeRango': bool(a.get('armaDeRango')), 'efectoMods': [], 'equipoEstadoNombre': '', 'equipoEstadoHpTurno': 0, 'equipoEstadoDetalle': '', 'consumible': False})
     return it
 
 

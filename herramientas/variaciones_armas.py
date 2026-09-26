@@ -26,7 +26,7 @@ VARIACIONES = {
     'Daga de la viuda verde': [VEN],
     'Estileto ritual del acólito': [SANG(25)],
     'Lanza de guardia de puerta': [B('rng', 1)],
-    'Honda del cazador de jabalíes': [B('pdg', 1)],
+    'Honda del cazador de jabalíes': [B('ini', 1)],
     # cortantes (Tipo 6)
     'Espada de taberna': [SANG(25)],
     'Machete de chacarero': [B('ini', 1)],

@@ -1206,5 +1206,570 @@
    }
   ],
   "detalle": "Dicen que suena una sola vez. A dos manos: +3 de daño fijo, Bloqueo +3, Parry +2, 33 % de Aturdir y 75 % de Demora."
+ },
+ {
+  "id": "nuevo-almadena-de-cantero",
+  "nombre": "Almádena de cantero",
+  "tanda": 6,
+  "tier": "Común",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Parte roca y, cuando hace falta, otras cosas duras. Muy pesada para lo que da."
+ },
+ {
+  "id": "nuevo-pico-de-demolicion",
+  "nombre": "Pico de demolición",
+  "tanda": 6,
+  "tier": "Común",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": false,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Con la punta se abre un muro. +1 de daño fijo."
+ },
+ {
+  "id": "nuevo-mazo-de-demolicion",
+  "nombre": "Mazo de demolición",
+  "tanda": 6,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Cae como un derrumbe y, de canto, frena lo que venga. +1 de daño fijo y Bloqueo +1."
+ },
+ {
+  "id": "nuevo-canon-de-mano",
+  "nombre": "Cañón de mano",
+  "tanda": 6,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Un caño corto que hace mucho ruido y bastante daño. Rango +3."
+ },
+ {
+  "id": "nuevo-hacha-de-derribo",
+  "nombre": "Hacha de derribo",
+  "tanda": 6,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Derribar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "detalle": "Hecha para tumbar puertas y a quien esté detrás. Bloqueo +1 y 25 % de Derribar."
+ },
+ {
+  "id": "nuevo-bombarda-portatil",
+  "nombre": "Bombarda portátil",
+  "tanda": 6,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Prende fuego",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Una bombarda de asedio recortada para cargar al hombro. +1 de daño fijo, Rango +5 y 25 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-lanzabombas",
+  "nombre": "Lanzabombas",
+  "tanda": 6,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Derribar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "detalle": "Lanza una bomba corta que hace saltar al que la recibe. +1 de daño fijo, Rango +4 y 25 % de Derribar."
+ },
+ {
+  "id": "nuevo-espadon-colosal-del-asedio",
+  "nombre": "Espadón colosal del asedio",
+  "tanda": 6,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Más un ariete que una espada; se maneja con los dos brazos y con todo el cuerpo. Parry +1."
+ },
+ {
+  "id": "nuevo-lanzallamas-de-asalto",
+  "nombre": "Lanzallamas de asalto",
+  "tanda": 6,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 2,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Prende fuego",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Un chorro de fuego líquido que no se apaga con nada. +1 de daño fijo, Rango +3 y 50 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-canon-de-campana-de-mano",
+  "nombre": "Cañón de campaña de mano",
+  "tanda": 6,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Un cañón de campaña con correa de hombro: sacude a quien lo recibe. Rango +5 y 25 % de Demora."
+ },
+ {
+  "id": "nuevo-maza-del-fin-del-mundo",
+  "nombre": "Maza del Fin del Mundo",
+  "tanda": 6,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 4,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   },
+   {
+    "nombre": "Demora",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Cuando cae, se oye en todo el reino. Bloqueo +2, 33 % de Aturdir y 50 % de Demora."
+ },
+ {
+  "id": "nuevo-canon-del-dragon",
+  "nombre": "Cañón del Dragón",
+  "tanda": 6,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 12,
+  "peso": 3,
+  "danoFijo": 3,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Prende fuego",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Dicen que el bronce se fundió con el aliento de un dragón. +3 de daño fijo, Rango +6 y 75 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-honda-de-pastor",
+  "nombre": "Honda de pastor",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con ella se cuidan las ovejas y se espantan lobos. +1 de daño fijo y Rango +3."
+ },
+ {
+  "id": "nuevo-arco-de-rama",
+  "nombre": "Arco de rama",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Una rama flexible y una cuerda de tripa. Rango +3."
+ },
+ {
+  "id": "nuevo-cerbatana",
+  "nombre": "Cerbatana",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Veneno (2 stacks).",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Un tubo largo y dardos untados. Rango +3 y 25 % de Veneno."
+ },
+ {
+  "id": "nuevo-arco-de-cuerno",
+  "nombre": "Arco de cuerno",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Cuerno de carnero laminado: tira lejos y con fuerza. Rango +4."
+ },
+ {
+  "id": "nuevo-ballesta-de-repeticion",
+  "nombre": "Ballesta de repetición",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Un cargador de madera con seis virotes. +2 de daño fijo y Rango +4."
+ },
+ {
+  "id": "nuevo-arcabuz-de-mecha",
+  "nombre": "Arcabuz de mecha",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Pólvora, mecha y mucho humo. +1 de daño fijo y Rango +4."
+ },
+ {
+  "id": "nuevo-arco-del-cazador-de-viboras",
+  "nombre": "Arco del cazador de víboras",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Veneno (2 stacks).",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Flechas con punta de colmillo. +1 de daño fijo, Rango +5 y 50 % de Veneno."
+ },
+ {
+  "id": "nuevo-ballesta-de-asedio",
+  "nombre": "Ballesta de asedio",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Un virote del largo de un brazo: atraviesa placas. Rango +5 y 50 % de romper armadura."
+ },
+ {
+  "id": "nuevo-trabuco-del-contrabandista",
+  "nombre": "Trabuco del contrabandista",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Derribar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "detalle": "Boca ancha y cañón corto: a corta distancia derriba a cualquiera. +2 de daño fijo, Rango +4, PdG +1 y 25 % de Derribar."
+ },
+ {
+  "id": "nuevo-arco-de-fuego-del-centinela",
+  "nombre": "Arco de fuego del centinela",
+  "tanda": 5,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Prende fuego",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Flechas con estopa embreada: encienden lo que tocan. Rango +6, PdG +1 y 33 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-rifle-de-cerrojo-del-cazador",
+  "nombre": "Rifle de cerrojo del cazador",
+  "tanda": 5,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Largo, pesado y silencioso de tan preciso. Rango +6 y PdG +2."
+ },
+ {
+  "id": "nuevo-arco-del-ultimo-halcon",
+  "nombre": "Arco del Último Halcón",
+  "tanda": 5,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 8
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Dicen que sigue apuntando aunque nadie lo tenga en la mano. +2 de daño fijo, Rango +8, PdG +2, Crítico potente +3 y 50 % de Sangrado."
  }
 ]

@@ -140,6 +140,9 @@ const Duelo = (() => {
 .duelo-danonum.inv{font-size:40px;color:#9ad0ff}
 .duelo-danosub{font-size:14px;color:#cfd6ea;margin-top:4px}
 .duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
+#duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+#duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
+#duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}

@@ -3447,6 +3447,36 @@ function dibujarAuraHex(centro, aura, z){
   ctx.strokeStyle = colorConAlfa(aura.color, 0.6); ctx.lineWidth = 2 / z; ctx.stroke();
 }
 
+// Rango de acción (📏 R y 🔮 T) con línea de visión (2026-09-26, pedido del dueño): como con la visión, si un objeto Sólido (o una Colisión) tapa el paso, lo que queda detrás
+// NO está en el rango. Se ve la pared misma, no lo que hay del otro lado. Sin sólidos en el mapa se dibuja el círculo completo, como siempre.
+function dibujarRangoConVision(centro, radio, color, z){
+  const solidos = solidosSet();
+  if(!solidos.size){ dibujarAuraHex(centro, {radio, color}, z); return; }
+  const C = hexACubo(centro), R = radio, origen = {col: centro.col, fila: centro.fila};
+  const dentro = new Set(), celdas = [];
+  for(let dq = -R; dq <= R; dq++){
+    for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++){
+      const q = C.q + dq, r = C.r + dr, col = cuboACol(q, r), fila = cuboAFila(q, r);
+      if(!lineaLibre(origen, {col, fila}, solidos)) continue;
+      dentro.add(dq + ',' + dr);
+      celdas.push({h: hexCentro(col, fila), dq, dr});
+    }
+  }
+  ctx.beginPath();
+  celdas.forEach(({h}) => trazarHex(h.x, h.y));
+  ctx.fillStyle = colorConAlfa(color, 0.18); ctx.fill();
+  ctx.beginPath();
+  celdas.forEach(({h, dq, dr}) => {
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      if(dentro.has((dq + vq) + ',' + (dr + vr))) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+      ctx.moveTo(h.x + a[0], h.y + a[1]);
+      ctx.lineTo(h.x + b[0], h.y + b[1]);
+    });
+  });
+  ctx.strokeStyle = colorConAlfa(color, 0.6); ctx.lineWidth = 2 / z; ctx.stroke();
+}
+
 function trazarHex(cx, cy){
   ctx.moveTo(cx + ESQUINAS[0][0], cy + ESQUINAS[0][1]);
   for(let i = 1; i < 6; i++) ctx.lineTo(cx + ESQUINAS[i][0], cy + ESQUINAS[i][1]);
@@ -3975,8 +4005,8 @@ function dibujar(){
     const mt = seleccion ? tokens.get(seleccion) : null;   // el rango es del token seleccionado
     const rr = mt && rangoDeToken(mt);
     if(mt && rr){
-      if(rangoActivo && rr.rng > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(rr.rng)), color: '#4FA8D8'}, z);
-      if(rangoMagicoActivo && rr.casteo > 0) dibujarAuraHex({col: mt.col, fila: mt.fila}, {radio: Math.max(0, Math.round(rr.casteo)), color: '#9B7BD4'}, z);
+      if(rangoActivo && rr.rng > 0) dibujarRangoConVision({col: mt.col, fila: mt.fila}, Math.max(0, Math.round(rr.rng)), '#4FA8D8', z);
+      if(rangoMagicoActivo && rr.casteo > 0) dibujarRangoConVision({col: mt.col, fila: mt.fila}, Math.max(0, Math.round(rr.casteo)), '#9B7BD4', z);
     }
   }
 

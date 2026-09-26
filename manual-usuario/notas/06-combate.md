@@ -487,3 +487,52 @@ Cuando **dos fichas de bandos distintos están adyacentes** (un casillero) y una
 
 > [!info] Diseño futuro
 > Es la base para habilidades que jueguen con esto más adelante: más PdG o Evasión en ataques de oportunidad, habilidades que dejan bloquearlos, etc.
+
++++
+titulo: El duelo (ataque paso a paso)
+alias: [Duelo, Menú de duelo, Ataque paso a paso, Cuadro del duelo]
+tags: [combate, herramientas]
+estado: borrador
++++
+Cuando alguien ataca, **se abre un cuadro compartido: el duelo**. Lo ven **todos los que están conectados** (se abre solo) y se puede **minimizar** (queda un botón «⚔ Ver duelo») para hacer otra cosa y volver. Cada uno ve **solo los botones que le tocan**: no se abre la Botonera entera.
+
+## Cómo empieza
+1. Elegís **Atacar** y el tipo de ataque (normal, de oportunidad o contraataque).
+2. Aparece un cartel: **hacé clic sobre el token al que atacás** (Esc o clic derecho cancelan; también hay «Sin objetivo · tirada suelta»).
+3. Se abre el duelo: quién ataca, con qué arma, contra quién.
+
+## Los pasos
+1. **Contacto.** El atacante tira su **PdG** y el defensor **elige a ciegas** cómo defenderse (antes de ver el PdG): **Evasión** o **Parry** con cada arma o escudo equipado. Cada botón muestra **cuánto tirarías** (y, en un Parry, el **Bloqueo** que tirarías si ganás). Los números **quedan secretos** (quien ya tiró ve solo la suya) y **se revelan juntos cuando tiraron los dos**, primero con los dados 3D y después en el cuadro.
+2. **Bloqueo** (si el defensor ganó un Parry): **Fuerza del golpe** contra **Bloqueo**. Si el defensor gana, el golpe queda **bloqueado** y puede **contraatacar**; si pierde, pasa **la mitad del daño** (redondeada para arriba) y el arma o escudo con el que bloqueó **pierde 1 punto de [[Durabilidad]]**.
+3. **Crítico.** Si el golpe pega, se compara el PdG con la defensa usada (Evasión o Parry). Si se alcanza el crítico, **es crítico**: se tiran los d20 (se ve la **tabla** de valores, y si el atacante tiene Crítico potente, cómo y por qué está modificada) y el mejor decide el multiplicador (×2, ×3 o ×4; un d20 bajo da ×1). **Un crítico siempre ignora la Defensa.**
+4. **Daño.** El atacante tira el daño de su arma. Con crítico: todo el daño × el multiplicador, **derecho a la vida**. Sin crítico: daño − Defensa. El **GM** aplica el daño a la vida (respeta Invulnerable y Escudo mágico).
+5. **Efectos del golpe.** Cada efecto del arma con probabilidad (por ejemplo Lisiado 25 %) es **un momento propio**: se tira el dado, sale «¡FUNCIONÓ!» o «No funcionó» y, si funcionó, se toca **Aplicar** (lo aplica el GM). Los efectos que necesitan daño (Envenenar, Sangrado, Lisiado…) **no entran si el golpe no hizo daño**.
+6. **Resumen.** Al terminar, queda **una línea en la [[Mesa]]** con todo lo que pasó.
+
+## Empates
+Si empatan las dos tiradas y **solo una lleva un «+» fijo** (el +1 de los stats impares), **gana la que no lo lleva**. Si las dos lo llevan (o ninguna), **cualquiera de los dos elige par o impar**: el que elige primero decide, se tira un dado y gana el que acierta. Se anuncia en la Mesa con el motivo.
+
+## Dados primero, resultado después
+En todo el juego, cuando hay animación de dados 3D, **primero ruedan los dados y recién cuando quedan quietos aparece el resultado** (en el cuadro y en la Mesa). En el crítico, **el dado más alto destaca** con un brillo y ondas.
+
+## Si el defensor no está
+El **GM** (o el dueño) puede **tirar «a mano»** por él escribiendo el valor de su stat.
+
+> [!question] Detalles abiertos
+> - **Hechizos:** el duelo todavía no cubre lanzar un hechizo (Especial contra Resistencia mágica o mental).
+> - **Áreas y varios objetivos:** hoy es uno contra uno.
+> - **Durabilidad y Armadura rota por ítem:** el cuadro avisa qué objeto pierde un punto, pero todavía no se descuenta solo.
+
++++
+titulo: Durabilidad
+alias: [Durabilidad de armas, Armadura rota por ítem, Reparar]
+tags: [combate, equipo]
+estado: borrador
++++
+**Regla nueva, todavía sin implementar en las fichas.** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**
+
+- **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.
+- **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico no rompe armadura**, ni siquiera el de un arma con Rompe armadura: el crítico justamente evita la armadura.
+- **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.
+- Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).
+- **No se puede reparar durante el combate.** Reparar: **herrero** (1 de oro por punto) y **habilidades de talento** con despojos (2 despojos por punto). El Óleo reparador queda en revisión.

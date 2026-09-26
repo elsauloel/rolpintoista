@@ -34,6 +34,8 @@ let mesaTextoPendiente = '';
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
 
 async function mesaPublicar(origen, r){
+  // Duelo (comun/duelo.js): el PdG, la Evasión, el Parry, la Fuerza del golpe y el Bloqueo de un duelo se publican juntos cuando tiran los dos (elegir la defensa es a ciegas).
+  if(window.DUELO_RETENER) return;
   if(!fbDb || !fbUsuario || !fbMiembro){
     if(typeof MESA_AVISAR_SIN_SESION !== 'undefined' && MESA_AVISAR_SIN_SESION) toast('Entrá a la mesa para tirar');
     return;

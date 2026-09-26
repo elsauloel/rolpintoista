@@ -118,3 +118,7 @@ Cada tirada usa la misma regla de empate (gana la que no lleva «+»; si no, par
 
 ## Estado del resumen final (2026-09-26, hecho, sin probar en mesa)
 Cuando el duelo termina, **quien lo creó (el atacante) publica en la Mesa una línea de resumen** (un renglón por cosa que pasó): quién ataca a quién y con qué, el contacto (PdG contra Evasión o Parry, y si hubo desempate), el Bloqueo, el crítico con sus d20, el daño (con la cuenta y la vida antes y después), la durabilidad que se gasta, cada efecto (✔ aplicado / ✘ no funcionó / no entró) y el resultado. Se publica una sola vez por duelo. **Hay que volver a pegar las reglas de Firestore** (campo `resumido`).
+
+## Ajustes por la primera prueba en el mapa (2026-09-26)
+- **Suspenso de verdad:** el PdG, la Evasión o el Parry, la Fuerza del golpe y el Bloqueo **ya no van a la Mesa apenas se tiran**: se guardan en el duelo y **las dos tiradas de cada par se publican juntas en la Mesa (con sus dados) cuando tiraron los dos**. Antes el PdG aparecía en la Mesa aunque el cuadro lo escondiera, lo que rompía elegir la defensa a ciegas y hacía parecer que el cuadro «no mostraba» un resultado que la Mesa sí. (Mecanismo: `window.DUELO_RETENER` frena `mesaPublicar` mientras el duelo espera esa tirada.)
+- **Opciones de defensa de un creep**: el mapa del GM las calcula solo (`opcionesLocal`), sin cargar las Acciones en un iframe (era lento y a veces no respondía). Si igual no llegan (o la ficha/Acciones no responden en 12 segundos) el cuadro ofrece **↻ Reintentar** y **🎲 Tirar a mano** en vez de quedarse cargando.

@@ -9006,6 +9006,16 @@ async function dueloAplicarDano(d){
   }
 }
 
+// Opciones de defensa de un creep, calculadas en el mapa del GM sin cargar las Acciones: Evasión o Parry con su arma (siempre 1 No2). null = no es un creep mío.
+function dueloOpcionesLocal(d){
+  if(!soyGM || d.defensor.tipo !== 'creep') return null;
+  const sc = creepPrivadoDe(d.defensor.ref);
+  if(!sc) return null;
+  const arma = sc.armaNombre || 'su arma';
+  return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
+    {modo: 'parry', itemId: '', itemNombre: arma, etiqueta: `🗡 Parry · ${arma}`, costo: 1, motivoNo: num(sc.nitros) < 1 ? 'no le alcanzan los No2' : ''}];
+}
+
 // Pone el estado de un efecto del golpe sobre el defensor (solo corre en el mapa del GM). Creep: se escribe su estado; personaje: le llega a su ficha (mismo
 // mecanismo que las trampas y las habilidades de creep); invocación o sin estado automático: a mano.
 async function dueloAplicarEfecto(d, ef){
@@ -9807,7 +9817,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto});
+  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

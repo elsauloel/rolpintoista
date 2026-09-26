@@ -58,7 +58,8 @@ const Duelo = (() => {
   let pendienteSuelto = null;
   let opciones = {};         // id → opciones de defensa del defensor (las pide al iframe o a los hooks)
   let opcionesPedidas = new Set();
-  let aplicando = new Set();   // duelos cuyo daño está aplicando esta pestaña (GM)
+  let aplicando = new Set();
+  const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
 
   const hooks = () => (typeof window !== 'undefined' && window.DUELO_HOOKS) || null;
   const yo = () => (typeof fbUsuario !== 'undefined' && fbUsuario ? fbUsuario.uid : '');
@@ -409,9 +410,9 @@ const Duelo = (() => {
     const tiro = {total: Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod)};
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
-    let anuncio = '';
+    let anuncio = '', par = null;
     await fbDb.runTransaction(async tx => {
-      anuncio = '';
+      anuncio = ''; par = null;
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
@@ -421,7 +422,14 @@ const Duelo = (() => {
       if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
       tx.update(ref, cambiosDe(m));
+      // Tiraron los dos: las dos tiradas van juntas a la Mesa (con los dados), como cierre del suspenso.
+      const a = fase === 'contacto' ? m.pdg : m.fuerza, b = fase === 'contacto' ? m.eva : m.bloqueo;
+      if(a && b){
+        const nb = fase === 'contacto' ? (m.defensa && m.defensa.modo === 'parry' ? 'Parry' : 'Evasión') : 'Bloqueo';
+        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? 'PdG' : 'Fuerza del golpe'}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}`, r: b}];
+      }
     });
+    if(par && typeof mesaPublicar === 'function'){ par.forEach(x => { try{ mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){} }); }
     anunciarMesa(anuncio);
   }
 
@@ -717,13 +725,23 @@ const Duelo = (() => {
     else ejecutar(msg);
   }
 
+  let opcionesFalla = {};   // id → true: las opciones no llegaron (tardaron demasiado o la ficha/Acciones no respondió)
   function pedirOpciones(d){
     if(opcionesPedidas.has(d.id)) return;
     opcionesPedidas.add(d.id);
+    delete opcionesFalla[d.id];
+    // Si la pestaña ya sabe calcularlas sola (el mapa del GM con un creep), no hace falta esperar a un iframe.
+    if(cfgEscuchar.opcionesLocal){
+      let ops = null;
+      try{ ops = cfgEscuchar.opcionesLocal(d); }catch(err){ console.error('Duelo: opcionesLocal', err); }
+      if(ops){ recibirOpciones(d.id, ops); return; }
+    }
     enviar(d.defensor, {tipo: 'duelo-opciones', id: d.id});
+    setTimeout(() => { if(!opciones[d.id]){ opcionesFalla[d.id] = true; if(actual && actual.id === d.id && actual.dato) dibujar(); } }, 12000);
   }
   function recibirOpciones(id, ops){
-    opciones[id] = Array.isArray(ops) ? ops : [];
+    if(Array.isArray(ops)){ opciones[id] = ops; delete opcionesFalla[id]; }
+    else opcionesFalla[id] = true;   // el dueño contestó que no puede (no es su personaje, etc.)
     if(actual && actual.id === id && actual.dato) dibujar();
   }
 
@@ -751,7 +769,11 @@ const Duelo = (() => {
     if(puedoTirarYo(lado)){
       if(campo === 'eva'){
         const ops = opciones[d.id];
-        if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa…</div>'; }
+        if(!ops && opcionesFalla[d.id]){
+          cuerpo = `<div class="espera">No llegaron tus opciones de defensa (la ficha o las Acciones no respondieron).</div><button type="button" class="sec" data-reintentar-def>↻ Reintentar</button>
+            <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo><option value="evasion">Evasión</option><option value="parry">Parry</option></select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
+        }
+        else if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
         else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? '🎲 Pagar y tirar PdG' : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
@@ -997,6 +1019,8 @@ const Duelo = (() => {
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
     });
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
+    const brd = f.querySelector('[data-reintentar-def]');
+    if(brd) brd.onclick = () => { opcionesPedidas.delete(d.id); delete opcionesFalla[d.id]; delete opciones[d.id]; dibujar(); };
     f.querySelectorAll('[data-ef-tirar]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Tirando…'; tirarEfecto(d.id, Number(b.dataset.efTirar)).catch(err => { console.error(err); _toast('No se pudo tirar el efecto'); }); });
     f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efAplicar), {aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); }); });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
@@ -1023,8 +1047,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const d = {id: m.id, ...doc.data()};
       if(m.tipo === 'duelo-opciones'){
-        if(!h.soy || !h.soy(d.defensor)) return;
-        const ops = (h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [];
+        const ops = (h.soy && h.soy(d.defensor)) ? ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []) : null;   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
         return;
@@ -1053,6 +1076,7 @@ const Duelo = (() => {
       if(campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
       if(campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
       if(campo === 'dano') extra = {efectos: h.efectosArma ? (h.efectosArma(d) || []) : []};
+      if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
       esperaTiro = {id: d.id, campo, re: campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo], defensa, extra};
       if(campo === 'pdg') h.atacar(d);
       else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
@@ -1063,6 +1087,7 @@ const Duelo = (() => {
     }catch(err){
       console.error('Duelo: no se pudo ejecutar el pedido', err);
       esperaTiro = null;
+      retener(false);
       _toast('No se pudo tirar: ' + (err.message || err));
       avisarMapaUi();
     }
@@ -1074,6 +1099,7 @@ const Duelo = (() => {
     if(!esperaTiro.re.test(String(det.origen || ''))) return;
     const {id, campo, defensa, extra} = esperaTiro;
     esperaTiro = null;
+    retener(false);
     (campo === 'dano' ? guardarDano(id, r, extra && extra.efectos) : guardarTiro(id, campo, r, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
       .then(() => avisarMapaUi());
   });
@@ -1111,7 +1137,7 @@ const Duelo = (() => {
     const defensa = campo === 'eva' ? {modo, itemId: '', itemNombre: '', costo: 0} : null;
     const etiqueta = campo === 'eva' ? (modo === 'parry' ? 'Parry' : 'Evasión') : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};
-    if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }
+    if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
     (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
@@ -1159,6 +1185,7 @@ const Duelo = (() => {
     });
   }
 
+  // cfg.opcionesLocal(duelo) → opciones de defensa o null (el mapa del GM las calcula solo para un creep, sin cargar las Acciones).
   // cfg.aplicarEfecto(duelo, efecto) → {nota, manual?} (solo el mapa del GM): pone el estado del efecto sobre el defensor.
   // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
   // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.

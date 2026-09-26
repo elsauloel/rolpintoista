@@ -22,6 +22,15 @@ Al tocar **Atacar** se elige el **token objetivo** en el mapa y se abre un **men
 - Espera visible: «esperando que Ana tire su Evasión…», para dar la sensación de duelo real.
 - El GM puede **saltear, forzar o corregir** cualquier paso (regla sandbox: ayudar, no encerrar).
 
+## El crítico como momento de festejo (dueño, 2026-09-26)
+- Cuando el golpe **es crítico**, el paso se **destaca a pantalla completa** en el duelo: cartel **«¡CRÍTICO!»** con animación y color propios, para que el jugador se ponga contento. Lo ven los dos.
+- La **calculadora de crítico** corre sola: rango (PdG − Evasión contra el Tipo), Resistencia a crítico del defensor, y el **multiplicador** que sale del d20 (doble, triple o cuádruple; ya está en `06-combate.md`).
+- El resultado se muestra **enorme y destacado**: el multiplicador («×3 · TRIPLE DAÑO») y, debajo, el número final grande (**35**) con la leyenda **«derecho a la vida»** en rojo. Coincide con la regla actual: el crítico **ignora la Defensa**, así que ese número es exactamente lo que baja de HP.
+- Además del crítico, se muestran con festejo propio los otros momentos altos: Parry exitoso, golpe bloqueado, muerte del defensor.
+
+## Efectos que ahora se aplican solos
+Con el duelo, «si pega, envenena» deja de ser un recordatorio: al pegar, los `efectosGolpe` se tiran en pantalla (con su probabilidad) y, si entran, **se aplican al defensor** (Envenenar, Sangrado, Rompe armadura, Lisiado, Aturdir…) con su estado ya cargado y una línea en el resumen final. Queda el botón «deshacer» y la salida manual del GM, como siempre. *(Esto responde a la pregunta 4: aplicar solos, con deshacer.)*
+
 ## Qué automatiza
 Costo de No2 del ataque, elección de bono de PdG según el tipo de ataque, comparación PdG vs Evasión, Parry vs PdG, Fuerza vs Bloqueo, rango de crítico, resistencia a crítico, resta de Defensa, descuento de HP en la ficha o en el creep, efectos del golpe, y la oferta de contraataque. Hoy todo eso es manual o va en pasos sueltos.
 
@@ -32,7 +41,7 @@ Un documento de Firestore por duelo (`duelos/{id}`) con el estado del paso, las 
 1. **¿Qué pasa si el defensor no responde?** Propuesta: el GM puede tirar por él, o el duelo espera con un botón «tirar por él / seguir sin defensa».
 2. **¿Los creeps defienden con el mismo menú?** Propuesta: sí, en la pantalla del GM, con las mismas botoneras.
 3. **¿El daño se descuenta solo del HP?** Propuesta: sí, con «deshacer» de un toque.
-4. **¿Los efectos del golpe (Sangrado, veneno…) se aplican solos al defensor?** Hoy es a mano a propósito; propuesta: botón «Aplicar» en el paso 7.
+4. ✅ (dueño, 2026-09-26) **Los efectos del golpe se aplican solos al defensor** («si pega, envenena»), con deshacer. *(Cambia la regla anterior de dejarlos a mano.)*
 5. **¿Se puede reaccionar más de una vez?** (Parry, Bloqueo, contraataque encadenado, ataque de oportunidad). Propuesta: cada respuesta abre un duelo hijo dentro del mismo.
 6. **¿Ataques de área, varios objetivos y trampas?** Propuesta: primero 1 contra 1; después uno por objetivo.
 7. **¿Se puede usar la tirada suelta de siempre?** Propuesta: sí, los botones actuales siguen para tiradas sueltas y para mesas sin mapa.

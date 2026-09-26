@@ -1,14 +1,15 @@
-/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 4: contacto, defensa, Parry, Bloqueo, crítico y daño; 1 contra 1).
+/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 5: contacto, defensa, Parry, Bloqueo, crítico, daño y efectos del golpe; 1 contra 1).
    Diseño: docs/ataque-paso-a-paso.md. Idea del dueño, 2026-09-26.
 
    Un duelo es un documento de Firestore (campanas/<partida>/duelos/<id>) que los dos lados ven y escriben en vivo:
-     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'dano'|'fin',
+     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'dano'|'efectos'|'fin',
       atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
       defensa: {modo:'evasion'|'parry', itemId, itemNombre, costo}|null,      ← la elige el defensor A CIEGAS (antes de ver el PdG)
       pdg, eva (la tirada de defensa: Evasión o Parry), fuerza (Fuerza del golpe), bloqueo: {total,formula,rolls,mod}|null,
       critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
       crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
       dano:{crudo,formula,rolls,mod,reclamado,aplicado,mult,golpe,ignoraDef,mitad,defensa,recibido,absorbido,hpAntes,hpDespues,manual}|null,
+      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'en-curso',aplicado,nota}]|null,
       contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
       resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
    Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
@@ -21,6 +22,9 @@
    DAÑO (etapa 4): si el golpe pega (o pasa la mitad), el atacante tira el daño de su arma (sin los efectos del golpe: son la etapa 5). Crítico: daño × multiplicador, derecho a
    la vida (sin restar la Defensa). Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba. El HP lo baja el mapa del GM
    (`escuchar({aplicar})`: reutiliza «Recibe daño» del mapa, con Invulnerable y Escudo mágico) y el resultado queda en el duelo.
+   EFECTOS DEL GOLPE (etapa 5, dueño 2026-09-26): los efectos del arma (Lisiado 25 %, Envenenar…) se tiran UNO POR UNO como momentos propios (dado a la vista y «¡FUNCIONÓ!» /
+   «No funcionó»); si funcionan, un botón «Aplicar» los pone sobre el defensor (lo ejecuta el mapa del GM). Los que necesitan daño (Envenenar, Veneno severo, Sangrado, Drena
+   vida, Lisiado) no entran si el golpe no hizo daño; Demora, Aturdir, Derribar, Prende fuego y Rompe armadura entran aunque no pase el daño.
    EMPATE (regla del dueño): si empatan y solo UNA de las dos tiradas lleva un «+» fijo, gana la que NO lo lleva; si las dos (o ninguna), par o impar.
    TODOS los conectados ven el cuadro (se abre solo); se puede minimizar («⚔ Ver duelo»). Cada uno solo ve los botones que le tocan.
 
@@ -39,7 +43,7 @@ const Duelo = (() => {
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano'];
+  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos'];
 
   let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
   let revelado = {};         // id:clave → true: ya se animó en esta pestaña
@@ -117,6 +121,16 @@ const Duelo = (() => {
 .duelo-veredicto.bloqueado{background:linear-gradient(180deg,#1f3f5a,#172c3d);border:2px solid #5aa7e8;color:#cfe6fb}
 .duelo-veredicto.mitad{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-ef{background:#12172a;border:1px solid #2f3852;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.duelo-ef-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}
+.duelo-ef-prob{font-size:12px;color:#ffd25a;border:1px solid #ffd25a;border-radius:99px;padding:1px 10px}
+.duelo-ef button{margin-top:8px;background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.duelo-ef button:disabled{opacity:.5}
+.duelo-ef-res{margin-top:8px;padding:10px 12px;border-radius:10px;font-weight:900;font-size:22px}
+.duelo-ef-res span{font-size:13px;font-weight:500}
+.duelo-ef-res.ok{background:rgba(79,206,124,.16);color:#8fe3a9;border:1px solid #4fce7c}
+.duelo-ef-res.no{background:rgba(154,134,126,.14);color:#9aa4bd;border:1px solid #39435c;text-decoration:none}
+.duelo-ef-res.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-danobox{margin-top:10px;text-align:center;border-radius:12px;padding:14px;background:rgba(0,0,0,.25);border:1px solid #39435c}
 .duelo-danobox.crit{border-color:#ff5a5a;background:radial-gradient(circle at 50% 30%,rgba(120,20,20,.55),rgba(40,8,8,.6))}
 .duelo-danonum{font-size:96px;font-weight:900;line-height:1;animation:duelo-num .6s ease-out both}
@@ -266,7 +280,7 @@ const Duelo = (() => {
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado)},
-      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, contra: null,
+      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
       creadoPor: yo(),
       creado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -411,8 +425,106 @@ const Duelo = (() => {
     anunciarMesa(anuncio);
   }
 
+  /* ---------- efectos del golpe ---------- */
+  // Efectos que SOLO entran si el golpe hizo daño (decidido por el dueño, 2026-09-26). El resto entra aunque la armadura absorba todo. Un efecto puede traer `requiereDano` propio.
+  const EFECTOS_CON_DANO = ['envenenar', 'veneno severo', 'sangrado', 'drena vida', 'lisiado'];
+  const requiereDanoDe = ef => (typeof ef.requiereDano === 'boolean') ? ef.requiereDano : EFECTOS_CON_DANO.includes(String(ef.nombre || '').trim().toLowerCase());
+  const siempreEf = ef => _num(ef.caras) <= 1 || _num(ef.exitos) >= _num(ef.caras);
+  const pctEf = ef => Math.round(_num(ef.exitos) / Math.max(1, _num(ef.caras)) * 100);
+  const necesitaTiradaEf = ef => !siempreEf(ef) || !!ef.dado;
+
+  // Del efecto del arma al estado que se le pone al defensor (null = a mano: no hay estado que lo represente).
+  function specDeEfecto(ef){
+    const n = String(ef.nombre || '').trim().toLowerCase();
+    const st = Math.max(0, Math.round(_num(ef.stacks)));
+    if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
+    if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado'};
+    if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
+    if(n === 'lisiado') return {nombre: 'Lisiado'};
+    if(n === 'pajaritos') return {nombre: 'Pajaritos'};
+    if(n === 'aturdir') return {nombre: 'Stun'};
+    if(n === 'derribar' || n === 'knockdown') return {nombre: 'Sentado'};
+    return null;
+  }
+
+  // Los efectos que trae el arma, en el formato del duelo (los manda la página del atacante al tirar el daño).
+  function normalizarEfectos(lista){
+    return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => {
+      const caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
+      const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
+      o.requiereDano = requiereDanoDe(e);
+      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = ''; o.aplicado = false; o.nota = '';
+      return o;
+    }).filter(e => e.nombre);
+  }
+
+  const efectoResuelto = ef => ef.omitido || ef.aplicado || (ef.res && !ef.res.exito);
+  // Si ya no queda ningún efecto por resolver, el duelo termina.
+  function cerrarSiListo(m){
+    if(m.fase !== 'efectos') return;
+    if((m.efectos || []).every(efectoResuelto)){ m.fase = 'fin'; m.estado = 'resuelto'; }
+  }
+
+  // El atacante (o el GM) tira el dado de un efecto: el dado a la vista, «funcionó» o «no funcionó».
+  async function tirarEfecto(id, i){
+    const ref = col().doc(id);
+    let publicar = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      publicar = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(m.fase !== 'efectos' || !ef || ef.res || ef.omitido) return;
+      const r = {dado: 0, exito: true, extra: null};
+      if(!siempreEf(ef)){
+        r.dado = 1 + Math.floor(Math.random() * ef.caras);
+        r.exito = r.dado >= ef.caras - ef.exitos + 1;
+      }
+      if(r.exito && ef.dado && typeof tirarDados === 'function'){
+        const x = tirarDados(ef.dado);
+        if(x) r.extra = {formula: x.formula, total: x.total, rolls: (x.rolls || []).slice(0, 10)};
+      }
+      ef.res = r;
+      m.efectos = m.efectos.map((e, k) => k === i ? ef : e);
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado}};
+      anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
+        : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  // Pedir «Aplicar» (lo ejecuta el mapa del GM) o dar por hecho uno que se hace a mano.
+  async function marcarEfecto(id, i, cambios){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(m.fase !== 'efectos' || !ef || ef.aplicado) return;
+      m.efectos = m.efectos.map((e, k) => k === i ? {...e, ...cambios} : e);
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+  async function terminarEfectos(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'efectos') return;
+      m.fase = 'fin'; m.estado = 'resuelto';
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+
   // El atacante tiró el daño de su arma.
-  async function guardarDano(id, r){
+  async function guardarDano(id, r, efectos){
     const ref = col().doc(id);
     await fbDb.runTransaction(async tx => {
       const doc = await tx.get(ref);
@@ -420,8 +532,27 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
+      m.efectos = normalizarEfectos(efectos);
       tx.update(ref, cambiosDe(m));
     });
+  }
+
+  // Reclamar un pedido de «Aplicar» para que, con varias pestañas del GM, solo una lo ejecute.
+  async function reclamarEfecto(id, i){
+    const ref = col().doc(id);
+    let mio = false;
+    await fbDb.runTransaction(async tx => {
+      mio = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(!ef || ef.aplicado || ef.aplicar !== 'pedido') return;
+      m.efectos = m.efectos.map((e, k) => k === i ? {...e, aplicar: 'en-curso'} : e);
+      tx.update(ref, cambiosDe(m));
+      mio = true;
+    });
+    return mio;
   }
 
   // El GM (en el mapa) aplica el daño al HP: primero se «reclama» para que, con varias pestañas del GM, solo una lo aplique.
@@ -450,8 +581,12 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.fase !== 'dano' || !m.dano || m.dano.aplicado) return;
       m.dano = {...m.dano, ...info, aplicado: true};
-      m.fase = 'fin';
-      m.estado = 'resuelto';
+      // ¿El golpe hizo daño? Los efectos que lo necesitan no entran si la armadura lo absorbió todo.
+      const dn0 = m.dano;
+      const hizoDano = dn0.invulnerable ? false : dn0.manual ? _num(dn0.golpe) > 0 : (_num(dn0.recibido) + _num(dn0.absorbido)) > 0;
+      m.efectos = (m.efectos || []).map(ef => (ef.requiereDano && !hizoDano) ? {...ef, omitido: true, motivo: dn0.invulnerable ? 'era Invulnerable: el golpe no hizo nada' : 'el golpe no hizo daño (la armadura lo absorbió)'} : ef);
+      if((m.efectos || []).length){ m.fase = 'efectos'; m.estado = 'esperando'; cerrarSiListo(m); }
+      else{ m.fase = 'fin'; m.estado = 'resuelto'; }
       tx.update(ref, cambiosDe(m));
       const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.mult > 1;
       anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
@@ -632,6 +767,39 @@ const Duelo = (() => {
 
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
 
+  // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
+  function efectosHtml(d){
+    const efs = d.efectos || [];
+    if(!efs.length) return '';
+    const puedeAtq = esMio(d.atacante) || soyGM();
+    const cards = efs.map((ef, i) => {
+      const clave = d.id + ':ef' + i;
+      const nuevo = ef.res && !revelado[clave];
+      if(ef.res) revelado[clave] = true;
+      const prob = siempreEf(ef) ? 'siempre' : pctEf(ef) + ' %';
+      const spec = specDeEfecto(ef);
+      let estado;
+      if(ef.omitido) estado = `<div class="duelo-ef-res no">✘ No entra: ${_esc(ef.motivo || 'el golpe no hizo daño')}</div>`;
+      else if(ef.aplicado) estado = `<div class="duelo-ef-res ok">✔ Aplicado${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;
+      else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)})</span></div>`;
+      else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
+        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
+        let acc;
+        if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(d.defensor.nombre)}…</div>`;
+        else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
+        else if(spec) acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(EstadosAplicarTexto(spec, ef))} sobre ${_esc(d.defensor.nombre)}</button>`;
+        else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
+        estado = cab + acc;
+      }
+      else if(puedeAtq) estado = `<button type="button" data-ef-tirar="${i}">🎲 Tirar ${siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)}</button><div class="duelo-nota">${siempreEf(ef) ? '' : 'de ' + _fmt(ef.caras - ef.exitos + 1) + (ef.exitos > 1 ? ' a ' + _fmt(ef.caras) : '') + ' funciona · '}${ef.requiereDano ? 'necesita que el golpe haga daño' : 'entra aunque no pase el daño'}</div>`;
+      else estado = `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
+      return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
+    }).join('');
+    const pendiente = d.fase === 'efectos';
+    return `<div class="duelo-paso"><h4><span class="n">6</span>Efectos del golpe</h4>${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
+  }
+  const EstadosAplicarTexto = (spec, ef) => (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre) + (spec.nombre === 'Armadura rota' && spec.stacks > 1 ? ` ×${spec.stacks}` : '');
+
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
   function danoHtml(d){
     const dn = d.dano;
@@ -713,7 +881,7 @@ const Duelo = (() => {
     const nuevoBloqueo = bloqueoListo ? nuevaClave('bloqueo') : false;
     let cierre = '';
     if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
-    else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano')) cierre = veredictoHtml(d, nuevaClave('resultado'));
+    else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano' || d.fase === 'efectos')) cierre = veredictoHtml(d, nuevaClave('resultado'));
     else if(d.estado === 'cancelado') cierre = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
@@ -737,6 +905,7 @@ const Duelo = (() => {
         </div>` : ''}
         ${d.crit ? criticoHtml(d) : ''}
         ${(d.fase === 'dano' || d.dano) ? danoHtml(d) : ''}
+        ${efectosHtml(d)}
         ${cierre}
         <div class="duelo-pie">
           ${puedoCancelar ? '<button type="button" class="sec" data-cancelarduelo>Cancelar duelo</button>' : ''}
@@ -771,6 +940,11 @@ const Duelo = (() => {
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
     });
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
+    f.querySelectorAll('[data-ef-tirar]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Tirando…'; tirarEfecto(d.id, Number(b.dataset.efTirar)).catch(err => { console.error(err); _toast('No se pudo tirar el efecto'); }); });
+    f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efAplicar), {aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); }); });
+    f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
+    const bft = f.querySelector('[data-ef-terminar]');
+    if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));
     const bdt = f.querySelector('[data-dano-tirar]');
     if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano'}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
     const bam = f.querySelector('[data-aplicar-mano]');
@@ -821,6 +995,7 @@ const Duelo = (() => {
       let extra = null;
       if(campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
       if(campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
+      if(campo === 'dano') extra = {efectos: h.efectosArma ? (h.efectosArma(d) || []) : []};
       esperaTiro = {id: d.id, campo, re: campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo], defensa, extra};
       if(campo === 'pdg') h.atacar(d);
       else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
@@ -842,7 +1017,7 @@ const Duelo = (() => {
     if(!esperaTiro.re.test(String(det.origen || ''))) return;
     const {id, campo, defensa, extra} = esperaTiro;
     esperaTiro = null;
-    (campo === 'dano' ? guardarDano(id, r) : guardarTiro(id, campo, r, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
+    (campo === 'dano' ? guardarDano(id, r, extra && extra.efectos) : guardarTiro(id, campo, r, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
       .then(() => avisarMapaUi());
   });
 
@@ -927,6 +1102,7 @@ const Duelo = (() => {
     });
   }
 
+  // cfg.aplicarEfecto(duelo, efecto) → {nota, manual?} (solo el mapa del GM): pone el estado del efecto sobre el defensor.
   // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
   // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.
   function escuchar(cfg){
@@ -959,6 +1135,24 @@ const Duelo = (() => {
           }).catch(err => console.error('Duelo: error al aplicar el daño', err));
         });
       }
+      // El GM (en el mapa) aplica los efectos que el atacante pidió («Aplicar»).
+      if(cfgEscuchar.aplicarEfecto && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.fase !== 'efectos') return;
+          (d.efectos || []).forEach((ef, i) => {
+            const clave = d.id + ':' + i;
+            if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;
+            aplicando.add(clave);
+            reclamarEfecto(d.id, i).then(async mio => {
+              if(!mio) return;
+              let info;
+              try{ info = await cfgEscuchar.aplicarEfecto(d, ef); }
+              catch(err){ console.error('Duelo: no se pudo aplicar el efecto', err); info = {manual: true, nota: 'no se pudo aplicar solo: hacelo a mano'}; }
+              await marcarEfecto(d.id, i, {aplicado: true, aplicar: '', nota: String(info.nota || (info.manual ? 'a mano' : '')).slice(0, 120)});
+            }).catch(err => console.error('Duelo: error al aplicar el efecto', err));
+          });
+        });
+      }
     }, err => console.error('Duelo: error escuchando los duelos', err));
     limpiarViejos();
   }
@@ -972,5 +1166,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones};
+  return {disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
 })();

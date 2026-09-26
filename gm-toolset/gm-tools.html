@@ -8367,6 +8367,11 @@ window.DUELO_HOOKS = {
     const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
     return sc && i >= 0 ? num((sc.crit || [])[i]) : 0;
   },
+  // Los efectos al golpear del arma del creep, que el duelo resuelve uno por uno.
+  efectosArma: d => {
+    const sc = S.creeps.find(c => c.id === d.atacante.ref);
+    return sc ? (sc.armaEfectos || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+  },
   // El daño del arma del creep (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
   dano: d => {
     const sc = S.creeps.find(c => c.id === d.atacante.ref);

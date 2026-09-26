@@ -40,6 +40,7 @@ const EstadosAplicar = (() => {
     if(s.hp) out.hp = Math.round(Number(s.hp) || 0);
     if(s.detalle) out.detalle = String(s.detalle).slice(0, 200);
     if(s.polaridad) out.polaridad = s.polaridad;
+    if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     return out;
   }
   const esPreset = nombre => DEBUFFS.some(p => p.nombre === nombre);
@@ -52,6 +53,7 @@ const EstadosAplicar = (() => {
     if(s.turnos !== undefined) base.turnos = s.turnos;
     if(s.mods) base.mods = structuredClone(s.mods);
     if(s.hp) base.hpTurno = s.hp;
+    if(s.stacks && p && p.esVeneno && !p.permanente){ base.stacks = s.stacks; base.turnos = s.stacks; }   // Veneno de N stacks: dura N turnos
     if(s.detalle) base.detalle = s.detalle;
     if(!p && !s.detalle){
       const partes = (base.mods || []).map(m => `${m.val > 0 ? '+' : ''}${m.val} ${m.stat}`);

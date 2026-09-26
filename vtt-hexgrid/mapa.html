@@ -9005,6 +9005,24 @@ async function dueloAplicarDano(d){
   }
 }
 
+// Pone el estado de un efecto del golpe sobre el defensor (solo corre en el mapa del GM). Creep: se escribe su estado; personaje: le llega a su ficha (mismo
+// mecanismo que las trampas y las habilidades de creep); invocación o sin estado automático: a mano.
+async function dueloAplicarEfecto(d, ef){
+  const spec = Duelo.specDeEfecto(ef);
+  if(!spec) return {manual: true, nota: 'a mano'};
+  const t = tokens.get(d.defensor.tokenId);
+  if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
+  if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return {manual: true, nota: 'es una invocación: aplicalo a mano'};
+  const veces = spec.nombre === 'Armadura rota' ? Math.max(1, num(spec.stacks) || 1) : 1;
+  const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota'} : spec;
+  if(t.tipo === 'creep'){
+    const res = await modificarCreep(t.fichaId, sc => { let r = {ok: false}; for(let i = 0; i < veces; i++) r = EstadosAplicar.aplicarACreep(sc, unico); return r; });
+    return res && res.ok ? {nota: EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')} : {nota: 'no entró: ' + ((res && res.motivo) || 'está protegido')};
+  }
+  for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
+  return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
+}
+
 // Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.
 function dueloRelayMapa(l, msg){
   const creep = l.tipo === 'creep';
@@ -9788,7 +9806,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano});
+  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto});
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

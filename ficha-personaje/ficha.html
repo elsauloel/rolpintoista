@@ -10267,6 +10267,13 @@ window.DUELO_HOOKS = {
     const v = compute().final['tipo' + (i + 1)];
     return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v));
   },
+  // Los efectos al golpear del arma (o de la invocación) que el duelo resuelve uno por uno.
+  efectosArma: d => {
+    const inv = dueloInvDe(d.atacante);
+    if(inv) return (inv.armaEfectos || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
+    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
+    return arma ? (arma.efectosGolpe || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+  },
   // El daño del arma del ataque (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
   dano: d => {
     const inv = dueloInvDe(d.atacante);

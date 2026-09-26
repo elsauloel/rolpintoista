@@ -75,3 +75,4 @@
 - [ ] **Sondeo de mecánicas** ([`sondeo-mecanicas.md`](sondeo-mecanicas.md)): resistencias por elemento mágico, ampliar el equipo con las mecánicas que faltan, relevar creeps y después **reworkear las skills de creeps** coordinadas con el equipo (pedido del dueño, 2026-09-25).
 - [ ] **Auditoría de defensa** (`datos/auditoria-defensa.html`): que el dueño audite; después el asistente aplica al catálogo con `importar_json.py`.
 - [ ] **Consumibles de visibilidad automáticos en el mapa** (destapar radio / luz sostenida con turnos / revelar lo oculto al usar el consumible): hoy son ✋ a mano. Diseño en [`rework-consumibles-visibilidad.md`](rework-consumibles-visibilidad.md).
+- [ ] **Revelar lo oculto automático para el Yelmo del Ojo Que Todo Lo Ve** (`revelaOculto` en el ítem equipado → el mapa muestra a los jugadores creeps en sigilo, trampas y elementos ocultos dentro del campo de visión del portador). Hoy es ✋ a mano. Ver `rework-defensa.md` (piezas de visión).

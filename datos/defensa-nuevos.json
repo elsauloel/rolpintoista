@@ -782,5 +782,328 @@
   "equipoEstadoNombre": "Percepción aumentada",
   "equipoEstadoDetalle": "Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón) y las trampas ocultas cercanas te avisan. Es el mismo efecto que la pasiva «Percepción aumentada» del Job.",
   "percepcionAumentada": true
+ },
+ {
+  "id": "nuevo-gafas-de-aviador",
+  "nombre": "Gafas de aviador",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Visión +1",
+  "descripcionNarrativa": "Cristales ahumados y cuero gastado; alguien las trajo de una cabina que ya no existe. Con ellas se ve un poco más lejos y se llora un poco menos con el viento.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-capucha-de-vigia",
+  "nombre": "Capucha de vigía",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 55,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1 · Visión +1",
+  "descripcionNarrativa": "Con visera larga para el sol de la muralla y una ranura ancha para los ojos. Los vigías de garita juran que con ella se ve hasta el día siguiente.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-yelmo-de-vigia",
+  "nombre": "Yelmo de vigía",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Visión +1",
+  "descripcionNarrativa": "Un yelmo abierto por delante, con una pequeña visera móvil. Quien lo usa aprendió a mirar sin que le moleste la cabeza que lleva puesta.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-monoculo-del-cartografo",
+  "nombre": "Monóculo del cartógrafo",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Visión +1 · Especial +1",
+  "descripcionNarrativa": "Un cristal fino en marco de bronce, con una escala grabada en el borde. Hace que el mundo parezca ya dibujado y medido.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-capa-del-explorador",
+  "nombre": "Capa del explorador",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Evasión +1 · Visión +1",
+  "descripcionNarrativa": "Lleva un forro de bolsillos para brújulas y catalejos. No abriga demasiado, pero acostumbra a mirar hacia adelante.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-casco-del-centinela",
+  "nombre": "Casco del centinela",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Visión +2",
+  "descripcionNarrativa": "Un casco cerrado, con mira de rendija que afila la vista en lugar de estrecharla. Los centinelas dicen que no se sienten las horas de guardia.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-antifaz-del-ave-nocturna",
+  "nombre": "Antifaz del ave nocturna",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 250,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Evasión +1 · Visión +2",
+  "descripcionNarrativa": "Cuero negro y plumas de lechuza cosidas al borde. Con él puesto, la oscuridad parece una idea que otros tienen.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-mayor",
+  "nombre": "Anillo de vista aguda mayor",
+  "tier": "Raro",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 2000,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +2",
+  "descripcionNarrativa": "Una alianza de plata con una piedra ámbar que sigue con la vista a quien la lleva. La distancia se vuelve un asunto de opinión.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-casco-de-ojos-de-aguila",
+  "nombre": "Casco de ojos de águila",
+  "tier": "Excepcional",
+  "tipoItem": "cabeza",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 750,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · PdG +1 · Visión +3",
+  "descripcionNarrativa": "Forjado con dos ojos de bronce sobre la frente y una visera que parece pico. Ve lo que ve un águila y golpea cuando el águila golpea.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda",
+  "nombre": "Anillo de vista aguda",
+  "tier": "Común",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 1200,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +1",
+  "descripcionNarrativa": "Un aro sencillo de cobre con una gota de cristal. Dicen que se le abren los ojos a quien lo lleva.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-superior",
+  "nombre": "Anillo de vista aguda superior",
+  "tier": "Legendario",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 3000,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +3",
+  "descripcionNarrativa": "Un anillo que ya no parece de metal: más bien un ojo diminuto que mira por dos. El horizonte deja de ser un límite.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-yelmo-del-ojo-que-todo-lo-ve",
+  "nombre": "Yelmo del Ojo Que Todo Lo Ve",
+  "tier": "Legendario",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 7
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Revela lo oculto en todo tu campo de visión (✋ a mano)",
+  "descripcionNarrativa": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es.",
+  "categoria": "vision",
+  "revelaOculto": true,
+  "equipoEstadoNombre": "Ojo que todo lo ve",
+  "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: personajes en sigilo, trampas y elementos escondidos se ven. ✋ A mano: el GM usa 👁 Revelar lo oculto dentro de ese radio (todavía no se hace solo desde el mapa)."
  }
 ]

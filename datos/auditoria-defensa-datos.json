@@ -16495,6 +16495,502 @@
   "detalle": "Un aro de plata con una piedra clara en forma de ojo. Al ponérselo, los sonidos se afinan y los rincones oscuros dejan de guardar secretos: cada detalle fuera de lugar salta a la vista."
  },
  {
+  "id": "nuevo-gafas-de-aviador",
+  "nombre": "Gafas de aviador",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Común",
+  "peso": 0,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 60,
+  "detalle": "Cristales ahumados y cuero gastado; alguien las trajo de una cabina que ya no existe. Con ellas se ve un poco más lejos y se llora un poco menos con el viento."
+ },
+ {
+  "id": "nuevo-capucha-de-vigia",
+  "nombre": "Capucha de vigía",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Común",
+  "peso": 1,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 55,
+  "detalle": "Con visera larga para el sol de la muralla y una ranura ancha para los ojos. Los vigías de garita juran que con ella se ve hasta el día siguiente."
+ },
+ {
+  "id": "nuevo-yelmo-de-vigia",
+  "nombre": "Yelmo de vigía",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Buena Calidad",
+  "peso": 2,
+  "def": 4,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 120,
+  "detalle": "Un yelmo abierto por delante, con una pequeña visera móvil. Quien lo usa aprendió a mirar sin que le moleste la cabeza que lleva puesta."
+ },
+ {
+  "id": "nuevo-monoculo-del-cartografo",
+  "nombre": "Monóculo del cartógrafo",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Buena Calidad",
+  "peso": 0,
+  "def": 1,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 130,
+  "detalle": "Un cristal fino en marco de bronce, con una escala grabada en el borde. Hace que el mundo parezca ya dibujado y medido."
+ },
+ {
+  "id": "nuevo-capa-del-explorador",
+  "nombre": "Capa del explorador",
+  "origen": "nuevo · defensa",
+  "slot": "torso",
+  "tipoItem": "armadura_blanda",
+  "tier": "Buena Calidad",
+  "peso": 2,
+  "def": 4,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 130,
+  "detalle": "Lleva un forro de bolsillos para brújulas y catalejos. No abriga demasiado, pero acostumbra a mirar hacia adelante."
+ },
+ {
+  "id": "nuevo-casco-del-centinela",
+  "nombre": "Casco del centinela",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Raro",
+  "peso": 2,
+  "def": 5,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 300,
+  "detalle": "Un casco cerrado, con mira de rendija que afila la vista en lugar de estrecharla. Los centinelas dicen que no se sienten las horas de guardia."
+ },
+ {
+  "id": "nuevo-antifaz-del-ave-nocturna",
+  "nombre": "Antifaz del ave nocturna",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 2,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 250,
+  "detalle": "Cuero negro y plumas de lechuza cosidas al borde. Con él puesto, la oscuridad parece una idea que otros tienen."
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-mayor",
+  "nombre": "Anillo de vista aguda mayor",
+  "origen": "nuevo · defensa",
+  "slot": "anillo",
+  "tipoItem": "anillos",
+  "tier": "Raro",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "despues": [
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 2000,
+  "detalle": "Una alianza de plata con una piedra ámbar que sigue con la vista a quien la lleva. La distancia se vuelve un asunto de opinión."
+ },
+ {
+  "id": "nuevo-casco-de-ojos-de-aguila",
+  "nombre": "Casco de ojos de águila",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Excepcional",
+  "peso": 3,
+  "def": 6,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 750,
+  "detalle": "Forjado con dos ojos de bronce sobre la frente y una visera que parece pico. Ve lo que ve un águila y golpea cuando el águila golpea."
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda",
+  "nombre": "Anillo de vista aguda",
+  "origen": "nuevo · defensa",
+  "slot": "anillo",
+  "tipoItem": "anillos",
+  "tier": "Común",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "despues": [
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1200,
+  "detalle": "Un aro sencillo de cobre con una gota de cristal. Dicen que se le abren los ojos a quien lo lleva."
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-superior",
+  "nombre": "Anillo de vista aguda superior",
+  "origen": "nuevo · defensa",
+  "slot": "anillo",
+  "tipoItem": "anillos",
+  "tier": "Legendario",
+  "peso": 0,
+  "def": 0,
+  "antes": [
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "despues": [
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 3000,
+  "detalle": "Un anillo que ya no parece de metal: más bien un ojo diminuto que mira por dos. El horizonte deja de ser un límite."
+ },
+ {
+  "id": "nuevo-yelmo-del-ojo-que-todo-lo-ve",
+  "nombre": "Yelmo del Ojo Que Todo Lo Ve",
+  "origen": "nuevo · defensa",
+  "slot": "cabeza",
+  "tipoItem": "cabeza",
+  "tier": "Legendario",
+  "peso": 2,
+  "def": 7,
+  "antes": [
+   {
+    "stat": "def",
+    "val": 7
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "despues": [
+   {
+    "stat": "def",
+    "val": 7
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "cambios": [],
+  "avisos": [],
+  "precioHoy": 1900,
+  "detalle": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es."
+ },
+ {
   "id": "nuevo-polvora-de-destello",
   "nombre": "Pólvora de destello",
   "origen": "nuevo · consumible",

@@ -446,7 +446,8 @@ const Duelo = (() => {
         par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? 'PdG' : 'Fuerza del golpe'}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}`, r: b}];
       }
     });
-    if(par && typeof mesaPublicar === 'function'){ par.forEach(x => { try{ mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){} }); }
+    // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
+    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){ return null; } })); }
     anunciarMesa(anuncio);
   }
 
@@ -994,8 +995,8 @@ const Duelo = (() => {
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }
 
-  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, los d20 del crítico).
-  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0) + (d.crit && d.crit.d20 ? 1 : 0);
+  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, los d20 del crítico, el daño y cada efecto tirado): el cuadro espera a los dados 3D en cada una.
+  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0) + (d.crit && d.crit.d20 ? 1 : 0) + (d.dano ? 1 : 0) + (d.efectos || []).filter(e => e && e.res && !siempreEf(e)).length;
 
   // Espera a que los dados 3D rueden y queden quietos (o un máximo, por si no hay animación) y llama a cb.
   function esperarDados(cb){

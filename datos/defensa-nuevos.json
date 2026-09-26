@@ -766,5 +766,21 @@
   "efectoMods": [],
   "detalle": "Res. crítico Tipo 12 +1 · Res. Mt +1",
   "descripcionNarrativa": "Un aro ennegrecido por mil chispas que jamás llegaron a prender. Quien lo lleva se asombra de lo poco que le explota alrededor."
+ },
+ {
+  "id": "nuevo-anillo-de-percepcion-aumentada",
+  "nombre": "Anillo de percepción aumentada",
+  "tier": "Raro",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 2000,
+  "mods": [],
+  "efectoMods": [],
+  "detalle": "Percepción aumentada mientras lo llevás puesto (el mismo efecto que la pasiva del Job).",
+  "descripcionNarrativa": "Un aro de plata con una piedra clara en forma de ojo. Al ponérselo, los sonidos se afinan y los rincones oscuros dejan de guardar secretos: cada detalle fuera de lugar salta a la vista.",
+  "equipoEstadoNombre": "Percepción aumentada",
+  "equipoEstadoDetalle": "Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón) y las trampas ocultas cercanas te avisan. Es el mismo efecto que la pasiva «Percepción aumentada» del Job.",
+  "percepcionAumentada": true
  }
 ]

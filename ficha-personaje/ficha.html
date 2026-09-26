@@ -4074,7 +4074,8 @@ const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 
    además hace que el mapa le avise de las trampas ocultas cercanas. */
 const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
 function tienePercepcionAumentada(){
-  return (S.pasivas || []).some(p => p.poolId === 'percepcion-aumentada' || p.percepcionAumentada);
+  return (S.pasivas || []).some(p => p.poolId === 'percepcion-aumentada' || p.percepcionAumentada)
+    || (S.inventario || []).some(i => i.equipado && (i.percepcionAumentada || /percepci[oó]n aumentada/i.test(i.equipoEstadoNombre || '')));   // el anillo de percepción aumentada, equipado, da el mismo efecto que la pasiva
 }
 function tirarPercepcion(){
   const valor = compute().final.percepcion;

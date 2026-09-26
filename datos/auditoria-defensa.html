@@ -77,7 +77,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 const GH_REPO = 'elsauloel/rolpintoista', GH_BRANCH = 'nueva-version';
 const RUTA_DECISIONES = 'datos/auditoria-defensa.json';
 const LS = 'auditoria-defensa';
-const NOMBRES_FAMILIA = {cabeza: 'Cabeza', torso: 'Torso', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', escudo: 'Escudos', 'cinturón': 'Cinturones', anillo: 'Anillos'};
+const NOMBRES_FAMILIA = {cabeza: 'Cabeza', torso: 'Torso', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', escudo: 'Escudos', 'cinturón': 'Cinturones', anillo: 'Anillos', consumible: 'Consumibles'};
 const ORDEN_FAMILIA = Object.keys(NOMBRES_FAMILIA);
 const ORDEN_TIER = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
 const TIPO_CRIT = {tipo1: 'Res. crít. Tipo 4', tipo2: 'Res. crít. Tipo 6', tipo3: 'Res. crít. Tipo 8', tipo4: 'Res. crít. Tipo 10', tipo5: 'Res. crít. Tipo 12'};
@@ -114,10 +114,10 @@ function tarjeta(a){
     <div class="cab"><b>${esc(a.nombre)}</b><span class="chip tier">${esc(a.tier)}</span><span class="chip">${esc(NOMBRES_FAMILIA[a.slot] || a.slot)}</span><span class="chip">peso ${a.peso ?? 0}</span>${a.origen !== 'catálogo actual' ? `<span class="chip">${esc(a.origen)}</span>` : ''}</div>
     <div class="grid">
       <div>
-        <div class="dato"><span>${cambia ? 'Antes:' : 'Stats:'}</span> ${esc(fmt(a.antes))}</div>
+        ${a.reglas ? `<div class="dato"><span>Reglas:</span> ${esc(a.reglas)}</div>` : `<div class="dato"><span>${cambia ? 'Antes:' : 'Stats:'}</span> ${esc(fmt(a.antes))}</div>`}
         ${cambia ? `<div class="dato"><span>Propuesto:</span> <b>${esc(fmt(a.despues))}</b></div>` : ''}
       </div>
-      <div class="val"><div><span class="cont">Precio hoy:</span> <b>${a.precioHoy != null ? '$' + a.precioHoy : '—'}</b> (${esc(a.tier)}; sin recalibrar)</div></div>
+      <div class="val"><div><span class="cont">Precio hoy:</span> <b>${a.precioHoy != null ? '$' + a.precioHoy : '—'}</b> (${esc(a.tier)}${a.slot === 'consumible' ? '' : '; sin recalibrar'})</div></div>
     </div>
     ${cambia ? `<div class="camb"><b>Cambios propuestos por las reglas de slots:</b><ul>${a.cambios.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
     ${(a.avisos || []).length ? `<div class="avis"><b>A decidir:</b><ul>${a.avisos.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}

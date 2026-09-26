@@ -21,7 +21,7 @@
   "id": "nuevo-estilete-de-practica",
   "nombre": "Estilete de práctica",
   "tanda": 1,
-  "tier": "Común",
+  "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
   "tipoDado": 4,
   "peso": 1,
@@ -33,7 +33,7 @@
    }
   ],
   "efectosGolpe": [],
-  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza. Variación: pdg +1."
+  "detalle": "Punta afilada de más. El arma del que recién empieza, y por eso la usa con cuidado: +1 de daño fijo y PdG +1."
  },
  {
   "id": "nuevo-lezna-de-zapatero",
@@ -143,10 +143,6 @@
   "danoFijo": 0,
   "mods": [
    {
-    "stat": "pdg",
-    "val": 1
-   },
-   {
     "stat": "rng",
     "val": 1
    },
@@ -160,7 +156,7 @@
    }
   ],
   "efectosGolpe": [],
-  "detalle": "El arma de los duelistas: PdG +1, Alcance +1, Crítico potente +3 y Crítico frecuente +1."
+  "detalle": "El arma de los duelistas: Alcance +1, Crítico potente +3 y Crítico frecuente +1."
  },
  {
   "id": "nuevo-lanza-de-lisiar",
@@ -177,10 +173,6 @@
     "val": 2
    },
    {
-    "stat": "pdg",
-    "val": 1
-   },
-   {
     "stat": "critpot",
     "val": 3
    }
@@ -193,7 +185,7 @@
     "detalle": "33 % de dejar Lisiado 3 turnos."
    }
   ],
-  "detalle": "Larga y traicionera: Alcance +2, PdG +1, Crítico potente +3 y 33 % de Lisiado."
+  "detalle": "Larga y traicionera: Alcance +2, Crítico potente +3 y 33 % de Lisiado."
  },
  {
   "id": "nuevo-punal-envenenado",
@@ -266,7 +258,7 @@
    },
    {
     "stat": "pdg",
-    "val": 2
+    "val": 1
    },
    {
     "stat": "critpot",
@@ -285,7 +277,7 @@
     "detalle": "50 % de dejar Lisiado 3 turnos."
    }
   ],
-  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +2, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado."
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +1, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado."
  },
  {
   "id": "nuevo-colmillo-de-la-reina-arana",
@@ -818,10 +810,6 @@
    {
     "stat": "rng",
     "val": 2
-   },
-   {
-    "stat": "pdg",
-    "val": 1
    }
   ],
   "efectosGolpe": [
@@ -832,7 +820,7 @@
     "detalle": "50 % de dejar Sangrado."
    }
   ],
-  "detalle": "Se tira y vuelve (a veces). Alcance +2, PdG +1 y 50 % de Sangrado."
+  "detalle": "Se tira y vuelve (a veces). Alcance +2, 50 % de Sangrado."
  },
  {
   "id": "nuevo-gran-hacha-de-doble-filo",

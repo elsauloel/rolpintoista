@@ -11133,6 +11133,7 @@ function fichaResumen(){
     percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
     rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
     rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
+    vision: n(c.final.vision),   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
     // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
     crit: n(c.final.crit), critpot: n(c.final.critpot),   // Crítico frecuente y potente
     armaTipo: (() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return a ? num(a.tipoDado) : 0; })(),   // Tipo de su arma equipada

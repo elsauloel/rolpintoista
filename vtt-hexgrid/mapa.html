@@ -218,6 +218,9 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
   position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
   background:var(--panel);border:1px solid #3F6FB0;border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:5px
 }
+.ojo-luz{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;font-size:13px;color:var(--paper)}
+.ojo-luz select,.ojo-luz input{background:var(--panel2, #221A1E);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font:inherit}
+.ojo-luz input{width:56px}
 .desplegable-lista a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);color:var(--paper);text-decoration:none}
 .desplegable-lista a:hover{background:rgba(63,111,176,.25)}
 .desplegable-lista .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
@@ -781,6 +784,11 @@ body.con-ruta .toast{bottom:auto;top:74px}
           <button type="button" class="btn" id="btn-niebla" title="Prender o apagar la niebla de guerra en este mapa">🌫 Niebla: no</button>
           <button type="button" class="btn" id="btn-niebla-jugador" title="Ver el mapa como lo ven los jugadores" hidden>👁 Como jugador</button>
           <button type="button" class="btn" id="btn-vision-creeps" title="Ver lo que ven los creeps: una niebla semitransparente sobre lo que ningún creep alcanza a ver, y en naranja lo que verían si los objetos sólidos no les taparan la vista">👹 Visión de los creeps</button>
+          <div class="ojo-luz" id="ojo-luz" title="Luz de la escena: el radio de visión base de este mapa. A más luz, más se ve (con la niebla prendida). Los ítems y pasivas de cada personaje se suman a este radio.">
+            <span>💡 Luz de la escena</span>
+            <select id="luz-preset"><option value="1">1 · Ceguera casi total</option><option value="2">2 · Oscuridad</option><option value="3">3 · Penumbra</option><option value="4">4 · Noche de luna</option><option value="5">5 · Anochecer</option><option value="6">6 · Normal</option><option value="8">8 · Día claro</option><option value="10">10 · Pleno día</option><option value="12">12 · Cielo despejado</option><option value="">Otro…</option></select>
+            <input type="number" id="luz-num" min="1" max="20" step="1">
+          </div>
           <button type="button" class="btn" id="btn-ojo" title="Revelar lo oculto (personajes en sigilo…). Los jugadores reciben un aviso muy evidente.">👁 Revelar lo oculto</button>
           <button type="button" class="btn peligro" id="btn-niebla-reiniciar" title="Volver a tapar todo lo descubierto de este mapa">↺ Restablecer niebla</button>
         </div>
@@ -1585,7 +1593,10 @@ function renderLinkHerramienta(){
    de "Como jugador". Campo de visión por defecto: radio de 6 hexágonos menos
    una cuña ciega de 120° hacia atrás (ver docs/preguntas-abiertas.md, P47). */
 const NB_OFF = 100000, NB_K = 200001;
-const VISION_RADIO = 6;
+const VISION_RADIO = 6;        // radio de visión normal (luz «Normal» de la escena)
+const LUZ_MIN = 1, LUZ_MAX = 20;
+let luzEscena = VISION_RADIO;   // radio de visión base de ESTE mapa (lo fija el GM en 👁 → 💡 Luz de la escena): a más luz, más se ve
+const LUZ_PRESETS = [[1, "Ceguera casi total"], [2, "Oscuridad"], [3, "Penumbra"], [4, "Noche de luna"], [5, "Anochecer"], [6, "Normal"], [8, "Día claro"], [10, "Pleno día"], [12, "Cielo despejado"]];
 const VISION_CUNA_CIEGA = 60;   // grados a cada lado de "atrás" que no se ven (120° en total)
 let nieblaActiva = false;
 let nieblaDescubierta = new Set();   // claves empaquetadas (col, fila)
@@ -2451,14 +2462,16 @@ function tokenVisiblePorNiebla(t){
 // Casillas (offsets en cubo) que ve un token según hacia dónde mira:
 // radio VISION_RADIO menos la cuña de atrás. Una por cada uno de los 6 frentes.
 const visionOffsets = [];
-function offsetsVision(k){
-  if(visionOffsets[k]) return visionOffsets[k];
+function offsetsVision(k, R){
+  R = R || VISION_RADIO;
+  const clave = k + ':' + R;
+  if(visionOffsets[clave]) return visionOffsets[clave];
   const rot = k * 60 * Math.PI / 180;
   const bx = Math.sin(rot), by = -Math.cos(rot);   // "atrás" (el frente es (-sin, cos); 0° = abajo)
   const base = hexCentro(0, 0);
   const res = [];
-  for(let dq = -VISION_RADIO; dq <= VISION_RADIO; dq++){
-    for(let dr = Math.max(-VISION_RADIO, -dq - VISION_RADIO); dr <= Math.min(VISION_RADIO, -dq + VISION_RADIO); dr++){
+  for(let dq = -R; dq <= R; dq++){
+    for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++){
       const p = hexCentro(cuboACol(dq, dr), cuboAFila(dq, dr));
       const vx = p.x - base.x, vy = p.y - base.y, largo = Math.hypot(vx, vy);
       if(largo > 0){
@@ -2468,7 +2481,16 @@ function offsetsVision(k){
       res.push({dq, dr});
     }
   }
-  return (visionOffsets[k] = res);
+  return (visionOffsets[clave] = res);
+}
+// Radio de visión de un token: la luz de la escena + lo que suman sus ítems y pasivas (Visión de la ficha: base 6, ej. Ojo avizor +1).
+function radioVisionDe(t){
+  let bonus = 0;
+  if(t && t.tipo === 'pj'){
+    const v = vinculo(t), r = v && v.resumen;
+    if(r && Number.isFinite(r.vision) && r.vision > 0) bonus = r.vision - VISION_RADIO;
+  }
+  return Math.max(1, Math.min(30, luzEscena + bonus));
 }
 function celdasVisionDe(t, ignorarSolidos){
   const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
@@ -2476,7 +2498,7 @@ function celdasVisionDe(t, ignorarSolidos){
   const solidos = ignorarSolidos ? new Set() : solidosSet();
   const origen = {col: t.col, fila: t.fila};
   const res = [];
-  offsetsVision(k).forEach(o => {
+  offsetsVision(k, radioVisionDe(t)).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
     if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
@@ -2502,7 +2524,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) : 0}`).join('|') + '#' + solidosFirma();
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
@@ -2552,6 +2574,7 @@ function escucharNiebla(){
   cortarNiebla = fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
     nieblaActiva = d.activa === true;
+    luzEscena = Number.isFinite(d.luz) ? Math.max(LUZ_MIN, Math.min(LUZ_MAX, Math.round(d.luz))) : VISION_RADIO;
     const antes = nieblaDescubierta.size;
     nieblaDescubierta = new Set(Array.isArray(d.descubiertas) ? d.descubiertas.map(Number) : []);
     // Restablecer la niebla (todo lo descubierto se vacía): también desaparecen
@@ -2577,10 +2600,28 @@ function renderNiebla(){
   j.classList.toggle('primary', nieblaComoJugador);
   j.title = nieblaComoJugador ? 'Volver a verlo todo' : 'Ver el mapa como lo ven los jugadores';
   $('#btn-ojo-menu').classList.toggle('activo', nieblaActiva || nieblaComoJugador || visionCreepsActiva);
+  renderLuz();
   const vc = $('#btn-vision-creeps');
   vc.classList.toggle('primary', visionCreepsActiva);
   vc.title = visionCreepsActiva ? 'Volver a verlo todo (apagar la visión de los creeps)' : 'Ver lo que ven los creeps: una niebla semitransparente sobre lo que ningún creep alcanza a ver, y en naranja lo que verían si los objetos sólidos no les taparan la vista';
 }
+// Luz de la escena (GM): el radio de visión base de este mapa, guardado en el mismo doc de la niebla (`luz`).
+function renderLuz(){
+  const sel = $('#luz-preset'), num_ = $('#luz-num');
+  if(!sel || !num_) return;
+  sel.value = LUZ_PRESETS.some(p => p[0] === luzEscena) ? String(luzEscena) : '';
+  if(document.activeElement !== num_) num_.value = luzEscena;
+}
+async function fijarLuz(v){
+  if(!soyGM) return;
+  v = Math.max(LUZ_MIN, Math.min(LUZ_MAX, Math.round(Number(v))));
+  if(!Number.isFinite(v)) return;
+  try{ await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({luz: v, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true}); }
+  catch(err){ console.error('No se pudo cambiar la luz:', err); toast('No se pudo cambiar la luz de la escena'); }
+}
+$('#ojo-luz').addEventListener('click', e => e.stopPropagation());   // no cierra el menú al tocar la luz
+$('#luz-preset').onchange = e => { if(e.target.value) fijarLuz(e.target.value); else $('#luz-num').focus(); };
+$('#luz-num').onchange = e => fijarLuz(e.target.value);
 $('#btn-niebla').onclick = async () => {
   if(!soyGM) return;
   try{

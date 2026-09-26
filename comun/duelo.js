@@ -375,7 +375,7 @@ const Duelo = (() => {
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
-      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor}};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor, destacar: 'max'}};
       anuncio = `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
@@ -726,7 +726,17 @@ const Duelo = (() => {
       if(!doc.exists){ _toast('Ese duelo ya no existe'); cerrar(); return; }
       if(!actual || actual.id !== id) return;
       actual.dato = {id, ...doc.data()};
-      dibujar();
+      // Primero ruedan los dados 3D y, cuando quedan a la vista, se muestra el resultado en el cuadro (no antes).
+      const nRev = nReveal(actual.dato);
+      if(actual.nRev === undefined){ actual.nRev = nRev; dibujar(); return; }   // al abrir un duelo que ya está avanzado no se espera nada
+      if(nRev > actual.nRev && typeof dadosActivos === 'function' && dadosActivos() && !document.hidden){
+        if(!actual.reteniendo){
+          actual.reteniendo = true;
+          esperarDados(() => { if(!actual || actual.id !== id) return; actual.reteniendo = false; actual.nRev = nReveal(actual.dato); dibujar(); });
+        }
+        return;
+      }
+      if(!actual.reteniendo){ actual.nRev = nRev; dibujar(); }
     }, err => { console.error('Duelo: error escuchando', err); _toast('No se pudo seguir el duelo'); });
     dibujarChips();
   }
@@ -984,10 +994,32 @@ const Duelo = (() => {
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }
 
+  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, los d20 del crítico).
+  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0) + (d.crit && d.crit.d20 ? 1 : 0);
+
+  // Espera a que los dados 3D rueden y queden quietos (o un máximo, por si no hay animación) y llama a cb.
+  function esperarDados(cb){
+    let hecho = false, empezo = false, tMax, tMin;
+    const t0 = Date.now();
+    const fin = () => {
+      if(hecho) return;
+      hecho = true;
+      window.removeEventListener('dados-inicio', ini); window.removeEventListener('dados-quietos', quietos);
+      clearTimeout(tMax); clearTimeout(tMin);
+      setTimeout(cb, 400);   // un instante para verlos quietos
+    };
+    const ini = () => { empezo = true; };
+    const quietos = () => { if(empezo) fin(); };
+    window.addEventListener('dados-inicio', ini);
+    window.addEventListener('dados-quietos', quietos);
+    tMin = setTimeout(() => { if(!empezo) fin(); }, 2200);   // los dados no llegaron a empezar: no se espera más
+    tMax = setTimeout(fin, 7000);
+  }
+
   function dibujar(){
     const d = actual && actual.dato;
     const f = document.getElementById('duelo-fondo');
-    if(!d || !f) return;
+    if(!d || !f || actual.reteniendo) return;
     f.querySelectorAll('[data-manual]').forEach(i => { manual[i.dataset.manual] = i.value; });   // conservar lo tipeado a mano
     const nombreAtaque = NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque';
     const nuevaClave = k => { const c = d.id + ':' + k; const nuevo = !revelado[c]; revelado[c] = true; return nuevo; };

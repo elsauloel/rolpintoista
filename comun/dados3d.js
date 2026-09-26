@@ -197,18 +197,78 @@ function dadosNotacion(formula, rolls){
   return grupos.map(g => `${g.n}d${g.caras}`).join('+') + '@' + valores.join(',');
 }
 
-async function dadosTirar(notacion, estilo){
+/* Destacar el dado más alto (2026-09-26, pedido del dueño, primero para los d20 del crítico; sirve para cualquier tirada de varios dados donde importa el mejor):
+   cuando los dados quedan quietos, el más alto se agranda, sube hacia la cámara, brilla y suelta ondas concéntricas. Todo es opcional: si algo falla, los dados
+   ruedan igual. Se pide con `destacar: 'max'` en la tirada (campo de la Mesa). */
+function dadosEstilosOnda(){
+  if(document.getElementById('dados3d-css')) return;
+  const st = document.createElement('style');
+  st.id = 'dados3d-css';
+  st.textContent = '.dados3d-onda{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border:3px solid #FFD25A;border-radius:50%;opacity:0;pointer-events:none;box-shadow:0 0 14px rgba(255,190,60,.8);animation:dados3d-onda 1.6s ease-out infinite}' +
+    '@keyframes dados3d-onda{0%{transform:scale(.35);opacity:.95}100%{transform:scale(3.2);opacity:0}}';
+  document.head.appendChild(st);
+}
+
+function dadosDestacarMayor(c, notacion){
+  const valores = String(notacion).split('@')[1];
+  if(!valores) return;
+  const vals = valores.split(',').map(v => parseInt(v, 10)).filter(v => Number.isFinite(v));
+  const lista = c.caja.diceList || [];
+  if(!vals.length || lista.length < vals.length) return;
+  const nuevos = lista.slice(-vals.length);
+  const die = nuevos[vals.indexOf(Math.max(...vals))];
+  if(!die || !die.position || !die.scale) return;
+  dadosEstilosOnda();
+  if(c.destacado) c.destacado.cancelar();
+  // Materiales propios (los de la librería se comparten entre dados del mismo tipo).
+  const orig = die.material;
+  const mats = (Array.isArray(orig) ? orig : [orig]).map(m => (m && m.clone ? m.clone() : m));
+  die.material = Array.isArray(orig) ? mats : mats[0];
+  mats.forEach(m => { if(m && m.emissive){ m.emissive.setHex(0xFFB400); m.emissiveIntensity = 0; } });
+  const cam = c.caja.camera, render = () => c.caja.renderer.render(c.caja.scene, cam);
+  const p0 = die.position.clone(), s0 = die.scale.x || 1;
+  const dir = cam.position.clone().sub(p0).normalize();
+  // Ondas concéntricas sobre la pantalla, centradas en el dado.
+  cam.updateMatrixWorld();
+  const v = p0.clone().project(cam), r = c.capa.getBoundingClientRect();
+  const centro = document.createElement('div');
+  centro.style.cssText = `position:absolute;left:${(v.x * 0.5 + 0.5) * r.width}px;top:${(-v.y * 0.5 + 0.5) * r.height}px;width:0;height:0;pointer-events:none`;
+  for(let i = 0; i < 3; i++){ const o = document.createElement('div'); o.className = 'dados3d-onda'; o.style.animationDelay = (i * 0.5) + 's'; centro.appendChild(o); }
+  c.capa.appendChild(centro);
+  let vivo = true;
+  const t0 = performance.now();
+  const fin = () => { vivo = false; centro.remove(); };
+  c.destacado = {cancelar: fin};
+  const paso = ahora => {
+    if(!vivo) return;
+    const k = Math.min(1, (ahora - t0) / 800), c1 = 1.70158, c3 = c1 + 1;
+    const e = 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2);   // easeOutBack: sube con un pequeño rebote
+    die.scale.setScalar(s0 + s0 * 0.8 * e);
+    die.position.copy(p0).addScaledVector(dir, 70 * e);
+    const pulso = 0.5 + 0.5 * Math.sin((ahora - t0) / 170);
+    mats.forEach(m => { if(m && m.emissive) m.emissiveIntensity = (0.3 + 0.5 * pulso) * k; });
+    try{ render(); }catch(err){ fin(); return; }
+    if(ahora - t0 < DADOS_QUIETOS_MS - 300) requestAnimationFrame(paso); else fin();
+  };
+  requestAnimationFrame(paso);
+}
+
+async function dadosTirar(notacion, estilo, opts){
   let c = null;
+  dados.rodando = (dados.rodando || 0) + 1;
+  try{ window.dispatchEvent(new Event('dados-inicio')); }catch(e){}
   try{
     c = await dadosCaja(estilo);
     c.pendientes++;
     c.uso = Date.now();
     clearTimeout(c.ocultarT);
+    if(c.destacado) c.destacado.cancelar();
     c.capa.style.opacity = '1';
     // Con la caja llena (dados viejos quietos) se limpia antes de sumar.
     const enMesa = (c.caja.diceList || []).length;
     if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX) c.caja.clearDice();
     await c.caja.add(notacion);
+    if(opts && opts.destacar === 'max'){ try{ dadosDestacarMayor(c, notacion); }catch(err){ console.error('Dados 3D: no se pudo destacar el más alto', err); } }
   }catch(err){
     console.error('Dados 3D:', err);
   }finally{
@@ -219,11 +279,15 @@ async function dadosTirar(notacion, estilo){
       if(c.pendientes === 0){
         clearTimeout(c.ocultarT);
         c.ocultarT = setTimeout(() => {
+          if(c.destacado) c.destacado.cancelar();
           c.capa.style.opacity = '0';
           c.ocultarT = setTimeout(() => { if(c.pendientes === 0){ try{ c.caja.clearDice(); }catch(e){} } }, 600);
         }, DADOS_QUIETOS_MS);
       }
     }
+    // Ya no rueda ninguno: los dados quedaron quietos y a la vista (el cuadro del duelo espera esto para mostrar el resultado).
+    dados.rodando = Math.max(0, dados.rodando - 1);
+    if(dados.rodando === 0){ try{ window.dispatchEvent(new Event('dados-quietos')); }catch(e){} }
   }
 }
 
@@ -237,7 +301,7 @@ function dadosAnimarTirada(t){
   const notacion = dadosNotacion(t.formula, t.rolls);
   if(!notacion) return;
   const estilo = dadosEstiloDe(t.estilo);
-  dadosTirar(notacion, estilo);
+  dadosTirar(notacion, estilo, {destacar: t.destacar});
   // Afortunado: ruedan los dos juegos de dados a la vez y un cartel dice cuál se eligió.
   if(t.ventaja && Array.isArray(t.ventaja.rolls)){
     const otra = dadosNotacion(t.formula, t.ventaja.rolls);

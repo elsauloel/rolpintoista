@@ -131,3 +131,4 @@ Mismo criterio que el contraataque, pero para las armas de **Tipo 4** (punzantes
 
 ## Tipo 12 = efecto Explosión (dueño, 2026-09-26)
 El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T12 si y solo si tiene ese efecto. No hay mazas ni martillos T12 que "solo peguen más". Las armas de Explosión son **muy raras y circunstanciales** (pocas, tiers altos, casi todas de rango y a dos manos). La calculadora valora la Explosión en 6 PC a radio 1 (+50 % por radio extra). Definición exacta del efecto: `preguntas-abiertas.md` (P-Explosión).
+**En pausa (2026-09-26):** no se diseñan armas T12 hasta que el resto esté consolidado; el único T12 del catálogo es el Lanzallamas (Excepcional).

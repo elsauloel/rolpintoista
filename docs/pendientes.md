@@ -95,4 +95,4 @@
 - [x] (2026-09-26, falta probar en pantalla) **La calculadora de rango (R / T) contempla los sólidos y colisiones como la visión**: el área se recorta detrás de un obstáculo. Ver `vtt-hexgrid/CLAUDE.md`.
 - [x] (2026-09-26, falta probar) **PdG en contraataque** (`pdgcontra`, +1 a +3, 0,8 PC por punto, casa de los cortantes T6) en 8 armas; suma solo al Contraataque. Ver `guia-de-diseno.md`.
 - [x] (2026-09-26, falta probar) **PdG en oportunidad** (`pdgopor`, +1 a +3, 0,8 PC por punto, casa de los punzantes T4) en 11 armas nuevas (tanda 7); suma solo al Ataque de oportunidad. Ver `guia-de-diseno.md`.
-- [~] (2026-09-26) **Tipo 12 = Explosión**: tanda 6 rehecha (5 armas con Explosión, muy raras), calculadora y docs corregidos. Falta: definir la Explosión (P-Explosión), decidir qué hacer con Lanzallamas y Martillo del Titán del catálogo, automatizar el área si se decide.
+- [x] (2026-09-26) **Tipo 12 = Explosión, en pausa:** Martillo del Titán quitado, Lanzallamas Excepcional, tanda 6 retirada. Se retoma (definir la Explosión, P-Explosión) cuando el resto esté consolidado.

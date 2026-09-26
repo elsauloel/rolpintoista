@@ -109,6 +109,7 @@ const Duelo = (() => {
 .duelo-tiro button.sec,.duelo-pie button.sec{background:#2b3347;color:#d5dbec}
 .duelo-opc{display:flex;flex-direction:column;gap:6px}
 .duelo-opc small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.duelo-opc small.duelo-info{font-size:13px;font-weight:700;opacity:1;color:#dfe8ff;margin-top:2px}
 .duelo-man{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
 .duelo-man input,.duelo-man select{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:6px;padding:7px;text-align:center}
 .duelo-man input{width:70px}
@@ -774,7 +775,7 @@ const Duelo = (() => {
             <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo><option value="evasion">Evasión</option><option value="parry">Parry</option></select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
         }
         else if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
-        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? '🎲 Pagar y tirar PdG' : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
         cuerpo = `<button type="button" data-tirar="${campo}">${txt}</button>${campo === 'pdg' ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;

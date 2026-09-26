@@ -10285,18 +10285,23 @@ window.DUELO_HOOKS = {
   },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
+    // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.
+    const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
     const inv = dueloInvDe(d.defensor);
     if(inv){
       const c = 1;
-      return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
-        {modo: 'parry', itemId: '', itemNombre: inv.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${inv.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : ''}];
+      return [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]},
+        {modo: 'parry', itemId: '', itemNombre: inv.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${inv.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
+          info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(invStatValor(inv, 'bloqueo') + pesoArmaInv(inv))}`]}];
     }
-    const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', motivoNo: ''}];
+    const sobre = compute().sobrecarga;
+    const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}${sobre > 0 ? ` (sobrepeso: −${fmt(sobre)} o pagás 1 No2)` : ''}`]}];
     const armas = armasYEscudosParaParry();
-    if(!armas.length) ops.push({modo: 'parry', itemId: '', itemNombre: '', etiqueta: '🗡 Parry (sin arma ni escudo)', costo: costoParryNitros(null), motivoNo: ''});
+    if(!armas.length) ops.push({modo: 'parry', itemId: '', itemNombre: '', etiqueta: '🗡 Parry (sin arma ni escudo)', costo: costoParryNitros(null), motivoNo: '', info: [`Parry 🎲 ${fx(statParaArma('parry', null), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorConArma(null))}`]});
     armas.forEach(a => {
       const c = costoParryNitros(a.item);
-      ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo: c, motivoNo: c > num(S.nitros) ? 'no te alcanzan los No2' : ''});
+      ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo: c, motivoNo: c > num(S.nitros) ? 'no te alcanzan los No2' : '',
+        info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorConArma(a.item))}`]});
     });
     return ops;
   },

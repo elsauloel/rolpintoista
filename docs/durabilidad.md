@@ -15,7 +15,8 @@
 - **Al llegar a 0 la pieza queda rota** (sin efectos, no se destruye): ✅ interpretación correcta.
 - **El estado Armadura rota sigue para TODOS**, también para los personajes de los jugadores (se les puede romper la armadura y bajar la Defensa). No queda «solo para creeps»: lo dije mal.
 - **Parry sin perder el Bloqueo: no se baja la durabilidad** del objeto (solo se gasta cuando se pierde el Bloqueo).
-- **En stand-by:** el **Óleo reparador**, el **precio de reparación** y cuánto repara cada forma (herrero, talento con despojos).
+- **Precios de reparación (dueño, 2026-09-26):** **herrero: 1 de oro por cada punto de durabilidad reparado**; **talento: 2 de despojos (loot) por cada punto reparado**. (Recordatorio: solo fuera de combate.)
+- **En stand-by:** el **Óleo reparador** (qué es y cuánto repara).
 
 ## Cómo encaja con lo que ya hay
 - El estado **Armadura rota** (acumulable) que aplica Rompe armadura baja la Defensa en creeps **y en personajes**. Los personajes suman además la **durabilidad de la pieza** (una pieza elegida al azar pierde 1 punto por golpe con Rompe armadura). Falta definir cómo conviven las dos cosas (pregunta 1).
@@ -26,4 +27,4 @@
 1. **¿Cómo conviven el estado Armadura rota y la durabilidad de la pieza en un personaje?** (un golpe con Rompe armadura hace **las dos cosas**: suma 1 stack de Armadura rota —baja 1 la Defensa total, como hoy— y baja 1 la durabilidad de una pieza elegida al azar; una pieza en 0 deja de dar su Defensa; al **reparar** una pieza se le devuelven puntos y se quita un stack de Armadura rota.)
 2. **¿Un arma o escudo de Peso 0 tiene el mínimo de 3, como las armaduras?** (sí, mínimo 3 para todo.)
 3. **¿La pieza al azar es pareja entre las equipadas que dan Defensa?** (sí, pareja.)
-4. *(en stand-by)* Óleo reparador, puntos por reparación y precio del herrero.
+4. *(en stand-by)* Óleo reparador (qué es y cuántos puntos repara).

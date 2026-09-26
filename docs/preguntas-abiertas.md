@@ -489,3 +489,4 @@ resuelven a mano, como el resto de los avisos).
   *Pausada por el dueño: el mundo T12 no se inventa hasta que esté consolidado el resto. Martillo del Titán quitado; Lanzallamas Excepcional; tanda 6 retirada.*
 
 - ⬜ **P-Duelo. Ataque paso a paso en vivo entre atacante y defensor — 2026-09-26.** Idea del dueño: al atacar se elige el token objetivo y se abre un menú compartido donde ambos ven y tiran cada etapa (PdG vs Evasión, Parry, Bloqueo, crítico y su resistencia, daño y defensa, efectos), con aviso al defensor y cada paso bien visible. Propuesta y 8 preguntas en [`ataque-paso-a-paso.md`](ataque-paso-a-paso.md).
+  *P-Duelo, avance 2026-09-26:* decididos defensor ausente (GM tira por él), efectos con botón «Aplicar», 1 contra 1 primero y hacerlo ya. **Nueva pregunta P-Duelo-efectos:** cada efecto de golpe lleva «se aplica solo si hace daño / aunque no pase»; los valores por defecto propuestos están en `ataque-paso-a-paso.md` (falta confirmar).

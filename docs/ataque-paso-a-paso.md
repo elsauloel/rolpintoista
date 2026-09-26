@@ -28,21 +28,28 @@ Al tocar **Atacar** se elige el **token objetivo** en el mapa y se abre un **men
 - El resultado se muestra **enorme y destacado**: el multiplicador («×3 · TRIPLE DAÑO») y, debajo, el número final grande (**35**) con la leyenda **«derecho a la vida»** en rojo. Coincide con la regla actual: el crítico **ignora la Defensa**, así que ese número es exactamente lo que baja de HP.
 - Además del crítico, se muestran con festejo propio los otros momentos altos: Parry exitoso, golpe bloqueado, muerte del defensor.
 
-## Efectos que ahora se aplican solos
-Con el duelo, «si pega, envenena» deja de ser un recordatorio: al pegar, los `efectosGolpe` se tiran en pantalla (con su probabilidad) y, si entran, **se aplican al defensor** (Envenenar, Sangrado, Rompe armadura, Lisiado, Aturdir…) con su estado ya cargado y una línea en el resumen final. Queda el botón «deshacer» y la salida manual del GM, como siempre. *(Esto responde a la pregunta 4: aplicar solos, con deshacer.)*
+## Efectos del golpe: se tiran solos, se aplican con un botón (dueño, 2026-09-26)
+Al pegar, los `efectosGolpe` del arma se **tiran en pantalla** (con su probabilidad) y, si entran, aparece un botón **«Aplicar»** para cargarlos al defensor (Envenenar, Sangrado, Rompe armadura, Lisiado, Aturdir…), con su estado ya armado y una línea en el resumen. **Aplicar es un gesto del jugador, a propósito**: la automatización ayuda pero no le quita la sensación de estar jugando un rol de mesa. Deshacer y salida manual del GM, como siempre.
+
+### Distinción nueva: efectos que necesitan daño y efectos que no (dueño, 2026-09-26)
+Hay efectos que **solo se aplican si el golpe hace daño** (ej.: una cuchilla envenenada acierta el PdG, pero si la armadura absorbe todo, no hay veneno) y otros que **se aplican aunque no pase el daño**. Cada efecto de golpe, en un ítem o en una habilidad, lleva un dato **«Se aplica: ☑ solo si hace daño / ☐ aunque no pase el daño»**, que se elige en el asistente paso a paso (con un valor por defecto según el efecto, editable).
+*Propuesta de valores por defecto (a confirmar):*
+- **Solo si hace daño** (tiene que entrar en la carne): Envenenar, Veneno severo, Sangrado, Drena vida, Lisiado.
+- **Aunque no pase el daño** (fuerza del impacto, fuego o daño a la armadura): Demora, Aturdir, Derribar, Prende fuego, Rompe armadura.
+En el duelo, el paso de efectos solo ofrece «Aplicar» a los que corresponden y muestra los otros tachados con el motivo («la armadura absorbió el golpe: el veneno no entra»).
 
 ## Qué automatiza
 Costo de No2 del ataque, elección de bono de PdG según el tipo de ataque, comparación PdG vs Evasión, Parry vs PdG, Fuerza vs Bloqueo, rango de crítico, resistencia a crítico, resta de Defensa, descuento de HP en la ficha o en el creep, efectos del golpe, y la oferta de contraataque. Hoy todo eso es manual o va en pasos sueltos.
 
-## Cómo se construiría (para más adelante)
+## Cómo se construiría
 Un documento de Firestore por duelo (`duelos/{id}`) con el estado del paso, las tiradas de cada lado y el resultado; las dos pantallas lo escuchan en vivo (mismo mecanismo que la Mesa y el mapa). La lógica de cada paso vive en `comun/` (un solo código para ficha, GM y mapa). Se puede hacer **por etapas**: primero pasos 1–3 (contacto), después Parry/Bloqueo, crítico y daño, y al final los efectos.
 
 ## Preguntas abiertas
-1. **¿Qué pasa si el defensor no responde?** Propuesta: el GM puede tirar por él, o el duelo espera con un botón «tirar por él / seguir sin defensa».
+1. ✅ (dueño, 2026-09-26) **Defensor ausente: el GM puede tirar por él** (botón «tirar por él»).
 2. **¿Los creeps defienden con el mismo menú?** Propuesta: sí, en la pantalla del GM, con las mismas botoneras.
 3. **¿El daño se descuenta solo del HP?** Propuesta: sí, con «deshacer» de un toque.
-4. ✅ (dueño, 2026-09-26) **Los efectos del golpe se aplican solos al defensor** («si pega, envenena»), con deshacer. *(Cambia la regla anterior de dejarlos a mano.)*
+4. ✅ (dueño, 2026-09-26) **Los efectos del golpe se tiran solos pero se aplican con un botón «Aplicar»** (para no perder la sensación de mesa), y hay una distinción nueva: solo si hace daño / aunque no pase.
 5. **¿Se puede reaccionar más de una vez?** (Parry, Bloqueo, contraataque encadenado, ataque de oportunidad). Propuesta: cada respuesta abre un duelo hijo dentro del mismo.
-6. **¿Ataques de área, varios objetivos y trampas?** Propuesta: primero 1 contra 1; después uno por objetivo.
+6. ✅ (dueño, 2026-09-26) **Se empieza en 1 contra 1**; los efectos de área y los ataques de un creep a varios quedan para después.
 7. **¿Se puede usar la tirada suelta de siempre?** Propuesta: sí, los botones actuales siguen para tiradas sueltas y para mesas sin mapa.
-8. **Cuándo:** ¿va antes que el resto del rework o después de consolidar catálogo y creeps?
+8. ✅ (dueño, 2026-09-26) **Se hace ya**, por etapas. El dueño lo va definiendo conceptualmente y lo revisa cuando esté en la compu.

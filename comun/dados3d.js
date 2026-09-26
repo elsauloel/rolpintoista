@@ -138,7 +138,7 @@ const DADOS_EN_MESA_MAX = 24;    // por caja; pasado esto se limpia lo viejo
 function dadosCrearCapa(){
   const capa = document.createElement('div');
   capa.id = 'dados3d-capa-' + (++dados.n);
-  capa.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:96;opacity:0;transition:opacity .5s';
+  capa.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:100000;opacity:0;transition:opacity .5s';
   document.body.appendChild(capa);
   return capa;
 }

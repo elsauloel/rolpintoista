@@ -8965,11 +8965,12 @@ function dueloElegirObjetivoMapa(msg){
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
   const pedir = () => {
-    elegirDestino(h => {
+    elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
       const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
       if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
-      const t = cand[0];
+      let t = cand[0];
+      try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
       Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
@@ -8983,6 +8984,20 @@ function dueloElegirObjetivoMapa(msg){
   };
   pedir();
 }
+// Un token de creep sin ficha detrás (creado con «Nuevo token» en vez de traerlo de GM Tools) no tiene datos para pelear. Si el GM ataca a uno, se lo vincula solo
+// al creep de GM Tools con el mismo nombre (prefiere uno que todavía no tenga token) y se avisa.
+async function dueloVincularSiFalta(t){
+  if(t.tipo !== 'creep' || t.fichaId || !soyGM) return t;
+  const nom = String(t.nombre || '').trim().toLowerCase();
+  const usados = new Set([...tokens.values()].filter(x => x.tipo === 'creep' && x.fichaId).map(x => x.fichaId));
+  const cands = [...creepsPub.entries()].filter(([, c]) => String(c.nombre || '').trim().toLowerCase() === nom);
+  const elegido = cands.find(([cid]) => !usados.has(cid)) || cands[0];
+  if(!elegido){ toast(`El token «${t.nombre}» no está vinculado a ningún creep de GM Tools (y no hay uno con ese nombre): el duelo no va a tener sus datos`); return t; }
+  await coleccionTokens().doc(t.id).update({fichaId: elegido[0]});
+  toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}» de GM Tools`);
+  return {...t, fichaId: elegido[0]};
+}
+
 // Aplica el daño de un duelo al HP del defensor (solo corre en el mapa del GM, ver comun/duelo.js). Reutiliza «Recibe daño»: Invulnerable y Escudo mágico valen.
 // Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
 async function dueloAplicarDano(d){

@@ -770,7 +770,7 @@ const Duelo = (() => {
       if(campo === 'eva'){
         const ops = opciones[d.id];
         if(!ops && opcionesFalla[d.id]){
-          cuerpo = `<div class="espera">No llegaron tus opciones de defensa (la ficha o las Acciones no respondieron).</div><button type="button" class="sec" data-reintentar-def>↻ Reintentar</button>
+          cuerpo = `<div class="espera">No llegaron tus opciones de defensa (la ficha o las Acciones no respondieron).</div>${window.DUELO_MOTIVO ? `<div class="det">${_esc(window.DUELO_MOTIVO)}</div>` : ''}<button type="button" class="sec" data-reintentar-def>↻ Reintentar</button>
             <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo><option value="evasion">Evasión</option><option value="parry">Parry</option></select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
         }
         else if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }

@@ -9008,9 +9008,13 @@ async function dueloAplicarDano(d){
 
 // Opciones de defensa de un creep, calculadas en el mapa del GM sin cargar las Acciones: Evasión o Parry con su arma (siempre 1 No2). null = no es un creep mío.
 function dueloOpcionesLocal(d){
-  if(!soyGM || d.defensor.tipo !== 'creep') return null;
-  const sc = creepPrivadoDe(d.defensor.ref);
-  if(!sc) return null;
+  const ref = d.defensor.ref;
+  const motivo = m => { window.DUELO_MOTIVO = `${m} · soy GM: ${soyGM ? 'sí' : 'no'} · tipo: ${d.defensor.tipo} · ref: ${ref || '(vacía: el token no está vinculado a un creep)'} · privado: ${creepsPriv.has(ref) ? (creepsPriv.get(ref).sc ? 'cargado' : 'cargando') : 'no'} · público: ${creepsPub.has(ref) ? 'sí' : 'no'}`; return null; };
+  if(d.defensor.tipo !== 'creep') return null;
+  if(!soyGM) return motivo('no sos el GM');
+  const sc = creepPrivadoDe(ref);
+  if(!sc) return motivo('no encuentro los datos de ese creep');
+  window.DUELO_MOTIVO = '';
   const arma = sc.armaNombre || 'su arma';
   return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
     {modo: 'parry', itemId: '', itemNombre: arma, etiqueta: `🗡 Parry · ${arma}`, costo: 1, motivoNo: num(sc.nitros) < 1 ? 'no le alcanzan los No2' : ''}];

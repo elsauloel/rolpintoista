@@ -137,3 +137,5 @@
 Por pedido del dueño, **62 entradas** de la pestaña 🎨 A desarrollar que el cotejo encontró implementadas se **tildaron como hechas** (salen de la lista de pendientes: de 112 quedaron **50 abiertas**) y cada una se sumó a la pestaña 🧪 **Falta testear** con el texto «Probar en mesa (ya implementado): …». Quedaron en A desarrollar los ⬜ (no existen), los 🔶 parciales y los que necesitan decisiones.
 
 **Corrección (2026-09-26):** se devolvieron a A desarrollar 4 entradas que se habían pasado a testear con evidencia floja: «Atacar por la espalda», «parry con escudo / escudos con HP» (**reglas del escudo cerradas hoy**), «PdG vs Destreza + bloqueo del escudo» (**cerrada hoy**) y «Ataque de oportunidad».
+
+**2026-09-26:** «Atacar por la espalda» quedó **definida como regla anotada** (no se automatiza): sin sigilo el defensor se da vuelta; si el atacante está en sigilo, la Evasión del defensor es 1. Se tildó en la lista.

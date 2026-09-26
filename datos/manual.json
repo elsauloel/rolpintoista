@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-09-26T11:46:17Z",
+ "actualizado": "2026-09-26T11:49:18Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -855,6 +855,23 @@
    "cuerpo": "Cuando tu [[HP]] llega a **0**, quedás **inconsciente**. Todavía no estás muerto.\n\n- Tenés una ventana de **5 [[Mantenimiento|mantenimientos]]** para que te revivan.\n- Dentro de esa ventana se puede revivir con **objetos o efectos** (por ejemplo, el consumible *Ankh de Reencarnación*, que si estaba en tu cinturón te revive con el 25% del HP).\n- Si pasan los 5 mantenimientos sin que te revivan, **morís**: quedás **muerto** para siempre (lo que antes se llamaba *permadeath*).\n\n## Qué pasa con la experiencia\nAl terminar un combate, un personaje **inconsciente** recibe solo el **25%** de la experiencia que le tocaba (redondeado hacia abajo). Uno **muerto** no recibe nada. Ver [[Experiencia y despojos]].\n\n> [!tip] Un aliado puede salvarte\n> Aunque el Ankh no esté en tu cinturón, **un aliado puede usarlo sobre tu cuerpo** para revivirte.\n\n> [!question] Estando inconsciente\n> - ¿Podés hacer algo estando inconsciente, o quedás fuera de juego hasta que te revivan?\n> - ¿Cuánto HP devuelve un revivir (1, la mitad, el máximo, depende del objeto)?\n> - ¿Los 5 mantenimientos cuentan desde el que sigue al HP 0?\n> - ¿Cambia algo fuera de combate (por ejemplo, caer inconsciente por veneno sin pelea activa)?"
   },
   {
+   "id": "atacar-por-la-espalda",
+   "titulo": "Atacar por la espalda",
+   "alias": [
+    "Ataque por la espalda",
+    "Por la espalda",
+    "Flanquear"
+   ],
+   "tags": [
+    "combate",
+    "sigilo",
+    "regla"
+   ],
+   "estado": "confirmado",
+   "capitulo": "combate",
+   "cuerpo": "Regla del dueño (2026-09-26). **No se automatiza: es una regla para anotar**; la mesa la aplica a mano.\n- **Sin sigilo:** si alguien aparece por la espalda del defensor, **el defensor simplemente se da vuelta** y se defiende como siempre ([[Defenderse de un ataque]]). No hay penalidad por estar de espaldas.\n- **Con sigilo:** si el atacante está en [[Sigilo]] y ataca por la espalda, **la Evasión del defensor es 1**: por regla la tirada de Evasión vale 1 (como cuando el [[Stun]] hace fallar la Evasión). Es el premio de acercarse sin que te vean.\n- **Excepciones (después):** situaciones en las que el defensor **no puede darse vuelta**, por ejemplo estando [[Inmovilizado]]; se definen más adelante.\n> [!question] A confirmar\n> «La evasión defensora debería ser una» se anotó como **Evasión = 1** (el mismo criterio que Stun). Si se refería a otra cosa (por ejemplo, tirar un solo dado), corregir acá."
+  },
+  {
    "id": "sigilo",
    "titulo": "Sigilo",
    "alias": [
@@ -871,7 +888,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "Un personaje o un creep puede **entrar en sigilo desde el mapa**: queda oculto para el bando rival.\n\n## Cómo se entra\n- Es una **habilidad estándar** (\"Sigilo\") que aplica el estado [[Sigilo (estado)|Sigilo]] sobre uno mismo. Quien la tenga cargada la ve como botón directo en la [[La Botonera|Botonera]].\n- Cuesta **1 No2** (a revisar). Moverte en sigilo cuesta lo mismo que moverte normal.\n\n## Quién ve qué\n| En sigilo | Lo ven | No lo ve |\n|---|---|---|\n| Un **personaje** | Su dueño y los demás jugadores (semitransparente) | El **GM** |\n| Un **creep** | El **GM** (semitransparente) | Los jugadores |\n\nCuando estás en sigilo ves el mapa con un **filtro violáceo tenue**, y tus tiradas se siguen viendo en la [[La Mesa|Mesa]].\n\n## Cuándo se rompe\n1. **Automáticamente:** si entrás en el **cono de detección** de un enemigo ([[Campo de visión]]).\n2. **Por una acción hostil:** cualquier acción con efecto directo sobre un enemigo (un ataque, una skill individual). Esto lo hace saber **el jugador a mano** (botón de la Botonera); el GM quita el estado del creep.\n3. Cuando te detectan, **aparecés donde te detectaron** y dejás una marca de tu última posición por **dos turnos**.\n\n## Detección\nCada **paso que das dentro de la zona de alerta** de un enemigo provoca una **tirada de detección** ([[Campo de visión]]). Es manual: el mapa cuenta los pasos y avisa; la resuelve la mesa (en principio **Destreza del que se esconde contra Especial del que vigila**). También se puede **buscar a propósito**, igual de manual.\n\n> [!info] Todo el ocultamiento es visual\n> El juego asume amigos de confianza: el mapa oculta lo que no debés ver, pero no hay un candado técnico.\n\n> [!question] A revisar\n> - Costo de entrar en sigilo: 1 No2 (a revisar con el grupo).\n> - ¿Qué cuenta como \"acción hostil\"? (Por ejemplo, invocar una nube tóxica en área: ¿rompe el sigilo?)\n> - Las invocaciones en sigilo: falta probarlas."
+   "cuerpo": "Un personaje o un creep puede **entrar en sigilo desde el mapa**: queda oculto para el bando rival.\n\n## Cómo se entra\n- **Atacar desde el sigilo por la espalda:** ver [[Atacar por la espalda]] (la Evasión del defensor es 1).\n- Es una **habilidad estándar** (\"Sigilo\") que aplica el estado [[Sigilo (estado)|Sigilo]] sobre uno mismo. Quien la tenga cargada la ve como botón directo en la [[La Botonera|Botonera]].\n- Cuesta **1 No2** (a revisar). Moverte en sigilo cuesta lo mismo que moverte normal.\n\n## Quién ve qué\n| En sigilo | Lo ven | No lo ve |\n|---|---|---|\n| Un **personaje** | Su dueño y los demás jugadores (semitransparente) | El **GM** |\n| Un **creep** | El **GM** (semitransparente) | Los jugadores |\n\nCuando estás en sigilo ves el mapa con un **filtro violáceo tenue**, y tus tiradas se siguen viendo en la [[La Mesa|Mesa]].\n\n## Cuándo se rompe\n1. **Automáticamente:** si entrás en el **cono de detección** de un enemigo ([[Campo de visión]]).\n2. **Por una acción hostil:** cualquier acción con efecto directo sobre un enemigo (un ataque, una skill individual). Esto lo hace saber **el jugador a mano** (botón de la Botonera); el GM quita el estado del creep.\n3. Cuando te detectan, **aparecés donde te detectaron** y dejás una marca de tu última posición por **dos turnos**.\n\n## Detección\nCada **paso que das dentro de la zona de alerta** de un enemigo provoca una **tirada de detección** ([[Campo de visión]]). Es manual: el mapa cuenta los pasos y avisa; la resuelve la mesa (en principio **Destreza del que se esconde contra Especial del que vigila**). También se puede **buscar a propósito**, igual de manual.\n\n> [!info] Todo el ocultamiento es visual\n> El juego asume amigos de confianza: el mapa oculta lo que no debés ver, pero no hay un candado técnico.\n\n> [!question] A revisar\n> - Costo de entrar en sigilo: 1 No2 (a revisar con el grupo).\n> - ¿Qué cuenta como \"acción hostil\"? (Por ejemplo, invocar una nube tóxica en área: ¿rompe el sigilo?)\n> - Las invocaciones en sigilo: falta probarlas."
   },
   {
    "id": "campo-de-vision",

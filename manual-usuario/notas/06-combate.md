@@ -302,6 +302,19 @@ Al terminar un combate, un personaje **inconsciente** recibe solo el **25%** de 
 > - ¿Cambia algo fuera de combate (por ejemplo, caer inconsciente por veneno sin pelea activa)?
 
 +++
+titulo: Atacar por la espalda
+alias: [Ataque por la espalda, Por la espalda, Flanquear]
+tags: [combate, sigilo, regla]
+estado: confirmado
++++
+Regla del dueño (2026-09-26). **No se automatiza: es una regla para anotar**; la mesa la aplica a mano.
+- **Sin sigilo:** si alguien aparece por la espalda del defensor, **el defensor simplemente se da vuelta** y se defiende como siempre ([[Defenderse de un ataque]]). No hay penalidad por estar de espaldas.
+- **Con sigilo:** si el atacante está en [[Sigilo]] y ataca por la espalda, **la Evasión del defensor es 1**: por regla la tirada de Evasión vale 1 (como cuando el [[Stun]] hace fallar la Evasión). Es el premio de acercarse sin que te vean.
+- **Excepciones (después):** situaciones en las que el defensor **no puede darse vuelta**, por ejemplo estando [[Inmovilizado]]; se definen más adelante.
+> [!question] A confirmar
+> «La evasión defensora debería ser una» se anotó como **Evasión = 1** (el mismo criterio que Stun). Si se refería a otra cosa (por ejemplo, tirar un solo dado), corregir acá.
+
++++
 titulo: Sigilo
 alias: [Sigilo, Ocultarse, Esconderse, Invi, Estar oculto]
 tags: [sigilo, combate, mapa]
@@ -310,6 +323,7 @@ estado: borrador
 Un personaje o un creep puede **entrar en sigilo desde el mapa**: queda oculto para el bando rival.
 
 ## Cómo se entra
+- **Atacar desde el sigilo por la espalda:** ver [[Atacar por la espalda]] (la Evasión del defensor es 1).
 - Es una **habilidad estándar** ("Sigilo") que aplica el estado [[Sigilo (estado)|Sigilo]] sobre uno mismo. Quien la tenga cargada la ve como botón directo en la [[La Botonera|Botonera]].
 - Cuesta **1 No2** (a revisar). Moverte en sigilo cuesta lo mismo que moverte normal.
 

@@ -132,3 +132,6 @@
 3. **Reglas de combate sin implementar:** colisión Con vs Con, muerto anula turno, armadura rota atada al ítem, «acción incierta», animación de turno compartida.
 4. **Sociales:** talentos, carisma, persuasión, intuición (decisiones de diseño primero).
 5. **Lote de mapa y fichas:** traer mi token, pausar sesión, imagen vertical, «Prisa», menú «🪤 Trampas» propio.
+
+## Actualización (2026-09-26): lo implementado pasó a «Falta testear»
+Por pedido del dueño, **62 entradas** de la pestaña 🎨 A desarrollar que el cotejo encontró implementadas se **tildaron como hechas** (salen de la lista de pendientes: de 112 quedaron **50 abiertas**) y cada una se sumó a la pestaña 🧪 **Falta testear** con el texto «Probar en mesa (ya implementado): …». Quedaron en A desarrollar los ⬜ (no existen), los 🔶 parciales y los que necesitan decisiones.

@@ -152,6 +152,7 @@ async function menuDibujar(){
     h += menuLink(menuUrl('preguntas-diseno/preguntas.html', ''), '🛠', 'Herramientas de diseño');
     h += menuLink(menuUrl('datos/auditoria-armas.html', ''), '🗡', 'Auditoría de armas');
     h += menuLink(menuUrl('datos/auditoria-defensa.html', ''), '🛡', 'Auditoría de defensa');
+    h += menuLink(menuUrl('datos/auditoria-creeps.html', ''), '👹', 'Auditoría de creeps');
     if(error) h += `<div class="ms-nota" style="padding-left:14px;color:#D4574E">${menuEsc(error)}</div>`;
     if(conCuenta) h += '<hr><button type="button" class="ms-item" id="menu-sitio-salir"><span class="ms-ico">⎋</span><span>Cerrar sesión</span></button>';
     p.innerHTML = h;

@@ -1304,6 +1304,148 @@
     [ap(ta('Larva voraz', 'La larva le come las fuerzas: el objetivo queda Exhausto.', 3), A('Exhausto')), 5],
     'Pone sus huevos en lo que aún respira.', IN);
 
+  /* ================= ELEMENTALES (tanda 1 del rework de creeps, 2026-09-26): fuego, hielo y rayo =================
+     Tres facciones de 7 (una por rol). Cada elemento tiene su mecánica firma (fuego: Quemado y terreno incendiado; hielo: Escarcha acumulable;
+     rayo: Descarga y Parálisis). Desde el nivel 3 llevan además una TERCERA habilidad (su mecánica firma). Las pasivas por familia se suman
+     al final para todos los creeps (ver aplicarProgresion). */
+  COLOR.fuego = '#E25822'; COLOR.hielo = '#7FB3D5'; COLOR.rayo = '#E6D84A';
+  ESCENARIO_TXT.fuego = 'volcán'; ESCENARIO_TXT.hielo = 'glaciar'; ESCENARIO_TXT.rayo = 'tormenta';
+  const EF = ['elemental', 'fuego'], EH = ['elemental', 'hielo'], ER = ['elemental', 'rayo'];
+  // Tercera habilidad (n ≥ 3): se suma al último creep cargado. cd: cooldown; la lenta arranca en cooldown.
+  function tercera(sp, cd){
+    const c = lista[lista.length - 1], n = c.nivel, h = armarHab(sp, n, cd, cd >= 4);
+    c.datos.habilidades.push(h);
+    c.detalle = c.detalle.replace(/ Rápida:/, ' Tercera: ' + sp.nombre + ' (CD ' + cd + ').' + ' Rápida:');
+    c.etiquetas = [...new Set([...c.etiquetas, ...mecEtiquetas(sp)])];
+  }
+  const RASTRO = () => tercera(zo('Rastro de llamas', 'Deja fuego por las casillas por donde pasa: terreno incendiado 3 turnos (a mano, con Terreno y Formas → Fuego). Daña al que entra.', 2, 'M'), 4);
+  const ESCARCHA3 = () => tercera(ap(zo('Escarcha acumulada', 'Una ola de frío: daño y el objetivo suma otro stack de Escarcha (−1 No2 máx. por stack, acumulable).', 2, 'M'), A('Escarcha', 2, {nitros: -1})), 4);
+  const ESTATICA3 = () => tercera(ap(zo('Estática', 'Un chispazo que enreda los músculos: daño y 15 % de Parálisis (PdG, Parry y Evasión a la mitad) 2 turnos (la tirada del porcentaje, a mano).', 2, 'M'), A('Parálisis', 2)), 4);
+
+  Object.assign(TROFEOS, {'Chispa ígnea': 'Chispa viva', 'Llama viva': 'Llama embotellada', 'Salamandra de brasas': 'Escama de brasa', 'Brasero errante': 'Carbón eterno', 'Mago de ceniza': 'Ceniza mágica', 'Arquero de magma': 'Roca de magma', 'Fénix menor': 'Pluma de fénix', 'Duende de escarcha': 'Cristal de escarcha', 'Golem de hielo': 'Núcleo de hielo', 'Oso de nieve': 'Piel blanca', 'Susurro de nieve': 'Copo eterno', 'Bruja de las nevadas': 'Vara de hielo', 'Arquero de carámbanos': 'Carámbano perpetuo', 'Anciano de la glaciación': 'Corazón helado', 'Chispita eléctrica': 'Chispa embotellada', 'Golem de cobre': 'Bobina de cobre', 'Coraza pararrayos': 'Pararrayos', 'Nube de estática': 'Estática embotellada', 'Chamán del rayo': 'Rayo en frasco', 'Arquero de tormenta': 'Trueno enjaulado', 'Espíritu de la tormenta': 'Nube en frasco'});
+  // --- Fuego ---
+  cr('fuego', 1, 'Chispa ígnea', 'rapido', 'elemental', 'Chisporroteo',
+    at('Chispazo', 'Una chispa que quema.', 'L'),
+    [bu('Rastro de chispas', 'Se mueve dejando chispas: +4 Evasión hasta su próximo turno.', 1, {eva: 4}, 1), 3],
+    'Una llamita que corre y no quiere que la apaguen.', EF);
+  cr('fuego', 2, 'Llama viva', 'brutal', 'elemental', 'Puños de fuego',
+    at('Puñetazo ardiente', 'Un golpe de fuego vivo.', 'M'),
+    [ap(zo('Abrazo de fuego', 'Un golpe que prende: daño y el objetivo queda Quemado 2 turnos.', 2, 'M'), A('Quemado', 2, {}, -2)), 4],
+    'Fuego que pelea como si tuviera brazos.', EF);
+  cr('fuego', 2, 'Salamandra de brasas', 'tanque', 'elemental', 'Cola de brasas',
+    bu('Piel de brasas', 'Se cubre de brasas: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Calor abrasador', 'Quema a quien la toca: devuelve daño en cuerpo a cuerpo (se cobra a mano).', 2, 'Espinas', 'buff', 3), 4],
+    'Duerme sobre carbones y despierta de mal humor.', EF);
+  cr('fuego', 3, 'Brasero errante', 'debuffer', 'elemental', 'Carbón candente',
+    ap(at('Carbón lanzado', 'Lanza un carbón: daño y el objetivo queda Quemado 2 turnos.', 'M'), A('Quemado', 2, {}, -2)),
+    [ap(ta('Humo asfixiante', 'Una nube de humo: los cercanos quedan Cegados (-2 Evasión) 2 turnos.', 2), A('Cegado', 2, {eva: -2})), 4],
+    'Un brasero que aprendió a caminar y a molestar.', EF); RASTRO();
+  cr('fuego', 3, 'Mago de ceniza', 'mago', 'elemental', 'Bastón de carbón',
+    at('Bola de brasas', 'Un proyectil de brasas.', 'M'),
+    [ap(zo('Bola de fuego', 'Explosión en flor de 1: daño y los golpeados quedan Quemados 2 turnos; deja terreno incendiado (a mano).', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    'Sus hechizos huelen a chamusquina.', EF); RASTRO();
+  cr('fuego', 4, 'Arquero de magma', 'rango', 'elemental', 'Arco de lava',
+    at('Flecha de magma', 'Una flecha de roca fundida.', 'M'),
+    [ap(zo('Lluvia de fuego', 'Flechas ardientes en flor de 2: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    'Dispara desde el borde del cráter y no falla.', EF); RASTRO();
+  cr('fuego', 5, 'Fénix menor', 'apoyo', 'elemental', 'Pico de brasa',
+    cu('Renacer parcial', 'Se cura con su propio fuego.', 1, 5),
+    [es('Llama de renacimiento', 'Un fuego que cura: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 3}), 5],
+    'Nunca muere del todo.', EF); RASTRO();
+
+  // --- Hielo ---
+  cr('hielo', 1, 'Duende de escarcha', 'rapido', 'elemental', 'Pellizco helado',
+    at('Pellizco helado', 'Un pellizco frío.', 'L'),
+    [bu('Deslizarse', 'Se desliza sobre el hielo: +4 Evasión hasta su próximo turno.', 1, {eva: 4}, 1), 3],
+    'Un duendecillo de cristal que se ríe cuando alguien resbala.', EH);
+  cr('hielo', 2, 'Golem de hielo', 'brutal', 'elemental', 'Puños de hielo',
+    at('Puñetazo helado', 'Un golpe de hielo macizo.', 'M'),
+    [ap(zo('Golpe congelante', 'Un golpe que enfría hasta los huesos: daño y el objetivo queda con Escarcha (−1 No2 máx.) 2 turnos.', 2, 'M'), A('Escarcha', 2, {nitros: -1})), 4],
+    'Un bloque que aprendió a pegar.', EH);
+  cr('hielo', 2, 'Oso de nieve', 'tanque', 'elemental', 'Zarpas de hielo',
+    bu('Pelaje espeso', 'Se eriza: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Piel de escarcha', 'Cristales de hielo por todo el cuerpo: devuelve daño en cuerpo a cuerpo (se cobra a mano).', 2, 'Espinas', 'buff', 3), 4],
+    'Blanco, pesado y con hambre.', EH);
+  cr('hielo', 3, 'Susurro de nieve', 'debuffer', 'elemental', 'Aliento gélido',
+    at('Aliento gélido', 'Una bocanada de frío.', 'M'),
+    [ap(ta('Ventisca', 'Levanta una ventisca: los cercanos quedan Cegados (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    'Se oye antes de verse, y no se oye nada.', EH); ESCARCHA3();
+  cr('hielo', 3, 'Bruja de las nevadas', 'mago', 'elemental', 'Vara de cristal helado',
+    at('Lanza de hielo', 'Una lanza de hielo.', 'M'),
+    [ap(zo('Aliento helado', 'Cono de 3: daño y los golpeados suman un stack de Escarcha (−1 No2 máx., acumulable).', 3, 'H'), A('Escarcha', 2, {nitros: -1})), 5],
+    'Cuando sonríe, hace frío.', EH); ESCARCHA3();
+  cr('hielo', 4, 'Arquero de carámbanos', 'rango', 'elemental', 'Arco de hielo',
+    at('Carámbano', 'Una flecha de hielo.', 'M'),
+    [es('Ojo helado', 'Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2), 4],
+    'Sus flechas se derriten donde caen, pero antes duelen.', EH); ESCARCHA3();
+  cr('hielo', 5, 'Anciano de la glaciación', 'apoyo', 'elemental', 'Cayado de glaciar',
+    cu('Manto de nieve', 'Se envuelve en nieve fresca y se cura.', 1, 5),
+    [es('Aliento del invierno', 'Un frío que conserva: recupera vida cada turno y gana +2 Defensa.', 2, 'Regeneración', 'buff', 3, {hp: 3, mods: {def: 2}}), 5],
+    'Recuerda la última glaciación, como si hubiera estado.', EH); ESCARCHA3();
+
+  // --- Rayo ---
+  cr('rayo', 1, 'Chispita eléctrica', 'rapido', 'elemental', 'Chispa',
+    at('Chispa', 'Un chispazo eléctrico.', 'L'),
+    [bu('Salto de chispa', 'Salta de un lado a otro: +4 Evasión hasta su próximo turno.', 1, {eva: 4}, 1), 3],
+    'Nunca se queda quieta y a veces prende el pelo.', ER);
+  cr('rayo', 2, 'Golem de cobre', 'brutal', 'elemental', 'Puños de cobre',
+    at('Puñetazo de cobre', 'Un golpe de metal.', 'M'),
+    [ap(zo('Golpe conductor', 'Un golpe que descarga: daño y el objetivo queda con Descarga (−1 No2) 1 turno.', 2, 'M'), A('Descarga', 1, {nitros: -1})), 4],
+    'Todo en él conduce, menos la paciencia.', ER);
+  cr('rayo', 2, 'Coraza pararrayos', 'tanque', 'elemental', 'Antena',
+    bu('Atraer el rayo', 'Se ilumina y se carga: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
+    [es('Jaula de Faraday', 'Una jaula de cables que lo aísla: ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3), 4],
+    'Un poste que pasa la tormenta sin inmutarse.', ER);
+  cr('rayo', 3, 'Nube de estática', 'debuffer', 'elemental', 'Chispas sueltas',
+    ap(at('Chispazo de estática', 'Una descarga: daño y el objetivo queda con Descarga (−1 No2) 1 turno.', 'M'), A('Descarga', 1, {nitros: -1})),
+    [ap(ta('Estática pegajosa', 'Todos los cercanos quedan con la ropa erizada: Pajaritos hasta el final de su próximo turno.', 2), A('Pajaritos', 1)), 4],
+    'Flota, cruje y despeina.', ER); ESTATICA3();
+  cr('rayo', 3, 'Chamán del rayo', 'mago', 'elemental', 'Vara de cobre',
+    at('Rayo corto', 'Un rayo corto.', 'M'),
+    [zo('Descarga en cadena', 'Un rayo que salta hasta 3 objetivos con la mitad del daño en cada salto; 15 % de Parálisis por salto (la cadena y la tirada, a mano).', 3, 'H'), 5],
+    'Siempre está cerca cuando cae un rayo.', ER); ESTATICA3();
+  cr('rayo', 4, 'Arquero de tormenta', 'rango', 'elemental', 'Arco de cables',
+    at('Flecha de rayo', 'Una flecha cargada.', 'M'),
+    [es('Ojo de la tormenta', 'Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2), 4],
+    'Cada flecha lleva un trueno adentro.', ER); ESTATICA3();
+  cr('rayo', 5, 'Espíritu de la tormenta', 'apoyo', 'elemental', 'Nube negra',
+    cu('Absorber el rayo', 'Absorbe un rayo y se cura.', 1, 5),
+    [es('Tormenta protectora', 'Una tormenta que lo cuida: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 5],
+    'La tormenta que vuelve cada vez que alguien lo lastima.', ER); ESTATICA3();
+
+  /* ================= PASIVAS POR FAMILIA (rework de creeps, 2026-09-26; opción A del dueño) =================
+     Los creeps de nivel 3 en adelante traen pasivas propias de su familia, ya cargadas como estados permanentes (`pasiva: true`) que el GM
+     puede sacar o cambiar como cualquier estado. Tabla: nivel 3 → 1 pasiva · nivel 4 → 1 (otra) · nivel 5 → 2 · jefe → +1. La elegida sale
+     del nombre del creep (siempre la misma), y las hay de tres por familia. */
+  const P = (nombre, mods, detalle, hp) => ({nombre, polaridad: 'buff', turnos: 0, stacks: 1, hpTurno: hp || 0, permanente: true, pasiva: true,
+    mods: Object.keys(mods || {}).map(stat => ({stat, val: mods[stat]})), detalle: 'Pasiva de familia. ' + detalle});
+  const PASIVAS_FAMILIA = {
+    bestia: [P('Piel gruesa', {def: 1}, '+1 Defensa.'), P('Instinto de manada', {dmg: 1}, '+1 Daño.'), P('Reflejos de presa', {eva: 1}, '+1 Evasión.')],
+    humano: [P('Entrenamiento', {pdg: 1}, '+1 PdG.'), P('Curtido', {def: 1}, '+1 Defensa.'), P('Sangre fría', {resm: 1}, '+1 Res.Mt.')],
+    humanoide: [P('Astucia', {eva: 1}, '+1 Evasión.'), P('Tozudez', {resm: 1}, '+1 Res.Mt.'), P('Mala leche', {dmg: 1}, '+1 Daño.')],
+    planta: [P('Corteza', {def: 1}, '+1 Defensa.'), P('Savia', {}, 'Recupera 1 HP por turno.', 1), P('Raíces profundas', {resm: 1}, '+1 Res.Mt.')],
+    elemental: [P('Núcleo estable', {def: 1}, '+1 Defensa.'), P('Poder desbordante', {dmg: 1}, '+1 Daño.'), P('Aura elemental', {resmg: 1}, '+1 Res.Mg.')],
+    'no-muerto': [P('Huesos duros', {def: 1}, '+1 Defensa.'), P('Frío sepulcral', {resm: 1}, '+1 Res.Mt.'), P('Sed de sangre', {dmg: 1}, '+1 Daño.')],
+    constructo: [P('Blindaje', {def: 1}, '+1 Defensa.'), P('Sin nervios', {resm: 1}, '+1 Res.Mt.'), P('Mecanismo preciso', {pdg: 1}, '+1 PdG.')],
+    'alienígena': [P('Mente ajena', {resmg: 1}, '+1 Res.Mg.'), P('Fisiología rara', {eva: 1}, '+1 Evasión.'), P('Adaptación', {def: 1}, '+1 Defensa.')],
+  };
+  function aplicarProgresion(){
+    lista.forEach(c => {
+      const d = c.datos, opciones = PASIVAS_FAMILIA[d.tipoCriatura];
+      if(!opciones || c.nivel < 3) return;
+      const h = [...c.nombre].reduce((a, ch) => a + ch.charCodeAt(0), 0) % opciones.length;
+      const idx = c.nivel === 3 ? [h] : c.nivel === 4 ? [(h + 1) % opciones.length] : [h, (h + 1) % opciones.length];
+      if(d.jefe) idx.push((h + 2) % opciones.length);
+      [...new Set(idx)].forEach(i => {
+        if((d.estados || []).some(e => e.pasiva && e.nombre === opciones[i].nombre)) return;
+        (d.estados = d.estados || []).push(structuredClone(opciones[i]));
+      });
+      const nombres = (d.estados || []).filter(e => e.pasiva).map(e => e.nombre);
+      if(nombres.length){ c.detalle = c.detalle + ' Pasivas: ' + nombres.join(', ') + '.'; c.etiquetas = [...new Set([...c.etiquetas, 'con pasivas'])]; }
+    });
+  }
+  aplicarProgresion();
+
   window.CREEPS_BASE = lista;
   // Revisa que cada creep de la lista tenga TODOS los puntos de atributo de su nivel (33 + 3 por nivel sobre 1, repartidos entre Con, Fue, Agi, Des y Esp)
   // y HP = Con × 5. Devuelve los que no cumplen: [{nombre, nivel, suma, meta, hp, hpEsperado}]. Se corre desde la consola: CreepsBaseUtil.verificarPresupuesto().

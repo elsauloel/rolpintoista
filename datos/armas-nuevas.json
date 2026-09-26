@@ -716,7 +716,7 @@
   "tier": "Buena Calidad",
   "tipoItem": "arma_1m",
   "tipoDado": 8,
-  "peso": 2,
+  "peso": 1,
   "danoFijo": 0,
   "mods": [
    {
@@ -779,7 +779,7 @@
   "tier": "Raro",
   "tipoItem": "arma_1m",
   "tipoDado": 8,
-  "peso": 3,
+  "peso": 2,
   "danoFijo": 0,
   "mods": [
    {
@@ -795,7 +795,7 @@
     "detalle": "50 % de dejar 1 stack de Armadura rota."
    }
   ],
-  "detalle": "Pesada y de mango largo: Alcance +1 y 50 % de romper armadura."
+  "detalle": "De mango largo y filo ancho: Alcance +1 y 50 % de romper armadura."
  },
  {
   "id": "nuevo-hacha-arrojadiza",

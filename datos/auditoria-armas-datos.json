@@ -117,13 +117,13 @@
   "precioHoy": 230,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1. Puede Derribar (25%).",
   "nuevo": {
-   "pc": 12.5,
+   "pc": 13.5,
    "tier": "Raro",
-   "precio": 200,
+   "precio": 230,
    "exceso": 0,
    "desglose": {
     "daño": 10.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.9,
     "peso del arma": -0.4
@@ -572,13 +572,13 @@
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 8.6,
+   "pc": 9.9,
    "tier": "Buena Calidad",
-   "precio": 160,
+   "precio": 200,
    "exceso": 1,
    "desglose": {
     "daño": 6.3,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -617,13 +617,13 @@
   "precioHoy": 90,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 9.2,
+   "pc": 10.5,
    "tier": "Buena Calidad",
-   "precio": 180,
+   "precio": 220,
    "exceso": 1,
    "desglose": {
     "daño": 6.3,
-    "bonos": 3.1,
+    "bonos": 4.4,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -731,13 +731,13 @@
   "precioHoy": 800,
   "detalle": "parry+2, bloqueo +1, alcance +1",
   "nuevo": {
-   "pc": 16.9,
-   "tier": "Raro",
-   "precio": 350,
+   "pc": 18.2,
+   "tier": "Excepcional",
+   "precio": 450,
    "exceso": 0,
    "desglose": {
     "daño": 11.8,
-    "bonos": 5.5,
+    "bonos": 6.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -772,13 +772,13 @@
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 14.1,
+   "pc": 15.3,
    "tier": "Raro",
-   "precio": 400,
+   "precio": 450,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 3.5,
+    "bonos": 4.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -817,13 +817,13 @@
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 15.3,
+   "pc": 16.6,
    "tier": "Raro",
-   "precio": 450,
+   "precio": 500,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 4.8,
+    "bonos": 6.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -866,13 +866,13 @@
   "precioHoy": 140,
   "detalle": "alcance +1, bloqueo +1",
   "nuevo": {
-   "pc": 15.1,
+   "pc": 16.4,
    "tier": "Raro",
-   "precio": 450,
+   "precio": 500,
    "exceso": 1,
    "desglose": {
     "daño": 11.0,
-    "bonos": 3.5,
+    "bonos": 4.8,
     "crítico": 0.0,
     "efectos": 1.0,
     "peso del arma": -0.4
@@ -2675,13 +2675,13 @@
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
-   "pc": 14.6,
+   "pc": 15.6,
    "tier": "Raro",
-   "precio": 270,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 4.0,
     "peso del arma": -0.4
@@ -3214,13 +3214,13 @@
   "precioHoy": 130,
   "detalle": "alcance +1. Rompe armadura. ",
   "nuevo": {
-   "pc": 15.6,
+   "pc": 16.6,
    "tier": "Raro",
-   "precio": 300,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 3.0,
+    "bonos": 4.0,
     "crítico": 0.0,
     "efectos": 4.0,
     "peso del arma": -0.4
@@ -3525,13 +3525,13 @@
   "precioHoy": 50,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 4.3,
+   "pc": 5.3,
    "tier": "Común",
-   "precio": 55,
+   "precio": 60,
    "exceso": 0,
    "desglose": {
     "daño": 2.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3737,13 +3737,13 @@
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 6.6,
-   "tier": "Común",
-   "precio": 75,
-   "exceso": 0,
+   "pc": 7.6,
+   "tier": "Buena Calidad",
+   "precio": 120,
+   "exceso": 1,
    "desglose": {
     "daño": 5.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3774,13 +3774,13 @@
   "precioHoy": 65,
   "detalle": "Arma de dos manos, Tipo 8. Alcance +1.",
   "nuevo": {
-   "pc": 6.3,
+   "pc": 7.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 80,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -3815,13 +3815,13 @@
   "precioHoy": 75,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 7.6,
+   "pc": 8.6,
    "tier": "Buena Calidad",
-   "precio": 120,
+   "precio": 160,
    "exceso": 1,
    "desglose": {
     "daño": 5.0,
-    "bonos": 3.0,
+    "bonos": 4.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3852,13 +3852,13 @@
   "precioHoy": 110,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 10.6,
-   "tier": "Buena Calidad",
-   "precio": 150,
+   "pc": 11.6,
+   "tier": "Raro",
+   "precio": 170,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -3929,13 +3929,13 @@
   "precioHoy": 150,
   "detalle": "Ignora 1 de res al crítico, alcance +1",
   "nuevo": {
-   "pc": 13.1,
+   "pc": 14.3,
    "tier": "Raro",
-   "precio": 220,
+   "precio": 260,
    "exceso": 0,
    "desglose": {
     "daño": 11.0,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -4047,13 +4047,13 @@
   "precioHoy": 160,
   "detalle": "Alcance +1.",
   "nuevo": {
-   "pc": 13.9,
+   "pc": 15.2,
    "tier": "Raro",
-   "precio": 250,
+   "precio": 290,
    "exceso": 0,
    "desglose": {
     "daño": 11.8,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -4084,13 +4084,13 @@
   "precioHoy": 150,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 23.7,
+   "pc": 24.9,
    "tier": "Excepcional",
-   "precio": 1200,
+   "precio": 1300,
    "exceso": 1,
    "desglose": {
     "daño": 22.0,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.8
@@ -4261,13 +4261,13 @@
   "precioHoy": 70,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 7.8,
+   "pc": 9.1,
    "tier": "Buena Calidad",
-   "precio": 130,
+   "precio": 170,
    "exceso": 1,
    "desglose": {
     "daño": 5.5,
-    "bonos": 2.5,
+    "bonos": 3.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -4693,13 +4693,13 @@
   "precioHoy": 90,
   "detalle": "alcance +1, 50% de romper armadura",
   "nuevo": {
-   "pc": 9.6,
+   "pc": 10.6,
    "tier": "Buena Calidad",
-   "precio": 130,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 3.0,
     "peso del arma": -0.4
@@ -5434,13 +5434,13 @@
   "precioHoy": 60,
   "detalle": "alcance +1",
   "nuevo": {
-   "pc": 6.3,
+   "pc": 7.3,
    "tier": "Común",
-   "precio": 70,
+   "precio": 80,
    "exceso": 0,
    "desglose": {
     "daño": 4.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.2
@@ -5547,7 +5547,7 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Punta afilada de más: +1 de daño fijo. El arma del que recién empieza. Variación: pdg +1.",
+  "detalle": "Punta afilada de más. El arma del que recién empieza, y por eso la usa con cuidado: +1 de daño fijo y PdG +1.",
   "nuevo": {
    "pc": 7.8,
    "tier": "Buena Calidad",
@@ -5676,13 +5676,13 @@
   "precioHoy": null,
   "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado.",
   "nuevo": {
-   "pc": 9.7,
+   "pc": 10.7,
    "tier": "Buena Calidad",
-   "precio": 130,
+   "precio": 150,
    "exceso": 0,
    "desglose": {
     "daño": 7.5,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.8,
     "peso del arma": -0.6
@@ -5764,13 +5764,13 @@
   "precioHoy": null,
   "detalle": "El arma de los duelistas: Alcance +1, Crítico potente +3 y Crítico frecuente +1.",
   "nuevo": {
-   "pc": 15.4,
+   "pc": 16.5,
    "tier": "Raro",
-   "precio": 300,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 5.0,
-    "bonos": 2.0,
+    "bonos": 3.0,
     "crítico": 8.8,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -5811,13 +5811,13 @@
   "precioHoy": null,
   "detalle": "Larga y traicionera: Alcance +2, Crítico potente +3 y 33 % de Lisiado.",
   "nuevo": {
-   "pc": 14.5,
+   "pc": 15.5,
    "tier": "Raro",
-   "precio": 270,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 7.5,
-    "bonos": 3.0,
+    "bonos": 4.0,
     "crítico": 3.6,
     "efectos": 1.0,
     "peso del arma": -0.6
@@ -5956,13 +5956,13 @@
   "precioHoy": null,
   "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +1, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado.",
   "nuevo": {
-   "pc": 24.8,
+   "pc": 25.8,
    "tier": "Excepcional",
-   "precio": 850,
+   "precio": 900,
    "exceso": 0,
    "desglose": {
     "daño": 10.0,
-    "bonos": 6.5,
+    "bonos": 7.5,
     "crítico": 7.7,
     "efectos": 1.5,
     "peso del arma": -0.8
@@ -6716,7 +6716,7 @@
   "tier": "Buena Calidad",
   "manos": 1,
   "tipo": 8,
-  "peso": 2,
+  "peso": 1,
   "danoFijo": 0,
   "rango": false,
   "bonos": [
@@ -6732,16 +6732,16 @@
   "precioHoy": null,
   "detalle": "Para trepar y pelear en el pasamanos. Alcance +1.",
   "nuevo": {
-   "pc": 10.6,
-   "tier": "Buena Calidad",
-   "precio": 150,
+   "pc": 7.3,
+   "tier": "Común",
+   "precio": 80,
    "exceso": 0,
    "desglose": {
-    "daño": 9.0,
-    "bonos": 2.0,
+    "daño": 4.5,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 0.0,
-    "peso del arma": -0.4
+    "peso del arma": -0.2
    }
   }
  },
@@ -6834,7 +6834,7 @@
   "tier": "Raro",
   "manos": 1,
   "tipo": 8,
-  "peso": 3,
+  "peso": 2,
   "danoFijo": 0,
   "rango": false,
   "bonos": [
@@ -6854,18 +6854,18 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Pesada y de mango largo: Alcance +1 y 50 % de romper armadura.",
+  "detalle": "De mango largo y filo ancho: Alcance +1 y 50 % de romper armadura.",
   "nuevo": {
-   "pc": 16.9,
+   "pc": 13.6,
    "tier": "Raro",
-   "precio": 350,
+   "precio": 240,
    "exceso": 0,
    "desglose": {
-    "daño": 13.5,
-    "bonos": 2.0,
+    "daño": 9.0,
+    "bonos": 3.0,
     "crítico": 0.0,
     "efectos": 2.0,
-    "peso del arma": -0.6
+    "peso del arma": -0.4
    }
   }
  },
@@ -6899,13 +6899,13 @@
   "precioHoy": null,
   "detalle": "Se tira y vuelve (a veces). Alcance +2, 50 % de Sangrado.",
   "nuevo": {
-   "pc": 12.8,
+   "pc": 13.8,
    "tier": "Raro",
-   "precio": 210,
+   "precio": 240,
    "exceso": 0,
    "desglose": {
     "daño": 9.0,
-    "bonos": 3.0,
+    "bonos": 4.0,
     "crítico": 0.0,
     "efectos": 1.2,
     "peso del arma": -0.4
@@ -6989,13 +6989,13 @@
   "precioHoy": null,
   "detalle": "Nació para desarmar caballeros: +2 de daño fijo, Bloqueo +2, Alcance +1 y 2 stacks de Armadura rota en cada golpe.",
   "nuevo": {
-   "pc": 24.9,
+   "pc": 25.9,
    "tier": "Excepcional",
-   "precio": 850,
+   "precio": 900,
    "exceso": 0,
    "desglose": {
     "daño": 15.5,
-    "bonos": 4.0,
+    "bonos": 5.0,
     "crítico": 0.0,
     "efectos": 6.0,
     "peso del arma": -0.6
@@ -7041,13 +7041,13 @@
   "precioHoy": null,
   "detalle": "Se dice que cortó la última veta del mundo. A dos manos: +3 de daño fijo, Bloqueo +3, Alcance +1, 2 stacks de Armadura rota y Sangrado en cada golpe.",
   "nuevo": {
-   "pc": 33.7,
+   "pc": 34.7,
    "tier": "Legendario",
-   "precio": 1800,
+   "precio": 1900,
    "exceso": 0,
    "desglose": {
     "daño": 21.0,
-    "bonos": 5.0,
+    "bonos": 6.0,
     "crítico": 0.0,
     "efectos": 8.5,
     "peso del arma": -0.8

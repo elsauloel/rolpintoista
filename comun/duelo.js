@@ -112,6 +112,11 @@ const Duelo = (() => {
 .duelo-veredicto.bloqueado{background:linear-gradient(180deg,#1f3f5a,#172c3d);border:2px solid #5aa7e8;color:#cfe6fb}
 .duelo-veredicto.mitad{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
+.duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
+.duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
+.duelo-tabla tr.mod td{color:#ffd25a}
+.duelo-tabla tr.gano td{background:rgba(255,210,90,.18);font-weight:800;color:#fff3c9}
 .duelo-veredicto.critico{background:radial-gradient(circle at 50% 30%,#8a5a12,#4a2a08 70%);border:3px solid #ffd25a;color:#fff3c9;box-shadow:0 0 40px rgba(255,190,60,.55),inset 0 0 30px rgba(255,210,90,.25);animation:duelo-brillo 1.4s ease-in-out infinite alternate}
 .duelo-veredicto.critico .grande{font-size:64px;letter-spacing:.06em;text-shadow:0 0 18px #ffb400,0 3px 0 #7a4a00}
 .duelo-veredicto.critico .mult{font-size:34px;font-weight:900;color:#ffd25a;margin-top:2px}
@@ -561,6 +566,19 @@ const Duelo = (() => {
   }
 
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+  // Tabla de valores del d20 para el multiplicador, a la vista ANTES de tirar. Si hay Crítico potente, dice cuánto se movió cada umbral y por qué.
+  function tablaCriticoHtml(c, d, mejor){
+    const P = Math.max(0, Math.round(_num(c.potente)));
+    const u = Critico.umbrales(P), b = Critico.umbrales(0);
+    const filas = [['×2', 'DOBLE DAÑO', b.doble, u.doble, P, 1], ['×3', 'TRIPLE DAÑO', b.triple, u.triple, Math.floor(P / 2), 2], ['×4', 'CUÁDRUPLE DAÑO', b.cuadruple, u.cuadruple, Math.floor(P / 3), 3]];
+    const gano = mejor ? (mejor >= u.cuadruple ? 2 : mejor >= u.triple ? 1 : mejor >= u.doble ? 0 : -1) : -2;
+    const cambia = P > 0;
+    const razones = cambia ? `<div class="duelo-nota" style="margin-top:6px">🔧 <b>Tabla modificada:</b> ${_esc(d.atacante.nombre)} tiene <b>Crítico potente ${_fmt(P)}</b>${_num(c.potente) ? ' (de su equipo, habilidades o estados)' : ''}. Cada punto baja <b>1</b> el número del doble daño (hasta un mínimo de 1), <b>1 cada 2 puntos</b> el del triple y <b>1 cada 3 puntos</b> el del cuádruple. Por eso: doble ${b.doble} → <b>${u.doble}</b>${P >= 2 ? `, triple ${b.triple} → <b>${u.triple}</b>` : ''}${P >= 3 ? `, cuádruple ${b.cuadruple} → <b>${u.cuadruple}</b>` : ''}.</div>` : `<div class="duelo-nota" style="margin-top:6px">Tabla base (sin Crítico potente).</div>`;
+    return `<table class="duelo-tabla"><thead><tr><th>Multiplicador</th><th>Sale con el mejor d20 de…</th>${cambia ? '<th>Base</th>' : ''}</tr></thead><tbody>
+      ${filas.map((f, i) => `<tr class="${gano === i ? 'gano' : ''}${f[3] !== f[2] ? ' mod' : ''}"><td>${f[0]} · ${f[1]}</td><td><b>${f[3] >= 20 && i === 2 ? '20' : f[3] + ' o más'}</b>${f[3] !== f[2] ? ' ✎' : ''}</td>${cambia ? `<td>${f[2] >= 20 && i === 2 ? '20' : f[2] + ' o más'}</td>` : ''}</tr>`).join('')}
+      <tr class="${gano === -1 ? 'gano' : ''}"><td>×1 · sin multiplicador</td><td>menos de ${u.doble}</td>${cambia ? `<td>menos de ${b.doble}</td>` : ''}</tr></tbody></table>${razones}`;
+  }
+
   // Paso 4 · Crítico: la cuenta, los d20 y (si sale) la celebración.
   function criticoHtml(d){
     const c = d.crit;
@@ -573,11 +591,12 @@ const Duelo = (() => {
       const puede = esMio(d.atacante) || soyGM();
       cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
         <div class="duelo-mini g">💥 ¡Hay posibilidad de crítico! Se tiran <b>${_fmt(c.dados)} d20</b> y vale el mejor</div>
-        <div class="duelo-nota" style="text-align:center">7 o más: doble daño · 17 o más: triple · 20: cuádruple${_num(c.potente) ? ` (con Crítico potente ${_fmt(c.potente)} los números bajan)` : ''}</div>
+        ${tablaCriticoHtml(c, d, 0)}
         <div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
       cuerpo = `<div class="duelo-mini">${_esc(cuenta)}</div>
-        <div class="duelo-mini">d20: ${c.d20.map(x => x === c.mejor ? `<b>${x}</b>` : x).join(' · ')} → mejor <b>${_fmt(c.mejor)}</b> · ${c.mult > 1 ? `×${_fmt(c.mult)} ${NOMBRE_MULT[c.mult]}` : 'sin multiplicador'}</div>`;
+        <div class="duelo-mini">d20: ${c.d20.map(x => x === c.mejor ? `<b>${x}</b>` : x).join(' · ')} → mejor <b>${_fmt(c.mejor)}</b> · ${c.mult > 1 ? `×${_fmt(c.mult)} ${NOMBRE_MULT[c.mult]}` : 'sin multiplicador'}</div>
+        ${tablaCriticoHtml(c, d, c.mejor)}`;
     }
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }

@@ -112,3 +112,6 @@ Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (
 - Territorios por **clase** y por **tipo de skill** (tanque, asalto, mago, shooter…), ver [`clases-borrador.md`](clases-borrador.md).
 - Territorios por **pieza de equipo** (casco, botas, anillos…) y por **rareza**.
 - Qué mecánicas son de "un solo dueño" y cuáles se pueden compartir libremente.
+
+## Movimiento negativo = drawback muy grande (dueño, 2026-09-25)
+"El −1 de movimiento era un drawback aceptable en el sistema anterior. Ahora **−1 de Movimiento es igual a −1 micro** (un casillero de movimiento menos por turno), por lo cual **se puede usar, pero tiene que ser un drawback muy grande y ofrecer a cambio un beneficio muy grande**." Regla al diseñar: por defecto, un ítem pesado paga con **Evasión o Iniciativa** (−1); el **Movimiento negativo se reserva para ítems con un beneficio enorme** (ej.: Coraza del Titán caído, Defensa 12; Mochila del buhonero, +28 ranuras). En la auditoría de defensa las piezas con Mov negativo llevan un aviso.

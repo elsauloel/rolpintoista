@@ -12824,12 +12824,12 @@
         "val": 2
       },
       {
-        "stat": "mov",
+        "stat": "ini",
         "val": -1
       }
     ],
     "efectoMods": [],
-    "detalle": "Defensa +8 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Movimiento -1",
+    "detalle": "Defensa +8 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Iniciativa -1",
     "descripcionNarrativa": "Es tan alto que se apoya en el suelo, y tras él caben dos personas y una excusa. Cuando se lo planta, el mundo se detiene a pensarlo."
   },
   {
@@ -13580,13 +13580,13 @@
         "val": 10
       },
       {
-        "stat": "mov",
+        "stat": "eva",
         "val": -1
       }
     ],
     "efectoMods": [],
-    "detalle": "Ranuras de mochila +10 · Movimiento -1",
-    "descripcionNarrativa": "Dos bolsas grandes cruzadas: cabe de todo, pero el paso se hace lento."
+    "detalle": "Ranuras de mochila +10 · Evasión -1",
+    "descripcionNarrativa": "Dos bolsas grandes cruzadas: cabe de todo, pero estorban al esquivar."
   },
   {
     "mods": [
@@ -16259,12 +16259,12 @@
         "val": 1
       },
       {
-        "stat": "mov",
+        "stat": "ini",
         "val": -1
       }
     ],
     "efectoMods": [],
-    "detalle": "Defensa +11 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +1 · Movimiento -1",
+    "detalle": "Defensa +11 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +1 · Iniciativa -1",
     "descripcionNarrativa": "La encargó un noble a un maestro armero que tardó un año en terminarla; después el noble murió y la armadura siguió esperando dueño. Calza tan justa que parece una segunda piel de acero."
   },
   {
@@ -20230,12 +20230,12 @@
         "val": 1
       },
       {
-        "stat": "mov",
+        "stat": "eva",
         "val": -1
       }
     ],
     "efectoMods": [],
-    "detalle": "Defensa +9 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Res. crítico Tipo 8 +1 · Movimiento -1",
+    "detalle": "Defensa +9 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Res. crítico Tipo 8 +1 · Evasión -1",
     "descripcionNarrativa": "Peto y espaldar de acero bien pulido, con correas que crujen en cada paso. Quien la lleva es una pequeña fortaleza que camina, a paso lento y seguro."
   },
   {
@@ -23465,11 +23465,11 @@
     "tipoItem": "mochila",
     "peso": 3,
     "ranuras": 0,
-    "precioCompra": 850,
+    "precioCompra": 1100,
     "mods": [
       {
         "stat": "capmochila",
-        "val": 18
+        "val": 28
       },
       {
         "stat": "mov",
@@ -23477,7 +23477,7 @@
       }
     ],
     "efectoMods": [],
-    "detalle": "Ranuras de mochila +18 · Movimiento -1",
+    "detalle": "Ranuras de mochila +28 · Movimiento -1 (drawback grande a cambio de un beneficio enorme)",
     "descripcionNarrativa": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar."
   },
   {

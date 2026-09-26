@@ -129,6 +129,8 @@ def reajustar(item):
             cambios.append('Res. crítico Tipo %d: de +%d a +%d (tope de %s).' % (tipo, m['val'], tope, tier))
             m = dict(m, val=tope)
         mods.append(m)
+    if any(m['stat'] == 'mov' and m['val'] < 0 for m in mods):
+        avisos.append('Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.')
     if cambios:
         avisos.append('Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono).')
     it['mods'] = mods

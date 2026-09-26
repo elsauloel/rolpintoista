@@ -68,6 +68,7 @@
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1700,
@@ -806,6 +807,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 900,
@@ -956,6 +958,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 260,
@@ -1014,6 +1017,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 140,
@@ -4130,6 +4134,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 180,
@@ -4180,6 +4185,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 90,
@@ -4851,6 +4857,7 @@
    "Quitar Res. crítico Tipo 12 (+1): el Tipo 12 solo va en cinturón y anillos."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1650,
@@ -7922,6 +7929,7 @@
    "Quitar Res. crítico Tipo 8 (+1): no la dan piezas de tier Buena Calidad."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 130,
@@ -8237,6 +8245,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 750,
@@ -9710,7 +9719,9 @@
    }
   ],
   "cambios": [],
-  "avisos": [],
+  "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+  ],
   "precioHoy": 70,
   "detalle": "Aros de metal remachados sobre cuero grueso. Pesan una barbaridad."
  },
@@ -9801,6 +9812,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 100,
@@ -10052,6 +10064,7 @@
    "Quitar Res. crítico Tipo 12 (+1): el Tipo 12 solo va en cinturón y anillos."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 1350,
@@ -10126,6 +10139,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 220,
@@ -11479,6 +11493,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 600,
@@ -13000,6 +13015,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 450,
@@ -13641,6 +13657,7 @@
    "Quitar Res. crítico Tipo 6 (+1): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 70,
@@ -13832,6 +13849,7 @@
    "Quitar Res. crítico Tipo 10 (+1): el Tipo 10 solo va en la cabeza."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 900,
@@ -13882,6 +13900,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 220,
@@ -13971,6 +13990,7 @@
    "Quitar Res. crítico Tipo 8 (+1): el Tipo 8 solo va en torso rígido y escudo."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 90,
@@ -14757,6 +14777,7 @@
    "Quitar Res. crítico Tipo 6 (+2): el Tipo 6 solo va en torso rígido, manos y piernas."
   ],
   "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho.",
    "Al quitar resistencia la pieza pierde valor: si querés compensarla, pedilo en la nota (+1 de Defensa u otro bono)."
   ],
   "precioHoy": 190,
@@ -15669,7 +15690,7 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "eva",
     "val": -1
    }
   ],
@@ -15691,7 +15712,7 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "eva",
     "val": -1
    }
   ],
@@ -15727,7 +15748,7 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": -1
    }
   ],
@@ -15749,7 +15770,7 @@
     "val": 1
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": -1
    }
   ],
@@ -15812,7 +15833,9 @@
    }
   ],
   "cambios": [],
-  "avisos": [],
+  "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+  ],
   "precioHoy": 1800,
   "detalle": "Dicen que un gigante cayó en la montaña y que con su peto se forjó ésta. Cada placa tiene la marca de una mano enorme y en el pecho todavía se escucha, si se apoya la oreja, un latido lejano."
  },
@@ -16263,7 +16286,7 @@
     "val": 2
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": -1
    }
   ],
@@ -16285,7 +16308,7 @@
     "val": 2
    },
    {
-    "stat": "mov",
+    "stat": "ini",
     "val": -1
    }
   ],
@@ -17457,7 +17480,7 @@
     "val": 10
    },
    {
-    "stat": "mov",
+    "stat": "eva",
     "val": -1
    }
   ],
@@ -17467,14 +17490,14 @@
     "val": 10
    },
    {
-    "stat": "mov",
+    "stat": "eva",
     "val": -1
    }
   ],
   "cambios": [],
   "avisos": [],
   "precioHoy": 150,
-  "detalle": "Dos bolsas grandes cruzadas: cabe de todo, pero el paso se hace lento."
+  "detalle": "Dos bolsas grandes cruzadas: cabe de todo, pero estorban al esquivar."
  },
  {
   "id": "nuevo-mochila-de-explorador",
@@ -17582,7 +17605,7 @@
   "antes": [
    {
     "stat": "capmochila",
-    "val": 18
+    "val": 28
    },
    {
     "stat": "mov",
@@ -17592,7 +17615,7 @@
   "despues": [
    {
     "stat": "capmochila",
-    "val": 18
+    "val": 28
    },
    {
     "stat": "mov",
@@ -17600,8 +17623,10 @@
    }
   ],
   "cambios": [],
-  "avisos": [],
-  "precioHoy": 850,
+  "avisos": [
+   "Movimiento negativo: hoy −1 Mov equivale a −1 casillero de movimiento por turno (un drawback MUY grande); solo se justifica con un beneficio enorme. Decidir si se cambia por otro drawback (Evasión, Iniciativa) o se compensa mucho."
+  ],
+  "precioHoy": 1100,
   "detalle": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar."
  },
  {
@@ -18209,7 +18234,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 1d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de oso», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 1d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Mandíbulas de hierro con resorte, armadas a ras del suelo. Se cierran con un chasquido que se oye en toda la ladera."
  },
  {
@@ -18226,7 +18251,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 2d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de oso», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 2d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Mandíbulas de hierro con resorte, armadas a ras del suelo. Se cierran con un chasquido que se oye en toda la ladera."
  },
  {
@@ -18243,7 +18268,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 3d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de oso», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 3d6 de daño (automático) e Inmovilizado (a mano). Para liberarse: 2 No2 y Fuerza contra 8. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Mandíbulas de hierro con resorte, armadas a ras del suelo. Se cierran con un chasquido que se oye en toda la ladera."
  },
  {
@@ -18260,7 +18285,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 2d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Foso con estacas», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 2d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un pozo estrecho con estacas afiladas y una tapa de ramas. Cae quien confía en el suelo."
  },
  {
@@ -18277,7 +18302,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 3d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Foso con estacas», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 3d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un pozo estrecho con estacas afiladas y una tapa de ramas. Cae quien confía en el suelo."
  },
  {
@@ -18294,7 +18319,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 4d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Foso con estacas», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 4d6 de daño (automático) y queda Sentado (a mano; pararse cuesta 1 No2). Evasión contra 12 evita la caída. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un pozo estrecho con estacas afiladas y una tapa de ramas. Cae quien confía en el suelo."
  },
  {
@@ -18311,7 +18336,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Red de caza», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una red de cuerda gruesa con lastres, plegada y lista para caer sobre quien pase."
  },
  {
@@ -18328,7 +18353,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 20,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Red de caza», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una red de cuerda gruesa con lastres, plegada y lista para caer sobre quien pase."
  },
  {
@@ -18345,7 +18370,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Red de caza», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Cae una red: Inmovilizado 2 turnos (a mano). Se libera con 2 No2 y Fuerza contra 8. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una red de cuerda gruesa con lastres, plegada y lista para caer sobre quien pase."
  },
  {
@@ -18362,7 +18387,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Brea pegajosa», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril de brea densa que se derrama sobre el camino: se pega a las botas y a las ganas de seguir."
  },
  {
@@ -18379,7 +18404,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 20,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Brea pegajosa», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril de brea densa que se derrama sobre el camino: se pega a las botas y a las ganas de seguir."
  },
  {
@@ -18396,7 +18421,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Brea pegajosa», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril de brea densa que se derrama sobre el camino: se pega a las botas y a las ganas de seguir."
  },
  {
@@ -18413,7 +18438,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Aceite resbaladizo», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Aceite de lámpara vertido sobre las piedras. Nadie ve dónde está hasta que ya está en el suelo."
  },
  {
@@ -18430,7 +18455,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 20,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Aceite resbaladizo», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Aceite de lámpara vertido sobre las piedras. Nadie ve dónde está hasta que ya está en el suelo."
  },
  {
@@ -18447,7 +18472,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Aceite resbaladizo», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Aceite de lámpara vertido sobre las piedras. Nadie ve dónde está hasta que ya está en el suelo."
  },
  {
@@ -18464,7 +18489,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. 1d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Dardos envenenados», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. 1d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una hilera de tubos con dardos untados en algo verde. Un hilo tenso hace de gatillo."
  },
  {
@@ -18481,7 +18506,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. 1d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Dardos envenenados», radio 5); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. 1d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una hilera de tubos con dardos untados en algo verde. Un hilo tenso hace de gatillo."
  },
  {
@@ -18498,7 +18523,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. 2d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Dardos envenenados», radio 7); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. 2d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una hilera de tubos con dardos untados en algo verde. Un hilo tenso hace de gatillo."
  },
  {
@@ -18515,7 +18540,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. 4d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cuchillas de guadaña», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. 4d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Guadañas montadas en un eje que giran como una puerta cuando alguien pisa la placa."
  },
  {
@@ -18532,7 +18557,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. 5d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cuchillas de guadaña», radio 5); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. 5d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Guadañas montadas en un eje que giran como una puerta cuando alguien pisa la placa."
  },
  {
@@ -18549,7 +18574,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 105,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. 6d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cuchillas de guadaña», radio 7); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. 6d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Guadañas montadas en un eje que giran como una puerta cuando alguien pisa la placa."
  },
  {
@@ -18566,7 +18591,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 15,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cable de alarma», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en línea de largo 3. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cable fino con cascabeles: no lastima a nadie, pero todos se enteran de que alguien pasó."
  },
  {
@@ -18583,7 +18608,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 20,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cable de alarma», radio 5); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en línea de largo 5. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cable fino con cascabeles: no lastima a nadie, pero todos se enteran de que alguien pasó."
  },
  {
@@ -18600,7 +18625,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Cable de alarma», radio 7); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en línea de largo 7. Cuerda con cascabeles: al tocarla suena. Los enemigos a 8 casillas se alertan y el que la activó sale del sigilo (a mano). Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cable fino con cascabeles: no lastima a nadie, pero todos se enteran de que alguien pasó."
  },
  {
@@ -18617,7 +18642,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Arena movediza», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un polvo mágico que, al ser pisado, convierte el suelo en arena que traga y retiene."
  },
  {
@@ -18634,7 +18659,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Arena movediza», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un polvo mágico que, al ser pisado, convierte el suelo en arena que traga y retiene."
  },
  {
@@ -18651,7 +18676,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Arena movediza», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Inmovilizado (a mano): salir cuesta 3 No2 (2 si gana Fuerza contra 8). Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un polvo mágico que, al ser pisado, convierte el suelo en arena que traga y retiene."
  },
  {
@@ -18668,7 +18693,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 40,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Cae el techo: 3d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Derrumbe», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Cae el techo: 3d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un puntal cortado a medias que sostiene un techo de piedras. Basta un roce para que ceda."
  },
  {
@@ -18685,7 +18710,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 60,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Cae el techo: 4d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Derrumbe», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Cae el techo: 4d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un puntal cortado a medias que sostiene un techo de piedras. Basta un roce para que ceda."
  },
  {
@@ -18702,7 +18727,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 85,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Cae el techo: 5d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Derrumbe», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Cae el techo: 5d6 de daño (automático) y Sentados (a mano). Evasión contra 14 reduce el daño a la mitad. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un puntal cortado a medias que sostiene un techo de piedras. Basta un roce para que ceda."
  },
  {
@@ -18719,7 +18744,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Nube de veneno», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una ampolla de vidrio grueso con gas verdoso. Se rompe al pisarla y no hay dónde respirar."
  },
  {
@@ -18736,7 +18761,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Nube de veneno», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una ampolla de vidrio grueso con gas verdoso. Se rompe al pisarla y no hay dónde respirar."
  },
  {
@@ -18753,7 +18778,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Nube de veneno», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una ampolla de vidrio grueso con gas verdoso. Se rompe al pisarla y no hay dónde respirar."
  },
  {
@@ -18770,7 +18795,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Gas somnífero», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una cápsula que libera un vapor dulzón que apaga los párpados antes de que la mente se entere."
  },
  {
@@ -18787,7 +18812,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Gas somnífero», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una cápsula que libera un vapor dulzón que apaga los párpados antes de que la mente se entere."
  },
  {
@@ -18804,7 +18829,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Gas somnífero», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una cápsula que libera un vapor dulzón que apaga los párpados antes de que la mente se entere."
  },
  {
@@ -18821,7 +18846,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 40,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Estalla en flor de 3: 1d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Bomba de esporas», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Estalla en flor de 3: 1d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una bola de hongo seco. Cuando revienta, el aire se llena de esporas que queman los pulmones."
  },
  {
@@ -18838,7 +18863,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 60,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Estalla en flor de 3: 2d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Bomba de esporas», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Estalla en flor de 3: 2d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una bola de hongo seco. Cuando revienta, el aire se llena de esporas que queman los pulmones."
  },
  {
@@ -18855,7 +18880,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 85,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Estalla en flor de 3: 3d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Bomba de esporas», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Estalla en flor de 3: 3d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una bola de hongo seco. Cuando revienta, el aire se llena de esporas que queman los pulmones."
  },
  {
@@ -18872,7 +18897,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Estalla en flor de 2: 2d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Mina explosiva», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Estalla en flor de 2: 2d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda."
  },
  {
@@ -18889,7 +18914,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Estalla en flor de 2: 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Mina explosiva», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Estalla en flor de 2: 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda."
  },
  {
@@ -18906,7 +18931,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Estalla en flor de 2: 4d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Mina explosiva», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Estalla en flor de 2: 4d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda."
  },
  {
@@ -18923,7 +18948,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 40,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Explota en flor de 3: 3d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Barril de pólvora», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Explota en flor de 3: 3d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril pequeño, sellado con cera y enterrado a medias. No es sutil, pero es muy convincente."
  },
  {
@@ -18940,7 +18965,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 60,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Explota en flor de 3: 4d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Barril de pólvora», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Explota en flor de 3: 4d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril pequeño, sellado con cera y enterrado a medias. No es sutil, pero es muy convincente."
  },
  {
@@ -18957,7 +18982,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 85,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Explota en flor de 3: 5d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Barril de pólvora», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Explota en flor de 3: 5d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un barril pequeño, sellado con cera y enterrado a medias. No es sutil, pero es muy convincente."
  },
  {
@@ -18974,7 +18999,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 1d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Llamarada», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 1d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un tubo de bronce con aceite y una chispa de pedernal: al pisarlo, lanza una lengua de fuego."
  },
  {
@@ -18991,7 +19016,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 2d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Llamarada», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 2d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un tubo de bronce con aceite y una chispa de pedernal: al pisarlo, lanza una lengua de fuego."
  },
  {
@@ -19008,7 +19033,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 3d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Llamarada», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 3d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un tubo de bronce con aceite y una chispa de pedernal: al pisarlo, lanza una lengua de fuego."
  },
  {
@@ -19025,7 +19050,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de silencio», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una piedra con un glifo que absorbe el sonido. Quien la pisa deja de oír su propia voz."
  },
  {
@@ -19042,7 +19067,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de silencio», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una piedra con un glifo que absorbe el sonido. Quien la pisa deja de oír su propia voz."
  },
  {
@@ -19059,7 +19084,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de silencio», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Apaga la magia: no puede usar habilidades con SP durante 1 turno (a mano). Res.Mt contra 12 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una piedra con un glifo que absorbe el sonido. Quien la pisa deja de oír su propia voz."
  },
  {
@@ -19076,7 +19101,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 25,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de debilidad», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo violeta que, al ser pisado, le roba el vigor a quien lo toca."
  },
  {
@@ -19093,7 +19118,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 35,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de debilidad», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo violeta que, al ser pisado, le roba el vigor a quien lo toca."
  },
  {
@@ -19110,7 +19135,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Runa de debilidad», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Maldición debilitante: -2 a todas las tiradas 2 turnos (a mano). Res.Mt contra 10 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo violeta que, al ser pisado, le roba el vigor a quien lo toca."
  },
  {
@@ -19127,7 +19152,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Niebla de confusión», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un frasco con una niebla violácea que embrolla los sentidos de quien la respira."
  },
  {
@@ -19144,7 +19169,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Niebla de confusión», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un frasco con una niebla violácea que embrolla los sentidos de quien la respira."
  },
  {
@@ -19161,7 +19186,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Niebla de confusión», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un frasco con una niebla violácea que embrolla los sentidos de quien la respira."
  },
  {
@@ -19178,7 +19203,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Hielo repentino: 1d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de escarcha», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Hielo repentino: 1d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cristal de hielo eterno que estalla en escarcha al contacto con un pie caliente."
  },
  {
@@ -19195,7 +19220,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Hielo repentino: 2d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de escarcha», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Hielo repentino: 2d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cristal de hielo eterno que estalla en escarcha al contacto con un pie caliente."
  },
  {
@@ -19212,7 +19237,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Hielo repentino: 3d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Trampa de escarcha», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Hielo repentino: 3d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano). Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un cristal de hielo eterno que estalla en escarcha al contacto con un pie caliente."
  },
  {
@@ -19229,7 +19254,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 2d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Descarga eléctrica», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). 2d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una placa de cobre y un carrete de cables. Cuando alguien la pisa, el aire cruje."
  },
  {
@@ -19246,7 +19271,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 3d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Descarga eléctrica», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). 3d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una placa de cobre y un carrete de cables. Cuando alguien la pisa, el aire cruje."
  },
  {
@@ -19263,7 +19288,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 4d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Descarga eléctrica», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). 4d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Una placa de cobre y un carrete de cables. Cuando alguien la pisa, el aire cruje."
  },
  {
@@ -19280,7 +19305,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 30,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Succión arcana», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo sin brillo que absorbe la energía de quien se acerca, como un sumidero."
  },
  {
@@ -19297,7 +19322,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 45,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Succión arcana», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo sin brillo que absorbe la energía de quien se acerca, como un sumidero."
  },
  {
@@ -19314,7 +19339,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Succión arcana», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo sin brillo que absorbe la energía de quien se acerca, como un sumidero."
  },
  {
@@ -19331,7 +19356,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 40,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Espejo de discordia», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un espejo de mano puesto boca arriba, con un hechizo que vuelve a los amigos enemigos."
  },
  {
@@ -19348,7 +19373,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 60,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Espejo de discordia», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un espejo de mano puesto boca arriba, con un hechizo que vuelve a los amigos enemigos."
  },
  {
@@ -19365,7 +19390,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 85,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Espejo de discordia», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un espejo de mano puesto boca arriba, con un hechizo que vuelve a los amigos enemigos."
  },
  {
@@ -19382,7 +19407,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 50,
-  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Portal cósmico», radio 1); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar."
  },
  {
@@ -19399,7 +19424,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 70,
-  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Portal cósmico», radio 2); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar."
  },
  {
@@ -19416,7 +19441,7 @@
   "cambios": [],
   "avisos": [],
   "precioHoy": 105,
-  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ✋ A mano: colocala con 📚 Catálogo de trampas del mapa («Portal cósmico», radio 3); todavía no se coloca sola desde la ficha. Se apila sin límite en la mochila.",
+  "reglas": "Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.",
   "detalle": "Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar."
  }
 ]

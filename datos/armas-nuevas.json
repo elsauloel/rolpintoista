@@ -389,10 +389,14 @@
    {
     "stat": "parry",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
    }
   ],
   "efectosGolpe": [],
-  "detalle": "La espada del soldado raso, bien balanceada. Parry +1."
+  "detalle": "La espada del soldado raso, bien balanceada. Parry +1. PdG +1 al contraatacar."
  },
  {
   "id": "nuevo-cimitarra-del-desierto",
@@ -407,6 +411,10 @@
    {
     "stat": "ini",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
    }
   ],
   "efectosGolpe": [
@@ -417,7 +425,7 @@
     "detalle": "33 % de dejar Sangrado."
    }
   ],
-  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado."
+  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado. PdG +1 al contraatacar."
  },
  {
   "id": "nuevo-espada-de-la-guardia",
@@ -462,6 +470,10 @@
    {
     "stat": "crit",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -472,7 +484,7 @@
     "detalle": "50 % de dejar Sangrado."
    }
   ],
-  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado."
+  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado. PdG +3 al contraatacar."
  },
  {
   "id": "nuevo-sable-del-capitan-pirata",
@@ -491,6 +503,10 @@
    {
     "stat": "crit",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
    }
   ],
   "efectosGolpe": [
@@ -501,7 +517,7 @@
     "detalle": "Cada golpe deja Sangrado."
    }
   ],
-  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe."
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe. PdG +2 al contraatacar."
  },
  {
   "id": "nuevo-espada-vampirica-menor",
@@ -516,6 +532,10 @@
    {
     "stat": "parry",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
    }
   ],
   "efectosGolpe": [
@@ -526,7 +546,7 @@
     "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
    }
   ],
-  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño)."
+  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño). PdG +2 al contraatacar."
  },
  {
   "id": "nuevo-espadon-de-acero-de-toledo",
@@ -545,6 +565,10 @@
    {
     "stat": "crit",
     "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -555,7 +579,7 @@
     "detalle": "Cada golpe deja Sangrado."
    }
   ],
-  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe."
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe. PdG +3 al contraatacar."
  },
  {
   "id": "nuevo-katana-del-viento",
@@ -578,6 +602,10 @@
    {
     "stat": "crit",
     "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -588,7 +616,7 @@
     "detalle": "50 % de dejar Lisiado 3 turnos."
    }
   ],
-  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado."
+  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado. PdG +3 al contraatacar."
  },
  {
   "id": "nuevo-filo-del-capitan-sin-nombre",
@@ -615,6 +643,10 @@
    {
     "stat": "critpot",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectosGolpe": [
@@ -631,7 +663,7 @@
     "detalle": "Veneno severo por 5 turnos en cada golpe."
    }
   ],
-  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe."
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe. PdG +3 al contraatacar."
  },
  {
   "id": "nuevo-hachuela-de-lenador",

@@ -6164,6 +6164,10 @@
    {
     "stat": "parry",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
    }
   ],
   "efectos": [],
@@ -6171,15 +6175,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "La espada del soldado raso, bien balanceada. Parry +1.",
+  "detalle": "La espada del soldado raso, bien balanceada. Parry +1. PdG +1 al contraatacar.",
   "nuevo": {
-   "pc": 7.6,
+   "pc": 8.4,
    "tier": "Buena Calidad",
-   "precio": 80,
+   "precio": 100,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
-    "bonos": 1.0,
+    "bonos": 1.8,
     "crítico": 0.0,
     "efectos": 0.0,
     "peso del arma": -0.4
@@ -6201,6 +6205,10 @@
    {
     "stat": "ini",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
    }
   ],
   "efectos": [
@@ -6214,15 +6222,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado.",
+  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado. PdG +1 al contraatacar.",
   "nuevo": {
-   "pc": 9.1,
+   "pc": 9.9,
    "tier": "Buena Calidad",
-   "precio": 120,
+   "precio": 130,
    "exceso": 0,
    "desglose": {
     "daño": 8.3,
-    "bonos": 0.5,
+    "bonos": 1.3,
     "crítico": 0.0,
     "efectos": 0.7,
     "peso del arma": -0.4
@@ -6293,6 +6301,10 @@
    {
     "stat": "crit",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectos": [
@@ -6306,15 +6318,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado.",
+  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado. PdG +3 al contraatacar.",
   "nuevo": {
-   "pc": 13.1,
+   "pc": 15.5,
    "tier": "Raro",
-   "precio": 220,
+   "precio": 300,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
-    "bonos": 2.5,
+    "bonos": 4.9,
     "crítico": 3.0,
     "efectos": 1.0,
     "peso del arma": -0.4
@@ -6340,6 +6352,10 @@
    {
     "stat": "crit",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
    }
   ],
   "efectos": [
@@ -6353,15 +6369,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe.",
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe. PdG +2 al contraatacar.",
   "nuevo": {
-   "pc": 15.3,
+   "pc": 16.9,
    "tier": "Raro",
-   "precio": 290,
+   "precio": 350,
    "exceso": 0,
    "desglose": {
     "daño": 9.7,
-    "bonos": 1.0,
+    "bonos": 2.6,
     "crítico": 3.0,
     "efectos": 2.0,
     "peso del arma": -0.4
@@ -6383,6 +6399,10 @@
    {
     "stat": "parry",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
    }
   ],
   "efectos": [
@@ -6396,15 +6416,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño).",
+  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño). PdG +2 al contraatacar.",
   "nuevo": {
-   "pc": 12.6,
+   "pc": 14.2,
    "tier": "Raro",
-   "precio": 200,
+   "precio": 260,
    "exceso": 0,
    "desglose": {
     "daño": 7.0,
-    "bonos": 1.0,
+    "bonos": 2.6,
     "crítico": 0.0,
     "efectos": 5.0,
     "peso del arma": -0.4
@@ -6430,6 +6450,10 @@
    {
     "stat": "crit",
     "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectos": [
@@ -6443,15 +6467,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe.",
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe. PdG +3 al contraatacar.",
   "nuevo": {
-   "pc": 23.2,
+   "pc": 25.6,
    "tier": "Excepcional",
-   "precio": 750,
+   "precio": 900,
    "exceso": 0,
    "desglose": {
     "daño": 14.0,
-    "bonos": 2.0,
+    "bonos": 4.4,
     "crítico": 6.0,
     "efectos": 2.0,
     "peso del arma": -0.8
@@ -6481,6 +6505,10 @@
    {
     "stat": "crit",
     "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectos": [
@@ -6494,15 +6522,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado.",
+  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado. PdG +3 al contraatacar.",
   "nuevo": {
-   "pc": 20.8,
+   "pc": 23.2,
    "tier": "Excepcional",
-   "precio": 600,
+   "precio": 750,
    "exceso": 0,
    "desglose": {
     "daño": 10.5,
-    "bonos": 3.0,
+    "bonos": 5.4,
     "crítico": 6.0,
     "efectos": 1.9,
     "peso del arma": -0.6
@@ -6536,6 +6564,10 @@
    {
     "stat": "critpot",
     "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
    }
   ],
   "efectos": [
@@ -6554,15 +6586,15 @@
   "avisos": [],
   "bonos_hoy": null,
   "precioHoy": null,
-  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe.",
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe. PdG +3 al contraatacar.",
   "nuevo": {
-   "pc": 36.4,
+   "pc": 38.7,
    "tier": "Legendario",
    "precio": 2000,
    "exceso": 0,
    "desglose": {
     "daño": 14.5,
-    "bonos": 3.5,
+    "bonos": 5.9,
     "crítico": 13.2,
     "efectos": 5.8,
     "peso del arma": -0.6

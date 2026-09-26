@@ -13,7 +13,7 @@ import calculadora_armas as C
 
 RAIZ = C.RAIZ
 CATALOGO = RAIZ / 'datos' / 'catalogo.json'
-STAT = {'rng': 'Alcance', 'pdg': 'PdG', 'parry': 'Parry', 'bloqueo': 'Bloqueo', 'crit': 'Crít. frecuente', 'critpot': 'Crít. potente', 'ini': 'Iniciativa', 'dmg': 'Dmg'}
+STAT = {'rng': 'Alcance', 'pdg': 'PdG', 'parry': 'Parry', 'bloqueo': 'Bloqueo', 'crit': 'Crít. frecuente', 'critpot': 'Crít. potente', 'pdgcontra': 'PdG en contraataque', 'ini': 'Iniciativa', 'dmg': 'Dmg'}
 EXTRAS = ('tanda', 'categoria', 'categoriaVisibilidad', 'revelaOculto', 'percepcionAumentada')   # campos de trabajo que no van al catálogo
 
 

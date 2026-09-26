@@ -8132,6 +8132,10 @@
       {
         "stat": "ini",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 1
       }
     ],
     "efectosGolpe": [
@@ -8143,8 +8147,8 @@
         "detalle": "33 % de dejar Sangrado."
       }
     ],
-    "detalle": "+1 de daño fijo · Iniciativa +1 · 33 % de dejar Sangrado",
-    "precioCompra": 120,
+    "detalle": "+1 de daño fijo · Iniciativa +1 · PdG en contraataque +1 · 33 % de dejar Sangrado",
+    "precioCompra": 130,
     "descripcionNarrativa": "Curva y ligera.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -8966,10 +8970,14 @@
       {
         "stat": "parry",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 1
       }
     ],
-    "detalle": "Parry +1",
-    "precioCompra": 80,
+    "detalle": "Parry +1 · PdG en contraataque +1",
+    "precioCompra": 100,
     "descripcionNarrativa": "La espada del soldado raso, bien balanceada.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -8992,6 +9000,10 @@
       {
         "stat": "parry",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 2
       }
     ],
     "efectosGolpe": [
@@ -9003,8 +9015,8 @@
         "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
       }
     ],
-    "detalle": "Parry +1 · Recupera el 25 % del daño hecho (no pasa el máximo de HP)",
-    "precioCompra": 200,
+    "detalle": "Parry +1 · PdG en contraataque +2 · Recupera el 25 % del daño hecho (no pasa el máximo de HP)",
+    "precioCompra": 260,
     "descripcionNarrativa": "Se bebe un poco de lo que corta.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -9088,6 +9100,10 @@
       {
         "stat": "crit",
         "val": 2
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 3
       }
     ],
     "efectosGolpe": [
@@ -9099,8 +9115,8 @@
         "detalle": "Cada golpe deja Sangrado."
       }
     ],
-    "detalle": "Parry +2 · Crít. frecuente +2 · Cada golpe deja Sangrado",
-    "precioCompra": 750,
+    "detalle": "Parry +2 · Crít. frecuente +2 · PdG en contraataque +3 · Cada golpe deja Sangrado",
+    "precioCompra": 900,
     "descripcionNarrativa": "A dos manos y de otro siglo.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -9513,6 +9529,10 @@
       {
         "stat": "critpot",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 3
       }
     ],
     "efectosGolpe": [
@@ -9531,7 +9551,7 @@
         "detalle": "Veneno severo por 5 turnos en cada golpe."
       }
     ],
-    "detalle": "+3 de daño fijo · Parry +3 · Iniciativa +1 · Crít. frecuente +4 · Crít. potente +1 · Cada golpe deja Sangrado · Veneno severo por 5 turnos en cada golpe",
+    "detalle": "+3 de daño fijo · Parry +3 · Iniciativa +1 · Crít. frecuente +4 · Crít. potente +1 · PdG en contraataque +3 · Cada golpe deja Sangrado · Veneno severo por 5 turnos en cada golpe",
     "precioCompra": 2000,
     "descripcionNarrativa": "De un capitán que nadie recuerda.",
     "ranuras": 0,
@@ -11003,6 +11023,10 @@
       {
         "stat": "crit",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 3
       }
     ],
     "efectosGolpe": [
@@ -11014,8 +11038,8 @@
         "detalle": "50 % de dejar Sangrado."
       }
     ],
-    "detalle": "Parry +2 · Iniciativa +1 · Crít. frecuente +1 · 50 % de dejar Sangrado",
-    "precioCompra": 220,
+    "detalle": "Parry +2 · Iniciativa +1 · Crít. frecuente +1 · PdG en contraataque +3 · 50 % de dejar Sangrado",
+    "precioCompra": 300,
     "descripcionNarrativa": "Forjada por quien enseña a forjar.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -11077,6 +11101,10 @@
       {
         "stat": "crit",
         "val": 2
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 3
       }
     ],
     "efectosGolpe": [
@@ -11088,8 +11116,8 @@
         "detalle": "50 % de dejar Lisiado 3 turnos."
       }
     ],
-    "detalle": "Iniciativa +2 · Parry +2 · Crít. frecuente +2 · 50 % de dejar Lisiado 3 turnos",
-    "precioCompra": 600,
+    "detalle": "Iniciativa +2 · Parry +2 · Crít. frecuente +2 · PdG en contraataque +3 · 50 % de dejar Lisiado 3 turnos",
+    "precioCompra": 750,
     "descripcionNarrativa": "Corta antes de que llegue el sonido.",
     "ranuras": 0,
     "danoAmplificado": 0,
@@ -13024,6 +13052,10 @@
       {
         "stat": "crit",
         "val": 1
+      },
+      {
+        "stat": "pdgcontra",
+        "val": 2
       }
     ],
     "efectosGolpe": [
@@ -13035,8 +13067,8 @@
         "detalle": "Cada golpe deja Sangrado."
       }
     ],
-    "detalle": "+2 de daño fijo · Parry +1 · Crít. frecuente +1 · Cada golpe deja Sangrado",
-    "precioCompra": 290,
+    "detalle": "+2 de daño fijo · Parry +1 · Crít. frecuente +1 · PdG en contraataque +2 · Cada golpe deja Sangrado",
+    "precioCompra": 350,
     "descripcionNarrativa": "Muchas cubiertas, muchas heridas.",
     "ranuras": 0,
     "danoAmplificado": 0,

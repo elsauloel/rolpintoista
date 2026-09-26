@@ -64,7 +64,7 @@ def main():
     antes = len(cat)
     cat = [i for i in cat if not str(i.get('id', '')).startswith('nuevo-')]
     quitados = antes - len(cat)
-    nuevos = [arma(a) for a in cargar_json('armas-nuevas.json')] + [otro(a) for a in cargar_json('defensa-nuevos.json')] + [otro(a) for a in cargar_json('consumibles-nuevos.json')]
+    nuevos = [arma(a) for a in cargar_json('armas-nuevas.json')] + [otro(a) for a in cargar_json('defensa-nuevos.json')] + [otro(a) for a in cargar_json('consumibles-nuevos.json')] + [otro(a) for a in cargar_json('trampas-consumibles.json')]
     nombres = {i['nombre'].strip().lower() for i in cat}
     choques = [n['nombre'] for n in nuevos if n['nombre'].strip().lower() in nombres]
     assert not choques, 'nombres que ya existen en el catálogo: %s' % choques

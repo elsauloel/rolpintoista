@@ -242,6 +242,10 @@ def item_js(it, con_imagen=True):
         partes.append("unidades:%s" % (it.get('unidades') or 1))
     if it.get('cargaMax'):
         partes.append("cargaMax:%s" % it['cargaMax'])
+    if it.get('pilaInfinita'):   # trampas consumibles: se apilan sin límite en la mochila
+        partes.append("pilaInfinita:true")
+    if it.get('trampaDatos'):    # lo que el mapa carga al colocar la trampa (ver comun/trampas-base.js)
+        partes.append("trampaDatos:%s" % json.dumps(it['trampaDatos'], ensure_ascii=False))
     partes.append("consumible:%s" % ('true' if es_cons else 'false'))
     if it.get('legacy'):
         partes.append("legacy:true")

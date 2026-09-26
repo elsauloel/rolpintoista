@@ -167,8 +167,11 @@ def datos_auditoria():
                 'def': val(it, 'def'), 'antes': resumen_mods(it), 'despues': resumen_mods(nuevo), 'cambios': cambios, 'avisos': avisos,
                 'precioHoy': it.get('precioCompra'), 'detalle': (it.get('descripcionNarrativa') or it.get('detalle') or '')[:400],
             })
-    p = RAIZ / 'datos' / 'consumibles-nuevos.json'
-    for it in (json.load(open(p, encoding='utf-8')) if p.exists() else []):
+    cons = []
+    for nombre in ('consumibles-nuevos.json', 'trampas-consumibles.json'):
+        p = RAIZ / 'datos' / nombre
+        cons += json.load(open(p, encoding='utf-8')) if p.exists() else []
+    for it in cons:
         out.append({'id': it['id'], 'nombre': it['nombre'], 'origen': 'nuevo · consumible', 'slot': 'consumible', 'tipoItem': 'consumibles', 'tier': tier_norm(it.get('tier')),
                     'peso': 0, 'def': 0, 'antes': [], 'despues': [], 'cambios': [], 'avisos': [], 'precioHoy': it.get('precioCompra'), 'reglas': it.get('detalle'),
                     'detalle': (it.get('descripcionNarrativa') or '')[:400]})

@@ -401,13 +401,16 @@ const Duelo = (() => {
   }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;
-    const t = h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
+    // Tirada personalizada (2026-09-27): la fórmula ya viene resuelta (X sustituida) desde quien la crea.
+    const t = h.tira && h.tira.formula ? {formula: txtCorto(h.tira.formula, 60), etq: txtCorto(h.tira.etq || 'Tirada', 30)}
+      : h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
     const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && String(h.dano.formula || '').trim() ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area'].includes(h.objetivo) ? h.objetivo : 'enemigo';
-    return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length)};
+    return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
+      ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {})};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
   const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : '<option value="evasion">Evasión</option><option value="parry">Parry</option>';
@@ -1134,9 +1137,13 @@ const Duelo = (() => {
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
+    // Efecto que la skill no puede automatizar del todo (2026-09-27, pedido del dueño — "Pasos personalizados"
+    // del 🎯): texto libre + la diferencia entre las dos tiradas, si hubo contienda, para resolverlo a mano.
+    const efectoLibre = d.hab && d.hab.efectoLibre
+      ? `<div class="duelo-motivo">✋ ${_esc(d.hab.efectoLibre)}${d.contacto ? ` <b>(diferencia: ${_fmt(Math.abs(_num(d.contacto.dif)))})</b>` : ''}</div>` : '';
     let caja;
-    if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div></div>`;
-    else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}</div>`;
+    if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
+    else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'fallo') caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 SE RESISTIÓ</div><div class="chico">${_esc(d.defensor.nombre)} resistió ${_esc(d.hab.nombre)} (${_esc(etqContra(d))})</div>${mot}</div>`;
     else if(d.resultado === 'pego' && d.crit && d.crit.critico){
       const porParry = d.defensa && d.defensa.modo === 'parry';

@@ -7,12 +7,21 @@
    dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
 
    Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'', alGuardar: cfg => …});
-   (cfg = {objetivo, tira, contra: [stats], dano, tipoDano, danoFijoPorX?, radio?, efectos: [{nombre, turnos} | {cura}]} o null)
+   (cfg = {objetivo, tira, tiraFormula?, tiraEtiqueta?, contra: [stats], dano, tipoDano, danoFijoPorX?, efectoLibre?,
+   radio?, efectos: [{nombre, turnos} | {cura}]} o null)
    Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
    `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
    ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
    arma la fórmula final sumando `danoFijoPorX * X` a la fórmula base (`it.tiradaExtra`). Los creeps de gm-tools no tienen
-   costo variable todavía, así que ahí `costoVariable` siempre es '' y esta sección no aparece. */
+   costo variable todavía, así que ahí `costoVariable` siempre es '' y esta sección no aparece.
+   **Tirada personalizada y efecto a mano** (2026-09-27, pedido del dueño — herramienta general, no a medida de una
+   skill puntual): en el paso "Tirada", en vez de un stat se puede escribir una fórmula propia (`tiraFormula`, admite
+   «X») con su propio texto (`tiraEtiqueta`) — reemplaza a `tira` (que queda '' en ese caso); quien la ejecuta arma la
+   fórmula final (con la X ya resuelta) antes de crear el duelo, igual que ya hacía `danoFijoPorX`. En el paso "Daño"
+   se puede tildar además "Tiene un efecto que no se puede automatizar" y escribir un texto libre (`efectoLibre`) que
+   el cuadro del duelo muestra junto al resultado (con la diferencia entre las dos tiradas, si la hubo) para
+   resolverlo a mano. Pensado para habilidades como Drenar vida (tira «X + 1dX», el efecto es "drená la diferencia"),
+   pero sirve para cualquier skill que se trabe en un paso puntual — el resto de la habilidad sigue automatizada. */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
@@ -60,8 +69,16 @@ const AsistenteDueloHab = (() => {
       paso: 0,
       activo: !!ini, objetivo: (ini && ini.objetivo) || 'enemigo',
       tira: ini ? (ini.tira === undefined ? 'pdgmg' : ini.tira) : 'pdgmg',
+      // Tirada personalizada (2026-09-27, pedido del dueño): para habilidades que no tiran ningún stat de la
+      // ficha (ej. Drenar vida: «X + 1dX») — reemplaza a `tira` cuando tiraModo === 'custom'. Se anuncia en la
+      // Mesa con `tiraEtiqueta` en vez del nombre de un stat; `tiraFormula` puede llevar «X» (costo variable).
+      tiraModo: (ini && ini.tiraFormula) ? 'custom' : 'stat',
+      tiraFormula: (ini && ini.tiraFormula) || '', tiraEtiqueta: (ini && ini.tiraEtiqueta) || '',
       contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
+      // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
+      // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
+      efectoLibreOn: !!(ini && ini.efectoLibre), efectoLibre: (ini && ini.efectoLibre) || '',
       // Daño que escala con la X del costo variable (P119, 2026-09-27): un fijo extra por cada punto de X
       // (ej. Rayo Mágico "amplifica el daño en el doble de X" → danoFijoPorX: 2). Solo tiene sentido si la
       // habilidad ya tiene costo en SP o No2 marcado como "X" (cfg.costoVariable la avisa).
@@ -83,7 +100,7 @@ const AsistenteDueloHab = (() => {
     f.id = 'adh-fondo';
     document.body.appendChild(f);
     const cerrar = () => f.remove();
-    const sinOp = () => !st.tira;
+    const sinOp = () => st.tiraModo === 'stat' && !st.tira;
 
     // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
     function pasos(){
@@ -140,9 +157,16 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoTira(){
-      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad. «Nada» es para buffs y curas: no hay nada que resistir.');
-      h += `<select data-tira><option value=""${sinOp() ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-      if(sinOp()) h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>`;
+      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad, o —si no encaja en ninguno— tu propia fórmula (ej. Drenar vida: «X + 1dX»). «Nada» es para buffs y curas: no hay nada que resistir.');
+      h += `<select data-tira-modo><option value="stat"${st.tiraModo !== 'custom' ? ' selected' : ''}>Un stat de la ficha</option><option value="custom"${st.tiraModo === 'custom' ? ' selected' : ''}>Personalizada: mi propia fórmula, con mi texto</option></select>`;
+      if(st.tiraModo === 'custom'){
+        h += `<div class="fila" style="margin-top:8px"><input type="text" style="min-width:160px" data-tira-formula placeholder="ej. X+1dX (podés usar «X»)" value="${esc(st.tiraFormula)}"></div>
+          <div class="fila"><input type="text" style="min-width:240px" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}"></div>
+          <p class="nota" style="margin-top:6px">Se tira con esa fórmula (podés usar «X» si la habilidad ya tiene costo variable) y se anuncia en la Mesa con tu texto, en vez del nombre de un stat.</p>`;
+      }else{
+        h += `<select data-tira style="margin-top:8px"><option value=""${sinOp() ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+        if(sinOp()) h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>`;
+      }
       return h;
     }
     function cuerpoContra(){
@@ -151,7 +175,7 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoDano(){
-      let h = titulo('', 'Daño', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá.');
+      let h = titulo('', 'Daño y lo que no se pueda automatizar', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá. Si además (o en vez de eso) tiene un efecto que el sistema no calcula solo, escribilo como texto.');
       h += `<label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> Esta habilidad hace daño${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>`;
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
@@ -161,6 +185,11 @@ const AsistenteDueloHab = (() => {
           h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
             <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
         }
+      }
+      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> Tiene un efecto que no se puede automatizar del todo</label></div>`;
+      if(st.efectoLibreOn){
+        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Excedente de vida si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
+          <p class="nota" style="margin-top:6px">Este texto se muestra en el cuadro del duelo junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.</p>`;
       }
       return h;
     }
@@ -202,8 +231,12 @@ const AsistenteDueloHab = (() => {
       }else{
         filas.push(`<b>Objetivo</b>: ${st.objetivo}${st.objetivo === 'area' ? ` (radio ${st.radio})` : ''}`);
         if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-        filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo' : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${[...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)'}`);
+        const contraTxt = [...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)';
+        filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
+          : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
+          : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
         if(st.dano) filas.push(`<b>Daño</b>: tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}`);
+        if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash'){
         const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.turnos ?? 2}t)`).join(', ');
@@ -239,6 +272,9 @@ const AsistenteDueloHab = (() => {
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
+      q('[data-tira-modo]', e => { st.tiraModo = e.target.value; dibujar(); });
+      q('[data-tira-formula]', e => { st.tiraFormula = e.target.value; });
+      q('[data-tira-etiqueta]', e => { st.tiraEtiqueta = e.target.value; });
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       q('[data-radio]', e => { st.radio = Math.max(0, Math.round(Number(e.target.value) || 0)); });
@@ -247,6 +283,8 @@ const AsistenteDueloHab = (() => {
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
+      q('[data-efectolibre-on]', e => { st.efectoLibreOn = e.target.checked; dibujar(); });
+      q('[data-efectolibre]', e => { st.efectoLibre = e.target.value; });
       f.querySelectorAll('[data-ef-nombre]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efNombre].nombre = i.value.trim(); });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efStat].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efVal].val = Number(i.value) || 0; });
@@ -268,10 +306,14 @@ const AsistenteDueloHab = (() => {
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
           cerrar(); cfg.alGuardar(o2); return;
         }
-        const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
-        if(st.objetivo === 'area' && !st.tira){ alert('Un hechizo de área necesita una tirada (Paso 4: PdG.Esp o PdG contra la Evasión de cada uno) — elegí qué tira quien la usa.'); return; }
-        if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
+        const hayTira = st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira;
+        if(st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»).'); return; }
+        const out = {objetivo: st.objetivo, tira: st.tiraModo === 'stat' ? (st.tira || '') : '', contra: hayTira ? [...st.contra] : []};
+        if(st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
+        if(st.objetivo === 'area' && !hayTira){ alert('Un hechizo de área necesita una tirada (Paso 4: PdG.Esp o PdG contra la Evasión de cada uno) — elegí qué tira quien la usa.'); return; }
+        if(hayTira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
+        if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.objetivo === 'area') out.radio = st.radio;
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});

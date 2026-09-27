@@ -288,12 +288,15 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
 5. **Maldición tormentosa** [5] — Maldición (Esp / Res.M). Por cada acción
    recibe daño igual a No2 - 1. Debe pagar 1 HP para moverse cada 2
    casillas. Duración: 3 turnos. Acumulable. Lento.
-6. ✅ **Drenar vida** — SP X (X ≤ tu Especial), No2 1 (regla general: sin dato, 1). Le drenás HP al objetivo igual a
-   la diferencia entre tu tirada y su Res.Esp, y te la sumás vos (Excedente de vida si pasa tu máximo). *(Auditada
-   2026-09-27 con la herramienta nueva «Pasos personalizados» — ver `comun/CLAUDE.md` y `ficha-personaje/CLAUDE.md`:
-   tira X + 1dX, una fórmula con X que no encaja en ningún stat fijo ni en el 🎯 del duelo, así que en vez de forzarla
-   ahí se armó una ventanita de 2 pasos con texto propio y tirada opcional en cada uno, de avance manual. El drenaje
-   en sí —la diferencia entre las dos tiradas— sigue siendo a mano, mismo criterio que Shockwave y Sonic Boom.)*
+6. ✅ **Drenar vida** — SP X (X ≤ tu Especial), No2 2 (dicho por el dueño: no está en el texto original). Le drenás
+   HP al objetivo igual a la diferencia entre tu tirada y su Res.Esp, y te la sumás vos (Excedente de vida si pasa
+   tu máximo). *(Auditada 2026-09-27 — primera skill con "tirada personalizada" del 🎯 (`comun/asistente-duelo-hab.js`,
+   ver `comun/CLAUDE.md`): se juega como un duelo de verdad (elegís objetivo en el mapa, cuadro compartido), pero en
+   el paso "Tirada" en vez de un stat fijo escribís tu propia fórmula — "X + 1dX" — con tu propio texto ("Drenaje"),
+   y en el paso "Daño" un texto libre ("efecto a mano") que el cuadro muestra junto a la diferencia numérica entre
+   las dos tiradas al resolverse. El drenaje en sí sigue siendo a mano, mismo criterio que Shockwave y Sonic Boom —
+   la diferencia entre "Pasos personalizados" (una ventanita aparte, descartada) y esto es que la tirada, el
+   objetivo y la contienda SÍ quedan automatizados, solo lo que de verdad no se puede calcular queda a mano.)*
 7. **Balas de sangre** [1] — Gasta X HP (máximo ESP). Dispara un proyectil
    tipo 1. El peso del proyectil es igual a la vida gastada.
 8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un

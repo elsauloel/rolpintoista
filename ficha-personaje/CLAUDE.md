@@ -455,17 +455,10 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 
 - **Vender ítems solo en las tiendas (regla del dueño, 2026-09-26):** la única forma de vender un ítem, del cinturón o despojos es el botón **💰 Vender** de la tienda abierta (`abrirVender`, exige `tiendaCargada`). No debe haber un botón de vender en la mochila, en la ventana del ítem ni en ningún otro lado. (Revisado el 2026-09-26: no queda ningún otro camino; el «Precio de venta» del editor de ítems es solo un dato.)
 
-- **"Pasos personalizados" de una habilidad** (2026-09-27, pedido del dueño, auditando la clase Debuffer): herramienta
-  general para habilidades que no encajan en un stat de la ficha ni en el 🎯 del duelo (ej. **Drenar vida**: tira
-  «X + 1dX» contra la Resistencia mágica del objetivo — ni es un stat fijo ni una contienda automática). Una
-  habilidad con `pasosCustom = [{texto, formula}]` (paso nuevo del editor, entre "Tirada de efecto" y "Efecto";
-  `htmlPasosCustom`) abre, al Ejecutar, una ventanita chica (`#scrim-pasos-custom`, `abrirPasosCustom`/
-  `renderPasosCustom`) que va mostrando cada paso — **texto libre del autor de la skill**, y un botón 🎲 si el
-  paso tiene fórmula (puede llevar **`X`**, reemplazada por la X del costo variable con `sustituirX` — mismo
-  criterio que `danoFijoPorX`) — con **«Siguiente paso →» manual** (nunca se avanza solo); en el último paso el
-  botón dice «Listo» y solo cierra la ventana. **Nada se aplica solo**: el resultado final (cuánto se drena,
-  quién gana, etc.) lo calculan y aplican los jugadores mirando lo que quedó anotado en cada tirada — mismo
-  criterio que ya usaban Shockwave y Sonic Boom para sus efectos "a mano". Toma prioridad sobre la tirada simple
-  (`tiradaStat`/`tiradaExtra`) cuando tiene al menos un paso con texto; convive sin problema con habilidades que
-  no lo usan (queda vacío, `pasosCustom` es opcional). No se integró con gm-tools ni invocaciones todavía — si
-  hace falta ahí, se suma después.
+- **Tirada personalizada del 🎯 (2026-09-27, pedido del dueño, auditando Drenar vida)**: reemplaza al intento
+  anterior de esta misma nota ("Pasos personalizados", una ventanita aparte en la ficha — descartada: el dueño
+  pidió que la dinámica de duelo compartido no se pierda). La solución final vive en el 🎯 de verdad
+  (`comun/asistente-duelo-hab.js`/`comun/duelo.js`, ver `../comun/CLAUDE.md`): el paso "Tirada" admite una fórmula
+  propia en vez de un stat, y el paso "Daño" un texto libre para lo que no se puede automatizar. Acá en la ficha,
+  `habDueloDe` arma `hab.tira = {formula, etq}` (con la X ya sustituida) y `DUELO_HOOKS.habTirar` la tira igual
+  que cualquier stat — sin ventanas nuevas ni cambios al flujo de Ejecutar.

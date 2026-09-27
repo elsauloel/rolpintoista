@@ -264,3 +264,34 @@ versión parecida en más de una, es candidato a juntar.
   se borra solo al llegar a 0** (confirmado revisando el código: ni `escudoParsear` ni el handler de los botones
   −/+/escribir tocan la lista de efectos, solo el valor — ya funcionaba así antes de este cambio, sin necesitar
   nada nuevo).
+
+- **`asistente-duelo-hab.js`/`duelo.js`: tirada personalizada y "efecto a mano" (2026-09-27, pedido del dueño,
+  auditando Drenar vida)** — herramienta GENERAL, no a medida de una skill puntual: el 🎯 sigue siendo el mismo
+  duelo compartido de siempre (elige objetivo en el mapa, cuadro visible a toda la mesa, minimizable), pero dos
+  de sus pasos ahora aceptan "no automatizar del todo":
+  - **Paso "Tirada"**: en vez de elegir un stat de la ficha, "Personalizada" deja escribir tu propia fórmula
+    (`tiraFormula`, admite **`X`**) con tu propio texto (`tiraEtiqueta`). `habDueloDe` (ficha) arma
+    `hab.tira = {formula, etq}` con la X ya sustituida (mismo momento que `danoFijoPorX`, antes de crear el
+    duelo) en vez de `{stat, etq, bono}`; `DUELO_HOOKS.habTirar` tira esa fórmula igual que cualquier stat
+    (`if(c.formula){ tirarDados(c.formula); ...; return; }`) — el resto del duelo (contienda, empate, dados 3D,
+    Mesa) no sabe ni le importa si la tirada vino de un stat o de una fórmula, porque siempre lee `c.etq`/el
+    resultado ya tirado. `sustituirX(formula, X)` (reemplaza el token `X` por un número) es el mismo helper para
+    esto y para `efectoLibre`.
+  - **Paso "Daño"**: una casilla nueva "Tiene un efecto que no se puede automatizar del todo" abre un texto
+    libre (`efectoLibre`) que el cuadro del duelo muestra en el veredicto junto a la **diferencia numérica**
+    entre las dos tiradas (`d.contacto.dif`, que ya calculaba el duelo pero no se mostraba en ningún lado) —
+    para que se resuelva a mano con el número a la vista, sin tener que abrir la consola ni adivinar.
+  - `limpiarHab` (usado por los hechizos de área) reconoce ambas formas de `tira` y pasa `efectoLibre`, así que
+    un hechizo de área también podría usar tirada personalizada si hiciera falta (no probado todavía).
+  - **Descartado en el camino**: una primera versión metía esto en una ventanita aparte de la ficha
+    (`pasosCustom`, con su propio popup fuera del duelo) — el dueño pidió que se mantuviera la dinámica real del
+    duelo compartido en vez de una herramienta paralela, así que se sacó esa versión por completo (no queda
+    ningún resto en el código) y se rehizo como está acá.
+  - **El sistema de ejecución simple (`tiradaStat`/`tiradaExtra`, sin `duelo`) sigue existiendo a propósito** —
+    el dueño lo va a testear en paralelo con el grupo antes de decidir si lo reemplaza del todo; el checkbox
+    "¿Se juega en el duelo?" del primer paso del 🎯 ya permite desactivar el duelo por habilidad para quien
+    prefiera la ejecución de siempre.
+  - **Drenar vida** (Debuffer) es la primera skill auditada así: tira personalizada "X + 1dX" (etiqueta
+    "Drenaje") contra Res.Esp (un stat normal, sin necesitar personalizar la Resistencia); el efecto a mano
+    explica que se drena la diferencia, con Excedente de vida si pasa el máximo. No2 = 2 (dicho por el dueño,
+    no estaba en el texto original).

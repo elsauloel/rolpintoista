@@ -7624,7 +7624,7 @@ function hudHtml(t){
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (t.tipo === 'creep' ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
-    (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) ? icono('ficha', '📜', 'Abrir la ficha completa del creep en GM Tools (otra pestaña)') : '') +
+    (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) ? icono('ficha', '📜', 'Ver la ficha del creep (la misma ventana «Ver» de GM Tools)') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
@@ -8477,9 +8477,9 @@ function puedeAgregarEstado(t){
 
 // Abre el selector de estados de la herramienta que corresponde.
 function abrirFichaDeToken(t){
-  // Un creep vinculado abre su ficha completa (ventana "Editar creep") en GM Tools.
+  // Un creep vinculado abre su ficha (la ventana «Ver» de GM Tools, de solo lectura) encima del mapa.
   if(t.tipo === 'creep' && t.fichaId && soyGM){
-    window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(t.fichaId), '_blank', 'noopener');
+    abrirAcciones(t.fichaId, {tipo: 'abrir-ver-creep', creep: t.fichaId});
     return;
   }
   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
@@ -8871,7 +8871,7 @@ function abrirAcciones(creepId, mensaje){
   botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
   $('#botonera-cargando').hidden = false;
-  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}`);
+  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}${mensaje && mensaje.tipo === 'abrir-ver-creep' ? '&ver=1' : ''}`);
 }
 
 // El foco pasa a la ventana del iframe, así sus teclas (Escape) le llegan directo.

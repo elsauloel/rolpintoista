@@ -8221,7 +8221,7 @@ async function gmProcesarSnapshot(snap){
     const modoGM = new URLSearchParams(location.search).get('modo');
     if(modoGM === 'finalizar'){ abrirReporteFinalizar(); gmAvisarMapa('acciones-lista'); }
     else if(modoGM === 'botin'){ abrirBotinGM(); gmAvisarMapa('acciones-lista'); }
-    else if(MODO_ACCIONES) accionesModoAbrir(new URLSearchParams(location.search).get('creep'));
+    else if(MODO_ACCIONES){ const cid = new URLSearchParams(location.search).get('creep'); if(new URLSearchParams(location.search).get('ver')) accionesModoVer(cid); else accionesModoAbrir(cid); }
     // ?editar=<creep>: el mapa abre la ficha completa de ese creep (botón 📜 del token).
     const paraEditar = new URLSearchParams(location.search).get('editar');
     if(!MODO_ACCIONES && paraEditar && S.creeps.some(s => s.id === paraEditar)) abrirEditarCreep(paraEditar);
@@ -8412,6 +8412,18 @@ window.DUELO_HOOKS = {
   },
 };
 
+// La ficha del creep (la misma ventana «Ver» de GM Tools) dentro del mapa: el 📜 del token de un creep, solo para el GM. Es de solo lectura.
+function accionesModoVer(creepId){
+  if(!S.creeps.some(sc => sc.id === creepId)){
+    toast('Ese creep ya no está en gm-tools');
+    gmAvisarMapa('acciones-cerrada');
+    return;
+  }
+  document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+  verCreep(creepId);
+  gmAvisarMapa('acciones-lista');
+}
+
 function accionesModoAbrir(creepId){
   if(!S.creeps.some(sc => sc.id === creepId)){
     toast('Ese creep ya no está en gm-tools');
@@ -8438,6 +8450,7 @@ if(MODO_ACCIONES){
   window.addEventListener('message', e => {
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
+    if(e.data.tipo === 'abrir-ver-creep' && gmVivo.listo) accionesModoVer(e.data.creep);   // el 📜 del token de un creep
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado a un creep: mismo selector que "+ Estado".

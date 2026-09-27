@@ -47,7 +47,10 @@ const CLASES_SKILLS = [
      detalle: 'Ataque con Crítico potente ×1 (el doble daño sale con 6+ en el d20, y el triple y el cuádruple un poco antes). A cambio, −2 a tu Evasión hasta tu próximo turno. Cuenta como un ataque con tu arma. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'},
   ]},
   {id: 'asalto', nombre: 'Asalto', habilidades: [
-    skillSA('asalto', 'Dash', 'SP 3. No2 1 + Ataque. Avanza 3 casilleros en línea recta atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2 fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si atraviesa un enemigo, se desplaza un casillero adicional.'),
+    {id: 'asalto-dash', nombre: 'Dash', costo: '3', nitrosCosto: 1,
+     efectoNombre: 'Dash', efectoTurnos: 1, efectoMods: [{stat: 'parry', val: 2}],
+     efectoDetalle: 'Dash: +2 fijo a tu Parry hasta el comienzo de tu próximo turno.',
+     detalle: 'El 1 No2 cubre todo el desplazamiento: avanzás 3 casilleros en línea recta (4 si atravesás a un enemigo, a mano). Como el mapa no tiene un modo "varios casilleros por un No2 fijo", movete con 🦶 Mover libre (gratis) — este No2 ya lo cobra la skill al ejecutarla. +2 fijo a tu Parry hasta tu próximo turno (automático). ✋ A mano: atacar a quien atravesaste cuesta aparte, con Atacar de siempre; se cancela si perdés una tirada de Parry o Bloqueo en el camino.'},
     skillSA('asalto', 'Lisiar', 'SP 2. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Lesión de -1 de PG al objetivo durante 2 turnos. Si es crítico, el efecto pasa a -2 fijo a la PG por 2 turnos.'),
     skillSA('asalto', 'Tajear', 'SP 3. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Deja heridas de 3 de daño por 3 turnos. Si es crítico, pasa a 5 de daño hasta curarse.'),
     skillSA('asalto', 'Invi', 'SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de 3; lenta (2 No2 por casillero) flor de 2.'),

@@ -105,10 +105,17 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
 
 ## Asalto ⏳
 
-1. **Dash** [3] — NO2: (1 + Ataque). Avanza 3 casilleros en línea recta
-   atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2
-   fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si
-   atraviesa un enemigo de esta forma, se desplaza un casillero adicional.
+1. ✅ **Dash** — SP 3, No2 1 (fijo: cubre todo el desplazamiento, no por
+   casillero — la gracia de la skill, confirmado por el dueño 2026-09-27).
+   Avanza 3 casilleros en línea recta (4 si atraviesa a un enemigo, a
+   mano); como el mapa no tiene un modo "varios casilleros por un No2
+   fijo", el desplazamiento se hace con 🦶 Mover libre (gratis) — el 1 No2
+   ya lo cobra la skill al ejecutarla. Automático: **+2 fijo a Parry**
+   hasta el comienzo de su próximo turno (`efectoMods`, 1 turno). A mano:
+   atacar a quien atravesó cuesta aparte con Atacar de siempre (los No2
+   del ataque van separados, "más los del ataque" — no están incluidos en
+   el 1 No2 de la skill); se cancela si pierde una tirada de Parry o
+   Bloqueo en el camino.
 2. **Lisiar** [2] — Ataque con +1 al crítico. Causa lesión de -1 de PG al
    objetivo durante 2 turnos. *Critical Matters:* si es crítico, cambia
    el efecto a -2 fijo a la PG por 2 turnos.

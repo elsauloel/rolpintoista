@@ -1120,6 +1120,7 @@ function gruposDeMapaHtmlSeguro(mapaId){
   const libres = [...existentes].filter(g => TokensAuto.mapaDeGrupo(enlacesGM, g) !== mapaId).sort((a, b) => a.localeCompare(b, 'es'));
   return `<div class="fila" style="margin-top:4px;flex-wrap:wrap;gap:4px;align-items:center" title="Los grupos de creeps vinculados a este mapa se traen juntos con 🎭 → Traer tokens de creeps">
       <span class="ayuda" style="margin:0">Grupos:</span>
+      ${propios.length ? `<button type="button" class="btn" data-mapa-traer="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Crea (ocultos) los tokens de los creeps de estos grupos en este mapa; los que ya tienen token se saltean">👹 Traer tokens</button>` : ''}
       ${propios.map(g => `<span class="btn" style="padding:2px 6px;font-size:11.5px;display:inline-flex;gap:4px;align-items:center">${esc(g)} <a href="#" data-mapa-grupo-quitar="${esc(g)}" title="Desvincular" style="text-decoration:none;color:inherit">✕</a></span>`).join('') || '<span class="ayuda" style="margin:0">ninguno</span>'}
       ${libres.length ? `<select data-mapa-grupo-add="${esc(mapaId)}" style="max-width:130px;font-size:11.5px"><option value="">＋ vincular grupo…</option>${libres.map(g => `<option value="${esc(g)}">${esc(g)}${TokensAuto.mapaDeGrupo(enlacesGM, g) ? ' (hoy: ' + esc(nombreMapa(TokensAuto.mapaDeGrupo(enlacesGM, g))) + ')' : ''}</option>`).join('')}</select>` : ''}
     </div>`;
@@ -7028,9 +7029,16 @@ function opcionesVinculo(tipo, elegido, todasLasFichas){
       });
   }
   const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
-  return '<option value="">Sin vincular</option>' + lista.map(([id, v]) =>
-    `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`
-  ).join('');
+  const opcion = ([id, v], grupo) => `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${grupo ? ' · ' + esc(grupo) : ''}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`;
+  if(tipo === 'creep'){
+    // Los creeps pueden repetir nombre en grupos distintos: se listan agrupados y cada uno lleva el nombre de su grupo.
+    const porGrupo = new Map();
+    lista.forEach(e => { const g = String(e[1].grupo || '').trim(); if(!porGrupo.has(g)) porGrupo.set(g, []); porGrupo.get(g).push(e); });
+    const grupos = [...porGrupo.keys()].sort((x, y) => (x === '' ? 1 : y === '' ? -1 : x.localeCompare(y, 'es')));
+    return '<option value="">Sin vincular</option>' + grupos.map(g =>
+      `<optgroup label="${esc(g || 'Sin grupo')}">${porGrupo.get(g).map(e => opcion(e, g)).join('')}</optgroup>`).join('');
+  }
+  return '<option value="">Sin vincular</option>' + lista.map(e => opcion(e, '')).join('');
 }
 
 // Lista de miembros para elegir dueño de un token de tipo "pj" (igual
@@ -7474,7 +7482,13 @@ function renderMapasMenu(forzar){
   menu.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
   menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
   menu.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
-  menu.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = () => { if(sel.value) vincularGrupoAMapa(sel.value, sel.dataset.mapaGrupoAdd); });
+  menu.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = async () => {
+    if(!sel.value) return;
+    const g = sel.value, mapaId = sel.dataset.mapaGrupoAdd;
+    await vincularGrupoAMapa(g, mapaId);
+    if(confirm(`Grupo «${g}» vinculado a «${nombreMapa(mapaId)}».\n\n¿Traer ahora los tokens de ese grupo a ese mapa? (Salen ocultos; los que ya tienen token se saltean.)`)) traerTokensDeGrupos([g], mapaId);
+  });
+  menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerTokensDeGrupos(TokensAuto.gruposDeMapa(enlacesGM, b.dataset.mapaTraer), b.dataset.mapaTraer));
   menu.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
   $('#mapa-nuevo').onclick = crearMapa;
   $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
@@ -8766,12 +8780,12 @@ function gruposDeCreepsPub(){
   creepsPub.forEach(c => { if(c.grupo) m.set(c.grupo, (m.get(c.grupo) || 0) + 1); });
   return m;
 }
-async function traerTokensDeGrupos(nombres){
+async function traerTokensDeGrupos(nombres, mapaDestino){   // mapaDestino: el mapa donde crear los tokens (por defecto el que se está mirando)
   const lista = [];
   creepsPub.forEach((c, id) => { if(nombres.includes(c.grupo)) lista.push({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}); });
   if(!lista.length){ toast('Esos grupos no tienen creeps'); return; }
   try{
-    const r = await TokensAuto.crear(lista, {mapaId: mapaMostrado, centro: centroDeLaVista()});
+    const r = await TokensAuto.crear(lista, {mapaId: mapaDestino || mapaMostrado, centro: centroDeLaVista()});
     toast(r.creados ? `👹 ${r.creados} token(s) de creeps creados, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos esos creeps ya tienen token en este mapa');
   }catch(err){
     console.error('No se pudieron traer los tokens de creeps:', err);
@@ -9008,11 +9022,18 @@ async function dueloVincularSiFalta(t){
   if(t.tipo !== 'creep' || t.fichaId || !soyGM) return t;
   const nom = String(t.nombre || '').trim().toLowerCase();
   const usados = new Set([...tokens.values()].filter(x => x.tipo === 'creep' && x.fichaId).map(x => x.fichaId));
-  const cands = [...creepsPub.entries()].filter(([, c]) => String(c.nombre || '').trim().toLowerCase() === nom);
-  const elegido = cands.find(([cid]) => !usados.has(cid)) || cands[0];
-  if(!elegido){ toast(`El token «${t.nombre}» no está vinculado a ningún creep de GM Tools (y no hay uno con ese nombre): el duelo no va a tener sus datos`); return t; }
+  const mismos = [...creepsPub.entries()].filter(([, c]) => String(c.nombre || '').trim().toLowerCase() === nom);
+  // Puede haber creeps con el mismo nombre en grupos distintos: se prefiere los de los grupos vinculados a ESTE mapa y los que todavía no tienen token; si sigue habiendo más de uno, no se adivina.
+  const gruposDelMapa = new Set(TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado));
+  let cands = mismos.filter(([, c]) => gruposDelMapa.has(c.grupo));
+  if(!cands.length) cands = mismos;
+  const libres = cands.filter(([cid]) => !usados.has(cid));
+  const finales = libres.length ? libres : cands;
+  if(!finales.length){ toast(`El token «${t.nombre}» no está vinculado a ningún creep de GM Tools (y no hay uno con ese nombre): el duelo no va a tener sus datos`); return t; }
+  if(finales.length > 1){ toast(`Hay ${finales.length} creeps llamados «${t.nombre}» en distintos grupos: vinculá este token a uno desde sus ajustes (⚙) para que el duelo tenga sus datos`); return t; }
+  const elegido = finales[0];
   await coleccionTokens().doc(t.id).update({fichaId: elegido[0]});
-  toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}» de GM Tools`);
+  toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}»${elegido[1].grupo ? ' (grupo ' + elegido[1].grupo + ')' : ''} de GM Tools`);
   return {...t, fichaId: elegido[0]};
 }
 

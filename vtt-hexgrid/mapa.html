@@ -7279,7 +7279,8 @@ function renderPanel(forzar){
   renderOjo();
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
-  $('#toolkit-tienda').hidden = !fbMiembro || soyGM;   // la tienda es para comprar y vender: solo jugadores
+  $('#toolkit-tienda').hidden = !fbMiembro;   // jugadores: comprar y vender; GM: abre el generador de tiendas
+  $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (solo se puede con la tienda abierta)';
   actualizarBotonMapas();
   $('#nuevo-token-capa').hidden = !creando;
   if(!creando) $('#nuevo-token-ventana').innerHTML = '';
@@ -8746,6 +8747,7 @@ function escucharBotinParaJugador(){
 // 🏪 Tienda (2026-09-24, pedido del dueño): abre la tienda que publicó el GM, sin salir del mapa, en la ventana de la ficha del
 // personaje principal (mismo iframe que la Botonera y el botín). Solo con la tienda abierta.
 $('#toolkit-tienda').onclick = async () => {
+  if(soyGM){ window.open('../gm-toolset/vendor-generator.html?partida=' + encodeURIComponent(FB_CAMPANA), '_blank', 'noopener'); return; }   // el GM arma y abre la tienda en el generador
   const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('Para usar la tienda necesitás un personaje'); return; }
   try{

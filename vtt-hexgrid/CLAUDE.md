@@ -988,6 +988,24 @@ hexágono con otro sin importar bando. Todavía no está construido.
   quiere que también frene crítico/trampas/fuego, es una pregunta nueva. El resumen del duelo en la Mesa ("Daño: X −
   Defensa Y") ahora muestra la Armadura mágica restada en vez de "Defensa 0" cuando corresponde.
 
+- **🌀 Esquivar área (Paso 7b de las reglas de casteo, 2026-09-27)**: herramienta nueva en la caja de herramientas
+  (`esquivararea`, solo GM, junto a Niebla) para resolver un hechizo de área (Paso 4, `docs/reglas-casteo.md` §1.3).
+  **Puramente local a la pantalla del GM**: no escribe nada en Firestore, no hace falta publicar reglas, y a propósito
+  **no** se integró en `comun/duelo.js` (ese sistema de "Duelo de habilidades dirigidas" es 1 contra 1 y deja las
+  áreas para una etapa posterior — ver `docs/duelo-de-habilidades.md` — meterlo ahí hubiera chocado con ese trabajo).
+  El primer contraste (PdG.Esp/PdG contra la Evasión de cada uno) sigue siendo a mano, como un proyectil normal — la
+  herramienta no automatiza eso, ayuda con el resto: `elegirDestino` marca el **centro** en el mapa (radio editable,
+  `areaEfecto = {col, fila, radio}`); `areaEfectoAdentro()` calcula en vivo (por `distanciaHex`) quién sigue adentro,
+  recalculado solo cuando llega un token nuevo por Firebase (`escucharTokens`); marcar **🏃 Ofrecer dodge roll** en un
+  token (`areaEfectoOfrecidos`, un Set solo visual) le dibuja un **anillo de 2 casilleros** como referencia — el
+  movimiento en sí no necesitó código nuevo, ya cuesta No2 con el arrastre normal del token (Rengo/Inmovilizado ya
+  los cubre `costoMoverCasillero`); **☠ Aplicar** (`areaEfectoAplicarDano`) tira una sola fórmula de daño y se la
+  aplica a todos los que sigan adentro al cerrar, mismo patrón que `trampaAplicarDano` (automático para creeps del
+  GM, "aplicalo a mano" para personajes de otros jugadores — mismos límites de permisos de Firestore). Con "Ignora la
+  Defensa" tildado (por defecto, Paso 1), resta la **Armadura mágica** de cada uno en vez de nada (mismo parámetro
+  `restaIgnorando` del Paso 7a, ver la entrada de arriba). Cerrar la herramienta borra todo el estado (ephemeral,
+  no hay "recordar la última área").
+
 - **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
   queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está
   abierto acá mismo), los dos tokens involucrados (atacante y defensor) laten despacio en el mapa —

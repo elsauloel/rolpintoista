@@ -20,7 +20,7 @@
 | 4 | Esquivar efectos de área | decisión | ✅ 2026-09-27 |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ✅ 2026-09-27 |
 | 6 | Código: tipo de daño y daño recibido | implementación | ✅ 2026-09-27 (en su mayoría) |
-| 7 | Código: armadura mágica y esquiva de área | implementación | 🟡 (armadura mágica lista, 2026-09-27) |
+| 7 | Código: armadura mágica y esquiva de área | implementación | ✅ 2026-09-27 |
 | 8 | Auditoría de contenido, por tandas | contenido | ⬜ |
 | 9 | Manual | documentación | ⬜ |
 
@@ -138,7 +138,7 @@ pensando en este paso puntual:
 **Termina cuando:** un rayo ignora la Defensa y una aguja de hielo no, en ficha, creeps y trampas, y la Mesa lo dice. ✅ Con el tilde
 independiente ya está — solo falta la lupa (menor, no bloquea el Paso 7).
 
-## Paso 7 — Código: armadura mágica y esquiva de área 🟡
+## Paso 7 — Código: armadura mágica y esquiva de área ✅ 2026-09-27
 **Depende de:** 3 y 4, y del paso 6. El Paso 3 aclaró que no hace falta resistencia por tipo (3a: un solo stat general) — este paso es
 "Armadura mágica" (stat nuevo) y la reacción de esquivar un área en el mapa.
 
@@ -157,9 +157,24 @@ independiente ya está — solo falta la lupa (menor, no bloquea el Paso 7).
   crítico/trampas/fuego, es una pregunta nueva, no una corrección de esto).
 - La Mesa muestra la Armadura mágica restada en vez de "Defensa 0" cuando el daño de casteo la resta.
 
-**Falta:** la reacción de esquivar un área (Paso 4: tirada de Evasión → dodge roll de hasta 2 casilleros) todavía no tiene
-código — es una función interactiva aparte (nueva fase del duelo, costo en No2, Rengo/Stun/Inmovilizado), pensada como su
-propia pasada de trabajo.
+**Hecho (2026-09-27) — Esquivar área:** herramienta nueva del GM en el mapa, **🌀 Esquivar área** (junto a Niebla en la caja
+de herramientas), pensada como ayuda de mesa y **no** integrada al sistema de "Duelo de habilidades dirigidas"
+(`comun/duelo.js`) — ese archivo está pensado para 1 contra 1 y su propio diseño (`docs/duelo-de-habilidades.md` §2, caso G)
+deja "Áreas" para una etapa posterior con varios objetivos a la vez, así que meterle el área acá hubiera chocado con ese
+trabajo en curso. La herramienta es **puramente local a la pantalla del GM** (no escribe nada en Firestore, no hace falta
+publicar reglas nuevas):
+- El **primer contraste** (4a: PdG.Esp/PdG contra la Evasión de cada uno) sigue siendo a mano, "como un proyectil normal" —
+  no hay nada nuevo que automatizarlo, ya se resuelve con las tiradas de siempre.
+- La herramienta ayuda con lo que sí faltaba: marcar el **centro y el radio** del área (clic en el mapa, `elegirDestino`),
+  ver en vivo **quién sigue adentro** (`areaEfectoAdentro`, por distancia hexagonal — se recalcula solo si alguien se mueve),
+  marcar a quién se le **ofrece el dodge roll** al ganar la Evasión (`areaEfectoOfrecidos`, dibuja un anillo de 2 casilleros
+  como referencia — el movimiento en sí ya cuesta No2 con el arrastre normal del token, no hizo falta programar nada nuevo
+  ahí) y **aplicar el daño** de una sola tirada a todos los que sigan adentro al cerrar (`areaEfectoAplicarDano`, mismo
+  patrón que las trampas de área: automático para creeps del GM, "aplicalo a mano" para personajes de otros jugadores, por
+  los mismos permisos de Firestore). Respeta 4e (sin término medio: si seguís adentro, te pega la tirada entera) y 4f (no
+  hay ningún camino para "esquivar" una trampa con esto — es una herramienta distinta).
+- Con "Ignora la Defensa" tildado (por defecto, según el Paso 1), resta la **Armadura mágica** de cada uno en vez de nada
+  (mismo `restaIgnorando` del Paso 7a) — así el hechizo de área también respeta la Armadura mágica cuando corresponde.
 
 ## Paso 8 — Auditoría de contenido, por tandas ⬜
 **Depende de:** 1, 2 y 6. Una tanda a la vez, revisando skill por skill (nada masivo):

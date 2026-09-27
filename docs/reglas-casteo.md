@@ -5,9 +5,9 @@
 > (ver "La esencia del Rol Pintoísta" en el `CLAUDE.md` de la raíz). Los stats se llaman **PdG.Esp** y **Res.Esp** (renombrados 2026-09-27, antes PdG.Mg / Res.Mg; los ids no cambiaron, siguen `pdgmg`, `resmg`)
 > hasta que se decida otro nombre (ver P97).
 >
-> Estado: **los 5 pasos de decisión cerrados; el Paso 6 (tipo de daño y daño recibido) también, en su mayoría —
-> ya lo cubría el sistema de duelo de habilidades (2026-09-27)**. Del Paso 7, la **Armadura mágica ya tiene código
-> (2026-09-27)**; falta la reacción de esquivar áreas.
+> Estado: **los 5 pasos de decisión cerrados; el Paso 6 (tipo de daño y daño recibido) y el Paso 7 (armadura mágica
+> y esquiva de área) también, en su mayoría — ya lo cubrían el sistema de duelo de habilidades y la herramienta
+> 🌀 Esquivar área del mapa (2026-09-27)**. Sigue el Paso 8 (auditoría de contenido).
 > Ver "Orden propuesto" más abajo y [`proceso-casteo.md`](proceso-casteo.md). Las preguntas abiertas están en
 > [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
 
@@ -75,6 +75,17 @@ Si pierde la Evasión, no llega a esa opción.
 - **No hay término medio:** si salió completamente del área, no recibe nada; si sigue adentro por cualquier motivo (perdió la
   Evasión, no tenía No2, Inmovilizado, no alcanzó a salir del todo), recibe el **efecto completo**, sin mitad.
 - **Las trampas no se esquivan así:** ni Evasión ni dodge roll — el elemento sorpresa es la gracia de una trampa.
+
+**Código (Paso 7, 2026-09-27):** herramienta **🌀 Esquivar área** en el mapa (solo GM, caja de herramientas, junto a Niebla),
+pensada como ayuda de mesa y **sin escribir nada en Firestore** (no hace falta publicar reglas). El primer contraste sigue
+siendo a mano, como dice arriba; la herramienta ayuda con lo demás: marcar el centro y el radio del área en el mapa, ver en
+vivo quién sigue adentro (se recalcula solo si alguien se mueve), ofrecerle el dodge roll a quien ganó la Evasión (dibuja un
+anillo de 2 casilleros como referencia — el movimiento en sí ya cuesta No2 arrastrando el token normalmente, no hubo que
+programar nada especial para eso) y aplicar el daño (una sola tirada, para todos los que sigan adentro) — con "ignora la
+Defensa" tildado por defecto, resta la Armadura mágica de cada uno en vez de nada (§1.4). No se integró en el sistema de
+"Duelo de habilidades dirigidas" (`comun/duelo.js`): ese sistema está pensado para 1 contra 1 y su propio diseño
+(`docs/duelo-de-habilidades.md`) deja las áreas (varios objetivos a la vez) para una etapa posterior — construirlo ahí hubiera
+chocado con ese trabajo en curso, así que quedó como una herramienta aparte, más liviana.
 
 ### 1.4 Resistencia al daño de casteo: Armadura mágica (Paso 3 cerrado, 2026-09-27)
 **Un solo stat nuevo, general — no uno por elemento** (consistente con 1.1: no hay lista de tipos, así que tampoco hace falta una

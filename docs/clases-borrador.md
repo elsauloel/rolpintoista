@@ -165,12 +165,17 @@ Estados que define la clase:
 
 Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 
-1. **Chispazo** [1] — NO2: (1). Dispara un proyectil T6 P1 (1d6) que ignora armadura. *(Rebalanceado 2026-09-25 por el dueño: antes NO2 3 y T4; equiparado a la Varita de proyectil mágico de buena calidad, 1d6 por 1 Nitro. ⚖ A auditar con el grupo.)*
+1. ✅ **Chispazo** [1] — NO2: (1). Tira PdG.Esp contra la Evasión del objetivo (no se parrea ni se bloquea); si gana, 1d6 de
+   daño arcano directo a la vida. *(Rebalanceado 2026-09-25 por el dueño: antes NO2 3 y T4; equiparado a la Varita de
+   proyectil mágico de buena calidad, 1d6 por 1 Nitro. Auditada 2026-09-27 con `duelo` cargado, para probar el sistema de
+   duelo de habilidades. ⚖ Balance a revisar con el grupo.)*
 2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
    tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
-   Especial.
-3. **Orbe arcano** [4] — NO2: (5). Dispara un orbe arcano que hace daño en
-   área tipo 5. Amplifica el daño en 4. Área: flor de 1.
+   Especial. *(Sin auditar: el duelo de habilidades todavía no soporta una fórmula de daño que dependa de la X elegida al ejecutar.)*
+3. ✅ **Orbe arcano** [4] — NO2: (5). Hechizo de área (Paso 4/7 del casteo, flor de 1): tira PdG.Esp contra la Evasión de
+   cada uno, en cascada; a quien gane le toca un dodge roll, si no logra salir hace 1d12+4 de daño arcano directo a la vida.
+   *(Auditada 2026-09-27 con `duelo` de objetivo "área", para probar la cascada de hechizos de área. ⚖ El "amplifica el
+   daño en 4" del texto original se tomó como +4 fijo sobre 1d12 (Tipo 12) — a revisar el balance con el grupo.)*
 4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
    proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos
    los objetivos posibles. Esquivable solo con dodge roll.

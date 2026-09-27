@@ -4212,7 +4212,7 @@ function habDueloCreep(sc, h){
     nombre: h.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' ? 0 : alcanceDeHabCreep(sc, c, stat),
     tira: stat ? {stat, etq: habEtqCreep(stat), bono: num(h.tiradaBono)} : null,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: habEtqCreep(s)})),
-    dano: c.dano && formula ? {formula, tipo, ignoraDef: tipo !== 'fisico'} : null,
+    dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
     efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
   };
 }

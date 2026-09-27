@@ -19,7 +19,7 @@
 | 3 | Resistencia por tipo y armadura mágica | decisión | ✅ 2026-09-27 |
 | 4 | Esquivar efectos de área | decisión | ✅ 2026-09-27 |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ✅ 2026-09-27 |
-| 6 | Código: tipo de daño y daño recibido | implementación | ⬜ |
+| 6 | Código: tipo de daño y daño recibido | implementación | ✅ 2026-09-27 (en su mayoría) |
 | 7 | Código: resistencias, armadura mágica y esquiva de área | implementación | ⬜ |
 | 8 | Auditoría de contenido, por tandas | contenido | ⬜ |
 | 9 | Manual | documentación | ⬜ |
@@ -117,14 +117,26 @@ falta una tabla de tipos: la regla general + la excepción del objeto físico cu
 **Entrega:** glosario. **Termina cuando:** hay un vocabulario único para usar en todo lo nuevo. ✅ Los 5 pasos de decisión están
 cerrados — sigue el Paso 6 (implementación).
 
-## Paso 6 — Código: tipo de daño y daño recibido ⬜
-**Depende de:** 1, 2 (y 5 si cambia nombres). **Hacer, en este orden y probando cada uno:**
-1. Campo `tipoDanio` en habilidades de la ficha, invocaciones y creeps (con "tira: …" si se decidió el campo en 2e).
-2. Que el daño recibido **no reste Defensa** cuando el tipo ignora armadura: mapa (`danioPj`, `danioCreep`, `resolverGolpe`), gm-tools, ficha ("tirar daño").
-3. Tipo de daño en las **trampas** (`trampaDano`) y en el asistente de trampas.
-4. Mostrar el tipo y "qué tira cada lado" en la Mesa y en la lupa 🔍.
+## Paso 6 — Código: tipo de daño y daño recibido ✅ (en su mayoría) 2026-09-27
+**Sorpresa al retomarlo:** el sistema de **"Duelo de habilidades dirigidas"** (`comun/duelo.js` + `comun/asistente-duelo-hab.js`,
+construido el mismo día en otra conversación, ver `docs/duelo-de-habilidades.md`) ya hacía casi todo esto, aunque no se armó
+pensando en este paso puntual:
+1. ✅ **Campo de tipo de daño** — el 🎯 de cada habilidad (ficha y creeps de gm-tools) ya tiene un selector Arcano/Fuego/Hielo/Rayo/Físico
+   (`AsistenteDueloHab`, guarda `habilidad.duelo.tipoDano`). **Corregido hoy:** el selector ataba el tipo a "ignora armadura" siempre
+   (Hielo = ignora siempre) — se agregó un tilde **independiente** "Ignora la Defensa" (arranca según el tipo, se puede destildar a
+   mano para la excepción del Paso 1: un objeto físico arrojado, aunque sea "Hielo", no ignora). `habDueloDe` (ficha) y
+   `habDueloCreep` (gm-tools) ahora leen ese tilde en vez de inferirlo siempre del tipo.
+2. ✅ **El daño no resta Defensa cuando ignora armadura** — ya lo hacía `dueloAplicarDano` en el mapa (lee `d.hab.dano.ignoraDef`).
+   `danioPj`/`danioCreep` ya aceptan un parámetro `ignoraDef` de antes (lo usan crítico y Rayo en cadena); el modo manual **"2 · HP
+   directo"** del HUD sigue siendo la salida para cualquier caso que no pase por el duelo (no hizo falta agregar un tilde nuevo ahí).
+3. ✅ **Trampas** — ya tenían su propio tilde independiente "¿Contempla la armadura?" (`ignoraDef` en `trampaColocar`/`AsistenteTrampa`),
+   sin depender de ningún tipo — ya cumplía la regla del Paso 1 antes de que se cerrara.
+4. ✅ **Se muestra en la Mesa** — el resumen final del duelo ya dice "Daño arcano: … directo a la vida" (`lineasResumen`, `comun/duelo.js`).
+   **Pendiente, menor:** la lupa 🔍 de una habilidad no menciona el tipo de daño (solo costo y qué tira) — bajo impacto, se puede sumar
+   cuando se retome contenido, no bloquea nada.
 
-**Termina cuando:** un rayo ignora la Defensa y una aguja de hielo no, en ficha, creeps y trampas, y la Mesa lo dice.
+**Termina cuando:** un rayo ignora la Defensa y una aguja de hielo no, en ficha, creeps y trampas, y la Mesa lo dice. ✅ Con el tilde
+independiente ya está — solo falta la lupa (menor, no bloquea el Paso 7).
 
 ## Paso 7 — Código: resistencias, armadura mágica y esquiva de área ⬜
 **Depende de:** 3 y 4, y del paso 6. Resistencia por tipo (stats, ítems, creeps, lupa), armadura mágica, y la reacción de esquivar un área en el mapa.

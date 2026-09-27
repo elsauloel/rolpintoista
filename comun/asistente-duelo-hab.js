@@ -41,6 +41,10 @@ const AsistenteDueloHab = (() => {
       tira: ini ? (ini.tira === undefined ? 'pdgmg' : ini.tira) : 'pdgmg',
       contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
+      // Independiente del tipo (2026-09-27, Paso 1 de las reglas de casteo: lo que ignora la armadura no es el
+      // elemento, es cómo se narra la habilidad — una "ráfaga de hielo" ignora, una "aguja de hielo" física no).
+      // Arranca según el tipo elegido (mágico = sí, físico = no) y se puede destildar a mano para la excepción.
+      ignoraDano: (ini && ini.ignoraDano !== undefined) ? !!ini.ignoraDano : ((ini && ini.tipoDano) || 'arcano') !== 'fisico',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
@@ -100,7 +104,8 @@ const AsistenteDueloHab = (() => {
           <div><h4>${sinOp ? '3' : '4'} · Daño</h4>
             <label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> La fórmula de daño de la habilidad (su «segunda tirada», por ejemplo 2d6+3) es el daño que hace${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
             ${st.dano ? `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-            <p class="nota">El daño mágico (arcano, fuego, hielo, rayo) <b>ignora la Defensa y no critica</b>: va derecho a la vida. El físico resta la Defensa como cualquier golpe.</p>` : ''}</div>
+            <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
+            <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>` : ''}</div>
           `}
           ${st.modo === 'flash' ? '' : `<div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
             <p class="nota">Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.</p>
@@ -127,7 +132,8 @@ const AsistenteDueloHab = (() => {
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
-      q('[data-tipodano]', e => { st.tipoDano = e.target.value; });
+      q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
+      q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
       f.querySelectorAll('[data-ef-nombre]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efNombre].nombre = i.value.trim(); });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efStat].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efVal].val = Number(i.value) || 0; });
@@ -151,7 +157,7 @@ const AsistenteDueloHab = (() => {
         }
         const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
         if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
-        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; }
+        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();

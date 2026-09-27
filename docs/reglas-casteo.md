@@ -5,7 +5,8 @@
 > (ver "La esencia del Rol Pintoísta" en el `CLAUDE.md` de la raíz). Los stats se llaman **PdG.Esp** y **Res.Esp** (renombrados 2026-09-27, antes PdG.Mg / Res.Mg; los ids no cambiaron, siguen `pdgmg`, `resmg`)
 > hasta que se decida otro nombre (ver P97).
 >
-> Estado: **los 5 pasos de decisión cerrados (2026-09-27); nada implementado en código todavía**. Sigue el Paso 6 (implementación).
+> Estado: **los 5 pasos de decisión cerrados; el Paso 6 (tipo de daño y daño recibido) también, en su mayoría —
+> ya lo cubría el sistema de duelo de habilidades (2026-09-27)**. Sigue el Paso 7 (resistencias y esquiva de área).
 > Ver "Orden propuesto" más abajo y [`proceso-casteo.md`](proceso-casteo.md). Las preguntas abiertas están en
 > [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
 

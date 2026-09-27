@@ -4,14 +4,15 @@
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
-> **Los 5 pasos de decisión están cerrados (2026-09-27).** Retomar por el primer paso sin ✅ de `proceso-casteo.md`
-> (hoy: **paso 6**, código — tipo de daño y daño recibido). Lo de abajo es solo un resumen.
+> **Los 5 pasos de decisión y el Paso 6 (en su mayoría) están cerrados (2026-09-27).** Retomar por el primer paso
+> sin ✅ de `proceso-casteo.md` (hoy: **paso 7**, resistencias, armadura mágica y esquiva de área). Lo de abajo es
+> solo un resumen.
 - [x] Paso 1 (2026-09-27): tipos de daño de casteo — **por defecto todo ignora armadura**, salvo que sea un objeto físico arrojado (regla general, no hizo falta una lista cerrada de tipos); críticos/Res. a crítico no aplican al casteo; el daño de trampas sigue la misma regla.
 - [x] Paso 2 (2026-09-27): "qué tira cada lado" — se apoya en el campo `duelo` cuando la habilidad ya está automatizada; si no, una frase tipo "Tirás PdG.Esp contra el Res.Esp del objetivo"; una sola tirada en habilidades mixtas (daño + debuff); sobre uno mismo/aliado no se tira nada pero se abre igual el cuadro de duelo sin oposición (visible a toda la mesa, botón «Aplicar» — ya construido); control mental tira PdG.Esp por defecto contra Res.Mt.
 - [x] Paso 3 (2026-09-27): resistencia al daño de casteo — un solo stat nuevo, **Armadura mágica** (número fijo, no por elemento, no deriva de atributo, solo ítems de tier alto); distinta del estado Escudo especial y de la skill **Armadura arcana** del Mago (renombrada, antes "Armadura Mágica").
 - [x] Paso 4 (2026-09-27): esquivar áreas — primero PdG.Esp/PdG del que actúa contra la Evasión del defensor; solo si gana esa Evasión gana el derecho a un dodge roll (hasta 2 casilleros, 1 No2 c/u, doble con Rengo, imposible con Stun/Inmovilizado); no hay término medio (fuera del área del todo o efecto completo); las trampas no se esquivan así.
 - [x] Paso 5 (2026-09-27): nombre del daño genérico → **"arcano"** (ya usado en el catálogo); "Mg"→"Esp" ya hecho; "Hechizo" se mantiene.
-- [ ] Paso 6 (código): campo `tipoDanio` en habilidades (ficha, invocaciones, creeps) y que el daño recibido **no reste Defensa** cuando el tipo ignora armadura (mapa `danioPj`/`danioCreep`, gm-tools, ficha, trampas).
+- [x] Paso 6 (2026-09-27, casi todo ya estaba hecho por el sistema de duelo de habilidades): tipo de daño en el 🎯 de cada habilidad (Arcano/Fuego/Hielo/Rayo/Físico) + tilde independiente "Ignora la Defensa" (corregido hoy, antes lo ataba siempre al tipo); el mapa ya no resta Defensa cuando corresponde; las trampas ya tenían su propio tilde independiente; la Mesa ya dice el tipo. Falta solo: mostrarlo también en la lupa 🔍 (menor).
 - [ ] Paso 7 (código): resistencias por tipo, armadura mágica y la reacción de esquivar áreas.
 - [ ] Paso 8: auditoría de contenido por tandas — skills de clase (13 de 62, una ya toca casteo: Chispazo, sin auditar) → habilidades de creeps → creeps base → armas naturales → trampas base → catálogo (~60 ítems) → pasivas y estados → manual.
 

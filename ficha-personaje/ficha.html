@@ -4432,11 +4432,12 @@ function habDueloDe(it){
   const tipo = c.tipoDano || 'arcano';
   const formula = String(it.tiradaExtra || '').trim();
   return {
-    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' ? 0 : alcanceDeHab(c, stat),
+    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' ? 0 : alcanceDeHab(c, stat),
     tira: stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
     dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
     efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
+    ...(c.objetivo === 'area' ? {radio: num(c.radio)} : {}),
   };
 }
 function lanzarDueloDeHab(it, hab){

@@ -1192,24 +1192,6 @@ let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport:
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
-// Esquivar área (Paso 4/7b de las reglas de casteo, 2026-09-27, docs/reglas-casteo.md §1.3): ayuda del GM
-// para resolver un hechizo de área. NO se guarda en Firestore (ni colección ni reglas nuevas) — es puramente
-// local a la pantalla del GM mientras la herramienta está abierta, como un tanteo de mesa. El primer contraste
-// (PdG.Esp/PdG del que actúa contra la Evasión de cada uno) sigue siendo a mano, como un proyectil normal
-// (4a); lo que esta herramienta ayuda es a ver quién sigue adentro, ofrecer el dodge roll (el movimiento en
-// sí ya cuesta No2 solo con el arrastre normal del token: acá solo se dibuja el anillo de 2 casilleros como
-// recordatorio) y aplicar el daño final a quien no logró salir.
-let areaEfecto = null;        // {col, fila, radio} una vez marcado el centro
-let areaEfectoRadio = 2;      // radio del área en sí (Orbe arcano, Tormenta arcana…): no confundir con los 2 casilleros del dodge roll, que son fijos
-let areaEfectoOfrecidos = new Set();   // tokenIds a los que se les ofreció el dodge roll (ganaron Evasión): se les dibuja el anillo de 2 casilleros
-let areaEfectoDano = '', areaEfectoIgnoraDef = true;   // input de daño a aplicar + si ignora la Defensa (Paso 1: por defecto sí)
-function areaEfectoLimpiar(){ areaEfecto = null; areaEfectoOfrecidos = new Set(); }
-// Tokens actualmente adentro del área (se recalcula en vivo: si alguien se mueve, entra o sale solo).
-// Ojo: un token del Map no trae su id adentro (es la clave del Map) — hay que pegarlo acá.
-function areaEfectoAdentro(){
-  if(!areaEfecto) return [];
-  return [...tokens.entries()].map(([id, t]) => ({...t, id})).filter(t => !t.oculto && distanciaHex(areaEfecto, t) <= areaEfecto.radio);
-}
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).
 let trampasGuardadas = [];
 try{ const g = JSON.parse(localStorage.getItem('mapa-trampas-guardadas') || '[]'); if(Array.isArray(g)) trampasGuardadas = g.filter(x => x && typeof x.nombre === 'string').slice(0, 40); }catch(e){}
@@ -4459,18 +4441,17 @@ function dibujar(){
       ctx.restore();
       animando = true;
     });
+    // Fase 'dodge' (Paso 4/7 del casteo): al defensor le queda dibujado un anillo de 2 casilleros,
+    // como referencia visual de hasta dónde se puede arrastrar para intentar salir del área.
+    if(p.fase === 'dodge' && p.defensorTokenId){
+      const tk = tokens.get(p.defensorTokenId);
+      if(tk && !(tk.oculto && !soyGM) && tokenVisiblePorNiebla(tk)) dibujarAuraHex(tk, {radio: 2, color: '#4FA88C'}, z);
+    }
   });
 
-  // Esquivar área (Paso 4/7b del casteo): el área en sí (violeta) y, por cada token al que
-  // se le ofreció el dodge roll, un anillo de 2 casilleros como referencia de hasta dónde
-  // puede arrastrarse (ver areaEfecto* más arriba). Solo mientras la herramienta está abierta.
-  if(herramientaActiva === 'esquivararea' && areaEfecto){
-    dibujarAuraHex(areaEfecto, {radio: areaEfecto.radio, color: '#9B7BD4'}, z);
-    areaEfectoOfrecidos.forEach(id => {
-      const tk = tokens.get(id);
-      if(tk) dibujarAuraHex(tk, {radio: 2, color: '#4FA88C'}, z);
-    });
-  }
+  // Hechizos de área en curso (Paso 4/7 del casteo, docs/reglas-casteo.md §1.3): el círculo se ve para
+  // TODOS los conectados (no solo el GM) mientras dura la cascada — ver escucharAreas().
+  areasActivas.forEach(a => dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z));
 
   if(dibujarEfectosTeleport()) animando = true;
 
@@ -6552,34 +6533,6 @@ async function trampaAplicarEstado(t, el){
   if(nombres.length) alertaRojaAnonima(`🎯 ${el.trampaNombre || 'Trampa'}: ${EstadosAplicar.texto(spec)}`, `${nombres.join(', ')}: estado aplicado solo`);
 }
 
-// Esquivar área (Paso 4/7b del casteo) — daño del hechizo a quien siga adentro, con el mismo
-// patrón que trampaAplicarDano: automático para creeps (GM), a mano para personajes de otros
-// jugadores. Si ignora la Defensa, resta la Armadura mágica de cada uno en vez de nada (Paso 7a).
-async function areaEfectoAplicarDano(){
-  if(!areaEfecto || !trampaDanoValido(areaEfectoDano)){ toast('Escribí una fórmula de daño válida (ej. 3d6+2)'); return; }
-  const tir = tirarDados(areaEfectoDano.trim());
-  if(!tir) return;
-  const afectados = areaEfectoAdentro();
-  if(!afectados.length){ toast('No hay nadie adentro'); return; }
-  const partes = [];
-  for(const x of afectados){
-    let hecho = false;
-    try{
-      if(x.tipo === 'creep' && x.fichaId && soyGM){
-        const sc = creepPrivadoDe(x.fichaId);
-        const resta = areaEfectoIgnoraDef ? (sc ? creepArmadmgMapa(sc) : 0) : 0;
-        await danioCreep(x, String(tir.total), areaEfectoIgnoraDef, resta); hecho = true;
-      }else if(x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && puedoMover(x)){
-        const f = fichasPub.get(x.fichaId);
-        const resta = areaEfectoIgnoraDef ? num(f && f.resumen ? f.resumen.armadmg : 0) : 0;
-        await danioPj(x, String(tir.total), areaEfectoIgnoraDef, resta); hecho = true;
-      }
-    }catch(err){ console.error('No se pudo aplicar el daño del área:', err); }
-    partes.push(`${x.oculto ? 'Alguien' : nombreDe(x)}: ${hecho ? 'daño aplicado solo' : 'aplicalo a mano'}`);
-  }
-  alertaRojaAnonima(`🌀 Hechizo de área: ${tir.formula} = ${tir.total} de daño (${areaEfectoIgnoraDef ? 'ignora la Defensa — resta la Armadura mágica si tiene' : 'menos la Defensa de cada uno'})`, partes.join(' · '));
-  areaEfectoOfrecidos.clear();
-}
 // Después de que el token llegó a la casilla donde se cortó.
 async function trampaResolver(){
   const p = trampaPendiente;
@@ -6860,7 +6813,6 @@ function escucharTokens(){
     // mucho en notarse aunque la posición ya hubiera llegado por Firebase. Se llama acá
     // también, directo desde la llegada del dato, así no depende de que se esté dibujando.
     sigiloRevisar();
-    if(herramientaActiva === 'esquivararea') renderHerramientaFlotante();   // la lista de "adentro" sigue a los tokens en vivo
     pedirDibujo();
   }, err => {
     console.error('Error escuchando los tokens:', err);
@@ -9214,6 +9166,7 @@ function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
+  if(ataque && ataque.hab && ataque.hab.objetivo === 'area'){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
@@ -9267,6 +9220,106 @@ async function dueloVincularSiFalta(t){
   await coleccionTokens().doc(t.id).update({fichaId: elegido[0]});
   toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}»${elegido[1].grupo ? ' (grupo ' + elegido[1].grupo + ')' : ''} de GM Tools`);
   return {...t, fichaId: elegido[0]};
+}
+
+/* ---------- Hechizos de área (Paso 4/7 del casteo, 2026-09-27, docs/reglas-casteo.md §1.3) ----------
+   Un casteo de área abre, para todos, la MISMA cascada de duelos de habilidad de siempre — un
+   sub-duelo por objetivo, uno detrás del otro, con la fase nueva 'dodge' (ver comun/duelo.js) —
+   más el círculo compartido en el mapa. Documento propio, campanas/<id>/areas/<id> (no anidado
+   por mapa, mismo criterio que `duelos`):
+   {casteador:{ref,tipo,nombre,uid,tokenId}, hab, centro:{col,fila}, radio, objetivos:[tokenId,…],
+    duelos:[dueloId|null,…] (mismo largo y orden que objetivos), indice (0-based: a quién le toca
+    ahora), estado:'en-curso'|'terminado', creadoPor, creado}. */
+function coleccionAreas(){ return fbDb.collection(fbRutaCampana('areas')); }
+let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el círculo; el GM además avanza la cascada)
+
+function escucharAreas(){
+  coleccionAreas().where('estado', '==', 'en-curso').onSnapshot(snap => {
+    areasActivas.clear();
+    snap.docs.forEach(doc => areasActivas.set(doc.id, doc.data()));
+    pedirDibujo();
+    // Autocuración: si a un área en curso le falta el sub-duelo que le toca (recién creada, o
+    // esta pestaña del GM no llegó a verlo antes), lo crea acá — cubre el primer objetivo y
+    // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
+    if(soyGM) areasActivas.forEach((a, id) => { if(!(a.duelos || [])[num(a.indice)]) areaCrearSiguienteSubDuelo(id, a); });
+  }, err => console.error('Error escuchando las áreas:', err));
+}
+
+// El GM crea el sub-duelo del objetivo que le toca ahora a esta área (o cierra el grupo si ya no queda ninguno).
+async function areaCrearSiguienteSubDuelo(areaId, a){
+  const idx = num(a.indice), objetivos = a.objetivos || [];
+  if(idx >= objetivos.length){ coleccionAreas().doc(areaId).update({estado: 'terminado'}).catch(err => console.error('No se pudo cerrar el área:', err)); return; }
+  if((a.duelos || [])[idx]) return;   // ya se creó (o dos pestañas del GM coinciden: riesgo chico y aceptado)
+  const tokenId = objetivos[idx], t = tokens.get(tokenId);
+  if(!t){   // el objetivo ya no está en el mapa: se lo saltea
+    const siguiente = idx + 1;
+    coleccionAreas().doc(areaId).update(siguiente >= objetivos.length ? {estado: 'terminado'} : {indice: siguiente}).catch(err => console.error(err));
+    return;
+  }
+  let dueloId;
+  try{
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: objetivos.length}},
+      {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
+  }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); return; }
+  try{
+    const doc = await coleccionAreas().doc(areaId).get();
+    if(!doc.exists) return;
+    const duelos = (doc.data().duelos || []).slice(); duelos[idx] = dueloId;
+    await coleccionAreas().doc(areaId).update({duelos});
+  }catch(err){ console.error('No se pudo anotar el sub-duelo en el área:', err); }
+}
+
+// comun/duelo.js avisa (hook grupoResuelto, solo al GM) cuando un sub-duelo con `grupo` se resuelve: avanza la cascada.
+function dueloGrupoResuelto(d){
+  const areaId = d.grupo.id, idx = num(d.grupo.indice) - 1;   // grupo.indice es 1-based
+  coleccionAreas().doc(areaId).get().then(doc => {
+    if(!doc.exists) return;
+    const a = doc.data();
+    if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
+    const siguiente = idx + 1, total = (a.objetivos || []).length;
+    return coleccionAreas().doc(areaId).update(siguiente >= total ? {estado: 'terminado'} : {indice: siguiente});
+  }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
+}
+
+// comun/duelo.js pide (hook chequearDodge, el botón "revisar" de la fase dodge): ¿el defensor SIGUE adentro del área?
+function dueloChequearDodge(d){
+  if(!d.grupo) return true;
+  const a = areasActivas.get(d.grupo.id);
+  const t = tokens.get(d.defensor.tokenId);
+  if(!a || !t) return true;   // sin datos: por las dudas, efecto completo (más seguro que dejarlo pasar gratis)
+  return distanciaHex(a.centro, t) <= num(a.radio);
+}
+
+// El casteador eligió una habilidad de área (asistente-duelo-hab.js: objetivo 'area' + radio) y le tocó elegir el
+// centro: arma la lista de objetivos (adentro del radio, rivales — nunca el propio casteador ni tokens ocultos —
+// salvo que la habilidad tenga fuego amigo) y crea el documento del área; el primer sub-duelo lo crea
+// escucharAreas() apenas llega el snapshot nuevo (mismo camino que cualquier avance de la cascada).
+function dueloElegirAreaMapa(msg){
+  const yo = msg.yo, hab = msg.ataque.hab;
+  cerrarBotonera();
+  seleccion = null; hudCerrar(); pedirDibujo();
+  const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
+  const radio = Math.max(0, Math.round(num(hab.radio)) || 0);
+  const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  elegirDestino(async h => {
+    const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
+    const mio = todos.find(propio);
+    const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
+    const objetivos = todos
+      .filter(t => !t.oculto && !propio(t) && distanciaHex(h, t) <= radio)
+      .filter(t => hab.fuegoAmigo || (soyGM ? t.tipo === 'pj' : t.tipo === 'creep'))
+      .map(t => t.id);
+    if(!objetivos.length){ toast('No hay nadie adentro del área'); return; }
+    try{
+      await coleccionAreas().add({
+        casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',
+        creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){
+      console.error('No se pudo lanzar el hechizo de área:', err);
+      toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));
+    }
+  }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true, cancelado);
 }
 
 /* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------
@@ -9460,7 +9513,6 @@ const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'G'},
   {id: 'niebla', icono: '🌫', nombre: 'Niebla', detalle: 'Destapar o tapar zonas a mano, o reiniciar (GM)', lista: true, soloGM: true},
-  {id: 'esquivararea', icono: '🌀', nombre: 'Esquivar área', detalle: 'Resolver un hechizo de área: quién queda adentro, ofrecer el dodge roll y aplicar el daño (GM)', lista: true, soloGM: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},
 ];
@@ -9482,7 +9534,6 @@ function descartarBorradorElemento(){
 function desactivarHerramienta(){
   if(!herramientaActiva) return;
   if(borradorElemento) consolidarBorradorElemento();
-  if(herramientaActiva === 'esquivararea') areaEfectoLimpiar();
   herramientaActiva = '';
   dibujando = null;
   dibujandoElemento = null;
@@ -9543,23 +9594,6 @@ function renderHerramientaFlotante(){
       <input type="range" id="niebla-radio" min="0" max="5" step="1" value="${nieblaPincelRadio}">
       <p class="tk-lapiz-ayuda">Arrastrá sobre el mapa para ${nieblaModo === 'destapar' ? 'destapar' : 'volver a tapar'} zonas. ${nieblaActiva ? '' : 'La niebla está apagada: prendela con el botón de la cabecera.'}</p>
       <div class="fila"><button type="button" class="btn peligro" id="niebla-reiniciar">Reiniciar (tapar todo)</button></div>`;
-  }else if(herramientaActiva === 'esquivararea'){
-    const adentro = areaEfectoAdentro();
-    cuerpo = `<p class="tk-lapiz-ayuda" style="margin-top:0">Ayuda para resolver un hechizo de área (Paso 4 del casteo): primero tirá a mano <b>PdG.Esp</b> (o PdG si es algo físico arrojado) contra la <b>Evasión</b> de cada uno, como un proyectil normal. Recién quien <b>gana esa Evasión</b> gana el derecho a un <b>dodge roll</b> (hasta 2 casilleros, arrastrando el token — ya cuesta No2 solo). No hay término medio: fuera del todo o efecto completo.</p>
-      ${areaEfecto ? `
-        <label class="etiqueta" style="margin-top:0">Radio del área</label>
-        <input type="number" id="area-radio" min="0" max="${TAMANO_ELEMENTO_MAX}" step="1" value="${areaEfecto.radio}">
-        <button type="button" class="btn" id="area-mover-centro" style="margin-top:6px;width:100%">📍 Mover el centro</button>
-        <div class="editar-separador" style="margin:10px 0 6px"><span>Adentro ahora (${adentro.length})</span></div>
-        ${adentro.length ? adentro.map(t => `<div class="tk-lapiz-check" style="justify-content:space-between;display:flex;align-items:center;gap:6px">
-          <span>${esc(t.oculto ? 'Alguien' : nombreDe(t))}</span>
-          <button type="button" class="btn${areaEfectoOfrecidos.has(t.id) ? ' primary' : ''}" data-area-ofrecer="${t.id}" style="padding:4px 8px;font-size:12px" title="Marcalo cuando ese token gane la tirada de Evasión: le dibuja un anillo de 2 casilleros como referencia de hasta dónde puede arrastrarse">🏃 ${areaEfectoOfrecidos.has(t.id) ? 'Dodge roll ofrecido' : 'Ofrecer dodge roll'}</button>
-        </div>`).join('') : '<p class="tk-lapiz-ayuda">Nadie adentro por ahora.</p>'}
-        <div class="editar-separador" style="margin:10px 0 6px"><span>Aplicar daño a los que sigan adentro</span></div>
-        <input type="text" id="area-dano" placeholder="ej. 3d6+2 (se tira una sola vez, para todos)" value="${esc(areaEfectoDano)}">
-        <label class="tk-lapiz-check"><input type="checkbox" id="area-ignoradef"${areaEfectoIgnoraDef ? ' checked' : ''}> Ignora la Defensa (resta la Armadura mágica en vez de nada — Paso 1: así es por defecto, salvo que sea un objeto físico arrojado)</label>
-        <button type="button" class="btn peligro" id="area-aplicar" style="margin-top:6px;width:100%"${adentro.length ? '' : ' disabled'}>☠ Aplicar a los ${adentro.length} que siguen adentro</button>
-      ` : `<button type="button" class="btn primary" id="area-marcar-centro" style="width:100%">📍 Marcar el centro en el mapa</button>`}`;
   }else if(herramientaActiva === 'elemento'){
     if(elemTipo === 'colision' && !soyGM) elemTipo = 'flor';   // la Colisión es solo del GM
     const selectorForma = `
@@ -9660,24 +9694,6 @@ $('#herramienta-flotante').addEventListener('click', e => {
   }
   if(e.target.closest('#herr-cerrar')){ desactivarHerramienta(); return; }
   if(e.target.closest('#niebla-reiniciar')){ nieblaReiniciar(); return; }
-  if(e.target.closest('#area-marcar-centro')){
-    elegirDestino(h => { areaEfecto = {col: h.col, fila: h.fila, radio: areaEfectoRadio}; areaEfectoOfrecidos.clear(); renderHerramientaFlotante(); pedirDibujo(); },
-      '<b>🌀 Elegí el centro del área</b> <span>clic en cualquier casilla · Esc o clic derecho cancela</span>', true);
-    return;
-  }
-  if(e.target.closest('#area-mover-centro')){
-    elegirDestino(h => { if(areaEfecto){ areaEfecto.col = h.col; areaEfecto.fila = h.fila; } renderHerramientaFlotante(); pedirDibujo(); },
-      '<b>🌀 Elegí el nuevo centro del área</b> <span>clic en cualquier casilla · Esc o clic derecho cancela</span>', true);
-    return;
-  }
-  const ofrecer = e.target.closest('[data-area-ofrecer]');
-  if(ofrecer){
-    const id = ofrecer.dataset.areaOfrecer;
-    if(areaEfectoOfrecidos.has(id)) areaEfectoOfrecidos.delete(id); else areaEfectoOfrecidos.add(id);
-    renderHerramientaFlotante(); pedirDibujo();
-    return;
-  }
-  if(e.target.closest('#area-aplicar')){ areaEfectoAplicarDano(); return; }
   if(e.target.closest('#borrador-crear')){ consolidarBorradorElemento(); return; }
   if(e.target.closest('#borrador-descartar')){ descartarBorradorElemento(); return; }
   const color = e.target.closest('[data-lapiz-color]');
@@ -9734,16 +9750,6 @@ $('#herramienta-flotante').addEventListener('change', e => {
     lapizPermanente = e.target.checked;
     try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}
     renderHerramientaFlotante();
-    return;
-  }
-  if(e.target.id === 'area-radio'){
-    areaEfectoRadio = Math.max(0, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 0));
-    if(areaEfecto) areaEfecto.radio = areaEfectoRadio;
-    renderHerramientaFlotante();
-    return;
-  }
-  if(e.target.id === 'area-ignoradef'){
-    areaEfectoIgnoraDef = e.target.checked;
     return;
   }
   if(e.target.id === 'elem-tipo-select'){
@@ -9812,12 +9818,6 @@ $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }
   if(e.target.id === 'elem-trampa-estado-turnos'){ elemTrampaEstadoTurnos = Math.max(0, Math.min(20, Math.round(num(e.target.value)) || 0)); return; }
-  if(e.target.id === 'area-radio'){
-    areaEfectoRadio = Math.max(0, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(e.target.value)) || 0));
-    if(areaEfecto) areaEfecto.radio = areaEfectoRadio;
-    pedirDibujo();
-  }
-  if(e.target.id === 'area-dano'){ areaEfectoDano = e.target.value; }
   if(e.target.id === 'niebla-radio'){
     nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
     const et = e.target.previousElementSibling;
@@ -10256,7 +10256,8 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal});
+  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge});
+  escucharAreas();   // hechizos de área (Paso 4/7 del casteo): el círculo compartido y, el GM, la cascada
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.
   if(bitacoraFlotanteAbierta) bitacoraEscuchar();

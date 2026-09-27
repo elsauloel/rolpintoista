@@ -340,4 +340,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   patrón que los stats derivados de atributo, no el de Defensa que se hornea al equipar — ver `armadmgOrigenTxt` para el
   desglose de la lupa). Se agregó `armadmg` a `cfgItemGM().stats` para poder dársela a un creep como bono de ítem.
 
+- **Hechizos de área** (Paso 7b del casteo, 2026-09-27): `habDueloCreep(sc, h)` suma `radio: num(c.radio)` cuando el 🎯 de
+  la habilidad tiene objetivo `'area'`. El resto (cascada, círculo compartido, fase de dodge) vive en `comun/duelo.js`
+  y `vtt-hexgrid/mapa.html` — ver `../comun/CLAUDE.md` y `../vtt-hexgrid/CLAUDE.md`.
+
 - **El Tablero solo muestra lo que está en el mapa publicado** (2026-09-22, a pedido del dueño): antes listaba TODAS las fichas de la partida y TODOS los creeps abiertos en gm-tools, tuvieran o no token puesto en algún mapa. Ahora, mientras el Tablero está abierto, además de escuchar `fichas` escucha `campanas/{id}/mapa/activo` (`tableroEscucharMapaPublicado`) y los tokens de ESE mapa (`tableroColeccionTokensDe`, mismo esquema de colecciones que `vtt-hexgrid/mapa.html`: `tokens` para el mapa principal, `mapas/{id}/tokens` para uno guardado) — `tableroTokensMapa`, un `Set` de `fichaId`s. `renderTablero()` filtra `tableroDatos.fichas` y `tableroCreepsLocales()` contra ese set antes de armar las tarjetas. Como esto lo ve solo el GM, no hace falta filtrar oculto ni sigilo (eso sí importa en la versión del mapa, ver `vtt-hexgrid/CLAUDE.md`, que además agrega el mismo Tablero ahí para que también lo puedan abrir los jugadores).

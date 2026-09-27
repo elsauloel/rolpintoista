@@ -47,6 +47,7 @@ const AsistenteDueloHab = (() => {
       ignoraDano: (ini && ini.ignoraDano !== undefined) ? !!ini.ignoraDano : ((ini && ini.tipoDano) || 'arcano') !== 'fisico',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
+      radio: (ini && ini.radio) || 2,   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ...((ini && ini.arma) || {})},
@@ -93,8 +94,11 @@ const AsistenteDueloHab = (() => {
             <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option><option value="flash"${st.modo === 'flash' ? ' selected' : ''}>⚡ Reacción Flash (suma a una tirada del duelo)</option></select></div>
           ${st.modo === 'flash' ? flashHtml() : st.modo === 'arma' ? armaHtml() : `
           <div><h4>1 · ¿A quién apunta?</h4>
-            <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          ${st.objetivo === 'uno mismo' ? '' : alcanceHtml(false)}
+            <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+          ${st.objetivo === 'area' ? `<div><h4>Radio del área</h4>
+            <p class="nota">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
+            <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros</span></div></div>` : ''}
+          ${st.objetivo === 'uno mismo' || st.objetivo === 'area' ? '' : alcanceHtml(false)}
           <div><h4>2 · ¿Qué tira quien la usa?</h4>
             <select data-tira><option value=""${sinOp ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           ${sinOp ? `<div class="aviso">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>` : `
@@ -130,6 +134,7 @@ const AsistenteDueloHab = (() => {
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
+      q('[data-radio]', e => { st.radio = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
@@ -156,8 +161,10 @@ const AsistenteDueloHab = (() => {
           cerrar(); cfg.alGuardar(o2); return;
         }
         const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
+        if(st.objetivo === 'area' && !st.tira){ alert('Un hechizo de área necesita una tirada (Paso 4: PdG.Esp o PdG contra la Evasión de cada uno) — elegí qué tira quien la usa.'); return; }
         if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; }
+        if(st.objetivo === 'area') out.radio = st.radio;
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();

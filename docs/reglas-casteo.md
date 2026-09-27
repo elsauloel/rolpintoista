@@ -76,16 +76,15 @@ Si pierde la Evasión, no llega a esa opción.
   Evasión, no tenía No2, Inmovilizado, no alcanzó a salir del todo), recibe el **efecto completo**, sin mitad.
 - **Las trampas no se esquivan así:** ni Evasión ni dodge roll — el elemento sorpresa es la gracia de una trampa.
 
-**Código (Paso 7, 2026-09-27):** herramienta **🌀 Esquivar área** en el mapa (solo GM, caja de herramientas, junto a Niebla),
-pensada como ayuda de mesa y **sin escribir nada en Firestore** (no hace falta publicar reglas). El primer contraste sigue
-siendo a mano, como dice arriba; la herramienta ayuda con lo demás: marcar el centro y el radio del área en el mapa, ver en
-vivo quién sigue adentro (se recalcula solo si alguien se mueve), ofrecerle el dodge roll a quien ganó la Evasión (dibuja un
-anillo de 2 casilleros como referencia — el movimiento en sí ya cuesta No2 arrastrando el token normalmente, no hubo que
-programar nada especial para eso) y aplicar el daño (una sola tirada, para todos los que sigan adentro) — con "ignora la
-Defensa" tildado por defecto, resta la Armadura mágica de cada uno en vez de nada (§1.4). No se integró en el sistema de
-"Duelo de habilidades dirigidas" (`comun/duelo.js`): ese sistema está pensado para 1 contra 1 y su propio diseño
-(`docs/duelo-de-habilidades.md`) deja las áreas (varios objetivos a la vez) para una etapa posterior — construirlo ahí hubiera
-chocado con ese trabajo en curso, así que quedó como una herramienta aparte, más liviana.
+**Código (Paso 7, 2026-09-27, versión final — reemplaza una primera versión con una herramienta aparte del GM, retirada el
+mismo día):** un hechizo de área usa el **mismo cuadro de duelo paso a paso** que uno contra un solo objetivo (Paso 6,
+`comun/duelo.js`), encadenado: el 🎯 de la habilidad tiene un objetivo **"A un área"** con **radio**; al ejecutarla, el mapa
+pide marcar el centro y arma la cascada — un sub-duelo por objetivo (rivales adentro del radio), uno detrás del otro, **visible
+a toda la mesa** con su propio "⚔ Ver duelo" para minimizarlo. El contraste (PdG.Esp/PdG contra Evasión) es la tirada de
+siempre; si el objetivo la **gana**, en vez de "SE RESISTIÓ" se abre una fase nueva, **`dodge`**: tiene el derecho a moverse
+hasta 2 casilleros (arrastrando el token — ya cuesta No2 solo) y un botón que revisa si logró salir; si no, recibe el efecto
+completo igual (no hay término medio, 4e). Con "ignora la Defensa", resta la Armadura mágica en vez de nada (§1.4), como
+cualquier sub-duelo de habilidad. Ver `docs/duelo-de-habilidades.md` §11 para el detalle técnico.
 
 ### 1.4 Resistencia al daño de casteo: Armadura mágica (Paso 3 cerrado, 2026-09-27)
 **Un solo stat nuevo, general — no uno por elemento** (consistente con 1.1: no hay lista de tipos, así que tampoco hace falta una

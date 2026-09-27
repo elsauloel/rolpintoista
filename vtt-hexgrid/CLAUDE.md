@@ -988,23 +988,40 @@ hexágono con otro sin importar bando. Todavía no está construido.
   quiere que también frene crítico/trampas/fuego, es una pregunta nueva. El resumen del duelo en la Mesa ("Daño: X −
   Defensa Y") ahora muestra la Armadura mágica restada en vez de "Defensa 0" cuando corresponde.
 
-- **🌀 Esquivar área (Paso 7b de las reglas de casteo, 2026-09-27)**: herramienta nueva en la caja de herramientas
-  (`esquivararea`, solo GM, junto a Niebla) para resolver un hechizo de área (Paso 4, `docs/reglas-casteo.md` §1.3).
-  **Puramente local a la pantalla del GM**: no escribe nada en Firestore, no hace falta publicar reglas, y a propósito
-  **no** se integró en `comun/duelo.js` (ese sistema de "Duelo de habilidades dirigidas" es 1 contra 1 y deja las
-  áreas para una etapa posterior — ver `docs/duelo-de-habilidades.md` — meterlo ahí hubiera chocado con ese trabajo).
-  El primer contraste (PdG.Esp/PdG contra la Evasión de cada uno) sigue siendo a mano, como un proyectil normal — la
-  herramienta no automatiza eso, ayuda con el resto: `elegirDestino` marca el **centro** en el mapa (radio editable,
-  `areaEfecto = {col, fila, radio}`); `areaEfectoAdentro()` calcula en vivo (por `distanciaHex`) quién sigue adentro,
-  recalculado solo cuando llega un token nuevo por Firebase (`escucharTokens`); marcar **🏃 Ofrecer dodge roll** en un
-  token (`areaEfectoOfrecidos`, un Set solo visual) le dibuja un **anillo de 2 casilleros** como referencia — el
-  movimiento en sí no necesitó código nuevo, ya cuesta No2 con el arrastre normal del token (Rengo/Inmovilizado ya
-  los cubre `costoMoverCasillero`); **☠ Aplicar** (`areaEfectoAplicarDano`) tira una sola fórmula de daño y se la
-  aplica a todos los que sigan adentro al cerrar, mismo patrón que `trampaAplicarDano` (automático para creeps del
-  GM, "aplicalo a mano" para personajes de otros jugadores — mismos límites de permisos de Firestore). Con "Ignora la
-  Defensa" tildado (por defecto, Paso 1), resta la **Armadura mágica** de cada uno en vez de nada (mismo parámetro
-  `restaIgnorando` del Paso 7a, ver la entrada de arriba). Cerrar la herramienta borra todo el estado (ephemeral,
-  no hay "recordar la última área").
+- **🌀 Hechizos de área — cascada de duelos (Paso 7b de las reglas de casteo, 2026-09-27, reemplaza una primera versión
+  del mismo día con una herramienta aparte del GM, retirada a pedido del dueño)**: un hechizo de área NO tiene su propia
+  ventana — usa el **mismo cuadro de duelo paso a paso** de `comun/duelo.js` (Paso 6), encadenado, un sub-duelo por
+  objetivo, visible a toda la mesa y minimizable como cualquier duelo. `comun/asistente-duelo-hab.js` suma el objetivo
+  **"A un área"** con un **radio**; al ejecutar la habilidad, `dueloElegirObjetivoMapa` detecta
+  `ataque.hab.objetivo === 'area'` y deriva a `dueloElegirAreaMapa(msg)`, que pide el **centro** (`elegirDestino`, como
+  el destino de un teleport) y arma los objetivos (rivales adentro del radio, sin el propio casteador ni ocultos —
+  mismo criterio que `trampaDispara`; sin "fuego amigo" todavía, simplificación consciente).
+  - **Documento nuevo** `campanas/<id>/areas/<id>` (`coleccionAreas()`, NO anidado por mapa, como `duelos`):
+    `{casteador, hab, centro, radio, objetivos:[tokenId,…], duelos:[dueloId|null,…], indice, estado, creadoPor, creado}`.
+    `escucharAreas()` (todos) escucha las `en-curso` para dibujar el **círculo compartido** (`dibujarAuraHex`, violeta,
+    visible a cualquiera, no solo al GM) y, si `soyGM`, es **autocurativo**: cada snapshot revisa si al índice actual
+    le falta su sub-duelo y lo crea (`areaCrearSiguienteSubDuelo`) — cubre tanto el primer objetivo como cualquier
+    corte a mitad de camino, sin necesitar transacciones de "reserva" (riesgo chico y aceptado de duplicar si dos
+    pestañas del GM coinciden exactamente).
+  - **`comun/duelo.js`**: cada sub-duelo lleva `d.grupo = {id, indice, total}` (limpiado por `limpiarGrupo`, ahora
+    campo escribible de `duelos` en las reglas). `cerrarPar` desvía a una **fase nueva, `dodge`**, en vez de terminar
+    en "SE RESISTIÓ", cuando el defensor gana el contacto Y el duelo tiene `grupo`: el cuadro (`dodgeHtml`) muestra
+    "🏃 ¡GANÓ LA EVASIÓN!" con un botón que llama al hook `chequearDodge` (solo el mapa lo define — `dueloChequearDodge`,
+    por `distanciaHex` contra `areasActivas`) y, si no hay mapa, botones "a mano" para el GM o el propio defensor;
+    `resolverDodge(id, logroSalir)` decide el fin (esquivó = "fallo" sin efecto; no esquivó = "pego", sigue a daño/
+    efectos igual que si hubiera perdido el contacto — 4e, no hay término medio). El movimiento en sí no necesitó
+    código nuevo: ya cuesta No2 con el arrastre normal del token; el HUD dibuja un anillo de 2 casilleros de
+    referencia sobre el defensor mientras dura la fase (`dueloParesActivos` ahora manda también `fase`, y el pulso ya
+    existente lo usa). Un hook nuevo más, `grupoResuelto` (solo GM), avisa cuando un sub-duelo con `grupo` se resuelve
+    — `dueloGrupoResuelto` avanza `indice` o cierra el área (`estado:'terminado'`).
+  - **Bug real corregido de paso**: `Duelo.crear` ponía siempre `atacante.uid = yo()` (la sesión que llama) — para el
+    1er objetivo eso es correcto (lo crea el propio casteador, vía su iframe → su mapa), pero del 2do en adelante lo
+    crea el mapa del **GM** (`areaCrearSiguienteSubDuelo`), así que sin arreglo el GM terminaba "siendo" el casteador
+    para efectos de permisos (`esMio`). Ahora `cfg.yo.uid` (si se pasa) manda sobre `yo()`; el orquestador del área lo
+    pasa (`a.casteador.uid`, capturado una sola vez al lanzar el hechizo).
+  - **Reglas nuevas: hay que pegarlas** — `grupo` sumado a `duelos`, y la colección `areas` completa.
+  - **Simplificaciones conscientes**: sin verificación de alcance al marcar el centro (no bloquea, tampoco resalta
+    nada); el orquestador de la cascada corre solo en la pantalla del GM (necesita al GM conectado para avanzar).
 
 - **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
   queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está

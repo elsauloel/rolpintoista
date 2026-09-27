@@ -337,11 +337,28 @@ service cloud.firestore {
       match /duelos/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'rerollUsado', 'creadoPor', 'creado'])
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'grupo', 'rerollUsado', 'creadoPor', 'creado'])
           && request.resource.data.creadoPor == request.auth.uid
           && request.resource.data.creado == request.time;
         allow update: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'rerollUsado', 'creadoPor', 'creado'])
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'grupo', 'rerollUsado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
+      // Hechizos de área (Paso 4/7 del casteo, comun/duelo.js + vtt-hexgrid/mapa.html): un documento por casteo que ata la
+      // cascada de sub-duelos (uno por objetivo dentro del área, cada uno un documento normal de `duelos`). Dibuja el
+      // círculo compartido en el mapa y dice a quién le toca. Mismo criterio relajado que `duelos`: cualquier miembro
+      // lo lee y lo actualiza (para avanzar la cascada); solo su autor o el GM lo borra.
+      match /areas/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['casteador', 'hab', 'centro', 'radio', 'objetivos', 'duelos', 'indice', 'estado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['casteador', 'hab', 'centro', 'radio', 'objetivos', 'duelos', 'indice', 'estado', 'creadoPor', 'creado'])
           && request.resource.data.creadoPor == resource.data.creadoPor
           && request.resource.data.creado == resource.data.creado;
         allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));

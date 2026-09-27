@@ -81,7 +81,32 @@ Todo lo que se pueda deducir de lo que la habilidad ya guarda (`tiradaStat`, `es
 - `comun/asistente-duelo-hab.js`: el botón **🎯** de cada habilidad (ficha y creeps de GM Tools) abre la ventanita para configurar el duelo: a quién apunta, qué tira quien la usa, con qué se resiste el objetivo (uno o varios, elige a ciegas), daño y tipo, y efectos. Guarda `habilidad.duelo`; ejecutar esa habilidad abre el duelo (con «Sin objetivo · tirada suelta» como salida).
 - Ficha (personaje e invocaciones) y creeps: tiran sus stats con los hooks `habTirar` y `habValor`. Mapa: objetivo «uno mismo» sin elegir, cura del duelo, opciones de defensa de creeps sin cargar las Acciones.
 - **Hay que volver a pegar `firebase/firestore.rules`** (campo nuevo `hab` en los duelos).
-- **Pendiente:** áreas (varios objetivos), ataque con habilidad de arma (Golpe brutal, Carga, Takle…), reacciones Flash, «esquivar áreas», y que las skills de clase y de creeps ya cargadas (Chispazo, Rayo Mágico…) traigan su `duelo` configurado (hoy se configura a mano con 🎯).
+- **Pendiente:** que las skills de clase y de creeps ya cargadas (Chispazo, Rayo Mágico…) traigan su `duelo` configurado (hoy se configura a mano con 🎯).
+
+## 11. Áreas (G) y «esquivar áreas» — HECHO (2026-09-27)
+La cascada real, no una herramienta aparte: el 🎯 de una habilidad suma un cuarto **objetivo: "A un área"** con un **radio**. Al
+ejecutarla, el mapa pide marcar el **centro** (clic en el mapa, como el destino de un teleport) y arma la lista de objetivos
+(rivales adentro del radio, sin el propio casteador ni tokens ocultos). Después **encadena el MISMO duelo de siempre, uno por
+objetivo**: se abre para todos, el objetivo tira su Evasión contra la tirada del casteador y, si el objetivo la **gana**, entra
+una fase nueva, **`dodge`**: tiene derecho a un dodge roll (arrastrar el token hasta 2 casilleros — ya cuesta No2 solo, no hizo
+falta programar el movimiento) y un botón que revisa si logró salir; si no salió, sigue como si hubiera perdido (efecto
+completo — no hay término medio, Paso 4e). Resuelto ese objetivo (cualquiera sea el resultado), se abre automáticamente el
+siguiente, hasta terminar la lista.
+- **Documento nuevo** `campanas/<id>/areas/<id>` (no anidado por mapa, como `duelos`): ata el casteador, la habilidad, el
+  centro/radio, la lista de objetivos y qué sub-duelo le toca a cada uno (`indice`); el mapa dibuja el **círculo compartido**
+  (violeta) a partir de esto mientras dura la cascada, visible a todos, no solo al GM.
+- **`comun/duelo.js`**: `d.grupo = {id, indice, total}` en cada sub-duelo ata el duelo a su cascada; `cerrarPar` desvía a la fase
+  `dodge` en vez de terminar en "SE RESISTIÓ" cuando hay grupo; `resolverDodge(id, logroSalir)` decide el fin. Dos hooks nuevos
+  de `escuchar(cfg)`: `chequearDodge(d)` (el mapa calcula si el defensor sigue adentro, por distancia hexagonal) y
+  `grupoResuelto(d)` (el GM avanza la cascada al resolverse un sub-duelo). Se corrigió además un bug real: `atacante.uid`
+  usaba siempre la sesión que llama a `crear()` — para la cascada, quien crea el 2do objetivo en adelante es el mapa del GM,
+  no el casteador; ahora `cfg.yo.uid` (si se pasa) manda sobre eso, así el casteador sigue siendo quien tira su propia PdG.Esp
+  en cada objetivo, no el GM.
+- **La herramienta GM-only "🌀 Esquivar área"** armada como paso intermedio (Paso 7, primera versión) quedó **reemplazada y
+  retirada**: no tenía el paso a paso visible a la mesa que pedía el dueño, solo un panel privado del GM.
+- **Simplificación consciente:** sin "fuego amigo" para hechizos de área todavía (siempre solo rivales, mismo criterio que
+  `trampaDispara`); sin verificación de alcance al marcar el centro (no bloquea, pero tampoco resalta nada); el orquestador de
+  la cascada (quién crea cada sub-duelo siguiente) corre solo en la pantalla del GM, así que necesita al GM conectado.
 
 ## 8. Alcance: los objetivos «laten» (2026-09-27, pedido del dueño)
 El alcance **no restringe**: al elegir el objetivo en el mapa, **los tokens que están a tu alcance laten con un brillo dorado** (el resto sigue elegible). Cuerpo a cuerpo = **1 casillero + el Alcance del arma** (su bono `rng`); arma de rango = su **Rango**; hechizos = su **Rango de casteo**; una habilidad puede fijarlo en su 🎯 (Rango de casteo, Rango, cuerpo a cuerpo, un número o sin límite; «Automático» = los hechizos usan el Rango de casteo). Lo calcula la página de quien actúa (`alcanceDeArma`, `alcanceDeHab`, `alcanceDeCreep`), viaja en `ataque.alcance` con el pedido de elegir objetivo (no se guarda en el duelo) y el mapa lo dibuja (`dueloResaltarObjetivos`, `objetivosResaltados`). Sin alcance (0) no se resalta nada. Los tokens ocultos no brillan para los jugadores.

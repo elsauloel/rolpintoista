@@ -443,4 +443,9 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   `resumen.armadmg` para que el mapa lo lea. Se da como bono de ítem desde el asistente compartido (paso "Bonos"), no
   tiene un campo propio como el `def` de una pieza de armadura.
 
+- **Hechizos de área** (Paso 7b del casteo, 2026-09-27): `habDueloDe(it)` suma `radio: num(c.radio)` cuando el 🎯 de la
+  habilidad tiene objetivo `'area'` (nuevo en `comun/asistente-duelo-hab.js`); el resto (marcar el centro, la cascada,
+  la fase de dodge) vive en `comun/duelo.js` y `vtt-hexgrid/mapa.html` — ver `../comun/CLAUDE.md` y `../vtt-hexgrid/CLAUDE.md`.
+  Ejecutar una habilidad de área **fuera del mapa** (ficha suelta, sin iframe) no funciona — avisa que hay que abrir el mapa.
+
 - **Vender ítems solo en las tiendas (regla del dueño, 2026-09-26):** la única forma de vender un ítem, del cinturón o despojos es el botón **💰 Vender** de la tienda abierta (`abrirVender`, exige `tiendaCargada`). No debe haber un botón de vender en la mochila, en la ventana del ítem ni en ningún otro lado. (Revisado el 2026-09-26: no queda ningún otro camino; el «Precio de venta» del editor de ítems es solo un dato.)

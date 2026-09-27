@@ -13,7 +13,7 @@
 - [x] Paso 5 (2026-09-27): nombre del daño genérico → **"arcano"** (ya usado en el catálogo); "Mg"→"Esp" ya hecho; "Hechizo" se mantiene.
 - [x] Paso 6 (2026-09-27, casi todo ya estaba hecho por el sistema de duelo de habilidades): tipo de daño en el 🎯 de cada habilidad (Arcano/Fuego/Hielo/Rayo/Físico) + tilde independiente "Ignora la Defensa" (corregido hoy, antes lo ataba siempre al tipo); el mapa ya no resta Defensa cuando corresponde; las trampas ya tenían su propio tilde independiente; la Mesa ya dice el tipo. Falta solo: mostrarlo también en la lupa 🔍 (menor).
 - [x] Paso 7a (2026-09-27): código de **Armadura mágica** — stat `armadmg` en ficha y creeps (igual que Defensa, sin fórmula de atributo), se puede dar como bono de ítem desde el asistente compartido, y el mapa la resta (en vez de nada) **solo** en el daño de casteo real que ignora la Defensa (`dueloAplicarDano`) — crítico real, trampas, fuego y Rayo en cadena siguen ignorando la Defensa entera, sin cambios.
-- [x] Paso 7b (2026-09-27): herramienta **🌀 Esquivar área** en el mapa (solo GM, ayuda de mesa, no toca Firestore) — marca el centro/radio, muestra en vivo quién sigue adentro, ofrece el dodge roll (anillo de 2 casilleros; el movimiento en sí ya cuesta No2 con el arrastre normal) y aplica el daño final a los que quedaron adentro (resta la Armadura mágica cuando ignora la Defensa). Deliberadamente aparte de `comun/duelo.js` (ese sistema deja las áreas para una etapa posterior, ver `docs/duelo-de-habilidades.md`).
+- [x] Paso 7b (2026-09-27, versión final — reemplaza una primera versión con herramienta aparte del GM, retirada el mismo día a pedido del dueño): el hechizo de área usa el **mismo cuadro de duelo paso a paso** que uno 1 contra 1, encadenado — un sub-duelo por objetivo, visible a toda la mesa y minimizable, con una fase nueva `dodge` (ganar la Evasión da derecho a un dodge roll de hasta 2 casilleros; si no logra salir, efecto completo igual). Documento nuevo `campanas/<id>/areas/<id>` dibuja el círculo compartido. Ver `docs/duelo-de-habilidades.md` §11. **Reglas nuevas: hay que pegarlas** (`grupo` en `duelos`, colección `areas` completa).
 - [ ] Paso 8: auditoría de contenido por tandas — skills de clase (13 de 62, una ya toca casteo: Chispazo, sin auditar) → habilidades de creeps → creeps base → armas naturales → trampas base → catálogo (~60 ítems) → pasivas y estados → manual.
 
 ## 2. Probar con la mesa abierta (nada de esto se probó con sesión iniciada y varios jugadores)
@@ -25,6 +25,7 @@
 - [ ] **Protección de jefe** (inmune a Stun, +1 Res.Esp).
 - [ ] Botón **🗺 Mapas** del GM (se arregló una posible falla de caché: confirmar que abre; si no, mandar el error de la consola).
 - [ ] Al borrar un creep, la pregunta de borrar sus tokens en todos los mapas.
+- [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.
 
 ## 3. Documentación
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.

@@ -59,6 +59,7 @@ const Duelo = (() => {
   let opciones = {};         // id → opciones de defensa del defensor (las pide al iframe o a los hooks)
   let opcionesPedidas = new Set();
   let aplicando = new Set();
+  let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
 
   const hooks = () => (typeof window !== 'undefined' && window.DUELO_HOOKS) || null;
@@ -264,6 +265,9 @@ const Duelo = (() => {
       window.parent.postMessage({tipo: 'duelo-elegir-objetivo', yo: cfg.yo, ataque: cfg.ataque, conSuelto: !!cfg.suelto}, location.origin);
       return;
     }
+    // Un hechizo de área (Paso 4/7 del casteo) necesita la geometría del mapa (marcar el centro, calcular quién
+    // queda adentro): sin el mapa abierto no hay forma de resolverlo — ni siquiera la lista de "a quién apunta".
+    if(cfg.ataque && cfg.ataque.hab && cfg.ataque.hab.objetivo === 'area'){ _toast('Los hechizos de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
     elegirObjetivoLista(cfg);
   }
 
@@ -317,7 +321,7 @@ const Duelo = (() => {
     const hab = limpiarHab(cfg.ataque.hab);
     const inicial = {
       estado: 'esperando', fase: 'contacto',
-      atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
+      atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: 0, rango: true}
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
@@ -332,6 +336,7 @@ const Duelo = (() => {
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
     }
+    if(cfg.grupo) inicial.grupo = limpiarGrupo(cfg.grupo);   // hechizo de área (Paso 4/7): ata este sub-duelo a la cascada (docs/reglas-casteo.md §1.3)
     const ref = await col().add(inicial);
     autoAbiertos.add(ref.id);
     if(!enIframe()) abrir(ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
@@ -376,6 +381,12 @@ const Duelo = (() => {
       detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
     })).filter(e => e.nombre);
   }
+  // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
+  // — solo lo que hace falta para dibujar/anunciar acá (el resto vive en el doc de `areas`). `indice`/`total` son 1-based.
+  function limpiarGrupo(g){
+    if(!g || !g.id) return null;
+    return {id: txtCorto(g.id, 40), indice: Math.max(1, Math.round(_num(g.indice)) || 1), total: Math.max(1, Math.round(_num(g.total)) || 1)};
+  }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;
     const t = h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
@@ -383,7 +394,7 @@ const Duelo = (() => {
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && String(h.dano.formula || '').trim() ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false} : null;
     const efectos = limpiarEfectos(h.efectos);
-    const objetivo = ['enemigo', 'aliado', 'uno mismo'].includes(h.objetivo) ? h.objetivo : 'enemigo';
+    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length)};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
@@ -431,6 +442,9 @@ const Duelo = (() => {
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
       if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarHab(m); }
+      else if(m.grupo){   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll
+        m.fase = 'dodge'; m.estado = 'esperando';
+      }
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
       return;
     }
@@ -555,6 +569,27 @@ const Duelo = (() => {
     });
     // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
     if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){ return null; } })); }
+    anunciarMesa(anuncio);
+  }
+
+  // Resuelve el dodge roll de un hechizo de área (Paso 4/7 del casteo): `logroSalir` lo decide quien lo pide
+  // (el mapa lo calcula solo comparando la posición actual del token con el centro/radio del grupo; sin mapa,
+  // el GM lo puede marcar a mano — "ayuda, no bloquea"). Si logró salir, el duelo termina sin efecto ("SE
+  // RESISTIÓ"); si sigue adentro (perdió la Evasión, no se movió, no le alcanzó, Inmovilizado…), NO hay
+  // término medio (regla 4e): sigue como si hubiera perdido el contacto, con el efecto completo.
+  async function resolverDodge(id, logroSalir){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'dodge') return;
+      if(logroSalir){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; anuncio = `🏃 ${m.defensor.nombre} logró salir del área de ${m.hab.nombre}: esquivó`; }
+      else{ m.resultado = 'pego'; entrarHab(m); anuncio = `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
+      tx.update(ref, cambiosDe(m));
+    });
     anunciarMesa(anuncio);
   }
 
@@ -1194,6 +1229,21 @@ const Duelo = (() => {
   }
 
   // Paso 4 · Crítico: la cuenta, los d20 y (si sale) la celebración.
+  // Fase 'dodge' (Paso 4/7 del casteo, hechizo de área): el defensor ganó la Evasión y tiene el derecho a moverse
+  // hasta 2 casilleros para intentar salir del área. El movimiento en sí no pasa por acá (ya cuesta No2 arrastrando
+  // el token, como siempre): esto solo espera a que alguien diga "ya elegí" y revisa si logró salir.
+  function dodgeHtml(d, nuevo){
+    const puedeMapa = !!(cfgEscuchar && cfgEscuchar.chequearDodge);
+    const puedeAMano = esMio(d.defensor) || soyGM();
+    return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
+      <div class="grande">🏃 ¡GANÓ LA EVASIÓN!</div>
+      <div class="chico">${_esc(d.defensor.nombre)} tiene derecho a un <b>dodge roll</b>: hasta 2 casilleros, arrastrando el token en el mapa (ya cuesta No2 solo, con Rengo/Inmovilizado de siempre). Si logra salir del área, no recibe nada; si sigue adentro por cualquier motivo, recibe el efecto completo — no hay término medio.</div>
+      ${puedeMapa ? '<div class="duelo-contra" style="text-align:center;margin-top:10px"><button type="button" data-dodge-resolver>▶ Ya se movió (o decidió no hacerlo): revisar</button></div>' : ''}
+      ${puedeAMano ? `<div class="duelo-nota" style="margin:8px 0 4px">${puedeMapa ? 'O a mano, si ya sabés el resultado:' : 'Se revisa mejor desde el mapa. A mano:'}</div>
+        <div class="duelo-pie" style="justify-content:center"><button type="button" class="sec" data-dodge-manual="1">✔ Logró esquivar</button><button type="button" class="sec" data-dodge-manual="0">✘ Sigue adentro</button></div>` : ''}
+      ${!puedeMapa && !puedeAMano ? '<div class="duelo-nota viva">esperando que se resuelva el dodge roll…</div>' : ''}
+    </div>`;
+  }
   function criticoHtml(d){
     const c = d.crit;
     const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
@@ -1295,6 +1345,7 @@ const Duelo = (() => {
           <div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
           ${miniHtml(d, 'bloqueo')}
         </div>` : ''}
+        ${d.fase === 'dodge' ? dodgeHtml(d, nuevaClave('dodge')) : ''}
         ${d.crit ? criticoHtml(d) : ''}
         ${(d.fase === 'dano' || d.dano) ? danoHtml(d) : ''}
         ${efectosHtml(d)}
@@ -1330,6 +1381,17 @@ const Duelo = (() => {
     f.querySelector('[data-x2]').onclick = cerrar;
     const bc = f.querySelector('[data-cancelarduelo]');
     if(bc) bc.onclick = () => col().doc(d.id).update({estado: 'cancelado'}).catch(err => console.error(err));
+    const bDodgeResolver = f.querySelector('[data-dodge-resolver]');
+    if(bDodgeResolver) bDodgeResolver.onclick = () => {
+      bDodgeResolver.disabled = true;
+      let adentro = true;
+      try{ adentro = !!cfgEscuchar.chequearDodge(d); }catch(err){ console.error('Duelo: chequearDodge', err); }
+      resolverDodge(d.id, !adentro).catch(err => { console.error(err); _toast('No se pudo resolver el dodge roll'); bDodgeResolver.disabled = false; });
+    };
+    f.querySelectorAll('[data-dodge-manual]').forEach(b => b.onclick = () => {
+      f.querySelectorAll('[data-dodge-manual]').forEach(x => x.disabled = true);
+      resolverDodge(d.id, b.dataset.dodgeManual === '1').catch(err => { console.error(err); _toast('No se pudo resolver el dodge roll'); });
+    });
     f.querySelectorAll('[data-par]').forEach(b => b.onclick = () => {
       const [q, e] = b.dataset.par.split(':');
       f.querySelectorAll('[data-par]').forEach(x => x.disabled = true);
@@ -1559,6 +1621,7 @@ const Duelo = (() => {
       const txt = d.estado === 'resuelto'
         ? `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
         : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
+        : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
         : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);
@@ -1579,7 +1642,7 @@ const Duelo = (() => {
     if(typeof dueloParesActivos === 'function'){
       dueloParesActivos([...mostrar.values()]
         .filter(d => d.estado !== 'resuelto')
-        .map(d => ({id: d.id, atacanteTokenId: d.atacante && d.atacante.tokenId, defensorTokenId: d.defensor && d.defensor.tokenId})));
+        .map(d => ({id: d.id, atacanteTokenId: d.atacante && d.atacante.tokenId, defensorTokenId: d.defensor && d.defensor.tokenId, fase: d.fase})));
     }
   }
 
@@ -1603,6 +1666,15 @@ const Duelo = (() => {
       });
       dibujarChips();
       listaDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa
+      // Hechizo de área (Paso 4/7 del casteo): un sub-duelo con `grupo` que se resolvió — el mapa (GM) avanza la cascada
+      // al siguiente objetivo o cierra el grupo si era el último.
+      if(cfgEscuchar.grupoResuelto && soyGM()){
+        listaDuelos.forEach(d => {
+          if(!d.grupo || d.estado !== 'resuelto' || grupoAvisado.has(d.id)) return;
+          grupoAvisado.add(d.id);
+          try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
+        });
+      }
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
       if(cfgEscuchar.aplicar && soyGM()){
         listaDuelos.forEach(d => {
@@ -1649,5 +1721,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
+  return {reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
 })();

@@ -157,24 +157,28 @@ independiente ya está — solo falta la lupa (menor, no bloquea el Paso 7).
   crítico/trampas/fuego, es una pregunta nueva, no una corrección de esto).
 - La Mesa muestra la Armadura mágica restada en vez de "Defensa 0" cuando el daño de casteo la resta.
 
-**Hecho (2026-09-27) — Esquivar área:** herramienta nueva del GM en el mapa, **🌀 Esquivar área** (junto a Niebla en la caja
-de herramientas), pensada como ayuda de mesa y **no** integrada al sistema de "Duelo de habilidades dirigidas"
-(`comun/duelo.js`) — ese archivo está pensado para 1 contra 1 y su propio diseño (`docs/duelo-de-habilidades.md` §2, caso G)
-deja "Áreas" para una etapa posterior con varios objetivos a la vez, así que meterle el área acá hubiera chocado con ese
-trabajo en curso. La herramienta es **puramente local a la pantalla del GM** (no escribe nada en Firestore, no hace falta
-publicar reglas nuevas):
-- El **primer contraste** (4a: PdG.Esp/PdG contra la Evasión de cada uno) sigue siendo a mano, "como un proyectil normal" —
-  no hay nada nuevo que automatizarlo, ya se resuelve con las tiradas de siempre.
-- La herramienta ayuda con lo que sí faltaba: marcar el **centro y el radio** del área (clic en el mapa, `elegirDestino`),
-  ver en vivo **quién sigue adentro** (`areaEfectoAdentro`, por distancia hexagonal — se recalcula solo si alguien se mueve),
-  marcar a quién se le **ofrece el dodge roll** al ganar la Evasión (`areaEfectoOfrecidos`, dibuja un anillo de 2 casilleros
-  como referencia — el movimiento en sí ya cuesta No2 con el arrastre normal del token, no hizo falta programar nada nuevo
-  ahí) y **aplicar el daño** de una sola tirada a todos los que sigan adentro al cerrar (`areaEfectoAplicarDano`, mismo
-  patrón que las trampas de área: automático para creeps del GM, "aplicalo a mano" para personajes de otros jugadores, por
-  los mismos permisos de Firestore). Respeta 4e (sin término medio: si seguís adentro, te pega la tirada entera) y 4f (no
-  hay ningún camino para "esquivar" una trampa con esto — es una herramienta distinta).
-- Con "Ignora la Defensa" tildado (por defecto, según el Paso 1), resta la **Armadura mágica** de cada uno en vez de nada
-  (mismo `restaIgnorando` del Paso 7a) — así el hechizo de área también respeta la Armadura mágica cuando corresponde.
+**Hecho (2026-09-27) — Esquivar área, versión final:** el dueño pidió explícitamente que el hechizo de área tenga **el mismo
+espíritu paso a paso que el duelo de siempre** — visible a toda la mesa, con instancias reales (no una línea de log), que se
+pueda minimizar, y que cada involucrado tenga su propio momento. Eso descartó la primera versión de este mismo Paso 7 (una
+herramienta aparte, solo del GM, sin nada de eso) — **se retiró del todo** y se reemplazó por esto:
+- El 🎯 de una habilidad suma un objetivo **"A un área"** con **radio** (`comun/asistente-duelo-hab.js`). Ejecutarla pide marcar
+  el **centro** en el mapa (`elegirDestino`, como el destino de un teleport) y arma la lista de objetivos (rivales adentro del
+  radio, sin el propio casteador ni ocultos).
+- **Cascada de sub-duelos**: por cada objetivo se abre, para todos, el **mismo cuadro de duelo de siempre** (Paso 6) — PdG.Esp/
+  PdG del casteador contra la Evasión del objetivo. Si el objetivo **gana**, en vez de terminar entra una **fase nueva,
+  `dodge`**: tiene el derecho a un dodge roll (arrastrar el token hasta 2 casilleros — el movimiento en sí no necesitó código
+  nuevo, ya cuesta No2 con el arrastre normal) y un botón que revisa si logró salir del área; si no, sigue como si hubiera
+  perdido, con el efecto completo (4e: no hay término medio). Resuelto, se abre automáticamente el sub-duelo del siguiente
+  objetivo, hasta terminar la cascada. 4f (las trampas no se esquivan así) no cambia: esto es solo para hechizos.
+- Documento nuevo `campanas/<id>/areas/<id>` ata el grupo (casteador, habilidad, centro/radio, objetivos, a quién le toca);
+  el mapa dibuja el **círculo compartido** a partir de él, visible para todos mientras dura. `comun/duelo.js` suma `d.grupo`
+  a cada sub-duelo y dos hooks de `escuchar(cfg)`: `chequearDodge` (el mapa calcula si el defensor sigue adentro) y
+  `grupoResuelto` (el GM avanza la cascada). El daño ya lo cubre el mecanismo de siempre de un sub-duelo (Paso 6/7a): con
+  "ignora la Defensa", resta la Armadura mágica en vez de nada.
+- Se corrigió de paso un bug real que esto sacó a la luz: `Duelo.crear` ponía siempre `atacante.uid` = la sesión que la llama;
+  para la cascada, del 2do objetivo en adelante es el mapa del GM el que la llama, no el casteador — sin el arreglo, el GM
+  terminaba "tirando" la PdG.Esp del casteador en su lugar. Ahora `cfg.yo.uid` (si se pasa) manda.
+- Reglas nuevas: `grupo` sumado a `duelos`, y la colección `areas` completa — **hay que pegarlas**.
 
 ## Paso 8 — Auditoría de contenido, por tandas ⬜
 **Depende de:** 1, 2 y 6. Una tanda a la vez, revisando skill por skill (nada masivo):

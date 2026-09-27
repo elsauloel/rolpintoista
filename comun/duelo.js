@@ -859,7 +859,7 @@ const Duelo = (() => {
     let caja;
     if(d.resultado === 'pego' && d.crit && d.crit.critico){
       const porParry = d.defensa && d.defensa.modo === 'parry';
-      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">¡CRÍTICO!</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
+      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">${TITULO_CRIT[d.crit.mult] || TITULO_CRIT[1]}</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
     }else if(d.resultado === 'pego'){
       const porParry = d.defensa && d.defensa.modo === 'parry';
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
@@ -879,6 +879,7 @@ const Duelo = (() => {
   }
 
   const NOMBRE_MULT = {1: 'SIN MULTIPLICADOR', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+  const TITULO_CRIT = {1: '¡ES CRÍTICO!', 2: '¡ES DOBLE CRÍTICO!', 3: '¡ES TRIPLE CRÍTICO!', 4: '¡ES CUÁDRUPLE CRÍTICO!'};   // el título dice el multiplicador que salió
 
   // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
   function efectosHtml(d){
@@ -987,7 +988,7 @@ const Duelo = (() => {
       const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
       const iMejor = c.d20.indexOf(c.mejor);
       const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${i === iMejor ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
-      cuerpo = titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
+      cuerpo = titulo('si', `💥 ${TITULO_CRIT[c.mult] || TITULO_CRIT[1]} ×${_fmt(c.mult)}`)
         + fichas
         + explica([`d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
         + tablaCriticoHtml(c, d, c.mejor);

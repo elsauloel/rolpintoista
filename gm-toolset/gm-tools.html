@@ -5117,6 +5117,12 @@ function datosLimpiosDelBorrador(sc){
   return d;
 }
 $('#view-editar').onclick = () => {
+  if(verCreepMesaId && !verCreepBib){   // creep de la mesa: se abre su ficha completa (editable)
+    const id = verCreepMesaId;
+    $('#scrim-view').classList.remove('open');
+    abrirEditarCreep(id);
+    return;
+  }
   const sc = borradorCreep();
   if(!sc) return;
   const bib = document.getElementById('scrim-biblioteca');
@@ -5158,6 +5164,7 @@ function editarHabDeCreepBib(scId, habId){
     verCreepDatos(sc, true);
   }});
 }
+let verCreepMesaId = null;   // el creep de la mesa que se está viendo (para el botón ✎ Editar)
 function verCreepDatos(sc, completo){
   // Recuadro con título chico y valor destacado; tip = texto al pasar el mouse.
   const caja = (label, valor, tip) => `<div class="vc-caja${tip ? ' con-tip' : ''}"${tip ? ` data-tip="${esc(tip)}"` : ''}>
@@ -5237,7 +5244,11 @@ function verCreepDatos(sc, completo){
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
   `;
   $('#scrim-view').classList.toggle('desde-biblioteca', !!completo);   // por encima de la ventana de la biblioteca
-  $('#view-pie').hidden = !completo;
+  // Un creep de la mesa (no una copia de la biblioteca): el pie trae solo «✎ Editar», que abre la ficha completa para modificar los stats a mano.
+  const enMesa = !completo && !sc._borrador;
+  verCreepMesaId = enMesa ? sc.id : null;
+  $('#view-pie').hidden = !(completo || enMesa);
+  ['view-biblioteca', 'view-agregar'].forEach(id => { const b = $('#' + id); if(b) b.style.display = enMesa ? 'none' : ''; });
   $('#view-biblioteca').disabled = !(completo && verCreepBib && verCreepBib.editado);
   $('#scrim-view').classList.add('open');
 }
@@ -8437,7 +8448,7 @@ function accionesModoAbrir(creepId){
 if(MODO_ACCIONES){
   // B (la tecla que abre las Acciones desde el mapa) también las cierra, con el foco adentro de esta ventana: se hace como Escape.
   document.addEventListener('keydown', e => {
-    if(e.key !== 'b' && e.key !== 'B') return;
+    if(e.key !== 'b' && e.key !== 'B' && e.key !== 'f' && e.key !== 'F') return;   // B o F también las cierran
     if(e.ctrlKey || e.altKey || e.metaKey || e.isTrusted === false) return;
     if(e.target && e.target.closest && e.target.closest('input,select,textarea,[contenteditable]')) return;
     e.preventDefault();

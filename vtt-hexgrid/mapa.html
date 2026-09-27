@@ -4949,7 +4949,7 @@ document.addEventListener('keydown', e => {
   // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
   if(!$('#botonera-capa').hidden){
     // Escape, o B (la tecla que la abre), la cierra.
-    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
+    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B' || e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
   if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoCancelar(); return; }
@@ -5030,11 +5030,23 @@ document.addEventListener('keydown', e => {
     else centrarEnMios();
     return;
   }
-  // F: prende o apaga Terreno y Formas.
-  if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
+  // G (antes F, 2026-09-26: la F ahora abre la ficha): prende o apaga Terreno y Formas.
+  if((e.key === 'g' || e.key === 'G') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();
     if(herramientaActiva === 'elemento') desactivarHerramienta();
     else{ if(borradorElemento) consolidarBorradorElemento(); herramientaActiva = 'elemento'; renderToolkit(); }
+    return;
+  }
+  // F (2026-09-26, pedido del dueño): abre el menú de la FICHA del token seleccionado (jugador: su personaje, o el principal si no hay selección; GM: la ficha del creep). Se cierra con F o con Esc.
+  if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
+    e.preventDefault();
+    const tf = seleccion ? tokens.get(seleccion) : null;
+    if(tf){
+      if(tf.tipo === 'creep'){ if(soyGM && tf.fichaId && creepsPub.has(tf.fichaId)) abrirFichaDeToken(tf); else toast('Ese token no está vinculado a un creep de GM Tools'); }
+      else if(!soyGM && tf.fichaId && tf.duenoUid === fbUsuario.uid) abrirBotonera(String(tf.fichaId).split(SEP_INVOCACION)[0], {tipo: 'abrir-ficha-mapa'});
+      else toast(soyGM ? 'Seleccioná un creep para ver su ficha' : 'Esa ficha no es tuya');
+    }else if(soyGM) toast('Seleccioná un creep para ver su ficha');
+    else{ const fid = fichaPrincipalId(); if(fid) abrirBotonera(fid, {tipo: 'abrir-ficha-mapa'}); else toast('No tenés un personaje para abrir'); }
     return;
   }
   // B (2026-09-24, pedido del dueño): abre la Botonera del TOKEN SELECCIONADO (jugador: su personaje o una invocación suya; GM: las
@@ -6793,6 +6805,7 @@ function escucharVinculables(){
       mapa.set(ch.doc.id, o);
     });
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
+    try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
     revisarAutoLentes();   // entrar en sigilo prende el modo lentes solo (no muestra todo de una)
@@ -8484,6 +8497,8 @@ function abrirFichaDeToken(t){
   }
   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   if(!fichaId) return;
+  // Un personaje MÍO abre su ficha liviana encima del mapa (menú de botones); la de otro jugador, o si soy GM, en otra pestaña como antes.
+  if(t.duenoUid === (fbUsuario && fbUsuario.uid) && !soyGM){ abrirBotonera(fichaId, {tipo: 'abrir-ficha-mapa'}); return; }
   const url = '../ficha-personaje/ficha.html?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaId);
   window.open(url, '_blank', 'noopener');
 }
@@ -9037,6 +9052,32 @@ async function dueloVincularSiFalta(t){
   return {...t, fichaId: elegido[0]};
 }
 
+/* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------
+   Cuando el personaje de este jugador queda inconsciente (HP 0), el mapa se tiñe de rojo, PERO con poco color y sin bloquear los clics (para poder seguir mirando y usando el
+   entorno), muestra los turnos que le quedan y un botón «Revivir» (abre el diálogo de revivir de la ficha). Lo publica la ficha en su resumen (`muerto`). */
+function actualizarMuerteMapa(){
+  let el = document.getElementById('muerte-mapa');
+  const fid = (!soyGM && fbUsuario) ? fichaPrincipalId() : '';
+  const f = fid ? fichasPub.get(fid) : null;
+  const r = f && f.resumen, m = r && r.muerto;
+  const muerto = !!(m && m.activo && num(r.hp) <= 0);
+  if(!muerto){ if(el) el.hidden = true; return; }
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'muerte-mapa';
+    el.style.cssText = 'position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(ellipse at center,rgba(150,0,0,.10) 35%,rgba(150,0,0,.34) 100%);box-shadow:inset 0 0 120px rgba(190,0,0,.35)';
+    el.innerHTML = '<div id="muerte-mapa-txt" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);text-align:center;color:#FFB4B4;font-family:\'Space Mono\',monospace;text-shadow:0 0 10px #000;background:rgba(40,0,0,.55);padding:8px 16px;border-radius:8px"></div>' +
+      '<button type="button" id="muerte-mapa-revivir" class="btn" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#7A1E1E;border:1px solid #FF7E7E;color:#fff">✚ Revivir</button>';
+    document.body.appendChild(el);
+    el.querySelector('#muerte-mapa-revivir').onclick = () => abrirBotonera(fichaPrincipalId(), {tipo: 'abrir-revivir'});
+  }
+  el.hidden = false;
+  $('#muerte-mapa-txt').innerHTML = m.definitivo
+    ? '<b>TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATRÁS</b>'
+    : `<div style="font-size:11px;letter-spacing:.14em">INCONSCIENTE · turnos hasta morir</div><div style="font-size:34px;font-weight:700;line-height:1.1">${fmt(num(m.turnos))}</div>`;
+  $('#muerte-mapa-revivir').style.display = m.definitivo ? 'none' : '';
+}
+
 // Aplica el daño de un duelo al HP del defensor (solo corre en el mapa del GM, ver comun/duelo.js). Reutiliza «Recibe daño»: Invulnerable y Escudo mágico valen.
 // Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
 async function dueloAplicarDano(d){
@@ -9137,7 +9178,7 @@ function imagenElementoOpcionHtml(imagen){
 
 const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L'},
-  {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'F'},
+  {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'G'},
   {id: 'niebla', icono: '🌫', nombre: 'Niebla', detalle: 'Destapar o tapar zonas a mano, o reiniciar (GM)', lista: true, soloGM: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},

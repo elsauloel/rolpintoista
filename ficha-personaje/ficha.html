@@ -1554,6 +1554,17 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-ficha-mapa" style="z-index:45">
+  <div class="modal" style="max-width:460px">
+    <header><h3 id="fm-titulo">Mi ficha</h3><button class="iconbtn" id="fm-x">Cerrar</button></header>
+    <div class="body">
+      <div id="fm-resumen" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px"></div>
+      <div id="fm-botones" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+      <p class="hint" style="margin:10px 0 0">Cada botón abre su propia ventana; al cerrarla volvés a este menú.</p>
+    </div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-vender">
   <div class="modal" style="max-width:640px">
     <header><h3>💰 Vender a la tienda</h3><button class="iconbtn" id="vender-x">Cerrar</button></header>
@@ -7985,6 +7996,49 @@ function renderEquipo(){
     <div><h4 class="equipo-tit">Mochila</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
 }
+/* ---------- Ficha liviana dentro del mapa (2026-09-26, pedido del dueño) ----------
+   El 📜 del token propio abre este menú: un resumen chico (Nivel, Despojos, DDE y Defensa, cada uno con su descripción al pasar el mouse; la vida, el SP y los No2 ya se
+   ven en los circulitos del token) y un botón por módulo. Cada módulo se abre en su propia ventana encima del menú (las mismas ventanas de siempre); al cerrarla se vuelve
+   al menú. «Ver ficha completa» la abre en otra pestaña. */
+function fichaMapaAbrir(){
+  document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
+  modoBotoneraInv = '';
+  const c = compute();
+  const esp = (S.loot.especial || []).reduce((a, l) => a + num(l.cantidad), 0);
+  const caja = (etq, valor, tip) => `<div title="${esc(tip)}" style="border:1px solid var(--line);border-radius:6px;padding:7px 10px;cursor:help"><div class="hint" style="margin:0">${etq}</div><div style="font-size:18px;font-weight:700">${valor}</div></div>`;
+  $('#fm-titulo').textContent = (S.meta && S.meta.nombre) ? S.meta.nombre : 'Mi ficha';
+  $('#fm-resumen').innerHTML =
+    caja('Nivel', fmt(num(S.meta.nivel) || 1), 'Tu nivel de personaje. Sube al juntar experiencia (EXP) y con cada nivel ganás puntos para tu personaje.') +
+    caja('Defensa', Number.isNaN(c.final.def) ? '?' : fmt(c.final.def), 'Cuánto daño te restan las armaduras en cada golpe que recibís. Los golpes críticos la ignoran. Se calcula con todo lo que llevás equipado (y baja con la Armadura rota de cada pieza).') +
+    caja('DDE', fmt(num(S.meta.dde)), 'Tu dinero (DDE): sirve para comprar en las tiendas y es lo que cobrás al vender ítems y despojos.') +
+    caja('Despojos', `${fmt(num(S.loot.normal))} · ${fmt(num(S.loot.magico))} · ${fmt(esp)}`, 'Materiales que soltaron los rivales: normales · mágicos · especiales. Las tiendas los compran (1 DDE cada normal) y sirven para reparar con talentos.');
+  const hayBotin = (typeof combatePublicado === 'function') && (combatePublicado() || (combateActual && (combateActual.jugadores || []).length));
+  const boton = (id, txt, tip) => `<button type="button" class="btn" data-fm="${id}" title="${esc(tip)}" style="padding:10px">${txt}</button>`;
+  $('#fm-botones').innerHTML =
+    boton('botonera', '⚔ Botonera', 'Tus tiradas y acciones de combate: atacar, defender, habilidades, stats.') +
+    boton('equipo', '🎒 Equipo y mochila', 'Lo que llevás puesto, tu mochila y tu cinturón.') +
+    boton('habilidades', '✨ Habilidades', 'Todas tus habilidades, para verlas y ejecutarlas.') +
+    boton('estados', '◎ Estados', 'Los estados alterados que tenés ahora (buenos y malos).') +
+    (tiendaAbiertaAhora ? boton('tienda', '🏪 Tienda', 'La tienda que publicó el GM: comprar, vender y reparar.') : '') +
+    (hayBotin ? boton('botin', '🎁 Botín', 'El botín del último combate.') : '') +
+    boton('completa', '📜 Ver ficha completa', 'Abre tu ficha completa en otra pestaña.');
+  $('#scrim-ficha-mapa').classList.add('open');
+  botoneraAvisarMapa('botonera-lista');
+}
+$('#fm-x').onclick = () => $('#scrim-ficha-mapa').classList.remove('open');
+$('#fm-botones').addEventListener('click', e => {
+  const b = e.target.closest('[data-fm]');
+  if(!b) return;
+  const m = b.dataset.fm;
+  if(m === 'botonera'){ modoBotoneraInv = ''; renderBotonera(); $('#scrim-botonera').classList.add('open'); }
+  else if(m === 'equipo'){ renderEquipo(); $('#scrim-equipo').classList.add('open'); }
+  else if(m === 'habilidades'){ renderTodasHabilidades(); $('#scrim-todas-habilidades').classList.add('open'); }
+  else if(m === 'estados'){ renderTodosEstados(); $('#scrim-todos-estados').classList.add('open'); }
+  else if(m === 'tienda'){ abrirVendedor(); }
+  else if(m === 'botin'){ botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); }
+  else if(m === 'completa'){ window.open(location.origin + location.pathname + '?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaVivo.id), '_blank', 'noopener'); }
+});
+
 function equipoModoAbrir(){
   document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));
   modoBotoneraInv = '';
@@ -11566,6 +11620,7 @@ function fichaResumen(){
     hpMax: n(c.final.hpmax),
     ini: n(c.final.ini),   // Iniciativa: el mapa la usa para el botón "Tirar iniciativa" de la lista de turnos
     def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
+    muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
     esp: n(c.final.esp),   // Especial
     percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
     rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
@@ -12490,7 +12545,7 @@ if(MODO_BOTONERA){
   // B (la misma tecla que la abre desde el mapa): cierra la Botonera. Se hace
   // como Escape, que ya cierra todas las ventanitas; no anda mientras se escribe.
   document.addEventListener('keydown', e => {
-    if(e.key !== 'b' && e.key !== 'B') return;
+    if(e.key !== 'b' && e.key !== 'B' && e.key !== 'f' && e.key !== 'F') return;   // B o F (las teclas que abren la Botonera y la ficha) también la cierran
     if(e.ctrlKey || e.altKey || e.metaKey || e.isTrusted === false) return;
     if(e.target && e.target.closest && e.target.closest('input,select,textarea,[contenteditable]')) return;
     e.preventDefault();
@@ -12503,6 +12558,12 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
+    if(e.data.tipo === 'abrir-ficha-mapa' && fichaVivo && fichaVivo.cargada) fichaMapaAbrir();   // el 📜 del token propio (o la tecla F)
+    if(e.data.tipo === 'abrir-revivir' && fichaVivo && fichaVivo.cargada){   // el botón ✚ Revivir del mapa
+      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+      $('#btn-revivir').click();
+      botoneraAvisarMapa('botonera-lista');
+    }
     if(e.data.tipo === 'abrir-botin' && fichaVivo && fichaVivo.cargada) botinModoAbrir();
     if(e.data.tipo === 'abrir-tienda' && fichaVivo && fichaVivo.cargada){   // 🏪 del mapa
       document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));

@@ -44,6 +44,8 @@
   const tr = (nombre, detalle, no2, codigo) => ({nombre, detalle, no2, trampa: codigo});
   const ts = (nombre, detalle, no2) => ({nombre, detalle, no2, colocar: true});   // trampa sin daño (alarma, red…)   // trampa: {T} en la descripción = su daño según el nivel
   const mecEtiquetas = (...sps) => { const t = []; sps.forEach(x => { if(x.trampa || /trampa/i.test(x.detalle)) t.push('trampas'); if(x.efecto && x.efecto.nombre === 'Sigilo') t.push('sigilo'); }); return [...new Set(t)]; };
+  const dx = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, efecto: {nombre: 'Excedente de vida', polaridad: 'buff', turnos: 0, excK: k}});   // tira daño y gana k × nivel de Excedente de vida
+  const ex = (nombre, detalle, no2, k) => ({nombre, detalle, no2, efecto: {nombre: 'Excedente de vida', polaridad: 'buff', turnos: 0, excK: k}});                 // gana k × nivel de Excedente de vida (HP sobre el máximo, sin tope ni recarga)
   const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
   function danoTxt(d, n){ return d === 'L' ? `1d6+${n}` : d === 'M' ? `2d6+${n}` : `3d6+${n + 1}`; }
@@ -119,7 +121,8 @@
       const m = Object.keys(mods).map(k => `${mods[k] > 0 ? '+' : ''}${mods[k]} ${MOD_TXT[k] || k}`).join(', ');
       const dur = ef.turnos ? ` durante ${ef.turnos} turno${ef.turnos === 1 ? '' : 's'}` : ' hasta que se lo saquen';
       const hp = ef.hp ? `; ${ef.hp > 0 ? 'recupera' : 'pierde'} ${Math.abs(ef.hp)} HP por turno` : '';
-      auto.push(ef.nombre ? `queda con el estado ${ef.nombre}${m ? ' (' + m + ')' : ''}${dur}${hp}` : `se aplica a sí mismo ${m}${dur}`);
+      if(ef.excK) auto.push(`gana ${ef.excK * n} HP de Excedente de vida (HP sobre el máximo, sin tope ni recarga; se acumula)`);
+      else auto.push(ef.nombre ? `queda con el estado ${ef.nombre}${m ? ' (' + m + ')' : ''}${dur}${hp}` : `se aplica a sí mismo ${m}${dur}`);
     }
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);
@@ -157,6 +160,7 @@
     if(sp.efecto){
       h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = sp.efecto.polaridad || 'buff';
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
+      if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Excedente de vida: HP que suma (se acumula con el que ya tenga)
       h.efectoDetalle = sinEtiqueta(textoHab(sp, n));
       h.efectoMods = Object.keys(sp.efecto.mods || {}).map(stat => ({stat, val: sp.efecto.mods[stat]}));
     }
@@ -1412,6 +1416,83 @@
     cu('Absorber el rayo', 'Absorbe un rayo y se cura.', 1, 5),
     [es('Tormenta protectora', 'Una tormenta que lo cuida: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 5],
     'La tormenta que vuelve cada vez que alguien lo lastima.', ER); ESTATICA3();
+
+
+  /* ================= NO-MUERTOS (tanda 2 del rework de creeps, 2026-09-27): la cripta =================
+     Una facción de 14 (dos por rol, niveles 1 a 5). Mecánicas firma: drenar vida, EXCEDENTE DE VIDA (solo lo dan skills específicas: `ex`/`dx`, HP sobre el máximo, sin tope ni recarga),
+     Miedo (−2 PdG y −2 Daño, control), Sombra (sigilo) y aura de pestilencia. Desde el nivel 3 llevan una TERCERA habilidad. */
+  COLOR.cripta = '#7C8A6E'; ESCENARIO_TXT.cripta = 'cripta';
+  const NM = ['no-muerto', 'cripta'];
+  const MIEDO3 = () => tercera(ap(ta('Chillido del hambre', 'Un alarido que hiela: el objetivo queda con Miedo 2 turnos (−2 PdG y −2 Daño; no puede acercarse a quien lo asustó, a mano).', 2), A('Miedo', 2)), 4);
+  const PESTE3 = () => tercera(ta('Aura de pestilencia', 'Un hedor que enferma: los enemigos adyacentes al empezar su turno pierden 1 No2 (a mano, lo aplica el GM).', 1), 4);
+  const COSECHA3 = () => tercera(dx('Cosecha de almas', 'Arranca un jirón de alma: daño y gana Excedente de vida.', 3, 'M', 1), 5);
+  Object.assign(TROFEOS, {'Esqueleto corredor': 'Tibia veloz', 'Zombi de la cripta': 'Dedo hinchado', 'Sabueso espectral': 'Colmillo de niebla', 'Ghoul devorador': 'Garra de ghoul',
+    'Armadura vacía': 'Guantelete oxidado', 'Caballero de la cripta': 'Escudo de huesos', 'Acólito de huesos': 'Cuenco de huesos', 'Nigromante aprendiz': 'Libro de ceniza',
+    'Arquero esquelético': 'Cuerda de tendón', 'Cazador de almas': 'Flecha de alma', 'Sepulturero': 'Pala de sepulcro', 'Plañidera': 'Velo de lágrimas',
+    'Alma en pena': 'Cadena espectral', 'Sombra hambrienta': 'Jirón de sombra'});
+  // --- Melee ---
+  cr('cripta', 2, 'Zombi de la cripta', 'brutal', 'no-muerto', 'Manos podridas',
+    ap(at('Mordisco podrido', 'Muerde: el objetivo queda Podrido (−2 Defensa y −1 Daño) 3 turnos.', 'M'), A('Podrido', 3, {def: -2, dmg: -1})),
+    [bu('Carne insensible', 'No siente los golpes: +3 Defensa hasta el final de su próximo turno.', 1, {def: 3}, 2), 4],
+    'Camina hasta que se le acaba el cuerpo, no las ganas.', NM);
+  cr('cripta', 4, 'Ghoul devorador', 'brutal', 'no-muerto', 'Garras de ghoul',
+    ap(at('Zarpazo desgarrador', 'Garras que abren la carne: el objetivo queda Sangrando.', 'M'), A('Sangrado')),
+    [dx('Devorar', 'Muerde y se alimenta: daño y gana Excedente de vida.', 2, 'H', 1), 4],
+    'Siempre tiene hambre, y siempre se sirve primero.', NM); MIEDO3();
+  // --- Asalto ---
+  cr('cripta', 1, 'Esqueleto corredor', 'rapido', 'no-muerto', 'Costillar afilado',
+    at('Puñalada de hueso', 'Una estocada rápida.', 'L'),
+    [bu('Traqueteo', 'Sus huesos suenan y confunden: +4 Evasión hasta su próximo turno.', 1, {eva: 4}, 1), 3],
+    'No tiene músculos, pero sí urgencia.', NM);
+  cr('cripta', 3, 'Sabueso espectral', 'rapido', 'no-muerto', 'Colmillos de niebla',
+    ap(at('Mordida helada', 'Un mordisco que hiela: el objetivo pierde 1 No2 máx. 1 turno (Escarcha).', 'M'), A('Escarcha', 1, {nitros: -1})),
+    [es('Niebla fugaz', 'Se vuelve niebla y desaparece: entra en Sigilo 2 turnos.', 2, 'Sigilo', 'buff', 2), 4],
+    'Se huele el frío antes de verlo.', NM); MIEDO3();
+  // --- Tanque ---
+  cr('cripta', 2, 'Armadura vacía', 'tanque', 'no-muerto', 'Espada hueca',
+    at('Espadazo hueco', 'Un tajo pesado y sin prisa.', 'M'),
+    [bu('Guardia inmóvil', 'Se planta: +3 Defensa hasta el final de su próximo turno.', 1, {def: 3}, 2), 4],
+    'No hay nadie adentro, pero alguien sigue mandando.', NM);
+  cr('cripta', 5, 'Caballero de la cripta', 'tanque', 'no-muerto', 'Mandoble sepulcral',
+    at('Tajo sepulcral', 'Un tajo que huele a tierra vieja.', 'H'),
+    [ex('Coraza de huesos', 'Los huesos de los caídos lo cubren: gana Excedente de vida.', 2, 4), 5],
+    'Jura lealtad a un rey que se pudrió hace siglos.', NM); PESTE3();
+  // --- Mágicos ---
+  cr('cripta', 2, 'Acólito de huesos', 'mago', 'no-muerto', 'Vara de fémur',
+    zo('Rayo pálido', 'Un rayo desvaído que enfría la sangre.', 2, 'M'),
+    [ap(ta('Maldición menor', 'Susurra una maldición: el objetivo queda Maldito (−2 Res.Mg y −1 Defensa) 3 turnos.', 2), A('Maldito', 3, {resmg: -2, def: -1})), 4],
+    'Reza a dioses que ya no responden.', NM);
+  cr('cripta', 4, 'Nigromante aprendiz', 'mago', 'no-muerto', 'Bastón de ceniza',
+    zo('Bola de ceniza', 'Una bola de ceniza fría que quema por dentro.', 2, 'M'),
+    [dx('Absorber vida', 'Chupa la vida del objetivo: daño y gana Excedente de vida.', 3, 'M', 2), 4],
+    'Todavía practica con lo que le queda de vivo.', NM); MIEDO3();
+  // --- Rango ---
+  cr('cripta', 1, 'Arquero esquelético', 'rango', 'no-muerto', 'Arco de tendón',
+    at('Flecha ósea', 'Una flecha hecha de hueso.', 'L'),
+    [at('Salva ósea', 'Dispara sin apuntar: daño.', 'M'), 4],
+    'Nunca se cansa de tensar la cuerda.', NM);
+  cr('cripta', 5, 'Cazador de almas', 'rango', 'no-muerto', 'Arco de almas',
+    at('Flecha de alma', 'Una flecha que atraviesa la armadura sin abollarla.', 'H'),
+    [ap(at('Disparo a la rodilla', 'Un disparo bajo: el objetivo queda Rengo (Mov a la mitad).', 'M'), A('Rengo')), 4],
+    'Persigue las almas que se escaparon de su tumba.', NM); COSECHA3();
+  // --- Apoyo ---
+  cr('cripta', 2, 'Plañidera', 'apoyo', 'no-muerto', 'Manos de velo',
+    ta('Lamento', 'Un llanto que da fuerzas: un aliado a 3 casillas gana +2 al daño hasta su próximo turno (a mano).', 1),
+    [ap(ta('Llanto que aterra', 'Su lamento paraliza de miedo: el objetivo queda con Miedo 2 turnos (−2 PdG y −2 Daño).', 2), A('Miedo', 2)), 4],
+    'Llora por todos, incluso por quien la mató.', NM);
+  cr('cripta', 3, 'Sepulturero', 'apoyo', 'no-muerto', 'Pala de sepulcro',
+    at('Palazo', 'Un golpe seco con la pala.', 'M'),
+    [ex('Tierra fresca', 'Se cubre de tierra de tumba: gana Excedente de vida.', 2, 3), 4],
+    'Entierra a quien sea, incluso a los que todavía se mueven.', NM); PESTE3();
+  // --- Debuffers ---
+  cr('cripta', 1, 'Alma en pena', 'debuffer', 'no-muerto', 'Toque helado',
+    ap(at('Roce helado', 'Un roce que apaga la energía: el objetivo queda Drenado (−2 No2) 1 turno.', 'L'), A('Drenado', 1, {nitros: -2})),
+    [ap(ta('Susurros', 'Le susurra cosas que no quiere oír: el objetivo queda con Susurros (−2 Res.Mt) 3 turnos.', 2), A('Susurros', 3, {resm: -2})), 3],
+    'Vaga sin recordar por qué.', NM);
+  cr('cripta', 4, 'Sombra hambrienta', 'debuffer', 'no-muerto', 'Zarpas de sombra',
+    ap(at('Zarpa de sombra', 'Zarpas que roban energía: el objetivo queda Drenado (−2 No2) 1 turno.', 'M'), A('Drenado', 1, {nitros: -2})),
+    [es('Entre las sombras', 'Se funde con la oscuridad: entra en Sigilo 2 turnos.', 2, 'Sigilo', 'buff', 2), 4],
+    'Solo se la ve un instante antes de que muerda.', NM); MIEDO3();
 
   /* ================= PASIVAS POR FAMILIA (rework de creeps, 2026-09-26; opción A del dueño) =================
      Los creeps de nivel 3 en adelante traen pasivas propias de su familia, ya cargadas como estados permanentes (`pasiva: true`) que el GM

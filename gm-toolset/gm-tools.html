@@ -4150,6 +4150,7 @@ function aplicarEfectoDeConsumoCreep(sc, h){
     stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
   if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
   let es = sc.estados.find(x => x.nombre === nombre);
+  const excPrevio = es ? num(es.escudoMagicoActual ?? es.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
   if(es && preset && preset.esVeneno){
     // Veneno se acumula (y el severo no): ver acumularVenenoCreep.
     return acumularVenenoCreep(sc, {nombre, esVeneno: true, permanente: !!preset.permanente, stacks});
@@ -4161,6 +4162,10 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   }else{
     es = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
     sc.estados.push(es);
+  }
+  if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
+    const suma = num(h.efectoEscudo), total = (preset && preset.excedenteVida) ? excPrevio + suma : suma;
+    es.escudoMagico = total; es.escudoMagicoActual = total;
   }
   return es;
 }

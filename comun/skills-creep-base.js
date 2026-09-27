@@ -426,6 +426,40 @@
   H('Furia del jefe', 'B', '*', 'm', 6, bU('Llega al límite: +5 de Daño y +2 No2 3 turnos.', 3, {dmg: 5, nitros: 2}, 3), 'jefe');
   H('Rugido de jefe', 'XA', 'bd', 'x', 6, zO('Un grito que sacude a todos: daño a los adyacentes (a mano) y quedan Pajaritos hasta el final de su turno (a mano).', 4, 'M'), 'jefe,estados alterados');
 
+  /* ================= HABILIDADES DE LOS CREEPS DEL REWORK (2026-09-27, pedido del dueño) =================
+     Cada habilidad que diseñamos para un creep del rework (elementales y cripta) también se ofrece suelta acá, con sus filtros, para poder
+     usarla al armar cualquier creep. Salen de `CreepsBaseUtil.habsDeCreeps` (una sola fuente: el creep y el buscador usan la misma receta).
+     Si dos creeps comparten una habilidad (mismo nombre), es una sola entrada con las razas y roles de todos. */
+  (function(){
+    const RAZA_DE = {'elemental': 'e', 'no-muerto': 'm', 'bestia': 'b', 'humano': 'h', 'humanoide': 'd', 'planta': 'p', 'constructo': 'c', 'alienígena': 'a'};
+    const ROL_DE = {brutal: 'm', tanque: 't', rapido: 'e', rango: 'r', mago: 'g', apoyo: 'a', debuffer: 'x'};
+    const FAMILIA = {fuego: 'fuego', hielo: 'hielo', rayo: 'rayo', cripta: 'cripta'};
+    const CONTROL = /^(Stun|Miedo|Inmovilizado|Parálisis|Paralisis|Exhausto)$/;
+    const existentes = new Set(lista.map(h => h.nombre));
+    const unicas = new Map();
+    (U.habsDeCreeps || []).forEach(({sp, cd, creep}) => {
+      const u = unicas.get(sp.nombre) || {sp, cd, razas: new Set(), roles: new Set(), fams: new Set()};
+      if(RAZA_DE[creep.tipo]) u.razas.add(RAZA_DE[creep.tipo]);
+      if(ROL_DE[creep.rol]) u.roles.add(ROL_DE[creep.rol]);
+      if(FAMILIA[creep.esc]) u.fams.add(FAMILIA[creep.esc]);
+      unicas.set(sp.nombre, u);
+    });
+    unicas.forEach((u, nombre) => {
+      if(existentes.has(nombre)) return;   // ya está en el catálogo general
+      const {sp} = u, ap = U.aplicaDe(sp), ef = sp.efecto || {};
+      let fn = '';
+      if(sp.dano) fn += 'D';
+      if(sp.cura) fn += 'C';
+      if(ef.nombre || (ef.mods && Object.keys(ef.mods).length)) fn += (ef.polaridad === 'debuff') ? 'X' : (ef.mods && ef.mods.def) || ef.excK ? 'TB' : 'B';
+      if(ap) fn += 'X' + (CONTROL.test(ap.nombre) ? 'K' : '');
+      if(/flor de|cono|línea|adyacentes|todos los|zona/i.test(sp.detalle)) fn += 'A';
+      if(!fn) fn = 'B';
+      const {nombre: _n, ...spBase} = sp;
+      const mec = [...u.fams].join(',');
+      H(nombre, [...new Set(fn)].join(''), [...u.razas].join('') || '*', [...u.roles].join('') || 'm', u.cd, spBase, mec);
+    });
+  })();
+
   window.HABILIDADES_CREEP_BASE = lista;
 
   // Arma la habilidad de un creep del nivel dado a partir de una entrada de la biblioteca.

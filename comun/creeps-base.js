@@ -208,7 +208,12 @@
   }
 
   const lista = [];
+  // Habilidades de los creeps del rework (elementales y cripta), para ofrecerlas también sueltas en el buscador de habilidades de creep (skills-creep-base.js).
+  const habsDeCreeps = []; let registrarHabs = false;
+  const registrarHab = (sp, cd, creep) => { if(registrarHabs) habsDeCreeps.push({sp, cd, creep}); };
   function cr(esc, n, nombre, rol, tipo, arma, rapida, lenta, notas, extras){
+    registrarHab(rapida, 2, {nombre, n, rol, tipo, esc});
+    registrarHab(lenta[0], lenta[1], {nombre, n, rol, tipo, esc});
     const total = 33 + 3 * (n - 1);
     const [con, fue, agl, des, esp] = repartir(total, PESOS[rol]);
     const rango = rol === 'rango' || rol === 'mago';
@@ -1312,12 +1317,15 @@
      Tres facciones de 7 (una por rol). Cada elemento tiene su mecánica firma (fuego: Quemado y terreno incendiado; hielo: Escarcha acumulable;
      rayo: Descarga y Parálisis). Desde el nivel 3 llevan además una TERCERA habilidad (su mecánica firma). Las pasivas por familia se suman
      al final para todos los creeps (ver aplicarProgresion). */
+  registrarHabs = true;
   COLOR.fuego = '#E25822'; COLOR.hielo = '#7FB3D5'; COLOR.rayo = '#E6D84A';
   ESCENARIO_TXT.fuego = 'volcán'; ESCENARIO_TXT.hielo = 'glaciar'; ESCENARIO_TXT.rayo = 'tormenta';
   const EF = ['elemental', 'fuego'], EH = ['elemental', 'hielo'], ER = ['elemental', 'rayo'];
   // Tercera habilidad (n ≥ 3): se suma al último creep cargado. cd: cooldown; la lenta arranca en cooldown.
   function tercera(sp, cd){
     const c = lista[lista.length - 1], n = c.nivel, h = armarHab(sp, n, cd, cd >= 4);
+    const ROL_INV = {melee: 'brutal', tanque: 'tanque', asalto: 'rapido', rango: 'rango', 'mágico': 'mago', apoyo: 'apoyo', debuffer: 'debuffer'}, ESC_INV = {'volcán': 'fuego', glaciar: 'hielo', tormenta: 'rayo', cripta: 'cripta'};
+    registrarHab(sp, cd, {nombre: c.nombre.replace(/ \(auditar\)$/, ''), n, rol: ROL_INV[c.etiquetas.find(t => ROL_INV[t])] || '', tipo: c.etiquetas.find(t => ['elemental', 'no-muerto'].includes(t)) || '', esc: ESC_INV[c.etiquetas.find(t => ESC_INV[t])] || ''});
     c.datos.habilidades.push(h);
     c.detalle = c.detalle.replace(/ Rápida:/, ' Tercera: ' + sp.nombre + ' (CD ' + cd + ').' + ' Rápida:');
     c.etiquetas = [...new Set([...c.etiquetas, ...mecEtiquetas(sp)])];
@@ -1494,6 +1502,8 @@
     [es('Entre las sombras', 'Se funde con la oscuridad: entra en Sigilo 2 turnos.', 2, 'Sigilo', 'buff', 2), 4],
     'Solo se la ve un instante antes de que muerda.', NM); MIEDO3();
 
+  registrarHabs = false;
+
   /* ================= PASIVAS POR FAMILIA (rework de creeps, 2026-09-26; opción A del dueño) =================
      Los creeps de nivel 3 en adelante traen pasivas propias de su familia, ya cargadas como estados permanentes (`pasiva: true`) que el GM
      puede sacar o cambiar como cualquier estado. Tabla: nivel 3 → 1 pasiva · nivel 4 → 1 (otra) · nivel 5 → 2 · jefe → +1. La elegida sale
@@ -1639,5 +1649,5 @@
       return {nombre: c.nombre || d.nombre, nivel, suma, meta, hp: Number(d.hp) || 0, hpEsperado: (Number(d.con) || 0) * 5};
     }).filter(x => x.suma !== x.meta || x.hp !== x.hpEsperado);
   }
-  window.CreepsBaseUtil = {verificarPresupuesto, armarHab, armarDetalle, esHabMagica, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
+  window.CreepsBaseUtil = {habsDeCreeps, verificarPresupuesto, armarHab, armarDetalle, esHabMagica, MANUAL_RE, esTrampa: sp => sp.trampa !== undefined || !!sp.colocar, aplicaDe, hayManual, APLICA};
 })();

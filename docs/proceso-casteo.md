@@ -16,7 +16,7 @@
 | 0 | Alcance: qué es "casteo con SP" | decisión | ✅ 2026-09-21 |
 | 1 | Tipos de daño de casteo | decisión | ✅ 2026-09-27 |
 | 2 | Qué tira cada lado (formato de la descripción) | decisión | ✅ 2026-09-27 |
-| 3 | Resistencia por tipo y armadura mágica | decisión | ⬜ |
+| 3 | Resistencia por tipo y armadura mágica | decisión | ✅ 2026-09-27 |
 | 4 | Esquivar efectos de área | decisión | ⬜ |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ⬜ |
 | 6 | Código: tipo de daño y daño recibido | implementación | ⬜ |
@@ -70,17 +70,23 @@ falta una tabla de tipos: la regla general + la excepción del objeto físico cu
 
 **Entrega:** plantilla de la línea + regla por caso, en `reglas-casteo.md` §1.2. **Termina cuando:** hay un formato único que se puede aplicar a todas. ✅
 
-## Paso 3 — Resistencia por tipo y armadura mágica ⬜
+## Paso 3 — Resistencia por tipo y armadura mágica ✅ 2026-09-27
 **Depende de:** 1. **Ya definido:** la armadura mágica debe ser **rara y escasa**.
 
-**Decidir:**
-- **3a.** Resistencia por tipo: ¿un stat por tipo (Res. fuego, Res. relámpago…) o uno general para todo lo elemental? Respuesta: ____
-- **3b.** ¿De qué atributo derivan? ¿Cuánto reducen (fijo, %)? Respuesta: ____
-- **3c.** Armadura mágica: ¿cuánto reduce el daño que ignora armadura (fijo, %)? Respuesta: ____
-- **3d.** ¿Es lo mismo que el estado **Escudo mágico** (absorbe todo, incluso true damage) y la skill **Armadura Mágica** (reduce 50%, máx. 10)? ¿O tres cosas distintas? Respuesta: ____
-- **3e.** ¿Qué tan rara: solo en ítems de tier alto? ¿en habilidades de clase? Respuesta: ____
+**Decidido (2026-09-27):**
+- **3a.** **Uno general, no por elemento** — consistente con el Paso 1 (no hay lista de tipos, así que tampoco hace falta resistencia
+  por tipo). Un solo stat nuevo: **Armadura mágica**.
+- **3b.** **No deriva de ningún atributo** (arranca en 0 para todos, como la Defensa normal). Reduce el daño como **número fijo**, no
+  un porcentaje — mismo mecanismo que la Defensa contra daño físico.
+- **3c.** Ya respondido en 3b: número fijo, restado directo (no %).
+- **3d.** **Son tres cosas distintas:** el estado **Escudo especial** (ex "Escudo mágico"; buffer temporal, absorbe cualquier daño,
+  no cambia), la skill **"Armadura arcana"** del Mago (**renombrada 2026-09-27**, antes "Armadura Mágica" — para no chocar con el
+  nombre del stat nuevo; sigue con su propia mecánica: −50 % máx. 10, refleja el daño al terminar) y la **Armadura mágica** (el stat
+  nuevo de este paso).
+- **3e.** Solo en **ítems de tier alto** (Raro en adelante), marcados a mano en el catálogo — no en equipo común ni de ninguna
+  habilidad de clase por defecto (si alguna la diera, se decide caso por caso al auditarla).
 
-**Entrega:** reglas en `reglas-casteo.md`. **Termina cuando:** se sabe cómo se calcula el daño de casteo que recibe alguien con resistencia y/o armadura mágica.
+**Entrega:** reglas en `reglas-casteo.md` §1.4. **Termina cuando:** se sabe cómo se calcula el daño de casteo que recibe alguien con resistencia y/o armadura mágica. ✅
 
 ## Paso 4 — Esquivar efectos de área ⬜
 **Ya definido:** el defensor puede **tirar Evasión para hacer un roll** de hasta **2 casilleros**; necesita **No2**; si se desplaza lo suficiente como para salir del área, esquiva.

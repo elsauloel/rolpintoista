@@ -58,6 +58,21 @@ hielo" (energía) ignora armadura; una "aguja de hielo" (objeto) no.
 - **Necesita No2 disponibles** para hacerlo. Si los tiene, se desplaza; **si se desplaza lo suficiente como para salir del área, esquiva**.
 - (Detalles a definir: costo en No2, cuánto significa "tirar Evasión" si no hay número que superar, si es una reacción fuera de turno… — P97.)
 
+### 1.4 Resistencia al daño de casteo: Armadura mágica (Paso 3 cerrado, 2026-09-27)
+**Un solo stat nuevo, general — no uno por elemento** (consistente con 1.1: no hay lista de tipos, así que tampoco hace falta una
+resistencia por tipo). Se llama **Armadura mágica**: un **número fijo** que se resta al daño de casteo que ignora la armadura normal,
+igual que la Defensa se resta al daño físico. **No deriva de ningún atributo**: arranca en 0 para todos, la dan **ítems de tier alto**
+(Raro en adelante, marcados a mano en el catálogo) — no equipo común, no una base automática. Si alguna habilidad de clase llegara a
+darla, se decide caso por caso al auditarla, no como regla general.
+
+**Son tres cosas distintas** (no hay que unificarlas):
+- **Armadura mágica** (esto, nuevo): un stat permanente mientras dure el ítem/efecto que la da; resta un número fijo al daño de casteo.
+- **Escudo especial** (el estado, ex "Escudo mágico"): un buffer temporal de HP que absorbe cualquier daño, incluso true damage — no
+  cambia, sigue como está.
+- **"Armadura arcana"** (la skill del Mago, **renombrada 2026-09-27** — antes "Armadura Mágica", para no confundirla con el stat de
+  arriba): su propio efecto puntual, reduce 50 % (máx. 10) y refleja el daño absorbido al terminar — no cambia, es una habilidad con
+  su propia mecánica, no el stat general.
+
 ## 2. Mapa de revisión (qué puede necesitar cambios)
 
 Números tomados del repo el 2026-09-21. **"Revisar" no es "cambiar"**: cada punto se decide por separado.
@@ -70,15 +85,15 @@ Números tomados del repo el 2026-09-21. **"Revisar" no es "cambiar"**: cada pun
 | A3 | **Daño de trampas** (`trampaDano`) | mapa, asistente de trampas | resta Defensa siempre ("menos la Defensa de cada uno") | tipo de daño por trampa (una runa explosiva no es igual que un foso) |
 | A4 | **Qué tira cada lado** | ficha/gm-tools (tirada de la habilidad, `tiradaStat`), Botonera, Acciones, la Mesa | el atacante tira PdG o el stat elegido; el defensor no tiene tirada automática | campo/aviso "tira PdG.Esp vs Evasión / Res.Esp / Res.Mt", visible en la descripción y en la Mesa |
 | A5 | **Esquivar un área (roll de 2 casilleros)** | mapa (movimiento, No2) | no existe | reacción del defensor: cobrar No2 y mover hasta 2 casilleros; ver si sale del área |
-| A6 | **Resistencia por tipo de daño** | stats de ficha y creeps, mods de ítems, lupa | solo Res.Esp, Res.Mt, Res.CC y las resistencias a crítico (Tipo 4–12) | stats o un mecanismo por tipo (P97) |
-| A7 | **Armadura mágica** | stats, ítems, estado | existe el estado **Escudo mágico** (barra de HP que absorbe todo, incluso true damage) y la skill "Armadura Mágica" (reduce 50%) | definir si son lo mismo o distintos; una regla clara |
+| A6 | **Resistencia por tipo de daño** | stats de ficha y creeps, mods de ítems, lupa | solo Res.Esp, Res.Mt, Res.CC y las resistencias a crítico (Tipo 4–12) | ✅ Paso 3: un stat nuevo, **Armadura mágica** (número fijo, no por elemento) |
+| A7 | **Armadura mágica** | stats, ítems, estado | existe el estado **Escudo especial** (barra de HP que absorbe todo, incluso true damage) y la skill "Armadura arcana" (reduce 50%) | ✅ Paso 3: son **tres cosas distintas** — ver §1.4 |
 | A8 | **Efectos al golpear con elemento** | `efectosGolpe` de armas (Prende fuego, Explosión…), armas naturales | son un recordatorio | ver si el daño extra sigue la regla de su tipo |
 | A9 | **Nombres de los stats** | interfaz de ficha/creeps/catálogo | PdG.Esp / Res.Esp / Rango de casteo | ✅ hecho 2026-09-27: "Mg" se renombró a "Esp" (solo la etiqueta; los ids `pdgmg`/`resmg` no cambiaron) |
 
 ### B. Contenido ya creado
 | # | Qué | Cantidad | Qué mirar |
 |---|---|---|---|
-| B1 | **Skills de clase** (`comun/skills-clase.js`) | 62 skills, ~13 tocan casteo (Chispazo, Rayo Mágico, Orbe arcano, Tormenta arcana, Ráfaga arcana, Toque mágico, Carga Elemental, Armadura Mágica, Telekinesis, Control Mental, Endurecimiento, Smite, Drenar vida) | tipo de daño, qué tira cada lado, y que se ajuste a estas reglas (el borrador manda menos que estas reglas) |
+| B1 | **Skills de clase** (`comun/skills-clase.js`) | 62 skills, ~13 tocan casteo (Chispazo, Rayo Mágico, Orbe arcano, Tormenta arcana, Ráfaga arcana, Toque mágico, Carga Elemental, Armadura arcana, Telekinesis, Control Mental, Endurecimiento, Smite, Drenar vida) | tipo de daño, qué tira cada lado, y que se ajuste a estas reglas (el borrador manda menos que estas reglas) |
 | B2 | **Habilidades de creeps** (`comun/skills-creep-base.js`) | 321; las de daño de casteo (Chispa, Bola de fuego, Rayo, Misil arcano, Llamarada, Lanza de hielo, Explosión psíquica, Rayo de vacío…), los debuffs y las 57 con estado automático | agregar tipo de daño y "qué tira cada lado" a cada descripción; separar proyectil / efecto abstracto / mental |
 | B3 | **Creeps base** (`comun/creeps-base.js`) | 134; roles mágico, apoyo y debuffer | las habilidades de sus dos slots |
 | B4 | **Armas naturales** (`comun/armas-naturales-base.js`) | 66; el filtro "Tipo de daño" ya tiene elemental, mágico, ácido | pasar esos tres a los tipos de estas reglas |

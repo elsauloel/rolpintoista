@@ -57,7 +57,7 @@ const GuiaDiseno = (() => {
         {n: 'Proyectiles y rayos', d: 'Ataques mágicos a distancia. Ojo: no hay defensa mágica, así que el daño mágico va directo a la vida (los que usan el Especial como daño tienen que ser muy caros). La alternativa: usar el Especial para la potencia pero con daño físico, que la armadura sí reduce (ej. estalactita de hielo).', ej: 'Chispazo, Rayo mágico, Ráfaga arcana', e: 'mano'},
         {n: 'Áreas', d: 'Explosiones y lluvias de proyectiles en una flor del mapa.', ej: 'Orbe arcano, Tormenta arcana', e: 'mano'},
         {n: 'Elementos', d: 'Modificar un hechizo de daño para darle un elemento (fuego, hielo…).', ej: 'Carga Elemental', e: 'mano'},
-        {n: 'Defensa mágica', d: 'Una armadura que reduce el daño recibido.', ej: 'Armadura Mágica', e: 'mano'},
+        {n: 'Defensa mágica', d: 'Una armadura que reduce el daño recibido.', ej: 'Armadura arcana', e: 'mano'},
         {n: 'Control', d: 'Mover objetos o dominar la voluntad de otro (tirada enfrentada).', ej: 'Telekinesis, Control Mental', e: 'mano'},
         {n: 'De contacto', d: 'Hechizos que piden tocar al objetivo.', ej: 'Toque mágico', e: 'mano'},
         {n: 'Portales y teleport', d: 'Invocar dos puntos de teletransporte dentro del rango de casteo, por unos turnos, que solo usan los aliados.', ej: 'Invocar portal', e: 'auto'},

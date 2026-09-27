@@ -135,3 +135,14 @@ El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T1
 
 ## Durabilidad como elemento de diseño (idea del dueño, 2026-09-26, para más adelante)
 Hoy todos los ítems tienen **3 puntos de durabilidad por punto de Peso** (mínimo 3). En el rework del catálogo se puede **usar la durabilidad para diferenciar ítems**: **escudos y armas resistentes** (más puntos que lo que da su Peso), **armas y escudos pensados para el Parry** (Parry y Bloqueo mejorados con buena durabilidad, o que gastan menos al perder el Bloqueo), etc. Pendiente: definir si es un campo propio del ítem o un bono, cuánto vale en PC en la calculadora y cómo se muestra en la tienda. Ver `durabilidad.md`.
+
+## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
+Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).
+| Tipo | Máximo | Desglose |
+|---|---|---|
+| **T4** | **22** | cabeza 3 · blanda 3 · rígida 3 · manos 3 · piernas 3 · pies 3 · escudo 3 · anillos 1 |
+| **T6** | **15** | 2 en cada pieza (7 piezas) · anillos 1 |
+| **T8** | **12** | cabeza 2 · blanda 1 · rígida 2 · manos 2 · piernas 1 · pies 1 · escudo 2 · anillos 1 |
+| **T10** | **9** | cabeza 2 · blanda 0 · rígida 1 · manos 2 · piernas 1 · pies 1 · escudo 1 · anillos 1 |
+| **T12** | **8** | cabeza 2 · blanda 0 · rígida 1 · manos 2 · piernas 1 · pies 1 · escudo 0 · anillos 1 |
+**Lectura:** cada punto de Resistencia le saca un d20 al crítico del atacante (nivel N − R). Un personaje armado al máximo con las mejores piezas es prácticamente inmune a los críticos de Tipo 4 y 6 (un arma de Tipo 4 con nivel 5 se queda sin dados), pero con Tipo 10 y 12 aguanta poco. Es un techo teórico: las mejores piezas son Legendarias y pesan mucho (el Peso equipado limita). A decidir: ¿ponemos un tope general (por ejemplo +6 por Tipo) para que nadie sea inmune?

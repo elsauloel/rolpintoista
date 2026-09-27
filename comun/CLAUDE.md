@@ -206,4 +206,15 @@ versión parecida en más de una, es candidato a juntar.
 
 - **`asistente-item.js`, bono "Armadura mágica"** (2026-09-27, Paso 7 de las reglas de casteo): el stat nuevo `armadmg` (ver `docs/reglas-casteo.md` §1.4) se puede dar como bono de ítem desde el paso "Bonos" de siempre — acceso rápido en la categoría Defensa (`RAPIDOS.defensa`) y disponible como "+ Otro stat" en cualquier categoría (ya estaba en la lista de stats de la ficha por venir de `EXTRA`; se sumó a mano a `cfgItemGM` de gm-tools, que arma su lista de stats aparte). El asistente no impone ninguna rareza mínima — es la mesa la que decide reservarlo para ítems Raros o mejores, como dice 3e.
 
+- **`asistente-duelo-hab.js`, daño que escala con X** (2026-09-27, P119, `docs/preguntas-abiertas.md`): mismo criterio que
+  ya usaba "ataque con mi arma, con arreglos" para su X (`dadosPorX`/`fijoPorX`, resuelta ANTES de armar el duelo, al pagar
+  el costo). El paso "Daño" del 🎯 suma `danoFijoPorX` (cuánto se suma a la fórmula por cada punto de X), **visible solo si
+  la habilidad ya tiene costo "X"** (`cfg.costoVariable: 'sp'|'nitros'|''`, nuevo parámetro de `AsistenteDueloHab.abrir`,
+  derivado de `spVariable(it)`/`nitrosVariable(it)` — los creeps de gm-tools no tienen costo variable, así que ahí siempre
+  es `''` y la opción no aparece). `habDueloDe(it, xSp, xNitros)` (antes sin esos dos parámetros) arma la fórmula final
+  (`base + danoFijoPorX * X`, con la X ya elegida en `#scrim-costox`) justo antes de crear el duelo; `terminarEjecucionHab`
+  le pasa la X que recibió. **Rayo Mágico** (Mago) quedó auditada con esto — primera skill del juego con daño variable por
+  X en el duelo. Simplificación consciente: sin tope de X por habilidad (el "X ≤ Especial" de Rayo Mágico queda ✋ a mano;
+  el placeholder general `IT2.limiteXSp` sigue sin confirmar) y sin dados extra por X (`danoDadosPorX`), solo el caso fijo.
+
 - **Hechizos de área: la misma cascada del duelo, no una herramienta aparte** (2026-09-27, Paso 7b del casteo, pedido explícito del dueño — "quiero que tenga el mismo espíritu del paso a paso... que se vea en la mesa"): `duelo.js` suma un objetivo `'area'` a `hab` (con `radio`, configurado en `asistente-duelo-hab.js`) y una **fase nueva, `dodge`**: si el defensor gana el contacto Y el duelo tiene `d.grupo` (ver más abajo), en vez de "SE RESISTIÓ" se abre el derecho a un dodge roll (`resolverDodge(id, logroSalir)` decide el fin). Dos hooks nuevos de `escuchar(cfg)`, ambos solo para el mapa/GM: `chequearDodge(d)` (¿el defensor sigue adentro del área?) y `grupoResuelto(d)` (avanzar la cascada de `vtt-hexgrid/mapa.html`, colección nueva `campanas/<id>/areas/<id>`, ver su `CLAUDE.md`). `Duelo.crear` ahora exporta `limpiarHab` (lo usa el mapa al crear el documento del área) y acepta `cfg.yo.uid` explícito (si no se pasa, sigue usando `yo()` como siempre) — hacía falta porque, en la cascada, del 2do objetivo en adelante es el mapa del GM el que llama a `crear()`, no el casteador. Reglas nuevas: campo `grupo` en `duelos`, colección `areas` completa — hay que pegarlas.

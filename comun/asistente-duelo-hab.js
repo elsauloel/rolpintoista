@@ -2,8 +2,13 @@
    Una ventana chica para decidir cómo se juega una habilidad dirigida en el duelo paso a paso: a quién apunta, qué tira quien la usa, con qué se resiste el objetivo,
    si hace daño (y de qué tipo), y qué efectos deja (estados o cura). Sin tocar ningún dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
 
-   Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, alGuardar: cfg => …});   (cfg = {objetivo, tira, contra: [stats], dano, tipoDano, efectos: [{nombre, turnos} | {cura}]} o null)
-   Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase. */
+   Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'', alGuardar: cfg => …});
+   (cfg = {objetivo, tira, contra: [stats], dano, tipoDano, danoFijoPorX?, radio?, efectos: [{nombre, turnos} | {cura}]} o null)
+   Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
+   `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
+   ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
+   arma la fórmula final sumando `danoFijoPorX * X` a la fórmula base (`it.tiradaExtra`). Los creeps de gm-tools no tienen
+   costo variable todavía, así que ahí `costoVariable` siempre es '' y esta sección no aparece. */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
@@ -41,6 +46,10 @@ const AsistenteDueloHab = (() => {
       tira: ini ? (ini.tira === undefined ? 'pdgmg' : ini.tira) : 'pdgmg',
       contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
+      // Daño que escala con la X del costo variable (P119, 2026-09-27): un fijo extra por cada punto de X
+      // (ej. Rayo Mágico "amplifica el daño en el doble de X" → danoFijoPorX: 2). Solo tiene sentido si la
+      // habilidad ya tiene costo en SP o No2 marcado como "X" (cfg.costoVariable la avisa).
+      danoFijoPorX: (ini && ini.danoFijoPorX) || 0,
       // Independiente del tipo (2026-09-27, Paso 1 de las reglas de casteo: lo que ignora la armadura no es el
       // elemento, es cómo se narra la habilidad — una "ráfaga de hielo" ignora, una "aguja de hielo" física no).
       // Arranca según el tipo elegido (mágico = sí, físico = no) y se puede destildar a mano para la excepción.
@@ -109,7 +118,9 @@ const AsistenteDueloHab = (() => {
             <label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> La fórmula de daño de la habilidad (su «segunda tirada», por ejemplo 2d6+3) es el daño que hace${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
             ${st.dano ? `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
             <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
-            <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>` : ''}</div>
+            <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>
+            ${cfg.costoVariable ? `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
+            <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>` : ''}` : ''}</div>
           `}
           ${st.modo === 'flash' ? '' : `<div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
             <p class="nota">Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.</p>
@@ -139,6 +150,7 @@ const AsistenteDueloHab = (() => {
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
+      q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
       f.querySelectorAll('[data-ef-nombre]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efNombre].nombre = i.value.trim(); });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efStat].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efVal].val = Number(i.value) || 0; });
@@ -163,7 +175,7 @@ const AsistenteDueloHab = (() => {
         const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
         if(st.objetivo === 'area' && !st.tira){ alert('Un hechizo de área necesita una tirada (Paso 4: PdG.Esp o PdG contra la Evasión de cada uno) — elegí qué tira quien la usa.'); return; }
         if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
-        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; }
+        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.objetivo === 'area') out.radio = st.radio;
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});

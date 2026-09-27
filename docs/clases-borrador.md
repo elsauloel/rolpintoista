@@ -169,9 +169,10 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    daño arcano directo a la vida. *(Rebalanceado 2026-09-25 por el dueño: antes NO2 3 y T4; equiparado a la Varita de
    proyectil mágico de buena calidad, 1d6 por 1 Nitro. Auditada 2026-09-27 con `duelo` cargado, para probar el sistema de
    duelo de habilidades. ⚖ Balance a revisar con el grupo.)*
-2. **Rayo Mágico** [X] — NO2: (5). Ataca con un rayo arcano que hace daño
-   tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a
-   Especial. *(Sin auditar: el duelo de habilidades todavía no soporta una fórmula de daño que dependa de la X elegida al ejecutar.)*
+2. ✅ **Rayo Mágico** [X] — NO2: (5). Tira PdG.Esp contra la Evasión del objetivo (proyectil mágico); si gana, 1d4 + el
+   doble de X de daño arcano directo a la vida (X = el SP pagado, elegido al ejecutar). *(Auditada 2026-09-27, P119: primera
+   skill con daño que escala por X en el duelo de habilidades — `duelo.danoFijoPorX`, ver `docs/preguntas-abiertas.md` P119
+   y `docs/duelo-de-habilidades.md`. "Tipo 1" del texto original se tomó como Tipo 4 (1d4). X ≤ Especial queda ✋ a mano.)*
 3. ✅ **Orbe arcano** [4] — NO2: (5). Hechizo de área (Paso 4/7 del casteo, flor de 1): tira PdG.Esp contra la Evasión de
    cada uno, en cascada; a quien gane le toca un dodge roll, si no logra salir hace 1d12+4 de daño arcano directo a la vida.
    *(Auditada 2026-09-27 con `duelo` de objetivo "área", para probar la cascada de hechizos de área. ⚖ El "amplifica el

@@ -4402,7 +4402,7 @@ function terminarEjecucionHab(it, arma, xSp, xNitros){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: aArma, suelto: () => tirarPrimeraDeHab(it)});
     return;
   }
-  const hDuelo = habDueloDe(it);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
+  const hDuelo = habDueloDe(it, xSp, xNitros);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
   if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
   if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
 }
@@ -4424,13 +4424,18 @@ function alcanceDeHab(c, statTira){
   if(modo === 'fijo') return Math.max(0, Math.round(num(c.alcanceN)));
   return statTira === 'pdgmg' ? rc() : 0;   // auto: los hechizos usan el Rango de casteo; el resto no resalta
 }
-function habDueloDe(it){
+function habDueloDe(it, xSp, xNitros){
   const c = dueloDe(it);
   if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash') return null;
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
   const tipo = c.tipoDano || 'arcano';
-  const formula = String(it.tiradaExtra || '').trim();
+  const base = String(it.tiradaExtra || '').trim();
+  // Daño que escala con X (P119, 2026-09-27): la X ya se eligió al pagar el costo variable (confirmarCostoVariable),
+  // acá solo se arma la fórmula final sumando danoFijoPorX * X — mismo momento que ataqueDeHabArma arma sus mods por X.
+  const X = spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0;
+  const extra = c.danoFijoPorX ? num(c.danoFijoPorX) * X : 0;
+  const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
   return {
     nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' ? 0 : alcanceDeHab(c, stat),
     tira: stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null,
@@ -6918,7 +6923,7 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
-    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), alGuardar: cfg => { if(cfg) it.duelo = cfg; else if(it.habClaseId && (function(){ const b = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return b && b.duelo; })()) it.duelo = null; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
+    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '', alGuardar: cfg => { if(cfg) it.duelo = cfg; else if(it.habClaseId && (function(){ const b = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return b && b.duelo; })()) it.duelo = null; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
     return;
   }
   if(b.dataset.armrota){

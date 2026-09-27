@@ -182,7 +182,7 @@ herramienta aparte, solo del GM, sin nada de eso) — **se retiró del todo** y 
 
 ## Paso 8 — Auditoría de contenido, por tandas ⬜
 **Depende de:** 1, 2 y 6. Una tanda a la vez, revisando skill por skill (nada masivo):
-- [ ] 8.1 Skills de clase (`comun/skills-clase.js`): 13 de 62 tocan casteo.
+- [ ] 8.1 Skills de clase (`comun/skills-clase.js`): 13 de 62 tocan casteo; Chispazo, Orbe arcano y Rayo Mágico ya auditadas (2026-09-27), quedan 10.
 - [ ] 8.2 Habilidades de creeps (`comun/skills-creep-base.js`): las de daño de casteo, los debuffs y las 57 con estado automático.
 - [ ] 8.3 Creeps base (`comun/creeps-base.js`): roles mágico, apoyo y debuffer.
 - [ ] 8.4 Armas naturales: los tipos elemental, mágico y ácido.

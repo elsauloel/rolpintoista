@@ -1169,7 +1169,6 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 #mesa-grilla{padding:0 10px 8px}
 #mesa-grilla .btn{width:100%}
 #mesa-grilla .btn.activo{border-color:var(--brass);color:var(--brass)}
-#mesa.colapsada #mesa-grilla{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
 .mesa-tirada.ultima{background:#2E6B57}
@@ -5830,10 +5829,10 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">🎯 duelo</span>' : ''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">⚔ duelo</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
-        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo (qué se tira, con qué se resiste, daño y efectos)">🎯</button></div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo (qué se tira, con qué se resiste, daño y efectos)">⚔</button></div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}

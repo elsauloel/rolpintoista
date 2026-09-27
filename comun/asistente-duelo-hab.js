@@ -1,6 +1,10 @@
-/* comun/asistente-duelo-hab.js — «🎯 Duelo» de una habilidad (2026-09-27, docs/duelo-de-habilidades.md).
-   Una ventana chica para decidir cómo se juega una habilidad dirigida en el duelo paso a paso: a quién apunta, qué tira quien la usa, con qué se resiste el objetivo,
-   si hace daño (y de qué tipo), y qué efectos deja (estados o cura). Sin tocar ningún dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
+/* comun/asistente-duelo-hab.js — «⚔ Duelo» de una habilidad (2026-09-27, docs/duelo-de-habilidades.md).
+   Ventana PASO A PASO (2026-09-27, pedido del dueño — mismo criterio que el resto de los asistentes del
+   juego: comun/asistente-item.js, comun/asistente-trampa.js, comun/asistente-estado.js) para decidir cómo
+   se juega una habilidad dirigida en el duelo: a quién apunta, qué tira quien la usa, con qué se resiste
+   el objetivo, si hace daño (y de qué tipo), y qué efectos deja (estados o cura). Cada paso tiene su propio
+   título y explicación, como los demás asistentes — nada de scroll largo con todo junto. Sin tocar ningún
+   dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
 
    Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'', alGuardar: cfg => …});
    (cfg = {objetivo, tira, contra: [stats], dano, tipoDano, danoFijoPorX?, radio?, efectos: [{nombre, turnos} | {cura}]} o null)
@@ -15,6 +19,7 @@ const AsistenteDueloHab = (() => {
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['fisico', 'Físico (respeta la Defensa)']];
+  const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
   function css(){
@@ -34,7 +39,17 @@ const AsistenteDueloHab = (() => {
 #adh-fondo button.sec{background:#2b3347;color:#d5dbec}
 #adh-fondo button.rojo{background:#5a2530;color:#fbd0d7}
 #adh-fondo .pie{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #2b3347;flex-wrap:wrap}
-#adh-fondo .aviso{background:rgba(255,210,90,.12);border:1px solid #d9b45a;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#f8ecc6}`;
+#adh-fondo .aviso{background:rgba(255,210,90,.12);border:1px solid #d9b45a;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#f8ecc6}
+#adh-fondo .adh-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:2px}
+#adh-fondo .adh-chip{font-size:10.5px;padding:4px 9px;border:1px solid #39435c;border-radius:99px;color:#9aa4bd;background:none;cursor:pointer;font-weight:700}
+#adh-fondo .adh-chip.hecho{color:#e9ecf4}
+#adh-fondo .adh-chip.activo{color:#fff;background:#2d6cdf;border-color:#2d6cdf}
+#adh-fondo .adh-titulo{font-size:16px;font-weight:800;margin:2px 0 4px}
+#adh-fondo .adh-ayuda{color:#aab3ca;font-size:12.5px;margin:0 0 10px;line-height:1.45}
+#adh-fondo .adh-ayuda b{color:#8db3ff}
+#adh-fondo .adh-nav{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding-top:10px;border-top:1px solid #2b3347}
+#adh-fondo .adh-resumen{border:1px solid #2b3347;background:#12172a;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.6}
+#adh-fondo .adh-resumen b{color:#8db3ff}`;
     document.head.appendChild(s);
   }
 
@@ -42,6 +57,7 @@ const AsistenteDueloHab = (() => {
     css();
     const ini = cfg.inicial || null;
     const st = {
+      paso: 0,
       activo: !!ini, objetivo: (ini && ini.objetivo) || 'enemigo',
       tira: ini ? (ini.tira === undefined ? 'pdgmg' : ini.tira) : 'pdgmg',
       contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
@@ -67,74 +83,154 @@ const AsistenteDueloHab = (() => {
     f.id = 'adh-fondo';
     document.body.appendChild(f);
     const cerrar = () => f.remove();
+    const sinOp = () => !st.tira;
 
-    function alcanceHtml(esArma){
+    // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
+    function pasos(){
+      const L = [{id: 'activo', corto: '¿Se juega?'}];
+      if(!st.activo){ L.push({id: 'listo', corto: 'Listo'}); return L; }
+      if(st.modo === 'flash'){
+        L.push({id: 'flash', corto: 'Flash'});
+      }else if(st.modo === 'arma'){
+        L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
+      }else{
+        L.push({id: 'objetivo', corto: 'Objetivo'});
+        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area') L.push({id: 'alcance', corto: 'Alcance'});
+        L.push({id: 'tira', corto: 'Tirada'});
+        if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
+        L.push({id: 'dano', corto: 'Daño'});
+        L.push({id: 'efectos', corto: 'Efectos'});
+      }
+      L.push({id: 'listo', corto: 'Listo'});
+      return L;
+    }
+
+    const titulo = (h, t, ayuda) => h + `<div class="adh-titulo">${t}</div><p class="adh-ayuda">${ayuda}</p>`;
+
+    function cuerpoAlcance(esArma){
       const lista = esArma ? [['auto', 'El de tu arma (cuerpo a cuerpo: 1 + su Alcance; a distancia: su Rango)'], ...ALCANCES.slice(1)] : ALCANCES;
-      return `<div><h4>Alcance</h4>
-        <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.</p>
-        <div class="fila"><select data-alcance>${lista.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div></div>`;
+      let h = titulo('', 'Alcance', 'No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.');
+      h += `<div class="fila"><select data-alcance>${lista.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div>`;
+      return h;
     }
     const FLASH_EN = [['pdg', 'La tirada de quien la usa (PdG, PdG.Esp…)'], ['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['fuerza', 'Fuerza del golpe'], ['dano', 'El daño']];
-    function flashHtml(){
-      return `<div><h4>Reacción Flash en el duelo</h4>
-        <p class="nota">Una habilidad Flash se usa <b>antes de una tirada</b> del duelo (nunca después de verla) y <b>no cuesta No2</b>, solo sus SP. En el cuadro del duelo aparece un botón «⚡» en las tiradas donde vale; al marcarlo y tirar, se cobran los SP y el bono se suma a esa tirada. Una vez por tirada.</p>
-        <div class="fila"><span>Suma</span><input type="number" style="width:70px" data-flashbono value="${esc(st.flashBono)}"><span>a la tirada</span></div>
+    function cuerpoFlash(){
+      let h = titulo('', 'Reacción Flash en el duelo', 'Una habilidad Flash se usa <b>antes de una tirada</b> del duelo (nunca después de verla) y <b>no cuesta No2</b>, solo sus SP. En el cuadro del duelo aparece un botón «⚡» en las tiradas donde vale; al marcarlo y tirar, se cobran los SP y el bono se suma a esa tirada. Una vez por tirada.');
+      h += `<div class="fila"><span>Suma</span><input type="number" style="width:70px" data-flashbono value="${esc(st.flashBono)}"><span>a la tirada</span></div>
         <p class="nota" style="margin-top:8px">Vale para:</p>
-        ${FLASH_EN.map(([v, t]) => `<label class="op"><input type="checkbox" data-flashen="${v}" ${st.flashEn.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
+        ${FLASH_EN.map(([v, t]) => `<label class="op"><input type="checkbox" data-flashen="${v}" ${st.flashEn.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}`;
+      return h;
     }
-    function armaHtml(){
+    function cuerpoArma(){
       const a = st.arma;
       const fila = (k, t) => `<div class="fila"><span style="min-width:250px">${t}</span><input type="number" style="width:80px" data-arma="${k}" value="${esc(a[k] ?? 0)}"></div>`;
-      return `<div><h4>Lo que la habilidad le suma a tu ataque</h4>
-        <p class="nota">Se juega como un ataque normal con tu arma (PdG contra Evasión o Parry, crítico, daño y efectos del arma). Los No2 del ataque ya los cobra la habilidad. «Por X» se multiplica por la X que elegís al ejecutarla.</p>
-        ${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
+      let h = titulo('', 'Lo que la habilidad le suma a tu ataque', 'Se juega como un ataque normal con tu arma (PdG contra Evasión o Parry, crítico, daño y efectos del arma). Los No2 del ataque ya los cobra la habilidad. «Por X» se multiplica por la X que elegís al ejecutarla.');
+      h += `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
         <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
-        <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label></div>
-      ${alcanceHtml(true)}`;
+        <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>`;
+      return h;
+    }
+    function cuerpoObjetivo(){
+      let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
+      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      if(st.objetivo === 'area'){
+        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
+          <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>`;
+      }
+      return h;
+    }
+    function cuerpoTira(){
+      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad. «Nada» es para buffs y curas: no hay nada que resistir.');
+      h += `<select data-tira><option value=""${sinOp() ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      if(sinOp()) h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>`;
+      return h;
+    }
+    function cuerpoContra(){
+      let h = titulo('', '¿Con qué se resiste el objetivo?', 'Si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada. Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Un hechizo no se parrea ni se bloquea.');
+      h += CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('');
+      return h;
+    }
+    function cuerpoDano(){
+      let h = titulo('', 'Daño', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá.');
+      h += `<label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> Esta habilidad hace daño${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>`;
+      if(st.dano){
+        h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+          <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
+          <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>`;
+        if(cfg.costoVariable){
+          h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
+            <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
+        }
+      }
+      return h;
+    }
+    function cuerpoEfectos(){
+      let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : 'Efectos sobre el objetivo', 'Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.');
+      h += st.efectos.map((e, i) => e.cura !== undefined
+        ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
+        : `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
+          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>`).join('');
+      h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+        <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
+      return h;
+    }
+    function cuerpoActivo(){
+      let h = titulo('', '¿Se juega en el duelo?', 'Si lo tildás, ejecutar esta habilidad abre el cuadro del duelo paso a paso — elegís el objetivo, se tira, se ve en vivo, con su resumen en la Mesa. Si no, se ejecuta como antes: se anuncia y tira su fórmula sola.');
+      h += `<label class="op"><input type="checkbox" data-activo ${st.activo ? 'checked' : ''}> Ejecutar esta habilidad abre el duelo paso a paso</label>`;
+      if(st.activo){
+        h += `<div style="margin-top:10px"><h4>¿Qué tipo de habilidad es?</h4>
+          <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option><option value="flash"${st.modo === 'flash' ? ' selected' : ''}>⚡ Reacción Flash (suma a una tirada del duelo)</option></select></div>`;
+      }
+      return h;
+    }
+    function cuerpoListo(){
+      if(!st.activo) return titulo('', 'Listo', 'Esta habilidad no usa el duelo: se ejecuta como antes (se anuncia en la Mesa y tira su fórmula sola, sin objetivo ni cuadro).') + `<div class="adh-resumen">Sin duelo.</div>`;
+      let h = titulo('', 'Revisá cómo quedó', 'Si algo no está bien, tocá el paso arriba para volver.');
+      const filas = [];
+      if(st.modo === 'flash'){
+        filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}`);
+      }else if(st.modo === 'arma'){
+        const a = st.arma, partes = [];
+        if(a.pdg) partes.push(`${a.pdg > 0 ? '+' : ''}${a.pdg} PdG`);
+        if(a.pdgPorX) partes.push(`${a.pdgPorX > 0 ? '+' : ''}${a.pdgPorX} PdG por X`);
+        if(a.dadosPorX) partes.push(`+${a.dadosPorX} dado(s) de daño por X`);
+        if(a.fijo) partes.push(`${a.fijo > 0 ? '+' : ''}${a.fijo} de daño fijo`);
+        if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
+        if(a.sinParry) partes.push('no se puede parrear');
+        filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
+        if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+      }else{
+        filas.push(`<b>Objetivo</b>: ${st.objetivo}${st.objetivo === 'area' ? ` (radio ${st.radio})` : ''}`);
+        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+        filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo' : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${[...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)'}`);
+        if(st.dano) filas.push(`<b>Daño</b>: tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}`);
+      }
+      if(st.modo !== 'flash'){
+        const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.turnos ?? 2}t)`).join(', ');
+        filas.push(`<b>Efectos</b>: ${efTxt || 'ninguno'}`);
+      }
+      h += `<div class="adh-resumen">${filas.join('<br>')}</div>`;
+      return h;
     }
 
     function dibujar(){
-      const sinOp = !st.tira;
-      f.innerHTML = `<div class="adh"><header><span>🎯 Duelo · ${esc(cfg.nombre || 'Habilidad')}</span><button type="button" class="sec" data-x>✕</button></header>
-        <div class="cuerpo">
-          <label class="op"><input type="checkbox" data-activo ${st.activo ? 'checked' : ''}> <b>Ejecutar esta habilidad abre el duelo paso a paso</b> (elegís el objetivo, se tira, se ve en vivo)</label>
-          ${st.activo ? `
-          <div><h4>¿Qué tipo de habilidad es?</h4>
-            <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option><option value="flash"${st.modo === 'flash' ? ' selected' : ''}>⚡ Reacción Flash (suma a una tirada del duelo)</option></select></div>
-          ${st.modo === 'flash' ? flashHtml() : st.modo === 'arma' ? armaHtml() : `
-          <div><h4>1 · ¿A quién apunta?</h4>
-            <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          ${st.objetivo === 'area' ? `<div><h4>Radio del área</h4>
-            <p class="nota">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
-            <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros</span></div></div>` : ''}
-          ${st.objetivo === 'uno mismo' || st.objetivo === 'area' ? '' : alcanceHtml(false)}
-          <div><h4>2 · ¿Qué tira quien la usa?</h4>
-            <select data-tira><option value=""${sinOp ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          ${sinOp ? `<div class="aviso">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>` : `
-          <div><h4>3 · ¿Con qué se resiste el objetivo?</h4>
-            <p class="nota">Si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada. Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Un hechizo no se parrea ni se bloquea.</p>
-            ${CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`}
-          <div><h4>${sinOp ? '3' : '4'} · Daño</h4>
-            <label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> La fórmula de daño de la habilidad (su «segunda tirada», por ejemplo 2d6+3) es el daño que hace${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
-            ${st.dano ? `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-            <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
-            <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>
-            ${cfg.costoVariable ? `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
-            <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>` : ''}` : ''}</div>
-          `}
-          ${st.modo === 'flash' ? '' : `<div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
-            <p class="nota">Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.</p>
-            ${st.efectos.map((e, i) => e.cura !== undefined
-              ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
-              : `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
-                <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>`).join('')}
-            <datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
-            <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div></div>`}` : ''}
-        </div>
+      const L = pasos();
+      st.paso = Math.max(0, Math.min(L.length - 1, st.paso));
+      const id = L[st.paso].id;
+      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'objetivo' ? cuerpoObjetivo() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
+        : id === 'tira' ? cuerpoTira() : id === 'contra' ? cuerpoContra() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
+        : id === 'arma' ? cuerpoArma() : id === 'flash' ? cuerpoFlash() : cuerpoListo();
+      const chips = `<div class="adh-chips">${L.map((x, i) => `<button type="button" class="adh-chip${i === st.paso ? ' activo' : ''}${i < st.paso ? ' hecho' : ''}" data-paso="${i}">${i + 1}. ${x.corto}</button>`).join('')}</div>`;
+      const nav = `<div class="adh-nav">${st.paso > 0 ? '<button type="button" class="sec" data-atras>← Atrás</button>' : '<span></span>'}${st.paso < L.length - 1 ? '<button type="button" data-siguiente>Siguiente →</button>' : '<span></span>'}</div>`;
+      f.innerHTML = `<div class="adh"><header><span>⚔ Duelo · ${esc(cfg.nombre || 'Habilidad')}</span><button type="button" class="sec" data-x>✕</button></header>
+        <div class="cuerpo">${chips}${cuerpo}${nav}</div>
         <div class="pie">${ini ? '<button type="button" class="rojo" data-quitar title="Vuelve a la ejecución de siempre (sin duelo)">Sacar el duelo de esta habilidad</button>' : ''}<button type="button" class="sec" data-x>Cancelar</button><button type="button" data-ok>Guardar</button></div></div>`;
       f.querySelectorAll('[data-x]').forEach(b => b.onclick = cerrar);
-      f.querySelector('[data-activo]').onchange = e => { st.activo = e.target.checked; dibujar(); };
+      f.querySelectorAll('[data-paso]').forEach(b => b.onclick = () => { st.paso = +b.dataset.paso; dibujar(); });
+      const atras = f.querySelector('[data-atras]'); if(atras) atras.onclick = () => { st.paso--; dibujar(); };
+      const sig = f.querySelector('[data-siguiente]'); if(sig) sig.onclick = () => { st.paso++; dibujar(); };
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
+      q('[data-activo]', e => { st.activo = e.target.checked; st.paso = 0; dibujar(); });
       q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });

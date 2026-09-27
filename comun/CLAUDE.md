@@ -223,3 +223,34 @@ versión parecida en más de una, es candidato a juntar.
   de la fase `dodge`, sin importar cuántos snapshots pasen mientras dura), para que el mapa minimice el cuadro solo
   en la pantalla de quien tiene que decidir el dodge roll (y lo reabra al terminar) — ver `../vtt-hexgrid/CLAUDE.md`
   para el detalle. No usan Firestore: es puramente local a cada pantalla.
+
+- **`asistente-duelo-hab.js` paso a paso** (2026-09-27, pedido del dueño — mismo criterio que `asistente-item.js`,
+  `asistente-estado.js` y `asistente-trampa.js`): el 🎯 (ahora ⚔) ya no es un formulario largo de una sola pantalla —
+  cada pregunta es su propio paso, con chips arriba (`pasos()`, dinámica según `st.activo`/`st.modo`/`st.objetivo`/
+  `st.tira`), un título y una explicación por paso, y Atrás/Siguiente. Reusa la paleta oscura que ya tenía el archivo
+  (`#adh-fondo`/`.adh`, azul `#2d6cdf`) en vez de la de pergamino de `asistente-item.js`. Guardar queda siempre
+  visible en el pie (se está editando siempre, nunca "creando" un ítem nuevo de cero como si pasa en el de ítems).
+  El resumen final ("Listo") repite en una línea lo que quedó configurado. Ninguna validación ni el payload final
+  cambiaron — solo la presentación.
+- **Íconos del duelo: ⚔ en vez de 🎯** (2026-09-27, pedido del dueño): el 🎯 (apuntar/objetivo) se usa en todo el
+  código para varias cosas de "elegir objetivo" que no son el duelo — se cambió solo lo que representa
+  específicamente "el duelo de esta habilidad": el encabezado del asistente, sus botones disparadores y la
+  etiqueta "duelo" del ítem, en `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`. El resto de los 🎯 del
+  juego (Crear tokens, ¿A quién le pegó?, etc.) no se tocó.
+- **Botón "🎲 Dados" de la Mesa: visible achicada o agrandada** (2026-09-27, pedido del dueño): antes
+  `#mesa.colapsada #mesa-grilla{display:none}` lo escondía del todo con la Mesa achicada — se sacó esa regla
+  (`ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`) para que se vea igual en los dos estados.
+- **Áreas: seguro contra que se queden pegadas para siempre** (2026-09-27, bug real reportado por el dueño —
+  "el área no debería dejar ninguna marca en el terreno" — quedó el círculo violeta en el mapa después de que Orbe
+  arcano ya había terminado): la causa más probable es un sub-duelo en fase `dodge` que nadie llegó a resolver
+  (el cartel «✋ No me quiero mover» solo lo ve el defensor o el GM — si ninguno lo toca, la cascada nunca avanza y
+  `areas/<id>.estado` se queda en `'en-curso'` para siempre). `escucharAreas()` (`vtt-hexgrid/mapa.html`) ahora,
+  además de la autocuración de siempre, cierra sola (`estado:'terminado'`) cualquier área que siga `'en-curso'`
+  pasados `AREA_ATASCADA_MS` (5 minutos) desde que se creó — sin importar la causa puntual del bloqueo, la marca en
+  el mapa nunca queda para siempre.
+- **La moneda de un empate rueda en 3D** (2026-09-27, pedido del dueño): `elegirParidad` (desempate por par o impar)
+  publicaba el resultado del d6 directo, sin pasar por la Mesa ni por los dados 3D — el cuadro mostraba quién ganó
+  al instante. Ahora publica la tirada con `mesaPublicar` (mismo camino que el d20 del crítico, `tirarCritico`) y
+  `nReveal` (`comun/duelo.js`) suma un paso propio cuando `d.contacto.moneda`/`d.bloq.moneda` aparece (aparte del que
+  ya contaba `pdg`+`eva`), así el cuadro espera a que el dado de la moneda quede quieto antes de revelar quién ganó
+  el empate — mismo mecanismo que ya usaban contacto, Bloqueo y crítico ("Primero los dados, después el resultado").

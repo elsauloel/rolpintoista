@@ -9249,6 +9249,7 @@ async function dueloVincularSiFalta(t){
 function coleccionAreas(){ return fbDb.collection(fbRutaCampana('areas')); }
 let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el círculo; el GM además avanza la cascada)
 
+const AREA_ATASCADA_MS = 5 * 60 * 1000;   // si sigue 'en-curso' pasado esto, se cierra sola (ver más abajo)
 function escucharAreas(){
   coleccionAreas().where('estado', '==', 'en-curso').onSnapshot(snap => {
     areasActivas.clear();
@@ -9257,7 +9258,16 @@ function escucharAreas(){
     // Autocuración: si a un área en curso le falta el sub-duelo que le toca (recién creada, o
     // esta pestaña del GM no llegó a verlo antes), lo crea acá — cubre el primer objetivo y
     // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
-    if(soyGM) areasActivas.forEach((a, id) => { if(!(a.duelos || [])[num(a.indice)]) areaCrearSiguienteSubDuelo(id, a); });
+    if(soyGM) areasActivas.forEach((a, id) => {
+      if(!(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
+      // Seguro contra que se quede pegada para siempre (ej. un dodge roll que nadie llegó a resolver, o
+      // un permiso que falló en el último paso): pasados AREA_ATASCADA_MS igual 'en-curso', se cierra sola
+      // — el pedido del dueño (2026-09-27) es que un área nunca deje una marca permanente en el mapa.
+      const creado = a.creado && a.creado.toMillis ? a.creado.toMillis() : 0;
+      if(creado && Date.now() - creado > AREA_ATASCADA_MS){
+        coleccionAreas().doc(id).update({estado: 'terminado'}).catch(err => console.error('No se pudo cerrar el área atascada:', err));
+      }
+    });
   }, err => console.error('Error escuchando las áreas:', err));
 }
 

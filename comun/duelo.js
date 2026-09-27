@@ -846,11 +846,13 @@ const Duelo = (() => {
   }
 
   // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un d6 y gana el que acierta.
+  // La moneda rueda en 3D como cualquier otra tirada del duelo (regla del dueño, 2026-09-27): se publica en la Mesa
+  // y `nReveal` (ver más abajo) hace que el cuadro espere a que el dado quede quieto antes de mostrar quién ganó.
   async function elegirParidad(id, quien, eleccion){
     const ref = col().doc(id);
-    let anuncio = '';
+    let anuncio = '', publicar = null;
     await fbDb.runTransaction(async tx => {
-      anuncio = '';
+      anuncio = ''; publicar = null;
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
@@ -864,7 +866,10 @@ const Duelo = (() => {
       cerrarPar(m, par, r);
       anuncio = textoDesempate(m, par, r);
       tx.update(ref, cambiosDe(m));
+      const quienTiro = quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
+      publicar = {origen: `${quienTiro} · Empate: ${eleccion}`, r: {formula: '1d6', rolls: [resultado], mod: 0, total: resultado}};
     });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
     anunciarMesa(anuncio);
   }
 
@@ -1290,8 +1295,13 @@ const Duelo = (() => {
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }
 
-  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, los d20 del crítico, el daño y cada efecto tirado): el cuadro espera a los dados 3D en cada una.
-  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0) + (d.crit && d.crit.d20 ? 1 : 0) + (d.dano ? 1 : 0) + (d.efectos || []).filter(e => e && e.res && !siempreEf(e)).length;
+  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, la moneda de un empate, los d20 del crítico,
+  // el daño y cada efecto tirado): el cuadro espera a los dados 3D en cada una. La moneda es su propia revelación,
+  // aparte de la de contacto/Bloqueo (que ya contaron al llegar las dos tiradas parejas) — así el cuadro también
+  // espera a que el d6 quede quieto antes de mostrar quién ganó el empate (2026-09-27, pedido del dueño).
+  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0)
+    + ((d.contacto && d.contacto.moneda) || (d.bloq && d.bloq.moneda) ? 1 : 0)
+    + (d.crit && d.crit.d20 ? 1 : 0) + (d.dano ? 1 : 0) + (d.efectos || []).filter(e => e && e.res && !siempreEf(e)).length;
 
   // Espera a que los dados 3D rueden y queden quietos (o un máximo, por si no hay animación) y llama a cb.
   function esperarDados(cb){

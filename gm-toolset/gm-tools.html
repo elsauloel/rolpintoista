@@ -763,7 +763,6 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
 #mesa-grilla{padding:0 10px 8px}
 #mesa-grilla .btn{width:100%}
 #mesa-grilla .btn.activo{border-color:var(--brass);color:var(--brass)}
-#mesa.colapsada #mesa-grilla{display:none}
 .mesa-tirada{padding:5px 7px;border-radius:var(--r);background:rgba(0,0,0,.28);transition:background 1.2s}
 .mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
 .mesa-tirada.ultima{background:#2E6B57}
@@ -5502,7 +5501,7 @@ function habHtml(sc, h){
         <span class="durlabel">CD</span>
         <input type="number" data-habf="cd" data-scid="${scId}" data-habid="${h.id}" value="${h.cd||0}" min="0" title="Turnos de reutilización. 0 = sin cooldown">
       </div>
-      ${h.duelo ? '<span class="tag" title="Al ejecutarla se abre el duelo paso a paso">🎯</span>' : ''}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo">🎯</button>
+      ${h.duelo ? '<span class="tag" title="Al ejecutarla se abre el duelo paso a paso">⚔</span>' : ''}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo">⚔</button>
       <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
       <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
     </div>

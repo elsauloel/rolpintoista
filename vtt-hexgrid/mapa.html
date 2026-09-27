@@ -4949,7 +4949,8 @@ document.addEventListener('keydown', e => {
   // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
   if(!$('#botonera-capa').hidden){
     // Escape, o B (la tecla que la abre), la cierra.
-    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B' || e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
+    if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey){ escapeABotonera(true); return; }   // F abre y cierra la ficha: cierra todo de una
+    if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
   if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoCancelar(); return; }
@@ -8897,12 +8898,12 @@ function enfocarBotonera(){
   try{ $('#botonera-marco').contentWindow.focus(); }catch(e){}
 }
 
-function escapeABotonera(){
+function escapeABotonera(cerrarTodo){
   if(!botonera.lista){
     $('#botonera-cargando-x').click();
     return;
   }
-  $('#botonera-marco').contentWindow.postMessage({tipo: 'tecla-escape'}, location.origin);
+  $('#botonera-marco').contentWindow.postMessage({tipo: cerrarTodo ? 'tecla-f' : 'tecla-escape'}, location.origin);
 }
 
 function cerrarBotonera(){

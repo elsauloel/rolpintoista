@@ -12579,6 +12579,7 @@ if(MODO_BOTONERA){
       abrirVendedor().then(() => botoneraAvisarMapa($('#scrim-catalogo').classList.contains('open') ? 'botonera-lista' : 'botonera-cerrada'));
     }
     // Escape apretado en el mapa: se hace como si se apretara acá.
+    if(e.data.tipo === 'tecla-f'){ document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open')); setTimeout(revisarCerrada, 60); }   // F desde el mapa: cierra todo
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     // El mapa pide agregar un estado: se abre el mismo selector que "+ Estado"
     // (el de la invocación que traiga el mensaje, o el propio si no trae ninguna).

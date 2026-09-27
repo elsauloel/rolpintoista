@@ -82,7 +82,7 @@ const CLASES_SKILLS = [
     {id: 'tanque-dano-en-area', nombre: 'Daño en área', costo: '2', nitrosCosto: 'ATAQUE', tiradaStat: 'pdg', zonaMapa: 'flor', zonaRadio: 1,
      detalle: 'Ataque en área: cuesta lo de un ataque con tu arma y cuenta como ese ataque. Tirás PdG y el mapa dibuja 3 s la flor de 1 (los adyacentes) a tu alrededor; el daño va con el 🎲 (a mano). Solo enemigos: pueden esquivar con dodge roll (a mano). Vos no te afectás.'},
     {id: 'tanque-takle', nombre: 'Takle', costo: '3', nitrosCosto: 0, tiradaStat: 'pdg', tiradaBono: 1,
-     detalle: 'Flash (SP x 2; no cuesta No2: ni el desplazamiento ni el ataque). Te desplazás hasta 2 casillas y atacás con PdG +1; te pueden esquivar, no parrear. Si conecta y ganás Constitución vs Constitución (a mano): pierde 2 No2 y lo empujás 2 casillas; en su turno, además pasa al final de la iniciativa (si era el último, lo pierde).'},
+     detalle: 'Flash (SP x 2; la skill en sí no cuesta No2, pero el desplazamiento cuesta lo de siempre: 1 No2 por casilla, a mano). Te desplazás hasta 2 casillas y atacás con PdG +1; te pueden esquivar, no parrear. Si conecta y ganás Constitución vs Constitución (a mano): pierde 2 No2 y lo empujás 2 casillas; en su turno, además pasa al final de la iniciativa (si era el último, lo pierde).'},
     skillSA('tanque', 'Taunt', 'SP 1. Tira Especial + 1 contra Especial para obligar a un enemigo a atacarte hasta el final de su próximo turno.'),
     skillSA('tanque', 'Miti-Miti', 'SP 2. Marca un personaje como protegido: comparte con el tanque la mitad del daño que recibe. Dura 1 turno.'),
     {id: 'tanque-temple', nombre: 'Temple', costo: '2', nitrosCosto: 1,

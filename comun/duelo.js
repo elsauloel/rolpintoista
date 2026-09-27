@@ -174,6 +174,9 @@ const Duelo = (() => {
 /* El latido va en el paso en curso (el que espera una acción), no en el veredicto. */
 .duelo-paso.activo{border-color:#6fa8ff;animation:duelo-latido 1.4s ease-in-out infinite alternate}
 .duelo-paso.activo h4{color:#cfe0ff}
+/* El botón que hay que apretar ahora brilla y late. */
+.duelo-tiro button:not(.sec):not(:disabled),.duelo-ef button:not(:disabled),.duelo-contra button:not(.sec):not(:disabled),.duelo-pie button:not(.sec):not(:disabled),.duelo-fin button:not(:disabled),.duelo-par button{animation:duelo-boton 1.2s ease-in-out infinite alternate}
+@keyframes duelo-boton{0%{box-shadow:0 0 4px rgba(90,150,255,.3);filter:brightness(1)}100%{box-shadow:0 0 22px 4px rgba(110,170,255,.95);filter:brightness(1.25)}}
 .viva{display:block;margin:6px auto;padding:10px 14px;border-radius:10px;color:#dfeaff!important;font-style:normal!important;font-weight:700;background:rgba(80,140,255,.14);border:1px solid rgba(110,170,255,.5);animation:duelo-latido 1.4s ease-in-out infinite alternate}
 .duelo-paso.activo h4 .n{background:#2d6cdf}
 @keyframes duelo-latido{0%{box-shadow:0 0 6px rgba(80,140,255,.25),inset 0 0 8px rgba(80,140,255,.06)}100%{box-shadow:0 0 30px rgba(80,150,255,.75),inset 0 0 22px rgba(80,150,255,.22)}}

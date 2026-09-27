@@ -8657,7 +8657,7 @@ function centrarTokenDeBotonera(herramienta, id){
 function abrirBotonera(fichaId, mensaje, invId){
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
-  const completa = !!(mensaje && mensaje.tipo === 'abrir-botin');   // la ventana de la batalla ocupa todo el centro
+  const completa = !!(mensaje && (mensaje.tipo === 'abrir-botin' || mensaje.tipo === 'abrir-equipo'));   // la ventana de la batalla y la de Equipo y mochila ocupan todo el centro
   capa.hidden = false;
   botonera.completa = completa;
   ubicarBotoneraCapa();

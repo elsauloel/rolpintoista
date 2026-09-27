@@ -7915,7 +7915,7 @@ function catalogoRowHtml(item){
     </div>
     <div class="cat-actions">
       <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1">
-      <button class="cat-btn add" data-catalogoadd="${item.id}">Agregar a mochila</button>
+      ${tiendaCargada && tiendaCargada.agregarGratis ? `<button class="cat-btn add" data-catalogoadd="${item.id}" title="El GM permitió agregar ítems gratis en esta tienda">Agregar a mochila (gratis)</button>` : ''}
       <button class="cat-btn buy" data-catalogocarrito="${item.id}">+ Carrito</button>
     </div>
     <div class="cat-manage">
@@ -9173,6 +9173,8 @@ function crearItemsDesdeCatalogo(item, cantidad){
 }
 
 function agregarDesdeCatalogo(id){
+  // Agregar gratis solo si el GM lo permitió en la tienda abierta (por defecto se compra con el carrito).
+  if(!(tiendaCargada && tiendaCargada.agregarGratis)){ toast('Esta tienda no permite agregar ítems gratis: usá el carrito'); return; }
   const item = itemCatalogo(id);
   if(!item) return;
   const qtyInput = document.querySelector(`[data-catqty="${id}"]`);

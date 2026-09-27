@@ -303,6 +303,10 @@ input[type=checkbox]{width:auto}
         <input type="number" id="f-precio-rep" step="1" min="0" value="1" style="width:60px" title="DDE que cobra por cada punto de durabilidad reparado">
         <span class="hint">DDE/punto</span>
       </div>
+      <div class="ajuste-grupo" title="Por defecto los jugadores solo pueden COMPRAR (con el carrito). Si tildás esto, ven además el botón «Agregar a mochila» que les da los ítems gratis (útil para repartir equipo inicial o premios)">
+        <label for="f-gratis">🎁 Permitir agregar gratis</label>
+        <input type="checkbox" id="f-gratis">
+      </div>
       <div class="ajuste-grupo">
         <label for="f-ajuste-venta">Al vender</label>
         <input type="number" id="f-ajuste-venta" step="5" value="0" title="Lo que cobran los jugadores al venderle a esta tienda (ítems y despojos): porcentaje sobre el valor de venta. Negativo paga menos, positivo paga más.">
@@ -2215,6 +2219,7 @@ function marcarAjuste(){
   $('#f-ajuste').value = n;
   $('#f-ajuste-venta').value = ajusteVentaActual();
   $('#f-herrero').checked = !!(tiendaActual && tiendaActual.herrero);
+  $('#f-gratis').checked = !!(tiendaActual && tiendaActual.agregarGratis);
   $('#f-precio-rep').value = tiendaActual && tiendaActual.precioReparacion !== undefined ? tiendaActual.precioReparacion : 1;
   document.querySelectorAll('.ajuste-preset[data-ajuste]').forEach(b =>
     b.classList.toggle('activo', Number(b.dataset.ajuste) === n));
@@ -2744,6 +2749,7 @@ $('#agregar-rubro').addEventListener('change', renderAgregarLista);
 $('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
 $('#f-ajuste-venta').addEventListener('change', e => aplicarAjusteVenta(e.target.value));
+$('#f-gratis').addEventListener('change', e => { if(!tiendaActual) return; tiendaActual.agregarGratis = e.target.checked; tiendaCambio(); });
 $('#f-herrero').addEventListener('change', e => { if(!tiendaActual) return; tiendaActual.herrero = e.target.checked; tiendaCambio(); });
 $('#f-precio-rep').addEventListener('change', e => {
   if(!tiendaActual) return;

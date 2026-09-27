@@ -5902,7 +5902,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 50,
-    "detalle": "Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. Mientras siga ahí, podés gastarla en cualquier momento para sumar +2 a una tirada de dado. Si todavía la tenés guardada sin consumir, no hay bono — el efecto arranca recién cuando la liberás, y dura hasta que la uses.",
+    "detalle": "Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. ⚙ Automatizado: mientras siga ahí, un botón flotante 🦋 queda SIEMPRE VISIBLE (arriba de cualquier ventana) — al tocarlo suma +2 a tu última tirada y se anuncia en la Mesa; la polilla se gasta sola.",
     "descripcionNarrativa": "Sale del frasco y se queda dando vueltas cerca. Espera el momento en que la necesites.",
     "legacy": true,
     "unidades": 1,
@@ -5914,7 +5914,7 @@
     "efectoTurnos": 0,
     "efectoHpTurno": 0,
     "efectoPermanente": true,
-    "efectoDetalle": "La polilla revolotea a tu alrededor. Cuando quieras, gastala para sumar +2 a una tirada de dado: borrá este estado en ese momento para marcar que ya la usaste. Hasta entonces queda acá, sin vencerse.",
+    "efectoDetalle": "La polilla revolotea a tu alrededor. ⚙ Automatizado: el botón flotante 🦋 suma +2 a tu última tirada y quita este estado (se gasta).",
     "consumible": true,
     "imagen": ""
   },

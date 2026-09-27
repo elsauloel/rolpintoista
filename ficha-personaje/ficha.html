@@ -1210,7 +1210,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#adh-fondo):not(#grilla-dados){display:none!important}
+html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#adh-fondo):not(#grilla-dados):not(#polilla-flotante){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
@@ -2628,7 +2628,7 @@ const DEFAULT = {
     {id:'new-pocion-de-segundo-aire', nombre:'Poción de segundo aire', tier:'Legendario', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:420, unidades:1, consumible:true, curahp:60, efectoNombre:'Segundo aire (poción)', efectoTurnos:3, efectoDetalle:'Iniciativa +5, Movimiento +3. Dura 3 turnos.', efectoMods:[{stat:'ini', val:5}, {stat:'mov', val:3}], mods:[], detalle:'Recuperás 60 HP y ganás Iniciativa +5 y Movimiento +3 durante 3 turnos. Al usarla se activa el estado "Segundo aire (poción)".', descripcionNarrativa:'Un frasco chico con burbujas que suben y bajan. Sabe a menta y a victoria.'},
     {id:'new-pocion-de-impetu', nombre:'Poción de Ímpetu', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, curahp:0, efectoNombre:'Ímpetu (poción)', efectoTurnos:4, efectoDetalle:'Acciones máximas +1 mientras dure (4 turnos).', efectoMods:[{stat:'accionesmax', val:1}], mods:[], detalle:'Otorga +1 a Acciones máximas durante 4 turnos. Al consumirla se activa el estado \'Ímpetu (poción)\'.', descripcionNarrativa:'Efervescente y ruidosa. Se toma de un saque o se desperdicia.'},
     {id:'new-pocion-de-impetu-mayor', nombre:'Poción de Ímpetu mayor', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, consumible:true, curahp:0, efectoNombre:'Ímpetu mayor (poción)', efectoTurnos:4, efectoDetalle:'Acciones máximas +2 mientras dure (4 turnos).', efectoMods:[{stat:'accionesmax', val:2}], mods:[], detalle:'Otorga +2 a Acciones máximas durante 4 turnos. Al consumirla se activa el estado \'Ímpetu mayor (poción)\'.', descripcionNarrativa:'Efervescente y ruidosa. Se toma de un saque o se desperdicia. La versión concentrada: pega más fuerte y se nota antes.'},
-    {id:'cat-polilla', nombre:'Polilla mística', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, legacy:true, curahp:0, efectoNombre:'Polilla revoloteando', efectoPermanente:true, efectoDetalle:'La polilla revolotea a tu alrededor. Cuando quieras, gastala para sumar +2 a una tirada de dado: borrá este estado en ese momento para marcar que ya la usaste. Hasta entonces queda acá, sin vencerse.', mods:[], detalle:'Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. Mientras siga ahí, podés gastarla en cualquier momento para sumar +2 a una tirada de dado. Si todavía la tenés guardada sin consumir, no hay bono — el efecto arranca recién cuando la liberás, y dura hasta que la uses.', descripcionNarrativa:'Sale del frasco y se queda dando vueltas cerca. Espera el momento en que la necesites.'},
+    {id:'cat-polilla', nombre:'Polilla mística', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:50, unidades:1, consumible:true, legacy:true, curahp:0, efectoNombre:'Polilla revoloteando', efectoPermanente:true, efectoDetalle:'La polilla revolotea a tu alrededor. ⚙ Automatizado: el botón flotante 🦋 suma +2 a tu última tirada y quita este estado (se gasta).', mods:[], detalle:'Al consumirla, se libera una polilla mística que queda revoloteando a tu alrededor. ⚙ Automatizado: mientras siga ahí, un botón flotante 🦋 queda SIEMPRE VISIBLE (arriba de cualquier ventana) — al tocarlo suma +2 a tu última tirada y se anuncia en la Mesa; la polilla se gasta sola.', descripcionNarrativa:'Sale del frasco y se queda dando vueltas cerca. Espera el momento en que la necesites.'},
     {id:'nuevo-polvo-de-revelacion', nombre:'Polvo de revelación', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:45, unidades:1, consumible:true, curahp:0, efectoNombre:'Destello (polvo de revelación)', efectoTurnos:1, efectoDetalle:'Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (polvo de revelación)» y el mapa lo lee (tokens de los creeps iluminados incluidos).', efectoMods:[{stat:'luz', val:2}, {stat:'veoculto', val:2}], mods:[], detalle:'Destello: ilumina un radio 2 (19 casilleros) alrededor de quien lo usa durante 1 turno, sin punto ciego, y destapa la niebla de esa zona (queda como ya vista). Además ve lo oculto en esa zona (creeps en sigilo y trampas escondidas). ⚙ Automático: al consumirlo aplica el estado «Destello (polvo de revelación)» y el mapa lo lee (tokens de los creeps iluminados incluidos).', descripcionNarrativa:'Un polvillo plateado que se posa sobre todo lo que se esconde y lo marca con un brillo delator.'},
     {id:'nuevo-trampa-portal-cosmico-r2', nombre:'Portal cósmico', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:70, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Portal cósmico", "detalle": "Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita.", "amiga": false, "tipo": "flor", "tamano": 2, "color": "#9B5FD0", "alfa": 45, "dano": ""}, consumible:true, curahp:0, mods:[], detalle:'Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar.'},
     {id:'nuevo-trampa-portal-cosmico-r3', nombre:'Portal cósmico mayor', tier:'Raro', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:105, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Portal cósmico mayor", "detalle": "Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita.", "amiga": false, "tipo": "flor", "tamano": 3, "color": "#9B5FD0", "alfa": 45, "dano": ""}, consumible:true, curahp:0, mods:[], detalle:'Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar.'},
@@ -4608,6 +4608,48 @@ function registrarTirada(origen, r){
   dadosHistorial = dadosHistorial.slice(0, 20);
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
   if(document.getElementById('scrim-reroll') && $('#scrim-reroll').classList.contains('open')) renderReroll();
+  renderPolillaBoton();   // el botón flotante muestra a qué tirada le sumaría el +2
+}
+
+/* ---------- Polilla mística (2026-09-27, regla del dueño; catálogo `cat-polilla`) ----------
+   El consumible ya crea, al usarlo, el estado permanente «Polilla revoloteando» (efectoNombre del ítem, EFECTOS_PRESET no lo conoce así que
+   queda como un estado libre). Mientras ese estado esté activo, un botón flotante (🦋) queda SIEMPRE VISIBLE, arriba de cualquier ventana:
+   al tocarlo, suma +2 a la ÚLTIMA tirada propia del log (no vuelve a tirar nada: la tirada ya está hecha) y se anuncia en la Mesa; el estado
+   se saca solo (la polilla se gastó). Sin una tirada en el log, no hay a qué sumarle el bono. */
+const esPolillaActiva = () => S.efectos.find(e => e && e.activo !== false && /^Polilla revoloteando/i.test(String(e.nombre || '')));
+function renderPolillaBoton(){
+  const est = esPolillaActiva();
+  let b = document.getElementById('polilla-flotante');
+  if(!est){ if(b) b.remove(); return; }
+  if(!b){
+    b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'polilla-flotante';
+    b.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:999999;background:#3a1f4a;color:#e9d6ff;border:2px solid #b98cff;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 20px rgba(180,120,255,.6);animation:polilla-latido 1.6s ease-in-out infinite alternate;text-align:left';
+    b.innerHTML = '<div>🦋 Polilla mística</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9" id="polilla-flotante-sub"></small>';
+    b.onclick = usarPolilla;
+    document.body.appendChild(b);
+    if(!document.getElementById('polilla-css')){
+      const s = document.createElement('style');
+      s.id = 'polilla-css';
+      s.textContent = '@keyframes polilla-latido{0%{box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 8px rgba(180,120,255,.35)}100%{box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 30px rgba(190,130,255,.95)}}';
+      document.head.appendChild(s);
+    }
+  }
+  const ultima = dadosHistorial[0];
+  $('#polilla-flotante-sub').textContent = ultima ? `+2 a tu última tirada: ${ultima.origen} (${fmt(num(ultima.total))})` : 'todavía no hiciste ninguna tirada';
+}
+function usarPolilla(){
+  const est = esPolillaActiva();
+  if(!est) return;
+  const ultima = dadosHistorial[0];
+  if(!ultima){ toast('Todavía no hiciste ninguna tirada para sumarle el +2'); return; }
+  S.efectos = S.efectos.filter(e => e.id !== est.id);   // la polilla se gasta
+  ultima.total = num(ultima.total) + 2;   // se ve reflejado en el historial de esta pantalla (la Mesa ya publicada no se reescribe)
+  try{ publicarRecordatorios([{nombre: `🦋 ${(S.meta && S.meta.nombre) || 'Alguien'} usó la Polilla mística`, detalle: `+2 a su última tirada — ${ultima.origen}: ahora ${fmt(ultima.total)}`}]); }catch(e){}
+  toast(`🦋 Polilla mística: +2 a "${ultima.origen}" (ahora ${fmt(ultima.total)})`);
+  renderList('efectos');
+  renderPolillaBoton();
 }
 
 /* ---------- Historial de sesión (tiradas + eventos, no se guarda) ---------- */
@@ -6438,6 +6480,7 @@ function renderAll(){
   renderTurno();
   renderNitros();
   renderVitals();
+  renderPolillaBoton();
   renderJob();
   renderInteligencia();
   renderExp();
@@ -6505,6 +6548,7 @@ function refresh(){
   sincronizarEstadosDeEquipo();
   renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderInteligencia(); renderExp(); renderNitros();
   renderList('efectos');
+  renderPolillaBoton();
   if($('#scrim-equipo').classList.contains('open')) renderEquipo();
 }
 

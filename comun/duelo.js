@@ -156,6 +156,11 @@ const Duelo = (() => {
 .duelo-d20.mejor::after{animation-delay:.9s}
 @keyframes duelo-onda{0%{transform:scale(.7);opacity:.95}100%{transform:scale(2.6);opacity:0}}
 @keyframes duelo-d20in{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:none;opacity:1}}
+.duelo-fin{text-align:center;border:2px solid #8db3ff;background:linear-gradient(180deg,#1b2a4a,#131c33);border-radius:14px;padding:16px 14px}
+.duelo-fin .grande{font-size:34px;font-weight:900;letter-spacing:.06em;color:#dbe7ff}
+.duelo-fin .chico{font-size:13px;color:#aab3ca;margin:4px 0 12px}
+.duelo-fin button{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 30px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+.duelo-fin.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
@@ -1032,6 +1037,12 @@ const Duelo = (() => {
     if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
     else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano' || d.fase === 'efectos')) cierre = veredictoHtml(d, nuevaClave('resultado'));
     else if(d.estado === 'cancelado') cierre = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
+    // Fin del duelo: cuando ya no queda ninguna reacción, un cartel claro y un botón para terminarlo.
+    const nuevoFin = d.estado === 'resuelto' && !revelado[d.id + ':fin'];
+    if(d.estado === 'resuelto') revelado[d.id + ':fin'] = true;
+    const finHtml = d.estado === 'resuelto'
+      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 FIN DEL DUELO</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>Terminar duelo</button></div>`
+      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 DUELO CANCELADO</div><button type="button" data-fin-duelo>Terminar duelo</button></div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const mostrarBloqueo = d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza;
@@ -1056,12 +1067,12 @@ const Duelo = (() => {
         ${(d.fase === 'dano' || d.dano) ? danoHtml(d) : ''}
         ${efectosHtml(d)}
         ${cierre}
+        ${finHtml}
         <div class="duelo-pie">
           ${puedoCancelar ? '<button type="button" class="sec" data-cancelarduelo>Cancelar duelo</button>' : ''}
           <button type="button" class="sec" data-min2>Minimizar</button>
           <button type="button" class="sec" data-x2>Cerrar</button>
         </div>
-        ${d.resultado ? '<div class="duelo-nota">Próximas etapas: crítico, daño y defensa (con la durabilidad), efectos del golpe.</div>' : ''}
       </div></div>`;
     if(min) f.classList.add('min');
     f.querySelector('[data-min]').onclick = minimizar;
@@ -1102,6 +1113,8 @@ const Duelo = (() => {
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
     if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
+    const bfin = f.querySelector('[data-fin-duelo]');
+    if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
   }

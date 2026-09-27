@@ -166,12 +166,16 @@ const Duelo = (() => {
 .duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
 .duelo-tabla tr.mod td{color:#ffd25a}
 .duelo-tabla tr.gano td{background:rgba(255,210,90,.18);font-weight:800;color:#fff3c9}
-.duelo-veredicto.critico{background:radial-gradient(circle at 50% 30%,#8a5a12,#4a2a08 70%);border:3px solid #ffd25a;color:#fff3c9;box-shadow:0 0 40px rgba(255,190,60,.55),inset 0 0 30px rgba(255,210,90,.25);animation:duelo-brillo 1.4s ease-in-out infinite alternate}
+.duelo-veredicto.critico{background:radial-gradient(circle at 50% 30%,#8a5a12,#4a2a08 70%);border:3px solid #ffd25a;color:#fff3c9;box-shadow:0 0 40px rgba(255,190,60,.55),inset 0 0 30px rgba(255,210,90,.25)}
 .duelo-veredicto.critico .grande{font-size:64px;letter-spacing:.06em;text-shadow:0 0 18px #ffb400,0 3px 0 #7a4a00}
 .duelo-veredicto.critico .mult{font-size:34px;font-weight:900;color:#ffd25a;margin-top:2px}
 .duelo-veredicto.critico .chispas{font-size:26px}
-.duelo-veredicto.critico.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both,duelo-brillo 1.4s ease-in-out .55s infinite alternate}
-@keyframes duelo-brillo{0%{box-shadow:0 0 22px rgba(255,190,60,.35),inset 0 0 20px rgba(255,210,90,.15)}100%{box-shadow:0 0 60px rgba(255,190,60,.8),inset 0 0 40px rgba(255,210,90,.35)}}
+.duelo-veredicto.critico.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+/* El latido va en el paso en curso (el que espera una acción), no en el veredicto. */
+.duelo-paso.activo{border-color:#6fa8ff;animation:duelo-latido 1.4s ease-in-out infinite alternate}
+.duelo-paso.activo h4{color:#cfe0ff}
+.duelo-paso.activo h4 .n{background:#2d6cdf}
+@keyframes duelo-latido{0%{box-shadow:0 0 6px rgba(80,140,255,.25),inset 0 0 8px rgba(80,140,255,.06)}100%{box-shadow:0 0 30px rgba(80,150,255,.75),inset 0 0 22px rgba(80,150,255,.22)}}
 .duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-motivo{margin-top:10px;background:rgba(0,0,0,.28);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:600;letter-spacing:0}
 .duelo-par{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:15px;font-weight:600;letter-spacing:0}
@@ -1076,6 +1080,11 @@ const Duelo = (() => {
         </div>
       </div></div>`;
     if(min) f.classList.add('min');
+    // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.
+    if(d.estado !== 'resuelto' && d.estado !== 'cancelado'){
+      const pasos = f.querySelectorAll('.duelo-paso');
+      if(pasos.length > 1) pasos[pasos.length - 1].classList.add('activo');
+    }
     f.querySelector('[data-min]').onclick = minimizar;
     f.querySelector('[data-min2]').onclick = minimizar;
     f.querySelector('[data-x]').onclick = cerrar;

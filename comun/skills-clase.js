@@ -150,7 +150,12 @@ const CLASES_SKILLS = [
     skillSA('debuffer', 'Maldición debilitante', 'SP 5. Maldición (Esp / Res.M). -1 a todas las tiradas. Dura 2 turnos. Acumulable. Lento.'),
     skillSA('debuffer', 'Maldición extenuante', 'SP 3. Maldición (Esp / Res.M). +1 Nitro a todas las acciones; debe pagar 1 Nitro para moverse cada 2 casillas. Dura 1 turno. Acumulable. Lento.'),
     skillSA('debuffer', 'Maldición tormentosa', 'SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas. Dura 3 turnos. Acumulable. Lento.'),
-    skillSA('debuffer', 'Drenar vida', 'SP X (X ≤ ESP). Tira X + 1dX; el objetivo tira resistencia mágica. Drena HP igual a la diferencia, acumulable hasta 50% sobre el máximo.'),
+    {id: 'debuffer-drenar-vida', nombre: 'Drenar vida', costo: 'X', nitrosCosto: 1,
+     pasosCustom: [
+       {texto: 'Tirás X + 1dX (X no puede ser mayor a tu Especial). El objetivo tira su Resistencia mágica (Res.Esp) — a mano, o con los dados libres de la Mesa.', formula: 'X+1dX'},
+       {texto: 'Si tu tirada ganó, drenás HP del objetivo igual a la diferencia entre las dos tiradas: restásela a mano y sumátela a tu vida. Si pasa tu HP máximo, aplicate el estado «Excedente de vida» por lo que sobre (no vence solo: se saca a mano cuando corresponda).', formula: ''},
+     ],
+     detalle: 'Le drenás HP al objetivo igual a la diferencia entre tu tirada y su Resistencia mágica, y te la sumás vos (podés pasar tu HP máximo: usá el estado Excedente de vida para lo que sobre). Tirás X + 1dX (X ≤ tu Especial) contra su Res.Esp, paso a paso con la herramienta de «Pasos personalizados» (🎯 no aplica: no es una tirada de stat fijo ni una contienda del duelo). ⚖ Auditada 2026-09-27 — primera skill con esta herramienta, pensada para reusarse en otras habilidades con mecánicas propias.'},
     skillSA('debuffer', 'Balas de sangre', 'SP 1. Gastás X HP (máx. ESP). Dispara un proyectil tipo 1 con peso igual a la vida gastada.'),
     skillSA('debuffer', 'Transfusión sanguínea', 'SP 1. Transfiere hasta 20 de HP de un aliado a otro.'),
     skillSA('debuffer', 'Veneno', 'SP 2. Maldición (Esp / Res.M). Aplica 3 stacks de veneno.'),

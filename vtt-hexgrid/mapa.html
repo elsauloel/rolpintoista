@@ -1707,6 +1707,62 @@ function miTokenPrincipal(){
   }
   return null;
 }
+
+/* ---------- 🦋 Polilla mística (2026-09-27) ----------
+   Mismo botón flotante que ya existe en ficha-personaje/ficha.html, portado acá para que
+   también se pueda usar sin tener que abrir la Botonera: mientras el estado «Polilla
+   revoloteando» esté activo en TU personaje, un botón fijo abajo a la izquierda (mismo lugar y
+   estilo que en la ficha) deja sumarle +2 a tu última tirada de la Mesa — mesaMiUltima, la sigue
+   comun/mesa.js — y se anuncia; el estado se saca con hudEstadoCambiar, la misma transacción que
+   usa el HUD para sacarle cualquier estado a tu propia ficha. */
+function polillaIndice(){
+  const t = miTokenPrincipal();
+  if(!t) return -1;
+  const f = fichasPub.get(t.fichaId);
+  const estados = (f && f.resumen && f.resumen.estados) || [];
+  return estados.findIndex(e => e && e.activo !== false && /^Polilla revoloteando/i.test(String(e.nombre || '')));
+}
+function renderPolillaBoton(){
+  const idx = polillaIndice();
+  let b = document.getElementById('polilla-flotante');
+  if(idx < 0){ if(b) b.remove(); return; }
+  if(!b){
+    b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'polilla-flotante';
+    b.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:999999;background:#3a1f4a;color:#e9d6ff;border:2px solid #b98cff;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(180,120,255,.5);animation:polilla-latido 2.6s ease-in-out infinite alternate;text-align:left;transform-origin:left bottom';
+    b.innerHTML = '<div>🦋 Polilla mística</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9" id="polilla-flotante-sub"></small>';
+    b.onclick = usarPolillaMapa;
+    document.body.appendChild(b);
+    if(!document.getElementById('polilla-css')){
+      const s = document.createElement('style');
+      s.id = 'polilla-css';
+      s.textContent = '@keyframes polilla-latido{0%{transform:scale(1);box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 10px rgba(180,120,255,.4)}100%{transform:scale(1.025);box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 18px rgba(190,130,255,.65)}}';
+      document.head.appendChild(s);
+    }
+  }
+  $('#polilla-flotante-sub').textContent = mesaMiUltima ? `+2 a tu última tirada: ${mesaMiUltima.origen} (${fmt(num(mesaMiUltima.total))})` : 'todavía no hiciste ninguna tirada';
+}
+async function usarPolillaMapa(){
+  const idx = polillaIndice();
+  const t = miTokenPrincipal();
+  if(idx < 0 || !t) return;
+  if(!mesaMiUltima){ toast('Todavía no hiciste ninguna tirada para sumarle el +2'); return; }
+  const origen = mesaMiUltima.origen, nuevoTotal = num(mesaMiUltima.total) + 2;
+  try{ await hudEstadoCambiar(t, idx, 'quitar'); }   // la polilla se gasta
+  catch(err){ console.error('No se pudo sacar el estado de la Polilla mística:', err); return; }
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nombreDe(t),
+      origen: `🦋 ${nombreDe(t)} usó la Polilla mística`, formula: `+2 a su última tirada — ${origen}: ahora ${fmt(nuevoTotal)}`,
+      rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo avisar el uso de la Polilla mística:', err); }
+  toast(`🦋 Polilla mística: +2 a "${origen}" (ahora ${fmt(nuevoTotal)})`);
+  mesaMiUltima = null;   // hace falta una tirada nueva para la próxima
+  renderPolillaBoton();
+}
 function renderBotonesRango(){
   const b1 = $('#btn-rango'), b2 = $('#btn-rango-magico');
   if(b1) b1.classList.toggle('activo', rangoActivo);
@@ -6828,6 +6884,7 @@ function escucharVinculables(){
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
     revisarAutoLentes();   // entrar en sigilo prende el modo lentes solo (no muestra todo de una)
     if(tableroAbierto) renderTablero();   // el HP/estados de las fichas o creeps del tablero cambió
+    renderPolillaBoton();   // el estado «Polilla revoloteando» se aplicó/gastó (propio o desde otra pantalla)
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);

@@ -950,3 +950,30 @@ hexágono con otro sin importar bando. Todavía no está construido.
 - **Rango con línea de visión** (2026-09-26, pedido del dueño): el visualizador 📏 (R, Rango) y 🔮 (T, casteo) ahora se recorta como la visión: `dibujarRangoConVision` usa `lineaLibre` + `solidosSet()` (los objetos **Sólidos** y las **Colisiones** tapan el paso). Lo que queda detrás de un obstáculo **no** está en el rango; la pared misma sí. Sin sólidos en el mapa se dibuja el círculo completo de siempre.
 
 - **Atajos (2026-09-26):** **F** abre el menú de la ficha del token seleccionado (jugador: su personaje; GM: la ficha del creep) y se cierra con F o Esc; **Terreno y Formas pasó a la G** (antes F). **Muerte:** el mapa tiñe de rojo suave la pantalla del jugador con su personaje inconsciente y le da el botón ✚ Revivir (`actualizarMuerteMapa`, lee `resumen.muerto` de su ficha).
+
+- **📋 Tablero de combate** (2026-09-22, dock izquierdo `#toolkit-tablero`, para cualquiera —
+  GM o jugador): muestra el estado (HP, SP, estados) de todo lo que tiene token en el **mapa
+  publicado** (`mapaActivo`), no en el que se está mirando ni en todo lo que exista en la
+  partida — `tableroTokensEscuchar()` abre un listener aparte de `coleccionTokensDe(mapaActivo)`
+  que sigue al mapa publicado aunque el GM esté mirando otro mientras arma un escenario
+  (`escucharMapaActivo` lo reinicia si `mapaActivo` cambia con el Tablero abierto). Los
+  jugadores no ven ahí lo **oculto** (`oculto: true`) ni lo que está en **sigilo**
+  (`tableroFichaIds`/`tableroCreepIds`, `!soyGM && (t.oculto || enSigilo(t))` los saca); el GM ve
+  todo. Los datos salen de `fichasPub`/`creepsPub` (ya en vivo); de un creep solo llega
+  `hpPct` (sin números, como en cualquier otra pantalla de jugador). **GM Tools conserva el
+  suyo** (`gm-toolset/CLAUDE.md`), con el mismo filtro de mapa publicado pero sin el de
+  oculto/sigilo (ahí solo lo ve el GM). `coleccionTokens()` de acá quedó como un alias de
+  `coleccionTokensDe(mapaMostrado)` para que ambos compartan la función de base.
+
+- **🦋 Polilla mística, portada del mapa** (2026-09-27): la ficha ya tenía un botón flotante
+  siempre visible (🦋, abajo a la izquierda) mientras el estado «Polilla revoloteando» está
+  activo, para sumar +2 a tu última tirada sin tener que volver a tirar nada. Acá se armó una
+  versión propia con el mismo lugar y estilo (`renderPolillaBoton`/`usarPolillaMapa`,
+  `polillaIndice` busca el estado en `fichasPub.get(miToken.fichaId).resumen.estados`), porque
+  el botón de la ficha vive en `dadosHistorial` (memoria de esa pestaña, no llega al mapa). Para
+  saber "cuál fue mi última tirada" sin duplicar historial, `comun/mesa.js` ahora mantiene
+  `mesaMiUltima` (la tirada real más reciente del usuario actual, entre las que trae la Mesa) y
+  llama a `renderPolillaBoton()` si existe (`typeof === 'function'`, no rompe gm-tools ni la
+  ficha, que no la necesitan ahí). Al usarla, `usarPolillaMapa` saca el estado con
+  `hudEstadoCambiar` (la misma transacción que ya usa el HUD para cualquier estado propio) y
+  publica el aviso con `desde: 'recordatorio'`, igual que `publicarRecordatorios` de la ficha.

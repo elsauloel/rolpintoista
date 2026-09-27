@@ -24,6 +24,10 @@ const MESA_MAX = 30;
 let mesaIdsVistos = null;
 let mesaAnimadas = new Set();   // tiradas cuyo dado 3D ya se lanzó (la Mesa espera a que queden quietos antes de mostrar el resultado)
 let mesaRetenida = null;         // {snap, fin}: la última lista de tiradas, esperando a los dados
+// La tirada REAL (no una línea de sistema) más reciente del usuario actual, entre las que trae
+// la Mesa ahora mismo — la usa, por ejemplo, la Polilla mística (2026-09-27) para saber a qué
+// tirada sumarle el +2 desde una pantalla que no tiene su propio historial de tiradas (el mapa).
+let mesaMiUltima = null;
 
 function mesaEstado(texto){
   const el = document.getElementById('mesa-estado');
@@ -177,14 +181,24 @@ function mesaPonerTurno(n){
   if(el) el.textContent = n ? 'T' + n : '';
 }
 
+// Líneas del sistema: no son una tirada real (ni la propia ni la de nadie), así que no cuentan
+// como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
+const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte"];
+
 function mesaRender(docs){
   mesaAlertaEstilos();
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
   const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
   // La última tirada (no las líneas del sistema) va con fondo verde.
-  const ultima = docs.find(d => !["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte"].includes(d.data().desde));
+  const ultima = docs.find(d => !MESA_DESDE_SISTEMA.includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
+  // La última tirada REAL propia (ver mesaMiUltima más arriba): mismo criterio, pero además uid.
+  if(fbUsuario){
+    const mia = docs.find(d => { const t = d.data(); return t.uid === fbUsuario.uid && !MESA_DESDE_SISTEMA.includes(t.desde); });
+    mesaMiUltima = mia ? mia.data({serverTimestamps: 'estimate'}) : null;
+    if(typeof renderPolillaBoton === 'function') renderPolillaBoton();
+  }
   // Resumen de esa misma última tirada: solo existe en la Mesa flotante
   // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
   // #mesa-resumen en cada herramienta.

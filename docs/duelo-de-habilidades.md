@@ -1,0 +1,70 @@
+# Duelo para habilidades dirigidas (hechizos, controles, apoyos) — propuesta (2026-09-27)
+
+> Pedido del dueño (2026-09-27): *«más importante que los skills es definir los duelos para situaciones que no sean ataques: hay muchos skills vinculados a ataques, pero también a hechizos, etc. Habría que definir las precisiones del paso a paso para cosas que no sean necesariamente ataques, pero sí habilidades dirigidas con objetivos.»*
+> Base: [`ataque-paso-a-paso.md`](ataque-paso-a-paso.md) (el duelo de ataque, ya hecho) y [`reglas-casteo.md`](reglas-casteo.md) §1.2 (qué tira cada lado). Relacionado: [`skills-clase-y-duelo.md`](skills-clase-y-duelo.md).
+
+## 1. Idea general
+El duelo de ataque tiene siempre la misma columna vertebral: **declaración → tirada del que actúa contra la del que se opone → veredicto (con empate) → consecuencias (daño, efectos)**. Una habilidad dirigida es lo mismo con **piezas intercambiables**. Propongo **un solo duelo con tres piezas que cada habilidad declara** (y el GM/grupo puede editar, sandbox):
+
+| Pieza | Qué decide | Opciones |
+|---|---|---|
+| **1. Objetivo** | a quién apunta | un enemigo · un aliado · uno mismo · varios (área, etapa posterior) |
+| **2. Contienda** | qué se tira | **(a)** *ninguna* (se aplica directo: buffs, curas, apoyos) · **(b)** *tirada contra tirada* (el lanzador tira su stat; el objetivo tira el suyo) · **(c)** *tirada contra número fijo o de la habilidad* |
+| **3. Consecuencia** | qué pasa si gana el lanzador (o pierde el objetivo) | daño (con su tipo) · estado sobre el objetivo · pérdida de No2 · empuje/derribo (a mano) · cura · lo que diga la skill |
+
+## 2. Los casos reales del catálogo (lo que hay que cubrir)
+| Caso | Ejemplos | Tira el que actúa | Tira el objetivo | Consecuencia |
+|---|---|---|---|---|
+| **A. Ataque con arma con arreglos** | Golpe brutal, Carga, Amplificar daño, Takle | PdG (con los modificadores de la skill) | Evasión / Parry (Takle: solo Evasión) | daño del arma (el duelo de ataque de siempre) |
+| **B. Proyectil mágico** | Chispazo, Rayo Mágico | PdG.Mg | **Evasión** | daño mágico (**ignora armadura, no critica**) |
+| **C. Efecto abstracto sobre el cuerpo** | maldiciones, Enyetar (Res.Mg) | PdG.Mg | **Res.Mg** (sale de Constitución) | estado o daño |
+| **D. Control mental** | (cualquier skill ligada a la mente) | lo que diga la skill | **Res.Mt** (sale de Especial) | estado |
+| **E. Contienda de atributos** | Shockwave, Sonic Boom (Fuerza vs Constitución), Takle (parte 2), Taunt (Esp+1 vs Esp) | el atributo de la skill | el atributo de la skill | estado, −No2, Sentado, empuje |
+| **F. Sin oposición** | Blindaje, Recuperación, Shield, buffs sobre un aliado | — (el costo se paga) | — | se aplica directo |
+| **G. Área** | Orbe arcano, Tormenta arcana, Shockwave, Daño en área | igual que B–E | **varios** objetivos, cada uno con su tirada | por objetivo (etapa posterior; y con «esquivar áreas»: rodar hasta 2 casilleros gastando No2) |
+
+## 3. Cómo se vería el cuadro (pasos)
+1. **Declaración:** «✨ *Rayo Mágico* — Fulano → Mengano» (título con el nombre de la habilidad; tipo de contienda escrito claro: «PdG.Mg contra Evasión»).
+2. **Elección del objetivo:** clic en el token (como el ataque). Un aliado o uno mismo se elige igual; «uno mismo» salta directo.
+3. **Cómo se defiende** (solo si la skill deja opciones): por ejemplo un proyectil se puede **esquivar (Evasión)**; un hechizo abstracto se resiste (Res.Mg) y no hay elección. Si hay más de una, el objetivo elige **a ciegas**, como en el ataque.
+4. **Las tiradas** (se revelan juntas, con los dados 3D): mismo tratamiento de empate y de «ver tu tirada antes que el otro».
+5. **Veredicto:** «el hechizo pegó / se resistió». **Cuando la skill dice «si el objetivo gana, resiste»**, no hay más pasos.
+6. **Daño** (si la skill hace): fórmula de la skill; **el daño mágico ignora la Defensa y no critica** (regla de casteo); el físico de la skill sigue las reglas del arma (Defensa, crítico).
+7. **Efectos** (estado, −No2, Sentado, empuje…): cada uno con su botón **«Aplicar»** y el aviso de «✋ a mano» cuando el mapa no lo puede hacer solo, igual que los efectos del golpe.
+8. **Fin:** el resumen en la Mesa y «🏁 FIN DEL DUELO».
+
+## 4. Datos nuevos que llevaría cada habilidad (`duelo` de la habilidad, editable en el asistente)
+```
+duelo: {
+  objetivo: 'enemigo' | 'aliado' | 'uno mismo' | 'varios',
+  tira:     'pdg' | 'pdgmg' | 'fue' | 'esp' | … (o un número fijo),
+  contra:   ['eva'] | ['resmg'] | ['resmt'] | ['con'] | ['eva','resmg'] (el objetivo elige) | [] (sin oposición),
+  dano:     { formula, tipo: 'fisico' | 'arcano' | 'fuego' | 'hielo' | 'rayo', ignoraDef, critica },
+  efectos:  [ { estado | no2 | manual, … } ],
+  siGana:   'el lanzador' | 'el objetivo' (quién domina la contienda de atributos)
+}
+```
+Todo lo que se pueda deducir de lo que la habilidad ya guarda (`tiradaStat`, `estadoObjetivo`, `zonaMapa`, `tipoDanio` del casteo) se **completa solo**; el resto se puede tocar a mano.
+
+## 4b. Reglas heredadas (ya decididas en otras conversaciones)
+- **Daño mágico:** no critica y va directo a la vida (por eso es caro); solo critica lo físico. Elementos: arcano, fuego, hielo, rayo.
+- **Flash:** siempre 0 No2; se declara **antes** de tirar.
+- **Empate:** la regla de siempre (gana quien no tiene «+» fijo; si no, par o impar).
+- **Automatizar o aclarar:** lo que se pueda aplicar solo se aplica; lo demás queda con «✋ a mano».
+
+## 5. Preguntas para el dueño (por dictado, una por una)
+1. **¿Te cierra un solo duelo con las tres piezas** (objetivo, contienda, consecuencia), en vez de un duelo distinto por tipo de skill?
+2. **Proyectil mágico (B):** el objetivo tira **Evasión** contra tu PdG.Mg. ¿Puede también **Parry**? (Propuesta: **no**; un hechizo no se parrea.) ¿Y el **Bloqueo** con escudo? (Propuesta: **no**.)
+3. **Efecto abstracto (C):** el objetivo tira **Res.Mg** contra tu PdG.Mg. ¿Empate? (Propuesta: la regla de siempre.)
+4. **Contienda de atributos (E):** ¿la tiran los dos con su atributo puro (Fuerza contra Constitución), o suman algo (el peso del arma, un bono)? ¿Cómo se ve? (Propuesta: cada uno tira su atributo con sus mods, gana el mayor, empate = par o impar.)
+5. **Sin oposición (F):** ¿hace falta un duelo para un buff a un aliado o basta con elegir el token y aplicar? (Propuesta: **sin cuadro largo**: un aviso corto al aliado y se aplica; el aliado no tiene que hacer nada.)
+6. **¿El objetivo puede rechazar un buff/cura?** (Propuesta: no; sandbox: lo saca a mano si quiere.)
+7. **¿Empezamos por B y C** (los hechizos con tirada, que son los que faltan) **y dejamos áreas (G) para después**? (Propuesta: sí.)
+8. **Daño de la skill:** ¿la fórmula la tira el lanzador con su botón 🎲 en el paso de daño, como el arma? (Propuesta: sí.)
+
+## 6. Orden de implementación que propongo
+1. **Generalizar el duelo** para aceptar `ataque.tipo: 'habilidad'` con `contienda` (`tira`/`contra`) y nombre de la habilidad: las piezas B, C, D y E de un solo objetivo.
+2. **Ejecutar una habilidad dirigida abre el duelo** (en vez de tirar el stat suelto), con lo que ya guarda la habilidad.
+3. **Sin oposición (F)** con el aviso corto.
+4. **Asistente de habilidades:** el paso «Objetivo y contienda».
+5. **Áreas (G)** más adelante (varios defensores + esquivar áreas).

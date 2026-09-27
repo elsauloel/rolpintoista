@@ -117,3 +117,5 @@
 - [~] (2026-09-26, falta probar) **Fin del duelo:** al resolverse la última reacción aparece el cartel «🏁 FIN DEL DUELO» con el botón «Terminar duelo».
 
 - [ ] **Skills de clase auditadas y el duelo** (2026-09-27, pedido del dueño): repaso hecho en [`skills-clase-y-duelo.md`](skills-clase-y-duelo.md) (17 auditadas: 7 ya automáticas, 5 se resuelven con «ataque con habilidad» en el duelo, 3 son de área). Falta: que el dueño elija el orden y responda las 4 preguntas del §5; después implementar (Espinas devueltas, ataque con habilidad, reacciones Flash, áreas) y seguir auditando las 45 restantes.
+
+- [ ] **Duelo para habilidades dirigidas** (hechizos, controles, apoyos; pedido del dueño 2026-09-27, más importante que automatizar cada skill): propuesta y 8 preguntas en [`duelo-de-habilidades.md`](duelo-de-habilidades.md). Reemplaza al viejo «duelo de hechizos». Falta que el dueño responda las preguntas del §5.

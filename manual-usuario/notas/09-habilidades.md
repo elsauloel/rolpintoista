@@ -229,7 +229,7 @@ estado: pendiente
 +++
 Apoyo: curas, buffs y ayuda al equipo. Pool de [[Clases|clase]].
 
-**Skills del borrador:** Empower (+3 a una tirada), Blessing (+1 a todas 2 turnos), Heal (4 + 1d6 HP), Shield (absorbe 14), Acelerador (casilla que da +2 No2), Endurecimiento (Def 3, Res.Mg 3), Re-roll (repetir tiradas aliadas), Smite, Transferir SP y Adrenalina.
+**Skills del borrador:** Empower (+3 a una tirada), Blessing (+1 a todas 2 turnos), Heal (4 + 1d6 HP), Shield (absorbe 14), Acelerador (casilla que da +2 No2), Endurecimiento (Def 3, Res.Esp 3), Re-roll (repetir tiradas aliadas), Smite, Transferir SP y Adrenalina.
 
 > [!question] Sin auditar
 > Ninguna automatizada todavía.

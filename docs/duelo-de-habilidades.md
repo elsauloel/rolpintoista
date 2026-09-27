@@ -16,17 +16,17 @@ El duelo de ataque tiene siempre la misma columna vertebral: **declaración → 
 | Caso | Ejemplos | Tira el que actúa | Tira el objetivo | Consecuencia |
 |---|---|---|---|---|
 | **A. Ataque con arma con arreglos** | Golpe brutal, Carga, Amplificar daño, Takle | PdG (con los modificadores de la skill) | Evasión / Parry (Takle: solo Evasión) | daño del arma (el duelo de ataque de siempre) |
-| **B. Proyectil mágico** | Chispazo, Rayo Mágico | PdG.Mg | **Evasión** | daño mágico (**ignora armadura, no critica**) |
-| **C. Efecto abstracto sobre el cuerpo** | maldiciones, Enyetar (Res.Mg) | PdG.Mg | **Res.Mg** (sale de Constitución) | estado o daño |
+| **B. Proyectil mágico** | Chispazo, Rayo Mágico | PdG.Esp | **Evasión** | daño mágico (**ignora armadura, no critica**) |
+| **C. Efecto abstracto sobre el cuerpo** | maldiciones, Enyetar (Res.Esp) | PdG.Esp | **Res.Esp** (sale de Constitución) | estado o daño |
 | **D. Control mental** | (cualquier skill ligada a la mente) | lo que diga la skill | **Res.Mt** (sale de Especial) | estado |
 | **E. Contienda de atributos** | Shockwave, Sonic Boom (Fuerza vs Constitución), Takle (parte 2), Taunt (Esp+1 vs Esp) | el atributo de la skill | el atributo de la skill | estado, −No2, Sentado, empuje |
 | **F. Sin oposición** | Blindaje, Recuperación, Shield, buffs sobre un aliado | — (el costo se paga) | — | se aplica directo |
 | **G. Área** | Orbe arcano, Tormenta arcana, Shockwave, Daño en área | igual que B–E | **varios** objetivos, cada uno con su tirada | por objetivo (etapa posterior; y con «esquivar áreas»: rodar hasta 2 casilleros gastando No2) |
 
 ## 3. Cómo se vería el cuadro (pasos)
-1. **Declaración:** «✨ *Rayo Mágico* — Fulano → Mengano» (título con el nombre de la habilidad; tipo de contienda escrito claro: «PdG.Mg contra Evasión»).
+1. **Declaración:** «✨ *Rayo Mágico* — Fulano → Mengano» (título con el nombre de la habilidad; tipo de contienda escrito claro: «PdG.Esp contra Evasión»).
 2. **Elección del objetivo:** clic en el token (como el ataque). Un aliado o uno mismo se elige igual; «uno mismo» salta directo.
-3. **Cómo se defiende** (solo si la skill deja opciones): por ejemplo un proyectil se puede **esquivar (Evasión)**; un hechizo abstracto se resiste (Res.Mg) y no hay elección. Si hay más de una, el objetivo elige **a ciegas**, como en el ataque.
+3. **Cómo se defiende** (solo si la skill deja opciones): por ejemplo un proyectil se puede **esquivar (Evasión)**; un hechizo abstracto se resiste (Res.Esp) y no hay elección. Si hay más de una, el objetivo elige **a ciegas**, como en el ataque.
 4. **Las tiradas** (se revelan juntas, con los dados 3D): mismo tratamiento de empate y de «ver tu tirada antes que el otro».
 5. **Veredicto:** «el hechizo pegó / se resistió». **Cuando la skill dice «si el objetivo gana, resiste»**, no hay más pasos.
 6. **Daño** (si la skill hace): fórmula de la skill; **el daño mágico ignora la Defensa y no critica** (regla de casteo); el físico de la skill sigue las reglas del arma (Defensa, crítico).
@@ -54,8 +54,8 @@ Todo lo que se pueda deducir de lo que la habilidad ya guarda (`tiradaStat`, `es
 
 ## 5. Preguntas para el dueño (por dictado, una por una)
 1. **¿Te cierra un solo duelo con las tres piezas** (objetivo, contienda, consecuencia), en vez de un duelo distinto por tipo de skill?
-2. **Proyectil mágico (B):** el objetivo tira **Evasión** contra tu PdG.Mg. ¿Puede también **Parry**? (Propuesta: **no**; un hechizo no se parrea.) ¿Y el **Bloqueo** con escudo? (Propuesta: **no**.)
-3. **Efecto abstracto (C):** el objetivo tira **Res.Mg** contra tu PdG.Mg. ¿Empate? (Propuesta: la regla de siempre.)
+2. **Proyectil mágico (B):** el objetivo tira **Evasión** contra tu PdG.Esp. ¿Puede también **Parry**? (Propuesta: **no**; un hechizo no se parrea.) ¿Y el **Bloqueo** con escudo? (Propuesta: **no**.)
+3. **Efecto abstracto (C):** el objetivo tira **Res.Esp** contra tu PdG.Esp. ¿Empate? (Propuesta: la regla de siempre.)
 4. **Contienda de atributos (E):** ¿la tiran los dos con su atributo puro (Fuerza contra Constitución), o suman algo (el peso del arma, un bono)? ¿Cómo se ve? (Propuesta: cada uno tira su atributo con sus mods, gana el mayor, empate = par o impar.)
 5. **Sin oposición (F):** ¿hace falta un duelo para un buff a un aliado o basta con elegir el token y aplicar? (Propuesta: **sin cuadro largo**: un aviso corto al aliado y se aplica; el aliado no tiene que hacer nada.)
 6. **¿El objetivo puede rechazar un buff/cura?** (Propuesta: no; sandbox: lo saca a mano si quiere.)

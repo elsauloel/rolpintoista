@@ -36,7 +36,7 @@
   // el objetivo (sí mismo / un enemigo / zona / aliados / terreno) se deduce de la descripción salvo que se pase en mec.
   function H(nombre, fn, razas, roles, cd, spBase, mec){
     const sp = {nombre, ...spBase};
-    if(sp.magico === undefined && roles.includes('g')) sp.magico = true;   // rol mágico: pega con PdG.Mg
+    if(sp.magico === undefined && roles.includes('g')) sp.magico = true;   // rol mágico: pega con PdG.Esp
     const lenta = cd >= 4;
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
     const aMano = U.hayManual(sp);
@@ -123,18 +123,18 @@
   H('Aguantar', 'TC', '*', 't', 3, cU('Aprieta los dientes y recupera fuerzas.', 2, 3));
   H('Regeneración', 'C', 'bpe', 't', 5, cU('Su cuerpo se cierra solo: recupera vida.', 3, 5));
   H('Segundo aliento', 'C', 'hd', 'tm', 6, cU('Una bocanada de energía: recupera mucha vida.', 3, 6));
-  H('Inamovible', 'T', 'ce', 't', 4, bU('Nada lo mueve: +3 de Defensa y +2 Res.Mg 3 turnos.', 2, {def: 3, resmg: 2}, 3));
-  H('Escudo de energía', 'T', 'cag', 'tg', 4, bU('Una barrera lo rodea: +3 de Defensa y +3 Res.Mg 2 turnos.', 2, {def: 3, resmg: 3}, 2));
-  H('Resistencia mágica', 'T', '*', 'tg', 3, bU('Se cubre contra hechizos: +4 Res.Mg 3 turnos.', 2, {resmg: 4}, 3));
+  H('Inamovible', 'T', 'ce', 't', 4, bU('Nada lo mueve: +3 de Defensa y +2 Res.Esp 3 turnos.', 2, {def: 3, resmg: 2}, 3));
+  H('Escudo de energía', 'T', 'cag', 'tg', 4, bU('Una barrera lo rodea: +3 de Defensa y +3 Res.Esp 2 turnos.', 2, {def: 3, resmg: 3}, 2));
+  H('Resistencia especial', 'T', '*', 'tg', 3, bU('Se cubre contra hechizos: +4 Res.Esp 3 turnos.', 2, {resmg: 4}, 3));
   H('Dura cabeza', 'T', 'bdc', 't', 2, bU('Encoge el cuello y aguanta: +2 de Defensa 2 turnos.', 1, {def: 2}, 2));
   H('Provocar', 'TX', '*', 't', 3, tA('Se burla y obliga al objetivo a atacarlo a él el próximo turno (a mano).', 1));
   H('Rugido desafiante', 'TX', 'bd', 't', 4, tA('Ruge y los enemigos cercanos prefieren atacarlo (a mano).', 2));
   H('Interponerse', 'T', 'hdc', 't', 3, bU('Se pone en el camino de un golpe (a mano): +3 de Defensa 1 turno.', 1, {def: 3}, 1));
   H('Rebotar', 'T', 'c', 't', 4, bU('Su coraza devuelve golpes: +4 de Defensa 2 turnos y quien lo golpea sufre 1d4 (a mano).', 2, {def: 4}, 2));
   H('Vigor', 'TC', 'bp', 't', 4, dC('Ataca y se alimenta de la pelea.', 3, 'L', 2));
-  H('Postura del roble', 'T', 'p', 't', 5, bU('Raíces que lo sostienen: +4 de Defensa y +2 Res.Mg 4 turnos.', 3, {def: 4, resmg: 2}, 4));
+  H('Postura del roble', 'T', 'p', 't', 5, bU('Raíces que lo sostienen: +4 de Defensa y +2 Res.Esp 4 turnos.', 3, {def: 4, resmg: 2}, 4));
   H('Armadura de hueso', 'T', 'm', 't', 3, bU('Los huesos se cierran sobre él: +3 de Defensa 3 turnos.', 2, {def: 3}, 3));
-  H('Carne muerta', 'T', 'm', 't', 4, bU('No siente dolor: +3 de Defensa y +2 Res.Mg 3 turnos.', 2, {def: 3, resmg: 2}, 3));
+  H('Carne muerta', 'T', 'm', 't', 4, bU('No siente dolor: +3 de Defensa y +2 Res.Esp 3 turnos.', 2, {def: 3, resmg: 2}, 3));
   H('Manto helado', 'T', 'e', 't', 3, bU('Una capa de hielo lo cubre: +3 de Defensa 3 turnos.', 2, {def: 3}, 3));
   H('Endurecer', 'T', 'c', 't', 2, bU('Sus juntas se traban: +2 de Defensa 2 turnos.', 1, {def: 2}, 2));
 
@@ -150,16 +150,16 @@
   H('Afilar', 'B', 'hd', 'me', 2, bU('Afila su arma: +2 de Daño 3 turnos.', 1, {dmg: 2}, 3));
   H('Sed de sangre', 'B', 'bdm', 'm', 4, bU('Huele sangre: +3 de Daño y +1 No2 3 turnos.', 2, {dmg: 3, nitros: 1}, 3));
   H('Instinto', 'B', 'b', 'e', 2, bU('Sigue el instinto: +2 de Evasión y +1 de Daño 2 turnos.', 1, {eva: 2, dmg: 1}, 2));
-  H('Campo de fuerza', 'B', 'ca', 'g', 3, bU('Se envuelve en energía: +2 de Defensa y +2 Res.Mg 3 turnos.', 2, {def: 2, resmg: 2}, 3));
+  H('Campo de fuerza', 'B', 'ca', 'g', 3, bU('Se envuelve en energía: +2 de Defensa y +2 Res.Esp 3 turnos.', 2, {def: 2, resmg: 2}, 3));
   H('Amplificar magia', 'B', 'ega', 'g', 3, bU('Carga su magia: +4 de Daño 2 turnos.', 2, {dmg: 4}, 2));
-  H('Coraje', 'B', 'hd', 'ma', 2, bU('Se llena de valor: +2 Res.Mg y +1 de Daño 3 turnos.', 1, {resmg: 2, dmg: 1}, 3));
+  H('Coraje', 'B', 'hd', 'ma', 2, bU('Se llena de valor: +2 Res.Esp y +1 de Daño 3 turnos.', 1, {resmg: 2, dmg: 1}, 3));
   H('Modo turbo', 'B', 'c', 'm', 4, bU('Sobrecalienta sus motores: +3 No2 y +2 de Daño 2 turnos.', 3, {nitros: 3, dmg: 2}, 2));
   H('Camuflaje', 'B', 'bpd', 'e', 3, bU('Se mimetiza con el entorno: +3 de Evasión 3 turnos.', 1, {eva: 3}, 3));
   H('Rabia ancestral', 'B', 'em', 'm', 5, bU('Una furia antigua lo posee: +5 de Daño y −2 de Defensa 3 turnos.', 3, {dmg: 5, def: -2}, 3));
   H('Preparar emboscada', 'B', 'hdb', 'e', 4, bU('Se esconde para el próximo golpe: +4 de Daño 2 turnos.', 2, {dmg: 4}, 2));
   H('Fortalecerse', 'B', '*', 'mt', 3, bU('Aprieta los músculos: +1 de Daño y +2 de Defensa 3 turnos.', 2, {dmg: 1, def: 2}, 3));
   H('Ojo avizor', 'B', 'bhd', 'r', 3, bU('Se concentra en el blanco: +3 de Daño 3 turnos.', 2, {dmg: 3}, 3));
-  H('Ritual', 'B', 'dhm', 'g', 5, bU('Un ritual corto: +4 de Daño y +3 Res.Mg 3 turnos.', 3, {dmg: 4, resmg: 3}, 3));
+  H('Ritual', 'B', 'dhm', 'g', 5, bU('Un ritual corto: +4 de Daño y +3 Res.Esp 3 turnos.', 3, {dmg: 4, resmg: 3}, 3));
 
   /* ================= APOYO (aliados: a mano) ================= */
   H('Aullido de manada', 'BA', 'b', 'a', 3, tA('Un aullido que anima a los aliados: +2 de Daño 2 turnos a los aliados cercanos (a mano).', 2));
@@ -180,7 +180,7 @@
 
   /* ================= DEBUFF (sobre otros: a mano) ================= */
   H('Debilitar', 'X', 'hdga', 'x', 3, tA('Maldice al objetivo: −2 de Daño 3 turnos (a mano).', 2));
-  H('Maldición', 'X', 'dmga', 'gx', 4, tA('El objetivo pierde 2 de Res.Mg y 1 de Defensa 3 turnos (a mano).', 2));
+  H('Maldición', 'X', 'dmga', 'gx', 4, tA('El objetivo pierde 2 de Res.Esp y 1 de Defensa 3 turnos (a mano).', 2));
   H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo pierde 3 de Evasión 2 turnos (a mano).', 2));
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
@@ -264,9 +264,9 @@
   H('Lluvia de piedras', 'DA', 'ce', 'rg', 5, zO('Piedras del techo caen en flor de 1 (a mano).', 3, 'M'));
   H('Tormenta de arena', 'XA', 'e', 'x', 5, tA('Una nube de arena en flor de 2: todos los de adentro pierden 2 de Evasión 2 turnos (a mano).', 3));
   H('Niebla', 'B', 'ea', 'e', 4, bU('Se cubre de niebla: +3 de Evasión 3 turnos.', 2, {eva: 3}, 3));
-  H('Reflejo de espejo', 'T', 'ca', 'tg', 4, bU('Refleja lo mágico: +5 Res.Mg 2 turnos.', 2, {resmg: 5}, 2));
+  H('Reflejo de espejo', 'T', 'ca', 'tg', 4, bU('Refleja lo mágico: +5 Res.Esp 2 turnos.', 2, {resmg: 5}, 2));
   H('Hambre insaciable', 'B', 'bm', 'm', 4, bU('Cuanto más pelea más quiere: +2 de Daño y +1 No2 3 turnos.', 2, {dmg: 2, nitros: 1}, 3));
-  H('Pacto oscuro', 'B', 'dhm', 'g', 5, bU('Firma un pacto: +5 de Daño y −3 Res.Mg 3 turnos.', 3, {dmg: 5, resmg: -3}, 3));
+  H('Pacto oscuro', 'B', 'dhm', 'g', 5, bU('Firma un pacto: +5 de Daño y −3 Res.Esp 3 turnos.', 3, {dmg: 5, resmg: -3}, 3));
   H('Pelaje erizado', 'BT', 'b', 'mt', 2, bU('Se eriza y parece enorme: +1 de Daño y +1 de Defensa 3 turnos.', 1, {dmg: 1, def: 1}, 3));
   H('Vuelo rasante', 'BM', 'b', 'e', 3, bU('Vuela bajo: +3 de Evasión y +1 No2 2 turnos.', 2, {eva: 3, nitros: 1}, 2));
   H('Reserva de energía', 'B', 'ca', 'g', 3, bU('Una carga extra: +2 No2 2 turnos.', 1, {nitros: 2}, 2));
@@ -278,7 +278,7 @@
   H('Camuflaje natural', 'B', 'bp', 'e', 4, eS('Su piel o su corteza copia lo que tiene alrededor.', 2, 'Sigilo', 'buff', 0), 'sigilo');
   H('Desaparecer', 'B', 'hdam', 'e', 5, eS('Un truco rápido y ya no está: entra en sigilo casi sin esfuerzo.', 1, 'Sigilo', 'buff', 0), 'sigilo');
   H('Reptar entre la maleza', 'B', 'bp', 'e', 3, eS('Se arrastra entre la vegetación: entra en sigilo y sus pasos son más seguros.', 2, 'Sigilo', 'buff', 0, {mods: {eva: 1}}), 'sigilo');
-  H('Velo de sombras', 'B', 'ma', 'ge', 4, eS('Las sombras lo envuelven: sigilo y −1 Res.Mg mientras dure (la magia lo nota).', 2, 'Sigilo', 'buff', 0, {mods: {resmg: -1}}), 'sigilo');
+  H('Velo de sombras', 'B', 'ma', 'ge', 4, eS('Las sombras lo envuelven: sigilo y −1 Res.Esp mientras dure (la magia lo nota).', 2, 'Sigilo', 'buff', 0, {mods: {resmg: -1}}), 'sigilo');
   H('Ataque desde las sombras', 'D', 'hdb', 'e', 4, zO('Golpe de emboscada: ideal si está en sigilo. Si el objetivo no lo detectó, el daño se duplica (a mano) y al golpear pierde el sigilo (a mano).', 3, 'H'), 'sigilo');
   H('Puñalada por la espalda', 'D', 'hd', 'e', 4, zO('Ataca al objetivo desde su punto ciego (el lado opuesto a donde mira): +1 dado de daño (a mano).', 3, 'M'), 'sigilo,orientación');
   H('Cazador invisible', 'DB', 'ba', 'e', 5, zO('Entra en sigilo y ataca en el mismo turno (a mano el sigilo); si el objetivo no lo vio, +4 de daño (a mano).', 4, 'M'), 'sigilo');
@@ -371,7 +371,7 @@
   H('Aura de mando', 'BA', 'hd', 'a', 4, tA('Aura de radio 2 (⚙ del token, color dorado): los aliados adentro ganan +1 de Daño (a mano).', 2), 'aura,zona o área,jefe');
   H('Aura de protección', 'TA', 'hdc', 'at', 4, tA('Aura de radio 1 (⚙ del token, color azul): los aliados adentro ganan +2 de Defensa (a mano).', 2), 'aura,zona o área');
   H('Aura de silencio', 'XA', 'ma', 'gx', 5, tA('Aura de radio 2 (⚙ del token, color gris): en el aura no se puede usar sigilo (a mano).', 3), 'aura,sigilo,zona o área');
-  H('Aura de corrupción', 'XA', 'ma', 'gx', 5, tA('Aura de radio 1 (⚙ del token, color púrpura): los de adentro pierden 2 Res.Mg (a mano).', 3), 'aura,zona o área');
+  H('Aura de corrupción', 'XA', 'ma', 'gx', 5, tA('Aura de radio 1 (⚙ del token, color púrpura): los de adentro pierden 2 Res.Esp (a mano).', 3), 'aura,zona o área');
 
   /* ================= ESTADOS ALTERADOS SOBRE SÍ MISMO (todo automatizado) ================= */
   H('Inmunidad total', 'T', 'ce', 't', 6, eS('Nada lo daña ni lo debilita un momento.', 3, 'Invulnerable', 'buff', 1), 'jefe');

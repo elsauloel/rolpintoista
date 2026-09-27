@@ -44,13 +44,13 @@ proyectil de casteo (aguja de hielo) la **respeta**.
 **Entrega:** tabla cerrada en `reglas-casteo.md` §1.1. **Termina cuando:** cada tipo tiene nombre y sí/no de armadura.
 
 ## Paso 2 — Qué tira cada lado ⬜
-**Depende de:** 1. **Ya definido:** proyectil = PdG.Mg vs Evasión; efecto abstracto = PdG.Mg vs Res.Mg; mental = Res.Mt; debe estar en la descripción.
+**Depende de:** 1. **Ya definido:** proyectil = PdG.Esp vs Evasión; efecto abstracto = PdG.Esp vs Res.Esp; mental = Res.Mt; debe estar en la descripción.
 
 **Decidir:**
-- **2a.** Formato fijo de una línea para la descripción de cada habilidad. Propuesta: `Tira: PdG.Mg vs Evasión` / `PdG.Mg vs Res.Mg` / `vs Res.Mt` / `sin tirada`. Respuesta: ____
+- **2a.** Formato fijo de una línea para la descripción de cada habilidad. Propuesta: `Tira: PdG.Esp vs Evasión` / `PdG.Esp vs Res.Esp` / `vs Res.Mt` / `sin tirada`. Respuesta: ____
 - **2b.** Las habilidades mixtas (daño de proyectil + un debuff): ¿tiran una vez o dos? Respuesta: ____
 - **2c.** Un efecto de casteo sobre uno mismo o un aliado: ¿tira algo? Respuesta: ____
-- **2d.** Control mental: ¿qué tira el casteador? (¿PdG.Mg?) Respuesta: ____
+- **2d.** Control mental: ¿qué tira el casteador? (¿PdG.Esp?) Respuesta: ____
 - **2e.** ¿Va como campo de la habilidad (`tiradaAtaque` / `tiradaDefensa`) o solo como texto? Respuesta: ____
 
 **Entrega:** plantilla de la línea + regla por caso. **Termina cuando:** hay un formato único que se puede aplicar a todas.
@@ -71,7 +71,7 @@ proyectil de casteo (aguja de hielo) la **respeta**.
 **Ya definido:** el defensor puede **tirar Evasión para hacer un roll** de hasta **2 casilleros**; necesita **No2**; si se desplaza lo suficiente como para salir del área, esquiva.
 
 **Decidir:**
-- **4a.** "Tirar Evasión": ¿se tira contra algo (el PdG.Mg del casteador, un número fijo) o alcanza con tener No2 y salir del área? Respuesta: ____
+- **4a.** "Tirar Evasión": ¿se tira contra algo (el PdG.Esp del casteador, un número fijo) o alcanza con tener No2 y salir del área? Respuesta: ____
 - **4b.** Costo en No2 del roll. Respuesta: ____
 - **4c.** ¿Se hace fuera del turno propio, como reacción? ¿Cuántas veces por ronda? Respuesta: ____
 - **4d.** ¿Se puede con Inmovilizado, Rengo, Stun o sin No2? Respuesta: ____
@@ -83,7 +83,7 @@ proyectil de casteo (aguja de hielo) la **respeta**.
 ## Paso 5 — Nombres y vocabulario ⬜
 **Decidir:**
 - **5a.** Nombre del daño de casteo genérico ("plasma", "arcano", otro). Respuesta: ____
-- **5b.** ¿Se renombra "Mg" (PdG.Mg, Res.Mg, `pdgmg`, `resmg`) o se deja? Si se renombra: nombre nuevo y si cambian también los ids. Respuesta: ____
+- **5b.** ✅ Respondida (dueño, 2026-09-27): sí, se renombra "Mg" a **"Esp"** — **PdG.Esp** / **Res.Esp**. Los ids **no** cambian (siguen `pdgmg` / `resmg`).
 - **5c.** ¿"Hechizo" sigue siendo la palabra en las descripciones? Respuesta: ____
 
 **Entrega:** glosario. **Termina cuando:** hay un vocabulario único para usar en todo lo nuevo.
@@ -107,7 +107,7 @@ proyectil de casteo (aguja de hielo) la **respeta**.
 - [ ] 8.3 Creeps base (`comun/creeps-base.js`): roles mágico, apoyo y debuffer.
 - [ ] 8.4 Armas naturales: los tipos elemental, mágico y ácido.
 - [ ] 8.5 Trampas base (`comun/trampas-base.js`): tipo de daño de cada una.
-- [ ] 8.6 Catálogo (`datos/catalogo.json`, por el editor): ~60 ítems con Res.Mg, PdG.Mg o Rango de casteo, bastones, consumibles de casteo, los que mencionan fuego/rayo/arcano.
+- [ ] 8.6 Catálogo (`datos/catalogo.json`, por el editor): ~60 ítems con Res.Esp, PdG.Esp o Rango de casteo, bastones, consumibles de casteo, los que mencionan fuego/rayo/arcano.
 - [ ] 8.7 Pasivas y estados (`pasivas.js`, `ESTADOS_PRESET`).
 
 ## Paso 9 — Manual ⬜

@@ -18,7 +18,7 @@
 | **Arte de la guerra** (Warrior, Flash) | +2 a **una** tirada de PdG, Parry, Bloqueo o Daño | Cobra 2 SP; el +2 a mano | Botón **«Arte de la guerra +2»** en cada paso de tirada del duelo, **antes de tirar** (justo como manda la regla de Flash) | Medio |
 | **Ojo de asesino** (Asalto) | Crítico frecuente ×1 hasta tu próximo turno | ✅ automático (estado) | ✅ el duelo ya lo usa | — |
 | **Temple** (Tanque) | +1 Resistencia a crítico de todo Tipo, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
-| **Piel resistente** (Tanque) | +5 Def, +5 Res.Mg, +1 Resistencia a crítico, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
+| **Piel resistente** (Tanque) | +5 Def, +5 Res.Esp, +1 Resistencia a crítico, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
 | **Blindaje** (Tanque, Flash) | Escudo especial de 8 | ✅ automático | ✅ absorbe en el daño del duelo | — |
 | **Recuperación** (Tanque) | +9 HP | ✅ automático | — | — |
 | **Aura de espinas** (Tanque) | Cada golpe cuerpo a cuerpo recibido devuelve **1/4 del daño INFLIGIDO** (para arriba) al atacante | ✅ **Hecho 2026-09-27**: el duelo lo devuelve solo (ver §7) | ✅ | — |

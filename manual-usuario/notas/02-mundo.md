@@ -39,7 +39,7 @@ En este mundo **magia y tecnología tienen el mismo estatus**, tanto en la histo
 
 ## Cómo se nota en las reglas
 - Lo mágico y lo tecnológico **usan los mismos recursos**: [[SP]] para las habilidades, [[Nitros (No2)]] para actuar.
-- El atributo [[Especial]] es el "motor" de los hechizos (SP, PdG.Mg, [[Resistencias|Res.Mt]]), pero nada te impide que una pistola de chispa —un arma de [[Ataques a distancia|rango]]— use Destreza como cualquier otra.
+- El atributo [[Especial]] es el "motor" de los hechizos (SP, PdG.Esp, [[Resistencias|Res.Mt]]), pero nada te impide que una pistola de chispa —un arma de [[Ataques a distancia|rango]]— use Destreza como cualquier otra.
 - Un objeto puede mezclar los dos mundos: en el [[Catálogo de ítems]] hay ítems de "ciencia" con efectos de "magia" y viceversa.
 
 > [!tip] Para el GM

@@ -37,7 +37,7 @@ const PASIVAS_BASE = [
    detalle: '+1 al campo de visión (radio en hexágonos).', mods: [{stat: 'vision', val: 1}]},
   // Resto de los stats secundarios (escalón +1 = lo que da 1 punto de su atributo).
   {poolId: 'temple-magico', nombre: 'Temple mágico', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
-   detalle: '+1 Res.Mg (resistencia mágica).', mods: [{stat: 'resmg', val: 1}]},
+   detalle: '+1 Res.Esp (resistencia mágica).', mods: [{stat: 'resmg', val: 1}]},
   {poolId: 'golpe-fuerte', nombre: 'Golpe fuerte', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 Dmg (daño).', mods: [{stat: 'dmg', val: 1}]},
   {poolId: 'guardia-firme', nombre: 'Guardia firme', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
@@ -59,7 +59,7 @@ const PASIVAS_BASE = [
   {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
-   detalle: '+1 PdG.Mg (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
+   detalle: '+1 PdG.Esp (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
   {poolId: 'mente-serena', nombre: 'Mente serena', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
    detalle: '+1 Res.Mt (resistencia mental).', mods: [{stat: 'resm', val: 1}]},
   {poolId: 'largo-alcance-arcano', nombre: 'Largo alcance arcano', jobCosto: 1, etiquetas: ['stat', 'utilidad'],

@@ -87,7 +87,7 @@
   tr('Niebla de confusión', 3, ['control', 'mágica', 'área'], 'flor', 2, '#B784E0', '',
     'Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita.');
   tr('Trampa de escarcha', 3, ['daño', 'debuff', 'mágica'], 'flor', 1, '#7FB3D5', '2d6',
-    'Hielo repentino: 2d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Mg contra 12 la evita (a mano).', false, true, {nombre: 'Escarcha', turnos: 2});
+    'Hielo repentino: 2d6 de daño directo y Escarcha (−1 No2 máx.) por los turnos que elijas al colocarla (automático). Res.Esp contra 12 la evita (a mano).', false, true, {nombre: 'Escarcha', turnos: 2});
   tr('Descarga eléctrica', 3, ['daño', 'control', 'mágica'], 'flor', 1, '#E6D84A', '3d6',
     '3d6 de daño eléctrico (automático) y Stun (sin No2) 1 turno (a mano). Res.CC contra 12 evita el Stun.', false, true);
   tr('Succión arcana', 3, ['debuff', 'mágica'], 'flor', 1, '#5B7FA6', '',

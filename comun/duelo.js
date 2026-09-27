@@ -341,7 +341,7 @@ const Duelo = (() => {
   /* ---------- habilidades dirigidas (2026-09-27, docs/duelo-de-habilidades.md) ----------
      El mismo duelo sirve para una habilidad con objetivo: `hab` describe la contienda.
        hab = {nombre, objetivo: 'enemigo'|'aliado'|'uno mismo',
-              tira: {stat, etq, bono}|null,                       ← lo que tira quien la usa (PdG.Mg, Fuerza…)
+              tira: {stat, etq, bono}|null,                       ← lo que tira quien la usa (PdG.Esp, Fuerza…)
               contra: [{modo, stat, etq}],                        ← lo que puede tirar el objetivo (elige a ciegas si hay más de una); [] = sin oposición
               dano: {formula, tipo, ignoraDef}|null,              ← daño de la habilidad (el mágico ignora la Defensa y no critica)
               efectos: [{nombre, caras, exitos, dado, detalle, stacks, spec, cura}],

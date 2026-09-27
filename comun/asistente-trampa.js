@@ -29,7 +29,7 @@ const AsistenteTrampa = (() => {
   ];
   const SALVACIONES = [
     {id: 'Evasión', texto: 'Evasión'}, {id: 'Fuerza', texto: 'Fuerza'}, {id: 'Res.CC', texto: 'Res. a controles'},
-    {id: 'Res.Mg', texto: 'Res. mágica'}, {id: 'Res.Mt', texto: 'Res. mental'},
+    {id: 'Res.Esp', texto: 'Res. especial'}, {id: 'Res.Mt', texto: 'Res. mental'},
   ];
 
   function estilos(){

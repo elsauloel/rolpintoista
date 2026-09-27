@@ -25,7 +25,7 @@ const skillSA = (clase, nombre, detalle) => ({
 
 const CLASES_SKILLS = [
   {id: 'warrior', nombre: 'Warrior', habilidades: [
-    {id: 'warrior-arte-de-la-guerra', nombre: 'Arte de la guerra', costo: '2', nitrosCosto: 0,
+    {id: 'warrior-arte-de-la-guerra', nombre: 'Arte de la guerra', costo: '2', nitrosCosto: 0, duelo: {modo: 'flash', flash: {en: ['pdg', 'parry', 'bloqueo', 'dano'], bono: 2}},
      detalle: 'Flash. +2 a una sola tirada de PdG, Parry, Bloqueo o Daño. No se usa más de una vez sobre la misma tirada. ⚖ A definir en mesa: ¿todas las veces que quieras en el turno, o una sola por turno?'},
     {id: 'warrior-amplificar-dano', nombre: 'Amplificar daño', costo: 'X', nitrosCosto: 'ATAQUE', duelo: {modo: 'arma', x: 'sp', arma: {dadosPorX: 1}},
      detalle: 'Ataque con +X dados de daño del Tipo del arma. X máx. 3 (a mano: la ficha no lo limita).'},

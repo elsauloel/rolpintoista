@@ -44,6 +44,7 @@ const AsistenteDueloHab = (() => {
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
+      flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ...((ini && ini.arma) || {})},
     };
     const prev = document.getElementById('adh-fondo');
@@ -58,6 +59,14 @@ const AsistenteDueloHab = (() => {
       return `<div><h4>Alcance</h4>
         <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.</p>
         <div class="fila"><select data-alcance>${lista.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div></div>`;
+    }
+    const FLASH_EN = [['pdg', 'La tirada de quien la usa (PdG, PdG.Mg…)'], ['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['fuerza', 'Fuerza del golpe'], ['dano', 'El daño']];
+    function flashHtml(){
+      return `<div><h4>Reacción Flash en el duelo</h4>
+        <p class="nota">Una habilidad Flash se usa <b>antes de una tirada</b> del duelo (nunca después de verla) y <b>no cuesta No2</b>, solo sus SP. En el cuadro del duelo aparece un botón «⚡» en las tiradas donde vale; al marcarlo y tirar, se cobran los SP y el bono se suma a esa tirada. Una vez por tirada.</p>
+        <div class="fila"><span>Suma</span><input type="number" style="width:70px" data-flashbono value="${esc(st.flashBono)}"><span>a la tirada</span></div>
+        <p class="nota" style="margin-top:8px">Vale para:</p>
+        ${FLASH_EN.map(([v, t]) => `<label class="op"><input type="checkbox" data-flashen="${v}" ${st.flashEn.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
     }
     function armaHtml(){
       const a = st.arma;
@@ -77,8 +86,8 @@ const AsistenteDueloHab = (() => {
           <label class="op"><input type="checkbox" data-activo ${st.activo ? 'checked' : ''}> <b>Ejecutar esta habilidad abre el duelo paso a paso</b> (elegís el objetivo, se tira, se ve en vivo)</label>
           ${st.activo ? `
           <div><h4>¿Qué tipo de habilidad es?</h4>
-            <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option></select></div>
-          ${st.modo === 'arma' ? armaHtml() : `
+            <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option><option value="flash"${st.modo === 'flash' ? ' selected' : ''}>⚡ Reacción Flash (suma a una tirada del duelo)</option></select></div>
+          ${st.modo === 'flash' ? flashHtml() : st.modo === 'arma' ? armaHtml() : `
           <div><h4>1 · ¿A quién apunta?</h4>
             <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           ${st.objetivo === 'uno mismo' ? '' : alcanceHtml(false)}
@@ -93,14 +102,14 @@ const AsistenteDueloHab = (() => {
             ${st.dano ? `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
             <p class="nota">El daño mágico (arcano, fuego, hielo, rayo) <b>ignora la Defensa y no critica</b>: va derecho a la vida. El físico resta la Defensa como cualquier golpe.</p>` : ''}</div>
           `}
-          <div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
+          ${st.modo === 'flash' ? '' : `<div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
             <p class="nota">Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.</p>
             ${st.efectos.map((e, i) => e.cura !== undefined
               ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
               : `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
                 <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>`).join('')}
             <datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
-            <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div></div>` : ''}
+            <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div></div>`}` : ''}
         </div>
         <div class="pie">${ini ? '<button type="button" class="rojo" data-quitar title="Vuelve a la ejecución de siempre (sin duelo)">Sacar el duelo de esta habilidad</button>' : ''}<button type="button" class="sec" data-x>Cancelar</button><button type="button" data-ok>Guardar</button></div></div>`;
       f.querySelectorAll('[data-x]').forEach(b => b.onclick = cerrar);
@@ -108,6 +117,8 @@ const AsistenteDueloHab = (() => {
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
       q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
+      q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
+      f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
       q('[data-x]', e => { st.x = e.target.value; });
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
@@ -128,6 +139,10 @@ const AsistenteDueloHab = (() => {
       if(bq) bq.onclick = () => { cerrar(); cfg.alGuardar(null); };
       f.querySelector('[data-ok]').onclick = () => {
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
+        if(st.modo === 'flash'){
+          if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return; }
+          cerrar(); cfg.alGuardar({modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}); return;
+        }
         const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         if(st.modo === 'arma'){
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};

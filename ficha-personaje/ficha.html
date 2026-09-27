@@ -2045,10 +2045,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
-<script src="../comun/asistente-duelo-hab.js?v=20260927c"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260927d"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927c"></script>
+<script src="../comun/duelo.js?v=20260927d"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -4410,7 +4410,7 @@ function alcanceDeHab(c, statTira){
 }
 function habDueloDe(it){
   const c = dueloDe(it);
-  if(!c || typeof c !== 'object' || c.modo === 'arma') return null;
+  if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash') return null;
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
   const tipo = c.tipoDano || 'arcano';
@@ -10610,6 +10610,27 @@ window.DUELO_HOOKS = {
     }
     const r = tirarDados(formula);
     if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
+  },
+  // Flash (2026-09-27): las habilidades Flash que me sirven para esta tirada del duelo (se marcan ANTES de tirar) y su uso (cobra los SP; el duelo suma el bono).
+  flashOpciones: (d, campo) => {
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    if(dueloInvDe(lado)) return [];   // las invocaciones no usan Flash
+    const clave = campo === 'eva' ? ['eva', 'parry'] : [campo];
+    const sp = spMaximo() - num(S.spGastado);
+    return S.habilidades.filter(h => { const c = dueloDe(h); return c && c.modo === 'flash' && c.flash && (c.flash.en || []).some(e => clave.includes(e)); })
+      .map(h => { const c = dueloDe(h).flash, costo = parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo, motivoNo: costo > sp ? 'no te alcanzan los SP' : ''}; });
+  },
+  flashUsar: (d, campo, modo, habId) => {
+    const h = S.habilidades.find(x => x.id === habId), c = h && dueloDe(h);
+    if(!c || c.modo !== 'flash' || !c.flash) return null;
+    const en = c.flash.en || [];
+    const sirve = campo === 'eva' ? en.includes(modo === 'parry' ? 'parry' : 'eva') : en.includes(campo);
+    if(!sirve){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
+    const costo = parseCostoSp(h.costo);
+    if(costo > spMaximo() - num(S.spGastado)){ toast(`No te alcanzan los SP para ${h.nombre}`); return null; }
+    S.spGastado = num(S.spGastado) + costo;   // Flash: no cuesta No2, solo SP
+    renderVitals(); refresh();
+    return {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje'};
   },
   // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
   habTirar: (d, quien, modo) => {

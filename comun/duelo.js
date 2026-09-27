@@ -177,7 +177,12 @@ const Duelo = (() => {
 /* El botón que hay que apretar ahora brilla y late. */
 .duelo-tiro button:not(.sec):not(:disabled),.duelo-ef button:not(:disabled),.duelo-contra button:not(.sec):not(:disabled),.duelo-pie button:not(.sec):not(:disabled),.duelo-fin button:not(:disabled),.duelo-par button{animation:duelo-boton 1.2s ease-in-out infinite alternate}
 @keyframes duelo-boton{0%{box-shadow:0 0 4px rgba(90,150,255,.3);filter:brightness(1)}100%{box-shadow:0 0 22px 4px rgba(110,170,255,.95);filter:brightness(1.25)}}
-.viva,.duelo-nota.viva,.espera.viva{display:block;margin:6px auto;padding:10px 14px;border-radius:10px;color:#dfeaff!important;font-style:normal!important;font-weight:700;background:rgba(80,140,255,.14);border:1px solid rgba(110,170,255,.5);animation:duelo-latido 1.4s ease-in-out infinite alternate}
+.viva,.duelo-nota.viva,.espera.duelo-flash{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.duelo-flash button.flash{background:#3a2f12;color:#ffe9a8;border:1px solid #d9b45a;font-size:14px}
+.duelo-flash button.flash small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.duelo-flash button.flash.on{background:#8a5a12;box-shadow:0 0 16px rgba(255,190,60,.7)}
+.duelo-flash button.flash:disabled{opacity:.45}
+.viva{display:block;margin:6px auto;padding:10px 14px;border-radius:10px;color:#dfeaff!important;font-style:normal!important;font-weight:700;background:rgba(80,140,255,.14);border:1px solid rgba(110,170,255,.5);animation:duelo-latido 1.4s ease-in-out infinite alternate}
 .duelo-paso.activo h4 .n{background:#2d6cdf}
 @keyframes duelo-latido{0%{box-shadow:0 0 6px rgba(80,140,255,.25),inset 0 0 8px rgba(80,140,255,.06)}100%{box-shadow:0 0 30px rgba(80,150,255,.75),inset 0 0 22px rgba(80,150,255,.22)}}
 .duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
@@ -882,6 +887,39 @@ const Duelo = (() => {
     if(actual && actual.id === id && actual.dato) dibujar();
   }
 
+  /* ---------- Reacciones Flash dentro del duelo (2026-09-27, docs/duelo-de-habilidades.md §10) ----------
+     Una habilidad Flash (`duelo.modo === 'flash'`, `duelo.flash = {en: ['pdg','eva','parry','bloqueo','fuerza','dano'], bono}`) se puede usar ANTES de una tirada del duelo (regla de Flash:
+     se declara antes de tirar, nunca después de ver el resultado; no cuesta No2, solo los SP de la habilidad). En cada caja de tirada, quien tira ve un botón por cada Flash que le sirve;
+     lo marca y, al tirar, la página del dueño cobra los SP (`flashUsar`) y el bono se suma a esa tirada (queda en su fórmula: «+2 ⚡»). Una vez por tirada. */
+  let flashOps = {};      // 'duelo:campo' → opciones que calculó la página del que tira ([] = ninguna)
+  let flashSel = {};      // 'duelo:campo' → habId marcado
+  let flashPedidas = new Set();
+  function pedirFlash(d, campo){
+    const k = d.id + ':' + campo;
+    if(flashPedidas.has(k)) return;
+    flashPedidas.add(k);
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    if(lado.tipo === 'creep' || String(lado.ref || '').includes('~')){ flashOps[k] = []; return; }   // los creeps y las invocaciones no usan Flash: no hace falta preguntar
+    enviar(lado, {tipo: 'duelo-flash', id: d.id, campo});
+    setTimeout(() => { if(flashOps[k] === undefined) flashOps[k] = []; }, 6000);
+  }
+  function recibirFlash(id, campo, ops){
+    flashOps[id + ':' + campo] = Array.isArray(ops) ? ops : [];
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  const ETQ_FLASH = {pdg: 'la tirada de ataque (PdG)', eva: 'Evasión', parry: 'Parry', bloqueo: 'Bloqueo', fuerza: 'Fuerza del golpe', dano: 'el daño'};
+  function flashHtml(d, campo){
+    const k = d.id + ':' + campo;
+    if(flashOps[k] === undefined){ pedirFlash(d, campo); return ''; }
+    const ops = flashOps[k];
+    if(!ops.length) return '';
+    return `<div class="duelo-flash"><div class="det">⚡ Flash (se declara antes de tirar · no cuesta No2):</div>${ops.map(o => {
+      const on = flashSel[k] === o.habId;
+      const vale = (o.en || []).map(e => ETQ_FLASH[e] || e).join(', ');
+      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${_fmt(o.costoSp)} SP${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
+    }).join('')}</div>`;
+  }
+
   const ETIQ = {pdg: 'PdG', eva: 'Defensa', fuerza: 'Fuerza del golpe', bloqueo: 'Bloqueo', dano: 'Daño'};
   const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
@@ -922,6 +960,7 @@ const Duelo = (() => {
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
         cuerpo = `<button type="button" data-tirar="${campo}">${txt}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
       }
+      cuerpo += flashHtml(d, campo);
     }else if(puedoAMano(lado)){
       const selModo = campo === 'eva' ? `<select data-manual-modo>${selModoHtml(d)}</select>` : '';
       cuerpo = `<div class="espera viva">esperando que ${quien} tire…</div>
@@ -1036,7 +1075,7 @@ const Duelo = (() => {
     let cuerpo;
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
-      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}</button><div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>`;
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>`;
       else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota viva" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>`;
       else cuerpo = `<div class="espera duelo-nota viva" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
@@ -1217,15 +1256,20 @@ const Duelo = (() => {
     f.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => {
       const campo = b.dataset.tirar;
       b.disabled = true; b.textContent = 'Tirando…';
-      enviar(campo === 'pdg' || campo === 'fuerza' ? d.atacante : d.defensor, {tipo: 'duelo-tirar', id: d.id, campo});
+      enviar(campo === 'pdg' || campo === 'fuerza' ? d.atacante : d.defensor, {tipo: 'duelo-tirar', id: d.id, campo, flash: flashSel[d.id + ':' + campo] || ''});
       setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
     });
     f.querySelectorAll('[data-def]').forEach(b => b.onclick = () => {
       const o = (opciones[d.id] || [])[Number(b.dataset.def)];
       if(!o) return;
       f.querySelectorAll('[data-def]').forEach(x => x.disabled = true);
-      enviar(d.defensor, {tipo: 'duelo-tirar', id: d.id, campo: 'eva', modo: o.modo, itemId: o.itemId || ''});
+      enviar(d.defensor, {tipo: 'duelo-tirar', id: d.id, campo: 'eva', modo: o.modo, itemId: o.itemId || '', flash: flashSel[d.id + ':eva'] || ''});
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
+    });
+    f.querySelectorAll('[data-flash]').forEach(b => b.onclick = () => {   // marcar o desmarcar el Flash de esta tirada
+      const [campo, habId] = b.dataset.flash.split(':'), k = d.id + ':' + campo;
+      flashSel[k] = flashSel[k] === habId ? '' : habId;
+      dibujar();
     });
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
     const brd = f.querySelector('[data-reintentar-def]');
@@ -1236,7 +1280,7 @@ const Duelo = (() => {
     const bft = f.querySelector('[data-ef-terminar]');
     if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));
     const bdt = f.querySelector('[data-dano-tirar]');
-    if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano'}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
+    if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano', flash: flashSel[d.id + ':dano'] || ''}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
     const bam = f.querySelector('[data-aplicar-mano]');
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
@@ -1261,6 +1305,13 @@ const Duelo = (() => {
         const ops = (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null;   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
+        return;
+      }
+      if(m.tipo === 'duelo-flash'){   // ¿qué Flash tengo para esta tirada?
+        const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'dano') ? d.atacante : d.defensor;
+        const ops = (h.soy && h.soy(lado) && h.flashOpciones) ? (h.flashOpciones(d, m.campo) || []) : [];
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-flash-res', id: d.id, campo: m.campo, opciones: ops}, location.origin);
+        else recibirFlash(d.id, m.campo, ops);
         return;
       }
       if(m.tipo === 'duelo-contra'){
@@ -1291,7 +1342,9 @@ const Duelo = (() => {
       let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');
       if(d.hab && campo === 'eva'){ const c = d.hab.contra.find(x => x.modo === m.modo); re = new RegExp(escRe(c ? c.etq : m.modo), 'i'); }
-      esperaTiro = {id: d.id, campo, re, defensa, extra};
+      let flash = null;   // Flash marcado: la página cobra los SP y el bono se suma a la tirada cuando llegue
+      if(m.flash && h.flashUsar){ flash = h.flashUsar(d, campo, m.modo || '', m.flash) || null; if(!flash) _toast('No se pudo usar el Flash: se tira sin él'); delete flashOps[d.id + ':' + campo]; flashPedidas.delete(d.id + ':' + campo); }
+      esperaTiro = {id: d.id, campo, re, defensa, extra, flash};
       if(d.hab && (campo === 'pdg' || campo === 'eva')){
         if(h.habTirar) h.habTirar(d, campo === 'pdg' ? 'atacante' : 'defensor', m.modo);
         else{ esperaTiro = null; retener(false); _toast('Esta página no sabe tirar habilidades'); }
@@ -1316,10 +1369,15 @@ const Duelo = (() => {
     if(!esperaTiro) return;
     const det = e.detail || {}, r = det.r || {};
     if(!esperaTiro.re.test(String(det.origen || ''))) return;
-    const {id, campo, defensa, extra} = esperaTiro;
+    const {id, campo, defensa, extra, flash} = esperaTiro;
     esperaTiro = null;
     retener(false);
-    (campo === 'dano' ? guardarDano(id, r, extra && extra.efectos) : guardarTiro(id, campo, r, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
+    let rr = r;
+    if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
+      rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`};
+      anunciarMesa(`⚡ ${flash.etq || 'Flash'}: +${_num(flash.bono)} a ${ETQ_FLASH[campo === 'eva' ? 'eva' : campo] || 'la tirada'} (${flash.quien || 'un jugador'})`);
+    }
+    (campo === 'dano' ? guardarDano(id, rr, extra && extra.efectos) : guardarTiro(id, campo, rr, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
       .then(() => avisarMapaUi());
   });
 
@@ -1339,7 +1397,7 @@ const Duelo = (() => {
       return;
     }
     if(m.tipo === 'duelo-cancelado'){ pendienteSuelto = null; return; }
-    if(m.tipo === 'duelo-opciones' || m.tipo === 'duelo-tirar' || m.tipo === 'duelo-contra') ejecutar(m);
+    if(m.tipo === 'duelo-opciones' || m.tipo === 'duelo-tirar' || m.tipo === 'duelo-contra' || m.tipo === 'duelo-flash') ejecutar(m);
   });
 
   // A mano: el GM (o el dueño) escribe el valor del stat y se tira con dados.
@@ -1479,5 +1537,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
+  return {recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
 })();

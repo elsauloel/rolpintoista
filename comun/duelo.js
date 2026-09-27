@@ -1572,6 +1572,15 @@ const Duelo = (() => {
       el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
       el.textContent = txt;
     });
+    // Hook opcional (2026-09-27, pedido del dueño): el mapa lo usa para hacer latir en el
+    // lienzo a los dos tokens de cada duelo que quedó minimizado/de fondo para esta pantalla —
+    // así se entiende entre quiénes hay acción sin reabrir el cuadro grande. No rompe ficha ni
+    // gm-tools, que no lo definen.
+    if(typeof dueloParesActivos === 'function'){
+      dueloParesActivos([...mostrar.values()]
+        .filter(d => d.estado !== 'resuelto')
+        .map(d => ({id: d.id, atacanteTokenId: d.atacante && d.atacante.tokenId, defensorTokenId: d.defensor && d.defensor.tokenId})));
+    }
   }
 
   // cfg.opcionesLocal(duelo) → opciones de defensa o null (el mapa del GM las calcula solo para un creep, sin cargar las Acciones).

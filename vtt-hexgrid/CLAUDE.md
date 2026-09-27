@@ -977,3 +977,13 @@ hexágono con otro sin importar bando. Todavía no está construido.
   ficha, que no la necesitan ahí). Al usarla, `usarPolillaMapa` saca el estado con
   `hudEstadoCambiar` (la misma transacción que ya usa el HUD para cualquier estado propio) y
   publica el aviso con `desde: 'recordatorio'`, igual que `publicarRecordatorios` de la ficha.
+
+- **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
+  queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está
+  abierto acá mismo), los dos tokens involucrados (atacante y defensor) laten despacio en el mapa —
+  mismo estilo que el anillo de "a quién le tocó el turno" (`iniResaltado`), pero persistente
+  mientras el duelo siga activo, no solo unos segundos. `dueloParesActivos(pares)` (llamada por
+  `comun/duelo.js` cada vez que cambia qué se muestra como chip) guarda `duelosPulsoPares` y pide
+  redibujar; `dibujar()` traza el anillo rojo pulsante alrededor de cada token (`tokens.get(id)`,
+  respeta oculto/niebla — un token que no ves no late) y mantiene `animando = true` mientras haya
+  algún par activo, para que sigan latiendo cuadro a cuadro.

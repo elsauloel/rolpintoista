@@ -3156,6 +3156,17 @@ async function iniciativaTirar(){
 }
 let iniResaltado = null;   // {id, hasta}: el token al que se llegó desde la lista de turnos
 
+// 🔔 Pulso de duelo en curso (2026-09-27, pedido del dueño): mientras un duelo quede minimizado o
+// de fondo para esta pantalla, los dos tokens involucrados laten despacio en el mapa, para
+// entender entre quiénes hay acción sin tener que reabrir el cuadro grande. comun/duelo.js llama
+// a esta función (hook opcional, `typeof === 'function'`) cada vez que cambia qué duelos están
+// minimizados/de fondo — nunca mientras el cuadro grande de ESE duelo está abierto acá mismo.
+let duelosPulsoPares = [];   // [{id, atacanteTokenId, defensorTokenId}]
+function dueloParesActivos(pares){
+  duelosPulsoPares = Array.isArray(pares) ? pares : [];
+  pedirDibujo();
+}
+
 // Un personaje caído o un creep derrotado (HP en 0) queda FUERA del orden de turnos mientras lo esté (2026-09-25, pedido del dueño): ▶ Siguiente lo
 // saltea y la lista lo muestra apagado con 💀. Si lo curan (HP > 0) vuelve solo a jugar.
 function iniciativaFueraDeJuego(id){
@@ -4414,6 +4425,23 @@ function dibujar(){
       animando = true;
     }
   }
+
+  // Pulso de duelo minimizado/de fondo: ver dueloParesActivos() más arriba.
+  duelosPulsoPares.forEach(p => {
+    [p.atacanteTokenId, p.defensorTokenId].forEach(id => {
+      if(!id) return;
+      const tk = tokens.get(id);
+      if(!tk || (tk.oculto && !soyGM) || !tokenVisiblePorNiebla(tk)) return;
+      const v = visibles.get(id) || hexCentro(tk.col, tk.fila);
+      const pulso = 0.5 + 0.5 * Math.sin(Date.now() / 260);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(v.x, v.y, HEX * (0.85 + 0.14 * pulso), 0, 2 * Math.PI);
+      ctx.strokeStyle = `rgba(15,8,10,${0.55 + 0.15 * pulso})`; ctx.lineWidth = 7 / z; ctx.stroke();
+      ctx.strokeStyle = `rgba(224,90,70,${0.55 + 0.35 * pulso})`; ctx.lineWidth = 3.5 / z; ctx.stroke();
+      ctx.restore();
+      animando = true;
+    });
+  });
 
   if(dibujarEfectosTeleport()) animando = true;
 

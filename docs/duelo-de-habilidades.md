@@ -97,6 +97,12 @@ siguiente, hasta terminar la lista.
   resolverse, esa tirada del casteador se guarda en el área (`pdgCompartido`) y cada objetivo siguiente **solo tira su
   propia Evasión**, contra esa misma tirada ya hecha — no una nueva. Se ve en el cuadro como "✔ ya tiró" desde el
   arranque para esos objetivos (mismo aviso que cuando un lado tira antes que el otro en cualquier duelo).
+- **La fase `dodge` minimiza el cuadro solo para dejar ver el mapa** (pedido del dueño, 2026-09-27): en la pantalla del
+  defensor (o del GM), el duelo se minimiza solo apenas entra en `dodge`, se selecciona su token (para ver el HUD, con
+  el circulito de No2) y aparece un cartel abajo con **"🔎 Ver el duelo"** y **"✋ No me quiero mover"** (declina sin
+  moverse — se resuelve con lo mismo que ya usaba el botón "revisar" de adentro del cuadro). Al salir de la fase
+  (se resolvió, moviéndose o declinando), el cuadro se vuelve a abrir solo para que se vea el veredicto. Para
+  cualquier otro cliente (espectadores) no cambia nada.
 - **Documento nuevo** `campanas/<id>/areas/<id>` (no anidado por mapa, como `duelos`): ata el casteador, la habilidad, el
   centro/radio, la lista de objetivos y qué sub-duelo le toca a cada uno (`indice`); el mapa dibuja el **círculo compartido**
   (violeta) a partir de esto mientras dura la cascada, visible a todos, no solo al GM.

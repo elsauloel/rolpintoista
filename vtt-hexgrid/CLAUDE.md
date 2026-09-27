@@ -1038,6 +1038,18 @@ hexágono con otro sin importar bando. Todavía no está construido.
     vista.y-paneo.y) >= 6` px) — si no, era un clic quieto y ahí sí se resuelve el destino. Vale para **cualquier**
     uso de `elegirDestino` (el centro de un área, el destino de un teleport, los dos puntos de Invocar portal), no
     solo para el área. El cursor `crosshair` de "elegir destino" también se restauró para cuando no se está arrastrando.
+  - **Corrección del dueño, probando en mesa (2026-09-27): la fase `dodge` minimiza el cuadro solo y muestra los No2.**
+    Dos hooks nuevos de `escuchar(cfg)`, con edge-detection propio en `comun/duelo.js` (`dodgeActivos`, un Set —
+    avisa una sola vez al entrar y una sola vez al salir de la fase, sin importar cuántos snapshots pasen mientras
+    dura): `dodgeEmpieza(d)` y `dodgeTermina(d)`. En la pantalla del **defensor mismo o del GM** (`d.defensor.uid ===
+    fbUsuario.uid || soyGM`; para cualquier otro cliente no hacen nada): `dodgeEmpieza` llama `Duelo.abrir(d.id)` +
+    `Duelo.minimizar()` (el mapa queda libre) y `seleccionar(d.defensor.tokenId)` (así se ve su HUD, con el
+    circulito de No2 — arrastrar el token ya cuesta No2 solo, sin cambios); aparece además un cartel nuevo
+    (`dodgeBanner`, `#dodge-banner`, mismo patrón visual que `#duelo-objetivo`) con **"🔎 Ver el duelo"** (reabre el
+    cuadro grande) y **"✋ No me quiero mover"** (`dodgeDeclinar`, llama a `dueloChequearDodge` + `Duelo.resolverDodge`
+    directo, sin pasar por el cuadro — mismo camino que el botón "revisar" de adentro). `dodgeTermina` saca el
+    cartel y reabre el cuadro (`Duelo.abrir`) para esa misma pantalla, para que se vea el veredicto. No hace falta
+    ninguna regla de Firestore nueva (es puramente local a cada pantalla).
 
 - **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
   queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está

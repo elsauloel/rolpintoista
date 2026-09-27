@@ -9313,6 +9313,47 @@ function dueloChequearDodge(d){
   return distanciaHex(a.centro, t) <= num(a.radio);
 }
 
+/* ---------- Fase 'dodge': minimizar solo, mostrar los No2 y el cartel "no me quiero mover" (pedido del dueño, 2026-09-27) ----------
+   Mientras le toca decidir el dodge roll a ESTE cliente (el propio defensor, o el GM), el cuadro grande del duelo
+   estorba para poder ver y arrastrar el token: se minimiza solo, se selecciona el token (así se ve su HUD, con el
+   circulito de No2) y aparece un cartel abajo con la opción de declinar sin moverse. Al salir de la fase (se
+   resolvió, moviéndose o declinando), el cuadro se vuelve a abrir solo — así se ve el veredicto. Para cualquier
+   otro cliente (espectadores) estos dos hooks no hacen nada: cada uno mira su propio duelo como siempre. */
+let dodgeBanner = null;   // {id, tokenId, nombre, grupoId}
+function dueloDodgeEmpieza(d){
+  if(!d.defensor || !(soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) return;
+  Duelo.abrir(d.id);
+  Duelo.minimizar();
+  seleccionar(d.defensor.tokenId);
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id};
+  renderDodgeBanner();
+}
+function dueloDodgeTermina(d){
+  if(dodgeBanner && dodgeBanner.id === d.id){ dodgeBanner = null; renderDodgeBanner(); }
+  if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) Duelo.abrir(d.id);
+}
+function renderDodgeBanner(){
+  let el = document.getElementById('dodge-banner');
+  if(!dodgeBanner){ if(el) el.hidden = true; return; }
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'dodge-banner';
+    el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:96;background:var(--bottle,#1f3d2f);color:#EAF3E6;border:2px solid var(--brass,#E0A458);border-radius:var(--r,3px);padding:12px 18px;font-family:"Space Mono",monospace;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center;max-width:92vw;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center';
+    document.body.appendChild(el);
+  }
+  el.hidden = false;
+  el.innerHTML = `<span>🏃 <b>${esc(dodgeBanner.nombre)}</b> ganó la Evasión: arrastrá el token hasta <b>2 casilleros</b> para intentar salir del área</span><button type="button" class="btn" data-dodge-ver>🔎 Ver el duelo</button><button type="button" class="btn" data-dodge-no-mover>✋ No me quiero mover</button>`;
+  el.querySelector('[data-dodge-ver]').onclick = () => Duelo.abrir(dodgeBanner.id);
+  el.querySelector('[data-dodge-no-mover]').onclick = () => dodgeDeclinar();
+}
+async function dodgeDeclinar(){
+  if(!dodgeBanner) return;
+  const {id, tokenId, grupoId} = dodgeBanner;
+  const adentro = dueloChequearDodge({grupo: grupoId ? {id: grupoId} : null, defensor: {tokenId}});
+  try{ await Duelo.resolverDodge(id, !adentro); }
+  catch(err){ console.error('No se pudo resolver el dodge roll:', err); toast('No se pudo resolver el dodge roll'); }
+}
+
 // El casteador eligió una habilidad de área (asistente-duelo-hab.js: objetivo 'area' + radio) y le tocó elegir el
 // centro: arma la lista de objetivos (adentro del radio, rivales — nunca el propio casteador ni tokens ocultos —
 // salvo que la habilidad tenga fuego amigo) y crea el documento del área; el primer sub-duelo lo crea
@@ -10279,7 +10320,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge});
+  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina});
   escucharAreas();   // hechizos de área (Paso 4/7 del casteo): el círculo compartido y, el GM, la cascada
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.

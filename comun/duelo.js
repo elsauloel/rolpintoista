@@ -60,6 +60,7 @@ const Duelo = (() => {
   let opcionesPedidas = new Set();
   let aplicando = new Set();
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
+  let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
   const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
 
   const hooks = () => (typeof window !== 'undefined' && window.DUELO_HOOKS) || null;
@@ -1684,6 +1685,23 @@ const Duelo = (() => {
           if(!d.grupo || d.estado !== 'resuelto' || grupoAvisado.has(d.id)) return;
           grupoAvisado.add(d.id);
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
+        });
+      }
+      // Fase 'dodge' de un hechizo de área (pedido del dueño, 2026-09-27): avisa cuando un duelo ENTRA y cuando SALE
+      // de la fase (se resolvió, moviéndose o declinando) — el mapa usa esto para minimizar/reabrir el cuadro solo y
+      // mostrar un cartel de "no me quiero mover" mientras le toca decidir a quien defiende (o al GM).
+      if(cfgEscuchar.dodgeEmpieza || cfgEscuchar.dodgeTermina){
+        const enDodgeAhora = new Map(listaDuelos.filter(d => d.fase === 'dodge' && d.estado === 'esperando').map(d => [d.id, d]));
+        enDodgeAhora.forEach((d, id) => {
+          if(dodgeActivos.has(id)) return;
+          dodgeActivos.add(id);
+          if(cfgEscuchar.dodgeEmpieza) try{ cfgEscuchar.dodgeEmpieza(d); }catch(err){ console.error('Duelo: dodgeEmpieza', err); }
+        });
+        [...dodgeActivos].forEach(id => {
+          if(enDodgeAhora.has(id)) return;
+          dodgeActivos.delete(id);
+          const d = listaDuelos.find(x => x.id === id) || {id};
+          if(cfgEscuchar.dodgeTermina) try{ cfgEscuchar.dodgeTermina(d); }catch(err){ console.error('Duelo: dodgeTermina', err); }
         });
       }
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.

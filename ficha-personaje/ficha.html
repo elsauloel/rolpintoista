@@ -1210,7 +1210,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
    muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#grilla-dados){display:none!important}
+html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#adh-fondo):not(#grilla-dados){display:none!important}
 </style>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
@@ -2045,9 +2045,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260927a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927a"></script>
+<script src="../comun/duelo.js?v=20260927b"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -4354,6 +4355,31 @@ function habStatTirable(it){
   return !!(s && (ATTR_LIST.some(a => a.id === s) || STATS_CON_TIRADA().some(x => x.id === s)));
 }
 function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExtra || '').trim(); }
+/* ---------- Habilidades dirigidas en el duelo (2026-09-27, docs/duelo-de-habilidades.md) ----------
+   Una habilidad con `duelo` = {objetivo: 'enemigo'|'aliado'|'uno mismo', tira: stat (por defecto su tiradaStat), contra: [stats con los que se resiste el objetivo],
+   dano: true si la fórmula de la habilidad (tiradaExtra) es daño, tipoDano: 'arcano'|'fuego'|'hielo'|'rayo'|'fisico', efectos: [{nombre, turnos, mods, hp, cura}]}
+   abre el duelo al ejecutarla en vez de tirar el stat suelto. */
+function habDueloDe(it){
+  const c = it && it.duelo;
+  if(!c || typeof c !== 'object') return null;
+  if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
+  const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
+  const tipo = c.tipoDano || 'arcano';
+  const formula = String(it.tiradaExtra || '').trim();
+  return {
+    nombre: it.nombre, objetivo: c.objetivo || 'enemigo',
+    tira: stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null,
+    contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
+    dano: c.dano && formula ? {formula, tipo, ignoraDef: tipo !== 'fisico'} : null,
+    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
+  };
+}
+function lanzarDueloDeHab(it, hab){
+  if(!hab) return false;
+  Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: {tipo: 'habilidad', hab}, suelto: () => tirarPrimeraDeHab(it)});
+  return true;
+}
+
 function tirarPrimeraDeHab(it){
   if(habStatTirable(it)){
     tirarValorStat(`${it.nombre} · ${STAT_LABEL[it.tiradaStat]}`, compute().final[it.tiradaStat] + num(it.tiradaBono), it.tiradaStat);   // tiradaBono: bono fijo de la habilidad al stat (ej. Takle: +1 PdG)
@@ -5616,10 +5642,10 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${i.duelo ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">🎯 duelo</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
-        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button></div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo (qué se tira, con qué se resiste, daño y efectos)">🎯</button></div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}
@@ -6703,6 +6729,11 @@ document.addEventListener('click', async e => {
       renderList('equipo'); renderList('mochila');
       refresh();
     }
+    return;
+  }
+  if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
+    const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
+    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: it.duelo || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), alGuardar: cfg => { if(cfg) it.duelo = cfg; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
     return;
   }
   if(b.dataset.armrota){
@@ -10521,6 +10552,24 @@ window.DUELO_HOOKS = {
     const r = tirarDados(armaDanoTxt(arma, compute().final.dmg));
     if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
   },
+  // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
+  habTirar: (d, quien, modo) => {
+    const lado = quien === 'atacante' ? d.atacante : d.defensor;
+    const c = quien === 'atacante' ? d.hab.tira : (d.hab.contra || []).find(x => x.modo === modo);
+    if(!c || !c.stat) return;
+    const inv = dueloInvDe(lado);
+    const nombre = quien === 'atacante' ? `${d.hab.nombre} · ${c.etq}` : c.etq;
+    const v = inv ? invStatValor(inv, c.stat) : compute().final[c.stat];
+    if(inv) tirarValorStatInv(inv, nombre, num(v) + num(c.bono), c.stat);
+    else tirarValorStat(nombre, num(v) + num(c.bono), c.stat);
+  },
+  // «Cuánto tirarías»: la fórmula de dados de ese stat (para el botón de defensa).
+  habValor: (d, quien, stat) => {
+    const inv = dueloInvDe(quien === 'atacante' ? d.atacante : d.defensor);
+    const v = inv ? invStatValor(inv, stat) : compute().final[stat];
+    const f = formulaParaValor(num(v));
+    return f ? f.formula : fmt(num(v));
+  },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
     // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.
@@ -11047,8 +11096,9 @@ function ejecutarHabilidad(id, armaId, forzar){
   const efecto = aplicarEfectoDeConsumo(it);
   colocarTrampaDeHab(it);
   avisarZonaAlMapa(it);
-  anunciarHabilidad(it);
-  tirarPrimeraDeHab(it);
+  const hDuelo = habDueloDe(it);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
+  if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
+  if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
   renderList("habilidades");
   if(efecto) renderList('efectos');
   renderNitros();
@@ -12556,7 +12606,7 @@ function botoneraModoAbrir(invId){
 if(MODO_BOTONERA){
   const revisarCerrada = () => {
     // El cartelito de cantidades de un estado (comun/estado-preguntas.js, #ep-fondo) cuenta como ventana abierta: si no, al elegir un preset se cerraba la Botonera.
-    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #duelo-fondo')){
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #adh-fondo, #duelo-fondo')){
       if(fichaVivo.editaGM) fichaGuardarTick(true);   // el GM editó estados de otro personaje: se sube antes de cerrar
       botoneraAvisarMapa('botonera-cerrada');
     }

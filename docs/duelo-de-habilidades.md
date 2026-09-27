@@ -68,3 +68,17 @@ Todo lo que se pueda deducir de lo que la habilidad ya guarda (`tiradaStat`, `es
 3. **Sin oposición (F)** con el aviso corto.
 4. **Asistente de habilidades:** el paso «Objetivo y contienda».
 5. **Áreas (G)** más adelante (varios defensores + esquivar áreas).
+
+## 7. Respuestas del dueño y primera versión hecha (2026-09-27)
+- **Un solo mecanismo general, lo más homogéneo posible**, con las salvedades de cada caso (no un duelo distinto por tipo de skill). ✅
+- **Proyectil mágico:** **no se puede parrear ni bloquear, solo esquivar** (Evasión). ✅
+- **Contienda de atributos** (Fuerza contra Constitución, etc.): cada uno tira su atributo con sus mods, gana el mayor, empate = la regla de siempre. ✅
+- **Buff o cura a un aliado:** sin oposición, pero **con su momento**: se abre el cuadro del duelo (pop-up para todos) con los efectos y el botón «Aplicar», no solo una línea en el log. ✅
+- **Empezar por** los hechizos con tirada (proyectil y efecto abstracto), más contienda de atributos y sin oposición. Las **áreas** quedan para después.
+
+**Hecho (sin probar en mesa):**
+- `comun/duelo.js`: el duelo acepta `ataque.tipo: 'habilidad'` con el campo `hab` (contienda, daño, efectos). Con oposición: quien la usa tira su stat contra el del objetivo (mismas fases, empate y dados 3D que el ataque); si gana, sigue el daño (el **mágico ignora la Defensa y no critica**) y los efectos con su botón **Aplicar**; si pierde, «SE RESISTIÓ». Sin oposición: el cuadro se abre directo en los efectos. Los efectos pueden ser **estados** (con bono opcional) o **cura** (el mapa del GM cura al objetivo, personaje o creep, sin pasar del máximo).
+- `comun/asistente-duelo-hab.js`: el botón **🎯** de cada habilidad (ficha y creeps de GM Tools) abre la ventanita para configurar el duelo: a quién apunta, qué tira quien la usa, con qué se resiste el objetivo (uno o varios, elige a ciegas), daño y tipo, y efectos. Guarda `habilidad.duelo`; ejecutar esa habilidad abre el duelo (con «Sin objetivo · tirada suelta» como salida).
+- Ficha (personaje e invocaciones) y creeps: tiran sus stats con los hooks `habTirar` y `habValor`. Mapa: objetivo «uno mismo» sin elegir, cura del duelo, opciones de defensa de creeps sin cargar las Acciones.
+- **Hay que volver a pegar `firebase/firestore.rules`** (campo nuevo `hab` en los duelos).
+- **Pendiente:** áreas (varios objetivos), ataque con habilidad de arma (Golpe brutal, Carga, Takle…), reacciones Flash, «esquivar áreas», y que las skills de clase y de creeps ya cargadas (Chispazo, Rayo Mágico…) traigan su `duelo` configurado (hoy se configura a mano con 🎯).

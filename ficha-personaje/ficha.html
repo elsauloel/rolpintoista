@@ -6938,7 +6938,14 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
-    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '', alGuardar: cfg => { if(cfg) it.duelo = cfg; else if(it.habClaseId && (function(){ const b = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return b && b.duelo; })()) it.duelo = null; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
+    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
+      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto},
+      alGuardar: r => {
+        if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; }
+        else if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
+        else delete it.duelo;
+        renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`);
+      }});
     return;
   }
   if(b.dataset.armrota){

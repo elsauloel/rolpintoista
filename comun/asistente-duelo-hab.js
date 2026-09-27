@@ -6,9 +6,14 @@
    título y explicación, como los demás asistentes — nada de scroll largo con todo junto. Sin tocar ningún
    dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
 
-   Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'', alGuardar: cfg => …});
-   (cfg = {objetivo, tira, tiraFormula?, tiraEtiqueta?, contra: [stats], dano, tipoDano, danoFijoPorX?, efectoLibre?,
-   radio?, efectos: [{nombre, turnos} | {cura}]} o null)
+   Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'',
+   costoInicial: {sp, nitrosCosto, hpCosto}, alGuardar: resultado => …});
+   `resultado` es `null` (sin duelo — o se sacó desde "Sacar el duelo de esta habilidad": no toca el costo) o
+   `{duelo, costo: {sp, nitrosCosto, hpCosto}}` — el paso "Costo" (2026-09-27, pedido del dueño: "al principio te
+   tiene que preguntar qué se cobra al ejecutar") es el mismo dato de siempre de la habilidad, editable también
+   desde acá; quien llama tiene que aplicar `resultado.costo` a `it.costo`/`it.nitrosCosto`/`it.hpCosto` igual que
+   `resultado.duelo` a `it.duelo`. `duelo` = {objetivo, tira, tiraFormula?, tiraEtiqueta?, contra: [stats], dano,
+   tipoDano, danoFijoPorX?, efectoLibre?, radio?, efectos: [{nombre, turnos} | {cura}]}.
    Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
    `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
    ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
@@ -93,6 +98,15 @@ const AsistenteDueloHab = (() => {
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ...((ini && ini.arma) || {})},
+      // ¿Cuánto cuesta ejecutarla? (2026-09-27, pedido del dueño: "al principio te tiene que preguntar qué se
+      // cobra al ejecutar" — antes solo vivía en el paso "Costo" del editor de la habilidad, aparte del 🎯).
+      // Mismo dato de siempre (it.costo/nitrosCosto/hpCosto): este paso lo lee y lo escribe también, así el 🎯
+      // queda autosuficiente. cfg.costoInicial = {sp, nitrosCosto, hpCosto} (ver ficha.html).
+      costoSp: String((cfg.costoInicial && cfg.costoInicial.sp) ?? '').trim(),
+      costoNitrosModo: (cfg.costoInicial && cfg.costoInicial.nitrosCosto) === 'ATAQUE' ? 'ataque'
+        : String((cfg.costoInicial && cfg.costoInicial.nitrosCosto) ?? '').trim().toUpperCase() === 'X' ? 'x' : 'num',
+      costoNitrosNum: (() => { const n = cfg.costoInicial && cfg.costoInicial.nitrosCosto; return (n === 'ATAQUE' || String(n ?? '').trim().toUpperCase() === 'X') ? 1 : Math.max(0, Math.round(Number(n) || 0)); })(),
+      costoHp: Math.max(0, Math.round(Number(cfg.costoInicial && cfg.costoInicial.hpCosto) || 0)),
     };
     const prev = document.getElementById('adh-fondo');
     if(prev) prev.remove();
@@ -106,6 +120,7 @@ const AsistenteDueloHab = (() => {
     function pasos(){
       const L = [{id: 'activo', corto: '¿Se juega?'}];
       if(!st.activo){ L.push({id: 'listo', corto: 'Listo'}); return L; }
+      L.push({id: 'costo', corto: 'Costo'});
       if(st.modo === 'flash'){
         L.push({id: 'flash', corto: 'Flash'});
       }else if(st.modo === 'arma'){
@@ -124,6 +139,15 @@ const AsistenteDueloHab = (() => {
 
     const titulo = (h, t, ayuda) => h + `<div class="adh-titulo">${t}</div><p class="adh-ayuda">${ayuda}</p>`;
 
+    function cuerpoCosto(){
+      let h = titulo('', '¿Cuánto cuesta ejecutarla?', 'Se cobra apenas tocás Ejecutar, antes de que se abra el duelo. Es el mismo costo de siempre de la habilidad (podés cambiarlo desde acá o desde su editor, es un solo dato). «X» en SP o Nitros significa que elegís cuánto pagar cada vez que la uses — esa misma X es la que podés usar en la Tirada o el Daño escribiendo «X» en la fórmula.');
+      h += `<div class="fila"><span style="min-width:90px">SP</span><input type="text" style="width:100px" data-costo-sp value="${esc(st.costoSp)}" placeholder="ej. 3 o X"></div>`;
+      h += `<div class="fila"><span style="min-width:90px">No2</span>
+        <select data-costo-nitros-modo><option value="num"${st.costoNitrosModo === 'num' ? ' selected' : ''}>Un número</option><option value="x"${st.costoNitrosModo === 'x' ? ' selected' : ''}>X (se elige al usarla)</option><option value="ataque"${st.costoNitrosModo === 'ataque' ? ' selected' : ''}>Lo mismo que un ataque</option></select>
+        ${st.costoNitrosModo === 'num' ? `<input type="number" min="0" style="width:70px" data-costo-nitros-num value="${esc(st.costoNitrosNum)}">` : ''}</div>`;
+      h += `<div class="fila"><span style="min-width:90px">HP</span><input type="number" min="0" style="width:100px" data-costo-hp value="${esc(st.costoHp)}"><span class="nota" style="margin:0">0 = no gasta vida</span></div>`;
+      return h;
+    }
     function cuerpoAlcance(esArma){
       const lista = esArma ? [['auto', 'El de tu arma (cuerpo a cuerpo: 1 + su Alcance; a distancia: su Rango)'], ...ALCANCES.slice(1)] : ALCANCES;
       let h = titulo('', 'Alcance', 'No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.');
@@ -216,6 +240,8 @@ const AsistenteDueloHab = (() => {
       if(!st.activo) return titulo('', 'Listo', 'Esta habilidad no usa el duelo: se ejecuta como antes (se anuncia en la Mesa y tira su fórmula sola, sin objetivo ni cuadro).') + `<div class="adh-resumen">Sin duelo.</div>`;
       let h = titulo('', 'Revisá cómo quedó', 'Si algo no está bien, tocá el paso arriba para volver.');
       const filas = [];
+      const nitrosTxt = st.costoNitrosModo === 'ataque' ? 'como un ataque' : st.costoNitrosModo === 'x' ? 'X (se elige al usarla)' : `${st.costoNitrosNum}`;
+      filas.push(`<b>Costo</b>: SP ${esc(st.costoSp) || '0'} · No2 ${nitrosTxt}${st.costoHp ? ` · HP ${st.costoHp}` : ''}`);
       if(st.modo === 'flash'){
         filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}`);
       }else if(st.modo === 'arma'){
@@ -250,7 +276,7 @@ const AsistenteDueloHab = (() => {
       const L = pasos();
       st.paso = Math.max(0, Math.min(L.length - 1, st.paso));
       const id = L[st.paso].id;
-      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'objetivo' ? cuerpoObjetivo() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
+      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'costo' ? cuerpoCosto() : id === 'objetivo' ? cuerpoObjetivo() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
         : id === 'tira' ? cuerpoTira() : id === 'contra' ? cuerpoContra() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
         : id === 'arma' ? cuerpoArma() : id === 'flash' ? cuerpoFlash() : cuerpoListo();
       const chips = `<div class="adh-chips">${L.map((x, i) => `<button type="button" class="adh-chip${i === st.paso ? ' activo' : ''}${i < st.paso ? ' hecho' : ''}" data-paso="${i}">${i + 1}. ${x.corto}</button>`).join('')}</div>`;
@@ -264,6 +290,10 @@ const AsistenteDueloHab = (() => {
       const sig = f.querySelector('[data-siguiente]'); if(sig) sig.onclick = () => { st.paso++; dibujar(); };
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
       q('[data-activo]', e => { st.activo = e.target.checked; st.paso = 0; dibujar(); });
+      q('[data-costo-sp]', e => { st.costoSp = e.target.value; });
+      q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
+      q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
+      q('[data-costo-hp]', e => { st.costoHp = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
@@ -294,17 +324,21 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-ef-mas]').forEach(b => b.onclick = () => { st.efectos.push(b.dataset.efMas === 'cura' ? {cura: 5} : {nombre: nombresEstado()[0] || 'Estado', turnos: 2}); dibujar(); });
       const bq = f.querySelector('[data-quitar]');
       if(bq) bq.onclick = () => { cerrar(); cfg.alGuardar(null); };
+      // Costo (2026-09-27, pedido del dueño): se guarda junto con el duelo, en el mismo Guardar — es el mismo
+      // dato de siempre (it.costo/nitrosCosto/hpCosto), no uno nuevo. cfg.alGuardar recibe {duelo, costo}
+      // cuando se guarda algo (null sigue siendo "sin duelo", sin tocar el costo).
+      const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp});
       f.querySelector('[data-ok]').onclick = () => {
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
         if(st.modo === 'flash'){
           if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return; }
-          cerrar(); cfg.alGuardar({modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}); return;
+          cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}, costo: costoResultado()}); return;
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         if(st.modo === 'arma'){
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
-          cerrar(); cfg.alGuardar(o2); return;
+          cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
         const hayTira = st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira;
         if(st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»).'); return; }
@@ -318,7 +352,7 @@ const AsistenteDueloHab = (() => {
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();
-        cfg.alGuardar(out);
+        cfg.alGuardar({duelo: out, costo: costoResultado()});
       };
     }
     // Nombres de estados que conoce el juego (debuffs automáticos); se puede escribir otro a mano si no hay lista.

@@ -295,3 +295,15 @@ versión parecida en más de una, es candidato a juntar.
     "Drenaje") contra Res.Esp (un stat normal, sin necesitar personalizar la Resistencia); el efecto a mano
     explica que se drena la diferencia, con Excedente de vida si pasa el máximo. No2 = 2 (dicho por el dueño,
     no estaba en el texto original).
+
+- **`asistente-duelo-hab.js`: paso "Costo" (2026-09-27, pedido del dueño — "al principio te tiene que preguntar
+  qué se cobra al ejecutar")**: segundo paso del 🎯 (justo después de "¿Se juega?"), con SP (texto, admite "X"),
+  No2 (Un número / X / Lo mismo que un ataque) y HP. **No es un dato nuevo**: lee y escribe el mismo
+  `it.costo`/`it.nitrosCosto`/`it.hpCosto` de siempre — el paso "Costo" del editor de la habilidad sigue
+  existiendo y editando lo mismo; ahora se puede tocar desde cualquiera de los dos lugares. `AsistenteDueloHab.abrir`
+  necesita `cfg.costoInicial = {sp, nitrosCosto, hpCosto}` para arrancar con los valores actuales, y su
+  `alGuardar` ahora recibe `{duelo, costo}` en vez del `duelo` pelado (o sigue siendo `null` para "sin duelo"/
+  "sacar el duelo", que no toca el costo) — **los dos call sites existentes** (`ficha-personaje/ficha.html` y
+  `gm-toolset/gm-tools.html`, el ✎ de una habilidad de creep) se actualizaron para el nuevo contrato; los creeps
+  no tienen costo en HP todavía, así que ahí `costoInicial.hpCosto` queda sin pasar y `r.costo.hpCosto` no se
+  guarda (el campo igual aparece en el paso, pensando en el día que haga falta).

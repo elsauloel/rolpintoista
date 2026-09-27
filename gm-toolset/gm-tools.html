@@ -5885,7 +5885,13 @@ document.addEventListener('click', e => {
     const [scId, habId] = b.dataset.duelohabcreep.split(':');
     const sc = S.creeps.find(s => s.id === scId);
     const h = sc && sc.habilidades.find(x => x.id === habId);
-    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, tieneFormula: !!String(h.tiradaExtra || '').trim(), alGuardar: cfg => { if(cfg) h.duelo = cfg; else delete h.duelo; renderAll(); toast(cfg ? `${h.nombre}: ahora se juega en el duelo` : `${h.nombre}: sin duelo`); }});
+    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, tieneFormula: !!String(h.tiradaExtra || '').trim(),
+      costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto},   // los creeps no tienen costo en HP todavía: ese campo del paso "Costo" no se guarda acá
+      alGuardar: r => {
+        if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; }
+        else delete h.duelo;
+        renderAll(); toast(r ? `${h.nombre}: ahora se juega en el duelo` : `${h.nombre}: sin duelo`);
+      }});
     return;
   }
   if(b.dataset.danohabcreep){

@@ -61,3 +61,5 @@ El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y
 - **No se puede reparar en combate:** con el mapa en modo combate los botones quedan apagados con el aviso.
 - **Vender** ya existía en toda tienda («💰 Vender»: mochila, cinturón y despojos; lo equipado no se vende; el ajuste «Al vender» lo fija cada tienda).
 **Falta:** la reparación por **talento con despojos** (2 despojos por punto) y el destino del Óleo reparador; mostrar la durabilidad al comprar.
+
+**Idea a futuro (dueño, 2026-09-26):** usar la durabilidad **como elemento de diseño del catálogo** (escudos y armas resistentes, armas y escudos optimizados para el Parry). Detalle en `pendientes.md` y `guia-de-diseno.md`.

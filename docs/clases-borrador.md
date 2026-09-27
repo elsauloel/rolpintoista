@@ -92,8 +92,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
 5. ✅ **Carga** — **No2:** X (1 por casillero) + los del ataque del final.
    **SP:** X, sin tope (a confirmar si X tiene tope). Avanza X casilleros en
    línea recta y al final ataca con +X de daño fijo y +X a la PdG.
-6. **Estoicismo** [2] — NO2: (0). Flash. +2 Def por cada enemigo
-   adyacente. +1 Res.Crit *.
+6. ✅ **Estoicismo** — SP 2, No2 0, Flash (dueño, 2026-09-27: se puede usar en el turno de cualquiera, sin costo de No2; ese es el punto de Flash). **+1 a cada Resistencia a crítico** (todos los Tipos) durante **2 turnos** (automático, `efectoMods`). **+2 a la Defensa por cada enemigo adyacente**, sin tope (✋ a mano: no hay forma de que la ficha sepa cuántos enemigos tenés al lado sin el mapa, así que se ajusta a mano en el estado al usarla; no se recalcula si se mueven).
 7. **Remolino** [3] — Ataque que daña a todos los objetivos adyacentes.
    Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto
    de ambas posiciones. Repetirlo de inmediato ignora el cooldown del

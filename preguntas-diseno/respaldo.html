@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Respaldo de diseño — Rol Pintoísta</title>
+<style>
+  :root{--bg:#161114;--panel:#211a1e;--linea:#3a2f35;--texto:#EDE3D2;--suave:#a89a90;--cobre:#C98545}
+  @media (prefers-color-scheme: light){:root{--bg:#f6f1ea;--panel:#fff;--linea:#ddd2c4;--texto:#2a2220;--suave:#7a6c62;--cobre:#a85f1e}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--texto);font:16px/1.5 system-ui,sans-serif}
+  main{max-width:820px;margin:0 auto;padding:16px}
+  h1{font-size:20px;margin:8px 0 4px}
+  h2{font-size:17px;margin:22px 0 8px;color:var(--cobre)}
+  .aviso{font-size:13px;color:var(--suave);margin:0 0 12px}
+  input{width:100%;padding:10px 12px;border:1px solid var(--linea);border-radius:8px;background:var(--panel);color:var(--texto);font-size:16px}
+  ul{list-style:none;margin:0;padding:0}
+  li.it{background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:10px 12px;margin:8px 0;overflow-wrap:anywhere}
+  .meta{display:block;font-size:12px;color:var(--suave);margin-bottom:2px}
+  .resp{margin:8px 0 0 10px;padding-left:10px;border-left:2px solid var(--cobre);font-size:14px}
+  .vacio{color:var(--suave);font-style:italic}
+</style>
+</head>
+<body>
+<main>
+  <h1>🛠 Respaldo de diseño</h1>
+  <p class="aviso" id="aviso">Cargando…</p>
+  <input id="buscar" type="search" placeholder="Buscar…" autocomplete="off">
+  <div id="lista"></div>
+</main>
+<script>
+/* Copia de solo lectura del log de Herramientas de diseño (A desarrollar y Preguntas), sin sesión de Firebase.
+   La fuente es respaldo.md (se actualiza a mano); esta página solo la dibuja. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+let secciones = [];
+fetch('respaldo.md?v=' + Date.now()).then(r => r.text()).then(md => {
+  const lineas = md.split('\n');
+  const aviso = lineas.find(l => l.startsWith('> '));
+  $('#aviso').textContent = (lineas.find(l => l.startsWith('# ')) || '').replace(/^# /, '') + ' · solo lectura';
+  let sec = null, item = null;
+  lineas.forEach(l => {
+    if(l.startsWith('## ')){ sec = {titulo: l.slice(3), items: []}; secciones.push(sec); item = null; }
+    else if(sec && l.startsWith('- ')){ item = {texto: l.slice(2), resp: []}; sec.items.push(item); }
+    else if(sec && item && /^\s+- /.test(l)) item.resp.push(l.replace(/^\s+- /, ''));
+  });
+  dibujar();
+}).catch(() => { $('#aviso').textContent = 'No se pudo cargar el respaldo.'; });
+function dibujar(){
+  const q = $('#buscar').value.trim().toLowerCase();
+  $('#lista').innerHTML = secciones.map(s => {
+    const its = s.items.filter(i => !q || (i.texto + ' ' + i.resp.join(' ')).toLowerCase().includes(q));
+    return `<h2>${esc(s.titulo)}</h2>` + (its.length ? '<ul>' + its.map(i => {
+      const m = i.texto.match(/^\[([^\]]+)\]\s*(.*)$/);
+      return `<li class="it">${m ? `<span class="meta">${esc(m[1])}</span>${esc(m[2])}` : esc(i.texto)}${i.resp.map(r => `<div class="resp">${esc(r)}</div>`).join('')}</li>`;
+    }).join('') + '</ul>' : '<p class="vacio">Nada que coincida.</p>');
+  }).join('');
+}
+$('#buscar').addEventListener('input', dibujar);
+</script>
+</body>
+</html>

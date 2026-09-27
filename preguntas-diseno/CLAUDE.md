@@ -148,3 +148,7 @@ Las entradas resueltas/hechas/probadas no se sincronizan solas con
 resuelve o se construye acá y vale la pena que quede en el repo (una regla
 del juego, una tarea real), el dueño lo pasa a mano al documento
 correspondiente, igual que siempre.
+
+## Respaldo sin iniciar sesión (2026-09-27, pedido del dueño)
+
+`respaldo.md` es una copia de solo lectura de **A desarrollar** y **Preguntas** (solo lo abierto, con las respuestas) y `respaldo.html` la muestra con buscador, sin Firebase ni login: `https://elsauloel.github.io/rolpintoista/preguntas-diseno/respaldo.html` (también hay un link «📥 Respaldo sin login» en la cabecera de `preguntas.html`). **Se actualiza a mano**: el log vive en Firestore, así que para refrescarlo hay que leerlo con la sesión del dueño en el Browser pane (colección `preguntas_diseno`) y volver a escribir `respaldo.md`. Al cerrar una sesión de trabajo larga, o cuando el dueño lo pida ("actualizá el respaldo"), hacerlo.

@@ -33,10 +33,21 @@ hielo" (energía) ignora armadura; una "aguja de hielo" (objeto) no.
 |---|---|---|
 | **Proyectil** (aguja de hielo, bola de fuego lanzada…) | **PdG.Esp** (como su probabilidad de golpe) | **Evasión** |
 | **Efecto abstracto sobre el cuerpo** (una maldición, un efecto que no es un proyectil) | **PdG.Esp** | **Res.Esp** (sale de Constitución) |
-| **Control mental** (cualquier skill ligada a la mente) | lo que diga la habilidad | **Res.Mt** (sale de Especial) |
+| **Control mental** (cualquier skill ligada a la mente) | **PdG.Esp** por defecto (salvo que la habilidad puntual diga otra cosa) | **Res.Mt** (sale de Especial) |
 
 - **Regla de oro:** *qué tira cada lado tiene que estar escrito en la descripción de cada habilidad de casteo*, porque hay muchos casos particulares.
 - El PdG físico contra Evasión de un ataque con arma no cambia.
+
+**Formato y casos particulares (Paso 2 cerrado, 2026-09-27):**
+- **Formato de la línea:** no es un campo de texto nuevo — cuando la habilidad ya usa el sistema de duelo (`duelo: {tira, contra}`, como
+  Taunt), esa estructura **ya es** la respuesta, no hace falta duplicarla en texto. Para las que siguen sin auditar, alcanza con que la
+  primera frase del `detalle` lo diga en criollo, mismo estilo que ya tiene Taunt: *"Tirás PdG.Esp contra el Res.Esp del objetivo."*
+  Al auditar cada una, ese texto se reemplaza por (o se acompaña de) el campo real.
+- **Habilidades mixtas** (daño + debuff): **una sola tirada**, la de ataque/contraste principal; si conecta, el debuff se aplica solo,
+  sin tirada aparte — salvo que la propia habilidad diga explícitamente lo contrario. Así ya funcionan las maldiciones del Debuffer: una
+  tirada, **PdG.Esp vs Res.Esp**.
+- **Sobre uno mismo o un aliado:** no tira nada — mismo criterio que Recuperación, Estoicismo o Piel resistente: se activa directo. Única
+  excepción: si la propia habilidad define una variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra alguien".
 
 ### 1.3 Efectos en área: cómo se esquivan
 - El defensor puede **tirar Evasión para hacer un roll (girar/rodar)**, con un **máximo de 2 casilleros** de desplazamiento.

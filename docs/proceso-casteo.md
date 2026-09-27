@@ -15,7 +15,7 @@
 |---|---|---|---|
 | 0 | Alcance: qué es "casteo con SP" | decisión | ✅ 2026-09-21 |
 | 1 | Tipos de daño de casteo | decisión | ✅ 2026-09-27 |
-| 2 | Qué tira cada lado (formato de la descripción) | decisión | ⬜ |
+| 2 | Qué tira cada lado (formato de la descripción) | decisión | ✅ 2026-09-27 |
 | 3 | Resistencia por tipo y armadura mágica | decisión | ⬜ |
 | 4 | Esquivar efectos de área | decisión | ⬜ |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ⬜ |
@@ -49,17 +49,24 @@ proyectil de casteo (aguja de hielo) la **respeta**.
 **Entrega:** regla cerrada en `reglas-casteo.md` §1.1. **Termina cuando:** cada tipo tiene nombre y sí/no de armadura. ✅ (no hizo
 falta una tabla de tipos: la regla general + la excepción del objeto físico cubre todos los casos).
 
-## Paso 2 — Qué tira cada lado ⬜
+## Paso 2 — Qué tira cada lado ✅ 2026-09-27
 **Depende de:** 1. **Ya definido:** proyectil = PdG.Esp vs Evasión; efecto abstracto = PdG.Esp vs Res.Esp; mental = Res.Mt; debe estar en la descripción.
 
-**Decidir:**
-- **2a.** Formato fijo de una línea para la descripción de cada habilidad. Propuesta: `Tira: PdG.Esp vs Evasión` / `PdG.Esp vs Res.Esp` / `vs Res.Mt` / `sin tirada`. Respuesta: ____
-- **2b.** Las habilidades mixtas (daño de proyectil + un debuff): ¿tiran una vez o dos? Respuesta: ____
-- **2c.** Un efecto de casteo sobre uno mismo o un aliado: ¿tira algo? Respuesta: ____
-- **2d.** Control mental: ¿qué tira el casteador? (¿PdG.Esp?) Respuesta: ____
-- **2e.** ¿Va como campo de la habilidad (`tiradaAtaque` / `tiradaDefensa`) o solo como texto? Respuesta: ____
+**Decidido (2026-09-27):**
+- **2a/2e.** No es un campo de texto nuevo: cuando la habilidad ya usa el sistema de duelo (`duelo: {tira, contra}`, como Taunt), esa
+  estructura **ya es** la respuesta — no hace falta duplicarla en texto. Para las que siguen sin auditar, alcanza con que la primera
+  frase del `detalle` lo diga en criollo, mismo estilo que ya tiene Taunt: *"Tirás PdG.Esp contra el Res.Esp del objetivo."* Al auditar
+  cada una, ese texto se reemplaza por (o se acompaña de) el campo real.
+- **2b.** Habilidades mixtas (daño + debuff): **una sola tirada**, la de ataque/contraste principal; si conecta, el debuff se aplica
+  solo, sin tirada aparte — salvo que la propia habilidad diga explícitamente lo contrario. Así ya funcionan las maldiciones del
+  Debuffer: una tirada, **PdG.Esp vs Res.Esp**.
+- **2c.** Sobre uno mismo o un aliado: **no tira nada** — mismo criterio que Recuperación, Estoicismo o Piel resistente: se activa
+  directo. Única excepción: si la propia habilidad define una variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra
+  alguien".
+- **2d.** Control mental: el casteador tira **PdG.Esp por defecto** contra el **Res.Mt** del objetivo, salvo que la habilidad puntual
+  diga otra cosa (Control Mental hoy dice "Esp" a secas; se aclara al auditarla, no hace falta forzar el default).
 
-**Entrega:** plantilla de la línea + regla por caso. **Termina cuando:** hay un formato único que se puede aplicar a todas.
+**Entrega:** plantilla de la línea + regla por caso, en `reglas-casteo.md` §1.2. **Termina cuando:** hay un formato único que se puede aplicar a todas. ✅
 
 ## Paso 3 — Resistencia por tipo y armadura mágica ⬜
 **Depende de:** 1. **Ya definido:** la armadura mágica debe ser **rara y escasa**.

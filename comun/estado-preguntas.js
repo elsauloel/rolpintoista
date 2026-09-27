@@ -26,6 +26,11 @@ const EstadoPreguntas = (() => {
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }
     if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, texto: '¿Cuántos HP de excedente de vida tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
+    // El excedente de vida es un valor neto sin tope por defecto (2026-09-27, pedido del dueño): al activarlo se
+    // pregunta si esta vez tiene uno (ej. Drenar vida: "hasta 50% del máximo") — se guarda como recordatorio en
+    // `excedenteTope`, nada lo hace cumplir solo.
+    if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,
+      sinLimiteTexto: 'Sin tope (se puede acumular lo que sea)', texto: '¿Tiene un tope máximo de excedente?'});
     if(num(p.stacks) > 1) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir
       (p.mods || []).forEach((m, i) => {
@@ -50,6 +55,7 @@ const EstadoPreguntas = (() => {
       else r[cfg.hp] = (num(p[cfg.hp]) < 0 ? -1 : 1) * resp.hp;
     }
     if('escudo' in resp) r.escudoMagico = resp.escudo;
+    if('tope' in resp) r.excedenteTope = resp.tope;   // null = sin tope
     if('stacks' in resp) r.stacks = resp.stacks;
     (p.mods || []).forEach((m, i) => { if(('mod' + i) in resp) r.mods[i].val = (num(m.val) < 0 ? -1 : 1) * resp['mod' + i]; });
     if('turnos' in resp){
@@ -113,7 +119,8 @@ const EstadoPreguntas = (() => {
       const dibujar = () => {
         const q = qs[i], ultimo = i === qs.length - 1;
         const previo = q.clave in resp ? resp[q.clave] : undefined;
-        const sinLimite = q.turnos && (previo === null || (previo === undefined && q.sinLimiteInicial));
+        const conCheckSin = q.turnos || q.sinLimite;
+        const sinLimite = conCheckSin && (previo === null || (previo === undefined && q.sinLimiteInicial));
         caja.innerHTML = `
           <div class="ep-titulo">${esc(cab.titulo)}</div>
           <div class="ep-estado">${esc(cab.nombre)}</div>
@@ -122,7 +129,7 @@ const EstadoPreguntas = (() => {
             ? `<input type="text" id="ep-valor" placeholder="${esc(q.placeholder || 'Escribí acá')}" value="${previo !== undefined && previo !== null ? esc(previo) : ''}" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:18px">`
             : `<input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número"
             value="${previo !== undefined && previo !== null ? previo : ''}"${sinLimite ? ' disabled' : ''}>`}
-          ${q.turnos ? `<label class="ep-sin"><input type="checkbox" id="ep-sin"${sinLimite ? ' checked' : ''}> Sin límite (no vence: dura hasta que se lo saquen)</label>` : ''}
+          ${conCheckSin ? `<label class="ep-sin"><input type="checkbox" id="ep-sin"${sinLimite ? ' checked' : ''}> ${esc(q.sinLimiteTexto || 'Sin límite (no vence: dura hasta que se lo saquen)')}</label>` : ''}
           <div class="ep-error" id="ep-error"></div>
           <div class="ep-fila">
             <span class="ep-pasos">${i + 1} de ${qs.length}</span>

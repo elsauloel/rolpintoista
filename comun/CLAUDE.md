@@ -254,3 +254,13 @@ versión parecida en más de una, es candidato a juntar.
   `nReveal` (`comun/duelo.js`) suma un paso propio cuando `d.contacto.moneda`/`d.bloq.moneda` aparece (aparte del que
   ya contaba `pdg`+`eva`), así el cuadro espera a que el dado de la moneda quede quieto antes de revelar quién ganó
   el empate — mismo mecanismo que ya usaban contacto, Bloqueo y crítico ("Primero los dados, después el resultado").
+
+- **`estado-preguntas.js`, tope opcional del Excedente de vida** (2026-09-27, pedido del dueño): al activar el
+  preset «Excedente de vida», el cartelito paso a paso suma una pregunta más, «¿Tiene un tope máximo de
+  excedente?», con el mismo checkbox «Sin límite» que ya usaba la pregunta de turnos (generalizado: cualquier
+  pregunta con `q.sinLimite` lo tiene, no solo `q.turnos`) — se guarda en `excedenteTope` (`null` = sin tope,
+  nada lo hace cumplir solo, es un recordatorio). El chip ❤+N lo muestra como ❤+N/tope cuando hay uno cargado
+  (ficha, gm-tools y el HUD del mapa — se agregó `tope` al resumen público que arma cada uno). **El estado nunca
+  se borra solo al llegar a 0** (confirmado revisando el código: ni `escudoParsear` ni el handler de los botones
+  −/+/escribir tocan la lista de efectos, solo el valor — ya funcionaba así antes de este cambio, sin necesitar
+  nada nuevo).

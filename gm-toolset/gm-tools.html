@@ -5475,7 +5475,7 @@ function estadoHtml(scId, es){
   const stacks = Math.max(1, num(es.stacks) || 1);
   const hpTotal = num(es.hpTurno) * stacks;
   const efectoTxt = es.detalle ? es.detalle : (hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)} HP/turno` : 'Sin efecto numérico');
-  const escudoBtns = (es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? `<button class="rm" data-escudo="${scId}:${es.id}:-1" title="Un punto menos de escudo">−</button><button class="rm" data-escudo="${scId}:${es.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor (número, +N, -N; en un escudo, «max N» cambia el máximo)">${es.excedenteVida ? '❤+' + fmt(num(es.escudoMagicoActual ?? es.escudoMagico)) : '🛡' + fmt(num(es.escudoMagicoActual ?? es.escudoMagico)) + '/' + fmt(num(es.escudoMagico))}</button><button class="rm" data-escudo="${scId}:${es.id}:1" title="Un punto más de escudo">+</button>` : '';
+  const escudoBtns = (es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? `<button class="rm" data-escudo="${scId}:${es.id}:-1" title="Un punto menos de escudo">−</button><button class="rm" data-escudo="${scId}:${es.id}:set" style="width:auto;padding:0 6px" title="Escribir el valor (número, +N, -N; en un escudo, «max N» cambia el máximo)">${es.excedenteVida ? '❤+' + fmt(num(es.escudoMagicoActual ?? es.escudoMagico)) + (es.excedenteTope ? '/' + fmt(num(es.excedenteTope)) : '') : '🛡' + fmt(num(es.escudoMagicoActual ?? es.escudoMagico)) + '/' + fmt(num(es.escudoMagico))}</button><button class="rm" data-escudo="${scId}:${es.id}:1" title="Un punto más de escudo">+</button>` : '';
   return `<div class="estado-compacto estado-${es.polaridad||'otro'}">
     <div class="estado-compacto-info">
       <div class="estado-compacto-nombre">${esc(es.nombre || '(sin nombre)')}</div>
@@ -6122,7 +6122,7 @@ function tableroCreepsLocales(){
     imagen: sc.imagen || '',
     hp: num(sc.hp),
     hpMax: num(sc.hpMax),
-    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}), detalle: es.detalle || ''})),
+    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}), detalle: es.detalle || ''})),
   }));
 }
 
@@ -8098,7 +8098,7 @@ function creepPublico(sc, orden){
           nombre: String(es.nombre).slice(0, 60),
           turnos: num(es.turnos),
           permanente: !!es.permanente,
-          ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
+          ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(es.detalle || '').slice(0, 300),

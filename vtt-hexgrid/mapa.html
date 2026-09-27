@@ -7259,7 +7259,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,
@@ -8040,8 +8040,8 @@ function hudEstadosHtml(t, estados, puede){
           : `<span class="turnos" title="Puntos de armadura rota">×${fmt(num(e.stacks) || 1)}</span>`) : '') +
       (e.escudo !== undefined && (puede || t.tipo !== 'creep')
         ? (puede && !e.derivado
-          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor (número, +N, -N${e.excedente ? '' : '; «max N» cambia el máximo'})">${e.excedente ? '❤+' + fmt(num(e.escudo)) : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Uno más">+</button>`
-          : `<span class="turnos" title="${e.excedente ? 'Excedente de vida' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
+          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor (número, +N, -N${e.excedente ? '' : '; «max N» cambia el máximo'})">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Uno más">+</button>`
+          : `<span class="turnos" title="${e.excedente ? 'Excedente de vida' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
       (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
@@ -8733,7 +8733,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           if(!inv) throw new Error('La invocación ya no existe');
           inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));
@@ -8741,7 +8741,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         }else{
           datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
             detalle: String(e.detalle || '').slice(0, 200),
           }));

@@ -5,26 +5,28 @@
 > (ver "La esencia del Rol Pintoísta" en el `CLAUDE.md` de la raíz). Los stats se llaman **PdG.Esp** y **Res.Esp** (renombrados 2026-09-27, antes PdG.Mg / Res.Mg; los ids no cambiaron, siguen `pdgmg`, `resmg`)
 > hasta que se decida otro nombre (ver P97).
 >
-> Estado: **reglas base definidas; nada implementado todavía**. Se aplica por partes (ver "Orden propuesto"). Las preguntas
-> abiertas están en [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
+> Estado: **reglas base definidas (Paso 1 cerrado, 2026-09-27); nada implementado en código todavía**. Se aplica por partes (ver
+> "Orden propuesto"). Las preguntas abiertas están en [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
 
 ## 1. Reglas definidas (2026-09-21)
 
-### 1.1 Daño de casteo: depende de la habilidad
-No todo el daño de casteo es igual. Cada habilidad dice de qué tipo es, y el tipo decide **si la armadura (Defensa) lo reduce**:
+### 1.1 Daño de casteo: por defecto ignora armadura (Paso 1 cerrado, 2026-09-27)
+La gracia del daño de casteo es que **ignora la armadura (Defensa) por defecto**, sea cual sea el elemento (genérico/arcano, relámpago,
+fuego, hielo, ácido, sagrado, oscuro, psíquico, viento, tierra…). No hace falta una lista cerrada de tipos: **lo que decide no es el
+elemento, es cómo se describe la habilidad.**
 
-| Tipo | ¿Ignora armadura? | Ejemplos dados |
-|---|---|---|
-| **Daño mágico genérico** (nombre por definir: "plasma", "arcano"…) | **Sí** | el daño de casteo "sin nombre" |
-| **Relámpago** | **Sí** | rayos |
-| **Fuego** | **Sí** ("no se resiste con armadura") | |
-| **Proyectil de casteo físico** | **No, respeta la armadura** | una aguja de hielo: es un objeto lanzado |
-| **Daño físico** (armas) | No | ataques con arma |
+**Única excepción — objeto físico arrojado:** si la habilidad se narra como lanzar algo sólido y tangible (una aguja de hielo, una
+piedra, un dardo), ese daño **respeta la armadura**, igual que cualquier proyectil físico — no por ser "hielo" o "tierra", sino por ser
+un objeto que una placa de metal puede frenar. **Un mismo elemento puede ser las dos cosas** según cómo se lo describa: una "ráfaga de
+hielo" (energía) ignora armadura; una "aguja de hielo" (objeto) no.
 
-- La lista de tipos (y cuáles ignoran armadura) **no está cerrada**: falta decidir cuáles más hay (hielo, ácido, sagrado, oscuro…) — P97.
-- Sobre esos tipos se podrá diseñar **resistencia por tipo de daño**, tanto en habilidades como en equipo (P97).
-- **Armadura mágica** (algo que reduce el daño que la armadura común no reduce): debe ser **rara y escasa**, porque la gracia de este
-  daño es que ignora armadura.
+- **Críticos y Resistencia a crítico (Tipo 4–12):** no aplican al daño de casteo — son del sistema de armas (Tipo del dado). El casteo
+  va a tener su propia resistencia por tipo más adelante (Paso 3), no antes.
+- **Daño de trampas:** depende de cada trampa, con la misma regla — por defecto ignora armadura, salvo que la trampa sea un mecanismo
+  físico (una lanza, un peso que cae, una red con puntas), que sí la respeta.
+- **Daño físico** (armas): sigue restando la Defensa como siempre — esta regla es solo para el daño de casteo.
+- **Armadura mágica** (algo que reduce el daño que la armadura común no reduce): sigue **rara y escasa**, a definir en el Paso 3 —
+  sobre esos tipos se podrá diseñar **resistencia por tipo de daño**, tanto en habilidades como en equipo.
 
 ### 1.2 Qué tira cada lado (según la habilidad)
 | Caso | Tira el casteador | Tira el defensor |

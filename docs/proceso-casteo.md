@@ -14,7 +14,7 @@
 | # | Paso | Tipo | Estado |
 |---|---|---|---|
 | 0 | Alcance: qué es "casteo con SP" | decisión | ✅ 2026-09-21 |
-| 1 | Tipos de daño de casteo | decisión | ⬜ |
+| 1 | Tipos de daño de casteo | decisión | ✅ 2026-09-27 |
 | 2 | Qué tira cada lado (formato de la descripción) | decisión | ⬜ |
 | 3 | Resistencia por tipo y armadura mágica | decisión | ⬜ |
 | 4 | Esquivar efectos de área | decisión | ⬜ |
@@ -30,18 +30,24 @@
 **Definido (2026-09-21):** casteo con SP = todo lo que se castea y **no es un ataque con un arma**. No se llama "magia". Es **subjetivo y
 narrativo**: lo decide la mesa; las reglas son la plataforma, no un corsé.
 
-## Paso 1 — Tipos de daño de casteo ⬜
+## Paso 1 — Tipos de daño de casteo ✅ 2026-09-27
 **Depende de:** nada. **Ya definido:** el tipo decide si la armadura reduce el daño. Genérico, relámpago y fuego **ignoran** armadura; un
 proyectil de casteo (aguja de hielo) la **respeta**.
 
-**Decidir:**
-- **1a.** Lista completa de tipos. ¿Hielo? ¿ácido? ¿veneno? ¿sagrado / oscuro? ¿psíquico? ¿viento, tierra…? Respuesta: ____
-- **1b.** Para cada tipo: ¿ignora armadura? (tabla) Respuesta: ____
-- **1c.** ¿Un mismo elemento puede ser las dos cosas según el skill? (ya pasa con el hielo: aguja = respeta armadura; ¿ráfaga de frío = ignora?) ¿Cómo se marca? Respuesta: ____
-- **1d.** ¿Los críticos y sus resistencias (Tipo 4–12) aplican al daño de casteo? Respuesta: ____
-- **1e.** ¿El daño de una **trampa** ignora armadura o depende de cada trampa? Respuesta: ____
+**Decidido (2026-09-27):** no hace falta una lista cerrada de tipos — se simplificó a una regla general.
+- **1a/1b.** No hay lista de tipos: **por defecto, todo daño de casteo ignora armadura**, sea cual sea el elemento. Eso responde 1a
+  (no hace falta enumerarlos) y 1b (todos "sí", salvo la excepción de abajo).
+- **1c.** Sí, un mismo elemento puede ser las dos cosas: lo que decide **no es el elemento, es cómo se narra la habilidad**. Si se
+  describe como **un objeto físico arrojado** (aguja de hielo, piedra, dardo), respeta la armadura, igual que cualquier proyectil
+  físico. Si se describe como energía/efecto (ráfaga de hielo, bola de fuego, rayo), ignora armadura. Se marca en el texto de la
+  habilidad, no con un campo de tipo separado.
+- **1d.** No: los críticos y las Resistencias a crítico (Tipo 4–12) **no aplican** al daño de casteo — son del sistema de armas. El
+  casteo va a tener su propia resistencia por tipo en el Paso 3, no antes.
+- **1e.** Depende de cada trampa, con la misma regla: por defecto ignora armadura, salvo que sea un mecanismo físico (una lanza, un
+  peso que cae, una red con puntas), que sí la respeta.
 
-**Entrega:** tabla cerrada en `reglas-casteo.md` §1.1. **Termina cuando:** cada tipo tiene nombre y sí/no de armadura.
+**Entrega:** regla cerrada en `reglas-casteo.md` §1.1. **Termina cuando:** cada tipo tiene nombre y sí/no de armadura. ✅ (no hizo
+falta una tabla de tipos: la regla general + la excepción del objeto físico cubre todos los casos).
 
 ## Paso 2 — Qué tira cada lado ⬜
 **Depende de:** 1. **Ya definido:** proyectil = PdG.Esp vs Evasión; efecto abstracto = PdG.Esp vs Res.Esp; mental = Res.Mt; debe estar en la descripción.

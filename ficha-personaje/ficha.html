@@ -12190,11 +12190,11 @@ let fichaIdentidadUsuario = '';
 
 function fichaIdentidadRender(){
   const f = fichaVivo;
-  // La pestaña dice el personaje abierto y la partida: "Ficha — Aurelio · Nombre de la partida".
+  // La pestaña dice el personaje abierto y la partida (2026-09-27, pedido del dueño): "Aurelio · Nombre de la partida · Ficha".
   try{
     const partida = fbPartida && fbPartida.nombre ? fbPartida.nombre : '';
     const nombre = f && f.cargada ? String(fichaNombre() || '').trim() : '';
-    document.title = nombre ? `Ficha — ${nombre}${partida ? ' · ' + partida : ''}` : `Ficha de personaje${partida ? ' — ' + partida : ''}`;
+    document.title = nombre ? `${nombre}${partida ? ' · ' + partida : ''} · Ficha` : `${partida ? partida + ' · ' : ''}Ficha de personaje`;
   }catch(e){}
   $('#barra-partida').innerHTML = f && f.cargada
     ? `<b>📜 Ficha</b> <span class="sec">${barraTexto(esc(fichaNombre()), fichaIdentidadUsuario ? esc(fichaIdentidadUsuario) : undefined)}</span>`

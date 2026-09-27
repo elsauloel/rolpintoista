@@ -4053,6 +4053,8 @@ function revisarMuerte(){
 }
 
 function renderOverlayMuerte(){
+  // Dentro del mapa (iframe): le avisa el estado de muerte para que tiña TODA la pantalla del mapa, no solo esta ventana.
+  try{ botoneraAvisarMapa('muerte-estado', {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)}); }catch(e){}
   if(!S.muerto || !S.muerto.activo){ $('#overlay-muerte').classList.remove('open'); return; }
   $('#overlay-muerte').classList.add('open');
   $('#btn-revivir').style.display = S.muerto.definitivo ? 'none' : '';
@@ -12511,8 +12513,8 @@ const MODO_BOTONERA = document.documentElement.classList.contains('modo-botonera
 // Acciones de un creep, pero acá vive adentro de la ficha de su dueño.
 let modoBotoneraInv = new URLSearchParams(location.search).get('inv') || '';
 
-function botoneraAvisarMapa(tipo){
-  if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
+function botoneraAvisarMapa(tipo, extra){
+  if(window.parent !== window) window.parent.postMessage(Object.assign({tipo}, extra || {}), location.origin);
 }
 
 function botoneraModoAbrir(invId){

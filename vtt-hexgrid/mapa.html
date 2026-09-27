@@ -8963,6 +8963,11 @@ function zonaDeHabilidad(msg){
 
 window.addEventListener('message', e => {
   if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
+  if(e.data.tipo === 'muerte-estado'){   // la ficha (iframe) avisa que su personaje está inconsciente: el filtro rojo cubre todo el mapa
+    muerteIframe = e.data.activo ? {activo: true, turnos: e.data.turnos, definitivo: !!e.data.definitivo} : null;
+    actualizarMuerteMapa();
+    return;
+  }
   if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){
     botonera.lista = true;
     $('#botonera-cargando').hidden = true;
@@ -9055,12 +9060,15 @@ async function dueloVincularSiFalta(t){
 /* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------
    Cuando el personaje de este jugador queda inconsciente (HP 0), el mapa se tiñe de rojo, PERO con poco color y sin bloquear los clics (para poder seguir mirando y usando el
    entorno), muestra los turnos que le quedan y un botón «Revivir» (abre el diálogo de revivir de la ficha). Lo publica la ficha en su resumen (`muerto`). */
+let muerteIframe = null;   // estado de muerte avisado por la ficha del iframe (respaldo del resumen publicado)
 function actualizarMuerteMapa(){
   let el = document.getElementById('muerte-mapa');
   const fid = (!soyGM && fbUsuario) ? fichaPrincipalId() : '';
   const f = fid ? fichasPub.get(fid) : null;
-  const r = f && f.resumen, m = r && r.muerto;
-  const muerto = !!(m && m.activo && num(r.hp) <= 0);
+  const r = f && f.resumen;
+  if(r && num(r.hp) > 0) muerteIframe = null;   // ya está de pie
+  const m = (r && r.muerto && r.muerto.activo && num(r.hp) <= 0) ? r.muerto : (!soyGM ? muerteIframe : null);
+  const muerto = !!(m && m.activo);
   if(!muerto){ if(el) el.hidden = true; return; }
   if(!el){
     el = document.createElement('div');

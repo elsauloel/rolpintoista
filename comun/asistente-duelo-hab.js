@@ -7,6 +7,7 @@
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Mg (magia)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Mg (resistir magia)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
+  const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Mg'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['fisico', 'Físico (respeta la Defensa)']];
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -41,6 +42,7 @@ const AsistenteDueloHab = (() => {
       contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
+      alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
     };
     const prev = document.getElementById('adh-fondo');
     if(prev) prev.remove();
@@ -57,6 +59,9 @@ const AsistenteDueloHab = (() => {
           ${st.activo ? `
           <div><h4>1 · ¿A quién apunta?</h4>
             <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+          ${st.objetivo === 'uno mismo' ? '' : `<div><h4>Alcance</h4>
+            <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.</p>
+            <div class="fila"><select data-alcance>${ALCANCES.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div></div>`}
           <div><h4>2 · ¿Qué tira quien la usa?</h4>
             <select data-tira><option value=""${sinOp ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           ${sinOp ? `<div class="aviso">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>` : `
@@ -80,8 +85,10 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-x]').forEach(b => b.onclick = cerrar);
       f.querySelector('[data-activo]').onchange = e => { st.activo = e.target.checked; dibujar(); };
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; });
+      q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
+      q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
+      q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; });
@@ -99,6 +106,7 @@ const AsistenteDueloHab = (() => {
         const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
         if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; }
+        if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();
         cfg.alGuardar(out);

@@ -4046,6 +4046,16 @@ function dibujar(){
     // Hexágono del token: mismo tamaño y orientación que la casilla de la
     // grilla (fijo — no rota con el frente), para que calce con el mapa.
     const puntos = verticesHex(x, y, rad);
+    if(objetivosResaltados && objetivosResaltados.has(d.id)){   // al elegir un objetivo: los que están a tu alcance laten
+      const pulso = 0.5 + 0.5 * Math.sin(performance.now() / 230);
+      ctx.save();
+      trazarPuntos(verticesHex(x, y, rad * (1.10 + 0.14 * pulso)));
+      ctx.fillStyle = `rgba(255,205,80,${0.10 + 0.18 * pulso})`; ctx.fill();
+      ctx.strokeStyle = `rgba(255,214,102,${0.6 + 0.4 * pulso})`; ctx.lineWidth = (3 + 2.5 * pulso) / z;
+      ctx.shadowColor = 'rgba(255,190,60,.95)'; ctx.shadowBlur = (12 + 16 * pulso) / z; ctx.stroke();
+      ctx.restore();
+      animando = true;
+    }
     // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
@@ -9011,7 +9021,26 @@ function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab){
   const b = el.querySelector('[data-duelo-suelto]');
   if(b) b.onclick = alSuelto;
 }
-function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; }
+/* Alcance del ataque o de la habilidad (2026-09-27, pedido del dueño): NO restringe a quién se puede apuntar; mientras se elige el objetivo, los tokens que están a
+   tu alcance (casilleros desde tu token) «laten» con un brillo dorado. `ataque.alcance` lo calcula la página de quien actúa: cuerpo a cuerpo = 1 (más el Alcance del arma),
+   armas de rango = su Rango, hechizos = Rango de casteo. Sin alcance (0) no se resalta nada. */
+let objetivosResaltados = null;
+function dueloResaltarObjetivos(propio, alcance){
+  objetivosResaltados = null;
+  const n = Math.round(num(alcance));
+  if(!(n > 0)){ pedirDibujo(); return 0; }
+  const mio = [...tokens.values()].find(propio);
+  if(!mio){ pedirDibujo(); return 0; }
+  const set = new Set();
+  tokens.forEach((t, id) => {
+    if(propio(t) || (t.oculto && !soyGM)) return;
+    if(distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}) <= n) set.add(id);
+  });
+  objetivosResaltados = set;
+  pedirDibujo();
+  return set.size;
+}
+function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } }
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
@@ -9026,6 +9055,7 @@ function dueloElegirObjetivoMapa(msg){
       return;
     }
   }
+  const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance);
   const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
   const alSuelto = () => {
     elegirDestinoTerminar(); dueloAvisoObjetivoOcultar();
@@ -9043,7 +9073,7 @@ function dueloElegirObjetivoMapa(msg){
       const mio = todos.find(propio);
       Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
-    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan</span>`, true, cancelado);
+    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
   };
   pedir();

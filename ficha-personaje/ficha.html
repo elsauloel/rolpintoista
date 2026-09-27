@@ -2045,7 +2045,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
-<script src="../comun/asistente-duelo-hab.js?v=20260927a"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260927b"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
 <script src="../comun/duelo.js?v=20260927b"></script>
@@ -4359,6 +4359,24 @@ function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExt
    Una habilidad con `duelo` = {objetivo: 'enemigo'|'aliado'|'uno mismo', tira: stat (por defecto su tiradaStat), contra: [stats con los que se resiste el objetivo],
    dano: true si la fórmula de la habilidad (tiradaExtra) es daño, tipoDano: 'arcano'|'fuego'|'hielo'|'rayo'|'fisico', efectos: [{nombre, turnos, mods, hp, cura}]}
    abre el duelo al ejecutarla en vez de tirar el stat suelto. */
+// Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
+function alcanceDeArma(arma){
+  if(arma && arma.armaDeRango){ const v = statParaArma('rng', arma); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
+  const bono = arma ? (arma.mods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0) : 0;
+  return 1 + Math.max(0, Math.round(bono));
+}
+// Alcance de una habilidad según lo que configuró el 🎯: 'casteo' (Rango de casteo), 'rango' (Rango), 'adyacente' (1), un número, o sin límite (0 = no resalta).
+function alcanceDeHab(c, statTira){
+  const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
+  const rc = () => { const v = compute().final.rangocasteo; return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v)); };
+  const rg = () => { const v = compute().final.rng; return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v)); };
+  if(modo === 'casteo') return rc();
+  if(modo === 'rango') return rg();
+  if(modo === 'adyacente') return 1;
+  if(modo === 'ilimitado') return 0;
+  if(modo === 'fijo') return Math.max(0, Math.round(num(c.alcanceN)));
+  return statTira === 'pdgmg' ? rc() : 0;   // auto: los hechizos usan el Rango de casteo; el resto no resalta
+}
 function habDueloDe(it){
   const c = it && it.duelo;
   if(!c || typeof c !== 'object') return null;
@@ -4367,7 +4385,7 @@ function habDueloDe(it){
   const tipo = c.tipoDano || 'arcano';
   const formula = String(it.tiradaExtra || '').trim();
   return {
-    nombre: it.nombre, objetivo: c.objetivo || 'enemigo',
+    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' ? 0 : alcanceDeHab(c, stat),
     tira: stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
     dano: c.dano && formula ? {formula, tipo, ignoraDef: tipo !== 'fisico'} : null,
@@ -4376,7 +4394,7 @@ function habDueloDe(it){
 }
 function lanzarDueloDeHab(it, hab){
   if(!hab) return false;
-  Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: {tipo: 'habilidad', hab}, suelto: () => tirarPrimeraDeHab(it)});
+  Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: {tipo: 'habilidad', hab, alcance: hab.alcance}, suelto: () => tirarPrimeraDeHab(it)});
   return true;
 }
 
@@ -5207,7 +5225,7 @@ function invAtacar(invId){
   if(!inv) return;
   if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre},
-      ataque: {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango}, suelto: () => invAtacarSuelto(invId)});
+      ataque: {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, alcance: inv.armaDeRango ? Math.max(1, Math.round(num(invStatValor(inv, 'rng')))) : 1}, suelto: () => invAtacarSuelto(invId)});
   }else invAtacarSuelto(invId);
 }
 function invAtacarSuelto(invId){
@@ -10495,7 +10513,7 @@ $('#tipo-ataque-lista').addEventListener('click', e => {
   // «Sin objetivo» deja el ataque suelto de siempre.
   if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
-      ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango)}, suelto: hacer});
+      ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: alcanceDeArma(arma)}, suelto: hacer});
   }else hacer();
 });
 

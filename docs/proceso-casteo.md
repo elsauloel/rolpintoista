@@ -18,7 +18,7 @@
 | 2 | Qué tira cada lado (formato de la descripción) | decisión | ✅ 2026-09-27 |
 | 3 | Resistencia por tipo y armadura mágica | decisión | ✅ 2026-09-27 |
 | 4 | Esquivar efectos de área | decisión | ✅ 2026-09-27 |
-| 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ⬜ |
+| 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ✅ 2026-09-27 |
 | 6 | Código: tipo de daño y daño recibido | implementación | ⬜ |
 | 7 | Código: resistencias, armadura mágica y esquiva de área | implementación | ⬜ |
 | 8 | Auditoría de contenido, por tandas | contenido | ⬜ |
@@ -106,13 +106,16 @@ falta una tabla de tipos: la regla general + la excepción del objeto físico cu
 
 **Entrega:** regla en `reglas-casteo.md` §1.3. **Termina cuando:** se puede resolver un área en la mesa sin dudas. ✅
 
-## Paso 5 — Nombres y vocabulario ⬜
-**Decidir:**
-- **5a.** Nombre del daño de casteo genérico ("plasma", "arcano", otro). Respuesta: ____
+## Paso 5 — Nombres y vocabulario ✅ 2026-09-27
+**Decidido:**
+- **5a.** ✅ **"Arcano"** — ya es de hecho el nombre que usa el catálogo para "magia sin apellido" (Orbe arcano, Tormenta arcana,
+  Ráfaga arcana, Armadura arcana): se cierra oficial, sin inventar un nombre nuevo ni renombrar nada existente.
 - **5b.** ✅ Respondida (dueño, 2026-09-27): sí, se renombra "Mg" a **"Esp"** — **PdG.Esp** / **Res.Esp**. Los ids **no** cambian (siguen `pdgmg` / `resmg`).
-- **5c.** ¿"Hechizo" sigue siendo la palabra en las descripciones? Respuesta: ____
+- **5c.** "Hechizo" sigue siendo la palabra en las descripciones — no hubo objeción, se mantiene como está (a revisar si en algún
+  momento hace falta otro término).
 
-**Entrega:** glosario. **Termina cuando:** hay un vocabulario único para usar en todo lo nuevo.
+**Entrega:** glosario. **Termina cuando:** hay un vocabulario único para usar en todo lo nuevo. ✅ Los 5 pasos de decisión están
+cerrados — sigue el Paso 6 (implementación).
 
 ## Paso 6 — Código: tipo de daño y daño recibido ⬜
 **Depende de:** 1, 2 (y 5 si cambia nombres). **Hacer, en este orden y probando cada uno:**

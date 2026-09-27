@@ -5,15 +5,17 @@
 > (ver "La esencia del Rol Pintoísta" en el `CLAUDE.md` de la raíz). Los stats se llaman **PdG.Esp** y **Res.Esp** (renombrados 2026-09-27, antes PdG.Mg / Res.Mg; los ids no cambiaron, siguen `pdgmg`, `resmg`)
 > hasta que se decida otro nombre (ver P97).
 >
-> Estado: **reglas base definidas (Paso 1 cerrado, 2026-09-27); nada implementado en código todavía**. Se aplica por partes (ver
-> "Orden propuesto"). Las preguntas abiertas están en [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
+> Estado: **los 5 pasos de decisión cerrados (2026-09-27); nada implementado en código todavía**. Sigue el Paso 6 (implementación).
+> Ver "Orden propuesto" más abajo y [`proceso-casteo.md`](proceso-casteo.md). Las preguntas abiertas están en
+> [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
 
 ## 1. Reglas definidas (2026-09-21)
 
 ### 1.1 Daño de casteo: por defecto ignora armadura (Paso 1 cerrado, 2026-09-27)
-La gracia del daño de casteo es que **ignora la armadura (Defensa) por defecto**, sea cual sea el elemento (genérico/arcano, relámpago,
-fuego, hielo, ácido, sagrado, oscuro, psíquico, viento, tierra…). No hace falta una lista cerrada de tipos: **lo que decide no es el
-elemento, es cómo se describe la habilidad.**
+La gracia del daño de casteo es que **ignora la armadura (Defensa) por defecto**, sea cual sea el elemento (**arcano** — el nombre
+oficial del daño genérico "sin apellido", cerrado en el Paso 5, ya usado en el catálogo: Orbe arcano, Tormenta arcana, Ráfaga arcana,
+Armadura arcana —, relámpago, fuego, hielo, ácido, sagrado, oscuro, psíquico, viento, tierra…). No hace falta una lista cerrada de
+tipos: **lo que decide no es el elemento, es cómo se describe la habilidad.**
 
 **Única excepción — objeto físico arrojado:** si la habilidad se narra como lanzar algo sólido y tangible (una aguja de hielo, una
 piedra, un dardo), ese daño **respeta la armadura**, igual que cualquier proyectil físico — no por ser "hielo" o "tierra", sino por ser

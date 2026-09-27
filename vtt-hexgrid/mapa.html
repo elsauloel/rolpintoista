@@ -4540,11 +4540,13 @@ lienzo.addEventListener('pointerdown', e => {
   if(borradorElemento){ consolidarBorradorElemento(); return; }
   // Colocando un token nuevo: el clic elige la casilla y después la orientación.
   if(colocando){ const pc = posEvento(e); colocacionClic(pc.px, pc.py); return; }
+  // Elegir un destino ya no se resuelve acá: arranca un paneo normal (para poder arrastrar el mapa y llegar
+  // a un token lejos) y se resuelve al soltar, solo si no hubo arrastre de verdad — ver soltar().
   if(elegirDestinoCb){
-    const pc = posEvento(e), mw = pantallaAMundo(pc.px, pc.py), h = mundoAHex(mw.x, mw.y), cb = elegirDestinoCb;
-    // Regla: el destino tiene que ser un punto transitable a pie (una casilla que no ocupa un Sólido ni la Colisión del mapa).
-    if(!elegirDestinoLibre && elementoSolidoEn(h.col, h.fila)){ toast('Ese punto no es transitable a pie (hay un Sólido o una pared): elegí otra casilla'); return; }
-    elegirDestinoTerminar(); cb(h); return;
+    const pc = posEvento(e);
+    paneo = {inicioX: pc.px, inicioY: pc.py, x: vista.x, y: vista.y};
+    lienzo.style.cursor = 'grabbing';
+    return;
   }
   // Pincel de niebla (GM): destapa o tapa lo que se arrastra.
   if(herramientaActiva === 'niebla' && soyGM){
@@ -4833,6 +4835,7 @@ lienzo.addEventListener('pointermove', e => {
   }
   const m = pantallaAMundo(px, py);
   const id = tokenEn(m.x, m.y);
+  if(elegirDestinoCb){ lienzo.style.cursor = 'crosshair'; return; }   // sin arrastrar: sigue esperando el clic que elige el destino
   if(moverLibre){ lienzo.style.cursor = id === moverLibre ? 'grab' : 'crosshair'; return; }
   if(!id){
     if(trazoSeleccionado && trazos.has(trazoSeleccionado) && !trazos.get(trazoSeleccionado).hex && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
@@ -5008,6 +5011,17 @@ function soltar(){
       }
     }
     pedirDibujo();
+  }
+  // Elegir un destino (centro de área, teleport…) ya no se resuelve en el pointerdown (bloqueaba poder
+  // arrastrar el mapa para llegar a un token lejos): arranca un paneo como cualquier clic y acá, al soltar,
+  // se mira si en el camino hubo arrastre de verdad o fue un clic quieto (dueño, 2026-09-27).
+  if(elegirDestinoCb && paneo){
+    const arrastrado = Math.hypot(vista.x - paneo.x, vista.y - paneo.y) >= 6;
+    if(!arrastrado){
+      const mw = pantallaAMundo(paneo.inicioX, paneo.inicioY), h = mundoAHex(mw.x, mw.y), cb = elegirDestinoCb;
+      if(!elegirDestinoLibre && elementoSolidoEn(h.col, h.fila)) toast('Ese punto no es transitable a pie (hay un Sólido o una pared): elegí otra casilla');
+      else{ elegirDestinoTerminar(); cb(h); }
+    }
   }
   if(paneo){ paneo = null; guardarVista(); }
   if(arrastreFondo){
@@ -9229,7 +9243,9 @@ async function dueloVincularSiFalta(t){
    por mapa, mismo criterio que `duelos`):
    {casteador:{ref,tipo,nombre,uid,tokenId}, hab, centro:{col,fila}, radio, objetivos:[tokenId,…],
     duelos:[dueloId|null,…] (mismo largo y orden que objetivos), indice (0-based: a quién le toca
-    ahora), estado:'en-curso'|'terminado', creadoPor, creado}. */
+    ahora), pdgCompartido:{total,formula,rolls,mod}|undefined (la PdG.Esp/PdG del casteador, tirada
+    UNA sola vez en el primer objetivo y reusada contra la Evasión de cada uno de los siguientes —
+    dicho por el dueño, 2026-09-27), estado:'en-curso'|'terminado', creadoPor, creado}. */
 function coleccionAreas(){ return fbDb.collection(fbRutaCampana('areas')); }
 let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el círculo; el GM además avanza la cascada)
 
@@ -9258,7 +9274,10 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
   }
   let dueloId;
   try{
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: objetivos.length}},
+    // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
+    // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
+    // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: objetivos.length}, pdgCompartido: a.pdgCompartido || null},
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
   }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); return; }
   try{
@@ -9270,6 +9289,8 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
 }
 
 // comun/duelo.js avisa (hook grupoResuelto, solo al GM) cuando un sub-duelo con `grupo` se resuelve: avanza la cascada.
+// De paso, si es el PRIMER objetivo, guarda su PdG.Esp/PdG en el área: es la tirada compartida que van a usar todos
+// los objetivos siguientes (dicho por el dueño, 2026-09-27 — el casteador tira una sola vez para toda la cascada).
 function dueloGrupoResuelto(d){
   const areaId = d.grupo.id, idx = num(d.grupo.indice) - 1;   // grupo.indice es 1-based
   coleccionAreas().doc(areaId).get().then(doc => {
@@ -9277,7 +9298,9 @@ function dueloGrupoResuelto(d){
     const a = doc.data();
     if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
-    return coleccionAreas().doc(areaId).update(siguiente >= total ? {estado: 'terminado'} : {indice: siguiente});
+    const cambios = siguiente >= total ? {estado: 'terminado'} : {indice: siguiente};
+    if(!a.pdgCompartido && d.pdg) cambios.pdgCompartido = d.pdg;
+    return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
 }
 

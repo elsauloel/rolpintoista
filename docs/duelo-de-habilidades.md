@@ -92,6 +92,11 @@ una fase nueva, **`dodge`**: tiene derecho a un dodge roll (arrastrar el token h
 falta programar el movimiento) y un botón que revisa si logró salir; si no salió, sigue como si hubiera perdido (efecto
 completo — no hay término medio, Paso 4e). Resuelto ese objetivo (cualquiera sea el resultado), se abre automáticamente el
 siguiente, hasta terminar la lista.
+- **El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada** (corrección del dueño, 2026-09-27 — la primera
+  versión tiraba de nuevo en cada objetivo): el primer objetivo hace el duelo completo (los dos lados tiran); al
+  resolverse, esa tirada del casteador se guarda en el área (`pdgCompartido`) y cada objetivo siguiente **solo tira su
+  propia Evasión**, contra esa misma tirada ya hecha — no una nueva. Se ve en el cuadro como "✔ ya tiró" desde el
+  arranque para esos objetivos (mismo aviso que cuando un lado tira antes que el otro en cualquier duelo).
 - **Documento nuevo** `campanas/<id>/areas/<id>` (no anidado por mapa, como `duelos`): ata el casteador, la habilidad, el
   centro/radio, la lista de objetivos y qué sub-duelo le toca a cada uno (`indice`); el mapa dibuja el **círculo compartido**
   (violeta) a partir de esto mientras dura la cascada, visible a todos, no solo al GM.

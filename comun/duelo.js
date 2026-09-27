@@ -332,6 +332,11 @@ const Duelo = (() => {
       creadoPor: yo(),
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     };
+    // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
+    // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
+    // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
+    // "medio hecho" — nada más pide la Evasión de este objetivo (mismo camino que cuando un lado tira antes que el otro).
+    if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(cfg.pdgCompartido);
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
@@ -386,6 +391,12 @@ const Duelo = (() => {
   function limpiarGrupo(g){
     if(!g || !g.id) return null;
     return {id: txtCorto(g.id, 40), indice: Math.max(1, Math.round(_num(g.indice)) || 1), total: Math.max(1, Math.round(_num(g.total)) || 1)};
+  }
+  // Una tirada ya resuelta ({total, formula, rolls, mod}) que llega de afuera (ej. la PdG compartida de un hechizo de
+  // área): mismo saneo que guardarTiro le hace a una tirada recién tirada, para no confiar ciego en lo que llega.
+  function limpiarTiro(r){
+    if(!r) return null;
+    return {total: Math.round(_num(r.total)), formula: txtCorto(r.formula, 60), rolls: (Array.isArray(r.rolls) ? r.rolls : []).slice(0, 20).map(_num), mod: _num(r.mod)};
   }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;

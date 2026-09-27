@@ -1019,9 +1019,25 @@ hexágono con otro sin importar bando. Todavía no está construido.
     crea el mapa del **GM** (`areaCrearSiguienteSubDuelo`), así que sin arreglo el GM terminaba "siendo" el casteador
     para efectos de permisos (`esMio`). Ahora `cfg.yo.uid` (si se pasa) manda sobre `yo()`; el orquestador del área lo
     pasa (`a.casteador.uid`, capturado una sola vez al lanzar el hechizo).
-  - **Reglas nuevas: hay que pegarlas** — `grupo` sumado a `duelos`, y la colección `areas` completa.
+  - **Reglas nuevas: hay que pegarlas** — `grupo` y `pdgCompartido` sumados a `duelos`/`areas`, y la colección `areas` completa.
   - **Simplificaciones conscientes**: sin verificación de alcance al marcar el centro (no bloquea, tampoco resalta
     nada); el orquestador de la cascada corre solo en la pantalla del GM (necesita al GM conectado para avanzar).
+  - **Corrección del dueño, probando en mesa (2026-09-27): el casteador tira PdG.Esp/PdG UNA SOLA VEZ para toda la
+    cascada, no de nuevo en cada objetivo.** El área doc suma `pdgCompartido` (`{total,formula,rolls,mod}`): el
+    primer objetivo hace el duelo completo (tira el casteador y ese objetivo); al resolverse, `dueloGrupoResuelto`
+    guarda esa tirada del casteador en `pdgCompartido` (solo si el área todavía no tenía una). Los objetivos
+    siguientes se crean con `Duelo.crear({..., pdgCompartido: a.pdgCompartido})` — `comun/duelo.js` la sanea
+    (`limpiarTiro`) y la precarga en `inicial.pdg`, así el sub-duelo nace con el contacto "medio hecho": solo le
+    falta la Evasión de ESE objetivo, contra la misma tirada de siempre (mismo camino visual que cuando un lado
+    tira antes que el otro en cualquier duelo — no hizo falta ningún cambio de render).
+  - **Corrección del dueño, probando en mesa (2026-09-27): elegir el centro bloqueaba poder arrastrar el mapa** para
+    llegar a un token que no se veía en pantalla — `elegirDestino` resolvía el clic en el mismísimo `pointerdown`,
+    así que cualquier intento de arrastrar para hacer paneo quedaba interpretado como "ya elegiste acá". Se separó
+    en dos tiempos: el `pointerdown` con `elegirDestinoCb` activo ahora arranca un `paneo` normal (se puede arrastrar
+    el mapa como siempre) y recién en `soltar()` se mide si hubo arrastre de verdad (`Math.hypot(vista.x-paneo.x,
+    vista.y-paneo.y) >= 6` px) — si no, era un clic quieto y ahí sí se resuelve el destino. Vale para **cualquier**
+    uso de `elegirDestino` (el centro de un área, el destino de un teleport, los dos puntos de Invocar portal), no
+    solo para el área. El cursor `crosshair` de "elegir destino" también se restauró para cuando no se está arrastrando.
 
 - **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
   queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está

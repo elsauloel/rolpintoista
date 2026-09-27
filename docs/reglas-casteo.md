@@ -81,7 +81,9 @@ mismo día):** un hechizo de área usa el **mismo cuadro de duelo paso a paso** 
 `comun/duelo.js`), encadenado: el 🎯 de la habilidad tiene un objetivo **"A un área"** con **radio**; al ejecutarla, el mapa
 pide marcar el centro y arma la cascada — un sub-duelo por objetivo (rivales adentro del radio), uno detrás del otro, **visible
 a toda la mesa** con su propio "⚔ Ver duelo" para minimizarlo. El contraste (PdG.Esp/PdG contra Evasión) es la tirada de
-siempre; si el objetivo la **gana**, en vez de "SE RESISTIÓ" se abre una fase nueva, **`dodge`**: tiene el derecho a moverse
+siempre, pero **el casteador tira su PdG.Esp/PdG una sola vez para toda la cascada** (corrección del dueño probando en mesa,
+2026-09-27): el primer objetivo hace el duelo completo, y esa tirada del casteador se reusa contra la Evasión de cada
+objetivo siguiente — no se vuelve a tirar. Si el objetivo la **gana**, en vez de "SE RESISTIÓ" se abre una fase nueva, **`dodge`**: tiene el derecho a moverse
 hasta 2 casilleros (arrastrando el token — ya cuesta No2 solo) y un botón que revisa si logró salir; si no, recibe el efecto
 completo igual (no hay término medio, 4e). Con "ignora la Defensa", resta la Armadura mágica en vez de nada (§1.4), como
 cualquier sub-duelo de habilidad. Ver `docs/duelo-de-habilidades.md` §11 para el detalle técnico.

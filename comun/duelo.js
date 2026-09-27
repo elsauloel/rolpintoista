@@ -310,7 +310,7 @@ const Duelo = (() => {
       estado: 'esperando', fase: 'contacto',
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
-      ataque: {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado)},
+      ataque: {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
       creadoPor: yo(),
@@ -595,6 +595,7 @@ const Duelo = (() => {
       else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
     }
+    if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
     if(d.resultado === 'mitad') L.push(`Durabilidad: ${d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto que bloqueó'} pierde 1 punto`);
     (d.efectos || []).forEach(ef => {
       if(ef.omitido) L.push(`— ${ef.nombre}: no entró (${ef.motivo || 'sin daño'})`);
@@ -957,7 +958,8 @@ const Duelo = (() => {
         else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)})</div>`;
         const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
           ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}</div>` : '';
-        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}`;
+        const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
+        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}${esp}`;
       }
     }
     return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;

@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260926d"></script>
+<script src="../comun/duelo.js?v=20260927a"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -9092,6 +9092,32 @@ function actualizarMuerteMapa(){
 
 // Aplica el daño de un duelo al HP del defensor (solo corre en el mapa del GM, ver comun/duelo.js). Reutiliza «Recibe daño»: Invulnerable y Escudo mágico valen.
 // Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
+/* Espinas (2026-09-27, regla del dueño): si el defensor tiene el estado Espinas y lo golpean cuerpo a cuerpo, el atacante recibe 1/4 (para arriba) del daño INFLIGIDO
+   (el daño del golpe con el multiplicador del crítico, ANTES de restar la Defensa: lo resista o no la armadura), directo a la vida. Solo si el golpe hizo daño (no si el defensor era
+   Invulnerable). Lo aplica el mapa del GM, como el resto del daño del duelo. */
+async function dueloEspinas(d, golpe){
+  try{
+    if(d.ataque && d.ataque.rango) return null;
+    if(!(d.resultado === 'pego' || d.resultado === 'mitad') || !(num(golpe) > 0)) return null;
+    const td = tokens.get(d.defensor.tokenId);
+    if(!td) return null;
+    let tiene = false;
+    if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); tiene = !!(sc && (sc.estados || []).some(e => e && e.activo !== false && (e.espinas || e.nombre === 'Espinas'))); }
+    else{ const f = fichasPub.get(String(td.fichaId).split(SEP_INVOCACION)[0]); tiene = !!(f && f.resumen && (f.resumen.estados || []).some(e => e && e.nombre === 'Espinas')) && !String(td.fichaId).includes(SEP_INVOCACION); }
+    if(!tiene) return null;
+    const monto = Math.ceil(num(golpe) / 4);
+    const ta = tokens.get(d.atacante.tokenId);
+    const quien = d.atacante.nombre;
+    if(!ta) return {quien, monto, manual: true, motivo: 'el token del atacante ya no está en el mapa'};
+    if(ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION)) return {quien, monto, manual: true, motivo: 'es una invocación'};
+    const res = ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
+    return {quien, monto, recibido: num(res.r.recibido), hpAntes: num(res.previo), hpDespues: num(res.nuevo)};
+  }catch(err){
+    console.error('No se pudo aplicar las Espinas:', err);
+    return {quien: d.atacante.nombre, monto: Math.ceil(num(golpe) / 4), manual: true, motivo: 'falló la escritura'};
+  }
+}
+
 async function dueloAplicarDano(d){
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
   const crit = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
@@ -9112,7 +9138,8 @@ async function dueloAplicarDano(d){
   }
   try{
     const res = t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef) : await danioPj(t, String(aplicar), ignoraDef);
-    return {...base, desgaste, defensa: crit ? 0 : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo)};
+    const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
+    return {...base, desgaste, defensa: crit ? 0 : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

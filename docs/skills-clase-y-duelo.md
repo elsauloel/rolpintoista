@@ -21,7 +21,7 @@
 | **Piel resistente** (Tanque) | +5 Def, +5 Res.Mg, +1 Resistencia a crítico, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
 | **Blindaje** (Tanque, Flash) | Escudo especial de 8 | ✅ automático | ✅ absorbe en el daño del duelo | — |
 | **Recuperación** (Tanque) | +9 HP | ✅ automático | — | — |
-| **Aura de espinas** (Tanque) | Cada golpe cuerpo a cuerpo recibido devuelve **1/4 del daño crudo** (para arriba) al atacante | Estado propio; la devolución **a mano** | **El paso Daño del duelo puede devolverlo solo** (el defensor con Espinas: el atacante recibe el 25 %, directo a la vida). También sirve al preset Espinas | **Bajo, mucho valor** |
+| **Aura de espinas** (Tanque) | Cada golpe cuerpo a cuerpo recibido devuelve **1/4 del daño INFLIGIDO** (para arriba) al atacante | ✅ **Hecho 2026-09-27**: el duelo lo devuelve solo (ver §7) | ✅ | — |
 | **Takle** (Tanque, Flash) | Desplaza hasta 2 casillas y ataca con **+1 PdG; no se puede parrear**; si conecta y gana Con vs Con: −2 No2 y empuja 2 | Solo anuncia | Duelo con **+1 PdG y solo Evasión** (sin Parry); el resto (Constitución vs Constitución, −2 No2, empuje) como **efecto del golpe** («Aplicar»), más el empuje a mano | Medio |
 | **Shockwave** (Tanque, Flash) | Fuerza + cada adyacente tira Con; el que pierde queda Pajaritos 2 turnos | Tira Fuerza; el resto a mano | **Área** (ver 3.3) | Alto |
 | **Sonic Boom** (Tanque, Flash) | Cono: Fuerza vs Con; pierden No2 o quedan Sentados | Tira Fuerza, dibuja el cono | **Área** (ver 3.3) | Alto |
@@ -50,3 +50,9 @@
 
 ## 6. Después: seguir auditando (45 skills sin auditar)
 Método de siempre (una por vez: cómo está → cómo se adapta → decisiones → se carga en `comun/skills-clase.js`). Con lo de arriba, cada skill que se audite desde ahora **nace con su campo `duelo`** cuando sea de ataque. Las que hoy ya están adaptadas a la mecánica nueva del crítico (Lisiar, Tajear, Degollar, Backstab del Asalto) son las candidatas naturales para seguir: usan Crítico frecuente/potente, efectos al golpear (Lisiado, Sangrado) y «Ignora 1 de resistencia a crítico», que el duelo ya maneja.
+
+## 7. Espinas devueltas — HECHO (2026-09-27)
+**Regla del dueño:** el daño devuelto **no es sobre el daño que pasa a la armadura, sino sobre el daño INFLIGIDO, independientemente de si lo resiste la armadura o no**: 1/4 (redondeado para arriba) del daño del golpe con el multiplicador del crítico, **antes de restar la Defensa** (y antes de los escudos), **directo a la vida** del atacante.
+- **Cuándo:** el defensor tiene el estado **Espinas** (la skill Aura de espinas o el preset; personaje o creep), el golpe **pegó o pasó la mitad** y **no es de rango** (`ataque.rango`, que mandan la ficha, las invocaciones y GM Tools según el arma); no se devuelve si el defensor era **Invulnerable** (no hubo daño infligido) ni si el golpe hizo 0.
+- **Cómo:** lo aplica el mapa del GM junto con el daño (`dueloEspinas`, `vtt-hexgrid/mapa.html`); queda en `dano.espinas` del duelo, se ve en el cuadro («🌵 Espinas: X recibe N de daño devuelto», con su HP antes → después) y en la línea de resumen de la Mesa. Si el atacante es una **invocación** o su token ya no está, se avisa para aplicarlo **a mano**.
+- **Pendiente:** el contraataque (tras un Parry) todavía no manda `rango` (se toma como cuerpo a cuerpo).

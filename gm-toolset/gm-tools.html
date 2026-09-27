@@ -2375,7 +2375,7 @@ function nuevoCreep(){
     con:1, fue:1, agl:1, des:1, esp:1,
     armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
     armaMods:[], armaEfectos:[], armaManos:'arma_1m',
-    defensa:0, armaduraTipo:'', equipo:[],
+    defensa:0, armadmg:0, armaduraTipo:'', equipo:[],
     crit:[0,0,0,0,0],
     habilidades:[],
     estados:[],
@@ -2485,6 +2485,29 @@ function creepDefensaEfectiva(sc){
   (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
   v -= rota;
   return Math.max(0, v);
+}
+// Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+// stat general, fijo, que NO sale de ningún atributo (base a mano, 0 por
+// defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
+// (no tiene un campo propio como "def" en las piezas de armadura). Protege
+// el daño de casteo que "ignora la Defensa" (Paso 1); no tiene nada que ver
+// con Escudo especial ni con la habilidad "Armadura arcana" del Mago.
+function creepArmadmgEfectiva(sc){
+  return Math.max(0, num(sc.armadmg) + creepModTotal(sc, 'armadmg'));
+}
+function armadmgOrigenTxt(sc){
+  const L = [];
+  let deItems = 0;
+  fuentesEquipoCreep(sc).forEach(it => {
+    const v = (it.mods || []).filter(m => m.stat === 'armadmg').reduce((a, m) => a + num(m.val), 0);
+    if(!v) return;
+    deItems += v;
+    L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
+  });
+  const resto = num(sc.armadmg) - deItems;
+  if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+  L.push(`= ${fmt(creepArmadmgEfectiva(sc))}`);
+  return L.join('\n');
 }
 function creepCritEfectivo(sc, i){
   return num(sc.crit[i]);
@@ -3477,11 +3500,13 @@ function lupaHtmlCreep(clave){
   const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
   if(tipo === 'stat') return {titulo: `${sc.nombre} · ${CREEP_STAT_LOOKUP[ref].label}`, html: lupaStatCreep(sc, ref) + sinCosto};
   if(tipo === 'defensa'){
-    // Defensa y resistencia a crítico: de dónde sale cada número (equipo, base a mano, armadura rota).
-    const esDef = ref === 'def';
-    const i = esDef ? 0 : num(String(ref).replace('tipo', '')) - 1;
-    const texto = esDef ? defensaOrigenTxt(sc) : critOrigenTxt(sc, i);
-    return {titulo: `${sc.nombre} · ${esDef ? 'Defensa' : 'Res. a crítico Tipo ' + (4 + 2 * i)}`, html: lupaSeccion('De dónde sale', texto.split('\n').map(l => lupaNota(esc(l))).join('')) + lupaNota('No se tira: se resta al daño (Defensa) o baja la chance de un crítico.')};
+    // Defensa, Armadura mágica y resistencia a crítico: de dónde sale cada número (equipo, base a mano, armadura rota).
+    const esDef = ref === 'def', esArmadmg = ref === 'armadmg';
+    const i = (esDef || esArmadmg) ? 0 : num(String(ref).replace('tipo', '')) - 1;
+    const texto = esDef ? defensaOrigenTxt(sc) : esArmadmg ? armadmgOrigenTxt(sc) : critOrigenTxt(sc, i);
+    const titulo = esDef ? 'Defensa' : esArmadmg ? 'Armadura mágica' : 'Res. a crítico Tipo ' + (4 + 2 * i);
+    const nota = esArmadmg ? 'No se tira: se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo).' : 'No se tira: se resta al daño (Defensa) o baja la chance de un crítico.';
+    return {titulo: `${sc.nombre} · ${titulo}`, html: lupaSeccion('De dónde sale', texto.split('\n').map(l => lupaNota(esc(l))).join('')) + lupaNota(nota)};
   }
   if(tipo === 'atacar'){
     const tipoArma = num(sc.armaTipo) || 8;
@@ -3601,6 +3626,10 @@ function renderAccionesCreep(){
             ${lupaBotonHtml(`${sc.id}|defensa|def`)}
             <span class="bt-label">Defensa</span><span class="bt-value">${fmt(creepDefensaEfectiva(sc))}</span>
           </div>
+          <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
+            ${lupaBotonHtml(`${sc.id}|defensa|armadmg`)}
+            <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(creepArmadmgEfectiva(sc))}</span>
+          </div>
           <div class="botonera-crit">
             <div class="botonera-crit-t">Resistencia a críticos</div>
             <div class="botonera-crit-grid">
@@ -3710,9 +3739,10 @@ function cardHtml(sc){
         </div>
       </div>
 
-      <div class="row3" style="grid-template-columns:1fr 1fr">
+      <div class="row3" style="grid-template-columns:1fr 1fr 1fr">
         <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque</label><div class="valor-fijo">${esc(ataqueCreepTxt(sc))}</div></div>
         <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
+        <div class="mini-f con-tip" data-tip="${esc(armadmgOrigenTxt(sc))}" title="Se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo). No sale de ningún atributo: normalmente 0, salvo ítems Raros o mejores."><label>Armad. mágica${creepArmadmgEfectiva(sc)!==num(sc.armadmg) ? ` <span class="mod-origen-btn efectivo-badge">efect. ${fmt(creepArmadmgEfectiva(sc))}</span>` : ''}</label><input type="number" data-f="armadmg" data-id="${sc.id}" value="${sc.armadmg}"></div>
       </div>
 
 
@@ -4993,7 +5023,8 @@ function cfgItemGM(){
   return {
     contexto: 'creep',
     stats: [...CREEP_DERIVED_STATS.map(s => ({id: s.id, label: s.label})),
-      ...['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => ({id, label: `Res. crítico ${STAT_LABEL_GM[id]}`}))],
+      ...['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => ({id, label: `Res. crítico ${STAT_LABEL_GM[id]}`})),
+      {id: 'armadmg', label: 'Armadura mágica'}],
     ejemplos: (tipoItem, t) => CATALOGO_EQUIPO.filter(it => String(it.tipoItem || '').startsWith('arma_') && num(it.tipoDado) === t).map(it => it.nombre),
   };
 }
@@ -5271,6 +5302,7 @@ function verCreepDatos(sc, completo){
       ${seccion('Daño y defensa', `<div class="vc-cajas vc-2">
         ${caja('Daño', ataqueCreepTxt(sc), ataqueOrigenTxt(sc))}
         ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
+        ${creepArmadmgEfectiva(sc) ? caja('Armadura mágica', fmt(creepArmadmgEfectiva(sc)), armadmgOrigenTxt(sc)) : ''}
       </div>
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
       ${seccion('Habilidades', completo
@@ -5516,7 +5548,7 @@ document.addEventListener('input', e => {
     // El HP se resuelve al salir del campo o con Enter: si se guardara
     // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
     if(campo === 'hp') return;
-    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa'];
+    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa','armadmg'];
     sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
     if(campo === 'nivel'){
       actualizarBadgePresupuesto(sc, t.closest('.card'));

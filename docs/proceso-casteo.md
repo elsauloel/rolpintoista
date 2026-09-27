@@ -20,7 +20,7 @@
 | 4 | Esquivar efectos de área | decisión | ✅ 2026-09-27 |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ✅ 2026-09-27 |
 | 6 | Código: tipo de daño y daño recibido | implementación | ✅ 2026-09-27 (en su mayoría) |
-| 7 | Código: resistencias, armadura mágica y esquiva de área | implementación | ⬜ |
+| 7 | Código: armadura mágica y esquiva de área | implementación | 🟡 (armadura mágica lista, 2026-09-27) |
 | 8 | Auditoría de contenido, por tandas | contenido | ⬜ |
 | 9 | Manual | documentación | ⬜ |
 
@@ -138,8 +138,28 @@ pensando en este paso puntual:
 **Termina cuando:** un rayo ignora la Defensa y una aguja de hielo no, en ficha, creeps y trampas, y la Mesa lo dice. ✅ Con el tilde
 independiente ya está — solo falta la lupa (menor, no bloquea el Paso 7).
 
-## Paso 7 — Código: resistencias, armadura mágica y esquiva de área ⬜
-**Depende de:** 3 y 4, y del paso 6. Resistencia por tipo (stats, ítems, creeps, lupa), armadura mágica, y la reacción de esquivar un área en el mapa.
+## Paso 7 — Código: armadura mágica y esquiva de área 🟡
+**Depende de:** 3 y 4, y del paso 6. El Paso 3 aclaró que no hace falta resistencia por tipo (3a: un solo stat general) — este paso es
+"Armadura mágica" (stat nuevo) y la reacción de esquivar un área en el mapa.
+
+**Hecho (2026-09-27) — Armadura mágica:**
+- Stat nuevo `armadmg` ("Armadura mágica"), igual de fijo que Defensa y sin fórmula de atributo (arranca en 0): en la ficha
+  (`EXTRA`/`STAT_LIST`, se computa solo por `compute()` como cualquier otro stat de `EXTRA`) y en los creeps de gm-tools
+  (`sc.armadmg`, `creepArmadmgEfectiva`, campo editable junto a Defensa en la ficha del creep y en Acciones).
+- Se puede dar como bono de ítem desde el asistente compartido (`comun/asistente-item.js`, paso "Bonos": aparece como acceso
+  rápido en Defensa y como "+ Otro stat" en cualquier categoría) — así se cumple 3e (a mano, en ítems Raro o mejor; el código
+  no lo impone, solo lo permite).
+- La ficha publica `resumen.armadmg`; el mapa la usa en `danioPj`/`danioCreep` (parámetro nuevo `restaIgnorando`, antes se
+  restaba directo `0`) **solo** en el daño de casteo real (`dueloAplicarDano`, cuando `hab.dano.ignoraDef` — Paso 6): un
+  crítico real, una trampa que ignora la Defensa, el fuego de terreno y el Rayo en cadena **siguen ignorando la Defensa
+  entera**, sin tocar — la Armadura mágica es específicamente la resistencia al daño de casteo del Paso 1, no un "ignora
+  ignorar" general (decisión tomada al implementar, no estaba explícita en 3a-3e; si la mesa quiere que también frene
+  crítico/trampas/fuego, es una pregunta nueva, no una corrección de esto).
+- La Mesa muestra la Armadura mágica restada en vez de "Defensa 0" cuando el daño de casteo la resta.
+
+**Falta:** la reacción de esquivar un área (Paso 4: tirada de Evasión → dodge roll de hasta 2 casilleros) todavía no tiene
+código — es una función interactiva aparte (nueva fase del duelo, costo en No2, Rengo/Stun/Inmovilizado), pensada como su
+propia pasada de trabajo.
 
 ## Paso 8 — Auditoría de contenido, por tandas ⬜
 **Depende de:** 1, 2 y 6. Una tanda a la vez, revisando skill por skill (nada masivo):

@@ -67,7 +67,7 @@ const AsistenteItem = (() => {
   const GRUPO_TITULO = {arma: 'Armas', defensa: 'Defensa', accesorio: 'Accesorios', otro: 'Otros', consumible: 'Consumibles'};
   const RAPIDOS = {
     arma: [['pdg', 'PdG'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'], ['pdgcontra', 'PdG en contraataque'], ['pdgopor', 'PdG en oportunidad'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
-    defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento']],
+    defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento'], ['armadmg', 'Armadura mágica']],
     accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón'], ['capmochila', 'Ranuras de mochila']],
     otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']],
   };
@@ -77,6 +77,7 @@ const AsistenteItem = (() => {
     pdg: 'probabilidad de golpe', crit: 'Crítico frecuente: baja el rango del crítico (cada punto = 1 menos de diferencia PdG − Evasión; mínimo 2)', critpot: 'Crítico potente: baja los umbrales del d20 (doble, triple y cuádruple daño)',
     parry: 'desviar golpes', bloqueo: 'frenar daño', dmg: 'suma al daño de los golpes cuerpo a cuerpo',
     eva: 'esquivar', hpmax: 'vida máxima', mov: 'casilleros de movimiento', capcinturon: 'lugares extra en el cinturón', capmochila: 'lugares extra en la mochila',
+    armadmg: 'protege contra el daño de casteo que ignora la Defensa — reservalo para ítems Raros o mejores',
   };
   const CRIT_IDS = ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'];
   const CRIT_TIPO = {tipo1: 4, tipo2: 6, tipo3: 8, tipo4: 10, tipo5: 12};

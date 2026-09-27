@@ -2100,6 +2100,12 @@ const GRUPOS = [
 ];
 const EXTRA = [
   {id:'def', label:'Defensa', full:'Defensa'},
+  // Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+  // stat general, fijo, que NO sale de ningún atributo (arranca en 0) — solo
+  // lo dan ítems Raros o mejores. Protege el daño de casteo que "ignora la
+  // Defensa" (Paso 1); no tiene nada que ver con el Escudo especial (HP
+  // temporal) ni con la skill del Mago "Armadura arcana".
+  {id:'armadmg', label:'Armadura mágica', full:'Armadura mágica: se resta al daño de casteo que ignora la Defensa. No sale de ningún atributo — solo la dan ítems raros o mejores.'},
   // Los ids tipo1..tipo5 quedaron de antes de correr la escala +2 (eran
   // Tipo 2..10): no se renombran para no tocar los mods ya guardados.
   {id:'tipo1', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
@@ -2411,7 +2417,7 @@ const DEFAULT = {
     eva:'agl', ini:'agl', nitros:'agl',
     rng:'des', pdg:'des', crit:'0', critpot:'0', pdgcontra:'0', pdgopor:'0', parry:'des', percepcion:'des',   // crit = Crítico frecuente (2026-09-25): ya no sale de la Destreza, solo lo suman equipo, skills y estados
     pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'floor(esp/2)', rangocasteo:'esp',
-    def:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', capmochila:'0', luz:'0', veoculto:'0', vision:'6'
+    def:'0', armadmg:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', capmochila:'0', luz:'0', veoculto:'0', vision:'6'
   },
   inventario:[],
   cinturon:[],
@@ -11913,6 +11919,7 @@ function fichaResumen(){
     hpMax: n(c.final.hpmax),
     ini: n(c.final.ini),   // Iniciativa: el mapa la usa para el botón "Tirar iniciativa" de la lista de turnos
     def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
+    armadmg: n(c.final.armadmg),   // Armadura mágica (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
     muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
     esp: n(c.final.esp),   // Especial
     percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante

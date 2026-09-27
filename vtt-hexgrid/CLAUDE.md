@@ -978,6 +978,16 @@ hexágono con otro sin importar bando. Todavía no está construido.
   `hudEstadoCambiar` (la misma transacción que ya usa el HUD para cualquier estado propio) y
   publica el aviso con `desde: 'recordatorio'`, igual que `publicarRecordatorios` de la ficha.
 
+- **Armadura mágica resta en vez de nada, solo en el daño de casteo** (Paso 7 de las reglas de casteo, 2026-09-27,
+  `docs/reglas-casteo.md` §1.4): `danioPj`/`danioCreep` reciben un parámetro nuevo `restaIgnorando` (antes, con
+  `ignoraDef`, siempre restaban `0`) — sigue en `0` por defecto para **todos** los llamados existentes (crítico real,
+  trampas, fuego de terreno, Rayo en cadena: sin cambios), y solo `dueloAplicarDano` (el daño real de una habilidad que
+  "ignora la Defensa", Paso 6) le pasa la Armadura mágica del objetivo (`creepArmadmgMapa(sc)` para un creep, o
+  `resumen.armadmg` de la ficha) en vez de `0`. La Armadura mágica es la resistencia al daño de casteo del Paso 1, no un
+  "ignora-ignorar" general — decisión tomada al programarlo, no viene de una respuesta explícita del dueño; si la mesa
+  quiere que también frene crítico/trampas/fuego, es una pregunta nueva. El resumen del duelo en la Mesa ("Daño: X −
+  Defensa Y") ahora muestra la Armadura mágica restada en vez de "Defensa 0" cuando corresponde.
+
 - **🔔 Pulso de duelo minimizado** (2026-09-27, pedido del dueño): mientras un duelo (`comun/duelo.js`)
   queda minimizado o de fondo **para esta pantalla** (no mientras el cuadro grande de ESE duelo está
   abierto acá mismo), los dos tokens involucrados (atacante y defensor) laten despacio en el mapa —

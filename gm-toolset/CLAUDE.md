@@ -334,4 +334,10 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 
 - **Ficha del creep desde el mapa (2026-09-26, pedido del dueño):** el 📜 del token de un creep vinculado (solo GM) abre, encima del mapa, la **misma ventana «Ver»** de GM Tools (`verCreep`, de solo lectura) en el iframe de Acciones (`?modo=acciones&creep=<id>&ver=1`, o el mensaje `abrir-ver-creep`). Antes abría la ventana «Editar creep» en otra pestaña (`?editar=`, que sigue existiendo).
 
+- **Armadura mágica en los creeps** (Paso 7 de las reglas de casteo, 2026-09-27, `docs/reglas-casteo.md` §1.4): campo nuevo
+  `sc.armadmg` (default 0), editable junto a Defensa en la ficha completa del creep y visible como tercer casillero "no se
+  tira" en Acciones (junto a Defensa y Res. a crítico); `creepArmadmgEfectiva(sc)` = base + mods de equipo/estados (mismo
+  patrón que los stats derivados de atributo, no el de Defensa que se hornea al equipar — ver `armadmgOrigenTxt` para el
+  desglose de la lupa). Se agregó `armadmg` a `cfgItemGM().stats` para poder dársela a un creep como bono de ítem.
+
 - **El Tablero solo muestra lo que está en el mapa publicado** (2026-09-22, a pedido del dueño): antes listaba TODAS las fichas de la partida y TODOS los creeps abiertos en gm-tools, tuvieran o no token puesto en algún mapa. Ahora, mientras el Tablero está abierto, además de escuchar `fichas` escucha `campanas/{id}/mapa/activo` (`tableroEscucharMapaPublicado`) y los tokens de ESE mapa (`tableroColeccionTokensDe`, mismo esquema de colecciones que `vtt-hexgrid/mapa.html`: `tokens` para el mapa principal, `mapas/{id}/tokens` para uno guardado) — `tableroTokensMapa`, un `Set` de `fichaId`s. `renderTablero()` filtra `tableroDatos.fichas` y `tableroCreepsLocales()` contra ese set antes de armar las tarjetas. Como esto lo ve solo el GM, no hace falta filtrar oculto ni sigilo (eso sí importa en la versión del mapa, ver `vtt-hexgrid/CLAUDE.md`, que además agrega el mismo Tablero ahí para que también lo puedan abrir los jugadores).

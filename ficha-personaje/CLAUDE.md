@@ -437,4 +437,10 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 
 - **Escudo especial es un valor neto** (2026-09-25, pedido del dueño): un solo número, **sin tope y sin recarga automática en el Mantenimiento** (antes: actual/máximo que se recargaba). Baja al absorber daño y se sube o baja a mano desde el chip, la tarjeta del creep o el token. Internamente sigue en `escudoMagico` (+ `escudoMagicoActual`, siempre iguales); un estado con escudo en 0 sigue siendo un escudo (`escudoMagicoActual !== undefined`) y se puede volver a subir. Ver también `vtt-hexgrid/CLAUDE.md`.
 
+- **Armadura mágica (Paso 7 de las reglas de casteo, 2026-09-27, `docs/reglas-casteo.md` §1.4)**: stat nuevo `armadmg`
+  ("Armadura mágica"), agregado a `EXTRA` igual que Defensa (`def`) — fijo, sin fórmula de atributo (`formulas.armadmg:'0'`
+  en `DEFAULT`), así que `compute()` lo calcula solo, sin tocar nada más. Se publica en `fichaResumen()` como
+  `resumen.armadmg` para que el mapa lo lea. Se da como bono de ítem desde el asistente compartido (paso "Bonos"), no
+  tiene un campo propio como el `def` de una pieza de armadura.
+
 - **Vender ítems solo en las tiendas (regla del dueño, 2026-09-26):** la única forma de vender un ítem, del cinturón o despojos es el botón **💰 Vender** de la tienda abierta (`abrirVender`, exige `tiendaCargada`). No debe haber un botón de vender en la mochila, en la ventana del ítem ni en ningún otro lado. (Revisado el 2026-09-26: no queda ningún otro camino; el «Precio de venta» del editor de ítems es solo un dato.)

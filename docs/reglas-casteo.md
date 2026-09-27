@@ -6,7 +6,8 @@
 > hasta que se decida otro nombre (ver P97).
 >
 > Estado: **los 5 pasos de decisión cerrados; el Paso 6 (tipo de daño y daño recibido) también, en su mayoría —
-> ya lo cubría el sistema de duelo de habilidades (2026-09-27)**. Sigue el Paso 7 (resistencias y esquiva de área).
+> ya lo cubría el sistema de duelo de habilidades (2026-09-27)**. Del Paso 7, la **Armadura mágica ya tiene código
+> (2026-09-27)**; falta la reacción de esquivar áreas.
 > Ver "Orden propuesto" más abajo y [`proceso-casteo.md`](proceso-casteo.md). Las preguntas abiertas están en
 > [`preguntas-abiertas.md`](preguntas-abiertas.md), P97.
 
@@ -89,6 +90,13 @@ darla, se decide caso por caso al auditarla, no como regla general.
 - **"Armadura arcana"** (la skill del Mago, **renombrada 2026-09-27** — antes "Armadura Mágica", para no confundirla con el stat de
   arriba): su propio efecto puntual, reduce 50 % (máx. 10) y refleja el daño absorbido al terminar — no cambia, es una habilidad con
   su propia mecánica, no el stat general.
+
+**Código (Paso 7, 2026-09-27):** stat `armadmg`, se computa igual que Defensa (ficha: `EXTRA`/`compute()`, `resumen.armadmg`;
+creeps de gm-tools: `sc.armadmg`/`creepArmadmgEfectiva`), y se puede dar como bono de ítem desde `comun/asistente-item.js` (paso
+Bonos). En el mapa, `danioPj`/`danioCreep` reciben un parámetro nuevo `restaIgnorando` que reemplaza el `0` fijo — pero **solo**
+para el daño de casteo real de `dueloAplicarDano` (`hab.dano.ignoraDef`, Paso 6). Un crítico real, una trampa que ignora la
+Defensa, el fuego de terreno y el Rayo en cadena siguen ignorando la Defensa entera sin restar nada: la Armadura mágica es la
+resistencia al daño de casteo del Paso 1, no un "ignora-ignorar" general para cualquier mecánica que hoy salta la Defensa.
 
 ## 2. Mapa de revisión (qué puede necesitar cambios)
 

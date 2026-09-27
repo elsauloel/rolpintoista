@@ -46,8 +46,12 @@ hielo" (energía) ignora armadura; una "aguja de hielo" (objeto) no.
 - **Habilidades mixtas** (daño + debuff): **una sola tirada**, la de ataque/contraste principal; si conecta, el debuff se aplica solo,
   sin tirada aparte — salvo que la propia habilidad diga explícitamente lo contrario. Así ya funcionan las maldiciones del Debuffer: una
   tirada, **PdG.Esp vs Res.Esp**.
-- **Sobre uno mismo o un aliado:** no tira nada — mismo criterio que Recuperación, Estoicismo o Piel resistente: se activa directo. Única
-  excepción: si la propia habilidad define una variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra alguien".
+- **Sobre uno mismo o un aliado:** **no hay tirada** (ni contra el objetivo ni contra nada) — pero **sí se abre el cuadro de duelo**
+  (sin oposición: `duelo: {contra: []}` o `sinOposicion`), visible a **toda la mesa**, directo en el paso de efectos, con su botón
+  **«Aplicar»** para el estado (o la cura) — así todos tienen tiempo de leer qué pasó antes de que se aplique, no una línea suelta en
+  el log (pedido del dueño, 2026-09-27; ver [`duelo-de-habilidades.md`](duelo-de-habilidades.md) §7, ya construido en `comun/duelo.js` +
+  `comun/asistente-duelo-hab.js`, sin probar en mesa todavía). Única excepción a que no haya tirada: si la propia habilidad define una
+  variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra alguien".
 
 ### 1.3 Efectos en área: cómo se esquivan
 - El defensor puede **tirar Evasión para hacer un roll (girar/rodar)**, con un **máximo de 2 casilleros** de desplazamiento.

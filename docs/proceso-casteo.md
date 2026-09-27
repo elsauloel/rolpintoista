@@ -60,8 +60,10 @@ falta una tabla de tipos: la regla general + la excepción del objeto físico cu
 - **2b.** Habilidades mixtas (daño + debuff): **una sola tirada**, la de ataque/contraste principal; si conecta, el debuff se aplica
   solo, sin tirada aparte — salvo que la propia habilidad diga explícitamente lo contrario. Así ya funcionan las maldiciones del
   Debuffer: una tirada, **PdG.Esp vs Res.Esp**.
-- **2c.** Sobre uno mismo o un aliado: **no tira nada** — mismo criterio que Recuperación, Estoicismo o Piel resistente: se activa
-  directo. Única excepción: si la propia habilidad define una variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra
+- **2c.** Sobre uno mismo o un aliado: **no hay tirada**, pero **sí se abre el cuadro de duelo** (sin oposición), visible a toda la
+  mesa, directo en el paso de efectos, con su botón **«Aplicar»** — para que todos tengan tiempo de leer qué pasó, no una línea suelta
+  en el log (pedido del dueño, 2026-09-27; ya construido, ver [`duelo-de-habilidades.md`](duelo-de-habilidades.md) §7). Única excepción
+  a que no haya tirada: si la propia habilidad define una variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra
   alguien".
 - **2d.** Control mental: el casteador tira **PdG.Esp por defecto** contra el **Res.Mt** del objetivo, salvo que la habilidad puntual
   diga otra cosa (Control Mental hoy dice "Esp" a secas; se aclara al auditarla, no hace falta forzar el default).

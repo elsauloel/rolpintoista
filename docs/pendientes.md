@@ -7,7 +7,7 @@
 > Retomar por el primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 3**, resistencia por tipo y armadura mágica). Lo de abajo
 > es solo un resumen — los números de paso son los de `proceso-casteo.md`, no un orden aparte.
 - [x] Paso 1 (2026-09-27): tipos de daño de casteo — **por defecto todo ignora armadura**, salvo que sea un objeto físico arrojado (regla general, no hizo falta una lista cerrada de tipos); críticos/Res. a crítico no aplican al casteo; el daño de trampas sigue la misma regla.
-- [x] Paso 2 (2026-09-27): "qué tira cada lado" — se apoya en el campo `duelo` cuando la habilidad ya está automatizada; si no, una frase tipo "Tirás PdG.Esp contra el Res.Esp del objetivo"; una sola tirada en habilidades mixtas (daño + debuff); sobre uno mismo/aliado no se tira nada; control mental tira PdG.Esp por defecto contra Res.Mt.
+- [x] Paso 2 (2026-09-27): "qué tira cada lado" — se apoya en el campo `duelo` cuando la habilidad ya está automatizada; si no, una frase tipo "Tirás PdG.Esp contra el Res.Esp del objetivo"; una sola tirada en habilidades mixtas (daño + debuff); sobre uno mismo/aliado no se tira nada pero se abre igual el cuadro de duelo sin oposición (visible a toda la mesa, botón «Aplicar» — ya construido); control mental tira PdG.Esp por defecto contra Res.Mt.
 - [ ] Paso 3 (decisión): resistencia por tipo de daño (stat por tipo o uno general), armadura mágica (cuánto reduce, si es lo mismo que Escudo mágico/Armadura Mágica).
 - [ ] Paso 4 (decisión): esquivar áreas — ¿la Evasión se tira contra algo?, costo en No2, ¿reacción fuera de turno?, ¿con Inmovilizado/Rengo?
 - [ ] Paso 5 (decisión): nombre del daño genérico ("plasma", "arcano"…); "Mg"→"Esp" ya hecho (2026-09-27).

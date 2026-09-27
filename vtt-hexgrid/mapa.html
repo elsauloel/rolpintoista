@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927d"></script>
+<script src="../comun/duelo.js?v=20260927e"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -8996,6 +8996,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
+  if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar
   if(e.data.tipo === 'duelo-opciones-res') Duelo.recibirOpciones(e.data.id, e.data.opciones);   // las opciones de defensa que calculó la ficha del defensor
   if(e.data.tipo === 'duelo-ui-visible'){   // la ficha tirando para un duelo necesita mostrar un cartelito (Nitros, sobrepeso…)

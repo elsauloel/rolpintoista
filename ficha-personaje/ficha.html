@@ -1751,7 +1751,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <span class="botonera-badge" id="botonera-badge-sp">SP 0/0</span>
         <span class="botonera-badge" id="botonera-badge-def" title="Defensa">Def 0</span>
       </div>
-      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonera-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonera-x">Cerrar</button></div>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonera-reroll" title="Moneda Re-Roll: volver a hacer tu última tirada (1 No2 con la moneda en el cinturón, 2 en la mochila; después se tira una moneda: par se conserva, impar se rompe)">🪙</button><button class="iconbtn" id="botonera-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonera-x">Cerrar</button></div>
     </header>
     <div class="body" id="botonera-body"></div>
   </div>
@@ -2048,7 +2048,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-duelo-hab.js?v=20260927d"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927d"></script>
+<script src="../comun/duelo.js?v=20260927e"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -2474,7 +2474,7 @@ const DEFAULT = {
     {id:'nuevo-trampa-mina-explosiva-r2', nombre:'Mina explosiva', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:45, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Mina explosiva", "detalle": "Estalla en flor de 2: 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano).", "amiga": true, "tipo": "flor", "tamano": 2, "color": "#D9531E", "alfa": 45, "dano": "3d6", "ignoraDef": true}, consumible:true, curahp:0, mods:[], detalle:'Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Estalla en flor de 2: 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda.'},
     {id:'nuevo-trampa-mina-explosiva-r3', nombre:'Mina explosiva mayor', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:70, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Mina explosiva mayor", "detalle": "Estalla en flor de 2: 4d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano).", "amiga": true, "tipo": "flor", "tamano": 3, "color": "#D9531E", "alfa": 45, "dano": "4d6", "ignoraDef": true}, consumible:true, curahp:0, mods:[], detalle:'Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Estalla en flor de 2: 4d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda.'},
     {id:'nuevo-trampa-mina-explosiva-r1', nombre:'Mina explosiva menor', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Mina explosiva menor", "detalle": "Estalla en flor de 2: 2d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano).", "amiga": true, "tipo": "flor", "tamano": 1, "color": "#D9531E", "alfa": 45, "dano": "2d6", "ignoraDef": true}, consumible:true, curahp:0, mods:[], detalle:'Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Estalla en flor de 2: 2d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano). Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un cilindro de bronce enterrado con pólvora prensada. Una sola pisada y no hay segunda.'},
-    {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, consumible:true, legacy:true, curahp:0, mods:[], detalle:'Permite repetir una tirada. Se conserva si gana tirando una moneda.', descripcionNarrativa:'Una moneda gastada de tanto pasar de mano en mano. Siempre vuelve al que la necesita.'},
+    {id:'cat-moneda-reroll', nombre:'Moneda Re-Roll', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:100, unidades:1, consumible:true, legacy:true, curahp:0, mods:[], detalle:'Permite repetir tu última tirada, después de cualquier tirada (1 No2 con la moneda en el cinturón, 2 No2 desde la mochila). Después de usarla se tira una moneda: si sale par se conserva; si sale impar se rompe. ⚙ Automatizado: botón 🪙 de la Botonera y botón flotante del duelo (reabre tu última tirada); la moneda se tira sola.', descripcionNarrativa:'Una moneda gastada de tanto pasar de mano en mano. Siempre vuelve al que la necesita.'},
     {id:'nuevo-trampa-niebla-de-confusion-r2', nombre:'Niebla de confusión', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:45, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Niebla de confusión", "detalle": "Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita.", "amiga": false, "tipo": "flor", "tamano": 2, "color": "#B784E0", "alfa": 45, "dano": ""}, consumible:true, curahp:0, mods:[], detalle:'Trampa común: al usarla se coloca en el mapa una trampa en flor de radio 2 (19 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un frasco con una niebla violácea que embrolla los sentidos de quien la respira.'},
     {id:'nuevo-trampa-niebla-de-confusion-r3', nombre:'Niebla de confusión mayor', tier:'Buena Calidad', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:70, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Niebla de confusión mayor", "detalle": "Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita.", "amiga": false, "tipo": "flor", "tamano": 3, "color": "#B784E0", "alfa": 45, "dano": ""}, consumible:true, curahp:0, mods:[], detalle:'Trampa mayor: al usarla se coloca en el mapa una trampa en flor de radio 3 (37 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones +2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un frasco con una niebla violácea que embrolla los sentidos de quien la respira.'},
     {id:'nuevo-trampa-niebla-de-confusion-r1', nombre:'Niebla de confusión menor', tier:'Común', imagen:'', tipoItem:'consumibles', peso:0, ranuras:1, precioCompra:30, unidades:1, pilaInfinita:true, trampaDatos:{"nombre": "Niebla de confusión menor", "detalle": "Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita.", "amiga": false, "tipo": "flor", "tamano": 1, "color": "#B784E0", "alfa": 45, "dano": ""}, consumible:true, curahp:0, mods:[], detalle:'Trampa menor: al usarla se coloca en el mapa una trampa en flor de radio 1 (7 casilleros). Confusión 2 turnos (a mano): antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal). Res.Mt contra 12 la evita. Dificultades y duraciones −2 respecto de la trampa común. ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.', descripcionNarrativa:'Un frasco con una niebla violácea que embrolla los sentidos de quien la respira.'},
@@ -4460,6 +4460,60 @@ function restaurarSpDeConsumo(it){
 }
 
 // Nitros que cuesta consumir un ítem según de dónde sale.
+/* ---------- Moneda Re-Roll (2026-09-27, regla del dueño; docs/reroll.md) ----------
+   Con una Moneda Re-Roll equipada en el cinturón (1 No2; en la mochila 2 No2) se puede volver a hacer la ÚLTIMA tirada, después de cualquier tirada. Al usarla se tira una moneda:
+   par (2) se conserva, impar (1) se rompe (gasta una unidad, como cualquier consumible). Fuera del duelo: botón 🪙 de la Botonera. En el duelo: el botón flotante 🪙 reabre la última tirada. */
+const esMonedaReroll = i => !!i && !!(i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || '')));
+function monedaReroll(){
+  const enC = S.cinturon.find(i => esMonedaReroll(i) && num(i.unidades) > 0);
+  if(enC) return {key: 'cinturon', it: enC};
+  const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa);
+  return enM ? {key: 'inventario', it: enM} : null;
+}
+function pagarNitrosReroll(costo){
+  return new Promise(res => {
+    if(costo <= num(S.nitros)){ S.nitros = num(S.nitros) - costo; renderNitros(); res(true); return; }
+    avisarSinNitros(costo, 'usar la Moneda Re-Roll', () => { S.nitros = num(S.nitros) - gastoNitrosForzado(costo, 'usó la Moneda Re-Roll'); renderNitros(); res(true); });
+  });
+}
+// Tira la moneda: par se conserva, impar se rompe.
+function tirarMonedaReroll(m){
+  const r = tirarDados('1d2');   // 2 = par (se conserva) · 1 = impar (se rompe)
+  const par = r.total % 2 === 0;
+  registrarTirada(`🪙 Moneda Re-Roll · ${par ? 'par: se conserva' : 'impar: se rompe'}`, r);
+  if(!par){
+    m.it.unidades = num(m.it.unidades) - 1;
+    purgarSiAgotado(m.key, m.it.id);
+    if(m.key === 'inventario') renderInventario(); else renderList('cinturon');
+    toast(`🪙 La moneda se rompió (impar)${num(m.it.unidades) > 0 ? '' : ': era la última'}`);
+  }else toast('🪙 La moneda se conserva (par)');
+  refresh();
+  return !par;
+}
+// Vuelve a tirar los mismos dados de una tirada anterior (con sus mismos bonos y mitades).
+function repetirTirada(u){
+  const r = u.r || {};
+  const mit = (String(r.formula || '').match(/÷2/g) || []).length;
+  const base = String(r.formula || '').replace(/÷2/g, '').replace(/\+\s*\d+\s*⚡/g, '');
+  const p = typeof parseDados === 'function' ? parseDados(base) : null;
+  if(!p || !p.dados.length){ toast('No se puede repetir esa tirada'); return false; }
+  const rolls = [];
+  p.dados.forEach(g => { for(let k = 0; k < g.n; k++) rolls.push(1 + Math.floor(Math.random() * g.caras)); });
+  const total = aplicarMitades(rolls.reduce((a, b) => a + b, 0) + num(r.mod), mit);
+  registrarTirada(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: r.formula, rolls, mod: r.mod, total, estados: r.estados});
+  return true;
+}
+// Botón 🪙 de la Botonera (fuera del duelo): repite la última tirada.
+async function rerollFuera(){
+  if(!ultimaTirada){ toast('Todavía no hiciste ninguna tirada para repetir'); return; }
+  const m = monedaReroll();
+  if(!m){ toast('No tenés una Moneda Re-Roll (equipada en el cinturón o en la mochila)'); return; }
+  const costo = costoConsumirNitros(m.key);
+  await pagarNitrosReroll(costo);
+  if(!repetirTirada(ultimaTirada)) return;
+  setTimeout(() => tirarMonedaReroll(m), 1200);   // la moneda se tira después de repetir la tirada
+}
+
 function costoConsumirNitros(key){
   return key === 'cinturon' ? IT2.nitrosConsumirCinturon : IT2.nitrosConsumirMochila;
 }
@@ -4518,7 +4572,9 @@ function armaDanoTxt(i, extra){
 let dadosHistorial = [];
 
 
+let ultimaTirada = null;   // la última tirada de este personaje (para la Moneda Re-Roll): {origen, r}
 function registrarTirada(origen, r){
+  if(!/^🪙/.test(String(origen))) ultimaTirada = {origen, r: {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, estados: r.estados}};
   dadosHistorial.unshift({origen, ...r, hora: new Date()});
   mesaPublicar(origen, r);
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));   // el duelo (comun/duelo.js) recoge su PdG / Evasión de acá
@@ -10611,6 +10667,21 @@ window.DUELO_HOOKS = {
     const r = tirarDados(formula);
     if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
   },
+  // Moneda Re-Roll (2026-09-27): ¿tengo una y cuánto cuesta? / usarla para reabrir una tirada del duelo.
+  rerollInfo: d => {
+    if(dueloInvDe(d.atacante) || dueloInvDe(d.defensor)) return {disponible: false};
+    const m = monedaReroll();
+    return m ? {disponible: true, costo: costoConsumirNitros(m.key), donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {disponible: false};
+  },
+  rerollUsar: async (d, campo) => {
+    const m = monedaReroll();
+    if(!m){ toast('No tenés una Moneda Re-Roll'); return false; }
+    await pagarNitrosReroll(costoConsumirNitros(m.key));
+    const ok = await Duelo.reabrir(d.id, campo);
+    if(!ok){ toast('La tirada ya no se puede repetir (no se gastó la moneda)'); return false; }
+    setTimeout(() => tirarMonedaReroll(m), 800);
+    return true;
+  },
   // Flash (2026-09-27): las habilidades Flash que me sirven para esta tirada del duelo (se marcan ANTES de tirar) y su uso (cobra los SP; el duelo suma el bono).
   flashOpciones: (d, campo) => {
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
@@ -11532,6 +11603,7 @@ $('#scrim-todas-habilidades').addEventListener('mousedown', e => { if(e.target.i
 $('#btn-botonera').onclick = () => { renderBotonera(); $('#scrim-botonera').classList.add('open'); };
 $('#botonera-x').onclick = () => $('#scrim-botonera').classList.remove('open');
 // 🎲 Dados libres dentro de la Botonera (2026-09-25, pedido del dueño): en el mapa la Mesa flotante queda tapada, así que la grilla de dados se abre desde acá.
+{ const br = $('#botonera-reroll'); if(br) br.onclick = rerollFuera; }   // 🪙 Moneda Re-Roll: repite la última tirada
 ['#botonera-dados', '#botonerainv-dados'].forEach(sel => { const b = $(sel); if(b && typeof grillaConectar === 'function') grillaConectar(b, {ancla: b, lado: 'abajo', alTirar: f => registrarTirada('Tirada libre', tirarDados(f))}); });
 $('#scrim-botonera').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera') $('#scrim-botonera').classList.remove('open'); });
 $('#scrim-portrait').addEventListener('mousedown', e => { if(e.target.id==='scrim-portrait') $('#scrim-portrait').classList.remove('open'); });

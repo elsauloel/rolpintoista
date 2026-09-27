@@ -177,7 +177,10 @@ const Duelo = (() => {
 /* El botón que hay que apretar ahora brilla y late. */
 .duelo-tiro button:not(.sec):not(:disabled),.duelo-ef button:not(:disabled),.duelo-contra button:not(.sec):not(:disabled),.duelo-pie button:not(.sec):not(:disabled),.duelo-fin button:not(:disabled),.duelo-par button{animation:duelo-boton 1.2s ease-in-out infinite alternate}
 @keyframes duelo-boton{0%{box-shadow:0 0 4px rgba(90,150,255,.3);filter:brightness(1)}100%{box-shadow:0 0 22px 4px rgba(110,170,255,.95);filter:brightness(1.25)}}
-.viva,.duelo-nota.viva,.espera.duelo-flash{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.viva,.duelo-nota.viva,.espera.duelo-reroll{position:fixed;right:22px;bottom:22px;z-index:99100;background:#3a2f12;color:#ffe9a8;border:2px solid #d9b45a;border-radius:16px;padding:12px 18px;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 22px rgba(255,190,60,.55);animation:duelo-latido 1.6s ease-in-out infinite alternate;text-align:center}
+.duelo-reroll small{display:block;font-size:11.5px;font-weight:500;opacity:.9}
+#duelo-fondo.min .duelo-reroll{display:none}
+.duelo-flash{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
 .duelo-flash button.flash{background:#3a2f12;color:#ffe9a8;border:1px solid #d9b45a;font-size:14px}
 .duelo-flash button.flash small{display:block;font-weight:500;font-size:11px;opacity:.85}
 .duelo-flash button.flash.on{background:#8a5a12;box-shadow:0 0 16px rgba(255,190,60,.7)}
@@ -921,6 +924,79 @@ const Duelo = (() => {
   }
 
   const ETIQ = {pdg: 'PdG', eva: 'Defensa', fuerza: 'Fuerza del golpe', bloqueo: 'Bloqueo', dano: 'Daño'};
+  /* ---------- Re-roll dentro del duelo (2026-09-27, dueño; docs/reroll.md) ----------
+     Con una Moneda Re-Roll (cinturón: 1 No2; mochila: 2 No2) se puede volver a hacer «la última tirada que hiciste». En el duelo eso es REABRIR esa tirada: se borra y quien la hizo la
+     vuelve a tirar con el botón de siempre (dados 3D, mismo empate). Solo se puede mientras no pasó a una etapa posterior con tiradas (Bloqueo, crítico, daño) ni se aplicó daño ni
+     efectos. El botón flotante 🪙 del cuadro lo ve quien tiene una moneda y puede reabrir alguna de sus tiradas; la página del dueño cobra los No2, tira la moneda (par se conserva,
+     impar se rompe) y reabre. */
+  function puedeReabrir(m, campo){
+    if(!m || m.estado === 'cancelado' || m.dano) return false;
+    if((m.efectos || []).some(e => e && (e.res || e.aplicado || e.aplicar))) return false;
+    const critHecho = !!(m.crit && m.crit.d20);
+    if(campo === 'critico') return critHecho;
+    if(campo === 'pdg' || campo === 'eva') return !!m[campo] && !m.fuerza && !m.bloqueo && !critHecho;
+    if(campo === 'fuerza' || campo === 'bloqueo') return !!m[campo] && !critHecho;
+    return false;
+  }
+  // La última tirada que hizo ese lado que todavía se puede reabrir (la más avanzada primero).
+  const campoReabrible = (m, lado) => (lado === 'atacante' ? ['critico', 'fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => puedeReabrir(m, c)) || null;
+  const etqCampo = (d, c) => c === 'pdg' ? etqTira(d) : c === 'eva' ? etqContra(d) : c === 'critico' ? 'los d20 del crítico' : ETIQ[c];
+  async function reabrir(id, campo){
+    const ref = col().doc(id);
+    let ok = false, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      ok = false; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(!puedeReabrir(m, campo)) return;
+      const quien = (campo === 'pdg' || campo === 'fuerza' || campo === 'critico') ? m.atacante.nombre : m.defensor.nombre;
+      if(campo === 'critico'){ m.crit = {...m.crit, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
+      else if(campo === 'fuerza' || campo === 'bloqueo'){ m[campo] = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+      else{
+        m[campo] = null; if(campo === 'eva') m.defensa = null;
+        m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto';
+        if(m.hab) m.efectos = null;
+      }
+      m.estado = 'esperando';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      tx.update(ref, upd);
+      ok = true;
+      anuncio = `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
+    });
+    if(ok) anunciarMesa(anuncio);
+    return ok;
+  }
+  let rerollInfo = {}, rerollPedidas = new Set();
+  function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }
+  function pedirRerollInfo(d, lado){
+    const k = d.id + ':' + lado;
+    if(rerollPedidas.has(k)) return;
+    rerollPedidas.add(k);
+    const l = d[lado];
+    if(l.tipo === 'creep' || String(l.ref || '').includes('~')){ rerollInfo[k] = {disponible: false}; return; }
+    enviar(l, {tipo: 'duelo-reroll-info', id: d.id, lado});
+    setTimeout(() => { if(rerollInfo[k] === undefined) rerollInfo[k] = {disponible: false}; }, 6000);
+  }
+  function recibirRerollInfo(id, lado, info){
+    rerollInfo[id + ':' + lado] = info || {disponible: false};
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  function rerollBtnHtml(d){
+    if(d.estado === 'cancelado') return '';
+    const lado = ladoMio(d);
+    if(!lado) return '';
+    const campo = campoReabrible(d, lado);
+    if(!campo){ return ''; }
+    const k = d.id + ':' + lado;
+    if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
+    const info = rerollInfo[k];
+    if(!info.disponible) return '';
+    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))}: cuesta ${_fmt(info.costo)} No2 (moneda en ${_esc(info.donde || 'el inventario')}) y después se tira una moneda: par se conserva, impar se rompe">🪙 Re-roll<small>volver a tirar ${_esc(etqCampo(d, campo))} · ${_fmt(info.costo)} No2</small></button>`;
+  }
+
+
   const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
   function numerosHtml(tiro, esNuevo, que, quien){
@@ -1180,6 +1256,10 @@ const Duelo = (() => {
     const nombreAtaque = nombreAtq(d);
     const nuevaClave = k => { const c = d.id + ':' + k; const nuevo = !revelado[c]; revelado[c] = true; return nuevo; };
     const contactoListo = !!(d.pdg && d.eva), bloqueoListo = !!(d.fuerza && d.bloqueo);
+    if(!contactoListo) delete revelado[d.id + ':contacto'];   // tras un re-roll, el nuevo resultado vuelve a animarse
+    if(!bloqueoListo) delete revelado[d.id + ':bloqueo'];
+    if(!d.resultado) delete revelado[d.id + ':resultado'];
+    if(!(d.crit && d.crit.d20)) delete revelado[d.id + ':d20'];
     const nuevoContacto = contactoListo ? nuevaClave('contacto') : false;
     const nuevoBloqueo = bloqueoListo ? nuevaClave('bloqueo') : false;
     let cierre = '';
@@ -1223,7 +1303,7 @@ const Duelo = (() => {
           <button type="button" class="sec" data-min2>Minimizar</button>
           <button type="button" class="sec" data-x2>Cerrar</button>
         </div>
-      </div></div>`;
+      </div></div>${rerollBtnHtml(d)}`;
     if(min) f.classList.add('min');
     // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.
     if(d.estado !== 'resuelto' && d.estado !== 'cancelado'){
@@ -1285,6 +1365,14 @@ const Duelo = (() => {
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
     if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
+    const brr = f.querySelector('[data-reroll]');
+    if(brr) brr.onclick = () => {
+      const [lado, campo] = brr.dataset.reroll.split(':');
+      brr.disabled = true;
+      enviar(d[lado], {tipo: 'duelo-reroll', id: d.id, campo});
+      delete rerollInfo[d.id + ':' + lado]; rerollPedidas.delete(d.id + ':' + lado);
+      setTimeout(() => { if(actual && actual.dato) dibujar(); }, 4000);
+    };
     const bfin = f.querySelector('[data-fin-duelo]');
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
@@ -1305,6 +1393,19 @@ const Duelo = (() => {
         const ops = (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null;   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
+        return;
+      }
+      if(m.tipo === 'duelo-reroll-info'){   // ¿tengo una moneda de re-roll?
+        const lado = m.lado === 'defensor' ? d.defensor : d.atacante;
+        const info = (h.soy && h.soy(lado) && h.rerollInfo) ? (h.rerollInfo(d) || {disponible: false}) : {disponible: false};
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-reroll-info-res', id: d.id, lado: m.lado, info}, location.origin);
+        else recibirRerollInfo(d.id, m.lado, info);
+        return;
+      }
+      if(m.tipo === 'duelo-reroll'){   // usar la moneda: verifica, cobra, reabre la tirada y tira la moneda
+        const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
+        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo)){ _toast('Esa tirada ya no se puede repetir'); return; }
+        await h.rerollUsar(d, m.campo);
         return;
       }
       if(m.tipo === 'duelo-flash'){   // ¿qué Flash tengo para esta tirada?
@@ -1397,7 +1498,7 @@ const Duelo = (() => {
       return;
     }
     if(m.tipo === 'duelo-cancelado'){ pendienteSuelto = null; return; }
-    if(m.tipo === 'duelo-opciones' || m.tipo === 'duelo-tirar' || m.tipo === 'duelo-contra' || m.tipo === 'duelo-flash') ejecutar(m);
+    if(m.tipo === 'duelo-opciones' || m.tipo === 'duelo-tirar' || m.tipo === 'duelo-contra' || m.tipo === 'duelo-flash' || m.tipo === 'duelo-reroll-info' || m.tipo === 'duelo-reroll') ejecutar(m);
   });
 
   // A mano: el GM (o el dueño) escribe el valor del stat y se tira con dados.
@@ -1537,5 +1638,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
+  return {reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto};
 })();

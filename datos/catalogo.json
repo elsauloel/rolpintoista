@@ -1620,7 +1620,7 @@
     "peso": 0,
     "ranuras": 1,
     "precioCompra": 100,
-    "detalle": "Permite repetir una tirada. Se conserva si gana tirando una moneda.",
+    "detalle": "Permite repetir tu última tirada, después de cualquier tirada (1 No2 con la moneda en el cinturón, 2 No2 desde la mochila). Después de usarla se tira una moneda: si sale par se conserva; si sale impar se rompe. ⚙ Automatizado: botón 🪙 de la Botonera y botón flotante del duelo (reabre tu última tirada); la moneda se tira sola.",
     "descripcionNarrativa": "Una moneda gastada de tanto pasar de mano en mano. Siempre vuelve al que la necesita.",
     "legacy": true,
     "unidades": 1,
@@ -1634,7 +1634,8 @@
     "efectoPermanente": false,
     "efectoDetalle": "",
     "consumible": true,
-    "imagen": ""
+    "imagen": "",
+    "rerollMoneda": true
   },
   {
     "id": "nuevo-trampa-niebla-de-confusion-r2",

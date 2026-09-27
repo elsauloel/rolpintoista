@@ -4,12 +4,12 @@
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
-> Retomar por el primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 4**, esquivar efectos de área). Lo de abajo
+> Retomar por el primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 5**, nombres y vocabulario). Lo de abajo
 > es solo un resumen — los números de paso son los de `proceso-casteo.md`, no un orden aparte.
 - [x] Paso 1 (2026-09-27): tipos de daño de casteo — **por defecto todo ignora armadura**, salvo que sea un objeto físico arrojado (regla general, no hizo falta una lista cerrada de tipos); críticos/Res. a crítico no aplican al casteo; el daño de trampas sigue la misma regla.
 - [x] Paso 2 (2026-09-27): "qué tira cada lado" — se apoya en el campo `duelo` cuando la habilidad ya está automatizada; si no, una frase tipo "Tirás PdG.Esp contra el Res.Esp del objetivo"; una sola tirada en habilidades mixtas (daño + debuff); sobre uno mismo/aliado no se tira nada pero se abre igual el cuadro de duelo sin oposición (visible a toda la mesa, botón «Aplicar» — ya construido); control mental tira PdG.Esp por defecto contra Res.Mt.
 - [x] Paso 3 (2026-09-27): resistencia al daño de casteo — un solo stat nuevo, **Armadura mágica** (número fijo, no por elemento, no deriva de atributo, solo ítems de tier alto); distinta del estado Escudo especial y de la skill **Armadura arcana** del Mago (renombrada, antes "Armadura Mágica").
-- [ ] Paso 4 (decisión): esquivar áreas — ¿la Evasión se tira contra algo?, costo en No2, ¿reacción fuera de turno?, ¿con Inmovilizado/Rengo?
+- [x] Paso 4 (2026-09-27): esquivar áreas — primero PdG.Esp/PdG del que actúa contra la Evasión del defensor; solo si gana esa Evasión gana el derecho a un dodge roll (hasta 2 casilleros, 1 No2 c/u, doble con Rengo, imposible con Stun/Inmovilizado); no hay término medio (fuera del área del todo o efecto completo); las trampas no se esquivan así.
 - [ ] Paso 5 (decisión): nombre del daño genérico ("plasma", "arcano"…); "Mg"→"Esp" ya hecho (2026-09-27).
 - [ ] Paso 6 (código): campo `tipoDanio` en habilidades (ficha, invocaciones, creeps) y que el daño recibido **no reste Defensa** cuando el tipo ignora armadura (mapa `danioPj`/`danioCreep`, gm-tools, ficha, trampas).
 - [ ] Paso 7 (código): resistencias por tipo, armadura mágica y la reacción de esquivar áreas.

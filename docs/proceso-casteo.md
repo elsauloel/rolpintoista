@@ -17,7 +17,7 @@
 | 1 | Tipos de daño de casteo | decisión | ✅ 2026-09-27 |
 | 2 | Qué tira cada lado (formato de la descripción) | decisión | ✅ 2026-09-27 |
 | 3 | Resistencia por tipo y armadura mágica | decisión | ✅ 2026-09-27 |
-| 4 | Esquivar efectos de área | decisión | ⬜ |
+| 4 | Esquivar efectos de área | decisión | ✅ 2026-09-27 |
 | 5 | Nombres y vocabulario ("Mg", daño genérico) | decisión | ⬜ |
 | 6 | Código: tipo de daño y daño recibido | implementación | ⬜ |
 | 7 | Código: resistencias, armadura mágica y esquiva de área | implementación | ⬜ |
@@ -88,18 +88,23 @@ falta una tabla de tipos: la regla general + la excepción del objeto físico cu
 
 **Entrega:** reglas en `reglas-casteo.md` §1.4. **Termina cuando:** se sabe cómo se calcula el daño de casteo que recibe alguien con resistencia y/o armadura mágica. ✅
 
-## Paso 4 — Esquivar efectos de área ⬜
+## Paso 4 — Esquivar efectos de área ✅ 2026-09-27
 **Ya definido:** el defensor puede **tirar Evasión para hacer un roll** de hasta **2 casilleros**; necesita **No2**; si se desplaza lo suficiente como para salir del área, esquiva.
 
-**Decidir:**
-- **4a.** "Tirar Evasión": ¿se tira contra algo (el PdG.Esp del casteador, un número fijo) o alcanza con tener No2 y salir del área? Respuesta: ____
-- **4b.** Costo en No2 del roll. Respuesta: ____
-- **4c.** ¿Se hace fuera del turno propio, como reacción? ¿Cuántas veces por ronda? Respuesta: ____
-- **4d.** ¿Se puede con Inmovilizado, Rengo, Stun o sin No2? Respuesta: ____
-- **4e.** ¿Y si el área es más grande que el desplazamiento (no puede salir)? ¿Recibe el efecto completo o la mitad? Respuesta: ____
-- **4f.** ¿Se aplica también a las trampas de área? Respuesta: ____
+**Decidido (2026-09-27):**
+- **4a.** Primero el contraste de siempre: **PdG.Esp** (hechizo) o **PdG** (algo físico arrojado, una molotova) **contra la Evasión**
+  de cada defensor — igual que un proyectil normal. **Recién si gana esa Evasión** gana el **derecho a un dodge roll** (moverse hasta
+  2 casilleros); si pierde, no llega a esa opción.
+- **4b.** **1 No2 por casillero** (hasta 2) — la regla de movimiento de siempre.
+- **4c.** Sí, es una **reacción fuera de turno**, se resuelve en el momento del casteo. Sin límite explícito por ronda: lo frena el
+  No2 disponible.
+- **4d.** **Stun:** ya falla la Evasión directo → sin dodge roll. **Inmovilizado:** puede ganar la Evasión pero no puede moverse →
+  se queda en el área. **Rengo:** puede moverse, pero el doble de No2 por casillero. **Sin No2 suficientes:** se mueve lo que pueda
+  pagar.
+- **4e.** **No hay término medio:** fuera del área del todo = nada; adentro por cualquier motivo = **efecto completo**, nunca mitad.
+- **4f.** **Las trampas no se esquivan así** — sin Evasión ni dodge roll, el elemento sorpresa es la gracia de una trampa.
 
-**Entrega:** regla en `reglas-casteo.md` §1.3. **Termina cuando:** se puede resolver un área en la mesa sin dudas.
+**Entrega:** regla en `reglas-casteo.md` §1.3. **Termina cuando:** se puede resolver un área en la mesa sin dudas. ✅
 
 ## Paso 5 — Nombres y vocabulario ⬜
 **Decidir:**

@@ -53,10 +53,24 @@ hielo" (energía) ignora armadura; una "aguja de hielo" (objeto) no.
   `comun/asistente-duelo-hab.js`, sin probar en mesa todavía). Única excepción a que no haya tirada: si la propia habilidad define una
   variable al azar (el ×2 de X de Rayo Mágico), que no es "tirar contra alguien".
 
-### 1.3 Efectos en área: cómo se esquivan
-- El defensor puede **tirar Evasión para hacer un roll (girar/rodar)**, con un **máximo de 2 casilleros** de desplazamiento.
-- **Necesita No2 disponibles** para hacerlo. Si los tiene, se desplaza; **si se desplaza lo suficiente como para salir del área, esquiva**.
-- (Detalles a definir: costo en No2, cuánto significa "tirar Evasión" si no hay número que superar, si es una reacción fuera de turno… — P97.)
+### 1.3 Efectos en área: cómo se esquivan (Paso 4 cerrado, 2026-09-27)
+**Primero, el contraste de siempre:** el que actúa tira **PdG.Esp** (si es un hechizo) o **PdG** (si es algo físico arrojado, una
+molotova) **contra la Evasión** de cada defensor en el área — el mismo mecanismo que un proyectil normal (§1.2). **Recién si el
+defensor gana esa Evasión**, gana además **el derecho a un dodge roll**: moverse hasta **2 casilleros** para intentar salir del área.
+Si pierde la Evasión, no llega a esa opción.
+
+- **Costo del dodge roll:** **1 No2 por casillero** (hasta 2) — la regla de movimiento de siempre, nada especial.
+- **Es una reacción fuera de turno:** se resuelve en el momento del casteo, sea o no el turno del defensor. Sin límite explícito de
+  veces por ronda — lo frena el No2 disponible.
+- **Inmovilizado, Rengo, Stun:**
+  - **Stun:** ni siquiera llega a tirar Evasión (ya falla directo, regla existente) → sin dodge roll.
+  - **Inmovilizado:** puede ganar la Evasión (es reflejos, no movimiento), pero **no puede usar el dodge roll** porque no se puede
+    mover — se queda en el área.
+  - **Rengo:** puede moverse, pero el dodge roll le cuesta el **doble** de No2 por casillero, como el movimiento normal con Rengo.
+  - Sin No2 suficientes: se mueve lo que pueda pagar.
+- **No hay término medio:** si salió completamente del área, no recibe nada; si sigue adentro por cualquier motivo (perdió la
+  Evasión, no tenía No2, Inmovilizado, no alcanzó a salir del todo), recibe el **efecto completo**, sin mitad.
+- **Las trampas no se esquivan así:** ni Evasión ni dodge roll — el elemento sorpresa es la gracia de una trampa.
 
 ### 1.4 Resistencia al daño de casteo: Armadura mágica (Paso 3 cerrado, 2026-09-27)
 **Un solo stat nuevo, general — no uno por elemento** (consistente con 1.1: no hay lista de tipos, así que tampoco hace falta una

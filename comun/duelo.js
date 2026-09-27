@@ -174,6 +174,7 @@ const Duelo = (() => {
 /* El latido va en el paso en curso (el que espera una acción), no en el veredicto. */
 .duelo-paso.activo{border-color:#6fa8ff;animation:duelo-latido 1.4s ease-in-out infinite alternate}
 .duelo-paso.activo h4{color:#cfe0ff}
+.viva{display:block;margin:6px auto;padding:10px 14px;border-radius:10px;color:#dfeaff!important;font-style:normal!important;font-weight:700;background:rgba(80,140,255,.14);border:1px solid rgba(110,170,255,.5);animation:duelo-latido 1.4s ease-in-out infinite alternate}
 .duelo-paso.activo h4 .n{background:#2d6cdf}
 @keyframes duelo-latido{0%{box-shadow:0 0 6px rgba(80,140,255,.25),inset 0 0 8px rgba(80,140,255,.06)}100%{box-shadow:0 0 30px rgba(80,150,255,.75),inset 0 0 22px rgba(80,150,255,.22)}}
 .duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
@@ -824,11 +825,11 @@ const Duelo = (() => {
       }
     }else if(puedoAMano(lado)){
       const selModo = campo === 'eva' ? `<select data-manual-modo><option value="evasion">Evasión</option><option value="parry">Parry</option></select>` : '';
-      cuerpo = `<div class="espera">esperando que ${quien} tire…</div>
+      cuerpo = `<div class="espera viva">esperando que ${quien} tire…</div>
         <div class="duelo-man">${selModo}<input type="number" min="1" data-manual="${campo}" placeholder="valor" value="${_esc(manual[campo] || '')}"><button type="button" class="sec" data-tirarpor="${campo}">🎲 Tirar a mano</button></div>
         <div class="det">${soyGM() ? 'como GM, tirás por él' : 'tirás vos'}: escribí el valor del stat y se tira con dados</div>`;
     }else{
-      cuerpo = `<div class="espera">esperando que ${quien} tire…</div>`;
+      cuerpo = `<div class="espera viva">esperando que ${quien} tire…</div>`;
     }
     return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${quien}</div>${cuerpo}</div>`;
   }
@@ -848,7 +849,7 @@ const Duelo = (() => {
     const [na, nb, ta, tb] = nombresPar(d, par);
     const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => puedoAMano(l));
     return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — las dos llevan «+» fijo (o ninguna): se resuelve con par o impar</div>
-      ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button></div>`).join('') : '<div class="chico">esperando que uno de los dos elija par o impar…</div>'}
+      ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button></div>`).join('') : '<div class="chico viva">esperando que uno de los dos elija par o impar…</div>'}
       <div class="chico">el primero que elige decide: se tira un dado y gana el que acierta</div></div>`;
   }
 
@@ -910,13 +911,13 @@ const Duelo = (() => {
         const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
         if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(d.defensor.nombre)}…</div>`;
-        else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
+        else if(!puedeAtq) acc = `<div class="duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
         else if(spec) acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(EstadosAplicarTexto(spec, ef))} sobre ${_esc(d.defensor.nombre)}</button>`;
         else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
         estado = cab + acc;
       }
       else if(puedeAtq) estado = `<button type="button" data-ef-tirar="${i}">🎲 Tirar ${siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)}</button><div class="duelo-nota">${siempreEf(ef) ? '' : 'de ' + _fmt(ef.caras - ef.exitos + 1) + (ef.exitos > 1 ? ' a ' + _fmt(ef.caras) : '') + ' funciona · '}${ef.requiereDano ? 'necesita que el golpe haga daño' : 'entra aunque no pase el daño'}</div>`;
-      else estado = `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
+      else estado = `<div class="espera duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
     const pendiente = d.fase === 'efectos';
@@ -934,9 +935,9 @@ const Duelo = (() => {
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
       if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}</button><div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : 'Se le resta la Defensa del defensor.'}</div></div>`;
-      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
+      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota viva" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>`;
-      else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
+      else cuerpo = `<div class="espera duelo-nota viva" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
     }else{
       const tiro = `<div class="duelo-mini">Daño${arma}: <b>${_fmt(dn.crudo)}</b> <span style="opacity:.7">(${_esc(dn.formula || '')}${dn.rolls && dn.rolls.length ? ' → ' + dn.rolls.join(' + ') : ''}${_num(dn.mod) ? ' ' + (_num(dn.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(dn.mod)) : ''})</span></div>`;
       if(!dn.aplicado){
@@ -992,7 +993,7 @@ const Duelo = (() => {
       cuerpo = titulo('posible', '💥 ' + tituloNivel(_num(c.dados)))
         + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
         + tablaCriticoHtml(c, d, 0)
-        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
+        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
       // Los d20 como fichas: el más alto destaca con ondas concéntricas.
       const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;

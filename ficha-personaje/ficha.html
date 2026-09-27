@@ -209,6 +209,9 @@ a{color:var(--brass)}
   #attrs .d .dv{font-size:17px}
 }#attrs .attr{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
 #attrs .attr .derived{flex:1;align-content:start}
+#stats-mapa-attrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+#stats-mapa-attrs .attr{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
+#stats-mapa-attrs .attr .derived{flex:1;align-content:start}
 .vision-fila{margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
 .vision-fila > .armbox{width:auto;min-width:170px}
 .vision-fila > .counter{min-width:190px}
@@ -1561,6 +1564,17 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <div id="fm-resumen" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px"></div>
       <div id="fm-botones" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
       <p class="hint" style="margin:10px 0 0">Cada botón abre su propia ventana; al cerrarla volvés a este menú.</p>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim-stats-mapa" style="z-index:46">
+  <div class="modal" style="max-width:820px">
+    <header><h3>📊 Stats</h3><button class="iconbtn" id="stats-mapa-x">Cerrar</button></header>
+    <div class="body">
+      <div class="hint" style="margin:0 0 8px">Tocá el número grande de un atributo para cambiarlo; los stats de abajo se recalculan solos. Tocá un stat para ver de dónde sale.</div>
+      <div id="stats-mapa-puntos" class="attr-points" style="margin-bottom:10px"></div>
+      <div id="stats-mapa-attrs"></div>
     </div>
   </div>
 </div>
@@ -3759,7 +3773,7 @@ function renderAttrs(){
     <span class="pt-nums">${pb.usado} / ${pb.total}</span>
     ${pb.pend !== 0 ? `<span class="pt-pend ${pb.pend<0?'over':''}">${pb.pend>0?`+${pb.pend} por asignar`:`${Math.abs(pb.pend)} de más`}</span>` : `<span class="pt-ok">al día</span>`}
   `;
-  $('#attrs').innerHTML = GRUPOS.map(g => {
+  const htmlAttrs = GRUPOS.map(g => {
     const m = c.modTotal[g.id];
     const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
     let descHtml = '';
@@ -3787,6 +3801,11 @@ function renderAttrs(){
       </div>
     </div>`;
   }).join('');
+  $('#attrs').innerHTML = htmlAttrs;
+  if($('#stats-mapa-attrs')){   // la copia del menú de Stats de la ficha liviana del mapa
+    $('#stats-mapa-attrs').innerHTML = htmlAttrs;
+    $('#stats-mapa-puntos').innerHTML = $('#attr-points').innerHTML;
+  }
 }
 
 function statTile(d, c, showMod=true){
@@ -6438,7 +6457,7 @@ document.addEventListener('input', e => {
     // renderAll() lo llena con el máximo nuevo, como al crear el personaje.
     const keep = t.dataset.attr, pos = t.selectionStart;
     refresh();
-    const again = document.querySelector(`[data-attr="${keep}"]`);
+    const again = document.querySelector(`.scrim.open [data-attr="${keep}"]`) || document.querySelector(`[data-attr="${keep}"]`);
     if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(_){} }
     return;
   }
@@ -8008,19 +8027,16 @@ function fichaMapaAbrir(){
   const c = compute();
   const esp = (S.loot.especial || []).reduce((a, l) => a + num(l.cantidad), 0);
   const caja = (etq, valor, tip) => `<div title="${esc(tip)}" style="border:1px solid var(--line);border-radius:6px;padding:7px 10px;cursor:help"><div class="hint" style="margin:0">${etq}</div><div style="font-size:18px;font-weight:700">${valor}</div></div>`;
-  $('#fm-titulo').textContent = (S.meta && S.meta.nombre) ? S.meta.nombre : 'Mi ficha';
+  $('#fm-titulo').textContent = ((S.meta && S.meta.nombre) ? S.meta.nombre : 'Mi ficha') + ' · Nivel ' + fmt(num(S.meta.nivel) || 1);
   $('#fm-resumen').innerHTML =
-    caja('Nivel', fmt(num(S.meta.nivel) || 1), 'Tu nivel de personaje. Sube al juntar experiencia (EXP) y con cada nivel ganás puntos para tu personaje.') +
     caja('Defensa', Number.isNaN(c.final.def) ? '?' : fmt(c.final.def), 'Cuánto daño te restan las armaduras en cada golpe que recibís. Los golpes críticos la ignoran. Se calcula con todo lo que llevás equipado (y baja con la Armadura rota de cada pieza).') +
     caja('DDE', fmt(num(S.meta.dde)), 'Tu dinero (DDE): sirve para comprar en las tiendas y es lo que cobrás al vender ítems y despojos.') +
     caja('Despojos', `${fmt(num(S.loot.normal))} · ${fmt(num(S.loot.magico))} · ${fmt(esp)}`, 'Materiales que soltaron los rivales: normales · mágicos · especiales. Las tiendas los compran (1 DDE cada normal) y sirven para reparar con talentos.');
   const hayBotin = (typeof combatePublicado === 'function') && (combatePublicado() || (combateActual && (combateActual.jugadores || []).length));
   const boton = (id, txt, tip) => `<button type="button" class="btn" data-fm="${id}" title="${esc(tip)}" style="padding:10px">${txt}</button>`;
   $('#fm-botones').innerHTML =
-    boton('botonera', '⚔ Botonera', 'Tus tiradas y acciones de combate: atacar, defender, habilidades, stats.') +
-    boton('equipo', '🎒 Equipo y mochila', 'Lo que llevás puesto, tu mochila y tu cinturón.') +
+    boton('stats', '📊 Stats', 'Tus atributos y stats: se pueden modificar desde acá.') +
     boton('habilidades', '✨ Habilidades', 'Todas tus habilidades, para verlas y ejecutarlas.') +
-    boton('estados', '◎ Estados', 'Los estados alterados que tenés ahora (buenos y malos).') +
     (tiendaAbiertaAhora ? boton('tienda', '🏪 Tienda', 'La tienda que publicó el GM: comprar, vender y reparar.') : '') +
     (hayBotin ? boton('botin', '🎁 Botín', 'El botín del último combate.') : '') +
     boton('completa', '📜 Ver ficha completa', 'Abre tu ficha completa en otra pestaña.');
@@ -8028,14 +8044,13 @@ function fichaMapaAbrir(){
   botoneraAvisarMapa('botonera-lista');
 }
 $('#fm-x').onclick = () => $('#scrim-ficha-mapa').classList.remove('open');
+$('#stats-mapa-x').onclick = () => $('#scrim-stats-mapa').classList.remove('open');
 $('#fm-botones').addEventListener('click', e => {
   const b = e.target.closest('[data-fm]');
   if(!b) return;
   const m = b.dataset.fm;
-  if(m === 'botonera'){ modoBotoneraInv = ''; renderBotonera(); $('#scrim-botonera').classList.add('open'); }
-  else if(m === 'equipo'){ renderEquipo(); $('#scrim-equipo').classList.add('open'); }
+  if(m === 'stats'){ renderAttrs(); $('#scrim-stats-mapa').classList.add('open'); }
   else if(m === 'habilidades'){ renderTodasHabilidades(); $('#scrim-todas-habilidades').classList.add('open'); }
-  else if(m === 'estados'){ renderTodosEstados(); $('#scrim-todos-estados').classList.add('open'); }
   else if(m === 'tienda'){ abrirVendedor(); }
   else if(m === 'botin'){ botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); }
   else if(m === 'completa'){ window.open(location.origin + location.pathname + '?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaVivo.id), '_blank', 'noopener'); }

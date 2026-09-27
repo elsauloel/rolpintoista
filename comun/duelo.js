@@ -281,7 +281,7 @@ const Duelo = (() => {
     const propio = t => t.fichaId === cfg.yo.ref && t.tipo === cfg.yo.tipo;
     const objetivos = lista.filter(t => !propio(t)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
     const cuerpo = f.querySelector('.duelo-cuerpo');
-    cuerpo.innerHTML = `<div class="duelo-nota">${_esc(NOMBRE_ATAQUE[cfg.ataque.tipo] || 'Ataque')}${cfg.ataque.armaNombre ? ' con ' + _esc(cfg.ataque.armaNombre) : ''}. Elegí el token al que va dirigido:</div>
+    cuerpo.innerHTML = `<div class="duelo-nota">${_esc(cfg.ataque.habNombre || NOMBRE_ATAQUE[cfg.ataque.tipo] || 'Ataque')}${cfg.ataque.armaNombre ? ' con ' + _esc(cfg.ataque.armaNombre) : ''}. Elegí el token al que va dirigido:</div>
       <div class="duelo-lista">${objetivos.length ? objetivos.map(t => `<button type="button" data-tok="${_esc(t.id)}"><span>${_esc(t.nombre)}</span><span class="tag">${t.tipo === 'creep' ? 'creep' : 'personaje'}</span></button>`).join('') : '<div class="duelo-nota">No hay otros tokens en el mapa.</div>'}</div>
       <div class="duelo-pie">${cfg.suelto ? '<button type="button" class="sec" data-suelto>Sin objetivo · tirada suelta</button>' : ''}<button type="button" class="sec" data-cancelar>Cancelar</button></div>`;
     cuerpo.querySelector('[data-cancelar]').onclick = () => quitarFondo();
@@ -312,6 +312,8 @@ const Duelo = (() => {
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: 0, rango: true}
+        : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
+          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo)}, efectos: limpiarEfectos(cfg.ataque.efectos)}
         : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
@@ -338,7 +340,16 @@ const Duelo = (() => {
               sinOposicion: bool}
      Con oposición: la tirada de quien la usa va en `pdg` y la del objetivo en `eva` (mismas fases y mismo empate que el ataque); si gana quien la usa, sigue el daño (si tiene) y
      los efectos; si no, «se resistió». Sin oposición (buffs, curas): el cuadro se abre directo en los efectos, con su botón «Aplicar». */
-  const nombreAtq = d => d.hab ? d.hab.nombre : (NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque');
+  const nombreAtq = d => d.hab ? d.hab.nombre : (d.ataque.tipo === 'habilidad-arma' && d.ataque.habNombre ? d.ataque.habNombre : (NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque'));
+  // Ataque con un arma hecho con una habilidad (Golpe brutal, Carga, Takle…): lo que la habilidad le suma al ataque, en palabras.
+  const modsTxt = d => {
+    const m = (d.ataque && d.ataque.mods) || {}, t = [];
+    if(_num(m.pdg)) t.push(`${_num(m.pdg) > 0 ? '+' : ''}${_fmt(m.pdg)} PdG`);
+    if(_num(m.dados)) t.push(`+${_fmt(m.dados)} dado${_num(m.dados) === 1 ? '' : 's'} de daño`);
+    if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
+    if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
+    return t.join(' · ');
+  };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const txtCorto = (v, n) => String(v === undefined || v === null ? '' : v).trim().slice(0, n);
   function limpiarSpec(s){
@@ -351,16 +362,19 @@ const Duelo = (() => {
     if(_num(s.stacks)) o.stacks = Math.max(1, Math.round(_num(s.stacks)));
     return o;
   }
+  function limpiarEfectos(lista){
+    return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => ({
+      nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20),
+      detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
+    })).filter(e => e.nombre);
+  }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;
     const t = h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
     const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && String(h.dano.formula || '').trim() ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false} : null;
-    const efectos = (Array.isArray(h.efectos) ? h.efectos : []).slice(0, 8).map(e => ({
-      nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20),
-      detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
-    })).filter(e => e.nombre);
+    const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length)};
   }
@@ -658,7 +672,7 @@ const Duelo = (() => {
     const L = [];
     const arma = d.ataque.armaNombre ? d.ataque.armaNombre : 'sin arma';
     if(d.hab) L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ✨ ${d.hab.nombre}${d.hab.sinOposicion ? '' : ' (' + etqTira(d) + ' contra ' + etqContra(d) + ')'}`);
-    else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque'} con ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})`);
+    else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} con ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
     const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
     if(d.hab){
       if(d.pdg && d.eva) L.push(`${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'funcionó' : 'se resistió'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
@@ -1148,7 +1162,7 @@ const Duelo = (() => {
       <div class="duelo-cuerpo">
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
-            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado))}</div></div>
+            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + _esc(modsTxt(d)) : '')}</div></div>
             <div class="vs">VS</div>
             <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
           </div></div>
@@ -1244,7 +1258,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const d = {id: m.id, ...doc.data()};
       if(m.tipo === 'duelo-opciones'){
-        const ops = (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [])) : null;   // null = este personaje/creep no es el mío
+        const ops = (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null;   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
         return;
@@ -1272,7 +1286,7 @@ const Duelo = (() => {
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
       if(!d.hab && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
-      if(campo === 'dano') extra = {efectos: d.hab ? [] : (h.efectosArma ? (h.efectosArma(d) || []) : [])};
+      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...((d.ataque && d.ataque.efectos) || [])]};
       if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
       let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');

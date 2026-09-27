@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927b"></script>
+<script src="../comun/duelo.js?v=20260927c"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -9197,8 +9197,9 @@ function dueloOpcionesLocal(d){
   window.DUELO_MOTIVO = '';
   if(d.hab) return Duelo.opcionesHab(d);   // habilidad dirigida: lo que puede tirar el creep contra ella
   const arma = sc.armaNombre || 'su arma';
-  return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
+  const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'},
     {modo: 'parry', itemId: '', itemNombre: arma, etiqueta: `🗡 Parry · ${arma}`, costo: 1, motivoNo: num(sc.nitros) < 1 ? 'no le alcanzan los No2' : ''}];
+  return d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops;   // Takle y otros ataques que no se pueden parrear
 }
 
 // Pone el estado de un efecto del golpe sobre el defensor (solo corre en el mapa del GM). Creep: se escribe su estado; personaje: le llega a su ficha (mismo

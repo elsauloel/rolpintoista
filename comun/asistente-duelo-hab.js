@@ -43,6 +43,8 @@ const AsistenteDueloHab = (() => {
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
+      modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
+      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ...((ini && ini.arma) || {})},
     };
     const prev = document.getElementById('adh-fondo');
     if(prev) prev.remove();
@@ -51,17 +53,35 @@ const AsistenteDueloHab = (() => {
     document.body.appendChild(f);
     const cerrar = () => f.remove();
 
+    function alcanceHtml(esArma){
+      const lista = esArma ? [['auto', 'El de tu arma (cuerpo a cuerpo: 1 + su Alcance; a distancia: su Rango)'], ...ALCANCES.slice(1)] : ALCANCES;
+      return `<div><h4>Alcance</h4>
+        <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.</p>
+        <div class="fila"><select data-alcance>${lista.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div></div>`;
+    }
+    function armaHtml(){
+      const a = st.arma;
+      const fila = (k, t) => `<div class="fila"><span style="min-width:250px">${t}</span><input type="number" style="width:80px" data-arma="${k}" value="${esc(a[k] ?? 0)}"></div>`;
+      return `<div><h4>Lo que la habilidad le suma a tu ataque</h4>
+        <p class="nota">Se juega como un ataque normal con tu arma (PdG contra Evasión o Parry, crítico, daño y efectos del arma). Los No2 del ataque ya los cobra la habilidad. «Por X» se multiplica por la X que elegís al ejecutarla.</p>
+        ${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
+        <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
+        <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label></div>
+      ${alcanceHtml(true)}`;
+    }
+
     function dibujar(){
       const sinOp = !st.tira;
       f.innerHTML = `<div class="adh"><header><span>🎯 Duelo · ${esc(cfg.nombre || 'Habilidad')}</span><button type="button" class="sec" data-x>✕</button></header>
         <div class="cuerpo">
           <label class="op"><input type="checkbox" data-activo ${st.activo ? 'checked' : ''}> <b>Ejecutar esta habilidad abre el duelo paso a paso</b> (elegís el objetivo, se tira, se ve en vivo)</label>
           ${st.activo ? `
+          <div><h4>¿Qué tipo de habilidad es?</h4>
+            <select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option></select></div>
+          ${st.modo === 'arma' ? armaHtml() : `
           <div><h4>1 · ¿A quién apunta?</h4>
             <select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          ${st.objetivo === 'uno mismo' ? '' : `<div><h4>Alcance</h4>
-            <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, <b>los tokens que están a tu alcance brillan</b> en el mapa.</p>
-            <div class="fila"><select data-alcance>${ALCANCES.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div></div>`}
+          ${st.objetivo === 'uno mismo' ? '' : alcanceHtml(false)}
           <div><h4>2 · ¿Qué tira quien la usa?</h4>
             <select data-tira><option value=""${sinOp ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           ${sinOp ? `<div class="aviso">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>` : `
@@ -72,7 +92,8 @@ const AsistenteDueloHab = (() => {
             <label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> La fórmula de daño de la habilidad (su «segunda tirada», por ejemplo 2d6+3) es el daño que hace${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
             ${st.dano ? `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
             <p class="nota">El daño mágico (arcano, fuego, hielo, rayo) <b>ignora la Defensa y no critica</b>: va derecho a la vida. El físico resta la Defensa como cualquier golpe.</p>` : ''}</div>
-          <div><h4>${sinOp ? '4' : '5'} · Efectos sobre el objetivo</h4>
+          `}
+          <div><h4>${st.modo === 'arma' ? '3 · Efectos al pegar' : (sinOp ? '4' : '5') + ' · Efectos sobre el objetivo'}</h4>
             <p class="nota">Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.</p>
             ${st.efectos.map((e, i) => e.cura !== undefined
               ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
@@ -86,6 +107,10 @@ const AsistenteDueloHab = (() => {
       f.querySelector('[data-activo]').onchange = e => { st.activo = e.target.checked; dibujar(); };
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
       q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
+      q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
+      q('[data-x]', e => { st.x = e.target.value; });
+      q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
+      f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
@@ -103,6 +128,12 @@ const AsistenteDueloHab = (() => {
       if(bq) bq.onclick = () => { cerrar(); cfg.alGuardar(null); };
       f.querySelector('[data-ok]').onclick = () => {
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
+        const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
+        if(st.modo === 'arma'){
+          const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
+          if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
+          cerrar(); cfg.alGuardar(o2); return;
+        }
         const out = {objetivo: st.objetivo, tira: st.tira || '', contra: st.tira ? [...st.contra] : []};
         if(st.tira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; }

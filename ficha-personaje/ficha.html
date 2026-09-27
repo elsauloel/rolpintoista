@@ -2045,10 +2045,10 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
-<script src="../comun/asistente-duelo-hab.js?v=20260927b"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260927c"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927b"></script>
+<script src="../comun/duelo.js?v=20260927c"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -4359,6 +4359,37 @@ function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExt
    Una habilidad con `duelo` = {objetivo: 'enemigo'|'aliado'|'uno mismo', tira: stat (por defecto su tiradaStat), contra: [stats con los que se resiste el objetivo],
    dano: true si la fórmula de la habilidad (tiradaExtra) es daño, tipoDano: 'arcano'|'fuego'|'hielo'|'rayo'|'fisico', efectos: [{nombre, turnos, mods, hp, cura}]}
    abre el duelo al ejecutarla en vez de tirar el stat suelto. */
+/* Ataque con arma hecho con una habilidad (2026-09-27): `duelo.modo === 'arma'` + `duelo.arma = {pdg, pdgPorX, dadosPorX, fijo, fijoPorX, sinParry}` y `duelo.x` ('sp' o 'nitros': cuál es la X de
+   su costo). Al ejecutarla se abre el duelo de ATAQUE de siempre (PdG, Evasión o Parry, crítico, daño con los efectos del arma) con lo que la habilidad le suma. Los No2 del ataque ya
+   los cobró la habilidad: el duelo no los vuelve a cobrar. */
+// El duelo de una habilidad: el que se le configuró con 🎯 (null = se lo sacaron) o, si nunca se tocó, el de la skill de clase de la que salió (así las que ya estaban en la mochila también lo traen).
+function dueloDe(it){
+  if(!it) return null;
+  if(it.duelo !== undefined) return it.duelo;
+  const base = it.habClaseId && typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId) : null;
+  return base && base.duelo ? base.duelo : null;
+}
+function ataqueDeHabArma(it, arma, xSp, xNitros){
+  const c = dueloDe(it);
+  if(!c || c.modo !== 'arma' || typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
+  const a = c.arma || {}, X = c.x === 'sp' ? num(xSp) : num(xNitros);
+  const efectos = (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined}, cura: num(e.cura), detalle: e.detalle || ''}));
+  return {tipo: 'habilidad-arma', habNombre: it.nombre, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango),
+    alcance: c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHab(c, 'pdg') : alcanceDeArma(arma), sinParry: !!a.sinParry,
+    mods: {pdg: num(a.pdg) + num(a.pdgPorX) * X, dados: num(a.dadosPorX) * X, fijo: num(a.fijo) + num(a.fijoPorX) * X}, efectos};
+}
+// Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo (habilidad dirigida o ataque con arma).
+function terminarEjecucionHab(it, arma, xSp, xNitros){
+  const aArma = ataqueDeHabArma(it, arma, xSp, xNitros);
+  if(aArma){
+    mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: aArma, suelto: () => tirarPrimeraDeHab(it)});
+    return;
+  }
+  const hDuelo = habDueloDe(it);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
+  if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
+  if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
+}
 // Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
 function alcanceDeArma(arma){
   if(arma && arma.armaDeRango){ const v = statParaArma('rng', arma); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
@@ -4378,8 +4409,8 @@ function alcanceDeHab(c, statTira){
   return statTira === 'pdgmg' ? rc() : 0;   // auto: los hechizos usan el Rango de casteo; el resto no resalta
 }
 function habDueloDe(it){
-  const c = it && it.duelo;
-  if(!c || typeof c !== 'object') return null;
+  const c = dueloDe(it);
+  if(!c || typeof c !== 'object' || c.modo === 'arma') return null;
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
   const tipo = c.tipoDano || 'arcano';
@@ -5660,7 +5691,7 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${i.duelo ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">🎯 duelo</span>' : ''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">🎯 duelo</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo (qué se tira, con qué se resiste, daño y efectos)">🎯</button></div>
@@ -6751,7 +6782,7 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
-    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: it.duelo || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), alGuardar: cfg => { if(cfg) it.duelo = cfg; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
+    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), alGuardar: cfg => { if(cfg) it.duelo = cfg; else if(it.habClaseId && (function(){ const b = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return b && b.duelo; })()) it.duelo = null; else delete it.duelo; renderList('habilidades'); refresh(); toast(cfg ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`); }});
     return;
   }
   if(b.dataset.armrota){
@@ -10533,6 +10564,10 @@ window.DUELO_HOOKS = {
     const inv = dueloInvDe(d.atacante);
     if(inv){ invAtacarSuelto(inv.id); return; }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
+    if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
+      tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', pdgParaArma(arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
+      return;
+    }
     if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
   },
   // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa) y la Resistencia a crítico del defensor contra el Tipo del arma.
@@ -10567,7 +10602,13 @@ window.DUELO_HOOKS = {
     if(inv){ invDanio(inv.id, true); return; }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
     if(!arma){ toast('No hay un arma equipada con daño para tirar'); return; }
-    const r = tirarDados(armaDanoTxt(arma, compute().final.dmg));
+    let formula = armaDanoTxt(arma, compute().final.dmg);
+    const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
+    if(m){
+      if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(arma.tipoDado) || 8}`;
+      if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
+    }
+    const r = tirarDados(formula);
     if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
   },
   // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
@@ -11114,9 +11155,7 @@ function ejecutarHabilidad(id, armaId, forzar){
   const efecto = aplicarEfectoDeConsumo(it);
   colocarTrampaDeHab(it);
   avisarZonaAlMapa(it);
-  const hDuelo = habDueloDe(it);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
-  if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
-  if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
+  terminarEjecucionHab(it, arma, 0, 0);
   renderList("habilidades");
   if(efecto) renderList('efectos');
   renderNitros();
@@ -11162,13 +11201,13 @@ function confirmarCostoVariable(){
   const costoHp = num(it.hpCosto);
   if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
   if(num(it.curaHp) > 0) fijarHp(num(S.hp) + num(it.curaHp));
-  const ataque = registrarAtaqueDeHabilidad(it, pendingArmaHab === undefined ? null : pendingArmaHab);
+  const armaDeLaHab = pendingArmaHab === undefined ? null : pendingArmaHab;
+  const ataque = registrarAtaqueDeHabilidad(it, armaDeLaHab);
   pendingArmaHab = undefined;
   const efecto = aplicarEfectoDeConsumo(it);
   colocarTrampaDeHab(it);
   avisarZonaAlMapa(it);
-  anunciarHabilidad(it);
-  tirarPrimeraDeHab(it);
+  terminarEjecucionHab(it, armaDeLaHab, sp, nitros);
   $("#scrim-costox").classList.remove("open");
   pendingEjecucion = null;
   renderList('habilidades');

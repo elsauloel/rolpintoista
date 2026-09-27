@@ -42,11 +42,11 @@ function menuEstilos(){
   cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.45)}
 #menu-sitio-boton span{display:block;width:18px;height:2px;border-radius:1px;background:#E0A458;transition:transform .2s,opacity .2s}
 #menu-sitio-boton:hover{border-color:#C98545}
-#menu-sitio-boton.abierto{border-color:#E0A458}
+#menu-sitio-boton.abierto{border-color:#E0A458;z-index:200}
 #menu-sitio-boton.abierto span:nth-child(1){transform:translateY(6px) rotate(45deg)}
 #menu-sitio-boton.abierto span:nth-child(2){opacity:0}
 #menu-sitio-boton.abierto span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-#menu-sitio{position:fixed;top:54px;left:10px;z-index:70;width:290px;max-width:calc(100vw - 20px);max-height:calc(100vh - 66px);
+#menu-sitio{position:fixed;top:54px;left:10px;z-index:200;width:290px;max-width:calc(100vw - 20px);max-height:calc(100vh - 66px);
   overflow-y:auto;background:#1A1418;border:1px solid #3B2E34;border-radius:3px;box-shadow:0 12px 30px rgba(0,0,0,.6);
   font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.35;color:#EDE3D2;padding:6px 0;text-align:left}
 #menu-sitio[hidden]{display:none!important}

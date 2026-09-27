@@ -17,6 +17,30 @@
 
 const DADOS_LIBRERIA = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/dist/dice-box-threejs.umd.js';
 const DADOS_RECURSOS = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/public/';
+
+// Arreglo: las caras del dado que no miran de lleno a la luz se ven "transparentes" (se filtra el fondo de la
+// página a través del dado sólido), pase lo que pase en Material/Textura — no es un estilo, es un choque técnico
+// entre el canvas transparente (necesario para que los dados rueden ENCIMA de la herramienta) y cómo Three.js
+// arma sus colores: el canvas pide alfa premultiplicado (`premultipliedAlpha:true`, el default del navegador)
+// pero los materiales de Three.js entregan el color SIN premultiplicar — ese descalce hace que el navegador
+// mezcle mal las caras oscuras del dado con lo que hay detrás. La librería no expone ningún parámetro para
+// esto (bug real reportado por el dueño, 2026-09-27), así que se corrige achicando el contexto WebGL que crea
+// por dentro: se intercepta `getContext('webgl'/'webgl2', …)` una sola vez y se le fuerza
+// `premultipliedAlpha:false` cuando pide un canvas transparente — deja intactos los demás canvas de la página
+// (el mapa hexagonal usa `getContext('2d')`, que ni pasa por acá).
+(function dadosParcheAlfa(){
+  const original = HTMLCanvasElement.prototype.getContext;
+  if(original.__dadosParcheado) return;
+  const parcheado = function(tipo, attrs){
+    if((tipo === 'webgl' || tipo === 'webgl2' || tipo === 'experimental-webgl') && attrs && attrs.alpha){
+      attrs = {...attrs, premultipliedAlpha: false};
+    }
+    return original.call(this, tipo, attrs);
+  };
+  parcheado.__dadosParcheado = true;
+  HTMLCanvasElement.prototype.getContext = parcheado;
+})();
+
 const DADOS_CLAVE = 'dados3d';
 const DADOS_MAX = 12;
 const DADOS_CARAS = [2, 4, 6, 8, 10, 12, 20];

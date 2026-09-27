@@ -4625,14 +4625,15 @@ function renderPolillaBoton(){
     b = document.createElement('button');
     b.type = 'button';
     b.id = 'polilla-flotante';
-    b.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:999999;background:#3a1f4a;color:#e9d6ff;border:2px solid #b98cff;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 20px rgba(180,120,255,.6);animation:polilla-latido 1.6s ease-in-out infinite alternate;text-align:left';
+    b.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:999999;background:#3a1f4a;color:#e9d6ff;border:2px solid #b98cff;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(180,120,255,.5);animation:polilla-latido 2.6s ease-in-out infinite alternate;text-align:left;transform-origin:left bottom';
     b.innerHTML = '<div>🦋 Polilla mística</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9" id="polilla-flotante-sub"></small>';
     b.onclick = usarPolilla;
     document.body.appendChild(b);
     if(!document.getElementById('polilla-css')){
       const s = document.createElement('style');
       s.id = 'polilla-css';
-      s.textContent = '@keyframes polilla-latido{0%{box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 8px rgba(180,120,255,.35)}100%{box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 30px rgba(190,130,255,.95)}}';
+      // Pulsación sutil: un leve respiro de tamaño y brillo, sin el contraste fuerte de los latidos de aviso (duelo, etc.).
+      s.textContent = '@keyframes polilla-latido{0%{transform:scale(1);box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 10px rgba(180,120,255,.4)}100%{transform:scale(1.025);box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 18px rgba(190,130,255,.65)}}';
       document.head.appendChild(s);
     }
   }

@@ -43,7 +43,7 @@ const Duelo = (() => {
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos'];
+  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos', 'rerollUsado', 'resumido'];
 
   let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
   let revelado = {};         // id:clave → true: ya se animó en esta pestaña
@@ -931,6 +931,7 @@ const Duelo = (() => {
      impar se rompe) y reabre. */
   function puedeReabrir(m, campo){
     if(!m || m.estado === 'cancelado' || m.dano) return false;
+    if(m.rerollUsado && m.rerollUsado[campo]) return false;   // una moneda por tirada: esta ya usó la suya
     if((m.efectos || []).some(e => e && (e.res || e.aplicado || e.aplicar))) return false;
     const critHecho = !!(m.crit && m.crit.d20);
     if(campo === 'critico') return critHecho;
@@ -950,6 +951,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(!puedeReabrir(m, campo)) return;
+      m.rerollUsado = {...(m.rerollUsado || {}), [campo]: true};
       const quien = (campo === 'pdg' || campo === 'fuerza' || campo === 'critico') ? m.atacante.nombre : m.defensor.nombre;
       if(campo === 'critico'){ m.crit = {...m.crit, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
       else if(campo === 'fuerza' || campo === 'bloqueo'){ m[campo] = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
@@ -993,7 +995,7 @@ const Duelo = (() => {
     if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
     const info = rerollInfo[k];
     if(!info.disponible) return '';
-    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))}: cuesta ${_fmt(info.costo)} No2 (moneda en ${_esc(info.donde || 'el inventario')}) y después se tira una moneda: par se conserva, impar se rompe">🪙 Re-roll<small>volver a tirar ${_esc(etqCampo(d, campo))} · ${_fmt(info.costo)} No2</small></button>`;
+    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Re-roll<small>volver a tirar ${_esc(etqCampo(d, campo))}</small></button>`;
   }
 
 

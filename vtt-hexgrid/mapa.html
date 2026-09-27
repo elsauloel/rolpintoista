@@ -779,6 +779,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
       </div>
       <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza) del token seleccionado. Apretá de vuelta para apagarlo. (R)">📏</button>
       <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial) del token seleccionado. Apretá de vuelta para apagarlo. (T, o Shift + R)">🔮</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-reroll" hidden title="Moneda Re-Roll: volver a hacer cualquiera de tus últimas tiradas, sin costo de No2, mientras tengas una moneda equipada (cinturón o mochila)">🪙</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
         <div class="desplegable-lista" id="ojo-menu" hidden>
@@ -932,7 +933,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-trampa.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927e"></script>
+<script src="../comun/duelo.js?v=20260927f"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1763,6 +1764,11 @@ function alternarRango(magico){
 }
 $('#btn-rango').onclick = () => alternarRango(false);
 $('#btn-rango-magico').onclick = () => alternarRango(true);
+$('#btn-reroll').onclick = () => {
+  const fid = fichaPrincipalId();
+  if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }
+  abrirBotonera(fid, {tipo: 'abrir-reroll'});
+};
 
 let verZonas = false;          // modo lentes prendido
 let lentesTodos = false;       // 👁 Ver todas las zonas (si no, hace falta seleccionar un token)
@@ -10020,6 +10026,7 @@ function arrancarEnVivo(){
   $('#aviso-mapa').hidden = true;
   estado(barraTexto());
   soyGM = fbMiembro.gm === true;
+  if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
   escucharMiembros();
   escucharVinculables();
   escucharMantenimiento();

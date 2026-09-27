@@ -1579,6 +1579,16 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
+<div class="scrim" id="scrim-reroll">
+  <div class="modal" style="max-width:560px">
+    <header><h3>🪙 Moneda Re-Roll</h3><button class="iconbtn" id="reroll-x">Cerrar</button></header>
+    <div class="body">
+      <p class="hint" id="reroll-aviso" style="margin:0 0 10px"></p>
+      <div id="reroll-lista"></div>
+    </div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim-vender">
   <div class="modal" style="max-width:640px">
     <header><h3>💰 Vender a la tienda</h3><button class="iconbtn" id="vender-x">Cerrar</button></header>
@@ -1751,7 +1761,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <span class="botonera-badge" id="botonera-badge-sp">SP 0/0</span>
         <span class="botonera-badge" id="botonera-badge-def" title="Defensa">Def 0</span>
       </div>
-      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonera-reroll" title="Moneda Re-Roll: volver a hacer tu última tirada (1 No2 con la moneda en el cinturón, 2 en la mochila; después se tira una moneda: par se conserva, impar se rompe)">🪙</button><button class="iconbtn" id="botonera-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonera-x">Cerrar</button></div>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" id="botonera-reroll" title="Moneda Re-Roll: elegí una de tus últimas tiradas para repetirla (sin costo de No2; después se tira una moneda: par se conserva, impar se rompe)">🪙</button><button class="iconbtn" id="botonera-dados" title="Dados libres: elegí dado y cantidad">🎲</button><button class="iconbtn" id="botonera-x">Cerrar</button></div>
     </header>
     <div class="body" id="botonera-body"></div>
   </div>
@@ -2048,7 +2058,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-duelo-hab.js?v=20260927d"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
-<script src="../comun/duelo.js?v=20260927e"></script>
+<script src="../comun/duelo.js?v=20260927f"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
@@ -4461,20 +4471,16 @@ function restaurarSpDeConsumo(it){
 
 // Nitros que cuesta consumir un ítem según de dónde sale.
 /* ---------- Moneda Re-Roll (2026-09-27, regla del dueño; docs/reroll.md) ----------
-   Con una Moneda Re-Roll equipada en el cinturón (1 No2; en la mochila 2 No2) se puede volver a hacer la ÚLTIMA tirada, después de cualquier tirada. Al usarla se tira una moneda:
-   par (2) se conserva, impar (1) se rompe (gasta una unidad, como cualquier consumible). Fuera del duelo: botón 🪙 de la Botonera. En el duelo: el botón flotante 🪙 reabre la última tirada. */
+   Con una Moneda Re-Roll equipada (cinturón o mochila) se puede volver a hacer CUALQUIER tirada tuya, sin costo de No2: se abre una ventana con tus últimas tiradas y elegís
+   cuál repetir («una moneda por tirada»: cada tirada solo se puede re-rolear una vez — la que sale de repetirla es una tirada nueva, que se puede re-rolear de nuevo con otra
+   moneda). Después de usarla se tira una moneda: par (2) se conserva, impar (1) se rompe (gasta una unidad, como cualquier consumible). Botón 🪙 fijo en el mapa (jugadores) y
+   en la cabecera de la Botonera; en el duelo, el botón flotante 🪙 reabre la última tirada tuya del duelo (docs/duelo-de-habilidades.md). */
 const esMonedaReroll = i => !!i && !!(i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || '')));
 function monedaReroll(){
   const enC = S.cinturon.find(i => esMonedaReroll(i) && num(i.unidades) > 0);
   if(enC) return {key: 'cinturon', it: enC};
   const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa);
   return enM ? {key: 'inventario', it: enM} : null;
-}
-function pagarNitrosReroll(costo){
-  return new Promise(res => {
-    if(costo <= num(S.nitros)){ S.nitros = num(S.nitros) - costo; renderNitros(); res(true); return; }
-    avisarSinNitros(costo, 'usar la Moneda Re-Roll', () => { S.nitros = num(S.nitros) - gastoNitrosForzado(costo, 'usó la Moneda Re-Roll'); renderNitros(); res(true); });
-  });
 }
 // Tira la moneda: par se conserva, impar se rompe.
 function tirarMonedaReroll(m){
@@ -4490,29 +4496,51 @@ function tirarMonedaReroll(m){
   refresh();
   return !par;
 }
-// Vuelve a tirar los mismos dados de una tirada anterior (con sus mismos bonos y mitades).
+// Vuelve a tirar los mismos dados de una tirada anterior (con sus mismos bonos y mitades). `u` es una entrada de dadosHistorial.
 function repetirTirada(u){
-  const r = u.r || {};
-  const mit = (String(r.formula || '').match(/÷2/g) || []).length;
-  const base = String(r.formula || '').replace(/÷2/g, '').replace(/\+\s*\d+\s*⚡/g, '');
+  const mit = (String(u.formula || '').match(/÷2/g) || []).length;
+  const base = String(u.formula || '').replace(/÷2/g, '').replace(/\+\s*\d+\s*⚡/g, '');
   const p = typeof parseDados === 'function' ? parseDados(base) : null;
   if(!p || !p.dados.length){ toast('No se puede repetir esa tirada'); return false; }
   const rolls = [];
   p.dados.forEach(g => { for(let k = 0; k < g.n; k++) rolls.push(1 + Math.floor(Math.random() * g.caras)); });
-  const total = aplicarMitades(rolls.reduce((a, b) => a + b, 0) + num(r.mod), mit);
-  registrarTirada(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: r.formula, rolls, mod: r.mod, total, estados: r.estados});
+  const total = aplicarMitades(rolls.reduce((a, b) => a + b, 0) + num(u.mod), mit);
+  registrarTirada(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: u.formula, rolls, mod: u.mod, total, estados: u.estados});
   return true;
 }
-// Botón 🪙 de la Botonera (fuera del duelo): repite la última tirada.
-async function rerollFuera(){
-  if(!ultimaTirada){ toast('Todavía no hiciste ninguna tirada para repetir'); return; }
+let rerollUsados = new Set();   // ids de dadosHistorial que ya usaron su moneda (una por tirada; no se guarda, es de esta sesión)
+function renderReroll(){
   const m = monedaReroll();
-  if(!m){ toast('No tenés una Moneda Re-Roll (equipada en el cinturón o en la mochila)'); return; }
-  const costo = costoConsumirNitros(m.key);
-  await pagarNitrosReroll(costo);
-  if(!repetirTirada(ultimaTirada)) return;
-  setTimeout(() => tirarMonedaReroll(m), 1200);   // la moneda se tira después de repetir la tirada
+  const lista = dadosHistorial.filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
+  $('#reroll-aviso').innerHTML = m
+    ? `Tenés una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b>. Elegí qué tirada repetir: no cuesta No2, pero después se tira la moneda (par se conserva, impar se rompe).`
+    : `No tenés una Moneda Re-Roll equipada (cinturón o mochila). Podés ver tus últimas tiradas igual.`;
+  $('#reroll-lista').innerHTML = lista.length ? lista.map(h => {
+    const usada = rerollUsados.has(h.rerollId);
+    return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
+      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${h.rerollId}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
+  }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
 }
+function abrirReroll(){
+  renderReroll();
+  $('#scrim-reroll').classList.add('open');
+}
+$('#reroll-x').onclick = () => $('#scrim-reroll').classList.remove('open');
+$('#scrim-reroll').addEventListener('mousedown', e => { if(e.target.id === 'scrim-reroll') $('#scrim-reroll').classList.remove('open'); });
+$('#reroll-lista').addEventListener('click', e => {
+  const b = e.target.closest('[data-rerollpick]');
+  if(!b) return;
+  const id = Number(b.dataset.rerollpick);
+  const h = dadosHistorial.find(x => x.rerollId === id);
+  const m = monedaReroll();
+  if(!h || !m || rerollUsados.has(id)) return;
+  rerollUsados.add(id);
+  if(!repetirTirada(h)) return;
+  setTimeout(() => tirarMonedaReroll(m), 900);
+  renderReroll();
+});
+// Botón 🪙 (Botonera y mapa): abre la ventana de re-roll.
+function rerollFuera(){ abrirReroll(); }
 
 function costoConsumirNitros(key){
   return key === 'cinturon' ? IT2.nitrosConsumirCinturon : IT2.nitrosConsumirMochila;
@@ -4572,14 +4600,14 @@ function armaDanoTxt(i, extra){
 let dadosHistorial = [];
 
 
-let ultimaTirada = null;   // la última tirada de este personaje (para la Moneda Re-Roll): {origen, r}
+let dadosHistorialSeq = 0;   // id creciente por tirada (para que la Moneda Re-Roll sepa cuál ya usó su re-roll)
 function registrarTirada(origen, r){
-  if(!/^🪙/.test(String(origen))) ultimaTirada = {origen, r: {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, estados: r.estados}};
-  dadosHistorial.unshift({origen, ...r, hora: new Date()});
+  dadosHistorial.unshift({origen, ...r, hora: new Date(), rerollId: ++dadosHistorialSeq});
   mesaPublicar(origen, r);
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));   // el duelo (comun/duelo.js) recoge su PdG / Evasión de acá
   dadosHistorial = dadosHistorial.slice(0, 20);
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
+  if(document.getElementById('scrim-reroll') && $('#scrim-reroll').classList.contains('open')) renderReroll();
 }
 
 /* ---------- Historial de sesión (tiradas + eventos, no se guarda) ---------- */
@@ -10671,12 +10699,11 @@ window.DUELO_HOOKS = {
   rerollInfo: d => {
     if(dueloInvDe(d.atacante) || dueloInvDe(d.defensor)) return {disponible: false};
     const m = monedaReroll();
-    return m ? {disponible: true, costo: costoConsumirNitros(m.key), donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {disponible: false};
+    return m ? {disponible: true, donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {disponible: false};
   },
   rerollUsar: async (d, campo) => {
     const m = monedaReroll();
     if(!m){ toast('No tenés una Moneda Re-Roll'); return false; }
-    await pagarNitrosReroll(costoConsumirNitros(m.key));
     const ok = await Duelo.reabrir(d.id, campo);
     if(!ok){ toast('La tirada ya no se puede repetir (no se gastó la moneda)'); return false; }
     setTimeout(() => tirarMonedaReroll(m), 800);
@@ -12782,6 +12809,7 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
+    if(e.data.tipo === 'abrir-reroll' && fichaVivo && fichaVivo.cargada) abrirReroll();   // el 🪙 fijo del mapa
     if(e.data.tipo === 'abrir-ficha-mapa' && fichaVivo && fichaVivo.cargada) fichaMapaAbrir();   // el 📜 del token propio (o la tecla F)
     if(e.data.tipo === 'abrir-revivir' && fichaVivo && fichaVivo.cargada){   // el botón ✚ Revivir del mapa
       document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));

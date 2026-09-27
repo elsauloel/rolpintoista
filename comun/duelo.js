@@ -1054,6 +1054,7 @@ const Duelo = (() => {
       : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 DUELO CANCELADO</div><button type="button" data-fin-duelo>Terminar duelo</button></div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
+    const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
     const mostrarBloqueo = d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza;
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>⚔ ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «Ver duelo»)">—</button><button type="button" data-x title="Cerrar">✕</button></div></div>
@@ -1088,6 +1089,18 @@ const Duelo = (() => {
     if(d.estado !== 'resuelto' && d.estado !== 'cancelado'){
       const pasos = f.querySelectorAll('.duelo-paso');
       if(pasos.length > 1) pasos[pasos.length - 1].classList.add('activo');
+    }
+    // Scroll: si cambió el paso en curso (o el duelo terminó) se enfoca ese recuadro; si solo se actualizó algo del mismo paso, se queda donde estaba.
+    const caja = f.querySelector('.duelo-caja');
+    if(caja){
+      const clave = d.id + '|' + f.querySelectorAll('.duelo-paso').length + '|' + d.fase + '|' + d.estado + '|' + (d.empate ? d.empate.par : '');
+      const cambio = f.dataset.pasoClave !== clave;
+      f.dataset.pasoClave = clave;
+      if(!cambio) caja.scrollTop = scrollAntes;
+      else{
+        const objetivo = f.querySelector('.duelo-paso.activo') || f.querySelector('.duelo-fin');
+        if(objetivo) caja.scrollTop += objetivo.getBoundingClientRect().top - caja.getBoundingClientRect().top - 70;
+      }
     }
     f.querySelector('[data-min]').onclick = minimizar;
     f.querySelector('[data-min2]').onclick = minimizar;

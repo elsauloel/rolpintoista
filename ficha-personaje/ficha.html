@@ -12553,6 +12553,11 @@ if(MODO_BOTONERA){
     if(e.ctrlKey || e.altKey || e.metaKey || e.isTrusted === false) return;
     if(e.target && e.target.closest && e.target.closest('input,select,textarea,[contenteditable]')) return;
     e.preventDefault();
+    if(e.key === 'f' || e.key === 'F'){   // F abre y cierra la ficha: cierra el menú y cualquier ventana que esté abierta encima, de una
+      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+      setTimeout(revisarCerrada, 60);
+      return;
+    }
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
   });
   const observador = new MutationObserver(revisarCerrada);

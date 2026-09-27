@@ -263,7 +263,8 @@ async function dadosTirar(notacion, estilo, opts){
     c.uso = Date.now();
     clearTimeout(c.ocultarT);
     if(c.destacado) c.destacado.cancelar();
-    c.capa.style.opacity = '1';
+    // Aparecen de golpe y opacos (sin fundido de entrada: rodaban semitransparentes); el fundido queda solo para apagarse.
+    c.capa.style.transition = 'none'; c.capa.style.opacity = '1';
     // Con la caja llena (dados viejos quietos) se limpia antes de sumar.
     const enMesa = (c.caja.diceList || []).length;
     if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX) c.caja.clearDice();
@@ -280,7 +281,7 @@ async function dadosTirar(notacion, estilo, opts){
         clearTimeout(c.ocultarT);
         c.ocultarT = setTimeout(() => {
           if(c.destacado) c.destacado.cancelar();
-          c.capa.style.opacity = '0';
+          c.capa.style.transition = 'opacity .5s'; c.capa.style.opacity = '0';
           c.ocultarT = setTimeout(() => { if(c.pendientes === 0){ try{ c.caja.clearDice(); }catch(e){} } }, 600);
         }, DADOS_QUIETOS_MS);
       }

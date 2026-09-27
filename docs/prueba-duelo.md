@@ -25,3 +25,10 @@
 ## Si algo falla
 - El aviso «No se pudo abrir el duelo: …» y la **línea gris** del cuadro dicen el motivo: copiarlos.
 - Errores típicos: reglas de Firestore sin pegar, token sin ficha vinculada, GM desconectado.
+
+## Pruebas de durabilidad, herrero y venta (2026-09-26)
+13. **Durabilidad en la ficha.** En cada arma, escudo o armadura se ve «🔧 6/9» (3 por punto de Peso, mínimo 3). Probar los botones **−** y **+** a mano, el aviso al quedar en 1 («a punto de romperse», con línea en la Mesa) y que un ítem en 0 queda **ROTO**: sigue en su lugar pero no da bonos ni Defensa, y un arma o escudo roto no ataca ni para.
+14. **Rompe armadura.** Un ataque con Rompe armadura (o un efecto «Aplicar» de un duelo) contra un personaje con varias piezas: rompe **una al azar** (Armadura rota ×N en esa pieza, −1 Defensa de la pieza), y sigue rota si se la saca.
+15. **Bloqueo perdido.** En un duelo con «pasa la mitad» el arma o escudo del Parry pierde 1 punto en la ficha del defensor.
+16. **Herrero.** En el generador de tiendas, tildar «🔨 Herrero» (y el precio por punto) y publicar: en la ficha, al abrir esa tienda aparece **🔧 Reparación**. Reparar +1 y «Todo»: cobra en DDE, devuelve Armadura rota, y con el mapa en **combate** los botones quedan apagados.
+17. **Vender.** El botón **💰 Vender** está solo dentro de las tiendas (mochila, cinturón y despojos; lo equipado no).

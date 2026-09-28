@@ -4399,10 +4399,15 @@ function ataqueDeHabArma(it, arma, xSp, xNitros){
     ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {})};
 }
 function xDeHab(it, xSp, xNitros){ return spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0; }
-// Reemplaza el token «X» (sin importar mayúsculas) de una fórmula de dados por un número — mismo criterio que
-// ya usa danoFijoPorX para el daño de una habilidad, generalizado para «Pasos personalizados» (ver más abajo).
+// Reemplaza el token «X» (sin importar mayúsculas) de una fórmula de dados o de un texto libre por un número —
+// mismo criterio que ya usa danoFijoPorX, generalizado para tirada personalizada y efecto a mano/personalizado.
+// \bx\b sola no alcanza: en «1dX» la X queda pegada a la «d» (las dos son \w, sin borde de palabra ahí) y no
+// la tocaba — la fórmula quedaba con una X literal y tirarDados fallaba en silencio (bug real, 2026-09-28).
+// Por eso hay una segunda pasada para «dX»/«Xd» (dado de X caras / X dados), sin tocar el resto del texto
+// libre (una palabra como "excedente" no tiene "dx"/"xd" pegados, así que no se toca).
 function sustituirX(formula, X){
-  return String(formula || '').replace(/\bx\b/gi, String(Math.max(0, Math.round(num(X)))));
+  const n = String(Math.max(0, Math.round(num(X))));
+  return String(formula || '').replace(/\bx\b/gi, n).replace(/dx/gi, 'd' + n).replace(/xd/gi, n + 'd');
 }
 // Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo (habilidad
 // dirigida o ataque con arma). La tirada personalizada de una habilidad dirigida (ver habDueloDe) ya vive
@@ -10847,7 +10852,7 @@ window.DUELO_HOOKS = {
     const nombre = quien === 'atacante' ? `${d.hab.nombre} · ${c.etq}` : c.etq;
     // Tirada personalizada (2026-09-27): la fórmula ya viene resuelta (X sustituida) desde habDueloDe — acá
     // solo se tira y se anuncia, igual que cualquier otra tirada del duelo.
-    if(c.formula){ const r = tirarDados(c.formula); if(r) registrarTirada(nombre, r); return; }
+    if(c.formula){ const r = tirarDados(c.formula); if(r) registrarTirada(nombre, r); else toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
     if(!c.stat) return;
     const inv = dueloInvDe(lado);
     const v = inv ? invStatValor(inv, c.stat) : compute().final[c.stat];

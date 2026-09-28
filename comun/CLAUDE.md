@@ -361,3 +361,15 @@ versión parecida en más de una, es candidato a juntar.
   tirada de por medio, así que `efectosHtml` ya no se corta si `d.efectos` viene vacío: se dibuja igual cuando
   hay nota, en cualquier fase del duelo (no hizo falta tocar `entrarHab`/`guardarAplicacion`: alcanza con que el
   render la muestre, sin importar a qué fase saltó el duelo por no tener efectos automáticos).
+
+- **Bug real encontrado jugando: `sustituirX` no tocaba la X pegada a una «d» (2026-09-28, Drenar vida en
+  partida real)**: el dueño reportó que el botón "🎲 Tirar Drenaje" del duelo se quedaba tirando sin resultado
+  (se prende de nuevo el brillo, nada pasa). Causa: `sustituirX` (`ficha-personaje/ficha.html`) usaba
+  `/\bx\b/gi` — en «X+1dX» eso reemplaza la primera X (con borde de palabra a los dos lados) pero NO la
+  segunda, porque «d» y «X» son las dos `\w` y no hay borde de palabra entre ellas. La fórmula quedaba
+  «3+1dX», con una X literal, y `tirarDados` la rechaza en silencio (`parseDados` devuelve `null`, y el hook
+  `habTirar` solo llama a `registrarTirada` `if(r)` — sin `else`, no avisaba nada). Arreglado con una segunda
+  pasada para `dx`/`xd` (dado de X caras / X dados) además de la de siempre — sigue sin tocar el resto de un
+  texto libre (`efectoLibre`/`efectosNota`) porque una palabra normal no trae "dx"/"xd" pegados. De paso,
+  `DUELO_HOOKS.habTirar` ahora avisa con un toast si la fórmula personalizada no es válida, en vez de quedarse
+  callado — para que la próxima vez que pase algo así se note enseguida, no después de 8 segundos de brillo.

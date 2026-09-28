@@ -149,7 +149,14 @@ Estados que define la clase:
    el estado **Barrera** (barra 🛡 de 8, como el Escudo mágico, hasta el
    próximo Mantenimiento): absorbe 8 de la próxima fuente de daño; si hace
    más, el resto entra normal.
-2. ✅ **Shockwave** — SP 4, No2 0 (Flash: SP x 2 = **el doble**, 8 SP en turno ajeno, a mano). Onda expansiva: el atacante tira **Fuerza** (automático, `tiradaStat: 'fue'`); cada **enemigo** adyacente tira **Constitución** (a mano) y **quien pierde** queda en **Pajaritos** (el de siempre: PdG y Evasión a la mitad) por **2 turnos** (a mano hasta que exista "aplicar estado a otros" para personajes). Solo afecta a enemigos. (2026-09-24)
+2. ✅ **Shockwave** — SP 3, No2 0 (Flash: SP x 3 = 9 SP en turno ajeno, a mano). Onda expansiva alrededor de quien la usa
+   (radio 1, sin marcar centro): tira **Fuerza** una sola vez; cada **enemigo** adyacente tira **Constitución** por
+   separado y **quien pierde** queda en **Pajaritos** (PdG y Evasión a la mitad) por **2 turnos**. *(Auditada
+   2026-09-28 — primera skill con el objetivo "onda alrededor de quien la usa" del 🎯 (`duelo: {objetivo:'onda',
+   radio:1, tira:'fue', contra:['con'], efectos:[Pajaritos 2t]}`, ver `comun/CLAUDE.md`): reusa la cascada de los
+   hechizos de área pero sin marcar centro y sin dodge roll — la tirada, la resistencia de cada enemigo y el
+   Pajaritos quedan del todo automatizados en el duelo; solo el costo extra de usarla en turno ajeno (Flash) sigue
+   a mano.)*
 3. ✅ **Aura de espinas** — SP 1, No2 1 (regla general: sin dato, 1). Deja sobre uno mismo el estado **Espinas** por 1 turno (hasta el comienzo del próximo turno). Espinas (2026-09-24): devuelve al atacante **1/4 (25 %) del daño CRUDO** del golpe (antes de Defensa y escudos), **solo cuerpo a cuerpo**, **redondeado hacia arriba**, como daño directo (true damage); aplicarlo es **a mano**. Reemplaza al 50 % que tenía el estado.
 4. ✅ **Recuperación** — SP 1, No2 2. Cura **9 HP fijos** sobre uno mismo, sin pasar el HP máximo; se puede usar con el HP lleno (gasta igual). Automatizada con el campo `curaHp` de la habilidad (2026-09-20).
 5. ✅ **Sonic Boom** — SP 2, No2 0 (Flash: SP x 2 = el doble, 4 SP en turno ajeno, a mano; ¿tiene sentido en turno ajeno? → pregunta P109). Golpea el piso: al ejecutar tira **Fuerza** (automático) y el mapa **dibuja 3 segundos el cono al frente** (el mismo de 16 casillas de la detección del sigilo, `zonaMapa: 'cono'`). Cada **enemigo** del cono tira **Constitución** (a mano); si el atacante gana, el defensor pierde **1 + la diferencia** en No2 (a mano) y, si se queda sin No2, queda **Sentado**. Empate o pérdida: no pasa nada. (2026-09-24)

@@ -347,3 +347,17 @@ versión parecida en más de una, es candidato a juntar.
   ignora 2 de Resistencia a crítico del defensor."). Solo para modo `'arma'` (el único donde hoy hay crítico —
   las habilidades dirigidas con daño mágico no critican). No se conectó todavía del lado de gm-tools (los creeps
   no tienen un `ataqueDeHabArma` propio hoy — ver "A desarrollar" si hiciera falta).
+  **Corregido el mismo día**: `Duelo.crear()` armaba `ataque.mods` con una lista fija de campos (`pdg`, `dados`,
+  `fijo`) que no incluía `ignoraResistCrit` — se guardaba en el objeto que llegaba, pero `crear()` lo descartaba
+  al sanear el doc antes de escribirlo en Firestore, así que el checkbox no hacía nada en la partida real (sí se
+  veía bien en el resumen del asistente, por eso no se notó antes). Ya está en la lista.
+
+- **Paso "Efectos": mismo "Personalizar" que Tirada y Daño (2026-09-27, pedido del dueño)**: además de los
+  ◎ Estado/💚 Cura de siempre, un checkbox "Personalizar: tiene otro efecto que no está en la lista" abre un
+  texto libre (`efectosNota`) — para algo que no encaja como estado ni como cura (ej. "invertí el orden de
+  turno"). Existe tanto en modo `'hab'` como en modo `'arma'` (los dos usan `cuerpoEfectos`). Se muestra en
+  `efectosHtml` (`comun/duelo.js`) como una tarjeta más, sin tirada ni botón «Aplicar» — a diferencia de
+  `efectoLibre` (que sale en el veredicto, con la diferencia numérica), esta nota no depende de que haya una
+  tirada de por medio, así que `efectosHtml` ya no se corta si `d.efectos` viene vacío: se dibuja igual cuando
+  hay nota, en cualquier fase del duelo (no hizo falta tocar `entrarHab`/`guardarAplicacion`: alcanza con que el
+  render la muestre, sin importar a qué fase saltó el duelo por no tener efectos automáticos).

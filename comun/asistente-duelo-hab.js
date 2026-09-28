@@ -13,7 +13,7 @@
    tiene que preguntar qué se cobra al ejecutar") es el mismo dato de siempre de la habilidad, editable también
    desde acá; quien llama tiene que aplicar `resultado.costo` a `it.costo`/`it.nitrosCosto`/`it.hpCosto` igual que
    `resultado.duelo` a `it.duelo`. `duelo` = {objetivo, tira, tiraFormula?, tiraEtiqueta?, contra: [stats], dano,
-   tipoDano, danoFijoPorX?, efectoLibre?, radio?, efectos: [{nombre, turnos} | {cura}]}.
+   tipoDano, danoFijoPorX?, efectoLibre?, efectosNota?, radio?, efectos: [{nombre, turnos} | {cura}]}.
    Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
    `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
    ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
@@ -26,7 +26,10 @@
    se puede tildar además "Tiene un efecto que no se puede automatizar" y escribir un texto libre (`efectoLibre`) que
    el cuadro del duelo muestra junto al resultado (con la diferencia entre las dos tiradas, si la hubo) para
    resolverlo a mano. Pensado para habilidades como Drenar vida (tira «X + 1dX», el efecto es "drená la diferencia"),
-   pero sirve para cualquier skill que se trabe en un paso puntual — el resto de la habilidad sigue automatizada. */
+   pero sirve para cualquier skill que se trabe en un paso puntual — el resto de la habilidad sigue automatizada.
+   El paso "Efectos" (2026-09-27, mismo pedido) tiene el mismo "Personalizar": un texto libre (`efectosNota`) además
+   de los ◎ Estado/💚 Cura de siempre, para un efecto que no encaja en esa lista — se muestra junto a los demás,
+   sin botón «Aplicar». Existe tanto en modo:'hab' como en modo:'arma' (ambos usan `cuerpoEfectos`). */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
@@ -84,6 +87,11 @@ const AsistenteDueloHab = (() => {
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
       efectoLibreOn: !!(ini && ini.efectoLibre), efectoLibre: (ini && ini.efectoLibre) || '',
+      // Personalizar los Efectos (2026-09-27, pedido del dueño — mismo patrón que la Tirada y el Daño):
+      // además de los ◎ Estado/💚 Cura automáticos, un texto libre para un efecto que no encaja en esa lista
+      // (ej. "invertí el orden de turno de todos los presentes"). Se muestra en el cuadro del duelo junto a
+      // los demás efectos, sin botón «Aplicar» — es a mano.
+      efectosNotaOn: !!(ini && ini.efectosNota), efectosNota: (ini && ini.efectosNota) || '',
       // Daño que escala con la X del costo variable (P119, 2026-09-27): un fijo extra por cada punto de X
       // (ej. Rayo Mágico "amplifica el daño en el doble de X" → danoFijoPorX: 2). Solo tiene sentido si la
       // habilidad ya tiene costo en SP o No2 marcado como "X" (cfg.costoVariable la avisa).
@@ -227,6 +235,11 @@ const AsistenteDueloHab = (() => {
           <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>`).join('');
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
         <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
+      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
+      if(st.efectosNotaOn){
+        h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
+          <p class="nota" style="margin-top:6px">Este texto se muestra junto a los demás efectos del duelo, sin botón «Aplicar» — para resolverlo a mano.</p>`;
+      }
       return h;
     }
     function cuerpoActivo(){
@@ -254,6 +267,7 @@ const AsistenteDueloHab = (() => {
         if(a.fijo) partes.push(`${a.fijo > 0 ? '+' : ''}${a.fijo} de daño fijo`);
         if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
         if(a.sinParry) partes.push('no se puede parrear');
+        if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
@@ -269,6 +283,7 @@ const AsistenteDueloHab = (() => {
       if(st.modo !== 'flash'){
         const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.turnos ?? 2}t)`).join(', ');
         filas.push(`<b>Efectos</b>: ${efTxt || 'ninguno'}`);
+        if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       h += `<div class="adh-resumen">${filas.join('<br>')}</div>`;
       return h;
@@ -318,6 +333,8 @@ const AsistenteDueloHab = (() => {
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
       q('[data-efectolibre-on]', e => { st.efectoLibreOn = e.target.checked; dibujar(); });
       q('[data-efectolibre]', e => { st.efectoLibre = e.target.value; });
+      q('[data-efectosnota-on]', e => { st.efectosNotaOn = e.target.checked; dibujar(); });
+      q('[data-efectosnota]', e => { st.efectosNota = e.target.value; });
       f.querySelectorAll('[data-ef-nombre]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efNombre].nombre = i.value.trim(); });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efStat].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efVal].val = Number(i.value) || 0; });
@@ -340,6 +357,7 @@ const AsistenteDueloHab = (() => {
         const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         if(st.modo === 'arma'){
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
+          if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
@@ -351,6 +369,7 @@ const AsistenteDueloHab = (() => {
         if(hayTira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
+        if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
         if(st.objetivo === 'area') out.radio = st.radio;
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});

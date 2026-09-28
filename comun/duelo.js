@@ -341,7 +341,8 @@ const Duelo = (() => {
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: 0, rango: true}
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
-          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo)}, efectos: limpiarEfectos(cfg.ataque.efectos)}
+          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
+          ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {})}
         : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
@@ -425,7 +426,8 @@ const Duelo = (() => {
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
-      ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {})};
+      ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
+      ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {})};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
   const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : '<option value="evasion">Evasión</option><option value="parry">Parry</option>';
@@ -1193,7 +1195,10 @@ const Duelo = (() => {
   // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
   function efectosHtml(d){
     const efs = d.efectos || [];
-    if(!efs.length) return '';
+    // Efecto personalizado (2026-09-27, pedido del dueño — mismo criterio que `efectoLibre` en el veredicto):
+    // texto libre, sin tirada ni botón «Aplicar», se muestra igual haya o no efectos automáticos.
+    const nota = (d.hab && d.hab.efectosNota) || (d.ataque && d.ataque.efectosNota) || '';
+    if(!efs.length && !nota) return '';
     const puedeAtq = esMio(d.atacante) || soyGM();
     const cards = efs.map((ef, i) => {
       const clave = d.id + ':ef' + i;
@@ -1218,8 +1223,9 @@ const Duelo = (() => {
       else estado = `<div class="espera duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
-    const pendiente = d.fase === 'efectos';
-    return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
+    const notaCard = nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '';
+    const pendiente = d.fase === 'efectos' && efs.length;
+    return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
   }
   const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre) + (spec.nombre === 'Armadura rota' && spec.stacks > 1 ? ` ×${spec.stacks}` : '');
 

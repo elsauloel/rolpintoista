@@ -4251,6 +4251,36 @@ function habDueloCreep(sc, h){
 function lanzarDueloDeHabCreep(sc, h, hab){
   Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque: {tipo: 'habilidad', hab, alcance: hab.alcance}, suelto: () => tirarExtraDeHab(h, sc)});
 }
+// Zona persistente de una habilidad de creep (2026-09-28): igual que ficha.html, no abre el cuadro del duelo —
+// le avisa al mapa (si gm-tools corre embebido ahí, ?modo=acciones) para que la coloque donde el GM marque el
+// centro. Si hay tirada («tira» del 🎯), la tira UNA vez acá (con los stats del creep) y manda el total. Sin el
+// mapa embebido no hay dónde marcar el centro — mismo límite que ya tienen los hechizos de área.
+function colocarZonaDeHabCreep(sc, h){
+  const c = h && h.duelo;
+  if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
+  if(window.parent === window) return false;
+  const stat = c.tira || '';
+  let resistValor = null;
+  if(stat){
+    const valor = habStatCreep(sc, stat);
+    const f = formulaParaValor(valor);
+    if(f){
+      const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+      resistValor = rolls.reduce((a, b) => a + b, 0) + f.mod;
+      registrarTirada(`${sc.nombre} · ${h.nombre} · ${habEtqCreep(stat)}`, {formula: f.formula, rolls, mod: f.mod, total: resistValor});
+    }
+  }
+  const formula = String(h.tiradaExtra || '').trim();
+  try{
+    window.parent.postMessage({tipo: 'zona-persistente-habilidad', fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre,
+      radio: Math.max(1, num(c.radio) || 1), zonaTurnos: Math.max(1, num(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
+      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && formula ? formula : '',
+      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      resistStat: (c.contra && c.contra[0]) || '', resistValor,
+    }, location.origin);
+    return true;
+  }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
+}
 
 function tirarExtraDeHab(h, sc){
   const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
@@ -5921,14 +5951,16 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
+    const esZona = h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // Una trampa se coloca sola y en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = h.trampaColocar ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const hDuelo = (h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
     if(h.trampaColocar) colocarTrampaDeHab(sc, h);
+    else if(esZona){ mesaPublicarHabilidadCreep(sc, h); if(!colocarZonaDeHabCreep(sc, h)) toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
     else if(habCreepTira(h) && !hDuelo) mesaConTexto(habTextoMesa(h));
     else mesaPublicarHabilidadCreep(sc, h);
     if(hDuelo) lanzarDueloDeHabCreep(sc, h, hDuelo);
-    else if(habCreepTira(h) && !h.trampaColocar) tirarExtraDeHab(h, sc);
+    else if(habCreepTira(h) && !h.trampaColocar && !esZona) tirarExtraDeHab(h, sc);
     if(h.estadoObjetivo) elegirObjetivoDeHab(sc, h);   // a quién le pegó: se le aplica el estado solo
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
     if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);

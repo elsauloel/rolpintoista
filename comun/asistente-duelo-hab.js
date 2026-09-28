@@ -13,7 +13,12 @@
    tiene que preguntar qué se cobra al ejecutar") es el mismo dato de siempre de la habilidad, editable también
    desde acá; quien llama tiene que aplicar `resultado.costo` a `it.costo`/`it.nitrosCosto`/`it.hpCosto` igual que
    `resultado.duelo` a `it.duelo`. `duelo` = {objetivo, tira, tiraFormula?, tiraEtiqueta?, contra: [stats], dano,
-   tipoDano, danoFijoPorX?, efectoLibre?, efectosNota?, radio?, efectos: [{nombre, turnos} | {cura}]}.
+   tipoDano, danoFijoPorX?, efectoLibre?, efectosNota?, radio?, efectos: [{nombre, turnos} | {cura}],
+   zonaTurnos?, zonaAmiga?, zonaEstado?: {nombre, turnos, stacks?}} — los tres últimos solo con objetivo:'zona'
+   (2026-09-28, ver comun/CLAUDE.md "Zona persistente"): `tira`/`contra` son la misma resistencia de siempre
+   (se tira una sola vez al crearla, se reusa contra cada uno que entra o sigue adentro en el Mantenimiento) y
+   `dano`/`tipoDano`/`ignoraDano` el mismo daño de siempre — la parte nueva es solo que queda puesta y se
+   chequea de a uno, en vez de resolverse toda junta al ejecutar.
    Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
    `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
    ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
@@ -115,6 +120,15 @@ const AsistenteDueloHab = (() => {
         : String((cfg.costoInicial && cfg.costoInicial.nitrosCosto) ?? '').trim().toUpperCase() === 'X' ? 'x' : 'num',
       costoNitrosNum: (() => { const n = cfg.costoInicial && cfg.costoInicial.nitrosCosto; return (n === 'ATAQUE' || String(n ?? '').trim().toUpperCase() === 'X') ? 1 : Math.max(0, Math.round(Number(n) || 0)); })(),
       costoHp: Math.max(0, Math.round(Number(cfg.costoInicial && cfg.costoInicial.hpCosto) || 0)),
+      // Zona persistente (2026-09-28, pedido del dueño — Nube tóxica): dura varios turnos, no un solo momento.
+      // El radio ya lo comparte con área/onda (st.radio). `tira`/`contra` (los mismos pasos de siempre) son la
+      // resistencia: quien la crea tira una sola vez al lanzarla, y esa tirada se reusa contra cada uno que entra
+      // o sigue adentro en el Mantenimiento — igual que ya hacen los hechizos de área entre sí.
+      zonaTurnos: (ini && ini.zonaTurnos) || 3,
+      zonaAmiga: !!(ini && ini.zonaAmiga),
+      zonaEstadoNombre: (ini && ini.zonaEstado && ini.zonaEstado.nombre) || '',
+      zonaEstadoTurnos: (ini && ini.zonaEstado && ini.zonaEstado.turnos) ?? 2,
+      zonaEstadoStacks: (ini && ini.zonaEstado && ini.zonaEstado.stacks) || '',
     };
     const prev = document.getElementById('adh-fondo');
     if(prev) prev.remove();
@@ -135,11 +149,11 @@ const AsistenteDueloHab = (() => {
         L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
       }else{
         L.push({id: 'objetivo', corto: 'Objetivo'});
-        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda') L.push({id: 'alcance', corto: 'Alcance'});
+        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
         L.push({id: 'tira', corto: 'Tirada'});
         if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
         L.push({id: 'dano', corto: 'Daño'});
-        L.push({id: 'efectos', corto: 'Efectos'});
+        if(st.objetivo !== 'zona') L.push({id: 'efectos', corto: 'Efectos'});
       }
       L.push({id: 'listo', corto: 'Listo'});
       return L;
@@ -183,7 +197,7 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoObjetivo(){
       let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
-      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
       if(st.objetivo === 'onda'){
         h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No hay dodge roll: no tienen a dónde salir. No te afecta a vos.</p>
           <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>`;
@@ -191,6 +205,20 @@ const AsistenteDueloHab = (() => {
       if(st.objetivo === 'area'){
         h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
           <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>`;
+      }
+      if(st.objetivo === 'zona'){
+        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla, como el área — pero <b>queda puesta varios turnos</b>: no se resuelve todo de una. Cualquier rival que entre, o que siga adentro en cada Mantenimiento, se chequea por separado; si esta habilidad tiene una tirada (paso «Tirada»), la tirás una sola vez al lanzarla y esa misma tirada se reusa contra la resistencia de cada uno (paso «Resistencia»). A quien pierde (o entra sin nada que resistir) se le puede aplicar un estado y/o el daño del paso «Daño».</p>
+          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>
+          <div class="fila"><input type="number" min="1" style="width:70px" data-zonaturnos value="${esc(st.zonaTurnos)}"><span>turnos que dura</span></div>
+          <label class="op"><input type="checkbox" data-zonaamiga ${st.zonaAmiga ? 'checked' : ''}> También afecta a tus aliados (no solo a los rivales)</label>
+          <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Deja un estado en quien corresponda?</h4>
+            <select data-zonaestado><option value="">— ninguno (solo el daño del paso «Daño», si tiene) —</option>${nombresEstado().map(n => `<option value="${esc(n)}"${st.zonaEstadoNombre === n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></div>`;
+        if(st.zonaEstadoNombre){
+          h += `<div class="fila"><span>Dura</span><input type="number" min="0" style="width:64px" data-zonaestadoturnos value="${esc(st.zonaEstadoTurnos)}"><span>turnos</span></div>`;
+          if(['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre)){
+            h += `<div class="fila"><span>Stacks</span><input type="number" min="1" style="width:64px" data-zonaestadostacks placeholder="por defecto" value="${esc(st.zonaEstadoStacks)}"></div>`;
+          }
+        }
       }
       return h;
     }
@@ -275,8 +303,12 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo}${st.objetivo === 'area' || st.objetivo === 'onda' ? ` (radio ${st.radio})` : ''}`);
-        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
+        if(st.objetivo === 'zona'){
+          filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
+          if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
+        }
+        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
         const contraTxt = [...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)';
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
@@ -284,7 +316,7 @@ const AsistenteDueloHab = (() => {
         if(st.dano) filas.push(`<b>Daño</b>: tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
-      if(st.modo !== 'flash'){
+      if(st.modo !== 'flash' && st.objetivo !== 'zona'){
         const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.turnos ?? 2}t)`).join(', ');
         filas.push(`<b>Efectos</b>: ${efTxt || 'ninguno'}`);
         if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
@@ -330,6 +362,11 @@ const AsistenteDueloHab = (() => {
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       q('[data-radio]', e => { st.radio = Math.max(0, Math.round(Number(e.target.value) || 0)); });
+      q('[data-zonaturnos]', e => { st.zonaTurnos = Math.max(1, Math.round(Number(e.target.value) || 1)); });
+      q('[data-zonaamiga]', e => { st.zonaAmiga = e.target.checked; });
+      q('[data-zonaestado]', e => { st.zonaEstadoNombre = e.target.value; dibujar(); });
+      q('[data-zonaestadoturnos]', e => { st.zonaEstadoTurnos = Math.max(0, Math.round(Number(e.target.value) || 0)); });
+      q('[data-zonaestadostacks]', e => { st.zonaEstadoStacks = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
@@ -370,11 +407,20 @@ const AsistenteDueloHab = (() => {
         const out = {objetivo: st.objetivo, tira: st.tiraModo === 'stat' ? (st.tira || '') : '', contra: hayTira ? [...st.contra] : []};
         if(st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
         if((st.objetivo === 'area' || st.objetivo === 'onda') && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return; }
+        if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return; }
         if(hayTira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
-        if(st.objetivo === 'area' || st.objetivo === 'onda') out.radio = Math.max(st.objetivo === 'onda' ? 1 : 0, st.radio);
+        if(st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'zona') out.radio = Math.max(st.objetivo === 'area' ? 0 : 1, st.radio);
+        if(st.objetivo === 'zona'){
+          out.zonaTurnos = st.zonaTurnos;
+          if(st.zonaAmiga) out.zonaAmiga = true;
+          if(st.zonaEstadoNombre){
+            out.zonaEstado = {nombre: st.zonaEstadoNombre, turnos: st.zonaEstadoTurnos};
+            if(['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks) out.zonaEstado.stacks = st.zonaEstadoStacks;
+          }
+        }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();

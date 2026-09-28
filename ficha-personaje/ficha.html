@@ -4421,9 +4421,50 @@ function terminarEjecucionHab(it, arma, xSp, xNitros){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: aArma, suelto: () => tirarPrimeraDeHab(it)});
     return;
   }
+  // Zona persistente (2026-09-28): no abre el cuadro del duelo — queda puesta en el mapa y se resuelve sola,
+  // de a uno, mientras dura (ver comun/asistente-duelo-hab.js y comun/CLAUDE.md "Zona persistente").
+  const cZona = dueloDe(it);
+  if(cZona && typeof cZona === 'object' && cZona.objetivo === 'zona'){
+    mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+    if(!colocarZonaDeHab(it, xSp, xNitros)) toast(`${it.nombre}: para colocar la zona hace falta tener el mapa abierto`);
+    return;
+  }
   const hDuelo = habDueloDe(it, xSp, xNitros);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
   if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
   if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
+}
+// Manda al mapa (la ficha corre en su iframe) todo lo que hace falta para crear la zona: radio, duración, estado
+// y/o daño, y con qué resistencia. Si hay tirada («tira» del 🎯), la tira UNA vez acá y manda el total — esa
+// misma tirada es la que se reusa contra cada uno que entra o sigue adentro en el Mantenimiento (mismo criterio
+// que la PdG.Esp compartida de los hechizos de área). Devuelve false si no se pudo avisar (sin mapa abierto).
+function colocarZonaDeHab(it, xSp, xNitros){
+  const c = dueloDe(it);
+  if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
+  if(window.parent === window || !fichaVivo || !fichaVivo.id) return false;
+  const stat = c.tira || '';
+  let resistValor = null;
+  if(stat){
+    const valor = compute().final[stat];
+    const f = formulaParaValor(valor);
+    if(f){
+      const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
+      resistValor = rolls.reduce((a, b) => a + b, 0) + f.mod;
+      registrarTirada(`${it.nombre} · ${STAT_LABEL[stat] || stat}`, {formula: f.formula, rolls, mod: f.mod, total: resistValor});
+    }
+  }
+  const X = spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0;
+  const base = String(it.tiradaExtra || '').trim();
+  const extra = c.danoFijoPorX ? num(c.danoFijoPorX) * X : 0;
+  const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
+  try{
+    window.parent.postMessage({tipo: 'zona-persistente-habilidad', fichaId: fichaVivo.id, casteadorTipo: 'pj', nombre: it.nombre,
+      radio: Math.max(1, num(c.radio) || 1), zonaTurnos: Math.max(1, num(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
+      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && formula ? formula : '',
+      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      resistStat: (c.contra && c.contra[0]) || '', resistValor,
+    }, location.origin);
+    return true;
+  }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
 // Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
 function alcanceDeArma(arma){
@@ -11992,6 +12033,7 @@ function fichaResumen(){
     armadmg: n(c.final.armadmg),   // Armadura mágica (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
     muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
     esp: n(c.final.esp),   // Especial
+    resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta
     percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
     rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
     rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)

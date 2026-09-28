@@ -2848,6 +2848,7 @@ function escucharMantenimiento(){
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
     fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
+    zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
     const base = '../';
     if(soyGM){
       mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
@@ -5533,6 +5534,18 @@ function escucharElementos(){
         fuegoDano: Math.max(1, Math.min(999, Math.round(num(d.fuegoDano)) || 5)),
         turnos: Math.round(num(d.turnos)) || 0,
         venceMant: Number.isFinite(d.venceMant) ? Math.round(d.venceMant) : null,
+        // Zona con efecto persistente (2026-09-28): generaliza fuego (daño y/o estado, con o sin resistencia; ver comun/CLAUDE.md).
+        zona: d.zona === true,
+        zonaNombre: typeof d.zonaNombre === 'string' ? d.zonaNombre : '',
+        zonaDano: typeof d.zonaDano === 'string' ? d.zonaDano : '',
+        zonaIgnoraDef: d.zonaIgnoraDef === true,
+        zonaEstado: typeof d.zonaEstado === 'string' ? d.zonaEstado : '',
+        zonaAmiga: d.zonaAmiga === true,
+        zonaResistStat: typeof d.zonaResistStat === 'string' ? d.zonaResistStat : '',
+        zonaResistValor: Number.isFinite(d.zonaResistValor) ? d.zonaResistValor : null,
+        zonaCasteadorRef: typeof d.zonaCasteadorRef === 'string' ? d.zonaCasteadorRef : '',
+        zonaCasteadorTipo: d.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj',
+        zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
       });
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
@@ -6165,11 +6178,12 @@ async function moverToken(id, col, fila, celdas){
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
     fuegoEntrada(id, celdas);
+    zonaRevisarEntrada(id);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); zonaRevisarEntrada(id); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);
@@ -6498,6 +6512,141 @@ async function fuegoMantenimiento(numero){
     if(manual.length) alertaRojaAnonima('🔥 Terreno incendiado (a mano)', `${manual.map(({t, d}) => `${nombreDe(t)}: ${d}`).join(' · ')} de daño de fuego: aplicalo a mano`);
   }
 }
+
+/* ---------- Zona con efecto persistente: el motor (2026-09-28, pedido del dueño) ----------
+   Generaliza 🔥 Terreno incendiado (que queda tal cual, sin tocar): además de daño puede dejar un estado, con o
+   sin resistencia, y la coloca una habilidad (jugador o creep), no solo el GM a mano. Mismo criterio de "mejor
+   esfuerzo, cada uno lo suyo" que el fuego: cada pantalla revisa sus propios tokens (el dueño los suyos, el GM
+   sus creeps) al entrar y en cada Mantenimiento. Pedido explícito del dueño: "que la automatización no quite el
+   momento de esto está pasando" — nunca se resuelve en silencio, siempre aparece #zona-banner con lo que
+   corresponde (tirar para resistir, o un simple "Aplicar" si no hay nada que tirar) antes de tocar nada. */
+const ZONA_STAT_LABEL = {resmg: 'Res.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
+// Res.Esp/Res.Mt de un creep salen de su Constitución (misma tabla que CREEP_DERIVADOS_POR_ATTR de gm-tools,
+// acá solo lo que hace falta para resolver una resistencia): base + lo que sume el equipo/estados.
+function zonaStatCreep(sc, statId){
+  if(['con', 'fue', 'agl', 'des', 'esp'].includes(statId)) return num(sc[statId]) + creepModTotalMapa(sc, statId);
+  const base = statId === 'pdg' ? 'des' : statId === 'pdgmg' ? 'esp' : statId === 'eva' ? 'agl' : 'con';
+  return num(sc[base]) + creepModTotalMapa(sc, statId);
+}
+function zonaEsMia(t){
+  if(t.tipo === 'creep') return soyGM;
+  return t.tipo === 'pj' && !!t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t);
+}
+// ¿t es rival de quien creó la zona? (mismo sentido que dueloEsRival, con el casteador guardado en el propio elemento).
+function zonaEsRival(el, t){ return el.zonaCasteadorTipo === 'creep' ? t.tipo === 'pj' : t.tipo === 'creep'; }
+function zonaAplicaA(el, t){
+  if(!t.fichaId || (t.fichaId === el.zonaCasteadorRef && t.tipo === el.zonaCasteadorTipo)) return false;   // no afecta a quien la creó
+  return el.zonaAmiga || zonaEsRival(el, t);
+}
+// ¿Todavía le falta algo a este par (zona, token)? El daño se vuelve a chequear siempre (como el fuego); el
+// estado, solo si ese token no está ya en zonaResueltos (una vez que lo tiene, no se le vuelve a tirar la resistencia).
+function zonaLeFalta(el, t){
+  if(el.zonaDano) return true;
+  if(el.zonaEstado && !(el.zonaResueltos || []).includes(t.id)) return true;
+  return false;
+}
+let zonaCola = [];      // [{elId, tokenId}] a la espera de mostrarse en esta pantalla
+let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mostrando ahora
+function zonaEncolar(el, t){
+  if(zonaCola.some(x => x.elId === el.id && x.tokenId === t.id)) return;
+  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === t.id) return;
+  zonaCola.push({elId: el.id, tokenId: t.id});
+  zonaMostrarSiguiente();
+}
+function zonaMostrarSiguiente(){
+  if(zonaBanner || !zonaCola.length) return;
+  const {elId, tokenId} = zonaCola.shift();
+  const el = elementos.get(elId), t = tokens.get(tokenId);
+  if(!el || !el.zona || !t || !zonaLeFalta(el, t)){ zonaMostrarSiguiente(); return; }
+  zonaBanner = {elId, tokenId, el, t, resultado: null};
+  renderZonaBanner();
+}
+function zonaRevisarToken(t){
+  if(!t || !zonaEsMia(t)) return;
+  elementos.forEach(el => {
+    if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(!celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) return;
+    zonaEncolar(el, t);
+  });
+}
+// Al soltar un movimiento: alcanza con mirar dónde terminó (si entró y volvió a salir en el mismo movimiento no
+// queda ningún "momento" pendiente que mostrar — no hace falta contar cada casillero cruzado, como sí hace el fuego).
+function zonaRevisarEntrada(id){ zonaRevisarToken(tokens.get(id)); }
+function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t)); }
+function renderZonaBanner(){
+  let el2 = document.getElementById('zona-banner');
+  if(!zonaBanner){ if(el2) el2.hidden = true; return; }
+  const el = elementos.get(zonaBanner.elId), t = tokens.get(zonaBanner.tokenId);
+  if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
+  if(!el2){
+    el2 = document.createElement('div');
+    el2.id = 'zona-banner';
+    el2.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:75;background:#151a26;border:1px solid #39435c;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;flex-wrap:wrap;justify-content:center;color:#e9ecf4;font-size:14px';
+    document.body.appendChild(el2);
+  }
+  el2.hidden = false;
+  const icono = el.zonaEstado ? '🌫' : '🔥';
+  const nombreT = t.oculto ? 'Alguien' : nombreDe(t);
+  let cuerpo;
+  if(zonaBanner.resultado){
+    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b> · ${esc(nombreT)}: ${esc(zonaBanner.resultado)}</span><button type="button" class="btn" id="zona-banner-ok">Listo</button>`;
+  }else if(el.zonaResistStat){
+    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b>: ${esc(nombreT)} entró — tirá ${esc(ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat)} para resistir</span><button type="button" class="btn" id="zona-banner-ir">🎲 Tirar</button>`;
+  }else{
+    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b>: le toca a ${esc(nombreT)}</span><button type="button" class="btn" id="zona-banner-ir">Aplicar</button>`;
+  }
+  el2.innerHTML = cuerpo;
+  const bt = document.getElementById('zona-banner-ir'); if(bt) bt.onclick = zonaResolverBanner;
+  const bo = document.getElementById('zona-banner-ok'); if(bo) bo.onclick = () => { zonaBanner = null; zonaMostrarSiguiente(); };
+}
+async function zonaResolverBanner(){
+  if(!zonaBanner) return;
+  const {elId, tokenId} = zonaBanner;
+  const el = elementos.get(elId), t = tokens.get(tokenId);
+  const bt = document.getElementById('zona-banner-ir'); if(bt) bt.disabled = true;
+  if(!el || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }
+  let resistio = false;
+  const partes = [];
+  if(el.zonaResistStat){
+    const valor = t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? zonaStatCreep(sc, el.zonaResistStat) : 0; })()
+      : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
+    const fd = formulaParaValor(valor);
+    if(fd){
+      const rolls = fd.combo.map(d => 1 + Math.floor(Math.random() * d));
+      const total = rolls.reduce((a, b) => a + b, 0) + fd.mod;
+      resistio = total > num(el.zonaResistValor);   // empate: gana quien creó la zona
+      try{ mesaPublicar(`${t.oculto ? 'Alguien' : nombreDe(t)} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: fd.formula, rolls, mod: fd.mod, total}); }catch(err){}
+      partes.push(resistio ? `resistió (${total} contra ${num(el.zonaResistValor)})` : `no resistió (${total} contra ${num(el.zonaResistValor)})`);
+    }
+  }
+  if(el.zonaDano){
+    const r = tirarDados(el.zonaDano);
+    if(r){
+      try{
+        if(t.tipo === 'creep') await danioCreep(t, String(r.total), !!el.zonaIgnoraDef);
+        else if(puedoMover(t)) await danioPj(t, String(r.total), !!el.zonaIgnoraDef);
+        partes.push(`${r.total} de daño`);
+      }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${r.total} de daño (aplicalo a mano)`); }
+    }
+  }
+  if(el.zonaEstado && !resistio){
+    let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}
+    if(spec && spec.nombre){
+      try{
+        if(t.tipo === 'creep'){ await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec)); }
+        else{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: el.zonaNombre || 'Zona'}); }
+        partes.push(spec.nombre);
+      }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }
+    }
+  }
+  if(el.zonaEstado && !resistio){
+    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(t.id)}); }
+    catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
+  }
+  zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};
+  renderZonaBanner();
+}
+
 // Quiénes sufren el efecto: quien la activó y, si es de área, los de adentro (todos con fuego amigo; si no, solo los que ella considera rivales).
 function trampaAfectados(t, el){
   const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
@@ -9109,6 +9258,39 @@ function zonaDeHabilidad(msg){
   if(flor.length) guardarTrazoHex(flor, false, {color: '#E88C32', grosor: TRAZO_ZONA_GROSOR});
 }
 
+/* ---------- Zona persistente de una habilidad (2026-09-28, pedido del dueño: "que la automatización no quite
+   el momento") ----------
+   A diferencia de zonaDeHabilidad (solo dibuja 3 s) y de un hechizo de área (se resuelve todo de una), esto
+   CREA un elemento de Terreno y Formas que queda puesto («zona: true», generaliza 🔥 sin tocarlo — ver
+   comun/CLAUDE.md). Se pide el centro con un clic, como un hechizo de área; el resto (quién entra, la
+   resistencia, el cartelito) lo maneja el motor de zonas más abajo. */
+function zonaPersistenteDeHabilidad(msg){
+  elegirDestino(async h => {
+    const radio = Math.max(1, Math.min(6, Math.round(num(msg.radio) || 1)));
+    const n = Math.max(1, Math.round(num(msg.zonaTurnos)) || 3);
+    const datos = {
+      tipo: 'flor', origen: {col: h.col, fila: h.fila}, celdas: celdasFlor(radio), rotacion: 0,
+      color: msg.zonaEstado ? '#4C9A2A' : '#D9531E', alfa: 40, solido: false, invisible: false,
+      imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
+      turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+      zona: true, zonaNombre: String(msg.nombre || 'Zona').slice(0, 40),
+      zonaCasteadorRef: String(msg.fichaId || '').slice(0, 64), zonaCasteadorTipo: msg.casteadorTipo === 'creep' ? 'creep' : 'pj',
+      zonaResueltos: [], duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    if(msg.zonaAmiga) datos.zonaAmiga = true;
+    if(msg.zonaDano){ datos.zonaDano = String(msg.zonaDano).slice(0, 12); if(msg.zonaIgnoraDef) datos.zonaIgnoraDef = true; }
+    if(msg.zonaEstado && msg.zonaEstado.nombre) datos.zonaEstado = JSON.stringify(msg.zonaEstado).slice(0, 300);
+    if(msg.resistStat && Number.isFinite(msg.resistValor)){ datos.zonaResistStat = String(msg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(msg.resistValor)); }
+    try{
+      await coleccionElementos().add(datos);
+      toast(`🌫 ${msg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
+    }catch(err){
+      console.error('No se pudo crear la zona:', err);
+      toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (zona)' : 'No se pudo colocar la zona');
+    }
+  }, `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${Math.max(1, Math.round(num(msg.radio) || 1))}) · Esc o clic derecho cancelan</span>`, true);
+}
+
 window.addEventListener('message', e => {
   if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
   if(e.data.tipo === 'muerte-estado'){   // la ficha (iframe) avisa que su personaje está inconsciente: el filtro rojo cubre todo el mapa
@@ -9129,6 +9311,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
+  if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
   if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar

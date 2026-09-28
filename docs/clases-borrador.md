@@ -309,7 +309,12 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
 8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un
    personaje aliado a otro.
 9. **Veneno** [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.
-10. **Nube tóxica** [3] — Crea un área de flor que aplica 3 stacks de
-    veneno al que entre en ella o esté en su interior durante el
-    mantenimiento. Solo aplica 1 stack a personajes ya envenenados.
-    Duración: 3 turnos.
+10. ✅ **Nube tóxica** [3] — SP 3, No2 1. Marcás el centro en el mapa; queda una nube de diámetro 3 (radio 1)
+    durante 3 turnos. Cada rival que entra, o que sigue adentro en el Mantenimiento, resiste con Res.Esp contra
+    tu Especial (tirado una sola vez, al lanzarla); quien pierde queda con 3 stacks de Veneno — una vez
+    envenenado no se le vuelve a tirar la resistencia. No afecta a los aliados. *(Auditada 2026-09-28 —
+    primera skill con el objetivo "Zona persistente" del 🎯: `duelo: {objetivo:'zona', radio:1, tira:'esp',
+    contra:['resmg'], zonaTurnos:3, zonaEstado:{nombre:'Veneno', turnos:3, stacks:3}}`, ver `comun/CLAUDE.md`.
+    La pregunta pendiente de `manual-usuario/notas/07-estados.md` — si reingresar ya envenenado suma 1 stack
+    o los normales — sigue abierta; hoy, una vez envenenado, la zona ya no vuelve a tirar nada para esa
+    persona, así que no llega a probarse.)*

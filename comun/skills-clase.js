@@ -158,7 +158,9 @@ const CLASES_SKILLS = [
     skillSA('debuffer', 'Balas de sangre', 'SP 1. Gastás X HP (máx. ESP). Dispara un proyectil tipo 1 con peso igual a la vida gastada.'),
     skillSA('debuffer', 'Transfusión sanguínea', 'SP 1. Transfiere hasta 20 de HP de un aliado a otro.'),
     skillSA('debuffer', 'Veneno', 'SP 2. Maldición (Esp / Res.M). Aplica 3 stacks de veneno.'),
-    skillSA('debuffer', 'Nube tóxica', 'SP 3. Área de flor que aplica 3 stacks de veneno a quien entre o esté adentro en el mantenimiento (solo 1 a los ya envenenados). Dura 3 turnos.'),
+    {id: 'debuffer-nube-toxica', nombre: 'Nube tóxica', costo: '3', nitrosCosto: 1, tiradaStat: 'esp',
+     duelo: {objetivo: 'zona', radio: 1, tira: 'esp', contra: ['resmg'], zonaTurnos: 3, zonaEstado: {nombre: 'Veneno', turnos: 3, stacks: 3}},
+     detalle: 'Marcás el centro en el mapa al ejecutarla: queda una nube de diámetro 3 (radio 1) durante 3 turnos. Cada rival que entra, o que sigue adentro en el Mantenimiento, resiste con Res.Esp contra tu Especial (tirado una sola vez, al lanzarla); quien pierde queda con 3 stacks de Veneno — una vez envenenado, no se le vuelve a tirar la resistencia. No afecta a tus aliados. ⚙ Automatizado en el duelo (2026-09-28, primera skill con el objetivo "Zona persistente" del 🎯): la tirada, la resistencia de cada uno y el Veneno se aplican con su propio aviso cada vez que alguien entra o pasa el Mantenimiento — nunca en silencio.'},
     skillSA('debuffer', 'Punto débil', 'SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un estado propio con −1 a las resistencias a crítico (Tipo 4 a 12). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'),
   ]},
 ];

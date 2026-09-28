@@ -1073,3 +1073,13 @@ hexágono con otro sin importar bando. Todavía no está construido.
   deja seguir, no prohíbe — no hay ninguna razón mecánica para impedir un golpe a un aliado a propósito).
   `dueloElegirAreaMapa` (hechizos de área) usa el mismo `dueloEsRival` para su lista de objetivos (esa sí sigue
   siendo un filtro real, no una sugerencia — el área no pide confirmar objetivo por objetivo).
+
+- **Zona con efecto persistente (2026-09-28, pedido del dueño): generaliza 🔥 Terreno incendiado sin tocarlo.**
+  Además de daño puede dejar un estado, con o sin resistencia, y la coloca una habilidad (de jugador o de
+  creep) marcando el centro con un clic, no solo el GM armándola a mano. Motor completo (detección al entrar y
+  en cada Mantenimiento, el cartelito `#zona-banner` que SIEMPRE muestra el momento antes de aplicar nada, la
+  resolución de la resistencia y del efecto) documentado en `comun/CLAUDE.md` — ahí está el detalle grande,
+  porque lo dispara el 🎯 de `comun/asistente-duelo-hab.js`, compartido con la ficha y con gm-tools. **Requiere
+  publicar las reglas nuevas de Firestore** (campos `zona*` del elemento). Pendiente (Etapa 2): un tercer modo
+  del botón ⬡ del toolkit para colocar una zona directo, sin pasar por una habilidad, y la misma opción en el
+  asistente de trampas.

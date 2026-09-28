@@ -378,3 +378,48 @@ versión parecida en más de una, es candidato a juntar.
 - **La tirada de Evasión nunca baja de 1** (2026-09-28, regla del dueño): se corrige a mínimo 1 al tirarla (`tirarValorStat` y `tirarValorStatInv` en `ficha.html`, `tirarValorStat` en `gm-tools.html`: cubre sobrepeso, mitades de Pajaritos/Sentado y modificadores negativos) y, como red de seguridad, al guardarla en el duelo (`guardarTiro`, `comun/duelo.js`, campo `eva`).
 
 - **Objetivo "Onda alrededor de quien la usa" (`objetivo: 'onda'`, 2026-09-28, pedido del dueño; primera skill: Shockwave del Tanque)**: nueva opción en el paso "Objetivo" del 🎯 (`asistente-duelo-hab.js`), con su radio (1 = los adyacentes). Reusa por completo la cascada de los hechizos de área (`vtt-hexgrid/mapa.html`, `dueloElegirAreaMapa` → doc `areas`, un sub-duelo por rival, quien la usa tira **una sola vez** y cada uno se resiste por separado) con tres diferencias: (1) **no hay que marcar el centro**: es el propio token de quien la usa (si no está en el mapa avisa y no lanza); (2) **no hay dodge roll** (`cerrarPar` en `duelo.js`: ganar la resistencia termina el duelo como "se resistió", no abre la fase `dodge`, porque no hay a dónde salir); (3) se saltea el paso "Alcance" (queda en 8 pasos). Igual que en el área: solo rivales, sin el propio ejecutor ni ocultos. `habDueloDe` (ficha) y `habDueloCreep` (gm-tools) mandan `radio` también para la onda, y `limpiarHab` acepta el objetivo. Sin ficha/mapa abierto avisa "se lanzan desde el mapa". No hacen falta reglas nuevas de Firestore. **Shockwave** (`comun/skills-clase.js`): `duelo: {objetivo:'onda', radio:1, tira:'fue', contra:['con'], efectos:[Pajaritos 2 turnos]}`; SP 3 (Flash ×2 = el doble, 6 SP en turno ajeno, a mano). Si el objetivo gana la Constitución no pasa nada (mismo criterio que Sonic Boom).
+
+- **Objetivo "Zona persistente" (`objetivo: 'zona'`, 2026-09-28, pedido del dueño — "que la automatización no
+  quite el momento de esto está pasando"; primera skill: Nube tóxica del Debuffer)**: nueva opción del paso
+  "Objetivo" del 🎯 (`comun/asistente-duelo-hab.js`), con radio, duración en turnos, si también afecta a los
+  aliados, y qué estado deja (con stacks si es Veneno/Veneno severo). A diferencia de área/onda **no se resuelve
+  al ejecutar**: crea un elemento de Terreno y Formas que queda puesto varios turnos y se chequea de a uno —
+  generaliza 🔥 Terreno incendiado (que sigue existiendo tal cual, sin tocar) para que además pueda dejar un
+  estado, con o sin resistencia, y lo pueda colocar una habilidad de jugador o de creep, no solo el GM a mano.
+  - **No pasa por `comun/duelo.js`** (no hay contienda instantánea, así que no hay dodge ni cascada de
+    sub-duelos): `ficha.html`/`gm-tools.html` interceptan el objetivo `'zona'` ANTES de armar el duelo normal
+    (`colocarZonaDeHab`/`colocarZonaDeHabCreep`) — si la habilidad tiene tirada (paso "Tirada"), la tira UNA
+    vez ahí mismo (con `compute().final[stat]` en la ficha, `creepStatValor` en gm-tools) y le manda al mapa,
+    por `postMessage({tipo:'zona-persistente-habilidad', …})`, el radio, la duración, el estado, el daño (si
+    el paso "Daño" está tildado, la fórmula sale de `it.tiradaExtra` como cualquier duelo) y esa tirada ya
+    resuelta. El mapa (`zonaPersistenteDeHabilidad`, `vtt-hexgrid/mapa.html`) pide el centro con un clic (como
+    un hechizo de área) y crea el elemento. Sin el mapa abierto, avisa que hace falta para colocarla.
+  - **El elemento** lleva `zona`, `zonaNombre`, `zonaDano?`, `zonaIgnoraDef?`, `zonaEstado?` (JSON
+    `{nombre,turnos,stacks?}`), `zonaAmiga?`, `zonaResistStat?`, `zonaResistValor?` (la tirada del casteador),
+    `zonaCasteadorRef`/`zonaCasteadorTipo` (quién la creó, para saber quién es rival) y `zonaResueltos` (a
+    quién ya se le aplicó el estado — no se lo vuelve a chequear). Mismo `turnos`/`venceMant` de siempre
+    (Formas con turnos) para que se borre sola. **Reglas de Firestore nuevas: hay que publicarlas** (los
+    campos `zona*` en `elementoValido` y en el `update` de `elementos`, con una rama nueva que deja a
+    cualquier afectado sumarse solo a `zonaResueltos`, uno a la vez).
+  - **El motor** (`vtt-hexgrid/mapa.html`, junto a `fuegoMantenimiento`): `zonaRevisarEntrada`/
+    `zonaRevisarMantenimiento` — mismo momento que ya usa el fuego (al mover un token, y en cada ⟳
+    Mantenimiento) — revisan, **cada pantalla lo suyo** (el dueño sus personajes, el GM sus creeps), si algún
+    token propio está parado en una zona que le falte algo: el daño se vuelve a chequear siempre (como el
+    fuego); el estado, solo si ese token no está ya en `zonaResueltos`.
+  - **El cartelito, no el silencio** (el pedido explícito del dueño): en vez de resolver todo solo, se encola
+    y se muestra `#zona-banner` — "🌫 *Nube tóxica*: *Fulano* entró — tirá Res.Esp para resistir" con un botón
+    🎲, o "le toca a *Fulano*" con un botón "Aplicar" si no hay nada que tirar (una zona de puro daño, tipo un
+    fuego armado por skill). Al resolver (`zonaResolverBanner`): si hay resistencia, tira el stat del afectado
+    (de `resumen.<stat>` publicado por la ficha para un PJ — se sumó `resumen.resmg`, Res.Esp, para esto — o
+    `zonaStatCreep` para un creep) contra la tirada guardada del casteador (empate = gana quien creó la zona);
+    si no resistió, aplica el daño (`danioPj`/`danioCreep`, como el fuego) y el estado (`EstadosAplicar`,
+    mismo mecanismo que "Estados sobre otros, automáticos" de gm-tools — a un creep directo, a un PJ con
+    `encolarPj`: la ficha del dueño lo aplica sola, aunque no esté mirando el mapa en ese momento) — y recién
+    ahí anota `zonaResueltos`. El resultado se muestra un momento más en el mismo cartelito antes de cerrarse.
+    Todo publicado a la Mesa (`mesaPublicar` para la tirada de resistencia; el daño ya se anuncia solo).
+  - **Nube tóxica** (`comun/skills-clase.js`): SP 3, No2 1, radio 1 (diámetro 3), dura 3 turnos, tira Especial
+    contra Res.Esp (una sola vez), Veneno ×3 al que pierde, no afecta a los aliados.
+  - **Etapa 2, pendiente** (lo cosmético, no construido todavía): partir el botón ⬡ del toolkit en tres —
+    Formas libres / Trampas / Zonas con efectos persistentes — para poder colocar una zona directo en el mapa
+    sin pasar por una habilidad, y sumar la misma opción al asistente de trampas (una trampa que, en vez de
+    dispararse una sola vez, deja puesta una zona). Ver el hilo de diseño de esta fecha.

@@ -3470,8 +3470,10 @@ function criticoDatosIniciales(){
   const c = compute();
   const arma = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado)));
   const d = {};
-  if(!Number.isNaN(c.final.crit)) d.frecuente = Math.max(0, Math.round(c.final.crit));
-  if(!Number.isNaN(c.final.critpot)) d.potente = Math.max(0, Math.round(c.final.critpot));
+  // El crítico de un arma vale solo para esa arma: con dos equipadas, lo que da la otra no cuenta (statParaArma).
+  const cf = statParaArma('crit', arma || null), cp = statParaArma('critpot', arma || null);
+  if(!Number.isNaN(cf)) d.frecuente = Math.max(0, Math.round(cf));
+  if(!Number.isNaN(cp)) d.potente = Math.max(0, Math.round(cp));
   if(arma) d.tipo = num(arma.tipoDado);
   return d;
 }
@@ -11993,7 +11995,8 @@ function fichaResumen(){
     luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
     vision: n(c.final.vision),   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
     // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
-    crit: n(c.final.crit), critpot: n(c.final.critpot),   // Crítico frecuente y potente
+    // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
+    ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),
     armaTipo: (() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return a ? num(a.tipoDado) : 0; })(),   // Tipo de su arma equipada
     rescrit: ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(k => n(c.final[k])),   // Resistencia a crítico contra armas de Tipo 4, 6, 8, 10 y 12
     percepcionAumentada: tienePercepcionAumentada(),   // el mapa le avisa de las trampas ocultas cercanas

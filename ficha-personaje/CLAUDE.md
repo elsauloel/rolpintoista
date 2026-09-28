@@ -462,3 +462,5 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   propia en vez de un stat, y el paso "Daño" un texto libre para lo que no se puede automatizar. Acá en la ficha,
   `habDueloDe` arma `hab.tira = {formula, etq}` (con la X ya sustituida) y `DUELO_HOOKS.habTirar` la tira igual
   que cualquier stat — sin ventanas nuevas ni cambios al flujo de Ejecutar.
+
+- **El Crítico frecuente/potente de un arma vale solo para esa arma** (2026-09-28, regla del dueño): con dos armas equipadas, lo que da una no mejora las tiradas de la otra (los anillos, pasivas y estados sí valen para las dos). El duelo ya lo hacía (`statsCritico` → `statParaArma`); se corrigió además la Calculadora de crítico (`criticoDatosIniciales`) y lo que la ficha publica al mapa (`resumen.crit`/`critpot`), que sumaban el de ambas armas: ahora usan `statParaArma` con la misma arma de `armaTipo`. El número "Crít.Frec." de la tarjeta de stats sigue siendo el total de la ficha (no es de un arma puntual).

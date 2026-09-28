@@ -283,7 +283,7 @@ const Duelo = (() => {
     }
     // Un hechizo de área (Paso 4/7 del casteo) necesita la geometría del mapa (marcar el centro, calcular quién
     // queda adentro): sin el mapa abierto no hay forma de resolverlo — ni siquiera la lista de "a quién apunta".
-    if(cfg.ataque && cfg.ataque.hab && cfg.ataque.hab.objetivo === 'area'){ _toast('Los hechizos de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
+    if(cfg.ataque && cfg.ataque.hab && (cfg.ataque.hab.objetivo === 'area' || cfg.ataque.hab.objetivo === 'onda')){ _toast('Las habilidades de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
     elegirObjetivoLista(cfg);
   }
 
@@ -424,7 +424,7 @@ const Duelo = (() => {
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && String(h.dano.formula || '').trim() ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false} : null;
     const efectos = limpiarEfectos(h.efectos);
-    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area'].includes(h.objetivo) ? h.objetivo : 'enemigo';
+    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {})};
@@ -474,7 +474,7 @@ const Duelo = (() => {
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
       if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarHab(m); }
-      else if(m.grupo){   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll
+      else if(m.grupo && m.hab.objetivo !== 'onda'){   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }

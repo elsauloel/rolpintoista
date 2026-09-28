@@ -4459,12 +4459,12 @@ function habDueloDe(it, xSp, xNitros){
   // igual que danoFijoPorX) — el duelo/DUELO_HOOKS.habTirar solo la tira, sin saber nada de X.
   const tira = c.tiraFormula ? {formula: sustituirX(c.tiraFormula, X), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null);
   return {
-    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' ? 0 : alcanceDeHab(c, stat),
+    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceDeHab(c, stat),
     tira,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
     dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
     efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
-    ...(c.objetivo === 'area' ? {radio: num(c.radio)} : {}),
+    ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
     ...(c.efectoLibre ? {efectoLibre: sustituirX(c.efectoLibre, X)} : {}),
     ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
   };

@@ -135,7 +135,7 @@ const AsistenteDueloHab = (() => {
         L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
       }else{
         L.push({id: 'objetivo', corto: 'Objetivo'});
-        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area') L.push({id: 'alcance', corto: 'Alcance'});
+        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda') L.push({id: 'alcance', corto: 'Alcance'});
         L.push({id: 'tira', corto: 'Tirada'});
         if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
         L.push({id: 'dano', corto: 'Daño'});
@@ -183,7 +183,11 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoObjetivo(){
       let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
-      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      if(st.objetivo === 'onda'){
+        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No hay dodge roll: no tienen a dónde salir. No te afecta a vos.</p>
+          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>`;
+      }
       if(st.objetivo === 'area'){
         h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
           <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>`;
@@ -271,8 +275,8 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo}${st.objetivo === 'area' ? ` (radio ${st.radio})` : ''}`);
-        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo}${st.objetivo === 'area' || st.objetivo === 'onda' ? ` (radio ${st.radio})` : ''}`);
+        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
         const contraTxt = [...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)';
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
@@ -311,7 +315,7 @@ const AsistenteDueloHab = (() => {
       q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
       q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-costo-hp]', e => { st.costoHp = Math.max(0, Math.round(Number(e.target.value) || 0)); });
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; dibujar(); });
+      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
@@ -365,12 +369,12 @@ const AsistenteDueloHab = (() => {
         if(st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»).'); return; }
         const out = {objetivo: st.objetivo, tira: st.tiraModo === 'stat' ? (st.tira || '') : '', contra: hayTira ? [...st.contra] : []};
         if(st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
-        if(st.objetivo === 'area' && !hayTira){ alert('Un hechizo de área necesita una tirada (Paso 4: PdG.Esp o PdG contra la Evasión de cada uno) — elegí qué tira quien la usa.'); return; }
+        if((st.objetivo === 'area' || st.objetivo === 'onda') && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return; }
         if(hayTira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
-        if(st.objetivo === 'area') out.radio = st.radio;
+        if(st.objetivo === 'area' || st.objetivo === 'onda') out.radio = Math.max(st.objetivo === 'onda' ? 1 : 0, st.radio);
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {})});
         cerrar();

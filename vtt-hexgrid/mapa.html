@@ -9184,7 +9184,7 @@ function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
-  if(ataque && ataque.hab && ataque.hab.objetivo === 'area'){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
+  if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
@@ -9389,7 +9389,7 @@ function dueloElegirAreaMapa(msg){
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   const radio = Math.max(0, Math.round(num(hab.radio)) || 0);
   const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
-  elegirDestino(async h => {
+  const lanzar = async h => {
     const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
     const mio = todos.find(propio);
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
@@ -9407,7 +9407,15 @@ function dueloElegirAreaMapa(msg){
       console.error('No se pudo lanzar el hechizo de área:', err);
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));
     }
-  }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true, cancelado);
+  };
+  // Onda alrededor de quien la usa (Shockwave…): el centro es su propio token, no hay que marcar nada.
+  if(hab.objetivo === 'onda'){
+    const mio = [...tokens.values()].find(propio);
+    if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar la onda'); cancelado(); return; }
+    lanzar({col: mio.col, fila: mio.fila});
+    return;
+  }
+  elegirDestino(lanzar, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true, cancelado);
 }
 
 /* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------

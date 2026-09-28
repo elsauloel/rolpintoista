@@ -9161,7 +9161,10 @@ function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab){
    tu alcance (casilleros desde tu token) «laten» con un brillo dorado. `ataque.alcance` lo calcula la página de quien actúa: cuerpo a cuerpo = 1 (más el Alcance del arma),
    armas de rango = su Rango, hechizos = Rango de casteo. Sin alcance (0) no se resalta nada. */
 let objetivosResaltados = null;
-function dueloResaltarObjetivos(propio, alcance){
+// ¿"t" es rival de quien castea (yo)? Mismo criterio que ya usaban los hechizos de área (dueloElegirAreaMapa,
+// 2026-09-27): los personajes atacan creeps y los creeps atacan personajes — no depende de quién mira el mapa.
+function dueloEsRival(yo, t){ return yo.tipo === 'creep' ? t.tipo === 'pj' : t.tipo === 'creep'; }
+function dueloResaltarObjetivos(propio, alcance, esValido){
   objetivosResaltados = null;
   const n = Math.round(num(alcance));
   if(!(n > 0)){ pedirDibujo(); return 0; }
@@ -9170,6 +9173,7 @@ function dueloResaltarObjetivos(propio, alcance){
   const set = new Set();
   tokens.forEach((t, id) => {
     if(propio(t) || (t.oculto && !soyGM)) return;
+    if(esValido && !esValido(t)) return;
     if(distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}) <= n) set.add(id);
   });
   objetivosResaltados = set;
@@ -9192,7 +9196,12 @@ function dueloElegirObjetivoMapa(msg){
       return;
     }
   }
-  const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance);
+  // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → solo tokens rivales; objetivo
+  // "aliado" → solo tokens del mismo bando (2026-09-27, pedido del dueño: la pulsación de elegir objetivo no
+  // debe ofrecer aliados en una habilidad hostil, ni rivales en una positiva).
+  const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
+  const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
+  const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido);
   const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
   const alSuelto = () => {
     elegirDestinoTerminar(); dueloAvisoObjetivoOcultar();
@@ -9202,8 +9211,8 @@ function dueloElegirObjetivoMapa(msg){
   const pedir = () => {
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
-      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
-      if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM) && (!esValido || esValido(t)));
+      if(!cand.length){ toast(esValido ? (objetivoTipo === 'aliado' ? 'Ahí no hay un aliado: esta habilidad solo apunta a los tuyos' : 'Ahí no hay un rival: esta habilidad solo apunta a enemigos') : 'Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       dueloAvisoObjetivoOcultar();
       let t = cand[0];
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
@@ -9381,7 +9390,7 @@ function dueloElegirAreaMapa(msg){
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && distanciaHex(h, t) <= radio)
-      .filter(t => hab.fuegoAmigo || (soyGM ? t.tipo === 'pj' : t.tipo === 'creep'))
+      .filter(t => hab.fuegoAmigo || dueloEsRival(yo, t))
       .map(t => t.id);
     if(!objetivos.length){ toast('No hay nadie adentro del área'); return; }
     try{

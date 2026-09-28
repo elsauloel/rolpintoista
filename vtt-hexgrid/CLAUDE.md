@@ -1061,12 +1061,15 @@ hexágono con otro sin importar bando. Todavía no está construido.
   respeta oculto/niebla — un token que no ves no late) y mantiene `animando = true` mientras haya
   algún par activo, para que sigan latiendo cuadro a cuadro.
 
-- **Elegir objetivo respeta bando (2026-09-27, pedido del dueño)**: hasta ahora, al elegir el objetivo de un
-  ataque o una habilidad, se podía hacer clic en CUALQUIER token (rival o aliado) — el `objetivo` configurado en
-  el 🎯 (`'enemigo'`/`'aliado'`) no se aplicaba en el mapa. `dueloEsRival(yo, t)` (nueva, compartida) dice si `t`
-  es rival de quien castea (personajes atacan creeps, creeps atacan personajes — no depende de quién mira el
-  mapa); `dueloElegirObjetivoMapa` arma `esValido` a partir de `ataque.hab.objetivo` (sin habilidad, o "Ataque con
-  mi arma, con arreglos" sin objetivo explícito, cuenta como `'enemigo'`) y se lo pasa tanto a
-  `dueloResaltarObjetivos` (lo que brilla al elegir) como al filtro del clic real — una habilidad hostil ya no
-  destaca ni deja elegir aliados, y una positiva ya no destaca ni deja elegir rivales. `dueloElegirAreaMapa`
-  (hechizos de área) pasó a usar el mismo `dueloEsRival` en vez de repetir la cuenta a mano.
+- **Elegir objetivo sugiere el bando, no lo impone (2026-09-27, pedido del dueño)**: `dueloEsRival(yo, t)` (nueva,
+  compartida) dice si `t` es rival de quien castea (personajes atacan creeps, creeps atacan personajes — no
+  depende de quién mira el mapa). `dueloElegirObjetivoMapa` arma `esValido` a partir de `ataque.hab.objetivo` (sin
+  habilidad, o "Ataque con mi arma, con arreglos" sin objetivo explícito, cuenta como `'enemigo'`) y se lo pasa a
+  `dueloResaltarObjetivos`: una habilidad hostil resalta solo rivales, una positiva solo aliados — pero es nomás
+  una ayuda visual. **Se puede clickear cualquier token igual** (primer intento: se dejaba elegir cualquiera sin
+  avisar nada, corregido el mismo día): si no es del bando esperado, un `confirm()` nativo pregunta antes de abrir
+  el duelo ("¿Igual atacarlo?" / "¿Igual apuntarle con esta habilidad pensada para aliados?") — cancelar vuelve a
+  pedir el objetivo, sin bloquear la posibilidad de todo lo demás (mismo criterio que el resto del juego: avisa y
+  deja seguir, no prohíbe — no hay ninguna razón mecánica para impedir un golpe a un aliado a propósito).
+  `dueloElegirAreaMapa` (hechizos de área) usa el mismo `dueloEsRival` para su lista de objetivos (esa sí sigue
+  siendo un filtro real, no una sugerencia — el área no pide confirmar objetivo por objetivo).

@@ -9196,9 +9196,10 @@ function dueloElegirObjetivoMapa(msg){
       return;
     }
   }
-  // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → solo tokens rivales; objetivo
-  // "aliado" → solo tokens del mismo bando (2026-09-27, pedido del dueño: la pulsación de elegir objetivo no
-  // debe ofrecer aliados en una habilidad hostil, ni rivales en una positiva).
+  // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → brillan los rivales; objetivo
+  // "aliado" → brillan los del mismo bando (2026-09-27, pedido del dueño). Es solo una ayuda visual: se puede
+  // clickear cualquiera igual, pero si no es del bando esperado se pide confirmar antes de abrir el duelo
+  // ("avisa y deja seguir", no bloquea — no hay razón mecánica para prohibir un golpe a un aliado a propósito).
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
   const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido);
@@ -9211,10 +9212,14 @@ function dueloElegirObjetivoMapa(msg){
   const pedir = () => {
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
-      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM) && (!esValido || esValido(t)));
-      if(!cand.length){ toast(esValido ? (objetivoTipo === 'aliado' ? 'Ahí no hay un aliado: esta habilidad solo apunta a los tuyos' : 'Ahí no hay un rival: esta habilidad solo apunta a enemigos') : 'Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
-      dueloAvisoObjetivoOcultar();
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
+      if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
+      if(esValido && !esValido(t)){
+        const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
+        if(!confirm(msg)){ pedir(); return; }
+      }
+      dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
       Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')

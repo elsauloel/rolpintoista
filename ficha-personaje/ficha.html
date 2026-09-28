@@ -4395,7 +4395,7 @@ function ataqueDeHabArma(it, arma, xSp, xNitros){
   const efectos = (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined}, cura: num(e.cura), detalle: e.detalle || ''}));
   return {tipo: 'habilidad-arma', habNombre: it.nombre, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango),
     alcance: c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHab(c, 'pdg') : alcanceDeArma(arma), sinParry: !!a.sinParry,
-    mods: {pdg: num(a.pdg) + num(a.pdgPorX) * X, dados: num(a.dadosPorX) * X, fijo: num(a.fijo) + num(a.fijoPorX) * X}, efectos};
+    mods: {pdg: num(a.pdg) + num(a.pdgPorX) * X, dados: num(a.dadosPorX) * X, fijo: num(a.fijo) + num(a.fijoPorX) * X, ignoraResistCrit: num(a.ignoraResistCrit)}, efectos};
 }
 function xDeHab(it, xSp, xNitros){ return spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0; }
 // Reemplaza el token «X» (sin importar mayúsculas) de una fórmula de dados por un número — mismo criterio que

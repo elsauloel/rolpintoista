@@ -326,3 +326,24 @@ versión parecida en más de una, es candidato a juntar.
   `info` de cada opción, que el cuadro del duelo ya sabía dibujar — `comun/duelo.js` línea de `Elegí cómo te
   defendés`); a `gm-toolset/gm-tools.html` (creeps) le faltaba, mismo `fx()` que ya usaba la ficha
   (`formulaParaValor` + `mitadesDeTirada` para Pajaritos/Lisiado/Parálisis).
+
+- **Cuadraditos del crítico: de a 5 y con leyenda (2026-09-27, ajuste del dueño a lo recién agregado)**: dos
+  correcciones sobre `criticoVizHtml`. (1) **Tachado por cuadradito, no por grupo**: un grupo de "rango" que anula
+  la Resistencia a crítico ya no lleva una línea sobre todo el grupo (`.duelo-crit-grupo.anulado::after`, sacado)
+  — cada cuadradito de ese grupo lleva su propia franja diagonal dorada (`.duelo-crit-cuad.anulado::after`, un
+  degradé sobre el cuadradito individual), así el tachado no se pierde al reordenar. (2) **Agrupado de a 5**
+  (`deA5`, en las dos filas): un hueco un poco más grande cada 5 cuadraditos, solo para poder contar de un
+  vistazo sin tener que ir de a uno — no tiene ningún significado de juego, es aparte del agrupado por "rango"
+  (que sigue existiendo, solo por color: azul = cuenta, tachado = anulado, gris = no llega a un nivel entero).
+  Se sumó una **leyenda** (`.duelo-crit-leyenda`) debajo de las dos filas con un cuadradito de ejemplo de cada
+  color/símbolo y su significado (incluye el Tipo del arma en el texto de "anulado por Resistencia a crítico").
+
+- **"Ignora Resistencia a crítico" en "Ataque con mi arma, con arreglos" (2026-09-27, pedido del dueño)**: nuevo
+  campo del paso "Tu ataque" del 🎯 (`comun/asistente-duelo-hab.js`, checkbox + cuántos puntos,
+  `duelo.arma.ignoraResistCrit`) para skills como Golpe brutal que ignoran parte de la Resistencia a crítico del
+  objetivo. `ataqueDeHabArma` (ficha.html) lo pasa en `mods.ignoraResistCrit`; `entrarCritico` (`comun/duelo.js`)
+  le resta esos puntos a la Resistencia ANTES de `Critico.evaluar`, así se ve reflejado en la cuenta, en los
+  cuadraditos y en cuántos d20 se tiran — con una línea extra en la explicación cuando corresponde ("Golpe brutal
+  ignora 2 de Resistencia a crítico del defensor."). Solo para modo `'arma'` (el único donde hoy hay crítico —
+  las habilidades dirigidas con daño mágico no critican). No se conectó todavía del lado de gm-tools (los creeps
+  no tienen un `ataqueDeHabArma` propio hoy — ver "A desarrollar" si hiciera falta).

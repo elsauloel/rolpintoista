@@ -153,14 +153,18 @@ const Duelo = (() => {
 .duelo-crit-viz{margin:8px 0 4px}
 .duelo-crit-viz-tit{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;margin:8px 0 5px}
 .duelo-crit-viz-tit:first-child{margin-top:0}
-.duelo-crit-fila{display:flex;flex-wrap:wrap;gap:3px}
-.duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none}
-.duelo-crit-cuad.fuera{opacity:.35;text-decoration:line-through}
+.duelo-crit-fila{display:flex;flex-wrap:wrap;align-items:center}
+.duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
+.duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
+.duelo-crit-cuad.fuera{opacity:.35}
 .duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
-.duelo-crit-cuad.azul{background:#2d6cdf;border-color:#8db3ff;color:#fff}
-.duelo-crit-cuad.gris{background:#12172a;border-color:#2b3347;color:#565f78}
-.duelo-crit-grupo{display:flex;gap:1px;position:relative}
-.duelo-crit-grupo.anulado::after{content:'';position:absolute;left:-1px;right:-1px;top:50%;height:2px;background:#ffd25a;transform:translateY(-50%)}
+.duelo-crit-cuad.activo{background:#2d6cdf;border-color:#8db3ff;color:#fff}
+.duelo-crit-cuad.suelto{background:#12172a;border-color:#2b3347;color:#565f78}
+.duelo-crit-cuad.anulado{background:#2d6cdf;border-color:#8db3ff}
+.duelo-crit-cuad.anulado::after{content:'';position:absolute;inset:0;border-radius:3px;background:linear-gradient(135deg,transparent 44%,#ffd25a 47%,#ffd25a 53%,transparent 56%)}
+.duelo-crit-leyenda{display:flex;flex-wrap:wrap;gap:5px 16px;margin-top:6px}
+.duelo-crit-ref{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#9aa4bd}
+.duelo-crit-ref .duelo-crit-cuad{width:16px;height:16px;font-size:7px}
 .duelo-d20s{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:12px 0 8px}
 .duelo-d20{width:44px;height:44px;border-radius:10px;background:#12172a;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#9aa4bd;position:relative}
 .duelo-d20.nuevo{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both}
@@ -490,16 +494,21 @@ const Duelo = (() => {
   // El golpe pegó (por Evasión o por un Parry perdido): se evalúa el crítico con la misma regla, contra la tirada de defensa que se usó.
   function entrarCritico(m){
     const dd = m.critDatos || {};
+    // "Ignora Resistencia a crítico" (2026-09-27, pedido del dueño): una habilidad tipo "ataque con mi arma, con
+    // arreglos" (Golpe brutal y similares, duelo.arma.ignoraResistCrit) le resta puntos a la Resistencia del
+    // defensor antes de calcular el crítico — a la vista en la cuenta y en los cuadraditos, como cualquier otra.
+    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit);
+    const resistencia = Math.max(0, _num(dd.resistencia) - ignora);
     let e = null;
     if(typeof Critico !== 'undefined' && m.pdg && m.eva){
-      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia)});
+      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia});
     }
     if(e && e.critico){
-      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia), d20: null, mejor: 0, mult: 1};
+      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia, d20: null, mejor: 0, mult: 1};
       m.fase = 'critico';
       m.estado = 'esperando';
     }else{
-      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia: _num(dd.resistencia), d20: null, mejor: 0, mult: 1} : null;
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia, d20: null, mejor: 0, mult: 1} : null;
       entrarDano(m);
     }
   }
@@ -1281,10 +1290,12 @@ const Duelo = (() => {
   }
   // Cuadraditos del crítico (2026-09-27, pedido del dueño — hacer visible la cuenta abstracta de PdG/Evasión/Tipo/
   // rango/resistencia). Arriba, el Tipo del arma en cuadrados: los que se pierden por Crítico frecuente quedan
-  // tachados, el resto (el rango real) queda entero. Abajo, la tirada de PdG completa (no la diferencia — el dueño
-  // pidió ver el total real): lo que se come la Evasión/Parry en rojo con una «E», y lo que queda se agrupa de a
-  // «rango» — cada grupo entero es un nivel de crítico; los grupos que anula la Resistencia a crítico quedan
-  // tachados con una línea dorada; lo que sobra sin llegar a un grupo entero queda gris.
+  // atenuados, el resto (el rango real) queda entero. Abajo, la tirada de PdG completa (no la diferencia — el
+  // dueño pidió ver el total real): lo que se come la Evasión/Parry en rojo con una «E», y lo que queda se agrupa
+  // de a «rango» — cada grupo entero es un nivel de crítico (azul); los que anula la Resistencia a crítico quedan
+  // tachados cuadradito por cuadradito (no con una línea por encima de todo el grupo); lo que sobra sin llegar a
+  // un grupo entero queda gris, suelto. Las dos filas se reordenan de a 5 (pedido del dueño, para contar de un
+  // vistazo) y abajo hay una leyenda con lo que significa cada color/símbolo.
   function criticoVizHtml(d){
     const c = d.crit;
     const tipo = Math.max(1, Math.round(_num(d.ataque.tipoDado)));
@@ -1293,22 +1304,42 @@ const Duelo = (() => {
     const pdgTotal = Math.max(0, Math.round(_num(d.pdg.total)));
     const nivel = Math.max(0, Math.round(_num(c.nivel)));
     const resistencia = Math.max(0, Math.round(_num(c.resistencia)));
+    const nombreDef2 = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
     const cuad = (cls, txt) => `<div class="duelo-crit-cuad ${cls || ''}">${txt || ''}</div>`;
-    const filaTipo = Array.from({length: tipo}, (_, i) => cuad(i < tipo - rango ? 'fuera' : '')).join('');
-    const cuadsEva = Array.from({length: Math.min(evaTotal, pdgTotal)}, () => cuad('eva', 'E')).join('');
-    let quedan = Math.max(0, pdgTotal - evaTotal), grupo = 0, grupos = '';
+    // Agrupados de a 5 (pedido del dueño, para contar fácil de un vistazo) — el hueco extra cada 5 es solo
+    // visual, no cambia nada del cálculo (el color/tachado de cada cuadradito ya dice lo que corresponde).
+    const deA5 = arr => { const out = []; for(let i = 0; i < arr.length; i += 5) out.push(`<div class="duelo-crit-cinco">${arr.slice(i, i + 5).join('')}</div>`); return out.join(''); };
+
+    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => cuad(i < tipo - rango ? 'fuera' : '')));
+
+    // La tirada: primero lo que come la Evasión/Parry (rojo, «E»); el resto se agrupa de a «rango» (cada grupo
+    // entero es un nivel de crítico) — los grupos que anula la Resistencia quedan tachados cuadradito por
+    // cuadradito (no como una línea sobre todo el grupo), así el tachado no se pierde al reordenar de a 5.
+    const cuadsTirada = Array.from({length: Math.min(evaTotal, pdgTotal)}, () => cuad('eva', 'E'));
+    let quedan = Math.max(0, pdgTotal - evaTotal), grupo = 0, huboAnulado = false, huboSuelto = false;
     while(quedan >= rango){
       grupo++;
       const anulado = grupo > nivel - resistencia && grupo <= nivel;
-      grupos += `<div class="duelo-crit-grupo${anulado ? ' anulado' : ''}">${Array.from({length: rango}, () => cuad('azul')).join('')}</div>`;
+      if(anulado) huboAnulado = true;
+      for(let i = 0; i < rango; i++) cuadsTirada.push(cuad(anulado ? 'anulado' : 'activo'));
       quedan -= rango;
     }
-    const sueltos = Array.from({length: quedan}, () => cuad('gris')).join('');
+    if(quedan > 0) huboSuelto = true;
+    for(let i = 0; i < quedan; i++) cuadsTirada.push(cuad('suelto'));
+
+    const leyenda = [
+      evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
+      `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
+      huboAnulado ? `${cuad('anulado')}<span>= anulado por Resistencia a crítico (Tipo ${_fmt(tipo)})</span>` : '',
+      huboSuelto ? `${cuad('suelto')}<span>= no llega a completar un nivel</span>` : '',
+    ].filter(Boolean).map(t => `<div class="duelo-crit-ref">${t}</div>`).join('');
+
     return `<div class="duelo-crit-viz">
       <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${tipo !== rango ? ` − Crítico frecuente = ${_fmt(rango)}` : ''}</div>
       <div class="duelo-crit-fila">${filaTipo}</div>
-      <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − Evasión/Parry ${_fmt(evaTotal)}` : ''}</div>
-      <div class="duelo-crit-fila">${cuadsEva}${grupos}${sueltos}</div>
+      <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − ${_esc(nombreDef2)} ${_fmt(evaTotal)}` : ''}</div>
+      <div class="duelo-crit-fila">${deA5(cuadsTirada)}</div>
+      <div class="duelo-crit-leyenda">${leyenda}</div>
     </div>`;
   }
   function criticoHtml(d){
@@ -1318,8 +1349,10 @@ const Duelo = (() => {
     // Lo primero que se lee es el veredicto en grande; la cuenta que lo explica va debajo, en renglones.
     const titulo = (clase, txt) => `<div class="duelo-crit-titulo ${clase}">${txt}</div>`;
     const explica = lineas => `<div class="duelo-crit-explica">${lineas.map(l => `<div>${_esc(l)}</div>`).join('')}</div>`;
+    const ignoraResistCrit = _num(d.ataque && d.ataque.mods && d.ataque.mods.ignoraResistCrit);
     const lCuenta = [`PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} de diferencia`,
       `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''})`,
+      ...(ignoraResistCrit ? [`${_esc(d.hab ? d.hab.nombre : d.ataque.habNombre || 'Esta habilidad')} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
     const viz = criticoVizHtml(d);

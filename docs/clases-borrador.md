@@ -149,7 +149,7 @@ Estados que define la clase:
    el estado **Barrera** (barra 🛡 de 8, como el Escudo mágico, hasta el
    próximo Mantenimiento): absorbe 8 de la próxima fuente de daño; si hace
    más, el resto entra normal.
-2. ✅ **Shockwave** — SP 3, No2 0 (Flash: SP x 3 = 9 SP en turno ajeno, a mano). Onda expansiva alrededor de quien la usa
+2. ✅ **Shockwave** — SP 3, No2 0 (Flash: SP x 2 = el doble, 6 SP en turno ajeno, a mano). Onda expansiva alrededor de quien la usa
    (radio 1, sin marcar centro): tira **Fuerza** una sola vez; cada **enemigo** adyacente tira **Constitución** por
    separado y **quien pierde** queda en **Pajaritos** (PdG y Evasión a la mitad) por **2 turnos**. *(Auditada
    2026-09-28 — primera skill con el objetivo "onda alrededor de quien la usa" del 🎯 (`duelo: {objetivo:'onda',

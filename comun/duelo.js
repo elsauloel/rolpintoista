@@ -150,6 +150,17 @@ const Duelo = (() => {
 .duelo-crit-titulo.posible{color:#ffd25a}
 .duelo-crit-titulo.si{color:#ffd25a;text-shadow:0 0 14px rgba(255,190,60,.7)}
 .duelo-crit-explica{text-align:center;font-size:13px;color:#aab3ca;line-height:1.5;margin-bottom:6px}
+.duelo-crit-viz{margin:8px 0 4px}
+.duelo-crit-viz-tit{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;margin:8px 0 5px}
+.duelo-crit-viz-tit:first-child{margin-top:0}
+.duelo-crit-fila{display:flex;flex-wrap:wrap;gap:3px}
+.duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none}
+.duelo-crit-cuad.fuera{opacity:.35;text-decoration:line-through}
+.duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
+.duelo-crit-cuad.azul{background:#2d6cdf;border-color:#8db3ff;color:#fff}
+.duelo-crit-cuad.gris{background:#12172a;border-color:#2b3347;color:#565f78}
+.duelo-crit-grupo{display:flex;gap:1px;position:relative}
+.duelo-crit-grupo.anulado::after{content:'';position:absolute;left:-1px;right:-1px;top:50%;height:2px;background:#ffd25a;transform:translateY(-50%)}
 .duelo-d20s{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:12px 0 8px}
 .duelo-d20{width:44px;height:44px;border-radius:10px;background:#12172a;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#9aa4bd;position:relative}
 .duelo-d20.nuevo{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both}
@@ -1268,6 +1279,38 @@ const Duelo = (() => {
       ${!puedeMapa && !puedeAMano ? '<div class="duelo-nota viva">esperando que se resuelva el dodge roll…</div>' : ''}
     </div>`;
   }
+  // Cuadraditos del crítico (2026-09-27, pedido del dueño — hacer visible la cuenta abstracta de PdG/Evasión/Tipo/
+  // rango/resistencia). Arriba, el Tipo del arma en cuadrados: los que se pierden por Crítico frecuente quedan
+  // tachados, el resto (el rango real) queda entero. Abajo, la tirada de PdG completa (no la diferencia — el dueño
+  // pidió ver el total real): lo que se come la Evasión/Parry en rojo con una «E», y lo que queda se agrupa de a
+  // «rango» — cada grupo entero es un nivel de crítico; los grupos que anula la Resistencia a crítico quedan
+  // tachados con una línea dorada; lo que sobra sin llegar a un grupo entero queda gris.
+  function criticoVizHtml(d){
+    const c = d.crit;
+    const tipo = Math.max(1, Math.round(_num(d.ataque.tipoDado)));
+    const rango = Math.max(1, Math.round(_num(c.rango)));
+    const evaTotal = Math.max(0, Math.round(_num(d.eva.total)));
+    const pdgTotal = Math.max(0, Math.round(_num(d.pdg.total)));
+    const nivel = Math.max(0, Math.round(_num(c.nivel)));
+    const resistencia = Math.max(0, Math.round(_num(c.resistencia)));
+    const cuad = (cls, txt) => `<div class="duelo-crit-cuad ${cls || ''}">${txt || ''}</div>`;
+    const filaTipo = Array.from({length: tipo}, (_, i) => cuad(i < tipo - rango ? 'fuera' : '')).join('');
+    const cuadsEva = Array.from({length: Math.min(evaTotal, pdgTotal)}, () => cuad('eva', 'E')).join('');
+    let quedan = Math.max(0, pdgTotal - evaTotal), grupo = 0, grupos = '';
+    while(quedan >= rango){
+      grupo++;
+      const anulado = grupo > nivel - resistencia && grupo <= nivel;
+      grupos += `<div class="duelo-crit-grupo${anulado ? ' anulado' : ''}">${Array.from({length: rango}, () => cuad('azul')).join('')}</div>`;
+      quedan -= rango;
+    }
+    const sueltos = Array.from({length: quedan}, () => cuad('gris')).join('');
+    return `<div class="duelo-crit-viz">
+      <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${tipo !== rango ? ` − Crítico frecuente = ${_fmt(rango)}` : ''}</div>
+      <div class="duelo-crit-fila">${filaTipo}</div>
+      <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − Evasión/Parry ${_fmt(evaTotal)}` : ''}</div>
+      <div class="duelo-crit-fila">${cuadsEva}${grupos}${sueltos}</div>
+    </div>`;
+  }
   function criticoHtml(d){
     const c = d.crit;
     const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
@@ -1279,14 +1322,17 @@ const Duelo = (() => {
       `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''})`,
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
+    const viz = criticoVizHtml(d);
     if(!c.critico){
       const anulado = c.nivel > 0 && c.dados <= 0;
       cuerpo = titulo('no', '✘ NO ES CRÍTICO')
-        + explica([anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta]);
+        + explica([anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta])
+        + viz;
     }else if(!c.d20){
       const puede = esMio(d.atacante) || soyGM();
       cuerpo = titulo('posible', '💥 ' + tituloNivel(_num(c.dados)))
         + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
+        + viz
         + tablaCriticoHtml(c, d, 0)
         + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
     }else{
@@ -1297,6 +1343,7 @@ const Duelo = (() => {
       cuerpo = titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
         + fichas
         + explica([`d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
+        + viz
         + tablaCriticoHtml(c, d, c.mejor);
     }
     return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;

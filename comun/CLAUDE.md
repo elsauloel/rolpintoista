@@ -307,3 +307,22 @@ versión parecida en más de una, es candidato a juntar.
   `gm-toolset/gm-tools.html`, el ✎ de una habilidad de creep) se actualizaron para el nuevo contrato; los creeps
   no tienen costo en HP todavía, así que ahí `costoInicial.hpCosto` queda sin pasar y `r.costo.hpCosto` no se
   guarda (el campo igual aparece en el paso, pensando en el día que haga falta).
+
+- **`duelo.js`: la cuenta del crítico en cuadraditos** (2026-09-27, pedido del dueño — antes era una probeta,
+  hecha con la herramienta de visualización para acordar el diseño; ahora vive en el duelo de verdad):
+  `criticoVizHtml(d)`, dentro del paso "4. Crítico", en las tres situaciones (no es crítico, es crítico
+  esperando tirar los d20, y ya tirados). Arriba, **"Rango del crítico"**: el Tipo del arma en cuadraditos, con
+  los que resta el Crítico frecuente tachados y atenuados (queda el rango real entero). Abajo, **"Tu tirada"**:
+  la tirada de PdG **completa** (no la diferencia — el dueño pidió ver el total real de la tirada), con lo que
+  se come la Evasión/Parry en rojo con una «E», y el resto agrupado de a "rango": cada grupo entero es un nivel
+  de crítico (azul); los grupos que anula la Resistencia a crítico quedan con una raya dorada encima (`.anulado`);
+  lo que sobra sin llegar a completar un grupo queda gris, suelto. Mismos colores que ya usaba el resto del
+  cuadro (`#2d6cdf` azul, `#d95a6e`/`#3b1820` rojo, `#ffd25a` dorado, `#39435c` bordes) — no se inventó paleta
+  nueva.
+
+- **`opcionesDefensa`: mostrar la fórmula ANTES de elegir, también para los creeps** (2026-09-27, pedido del
+  dueño — "uno debe saber cuánto tira antes de apretar el botón"): la ficha (personajes e invocaciones) ya
+  mostraba "Evasión 🎲 1d8+2" / "Parry 🎲 …" al lado de cada botón del menú "Elegí cómo te defendés" (campo
+  `info` de cada opción, que el cuadro del duelo ya sabía dibujar — `comun/duelo.js` línea de `Elegí cómo te
+  defendés`); a `gm-toolset/gm-tools.html` (creeps) le faltaba, mismo `fx()` que ya usaba la ficha
+  (`formulaParaValor` + `mitadesDeTirada` para Pajaritos/Lisiado/Parálisis).

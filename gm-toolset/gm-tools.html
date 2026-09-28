@@ -8501,9 +8501,13 @@ window.DUELO_HOOKS = {
   opcionesDefensa: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
     if(!sc) return [];
+    // «Cuánto tirarías» antes de elegir (2026-09-27, pedido del dueño): mismo criterio que ya tenía la ficha
+    // con sus personajes e invocaciones — acá faltaba para los creeps.
+    const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? mitadesDeTirada(sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
     const c = costoParryCreep(sc);
-    return [{modo: 'evasion', etiqueta: '🏃 Evasión'},
-      {modo: 'parry', itemId: '', itemNombre: sc.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${sc.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : ''}];
+    return [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(creepStatValor(sc, 'eva'), 'eva')}`]},
+      {modo: 'parry', itemId: '', itemNombre: sc.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${sc.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : '',
+        info: [`Parry 🎲 ${fx(creepStatValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(bloqueoValorCreep(sc))}`]}];
   },
   defender: (d, modo) => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);

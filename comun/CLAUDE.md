@@ -373,3 +373,6 @@ versión parecida en más de una, es candidato a juntar.
   texto libre (`efectoLibre`/`efectosNota`) porque una palabra normal no trae "dx"/"xd" pegados. De paso,
   `DUELO_HOOKS.habTirar` ahora avisa con un toast si la fórmula personalizada no es válida, en vez de quedarse
   callado — para que la próxima vez que pase algo así se note enseguida, no después de 8 segundos de brillo.
+
+- **Cuadraditos del crítico, ajuste (2026-09-28, pedido del dueño)**: (1) la barra de "Tu tirada" vuelve a agruparse por el **rango** (cada grupo = un nivel de crítico; lo que se come la Evasión/Parry, las «E», va aparte de a 5) en vez de a 5 parejo; la fila de arriba (Rango) sigue de a 5. (2) Los cuadraditos que resta el **Crítico frecuente** van en **verde con una «F»** (`.duelo-crit-cuad.frec`, antes atenuados) y la leyenda suma su línea "F = Crítico frecuente (N)…" cuando hay alguno.
+- **La tirada de Evasión nunca baja de 1** (2026-09-28, regla del dueño): se corrige a mínimo 1 al tirarla (`tirarValorStat` y `tirarValorStatInv` en `ficha.html`, `tirarValorStat` en `gm-tools.html`: cubre sobrepeso, mitades de Pajaritos/Sentado y modificadores negativos) y, como red de seguridad, al guardarla en el duelo (`guardarTiro`, `comun/duelo.js`, campo `eva`).

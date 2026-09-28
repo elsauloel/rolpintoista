@@ -4822,7 +4822,9 @@ function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
   if(sobrepeso === 'penal') estados.push({n: 'Sobrepeso', p: 'debuff'});
   else if(sobrepeso === 'pagado') estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
   const mit = statId ? mitadesDeTirada(S.efectos, statId) : 0;
-  const r = {formula: f.formula + (ex ? `+${ex}` : '') + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod + ex, total: mit ? aplicarMitades(intento.total + ex, mit) : intento.total + ex, estados, ...(ventaja ? {ventaja} : {})};
+  let totalFinal = mit ? aplicarMitades(intento.total + ex, mit) : intento.total + ex;
+  if(statId === 'eva') totalFinal = Math.max(1, totalFinal);   // una tirada de Evasión nunca baja de 1 (regla del dueño, 2026-09-28)
+  const r = {formula: f.formula + (ex ? `+${ex}` : '') + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod + ex, total: totalFinal, estados, ...(ventaja ? {ventaja} : {})};
   registrarTirada(nombre, r);
 }
 
@@ -5409,7 +5411,8 @@ function tirarValorStatInv(inv, nombre, valor, statId){
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
   const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
   const mit = statId ? mitadesDeTirada(inv.estados, statId) : 0;
-  const total = aplicarMitades(rolls.reduce((a,b)=>a+b,0) + f.mod, mit);
+  let total = aplicarMitades(rolls.reduce((a,b)=>a+b,0) + f.mod, mit);
+  if(statId === 'eva') total = Math.max(1, total);   // la Evasión nunca baja de 1
   const estados = statId ? estadosQueAfectanStatInv(inv, statId) : [];
   registrarTirada(`${inv.nombre} · ${nombre}`, {formula: f.formula + ' ÷2'.repeat(mit), rolls, mod: f.mod, total, estados});
 }

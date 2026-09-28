@@ -1392,7 +1392,9 @@ function tirarValorStat(nombre, valor, sc, statId){
   }
   const estados = statId ? estadosQueAfectanStatCreep(sc, statId, conVentaja) : [];
   const mit = sc && statId ? mitadesDeTirada(sc.estados, statId) : 0;
-  registrarTirada(nombre, {formula: f.formula + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod, total: aplicarMitades(intento.total, mit), estados, ...(ventaja ? {ventaja} : {})});
+  let totalFinal = aplicarMitades(intento.total, mit);
+  if(statId === 'eva') totalFinal = Math.max(1, totalFinal);   // la Evasión nunca baja de 1
+  registrarTirada(nombre, {formula: f.formula + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod, total: totalFinal, estados, ...(ventaja ? {ventaja} : {})});
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];

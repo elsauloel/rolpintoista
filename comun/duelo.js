@@ -156,7 +156,7 @@ const Duelo = (() => {
 .duelo-crit-fila{display:flex;flex-wrap:wrap;align-items:center}
 .duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
 .duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
-.duelo-crit-cuad.fuera{opacity:.35}
+.duelo-crit-cuad.frec{background:#1f6b3a;border-color:#5fd08a;color:#e6ffee}
 .duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
 .duelo-crit-cuad.activo{background:#2d6cdf;border-color:#8db3ff;color:#fff}
 .duelo-crit-cuad.suelto{background:#12172a;border-color:#2b3347;color:#565f78}
@@ -582,7 +582,7 @@ const Duelo = (() => {
 
   // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
   async function guardarTiro(id, campo, r, defensa, extra){
-    const tiro = {total: Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod)};
+    const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod)};
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
     let anuncio = '', par = null;
@@ -1316,24 +1316,30 @@ const Duelo = (() => {
     // visual, no cambia nada del cálculo (el color/tachado de cada cuadradito ya dice lo que corresponde).
     const deA5 = arr => { const out = []; for(let i = 0; i < arr.length; i += 5) out.push(`<div class="duelo-crit-cinco">${arr.slice(i, i + 5).join('')}</div>`); return out.join(''); };
 
-    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => cuad(i < tipo - rango ? 'fuera' : '')));
+    // Fila del Rango: los cuadraditos que resta el Crítico frecuente van en verde con una «F» (pedido del dueño).
+    const nFrec = Math.max(0, tipo - rango);
+    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => i < nFrec ? cuad('frec', 'F') : cuad('')));
 
-    // La tirada: primero lo que come la Evasión/Parry (rojo, «E»); el resto se agrupa de a «rango» (cada grupo
-    // entero es un nivel de crítico) — los grupos que anula la Resistencia quedan tachados cuadradito por
-    // cuadradito (no como una línea sobre todo el grupo), así el tachado no se pierde al reordenar de a 5.
-    const cuadsTirada = Array.from({length: Math.min(evaTotal, pdgTotal)}, () => cuad('eva', 'E'));
+    // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
+    // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
+    // «E», de a 5 porque no es un nivel); los grupos que anula la Resistencia quedan tachados cuadradito por
+    // cuadradito.
+    const grupos = [];
+    const nEva = Math.min(evaTotal, pdgTotal);
+    for(let i = 0; i < nEva; i += 5) grupos.push(Array.from({length: Math.min(5, nEva - i)}, () => cuad('eva', 'E')));
     let quedan = Math.max(0, pdgTotal - evaTotal), grupo = 0, huboAnulado = false, huboSuelto = false;
     while(quedan >= rango){
       grupo++;
       const anulado = grupo > nivel - resistencia && grupo <= nivel;
       if(anulado) huboAnulado = true;
-      for(let i = 0; i < rango; i++) cuadsTirada.push(cuad(anulado ? 'anulado' : 'activo'));
+      grupos.push(Array.from({length: rango}, () => cuad(anulado ? 'anulado' : 'activo')));
       quedan -= rango;
     }
-    if(quedan > 0) huboSuelto = true;
-    for(let i = 0; i < quedan; i++) cuadsTirada.push(cuad('suelto'));
+    if(quedan > 0){ huboSuelto = true; grupos.push(Array.from({length: quedan}, () => cuad('suelto'))); }
+    const filaTirada = grupos.map(g => `<div class="duelo-crit-cinco">${g.join('')}</div>`).join('');
 
     const leyenda = [
+      nFrec ? `${cuad('frec', 'F')}<span>= Crítico frecuente (${_fmt(nFrec)}): se resta del Tipo y achica el rango</span>` : '',
       evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
       `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
       huboAnulado ? `${cuad('anulado')}<span>= anulado por Resistencia a crítico (Tipo ${_fmt(tipo)})</span>` : '',
@@ -1344,7 +1350,7 @@ const Duelo = (() => {
       <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${tipo !== rango ? ` − Crítico frecuente = ${_fmt(rango)}` : ''}</div>
       <div class="duelo-crit-fila">${filaTipo}</div>
       <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − ${_esc(nombreDef2)} ${_fmt(evaTotal)}` : ''}</div>
-      <div class="duelo-crit-fila">${deA5(cuadsTirada)}</div>
+      <div class="duelo-crit-fila">${filaTirada}</div>
       <div class="duelo-crit-leyenda">${leyenda}</div>
     </div>`;
   }

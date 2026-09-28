@@ -556,7 +556,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'trampaDejaZona', 'zonaTurnos'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -607,6 +607,9 @@ service cloud.firestore {
           && (!('zonaResueltos' in d) || (d.zonaResueltos is list && d.zonaResueltos.size() <= 60))
           && (!('zonaEnMantenimiento' in d) || d.zonaEnMantenimiento is bool)
           && (!('zonaCadaPaso' in d) || d.zonaCadaPaso is bool)
+          // Trampa persistente (2026-09-28): al dispararse se convierte en zona (mismas celdas), ver trampaResolver.
+          && (!('trampaDejaZona' in d) || d.trampaDejaZona is bool)
+          && (!('zonaTurnos' in d) || (d.zonaTurnos is int && d.zonaTurnos >= 1 && d.zonaTurnos <= 99))
           && d.duenoUid is string;
       }
       match /elementos/{id} {
@@ -620,7 +623,7 @@ service cloud.firestore {
         allow update: if esMiembro(c) && (
           ((resource.data.duenoUid == request.auth.uid || esGM(c))
             && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos'])
             && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
           || (resource.data.get('trampa', false) == true
@@ -633,7 +636,12 @@ service cloud.firestore {
           // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).
           || (resource.data.get('zona', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zonaResueltos'])
-            && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1));
+            && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1)
+          // Trampa persistente ya disparada: cualquiera completa su conversión a zona (viene pre-armada por
+          // quien puso la trampa) — ver comun/CLAUDE.md "Trampas persistentes".
+          || (resource.data.get('trampa', false) == true && resource.data.get('trampaDejaZona', false) == true && resource.data.get('disparada', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor'])
+            && request.resource.data.zona == true));
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -718,7 +726,7 @@ service cloud.firestore {
           allow update: if esMiembro(c) && (
             ((resource.data.duenoUid == request.auth.uid || esGM(c))
               && elementoValido(request.resource.data)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos'])
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
@@ -730,7 +738,11 @@ service cloud.firestore {
             // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).
             || (resource.data.get('zona', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zonaResueltos'])
-              && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1));
+              && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1)
+            // Trampa persistente ya disparada: cualquiera completa su conversión a zona.
+            || (resource.data.get('trampa', false) == true && resource.data.get('trampaDejaZona', false) == true && resource.data.get('disparada', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor'])
+              && request.resource.data.zona == true));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c));
         }

@@ -464,3 +464,29 @@ versión parecida en más de una, es candidato a juntar.
     `zonaCadaPaso` sumadas a `elementoValido`.
   - **Pendiente**: sumar la misma opción de "queda como zona" al asistente de trampas (una trampa que en vez de
     dispararse una vez deja puesta una zona), y que el asistente de zonas también sepa armar Línea/Forma libre.
+
+- **Trampas persistentes (2026-09-28, pedido del dueño, sigue a las dos etapas de arriba)**: en el asistente
+  paso a paso de una trampa del mapa (`comun/asistente-trampa.js`, no en las que coloca una habilidad) hay un
+  paso nuevo, justo después de "Estado": **"¿Al dispararse, queda además como una zona?"**. Marcado, además del
+  golpe de siempre (una vez, a quien la pisó), la trampa deja puesta una zona con el **mismo daño y/o estado**
+  que ya se configuró — como una trampa de gas que, al saltar, deja la nube ahí un rato. Se pregunta cuántos
+  turnos dura esa zona, si sigue afectando en cada Mantenimiento y si se dispara con cada paso o alcanza con
+  entrar (mismos dos disparadores de la Etapa 2), y si la zona se resiste con algo (dificultad fija, como el
+  asistente de zonas — aparte del "se evita" de la trampa, que sigue siendo a mano y es solo para el golpe inicial).
+  - **Cómo se guarda**: la trampa dormida lleva `trampaDejaZona` + `zonaTurnos` (la duración de la zona
+    resultante — distinto de `turnos`/`venceMant`, que mientras la trampa no se disparó puede significar "se
+    borra sola si nadie la pisa") + `zonaEnMantenimiento`/`zonaCadaPaso`/`zonaResistStat`/`zonaResistValor`.
+    Nada de esto activa nada todavía: son datos a la espera.
+  - **Al dispararse** (`trampaResolver`, `vtt-hexgrid/mapa.html`): después del golpe de siempre, si
+    `trampaDejaZona`, una segunda escritura convierte el MISMO elemento (mismas celdas) en una zona de verdad
+    — `zona: true`, copiando `trampaDano`→`zonaDano`, `trampaEstado`→`zonaEstado` (ya es el mismo formato JSON,
+    se copia tal cual), `trampaIgnoraDef`→`zonaIgnoraDef`, `fuegoAmigo`→`zonaAmiga`, y recalculando
+    `turnos`/`venceMant` con `zonaTurnos` desde ese momento (no desde que se colocó la trampa). El "bando" de la
+    zona resultante es el mismo que ya definía `trampaDispara` (dueño GM → rivales los PJ; dueño jugador →
+    rivales los creeps), sin un token de casteador puntual — mismo criterio que una zona puesta a mano.
+  - **Regla de Firestore nueva**: quien dispara la trampa no es necesariamente su dueño, así que hace falta una
+    rama de permiso aparte para esa segunda escritura — "una trampa con `trampaDejaZona` ya disparada, cualquiera
+    completa su conversión a zona" (los campos vienen pre-armados por quien puso la trampa, no se inventan).
+  - **Pendiente**: "Trampas guardadas" (recurrentes) todavía no recuerda esta configuración — una trampa
+    persistente guardada y vuelta a cargar pierde el "deja zona" (hay que rearmarlo). Tampoco está en las
+    trampas que coloca una habilidad (`trampaColocar`), solo en las del mapa.

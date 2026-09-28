@@ -1192,6 +1192,12 @@ let elemSolido = false;
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
 let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport: destino "col,fila" (se elige con un clic en el mapa)
+// Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además del efecto de siempre (una vez, a
+// quien la pisó), el elemento se convierte en una zona (zona:true, ver comun/CLAUDE.md) con el mismo daño/estado,
+// y queda puesta zonaTurnos turnos. La resistencia de la zona es aparte de "se evita" de la trampa (esa sigue
+// siendo a mano); acá sí es automática, con una dificultad fija (no hay quien tire, como en el asistente de zonas).
+let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant = true, elemTrampaZonaCadaPaso = false;
+let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
@@ -2085,7 +2091,8 @@ function abrirAsistenteTrampaPanel(){
   AsistenteTrampa.abrir({
     contexto: 'mapa', editando: false, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: elemTrampaNombre, descripcion: elemTrampaDetalle, forma: elemTipo, color: elemColor, alfa: elemAlfa, amiga: elemTrampaAmiga,
-      dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos, teleport: elemTrampaTeleport},
+      dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos, teleport: elemTrampaTeleport,
+      dejaZona: elemTrampaDejaZona, zonaTurnos: elemTrampaZonaTurnos, zonaEnMant: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso, zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor},
     alTerminar: res => {
       elemTrampa = true; elemTrampaNombre = res.nombre.trim().slice(0, 40); elemTrampaDetalle = AsistenteTrampa.detalleFinal(res); elemTrampaAmiga = !!res.amiga;
       elemTrampaDano = res.dano || ''; elemTrampaIgnoraDef = !res.contemplaArmadura; elemTrampaEstado = res.estado || ''; elemTrampaEstadoTurnos = num(res.estadoTurnos);
@@ -2095,6 +2102,9 @@ function abrirAsistenteTrampaPanel(){
       elemTurnos = Math.max(0, Math.min(99, num(res.turnos)));
       elemTrampaTeleport = !!res.teleport;
       if(!elemTrampaTeleport) elemTrampaDestino = '';
+      elemTrampaDejaZona = !!res.dejaZona; elemTrampaZonaTurnos = Math.max(1, Math.round(num(res.zonaTurnos)) || 3);
+      elemTrampaZonaEnMant = res.zonaEnMant !== false; elemTrampaZonaCadaPaso = !!res.zonaCadaPaso;
+      elemTrampaZonaResistStat = res.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(res.zonaResistValor)) || 12;
       if(res.guardar) guardarTrampaRecurrente({nombre: elemTrampaNombre, detalle: elemTrampaDetalle, amiga: elemTrampaAmiga, tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa,
         dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos});
       renderHerramientaFlotante(); pedirDibujo();
@@ -2115,12 +2125,15 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
     contexto: 'mapa', editando: true, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: el.trampaNombre || '', descripcion: el.trampaDetalle || '', forma: el.tipo, color: el.color, alfa: el.alfa, amiga: !!el.fuegoAmigo,
       dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
-      estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino},
+      estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino,
+      dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor},
     alTerminar: res => {
       const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
         trampaDano: res.dano || '', trampaIgnoraDef: !res.contemplaArmadura,
         trampaEstado: res.estado ? JSON.stringify({nombre: res.estado, turnos: res.estadoTurnos > 0 ? res.estadoTurnos : trampaEstadoTurnosPreset(res.estado)}) : '',
-        trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa};
+        trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa,
+        trampaDejaZona: !!res.dejaZona, zonaTurnos: Math.max(1, num(res.zonaTurnos) || 3), zonaEnMantenimiento: res.zonaEnMant !== false, zonaCadaPaso: !!res.zonaCadaPaso,
+        zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12};
       const n = Math.max(0, Math.min(99, num(res.turnos)));
       Object.assign(cambios, n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null});
       Object.assign(el, cambios);
@@ -5551,6 +5564,11 @@ function escucharElementos(){
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
+        // Trampa persistente (2026-09-28): configuración todavía dormida (antes de dispararse) de la zona que va
+        // a dejar al activarse — ver trampaResolver. `zonaTurnos` es la duración de ESA zona, aparte de `turnos`
+        // (que mientras la trampa está dormida puede significar otra cosa: cuándo se borra sola si no la pisan).
+        trampaDejaZona: d.trampaDejaZona === true,
+        zonaTurnos: Math.max(1, Math.round(num(d.zonaTurnos)) || 3),
       });
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
@@ -5703,7 +5721,10 @@ async function pegarElemento(){
     color: c.color, alfa: c.alfa, solido: !!c.solido, invisible: !!(soyGM && c.invisible), imagen: c.imagen || '',
     imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
     ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
-      trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {})} : {}),
+      trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {}),
+      trampaDejaZona: !!c.trampaDejaZona,
+      ...(c.trampaDejaZona ? {zonaTurnos: Math.max(1, Math.round(num(c.zonaTurnos)) || 3), zonaEnMantenimiento: c.zonaEnMantenimiento !== false, zonaCadaPaso: !!c.zonaCadaPaso,
+        ...(c.zonaResistStat ? {zonaResistStat: String(c.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(c.zonaResistValor)) || 1} : {})} : {})} : {}),
     ...(c.fuego ? {fuego: true, fuegoDano: c.fuegoDano || 5} : {}),
     ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos} : {}),
     duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -5732,6 +5753,11 @@ async function guardarElemento(tipo, origen, celdasSet){
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
+      // Trampa persistente (2026-09-28): al dispararse se convierte en zona (ver trampaResolver) — acá solo se
+      // guarda su configuración, todavía dormida.
+      ...(elemTrampa ? {trampaDejaZona: elemTrampaDejaZona} : {}),
+      ...(elemTrampa && elemTrampaDejaZona ? {zonaTurnos: elemTrampaZonaTurnos, zonaEnMantenimiento: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso,
+        ...(elemTrampaZonaResistStat ? {zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor} : {})} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -5870,7 +5896,10 @@ function renderEditorElemento(){
       ...(el.fuego ? {fuegoDano: Math.max(1, Math.min(999, Math.round(num(el.fuegoDano)) || 5))} : {}),
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
-      ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300)} : {})};
+      ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300),
+        trampaDejaZona: !!el.trampaDejaZona,
+        ...(el.trampaDejaZona ? {zonaTurnos: Math.max(1, Math.round(num(el.zonaTurnos)) || 3), zonaEnMantenimiento: el.zonaEnMantenimiento !== false, zonaCadaPaso: !!el.zonaCadaPaso,
+          ...(el.zonaResistStat ? {zonaResistStat: String(el.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(el.zonaResistValor)) || 1} : {})} : {})} : {})};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
     moverElemento(id, cambios);
@@ -6740,6 +6769,24 @@ async function trampaResolver(){
     await trampaAplicarDano(t, p.el);
     await trampaAplicarEstado(t, p.el);
     if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
+    // Trampa persistente (2026-09-28, pedido del dueño): además del golpe de siempre (arriba), se convierte en
+    // zona — mismas celdas y el mismo daño/estado, quedando puesta zonaTurnos turnos. Segunda escritura aparte
+    // (regla nueva de Firestore: cualquiera puede completarla, ya viene pre-armada por quien puso la trampa).
+    if(p.el.trampaDejaZona){
+      const n = Math.max(1, Math.round(num(p.el.zonaTurnos)) || 3);
+      const dueno = miembros.get(p.el.duenoUid);
+      const cambios = {
+        zona: true, zonaNombre: p.el.trampaNombre || 'Trampa', zonaCasteadorRef: '', zonaCasteadorTipo: (dueno && dueno.gm) ? 'creep' : 'pj',
+        zonaResueltos: [], turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+        zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
+      };
+      if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
+      if(trampaDanoValido(p.el.trampaDano)){ cambios.zonaDano = p.el.trampaDano; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
+      if(p.el.trampaEstado) cambios.zonaEstado = p.el.trampaEstado;
+      if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
+      try{ await coleccionElementos().doc(p.id).update(cambios); }
+      catch(err){ console.error('No se pudo convertir la trampa en zona:', err); }
+    }
     return;
   }
   trampasAvisadas.add(p.tokenId + ':' + p.id);

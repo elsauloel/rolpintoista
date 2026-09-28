@@ -103,9 +103,15 @@ const AsistenteTrampa = (() => {
       seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && ini.salvacion.stat) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
+      // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
+      // como una zona con el mismo daño/estado — ver comun/CLAUDE.md "Trampas persistentes". Solo para trampas
+      // del mapa (no las que coloca una habilidad, que no tienen un "acá te quedás" claro).
+      dejaZona: !!ini.dejaZona, zonaTurnos: num(ini.zonaTurnos) || 3, zonaEnMant: ini.zonaEnMant !== false, zonaCadaPaso: !!ini.zonaCadaPaso,
+      zonaSeResiste: !!ini.zonaResistStat, zonaResistStat: ini.zonaResistStat || 'resmg', zonaResistValor: num(ini.zonaResistValor) || 12,
       guardar: false,
     };
-    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'teleport', 'evita', 'dura', 'resumen'];
+    const ZSTATS = [['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['eva', 'Evasión'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
+    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'persistente', 'teleport', 'evita', 'dura', 'resumen'];
     const danoTxt = () => est.haceDano ? `${Math.max(1, est.dados)}d${est.caras}${est.fijo ? (est.fijo > 0 ? '+' : '') + est.fijo : ''}` : '';
     const preset = () => estadosDisp.find(p => p.nombre === est.estado) || null;
     const durEstado = () => { const p = preset(); if(!p) return 0; if(p.permanente) return 0; return est.estadoTurnos > 0 ? est.estadoTurnos : num(p.turnos); };
@@ -114,6 +120,7 @@ const AsistenteTrampa = (() => {
       const f = [];
       if(danoTxt()) f.push(`Hace ${danoTxt()} de daño ${est.contemplaArmadura ? '(contempla la armadura: se le resta la Defensa)' : '(directo a la vida: ignora la armadura)'}`);
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
+      if(est.dejaZona && !deHab) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
       if(est.seEvita) f.push(`Se evita con ${est.salStat} contra ${est.salDif} (a mano)`);
       if(!f.length) f.push('No hace daño ni deja estados: solo avisa en la Mesa cuando se activa');
@@ -129,6 +136,10 @@ const AsistenteTrampa = (() => {
       if(id === 'estado' && est.aplicaEstado && !est.estado) return 'Elegí qué estado deja (o marcá "No").';
       if(id === 'evita' && est.seEvita && !(est.salDif >= 1)) return 'Poné la dificultad (un número).';
       if(id === 'dura' && est.dura && !(est.turnos >= 1)) return 'Poné cuántos turnos dura (1 o más).';
+      if(id === 'persistente' && est.dejaZona){
+        if(!(est.zonaTurnos >= 1)) return 'Poné cuántos turnos dura la zona (1 o más).';
+        if(est.zonaSeResiste && !(est.zonaResistValor >= 1)) return 'Poné la dificultad de la zona (un número).';
+      }
       return '';
     }
 
@@ -193,6 +204,24 @@ const AsistenteTrampa = (() => {
               <p class="at-ayuda">Cada ⟳ Mantenimiento del GM cuenta un turno.</p>
               <input type="number" id="at-estadoTurnos" min="1" max="20" value="${esc(est.estadoTurnos || num(preset().turnos))}">` : ''}` : ''}`;
       }
+      if(id === 'persistente'){
+        return `<div class="at-preg">¿Al dispararse, queda además como una zona?</div>
+          <p class="at-ayuda">Una trampa normal actúa una sola vez, sobre quien la pisó. Marcada esto, además queda puesta un tiempo, con el mismo daño y/o estado de los pasos anteriores, para cualquiera que entre o se quede adentro — como una nube de gas que sigue ahí después del disparo.</p>
+          <label class="at-sin"><input type="checkbox" id="at-dejaZona"${est.dejaZona ? ' checked' : ''}> Sí, queda como zona</label>
+          ${est.dejaZona ? `<div class="at-preg">¿Cuántos turnos dura la zona?</div>
+            <input type="number" id="at-zonaTurnos" min="1" max="99" value="${esc(est.zonaTurnos)}">
+            <div class="at-preg">¿Sigue afectando a quien se queda adentro?</div>
+            <div class="at-fila"><button type="button" class="at-op${est.zonaEnMant ? ' on' : ''}" data-zona-en-mant="1" style="margin:0"><span><b>Sí, en cada Mantenimiento</b></span></button>
+              <button type="button" class="at-op${!est.zonaEnMant ? ' on' : ''}" data-zona-en-mant="0" style="margin:0"><span><b>No, solo al moverse</b></span></button></div>
+            <div class="at-preg">¿Se dispara con cada paso, o alcanza con entrar?</div>
+            <div class="at-fila"><button type="button" class="at-op${!est.zonaCadaPaso ? ' on' : ''}" data-zona-cada-paso="0" style="margin:0"><span><b>Alcanza con entrar</b></span></button>
+              <button type="button" class="at-op${est.zonaCadaPaso ? ' on' : ''}" data-zona-cada-paso="1" style="margin:0"><span><b>Cada paso caminado adentro</b></span></button></div>
+            <div class="at-preg">¿La zona se resiste con algo?</div>
+            <p class="at-ayuda">Aparte de "se evita" de más abajo (que es a mano, solo para el disparo): esto es automático, para cada uno que la zona chequea mientras dura. Como nadie la tira, le ponés vos la dificultad.</p>
+            <label class="at-sin"><input type="checkbox" id="at-zonaSeResiste"${est.zonaSeResiste ? ' checked' : ''}> Sí, hay algo que resistir</label>
+            ${est.zonaSeResiste ? `<div class="at-fila"><select id="at-zonaResistStat" style="flex:1.4">${ZSTATS.map(([v, t]) => `<option value="${v}"${est.zonaResistStat === v ? ' selected' : ''}>${t}</option>`).join('')}</select>
+              <label>contra</label><input type="number" id="at-zonaResistValor" min="1" value="${esc(est.zonaResistValor)}" style="width:80px"></div>` : ''}` : ''}`;
+      }
       if(id === 'teleport'){
         return `<div class="at-preg">¿Teletransporta a quien la pisa?</div>
           <p class="at-ayuda">Al saltar, mueve a quien la activó a <b>otro punto del mapa</b>, que tiene que ser un <b>punto transitable a pie</b> (una casilla donde un personaje podría pararse: sin Sólido ni pared; no hace falta que haya camino hasta ahí). Si la casilla está ocupada, va a la libre más cercana. Después de confirmar te pide hacer clic en el mapa para marcar el destino; se puede cambiar desde el ⚙ de la trampa. Puede combinarse con daño o estado.</p>
@@ -241,6 +270,8 @@ const AsistenteTrampa = (() => {
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif} : null,
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
+      dejaZona: !deHab && est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso,
+      zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
     });
 
     const siguiente = () => {
@@ -263,6 +294,8 @@ const AsistenteTrampa = (() => {
       if(d.amiga !== undefined){ est.amiga = d.amiga === '1'; dibujar(); return; }
       if(d.aplica !== undefined){ est.aplicaEstado = d.aplica === '1'; if(!est.aplicaEstado){ est.estado = ''; } est.error = ''; dibujar(); return; }
       if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.error = ''; dibujar(); return; }
+      if(d.zonaEnMant !== undefined){ est.zonaEnMant = d.zonaEnMant === '1'; dibujar(); return; }
+      if(d.zonaCadaPaso !== undefined){ est.zonaCadaPaso = d.zonaCadaPaso === '1'; dibujar(); return; }
     });
     fondo.addEventListener('input', e => {
       const t = e.target;
@@ -276,6 +309,8 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-estadoTurnos') est.estadoTurnos = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'at-salDif') est.salDif = Math.round(num(t.value));
       else if(t.id === 'at-turnos') est.turnos = Math.max(0, Math.round(num(t.value)));
+      else if(t.id === 'at-zonaTurnos') est.zonaTurnos = Math.max(0, Math.round(num(t.value)));
+      else if(t.id === 'at-zonaResistValor') est.zonaResistValor = Math.round(num(t.value));
     });
     fondo.addEventListener('change', e => {
       const t = e.target;
@@ -287,6 +322,9 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-salStat') est.salStat = t.value;
       else if(t.id === 'at-dura'){ est.dura = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'at-guardar') est.guardar = t.checked;
+      else if(t.id === 'at-dejaZona'){ est.dejaZona = t.checked; est.error = ''; dibujar(); }
+      else if(t.id === 'at-zonaSeResiste'){ est.zonaSeResiste = t.checked; dibujar(); }
+      else if(t.id === 'at-zonaResistStat') est.zonaResistStat = t.value;
     });
     fondo.addEventListener('keydown', e => {
       if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); siguiente(); }

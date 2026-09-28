@@ -131,6 +131,12 @@ volver a loguearse ahí una vez. Ver la memoria del asistente
   la consola de Firebase (`orden` en `entradaPregunta` y en la rama
   "cualquiera") — sin eso, mover falla con un aviso.
 
+## Copiar el texto (2026-09-28, pedido del dueño)
+
+Cada publicación (en las tres pestañas) tiene un botón **📋 Copiar** junto a "Responder" y "Marcar hecho": copia solo el texto de esa
+entrada (sin respuestas) al portapapeles y muestra "✓ Copiado" un momento (`copiarTexto`: `navigator.clipboard` si hay https, y si no el
+truco del textarea con `execCommand`, para celulares/páginas sin contexto seguro). Las respuestas no lo llevan.
+
 ## Dependencias con otras carpetas
 
 - `comun/sesion.js` — solo `fbIniciar`/`fbCuentaConfirmada`, no el resto

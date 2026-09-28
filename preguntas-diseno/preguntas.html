@@ -289,6 +289,7 @@ function render(){
       <div class="p-acciones">
         <button type="button" class="btn chico" data-responder="${esc(p.id)}">💬 Responder</button>
         <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? t.accionReabrir : t.accionHecha}</button>
+        <button type="button" class="btn chico ghost" data-copiar="${esc(p.id)}" title="Copiar el texto">📋 Copiar</button>
         <span class="p-orden">
           <button type="button" class="btn chico ghost" data-arriba="${esc(p.id)}" title="Mandar arriba de todo">⤒</button>
           <button type="button" class="btn chico ghost" data-abajo="${esc(p.id)}" title="Mandar abajo de todo">⤓</button>
@@ -410,6 +411,14 @@ document.addEventListener('click', e => {
     guardarOrden(id, arriba ? menor - 1000 : mayor + 1000);
     return;
   }
+  if(b.dataset.copiar){
+    const x = entradas.find(v => v.id === b.dataset.copiar);
+    if(x) copiarTexto(x.texto).then(ok => {
+      b.textContent = ok ? '✓ Copiado' : 'No se pudo copiar';
+      setTimeout(() => { if(b.isConnected) b.textContent = '📋 Copiar'; }, 1600);
+    });
+    return;
+  }
   if(b.dataset.borrar){
     if(!confirm('¿Borrar esto? No se puede deshacer.')) return;
     fbDb.collection('preguntas_diseno').doc(b.dataset.borrar).delete().catch(err => console.error(err));
@@ -420,6 +429,21 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if(e.target.matches('textarea[data-borrador]')) borradorEdicion = e.target.value;
 });
+
+// Copiar al portapapeles: la API moderna si hay, y si no (celulares viejos, páginas sin https) el truco del textarea.
+async function copiarTexto(txt){
+  try{
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(txt); return true; }
+  }catch(_){}
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length);
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  }catch(_){ return false; }
+}
 
 function guardarOrden(id, orden){
   fbDb.collection('preguntas_diseno').doc(id).update({orden})

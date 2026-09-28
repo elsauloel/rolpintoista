@@ -423,3 +423,44 @@ versión parecida en más de una, es candidato a juntar.
     Formas libres / Trampas / Zonas con efectos persistentes — para poder colocar una zona directo en el mapa
     sin pasar por una habilidad, y sumar la misma opción al asistente de trampas (una trampa que, en vez de
     dispararse una sola vez, deja puesta una zona). Ver el hilo de diseño de esta fecha.
+
+- **Etapa 2 — el ⬡ despliega tres modos, y "Zonas con efectos persistentes" tiene su asistente paso a paso**
+  (2026-09-28, pedido del dueño, sigue a la etapa 1 de arriba). El botón ⬡ Terreno y Formas del toolkit
+  (`vtt-hexgrid/mapa.html`, `HERRAMIENTAS`) ya no entra directo a un modo: el clic despliega dos filas más debajo
+  (`elementoSubmenuAbierto`) — **Formas libres** (lo de siempre: color, transparencia, imagen, Sólido, Invisible,
+  Turnos, 🧱 Colisión del GM — pero ya sin la casilla "Trampa" ni "🔥 Terreno incendiado", que se sacaron de acá) y
+  **Trampas** (mismo panel de dibujo, ahora con los campos de trampa siempre visibles — el modo ya implica que
+  es una trampa, no hace falta tildar nada; al entrar sin nombre se abre solo el asistente de siempre). **🔥
+  Terreno incendiado no se puede crear más desde acá** — lo reemplaza una zona con solo daño (sin estado); el
+  mecanismo viejo (`fuego`/`fuegoDano`, `fuegoEntrada`/`fuegoMantenimiento`) queda intacto para lo que ya estaba
+  colocado, sin tocar una línea.
+  - **Zonas con efectos persistentes** es la tercera opción y NO usa el panel de dibujo: abre de una
+    `comun/asistente-zona.js` (`AsistenteZona.abrir`), un asistente paso a paso nuevo (mismo estilo visual que
+    `asistente-trampa.js`, con su propio prefijo de clases `az-` para no compartir CSS por las dudas) con 7
+    pasos: **tamaño** (radio; por ahora solo Flor — Línea y Forma libre se siguen armando a mano por "Formas
+    libres") **+ turnos que dura** en el mismo paso, **daño** (fórmula, tipo, ignora Defensa), **estado** (de
+    `EstadosAplicar.DEBUFFS`, con stacks si es Veneno/Veneno severo), **resistencia** (opcional: como quien la
+    pone es el GM y no hay nadie que tire, en vez de una tirada compartida se le pone un **número fijo** de
+    dificultad — mismo criterio que ya usan las trampas en su texto), **disparo** (dos preguntas independientes:
+    ¿sigue afectando en cada Mantenimiento a quien se queda adentro?, y ¿se dispara con cada paso caminado
+    adentro o alcanza con entrar?) y **nombre + color**. Al terminar, pide marcar el centro con un clic (como un
+    hechizo de área) y crea el elemento — `crearElementoZona(centro, cfg)`, la misma función que ahora también
+    usa `zonaPersistenteDeHabilidad` (la de la Etapa 1, sin duplicar código). Cualquier miembro puede usarlo,
+    igual que Formas libres y Trampas; el "bando" de una zona puesta así es el de quien la coloca (el GM =
+    rival de los PJ, un jugador = rival de los creeps), sin un token puntual de casteador.
+  - **Motor: dos disparadores nuevos, independientes** (`zonaEnMantenimiento`, default `true`; `zonaCadaPaso`,
+    default `false`) que generalizan cómo y cuándo se chequea una zona — pensados para poder armar un piso de
+    púas (duele al caminar, no por quedarse parado) además de una nube que sigue afectando a quien se queda
+    quieto: `zonaRevisarMantenimiento()` salta las zonas con `zonaEnMantenimiento === false`;
+    `zonaRevisarEntrada(id, celdas)` sigue mirando dónde terminó el movimiento para el caso normal, y ADEMÁS,
+    para las zonas con `zonaCadaPaso`, cuenta cualquier casillero cruzado que sea suyo y venga de uno que no lo
+    era (mismo conteo que ya usa 🔥, una vez por movimiento, no por casillero — ver el comentario en el código).
+  - **Bug real encontrado probando el asistente**: si se elegía Veneno sin poner stacks a mano, los dos
+    asistentes (`asistente-zona.js` y el paso "Objetivo" de `asistente-duelo-hab.js`) mandaban igual un `turnos`
+    fijo (0 o 2) junto al nombre — `EstadosAplicar.componer` lo toma tal cual y el Veneno quedaba con los stacks
+    de siempre (4) pero vencido antes de tiempo. Arreglado: sin stacks a mano, no se manda `turnos` en absoluto,
+    así el preset se aplica entero. Nube tóxica (Etapa 1) no lo sufría porque siempre manda sus 3 stacks a mano.
+  - **Reglas de Firestore nuevas** (además de las de la Etapa 1, todavía sin publicar): `zonaEnMantenimiento` y
+    `zonaCadaPaso` sumadas a `elementoValido`.
+  - **Pendiente**: sumar la misma opción de "queda como zona" al asistente de trampas (una trampa que en vez de
+    dispararse una vez deja puesta una zona), y que el asistente de zonas también sepa armar Línea/Forma libre.

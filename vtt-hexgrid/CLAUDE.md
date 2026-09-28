@@ -1083,3 +1083,8 @@ hexágono con otro sin importar bando. Todavía no está construido.
   publicar las reglas nuevas de Firestore** (campos `zona*` del elemento). Pendiente (Etapa 2): un tercer modo
   del botón ⬡ del toolkit para colocar una zona directo, sin pasar por una habilidad, y la misma opción en el
   asistente de trampas.
+
+- **⬡ Terreno y Formas se abrió en tres (2026-09-28, pedido del dueño)**: el clic despliega Formas libres /
+  Trampas / Zonas con efectos persistentes en vez de entrar directo a un modo; Zonas abre un asistente paso a
+  paso nuevo (`comun/asistente-zona.js`). Detalle grande en `comun/CLAUDE.md` (comparte motor y datos con la
+  Etapa 1 del mismo día). 🔥 Terreno incendiado ya no se crea desde acá — lo reemplaza una zona sin estado.

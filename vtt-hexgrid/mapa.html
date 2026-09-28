@@ -391,6 +391,9 @@ aside{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:0 4px
 }
+#toolkit .tk-flecha{margin-left:auto;color:var(--muted);font-size:11px}
+#toolkit .tk-herramienta.tk-sub{margin-left:16px;width:calc(100% - 16px);padding:6px 8px}
+#toolkit .tk-herramienta.tk-sub .tk-icono{width:26px;height:26px;font-size:14px}
 .tk-lapiz-colores{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
 .tk-color{width:20px;height:20px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);cursor:pointer}
 .tk-color.elegido{border-color:var(--paper)}
@@ -931,6 +934,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/estados-aplicar.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/asistente-zona.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
 <script src="../comun/duelo.js?v=20260927f"></script>
@@ -1187,7 +1191,6 @@ let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
-let elemFuego = false, elemFuegoDano = 5;   // Terreno incendiado (2026-09-25): daño al entrar y en cada Mantenimiento (directo a la vida), valor inicial 5 y editable
 let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport: destino "col,fila" (se elige con un clic en el mapa)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
@@ -5546,6 +5549,8 @@ function escucharElementos(){
         zonaCasteadorRef: typeof d.zonaCasteadorRef === 'string' ? d.zonaCasteadorRef : '',
         zonaCasteadorTipo: d.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj',
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
+        zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
+        zonaCadaPaso: d.zonaCadaPaso === true,
       });
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
@@ -5727,7 +5732,6 @@ async function guardarElemento(tipo, origen, celdasSet){
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
-      ...(elemFuego ? {fuego: true, fuegoDano: Math.max(1, Math.min(999, Math.round(elemFuegoDano) || 5))} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -6178,12 +6182,12 @@ async function moverToken(id, col, fila, celdas){
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
     fuegoEntrada(id, celdas);
-    zonaRevisarEntrada(id);
+    zonaRevisarEntrada(id, celdas);
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); zonaRevisarEntrada(id); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); zonaRevisarEntrada(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);
@@ -6561,18 +6565,36 @@ function zonaMostrarSiguiente(){
   zonaBanner = {elId, tokenId, el, t, resultado: null};
   renderZonaBanner();
 }
-function zonaRevisarToken(t){
+// `desdeMantenimiento`: las zonas con zonaEnMantenimiento === false (las púas: "no mientras estás parado") no se
+// chequean acá — solo al caminar (ver zonaRevisarEntrada).
+function zonaRevisarToken(t, desdeMantenimiento){
   if(!t || !zonaEsMia(t)) return;
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
     if(!celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) return;
     zonaEncolar(el, t);
   });
 }
-// Al soltar un movimiento: alcanza con mirar dónde terminó (si entró y volvió a salir en el mismo movimiento no
-// queda ningún "momento" pendiente que mostrar — no hace falta contar cada casillero cruzado, como sí hace el fuego).
-function zonaRevisarEntrada(id){ zonaRevisarToken(tokens.get(id)); }
-function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t)); }
+// Al soltar un movimiento: para la mayoría de las zonas alcanza con mirar dónde terminó. Las de zonaCadaPaso
+// (púas: se disparan aunque solo se las cruce, sin quedarse) además cuentan cualquier casillero cruzado que sea
+// suyo y venga de uno que no lo era — mismo conteo que ya usa 🔥, una sola vez por movimiento (no por casillero).
+function zonaRevisarEntrada(id, celdas){
+  const t = tokens.get(id);
+  if(!t || !zonaEsMia(t)) return;
+  if(celdas && celdas.length > 1){
+    elementos.forEach(el => {
+      if(!el.zona || !el.zonaCadaPaso || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+      const cs = celdasDeElemento(el);
+      const enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
+      for(let i = 1; i < celdas.length; i++){
+        if(enCelda(celdas[i]) && !enCelda(celdas[i - 1])){ zonaEncolar(el, t); break; }
+      }
+    });
+  }
+  zonaRevisarToken(t, false);
+}
+function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
 function renderZonaBanner(){
   let el2 = document.getElementById('zona-banner');
   if(!zonaBanner){ if(el2) el2.hidden = true; return; }
@@ -9264,31 +9286,62 @@ function zonaDeHabilidad(msg){
    CREA un elemento de Terreno y Formas que queda puesto («zona: true», generaliza 🔥 sin tocarlo — ver
    comun/CLAUDE.md). Se pide el centro con un clic, como un hechizo de área; el resto (quién entra, la
    resistencia, el cartelito) lo maneja el motor de zonas más abajo. */
+// Crea el elemento de una zona (compartido entre una habilidad y el asistente paso a paso del GM, 2026-09-28).
+// cfg: {radio, turnos, nombre, color?, alfa?, amiga, dano, ignoraDef, estado, resistStat, resistValor,
+//       enMantenimiento, cadaPaso, casteadorRef, casteadorTipo}
+async function crearElementoZona(centro, cfg){
+  const radio = Math.max(1, Math.min(6, Math.round(num(cfg.radio)) || 1));
+  const n = Math.max(1, Math.round(num(cfg.turnos)) || 3);
+  const datos = {
+    tipo: 'flor', origen: {col: centro.col, fila: centro.fila}, celdas: celdasFlor(radio), rotacion: 0,
+    color: /^#[0-9a-fA-F]{6}$/.test(cfg.color || '') ? cfg.color : (cfg.estado ? '#4C9A2A' : '#D9531E'),
+    alfa: Number.isFinite(cfg.alfa) ? cfg.alfa : 40, solido: false, invisible: false,
+    imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
+    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+    zona: true, zonaNombre: String(cfg.nombre || 'Zona').slice(0, 40),
+    zonaCasteadorRef: String(cfg.casteadorRef || '').slice(0, 64), zonaCasteadorTipo: cfg.casteadorTipo === 'creep' ? 'creep' : 'pj',
+    zonaResueltos: [], zonaEnMantenimiento: cfg.enMantenimiento !== false, zonaCadaPaso: !!cfg.cadaPaso,
+    duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  if(cfg.amiga) datos.zonaAmiga = true;
+  if(cfg.dano){ datos.zonaDano = String(cfg.dano).slice(0, 12); if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
+  if(cfg.estado && cfg.estado.nombre) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);
+  if(cfg.resistStat && Number.isFinite(cfg.resistValor)){ datos.zonaResistStat = String(cfg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(cfg.resistValor)); }
+  try{
+    await coleccionElementos().add(datos);
+    toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
+    return true;
+  }catch(err){
+    console.error('No se pudo crear la zona:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (zona)' : 'No se pudo colocar la zona');
+    return false;
+  }
+}
 function zonaPersistenteDeHabilidad(msg){
-  elegirDestino(async h => {
-    const radio = Math.max(1, Math.min(6, Math.round(num(msg.radio) || 1)));
-    const n = Math.max(1, Math.round(num(msg.zonaTurnos)) || 3);
-    const datos = {
-      tipo: 'flor', origen: {col: h.col, fila: h.fila}, celdas: celdasFlor(radio), rotacion: 0,
-      color: msg.zonaEstado ? '#4C9A2A' : '#D9531E', alfa: 40, solido: false, invisible: false,
-      imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
-      turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
-      zona: true, zonaNombre: String(msg.nombre || 'Zona').slice(0, 40),
-      zonaCasteadorRef: String(msg.fichaId || '').slice(0, 64), zonaCasteadorTipo: msg.casteadorTipo === 'creep' ? 'creep' : 'pj',
-      zonaResueltos: [], duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
-    };
-    if(msg.zonaAmiga) datos.zonaAmiga = true;
-    if(msg.zonaDano){ datos.zonaDano = String(msg.zonaDano).slice(0, 12); if(msg.zonaIgnoraDef) datos.zonaIgnoraDef = true; }
-    if(msg.zonaEstado && msg.zonaEstado.nombre) datos.zonaEstado = JSON.stringify(msg.zonaEstado).slice(0, 300);
-    if(msg.resistStat && Number.isFinite(msg.resistValor)){ datos.zonaResistStat = String(msg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(msg.resistValor)); }
-    try{
-      await coleccionElementos().add(datos);
-      toast(`🌫 ${msg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
-    }catch(err){
-      console.error('No se pudo crear la zona:', err);
-      toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (zona)' : 'No se pudo colocar la zona');
-    }
-  }, `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${Math.max(1, Math.round(num(msg.radio) || 1))}) · Esc o clic derecho cancelan</span>`, true);
+  const radio = Math.max(1, Math.round(num(msg.radio) || 1));
+  elegirDestino(h => crearElementoZona(h, {
+    radio, turnos: msg.zonaTurnos, nombre: msg.nombre, amiga: msg.zonaAmiga, dano: msg.zonaDano, ignoraDef: msg.zonaIgnoraDef,
+    estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
+    casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
+  }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+}
+// 🌫 Zonas con efectos persistentes: el asistente paso a paso (comun/asistente-zona.js, 2026-09-28, pedido del
+// dueño). Cualquier miembro lo puede usar (mismo criterio que Formas libres y Trampas); el casteador queda como
+// "el bando de quien la coloca" (el GM = rival de los PJ; un jugador = rival de los creeps), no un token puntual.
+function abrirAsistenteZonaNueva(){
+  if(borradorElemento) consolidarBorradorElemento();
+  desactivarHerramienta();
+  AsistenteZona.abrir({
+    colores: COLORES,
+    alTerminar: r => {
+      const radio = Math.max(1, Math.min(6, Math.round(num(r.radio)) || 1));
+      elegirDestino(h => crearElementoZona(h, {
+        radio, turnos: r.turnos, nombre: r.nombre, color: r.color, alfa: r.alfa, amiga: r.amiga, dano: r.dano, ignoraDef: r.ignoraDef,
+        estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso,
+        casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
+      }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+    },
+  });
 }
 
 window.addEventListener('message', e => {
@@ -9792,6 +9845,9 @@ const HERRAMIENTAS = [
   {id: 'lapiz', icono: '✏️', nombre: 'Lápiz', detalle: 'Dibujar a mano sobre el mapa', lista: true, atajo: 'L'},
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'G'},
   {id: 'niebla', icono: '🌫', nombre: 'Niebla', detalle: 'Destapar o tapar zonas a mano, o reiniciar (GM)', lista: true, soloGM: true},
+  // No son modos de dibujo propios: aparecen colgando de ⬡ Terreno y Formas cuando se despliega (ver renderToolkit).
+  {id: 'trampa', icono: '🪤', nombre: 'Trampas', detalle: 'Ocultas; se disparan solas cuando un rival las pisa', lista: true, sub: true},
+  {id: 'zonapersistente', icono: '🌫', nombre: 'Zonas con efectos persistentes', detalle: 'Quedan puestas varios turnos: daño y/o estado, al entrar y en cada Mantenimiento', lista: true, sub: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},
 ];
@@ -9822,6 +9878,9 @@ function desactivarHerramienta(){
 }
 let toolkitAbierto = false;
 try{ toolkitAbierto = localStorage.getItem('mapa-toolkit-abierto') === '1'; }catch(e){}
+// ⬡ Terreno y Formas despliega tres sub-opciones (Formas libres/Trampas/Zonas, 2026-09-28, pedido del dueño)
+// en vez de entrar directo a un modo — mismo criterio que "botón que despliega botones".
+let elementoSubmenuAbierto = false;
 
 function renderToolkit(){
   $('#toolkit').classList.toggle('abierto', toolkitAbierto);
@@ -9829,14 +9888,20 @@ function renderToolkit(){
   const pestana = $('#toolkit-pestana');
   pestana.setAttribute('aria-expanded', toolkitAbierto ? 'true' : 'false');
   pestana.title = (toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas') + ' (atajo: H)';
-  $('#toolkit-lista').innerHTML = HERRAMIENTAS.filter(h => !h.soloGM || soyGM).map(h => {
-    const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : herramientaActiva === h.id;
+  const MODOS_ELEMENTO = ['elemento', 'trampa', 'zonapersistente'];
+  const filaHerramienta = h => {
+    const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : h.id === 'elemento' ? (elementoSubmenuAbierto || MODOS_ELEMENTO.includes(herramientaActiva)) : herramientaActiva === h.id;
     return `<li>
-    <button type="button" class="tk-herramienta${activa ? ' activa' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}"${h.atajo ? ` title="${esc(h.nombre)} — atajo de teclado: ${esc(h.atajo)}"` : ''}>
+    <button type="button" class="tk-herramienta${activa ? ' activa' : ''}${h.sub ? ' tk-sub' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}"${h.atajo ? ` title="${esc(h.nombre)} — atajo de teclado: ${esc(h.atajo)}"` : ''}>
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
-      <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}</span>
+      <span class="tk-nombre">${esc(h.nombre)}${h.lista ? '' : '<span class="tk-pronto">Pronto</span>'}${h.id === 'elemento' ? `<span class="tk-flecha">${elementoSubmenuAbierto ? '▾' : '▸'}</span>` : ''}</span>
       <span class="tk-detalle">${esc(h.detalle)}</span>
     </button></li>`;
+  };
+  $('#toolkit-lista').innerHTML = HERRAMIENTAS.filter(h => (!h.soloGM || soyGM) && !h.sub).map(h => {
+    if(h.id !== 'elemento') return filaHerramienta(h);
+    const subFilas = elementoSubmenuAbierto ? HERRAMIENTAS.filter(x => x.sub && (!x.soloGM || soyGM)).map(filaHerramienta).join('') : '';
+    return filaHerramienta(h) + subFilas;
   }).join('');
   renderHerramientaFlotante();
 }
@@ -9873,17 +9938,22 @@ function renderHerramientaFlotante(){
       <input type="range" id="niebla-radio" min="0" max="5" step="1" value="${nieblaPincelRadio}">
       <p class="tk-lapiz-ayuda">Arrastrá sobre el mapa para ${nieblaModo === 'destapar' ? 'destapar' : 'volver a tapar'} zonas. ${nieblaActiva ? '' : 'La niebla está apagada: prendela con el botón de la cabecera.'}</p>
       <div class="fila"><button type="button" class="btn peligro" id="niebla-reiniciar">Reiniciar (tapar todo)</button></div>`;
-  }else if(herramientaActiva === 'elemento'){
-    if(elemTipo === 'colision' && !soyGM) elemTipo = 'flor';   // la Colisión es solo del GM
+  }else if(herramientaActiva === 'elemento' || herramientaActiva === 'trampa'){
+    // Trampas ya no vive adentro de "Formas libres" con una casilla: es su propio modo (2026-09-28, el ⬡ ahora
+    // despliega los tres). 🔥 Terreno incendiado también salió de acá — lo reemplaza 🌫 Zonas con efectos
+    // persistentes (una zona con solo daño, sin estado, es lo mismo que era el fuego, ahora también jugable por
+    // una habilidad); el mecanismo viejo sigue andando tal cual para lo que ya estaba colocado, sin tocarlo.
+    const esTrampa = herramientaActiva === 'trampa';
+    if(elemTipo === 'colision' && (!soyGM || esTrampa)) elemTipo = 'flor';   // la Colisión es solo de Formas libres + GM
     const selectorForma = `
       <label class="etiqueta" style="margin-top:0">Forma</label>
       <select id="elem-tipo-select">
         <option value="flor"${elemTipo === 'flor' ? ' selected' : ''}>Flor (un centro + alrededor)</option>
         <option value="linea"${elemTipo === 'linea' ? ' selected' : ''}>Línea</option>
         <option value="libre"${elemTipo === 'libre' ? ' selected' : ''}>Forma libre (pintar casilleros)</option>
-        ${soyGM ? `<option value="colision"${elemTipo === 'colision' ? ' selected' : ''}>🧱 Colisión del mapa</option>` : ''}
+        ${soyGM && !esTrampa ? `<option value="colision"${elemTipo === 'colision' ? ' selected' : ''}>🧱 Colisión del mapa</option>` : ''}
       </select>`;
-    if(elemTipo === 'colision'){
+    if(elemTipo === 'colision' && !esTrampa){
       cuerpo = selectorForma + `
       <p class="tk-lapiz-ayuda" style="margin-top:8px"><b>Colisión del mapa</b>: ya viene configurada (sólida: bloquea el paso y la vista; visible para todos). Arrastrá para pintar los casilleros o hacé clic de a uno. Los casilleros que quedan pegados se <b>fusionan solos</b> en una sola forma. Mantené <b>Shift</b> para <b>borrar</b> casilleros. Todos ven el contorno, y adentro se borra la grilla para que se vea el dibujo del fondo sin líneas.</p>
       <p class="tk-lapiz-ayuda">Hoy hay <b>${colisionInfo().celdas.length}</b> casillero${colisionInfo().celdas.length === 1 ? '' : 's'} de colisión en este mapa.</p>`;
@@ -9893,20 +9963,16 @@ function renderHerramientaFlotante(){
       <label class="etiqueta">Transparencia</label>
       <input type="range" id="elem-alfa-slider" min="0" max="100" step="5" value="${elemAlfa}">
       ${imagenElementoOpcionHtml(elemImagen)}
-      <label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
-      ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+      ${esTrampa ? '' : `<label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
+      ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}`}
       <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
       <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
-      <label class="tk-lapiz-check" title="Terreno incendiado: quien entra recibe el daño (directo a la vida, el fuego ignora la Defensa) y después, en cada Mantenimiento, todo el que siga adentro lo vuelve a recibir"><input type="checkbox" id="elem-fuego-check"${elemFuego ? ' checked' : ''}> 🔥 Terreno incendiado</label>
-      ${elemFuego ? `<label class="etiqueta">Daño de fuego (al entrar y en cada Mantenimiento)</label>
-      <input type="number" id="elem-fuego-dano" min="1" max="999" step="1" value="${elemFuegoDano}" title="Valor inicial 5; se puede cambiar acá o después con el ⚙ de la forma. Con Turnos que dura el fuego se apaga solo.">` : ''}
-      <label class="tk-lapiz-check" title="Una trampa oculta: solo la ves vos (y el GM); si un rival la pisa, se dispara y avisa en la Mesa"><input type="checkbox" id="elem-trampa-check"${elemTrampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
-      ${elemTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga, elemTrampaTeleport ? (elemTrampaDestino || 'un destino (falta marcarlo)') : ''))}</div>
+      ${esTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga, elemTrampaTeleport ? (elemTrampaDestino || 'un destino (falta marcarlo)') : ''))}</div>
       ${elemTrampaTeleport ? `<button type="button" class="btn" id="trampa-destino" style="margin-top:6px;width:100%">🌀 ${elemTrampaDestino ? 'Cambiar' : 'Elegir'} el destino en el mapa</button>` : ''}
       <button type="button" class="btn primary" id="trampa-asistente" style="margin-top:6px;width:100%" title="Nombre, superficie, daño, estado y más, paso a paso">🪄 ${elemTrampaNombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>
-      <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>` : ''}
-      ${trampasGuardadasHtml()}
-      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'} ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}</p>
+      <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>
+      ${trampasGuardadasHtml()}` : ''}
+      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'}${esTrampa ? '' : ` ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}`}</p>
       ${borradorElemento ? `<div class="nt-pista" style="color:var(--paper);border-top:1px solid var(--line);padding-top:8px;margin-top:8px">
         Borrador: ajustá lo de arriba y mirá cómo queda en el mapa. Hacé clic en otro lado (o Enter) para crearlo; Esc o clic derecho lo descartan.</div>
         <div class="fila"><button type="button" class="btn primary" id="borrador-crear">✔ Crear</button><button type="button" class="btn" id="borrador-descartar">Descartar</button></div>` : ''}`;
@@ -9933,10 +9999,25 @@ $('#toolkit-lista').addEventListener('click', e => {
   if(!h) return;
   if(h.id === 'bitacora'){ abrirBitacoraFlotante(!bitacoraFlotanteAbierta); return; }
   if(!h.lista){ toast(`${h.nombre}: todavía en diseño`); return; }
+  // ⬡ Terreno y Formas: el clic despliega/repliega Formas libres/Trampas/Zonas en vez de entrar directo (2026-09-28).
+  if(h.id === 'elemento'){
+    if(['elemento', 'trampa', 'zonapersistente'].includes(herramientaActiva)){ desactivarHerramienta(); elementoSubmenuAbierto = false; renderToolkit(); return; }
+    elementoSubmenuAbierto = !elementoSubmenuAbierto;
+    renderToolkit();
+    return;
+  }
+  if(h.id === 'zonapersistente'){
+    elementoSubmenuAbierto = false;
+    abrirAsistenteZonaNueva();
+    return;
+  }
   if(herramientaActiva === h.id){ desactivarHerramienta(); return; }
   if(borradorElemento) consolidarBorradorElemento();
+  elementoSubmenuAbierto = false;
   herramientaActiva = h.id;
+  elemTrampa = h.id === 'trampa';   // el modo ya implica "es una trampa": no hace falta la casilla de antes
   renderToolkit();
+  if(elemTrampa && !elemTrampaNombre.trim()) abrirAsistenteTrampaPanel();   // igual que antes al tildar la casilla
 });
 $('#herramienta-flotante').addEventListener('click', e => {
   // Trampas recurrentes: guardar la que se está armando, cargar una guardada o borrarla.
@@ -10060,20 +10141,6 @@ $('#herramienta-flotante').addEventListener('change', e => {
     renderHerramientaFlotante();
     return;
   }
-  if(e.target.id === 'elem-fuego-check'){
-    elemFuego = e.target.checked;
-    if(elemFuego){ elemColor = '#E25822'; try{ localStorage.setItem('elem-color', elemColor); }catch(err){} }   // el fuego arranca en rojo anaranjado (se puede cambiar)
-    renderHerramientaFlotante();
-    pedirDibujo();
-    return;
-  }
-  if(e.target.id === 'elem-trampa-check'){
-    elemTrampa = e.target.checked;
-    renderHerramientaFlotante();
-    pedirDibujo();
-    if(elemTrampa && !elemTrampaNombre.trim()) abrirAsistenteTrampaPanel();   // al tildarla se abre el menú paso a paso
-    return;
-  }
   if(e.target.id === 'elem-invisible-check'){
     elemInvisible = e.target.checked;
     try{ localStorage.setItem('elem-invisible', elemInvisible ? '1' : ''); }catch(err){}
@@ -10092,7 +10159,6 @@ $('#herramienta-flotante').addEventListener('click', e => {
 });
 $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'elem-turnos'){ elemTurnos = Math.max(0, Math.min(99, Math.round(num(e.target.value)) || 0)); return; }
-  if(e.target.id === 'elem-fuego-dano'){ elemFuegoDano = Math.max(1, Math.min(999, Math.round(num(e.target.value)) || 1)); return; }
   if(e.target.id === 'elem-trampa-nombre'){ elemTrampaNombre = e.target.value; return; }
   if(e.target.id === 'elem-trampa-detalle'){ elemTrampaDetalle = e.target.value; return; }
   if(e.target.id === 'elem-trampa-dano'){ elemTrampaDano = e.target.value; return; }

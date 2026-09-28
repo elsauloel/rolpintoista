@@ -417,8 +417,11 @@ const AsistenteDueloHab = (() => {
           out.zonaTurnos = st.zonaTurnos;
           if(st.zonaAmiga) out.zonaAmiga = true;
           if(st.zonaEstadoNombre){
-            out.zonaEstado = {nombre: st.zonaEstadoNombre, turnos: st.zonaEstadoTurnos};
-            if(['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks) out.zonaEstado.stacks = st.zonaEstadoStacks;
+            const esVenenoZona = ['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre);
+            // Veneno sin stacks a mano: no se manda `turnos` — si no, EstadosAplicar.componer lo toma igual y el
+            // Veneno queda con los stacks de siempre (4) pero vencido en menos turnos de los que dura ese daño.
+            out.zonaEstado = esVenenoZona ? {nombre: st.zonaEstadoNombre} : {nombre: st.zonaEstadoNombre, turnos: st.zonaEstadoTurnos};
+            if(esVenenoZona && st.zonaEstadoStacks) out.zonaEstado.stacks = st.zonaEstadoStacks;
           }
         }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }

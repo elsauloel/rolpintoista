@@ -9893,6 +9893,9 @@ const HERRAMIENTAS = [
   {id: 'elemento', icono: '⬡', nombre: 'Terreno y Formas', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, atajo: 'G'},
   {id: 'niebla', icono: '🌫', nombre: 'Niebla', detalle: 'Destapar o tapar zonas a mano, o reiniciar (GM)', lista: true, soloGM: true},
   // No son modos de dibujo propios: aparecen colgando de ⬡ Terreno y Formas cuando se despliega (ver renderToolkit).
+  // "Formas libres" activa el mismo modo 'elemento' de siempre — el clic en ⬡ ahora solo despliega/repliega, así
+  // que hace falta esta fila para poder entrar a ese modo (antes era el propio ⬡ el que lo activaba directo).
+  {id: 'formalibre', icono: '⬡', nombre: 'Formas libres', detalle: 'Nubes, charcos, muros… con color o imagen; "Sólido" bloquea el paso', lista: true, sub: true},
   {id: 'trampa', icono: '🪤', nombre: 'Trampas', detalle: 'Ocultas; se disparan solas cuando un rival las pisa', lista: true, sub: true},
   {id: 'zonapersistente', icono: '🌫', nombre: 'Zonas con efectos persistentes', detalle: 'Quedan puestas varios turnos: daño y/o estado, al entrar y en cada Mantenimiento', lista: true, sub: true},
   // No es un modo de dibujo: abre o cierra la bitácora flotante (más abajo).
@@ -9937,7 +9940,8 @@ function renderToolkit(){
   pestana.title = (toolkitAbierto ? 'Esconder las herramientas' : 'Abrir las herramientas') + ' (atajo: H)';
   const MODOS_ELEMENTO = ['elemento', 'trampa', 'zonapersistente'];
   const filaHerramienta = h => {
-    const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : h.id === 'elemento' ? (elementoSubmenuAbierto || MODOS_ELEMENTO.includes(herramientaActiva)) : herramientaActiva === h.id;
+    const activa = h.id === 'bitacora' ? bitacoraFlotanteAbierta : h.id === 'elemento' ? (elementoSubmenuAbierto || MODOS_ELEMENTO.includes(herramientaActiva))
+      : h.id === 'formalibre' ? herramientaActiva === 'elemento' : herramientaActiva === h.id;
     return `<li>
     <button type="button" class="tk-herramienta${activa ? ' activa' : ''}${h.sub ? ' tk-sub' : ''}" data-herramienta="${h.id}" aria-pressed="${activa}"${h.atajo ? ` title="${esc(h.nombre)} — atajo de teclado: ${esc(h.atajo)}"` : ''}>
       <span class="tk-icono" aria-hidden="true">${h.icono}</span>
@@ -10058,10 +10062,12 @@ $('#toolkit-lista').addEventListener('click', e => {
     abrirAsistenteZonaNueva();
     return;
   }
-  if(herramientaActiva === h.id){ desactivarHerramienta(); return; }
+  // "Formas libres" activa el modo 'elemento' de siempre (no tiene uno propio, ver HERRAMIENTAS).
+  const modo = h.id === 'formalibre' ? 'elemento' : h.id;
+  if(herramientaActiva === modo){ desactivarHerramienta(); elementoSubmenuAbierto = false; renderToolkit(); return; }
   if(borradorElemento) consolidarBorradorElemento();
   elementoSubmenuAbierto = false;
-  herramientaActiva = h.id;
+  herramientaActiva = modo;
   elemTrampa = h.id === 'trampa';   // el modo ya implica "es una trampa": no hace falta la casilla de antes
   renderToolkit();
   if(elemTrampa && !elemTrampaNombre.trim()) abrirAsistenteTrampaPanel();   // igual que antes al tildar la casilla

@@ -598,3 +598,30 @@ versión parecida en más de una, es candidato a juntar.
   con costo variable "X"** (`confirmarCostoVariable`, el modal de X): a propósito, sin precedente real que lo
   necesite. Verificado en vivo (no solo por sintaxis): el pop-up, las tres respuestas (Sí/No/Cancelar) y que
   cobran exactamente lo que dicen, con Shockwave de prueba (3 SP propio, 6 SP ajeno).
+
+- **Bug real: una habilidad "a uno mismo" pedía objetivo igual, y nunca podía aplicarse sin el GM (2026-09-29,
+  reportado por el dueño probando Blindaje en una partida real — "el origen de las especies")**. Dos fallas
+  separadas, encontradas siguiendo el reporte:
+  1. **`Duelo.elegirObjetivo` (`comun/duelo.js`) solo tenía el atajo "sin objetivo: uno mismo" del lado del
+     mapa** (`dueloElegirObjetivoMapa`, `vtt-hexgrid/mapa.html`, agregado el 2026-09-28 junto con Shockwave).
+     Cuando la habilidad se ejecuta **fuera del mapa** (ficha suelta, sin iframe — `elegirObjetivoLista`), no
+     existía el mismo atajo: se mostraba "¿A quién atacás?" con la lista de TODOS los demás tokens — ni
+     siquiera incluía el propio, porque la lista se arma filtrando `!propio(t)` — así que una habilidad "a uno
+     mismo" no tenía forma de aplicarse sobre quien la usó, solo sobre quien se eligiera por error. Fix: nueva
+     `elegirObjetivoUnoMismo(cfg)`, mismo criterio que el mapa (busca el propio token con `tokensDelMapa()` y
+     llama a `crear()` directo), enganchada en `elegirObjetivo` antes de caer en `elegirObjetivoLista`.
+  2. **Aunque el objetivo fuera correcto, aplicar el efecto (el botón «✔ Aplicar» del cuadro) dependía SIEMPRE
+     de que el GM tuviera el mapa abierto y conectado** — `cfgEscuchar.aplicarEfecto` (el hook que realmente
+     escribe el estado) estaba gateado a `soyGM()` sin excepción, porque hasta ahora la única función que lo
+     definía era la del mapa (`dueloAplicarEfecto`, pensada para aplicar sobre un RIVAL, algo que solo el GM
+     puede hacer). Un buff sobre uno mismo escribe la PROPIA ficha, que no necesita el permiso de nadie más.
+     Fix: el gate pasó a `soyGM() || esMio(d.defensor)` (por duelo, no global), y `ficha-personaje/ficha.html`
+     define su propio hook, `dueloAplicarEfectoPropio(d, ef)` (reusa `aplicarEstadoRecibido`, el mismo camino
+     ya probado para estados que llegan de afuera; cura se aplica con `fijarHp`), enganchado en su
+     `Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio})` de cuando corre **suelta** (`fbAlEntrar`,
+     `window.parent === window`). **Corriendo dentro del mapa** (Botonera embebida, el modo normal de jugar) no
+     hizo falta tocar la ficha: el propio `Duelo.escuchar` del mapa ya usa `dueloAplicarEfecto`, que sabe
+     aplicar a un PJ vía `EstadosAplicar.encolarPj` — con el gate relajado, alcanza con que CUALQUIER miembro
+     (no solo el GM) tenga el mapa abierto para que su propio buff se aplique solo.
+  **No verificado en vivo con Firebase real** (solo por trazado de código + sintaxis: no hay forma de simular
+  un duelo completo con Firestore real sin credenciales) — pedido al dueño reprobar en su partida.

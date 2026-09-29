@@ -4416,6 +4416,24 @@ function sustituirX(formula, X){
   const n = String(Math.max(0, Math.round(num(X))));
   return String(formula || '').replace(/\bx\b/gi, n).replace(/dx/gi, 'd' + n).replace(/xd/gi, n + 'd');
 }
+// Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje, sin esperar al GM (2026-09-29,
+// bug real reportado con Blindaje: un buff sobre uno mismo se quedaba en «Aplicando…» para siempre si el GM no
+// tenía el mapa abierto y conectado — antes SOLO el mapa del GM podía aplicar un efecto, comun/duelo.js
+// cfgEscuchar.aplicarEfecto, gateado a soyGM()). Escribir la propia ficha nunca necesita el permiso de nadie
+// más, así que este hook (pasado a Duelo.escuchar) se habilita también para `esMio(d.defensor)` — ver el
+// cambio de esa fecha en comun/duelo.js. Cualquier otro caso (un aliado, un rival) sigue dependiendo del mapa.
+function dueloAplicarEfectoPropio(d, ef){
+  if(!fichaVivo || d.defensor.tipo !== 'pj' || d.defensor.ref !== fichaVivo.id) return {manual: true, nota: 'a mano'};
+  const spec = Duelo.specDeEfecto(ef);
+  if(!spec) return {manual: true, nota: 'a mano'};
+  if(spec.cura){
+    const antes = num(S.hp);
+    fijarHp(antes + num(spec.cura));
+    return {nota: `+${fmt(num(spec.cura))} HP (${fmt(antes)} → ${fmt(num(S.hp))})`};
+  }
+  aplicarEstadoRecibido(spec, `${d.atacante.nombre} · ${ef.nombre}`);
+  return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
+}
 // Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo (habilidad
 // dirigida o ataque con arma). La tirada personalizada de una habilidad dirigida (ver habDueloDe) ya vive
 // DENTRO del duelo (hab.tira.formula), no acá — no hace falta ninguna ventanita aparte en la ficha.
@@ -12939,7 +12957,7 @@ bitacoraRender();  // estado inicial: sin conexión hasta entrar a la partida
 // Se llama cuando ya se entró a la mesa: arranca las tiradas y abre el
 // último personaje de esta pestaña (o de este navegador).
 async function fbAlEntrar(){
-  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar();   // aviso «te están atacando» (en el mapa lo escucha el propio mapa)
+  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio});   // aviso «te están atacando» (en el mapa lo escucha el propio mapa); aplicarEfecto: solo para lo que sea sobre uno mismo, ver dueloAplicarEfectoPropio
   bitacoraEscuchar();
   fichaIdentidadRender();
   mesaEscuchar();

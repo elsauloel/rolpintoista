@@ -284,7 +284,25 @@ const Duelo = (() => {
     // Un hechizo de área (Paso 4/7 del casteo) necesita la geometría del mapa (marcar el centro, calcular quién
     // queda adentro): sin el mapa abierto no hay forma de resolverlo — ni siquiera la lista de "a quién apunta".
     if(cfg.ataque && cfg.ataque.hab && (cfg.ataque.hab.objetivo === 'area' || cfg.ataque.hab.objetivo === 'onda')){ _toast('Las habilidades de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
+    // Sobre uno mismo (bug real, 2026-09-29 — reportado con Blindaje ejecutado desde la ficha suelta, fuera del
+    // mapa): el mapa ya tenía este atajo (dueloElegirObjetivoMapa), pero acá faltaba — sin él, elegirObjetivoLista
+    // mostraba "¿A quién atacás?" con la lista de TODOS los demás tokens (ni siquiera incluye el propio, porque
+    // la lista se arma filtrando `!propio(t)`), así que una habilidad "a uno mismo" no tenía forma de aplicarse
+    // sobre quien la usó — solo sobre quien se eligiera por error.
+    if(cfg.ataque && cfg.ataque.hab && cfg.ataque.hab.objetivo === 'uno mismo'){ elegirObjetivoUnoMismo(cfg); return; }
     elegirObjetivoLista(cfg);
+  }
+
+  async function elegirObjetivoUnoMismo(cfg){
+    let lista = [];
+    try{ lista = await tokensDelMapa(); }catch(err){ console.error('Duelo: no se pudieron leer los tokens', err); }
+    const mio = lista.find(t => t.fichaId === cfg.yo.ref && t.tipo === cfg.yo.tipo);
+    if(!mio){ _toast('No encontré tu token en el mapa: abrilo para ejecutar esta habilidad'); return; }
+    try{ await crear(cfg, mio, mio.id); }
+    catch(err){
+      console.error('Duelo: no se pudo crear', err);
+      _toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + (err.message || err));
+    }
   }
 
   async function tokensDelMapa(){
@@ -1838,10 +1856,14 @@ const Duelo = (() => {
           }).catch(err => console.error('Duelo: error al aplicar el daño', err));
         });
       }
-      // El GM (en el mapa) aplica los efectos que el atacante pidió («Aplicar»).
-      if(cfgEscuchar.aplicarEfecto && soyGM()){
+      // El GM (en el mapa) aplica los efectos que el atacante pidió («Aplicar») — y, desde el 2026-09-29, también
+      // uno mismo cuando el efecto es sobre su propio personaje (`esMio(d.defensor)`, ej. Blindaje): antes esto
+      // dependía SIEMPRE de que el GM tuviera el mapa abierto y conectado, así que un buff sobre uno mismo se
+      // quedaba en «Aplicando…» para siempre si nadie más estaba mirando. Escribir la propia ficha nunca
+      // necesita permiso de nadie más, así que no hace falta esperar al GM para eso puntual.
+      if(cfgEscuchar.aplicarEfecto){
         listaDuelos.forEach(d => {
-          if(d.fase !== 'efectos') return;
+          if(d.fase !== 'efectos' || !(soyGM() || esMio(d.defensor))) return;
           (d.efectos || []).forEach((ef, i) => {
             const clave = d.id + ':' + i;
             if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;

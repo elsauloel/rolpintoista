@@ -9472,12 +9472,15 @@ function dueloElegirObjetivoMapa(msg){
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   if(ataque && ataque.hab && ataque.hab.objetivo === 'uno mismo'){   // habilidad sobre uno mismo: no hay nada que elegir
-    const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio);
-    if(mio0){
+    // 2026-09-29: antes, cualquier error acá (sincrónico, antes de llegar al .catch) quedaba sin ningún aviso —
+    // "no pasa nada" para quien lo usa, sin ni un toast. Con el try/catch, si algo sale mal se ve.
+    try{
+      const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio);
+      if(!mio0){ toast(`${ataque.habNombre || 'Habilidad'}: no encontré tu token en este mapa`); return; }
       Duelo.crear({yo, ataque}, {id: mio0.id, nombre: nombreDe(mio0), tipo: mio0.tipo, fichaId: mio0.fichaId, duenoUid: mio0.duenoUid}, mio0.id)
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
-      return;
-    }
+    }catch(err){ console.error('No se pudo abrir el duelo (uno mismo):', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); }
+    return;
   }
   // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → brillan los rivales; objetivo
   // "aliado" → brillan los del mismo bando (2026-09-27, pedido del dueño). Es solo una ayuda visual: se puede

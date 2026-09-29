@@ -2055,11 +2055,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
-<script src="../comun/tokens-auto.js?v=20260929e"></script>
+<script src="../comun/tokens-auto.js?v=20260929f"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
-<script src="../comun/asistente-trampa.js?v=20260929e"></script>
+<script src="../comun/asistente-trampa.js?v=20260929f"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
@@ -2067,8 +2067,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929e"></script>
-<script src="../comun/biblioteca.js?v=20260929e"></script>
+<script src="../comun/plantillas.js?v=20260929f"></script>
+<script src="../comun/biblioteca.js?v=20260929f"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -10156,7 +10156,7 @@ function trampaHtml(draft){
 }
 function trampaGuardarCampo(el){
   const d = editing.draft, k = el.dataset.tr;
-  if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, tipo: 'flor', tamano: 1, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; drawEditor(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaAbrirAsistente(); return; }
+  if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, tipo: 'flor', tamano: 0, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; drawEditor(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaAbrirAsistente(); return; }
   const t = d.trampaColocar; if(!t) return;
   if(k === 'ignoraDef') t[k] = el.checked;
   else if(k === 'radio' || k === 'cant') t[k] = Math.max(k === 'cant' ? 1 : 0, Math.min(6, Math.round(num(el.value) || 0)));
@@ -10184,7 +10184,7 @@ async function colocarTrampaDeItem(it){
   if(!d || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id){ toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
   try{
     const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
-    // Forma única de trampa (P123): el `tamano` de la flor es 1 = una casilla (antes se tomaba como radio y salía una flor de más).
+    // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
     const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj',
       trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
       item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
@@ -10220,7 +10220,7 @@ function trampaPreconstruidas(){
       // cantidad que se eligieron recién. Si es una línea, el "radio" que se preguntó se toma como su largo.
       const base = Plantillas.trampaDesde(datos);
       ed.draft.trampaColocar = {...base, nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '',
-        tamano: base.tipo === 'linea' ? Math.max(1, Math.min(20, r.radio || 1)) : Math.max(0, Math.min(6, r.radio)) + 1, cant: Math.max(1, Math.min(6, r.cant))};
+        tamano: base.tipo === 'linea' ? Math.max(1, Math.min(20, r.radio || 1)) : Math.max(0, Math.min(6, r.radio)), cant: Math.max(1, Math.min(6, r.cant))};
       delete ed.draft.trampaColocar.teleport;   // el teleport no lo coloca una habilidad (su destino se marca en el mapa)
       drawEditor();
       toast(`Trampa "${datos.nombre}" cargada`);

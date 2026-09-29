@@ -1276,9 +1276,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
-<script src="../comun/plantillas.js?v=20260929e"></script>
-<script src="../comun/biblioteca.js?v=20260929e"></script>
-<script src="../comun/tokens-auto.js?v=20260929e"></script>
+<script src="../comun/plantillas.js?v=20260929f"></script>
+<script src="../comun/biblioteca.js?v=20260929f"></script>
+<script src="../comun/tokens-auto.js?v=20260929f"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -1299,7 +1299,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/trampas-base.js"></script>
-<script src="../comun/asistente-trampa.js?v=20260929e"></script>
+<script src="../comun/asistente-trampa.js?v=20260929f"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
@@ -7812,7 +7812,7 @@ $('#hc-trampa-preconstruidas').onclick = () => {
       // que se eligieron recién. En una línea, el "radio" preguntado es su largo. El teleport no lo coloca una habilidad.
       const base = Plantillas.trampaDesde(datos);
       hcTrampa = {...base, nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '',
-        tamano: base.tipo === 'linea' ? Math.max(1, Math.min(20, r.radio || 1)) : Math.max(0, Math.min(6, r.radio)) + 1, cant: Math.max(1, Math.min(6, r.cant))};
+        tamano: base.tipo === 'linea' ? Math.max(1, Math.min(20, r.radio || 1)) : Math.max(0, Math.min(6, r.radio)), cant: Math.max(1, Math.min(6, r.cant))};
       delete hcTrampa.teleport;
       $('#hc-trampa-on').checked = true;
       hcTrampaRender();

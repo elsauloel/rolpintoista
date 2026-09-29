@@ -74,7 +74,8 @@ const Plantillas = (() => {
   /* ---- Trampa: UNA sola forma para el mapa y para las habilidades (P123, 2026-09-29) ----
      Es la forma de las trampas del mapa ("Trampas guardadas", catálogo): nombre, detalle, amiga (el efecto alcanza a los
      aliados del área), ignoraDef, dano, estado (nombre) + estadoTurnos (+ estadoMods si es un estado propio con bonos),
-     tipo ('flor' | 'linea' | 'libre') + tamano (flor: 1 = una casilla, 2 = flor de 1…; línea: largo), color, alfa, teleport,
+     tipo ('flor' | 'linea' | 'libre') + tamano (flor: su RADIO, 0 = una casilla, 1 = flor de 7, 2 = flor de 19 — como en el
+     mapa y en las trampas consumibles; línea: su largo), color, alfa, teleport,
      la zona que deja al dispararse (dejaZona, zonaTurnos, zonaEnMantenimiento, zonaCadaPaso, zonaResistStat,
      zonaResistValor), turnos (cuánto dura la trampa puesta; 0 = sin límite) y `cant` (cuántas deja una habilidad cada vez
      que se ejecuta). Una habilidad guarda esto mismo en `trampaColocar`, así una trampa del catálogo sirve para las dos cosas.
@@ -88,8 +89,9 @@ const Plantillas = (() => {
     const out = clon(t);
     delete out.forma; delete out.radio; delete out.largo;
     out.tipo = ['flor', 'linea', 'libre'].includes(t.tipo) ? t.tipo : (t.forma === 'linea' ? 'linea' : 'flor');
-    out.tamano = t.tamano !== undefined ? Math.max(1, Math.round(n(t.tamano)) || 1)
-      : out.tipo === 'linea' ? Math.max(1, Math.round(n(t.largo)) || 3) : Math.max(0, Math.round(n(t.radio))) + 1;
+    out.tamano = t.tamano !== undefined ? Math.max(0, Math.min(30, Math.round(n(t.tamano))))
+      : out.tipo === 'linea' ? Math.max(1, Math.round(n(t.largo)) || 3) : Math.max(0, Math.round(n(t.radio)));
+    if(out.tipo === 'linea') out.tamano = Math.max(1, out.tamano);
     if(t.estado && typeof t.estado === 'object'){
       out.estado = String(t.estado.nombre || '');
       if(t.estadoTurnos === undefined) out.estadoTurnos = n(t.estado.turnos);
@@ -99,8 +101,8 @@ const Plantillas = (() => {
     out.cant = Math.max(1, Math.min(6, Math.round(n(t.cant)) || 1));
     return out;
   }
-  // Radio de la flor para colocarla (0 = una sola casilla), a partir de `tamano`.
-  const radioDeTrampa = t => Math.max(0, (Number(t && t.tamano) || 1) - 1);
+  // Radio de la flor para colocarla (0 = una sola casilla): es el mismo `tamano`.
+  const radioDeTrampa = t => Math.max(0, Math.round(Number(t && t.tamano) || 0));
   function trampa(t){
     const x = trampaDesde(t) || {};
     const out = {};

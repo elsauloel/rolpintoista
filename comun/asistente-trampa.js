@@ -367,7 +367,7 @@ const AsistenteTrampa = (() => {
     const linea = r.forma === 'linea';
     return {nombre: String(r.nombre || '').trim().slice(0, 40), detalle: detalleFinal(r), amiga: !!r.amiga, ignoraDef: !r.contemplaArmadura, dano: r.dano || '',
       estado: r.estado || '', estadoTurnos: r.estado ? Math.max(0, num(r.estadoTurnos)) : 0, ...(r.estado && r.estadoMods ? {estadoMods: r.estadoMods} : {}),
-      tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))) + 1,
+      tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))),
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
         zonaResistStat: r.zonaResistStat || '', zonaResistValor: num(r.zonaResistValor) || 12} : {}),
@@ -377,7 +377,7 @@ const AsistenteTrampa = (() => {
   function inicialDe(t0){
     const t = typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? Plantillas.trampaDesde(t0 || {}) : (t0 || {});
     const linea = t.tipo === 'linea';
-    return {nombre: t.nombre || '', descripcion: t.detalle || '', forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Math.max(0, num(t.tamano) - 1), largo: linea ? num(t.tamano) || 3 : 3,
+    return {nombre: t.nombre || '', descripcion: t.detalle || '', forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Math.max(0, num(t.tamano)), largo: linea ? num(t.tamano) || 3 : 3,
       cant: t.cant || 1, color: t.color, alfa: t.alfa, amiga: !!t.amiga, dano: t.dano || '', contemplaArmadura: !t.ignoraDef,
       estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, teleport: !!t.teleport,
       dejaZona: !!t.dejaZona, zonaTurnos: t.zonaTurnos, zonaEnMant: t.zonaEnMantenimiento !== false, zonaCadaPaso: !!t.zonaCadaPaso,
@@ -390,7 +390,7 @@ const AsistenteTrampa = (() => {
     if(t.dano) p.push(`${t.dano} de daño ${t.ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
     if(t.estado) p.push(`deja ${t.estado}`);
     if(!p.length) p.push('solo avisa cuando se activa');
-    p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : `radio ${Math.max(0, num(t.tamano) - 1)}`);
+    p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : `radio ${Math.max(0, num(t.tamano))}`);
     if((t.cant || 1) > 1) p.push(`×${t.cant}`);
     if(t.dejaZona) p.push(`deja zona ${t.zonaTurnos || 3} turnos`);
     if(num(t.turnos) > 0) p.push(`dura ${t.turnos} turnos`);

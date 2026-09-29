@@ -1096,7 +1096,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 
 /* ---------- Barra superior (arriba de los vitales, fija al scrollear) ---------- */
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
-.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:6px}
+.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px} /* por debajo del menú del sitio (z 49, ver más abajo): si no, el menú abierto queda tapado por el dock (bug real, 2026-09-29) */
 .dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:40px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
   background:var(--panel);border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;color:var(--paper);text-decoration:none;
   cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;

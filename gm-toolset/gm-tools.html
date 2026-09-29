@@ -392,11 +392,18 @@ input[type=file]{display:none}
 @media(max-width:820px){.botonera-grid,.botonera-grid-even{grid-template-columns:1fr}}
 .botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;min-width:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-/* Defensa y resistencias a crítico (solo se ven, no se tiran): igual que en la botonera de la ficha. */
-.botonera-defensa{display:grid;grid-template-columns:minmax(70px,1fr) 4fr;gap:6px;align-items:stretch;margin-top:6px}
+/* Defensa y resistencias a crítico (solo se ven, no se tiran): igual que en la botonera de la ficha, PERO acá
+   son 3 hijos (Defensa, Armadura mágica y el bloque de Resistencia a críticos), no 2 — la ficha nunca tiene
+   Armadura mágica en esta fila. Con solo 2 columnas declaradas, el 3er hijo (el bloque de crítico, con sus 5
+   cajitas adentro) caía en la 2da fila reusando la columna angosta pensada para "Defensa" solo, y todo quedaba
+   amontonado (bug real reportado por el dueño, 2026-09-29, captura con "TIP4 TIP6 TIP8..." superpuestos). Fix:
+   Defensa y Armadura mágica quedan 50/50 en la fila de arriba; el bloque de crítico ocupa la fila de abajo
+   entera (`grid-column:1 / -1` en `.botonera-crit`, ver más abajo). No se tocó `ficha-personaje/ficha.html`:
+   ahí esta fila siempre tuvo 2 hijos nomás y ya se veía bien. */
+.botonera-defensa{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch;margin-top:6px}
 .botonera-tile.bt-info{cursor:default;justify-content:center}
 .botonera-tile.bt-info:hover{border-color:var(--line-soft)}
-.botonera-crit{display:flex;flex-direction:column;gap:4px;min-width:0}
+.botonera-crit{display:flex;flex-direction:column;gap:4px;min-width:0;grid-column:1 / -1}
 .botonera-crit-t{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .botonera-crit-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;flex:1}
 @media(max-width:420px){.botonera-defensa{grid-template-columns:1fr}}

@@ -59,9 +59,14 @@ pre{margin:0;white-space:pre-wrap;font-family:"Space Mono",monospace;font-size:1
 table.dif{width:100%;border-collapse:collapse;font-size:12.5px}
 table.dif th,table.dif td{border:1px solid var(--line-soft);padding:5px 7px;vertical-align:top;text-align:left}
 table.dif th{color:var(--muted);font-weight:600;background:var(--panel2)}
-table.dif td.k{font-family:"Space Mono",monospace;color:var(--brass);white-space:nowrap}
-table.dif td.antes{color:#F0A49E}
-table.dif td.ahora{color:#BFE08A}
+table.dif{table-layout:fixed}
+table.dif td{overflow-wrap:anywhere;line-height:1.5}
+table.dif td.k{color:var(--brass);font-weight:600}
+table.dif td.k small{display:block;font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);font-weight:400}
+del{background:rgba(212,87,78,.28);color:#F6B9B3;text-decoration:line-through;border-radius:3px;padding:0 2px}
+ins{background:rgba(168,194,86,.26);color:#D6EE9C;text-decoration:none;border-radius:3px;padding:0 2px}
+.kv.sub{grid-template-columns:150px 1fr;border-left:2px solid var(--line);padding-left:10px;margin:2px 0 4px}
+.kv .k{font-family:inherit;font-size:12.5px}
 .seccion{margin:22px 0 8px;font-size:14px;font-weight:700;color:var(--brass);text-transform:uppercase;letter-spacing:.06em}
 #login-box{max-width:380px;margin:16vh auto 0;padding:0 20px;text-align:center}
 #login-error{color:#F0A49E;min-height:1.4em;font-size:13px;margin-top:8px}
@@ -144,8 +149,8 @@ function bases(){
   if(basesCache) return basesCache;
   const m = {skills: new Map(), habs_creep: new Map(), creeps: new Map(), pasivas: new Map(), trampas: new Map(), items: new Map()};
   const put = (tipo, id, datos, nombre) => m[tipo].set('base-' + id, {datos, nombre});
-  (typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []).forEach(c => c.habilidades.forEach(h => put('skills', h.id, h, `${h.nombre} (${c.nombre})`)));
-  (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []).forEach(h => put('skills', h.id, h, `${h.nombre} (pool custom)`));
+  (typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []).forEach(c => c.habilidades.forEach(h => put('skills', h.id, {para: 'jugador', clase: c.id, ...h}, `${h.nombre} (${c.nombre})`)));
+  (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []).forEach(h => put('skills', h.id, {para: 'jugador', ...h}, `${h.nombre} (pool custom)`));
   (typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : []).forEach(b => {
     let d = b.datos || b;
     try{ if(d.sp && typeof armarHabilidadDeCreep === 'function') d = {...armarHabilidadDeCreep(d, 1), para: 'creep'}; }catch(e){}
@@ -191,25 +196,108 @@ function valorHtml(v){
   if(typeof v === 'object') return `<pre>${esc(JSON.stringify(v, null, 2))}</pre>`;
   return esc(String(v));
 }
+// Ver: la configuración entera con nombres legibles; lo anidado (Ejecución, bonos, efectos…) como sub-lista, sin llaves.
+function verValorHtml(v, campo){
+  if(vacio(v)) return '<span class="hint">—</span>';
+  if(escalar(v) || (Array.isArray(v) && v.every(escalar))) return esc(textoValor(v, campo));
+  const pares = Array.isArray(v) ? v.map((x, i) => [i, x]) : Object.entries(v);
+  return `<div class="kv sub">${pares.map(([k, x]) => `<div class="k">${esc(typeof k === 'number' ? `${NOMBRE_CAMPO[campo] || campo} ${k + 1}` : (NOMBRE_CAMPO[k] || k))}</div><div class="v">${verValorHtml(x, typeof k === 'number' ? campo : k)}</div>`).join('')}</div>`;
+}
 function verHtml(e){
   const d = e.datos || {};
   const claves = Object.keys(d).filter(k => !['imagen', '_bib'].includes(k));
-  return `<div class="kv">${claves.map(k => `<div class="k">${esc(k)}</div><div class="v">${valorHtml(d[k])}</div>`).join('')}</div>`;
+  return `<div class="kv">${claves.map(k => `<div class="k" title="${esc(k)}">${esc(NOMBRE_CAMPO[k] || k)}</div><div class="v">${verValorHtml(d[k], k)}</div>`).join('')}</div>`;
 }
-// Diferencias campo por campo entre el original y la versión subida (las dos pasadas por su plantilla, para no ver ruido).
+/* ---------- Comparar: dato por dato, con nombres legibles ----------
+   Los bloques anidados (la Ejecución `duelo`, los bonos `mods`, los efectos…) se abren en sus datos sueltos
+   ("Ejecución › Objetivo", "Ejecución › Efectos 1 › Turnos") y se comparan uno por uno, sin importar el orden en que
+   vengan guardados — así solo aparece lo que de verdad cambió. En los textos se resaltan las palabras distintas. */
+const NOMBRE_CAMPO = {
+  nombre: 'Nombre', detalle: 'Descripción', descripcion: 'Descripción', descripcionNarrativa: 'Descripción narrativa',
+  costo: 'Costo en SP', nitrosCosto: 'Costo en No2', hpCosto: 'Costo en HP', turnoAjenoSp: 'SP en turno ajeno',
+  cd: 'Cooldown', cdArranca: 'Habilidad lenta', tiradaStat: 'Tira (stat)', tiradaExtra: 'Tira (fórmula)',
+  duelo: 'Ejecución', objetivo: 'Objetivo', radio: 'Radio', alcance: 'Alcance', tira: 'Tira', contra: 'Se resiste con',
+  tiraFormula: 'Fórmula propia', tiraEtiqueta: 'Nombre de la tirada', contraModo: 'Resistencia', contraOtro: 'Resistencia (a mano)',
+  dano: 'Daño', danoTipo: 'Tipo de daño', danoFijoPorX: 'Daño por cada X', ignoraDano: 'Ignora la Defensa',
+  efectos: 'Efectos', efectosNota: 'Otro efecto (a mano)', efectoLibre: 'Efecto a mano', critico: 'Si es crítico',
+  arma: 'Ataque con el arma', turnos: 'Turnos', stacks: 'Stacks', hp: 'HP', cura: 'Cura', escudoMagico: 'Escudo',
+  efectoNombre: 'Estado al usar', efectoTurnos: 'Turnos del estado', efectoHpTurno: 'HP por turno del estado',
+  efectoMods: 'Bonos del estado', efectoEscudo: 'Escudo del estado', efectoPermanente: 'Estado sin límite', efectoStacks: 'Stacks del estado',
+  curaHp: 'Cura', automatizada: 'Automatizada', jobCosto: 'Costo de Job', clase: 'Clase', para: 'Para', etiquetas: 'Etiquetas',
+  trampaColocar: 'Coloca una trampa', mods: 'Bonos', stat: 'Stat', val: 'Valor', tier: 'Rareza', precioCompra: 'Precio',
+  tipoItem: 'Categoría', tipoDado: 'Tipo', danoFijo: 'Daño fijo', danoAmplificado: 'Daño amplificado', peso: 'Peso',
+  ranuras: 'Ranuras', efectosGolpe: 'Efectos al golpear', caras: 'Caras del dado', exitos: 'Éxitos', nivel: 'Nivel',
+};
+const NOMBRE_STAT = {
+  fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', pdg: 'PdG', pdgmg: 'PdG.Esp',
+  eva: 'Evasión', parry: 'Parry', bloqueo: 'Bloqueo', resm: 'Res.Mt', resmg: 'Res.Esp', rescc: 'Res.CC', def: 'Defensa',
+  ini: 'Iniciativa', rng: 'Rango', crit: 'Crítico frecuente', critpot: 'Crítico potente', mov: 'Movimiento',
+  tipo1: 'Res. crítico Tipo 4', tipo2: 'Res. crítico Tipo 6', tipo3: 'Res. crítico Tipo 8', tipo4: 'Res. crítico Tipo 10', tipo5: 'Res. crítico Tipo 12',
+};
+const CAMPOS_STAT = new Set(['tira', 'tiradaStat', 'contra', 'stat']);
+const escalar = v => v === null || typeof v !== 'object';
+// Abre un valor en sus datos sueltos: [{ruta: ['duelo', 'efectos', 0, 'turnos'], v}]. Una lista de valores simples
+// (["con", "eva"]) queda entera; las claves de un objeto se recorren siempre en el mismo orden.
+function hojas(v, ruta = [], out = []){
+  if(escalar(v) || (Array.isArray(v) && v.every(escalar))) out.push({ruta, v});
+  else if(Array.isArray(v)) v.forEach((x, i) => hojas(x, [...ruta, i], out));
+  else Object.keys(v).sort().forEach(k => hojas(v[k], [...ruta, k], out));
+  return out;
+}
+const vacio = v => v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length);
+const igual = (a, b) => (vacio(a) && vacio(b)) || JSON.stringify(a) === JSON.stringify(b);
+function nombreRuta(ruta){
+  return ruta.map(p => typeof p === 'number' ? `${p + 1}` : (NOMBRE_CAMPO[p] || p)).join(' › ');
+}
+function textoValor(v, campo){
+  if(vacio(v)) return '';
+  if(typeof v === 'boolean') return v ? 'sí' : 'no';
+  const uno = x => CAMPOS_STAT.has(campo) && NOMBRE_STAT[x] ? NOMBRE_STAT[x] : String(x);
+  return Array.isArray(v) ? v.map(uno).join(', ') : uno(v);
+}
+// Diferencia palabra por palabra de dos textos: marca en el original lo que se sacó y en el subido lo que se agregó.
+function difPalabras(a, b){
+  const A = a.split(/(\s+)/), B = b.split(/(\s+)/);
+  if(A.length * B.length > 250000) return [esc(a), esc(b)];
+  const n = A.length, m = B.length, L = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
+  for(let i = n - 1; i >= 0; i--) for(let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  // Reescrito casi entero: marcar palabra por palabra sería una pared de color; se muestran los dos textos limpios.
+  if(L[0][0] < Math.max(n, m) * 0.45) return [esc(a), esc(b)];
+  let i = 0, j = 0, x = '', y = '';
+  while(i < n || j < m){
+    if(i < n && j < m && A[i] === B[j]){ x += esc(A[i]); y += esc(B[j]); i++; j++; }
+    else if(j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])){ y += /^\s+$/.test(B[j]) ? esc(B[j]) : `<ins>${esc(B[j])}</ins>`; j++; }
+    else { x += /^\s+$/.test(A[i]) ? esc(A[i]) : `<del>${esc(A[i])}</del>`; i++; }
+  }
+  return [x, y];
+}
+// Diferencias dato por dato entre el original y la versión subida (las dos pasadas por su plantilla, para no ver ruido).
 function diferencias(e, o){
   const L = x => { try{ return Plantillas.limpiar(e.tipo, structuredClone(x)); }catch(err){ return x; } };
   const a = L(o.datos) || {}, b = L(e.datos) || {};
-  const ignorar = new Set(['id', 'imagen', '_bib', 'bibOrigen', 'cdActual']);
-  return [...new Set([...Object.keys(a), ...Object.keys(b)])].filter(k => !ignorar.has(k))
-    .filter(k => JSON.stringify(a[k]) !== JSON.stringify(b[k])).map(k => ({k, antes: a[k], ahora: b[k]}));
+  const ignorar = new Set(['id', 'imagen', '_bib', 'bibOrigen', 'bibIgnorada', 'cdActual']);
+  const quitar = x => Object.fromEntries(Object.entries(x).filter(([k]) => !ignorar.has(k)));
+  const ha = new Map(hojas(quitar(a)).map(h => [JSON.stringify(h.ruta), h]));
+  const hb = new Map(hojas(quitar(b)).map(h => [JSON.stringify(h.ruta), h]));
+  const rutas = [...new Set([...ha.keys(), ...hb.keys()])];
+  return rutas.map(r => ({ruta: (ha.get(r) || hb.get(r)).ruta, antes: ha.get(r)?.v, ahora: hb.get(r)?.v}))
+    .filter(x => !igual(x.antes, x.ahora));
+}
+function filaDif(x){
+  const campo = [...x.ruta].reverse().find(p => typeof p === 'string');
+  let antes = textoValor(x.antes, campo), ahora = textoValor(x.ahora, campo);
+  let ha, hb;
+  if(antes && ahora && (antes.length > 30 || ahora.length > 30)) [ha, hb] = difPalabras(antes, ahora);
+  else { ha = antes ? `<del>${esc(antes)}</del>` : ''; hb = ahora ? `<ins>${esc(ahora)}</ins>` : ''; }
+  const nada = '<span class="hint">(nada)</span>';
+  return `<tr><td class="k">${esc(nombreRuta(x.ruta))}<small>${esc(x.ruta.join('.'))}</small></td><td>${ha || nada}</td><td>${hb || nada}</td></tr>`;
 }
 function compararHtml(e){
   const o = originalDe(e);
   if(!o) return `<div class="hint">${e.reemplaza ? 'No encontré el original que corrige (puede haber cambiado de nombre o haberse borrado).' : 'Es algo nuevo: no corrige a ningún original. Usá 👁 Ver para revisarlo entero.'}</div>`;
   const dif = diferencias(e, o);
-  return `<div class="hint" style="margin-bottom:6px">Corrige a <b>${esc(o.nombre)}</b>${o.deFabrica ? ' (de fábrica)' : ''}. ${dif.length ? `${dif.length} campo${dif.length === 1 ? '' : 's'} distinto${dif.length === 1 ? '' : 's'}:` : 'No cambia nada respecto del original.'}</div>
-    ${dif.length ? `<table class="dif"><tr><th>Campo</th><th>Original</th><th>Subido</th></tr>${dif.map(x => `<tr><td class="k">${esc(x.k)}</td><td class="antes">${valorHtml(x.antes)}</td><td class="ahora">${valorHtml(x.ahora)}</td></tr>`).join('')}</table>` : ''}`;
+  return `<div class="hint" style="margin-bottom:6px">Corrige a <b>${esc(o.nombre)}</b>${o.deFabrica ? ' (de fábrica)' : ''}. ${dif.length ? `${dif.length} dato${dif.length === 1 ? '' : 's'} distinto${dif.length === 1 ? '' : 's'} — <del>tachado</del> lo que se sacó, <ins>resaltado</ins> lo que se agregó:` : 'No cambia nada respecto del original.'}</div>
+    ${dif.length ? `<table class="dif"><colgroup><col style="width:22%"><col style="width:39%"><col style="width:39%"></colgroup><tr><th>Dato</th><th>Original</th><th>Subido</th></tr>${dif.map(filaDif).join('')}</table>` : ''}`;
 }
 function editarHtml(e){
   const txt = st.borrador[e.id] ?? JSON.stringify(e.datos, null, 2);

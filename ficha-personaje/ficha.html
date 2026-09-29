@@ -3720,12 +3720,16 @@ function aplicarEstadoRecibido(spec, origen){
     const {nombre, ...resto} = preset;
     draft = {id: uid(), nombre, ...structuredClone(resto)};
     if(spec.turnos !== undefined && spec.turnos !== null) draft.turnos = spec.turnos;
+    // Escudo a mano desde el 🎯 (2026-09-28): un número puesto en el paso «Efectos» manda sobre el fijo del
+    // preset (ej. Blindaje con un escudo distinto de los 10 de siempre de Escudo especial).
+    if(num(spec.escudoMagico)) draft.escudoMagico = num(spec.escudoMagico);
   }else{
     const mods = (spec.mods || []).map(m => ({stat: m.stat, val: num(m.val)}));
     const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${STAT_LABEL[m.stat] || m.stat}`);
     if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
-    draft = {id: uid(), nombre: spec.nombre, polaridad: spec.polaridad || 'debuff', turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
-      permanente: false, detalle: spec.detalle || txt.join(', '), mods};
+    if(spec.escudoMagico) txt.push(`escudo de ${num(spec.escudoMagico)}`);
+    draft = {id: uid(), nombre: spec.nombre, polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
+      permanente: false, detalle: spec.detalle || txt.join(', '), mods, ...(num(spec.escudoMagico) ? {escudoMagico: num(spec.escudoMagico)} : {})};
   }
   draft.activo = true;
   if(!draft.polaridad) draft.polaridad = 'debuff';
@@ -4504,7 +4508,7 @@ function habDueloDe(it, xSp, xNitros){
     tira,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
     dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
-    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
+    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo}, cura: num(e.cura), detalle: e.detalle || ''})),
     ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
     ...(c.efectoLibre ? {efectoLibre: sustituirX(c.efectoLibre, X)} : {}),
     ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
@@ -5899,10 +5903,10 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el duelo paso a paso">⚔ duelo</span>' : ''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
-        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo (qué se tira, con qué se resiste, daño y efectos)">⚔</button></div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button></div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}

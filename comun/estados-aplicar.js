@@ -33,6 +33,17 @@ const EstadosAplicar = (() => {
     {nombre: 'Sentado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: 0, permanente: true, sentado: true, esCC: true, detalle: 'Su Evasión se parte a la mitad, no puede atacar y no puede hacer dodge roll. No vence solo: levantarse cuesta 1 No2.'},
   ];
 
+  // Buffs con escudo especial (2026-09-28, pedido del dueño): los mismos presets de EFECTOS_PRESET (ficha.html)
+  // y ESTADOS_PRESET_GM (gm-tools.html), acá en la forma de un creep, para que una habilidad que da un escudo
+  // sobre uno mismo o un aliado (Blindaje…) los pueda usar desde el paso «Efectos» del 🎯, igual que ya hacía
+  // un debuff sobre un rival. `escudoMagico` es el mismo campo que ya entiende el resto del juego (HUD del mapa,
+  // chip de la ficha): una barra secundaria que absorbe daño antes que el HP real.
+  const BUFFS = [
+    {nombre: 'Escudo especial', polaridad: 'buff', turnos: 3, stacks: 1, hpTurno: 0, escudoMagico: 10, detalle: 'Escudo especial: absorbe daño antes que el HP real, hasta agotarse.'},
+    {nombre: 'Barrera', polaridad: 'buff', turnos: 1, stacks: 1, hpTurno: 0, escudoMagico: 8, detalle: 'Barrera: absorbe daño antes que el HP real, dura poco.'},
+  ];
+  const presetPorNombre = nombre => DEBUFFS.find(p => p.nombre === nombre) || BUFFS.find(p => p.nombre === nombre);
+
   function limpiarSpec(spec){
     const s = spec || {};
     const out = {nombre: String(s.nombre || 'Estado').slice(0, 40)};
@@ -43,23 +54,30 @@ const EstadosAplicar = (() => {
     if(s.polaridad) out.polaridad = s.polaridad;
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
+    // Escudo especial (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
+    // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
+    if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
     return out;
   }
-  const esPreset = nombre => DEBUFFS.some(p => p.nombre === nombre);
+  const esPreset = nombre => !!presetPorNombre(nombre);
 
   // Estado en la forma de un creep.
   function componer(spec){
     const s = limpiarSpec(spec);
-    const p = DEBUFFS.find(x => x.nombre === s.nombre);
-    const base = p ? structuredClone(p) : {nombre: s.nombre, polaridad: s.polaridad || 'debuff', turnos: 0, stacks: 1, hpTurno: 0, detalle: ''};
+    const p = presetPorNombre(s.nombre);
+    // Sin preset (nombre propio) pero con un escudo puesto a mano: es un buff, no el debuff de siempre por
+    // defecto (2026-09-28) — un «Blindaje improvisado» con escudoMagico:6 no debería quedar marcado en contra.
+    const base = p ? structuredClone(p) : {nombre: s.nombre, polaridad: s.polaridad || (s.escudoMagico ? 'buff' : 'debuff'), turnos: 0, stacks: 1, hpTurno: 0, detalle: ''};
     if(s.turnos !== undefined) base.turnos = s.turnos;
     if(s.mods) base.mods = structuredClone(s.mods);
     if(s.hp) base.hpTurno = s.hp;
     if(s.stacks && p && p.esVeneno && !p.permanente){ base.stacks = s.stacks; base.turnos = s.stacks; }   // Veneno de N stacks: dura N turnos
+    if(s.escudoMagico !== undefined) base.escudoMagico = s.escudoMagico;   // un valor a mano manda sobre el del preset
     if(s.detalle) base.detalle = s.detalle;
     if(!p && !s.detalle){
       const partes = (base.mods || []).map(m => `${m.val > 0 ? '+' : ''}${m.val} ${m.stat}`);
       if(base.hpTurno) partes.push(`${base.hpTurno > 0 ? '+' : ''}${base.hpTurno} HP por turno`);
+      if(base.escudoMagico) partes.push(`escudo de ${base.escudoMagico}`);
       base.detalle = partes.length ? partes.join(', ') + (base.turnos ? ` durante ${base.turnos} turno(s).` : '.') : '';
     }
     return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base};
@@ -126,12 +144,13 @@ const EstadosAplicar = (() => {
   // "Veneno" / "Debilitado (3 turnos: −2 Daño)" — para descripciones y avisos.
   function texto(spec){
     const s = limpiarSpec(spec);
-    const p = DEBUFFS.find(x => x.nombre === s.nombre);
+    const p = presetPorNombre(s.nombre);
     const turnos = s.turnos !== undefined ? s.turnos : (p ? p.turnos : 0);
     const mods = (s.mods || (p && p.mods) || []).map(m => `${m.val > 0 ? '+' : '−'}${Math.abs(m.val)} ${m.stat}`);
-    const extra = [turnos ? `${turnos} turno${turnos === 1 ? '' : 's'}` : '', ...mods, s.hp ? `${s.hp > 0 ? '+' : '−'}${Math.abs(s.hp)} HP por turno` : ''].filter(Boolean);
+    const escudo = s.escudoMagico !== undefined ? s.escudoMagico : (p ? p.escudoMagico : 0);
+    const extra = [turnos ? `${turnos} turno${turnos === 1 ? '' : 's'}` : '', ...mods, s.hp ? `${s.hp > 0 ? '+' : '−'}${Math.abs(s.hp)} HP por turno` : '', escudo ? `🛡${escudo}` : ''].filter(Boolean);
     return s.nombre + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
+  return {DEBUFFS, BUFFS, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
 })();

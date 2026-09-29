@@ -4244,7 +4244,7 @@ function habDueloCreep(sc, h){
     tira: stat ? {stat, etq: habEtqCreep(stat), bono: num(h.tiradaBono)} : null,
     contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: habEtqCreep(s)})),
     dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
-    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined, hp: e.hp, stacks: e.stacks}, cura: num(e.cura), detalle: e.detalle || ''})),
+    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo}, cura: num(e.cura), detalle: e.detalle || ''})),
     ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
     ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
   };
@@ -5534,7 +5534,7 @@ function habHtml(sc, h){
         <span class="durlabel">CD</span>
         <input type="number" data-habf="cd" data-scid="${scId}" data-habid="${h.id}" value="${h.cd||0}" min="0" title="Turnos de reutilización. 0 = sin cooldown">
       </div>
-      ${h.duelo ? '<span class="tag" title="Al ejecutarla se abre el duelo paso a paso">⚔</span>' : ''}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Duelo: cómo se juega esta habilidad contra un objetivo">⚔</button>
+      ${h.duelo ? '<span class="tag" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨</span>' : ''}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Ejecución: cómo se juega esta habilidad">✨</button>
       <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
       <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
     </div>

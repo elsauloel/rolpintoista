@@ -395,6 +395,9 @@ const Duelo = (() => {
     if(_num(s.hp)) o.hp = _num(s.hp);
     if(s.polaridad === 'buff' || s.polaridad === 'debuff') o.polaridad = s.polaridad;
     if(_num(s.stacks)) o.stacks = Math.max(1, Math.round(_num(s.stacks)));
+    // Escudo (2026-09-28, pedido del dueño): un efecto de la habilidad puede dar un escudo especial (Blindaje,
+    // Barrera…) en vez de (o además de) un debuff — ver EstadosAplicar.BUFFS y el paso «Efectos» del 🎯.
+    if(_num(s.escudoMagico)) o.escudoMagico = Math.max(0, Math.round(_num(s.escudoMagico)));
     return o;
   }
   function limpiarEfectos(lista){
@@ -917,7 +920,7 @@ const Duelo = (() => {
     actual = null;
     const f = fondo();
     f.classList.remove('min');
-    f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button><button type="button" data-x title="Cerrar">✕</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo el duelo…</div></div></div>';
+    f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button><button type="button" data-x title="Cerrar">✕</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo…</div></div></div>';
     f.querySelector('[data-min]').onclick = minimizar;
     f.querySelector('[data-x]').onclick = cerrar;
     actual = {id, dato: null, baja: null, min: false};
@@ -1457,7 +1460,7 @@ const Duelo = (() => {
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
     const mostrarBloqueo = d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza;
     f.innerHTML = `<div class="duelo-caja">
-      <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «Ver duelo»)">—</button><button type="button" data-x title="Cerrar">✕</button></div></div>
+      <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button><button type="button" data-x title="Cerrar">✕</button></div></div>
       <div class="duelo-cuerpo">
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
@@ -1751,7 +1754,7 @@ const Duelo = (() => {
         : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
         : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
-        : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
+        : d.hab ? `✨ Ver ejecución: ${d.atacante.nombre} → ${d.defensor.nombre}` : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);
       if(!el){
         el = document.createElement('button');

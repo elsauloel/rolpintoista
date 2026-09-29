@@ -4508,6 +4508,7 @@ function habDueloDe(it, xSp, xNitros){
     ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
     ...(c.efectoLibre ? {efectoLibre: sustituirX(c.efectoLibre, X)} : {}),
     ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
+    ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
   };
 }
 function lanzarDueloDeHab(it, hab){

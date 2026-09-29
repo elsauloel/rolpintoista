@@ -427,7 +427,11 @@ const Duelo = (() => {
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
-      ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {})};
+      ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
+      // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo
+      // aplique a mano (2026-09-28, pedido del dueño). No cambia sinOposicion (sigue abriéndose directo en
+      // los efectos): es solo un recordatorio visible.
+      ...(h.contraOtro ? {contraOtro: txtCorto(h.contraOtro, 120)} : {})};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
   const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : '<option value="evasion">Evasión</option><option value="parry">Parry</option>';
@@ -1198,7 +1202,9 @@ const Duelo = (() => {
     // Efecto personalizado (2026-09-27, pedido del dueño — mismo criterio que `efectoLibre` en el veredicto):
     // texto libre, sin tirada ni botón «Aplicar», se muestra igual haya o no efectos automáticos.
     const nota = (d.hab && d.hab.efectosNota) || (d.ataque && d.ataque.efectosNota) || '';
-    if(!efs.length && !nota) return '';
+    // «Se resiste con» a mano (2026-09-28): la habilidad tira igual pero no hay stat automático que la resista.
+    const contraOtro = (d.hab && d.hab.contraOtro) || '';
+    if(!efs.length && !nota && !contraOtro) return '';
     const puedeAtq = esMio(d.atacante) || soyGM();
     const cards = efs.map((ef, i) => {
       const clave = d.id + ':ef' + i;
@@ -1223,7 +1229,8 @@ const Duelo = (() => {
       else estado = `<div class="espera duelo-nota viva">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
-    const notaCard = nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '';
+    const contraCard = contraOtro ? `<div class="duelo-ef"><div class="duelo-nota">✋ Se resiste con: ${_esc(contraOtro)}</div></div>` : '';
+    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '');
     const pendiente = d.fase === 'efectos' && efs.length;
     return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
   }

@@ -34,7 +34,17 @@
    pero sirve para cualquier skill que se trabe en un paso puntual — el resto de la habilidad sigue automatizada.
    El paso "Efectos" (2026-09-27, mismo pedido) tiene el mismo "Personalizar": un texto libre (`efectosNota`) además
    de los ◎ Estado/💚 Cura de siempre, para un efecto que no encaja en esa lista — se muestra junto a los demás,
-   sin botón «Aplicar». Existe tanto en modo:'hab' como en modo:'arma' (ambos usan `cuerpoEfectos`). */
+   sin botón «Aplicar». Existe tanto en modo:'hab' como en modo:'arma' (ambos usan `cuerpoEfectos`).
+   **"No lleva tirada" y "Nadie"/"Otro" en Resistencia** (2026-09-28, pedido del dueño — el menú sirve para
+   automatizar CUALQUIER habilidad, no solo ataques: muchas son buffs sobre uno mismo o un aliado, sin nada que
+   las resista). Paso "Tirada": un tilde propio arriba de todo (`tiraNinguna`) tapa el resto sea cual sea el modo
+   (stat o fórmula personalizada) — antes «Nada» vivía escondido adentro del `<select>` de stats y no existía en
+   modo personalizada. Paso "Resistencia" (solo si hay tirada y el objetivo no es área/onda, que sí necesitan un
+   stat real para la cascada): además de la lista de siempre, «Nadie» (se aplica directo, aunque haya tirada —
+   por ejemplo un buff con una tirada propia de sabor) y «Otro» (`contraOtro`, texto libre para algo que no está
+   en la lista de stats: se muestra en el cuadro del duelo como recordatorio, la mesa lo resuelve a mano). Ninguna
+   de las dos cambia `sinOposicion` en el sentido mecánico: con contra vacío el duelo se abre directo en los
+   efectos, como ya hacía un buff sin tirada. */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
@@ -55,7 +65,10 @@ const AsistenteDueloHab = (() => {
 #adh-fondo h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9aa4bd}
 #adh-fondo .nota{font-size:12.5px;color:#aab3ca;margin:0 0 6px}
 #adh-fondo select,#adh-fondo input[type=number],#adh-fondo input[type=text]{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px;max-width:100%}
-#adh-fondo label.op{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:14px;cursor:pointer}
+#adh-fondo label.op{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:14px;cursor:pointer;width:100%;box-sizing:border-box}
+#adh-fondo label.op input[type=checkbox],#adh-fondo label.op input[type=radio]{flex-shrink:0;margin-top:3px}
+#adh-fondo .adh-check-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
+#adh-fondo .adh-modo{display:flex;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 10px;background:#0e1220;border:1px solid #2b3347;border-radius:8px}
 #adh-fondo .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
 #adh-fondo button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:700;cursor:pointer}
 #adh-fondo button.sec{background:#2b3347;color:#d5dbec}
@@ -81,13 +94,23 @@ const AsistenteDueloHab = (() => {
     const st = {
       paso: 0,
       activo: !!ini, objetivo: (ini && ini.objetivo) || 'enemigo',
-      tira: ini ? (ini.tira === undefined ? 'pdgmg' : ini.tira) : 'pdgmg',
+      // No lleva tirada (2026-09-28, pedido del dueño): antes «Nada» era una opción escondida adentro del
+      // desplegable de stats, y no existía en modo Personalizada — un buff sobre uno mismo o un aliado con
+      // tirada personalizada no tenía forma de decir «no hay nada que resistir». Ahora es un tilde propio,
+      // arriba de todo del paso, que tapa el resto (stat o fórmula) sea cual sea el modo.
+      tiraNinguna: !!(ini && ini.tira === '' && !ini.tiraFormula),
+      tira: ini ? (ini.tira || 'pdgmg') : 'pdgmg',
       // Tirada personalizada (2026-09-27, pedido del dueño): para habilidades que no tiran ningún stat de la
       // ficha (ej. Drenar vida: «X + 1dX») — reemplaza a `tira` cuando tiraModo === 'custom'. Se anuncia en la
       // Mesa con `tiraEtiqueta` en vez del nombre de un stat; `tiraFormula` puede llevar «X» (costo variable).
       tiraModo: (ini && ini.tiraFormula) ? 'custom' : 'stat',
       tiraFormula: (ini && ini.tiraFormula) || '', tiraEtiqueta: (ini && ini.tiraEtiqueta) || '',
-      contra: new Set(ini && Array.isArray(ini.contra) ? ini.contra : ['resmg']),
+      contra: new Set(ini && Array.isArray(ini.contra) && ini.contra.length ? ini.contra : ['resmg']),
+      // Resistencia: además del stat de siempre, «Nadie» (se aplica directo, aunque haya tirada — ej. un buff
+      // con una tirada propia de sabor) y «Otro» (texto libre para lo que no está en la lista: la mesa lo
+      // resuelve a mano, ver `contraOtro`) — 2026-09-28, pedido del dueño.
+      contraModo: (ini && ini.contraOtro) ? 'otro' : (ini && Array.isArray(ini.contra) && ini.contra.length) ? 'stats' : (ini && ini.tira !== undefined) ? 'ninguna' : 'stats',
+      contraOtro: (ini && ini.contraOtro) || '',
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
@@ -136,7 +159,7 @@ const AsistenteDueloHab = (() => {
     f.id = 'adh-fondo';
     document.body.appendChild(f);
     const cerrar = () => f.remove();
-    const sinOp = () => st.tiraModo === 'stat' && !st.tira;
+    const sinOp = () => st.tiraNinguna;
 
     // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
     function pasos(){
@@ -223,21 +246,42 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoTira(){
-      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad, o —si no encaja en ninguno— tu propia fórmula (ej. Drenar vida: «X + 1dX»). «Nada» es para buffs y curas: no hay nada que resistir.');
-      h += `<select data-tira-modo><option value="stat"${st.tiraModo !== 'custom' ? ' selected' : ''}>Un stat de la ficha</option><option value="custom"${st.tiraModo === 'custom' ? ' selected' : ''}>Personalizada: mi propia fórmula, con mi texto</option></select>`;
+      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad, o —si no encaja en ninguno— tu propia fórmula (ej. Drenar vida: «X + 1dX»).');
+      h += `<label class="op"><input type="checkbox" data-tira-ninguna ${st.tiraNinguna ? 'checked' : ''}> No lleva tirada: se aplica directo (buffs, curas sobre uno mismo o un aliado)</label>`;
+      if(st.tiraNinguna){
+        h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla igual.</div>`;
+        return h;
+      }
+      h += `<select data-tira-modo style="margin-top:10px"><option value="stat"${st.tiraModo !== 'custom' ? ' selected' : ''}>Un stat de la ficha</option><option value="custom"${st.tiraModo === 'custom' ? ' selected' : ''}>Personalizada: mi propia fórmula, con mi texto</option></select>`;
       if(st.tiraModo === 'custom'){
         h += `<div class="fila" style="margin-top:8px"><input type="text" style="min-width:160px" data-tira-formula placeholder="ej. X+1dX (podés usar «X»)" value="${esc(st.tiraFormula)}"></div>
           <div class="fila"><input type="text" style="min-width:240px" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}"></div>
           <p class="nota" style="margin-top:6px">Se tira con esa fórmula (podés usar «X» si la habilidad ya tiene costo variable) y se anuncia en la Mesa con tu texto, en vez del nombre de un stat.</p>`;
       }else{
-        h += `<select data-tira style="margin-top:8px"><option value=""${sinOp() ? ' selected' : ''}>Nada: no hay nada que resistir, se aplica directo (buffs, curas)</option>${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-        if(sinOp()) h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro del duelo con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla.</div>`;
+        h += `<select data-tira style="margin-top:8px">${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
       }
       return h;
     }
     function cuerpoContra(){
-      let h = titulo('', '¿Con qué se resiste el objetivo?', 'Si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada. Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Un hechizo no se parrea ni se bloquea.');
-      h += CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('');
+      const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
+      let h = titulo('', '¿Con qué se resiste el objetivo?', esArea
+        ? 'Un hechizo de área u onda necesita un stat real: cada objetivo lo tira contra vos por separado, en la cascada.'
+        : 'Para un ataque o control sobre un rival, elegí uno o más stats (si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada). Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Para un buff sobre uno mismo o un aliado, casi siempre no hay nada que resistir.');
+      if(!esArea){
+        h += `<div class="adh-modo">
+          <label class="op"><input type="radio" name="contramodo" value="stats" ${st.contraModo === 'stats' ? 'checked' : ''}> Con un stat de la lista</label>
+          <label class="op"><input type="radio" name="contramodo" value="ninguna" ${st.contraModo === 'ninguna' ? 'checked' : ''}> Nadie: no hay nada que resista, se aplica directo</label>
+          <label class="op"><input type="radio" name="contramodo" value="otro" ${st.contraModo === 'otro' ? 'checked' : ''}> Otro (no está en la lista): lo resuelve la mesa a mano</label>
+        </div>`;
+      }
+      if(esArea || st.contraModo === 'stats'){
+        h += `<div class="adh-check-list">${CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
+      }else if(st.contraModo === 'otro'){
+        h += `<input type="text" style="margin-top:8px;width:100%;box-sizing:border-box" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}">
+          <p class="nota" style="margin-top:6px">La habilidad tira igual (paso anterior), pero nadie automatiza lo que la resiste: el cuadro se abre directo en los efectos, con este texto como recordatorio.</p>`;
+      }else{
+        h += `<p class="nota" style="margin-top:10px">El cuadro se abre directo en los efectos: nadie tiene que tirar nada para resistirla.</p>`;
+      }
       return h;
     }
     function cuerpoDano(){
@@ -309,7 +353,10 @@ const AsistenteDueloHab = (() => {
           if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
         }
         if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-        const contraTxt = [...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)';
+        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda';
+        const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)')
+          : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
+          : 'nadie: se aplica directo';
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
@@ -347,7 +394,7 @@ const AsistenteDueloHab = (() => {
       q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
       q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-costo-hp]', e => { st.costoHp = Math.max(0, Math.round(Number(e.target.value) || 0)); });
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; dibujar(); });
+      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
@@ -356,6 +403,7 @@ const AsistenteDueloHab = (() => {
       q('[data-ignoraresistcrit-on]', e => { st.arma.ignoraResistCrit = e.target.checked ? 1 : 0; dibujar(); });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
+      q('[data-tira-ninguna]', e => { st.tiraNinguna = e.target.checked; dibujar(); });
       q('[data-tira-modo]', e => { st.tiraModo = e.target.value; dibujar(); });
       q('[data-tira-formula]', e => { st.tiraFormula = e.target.value; });
       q('[data-tira-etiqueta]', e => { st.tiraEtiqueta = e.target.value; });
@@ -368,6 +416,8 @@ const AsistenteDueloHab = (() => {
       q('[data-zonaestadoturnos]', e => { st.zonaEstadoTurnos = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-zonaestadostacks]', e => { st.zonaEstadoStacks = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
+      f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
+      q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
       q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
@@ -402,13 +452,18 @@ const AsistenteDueloHab = (() => {
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
-        const hayTira = st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira;
-        if(st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»).'); return; }
-        const out = {objetivo: st.objetivo, tira: st.tiraModo === 'stat' ? (st.tira || '') : '', contra: hayTira ? [...st.contra] : []};
-        if(st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
-        if((st.objetivo === 'area' || st.objetivo === 'onda') && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return; }
+        const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
+        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»), o tildá «No lleva tirada».'); return; }
+        const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
+        const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
+        if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
+        if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return; }
         if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return; }
-        if(hayTira && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nada» en lo que tira quien la usa).'); return; }
+        if(hayTira && (esArea || st.contraModo === 'stats') && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otro»).'); return; }
+        if(hayTira && !esArea && st.contraModo === 'otro'){
+          if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return; }
+          out.contraOtro = st.contraOtro.trim();
+        }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();

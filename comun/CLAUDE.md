@@ -490,3 +490,42 @@ versión parecida en más de una, es candidato a juntar.
   - **Pendiente**: "Trampas guardadas" (recurrentes) todavía no recuerda esta configuración — una trampa
     persistente guardada y vuelta a cargar pierde el "deja zona" (hay que rearmarlo). Tampoco está en las
     trampas que coloca una habilidad (`trampaColocar`), solo en las del mapa.
+
+- **El menú «Duelo» de una habilidad pasa a llamarse «Ejecución» (2026-09-28, pedido del dueño)**: probando
+  configurar Blindaje (un escudo sobre uno mismo) desde el 🎯/⚔ de `comun/asistente-duelo-hab.js`, quedó claro
+  que el nombre "Duelo" quedaba chico — el menú sirve para automatizar CUALQUIER tipo de habilidad (ataques,
+  pero también buffs y curas sobre uno mismo o un aliado), y "unifica el efecto visual de ejecutar" cualquiera
+  de ellas con el mismo cuadro compartido. Cambio solo de **etiqueta visible** (título del asistente `✨
+  Ejecución · <nombre>`, el botón `✨`/tag de la lista de habilidades en ficha y gm-tools, y —dentro de
+  `comun/duelo.js`— la cabecera, el tooltip de minimizar y el chip pendiente cuando el duelo es de una habilidad,
+  `d.hab` truthy) — el motor real de combate cuerpo a cuerpo (`Duelo`, `duelo.js`, PdG contra Evasión) sigue
+  siendo un duelo de verdad y conserva su nombre y su ⚔ en todo lo demás (un ataque con arma normal, sin `d.hab`).
+  - **Tres obstáculos reales encontrados en el ejercicio, los tres corregidos el mismo día:**
+    1. **Paso "Tirada": "Nada" vivía escondido** adentro del `<select>` de stats y no existía en modo
+       Personalizada — un buff con tirada personalizada (propia, de sabor) no tenía forma de decir "no hay
+       nada que resistir". Ahora es un tilde propio (`tiraNinguna`) que tapa el resto del paso sea cual sea
+       el modo.
+    2. **Paso "Resistencia" exigía siempre un stat** en cuanto había cualquier tirada — bloqueaba a Blindaje
+       (una tirada propia sin nada que la resista). Suma **"Nadie"** (se aplica directo igual, `contraModo:
+       'ninguna'`) y **"Otro"** (`contraOtro`, texto libre que se muestra en el cuadro del duelo como
+       recordatorio para resolverlo a mano) al lado de "Con un stat de la lista"; el layout de la lista de
+       checkboxes quedó además más prolijo (`.adh-check-list`, `align-items:flex-start`, ancho explícito —
+       el dueño lo reportó "desprolijo" en una captura; no se pudo reproducir el desalineado exacto en una
+       prueba aislada, así que el endurecimiento del CSS es preventivo).
+    3. **Paso "Efectos" solo ofrecía debuffs**: `EstadosAplicar` solo tenía `DEBUFFS` (Veneno, Sangrado…) —
+       nada de escudo ni de ningún buff, así que "Escudo especial" (lo que Blindaje necesita) no aparecía ni
+       se podía dar un valor de escudo. `EstadosAplicar` suma **`BUFFS`** (Escudo especial, Barrera — mismos
+       presets que `EFECTOS_PRESET`/`ESTADOS_PRESET_GM`, ver `ficha-personaje/CLAUDE.md`) y `presetPorNombre`
+       busca en los dos; `componer`/`limpiarSpec`/`texto` ahora saben de `escudoMagico` (con un valor a mano
+       ganándole al del preset), y el paso "Efectos" del 🎯 suma un campo propio "o un escudo de (opcional)"
+       por cada ◎ Estado, con **autocompletado** al elegir "Escudo especial"/"Barrera" (carga su escudo y
+       turnos de siempre, editable igual). `escudoMagico` tuvo que sumarse a CUATRO saneos separados que
+       hasta ahora solo conocían campos de debuff — el mismo tipo de bug que ya pasó antes con
+       `ignoraResistCrit` (ver la entrada del Paso "Ignora Resistencia a crítico" más arriba): el `limpiarSpec`
+       **local** de `comun/duelo.js` (no el de `EstadosAplicar`, son dos funciones separadas con el mismo
+       nombre), `EstadosAplicar.limpiarSpec`, y `aplicarEstadoRecibido` de la ficha (que arma el draft del
+       estado recién llegado a mano, sin pasar por `EstadosAplicar.componer`).
+  - **Blindaje en sí no se tocó** — sigue siendo una habilidad del sistema simple de siempre (sin duelo, paso
+    "Efecto" del editor, `efectoEscudo: 8`, ver `ficha-personaje/CLAUDE.md`), que ya funcionaba. Este trabajo
+    solo abre la puerta a que, si alguna vez se quiere migrarla (u otra parecida) al cuadro de Ejecución
+    compartido, el paso "Efectos" ya la sepa representar.

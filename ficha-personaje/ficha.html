@@ -2052,6 +2052,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
@@ -6997,9 +6998,9 @@ document.addEventListener('click', async e => {
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
     if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
-      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto}, elegirEstado: elegirEstadoDuelo,
+      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto, turnoAjenoSp: it.turnoAjenoSp}, elegirEstado: elegirEstadoDuelo,
       alGuardar: r => {
-        if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; }
+        if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; it.turnoAjenoSp = r.costo.turnoAjenoSp || ''; }
         else if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
         else delete it.duelo;
         renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`);
@@ -11408,7 +11409,7 @@ function costoAtaqueHabTxt(){
   return `ataque: ${opciones.map(o => `${o.arma.nombre} ${fmt(costoAtaqueNitros(o.arma))}`).join(' / ')} No2`;
 }
 
-function ejecutarHabilidad(id, armaId, forzar){
+async function ejecutarHabilidad(id, armaId, forzar){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
   // No automatizada: "Anunciar" solo publica la descripción en la Mesa.
@@ -11462,7 +11463,13 @@ function ejecutarHabilidad(id, armaId, forzar){
     avisarSinNitros(costoNitros, `usar ${it.nombre}${nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(id, armaId, true));
     return;
   }
-  const costoSp = parseCostoSp(it.costo);
+  let costoSp = parseCostoSp(it.costo);
+  // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
+  if(String(it.turnoAjenoSp || '').trim() && !spVariable(it)){
+    const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp));
+    if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
+    costoSp = elegido;
+  }
   S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(costoNitros, `usó ${it.nombre}`) : costoNitros);
   S.spGastado = num(S.spGastado) + costoSp;
   const costoHp = num(it.hpCosto);

@@ -56,7 +56,12 @@
    por ejemplo un buff con una tirada propia de sabor) y «Otro» (`contraOtro`, texto libre para algo que no está
    en la lista de stats: se muestra en el cuadro del duelo como recordatorio, la mesa lo resuelve a mano). Ninguna
    de las dos cambia `sinOposicion` en el sentido mecánico: con contra vacío el duelo se abre directo en los
-   efectos, como ya hacía un buff sin tirada. */
+   efectos, como ya hacía un buff sin tirada.
+   **Costo distinto en turno ajeno** (2026-09-28, pedido del dueño — paso intermedio hasta tener al mapa avisando
+   solo de quién es el turno, ver `docs/pendientes.md`): el paso "Costo" suma un tilde "El costo en SP es
+   distinto si no es tu turno" + el SP que se cobra en ese caso (`turnoAjenoSp` en `costoInicial`/`costoResultado`,
+   vacío = no aplica). Solo guarda el dato — quien ejecuta la habilidad (`ficha-personaje/ficha.html`,
+   `comun/confirmar-turno.js`) es quien pregunta «¿es tu turno?» y cobra el SP que corresponda, antes de nada más. */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
@@ -157,6 +162,11 @@ const AsistenteDueloHab = (() => {
         : String((cfg.costoInicial && cfg.costoInicial.nitrosCosto) ?? '').trim().toUpperCase() === 'X' ? 'x' : 'num',
       costoNitrosNum: (() => { const n = cfg.costoInicial && cfg.costoInicial.nitrosCosto; return (n === 'ATAQUE' || String(n ?? '').trim().toUpperCase() === 'X') ? 1 : Math.max(0, Math.round(Number(n) || 0)); })(),
       costoHp: Math.max(0, Math.round(Number(cfg.costoInicial && cfg.costoInicial.hpCosto) || 0)),
+      // Costo distinto en turno ajeno (2026-09-28, pedido del dueño — paso intermedio hasta que el mapa avise
+      // solo de quién es el turno, ver comun/confirmar-turno.js): `it.turnoAjenoSp` es el SP que se cobra si NO
+      // es tu turno; al ejecutar, un cartelito pregunta antes de cobrar nada. Sin llenar = no aplica.
+      costoTurnoOn: !!(cfg.costoInicial && cfg.costoInicial.turnoAjenoSp),
+      costoTurnoSp: String((cfg.costoInicial && cfg.costoInicial.turnoAjenoSp) ?? '').trim(),
       // Zona persistente (2026-09-28, pedido del dueño — Nube tóxica): dura varios turnos, no un solo momento.
       // El radio ya lo comparte con área/onda (st.radio). `tira`/`contra` (los mismos pasos de siempre) son la
       // resistencia: quien la crea tira una sola vez al lanzarla, y esa tirada se reusa contra cada uno que entra
@@ -205,6 +215,11 @@ const AsistenteDueloHab = (() => {
         <select data-costo-nitros-modo><option value="num"${st.costoNitrosModo === 'num' ? ' selected' : ''}>Un número</option><option value="x"${st.costoNitrosModo === 'x' ? ' selected' : ''}>X (se elige al usarla)</option><option value="ataque"${st.costoNitrosModo === 'ataque' ? ' selected' : ''}>Lo mismo que un ataque</option></select>
         ${st.costoNitrosModo === 'num' ? `<input type="number" min="0" style="width:70px" data-costo-nitros-num value="${esc(st.costoNitrosNum)}">` : ''}</div>`;
       h += `<div class="fila"><span style="min-width:90px">HP</span><input type="number" min="0" style="width:100px" data-costo-hp value="${esc(st.costoHp)}"><span class="nota" style="margin:0">0 = no gasta vida</span></div>`;
+      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-costoturno-on ${st.costoTurnoOn ? 'checked' : ''}> El costo en SP es distinto si no es tu turno</label></div>`;
+      if(st.costoTurnoOn){
+        h += `<div class="fila"><span>En turno ajeno cuesta</span><input type="number" min="0" style="width:80px" data-costoturno-sp value="${esc(st.costoTurnoSp)}"><span>SP</span></div>
+          <p class="nota">Al tocar Ejecutar, antes de cobrar nada, un cartelito pregunta «¿es tu turno?» — como Shockwave (SP ×2 en turno ajeno). Solo se aplica si el SP de arriba es un número fijo, no «X».</p>`;
+      }
       return h;
     }
     function cuerpoAlcance(esArma){
@@ -367,7 +382,7 @@ const AsistenteDueloHab = (() => {
       let h = titulo('', 'Revisá cómo quedó', 'Si algo no está bien, tocá el paso arriba para volver.');
       const filas = [];
       const nitrosTxt = st.costoNitrosModo === 'ataque' ? 'como un ataque' : st.costoNitrosModo === 'x' ? 'X (se elige al usarla)' : `${st.costoNitrosNum}`;
-      filas.push(`<b>Costo</b>: SP ${esc(st.costoSp) || '0'} · No2 ${nitrosTxt}${st.costoHp ? ` · HP ${st.costoHp}` : ''}`);
+      filas.push(`<b>Costo</b>: SP ${esc(st.costoSp) || '0'} · No2 ${nitrosTxt}${st.costoHp ? ` · HP ${st.costoHp}` : ''}${st.costoTurnoOn && st.costoTurnoSp ? ` · ${esc(st.costoTurnoSp)} SP en turno ajeno` : ''}`);
       if(st.modo === 'flash'){
         filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}`);
       }else if(st.modo === 'arma'){
@@ -429,6 +444,12 @@ const AsistenteDueloHab = (() => {
       q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
       q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-costo-hp]', e => { st.costoHp = Math.max(0, Math.round(Number(e.target.value) || 0)); });
+      q('[data-costoturno-on]', e => {
+        st.costoTurnoOn = e.target.checked;
+        if(st.costoTurnoOn && !st.costoTurnoSp.trim()) st.costoTurnoSp = String((Number(st.costoSp) || 0) * 2 || '');
+        dibujar();
+      });
+      q('[data-costoturno-sp]', e => { st.costoTurnoSp = e.target.value; });
       q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
@@ -502,7 +523,7 @@ const AsistenteDueloHab = (() => {
       // Costo (2026-09-27, pedido del dueño): se guarda junto con el duelo, en el mismo Guardar — es el mismo
       // dato de siempre (it.costo/nitrosCosto/hpCosto), no uno nuevo. cfg.alGuardar recibe {duelo, costo}
       // cuando se guarda algo (null sigue siendo "sin duelo", sin tocar el costo).
-      const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp});
+      const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp, turnoAjenoSp: st.costoTurnoOn ? st.costoTurnoSp.trim() : ''});
       f.querySelector('[data-ok]').onclick = () => {
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
         if(st.modo === 'flash'){

@@ -580,3 +580,21 @@ versión parecida en más de una, es candidato a juntar.
     cargando cada una con su propio arranque de sesión desactivado a propósito para la prueba (archivo aparte,
     después borrado) porque `mesaIniciar(gmAlEntrar)`/`mesaIniciar(fbAlEntrar)` redirigen solos al no encontrar
     sesión.
+
+- **`comun/confirmar-turno.js` — costo distinto en turno ajeno (2026-09-28, pedido del dueño, paso intermedio
+  hasta tener al mapa avisando solo de quién es el turno — ver `docs/pendientes.md`)**: el paso "Costo" del
+  🎯/✨ (`comun/asistente-duelo-hab.js`) suma un tilde "El costo en SP es distinto si no es tu turno" + un campo
+  con el SP que se cobra en ese caso (`turnoAjenoSp`; al tildarlo por primera vez se autocompleta con el doble
+  del SP de arriba — el mismo criterio que ya usa Shockwave en su texto, editable igual). Solo guarda el dato;
+  vacío = no aplica. `ConfirmarTurno.pedir(nombre, costoPropio, costoAjeno)` (mismo patrón de Promise que
+  `EstadoPreguntas.preguntar`: `null` si se cancela) es quien pregunta «¿es tu turno?» — lo usa
+  `ficha-personaje/ficha.html` en `ejecutarHabilidad` (ahora `async`), justo antes de cobrar el SP (después del
+  gate de No2 insuficiente, antes de `S.spGastado += costoSp`): si `it.turnoAjenoSp` tiene algo y el SP no es
+  «X» (`!spVariable(it)`), se pregunta y el SP a cobrar es la respuesta — cancelar no cobra ni ejecuta nada.
+  **Solo en la ficha por ahora**: `gm-toolset/gm-tools.html` no toca el archivo ni el flujo de Ejecutar de un
+  creep — los creeps no tienen un concepto de SP gastado (`h.costo` ahí es solo para mostrar/duelo, ver la nota
+  de la investigación de este mismo día en el hilo de diseño), así que no hay nada que cobrar distinto todavía;
+  el checkbox del 🎯 igual se puede tildar y guardar en `h.turnoAjenoSp` para cuando haga falta. **No se combina
+  con costo variable "X"** (`confirmarCostoVariable`, el modal de X): a propósito, sin precedente real que lo
+  necesite. Verificado en vivo (no solo por sintaxis): el pop-up, las tres respuestas (Sí/No/Cancelar) y que
+  cobran exactamente lo que dicen, con Shockwave de prueba (3 SP propio, 6 SP ajeno).

@@ -5926,7 +5926,7 @@ const LISTS = {
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
-        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button></div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button>${!i.habClaseId ? `<button class="mini" data-publicarhab="${i.id}" title="Publicar esta habilidad custom en el pool del sistema (comun/skills-clase.js), marcada «a auditar» para que el dueño la revise">📤</button>` : ''}</div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}
@@ -7024,6 +7024,11 @@ document.addEventListener('click', async e => {
         else delete it.duelo;
         renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`);
       }});
+    return;
+  }
+  if(b.dataset.publicarhab){   // 📤 publicar una habilidad custom en el pool del sistema (comun/skills-clase.js)
+    const it = S.habilidades.find(x => x.id === b.dataset.publicarhab);
+    if(it) publicarHabilidadEnSistema(it, b);
     return;
   }
   if(b.dataset.armrota){
@@ -10600,6 +10605,76 @@ async function publicarEnCatalogoDesdeFicha(draft, btn){
   }
 }
 $('#modal-catalogo').onclick = agregarAlCatalogoDelFabricante;
+
+/* ---------- 📤 Publicar una habilidad custom en el pool del sistema (2026-09-29, pedido del dueño) ----------
+   "Creación colectiva del grupo" (ver CLAUDE.md raíz): cualquiera que arma una habilidad custom en su ficha
+   la puede publicar acá mismo — mismo mecanismo que "📦 Agregar al catálogo" (token de GitHub, sin pasar por
+   una herramienta aparte), pero apunta a comun/skills-clase.js, no al catálogo, y SIEMPRE a la rama
+   nueva-version (GH_BRANCH de acá es 'main', a propósito solo para el catálogo — ver su comentario). Queda
+   marcada `auditar: true` para que el dueño la revise con datos/auditoria-skills.html; no toca ni borra la
+   habilidad del personaje, solo sube una copia limpia al pool custom (SKILLS_CUSTOM, fuera de las 7 clases). */
+const GH_BRANCH_APP = 'nueva-version';
+const ARCHIVO_SKILLS_CLASE = 'comun/skills-clase.js';
+function slugSkillCustom(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'skill'; }
+async function ghLeerTexto(ruta, rama){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${rama || GH_BRANCH}`;
+  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+  if(resp.status === 404) return null;
+  if(resp.status === 401 || resp.status === 403) throw {auth: true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} leyendo ${ruta}`);
+  return await resp.text();
+}
+async function ghSubirRama(ruta, contenidoB64, token, mensaje, rama){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
+  const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
+  const g = await fetch(url + '?ref=' + rama, {headers: cab, cache: 'no-store'});
+  if(g.status === 401 || g.status === 403) throw {auth: true};
+  if(!g.ok) throw new Error(`GitHub respondió ${g.status} leyendo ${ruta} antes de subir`);
+  const sha = (await g.json()).sha;
+  const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: mensaje, content: contenidoB64, branch: rama, sha})});
+  if(r.status === 401 || r.status === 403) throw {auth: true};
+  if(!r.ok) throw new Error(`GitHub respondió ${r.status} subiendo ${ruta}: ${await r.text()}`);
+}
+async function publicarHabilidadEnSistema(it, btn){
+  if(!it.nombre.trim()){ toast('Poné un nombre antes de publicarla'); return; }
+  const aviso = `Esto publica "${it.nombre}" en el pool de habilidades custom del sistema (comun/skills-clase.js, ` +
+    `rama nueva-version) — va a quedar disponible para agregarse desde cualquier ficha, marcada "a auditar" para ` +
+    `que el dueño la revise. No borra ni modifica la que tenés en tu personaje, solo sube una copia.\n\n¿Seguís?`;
+  if(!confirm(aviso)) return;
+  const token = await ghToken(false);
+  if(!token){ toast('Sin token no se puede publicar'); return; }
+  if(btn) btn.disabled = true;
+  toast('Publicando en el sistema…');
+  try{
+    const actual = await ghLeerTexto(ARCHIVO_SKILLS_CLASE, GH_BRANCH_APP);
+    if(actual === null) throw new Error('No encontré comun/skills-clase.js en nueva-version');
+    const marca = 'const SKILLS_CUSTOM = ';
+    const pos = actual.indexOf(marca);
+    if(pos < 0) throw new Error('No encontré «const SKILLS_CUSTOM = » en el archivo — no lo toqué, para no arriesgarme a romperlo');
+    const cola = actual.slice(pos + marca.length).trimEnd();
+    const lista = JSON.parse(cola.endsWith(';') ? cola.slice(0, -1) : cola);
+    const copia = {...structuredClone(it), auditar: true};
+    delete copia.job; delete copia.jobCosto; delete copia.origen; delete copia.imagen; delete copia.habClaseId; delete copia.habClase;
+    const ids = new Set(lista.map(h => h.id));
+    let idBase = 'custom-' + slugSkillCustom(copia.nombre), idFinal = idBase, n = 2;
+    while(ids.has(idFinal)) idFinal = `${idBase}-${n++}`;
+    copia.id = idFinal;
+    lista.push(copia);
+    const nuevo = actual.slice(0, pos + marca.length) + JSON.stringify(lista, null, 1) + ';\n';
+    await ghSubirRama(ARCHIVO_SKILLS_CLASE, await aBase64(nuevo), token, `Skills: agregar "${copia.nombre}" al pool custom (desde la ficha, a auditar)`, GH_BRANCH_APP);
+    toast(`"${copia.nombre}" publicada en el pool custom ✓ — se publica sola en 1-2 min, queda "a auditar"`);
+  }catch(err){
+    if(err && err.auth){
+      localStorage.removeItem('gh-token');
+      toast('El token no sirve o venció — tocá de nuevo y pegá uno nuevo');
+    }else{
+      console.error('Error publicando la habilidad en el sistema:', err);
+      toast('No se pudo publicar — revisá la consola');
+    }
+  }finally{
+    if(btn) btn.disabled = false;
+  }
+}
 
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;

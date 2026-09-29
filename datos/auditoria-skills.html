@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditoría de skills — Rol Pintoísta</title>
+<style>
+:root{--bg:#120E10;--panel:#1A1418;--panel2:#221A1E;--line:#3B2E34;--paper:#EDE3D2;--muted:#9A867E;--brass:#E0A458;--copper:#C98545;--ok:#6FBF73;--warn:#E0A458;--bad:#D4574E;--info:#6FA8D8}
+@media (prefers-color-scheme: light){:root{--bg:#F4EEE3;--panel:#FFFFFF;--panel2:#F1E9DA;--line:#D8CBB4;--paper:#2A2126;--muted:#7A6A62;--brass:#9A5F14;--copper:#A5622A;--ok:#2F7D3A;--warn:#9A5F14;--bad:#B23A32;--info:#2A6AA8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--paper);font:15px/1.4 "Space Grotesk",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px}
+h1{margin:0 0 6px;font-size:18px;color:var(--brass)}
+.barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.barra input,.barra select{background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:6px 9px;font:inherit;font-size:14px}
+.barra input[type=search]{min-width:200px;flex:1}
+button{font:inherit;cursor:pointer;color:var(--paper);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:6px 11px}
+button:hover{border-color:var(--copper)}
+button.prim{background:var(--copper);border-color:var(--copper);color:#1A1418;font-weight:700}
+button.rojo{border-color:var(--bad);color:var(--bad)}
+button.rojo:hover{background:var(--bad);color:#1A1418}
+.cont{color:var(--muted);font-size:13px}
+.cont b{color:var(--paper)}
+#estado{font-size:13px;min-height:18px;color:var(--muted)}
+#estado.ok{color:var(--ok)}#estado.err{color:var(--bad)}
+main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
+.banner{background:var(--panel2);border:1px solid var(--brass);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:13.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.clase-head{display:flex;align-items:baseline;gap:8px;margin:22px 0 8px}
+.clase-head:first-child{margin-top:0}
+.clase-head h2{margin:0;font-size:16px;color:var(--brass)}
+.clase-head .cont{margin-left:auto}
+.tarjeta{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:10px 14px;margin-bottom:8px}
+.tarjeta.auditada{border-left-color:var(--ok)}
+.tarjeta.sinauditar{border-left-color:var(--warn)}
+.tarjeta.porauditar{border-left-color:var(--bad)}
+.chip.porauditar{color:var(--bad);border-color:var(--bad);font-weight:700}
+.cab{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.cab b{font-size:15px}
+.chip{font-size:11.5px;padding:1px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--ok);border-color:var(--ok)}
+.chip.warn{color:var(--warn);border-color:var(--warn)}
+.chip.info{color:var(--info);border-color:var(--info)}
+.det{font-size:12.5px;color:var(--muted);margin:4px 0 8px}
+.botonera{display:flex;gap:6px;flex-wrap:wrap}
+.vacio{padding:20px;text-align:center;color:var(--muted);font-size:13.5px}
+.leyenda{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.nueva{margin-top:4px}
+/* Editor */
+.scrim{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);display:flex;align-items:flex-start;justify-content:center;padding:20px 12px;overflow:auto}
+.scrim[hidden]{display:none}
+#editor-caja{width:min(720px,100%);background:var(--panel);border:1px solid var(--line);border-radius:8px;margin:10px 0 40px}
+.editor-cab{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0}
+.editor-cab b{font-size:16px;color:var(--brass)}
+#editor-cuerpo{padding:14px 16px 20px}
+.campo{margin-bottom:12px}
+.campo label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:3px}
+.campo input[type=text],.campo input[type=number],.campo textarea,.campo select{width:100%;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:inherit;font-size:14px;box-sizing:border-box}
+.campo textarea{min-height:60px;resize:vertical}
+.campo .nota{font-size:11.5px;color:var(--muted);margin-top:3px}
+.campo input[type=checkbox]{width:16px;height:16px;margin-right:6px;vertical-align:-3px}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fila3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:560px){.fila2,.fila3{grid-template-columns:1fr}}
+.seccion{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}
+.seccion h3{margin:0 0 8px;font-size:13.5px;color:var(--copper);text-transform:uppercase;letter-spacing:.03em}
+.mod-fila{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.mod-fila select{flex:1}
+.mod-fila input{width:70px}
+.ejec-resumen{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.editor-pie{display:flex;justify-content:space-between;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>✨ Auditoría de skills de clase</h1>
+  <div class="barra">
+    <input type="search" id="buscar" placeholder="Buscar por nombre o descripción…">
+    <select id="f-clase"><option value="">Todas las clases</option></select>
+    <select id="f-estado">
+      <option value="">Todas</option><option value="porauditar">🔍 A auditar (llegaron de una ficha)</option>
+      <option value="auditada">✅ Auditadas</option><option value="sinauditar">🚧 Sin auditar</option>
+      <option value="ejec">Con Ejecución (⚔/✨) configurada</option><option value="sinejec">Sin Ejecución configurada</option>
+    </select>
+    <span class="cont" id="cont"></span>
+  </div>
+  <div class="barra" style="margin-top:6px">
+    <button class="prim" id="btn-guardar" title="Sube esta configuración a comun/skills-clase.js para que valga en el juego">💾 Guardar en el proyecto</button>
+    <button id="btn-bajar" title="Descarga un archivo de respaldo">⬇ Descargar</button>
+    <button id="btn-cargar" title="Carga un archivo de respaldo guardado antes">⬆ Cargar archivo</button>
+    <input type="file" id="archivo" accept=".json" hidden>
+    <span id="estado"></span>
+  </div>
+</header>
+<main>
+  <div id="banner-borrador"></div>
+  <p class="leyenda">Cada skill se edita acá directo: nombre, descripción, costo y (con <b>⚔/✨ Ejecución</b>) el mismo menú paso a paso que usa la ficha para el duelo. Los cambios quedan en este navegador hasta que apretás <b>💾 Guardar en el proyecto</b> — recién ahí valen para el juego real (se publica solo en 1-2 min).</p>
+  <div id="lista"></div>
+</main>
+
+<div id="editor-fondo" class="scrim" hidden>
+  <div id="editor-caja">
+    <div class="editor-cab">
+      <b id="editor-titulo">Editar skill</b>
+      <div class="botonera"><button id="editor-x">✕ Cerrar</button></div>
+    </div>
+    <div id="editor-cuerpo"></div>
+    <div class="editor-pie">
+      <button class="rojo" id="editor-borrar">🗑 Borrar esta skill</button>
+      <button class="prim" id="editor-cerrar2">Listo por ahora</button>
+    </div>
+  </div>
+</div>
+
+<script src="../comun/skills-clase.js"></script>
+<script src="../comun/asistente-duelo-hab.js"></script>
+<script>
+window.esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const esc = window.esc;
+const $ = s => document.querySelector(s);
+const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+
+const GH_REPO = 'elsauloel/rolpintoista', GH_BRANCH = 'nueva-version';
+const RUTA_ARCHIVO = 'comun/skills-clase.js';
+const LS = 'auditoria-skills-borrador';
+
+// Los mismos 7 stats "tirables" que ofrece el paso Tirada de comun/asistente-duelo-hab.js (TIRA),
+// para el campo suelto `tiradaStat` (el sistema simple, sin Ejecución configurada).
+const TIRA = [['', '— ninguna —'], ['pdgmg', 'PdG.Esp'], ['pdg', 'PdG'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
+// Stats que puede dar un bono un efecto sobre uno mismo (efectoMods) — mismo universo que usan
+// las otras auditorías (auditoria-defensa.html/auditoria-creeps.html) para no inventar otra lista.
+const STAT_BONO = [['tipo1', 'Res. crít. Tipo 4'], ['tipo2', 'Res. crít. Tipo 6'], ['tipo3', 'Res. crít. Tipo 8'], ['tipo4', 'Res. crít. Tipo 10'], ['tipo5', 'Res. crít. Tipo 12'],
+  ['def', 'Defensa'], ['resm', 'Res. Mt'], ['resmg', 'Res. Esp'], ['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Especial'],
+  ['pdg', 'PdG'], ['pdgmg', 'PdG.Esp'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'],
+  ['ini', 'Iniciativa'], ['dmg', 'Dmg'], ['eva', 'Evasión'], ['rng', 'Alcance'], ['rangocasteo', 'Rango casteo'], ['nitros', 'Nitros']];
+const NOMBRES_CLASE = {warrior: 'Warrior', asalto: 'Asalto', tanque: 'Tanque', mago: 'Mago', shooter: 'Shooter', support: 'Support', debuffer: 'Debuffer'};
+
+let datos = null;   // {clases: [...], custom: [...]}  — clon editable de CLASES_SKILLS/SKILLS_CUSTOM
+let editando = null;   // referencia directa al objeto skill que muestra el editor ahora mismo
+
+function slug(s){
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'skill';
+}
+function todosLosIds(){
+  const ids = new Set();
+  datos.clases.forEach(c => c.habilidades.forEach(h => ids.add(h.id)));
+  datos.custom.forEach(h => ids.add(h.id));
+  return ids;
+}
+function nuevoId(prefijo, nombre){
+  const ids = todosLosIds();
+  const base = prefijo + '-' + slug(nombre);
+  if(!ids.has(base)) return base;
+  let n = 2;
+  while(ids.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
+}
+
+/* ---------- carga y borrador local ---------- */
+function leerLocal(){ try{ const g = JSON.parse(localStorage.getItem(LS) || 'null'); if(g && g.clases) return g; }catch(e){} return null; }
+let temporizadorAutosave = null;
+function autosave(){
+  clearTimeout(temporizadorAutosave);
+  temporizadorAutosave = setTimeout(() => { try{ localStorage.setItem(LS, JSON.stringify({actualizado: Date.now(), clases: datos.clases, custom: datos.custom})); }catch(e){} }, 400);
+}
+
+function cargar(){
+  // CLASES_SKILLS/SKILLS_CUSTOM se declaran con `const` en comun/skills-clase.js: eso las deja visibles como
+  // identificador suelto en este script (los <script> clásicos de una misma página comparten el scope de
+  // arriba), pero NUNCA como propiedad de `window` — buscarlas con `window.CLASES_SKILLS` siempre da undefined.
+  datos = {clases: structuredClone(typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []), custom: structuredClone(typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [])};
+  $('#f-clase').insertAdjacentHTML('beforeend', datos.clases.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}</option>`).join('') + '<option value="_custom">Pool custom (fuera de clase)</option>');
+  const local = leerLocal();
+  if(local){
+    $('#banner-borrador').innerHTML = `<div class="banner">📝 Hay un borrador sin publicar en este navegador (${new Date(local.actualizado).toLocaleString('es-AR')}).
+      <button id="btn-recuperar">↺ Recuperar borrador</button> <button id="btn-descartar-borrador">Descartar</button></div>`;
+    $('#btn-recuperar').onclick = () => { datos = {clases: local.clases, custom: local.custom}; $('#banner-borrador').innerHTML = ''; dibujar(); };
+    $('#btn-descartar-borrador').onclick = () => { localStorage.removeItem(LS); $('#banner-borrador').innerHTML = ''; };
+  }
+  dibujar();
+}
+
+/* ---------- lista ---------- */
+function costoTxt(h){
+  const partes = [];
+  if(h.costo) partes.push(`${h.costo} SP`);
+  if(h.nitrosCosto !== undefined && h.nitrosCosto !== '' && h.nitrosCosto !== 0) partes.push(`${h.nitrosCosto} No2`);
+  if(h.hpCosto) partes.push(`${h.hpCosto} HP`);
+  return partes.join(' · ') || 'sin costo';
+}
+function tarjetaSkill(h, contexto){
+  const auditada = h.automatizada !== false;
+  return `<div class="tarjeta ${h.auditar ? 'porauditar' : auditada ? 'auditada' : 'sinauditar'}" data-ref="${contexto}:${esc(h.id)}">
+    <div class="cab"><b>${esc(h.nombre)}</b>
+      ${h.auditar ? '<span class="chip porauditar">🔍 A auditar — llegó de una ficha</span>' : ''}
+      <span class="chip ${auditada ? 'ok' : 'warn'}">${auditada ? '✅ Auditada' : '🚧 Sin auditar'}</span>
+      <span class="chip">${esc(costoTxt(h))}</span>
+      ${h.duelo ? '<span class="chip info">⚔/✨ Ejecución configurada</span>' : ''}
+    </div>
+    <div class="det">${esc((h.detalle || '').length > 220 ? h.detalle.slice(0, 218) + '…' : (h.detalle || '—'))}</div>
+    <div class="botonera"><button data-editar="${contexto}:${esc(h.id)}">✎ Editar</button></div>
+  </div>`;
+}
+function buscar(lista, q){
+  if(!q) return lista;
+  q = q.toLowerCase();
+  return lista.filter(h => (h.nombre + ' ' + (h.detalle || '')).toLowerCase().includes(q));
+}
+function pasaFiltroEstado(h, fe){
+  if(!fe) return true;
+  if(fe === 'porauditar') return !!h.auditar;
+  if(fe === 'auditada') return h.automatizada !== false;
+  if(fe === 'sinauditar') return h.automatizada === false;
+  if(fe === 'ejec') return !!h.duelo;
+  if(fe === 'sinejec') return !h.duelo;
+  return true;
+}
+function dibujar(){
+  const q = $('#buscar').value.trim(), fc = $('#f-clase').value, fe = $('#f-estado').value;
+  let html = '', total = 0, auditadasN = 0;
+  const clasesAMostrar = fc && fc !== '_custom' ? datos.clases.filter(c => c.id === fc) : (fc === '_custom' ? [] : datos.clases);
+  clasesAMostrar.forEach(c => {
+    const lista = buscar(c.habilidades, q).filter(h => pasaFiltroEstado(h, fe));
+    total += c.habilidades.length; auditadasN += c.habilidades.filter(h => h.automatizada !== false).length;
+    html += `<div class="clase-head"><h2>${esc(c.nombre)}</h2><span class="cont">${c.habilidades.length} skill${c.habilidades.length === 1 ? '' : 's'}</span></div>`;
+    html += lista.length ? lista.map(h => tarjetaSkill(h, c.id)).join('') : (q || fe ? '<div class="vacio">Ninguna con esos filtros.</div>' : '');
+    html += `<button class="nueva" data-nueva="${esc(c.id)}">+ Nueva skill de ${esc(c.nombre)}</button>`;
+  });
+  if(!fc || fc === '_custom'){
+    const lista = buscar(datos.custom, q).filter(h => pasaFiltroEstado(h, fe));
+    total += datos.custom.length; auditadasN += datos.custom.filter(h => h.automatizada !== false).length;
+    html += `<div class="clase-head"><h2>🧩 Pool custom (fuera de clase)</h2><span class="cont">${datos.custom.length} skill${datos.custom.length === 1 ? '' : 's'}</span></div>`;
+    html += lista.length ? lista.map(h => tarjetaSkill(h, '_custom')).join('') : '<div class="vacio">Todavía no hay ninguna acá.</div>';
+    html += `<button class="nueva" data-nueva="_custom">+ Nueva skill custom (sin clase)</button>`;
+  }
+  $('#lista').innerHTML = html;
+  $('#cont').innerHTML = `<b>${total}</b> skills · ${auditadasN} auditadas`;
+}
+['#buscar', '#f-clase', '#f-estado'].forEach(s => $(s).addEventListener('input', dibujar));
+
+function listaDe(contexto){ return contexto === '_custom' ? datos.custom : (datos.clases.find(c => c.id === contexto) || {habilidades: []}).habilidades; }
+function skillDe(contexto, id){ return (listaDe(contexto) || []).find(h => h.id === id); }
+
+$('#lista').addEventListener('click', e => {
+  const bn = e.target.closest('[data-nueva]');
+  if(bn){ nuevaSkill(bn.dataset.nueva); return; }
+  const be = e.target.closest('[data-editar]');
+  if(be){ const [contexto, id] = be.dataset.editar.split(':'); const h = skillDe(contexto, id); if(h) abrirEditor(h, contexto); return; }
+});
+
+function nuevaSkill(contexto){
+  const nombre = (prompt('Nombre de la skill nueva:') || '').trim();
+  if(!nombre) return;
+  const h = {id: nuevoId(contexto === '_custom' ? 'custom' : contexto, nombre), nombre, costo: '', nitrosCosto: 0, automatizada: false, detalle: ''};
+  listaDe(contexto).push(h);
+  autosave(); dibujar();
+  abrirEditor(h, contexto);
+}
+
+/* ---------- editor ---------- */
+function abrirEditor(h, contexto){
+  editando = h;
+  $('#editor-titulo').textContent = `Editar · ${h.nombre || '(sin nombre)'}`;
+  renderEditor(h);
+  $('#editor-fondo').hidden = false;
+  $('#editor-borrar').onclick = () => {
+    if(!confirm(`¿Borrar «${h.nombre}»? No se puede deshacer (salvo que no hayas guardado en el proyecto todavía).`)) return;
+    const lista = listaDe(contexto);
+    const idx = lista.indexOf(h);
+    if(idx >= 0) lista.splice(idx, 1);
+    cerrarEditor();
+    autosave(); dibujar();
+  };
+}
+function cerrarEditor(){
+  $('#editor-fondo').hidden = true;
+  editando = null;
+  dibujar();
+}
+$('#editor-x').onclick = cerrarEditor;
+$('#editor-cerrar2').onclick = cerrarEditor;
+$('#editor-fondo').addEventListener('mousedown', e => { if(e.target.id === 'editor-fondo') cerrarEditor(); });
+
+function campoMods(h){
+  const mods = h.efectoMods || [];
+  return `<div id="mods-lista">${mods.map((m, i) => `
+    <div class="mod-fila">
+      <select data-mod-stat="${i}">${STAT_BONO.map(([v, t]) => `<option value="${esc(v)}"${m.stat === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>
+      <input type="number" data-mod-val="${i}" value="${esc(m.val ?? 0)}">
+      <button type="button" class="rojo" data-mod-x="${i}">✕</button>
+    </div>`).join('')}</div>
+    <button type="button" id="mod-agregar">+ Agregar bono</button>`;
+}
+function renderEditor(h){
+  const cuerpo = $('#editor-cuerpo');
+  cuerpo.innerHTML = `
+    <div class="campo"><label>Nombre</label><input type="text" id="c-nombre" value="${esc(h.nombre)}"></div>
+    <div class="campo"><label>Descripción (lo que se publica en la Mesa y ve el jugador)</label><textarea id="c-detalle">${esc(h.detalle || '')}</textarea></div>
+    <div class="campo"><label><input type="checkbox" id="c-auto" ${h.automatizada !== false ? 'checked' : ''}> Auditada (automatizada) — destildado = «🚧 Sin auditar», solo se anuncia</label>
+      <div class="nota">Por convención, una sin auditar arranca la descripción con «(Sin auditar) ». <button type="button" id="c-prefijo" style="margin-top:4px">Anteponer/quitar «(Sin auditar) »</button></div></div>
+    ${h.auditar ? `<div class="campo"><label><input type="checkbox" id="c-porauditar" checked> 🔍 A auditar — llegó publicada desde una ficha</label>
+      <div class="nota">Destildala cuando ya la revisaste (no afecta nada del juego, es solo para que dejes de verla marcada acá).</div></div>` : ''}
+
+    <div class="seccion"><h3>Costo</h3>
+      <div class="fila3">
+        <div class="campo"><label>SP (texto: "2", "X", "2 + X")</label><input type="text" id="c-costo" value="${esc(h.costo ?? '')}"></div>
+        <div class="campo"><label>Nitros (número, "X" o "ATAQUE")</label><input type="text" id="c-nitros" value="${esc(h.nitrosCosto ?? '')}"></div>
+        <div class="campo"><label>HP (0 = no gasta vida)</label><input type="number" id="c-hpcosto" value="${esc(h.hpCosto ?? 0)}"></div>
+      </div>
+      <div class="nota">Si configurás ⚔/✨ Ejecución más abajo, su propio paso «Costo» toma el control de estos tres campos (los deja sincronizados acá).</div>
+    </div>
+
+    <div class="seccion"><h3>⚔/✨ Ejecución (duelo paso a paso)</h3>
+      <div class="ejec-resumen" id="ejec-resumen">${h.duelo ? 'Ya tiene Ejecución configurada.' : 'Todavía no tiene — se ejecuta con el sistema simple de abajo (tirada + efecto sobre uno mismo).'}</div>
+      <div class="botonera">
+        <button type="button" class="prim" id="btn-ejecucion">⚔/✨ Configurar Ejecución</button>
+        ${h.duelo ? '<button type="button" class="rojo" id="btn-quitar-ejecucion">Quitar Ejecución (volver al sistema simple)</button>' : ''}
+      </div>
+    </div>
+
+    <div class="seccion"><h3>Sistema simple (si no usa Ejecución)</h3>
+      <div class="fila2">
+        <div class="campo"><label>Tirada al ejecutar</label><select id="c-tiradastat">${TIRA.map(([v, t]) => `<option value="${v}"${(h.tiradaStat || '') === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+        <div class="campo"><label>Bono fijo a esa tirada</label><input type="number" id="c-tiradabono" value="${esc(h.tiradaBono ?? 0)}"></div>
+      </div>
+      <div class="campo"><label>Tirada extra / daño (fórmula, ej. 1d6, 2d6+3)</label><input type="text" id="c-tiradaextra" value="${esc(h.tiradaExtra ?? '')}"></div>
+      <div class="campo"><label>Cura HP fija sobre uno mismo</label><input type="number" id="c-curahp" value="${esc(h.curaHp ?? 0)}"></div>
+    </div>
+
+    <div class="seccion"><h3>Efecto sobre uno mismo (estado que se aplica solo)</h3>
+      <div class="fila2">
+        <div class="campo"><label>Nombre del estado</label><input type="text" id="c-efnombre" value="${esc(h.efectoNombre ?? '')}"></div>
+        <div class="campo"><label>Turnos que dura</label><input type="number" id="c-efturnos" value="${esc(h.efectoTurnos ?? 0)}"></div>
+      </div>
+      <div class="campo"><label>Escudo (HP que absorbe, 0 = no da escudo)</label><input type="number" id="c-efescudo" value="${esc(h.efectoEscudo ?? 0)}"></div>
+      <div class="campo"><label>Bonos que da</label>${campoMods(h)}</div>
+      <div class="campo"><label>Detalle del estado (lo que se ve al pasar el mouse)</label><textarea id="c-efdetalle">${esc(h.efectoDetalle ?? '')}</textarea></div>
+    </div>
+
+    <div class="seccion"><h3>Zona en el mapa (visual, se resuelve a mano)</h3>
+      <div class="fila2">
+        <div class="campo"><label>Forma</label><select id="c-zonamapa"><option value=""${!h.zonaMapa ? ' selected' : ''}>— ninguna —</option><option value="cono"${h.zonaMapa === 'cono' ? ' selected' : ''}>Cono</option><option value="flor"${h.zonaMapa === 'flor' ? ' selected' : ''}>Flor (radio)</option></select></div>
+        <div class="campo"><label>Radio (si es flor)</label><input type="number" id="c-zonaradio" value="${esc(h.zonaRadio ?? 0)}"></div>
+      </div>
+    </div>
+
+    <div class="seccion"><h3>Portal (como Invocar portal)</h3>
+      <div class="campo"><label><input type="checkbox" id="c-portal" ${h.portalMapa ? 'checked' : ''}> Invoca un portal de teletransporte</label></div>
+      <div class="campo" id="c-portal-turnos-campo" ${h.portalMapa ? '' : 'style="display:none"'}><label>Turnos que dura</label><input type="number" id="c-portal-turnos" value="${esc((h.portalMapa && h.portalMapa.turnos) ?? 3)}"></div>
+    </div>
+  `;
+  // --- handlers: mutan el objeto directo, sin volver a dibujar toda la lista (foco/scroll se mantienen) ---
+  const q = sel => cuerpo.querySelector(sel);
+  q('#c-nombre').oninput = e => { h.nombre = e.target.value; $('#editor-titulo').textContent = `Editar · ${h.nombre || '(sin nombre)'}`; autosave(); };
+  q('#c-detalle').oninput = e => { h.detalle = e.target.value; autosave(); };
+  q('#c-auto').onchange = e => { h.automatizada = e.target.checked; autosave(); };
+  const cPorAuditar = q('#c-porauditar');
+  if(cPorAuditar) cPorAuditar.onchange = e => { if(!e.target.checked) delete h.auditar; else h.auditar = true; autosave(); dibujar(); };
+  q('#c-prefijo').onclick = () => {
+    const marca = '(Sin auditar) ';
+    h.detalle = String(h.detalle || '').startsWith(marca) ? h.detalle.slice(marca.length) : marca + (h.detalle || '');
+    q('#c-detalle').value = h.detalle; autosave();
+  };
+  q('#c-costo').oninput = e => { h.costo = e.target.value; autosave(); };
+  q('#c-nitros').oninput = e => { const v = e.target.value.trim(); h.nitrosCosto = /^-?\d+$/.test(v) ? Number(v) : v; autosave(); };
+  q('#c-hpcosto').oninput = e => { h.hpCosto = num(e.target.value); autosave(); };
+  q('#c-tiradastat').onchange = e => { h.tiradaStat = e.target.value; autosave(); };
+  q('#c-tiradabono').oninput = e => { h.tiradaBono = num(e.target.value); autosave(); };
+  q('#c-tiradaextra').oninput = e => { h.tiradaExtra = e.target.value; autosave(); };
+  q('#c-curahp').oninput = e => { h.curaHp = num(e.target.value); autosave(); };
+  q('#c-efnombre').oninput = e => { h.efectoNombre = e.target.value; autosave(); };
+  q('#c-efturnos').oninput = e => { h.efectoTurnos = num(e.target.value); autosave(); };
+  q('#c-efescudo').oninput = e => { h.efectoEscudo = num(e.target.value); autosave(); };
+  q('#c-efdetalle').oninput = e => { h.efectoDetalle = e.target.value; autosave(); };
+  q('#c-zonamapa').onchange = e => { h.zonaMapa = e.target.value || undefined; if(!h.zonaMapa) delete h.zonaMapa; autosave(); };
+  q('#c-zonaradio').oninput = e => { h.zonaRadio = num(e.target.value); autosave(); };
+  q('#c-portal').onchange = e => {
+    if(e.target.checked){ h.portalMapa = h.portalMapa || {turnos: 3}; $('#c-portal-turnos-campo').style.display = ''; }
+    else{ delete h.portalMapa; $('#c-portal-turnos-campo').style.display = 'none'; }
+    autosave();
+  };
+  q('#c-portal-turnos').oninput = e => { h.portalMapa = h.portalMapa || {}; h.portalMapa.turnos = num(e.target.value); autosave(); };
+  function renderMods(){ $('#c-efmods-wrap') && ($('#c-efmods-wrap').innerHTML = campoMods(h)); enganchoMods(); }
+  function enganchoMods(){
+    cuerpo.querySelectorAll('[data-mod-stat]').forEach(sel => sel.onchange = e => { h.efectoMods[+e.target.dataset.modStat].stat = e.target.value; autosave(); });
+    cuerpo.querySelectorAll('[data-mod-val]').forEach(inp => inp.oninput = e => { h.efectoMods[+e.target.dataset.modVal].val = num(e.target.value); autosave(); });
+    cuerpo.querySelectorAll('[data-mod-x]').forEach(b => b.onclick = e => { h.efectoMods.splice(+e.target.dataset.modX, 1); renderModsWrap(); });
+    const btnAgregar = cuerpo.querySelector('#mod-agregar');
+    if(btnAgregar) btnAgregar.onclick = () => { h.efectoMods = h.efectoMods || []; h.efectoMods.push({stat: 'def', val: 1}); renderModsWrap(); };
+  }
+  function renderModsWrap(){
+    const wrap = cuerpo.querySelector('.campo label + div#mods-lista') ? cuerpo.querySelector('#mods-lista').parentElement : null;
+    // Reconstruye solo el bloque de mods (el campo entero) para no perder el resto del formulario.
+    const contenedor = [...cuerpo.querySelectorAll('.campo')].find(c => c.querySelector('#mods-lista') || c.querySelector('#mod-agregar'));
+    if(contenedor){ contenedor.innerHTML = `<label>Bonos que da</label>${campoMods(h)}`; enganchoMods(); }
+    autosave();
+  }
+  enganchoMods();
+  q('#btn-ejecucion').onclick = () => abrirEjecucion(h);
+  const btnQuitar = q('#btn-quitar-ejecucion');
+  if(btnQuitar) btnQuitar.onclick = () => { if(confirm('¿Quitar la Ejecución configurada? Vuelve al sistema simple.')){ delete h.duelo; autosave(); renderEditor(h); } };
+}
+
+function spVariableTxt(costo){ return /x/i.test(String(costo || '')); }
+function nitrosAtaqueTxt(nc){ return String(nc ?? '').trim().toUpperCase() === 'ATAQUE'; }
+function abrirEjecucion(h){
+  AsistenteDueloHab.abrir({
+    nombre: h.nombre || 'Skill',
+    inicial: h.duelo || null,
+    tieneFormula: !!String(h.tiradaExtra || '').trim(),
+    costoVariable: spVariableTxt(h.costo) ? 'sp' : (spVariableTxt(h.nitrosCosto) && !nitrosAtaqueTxt(h.nitrosCosto)) ? 'nitros' : '',
+    costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto, hpCosto: h.hpCosto, turnoAjenoSp: h.turnoAjenoSp},
+    // Sin elegirEstado a propósito (2026-09-29, decidido con el dueño): el paso Efectos queda en modo manual,
+    // sin el selector real de presets (EFECTOS_PRESET vive copiado en ficha.html/gm-tools.html, no en comun/
+    // todavía) — si hace falta más adelante, se extrae y se suma acá también.
+    alGuardar: r => {
+      if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; h.hpCosto = r.costo.hpCosto; h.turnoAjenoSp = r.costo.turnoAjenoSp || ''; }
+      else delete h.duelo;
+      autosave();
+      renderEditor(h);
+    },
+  });
+}
+
+/* ---------- descarga / carga de respaldo ---------- */
+$('#btn-bajar').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({clases: datos.clases, custom: datos.custom}, null, 1)], {type: 'application/json'}));
+  a.download = 'auditoria-skills-respaldo.json'; a.click();
+};
+$('#btn-cargar').onclick = () => $('#archivo').click();
+$('#archivo').onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const j = JSON.parse(await f.text());
+    if(!Array.isArray(j.clases)) throw 0;
+    datos = {clases: j.clases, custom: j.custom || []};
+    autosave(); dibujar();
+    estado('Archivo cargado ✓', 'ok');
+  }catch(err){ estado('Ese archivo no es un respaldo válido.', 'err'); }
+  e.target.value = '';
+};
+
+/* ---------- guardar en el proyecto (GitHub, mismo token que el editor de catálogo) ---------- */
+function estado(t, cls){ const e = $('#estado'); e.textContent = t || ''; e.className = cls || ''; }
+async function token(nuevo){
+  let t = nuevo ? '' : localStorage.getItem('gh-token');
+  if(!t){
+    t = prompt('Para guardar en el proyecto hace falta el token de GitHub (el mismo del editor de catálogo).\n\nSi no lo tenés: github.com/settings/tokens/new → marcá "public_repo" → generar, y pegalo acá:');
+    if(t) localStorage.setItem('gh-token', t.trim());
+  }
+  return t && t.trim();
+}
+function b64(txt){ const bytes = new TextEncoder().encode(txt); let s = ''; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s); }
+function unb64(b64txt){ const bin = atob(b64txt.replace(/\n/g, '')); const bytes = Uint8Array.from(bin, c => c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
+async function subir(t){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${RUTA_ARCHIVO}`;
+  const cab = {Authorization: 'Bearer ' + t, Accept: 'application/vnd.github+json'};
+  const g = await fetch(url + '?ref=' + GH_BRANCH, {headers: cab, cache: 'no-store'});
+  if(!g.ok){ if(g.status === 401 || g.status === 403) throw {auth: true}; throw new Error('GitHub respondió ' + g.status + ' al leer el archivo actual'); }
+  const info = await g.json();
+  const actual = unb64(info.content);
+  // Se conserva todo lo que hay ANTES de "const CLASES_SKILLS = [" tal cual está en el archivo (el comentario
+  // de cabecera, SKILL_SIN_AUDITAR, skillSA) — solo se regenera lo que sigue, para no perder ediciones a mano
+  // de esa parte hechas fuera de esta herramienta.
+  const marca = 'const CLASES_SKILLS = [';
+  const pos = actual.indexOf(marca);
+  if(pos < 0) throw new Error('No encontré «const CLASES_SKILLS = [» en el archivo actual — no lo toqué, para no arriesgarme a romperlo.');
+  const cabecera = actual.slice(0, pos);
+  const cuerpo = `const CLASES_SKILLS = ${JSON.stringify(datos.clases, null, 1)};\n\nconst SKILLS_CUSTOM = ${JSON.stringify(datos.custom, null, 1)};\n`;
+  const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: 'Auditoría de skills: guardado desde la herramienta', content: b64(cabecera + cuerpo), branch: GH_BRANCH, sha: info.sha})});
+  if(r.status === 401 || r.status === 403) throw {auth: true};
+  if(!r.ok) throw new Error('GitHub respondió ' + r.status);
+}
+$('#btn-guardar').onclick = async () => {
+  let t = await token(false); if(!t) return;
+  estado('Guardando…');
+  try{
+    await subir(t);
+    localStorage.removeItem(LS);
+    $('#banner-borrador').innerHTML = '';
+    estado('Guardado en el proyecto ✓ (' + new Date().toLocaleTimeString('es-AR') + ') — se publica solo en 1-2 min', 'ok');
+  }catch(err){
+    if(err && err.auth){ localStorage.removeItem('gh-token'); estado('GitHub no aceptó el token: probá de nuevo.', 'err'); }
+    else{ console.error(err); estado('No se pudo guardar: ' + (err && err.message ? err.message : err) + ' — usá ⬇ Descargar como respaldo.', 'err'); }
+  }
+};
+
+cargar();
+</script>
+</body>
+</html>

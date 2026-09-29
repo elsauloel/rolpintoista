@@ -56,6 +56,23 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
 - **`reglas.json`** — el borrador viejo del manual; archivo histórico, ya no
   se usa.
 - **`esquema.md`** — referencia de formato de todo lo de arriba.
+- **`auditoria-armas.html`/`auditoria-defensa.html`/`auditoria-creeps.html`** — auditorías de **decisión**: tarjetas
+  de solo lectura con ✅ Confirmar / 🔧 Reajustar / 🔄 Reimaginar / 🗑 Descartar + una nota, guardadas en este
+  navegador y subibles a un JSON de auditoría (`btn-guardar`, mismo token `gh-token`) para que una conversación
+  las lea y aplique después — no editan nada directo.
+- **`auditoria-skills.html`** (2026-09-29, pedido del dueño) — **distinta de las tres de arriba**: acá se **edita
+  de una** cada skill de `comun/skills-clase.js` (las 7 clases + el pool `SKILLS_CUSTOM`, fuera de clase), sin el
+  sistema de 4 botones — nombre, descripción, costo, el sistema simple (tirada/efecto propio/zona/portal) y, con
+  **⚔/✨ Configurar Ejecución**, el mismo asistente paso a paso que usa `ficha-personaje/ficha.html`
+  (`comun/asistente-duelo-hab.js`, cargado tal cual — sin el selector real de presets de estados en el paso
+  Efectos, que por ahora queda en modo manual, ver su comentario). **💾 Guardar en el proyecto** escribe DIRECTO
+  a `comun/skills-clase.js` en la rama `nueva-version` (no pasa por un JSON de decisiones intermedio): regenera
+  todo desde `const CLASES_SKILLS = ` en adelante conservando el comentario de cabecera y `skillSA` tal cual
+  estén en el archivo en ese momento. Autoguarda un borrador en este navegador (recuperable si se cierra sin
+  publicar) y tiene ⬇/⬆ para respaldo aparte. **"+ Nueva skill..."** por clase o en el pool custom arranca una
+  skill vacía y abre su editor. Las skills marcadas `auditar: true` (llegaron de "📤 Guardar en sistema" desde
+  una ficha, ver `ficha-personaje/CLAUDE.md`) se ven con una chip roja "🔍 A auditar"; el filtro de la cabecera
+  las aísla para revisarlas una por una.
 
 ## Dependencias con otras carpetas
 

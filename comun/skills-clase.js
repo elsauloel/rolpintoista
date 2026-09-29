@@ -164,3 +164,11 @@ const CLASES_SKILLS = [
     skillSA('debuffer', 'Punto débil', 'SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un estado propio con −1 a las resistencias a crítico (Tipo 4 a 12). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'),
   ]},
 ];
+
+/* Pool de habilidades custom, fuera de las 7 clases (2026-09-29, pedido del dueño —
+   datos/auditoria-skills.html). Mismo formato que una habilidad de CLASES_SKILLS (mismos
+   campos, ver el comentario de arriba); no está atada a ninguna clase — pensada para
+   habilidades que cualquiera pueda tomar, o para probar una idea antes de decidir si
+   entra en el pool de una clase. La ficha todavía no la ofrece en "+ Habilidad" (falta
+   sumarla ahí si se quiere que los jugadores la vean — ver docs/pendientes.md). */
+const SKILLS_CUSTOM = [];

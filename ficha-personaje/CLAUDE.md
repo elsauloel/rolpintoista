@@ -349,6 +349,22 @@ y "Agregar" (`agregarHabClase`): copia la skill de `CLASES_SKILLS`
 (`comun/skills-clase.js`) al personaje, siempre con Job 1 (`HAB_JOB_CLASE`,
 sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 
+**📤 Publicar una habilidad custom en el pool del sistema** (2026-09-29, pedido del dueño — "creación colectiva
+del grupo", ver el CLAUDE.md raíz): en la fila de una habilidad **custom** (sin `habClaseId`; no aparece en las
+de clase) hay un botón 📤 junto al ✨ de Ejecución (`data-publicarhab`, `publicarHabilidadEnSistema`). Sube una
+copia limpia de esa habilidad (sin `job`/`jobCosto`/`origen`/`imagen`/`habClaseId`/`habClase`) a
+`comun/skills-clase.js`, array `SKILLS_CUSTOM` (el pool fuera de las 7 clases, ver `comun/skills-clase.js`),
+marcada `auditar: true` — mismo mecanismo de token que "📦 Agregar al catálogo" (`ghToken`/`aBase64`), pero
+**siempre contra la rama `nueva-version`**, no `main` (`GH_BRANCH_APP`, aparte de la constante `GH_BRANCH` de la
+ficha, que es `'main'` **solo** para el catálogo — reusarla acá hubiera escrito en la rama equivocada, sin que
+se notara hasta la próxima carga). No toca ni borra la habilidad del personaje, solo publica una copia; el dueño
+la revisa después con [`../datos/auditoria-skills.html`](../datos/auditoria-skills.html) (filtro "🔍 A auditar"),
+que además es donde se arma cualquier skill nueva de clase o del pool desde cero, con el mismo asistente ⚔/✨
+Ejecución que usa la ficha (`comun/asistente-duelo-hab.js`, sin cambios — se reusa tal cual). Lee/escribe el
+archivo por texto, no por JSON (`ghLeerTexto`, nuevo — `ghLeerJson` no sirve para un `.js`), y solo toca desde
+`const SKILLS_CUSTOM = ` en adelante: si `CLASES_SKILLS` cambió mientras tanto (por ejemplo alguien guardó desde
+la auditoría), esa parte del archivo no se pisa.
+
 - **Nueva disposición** (2026-09-19): bajo la cabecera va **Atributos a todo el
   ancho** (los cinco en horizontal, `#attrs` en grilla; el cuadro de **Campo de
   visión** quedó ahí abajo) y después **dos columnas**: Mochila, Cinturón y

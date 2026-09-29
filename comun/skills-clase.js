@@ -24,156 +24,971 @@ const skillSA = (clase, nombre, detalle) => ({
 });
 
 const CLASES_SKILLS = [
-  {id: 'warrior', nombre: 'Warrior', habilidades: [
-    {id: 'warrior-arte-de-la-guerra', nombre: 'Arte de la guerra', costo: '2', nitrosCosto: 0, duelo: {modo: 'flash', flash: {en: ['pdg', 'parry', 'bloqueo', 'dano'], bono: 2}},
-     detalle: 'Flash. +2 a una sola tirada de PdG, Parry, Bloqueo o Daño. No se usa más de una vez sobre la misma tirada. ⚖ A definir en mesa: ¿todas las veces que quieras en el turno, o una sola por turno?'},
-    {id: 'warrior-amplificar-dano', nombre: 'Amplificar daño', costo: 'X', nitrosCosto: 'ATAQUE', duelo: {modo: 'arma', x: 'sp', arma: {dadosPorX: 1}},
-     detalle: 'Ataque con +X dados de daño del Tipo del arma. X máx. 3 (a mano: la ficha no lo limita).'},
-    skillSA('warrior', 'Sacadito', 'En pausa, a definir. SP 3. Recibe 10 Nitros que puede usar en ataques consecutivos iguales. Acumulable con otras skills si todos los ataques son idénticos.'),
-    {id: 'warrior-canon-vasco', nombre: 'Cañón Vasco', costo: '2 + X', nitrosCosto: 1,
-     detalle: 'Salta X casillas (X hasta Fue); si cae sobre un enemigo lo empuja 1. Al caer, los enemigos adyacentes (flor de 1, no aliados) reciben X + tirada de Fuerza de daño de onda expansiva (defienden con Constitución, a confirmar). Puede atacar al caer (pagando el ataque) con +X daño fijo. Al ejecutar, poné el SP total (2 + X).'},
-    {id: 'warrior-carga', nombre: 'Carga', costo: 'X', nitrosCosto: 'X', duelo: {modo: 'arma', x: 'nitros', arma: {pdgPorX: 1, fijoPorX: 1}},
-     detalle: 'Avanza X casilleros en línea recta (1 No2 por casillero) y al final ataca con +X de daño fijo y +X a la PdG. El ataque final se paga aparte con Atacar. Tope de X a confirmar.'},
-    {id: 'warrior-estoicismo', nombre: 'Estoicismo', costo: '2', nitrosCosto: 0,
-     efectoNombre: 'Estoicismo', efectoTurnos: 2, efectoMods: [{stat: 'tipo1', val: 1}, {stat: 'tipo2', val: 1}, {stat: 'tipo3', val: 1}, {stat: 'tipo4', val: 1}, {stat: 'tipo5', val: 1}],
-     efectoDetalle: 'Estoicismo: +1 a cada Resistencia a crítico (todos los Tipos) durante 2 turnos. ✋ A mano: además sumale +2 a tu Defensa por cada enemigo que tengas adyacente en el momento de usarla (editá el estado para poner el número — no se recalcula si después se te acercan o alejan).',
-     detalle: 'Flash: se puede usar en el turno de cualquiera, no cuesta No2. +1 a cada Resistencia a crítico durante 2 turnos (automático) y +2 a tu Defensa por cada enemigo adyacente en ese momento (✋ a mano, fijo — no se recalcula solo).'},
-    skillSA('warrior', 'Remolino', 'SP 3. Ataque que daña a todos los objetivos adyacentes. Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto de ambas posiciones. Repetirlo de inmediato ignora el cooldown del arma.'),
-    skillSA('warrior', 'Parry', 'SP 2. No2 1. Cooldown 1. Flash. Reemplaza la EV por PG en una tirada de evasión. El que tenga el arma más pesada tiene una bonificación igual a la diferencia en el peso de las armas.'),
-    skillSA('warrior', 'Contraataque', 'SP 2. Permite realizar un ataque de oportunidad después de esquivar un ataque.'),
-    {id: 'warrior-golpe-brutal', nombre: 'Golpe brutal', costo: '3', nitrosCosto: 'ATAQUE', tiradaStat: 'pdg', duelo: {modo: 'arma', arma: {}},
-     efectoNombre: 'Golpe brutal', efectoTurnos: 1, efectoMods: [{stat: 'critpot', val: 1}, {stat: 'eva', val: -2}],
-     efectoDetalle: 'Golpe brutal: Crítico potente ×1 (los multiplicadores del d20 salen con menos) y −2 a tu Evasión hasta el comienzo de tu próximo turno.',
-     detalle: 'Ataque con Crítico potente ×1 (el doble daño sale con 6+ en el d20, y el triple y el cuádruple un poco antes). A cambio, −2 a tu Evasión hasta tu próximo turno. Cuenta como un ataque con tu arma. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'},
-  ]},
-  {id: 'asalto', nombre: 'Asalto', habilidades: [
-    {id: 'asalto-dash', nombre: 'Dash', costo: '3', nitrosCosto: 1,
-     efectoNombre: 'Dash', efectoTurnos: 1, efectoMods: [{stat: 'parry', val: 2}],
-     efectoDetalle: 'Dash: +2 fijo a tu Parry hasta el comienzo de tu próximo turno.',
-     detalle: 'Avanzás 3 casilleros en línea recta (4 si atravesás a un enemigo, a mano) y ganás +2 fijo a tu Parry hasta el comienzo de tu próximo turno. El 1 No2 cubre todo el desplazamiento: como el mapa no tiene un modo "varios casilleros por un No2 fijo", movete con 🦶 Mover libre (gratis) — este No2 ya lo cobra la skill al ejecutarla. ✋ A mano: atacar a quien atravesaste cuesta aparte, con Atacar de siempre; se cancela si perdés una tirada de Parry o Bloqueo en el camino.'},
-    skillSA('asalto', 'Lisiar', 'SP 2. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Lesión de -1 de PG al objetivo durante 2 turnos. Si es crítico, el efecto pasa a -2 fijo a la PG por 2 turnos.'),
-    skillSA('asalto', 'Tajear', 'SP 3. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Deja heridas de 3 de daño por 3 turnos. Si es crítico, pasa a 5 de daño hasta curarse.'),
-    skillSA('asalto', 'Invi', 'SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de 3; lenta (2 No2 por casillero) flor de 2.'),
-    skillSA('asalto', 'Envenenar arma', 'SP 2. Mejora el arma con veneno: +3 fijo al daño y 3 stacks de veneno. Dura 2 ataques.'),
-    skillSA('asalto', 'Backstab', 'SP 2. Únicamente por la espalda. +5 daño fijo. Ignora 1 de resistencia a crítico.'),
-    skillSA('asalto', 'Degollar', 'SP 7. Ataque devastador: +4 de PG, +7 de daño, Crítico frecuente ×1 y Crítico potente ×1. Interrumpe tu turno y pasás al final de la iniciativa. Hasta tu próximo turno perdés 50% de evasión y no podés usar No2 para responder a acciones enemigas.'),
-    skillSA('asalto', 'Sprint', 'SP 1. 2 No2: avanza 3 casillas.'),
-    skillSA('asalto', 'Tronco de huída', 'SP 2. +2 fijo a una tirada de evasión con giro.'),
-    skillSA('asalto', 'Robar SP', 'SP 1. Ganás 2 SP por cada crítico obtenido.'),
-    {id: 'asalto-ojo-de-asesino', nombre: 'Ojo de asesino', costo: '2', nitrosCosto: 1,
-     efectoNombre: 'Crítico frecuente', efectoTurnos: 1, efectoMods: [{stat: 'crit', val: 1}],
-     efectoDetalle: 'Ojo de asesino: Crítico frecuente ×1 (baja 1 el rango del crítico; mínimo 2) hasta el comienzo de tu próximo turno.',
-     detalle: 'Tu próximo ataque del turno tiene Crítico frecuente ×1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; nunca baja de 2). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'},
-  ]},
-  {id: 'tanque', nombre: 'Tanque', habilidades: [
-    {id: 'tanque-blindaje', nombre: 'Blindaje', costo: '1', nitrosCosto: 0,
-     efectoNombre: 'Escudo especial', efectoEscudo: 8, efectoTurnos: 1,
-     efectoDetalle: 'Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal.',
-     detalle: 'Flash (SP x 2: en turno ajeno cuesta 2 SP, a mano). Solo sobre vos: absorbe 8 de daño de la próxima fuente de daño este turno; si hace más, el resto entra normal.'},
-    {id: 'tanque-shockwave', nombre: 'Shockwave', costo: '3', nitrosCosto: 0, tiradaStat: 'fue',
-     duelo: {objetivo: 'onda', radio: 1, tira: 'fue', contra: ['con'], efectos: [{nombre: 'Pajaritos', turnos: 2}]},
-     detalle: 'Flash (SP x 2 = el doble: en turno ajeno cuesta 6 SP, a mano). Onda expansiva: al ejecutar tirás Fuerza. Cada enemigo adyacente tira Constitución: el que pierde queda en Pajaritos (PdG y Evasión a la mitad) durante 2 turnos. ⚙ Automatizado en el duelo: tirás Fuerza una sola vez, cada enemigo adyacente tira Constitución por separado y el Pajaritos se aplica solo. ✋ A mano: el costo de Flash en turno ajeno.'},
-    {id: 'tanque-aura-de-espinas', nombre: 'Aura de espinas', costo: '1', nitrosCosto: 1,
-     efectoNombre: 'Espinas', efectoTurnos: 1,
-     efectoDetalle: '⚙ Automatizado en el duelo: mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño INFLIGIDO (el del golpe con el multiplicador del crítico, antes de la Defensa y los escudos: lo resista o no la armadura), redondeado hacia arriba, como daño directo (ignora Defensa). ✋ A mano: fuera del duelo (trampas, ataques sueltos) y con invocaciones.',
-     detalle: 'Hasta el comienzo de tu próximo turno, cada ataque cuerpo a cuerpo que recibís le devuelve al atacante 1/4 del daño infligido (antes de la Defensa, lo resista o no la armadura), redondeado hacia arriba, como daño directo. ⚙ Automatizado en el duelo.'},
-    {id: 'tanque-recuperacion', nombre: 'Recuperación', costo: '1', nitrosCosto: 2, curaHp: 9,
-     detalle: 'Recuperás 9 HP (fijos, sin pasar tu HP máximo). Solo sobre vos. Se puede usar con el HP lleno: gasta igual.'},
-    {id: 'tanque-sonic-boom', nombre: 'Sonic Boom', costo: '2', nitrosCosto: 0, tiradaStat: 'fue', zonaMapa: 'cono',
-     detalle: 'Flash (SP x 2: 4 SP en turno ajeno, a mano). Tirás Fuerza y el mapa dibuja el cono 3 s. Los enemigos del cono tiran Constitución (a mano): si ganás, pierden 1 + la diferencia en No2; sin No2 quedan Sentados (Evasión a la mitad, sin atacar; levantarse cuesta 1 No2). Empate o pérdida: nada.'},
-    {id: 'tanque-piel-resistente', nombre: 'Piel resistente', costo: '5', nitrosCosto: 1,
-     efectoNombre: 'Piel resistente', efectoTurnos: 2,
-     efectoMods: [{stat: 'def', val: 5}, {stat: 'resmg', val: 5}, {stat: 'tipo1', val: 1}, {stat: 'tipo2', val: 1}, {stat: 'tipo3', val: 1}, {stat: 'tipo4', val: 1}, {stat: 'tipo5', val: 1}],
-     efectoDetalle: 'Armadura temporal: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (todos los tipos). Dura 2 turnos.',
-     detalle: 'Armadura temporal sobre vos: Defensa +5, Res. Mágica +5 y +1 a las resistencias a crítico de todo tipo, durante 2 turnos.'},
-    {id: 'tanque-dano-en-area', nombre: 'Daño en área', costo: '2', nitrosCosto: 'ATAQUE', tiradaStat: 'pdg', zonaMapa: 'flor', zonaRadio: 1,
-     detalle: 'Ataque en área: cuesta lo de un ataque con tu arma y cuenta como ese ataque. Tirás PdG y el mapa dibuja 3 s la flor de 1 (los adyacentes) a tu alrededor; el daño va con el 🎲 (a mano). Solo enemigos: pueden esquivar con dodge roll (a mano). Vos no te afectás.'},
-    {id: 'tanque-takle', nombre: 'Takle', costo: '3', nitrosCosto: 0, tiradaStat: 'pdg', tiradaBono: 1, duelo: {modo: 'arma', arma: {pdg: 1, sinParry: true}},
-     detalle: 'Flash (SP x 2; la skill en sí no cuesta No2, pero el desplazamiento cuesta lo de siempre: 1 No2 por casilla, a mano). Te desplazás hasta 2 casillas y atacás con PdG +1; te pueden esquivar, no parrear. Si conecta y ganás Constitución vs Constitución (a mano): pierde 2 No2 y lo empujás 2 casillas; en su turno, además pasa al final de la iniciativa (si era el último, lo pierde).'},
-    {id: 'tanque-taunt', nombre: 'Taunt', costo: '1', nitrosCosto: 1, tiradaStat: 'pdgmg', tiradaBono: 1,
-     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', efectos: [{nombre: 'Provocado', turnos: 2}]},
-     detalle: 'Si ganás, el objetivo queda Provocado 2 turnos: mientras dure, si ataca, tiene que elegirte a vos si puede llegar (✋ a mano). Tirás PdG.Esp +1 contra el Res.Esp del objetivo (dentro de tu Rango). Empate: la regla general del juego. (2026-09-27: cambiado de Especial vs Especial a PdG.Esp vs Res.Esp.)'},
-    skillSA('tanque', 'Miti-Miti', 'SP 2. Marca un personaje como protegido: comparte con el tanque la mitad del daño que recibe. Dura 1 turno.'),
-    {id: 'tanque-temple', nombre: 'Temple', costo: '2', nitrosCosto: 1,
-     efectoNombre: 'Temple', efectoTurnos: 2,
-     efectoMods: [{stat: 'tipo1', val: 1}, {stat: 'tipo2', val: 1}, {stat: 'tipo3', val: 1}, {stat: 'tipo4', val: 1}, {stat: 'tipo5', val: 1}],
-     efectoDetalle: 'Temple: +1 a cada Resistencia a crítico (todos los Tipos): cada punto le quita un nivel a los críticos que te hagan. Dura 2 turnos.',
-     detalle: 'Endurecés el cuerpo: +1 de Resistencia a crítico contra armas de todo Tipo durante 2 turnos (cada punto le quita un nivel al crítico). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'},
-  ]},
-  {id: 'mago', nombre: 'Mago', habilidades: [
-    {id: 'mago-invocar-portal', nombre: 'Invocar portal', costo: '6', nitrosCosto: 3, portalMapa: {turnos: 3},
-     detalle: 'Invocás DOS portales de teletransporte en dos puntos dentro de tu rango de casteo (transitables a pie). Duran 3 turnos (X, a definir en mesa). Solo los ALIADOS los usan: al pisar uno, aparecen en el otro. ⚙ Automatizado: al ejecutarla el mapa te pide hacer clic en los dos puntos, crea los portales y los quita solos al terminar los turnos; el teleport es gratis. ✋ A mano: elegir bien los puntos. ⚖ A definir en mesa: costos (SP 6, No2 3) y duración.'},
-    {id: 'mago-chispazo', nombre: 'Chispazo', costo: '1', nitrosCosto: 1, tiradaStat: 'pdgmg', tiradaExtra: '1d6',
-     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'arcano', ignoraDano: true},
-     detalle: '1d6 de daño arcano, directo a la vida. Tirás PdG.Esp contra la Evasión del objetivo (proyectil mágico: no se puede parrear ni bloquear). ⚖ Rebalanceado 2026-09-25 (antes No2 3 y T4): equiparado a la Varita de proyectil mágica de buena calidad (1d6 por 1 Nitro). Auditada 2026-09-27 para probar el duelo de habilidades (Paso 6/7 del casteo); a revisar el balance con el grupo.'},
-    {id: 'mago-rayo-magico', nombre: 'Rayo Mágico', costo: 'X', nitrosCosto: 5, tiradaStat: 'pdgmg', tiradaExtra: '1d4',
-     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'arcano', ignoraDano: true, danoFijoPorX: 2},
-     detalle: '1d4 + el doble de X de daño arcano, directo a la vida (X es el SP que pagás, elegido al ejecutar). Tirás PdG.Esp contra la Evasión del objetivo (proyectil mágico: no se parrea ni se bloquea). ✋ A mano: X no puede ser mayor que tu Especial — el asistente todavía no lo limita solo. ⚖ "Tipo 1" del texto original se tomó como Tipo 4 (1d4), el más bajo de la escala. Auditada 2026-09-27 (P119): primera skill con daño que escala por X (ver docs/preguntas-abiertas.md).'},
-    {id: 'mago-orbe-arcano', nombre: 'Orbe arcano', costo: '4', nitrosCosto: 5, tiradaStat: 'pdgmg', tiradaExtra: '1d12+4',
-     duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'arcano', ignoraDano: true, radio: 1},
-     detalle: '1d12+4 de daño arcano, directo a la vida, en área (flor de 1 casillero, marcás el centro en el mapa). Tirás PdG.Esp contra la Evasión de cada uno, uno detrás del otro; a quien gane le toca un dodge roll, y si no logra salir recibe el daño igual. ⚖ El "amplifica el daño en 4" del texto original se tomó como +4 fijo sobre 1d12 (Tipo 12, el "tipo 5" de la escala). Auditada 2026-09-27 para probar la cascada de hechizos de área (Paso 4/7 del casteo); a revisar el balance con el grupo.'},
-    skillSA('mago', 'Tormenta arcana', 'SP 15. No2 5. Hechizo. Lluvia de 1d20 proyectiles arcanos T4 P1 en flor de 2, caen al azar sobre todos los objetivos posibles. Esquivable solo con dodge roll.'),
-    skillSA('mago', 'Ráfaga arcana', 'SP 2. No2 3. Hechizo. Ráfaga de daño en área tipo 3. Área: cono de 3 al frente.'),
-    skillSA('mago', 'Toque mágico', 'SP 3. No2 4. Hechizo. Requiere un toque físico con la mano o el arma, PG contra Evasión. No se puede bloquear. A distancia melé hace 3d T6 + ESP de daño mágico.'),
-    skillSA('mago', 'Carga Elemental', 'SP X (la mitad del coste del skill que modifica). Modifica un skill de daño mágico para darle propiedades elementales; cada nivel da nuevos elementos. Fuego: +50% de daño. Frío: -1 No2 cada 5 de daño (mín. 1). Eléctrico: el daño se propaga a enemigos hasta 5 de distancia.'),
-    skillSA('mago', 'Armadura arcana', 'SP 5. No2 3. Hechizo. Armadura que reduce el daño recibido 50% (máx. 10). Al terminar hace daño mágico en flor igual al daño absorbido. Dura 2 turnos. (2026-09-27: renombrada de "Armadura Mágica" para no confundirla con la Armadura mágica, el stat nuevo del Paso 3 de las reglas de casteo.)'),
-    skillSA('mago', 'Telekinesis', 'SP 15. No2 3. Hechizo. Mueve y controla un objeto con la mente; puede arrebatar el arma a un enemigo con Esp/Fue y atacar con ella (ESP como PG y como daño). 1 SP por cada No2 que use para atacar o mover el objeto. Controlado el resto del turno; 1 SP para contrarrestar con ESP; 1 SP por mantenimiento para conservarlo.'),
-    skillSA('mago', 'Control Mental', 'SP 7. No2 3. Hechizo. Tira Esp contra (Esp + Res.M) de otro personaje. Si gana, lo controla y lo obliga a cualquier acción que no lo dañe a sí mismo. Pagás 1 SP y 1 No2 por cada No2 que gaste el controlado.'),
-  ]},
-  {id: 'shooter', nombre: 'Shooter', habilidades: [
-    skillSA('shooter', 'Apuntar', 'SP X (X ≤ 3). X No2: +X a la PG y Crítico frecuente ×X en el próximo ataque a distancia (el rango del crítico nunca baja de 2).'),
-    skillSA('shooter', 'Acelerado', 'SP 1. Reduce el cooldown de un ataque. Repetible (+1 SP por repetición).'),
-    skillSA('shooter', 'Enfocado', 'SP 1. +2 de daño al próximo ataque. Repetible (+1 SP por repetición).'),
-    skillSA('shooter', 'Parry a distancia', 'SP 2. Flash. Realiza un ataque de rango como instantáneo. Si es respuesta a un ataque, tira Agilidad para cancelarlo.'),
-    skillSA('shooter', 'Headshot', 'SP 4. Ataque con Crítico frecuente ×1 y Crítico potente ×1. Daño +5. +2 fijo a PG. Falla si no es crítico.'),
-    skillSA('shooter', 'Proyectil perforante', 'SP 2. Ataque que continúa hasta un segundo objetivo. Los efectos especiales se pierden después del primero.'),
-    skillSA('shooter', 'Marcar', 'SP 3. Marca un objetivo hasta que ataques a otro. +1 PG, +1 Daño y +1 Crítico contra el marcado.'),
-    skillSA('shooter', 'Repetición', 'SP X. X ataques consecutivos idénticos (gastan No2 normalmente). Cada ataque después del primero suma +1 a la PG y amplifica +1 el daño.'),
-    skillSA('shooter', 'Disparo múltiple', 'SP X (el doble de objetivos adicionales). Ataca a múltiples objetivos en línea directa en un cono ancho.'),
-    skillSA('shooter', 'Tiro con comba', 'SP 1. Altera la trayectoria de un ataque de rango para esquivar obstáculos. Desvío máx. 2 casillas; cada una cuenta como +1 de distancia.'),
-  ]},
-  {id: 'support', nombre: 'Support', habilidades: [
-    skillSA('support', 'Empower', 'SP 2. No2 0. +3 a cualquier tirada propia o de un aliado.'),
-    skillSA('support', 'Blessing', 'SP 5. +1 fijo en todas las tiradas por 2 turnos.'),
-    skillSA('support', 'Heal', 'SP 2. No2 1. Cura 4 + 1d6 HP.'),
-    skillSA('support', 'Shield', 'SP 2. Flash (SP x 2). Blindaje temporal que absorbe 14 de HP hasta el final del turno.'),
-    skillSA('support', 'Acelerador', 'SP 1. Marca una casilla con flechitas (>>). Cada aliado que la pisa obtiene +2 No2 (máx. una vez por turno). Dura 10 turnos.'),
-    skillSA('support', 'Endurecimiento', 'SP 5. Armadura temporal: Defensa 3, Res. Mágica 3, reduce críticos de todo tipo. Dura 2 turnos.'),
-    skillSA('support', 'Re-roll', 'SP 2. Flash. Permite rerolear tiradas aliadas. Lento.'),
-    skillSA('support', 'Smite', 'SP 1. No2 1. Rayo de daño holy inesquivable, 1d4 de daño.'),
-    skillSA('support', 'Transferir SP', 'SP 1. Transfiere 1d6 SP entre vos y un aliado.'),
-    skillSA('support', 'Adrenalina', 'SP 5. +1 a Destreza, Fuerza y Agilidad durante 2 turnos. Acumulable. Lento.'),
-    skillSA('support', 'Marca del cazador', 'SP 3. No2 1. Un aliado dentro de tu rango de casteo recibe Crítico frecuente ×1 durante 2 turnos (baja 1 el rango de sus críticos; mínimo 2). ✋ A mano: dale el estado "Crítico frecuente" al aliado con el menú + Estado (o pedíselo al GM). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'),
-  ]},
-  {id: 'debuffer', nombre: 'Debuffer', habilidades: [
-    skillSA('debuffer', 'Enyetar', 'SP 5. Maldición (Esp / Res.M). Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.'),
-    skillSA('debuffer', 'Confusión', 'SP 5. Maldición (Esp / Res.M). Antes de un ataque o habilidad con objetivo, tira 1d4: 1) elegís vos el objetivo; 2) gasta los No2 pero no actúa; 3) objetivo al azar; 4) actúa normal. Alternativos en radio de 3 No2. Dura 2 turnos.'),
-    skillSA('debuffer', 'Maldición debilitante', 'SP 5. Maldición (Esp / Res.M). -1 a todas las tiradas. Dura 2 turnos. Acumulable. Lento.'),
-    skillSA('debuffer', 'Maldición extenuante', 'SP 3. Maldición (Esp / Res.M). +1 Nitro a todas las acciones; debe pagar 1 Nitro para moverse cada 2 casillas. Dura 1 turno. Acumulable. Lento.'),
-    skillSA('debuffer', 'Maldición tormentosa', 'SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas. Dura 3 turnos. Acumulable. Lento.'),
-    {id: 'debuffer-drenar-vida', nombre: 'Drenar vida', costo: 'X', nitrosCosto: 2,
-     duelo: {objetivo: 'enemigo', tira: '', tiraFormula: 'X+1dX', tiraEtiqueta: 'Drenaje', contra: ['resmg'],
-       efectoLibre: 'Drenás una cantidad de HP igual a la diferencia entre tu tirada y su Resistencia mágica; sumátela a tu vida (Excedente de vida si pasa tu máximo, con tope si corresponde).'},
-     detalle: 'Le drenás HP al objetivo igual a la diferencia entre tu tirada y su Resistencia mágica, y te la sumás vos (podés pasar tu HP máximo: usá el estado Excedente de vida para lo que sobre). Se juega como un duelo de verdad: elegís objetivo en el mapa, tirás X + 1dX (X ≤ tu Especial, tirada personalizada del 🎯) contra su Res.Esp, y el cuadro muestra la diferencia — el drenaje en sí queda a mano, mismo criterio que Shockwave y Sonic Boom. ⚖ Auditada 2026-09-27 — primera skill con «tirada personalizada», pensada para reusarse en cualquier habilidad con una mecánica propia. No2: 2 (no está en el texto original, lo fijó el dueño).'},
-    skillSA('debuffer', 'Balas de sangre', 'SP 1. Gastás X HP (máx. ESP). Dispara un proyectil tipo 1 con peso igual a la vida gastada.'),
-    skillSA('debuffer', 'Transfusión sanguínea', 'SP 1. Transfiere hasta 20 de HP de un aliado a otro.'),
-    skillSA('debuffer', 'Veneno', 'SP 2. Maldición (Esp / Res.M). Aplica 3 stacks de veneno.'),
-    {id: 'debuffer-nube-toxica', nombre: 'Nube tóxica', costo: '3', nitrosCosto: 1, tiradaStat: 'esp',
-     duelo: {objetivo: 'zona', radio: 1, tira: 'esp', contra: ['resmg'], zonaTurnos: 3, zonaEstado: {nombre: 'Veneno', turnos: 3, stacks: 3}},
-     detalle: 'Marcás el centro en el mapa al ejecutarla: queda una nube de diámetro 3 (radio 1) durante 3 turnos. Cada rival que entra, o que sigue adentro en el Mantenimiento, resiste con Res.Esp contra tu Especial (tirado una sola vez, al lanzarla); quien pierde queda con 3 stacks de Veneno — una vez envenenado, no se le vuelve a tirar la resistencia. No afecta a tus aliados. ⚙ Automatizado en el duelo (2026-09-28, primera skill con el objetivo "Zona persistente" del 🎯): la tirada, la resistencia de cada uno y el Veneno se aplican con su propio aviso cada vez que alguien entra o pasa el Mantenimiento — nunca en silencio.'},
-    skillSA('debuffer', 'Punto débil', 'SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un estado propio con −1 a las resistencias a crítico (Tipo 4 a 12). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).'),
-  ]},
+ {
+  "id": "warrior",
+  "nombre": "Warrior",
+  "habilidades": [
+   {
+    "id": "warrior-arte-de-la-guerra",
+    "nombre": "Arte de la guerra",
+    "costo": "2",
+    "nitrosCosto": 0,
+    "duelo": {
+     "modo": "flash",
+     "flash": {
+      "en": [
+       "pdg",
+       "parry",
+       "bloqueo",
+       "dano"
+      ],
+      "bono": 2
+     }
+    },
+    "detalle": "Flash. +2 a una sola tirada de PdG, Parry, Bloqueo o Daño. No se usa más de una vez sobre la misma tirada. ⚖ A definir en mesa: ¿todas las veces que quieras en el turno, o una sola por turno?"
+   },
+   {
+    "id": "warrior-amplificar-dano",
+    "nombre": "Amplificar daño",
+    "costo": "X",
+    "nitrosCosto": "ATAQUE",
+    "duelo": {
+     "modo": "arma",
+     "x": "sp",
+     "arma": {
+      "dadosPorX": 1
+     }
+    },
+    "detalle": "Ataque con +X dados de daño del Tipo del arma. X máx. 3 (a mano: la ficha no lo limita)."
+   },
+   {
+    "id": "warrior-sacadito",
+    "nombre": "Sacadito",
+    "detalle": "(Sin auditar) En pausa, a definir. SP 3. Recibe 10 Nitros que puede usar en ataques consecutivos iguales. Acumulable con otras skills si todos los ataques son idénticos.",
+    "automatizada": false
+   },
+   {
+    "id": "warrior-canon-vasco",
+    "nombre": "Cañón Vasco",
+    "costo": "2 + X",
+    "nitrosCosto": 1,
+    "detalle": "Salta X casillas (X hasta Fue); si cae sobre un enemigo lo empuja 1. Al caer, los enemigos adyacentes (flor de 1, no aliados) reciben X + tirada de Fuerza de daño de onda expansiva (defienden con Constitución, a confirmar). Puede atacar al caer (pagando el ataque) con +X daño fijo. Al ejecutar, poné el SP total (2 + X)."
+   },
+   {
+    "id": "warrior-carga",
+    "nombre": "Carga",
+    "costo": "X",
+    "nitrosCosto": "X",
+    "duelo": {
+     "modo": "arma",
+     "x": "nitros",
+     "arma": {
+      "pdgPorX": 1,
+      "fijoPorX": 1
+     }
+    },
+    "detalle": "Avanza X casilleros en línea recta (1 No2 por casillero) y al final ataca con +X de daño fijo y +X a la PdG. El ataque final se paga aparte con Atacar. Tope de X a confirmar."
+   },
+   {
+    "id": "warrior-estoicismo",
+    "nombre": "Estoicismo",
+    "costo": "2",
+    "nitrosCosto": 0,
+    "efectoNombre": "Estoicismo",
+    "efectoTurnos": 2,
+    "efectoMods": [
+     {
+      "stat": "tipo1",
+      "val": 1
+     },
+     {
+      "stat": "tipo2",
+      "val": 1
+     },
+     {
+      "stat": "tipo3",
+      "val": 1
+     },
+     {
+      "stat": "tipo4",
+      "val": 1
+     },
+     {
+      "stat": "tipo5",
+      "val": 1
+     }
+    ],
+    "efectoDetalle": "Estoicismo: +1 a cada Resistencia a crítico (todos los Tipos) durante 2 turnos. ✋ A mano: además sumale +2 a tu Defensa por cada enemigo que tengas adyacente en el momento de usarla (editá el estado para poner el número — no se recalcula si después se te acercan o alejan).",
+    "detalle": "Flash: se puede usar en el turno de cualquiera, no cuesta No2. +1 a cada Resistencia a crítico durante 2 turnos (automático) y +2 a tu Defensa por cada enemigo adyacente en ese momento (✋ a mano, fijo — no se recalcula solo)."
+   },
+   {
+    "id": "warrior-remolino",
+    "nombre": "Remolino",
+    "detalle": "(Sin auditar) SP 3. Ataque que daña a todos los objetivos adyacentes. Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto de ambas posiciones. Repetirlo de inmediato ignora el cooldown del arma.",
+    "automatizada": false
+   },
+   {
+    "id": "warrior-parry",
+    "nombre": "Parry",
+    "detalle": "(Sin auditar) SP 2. No2 1. Cooldown 1. Flash. Reemplaza la EV por PG en una tirada de evasión. El que tenga el arma más pesada tiene una bonificación igual a la diferencia en el peso de las armas.",
+    "automatizada": false
+   },
+   {
+    "id": "warrior-contraataque",
+    "nombre": "Contraataque",
+    "detalle": "(Sin auditar) SP 2. Permite realizar un ataque de oportunidad después de esquivar un ataque.",
+    "automatizada": false
+   },
+   {
+    "id": "warrior-golpe-brutal",
+    "nombre": "Golpe brutal",
+    "costo": "3",
+    "nitrosCosto": "ATAQUE",
+    "tiradaStat": "pdg",
+    "duelo": {
+     "modo": "arma",
+     "arma": {}
+    },
+    "efectoNombre": "Golpe brutal",
+    "efectoTurnos": 1,
+    "efectoMods": [
+     {
+      "stat": "critpot",
+      "val": 1
+     },
+     {
+      "stat": "eva",
+      "val": -2
+     }
+    ],
+    "efectoDetalle": "Golpe brutal: Crítico potente ×1 (los multiplicadores del d20 salen con menos) y −2 a tu Evasión hasta el comienzo de tu próximo turno.",
+    "detalle": "Ataque con Crítico potente ×1 (el doble daño sale con 6+ en el d20, y el triple y el cuádruple un poco antes). A cambio, −2 a tu Evasión hasta tu próximo turno. Cuenta como un ataque con tu arma. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20)."
+   }
+  ]
+ },
+ {
+  "id": "asalto",
+  "nombre": "Asalto",
+  "habilidades": [
+   {
+    "id": "asalto-dash",
+    "nombre": "Dash",
+    "costo": "3",
+    "nitrosCosto": 1,
+    "efectoNombre": "Dash",
+    "efectoTurnos": 1,
+    "efectoMods": [
+     {
+      "stat": "parry",
+      "val": 2
+     }
+    ],
+    "efectoDetalle": "Dash: +2 fijo a tu Parry hasta el comienzo de tu próximo turno.",
+    "detalle": "Avanzás 3 casilleros en línea recta (4 si atravesás a un enemigo, a mano) y ganás +2 fijo a tu Parry hasta el comienzo de tu próximo turno. El 1 No2 cubre todo el desplazamiento: como el mapa no tiene un modo \"varios casilleros por un No2 fijo\", movete con 🦶 Mover libre (gratis) — este No2 ya lo cobra la skill al ejecutarla. ✋ A mano: atacar a quien atravesaste cuesta aparte, con Atacar de siempre; se cancela si perdés una tirada de Parry o Bloqueo en el camino."
+   },
+   {
+    "id": "asalto-lisiar",
+    "nombre": "Lisiar",
+    "detalle": "(Sin auditar) SP 2. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Lesión de -1 de PG al objetivo durante 2 turnos. Si es crítico, el efecto pasa a -2 fijo a la PG por 2 turnos.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-tajear",
+    "nombre": "Tajear",
+    "detalle": "(Sin auditar) SP 3. Ataque con Crítico frecuente ×1 (baja 1 el rango del crítico). Deja heridas de 3 de daño por 3 turnos. Si es crítico, pasa a 5 de daño hasta curarse.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-invi",
+    "nombre": "Invi",
+    "detalle": "(Sin auditar) SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de 3; lenta (2 No2 por casillero) flor de 2.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-envenenar-arma",
+    "nombre": "Envenenar arma",
+    "detalle": "(Sin auditar) SP 2. Mejora el arma con veneno: +3 fijo al daño y 3 stacks de veneno. Dura 2 ataques.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-backstab",
+    "nombre": "Backstab",
+    "detalle": "(Sin auditar) SP 2. Únicamente por la espalda. +5 daño fijo. Ignora 1 de resistencia a crítico.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-degollar",
+    "nombre": "Degollar",
+    "detalle": "(Sin auditar) SP 7. Ataque devastador: +4 de PG, +7 de daño, Crítico frecuente ×1 y Crítico potente ×1. Interrumpe tu turno y pasás al final de la iniciativa. Hasta tu próximo turno perdés 50% de evasión y no podés usar No2 para responder a acciones enemigas.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-sprint",
+    "nombre": "Sprint",
+    "detalle": "(Sin auditar) SP 1. 2 No2: avanza 3 casillas.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-tronco-de-huida",
+    "nombre": "Tronco de huída",
+    "detalle": "(Sin auditar) SP 2. +2 fijo a una tirada de evasión con giro.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-robar-sp",
+    "nombre": "Robar SP",
+    "detalle": "(Sin auditar) SP 1. Ganás 2 SP por cada crítico obtenido.",
+    "automatizada": false
+   },
+   {
+    "id": "asalto-ojo-de-asesino",
+    "nombre": "Ojo de asesino",
+    "costo": "2",
+    "nitrosCosto": 1,
+    "efectoNombre": "Crítico frecuente",
+    "efectoTurnos": 1,
+    "efectoMods": [
+     {
+      "stat": "crit",
+      "val": 1
+     }
+    ],
+    "efectoDetalle": "Ojo de asesino: Crítico frecuente ×1 (baja 1 el rango del crítico; mínimo 2) hasta el comienzo de tu próximo turno.",
+    "detalle": "Tu próximo ataque del turno tiene Crítico frecuente ×1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; nunca baja de 2). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20)."
+   }
+  ]
+ },
+ {
+  "id": "tanque",
+  "nombre": "Tanque",
+  "habilidades": [
+   {
+    "id": "tanque-blindaje",
+    "nombre": "Blindaje",
+    "costo": "1",
+    "nitrosCosto": 0,
+    "efectoNombre": "Escudo especial",
+    "efectoEscudo": 8,
+    "efectoTurnos": 1,
+    "efectoDetalle": "Blindaje del Tanque: absorbe 8 de daño de la próxima fuente de daño este turno, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal.",
+    "detalle": "Flash (SP x 2: en turno ajeno cuesta 2 SP, a mano). Solo sobre vos: absorbe 8 de daño de la próxima fuente de daño este turno; si hace más, el resto entra normal."
+   },
+   {
+    "id": "tanque-shockwave",
+    "nombre": "Shockwave",
+    "costo": "3",
+    "nitrosCosto": 0,
+    "tiradaStat": "fue",
+    "duelo": {
+     "objetivo": "onda",
+     "radio": 1,
+     "tira": "fue",
+     "contra": [
+      "con"
+     ],
+     "efectos": [
+      {
+       "nombre": "Pajaritos",
+       "turnos": 2
+      }
+     ]
+    },
+    "detalle": "Flash (SP x 2 = el doble: en turno ajeno cuesta 6 SP, a mano). Onda expansiva: al ejecutar tirás Fuerza. Cada enemigo adyacente tira Constitución: el que pierde queda en Pajaritos (PdG y Evasión a la mitad) durante 2 turnos. ⚙ Automatizado en el duelo: tirás Fuerza una sola vez, cada enemigo adyacente tira Constitución por separado y el Pajaritos se aplica solo. ✋ A mano: el costo de Flash en turno ajeno."
+   },
+   {
+    "id": "tanque-aura-de-espinas",
+    "nombre": "Aura de espinas",
+    "costo": "1",
+    "nitrosCosto": 1,
+    "efectoNombre": "Espinas",
+    "efectoTurnos": 1,
+    "efectoDetalle": "⚙ Automatizado en el duelo: mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño INFLIGIDO (el del golpe con el multiplicador del crítico, antes de la Defensa y los escudos: lo resista o no la armadura), redondeado hacia arriba, como daño directo (ignora Defensa). ✋ A mano: fuera del duelo (trampas, ataques sueltos) y con invocaciones.",
+    "detalle": "Hasta el comienzo de tu próximo turno, cada ataque cuerpo a cuerpo que recibís le devuelve al atacante 1/4 del daño infligido (antes de la Defensa, lo resista o no la armadura), redondeado hacia arriba, como daño directo. ⚙ Automatizado en el duelo."
+   },
+   {
+    "id": "tanque-recuperacion",
+    "nombre": "Recuperación",
+    "costo": "1",
+    "nitrosCosto": 2,
+    "curaHp": 9,
+    "detalle": "Recuperás 9 HP (fijos, sin pasar tu HP máximo). Solo sobre vos. Se puede usar con el HP lleno: gasta igual."
+   },
+   {
+    "id": "tanque-sonic-boom",
+    "nombre": "Sonic Boom",
+    "costo": "2",
+    "nitrosCosto": 0,
+    "tiradaStat": "fue",
+    "zonaMapa": "cono",
+    "detalle": "Flash (SP x 2: 4 SP en turno ajeno, a mano). Tirás Fuerza y el mapa dibuja el cono 3 s. Los enemigos del cono tiran Constitución (a mano): si ganás, pierden 1 + la diferencia en No2; sin No2 quedan Sentados (Evasión a la mitad, sin atacar; levantarse cuesta 1 No2). Empate o pérdida: nada."
+   },
+   {
+    "id": "tanque-piel-resistente",
+    "nombre": "Piel resistente",
+    "costo": "5",
+    "nitrosCosto": 1,
+    "efectoNombre": "Piel resistente",
+    "efectoTurnos": 2,
+    "efectoMods": [
+     {
+      "stat": "def",
+      "val": 5
+     },
+     {
+      "stat": "resmg",
+      "val": 5
+     },
+     {
+      "stat": "tipo1",
+      "val": 1
+     },
+     {
+      "stat": "tipo2",
+      "val": 1
+     },
+     {
+      "stat": "tipo3",
+      "val": 1
+     },
+     {
+      "stat": "tipo4",
+      "val": 1
+     },
+     {
+      "stat": "tipo5",
+      "val": 1
+     }
+    ],
+    "efectoDetalle": "Armadura temporal: Defensa +5, Res. Mágica +5 y +1 a cada resistencia a crítico (todos los tipos). Dura 2 turnos.",
+    "detalle": "Armadura temporal sobre vos: Defensa +5, Res. Mágica +5 y +1 a las resistencias a crítico de todo tipo, durante 2 turnos."
+   },
+   {
+    "id": "tanque-dano-en-area",
+    "nombre": "Daño en área",
+    "costo": "2",
+    "nitrosCosto": "ATAQUE",
+    "tiradaStat": "pdg",
+    "zonaMapa": "flor",
+    "zonaRadio": 1,
+    "detalle": "Ataque en área: cuesta lo de un ataque con tu arma y cuenta como ese ataque. Tirás PdG y el mapa dibuja 3 s la flor de 1 (los adyacentes) a tu alrededor; el daño va con el 🎲 (a mano). Solo enemigos: pueden esquivar con dodge roll (a mano). Vos no te afectás."
+   },
+   {
+    "id": "tanque-takle",
+    "nombre": "Takle",
+    "costo": "3",
+    "nitrosCosto": 0,
+    "tiradaStat": "pdg",
+    "tiradaBono": 1,
+    "duelo": {
+     "modo": "arma",
+     "arma": {
+      "pdg": 1,
+      "sinParry": true
+     }
+    },
+    "detalle": "Flash (SP x 2; la skill en sí no cuesta No2, pero el desplazamiento cuesta lo de siempre: 1 No2 por casilla, a mano). Te desplazás hasta 2 casillas y atacás con PdG +1; te pueden esquivar, no parrear. Si conecta y ganás Constitución vs Constitución (a mano): pierde 2 No2 y lo empujás 2 casillas; en su turno, además pasa al final de la iniciativa (si era el último, lo pierde)."
+   },
+   {
+    "id": "tanque-taunt",
+    "nombre": "Taunt",
+    "costo": "1",
+    "nitrosCosto": 1,
+    "tiradaStat": "pdgmg",
+    "tiradaBono": 1,
+    "duelo": {
+     "objetivo": "enemigo",
+     "tira": "pdgmg",
+     "contra": [
+      "resmg"
+     ],
+     "alcance": "rango",
+     "efectos": [
+      {
+       "nombre": "Provocado",
+       "turnos": 2
+      }
+     ]
+    },
+    "detalle": "Si ganás, el objetivo queda Provocado 2 turnos: mientras dure, si ataca, tiene que elegirte a vos si puede llegar (✋ a mano). Tirás PdG.Esp +1 contra el Res.Esp del objetivo (dentro de tu Rango). Empate: la regla general del juego. (2026-09-27: cambiado de Especial vs Especial a PdG.Esp vs Res.Esp.)"
+   },
+   {
+    "id": "tanque-miti-miti",
+    "nombre": "Miti-Miti",
+    "detalle": "(Sin auditar) SP 2. Marca un personaje como protegido: comparte con el tanque la mitad del daño que recibe. Dura 1 turno.",
+    "automatizada": false
+   },
+   {
+    "id": "tanque-temple",
+    "nombre": "Temple",
+    "costo": "2",
+    "nitrosCosto": 1,
+    "efectoNombre": "Temple",
+    "efectoTurnos": 2,
+    "efectoMods": [
+     {
+      "stat": "tipo1",
+      "val": 1
+     },
+     {
+      "stat": "tipo2",
+      "val": 1
+     },
+     {
+      "stat": "tipo3",
+      "val": 1
+     },
+     {
+      "stat": "tipo4",
+      "val": 1
+     },
+     {
+      "stat": "tipo5",
+      "val": 1
+     }
+    ],
+    "efectoDetalle": "Temple: +1 a cada Resistencia a crítico (todos los Tipos): cada punto le quita un nivel a los críticos que te hagan. Dura 2 turnos.",
+    "detalle": "Endurecés el cuerpo: +1 de Resistencia a crítico contra armas de todo Tipo durante 2 turnos (cada punto le quita un nivel al crítico). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20)."
+   }
+  ]
+ },
+ {
+  "id": "mago",
+  "nombre": "Mago",
+  "habilidades": [
+   {
+    "id": "mago-invocar-portal",
+    "nombre": "Invocar portal",
+    "costo": "6",
+    "nitrosCosto": 3,
+    "portalMapa": {
+     "turnos": 3
+    },
+    "detalle": "Invocás DOS portales de teletransporte en dos puntos dentro de tu rango de casteo (transitables a pie). Duran 3 turnos (X, a definir en mesa). Solo los ALIADOS los usan: al pisar uno, aparecen en el otro. ⚙ Automatizado: al ejecutarla el mapa te pide hacer clic en los dos puntos, crea los portales y los quita solos al terminar los turnos; el teleport es gratis. ✋ A mano: elegir bien los puntos. ⚖ A definir en mesa: costos (SP 6, No2 3) y duración."
+   },
+   {
+    "id": "mago-chispazo",
+    "nombre": "Chispazo",
+    "costo": "1",
+    "nitrosCosto": 1,
+    "tiradaStat": "pdgmg",
+    "tiradaExtra": "1d6",
+    "duelo": {
+     "objetivo": "enemigo",
+     "tira": "pdgmg",
+     "contra": [
+      "eva"
+     ],
+     "dano": true,
+     "tipoDano": "arcano",
+     "ignoraDano": true
+    },
+    "detalle": "1d6 de daño arcano, directo a la vida. Tirás PdG.Esp contra la Evasión del objetivo (proyectil mágico: no se puede parrear ni bloquear). ⚖ Rebalanceado 2026-09-25 (antes No2 3 y T4): equiparado a la Varita de proyectil mágica de buena calidad (1d6 por 1 Nitro). Auditada 2026-09-27 para probar el duelo de habilidades (Paso 6/7 del casteo); a revisar el balance con el grupo."
+   },
+   {
+    "id": "mago-rayo-magico",
+    "nombre": "Rayo Mágico",
+    "costo": "X",
+    "nitrosCosto": 5,
+    "tiradaStat": "pdgmg",
+    "tiradaExtra": "1d4",
+    "duelo": {
+     "objetivo": "enemigo",
+     "tira": "pdgmg",
+     "contra": [
+      "eva"
+     ],
+     "dano": true,
+     "tipoDano": "arcano",
+     "ignoraDano": true,
+     "danoFijoPorX": 2
+    },
+    "detalle": "1d4 + el doble de X de daño arcano, directo a la vida (X es el SP que pagás, elegido al ejecutar). Tirás PdG.Esp contra la Evasión del objetivo (proyectil mágico: no se parrea ni se bloquea). ✋ A mano: X no puede ser mayor que tu Especial — el asistente todavía no lo limita solo. ⚖ \"Tipo 1\" del texto original se tomó como Tipo 4 (1d4), el más bajo de la escala. Auditada 2026-09-27 (P119): primera skill con daño que escala por X (ver docs/preguntas-abiertas.md)."
+   },
+   {
+    "id": "mago-orbe-arcano",
+    "nombre": "Orbe arcano",
+    "costo": "4",
+    "nitrosCosto": 5,
+    "tiradaStat": "pdgmg",
+    "tiradaExtra": "1d12+4",
+    "duelo": {
+     "objetivo": "area",
+     "tira": "pdgmg",
+     "contra": [
+      "eva"
+     ],
+     "dano": true,
+     "tipoDano": "arcano",
+     "ignoraDano": true,
+     "radio": 1
+    },
+    "detalle": "1d12+4 de daño arcano, directo a la vida, en área (flor de 1 casillero, marcás el centro en el mapa). Tirás PdG.Esp contra la Evasión de cada uno, uno detrás del otro; a quien gane le toca un dodge roll, y si no logra salir recibe el daño igual. ⚖ El \"amplifica el daño en 4\" del texto original se tomó como +4 fijo sobre 1d12 (Tipo 12, el \"tipo 5\" de la escala). Auditada 2026-09-27 para probar la cascada de hechizos de área (Paso 4/7 del casteo); a revisar el balance con el grupo."
+   },
+   {
+    "id": "mago-tormenta-arcana",
+    "nombre": "Tormenta arcana",
+    "detalle": "(Sin auditar) SP 15. No2 5. Hechizo. Lluvia de 1d20 proyectiles arcanos T4 P1 en flor de 2, caen al azar sobre todos los objetivos posibles. Esquivable solo con dodge roll.",
+    "automatizada": false
+   },
+   {
+    "id": "mago-rafaga-arcana",
+    "nombre": "Ráfaga arcana",
+    "detalle": "(Sin auditar) SP 2. No2 3. Hechizo. Ráfaga de daño en área tipo 3. Área: cono de 3 al frente.",
+    "automatizada": false
+   },
+   {
+    "id": "mago-toque-magico",
+    "nombre": "Toque mágico",
+    "detalle": "(Sin auditar) SP 3. No2 4. Hechizo. Requiere un toque físico con la mano o el arma, PG contra Evasión. No se puede bloquear. A distancia melé hace 3d T6 + ESP de daño mágico.",
+    "automatizada": false
+   },
+   {
+    "id": "mago-carga-elemental",
+    "nombre": "Carga Elemental",
+    "detalle": "(Sin auditar) SP X (la mitad del coste del skill que modifica). Modifica un skill de daño mágico para darle propiedades elementales; cada nivel da nuevos elementos. Fuego: +50% de daño. Frío: -1 No2 cada 5 de daño (mín. 1). Eléctrico: el daño se propaga a enemigos hasta 5 de distancia.",
+    "automatizada": false
+   },
+   {
+    "id": "mago-armadura-arcana",
+    "nombre": "Armadura arcana",
+    "detalle": "(Sin auditar) SP 5. No2 3. Hechizo. Armadura que reduce el daño recibido 50% (máx. 10). Al terminar hace daño mágico en flor igual al daño absorbido. Dura 2 turnos. (2026-09-27: renombrada de \"Armadura Mágica\" para no confundirla con la Armadura mágica, el stat nuevo del Paso 3 de las reglas de casteo.)",
+    "automatizada": false
+   },
+   {
+    "id": "mago-telekinesis",
+    "nombre": "Telekinesis",
+    "detalle": "(Sin auditar) SP 15. No2 3. Hechizo. Mueve y controla un objeto con la mente; puede arrebatar el arma a un enemigo con Esp/Fue y atacar con ella (ESP como PG y como daño). 1 SP por cada No2 que use para atacar o mover el objeto. Controlado el resto del turno; 1 SP para contrarrestar con ESP; 1 SP por mantenimiento para conservarlo.",
+    "automatizada": false
+   },
+   {
+    "id": "mago-control-mental",
+    "nombre": "Control Mental",
+    "detalle": "(Sin auditar) SP 7. No2 3. Hechizo. Tira Esp contra (Esp + Res.M) de otro personaje. Si gana, lo controla y lo obliga a cualquier acción que no lo dañe a sí mismo. Pagás 1 SP y 1 No2 por cada No2 que gaste el controlado.",
+    "automatizada": false
+   }
+  ]
+ },
+ {
+  "id": "shooter",
+  "nombre": "Shooter",
+  "habilidades": [
+   {
+    "id": "shooter-apuntar",
+    "nombre": "Apuntar",
+    "detalle": "(Sin auditar) SP X (X ≤ 3). X No2: +X a la PG y Crítico frecuente ×X en el próximo ataque a distancia (el rango del crítico nunca baja de 2).",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-acelerado",
+    "nombre": "Acelerado",
+    "detalle": "(Sin auditar) SP 1. Reduce el cooldown de un ataque. Repetible (+1 SP por repetición).",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-enfocado",
+    "nombre": "Enfocado",
+    "detalle": "(Sin auditar) SP 1. +2 de daño al próximo ataque. Repetible (+1 SP por repetición).",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-parry-a-distancia",
+    "nombre": "Parry a distancia",
+    "detalle": "(Sin auditar) SP 2. Flash. Realiza un ataque de rango como instantáneo. Si es respuesta a un ataque, tira Agilidad para cancelarlo.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-headshot",
+    "nombre": "Headshot",
+    "detalle": "(Sin auditar) SP 4. Ataque con Crítico frecuente ×1 y Crítico potente ×1. Daño +5. +2 fijo a PG. Falla si no es crítico.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-proyectil-perforante",
+    "nombre": "Proyectil perforante",
+    "detalle": "(Sin auditar) SP 2. Ataque que continúa hasta un segundo objetivo. Los efectos especiales se pierden después del primero.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-marcar",
+    "nombre": "Marcar",
+    "detalle": "(Sin auditar) SP 3. Marca un objetivo hasta que ataques a otro. +1 PG, +1 Daño y +1 Crítico contra el marcado.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-repeticion",
+    "nombre": "Repetición",
+    "detalle": "(Sin auditar) SP X. X ataques consecutivos idénticos (gastan No2 normalmente). Cada ataque después del primero suma +1 a la PG y amplifica +1 el daño.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-disparo-multiple",
+    "nombre": "Disparo múltiple",
+    "detalle": "(Sin auditar) SP X (el doble de objetivos adicionales). Ataca a múltiples objetivos en línea directa en un cono ancho.",
+    "automatizada": false
+   },
+   {
+    "id": "shooter-tiro-con-comba",
+    "nombre": "Tiro con comba",
+    "detalle": "(Sin auditar) SP 1. Altera la trayectoria de un ataque de rango para esquivar obstáculos. Desvío máx. 2 casillas; cada una cuenta como +1 de distancia.",
+    "automatizada": false
+   }
+  ]
+ },
+ {
+  "id": "support",
+  "nombre": "Support",
+  "habilidades": [
+   {
+    "id": "support-empower",
+    "nombre": "Empower",
+    "detalle": "(Sin auditar) SP 2. No2 0. +3 a cualquier tirada propia o de un aliado.",
+    "automatizada": false
+   },
+   {
+    "id": "support-blessing",
+    "nombre": "Blessing",
+    "detalle": "(Sin auditar) SP 5. +1 fijo en todas las tiradas por 2 turnos.",
+    "automatizada": false
+   },
+   {
+    "id": "support-heal",
+    "nombre": "Heal",
+    "detalle": "(Sin auditar) SP 2. No2 1. Cura 4 + 1d6 HP.",
+    "automatizada": false
+   },
+   {
+    "id": "support-shield",
+    "nombre": "Shield",
+    "detalle": "(Sin auditar) SP 2. Flash (SP x 2). Blindaje temporal que absorbe 14 de HP hasta el final del turno.",
+    "automatizada": false
+   },
+   {
+    "id": "support-acelerador",
+    "nombre": "Acelerador",
+    "detalle": "(Sin auditar) SP 1. Marca una casilla con flechitas (>>). Cada aliado que la pisa obtiene +2 No2 (máx. una vez por turno). Dura 10 turnos.",
+    "automatizada": false
+   },
+   {
+    "id": "support-endurecimiento",
+    "nombre": "Endurecimiento",
+    "detalle": "(Sin auditar) SP 5. Armadura temporal: Defensa 3, Res. Mágica 3, reduce críticos de todo tipo. Dura 2 turnos.",
+    "automatizada": false
+   },
+   {
+    "id": "support-re-roll",
+    "nombre": "Re-roll",
+    "detalle": "(Sin auditar) SP 2. Flash. Permite rerolear tiradas aliadas. Lento.",
+    "automatizada": false
+   },
+   {
+    "id": "support-smite",
+    "nombre": "Smite",
+    "detalle": "(Sin auditar) SP 1. No2 1. Rayo de daño holy inesquivable, 1d4 de daño.",
+    "automatizada": false
+   },
+   {
+    "id": "support-transferir-sp",
+    "nombre": "Transferir SP",
+    "detalle": "(Sin auditar) SP 1. Transfiere 1d6 SP entre vos y un aliado.",
+    "automatizada": false
+   },
+   {
+    "id": "support-adrenalina",
+    "nombre": "Adrenalina",
+    "detalle": "(Sin auditar) SP 5. +1 a Destreza, Fuerza y Agilidad durante 2 turnos. Acumulable. Lento.",
+    "automatizada": false
+   },
+   {
+    "id": "support-marca-del-cazador",
+    "nombre": "Marca del cazador",
+    "detalle": "(Sin auditar) SP 3. No2 1. Un aliado dentro de tu rango de casteo recibe Crítico frecuente ×1 durante 2 turnos (baja 1 el rango de sus críticos; mínimo 2). ✋ A mano: dale el estado \"Crítico frecuente\" al aliado con el menú + Estado (o pedíselo al GM). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).",
+    "automatizada": false
+   }
+  ]
+ },
+ {
+  "id": "debuffer",
+  "nombre": "Debuffer",
+  "habilidades": [
+   {
+    "id": "debuffer-enyetar",
+    "nombre": "Enyetar",
+    "detalle": "(Sin auditar) SP 5. Maldición (Esp / Res.M). Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-confusion",
+    "nombre": "Confusión",
+    "detalle": "(Sin auditar) SP 5. Maldición (Esp / Res.M). Antes de un ataque o habilidad con objetivo, tira 1d4: 1) elegís vos el objetivo; 2) gasta los No2 pero no actúa; 3) objetivo al azar; 4) actúa normal. Alternativos en radio de 3 No2. Dura 2 turnos.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-maldicion-debilitante",
+    "nombre": "Maldición debilitante",
+    "detalle": "(Sin auditar) SP 5. Maldición (Esp / Res.M). -1 a todas las tiradas. Dura 2 turnos. Acumulable. Lento.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-maldicion-extenuante",
+    "nombre": "Maldición extenuante",
+    "detalle": "(Sin auditar) SP 3. Maldición (Esp / Res.M). +1 Nitro a todas las acciones; debe pagar 1 Nitro para moverse cada 2 casillas. Dura 1 turno. Acumulable. Lento.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-maldicion-tormentosa",
+    "nombre": "Maldición tormentosa",
+    "detalle": "(Sin auditar) SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas. Dura 3 turnos. Acumulable. Lento.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-drenar-vida",
+    "nombre": "Drenar vida",
+    "costo": "X",
+    "nitrosCosto": 2,
+    "duelo": {
+     "objetivo": "enemigo",
+     "tira": "",
+     "tiraFormula": "X+1dX",
+     "tiraEtiqueta": "Drenaje",
+     "contra": [
+      "resmg"
+     ],
+     "efectoLibre": "Drenás una cantidad de HP igual a la diferencia entre tu tirada y su Resistencia mágica; sumátela a tu vida (Excedente de vida si pasa tu máximo, con tope si corresponde)."
+    },
+    "detalle": "Le drenás HP al objetivo igual a la diferencia entre tu tirada y su Resistencia mágica, y te la sumás vos (podés pasar tu HP máximo: usá el estado Excedente de vida para lo que sobre). Se juega como un duelo de verdad: elegís objetivo en el mapa, tirás X + 1dX (X ≤ tu Especial, tirada personalizada del 🎯) contra su Res.Esp, y el cuadro muestra la diferencia — el drenaje en sí queda a mano, mismo criterio que Shockwave y Sonic Boom. ⚖ Auditada 2026-09-27 — primera skill con «tirada personalizada», pensada para reusarse en cualquier habilidad con una mecánica propia. No2: 2 (no está en el texto original, lo fijó el dueño)."
+   },
+   {
+    "id": "debuffer-balas-de-sangre",
+    "nombre": "Balas de sangre",
+    "detalle": "(Sin auditar) SP 1. Gastás X HP (máx. ESP). Dispara un proyectil tipo 1 con peso igual a la vida gastada.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-transfusion-sanguinea",
+    "nombre": "Transfusión sanguínea",
+    "detalle": "(Sin auditar) SP 1. Transfiere hasta 20 de HP de un aliado a otro.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-veneno",
+    "nombre": "Veneno",
+    "detalle": "(Sin auditar) SP 2. Maldición (Esp / Res.M). Aplica 3 stacks de veneno.",
+    "automatizada": false
+   },
+   {
+    "id": "debuffer-nube-toxica",
+    "nombre": "Nube tóxica",
+    "costo": "3",
+    "nitrosCosto": 1,
+    "tiradaStat": "esp",
+    "duelo": {
+     "objetivo": "zona",
+     "radio": 1,
+     "tira": "esp",
+     "contra": [
+      "resmg"
+     ],
+     "zonaTurnos": 3,
+     "zonaEstado": {
+      "nombre": "Veneno",
+      "turnos": 3,
+      "stacks": 3
+     }
+    },
+    "detalle": "Marcás el centro en el mapa al ejecutarla: queda una nube de diámetro 3 (radio 1) durante 3 turnos. Cada rival que entra, o que sigue adentro en el Mantenimiento, resiste con Res.Esp contra tu Especial (tirado una sola vez, al lanzarla); quien pierde queda con 3 stacks de Veneno — una vez envenenado, no se le vuelve a tirar la resistencia. No afecta a tus aliados. ⚙ Automatizado en el duelo (2026-09-28, primera skill con el objetivo \"Zona persistente\" del 🎯): la tirada, la resistencia de cada uno y el Veneno se aplican con su propio aviso cada vez que alguien entra o pasa el Mantenimiento — nunca en silencio."
+   },
+   {
+    "id": "debuffer-punto-debil",
+    "nombre": "Punto débil",
+    "detalle": "(Sin auditar) SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un estado propio con −1 a las resistencias a crítico (Tipo 4 a 12). ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja el rango del crítico, mínimo 2; Crítico potente baja los umbrales del d20).",
+    "automatizada": false
+   }
+  ]
+ }
 ];
 
-/* Pool de habilidades custom, fuera de las 7 clases (2026-09-29, pedido del dueño —
-   datos/auditoria-skills.html). Mismo formato que una habilidad de CLASES_SKILLS (mismos
-   campos, ver el comentario de arriba); no está atada a ninguna clase — pensada para
-   habilidades que cualquiera pueda tomar, o para probar una idea antes de decidir si
-   entra en el pool de una clase. La ficha la ofrece en "+ Habilidad → 🧩 Pool custom"
-   (ficha-personaje/ficha.html, abrirHabClase/agregarHabClase con claseId '_custom'),
-   a 2 de Job (el mismo costo que armar una habilidad custom de cero — HAB_JOB_CUSTOM,
-   no el 1 de Job de una habilidad ya cerrada de una clase). Una entrada puede llegar
-   acá a mano (editando esta lista o desde datos/auditoria-skills.html) o publicada por
-   un jugador con el botón 📤 de una habilidad custom en su ficha (marcada `auditar:
-   true` hasta que el dueño la revise — ver ficha-personaje/CLAUDE.md). */
-const SKILLS_CUSTOM = [];
+const SKILLS_CUSTOM = [
+ {
+  "id": "custom-lisiar",
+  "nombre": "Lisiar",
+  "peso": 0,
+  "ranuras": 1,
+  "detalle": " SP 2. Ataque con +1 al crítico. Lesión de -1 de PG al objetivo durante 2 turnos. Si es crítico, el efecto pasa a -2 fijo a la PG por 2 turnos.",
+  "mods": [],
+  "equipado": true,
+  "activo": true,
+  "stacks": 1,
+  "costo": "2",
+  "nitrosCosto": "ATAQUE",
+  "dado": "",
+  "turnos": "",
+  "hpturno": 0,
+  "stacksturno": 0,
+  "permanente": false,
+  "popup": false,
+  "compras": 1,
+  "regenHp": 0,
+  "categoria": "Espameable",
+  "tipoItem": "",
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "danoAmplificado": 0,
+  "armaDeRango": false,
+  "manoPreferida": "",
+  "unidades": 1,
+  "consumible": false,
+  "curahp": 0,
+  "precioCompra": 0,
+  "efectoNombre": "",
+  "efectoTurnos": 0,
+  "efectoHpTurno": 0,
+  "efectoEscudo": 0,
+  "efectoStacks": 1,
+  "efectoPermanente": false,
+  "efectoDetalle": "",
+  "efectoMods": [],
+  "curaspPct": 0,
+  "cargaMax": 1,
+  "cargaActual": 1,
+  "forzarNitros": "",
+  "mitadPdgEva": false,
+  "armaduraRota": false,
+  "escudoMagico": 0,
+  "tiradaExtra": "",
+  "tiradaStat": "pdg",
+  "equipoEstadoNombre": "",
+  "equipoEstadoHpTurno": 0,
+  "equipoEstadoDetalle": "",
+  "usadaEsteTurno": false,
+  "armaduraArruinada": false,
+  "duelo": {
+   "modo": "arma",
+   "objetivo": "enemigo",
+   "x": "nitros",
+   "arma": {
+    "pdg": 0,
+    "pdgPorX": 0,
+    "dadosPorX": 0,
+    "fijo": 0,
+    "fijoPorX": 0,
+    "sinParry": false,
+    "ignoraResistCrit": 0,
+    "critBono": 1,
+    "critpotBono": 1
+   },
+   "efectos": [
+    {
+     "nombre": "Lesión",
+     "turnos": 2,
+     "stat": "pdg",
+     "val": -1
+    }
+   ],
+   "critico": {
+    "efectos": [
+     {
+      "nombre": "Lesión",
+      "turnos": 2,
+      "stat": "pdg",
+      "val": -2
+     }
+    ]
+   }
+  },
+  "hpCosto": 0,
+  "turnoAjenoSp": "",
+  "auditar": true
+ },
+ {
+  "id": "custom-lisiar-2",
+  "nombre": "Lisiar",
+  "peso": 0,
+  "ranuras": 1,
+  "detalle": " SP 2. Ataque con +1 al crítico frecuente y +2 al crítico potente. Lesión de -1 de PG al objetivo durante 2 turnos. Si es crítico, el efecto pasa a -2 fijo a la PG por 2 turnos.",
+  "mods": [],
+  "equipado": true,
+  "activo": true,
+  "stacks": 1,
+  "costo": "2",
+  "nitrosCosto": "ATAQUE",
+  "dado": "",
+  "turnos": "",
+  "hpturno": 0,
+  "stacksturno": 0,
+  "permanente": false,
+  "popup": false,
+  "compras": 1,
+  "regenHp": 0,
+  "categoria": "Espameable",
+  "tipoItem": "",
+  "tipoDado": 8,
+  "danoFijo": 0,
+  "danoAmplificado": 0,
+  "armaDeRango": false,
+  "manoPreferida": "",
+  "unidades": 1,
+  "consumible": false,
+  "curahp": 0,
+  "precioCompra": 0,
+  "efectoNombre": "",
+  "efectoTurnos": 0,
+  "efectoHpTurno": 0,
+  "efectoEscudo": 0,
+  "efectoStacks": 1,
+  "efectoPermanente": false,
+  "efectoDetalle": "",
+  "efectoMods": [],
+  "curaspPct": 0,
+  "cargaMax": 1,
+  "cargaActual": 1,
+  "forzarNitros": "",
+  "mitadPdgEva": false,
+  "armaduraRota": false,
+  "escudoMagico": 0,
+  "tiradaExtra": "",
+  "tiradaStat": "pdg",
+  "equipoEstadoNombre": "",
+  "equipoEstadoHpTurno": 0,
+  "equipoEstadoDetalle": "",
+  "usadaEsteTurno": false,
+  "armaduraArruinada": false,
+  "duelo": {
+   "modo": "arma",
+   "objetivo": "enemigo",
+   "x": "nitros",
+   "arma": {
+    "pdg": 0,
+    "pdgPorX": 0,
+    "dadosPorX": 0,
+    "fijo": 0,
+    "fijoPorX": 0,
+    "sinParry": false,
+    "ignoraResistCrit": 0,
+    "critBono": 1,
+    "critpotBono": 2
+   },
+   "efectos": [
+    {
+     "nombre": "Lesión",
+     "turnos": 2,
+     "stat": "pdg",
+     "val": -1
+    }
+   ],
+   "critico": {
+    "efectos": [
+     {
+      "nombre": "Lesión",
+      "turnos": 2,
+      "stat": "pdg",
+      "val": -2
+     }
+    ]
+   }
+  },
+  "hpCosto": 0,
+  "turnoAjenoSp": "",
+  "automatizada": true,
+  "auditar": true
+ }
+];

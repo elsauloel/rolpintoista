@@ -529,3 +529,54 @@ versión parecida en más de una, es candidato a juntar.
     "Efecto" del editor, `efectoEscudo: 8`, ver `ficha-personaje/CLAUDE.md`), que ya funcionaba. Este trabajo
     solo abre la puerta a que, si alguna vez se quiere migrarla (u otra parecida) al cuadro de Ejecución
     compartido, el paso "Efectos" ya la sepa representar.
+
+- **Bug real: el checkbox del cuadro de Ejecución se estiraba a todo el ancho (2026-09-28, reportado por el
+  dueño con capturas de los pasos Resistencia y Daño)**: `#adh-fondo` (`comun/asistente-duelo-hab.js`) resetea
+  el ancho de `select`/`input[type=text]`/`input[type=number]`, pero nunca lo hacía para `input[type=checkbox]`
+  ni `input[type=radio]` — ambas herramientas (`ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`) tienen
+  una regla global `input,textarea,select{width:100%}` para sus propios formularios, que sin ese reset se colaba
+  también en los checkboxes/radios del cuadro: el checkbox se estiraba a ~600px (toda la fila, con el tilde
+  real pintado en una esquina) y el texto de la etiqueta quedaba empujado a una columna de ~60px, una palabra
+  por línea — exactamente lo que se veía en las capturas. **No se pudo reproducir en un harness aislado** (sin
+  el CSS del host no aparece) — se diagnosticó recién al reproducirlo contra el stylesheet real de gm-tools.html
+  (extraído a un archivo aparte para una prueba, después borrado). Fix: `width:16px;min-width:16px;max-width:16px`
+  fijo para esos dos tipos de input dentro de `#adh-fondo label.op`. Afecta a TODOS los checkboxes/radios del
+  cuadro (existían desde el 27, no solo los nuevos del 28), así que corrige de una: "¿Se juega?", Resistencia,
+  Daño y el "Personalizar" de Efectos.
+- **Paso "Daño": "No hace daño" pasa a ser una opción explícita** (mismo pedido, 2026-09-28): el único checkbox
+  "Esta habilidad hace daño" (con "no hace daño" implícito al dejarlo destildado) se reemplaza por un radio
+  No/Sí — mismo criterio que "Nadie"/"Otro" de Resistencia, para que ningún paso del cuadro dependa de leer un
+  estado por omisión.
+- **Paso "Efectos": el selector de "◎ Estado" reusa el selector real en vez de reinventar uno propio (2026-09-28,
+  pedido del dueño — "el selector de estado no debería ser un desplegable... sino un botón de +ESTADO que
+  despliegue el menú de estados alterados... siguiendo el mismo andamiaje")**: antes, cada fila de estado era un
+  campo de texto libre (con un `<datalist>` de sugerencias) + turnos + un bono + un escudo, todo a mano — una
+  versión pobre del selector de "+ Estado" que ya existe en toda la mesa (la grilla con Ver/Activar de siempre +
+  el cartelito de `EstadoPreguntas` que pregunta las cantidades una por una). Ahora el botón "＋ Estado" (y el
+  "✎ Cambiar" de una fila ya elegida) llama a `cfg.elegirEstado()`, una función opcional que **cada página define
+  con SU propio catálogo** — `comun/asistente-duelo-hab.js` no sabe nada de `EFECTOS_PRESET` ni
+  `ESTADOS_PRESET_GM`, solo espera una Promise que resuelve `null` (canceló), `{modo:'manual'}` ("Empezar en
+  blanco": cae en los campos de texto de siempre, para algo que no está en ningún catálogo) o
+  `{modo:'preset', nombre, turnos, permanente, hp, mods, stacks, escudoMagico, polaridad, detalle}` (un preset
+  real, ya con sus cantidades respondidas). Sin `elegirEstado` (compatibilidad), el botón sigue con el
+  comportamiento viejo.
+  - **`ficha-personaje/ficha.html`**: `elegirEstadoDuelo()` reutiliza `abrirPresetsEfecto`/`aplicarPresetEfecto`
+    con un destino nuevo, `'duelo'` — mismo mecanismo que ya distinguía `'directo'`/`'inv'`/`'item'`/`'efecto'`,
+    sin tocar ninguno de esos. Como la elección llega por un clic asincrónico (no hay `editing.draft` que llenar:
+    el resultado tiene que volver como el valor de una Promise), se guarda un resolver (`presetDueloResolver`) y
+    `cerrarPresetsDuelo(valor)` lo resuelve y cierra el panel — hay que llamarlo desde los TRES lugares que antes
+    solo hacían `$('#scrim-presets').classList.remove('open')` a mano: el botón ✕, el clic afuera del panel y el
+    handler global de Escape (este último se comparte con un montón de otros scrims: si se agrega uno más ahí,
+    hay que revisar si también necesita este tratamiento). El panel usa `z-index:60` de fondo — se sube a 99600
+    al abrirse para 'duelo' (el cuadro de Ejecución está en 99500) y se repone al cerrar.
+  - **`gm-toolset/gm-tools.html`**: mismo patrón (`presetsCreepDestino`, `presetDueloResolverGM`,
+    `cerrarPresetsDuelo`) sobre `abrirPresetsEstadoCreep`/`aplicarPresetEstadoCreep` (el selector de aplicar un
+    estado directo a un creep abierto) — con una diferencia real: ese selector nunca tuvo "— Empezar en blanco —"
+    (siempre se aplica un preset real a un creep), así que `elegirEstadoDuelo()` arma su propio HTML con ese
+    botón agregado en vez de llamar a `abrirPresetsEstadoCreep` tal cual.
+  - **Verificado en vivo, no solo por sintaxis**: se probó el flujo completo (abrir el cuadro, ＋ Estado, elegir
+    "Escudo especial"/"Barrera" de la grilla real, responder el cartelito de HP del escudo y turnos, ver la
+    tarjeta de resumen en el paso Efectos, Guardar) en las dos páginas reales — no en un harness aislado —
+    cargando cada una con su propio arranque de sesión desactivado a propósito para la prueba (archivo aparte,
+    después borrado) porque `mesaIniciar(gmAlEntrar)`/`mesaIniciar(fbAlEntrar)` redirigen solos al no encontrar
+    sesión.

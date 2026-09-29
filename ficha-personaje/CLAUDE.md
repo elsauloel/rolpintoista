@@ -349,23 +349,9 @@ y "Agregar" (`agregarHabClase`): copia la skill de `CLASES_SKILLS`
 (`comun/skills-clase.js`) al personaje, siempre con Job 1 (`HAB_JOB_CLASE`,
 sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
 
-**📤 Publicar una habilidad custom en el pool del sistema** (2026-09-29, pedido del dueño — "creación colectiva
-del grupo", ver el CLAUDE.md raíz): en la fila de una habilidad **custom** (sin `habClaseId`; no aparece en las
-de clase) hay un botón 📤 junto al ✨ de Ejecución (`data-publicarhab`, `publicarHabilidadEnSistema`). Sube una
-copia limpia de esa habilidad (sin `job`/`jobCosto`/`origen`/`imagen`/`habClaseId`/`habClase`) a
-`comun/skills-clase.js`, array `SKILLS_CUSTOM` (el pool fuera de las 7 clases, ver `comun/skills-clase.js`),
-marcada `auditar: true` — mismo mecanismo de token que "📦 Agregar al catálogo" (`ghToken`/`aBase64`), pero
-**siempre contra la rama `nueva-version`**, no `main` (`GH_BRANCH_APP`, aparte de la constante `GH_BRANCH` de la
-ficha, que es `'main'` **solo** para el catálogo — reusarla acá hubiera escrito en la rama equivocada, sin que
-se notara hasta la próxima carga). No toca ni borra la habilidad del personaje, solo publica una copia; el dueño
-la revisa después con [`../datos/auditoria-skills.html`](../datos/auditoria-skills.html) (filtro "🔍 A auditar"),
-que además es donde se arma cualquier skill nueva de clase o del pool desde cero, con el mismo asistente ⚔/✨
-Ejecución que usa la ficha (`comun/asistente-duelo-hab.js`, sin cambios — se reusa tal cual). Lee/escribe el
-archivo por texto, no por JSON (`ghLeerTexto`, nuevo — `ghLeerJson` no sirve para un `.js`), y solo toca desde
-`const SKILLS_CUSTOM = ` en adelante: si `CLASES_SKILLS` cambió mientras tanto (por ejemplo alguien guardó desde
-la auditoría), esa parte del archivo no se pisa.
+**📤 Publicar una habilidad desde la ficha — retirado** (hecho y retirado el 2026-09-29): escribía directo en `comun/skills-clase.js` por GitHub, con token; era un tercer camino de "subir", en paralelo a la Biblioteca, con caché de 10 minutos, campos basura y duplicados. Se reemplaza por el mecanismo único de [`../docs/plan-subida-unificada.md`](../docs/plan-subida-unificada.md) (pasos 1 y 2). Hasta entonces, las habilidades de clase y del pool custom se editan con [`../datos/auditoria-skills.html`](../datos/auditoria-skills.html).
 
-**"+ Habilidad" ya ofrece el pool custom** (2026-09-29, pedido del dueño, cierra el círculo de lo de arriba):
+**"+ Habilidad" ya ofrece el pool custom** (2026-09-29, pedido del dueño):
 `abrirHabClase()` (sin argumento, el menú de siempre) suma un tercer botón **🧩 Pool custom** junto a "Habilidad
 custom" y la grilla de clases — deshabilitado con "sin cargar" mientras `SKILLS_CUSTOM` esté vacío. Es un
 pseudo-`claseId` (`'_custom'`, no está en `CLASES_SKILLS`) que `abrirHabClase(claseId)`/`agregarHabClase(claseId,
@@ -373,30 +359,11 @@ habId)` reconocen antes de buscar en `CLASES_SKILLS`, así que reusan la misma g
 la misma detección de "Ya la tenés" (`claveHabClase`, por `habClaseId`) que las habilidades de clase — **la única
 diferencia real es el costo**: **2 de Job** (`HAB_JOB_CUSTOM`, la misma constante que ya usaba "Habilidad custom"
 para armar una de cero — coherente: del pool sin auditar del todo por la mesa cuesta lo mismo que crear la tuya)
-en vez de 1 (`HAB_JOB_CLASE`). Al agregarla, `agregarHabClase` borra el campo `auditar` de la copia que llega al
-personaje (es dato del pool — si el dueño todavía no la revisó —, no algo que tenga sentido que cargue la ficha
-de un jugador). **Filtro por función y tipo de daño** (mismo día, mismo pedido): con el pool abierto aparecen dos
+en vez de 1 (`HAB_JOB_CLASE`). **Filtro por función y tipo de daño** (mismo día, mismo pedido): con el pool abierto aparecen dos
 `<select>` (Función / Tipo de daño, `FUNCION_TAGS`/`TIPODANO_TAGS` — mismo vocabulario que
 `datos/auditoria-skills.html`, ver su comentario y el de `datos/CLAUDE.md`) que filtran la lista por `h.etiquetas`;
 el estado de los filtros (`poolFiltroFuncion`/`poolFiltroTipoDano`) se resetea al salir del pool ("← Volver" o
 elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
-
-**📤 ya no es solo para habilidades sin `habClaseId`** (2026-09-29, corrige el párrafo de arriba, pedido del
-dueño — "si un jugador se carga un skill de clase, lo edita y sube, ¿se interpreta como cambio al skill core o
-como uno nuevo?"): el botón 📤 aparece SIEMPRE, en cualquier habilidad. Si `it.habClaseId` está vacío (nunca
-vino de ningún lado), publica directo como custom nueva, sin preguntar nada — no hay ambigüedad posible. Si
-`it.habClaseId` tiene algo (vino de una clase o ya del pool custom, y tal vez se editó), `publicarHabilidadEnSistema`
-pregunta primero con un `confirm()`: **Aceptar = "original"**, pisa la entrada de la que salió dondequiera que
-esté (una clase o el pool), **con el mismo id** — cambia lo que carga cualquiera que la agregue desde ese momento
-en más, pero no afecta a quien ya la tiene en su ficha (cada ficha clona su propia copia en `agregarHabClase`).
-**Cancelar = "nueva"**, la guarda aparte con un id fresco, sin tocar el original — el comportamiento de siempre.
-Los dos modos leen el archivo REAL fresco de GitHub en el momento de publicar (no la copia de
-`CLASES_SKILLS`/`SKILLS_CUSTOM` que cargó la pestaña al abrirse, que puede estar desactualizada) y lo evalúan
-entero con `new Function(texto + 'return {CLASES_SKILLS, SKILLS_CUSTOM};')()` para tener los dos arrays como
-objetos de JS sin escribir un parser a mano — hace falta el archivo ENTERO, no solo la cola, porque
-`CLASES_SKILLS` usa `skillSA(...)`, definido en la cabecera. Verificado con una prueba aislada (stub de
-`ghLeerTexto`/`ghSubirRama`/`confirm`/`ghToken` contra un archivo de skills falso, sin tocar GitHub real): los
-tres casos (sin `habClaseId`; con `habClaseId` y "pisar"; con `habClaseId` y "nueva") arman el archivo esperado.
 
 - **Nueva disposición** (2026-09-19): bajo la cabecera va **Atributos a todo el
   ancho** (los cinco en horizontal, `#attrs` en grilla; el cuadro de **Campo de

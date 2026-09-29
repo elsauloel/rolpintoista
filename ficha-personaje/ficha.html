@@ -5935,7 +5935,7 @@ const LISTS = {
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
-        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button><button class="mini" data-publicarhab="${i.id}" title="${i.habClaseId ? 'Publicar un cambio a esta habilidad en el sistema (proponer un cambio a la original, o guardarla como una skill custom nueva)' : 'Publicar esta habilidad custom en el pool del sistema (comun/skills-clase.js), marcada «a auditar» para que el dueño la revise'}">📤</button></div>
+        <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button></div>
       </div>
       <button class="ejecutar-btn" data-ejecutar="${i.id}" ${bloqueada?'disabled':''}>${habAutomatizada(i) ? 'Ejecutar' + (sinNitros?' · sin recursos':'') : 'Anunciar'}</button>
       ${botonSegundaHab(i) ? `<div style="margin-top:6px">${botonSegundaHab(i)}</div>` : ''}
@@ -7033,11 +7033,6 @@ document.addEventListener('click', async e => {
         else delete it.duelo;
         renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`);
       }});
-    return;
-  }
-  if(b.dataset.publicarhab){   // 📤 publicar una habilidad custom en el pool del sistema (comun/skills-clase.js)
-    const it = S.habilidades.find(x => x.id === b.dataset.publicarhab);
-    if(it) publicarHabilidadEnSistema(it, b);
     return;
   }
   if(b.dataset.armrota){
@@ -9711,12 +9706,9 @@ function agregarHabClase(claseId, habId){
   if(!base) return;
   if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
   const job = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
-  // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar…). `auditar` es un dato del pool (si
-  // todavía no la revisó el dueño), no del personaje: no tiene sentido que viaje a la ficha.
-  const copiaBase = structuredClone(base);
-  delete copiaBase.auditar;
+  // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar, la Ejecución completa…).
   S.habilidades.push({
-    ...copiaBase,
+    ...structuredClone(base),
     id: uid(), costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
     habClaseId: base.id, habClase: esCustomPool ? 'Pool custom' : clase.nombre,
@@ -10642,112 +10634,6 @@ async function publicarEnCatalogoDesdeFicha(draft, btn){
   }
 }
 $('#modal-catalogo').onclick = agregarAlCatalogoDelFabricante;
-
-/* ---------- 📤 Publicar una habilidad en el sistema (2026-09-29, pedido del dueño) ----------
-   "Creación colectiva del grupo" (ver CLAUDE.md raíz): cualquiera que tenga una habilidad en su ficha la puede
-   publicar acá mismo — mismo mecanismo que "📦 Agregar al catálogo" (token de GitHub, sin pasar por una
-   herramienta aparte), pero apunta a comun/skills-clase.js, no al catálogo, y SIEMPRE a la rama nueva-version
-   (GH_BRANCH de acá es 'main', a propósito solo para el catálogo — ver su comentario). Queda marcada
-   `auditar: true` para que el dueño la revise con datos/auditoria-skills.html.
-   Dos modos (2026-09-29, pregunta agregada a pedido del dueño — "si un jugador se carga un skill de clase, lo
-   edita y sube, ¿se interpreta como cambio al skill core o como uno nuevo?"): una habilidad SIN `habClaseId`
-   (nunca vino de ningún lado, 100% propia) se publica directo como custom nueva, sin preguntar nada — no hay
-   ambigüedad posible. Una CON `habClaseId` (vino de una clase o ya del pool custom, y quizás la editaste)
-   pregunta primero: "original" PISA la entrada de la que salió, dondequiera que esté (una clase o el pool),
-   con el MISMO id — cambia lo que carga cualquiera que la agregue desde ahora en más, no afecta a quien ya la
-   tiene en su ficha (cada ficha tiene su propia copia, `agregarHabClase` la clona). "nueva" la guarda aparte,
-   sin tocar el original, igual que siempre. Ambos modos leen el archivo REAL fresco de GitHub (no la copia de
-   CLASES_SKILLS/SKILLS_CUSTOM que cargó esta pestaña al abrirse, que puede estar desactualizada) y lo evalúan
-   con `new Function` para tener los dos arrays como objetos — mismo truco ya usado para probar esto en la
-   sesión que lo armó, acá para no reinventar un parser de JS a mano. */
-const GH_BRANCH_APP = 'nueva-version';
-const ARCHIVO_SKILLS_CLASE = 'comun/skills-clase.js';
-function slugSkillCustom(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'skill'; }
-async function ghLeerTexto(ruta, rama){
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}?ref=${rama || GH_BRANCH}`;
-  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
-  if(resp.status === 404) return null;
-  if(resp.status === 401 || resp.status === 403) throw {auth: true};
-  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} leyendo ${ruta}`);
-  return await resp.text();
-}
-async function ghSubirRama(ruta, contenidoB64, token, mensaje, rama){
-  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ruta}`;
-  const cab = {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.object+json'};
-  const g = await fetch(url + '?ref=' + rama, {headers: cab, cache: 'no-store'});
-  if(g.status === 401 || g.status === 403) throw {auth: true};
-  if(!g.ok) throw new Error(`GitHub respondió ${g.status} leyendo ${ruta} antes de subir`);
-  const sha = (await g.json()).sha;
-  const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: mensaje, content: contenidoB64, branch: rama, sha})});
-  if(r.status === 401 || r.status === 403) throw {auth: true};
-  if(!r.ok) throw new Error(`GitHub respondió ${r.status} subiendo ${ruta}: ${await r.text()}`);
-}
-async function publicarHabilidadEnSistema(it, btn){
-  if(!it.nombre.trim()){ toast('Poné un nombre antes de publicarla'); return; }
-  let modo = 'nueva';
-  if(it.habClaseId){
-    const origen = it.habClase ? ` de «${it.habClase}»` : '';
-    const pisar = confirm(`Esta habilidad viene${origen} (id original: ${it.habClaseId}).\n\n` +
-      `Aceptar = PROPONER UN CAMBIO a esa skill original: la pisa donde esté (una clase o el pool custom), con el mismo id. Cambia lo que carga cualquiera que la agregue desde ahora en más; no afecta a quien ya la tiene en su ficha.\n\n` +
-      `Cancelar = guardarla como una skill CUSTOM NUEVA y separada, sin tocar la original.`);
-    modo = pisar ? 'original' : 'nueva';
-  }
-  const aviso = modo === 'original'
-    ? `Esto sube "${it.nombre}" PISANDO la skill original en comun/skills-clase.js (rama nueva-version), marcada "a auditar" para que el dueño la revise.\n\n¿Seguís?`
-    : `Esto publica "${it.nombre}" en el pool de habilidades custom del sistema (comun/skills-clase.js, ` +
-      `rama nueva-version) — va a quedar disponible para agregarse desde cualquier ficha, marcada "a auditar" para ` +
-      `que el dueño la revise. No borra ni modifica la que tenés en tu personaje, solo sube una copia.\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
-  const token = await ghToken(false);
-  if(!token){ toast('Sin token no se puede publicar'); return; }
-  if(btn) btn.disabled = true;
-  toast('Publicando en el sistema…');
-  try{
-    const actual = await ghLeerTexto(ARCHIVO_SKILLS_CLASE, GH_BRANCH_APP);
-    if(actual === null) throw new Error('No encontré comun/skills-clase.js en nueva-version');
-    const marca = 'const CLASES_SKILLS = [';
-    const pos = actual.indexOf(marca);
-    if(pos < 0) throw new Error('No encontré «const CLASES_SKILLS = » en el archivo — no lo toqué, para no arriesgarme a romperlo');
-    const cabecera = actual.slice(0, pos);
-    // Se evalúa el archivo ENTERO (no solo la cola): CLASES_SKILLS usa skillSA(...), definido en la cabecera.
-    const {CLASES_SKILLS: clasesActuales, SKILLS_CUSTOM: customActual} = new Function(actual + '\nreturn {CLASES_SKILLS, SKILLS_CUSTOM};')();
-    const copia = {...structuredClone(it), auditar: true};
-    delete copia.job; delete copia.jobCosto; delete copia.origen; delete copia.imagen; delete copia.habClaseId; delete copia.habClase;
-    if(modo === 'original'){
-      copia.id = it.habClaseId;
-      const enClase = clasesActuales.some(c => {
-        const idx = c.habilidades.findIndex(h => h.id === it.habClaseId);
-        if(idx < 0) return false;
-        c.habilidades[idx] = copia;
-        return true;
-      });
-      if(!enClase){
-        const idx2 = customActual.findIndex(h => h.id === it.habClaseId);
-        if(idx2 >= 0) customActual[idx2] = copia; else customActual.push(copia);
-      }
-    }else{
-      const ids = new Set([...clasesActuales.flatMap(c => c.habilidades.map(h => h.id)), ...customActual.map(h => h.id)]);
-      let idBase = 'custom-' + slugSkillCustom(copia.nombre), idFinal = idBase, n = 2;
-      while(ids.has(idFinal)) idFinal = `${idBase}-${n++}`;
-      copia.id = idFinal;
-      customActual.push(copia);
-    }
-    const cuerpo = `const CLASES_SKILLS = ${JSON.stringify(clasesActuales, null, 1)};\n\nconst SKILLS_CUSTOM = ${JSON.stringify(customActual, null, 1)};\n`;
-    const mensaje = modo === 'original' ? `Skills: propuesta de cambio a "${copia.nombre}" (desde la ficha, a auditar)` : `Skills: agregar "${copia.nombre}" al pool custom (desde la ficha, a auditar)`;
-    await ghSubirRama(ARCHIVO_SKILLS_CLASE, await aBase64(cabecera + cuerpo), token, mensaje, GH_BRANCH_APP);
-    toast(`"${copia.nombre}" ${modo === 'original' ? 'subida como propuesta de cambio a la original' : 'publicada en el pool custom'} ✓ — se publica sola en 1-2 min, queda "a auditar"`);
-  }catch(err){
-    if(err && err.auth){
-      localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá de nuevo y pegá uno nuevo');
-    }else{
-      console.error('Error publicando la habilidad en el sistema:', err);
-      toast('No se pudo publicar — revisá la consola');
-    }
-  }finally{
-    if(btn) btn.disabled = false;
-  }
-}
 
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;

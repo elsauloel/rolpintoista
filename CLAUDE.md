@@ -16,6 +16,10 @@
 >
 > **Rework del catálogo (en curso) → [`docs/rework-armas.md`](docs/rework-armas.md)** (hoja de trabajo con las preguntas, propuestas y respuestas, pensada para retomarla desde otra conversación) y [`docs/hoja-de-ruta-rework-catalogo.md`](docs/hoja-de-ruta-rework-catalogo.md). Criterios de diseño: [`docs/guia-de-diseno.md`](docs/guia-de-diseno.md).
 >
+> **Subir / bajar / auditar elementos (skills, creeps, ítems…) → [`docs/plan-subida-unificada.md`](docs/plan-subida-unificada.md)**
+> (en curso desde 2026-09-29): un solo mecanismo para todo tipo de elemento, con la configuración completa
+> incluida la automatización, partiendo de la Biblioteca de Firebase. No armar otro camino en paralelo.
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

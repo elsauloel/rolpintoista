@@ -68,11 +68,14 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   Efectos, que por ahora queda en modo manual, ver su comentario). **💾 Guardar en el proyecto** escribe DIRECTO
   a `comun/skills-clase.js` en la rama `nueva-version` (no pasa por un JSON de decisiones intermedio): regenera
   todo desde `const CLASES_SKILLS = ` en adelante conservando el comentario de cabecera y `skillSA` tal cual
-  estén en el archivo en ese momento. Autoguarda un borrador en este navegador (recuperable si se cierra sin
+  estén en el archivo en ese momento. Guarda solo la **plantilla** de una habilidad (`limpiarHab`, ver
+  `../docs/plan-subida-unificada.md`) con **una habilidad por renglón** (`serializarSkills`/`lineaHab`; las sin
+  auditar que son solo título + descripción salen como `skillSA(…)`) — verificado que cargar y volver a guardar
+  deja el archivo idéntico. Si el archivo cambió desde que se abrió la página (otra conversación guardó), avisa
+  antes de pisarlo (`cuerpoAlCargar`). Autoguarda un borrador en este navegador (recuperable si se cierra sin
   publicar) y tiene ⬇/⬆ para respaldo aparte. **"+ Nueva skill..."** por clase o en el pool custom arranca una
-  skill vacía y abre su editor. Las skills marcadas `auditar: true` (llegaron de "📤 Guardar en sistema" desde
-  una ficha, ver `ficha-personaje/CLAUDE.md`) se ven con una chip roja "🔍 A auditar"; el filtro de la cabecera
-  las aísla para revisarlas una por una.
+  skill vacía y abre su editor. (El filtro "🔍 A auditar" se sacó el 2026-09-29 junto con el 📤 de la ficha que
+  lo alimentaba; la auditoría de lo que suben los jugadores va a ser el paso 6 del plan.)
   **Clasificación por función y tipo de daño** (2026-09-29, pedido del dueño, pensado para navegar el pool
   custom a medida que crece): cada skill tiene una sección "Clasificación" con chips para tildar **Función**
   (mismo vocabulario que ya usa `comun/skills-creep-base.js` para las habilidades de creep: daño, defensa, buff,

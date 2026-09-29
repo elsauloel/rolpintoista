@@ -32,8 +32,6 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 .tarjeta{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:10px 14px;margin-bottom:8px}
 .tarjeta.auditada{border-left-color:var(--ok)}
 .tarjeta.sinauditar{border-left-color:var(--warn)}
-.tarjeta.porauditar{border-left-color:var(--bad)}
-.chip.porauditar{color:var(--bad);border-color:var(--bad);font-weight:700}
 .cab{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
 .cab b{font-size:15px}
 .chip{font-size:11.5px;padding:1px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
@@ -81,7 +79,7 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
     <input type="search" id="buscar" placeholder="Buscar por nombre o descripción…">
     <select id="f-clase"><option value="">Todas las clases</option></select>
     <select id="f-estado">
-      <option value="">Todas</option><option value="porauditar">🔍 A auditar (llegaron de una ficha)</option>
+      <option value="">Todas</option>
       <option value="auditada">✅ Auditadas</option><option value="sinauditar">🚧 Sin auditar</option>
       <option value="ejec">Con Ejecución (⚔/✨) configurada</option><option value="sinejec">Sin Ejecución configurada</option>
     </select>
@@ -155,6 +153,51 @@ const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'físico'];
 // para sumar otras mecánicas puntuales el día que aparezcan, sin tocar el resto de la clasificación.
 const MECANICA_TAGS = ['critical matters'];
 
+/* Plantilla de una habilidad (docs/plan-subida-unificada.md): lo único que se guarda en comun/skills-clase.js,
+   en ese orden. Lo vacío se omite (salvo id/nombre/detalle/nitrosCosto: nitrosCosto ausente vale 1 al cargarla
+   en la ficha, no 0); los efecto* solo si hay efectoNombre. */
+const PLANTILLA_HAB = ['id', 'nombre', 'detalle', 'automatizada', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp',
+  'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
+  'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
+  'zonaMapa', 'zonaRadio', 'portalMapa', 'trampaColocar', 'duelo'];
+const HAB_SIEMPRE = new Set(['id', 'nombre', 'detalle', 'nitrosCosto']);
+const esVacio = v => v === null || v === undefined || v === false || v === '' || v === 0
+  || (Array.isArray(v) && !v.length) || (typeof v === 'object' && v && !Array.isArray(v) && !Object.keys(v).length);
+function limpiarHab(h){
+  const out = {}, conEfecto = !!String(h.efectoNombre || '').trim();
+  PLANTILLA_HAB.forEach(k => {
+    if(!(k in h)) return;
+    const v = h[k];
+    if(HAB_SIEMPRE.has(k)){ out[k] = v; return; }
+    if(k === 'automatizada'){ if(v === false) out[k] = false; return; }
+    if(k.startsWith('efecto')){ if(conEfecto && v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && !v.length)) out[k] = v; return; }
+    if(!esVacio(v)) out[k] = v;
+  });
+  return out;
+}
+// Formato del archivo: una habilidad por renglón; las sin auditar que son solo título + descripción, con skillSA(…).
+const SIN_AUDITAR = '(Sin auditar) ';
+function lineaHab(claseId, h){
+  const x = limpiarHab(h), J = JSON.stringify;
+  const claves = Object.keys(x).sort().join(',');
+  if(claves === 'automatizada,detalle,id,nombre' && x.automatizada === false && x.detalle.startsWith(SIN_AUDITAR) && x.id === claseId + '-' + slug(x.nombre))
+    return `skillSA(${J(claseId)}, ${J(x.nombre)}, ${J(x.detalle.slice(SIN_AUDITAR.length))})`;
+  return J(x);
+}
+function serializarSkills(d){
+  const J = JSON.stringify;
+  let s = 'const CLASES_SKILLS = [\n';
+  d.clases.forEach(c => {
+    s += `  {id: ${J(c.id)}, nombre: ${J(c.nombre)}, habilidades: [\n`;
+    c.habilidades.forEach(h => { s += `    ${lineaHab(c.id, h)},\n`; });
+    s += '  ]},\n';
+  });
+  s += '];\n\nconst SKILLS_CUSTOM = [\n';
+  d.custom.forEach(h => { s += `  ${lineaHab('custom', h)},\n`; });
+  return s + '];\n';
+}
+let cuerpoAlCargar = null;   // cómo estaba el archivo (desde "const CLASES_SKILLS") al abrir la página, para avisar si otro lo cambió
+
 let datos = null;   // {clases: [...], custom: [...]}  — clon editable de CLASES_SKILLS/SKILLS_CUSTOM
 let editando = null;   // referencia directa al objeto skill que muestra el editor ahora mismo
 
@@ -189,6 +232,7 @@ function cargar(){
   // identificador suelto en este script (los <script> clásicos de una misma página comparten el scope de
   // arriba), pero NUNCA como propiedad de `window` — buscarlas con `window.CLASES_SKILLS` siempre da undefined.
   datos = {clases: structuredClone(typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []), custom: structuredClone(typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [])};
+  cuerpoAlCargar = serializarSkills(datos);
   $('#f-clase').insertAdjacentHTML('beforeend', datos.clases.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}</option>`).join('') + '<option value="_custom">Pool custom (fuera de clase)</option>');
   $('#f-funcion').insertAdjacentHTML('beforeend', FUNCION_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
   $('#f-tipodano').insertAdjacentHTML('beforeend', TIPODANO_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
@@ -213,9 +257,8 @@ function costoTxt(h){
 }
 function tarjetaSkill(h, contexto){
   const auditada = h.automatizada !== false;
-  return `<div class="tarjeta ${h.auditar ? 'porauditar' : auditada ? 'auditada' : 'sinauditar'}" data-ref="${contexto}:${esc(h.id)}">
+  return `<div class="tarjeta ${auditada ? 'auditada' : 'sinauditar'}" data-ref="${contexto}:${esc(h.id)}">
     <div class="cab"><b>${esc(h.nombre)}</b>
-      ${h.auditar ? '<span class="chip porauditar">🔍 A auditar — llegó de una ficha</span>' : ''}
       <span class="chip ${auditada ? 'ok' : 'warn'}">${auditada ? '✅ Auditada' : '🚧 Sin auditar'}</span>
       <span class="chip">${esc(costoTxt(h))}</span>
       ${h.duelo ? '<span class="chip info">⚔/✨ Ejecución configurada</span>' : ''}
@@ -232,7 +275,6 @@ function buscar(lista, q){
 }
 function pasaFiltroEstado(h, fe){
   if(!fe) return true;
-  if(fe === 'porauditar') return !!h.auditar;
   if(fe === 'auditada') return h.automatizada !== false;
   if(fe === 'sinauditar') return h.automatizada === false;
   if(fe === 'ejec') return !!h.duelo;
@@ -324,8 +366,6 @@ function renderEditor(h){
     <div class="campo"><label>Descripción (lo que se publica en la Mesa y ve el jugador)</label><textarea id="c-detalle">${esc(h.detalle || '')}</textarea></div>
     <div class="campo"><label><input type="checkbox" id="c-auto" ${h.automatizada !== false ? 'checked' : ''}> Auditada (automatizada) — destildado = «🚧 Sin auditar», solo se anuncia</label>
       <div class="nota">Por convención, una sin auditar arranca la descripción con «(Sin auditar) ». <button type="button" id="c-prefijo" style="margin-top:4px">Anteponer/quitar «(Sin auditar) »</button></div></div>
-    ${h.auditar ? `<div class="campo"><label><input type="checkbox" id="c-porauditar" checked> 🔍 A auditar — llegó publicada desde una ficha</label>
-      <div class="nota">Destildala cuando ya la revisaste (no afecta nada del juego, es solo para que dejes de verla marcada acá).</div></div>` : ''}
 
     <div class="seccion"><h3>Clasificación (para filtrar el pool)</h3>
       <div class="campo"><label>Función</label><div class="tagpick" id="tags-funcion">${FUNCION_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
@@ -387,8 +427,6 @@ function renderEditor(h){
   q('#c-nombre').oninput = e => { h.nombre = e.target.value; $('#editor-titulo').textContent = `Editar · ${h.nombre || '(sin nombre)'}`; autosave(); };
   q('#c-detalle').oninput = e => { h.detalle = e.target.value; autosave(); };
   q('#c-auto').onchange = e => { h.automatizada = e.target.checked; autosave(); };
-  const cPorAuditar = q('#c-porauditar');
-  if(cPorAuditar) cPorAuditar.onchange = e => { if(!e.target.checked) delete h.auditar; else h.auditar = true; autosave(); dibujar(); };
   q('#c-prefijo').onclick = () => {
     const marca = '(Sin auditar) ';
     h.detalle = String(h.detalle || '').startsWith(marca) ? h.detalle.slice(marca.length) : marca + (h.detalle || '');
@@ -507,8 +545,12 @@ async function subir(t){
   const pos = actual.indexOf(marca);
   if(pos < 0) throw new Error('No encontré «const CLASES_SKILLS = [» en el archivo actual — no lo toqué, para no arriesgarme a romperlo.');
   const cabecera = actual.slice(0, pos);
-  const cuerpo = `const CLASES_SKILLS = ${JSON.stringify(datos.clases, null, 1)};\n\nconst SKILLS_CUSTOM = ${JSON.stringify(datos.custom, null, 1)};\n`;
+  // Si el archivo cambió desde que se abrió esta página (otra conversación o alguien más guardó), guardar pisaría eso.
+  if(cuerpoAlCargar !== null && actual.slice(pos) !== cuerpoAlCargar
+    && !confirm('comun/skills-clase.js cambió desde que abriste esta página (alguien más guardó). Si seguís, se pisa lo que cambió.\n\nMejor: ⬇ Descargar tu trabajo, recargar la página y volver a aplicarlo.\n\n¿Guardar igual?')) throw new Error('cancelado: el archivo había cambiado');
+  const cuerpo = serializarSkills(datos);
   const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: 'Auditoría de skills: guardado desde la herramienta', content: b64(cabecera + cuerpo), branch: GH_BRANCH, sha: info.sha})});
+  if(r.ok) cuerpoAlCargar = cuerpo;
   if(r.status === 401 || r.status === 403) throw {auth: true};
   if(!r.ok) throw new Error('GitHub respondió ' + r.status);
 }

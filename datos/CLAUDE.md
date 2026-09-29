@@ -73,6 +73,14 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   skill vacía y abre su editor. Las skills marcadas `auditar: true` (llegaron de "📤 Guardar en sistema" desde
   una ficha, ver `ficha-personaje/CLAUDE.md`) se ven con una chip roja "🔍 A auditar"; el filtro de la cabecera
   las aísla para revisarlas una por una.
+  **Clasificación por función y tipo de daño** (2026-09-29, pedido del dueño, pensado para navegar el pool
+  custom a medida que crece): cada skill tiene una sección "Clasificación" con chips para tildar **Función**
+  (mismo vocabulario que ya usa `comun/skills-creep-base.js` para las habilidades de creep: daño, defensa, buff,
+  debuff, curación, control, movilidad, invocación, área — reusado a propósito, no uno nuevo) y **Tipo de daño**
+  (mismo `TIPOS` del paso «Daño» del asistente: arcano, fuego, hielo, rayo, físico); las dos viven juntas en
+  `h.etiquetas` (un array de strings), separadas solo para mostrarlas y filtrarlas. La cabecera suma dos
+  `<select>` (Función / Tipo de daño) que filtran la lista junto con los de siempre. **El mismo filtro aparece
+  en la ficha**, al abrir "+ Habilidad → 🧩 Pool custom" — ver `ficha-personaje/CLAUDE.md`.
 
 ## Dependencias con otras carpetas
 

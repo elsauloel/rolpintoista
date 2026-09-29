@@ -67,6 +67,10 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 .mod-fila select{flex:1}
 .mod-fila input{width:70px}
 .ejec-resumen{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.tagpick{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.tagpick button{font-size:12px;padding:4px 10px;border-radius:14px}
+.tagpick button.on{background:var(--copper);border-color:var(--copper);color:#1A1418;font-weight:700}
+.chip.tag{color:var(--info);border-color:var(--info)}
 .editor-pie{display:flex;justify-content:space-between;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
 </style>
 </head>
@@ -81,6 +85,8 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
       <option value="auditada">✅ Auditadas</option><option value="sinauditar">🚧 Sin auditar</option>
       <option value="ejec">Con Ejecución (⚔/✨) configurada</option><option value="sinejec">Sin Ejecución configurada</option>
     </select>
+    <select id="f-funcion"><option value="">Cualquier función</option></select>
+    <select id="f-tipodano"><option value="">Cualquier tipo de daño</option></select>
     <span class="cont" id="cont"></span>
   </div>
   <div class="barra" style="margin-top:6px">
@@ -133,6 +139,15 @@ const STAT_BONO = [['tipo1', 'Res. crít. Tipo 4'], ['tipo2', 'Res. crít. Tipo 
   ['pdg', 'PdG'], ['pdgmg', 'PdG.Esp'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'],
   ['ini', 'Iniciativa'], ['dmg', 'Dmg'], ['eva', 'Evasión'], ['rng', 'Alcance'], ['rangocasteo', 'Rango casteo'], ['nitros', 'Nitros']];
 const NOMBRES_CLASE = {warrior: 'Warrior', asalto: 'Asalto', tanque: 'Tanque', mago: 'Mago', shooter: 'Shooter', support: 'Support', debuffer: 'Debuffer'};
+// Clasificación por rol/función (2026-09-29, pedido del dueño, pensada sobre todo para navegar el pool custom
+// a medida que crece): mismo vocabulario de "función" que ya usa comun/skills-creep-base.js para las
+// habilidades de creep (daño/defensa/buff/debuff/curación/control/movilidad/invocación/área) — no se inventó
+// uno nuevo, para que un jugador que ya conoce esas etiquetas del lado de los creeps las reconozca acá. El tipo
+// de daño reusa el mismo TIPOS del paso «Daño» de comun/asistente-duelo-hab.js (arcano/fuego/hielo/rayo/físico).
+// Las dos viven juntas en `h.etiquetas` (un solo array de strings, como comun/biblioteca.js) — se separan por
+// grupo solo para mostrarlas y filtrarlas, no por el dato en sí.
+const FUNCION_TAGS = ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área'];
+const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'físico'];
 
 let datos = null;   // {clases: [...], custom: [...]}  — clon editable de CLASES_SKILLS/SKILLS_CUSTOM
 let editando = null;   // referencia directa al objeto skill que muestra el editor ahora mismo
@@ -169,6 +184,8 @@ function cargar(){
   // arriba), pero NUNCA como propiedad de `window` — buscarlas con `window.CLASES_SKILLS` siempre da undefined.
   datos = {clases: structuredClone(typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []), custom: structuredClone(typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [])};
   $('#f-clase').insertAdjacentHTML('beforeend', datos.clases.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}</option>`).join('') + '<option value="_custom">Pool custom (fuera de clase)</option>');
+  $('#f-funcion').insertAdjacentHTML('beforeend', FUNCION_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
+  $('#f-tipodano').insertAdjacentHTML('beforeend', TIPODANO_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
   const local = leerLocal();
   if(local){
     $('#banner-borrador').innerHTML = `<div class="banner">📝 Hay un borrador sin publicar en este navegador (${new Date(local.actualizado).toLocaleString('es-AR')}).
@@ -195,6 +212,7 @@ function tarjetaSkill(h, contexto){
       <span class="chip ${auditada ? 'ok' : 'warn'}">${auditada ? '✅ Auditada' : '🚧 Sin auditar'}</span>
       <span class="chip">${esc(costoTxt(h))}</span>
       ${h.duelo ? '<span class="chip info">⚔/✨ Ejecución configurada</span>' : ''}
+      ${(h.etiquetas || []).map(t => `<span class="chip tag">${esc(t)}</span>`).join('')}
     </div>
     <div class="det">${esc((h.detalle || '').length > 220 ? h.detalle.slice(0, 218) + '…' : (h.detalle || '—'))}</div>
     <div class="botonera"><button data-editar="${contexto}:${esc(h.id)}">✎ Editar</button></div>
@@ -215,27 +233,29 @@ function pasaFiltroEstado(h, fe){
   return true;
 }
 function dibujar(){
-  const q = $('#buscar').value.trim(), fc = $('#f-clase').value, fe = $('#f-estado').value;
+  const q = $('#buscar').value.trim(), fc = $('#f-clase').value, fe = $('#f-estado').value, ff = $('#f-funcion').value, ft = $('#f-tipodano').value;
+  const pasaTags = h => (!ff || (h.etiquetas || []).includes(ff)) && (!ft || (h.etiquetas || []).includes(ft));
   let html = '', total = 0, auditadasN = 0;
+  const hayFiltro = q || fe || ff || ft;
   const clasesAMostrar = fc && fc !== '_custom' ? datos.clases.filter(c => c.id === fc) : (fc === '_custom' ? [] : datos.clases);
   clasesAMostrar.forEach(c => {
-    const lista = buscar(c.habilidades, q).filter(h => pasaFiltroEstado(h, fe));
+    const lista = buscar(c.habilidades, q).filter(h => pasaFiltroEstado(h, fe) && pasaTags(h));
     total += c.habilidades.length; auditadasN += c.habilidades.filter(h => h.automatizada !== false).length;
     html += `<div class="clase-head"><h2>${esc(c.nombre)}</h2><span class="cont">${c.habilidades.length} skill${c.habilidades.length === 1 ? '' : 's'}</span></div>`;
-    html += lista.length ? lista.map(h => tarjetaSkill(h, c.id)).join('') : (q || fe ? '<div class="vacio">Ninguna con esos filtros.</div>' : '');
+    html += lista.length ? lista.map(h => tarjetaSkill(h, c.id)).join('') : (hayFiltro ? '<div class="vacio">Ninguna con esos filtros.</div>' : '');
     html += `<button class="nueva" data-nueva="${esc(c.id)}">+ Nueva skill de ${esc(c.nombre)}</button>`;
   });
   if(!fc || fc === '_custom'){
-    const lista = buscar(datos.custom, q).filter(h => pasaFiltroEstado(h, fe));
+    const lista = buscar(datos.custom, q).filter(h => pasaFiltroEstado(h, fe) && pasaTags(h));
     total += datos.custom.length; auditadasN += datos.custom.filter(h => h.automatizada !== false).length;
     html += `<div class="clase-head"><h2>🧩 Pool custom (fuera de clase)</h2><span class="cont">${datos.custom.length} skill${datos.custom.length === 1 ? '' : 's'}</span></div>`;
-    html += lista.length ? lista.map(h => tarjetaSkill(h, '_custom')).join('') : '<div class="vacio">Todavía no hay ninguna acá.</div>';
+    html += lista.length ? lista.map(h => tarjetaSkill(h, '_custom')).join('') : (hayFiltro ? '<div class="vacio">Ninguna con esos filtros.</div>' : '<div class="vacio">Todavía no hay ninguna acá.</div>');
     html += `<button class="nueva" data-nueva="_custom">+ Nueva skill custom (sin clase)</button>`;
   }
   $('#lista').innerHTML = html;
   $('#cont').innerHTML = `<b>${total}</b> skills · ${auditadasN} auditadas`;
 }
-['#buscar', '#f-clase', '#f-estado'].forEach(s => $(s).addEventListener('input', dibujar));
+['#buscar', '#f-clase', '#f-estado', '#f-funcion', '#f-tipodano'].forEach(s => $(s).addEventListener('input', dibujar));
 
 function listaDe(contexto){ return contexto === '_custom' ? datos.custom : (datos.clases.find(c => c.id === contexto) || {habilidades: []}).habilidades; }
 function skillDe(contexto, id){ return (listaDe(contexto) || []).find(h => h.id === id); }
@@ -300,6 +320,12 @@ function renderEditor(h){
     ${h.auditar ? `<div class="campo"><label><input type="checkbox" id="c-porauditar" checked> 🔍 A auditar — llegó publicada desde una ficha</label>
       <div class="nota">Destildala cuando ya la revisaste (no afecta nada del juego, es solo para que dejes de verla marcada acá).</div></div>` : ''}
 
+    <div class="seccion"><h3>Clasificación (para filtrar el pool)</h3>
+      <div class="campo"><label>Función</label><div class="tagpick" id="tags-funcion">${FUNCION_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
+      <div class="campo"><label>Tipo de daño (si hace daño)</label><div class="tagpick" id="tags-tipodano">${TIPODANO_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
+      <div class="nota">Se pueden marcar varias. Es solo para navegar y filtrar el pool — no cambia nada de cómo juega la skill.</div>
+    </div>
+
     <div class="seccion"><h3>Costo</h3>
       <div class="fila3">
         <div class="campo"><label>SP (texto: "2", "X", "2 + X")</label><input type="text" id="c-costo" value="${esc(h.costo ?? '')}"></div>
@@ -360,6 +386,13 @@ function renderEditor(h){
     h.detalle = String(h.detalle || '').startsWith(marca) ? h.detalle.slice(marca.length) : marca + (h.detalle || '');
     q('#c-detalle').value = h.detalle; autosave();
   };
+  cuerpo.querySelectorAll('.tagpick [data-tag]').forEach(b => b.onclick = () => {
+    h.etiquetas = h.etiquetas || [];
+    const t = b.dataset.tag, i = h.etiquetas.indexOf(t);
+    if(i >= 0) h.etiquetas.splice(i, 1); else h.etiquetas.push(t);
+    b.classList.toggle('on', i < 0);
+    autosave();
+  });
   q('#c-costo').oninput = e => { h.costo = e.target.value; autosave(); };
   q('#c-nitros').oninput = e => { const v = e.target.value.trim(); h.nitrosCosto = /^-?\d+$/.test(v) ? Number(v) : v; autosave(); };
   q('#c-hpcosto').oninput = e => { h.hpCosto = num(e.target.value); autosave(); };

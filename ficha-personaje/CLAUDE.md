@@ -375,8 +375,28 @@ diferencia real es el costo**: **2 de Job** (`HAB_JOB_CUSTOM`, la misma constant
 para armar una de cero — coherente: del pool sin auditar del todo por la mesa cuesta lo mismo que crear la tuya)
 en vez de 1 (`HAB_JOB_CLASE`). Al agregarla, `agregarHabClase` borra el campo `auditar` de la copia que llega al
 personaje (es dato del pool — si el dueño todavía no la revisó —, no algo que tenga sentido que cargue la ficha
-de un jugador) y con `habClaseId` puesto, el botón 📤 de arriba ya no aparece para ella (tiene sentido: ya está
-"en el sistema", republicarla sería redundante).
+de un jugador). **Filtro por función y tipo de daño** (mismo día, mismo pedido): con el pool abierto aparecen dos
+`<select>` (Función / Tipo de daño, `FUNCION_TAGS`/`TIPODANO_TAGS` — mismo vocabulario que
+`datos/auditoria-skills.html`, ver su comentario y el de `datos/CLAUDE.md`) que filtran la lista por `h.etiquetas`;
+el estado de los filtros (`poolFiltroFuncion`/`poolFiltroTipoDano`) se resetea al salir del pool ("← Volver" o
+elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
+
+**📤 ya no es solo para habilidades sin `habClaseId`** (2026-09-29, corrige el párrafo de arriba, pedido del
+dueño — "si un jugador se carga un skill de clase, lo edita y sube, ¿se interpreta como cambio al skill core o
+como uno nuevo?"): el botón 📤 aparece SIEMPRE, en cualquier habilidad. Si `it.habClaseId` está vacío (nunca
+vino de ningún lado), publica directo como custom nueva, sin preguntar nada — no hay ambigüedad posible. Si
+`it.habClaseId` tiene algo (vino de una clase o ya del pool custom, y tal vez se editó), `publicarHabilidadEnSistema`
+pregunta primero con un `confirm()`: **Aceptar = "original"**, pisa la entrada de la que salió dondequiera que
+esté (una clase o el pool), **con el mismo id** — cambia lo que carga cualquiera que la agregue desde ese momento
+en más, pero no afecta a quien ya la tiene en su ficha (cada ficha clona su propia copia en `agregarHabClase`).
+**Cancelar = "nueva"**, la guarda aparte con un id fresco, sin tocar el original — el comportamiento de siempre.
+Los dos modos leen el archivo REAL fresco de GitHub en el momento de publicar (no la copia de
+`CLASES_SKILLS`/`SKILLS_CUSTOM` que cargó la pestaña al abrirse, que puede estar desactualizada) y lo evalúan
+entero con `new Function(texto + 'return {CLASES_SKILLS, SKILLS_CUSTOM};')()` para tener los dos arrays como
+objetos de JS sin escribir un parser a mano — hace falta el archivo ENTERO, no solo la cola, porque
+`CLASES_SKILLS` usa `skillSA(...)`, definido en la cabecera. Verificado con una prueba aislada (stub de
+`ghLeerTexto`/`ghSubirRama`/`confirm`/`ghToken` contra un archivo de skills falso, sin tocar GitHub real): los
+tres casos (sin `habClaseId`; con `habClaseId` y "pisar"; con `habClaseId` y "nueva") arman el archivo esperado.
 
 - **Nueva disposición** (2026-09-19): bajo la cabecera va **Atributos a todo el
   ancho** (los cinco en horizontal, `#attrs` en grilla; el cuadro de **Campo de

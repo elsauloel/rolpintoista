@@ -527,10 +527,13 @@ resuelven a mano, como el resto de los avisos).
   Si se unifica (todos con SP), la marca `para` de P122 deja de separar recursos y una habilidad sirve igual para los
   dos. Mientras tanto, la distinción tiene que quedar visible.
 
-- ⬜ **P123. ¿Una sola forma de trampa? — 2026-09-29 (paso 0e).** Hoy hay dos: la del mapa ("Trampas guardadas":
-  forma, color, daño, estado, zona que deja) y la que coloca una habilidad (`trampaColocar`: radio, cantidad, daño,
-  estado). **Propuesta**: que la de la habilidad use la misma plantilla que la del mapa (más "cuántas" y el radio),
-  así una trampa subida sirve para las dos cosas. Se decide en el paso 4.
+- ✅ **P123. ¿Una sola forma de trampa? — 2026-09-29 (paso 0e), decidida y hecha el mismo día.** Había dos: la del mapa
+  ("Trampas guardadas": forma, color, daño, estado, zona que deja) y la que coloca una habilidad (`trampaColocar`: radio,
+  cantidad, daño, estado). **Decidido (dueño): unificarlas.** La de la habilidad usa la forma del mapa más `cant`
+  (`Plantillas.trampaDesde`/`radioDeTrampa` en `comun/plantillas.js`; las viejas se traducen solas al leerlas). El
+  asistente de trampas en una habilidad tiene ahora los mismos pasos que en el mapa (forma flor o línea, color, zona que
+  deja al dispararse, cuánto dura) **salvo el teleport** (su destino se marca con un clic en el mapa) y la forma libre
+  (se pinta a mano). Una trampa del catálogo elegida desde una habilidad conserva su estado, su color y su zona.
 
 - ⬜ **P124. Ítems subidos por jugadores: ¿viven en Firebase o van al catálogo de GitHub? — 2026-09-29 (paso 0e).**
   La decisión 4 del plan dice "lo subido vive en Firebase"; el catálogo de ítems hoy vive en `datos/catalogo.json`

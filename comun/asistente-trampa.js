@@ -15,8 +15,13 @@
        alTerminar: res => {...},
        alCancelar: () => {...}              // opcional: se cerró sin terminar
      });
-   res = {nombre, descripcion, forma: 'flor'|'linea'|'libre', color, alfa, radio, cant (habilidad), amiga, dano ('' o '2d6+1'), contemplaArmadura,
+   res = {nombre, descripcion, forma: 'flor'|'linea'|'libre', color, alfa, radio, largo, cant (habilidad), amiga, dano ('' o '2d6+1'), contemplaArmadura,
           estado ('' o nombre), estadoTurnos, salvacion: {stat, dif} | null, turnos (0 = sin límite), guardar}
+
+   Una sola forma de trampa (P123, 2026-09-29): una habilidad arma la trampa con los mismos pasos que el mapa (forma y tamaño,
+   color, daño, estado, zona que deja al dispararse, cuánto dura…) salvo el teleport (su destino se marca con un clic en el mapa)
+   y la forma libre (se pinta a mano). `aTrampa(res)` lo pasa a la forma única de comun/plantillas.js (lo que se guarda en
+   `trampaColocar` y en el catálogo) e `inicialDe(trampa)` hace el camino inverso; `resumenTexto(trampa)` la describe corta.
    ========================================================= */
 const AsistenteTrampa = (() => {
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
@@ -94,33 +99,37 @@ const AsistenteTrampa = (() => {
     const est = {
       paso: 0, error: '',
       nombre: ini.nombre || '', descripcion: ini.descripcion || '',
-      radio: Math.max(0, Math.min(6, num(ini.radio))), cant: Math.max(1, Math.min(6, num(ini.cant) || 1)),
+      radio: Math.max(0, Math.min(6, num(ini.radio))), cant: Math.max(1, Math.min(6, num(ini.cant) || 1)), largo: Math.max(1, Math.min(20, num(ini.largo) || 3)),
       forma: ini.forma || 'flor', color: ini.color || colores[0], alfa: Number.isFinite(ini.alfa) ? ini.alfa : 45,
       amiga: !!ini.amiga,
       haceDano: !!m, dados: m ? num(m[1]) : 2, caras: m ? num(m[2]) : 6, fijo: m && m[3] ? num(m[3]) : 0,
       contemplaArmadura: ini.contemplaArmadura !== false,
       aplicaEstado: !!ini.estado, estado: ini.estado || '', estadoTurnos: num(ini.estadoTurnos) || 0,
+      estadoPropio: ini.estado || '', estadoMods: Array.isArray(ini.estadoMods) ? ini.estadoMods : null,   // un estado propio (fuera de la lista) que ya traía
       seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && ini.salvacion.stat) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
       // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
-      // como una zona con el mismo daño/estado — ver comun/CLAUDE.md "Trampas persistentes". Solo para trampas
-      // del mapa (no las que coloca una habilidad, que no tienen un "acá te quedás" claro).
+      // como una zona con el mismo daño/estado — ver comun/CLAUDE.md "Trampas persistentes". Desde P123 (2026-09-29)
+      // también para las que coloca una habilidad.
       dejaZona: !!ini.dejaZona, zonaTurnos: num(ini.zonaTurnos) || 3, zonaEnMant: ini.zonaEnMant !== false, zonaCadaPaso: !!ini.zonaCadaPaso,
       zonaSeResiste: !!ini.zonaResistStat, zonaResistStat: ini.zonaResistStat || 'resmg', zonaResistValor: num(ini.zonaResistValor) || 12,
       guardar: false,
     };
     const ZSTATS = [['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['eva', 'Evasión'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
-    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'evita', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'persistente', 'teleport', 'evita', 'dura', 'resumen'];
+    const PASOS = deHab ? ['nombre', 'superficie', 'quien', 'dano', 'estado', 'persistente', 'evita', 'dura', 'resumen'] : ['nombre', 'superficie', 'quien', 'dano', 'estado', 'persistente', 'teleport', 'evita', 'dura', 'resumen'];
     const danoTxt = () => est.haceDano ? `${Math.max(1, est.dados)}d${est.caras}${est.fijo ? (est.fijo > 0 ? '+' : '') + est.fijo : ''}` : '';
-    const preset = () => estadosDisp.find(p => p.nombre === est.estado) || null;
+    // La lista de estados, más el estado propio que ya traía la trampa si no está en ella (para no perderlo al re-editar).
+    const listaEstados = () => est.estadoPropio && !estadosDisp.some(p => p.nombre === est.estadoPropio)
+      ? [...estadosDisp, {nombre: est.estadoPropio, detalle: '(estado propio que ya traía esta trampa)', turnos: est.estadoTurnos || 0, permanente: false}] : estadosDisp;
+    const preset = () => listaEstados().find(p => p.nombre === est.estado) || null;
     const durEstado = () => { const p = preset(); if(!p) return 0; if(p.permanente) return 0; return est.estadoTurnos > 0 ? est.estadoTurnos : num(p.turnos); };
 
     function frases(){
       const f = [];
       if(danoTxt()) f.push(`Hace ${danoTxt()} de daño ${est.contemplaArmadura ? '(contempla la armadura: se le resta la Defensa)' : '(directo a la vida: ignora la armadura)'}`);
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
-      if(est.dejaZona && !deHab) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
+      if(est.dejaZona) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
       if(est.seEvita) f.push(`Se evita con ${est.salStat} contra ${est.salDif} (a mano)`);
       if(!f.length) f.push('No hace daño ni deja estados: solo avisa en la Mesa cuando se activa');
@@ -159,12 +168,17 @@ const AsistenteTrampa = (() => {
           <textarea id="at-desc" maxlength="200" placeholder="Ej.: Una red cae desde el techo y deja atrapado a quien la pisa.">${esc(est.descripcion)}</textarea>`;
       }
       if(id === 'superficie' && deHab){
-        return `<div class="at-preg">¿De qué tamaño es y cuántas deja?</div>
-          <p class="at-ayuda">Esta trampa no se dibuja: la habilidad la coloca sola, <b>oculta y al lado de tu token</b> cada vez que la usás.</p>
-          <div class="at-fila"><label style="flex:1.4">Tamaño (radio)</label><input type="number" id="at-radio" min="0" max="6" value="${esc(est.radio)}" style="width:90px"></div>
-          <p class="at-ayuda">0 = una sola casilla · 1 = una flor de 1 (7 casillas) · 2 = una flor de 2…</p>
+        const linea = est.forma === 'linea';
+        return `<div class="at-preg">¿Qué forma tiene, de qué tamaño y cuántas deja?</div>
+          <p class="at-ayuda">Esta trampa no se dibuja: la habilidad la coloca sola, <b>oculta y al lado de tu token</b> cada vez que la usás (una línea sale hacia afuera del token).</p>
+          ${FORMAS.filter(f => f.id !== 'libre').map(f => `<button type="button" class="at-op${(linea ? 'linea' : 'flor') === f.id ? ' on' : ''}" data-forma="${f.id}"><span class="ico">${f.icono}</span><span><b>${f.texto}</b></span></button>`).join('')}
+          ${linea ? `<div class="at-fila"><label style="flex:1.4">Largo (casillas)</label><input type="number" id="at-largo" min="1" max="20" value="${esc(est.largo)}" style="width:90px"></div>`
+            : `<div class="at-fila"><label style="flex:1.4">Tamaño (radio)</label><input type="number" id="at-radio" min="0" max="6" value="${esc(est.radio)}" style="width:90px"></div>
+          <p class="at-ayuda">0 = una sola casilla · 1 = una flor de 1 (7 casillas) · 2 = una flor de 2…</p>`}
           <div class="at-fila"><label style="flex:1.4">Cuántas por vez</label><input type="number" id="at-cant" min="1" max="6" value="${esc(est.cant)}" style="width:90px"></div>
-          <p class="at-ayuda">Cuántas trampas deja de una vez cada vez que se ejecuta la habilidad (1 a 6).</p>`;
+          <p class="at-ayuda">Cuántas trampas deja de una vez cada vez que se ejecuta la habilidad (1 a 6).</p>
+          <div class="at-preg">Color</div>
+          <div class="at-colores">${colores.map(c => `<button type="button" class="at-color${est.color === c ? ' on' : ''}" data-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>`;
       }
       if(id === 'superficie'){
         const formas = editando
@@ -198,7 +212,7 @@ const AsistenteTrampa = (() => {
           <p class="at-ayuda">Por ejemplo dejar a quien la pisa Inmovilizado, Rengo o con Escarcha. Se aplica solo, mientras dure.</p>
           <div class="at-fila"><button type="button" class="at-op${!est.aplicaEstado ? ' on' : ''}" data-aplica="0" style="margin:0"><span><b>No</b></span></button>
             <button type="button" class="at-op${est.aplicaEstado ? ' on' : ''}" data-aplica="1" style="margin:0"><span><b>Sí, deja un estado</b></span></button></div>
-          ${est.aplicaEstado ? `<div class="at-preg">¿Cuál?</div><div class="at-grid">${estadosDisp.map(p => `<button type="button" class="at-op${est.estado === p.nombre ? ' on' : ''}" data-estado="${esc(p.nombre)}">
+          ${est.aplicaEstado ? `<div class="at-preg">¿Cuál?</div><div class="at-grid">${listaEstados().map(p => `<button type="button" class="at-op${est.estado === p.nombre ? ' on' : ''}" data-estado="${esc(p.nombre)}">
             <span class="cab"><b>${esc(p.nombre)}</b><em>${p.permanente ? 'no vence' : num(p.turnos) + ' turnos'}</em></span><small>${esc(p.detalle || '')}</small></button>`).join('')}</div>
             ${preset() && !preset().permanente ? `<div class="at-preg">¿Cuántos turnos dura el estado?</div>
               <p class="at-ayuda">Cada ⟳ Mantenimiento del GM cuenta un turno.</p>
@@ -235,14 +249,14 @@ const AsistenteTrampa = (() => {
             <label>contra</label><input type="number" id="at-salDif" min="1" value="${esc(est.salDif)}" style="width:80px"></div>` : ''}`;
       }
       if(id === 'dura'){
-        return `<div class="at-preg">${editando ? '¿Cuántos turnos le quedan?' : '¿Cuánto dura la trampa?'}</div>
+        return `<div class="at-preg">${editando ? '¿Cuántos turnos le quedan?' : deHab ? '¿Cuánto dura cada trampa que deja?' : '¿Cuánto dura la trampa?'}</div>
           <p class="at-ayuda">Por defecto queda en el mapa hasta que alguien la borre. También puede eliminarse sola después de unos turnos (cada ⟳ Mantenimiento del GM cuenta uno).</p>
           <label class="at-sin"><input type="checkbox" id="at-dura"${est.dura ? ' checked' : ''}> Que se elimine sola después de unos turnos</label>
           ${est.dura ? `<input type="number" id="at-turnos" min="1" max="99" value="${esc(est.turnos)}">` : ''}`;
       }
       const fr = frases();
       return `<div class="at-preg">Así queda tu trampa</div>
-        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 daña también a aliados en el área' : '🎯 efecto solo a rivales'}${editando ? '' : deHab ? ' · radio ' + est.radio + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
+        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 daña también a aliados en el área' : '🎯 efecto solo a rivales'}${editando ? '' : deHab ? (est.forma === 'linea' ? ' · línea de ' + est.largo : ' · radio ' + est.radio) + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
           <ul>${fr.map(x => `<li>${esc(x)}</li>`).join('')}<li>${est.dura ? `Se elimina sola tras ${est.turnos} turno${est.turnos === 1 ? '' : 's'}` : 'Queda hasta que alguien la borre'}</li></ul>
           ${est.descripcion.trim() ? `<div style="margin-top:8px;color:#B7A79E;font-size:13px">“${esc(est.descripcion.trim())}”</div>` : ''}</div>
         <p class="at-ayuda">${editando ? 'Al confirmar se guardan los cambios en la trampa.' : deHab ? 'Al confirmar se guarda en la habilidad; se coloca sola cada vez que la ejecutes.' : 'Al confirmar te queda la trampa lista: <b>hacé clic en el mapa y arrastrá</b> para dibujarla donde quieras.'}</p>
@@ -264,13 +278,14 @@ const AsistenteTrampa = (() => {
 
     const resultado = () => ({
       nombre: est.nombre.trim(), descripcion: est.descripcion.trim(), forma: est.forma, color: est.color, alfa: est.alfa, amiga: est.amiga,
-      radio: est.radio, cant: est.cant,
+      radio: est.radio, cant: est.cant, largo: est.largo,
       dano: danoTxt(), contemplaArmadura: est.contemplaArmadura,
       estado: est.aplicaEstado && preset() ? est.estado : '', estadoTurnos: est.aplicaEstado && preset() ? durEstado() : 0,
+      estadoMods: est.aplicaEstado && est.estado === est.estadoPropio && est.estadoMods ? est.estadoMods : null,
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif} : null,
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
-      dejaZona: !deHab && est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso,
+      dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
     });
 
@@ -304,6 +319,7 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-alfa') est.alfa = Math.round(num(t.value));
       else if(t.id === 'at-radio') est.radio = Math.max(0, Math.min(6, Math.round(num(t.value))));
       else if(t.id === 'at-cant') est.cant = Math.max(1, Math.min(6, Math.round(num(t.value)) || 1));
+      else if(t.id === 'at-largo') est.largo = Math.max(1, Math.min(20, Math.round(num(t.value)) || 1));
       else if(t.id === 'at-dados'){ est.dados = Math.max(0, Math.round(num(t.value))); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-fijo'){ est.fijo = Math.round(num(t.value)); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-estadoTurnos') est.estadoTurnos = Math.max(0, Math.round(num(t.value)));
@@ -346,5 +362,40 @@ const AsistenteTrampa = (() => {
     if(r.salvacion) partes.push(`${r.salvacion.stat} contra ${r.salvacion.dif} la evita (a mano)`);
     return (partes.join('. ') + '.').slice(0, 200);
   }
-  return {abrir, detalleFinal};
+  // El resultado del asistente (contexto 'habilidad') en la forma única de trampa (comun/plantillas.js).
+  function aTrampa(r){
+    const linea = r.forma === 'linea';
+    return {nombre: String(r.nombre || '').trim().slice(0, 40), detalle: detalleFinal(r), amiga: !!r.amiga, ignoraDef: !r.contemplaArmadura, dano: r.dano || '',
+      estado: r.estado || '', estadoTurnos: r.estado ? Math.max(0, num(r.estadoTurnos)) : 0, ...(r.estado && r.estadoMods ? {estadoMods: r.estadoMods} : {}),
+      tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))) + 1,
+      color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
+      ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
+        zonaResistStat: r.zonaResistStat || '', zonaResistValor: num(r.zonaResistValor) || 12} : {}),
+      turnos: Math.max(0, num(r.turnos)), cant: Math.max(1, Math.min(6, num(r.cant) || 1))};
+  }
+  // Una trampa (cualquier forma, también las viejas de las habilidades) como valores de partida del asistente.
+  function inicialDe(t0){
+    const t = typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? Plantillas.trampaDesde(t0 || {}) : (t0 || {});
+    const linea = t.tipo === 'linea';
+    return {nombre: t.nombre || '', descripcion: t.detalle || '', forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Math.max(0, num(t.tamano) - 1), largo: linea ? num(t.tamano) || 3 : 3,
+      cant: t.cant || 1, color: t.color, alfa: t.alfa, amiga: !!t.amiga, dano: t.dano || '', contemplaArmadura: !t.ignoraDef,
+      estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, teleport: !!t.teleport,
+      dejaZona: !!t.dejaZona, zonaTurnos: t.zonaTurnos, zonaEnMant: t.zonaEnMantenimiento !== false, zonaCadaPaso: !!t.zonaCadaPaso,
+      zonaResistStat: t.zonaResistStat || '', zonaResistValor: t.zonaResistValor, turnos: t.turnos || 0};
+  }
+  // "2d6 de daño (contempla la armadura) · deja Rengo · radio 1 × 2 · deja zona 3 turnos · efecto solo a rivales"
+  function resumenTexto(t0){
+    const t = typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? Plantillas.trampaDesde(t0 || {}) : (t0 || {});
+    const p = [];
+    if(t.dano) p.push(`${t.dano} de daño ${t.ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
+    if(t.estado) p.push(`deja ${t.estado}`);
+    if(!p.length) p.push('solo avisa cuando se activa');
+    p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : `radio ${Math.max(0, num(t.tamano) - 1)}`);
+    if((t.cant || 1) > 1) p.push(`×${t.cant}`);
+    if(t.dejaZona) p.push(`deja zona ${t.zonaTurnos || 3} turnos`);
+    if(num(t.turnos) > 0) p.push(`dura ${t.turnos} turnos`);
+    p.push(t.amiga ? 'daña también a aliados en el área' : 'el efecto solo alcanza a rivales');
+    return p.join(' · ');
+  }
+  return {abrir, detalleFinal, aTrampa, inicialDe, resumenTexto};
 })();

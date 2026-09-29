@@ -71,12 +71,40 @@ const Plantillas = (() => {
     return out;
   }
 
-  /* ---- Trampa del mapa ("Trampas guardadas") ---- con la zona que deja al dispararse, si la tiene. */
-  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'teleport',
-    'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor'];
+  /* ---- Trampa: UNA sola forma para el mapa y para las habilidades (P123, 2026-09-29) ----
+     Es la forma de las trampas del mapa ("Trampas guardadas", catálogo): nombre, detalle, amiga (el efecto alcanza a los
+     aliados del área), ignoraDef, dano, estado (nombre) + estadoTurnos (+ estadoMods si es un estado propio con bonos),
+     tipo ('flor' | 'linea' | 'libre') + tamano (flor: 1 = una casilla, 2 = flor de 1…; línea: largo), color, alfa, teleport,
+     la zona que deja al dispararse (dejaZona, zonaTurnos, zonaEnMantenimiento, zonaCadaPaso, zonaResistStat,
+     zonaResistValor), turnos (cuánto dura la trampa puesta; 0 = sin límite) y `cant` (cuántas deja una habilidad cada vez
+     que se ejecuta). Una habilidad guarda esto mismo en `trampaColocar`, así una trampa del catálogo sirve para las dos cosas.
+     `trampaDesde(t)` traduce cualquier trampa, también las viejas de las habilidades ({radio, cant, estado: {nombre,
+     turnos}}), a esta forma. */
+  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'estadoMods', 'teleport',
+    'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor', 'turnos', 'cant'];
+  function trampaDesde(t){
+    if(!t || typeof t !== 'object') return null;
+    const n = v => Number(v) || 0;
+    const out = clon(t);
+    delete out.forma; delete out.radio; delete out.largo;
+    out.tipo = ['flor', 'linea', 'libre'].includes(t.tipo) ? t.tipo : (t.forma === 'linea' ? 'linea' : 'flor');
+    out.tamano = t.tamano !== undefined ? Math.max(1, Math.round(n(t.tamano)) || 1)
+      : out.tipo === 'linea' ? Math.max(1, Math.round(n(t.largo)) || 3) : Math.max(0, Math.round(n(t.radio))) + 1;
+    if(t.estado && typeof t.estado === 'object'){
+      out.estado = String(t.estado.nombre || '');
+      if(t.estadoTurnos === undefined) out.estadoTurnos = n(t.estado.turnos);
+      if(Array.isArray(t.estado.mods) && t.estado.mods.length) out.estadoMods = clon(t.estado.mods);
+    }else out.estado = String(t.estado || '');
+    out.estadoTurnos = Math.max(0, Math.round(n(out.estadoTurnos)));
+    out.cant = Math.max(1, Math.min(6, Math.round(n(t.cant)) || 1));
+    return out;
+  }
+  // Radio de la flor para colocarla (0 = una sola casilla), a partir de `tamano`.
+  const radioDeTrampa = t => Math.max(0, (Number(t && t.tamano) || 1) - 1);
   function trampa(t){
+    const x = trampaDesde(t) || {};
     const out = {};
-    TRAMPA.forEach(k => { if(k in t && t[k] !== undefined) out[k] = clon(t[k]); });
+    TRAMPA.forEach(k => { if(k in x && x[k] !== undefined) out[k] = clon(x[k]); });
     return out;
   }
 
@@ -123,5 +151,5 @@ const Plantillas = (() => {
   // versión nueva". Es de la copia, no del elemento: no se sube.
   function sinOrigen(o){ if(o && typeof o === 'object'){ delete o.bibOrigen; delete o.bibIgnorada; } return o; }
 
-  return {limpiar, habilidad, habCreep, creep, pasiva, trampa, estado, item, HAB};
+  return {limpiar, habilidad, habCreep, creep, pasiva, trampa, trampaDesde, radioDeTrampa, estado, item, HAB};
 })();

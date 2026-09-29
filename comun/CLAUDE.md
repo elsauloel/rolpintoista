@@ -752,3 +752,16 @@ versión parecida en más de una, es candidato a juntar.
 - **`biblioteca.js`, cartel único de versión nueva** (2026-09-29, paso 4): `Biblioteca.versionNueva(subidas, origen,
   ignorada)` (¿hay una versión más nueva que la de la copia?) y `Biblioteca.avisoVersion(opts)` (el cartel "🔔 hay una
   versión nueva" con Actualizar / Dejar la mía / Ahora no). Todas las herramientas lo usan en vez de un cartel propio.
+- **Una sola forma de trampa (P123, 2026-09-29, decidido por el dueño)**: la trampa que coloca una habilidad
+  (`trampaColocar`, ficha y gm-tools) pasó a tener la misma forma que las del mapa y el catálogo — `tipo`/`tamano` (flor:
+  1 = una casilla; línea: largo), color, alfa, daño, `estado` (nombre) + `estadoTurnos` (+ `estadoMods` si es un estado
+  propio), zona que deja al dispararse, `turnos` (cuánto dura puesta) y `cant` (cuántas deja por ejecución).
+  `Plantillas.trampaDesde(t)` traduce cualquier trampa (también las viejas `{radio, cant, estado: {nombre, turnos}}` de
+  `creeps-base.js` y de las habilidades ya guardadas, que no se tocaron) y `Plantillas.radioDeTrampa(t)` da el radio de la
+  flor. `TokensAuto.colocarTrampas({fichaId, tipoToken, trampa})` coloca esa forma (color, alfa, estado, zona que deja
+  —mismos campos `trampaDejaZona`/`zona*` que pone el mapa— y vencimiento con `turnos`/`venceMant`); sigue aceptando los
+  parámetros sueltos de antes. `AsistenteTrampa` en contexto `'habilidad'` suma forma (flor/línea), color, "deja zona" y
+  duración (9 pasos; el teleport y la forma libre siguen siendo solo del mapa) y exporta `aTrampa(res)`, `inicialDe(t)` y
+  `resumenTexto(t)`, que usan la ficha y gm-tools (gm-tools guarda la trampa en edición en `hcTrampa`; los campos
+  `#hc-trampa-*` quedaron sin uso). Arreglo de paso: una trampa **consumible** con `tamano: 1` se colocaba como flor de 1
+  (7 casillas) porque el tamaño se tomaba como radio; ahora es una sola casilla, como en el mapa.

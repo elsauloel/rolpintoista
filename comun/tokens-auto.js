@@ -91,9 +91,20 @@ const TokensAuto = (() => {
     }
     return out;
   }
-  /* o: {fichaId, tipoToken?, nombre, detalle, dano, radio, cant, fuegoAmigo, color, mapaId?, forma?: 'flor'|'linea', largo? (solo la línea)}
-     Devuelve {colocadas, mapaId, motivo?} (motivo: 'sin-token' | 'sin-lugar'). */
+  /* o: {fichaId, tipoToken?, trampa, mapaId?, item?} — `trampa` en la forma única de comun/plantillas.js (P123: la misma de las
+     trampas del mapa y del catálogo: tipo/tamano, color, alfa, daño, estado, zona que deja al dispararse, turnos que dura, cant).
+     Se sigue aceptando la forma vieja suelta {nombre, detalle, dano, radio, cant, fuegoAmigo, color, forma, largo, estado}.
+     El teleport no se coloca solo (su destino se marca en el mapa, a mano). Devuelve {colocadas, mapaId, motivo?}
+     (motivo: 'sin-token' | 'sin-lugar'). */
   async function colocarTrampas(o){
+    if(o.trampa && typeof Plantillas !== 'undefined'){
+      const t = Plantillas.trampaDesde(o.trampa);
+      const linea = t.tipo === 'linea';
+      o = {...o, nombre: t.nombre, detalle: t.detalle, dano: t.dano, ignoraDef: !!t.ignoraDef, fuegoAmigo: !!t.amiga, color: t.color, alfa: t.alfa,
+        forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
+        estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {})} : null,
+        dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0))};
+    }
     const mapaId = o.mapaId || await mapaQueMiraElGM();
     const tokens = await fbDb.collection(fbRutaCampana(rutaTokens(mapaId))).get();
     const mio = tokens.docs.find(d => d.data().fichaId === o.fichaId && d.data().tipo === (o.tipoToken || 'creep'));
@@ -111,19 +122,30 @@ const TokensAuto = (() => {
       if(elegidas.length < (o.cant || 1) && !ocupadas.has(`${c.col},${c.fila}`)){ c.dir = (frente + k) % 6; elegidas.push(c); }   // dir: hacia dónde apunta (la línea se extiende hacia afuera del token)
     });
     if(!elegidas.length) return {colocadas: 0, mapaId, motivo: 'sin-lugar'};
+    // Una trampa con duración se va sola: vence en el Mantenimiento actual + N (mismo dato que las formas con turnos del mapa).
+    let venceMant = null;
+    if(o.turnos > 0){
+      try{ const m = await fbDb.doc(fbRutaCampana('mapa/mantenimiento')).get(); venceMant = Math.round(Number(m.exists ? m.data().numero : 0) || 0) + o.turnos; }
+      catch(e){ venceMant = null; }
+    }
+    const z = o.dejaZona;
     const lote = fbDb.batch();
     elegidas.forEach(c => {
       const linea = o.forma === 'linea';
       const celdasLinea = []; for(let i = 0; i < Math.max(1, Math.min(20, o.largo || 3)); i++) celdasLinea.push(0, i);   // recta hacia afuera: (0,0), (0,1), (0,2)…, rotada según hacia dónde mira
       lote.set(elCol.doc(), {
         tipo: linea ? 'linea' : 'flor', origen: {col: c.col, fila: c.fila}, celdas: linea ? celdasLinea : celdasFlor(o.radio || 0), rotacion: linea ? ((c.dir % 6) + 6) % 6 * 60 : 0,
-        color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#D9A21B', alfa: 45, solido: false, invisible: false,
+        color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#D9A21B', alfa: Number.isFinite(o.alfa) ? Math.max(10, Math.min(100, Math.round(o.alfa))) : 45, solido: false, invisible: false,
         imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
         ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma y vuelve a su dueño
         ...(o.estado && JSON.stringify(o.estado).length <= 300 ? {trampaEstado: JSON.stringify(o.estado)} : {}),
+        ...(venceMant !== null ? {turnos: o.turnos, venceMant} : {}),
+        // Trampa persistente: al dispararse queda como zona (el mapa la convierte, ver trampaResolver) — mismos campos que pone el mapa.
+        ...(z ? {trampaDejaZona: true, zonaTurnos: Math.max(1, Math.round(Number(z.zonaTurnos) || 3)), zonaEnMantenimiento: z.zonaEnMantenimiento !== false, zonaCadaPaso: !!z.zonaCadaPaso,
+          ...(z.zonaResistStat ? {zonaResistStat: String(z.zonaResistStat), zonaResistValor: Math.round(Number(z.zonaResistValor) || 12)} : {})} : {}),
         duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
     });

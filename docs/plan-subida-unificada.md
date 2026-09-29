@@ -235,7 +235,9 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
   `elemTrampaBibOrigen`). `Plantillas.trampa` suma `teleport`.
 - Las trampas preconstruidas que se eligen desde el editor de habilidades (ficha y gm-tools) no cambiaron: leen el
   mismo catálogo, que ahora muestra lo subido al instante.
-- P123 (una sola forma de trampa para el mapa y para las habilidades) sigue abierta: este paso no la necesitaba.
+- **P123 resuelta (mismo día): una sola forma de trampa** para el mapa, el catálogo y las habilidades
+  (`Plantillas.trampaDesde`, `TokensAuto.colocarTrampas({trampa})`, `AsistenteTrampa.aTrampa/inicialDe/resumenTexto`).
+  Ver `comun/CLAUDE.md`, "Una sola forma de trampa".
 - Verificado con la base de datos simulada en copias de la ficha, GM Tools y el mapa; no probado contra Firebase real.
 
 ## Pasos
@@ -251,6 +253,6 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
 | 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | ✅ 2026-09-29 (el mecanismo; el aviso en cada herramienta va en su paso) — ver "Paso 1: cómo quedó" · **falta pegar las reglas de Firestore** |
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | ✅ 2026-09-29 — ver "Paso 2: cómo quedó" |
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | ✅ 2026-09-29 — ver "Paso 3: cómo quedó" |
-| 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (P123, unificar las dos formas de trampa, sigue abierta) |
+| 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (incluye P123: una sola forma de trampa) |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | Pendiente |
 | 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | Pendiente |

@@ -2055,11 +2055,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
-<script src="../comun/tokens-auto.js?v=3"></script>
+<script src="../comun/tokens-auto.js?v=20260929e"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
-<script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/asistente-trampa.js?v=20260929e"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
@@ -2067,8 +2067,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929d"></script>
-<script src="../comun/biblioteca.js?v=20260929d"></script>
+<script src="../comun/plantillas.js?v=20260929e"></script>
+<script src="../comun/biblioteca.js?v=20260929e"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -10117,9 +10117,10 @@ $('#modal-body').addEventListener('change', e => {
 
 // Sección "Estado alterado al usar" (consumibles y habilidades).
 /* ---------- 🪤 Trampa de una habilidad (2026-09-24, pedido del dueño) ----------
-   Una habilidad del personaje puede colocar una trampa oculta en el mapa al ejecutarse: `h.trampaColocar = {nombre, detalle, dano,
-   ignoraDef, radio, cant}`. Se coloca sola al lado del token del personaje (comun/tokens-auto.js, igual que las de los creeps);
-   los demás no la ven hasta que la pisan. Sin trampa, la habilidad no toca el mapa. */
+   Una habilidad del personaje puede colocar una trampa oculta en el mapa al ejecutarse: `h.trampaColocar` = una trampa en la forma
+   única (P123: la misma del mapa y del catálogo, ver `Plantillas.trampaDesde` en comun/plantillas.js; las viejas {radio, cant,
+   estado:{…}} se traducen solas). Se coloca sola al lado del token del personaje (comun/tokens-auto.js, igual que las de los
+   creeps); los demás no la ven hasta que la pisan. Sin trampa, la habilidad no toca el mapa. */
 const TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
 /* Menú paso a paso (comun/asistente-trampa.js, 2026-09-25): reemplaza a los campos sueltos. Guarda también fuego amigo (`amiga`) y el estado que deja. */
 // Estados que puede dejar una trampa (los debuffs con duración de EstadosAplicar) y el spec {nombre, turnos} que se guarda.
@@ -10134,31 +10135,16 @@ function trampaEstadoSpec(nombre, turnos){
 function trampaAbrirAsistente(){
   const ed = editing, t = ed.draft.trampaColocar || {};
   AsistenteTrampa.abrir({
-    contexto: 'habilidad', editando: false, estados: trampaEstadosLista(),
-    inicial: {nombre: t.nombre || '', descripcion: t.detalle || '', radio: t.radio || 0, cant: t.cant || 1, amiga: !!t.amiga,
-      dano: TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '', contemplaArmadura: !t.ignoraDef,
-      estado: t.estado && t.estado.nombre || '', estadoTurnos: t.estado ? Number(t.estado.turnos) || 0 : 0},
+    contexto: 'habilidad', editando: false, estados: trampaEstadosLista(), inicial: AsistenteTrampa.inicialDe(t),
     alTerminar: res => {
       if(editing !== ed) return;
-      const nueva = {nombre: res.nombre.trim().slice(0, 40), detalle: AsistenteTrampa.detalleFinal(res), dano: res.dano || '', ignoraDef: !res.contemplaArmadura,
-        radio: Math.max(0, Math.min(6, res.radio)), cant: Math.max(1, Math.min(6, res.cant)), amiga: !!res.amiga};
-      const es = trampaEstadoSpec(res.estado, res.estadoTurnos);
-      if(es) nueva.estado = es;
-      ed.draft.trampaColocar = nueva;
+      ed.draft.trampaColocar = AsistenteTrampa.aTrampa(res);   // forma única (P123)
       drawEditor();
     },
     alCancelar: () => { if(editing === ed && ed.draft.trampaColocar && !String(ed.draft.trampaColocar.nombre || '').trim() && !ed.draft.trampaColocar.dano){ delete ed.draft.trampaColocar; drawEditor(); } },
   });
 }
-function trampaResumenTexto(t){
-  const p = [];
-  if(t.dano) p.push(`${t.dano} de daño ${t.ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
-  if(t.estado && t.estado.nombre) p.push(`deja ${t.estado.nombre}`);
-  if(!p.length) p.push('solo avisa cuando se activa');
-  p.push(`radio ${t.radio || 0}`); if((t.cant || 1) > 1) p.push(`×${t.cant}`);
-  p.push(t.amiga ? 'daña también a aliados en el área' : 'el efecto solo alcanza a rivales');
-  return p.join(' · ');
-}
+const trampaResumenTexto = t => AsistenteTrampa.resumenTexto(t);
 function trampaHtml(draft){
   const t = draft.trampaColocar || null;
   const campo = (k, etiqueta, tipo, extra) => `<div class="f"><label>${etiqueta}</label><input data-tr="${k}" type="${tipo}" value="${esc(t && t[k] !== undefined ? t[k] : '')}" ${extra || ''}></div>`;
@@ -10170,7 +10156,7 @@ function trampaHtml(draft){
 }
 function trampaGuardarCampo(el){
   const d = editing.draft, k = el.dataset.tr;
-  if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, radio: 0, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; drawEditor(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaAbrirAsistente(); return; }
+  if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, tipo: 'flor', tamano: 1, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; drawEditor(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaAbrirAsistente(); return; }
   const t = d.trampaColocar; if(!t) return;
   if(k === 'ignoraDef') t[k] = el.checked;
   else if(k === 'radio' || k === 'cant') t[k] = Math.max(k === 'cant' ? 1 : 0, Math.min(6, Math.round(num(el.value) || 0)));
@@ -10198,10 +10184,9 @@ async function colocarTrampaDeItem(it){
   if(!d || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id){ toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
   try{
     const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
-    const linea = d.tipo === 'linea';
-    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', nombre: String(d.nombre || it.nombre).slice(0, 40), detalle: d.detalle || '', dano, ignoraDef: !!d.ignoraDef,
-      forma: linea ? 'linea' : 'flor', radio: linea ? 0 : (num(d.tamano) || 1), largo: linea ? (num(d.tamano) || 3) : 0, color: d.color, cant: 1, fuegoAmigo: !!d.amiga,
-      estado: d.estado ? {nombre: d.estado, turnos: num(d.estadoTurnos)} : null,
+    // Forma única de trampa (P123): el `tamano` de la flor es 1 = una casilla (antes se tomaba como radio y salía una flor de más).
+    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj',
+      trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
       item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
     if(r.colocadas){ toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
     toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
@@ -10213,8 +10198,7 @@ async function colocarTrampaDeHab(h){
   if(!t || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id) return;
   try{
     const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
-    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', nombre: String(t.nombre || '').trim() || h.nombre, detalle: t.detalle || '',
-      dano, ignoraDef: !!t.ignoraDef, radio: t.radio || 0, cant: t.cant || 1, fuegoAmigo: !!t.amiga, estado: t.estado && t.estado.nombre ? t.estado : null});
+    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', trampa: {...t, nombre: String(t.nombre || '').trim() || h.nombre, dano}});
     if(r.colocadas) toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
     else toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
   }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
@@ -10232,8 +10216,12 @@ function trampaPreconstruidas(){
       qs.push({clave: 'cant', min: 1, texto: '¿Cuántas trampas coloca cada vez que la ejecutás?'});
       const r = await EstadoPreguntas.preguntar({titulo: 'Trampa', nombre: datos.nombre}, qs, x => x);
       if(!r || editing !== ed) return;
-      ed.draft.trampaColocar = {nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '', ignoraDef: !!datos.ignoraDef,
-        radio: Math.max(0, Math.min(6, r.radio)), cant: Math.max(1, Math.min(6, r.cant)), amiga: !!datos.amiga};
+      // La trampa del catálogo entera (forma única, P123: con su estado, color y la zona que deja), con el tamaño, el daño y la
+      // cantidad que se eligieron recién. Si es una línea, el "radio" que se preguntó se toma como su largo.
+      const base = Plantillas.trampaDesde(datos);
+      ed.draft.trampaColocar = {...base, nombre: String(datos.nombre || '').slice(0, 40), detalle: String(datos.detalle || '').slice(0, 200), dano: r.dano || '',
+        tamano: base.tipo === 'linea' ? Math.max(1, Math.min(20, r.radio || 1)) : Math.max(0, Math.min(6, r.radio)) + 1, cant: Math.max(1, Math.min(6, r.cant))};
+      delete ed.draft.trampaColocar.teleport;   // el teleport no lo coloca una habilidad (su destino se marca en el mapa)
       drawEditor();
       toast(`Trampa "${datos.nombre}" cargada`);
     },

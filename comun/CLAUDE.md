@@ -367,6 +367,41 @@ versión parecida en más de una, es candidato a juntar.
   ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
   modo `'arma'`, sin conectar del lado de gm-tools todavía.
 
+- **⚡ Critical Matters: efectos que solo pasan si el golpe es crítico (2026-09-29, pedido del dueño, auditando
+  Lisiar — "un efecto que es de una manera si no es crítico, y de una manera más intensa si el golpe sí es
+  crítico")**: en el paso "Al pegar" del 🎯/✨, solo para modo `'arma'` (el único que puede critear), un checkbox
+  nuevo **⚡ Critical Matters** destapa una segunda tanda de ◎ Estado / 💚 Cura / Personalizar — **el mismo
+  andamiaje de siempre, duplicado**, que se guarda en `duelo.critico = {efectos, efectosNota}` (top-level, al
+  lado de `duelo.efectos`/`efectosNota`, no adentro de `duelo.arma`: es "qué pasa si pega", no un arreglo del
+  ataque en sí). Se **suma** a los efectos de siempre, no los reemplaza — Lisiar por ejemplo lleva la Lesión
+  −1 PG de siempre en `efectos`, y en `critico.efectos` un texto libre aclarando que pasa a −2 fijo.
+  - **Generalización del paso "Efectos" para no duplicar código**: `filaEstadoPresetHtml`/`filaEstadoManualHtml`
+    ya tomaban `(e, i)` con `i` como clave de fila en los `data-ef-*`; ahora `i` puede ser un número (lista de
+    siempre) o `'c'+número` (lista de Critical Matters) — `efRef(clave)` (nuevo, en el bloque de handlers)
+    resuelve la clave al array real (`st.efectos` o `st.efectosCritico`) y al índice adentro, así **una sola
+    fila de handlers sirve para las dos listas** (`data-ef-nombre`, `-stat`, `-val`, `-turnos`, `-escudo`,
+    `-cura`, `-x`, `-recambiar`). `data-ef-mas` distingue con un prefijo (`"estado"`/`"cura"` vs
+    `"c:estado"`/`"c:cura"`) a cuál de las dos empuja.
+  - **`comun/duelo.js`**: `Duelo.crear()` sanea `cfg.ataque.critico` igual que `cfg.ataque.efectos`/`efectosNota`
+    (mismo `limpiarEfectos`, mismo tope de 8 y de 200 caracteres) y lo guarda en `inicial.ataque.critico` — sin
+    esto, mismo bug real que ya tuvieron `ignoraResistCrit` y `critBono`/`critpotBono` (se ve bien en el
+    asistente, no persiste). `entrarCritico` ya resuelve `d.crit` ANTES de la fase de daño, así que al tirar el
+    daño (`campo === 'dano'`, donde ya se arma `extra.efectos` con lo de la propia arma + `d.ataque.efectos`) se
+    suma también `d.ataque.critico.efectos` **si y solo si** `d.crit.critico` es `true` — mismo mecanismo de
+    "recordar y tirar, no aplicar" que ya usan `efectosArma`/`d.ataque.efectos` (el estado se muestra con su
+    botón «Aplicar», no se escribe solo). `efectosHtml` agrega una tarjeta aparte **"⚡ Crítico: …"** con
+    `d.ataque.critico.efectosNota`, con la misma condición (`d.crit && d.crit.critico`) — no aparece si el golpe
+    no fue crítico, aunque la habilidad tenga el texto cargado.
+  - **`ficha-personaje/ficha.html`**: `ataqueDeHabArma` mapea `c.critico.efectos` con el mismo `mapEf` que ya
+    usaba para `c.efectos` (mismo shape `{nombre, caras, exitos, spec, cura, detalle}`) y pasa `c.critico.efectosNota`
+    por `sustituirX` igual que `c.efectosNota` (por si el texto usa «X»).
+  - **Verificado de punta a punta** (no solo por sintaxis): la ventana del asistente arma el `duelo.critico`
+    esperado; `Duelo.crear()` contra un Firestore simulado lo persiste saneado; un doc de duelo armado a mano
+    con `d.crit.critico: true` muestra la tarjeta del estado y la nota "⚡ Crítico: …" (con `d.crit.critico:
+    false` no aparece ninguna de las dos, confirmando que la condición realmente filtra y no que siempre se
+    muestre). Sin conectar del lado de gm-tools (mismo alcance que `critBono`/`ignoraResistCrit`: los creeps no
+    tienen `ataqueDeHabArma` propio todavía).
+
 - **Paso "Efectos": mismo "Personalizar" que Tirada y Daño (2026-09-27, pedido del dueño)**: además de los
   ◎ Estado/💚 Cura de siempre, un checkbox "Personalizar: tiene otro efecto que no está en la lista" abre un
   texto libre (`efectosNota`) — para algo que no encaja como estado ni como cura (ej. "invertí el orden de

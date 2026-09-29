@@ -361,7 +361,13 @@ const Duelo = (() => {
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
-          ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {})}
+          ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
+          // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver
+          // entrarCritico/efectosHtml) — mismo saneo que los de siempre, adentro de un campo aparte.
+          ...(cfg.ataque.critico ? {critico: {
+            ...(cfg.ataque.critico.efectos && cfg.ataque.critico.efectos.length ? {efectos: limpiarEfectos(cfg.ataque.critico.efectos)} : {}),
+            ...(cfg.ataque.critico.efectosNota ? {efectosNota: txtCorto(cfg.ataque.critico.efectosNota, 200)} : {}),
+          }} : {})}
         : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
@@ -1237,9 +1243,12 @@ const Duelo = (() => {
     // Efecto personalizado (2026-09-27, pedido del dueño — mismo criterio que `efectoLibre` en el veredicto):
     // texto libre, sin tirada ni botón «Aplicar», se muestra igual haya o no efectos automáticos.
     const nota = (d.hab && d.hab.efectosNota) || (d.ataque && d.ataque.efectosNota) || '';
+    // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar): el texto libre de "si es crítico" solo se
+    // muestra cuando el golpe SALIÓ crítico — d.crit ya está resuelto a esta altura (se evalúa antes del daño).
+    const notaCritico = (d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectosNota) || '';
     // «Se resiste con» a mano (2026-09-28): la habilidad tira igual pero no hay stat automático que la resista.
     const contraOtro = (d.hab && d.hab.contraOtro) || '';
-    if(!efs.length && !nota && !contraOtro) return '';
+    if(!efs.length && !nota && !notaCritico && !contraOtro) return '';
     const puedeAtq = esMio(d.atacante) || soyGM();
     const cards = efs.map((ef, i) => {
       const clave = d.id + ':ef' + i;
@@ -1265,7 +1274,8 @@ const Duelo = (() => {
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
     const contraCard = contraOtro ? `<div class="duelo-ef"><div class="duelo-nota">✋ Se resiste con: ${_esc(contraOtro)}</div></div>` : '';
-    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '');
+    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '')
+      + (notaCritico ? `<div class="duelo-ef"><div class="duelo-nota">⚡ Crítico: ${_esc(notaCritico)}</div></div>` : '');
     const pendiente = d.fase === 'efectos' && efs.length;
     return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
   }
@@ -1672,7 +1682,11 @@ const Duelo = (() => {
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
       if(!d.hab && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
-      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...((d.ataque && d.ataque.efectos) || [])]};
+      // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
+      // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
+      // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.
+      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...((d.ataque && d.ataque.efectos) || []),
+        ...((d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectos) || [])]};
       if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
       let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');

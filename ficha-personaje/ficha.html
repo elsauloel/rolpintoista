@@ -4399,11 +4399,20 @@ function ataqueDeHabArma(it, arma, xSp, xNitros){
   const c = dueloDe(it);
   if(!c || c.modo !== 'arma' || typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   const a = c.arma || {}, X = c.x === 'sp' ? num(xSp) : num(xNitros);
-  const efectos = (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined}, cura: num(e.cura), detalle: e.detalle || ''}));
+  const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : undefined}, cura: num(e.cura), detalle: e.detalle || ''});
+  const efectos = (c.efectos || []).map(mapEf);
+  // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar): efectos/nota que SOLO se suman si el golpe
+  // termina siendo crítico. Mismo mapeo que los efectos de siempre; comun/duelo.js los suma a d.efectos y
+  // a la nota del cuadro nada más que cuando d.crit.critico es true (ver entrarCritico/efectosHtml).
+  const critico = c.critico ? {
+    ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),
+    ...(c.critico.efectosNota ? {efectosNota: sustituirX(c.critico.efectosNota, X)} : {}),
+  } : null;
   return {tipo: 'habilidad-arma', habNombre: it.nombre, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango),
     alcance: c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHab(c, 'pdg') : alcanceDeArma(arma), sinParry: !!a.sinParry,
     mods: {pdg: num(a.pdg) + num(a.pdgPorX) * X, dados: num(a.dadosPorX) * X, fijo: num(a.fijo) + num(a.fijoPorX) * X, ignoraResistCrit: num(a.ignoraResistCrit), critBono: num(a.critBono), critpotBono: num(a.critpotBono)}, efectos,
-    ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {})};
+    ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
+    ...(critico && Object.keys(critico).length ? {critico} : {})};
 }
 function xDeHab(it, xSp, xNitros){ return spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0; }
 // Reemplaza el token «X» (sin importar mayúsculas) de una fórmula de dados o de un texto libre por un número —

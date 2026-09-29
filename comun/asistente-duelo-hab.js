@@ -153,6 +153,16 @@ const AsistenteDueloHab = (() => {
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, ...((ini && ini.arma) || {})},
+      // Critical Matters (2026-09-29, pedido del dueño — Lisiar: "Crítico frecuente ×1... si es crítico, el
+      // efecto pasa a -2 fijo"): SOLO tiene sentido en modo 'arma' (es el único que puede critear). Mismo
+      // andamiaje que los Efectos de siempre (◎ Estado/💚 Cura + Personalizar), pero una lista APARTE
+      // (`efectosCritico`) que solo se suma a los de siempre si el golpe termina siendo crítico — se guarda en
+      // `duelo.critico` (top-level, al lado de `duelo.efectos`/`efectosNota`, no adentro de `duelo.arma`: son
+      // "qué pasa si pega" igual que los de siempre, no un arreglo del ataque en sí).
+      critMatters: !!(ini && ini.critico),
+      efectosCritico: ini && ini.critico && Array.isArray(ini.critico.efectos) ? ini.critico.efectos.map(e => ({...e})) : [],
+      efectosNotaCriticoOn: !!(ini && ini.critico && ini.critico.efectosNota),
+      efectosNotaCritico: (ini && ini.critico && ini.critico.efectosNota) || '',
       // ¿Cuánto cuesta ejecutarla? (2026-09-27, pedido del dueño: "al principio te tiene que preguntar qué se
       // cobra al ejecutar" — antes solo vivía en el paso "Costo" del editor de la habilidad, aparte del 🎯).
       // Mismo dato de siempre (it.costo/nitrosCosto/hpCosto): este paso lo lee y lo escribe también, así el 🎯
@@ -357,17 +367,38 @@ const AsistenteDueloHab = (() => {
           <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>
           <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>`;
     }
+    // Filas de una lista de efectos (◎ Estado / 💚 Cura). `clave(i)` arma la clave que llevan los data-attribute
+    // (ver efRef) — así la misma función sirve para `st.efectos` (clave = i) y `st.efectosCritico` (clave = 'c'+i).
+    function filaEfectosLista(lista, clave){
+      return lista.map((e, i) => e.cura !== undefined
+        ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${clave(i)}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
+        : e.origen === 'preset' ? filaEstadoPresetHtml(e, clave(i)) : filaEstadoManualHtml(e, clave(i))).join('');
+    }
     function cuerpoEfectos(){
       let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : 'Efectos sobre el objetivo', 'Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.');
-      h += st.efectos.map((e, i) => e.cura !== undefined
-        ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
-        : e.origen === 'preset' ? filaEstadoPresetHtml(e, i) : filaEstadoManualHtml(e, i)).join('');
+      h += filaEfectosLista(st.efectos, i => i);
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
         <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
       if(st.efectosNotaOn){
         h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
           <p class="nota" style="margin-top:6px">Este texto se muestra junto a los demás efectos, sin botón «Aplicar» — para resolverlo a mano.</p>`;
+      }
+      // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar: bono al crítico + un efecto que es más
+      // intenso si el golpe termina siendo crítico). Solo tiene sentido en modo 'arma' (el único que puede
+      // critear); mismo andamiaje de arriba, en una lista aparte que se SUMA a la de siempre solo si pega crítico.
+      if(st.modo === 'arma'){
+        h += `<div class="fila" style="margin-top:18px;padding-top:14px;border-top:1px solid #2b3347"><label class="op" style="padding:0"><input type="checkbox" data-critmatters ${st.critMatters ? 'checked' : ''}> ⚡ Critical Matters: si el golpe es crítico, pasa algo más (además de lo de arriba)</label></div>`;
+        if(st.critMatters){
+          h += `<p class="nota" style="margin:4px 0 8px">Esto se suma a los efectos de arriba SOLO si el golpe resulta crítico — no reemplaza nada, se agrega. Si no es crítico, esta parte no pasa nada.</p>`;
+          h += filaEfectosLista(st.efectosCritico, i => 'c' + i);
+          h += `<div class="fila"><button type="button" class="sec" data-ef-mas="c:estado">＋ Estado (si es crítico)</button><button type="button" class="sec" data-ef-mas="c:cura">＋ Cura (si es crítico)</button></div>`;
+          h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnotacritico-on ${st.efectosNotaCriticoOn ? 'checked' : ''}> Personalizar: un efecto libre que solo pasa si es crítico</label></div>`;
+          if(st.efectosNotaCriticoOn){
+            h += `<textarea data-efectosnotacritico rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. La lesión pasa a -2 fijo a la PdG por 2 turnos.">${esc(st.efectosNotaCritico)}</textarea>
+              <p class="nota" style="margin-top:6px">Se muestra en el cuadro del duelo, junto a los demás efectos, SOLO cuando el golpe sale crítico — sin botón «Aplicar», para resolverlo a mano.</p>`;
+          }
+        }
       }
       return h;
     }
@@ -419,9 +450,16 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
-        const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
-        filas.push(`<b>Efectos</b>: ${efTxt || 'ninguno'}`);
+        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
+        filas.push(`<b>Efectos</b>: ${efTxtDe(st.efectos) || 'ninguno'}`);
         if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
+        if(st.modo === 'arma' && st.critMatters){
+          const partesCrit = [];
+          const efTxtCrit = efTxtDe(st.efectosCritico);
+          if(efTxtCrit) partesCrit.push(efTxtCrit);
+          if(st.efectosNotaCriticoOn && st.efectosNotaCritico.trim()){ const t = st.efectosNotaCritico.trim(); partesCrit.push(esc(t.length > 90 ? t.slice(0, 90) + '…' : t)); }
+          filas.push(`<b>⚡ Si es crítico, además</b>: ${partesCrit.join(' · ') || '(nada cargado todavía)'}`);
+        }
       }
       h += `<div class="adh-resumen">${filas.join('<br>')}</div>`;
       return h;
@@ -490,31 +528,42 @@ const AsistenteDueloHab = (() => {
       q('[data-efectolibre]', e => { st.efectoLibre = e.target.value; });
       q('[data-efectosnota-on]', e => { st.efectosNotaOn = e.target.checked; dibujar(); });
       q('[data-efectosnota]', e => { st.efectosNota = e.target.value; });
+      q('[data-critmatters]', e => { st.critMatters = e.target.checked; dibujar(); });
+      q('[data-efectosnotacritico-on]', e => { st.efectosNotaCriticoOn = e.target.checked; dibujar(); });
+      q('[data-efectosnotacritico]', e => { st.efectosNotaCritico = e.target.value; });
+      // Una clave de fila es 'c'+i (lista de Critical Matters) o directamente i (lista de siempre) — efRef la
+      // resuelve al array real y al índice adentro. Mismas filas/handlers para las dos listas, sin duplicar código.
+      const efRef = clave => { const s = String(clave); return s.startsWith('c') ? {arr: st.efectosCritico, i: +s.slice(1)} : {arr: st.efectos, i: +s}; };
       f.querySelectorAll('[data-ef-nombre]').forEach(i => i.onchange = () => {
-        const ef = st.efectos[+i.dataset.efNombre];
+        const {arr, i: idx} = efRef(i.dataset.efNombre);
+        const ef = arr[idx];
         ef.nombre = i.value.trim();
         // Al elegir un preset con escudo (Escudo especial/Barrera) y no haber tocado nada todavía, precarga sus
         // valores de siempre — se pueden cambiar igual, es solo para no arrancar de cero (2026-09-28).
         const preset = BUFF_PRESETS.find(p => p.nombre === ef.nombre);
         if(preset && !ef.escudo && !ef.stat){ ef.escudo = preset.escudoMagico; ef.turnos = preset.turnos; dibujar(); }
       });
-      f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efStat].stat = i.value; });
-      f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efVal].val = Number(i.value) || 0; });
-      f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efTurnos].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
-      f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efEscudo].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
-      f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efCura].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
-      f.querySelectorAll('[data-ef-x]').forEach(b => b.onclick = () => { st.efectos.splice(+b.dataset.efX, 1); dibujar(); });
+      f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efStat); arr[idx].stat = i.value; });
+      f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efVal); arr[idx].val = Number(i.value) || 0; });
+      f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efTurnos); arr[idx].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
+      f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efEscudo); arr[idx].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
+      f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efCura); arr[idx].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
+      f.querySelectorAll('[data-ef-x]').forEach(b => b.onclick = () => { const {arr, i: idx} = efRef(b.dataset.efX); arr.splice(idx, 1); dibujar(); });
       // «◎ Estado»: con cfg.elegirEstado (el selector real de la página, ver docblock), abre ese menú en vez de
       // reinventar uno acá — «Empezar en blanco» cae en los campos de siempre (filaEstadoManualHtml).
       const efectoDePreset = r => ({origen: 'preset', nombre: r.nombre, turnos: r.turnos, permanente: !!r.permanente, hp: r.hp || 0, mods: r.mods || [], stacks: r.stacks || 1, escudo: r.escudoMagico || 0, detalle: r.detalle || '', polaridad: r.polaridad});
       f.querySelectorAll('[data-ef-mas]').forEach(b => b.onclick = async () => {
-        if(b.dataset.efMas === 'cura'){ st.efectos.push({cura: 5}); dibujar(); return; }
+        // data-ef-mas es "estado"/"cura" (lista de siempre) o "c:estado"/"c:cura" (Critical Matters).
+        const esCritico = b.dataset.efMas.startsWith('c:');
+        const tipo = esCritico ? b.dataset.efMas.slice(2) : b.dataset.efMas;
+        const arr = esCritico ? st.efectosCritico : st.efectos;
+        if(tipo === 'cura'){ arr.push({cura: 5}); dibujar(); return; }
         if(cfg.elegirEstado){
           const r = await cfg.elegirEstado();
           if(!r) return;
-          st.efectos.push(r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'});
+          arr.push(r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'});
         }else{
-          st.efectos.push({nombre: nombresEstado()[0] || 'Estado', turnos: 2, origen: 'manual'});
+          arr.push({nombre: nombresEstado()[0] || 'Estado', turnos: 2, origen: 'manual'});
         }
         dibujar();
       });
@@ -522,8 +571,8 @@ const AsistenteDueloHab = (() => {
         if(!cfg.elegirEstado) return;
         const r = await cfg.elegirEstado();
         if(!r) return;
-        const i = +b.dataset.efRecambiar;
-        st.efectos[i] = r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'};
+        const {arr, i} = efRef(b.dataset.efRecambiar);
+        arr[i] = r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'};
         dibujar();
       });
       const bq = f.querySelector('[data-quitar]');
@@ -543,6 +592,15 @@ const AsistenteDueloHab = (() => {
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
           if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
+          // ⚡ Critical Matters: solo se manda si está tildado Y tiene algo cargado (si se destilda, o se deja
+          // vacío, `critico` no viaja — mismo criterio que efectosNota).
+          if(st.critMatters){
+            const efsCrit = st.efectosCritico.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
+            const critico = {};
+            if(efsCrit.length) critico.efectos = efsCrit;
+            if(st.efectosNotaCriticoOn && st.efectosNotaCritico.trim()) critico.efectosNota = st.efectosNotaCritico.trim();
+            if(Object.keys(critico).length) o2.critico = critico;
+          }
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);

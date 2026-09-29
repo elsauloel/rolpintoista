@@ -5366,7 +5366,8 @@ function renderBotoneraInv(){
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
     {stat:'eva', nombre:'Esquivar (Eva)', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    {stat:'parry', nombre:`Parry · 1 No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < 1, clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < 1 ? 'Sin No2 · ' : ''}Cuesta 1 No2`, attr:`data-invtirarstat="${inv.id}:parry"`},
+    // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha).
+    ...(inv.armaNombre ? [{stat:'parry', nombre:`Parry · 1 No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < 1, clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < 1 ? 'Sin No2 · ' : ''}Cuesta 1 No2`, attr:`data-invtirarstat="${inv.id}:parry"`}] : []),
     {stat:'bloqueo', nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
   ];
   const tilesCombate = combate.map(c => {
@@ -10955,9 +10956,11 @@ window.DUELO_HOOKS = {
     const inv = dueloInvDe(d.defensor);
     if(inv){
       const c = 1;
-      return [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]},
-        {modo: 'parry', itemId: '', itemNombre: inv.armaNombre || 'su arma', etiqueta: `🗡 Parry · ${inv.armaNombre || 'su arma'}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
-          info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(invStatValor(inv, 'bloqueo') + pesoArmaInv(inv))}`]}];
+      const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]}];
+      // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha).
+      if(inv.armaNombre) ops.push({modo: 'parry', itemId: '', itemNombre: inv.armaNombre, etiqueta: `🗡 Parry · ${inv.armaNombre}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
+        info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(invStatValor(inv, 'bloqueo') + pesoArmaInv(inv))}`]});
+      return ops;
     }
     const sobre = compute().sobrecarga;
     // Con sobrepeso (el equipo pasa el Crg.Max) la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.

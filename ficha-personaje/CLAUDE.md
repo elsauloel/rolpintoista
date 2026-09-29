@@ -474,7 +474,9 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   (el texto del tooltip del botón) dice lo mismo en vez de mostrar un costo que ya no aplica. La fórmula de
   costo (`costoParryNitros`, Peso del arma, 0 sin nada) no cambió — lo que cambió es que ahora, sin arma ni
   escudo, no hay ninguna opción de Parry para elegir, ni desde el duelo ni desde el botón suelto.
-  **Sin tocar todavía**: las invocaciones (siguen ofreciendo Parry siempre, `inv.armaNombre || 'su arma'`) y los
-  creeps de gm-tools (`DUELO_HOOKS.opcionesDefensa` en gm-tools.html, mismo `sc.armaNombre || 'su arma'`) — no
-  se sabe si esos dos casos deberían seguir la misma regla o si un creep/invocación sin arma puede considerarse
-  "a mano limpia" a propósito; es una pregunta de diseño nueva, no una omisión.
+  **Misma regla para invocaciones y creeps (P121, `docs/preguntas-abiertas.md`, resuelta el mismo día — "invocaciones
+  y GM Tools van a seguir las mismas reglas")**: la fila de combate de una invocación (`ficha.html`) y de un creep
+  (`gm-toolset/gm-tools.html`) ya no ofrecen Parry si `!inv.armaNombre`/`!sc.armaNombre`, ni en su propia lista de
+  tiradas ni en el `DUELO_HOOKS.opcionesDefensa` de cada archivo — mismo criterio (nombre de arma vacío = sin
+  arma). Un arma natural (garras, colmillos…) puesta en `armaNombre` sigue contando como arma, así que un creep
+  con arma natural no pierde Parry.

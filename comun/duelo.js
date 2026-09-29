@@ -359,7 +359,8 @@ const Duelo = (() => {
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: 0, rango: true}
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
-          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
+          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
+            critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {})}
         : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
@@ -533,16 +534,22 @@ const Duelo = (() => {
     // defensor antes de calcular el crítico — a la vista en la cuenta y en los cuadraditos, como cualquier otra.
     const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit);
     const resistencia = Math.max(0, _num(dd.resistencia) - ignora);
+    // Crítico frecuente/potente "solo esta tirada" (2026-09-29, pedido del dueño — Lisiar: el bono no puede
+    // quedar como un estado de al menos 1 turno, que podría alcanzar a un ataque posterior). A diferencia de
+    // un Efecto sobre uno mismo (que sí deja un estado real), esto se suma acá nomás, para ESTE golpe: no
+    // escribe nada en la ficha ni en S.efectos.
+    const frecuente = _num(dd.frecuente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critBono);
+    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono);
     let e = null;
     if(typeof Critico !== 'undefined' && m.pdg && m.eva){
-      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia});
+      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
     }
     if(e && e.critico){
-      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia, d20: null, mejor: 0, mult: 1};
+      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1};
       m.fase = 'critico';
       m.estado = 'esperando';
     }else{
-      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente: _num(dd.frecuente), potente: _num(dd.potente), resistencia, d20: null, mejor: 0, mult: 1} : null;
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1} : null;
       entrarDano(m);
     }
   }
@@ -1397,9 +1404,14 @@ const Duelo = (() => {
     const titulo = (clase, txt) => `<div class="duelo-crit-titulo ${clase}">${txt}</div>`;
     const explica = lineas => `<div class="duelo-crit-explica">${lineas.map(l => `<div>${_esc(l)}</div>`).join('')}</div>`;
     const ignoraResistCrit = _num(d.ataque && d.ataque.mods && d.ataque.mods.ignoraResistCrit);
+    const critBono = _num(d.ataque && d.ataque.mods && d.ataque.mods.critBono);
+    const critpotBono = _num(d.ataque && d.ataque.mods && d.ataque.mods.critpotBono);
+    const nombreHab = d.hab ? d.hab.nombre : d.ataque.habNombre || 'Esta habilidad';
     const lCuenta = [`PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} de diferencia`,
       `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''})`,
-      ...(ignoraResistCrit ? [`${_esc(d.hab ? d.hab.nombre : d.ataque.habNombre || 'Esta habilidad')} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
+      ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
+      ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
+      ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
     const viz = criticoVizHtml(d);

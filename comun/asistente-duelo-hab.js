@@ -152,7 +152,7 @@ const AsistenteDueloHab = (() => {
       radio: (ini && ini.radio) || 2,   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
-      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, ...((ini && ini.arma) || {})},
+      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, ...((ini && ini.arma) || {})},
       // ¿Cuánto cuesta ejecutarla? (2026-09-27, pedido del dueño: "al principio te tiene que preguntar qué se
       // cobra al ejecutar" — antes solo vivía en el paso "Costo" del editor de la habilidad, aparte del 🎯).
       // Mismo dato de siempre (it.costo/nitrosCosto/hpCosto): este paso lo lee y lo escribe también, así el 🎯
@@ -244,7 +244,9 @@ const AsistenteDueloHab = (() => {
         <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
         <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>
         <label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
-        ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}`;
+        ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
+        ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}
+        <p class="nota" style="margin-top:2px">A diferencia de un «Efecto sobre uno mismo» (que dura al menos 1 turno y podría alcanzar a otro ataque), estos dos suman solo para EL crítico de este ataque puntual — no dejan ningún estado activo.</p>`;
       return h;
     }
     function cuerpoObjetivo(){
@@ -395,6 +397,8 @@ const AsistenteDueloHab = (() => {
         if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
         if(a.sinParry) partes.push('no se puede parrear');
         if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
+        if(a.critBono) partes.push(`+${a.critBono} Crítico frecuente (solo esta tirada)`);
+        if(a.critpotBono) partes.push(`+${a.critpotBono} Crítico potente (solo esta tirada)`);
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{

@@ -352,6 +352,21 @@ versión parecida en más de una, es candidato a juntar.
   al sanear el doc antes de escribirlo en Firestore, así que el checkbox no hacía nada en la partida real (sí se
   veía bien en el resumen del asistente, por eso no se notó antes). Ya está en la lista.
 
+- **+Crítico frecuente/potente "solo esta tirada" en "Ataque con mi arma, con arreglos" (2026-09-29, pedido del
+  dueño, auditando Lisiar)**: mismo espíritu que "Ignora Resistencia a crítico" de arriba, pero para el rango del
+  crítico en vez de la resistencia — dos campos nuevos del paso "Tu ataque", `duelo.arma.critBono`/`critpotBono`.
+  La diferencia con darle el bono como un "Efecto sobre uno mismo" (`efectoMods` con `crit`/`critpot`) es a
+  propósito: un efecto **dura al menos 1 turno** (mínimo del asistente de estados) y por lo tanto podría alcanzar
+  a un ataque posterior dentro del mismo turno — Lisiar necesita que el bono cuente **solo para el ataque de esta
+  habilidad puntual**, sin dejar ningún estado. `ataqueDeHabArma` (ficha.html) los pasa en
+  `mods.critBono`/`mods.critpotBono`; `Duelo.crear()` los suma a la lista blanca de `ataque.mods` que sí persiste
+  (mismo bug real que ya tuvo `ignoraResistCrit`: sin sumarlos ahí, el checkbox se ve bien en el asistente pero no
+  hace nada en la partida); `entrarCritico` (`comun/duelo.js`) los suma a `frecuente`/`potente` ANTES de
+  `Critico.evaluar` (no después: así también corrigen el rango del crítico y no solo el multiplicador), con su
+  propia línea en la explicación ("Lisiar suma +1 a tu Crítico frecuente, solo en esta tirada."). No toca `S.efectos`
+  ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
+  modo `'arma'`, sin conectar del lado de gm-tools todavía.
+
 - **Paso "Efectos": mismo "Personalizar" que Tirada y Daño (2026-09-27, pedido del dueño)**: además de los
   ◎ Estado/💚 Cura de siempre, un checkbox "Personalizar: tiene otro efecto que no está en la lista" abre un
   texto libre (`efectosNota`) — para algo que no encaja como estado ni como cura (ej. "invertí el orden de

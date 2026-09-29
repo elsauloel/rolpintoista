@@ -12248,8 +12248,14 @@ function fichaIdentidadRender(){
 // El GM también la mira, pero puede pasar a editarla (para ayudar a un jugador
 // nuevo a configurar habilidades, automatizarlas, etc.): f.editaGM.
 function fichaSoloLecturaPara(duenoUid, f){
+  // Tu propio personaje nunca arranca en solo lectura, seas GM o no (2026-09-29, bug real: un GM que también
+  // juega con su propio PJ —"múltiples cuentas, mismo dueño" no aplica acá, es la MISMA cuenta con los dos roles—
+  // lo abría en solo lectura por defecto, como si fuera de otro jugador, y las habilidades con duelo (que
+  // chequean fichaVivo.soloLectura) no hacían nada, sin ningún aviso). El resto de las reglas de GM (fichas
+  // ajenas en solo lectura salvo "Editar como GM") sigue igual.
+  if(duenoUid === fbUsuario.uid) return false;
   if(fbMiembro.gm) return !(f && f.editaGM);
-  return duenoUid !== fbUsuario.uid;
+  return true;
 }
 
 async function fichaAlternarEdicionGM(){

@@ -313,6 +313,26 @@ explícita del GM, no el estado por defecto, para no tocar una ficha sin querer.
 `fichas/{id}/partes/*`). Si el dueño y el GM editan a la vez, gana el último
 que guarda cada parte (igual que con dos ventanas del mismo jugador).
 
+- **Bug real: el GM abría en solo lectura hasta su PROPIO personaje (2026-09-29,
+  reportado por el dueño: Blindaje "no pasaba nada" ejecutado desde la Botonera
+  del mapa, pero sí andaba abriendo la ficha suelta)**. `fichaSoloLecturaPara(duenoUid, f)`
+  decidía solo lectura con `if(fbMiembro.gm) return !(f && f.editaGM)` — es decir,
+  **cualquier ficha, sin excepción, si quien la abre es GM** — sin comparar
+  `duenoUid` contra el propio uid. El dueño juega con su propia cuenta de GM Y
+  con su propio personaje en la misma partida (no es el caso de "múltiples
+  cuentas, mismo dueño": acá es la MISMA cuenta con los dos roles a la vez), así
+  que su PJ se abría en solo lectura por defecto como si fuera de otro
+  jugador — y como las habilidades con duelo chequean `fichaVivo.soloLectura`
+  (`habDueloDe`) y cortan en silencio si es `true`, Ejecutar no hacía nada, sin
+  ningún toast ni error en consola (el camino viejo, `tirarPrimeraDeHab`, al que
+  cae de rebote, tampoco avisa si la habilidad no tiene stat ni fórmula, como
+  Blindaje). Fix: `fichaSoloLecturaPara` primero chequea `duenoUid ===
+  fbUsuario.uid` — tu propio personaje nunca arranca en solo lectura, seas GM o
+  no — y deja el resto de las reglas de GM sin cambios (fichas ajenas siguen en
+  solo lectura salvo "Editar como GM"). Por qué la ficha suelta SÍ funcionaba:
+  ahí el dueño probablemente estaba con otra sesión/cuenta (jugador, no GM) —
+  ver `multiples-cuentas-mismo-dueno` en la memoria del asistente.
+
 **Título de la pestaña** (2026-09-19): "Ficha — <personaje> · <partida>" con un
 personaje abierto, y "Ficha de personaje — <partida>" sin ninguno
 (`fichaIdentidadRender`, que se llama al abrir, soltar y renombrar).

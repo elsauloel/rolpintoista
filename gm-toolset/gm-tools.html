@@ -4036,7 +4036,11 @@ function presetBtnHtmlCreep(p, valor, clase){
 }
 
 let presetsCreepScId = null;
+// La grilla de presets sirve para dos destinos: aplicar directo a un creep abierto ('creep', de siempre) y el
+// paso "Efectos" del 🎯/✨ de una habilidad ('duelo', 2026-09-28 — ver elegirEstadoDuelo más abajo).
+let presetsCreepDestino = 'creep';
 function abrirPresetsEstadoCreep(scId){
+  presetsCreepDestino = 'creep';
   presetsCreepScId = scId;
   const propios = S.estadosPersonalizados || [];
   let html = '';
@@ -4051,7 +4055,42 @@ function abrirPresetsEstadoCreep(scId){
     html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtmlCreep(p, `custom:${i}`, 'propio')).join('')}</div>`;
   }
   $('#presets-creep-body').innerHTML = html;
+  $('#presets-creep-personalizado').style.display = '';
   $('#scrim-presets-creep').classList.add('open');
+}
+// Selector real de estados para el paso "Efectos" del cuadro de Ejecución (2026-09-28, pedido del dueño —
+// "siguiendo el mismo andamiaje" del selector de siempre, en vez de reinventar uno adentro de
+// comun/asistente-duelo-hab.js): misma grilla + EstadoPreguntas, con "— Empezar en blanco —" (esto no lo tiene
+// el selector de aplicar directo a un creep). Devuelve una Promise: null = canceló.
+let presetDueloResolverGM = null;
+function elegirEstadoDuelo(){
+  return new Promise(resolve => {
+    presetDueloResolverGM = resolve;
+    presetsCreepDestino = 'duelo';
+    const propios = S.estadosPersonalizados || [];
+    let html = `<button type="button" class="preset-blanco" data-presetcreep="">— Empezar en blanco —</button>`;
+    ['buff','debuff','otro'].forEach(pol => {
+      const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+      if(!del.length) return;
+      html += `<div class="preset-grupo">${POLARIDAD_ESTADO_LABEL[pol]} · ${fmt(del.length)}</div>`;
+      html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtmlCreep(p, `std:${i}`, pol)).join('')}</div>`;
+    });
+    if(propios.length){
+      html += `<div class="preset-grupo">Mis presets · ${fmt(propios.length)}</div>`;
+      html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtmlCreep(p, `custom:${i}`, 'propio')).join('')}</div>`;
+    }
+    $('#presets-creep-body').innerHTML = html;
+    $('#presets-creep-personalizado').style.display = 'none';
+    $('#scrim-presets-creep').classList.add('open');
+    $('#scrim-presets-creep').style.zIndex = 99600;   // encima del cuadro de Ejecución (z-index 99500)
+  });
+}
+function cerrarPresetsDuelo(valor){
+  $('#scrim-presets-creep').classList.remove('open');
+  $('#scrim-presets-creep').style.zIndex = '';
+  const resolver = presetDueloResolverGM;
+  presetDueloResolverGM = null;
+  if(resolver) resolver(valor);
 }
 
 function activarEstadoPresetCreep(preset){
@@ -4135,6 +4174,16 @@ function acumularSangradoCreep(sc, nuevo){
 }
 
 function aplicarPresetEstadoCreep(valor){
+  if(presetsCreepDestino === 'duelo'){
+    if(!valor){ cerrarPresetsDuelo({modo: 'manual'}); return; }
+    const [tipoD, idxD] = valor.split(':');
+    const presetD = (tipoD === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idxD];
+    if(!presetD){ cerrarPresetsDuelo(null); return; }
+    const armar = p => ({modo: 'preset', nombre: p.nombre, turnos: p.turnos, permanente: !!p.permanente, hp: num(p.hpTurno), mods: p.mods, stacks: p.stacks, escudoMagico: num(p.escudoMagico), polaridad: p.polaridad, detalle: p.detalle});
+    if(tipoD === 'std') EstadoPreguntas.pedir(presetD, CFG_PREGUNTAS_GM).then(armado => cerrarPresetsDuelo(armado ? armar(armado) : null));
+    else cerrarPresetsDuelo(armar(presetD));
+    return;
+  }
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
   if(!preset) return;
@@ -5919,7 +5968,7 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s => s.id === scId);
     const h = sc && sc.habilidades.find(x => x.id === habId);
     if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, tieneFormula: !!String(h.tiradaExtra || '').trim(),
-      costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto},   // los creeps no tienen costo en HP todavía: ese campo del paso "Costo" no se guarda acá
+      costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto}, elegirEstado: elegirEstadoDuelo,   // los creeps no tienen costo en HP todavía: ese campo del paso "Costo" no se guarda acá
       alGuardar: r => {
         if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; }
         else delete h.duelo;
@@ -7858,7 +7907,7 @@ $('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
 $('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
 $('#scrim-estado-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-estado-creep'){ editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); } });
-$('#presets-creep-x').onclick = () => $('#scrim-presets-creep').classList.remove('open');
+$('#presets-creep-x').onclick = () => { if(presetsCreepDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets-creep').classList.remove('open'); };
 // Menú paso a paso para crear un estado de cero (comun/asistente-estado.js); el formulario completo sigue en el último paso.
 function armarPresetDeAsistenteGM(res){
   return {nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
@@ -7900,7 +7949,7 @@ $('#presets-creep-personalizado').onclick = () => {
     },
   });
 };
-$('#scrim-presets-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets-creep') $('#scrim-presets-creep').classList.remove('open'); });
+$('#scrim-presets-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets-creep'){ if(presetsCreepDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets-creep').classList.remove('open'); } });
 $('#ec-nombre').addEventListener('input', actualizarBotonesPresetEc);
 $('#ec-preset').addEventListener('change', e => {
   if(!e.target.value) return;

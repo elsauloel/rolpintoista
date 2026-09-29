@@ -7,7 +7,19 @@
    dato a mano: devuelve el objeto `duelo` que guarda la habilidad (o null = sin duelo).
 
    Uso:  AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, costoVariable: 'sp'|'nitros'|'',
-   costoInicial: {sp, nitrosCosto, hpCosto}, alGuardar: resultado => …});
+   costoInicial: {sp, nitrosCosto, hpCosto}, elegirEstado, alGuardar: resultado => …});
+   `elegirEstado` (2026-09-28, pedido del dueño — "el selector de estado no debería ser un desplegable... sino
+   un botón de +ESTADO que despliegue el menú de estados alterados... siguiendo el mismo andamiaje"): función
+   opcional, sin argumentos, que devuelve una Promise con el resultado del selector REAL de estados de la
+   página (la grilla con Ver/Activar de siempre + el cartelito de EstadoPreguntas que pregunta las cantidades)
+   en vez de reinventar uno adentro de este archivo compartido — cada página (ficha.html, gm-tools.html) la
+   define con SU propio catálogo (EFECTOS_PRESET / ESTADOS_PRESET_GM). Devuelve `null` (canceló), `{modo:
+   'manual'}` ("Empezar en blanco": el paso "Efectos" muestra sus campos de siempre —nombre a mano, turnos,
+   un bono, un escudo— para algo que no está en ningún catálogo) o `{modo:'preset', nombre, turnos, permanente,
+   hp, mods, stacks, escudoMagico, polaridad, detalle}` (un preset real ya con sus cantidades respondidas —
+   mismo formato que devuelve `EstadoPreguntas.pedir`, con `hp` ya normalizado por la página que llama, que es
+   `hpturno` en la ficha y `hpTurno` en gm-tools). Sin `elegirEstado` (compatibilidad), el botón ＋ Estado cae
+   en el comportamiento viejo: un campo de texto con un `<datalist>` de sugerencias.
    `resultado` es `null` (sin duelo — o se sacó desde "Sacar el duelo de esta habilidad": no toca el costo) o
    `{duelo, costo: {sp, nitrosCosto, hpCosto}}` — el paso "Costo" (2026-09-27, pedido del dueño: "al principio te
    tiene que preguntar qué se cobra al ejecutar") es el mismo dato de siempre de la habilidad, editable también
@@ -50,6 +62,7 @@ const AsistenteDueloHab = (() => {
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
+  const BONOS_LABEL = Object.fromEntries(BONOS);
   const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['fisico', 'Físico (respeta la Defensa)']];
   const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -66,9 +79,10 @@ const AsistenteDueloHab = (() => {
 #adh-fondo .nota{font-size:12.5px;color:#aab3ca;margin:0 0 6px}
 #adh-fondo select,#adh-fondo input[type=number],#adh-fondo input[type=text]{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px;max-width:100%}
 #adh-fondo label.op{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:14px;cursor:pointer;width:100%;box-sizing:border-box}
-#adh-fondo label.op input[type=checkbox],#adh-fondo label.op input[type=radio]{flex-shrink:0;margin-top:3px}
+#adh-fondo label.op input[type=checkbox],#adh-fondo label.op input[type=radio]{flex-shrink:0;flex-grow:0;width:16px;min-width:16px;max-width:16px;height:16px;margin:3px 0 0}
 #adh-fondo .adh-check-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
 #adh-fondo .adh-modo{display:flex;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 10px;background:#0e1220;border:1px solid #2b3347;border-radius:8px}
+#adh-fondo .adh-ef-card{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:8px 10px;margin:4px 0;background:#0e1220;border:1px solid #2b3347;border-radius:8px}
 #adh-fondo .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
 #adh-fondo button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:700;cursor:pointer}
 #adh-fondo button.sec{background:#2b3347;color:#d5dbec}
@@ -286,7 +300,10 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoDano(){
       let h = titulo('', 'Daño y lo que no se pueda automatizar', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá. Si además (o en vez de eso) tiene un efecto que el sistema no calcula solo, escribilo como texto.');
-      h += `<label class="op"><input type="checkbox" data-dano ${st.dano ? 'checked' : ''}> Esta habilidad hace daño${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>`;
+      h += `<div class="adh-modo">
+        <label class="op"><input type="radio" name="hacedano" value="no" ${!st.dano ? 'checked' : ''}> No hace daño</label>
+        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
+      </div>`;
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
@@ -303,13 +320,30 @@ const AsistenteDueloHab = (() => {
       }
       return h;
     }
+    // Una fila «◎ Estado» elegida del catálogo real (cfg.elegirEstado): de solo lectura, con ✎ Cambiar.
+    function filaEstadoPresetHtml(e, i){
+      const partes = [e.permanente ? 'no vence' : `${e.turnos ?? 0} turno${(e.turnos ?? 0) === 1 ? '' : 's'}`];
+      if(e.escudo) partes.push(`🛡${e.escudo}`);
+      if(e.hp) partes.push(`${e.hp > 0 ? '+' : ''}${e.hp} HP/turno`);
+      (e.mods || []).forEach(m => { if(m && m.stat) partes.push(`${m.val > 0 ? '+' : ''}${m.val} ${BONOS_LABEL[m.stat] || m.stat}`); });
+      if(e.stacks > 1) partes.push(`×${e.stacks}`);
+      const det = (e.detalle || '').trim();
+      return `<div class="adh-ef-card">
+        <div><b>◎ ${esc(e.nombre)}</b><div class="nota" style="margin:2px 0 0">${esc(partes.join(' · '))}</div>${det ? `<div class="nota" style="margin:2px 0 0">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</div>` : ''}</div>
+        <div class="fila" style="gap:6px;flex-wrap:nowrap"><button type="button" class="sec" data-ef-recambiar="${i}">✎ Cambiar</button><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
+      </div>`;
+    }
+    // Sin cfg.elegirEstado (o «Empezar en blanco»): los campos de siempre, a mano.
+    function filaEstadoManualHtml(e, i){
+      return `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
+          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>
+          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>`;
+    }
     function cuerpoEfectos(){
       let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : 'Efectos sobre el objetivo', 'Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.');
       h += st.efectos.map((e, i) => e.cura !== undefined
         ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${i}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>`
-        : `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
-          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>
-          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>`).join('');
+        : e.origen === 'preset' ? filaEstadoPresetHtml(e, i) : filaEstadoManualHtml(e, i)).join('');
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
         <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
@@ -365,7 +399,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
-        const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.turnos ?? 2}t)${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
+        const efTxt = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
         filas.push(`<b>Efectos</b>: ${efTxt || 'ninguno'}`);
         if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
@@ -419,7 +453,7 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
       f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
-      q('[data-dano]', e => { st.dano = e.target.checked; dibujar(); });
+      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value === 'si'; dibujar(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
@@ -441,7 +475,28 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efEscudo].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { st.efectos[+i.dataset.efCura].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
       f.querySelectorAll('[data-ef-x]').forEach(b => b.onclick = () => { st.efectos.splice(+b.dataset.efX, 1); dibujar(); });
-      f.querySelectorAll('[data-ef-mas]').forEach(b => b.onclick = () => { st.efectos.push(b.dataset.efMas === 'cura' ? {cura: 5} : {nombre: nombresEstado()[0] || 'Estado', turnos: 2}); dibujar(); });
+      // «◎ Estado»: con cfg.elegirEstado (el selector real de la página, ver docblock), abre ese menú en vez de
+      // reinventar uno acá — «Empezar en blanco» cae en los campos de siempre (filaEstadoManualHtml).
+      const efectoDePreset = r => ({origen: 'preset', nombre: r.nombre, turnos: r.turnos, permanente: !!r.permanente, hp: r.hp || 0, mods: r.mods || [], stacks: r.stacks || 1, escudo: r.escudoMagico || 0, detalle: r.detalle || '', polaridad: r.polaridad});
+      f.querySelectorAll('[data-ef-mas]').forEach(b => b.onclick = async () => {
+        if(b.dataset.efMas === 'cura'){ st.efectos.push({cura: 5}); dibujar(); return; }
+        if(cfg.elegirEstado){
+          const r = await cfg.elegirEstado();
+          if(!r) return;
+          st.efectos.push(r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'});
+        }else{
+          st.efectos.push({nombre: nombresEstado()[0] || 'Estado', turnos: 2, origen: 'manual'});
+        }
+        dibujar();
+      });
+      f.querySelectorAll('[data-ef-recambiar]').forEach(b => b.onclick = async () => {
+        if(!cfg.elegirEstado) return;
+        const r = await cfg.elegirEstado();
+        if(!r) return;
+        const i = +b.dataset.efRecambiar;
+        st.efectos[i] = r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'};
+        dibujar();
+      });
       const bq = f.querySelector('[data-quitar]');
       if(bq) bq.onclick = () => { cerrar(); cfg.alGuardar(null); };
       // Costo (2026-09-27, pedido del dueño): se guarda junto con el duelo, en el mismo Guardar — es el mismo
@@ -454,7 +509,7 @@ const AsistenteDueloHab = (() => {
           if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return; }
           cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}, costo: costoResultado()}); return;
         }
-        const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {}), ...(e.escudo ? {escudo: e.escudo} : {})});
+        const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
         if(st.modo === 'arma'){
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
           if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
@@ -489,7 +544,7 @@ const AsistenteDueloHab = (() => {
           }
         }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
-        out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? {cura: e.cura} : {nombre: e.nombre, turnos: e.turnos ?? 2, ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {}), ...(e.escudo ? {escudo: e.escudo} : {})});
+        out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
         cerrar();
         cfg.alGuardar({duelo: out, costo: costoResultado()});
       };
@@ -500,6 +555,22 @@ const AsistenteDueloHab = (() => {
     function nombresEstado(){
       const debuffs = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.map(p => p.nombre) : [];
       return [...debuffs, ...BUFF_PRESETS.map(p => p.nombre)];
+    }
+    // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
+    // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
+    function mapEfectoOut(e){
+      if(e.cura !== undefined) return {cura: e.cura};
+      return {
+        nombre: e.nombre, turnos: e.turnos ?? 2,
+        ...(e.permanente ? {permanente: true} : {}),
+        ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {}),
+        ...(e.mods && e.mods.length ? {mods: e.mods} : {}),
+        ...(e.escudo ? {escudo: e.escudo} : {}),
+        ...(e.hp ? {hp: e.hp} : {}),
+        ...(e.stacks && e.stacks > 1 ? {stacks: e.stacks} : {}),
+        ...(e.detalle ? {detalle: e.detalle} : {}),
+        ...(e.polaridad ? {polaridad: e.polaridad} : {}),
+      };
     }
     dibujar();
   }

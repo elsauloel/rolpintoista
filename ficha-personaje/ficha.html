@@ -6997,7 +6997,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
     if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
-      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto},
+      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto}, elegirEstado: elegirEstadoDuelo,
       alGuardar: r => {
         if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; }
         else if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
@@ -7636,9 +7636,9 @@ function ghCabeceras(accept){
 
 $('#btn-personajes').onclick = () => abrirPersonajes();
 $('#btn-vendedor').onclick = () => abrirVendedor();
-$('#presets-x').onclick = () => $('#scrim-presets').classList.remove('open');
+$('#presets-x').onclick = () => { if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); };
 $('#presets-personalizado').onclick = () => { const destino = presetDestino; $('#scrim-presets').classList.remove('open'); abrirAsistenteEstadoFicha(destino); };
-$('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets') $('#scrim-presets').classList.remove('open'); });
+$('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets'){ if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); } });
 $('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
 $('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
 document.addEventListener('click', e => {
@@ -7875,10 +7875,30 @@ function editarPresetEfecto(valor){
   drawEditor();
 }
 
-// La botonera de estados sirve para dos destinos: el editor de estados
-// (donde el preset llena la ficha entera) y el de ítems/habilidades
-// (donde solo llena los campos del efecto que dispara).
+// La botonera de estados sirve para varios destinos: el editor de estados
+// (donde el preset llena la ficha entera), el de ítems/habilidades
+// (donde solo llena los campos del efecto que dispara) y el paso "Efectos"
+// del 🎯/✨ (destino 'duelo', ver elegirEstadoDuelo más abajo).
 let presetDestino = 'efecto';
+// Selector real de estados para el paso "Efectos" del cuadro de Ejecución (2026-09-28, pedido del dueño —
+// "siguiendo el mismo andamiaje" del +Estado de siempre, en vez de reinventar un selector adentro de
+// comun/asistente-duelo-hab.js): abre la misma grilla de presets + EstadoPreguntas, y resuelve la Promise que
+// pide AsistenteDueloHab.abrir({elegirEstado: elegirEstadoDuelo}). null = canceló.
+let presetDueloResolver = null;
+function elegirEstadoDuelo(){
+  return new Promise(resolve => {
+    presetDueloResolver = resolve;
+    abrirPresetsEfecto('duelo');
+    $('#scrim-presets').style.zIndex = 99600;   // encima del cuadro de Ejecución (z-index 99500)
+  });
+}
+function cerrarPresetsDuelo(valor){
+  $('#scrim-presets').classList.remove('open');
+  $('#scrim-presets').style.zIndex = '';
+  const resolver = presetDueloResolver;
+  presetDueloResolver = null;
+  if(resolver) resolver(valor);
+}
 
 function abrirTipoItem(){
   const grupos = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', consumibles:'Consumibles', otros:'Otros'};
@@ -8012,6 +8032,16 @@ function abrirAsistenteEstadoFicha(destino){
 }
 
 function aplicarPresetEfecto(valor){
+  if(presetDestino === 'duelo'){
+    if(!valor){ cerrarPresetsDuelo({modo: 'manual'}); return; }
+    const [tipoD, idxD] = valor.split(':');
+    const presetD = (tipoD === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idxD];
+    if(!presetD){ cerrarPresetsDuelo(null); return; }
+    const armar = p => ({modo: 'preset', nombre: p.nombre, turnos: p.turnos, permanente: !!p.permanente, hp: num(p.hpturno), mods: p.mods, stacks: p.stacks, escudoMagico: num(p.escudoMagico), polaridad: p.polaridad, detalle: p.detalle});
+    if(tipoD === 'std') EstadoPreguntas.pedir(presetD, CFG_PREGUNTAS_FICHA).then(armado => cerrarPresetsDuelo(armado ? armar(armado) : null));
+    else cerrarPresetsDuelo(armar(presetD));
+    return;
+  }
   $('#scrim-presets').classList.remove('open');
   if(!valor) return;
   const [tipo, idx] = valor.split(':');
@@ -10593,7 +10623,7 @@ $('#modal-cancel').onclick = closeModal;
 $('#modal-x').onclick = closeModal;
 $('#modal-activar').onclick = () => $('#modal-save').click();
 $('#scrim').addEventListener('mousedown', e => { if(e.target.id==='scrim') closeModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); $('#scrim-todos-estados').classList.remove('open'); document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; }); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); $('#scrim-todos-estados').classList.remove('open'); document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; }); } });
 function closeModal(){ $('#scrim').classList.remove('open'); editing = null; }
 
 

@@ -195,6 +195,29 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
 - Verificado en una copia de la ficha con la base de datos simulada (agregar, corregir, actualizar, dejar la mía,
   segunda corrección que vuelve a avisar, subir una creada de cero); no probado contra Firebase real.
 
+## Paso 3: cómo quedó (2026-09-29)
+
+- **Habilidades de creep en el tipo único** (P122): se suben a `biblioteca_skills` con `para: 'creep'`
+  (`Plantillas.limpiar('skills')` las limpia como de creep: conservan cooldown, "lenta", estado sobre el objetivo…).
+  Lo que ya estaba en `biblioteca_habs_creep` se sigue viendo: la Biblioteca acepta `opts.legado = {tipo, convertir}`,
+  lee también esa colección (y sus propuestas), deja auditarla y borrarla, y una corrección de algo viejo es una entrada
+  nueva con `reemplaza` que lo tapa. Nada se migró a mano.
+- **GM Tools, "+ Habilidad" de un creep** (`abrirCatalogoHabilidades`): muestra fábrica + lo subido de creep **y de
+  jugador**, cada fila con **🐾 Creep · cooldown** o **🧙 Jugador · SP**. Elegir una de jugador avisa (en el mismo
+  cartel) que paga con SP; la copia conserva `para: 'jugador'` y su "Ver" lo recuerda (`paraHabHtml`). Toda habilidad
+  agregada guarda `bibOrigen`. **⬆ Subir** también en la ventana "Ver" de una habilidad de un creep de la mesa
+  (`#verhab-subir`), además del 📚 de la vista de la biblioteca; ambos preguntan corrección / nuevo.
+- **Creeps**: `guardarCreepEnBiblioteca` pregunta corrección / nuevo si el creep salió de la biblioteca; los agregados
+  guardan `bibOrigen` (también los de fábrica: `base-<poolId>`, versión 1). Si el original se corrige, la tarjeta del
+  creep muestra **🔔** (`versionNuevaDeCreep`, `abrirVersionNuevaCreep`): Actualizar cambia atributos, arma, equipo y
+  habilidades pero conserva lo del combate (vida con tope del máximo nuevo, estados, grupo, imagen, color); Dejar el
+  mío; Ahora no. Lo subido se lee al entrar (GM) y al abrir "+ Creep" (`cargarCreepsSubidos`).
+- **Ficha, "+ Habilidad → 🐾 De creep"**: las habilidades de creep subidas, con el aviso a la vista (pagan con cooldown;
+  en la ficha hay que ponerles costo en SP), 2 de Job; la copia lleva `para: 'creep'` y la fila muestra 🐾 de creep.
+- Pendiente chico: el 🔔 por habilidad **dentro** de un creep (hoy el aviso es por creep entero; las habilidades de un
+  creep ya guardan `bibOrigen`, así que se puede sumar). Anotado en `docs/pendientes.md`.
+- Verificado con la base de datos simulada en copias de GM Tools y de la ficha; no probado contra Firebase real.
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -207,7 +230,7 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
 | 0e | Plantillas del resto de los elementos (este documento) + el "sobre" común; preguntas P122–P124 | ✅ 2026-09-29 |
 | 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | ✅ 2026-09-29 (el mecanismo; el aviso en cada herramienta va en su paso) — ver "Paso 1: cómo quedó" · **falta pegar las reglas de Firestore** |
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | ✅ 2026-09-29 — ver "Paso 2: cómo quedó" |
-| 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | Pendiente |
+| 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | ✅ 2026-09-29 — ver "Paso 3: cómo quedó" |
 | 4 | Pasivas y trampas | Pendiente |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | Pendiente |
 | 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | Pendiente |

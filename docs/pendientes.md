@@ -124,3 +124,7 @@
 - [ ] **Skills de clase auditadas y el duelo** (2026-09-27, pedido del dueño): repaso hecho en [`skills-clase-y-duelo.md`](skills-clase-y-duelo.md) (17 auditadas: 7 ya automáticas, 5 se resuelven con «ataque con habilidad» en el duelo, 3 son de área). Falta: que el dueño elija el orden y responda las 4 preguntas del §5; después implementar (Espinas devueltas, ataque con habilidad, reacciones Flash, áreas) y seguir auditando las 45 restantes.
 
 - [ ] **Duelo para habilidades dirigidas** (hechizos, controles, apoyos; pedido del dueño 2026-09-27, más importante que automatizar cada skill): propuesta y 8 preguntas en [`duelo-de-habilidades.md`](duelo-de-habilidades.md). Reemplaza al viejo «duelo de hechizos». Primera versión hecha el 2026-09-27 (hechizos con tirada, contienda de atributos y sin oposición; ver §7): falta pegar las reglas, probar en mesa y las áreas.
+
+- [ ] **🔔 versión nueva por habilidad dentro de un creep** (2026-09-29, paso 3 de `docs/plan-subida-unificada.md`): hoy
+  el aviso de versión nueva es por creep entero; las habilidades de un creep ya guardan `bibOrigen`, falta mostrar el 🔔
+  en su fila y el cartel de Actualizar (mismo patrón que `abrirVersionNuevaHab` de la ficha).

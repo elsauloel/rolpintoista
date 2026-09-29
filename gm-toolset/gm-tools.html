@@ -881,6 +881,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <header><h3 id="verhab-nombre">Habilidad</h3><button class="iconbtn" id="verhab-x">Cerrar</button></header>
     <div class="body" id="verhab-body"></div>
     <footer>
+      <button class="btn ghost" id="verhab-subir" title="Subir esta habilidad a la biblioteca compartida, con toda su configuración: queda disponible para todos al instante">⬆ Subir</button>
       <button class="btn ghost" id="verhab-reemplazar" title="Cambiar esta habilidad por otra de la biblioteca">↻ Reemplazar</button>
       <button class="btn primary" id="verhab-editar" title="Abrir el editor paso a paso de esta habilidad">✎ Editar</button>
     </footer>
@@ -1275,8 +1276,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
-<script src="../comun/plantillas.js?v=20260929b"></script>
-<script src="../comun/biblioteca.js?v=20260929b"></script>
+<script src="../comun/plantillas.js?v=20260929c"></script>
+<script src="../comun/biblioteca.js?v=20260929c"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
@@ -2398,7 +2399,9 @@ function nuevoCreep(){
 // Biblioteca global de creeps (comun/biblioteca.js): un creep guardado va sin
 // imagen, con la vida llena y sin estados pasajeros; al agregarlo a la mesa
 // se vuelca sobre la base (como uno cargado de Firebase) con ids nuevos.
-function guardarCreepEnBiblioteca(sc){
+// (La limpieza completa es la plantilla `Plantillas.creep`, que aplica Biblioteca.guardar.) Si el creep salió de la
+// biblioteca (`bibOrigen`), pregunta si es una corrección de ese o uno nuevo.
+function guardarCreepEnBiblioteca(sc, origen){
   const datos = JSON.parse(creepFichaJson(sc));
   delete datos.id;
   delete datos._borrador;
@@ -2406,11 +2409,71 @@ function guardarCreepEnBiblioteca(sc){
   datos.nitros = null;
   datos.ataquesTurno = 0;
   datos.estados = (datos.estados || []).filter(es => es && es.permanente);
-  Biblioteca.guardar({tipo: 'creeps', datos, nombre: sc.nombre, nivel: sc.nivel, grupos: CREEPS_GRUPOS, base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : []});
+  const o = origen || sc.bibOrigen;
+  Biblioteca.guardar({tipo: 'creeps', datos, nombre: sc.nombre, nivel: sc.nivel, grupos: CREEPS_GRUPOS, base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
+    basadoEn: o && o.id ? {id: o.id, nombre: sc.nombre} : null,
+    alSubir: r => { if(!sc._borrador){ sc.bibOrigen = {tipo: 'creeps', id: r.id, version: r.version}; delete sc.bibIgnorada; } cargarCreepsSubidos(); }});
 }
 
-function agregarCreepDeBiblioteca(datos){
+/* 🔔 Versión nueva de un creep (subida unificada, paso 3): los creeps agregados desde la biblioteca guardan de dónde
+   salieron (`bibOrigen`); si alguien corrige el original, la tarjeta muestra 🔔 y se puede actualizar sin perder lo del
+   combate (vida, estados, grupo, imagen). Lo subido se lee al entrar y cada vez que se abre "+ Creep". */
+let creepsSubidos = [];
+function cargarCreepsSubidos(){
+  if(typeof Biblioteca === 'undefined' || !Biblioteca.lista) return Promise.resolve();
+  return Biblioteca.lista('creeps').then(l => { creepsSubidos = l; renderAll(); }).catch(() => {});
+}
+function versionNuevaDeCreep(sc){
+  const o = sc.bibOrigen;
+  if(!o || !o.id) return null;
+  const e = String(o.id).startsWith('base-') ? creepsSubidos.find(x => x.reemplaza === o.id) : creepsSubidos.find(x => x.id === o.id);
+  if(!e || (e.version || 1) <= (o.version || 1)) return null;
+  if(sc.bibIgnorada === e.id + ':' + (e.version || 1)) return null;
+  return e;
+}
+function actualizarCreepDesdeBib(sc, e){
+  const d = Plantillas.creep(e.datos);
+  const combate = {id: sc.id, imagen: sc.imagen, grupo: sc.grupo, color: sc.color, estados: sc.estados, hp: sc.hp, nitros: sc.nitros,
+    ataquesTurno: sc.ataquesTurno, recompensado: sc.recompensado};
+  Object.assign(sc, d, combate);
+  sc.habilidades = (d.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
+  sc.equipo = (d.equipo || []).map(it => ({...it, id: uid()}));
+  sc.hp = Math.min(num(sc.hp), num(sc.hpMax));
+  sc.bibOrigen = {tipo: 'creeps', id: e.id, version: e.version || 1};
+  delete sc.bibIgnorada;
+}
+function abrirVersionNuevaCreep(sc){
+  const e = versionNuevaDeCreep(sc);
+  if(!e) return;
+  let fondo = document.getElementById('scrim-creepnuevo');
+  if(!fondo){ fondo = document.createElement('div'); fondo.className = 'scrim'; fondo.id = 'scrim-creepnuevo'; fondo.style.zIndex = '96'; document.body.appendChild(fondo); }
+  const quien = e.editorNombre || e.autorNombre;
+  fondo.innerHTML = `<div class="modal" style="max-width:480px">
+    <header><h3>🔔 ${esc(sc.nombre)}: hay una versión nueva</h3></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:8px">
+      <div>El creep de la biblioteca del que salió este se corrigió${quien ? ` (por <b>${esc(quien)}</b>)` : ''} — versión ${fmt(e.version || 1)}${e.auditado ? '' : ', 🔶 sin auditar todavía'}.</div>
+      <div class="hint"><b>Actualizar</b> cambia sus atributos, arma, equipo y habilidades por los nuevos; se quedan su vida (con el tope del máximo nuevo), sus estados, su grupo y su imagen. <b>Dejar el mío</b> no vuelve a avisar de esta versión.</div>
+    </div>
+    <footer style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button type="button" class="btn ghost" data-cn="despues">Ahora no</button>
+      <button type="button" class="btn" data-cn="mio">Dejar el mío</button>
+      <button type="button" class="btn primary" data-cn="actualizar">Actualizar</button>
+    </footer></div>`;
+  fondo.classList.add('open');
+  fondo.onclick = ev => {
+    const b = ev.target.closest('[data-cn]');
+    if(!b && ev.target !== fondo) return;
+    fondo.classList.remove('open');
+    if(!b || b.dataset.cn === 'despues') return;
+    if(b.dataset.cn === 'mio') sc.bibIgnorada = e.id + ':' + (e.version || 1);
+    else{ actualizarCreepDesdeBib(sc, e); toast(`${sc.nombre} actualizado a la versión ${fmt(e.version || 1)}`); }
+    renderAll();
+  };
+}
+
+function agregarCreepDeBiblioteca(datos, meta){
   const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: '', grupo: grupoParaNuevo()});
+  if(meta && meta.id) sc.bibOrigen = {tipo: 'creeps', id: meta.id, version: meta.version || 1};
   sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
   sc.equipo = (sc.equipo || []).map(it => ({...it, id: uid()}));
@@ -3682,6 +3745,7 @@ function abrirVerHabAccion(scId, habId){
   const cdTxt = num(h.cd) > 0 ? `${fmt(num(h.cd))} turno(s) de cooldown` : 'Sin cooldown';
   $('#verhab-nombre').textContent = h.nombre || 'Sin nombre';
   $('#verhab-body').innerHTML = `
+    ${paraHabHtml(h)}
     <div class="hint" style="margin-bottom:10px">${esc(costoTxt)} · ${esc(cdTxt)}</div>
     <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`;
   $('#scrim-ver-hab').classList.add('open');
@@ -3881,6 +3945,7 @@ function cardCompactoHtml(sc){
       <button type="button" class="eyebtn" data-editarcreep="${sc.id}" title="Editar creep">${SVG_LAPIZ}</button>
       <span class="name-compacto">${esc(sc.nombre)}</span>${grupoActivo === '' && sc.grupo ? `<span class="grupo-tag" title="Grupo de este creep">${esc(sc.grupo)}</span>` : ''}
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
+      ${versionNuevaDeCreep(sc) ? `<button class="verbtn" data-versioncreep="${sc.id}" title="Alguien corrigió el creep de la biblioteca del que salió este: ver y decidir si actualizarlo">🔔</button>` : ''}
       <button class="verbtn" data-ver="${sc.id}">Ver</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
@@ -4807,14 +4872,30 @@ function hcResumenHtml(){
 /* Ver una habilidad de la biblioteca en detalle (👁 Ver): calculada con el nivel del creep. Desde ahí se puede Agregar,
    ✎ Editar (asistente paso a paso sobre una copia; no toca al creep) y, ya editada, 📚 Biblioteca para proponer esa versión. */
 let verHab = null;   // {scId, ent, hab, editada}
-function habDeBiblioteca(sc, datos){
-  const h = armarHabilidadDeCreep(datos, sc.nivel);
-  return {...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0};
+/* Habilidades de jugador y de creep son un solo tipo en la biblioteca (`biblioteca_skills`, P122), con la marca `para`
+   bien a la vista porque pagan distinto: 🐾 creep = cooldown, 🧙 jugador = SP (ver P125). Lo que se subió antes como
+   habilidad de creep (`biblioteca_habs_creep`, `{habilidad}`) se sigue mostrando: LEGADO_HABS lo lee de ahí. */
+const LEGADO_HABS = {tipo: 'habs_creep', convertir: d => d && d.habilidad ? {...d.habilidad, para: 'creep'} : d};
+const paraDeDatos = d => d && d.sp ? 'creep' : (d && d.para) || 'creep';   // las recetas de fábrica (sp) son de creep
+const PARA_TXT = {creep: '🐾 Creep · cooldown', jugador: '🧙 Jugador · SP'};
+function paraHabHtml(h){
+  if(h.para !== 'jugador') return `<div class="hint" style="margin-bottom:6px"><b>${PARA_TXT.creep}</b></div>`;
+  return `<div class="hint" style="margin-bottom:6px;color:#e0a040"><b>${PARA_TXT.jugador}</b> — es una habilidad de jugador: paga con SP, que un creep no tiene. Revisale el costo y, si hace falta, ponele cooldown.</div>`;
 }
+// Una habilidad de la biblioteca lista para un creep: las recetas de fábrica se calculan con su nivel; lo subido va tal
+// cual. `meta` = de dónde salió ({tipo, id, version}), para el aviso de versión nueva. Una de jugador conserva la marca.
+function habDeBiblioteca(sc, datos, meta){
+  const para = paraDeDatos(datos);
+  const h = datos.sp ? armarHabilidadDeCreep(datos, sc.nivel) : structuredClone(datos.habilidad || datos);
+  delete h.para; delete h.clase;
+  return {...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0, ...(para === 'jugador' ? {para: 'jugador'} : {}), ...(meta ? {bibOrigen: meta} : {})};
+}
+const avisoJugador = h => h.para === 'jugador' ? ' — 🧙 es de jugador (paga con SP): revisale el costo' : '';
+const metaHab = ent => ent ? {tipo: 'skills', id: ent.id, version: ent.version || 1} : null;
 function verHabBiblioteca(scId, datos, ent){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
-  verHab = {scId, ent, hab: habDeBiblioteca(sc, datos), editada: false, fija: !!datos.habilidad};
+  verHab = {scId, ent, hab: habDeBiblioteca(sc, datos, metaHab(ent)), editada: false, fija: !datos.sp};
   renderVerHab();
   $('#scrim-ver-habbib').classList.add('open');
 }
@@ -4835,6 +4916,7 @@ function renderVerHab(){
   $('#verhabbib-titulo').textContent = h.nombre || 'Habilidad';
   $('#verhabbib-body').innerHTML = `
     <div class="view-lines" style="padding:14px 16px 10px">
+      ${paraHabHtml(h)}
       <div class="hint">${esc(nota)}</div>
       ${(v.ent && v.ent.etiquetas || []).length ? `<div class="vc-chips">${v.ent.etiquetas.map(t => `<span class="vc-chip">${esc(t)}</span>`).join('')}</div>` : ''}
       ${linea('Costo', costoHabCreepTxt(sc, h))}
@@ -4863,7 +4945,7 @@ $('#verhabbib-agregar').onclick = () => {
   const bib = document.getElementById('scrim-biblioteca');
   if(bib) bib.classList.remove('open');
   renderAll();
-  toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})`);
+  toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})${avisoJugador(h)}`);
 };
 $('#verhabbib-editar').onclick = () => {
   if(!verHab) return;
@@ -4875,12 +4957,17 @@ $('#verhabbib-biblioteca').onclick = () => {
   const sc = verHab && S.creeps.find(s => s.id === verHab.scId);
   if(sc && verHab.editada) proponerHabilidadABiblioteca(sc, verHab.hab);
 };
-// Propone a la biblioteca una habilidad ya calculada (queda con valores fijos).
+// ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de
+// jugador). Si salió de otra (`bibOrigen`), pregunta si es una corrección o algo nuevo (comun/biblioteca.js).
 function proponerHabilidadABiblioteca(sc, hab){
   const h = structuredClone(hab);
   delete h.id;
   h.cdActual = h.cdArranca ? num(h.cd) : 0;
-  Biblioteca.guardar({tipo: 'habs_creep', datos: {habilidad: h}, nombre: h.nombre, nivel: sc.nivel, grupos: HABS_CREEP_GRUPOS, base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : []});
+  const o = hab.bibOrigen;
+  Biblioteca.guardar({tipo: 'skills', datos: {...h, para: h.para === 'jugador' ? 'jugador' : 'creep'}, nombre: h.nombre, nivel: sc.nivel,
+    grupos: HABS_CREEP_GRUPOS, base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [], legado: LEGADO_HABS,
+    basadoEn: o && o.id ? {id: o.id, nombre: h.nombre} : null,
+    alSubir: r => { hab.bibOrigen = {tipo: 'skills', id: r.id, version: r.version}; renderAll(); }});
 }
 // Ver una habilidad que ya está en un creep (las filas de la copia de un creep de la biblioteca): sin Agregar, porque ya es suya.
 function verHabDeCreep(scId, habId){
@@ -4900,26 +4987,27 @@ function abrirCatalogoHabilidades(scId, reemplazarId){
   if(!sc) return;
   const vieja = reemplazarId ? sc.habilidades.find(x => x.id === reemplazarId) : null;
   Biblioteca.abrir({
-    tipo: 'habs_creep', titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
+    tipo: 'skills', legado: LEGADO_HABS,
+    titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
     textoCrearDeCero: vieja ? '✎ Mejor editar la actual (paso a paso)' : '+ Crear de cero (paso a paso)',
     alCrearDeCero: () => abrirEditorHabCreep(sc.id, vieja ? vieja.id : null),
     base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
-    subtitulo: e => e.datos.habilidad
-      ? ` · ${e.datos.habilidad.cdArranca ? 'lenta' : 'rápida'} · versión propuesta, valores fijos`
-      : ` · ${e.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep`,
+    // Siempre a la vista para quién es (P122): 🐾 de creep (cooldown) o 🧙 de jugador (SP).
+    subtitulo: e => paraDeDatos(e.datos) === 'jugador' ? ` · ${PARA_TXT.jugador}`
+      : ` · ${PARA_TXT.creep} · ` + (e.datos.sp ? `${e.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep` : `${e.datos.cdArranca ? 'lenta' : 'rápida'} · valores fijos`),
     alVer: (datos, ent) => verHabBiblioteca(sc.id, datos, ent),
-    alElegir: datos => {
-      const h = habDeBiblioteca(sc, datos);
+    alElegir: (datos, meta) => {
+      const h = habDeBiblioteca(sc, datos, meta);
       const i = vieja ? sc.habilidades.indexOf(vieja) : -1;
       if(i >= 0){
         sc.habilidades[i] = h;   // en el mismo lugar de la lista
         renderAll();
-        toast(`${vieja.nombre || 'La habilidad'} reemplazada por ${h.nombre}`);
+        toast(`${vieja.nombre || 'La habilidad'} reemplazada por ${h.nombre}${avisoJugador(h)}`);
         return;
       }
       sc.habilidades.push(h);
       renderAll();
-      toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})`);
+      toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})${avisoJugador(h)}`);
     },
     grupos: HABS_CREEP_GRUPOS,
   });
@@ -5246,14 +5334,16 @@ $('#view-editar').onclick = () => {
 $('#view-agregar').onclick = () => {
   const sc = borradorCreep();
   if(!sc) return;
-  agregarCreepDeBiblioteca(datosLimpiosDelBorrador(sc));
+  const ent = verCreepBib && verCreepBib.ent;
+  agregarCreepDeBiblioteca(datosLimpiosDelBorrador(sc), ent ? {id: ent.id, version: ent.version} : null);
   const bib = document.getElementById('scrim-biblioteca');
   if(bib) bib.classList.remove('open');
   cerrarVerCreep();
 };
 $('#view-biblioteca').onclick = () => {
   const sc = borradorCreep();
-  if(sc && verCreepBib.editado) guardarCreepEnBiblioteca(sc);
+  const ent = verCreepBib && verCreepBib.ent;
+  if(sc && verCreepBib.editado) guardarCreepEnBiblioteca(sc, ent ? {id: ent.id, version: ent.version} : null);
 };
 $('#view-body').addEventListener('click', e => {
   const b = e.target.closest('[data-vc-hab]');
@@ -5642,6 +5732,7 @@ document.addEventListener('click', e => {
   }
 
   if(b.id === 'btn-add'){
+    cargarCreepsSubidos();   // de paso, los avisos 🔔 de las tarjetas quedan al día
     Biblioteca.abrir({
       tipo: 'creeps', titulo: 'Creep nuevo',
       textoCrearDeCero: '+ Crear de cero',
@@ -5660,6 +5751,7 @@ document.addEventListener('click', e => {
     if(sc) guardarCreepEnBiblioteca(sc);
     return;
   }
+  if(b.dataset.versioncreep){ const sc = S.creeps.find(s => s.id === b.dataset.versioncreep); if(sc) abrirVersionNuevaCreep(sc); return; }
   if(b.dataset.ver){ verCreep(b.dataset.ver); return; }
   if(b.dataset.editarcreep){ abrirEditarCreep(b.dataset.editarcreep); return; }
   if(b.dataset.cerrareditar){ cerrarEditarCreep(); return; }
@@ -7827,6 +7919,12 @@ $('#verhab-editar').onclick = () => {
   $('#scrim-ver-hab').classList.remove('open');
   abrirEditorHabCreep(scId, habId, {encima: true});
 };
+$('#verhab-subir').onclick = () => {
+  if(!verHabAccion) return;
+  const sc = S.creeps.find(s => s.id === verHabAccion.scId);
+  const h = sc && sc.habilidades.find(x => x.id === verHabAccion.habId);
+  if(h) proponerHabilidadABiblioteca(sc, h);
+};
 $('#verhab-reemplazar').onclick = () => {
   if(!verHabAccion) return;
   const {scId, habId} = verHabAccion;
@@ -8425,6 +8523,7 @@ function gmAlEntrar(){
   mesaHistorialAlEntrar();
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
+  if(gmVivo.activo) cargarCreepsSubidos();   // avisos 🔔 de versión nueva en las tarjetas
   if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); gbitEscuchar(); }
 }
 

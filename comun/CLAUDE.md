@@ -744,3 +744,8 @@ versión parecida en más de una, es candidato a juntar.
 - **`biblioteca.js`, para herramientas con pantalla propia** (2026-09-29, paso 2): `Biblioteca.lista(tipo)` devuelve lo
   subido (sin lo de fábrica) sin abrir la ventana; `guardar` acepta `datosPara(modo)` (datos distintos si es corrección
   o algo nuevo) y `alSubir({id, version, modo})` (la entrada que quedó). La ficha los usa para las habilidades.
+- **`biblioteca.js`, colección vieja a la vista** (2026-09-29, paso 3): `opts.legado = {tipo, convertir(datos)}` en
+  `abrir`/`guardar` lee además `biblioteca_<legado>` (y sus propuestas) convertidas a la forma nueva, con su colección
+  en `ent.col` para auditar/borrar; corregir una entrada vieja crea una nueva con `reemplaza`. Lo usa gm-tools para las
+  habilidades de creep (`biblioteca_habs_creep` → `biblioteca_skills`). `Plantillas.limpiar('skills', {para:'creep'})`
+  limpia como habilidad de creep.

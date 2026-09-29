@@ -88,17 +88,29 @@ const Biblioteca = (() => {
       auditado: true, version: 1, reemplaza: ''}));
   }
 
+  // `opts.legado = {tipo, convertir(datos)}`: una colección de antes que se sigue mostrando junto a esta (las habilidades
+  // de creep vivían en biblioteca_habs_creep hasta que se juntaron con las de jugador en biblioteca_skills, P122).
+  // Sus entradas se leen de su colección (`col`), se convierten a la forma nueva y se pueden auditar, borrar y corregir;
+  // una corrección de una entrada vieja es una entrada nueva con `reemplaza` (como las de fábrica).
+  async function leerLegado(opts, prefijo){
+    const L = opts && opts.legado;
+    if(!L) return [];
+    const col = prefijo + L.tipo;
+    const lista = await leer(col).catch(() => []);
+    return lista.map(e => ({...e, col, legado: true, datos: L.convertir ? L.convertir(e.datos) : e.datos}));
+  }
+
   async function cargar(tipo, forzar){
     const st = estado[tipo];
     if(!forzar && st.oficial) return;
     const base = entradasBase(st.opts);
     if(!hayMesa()){ st.oficial = base; st.propuestas = []; return; }
     try{
-      const subidas = await leer(`biblioteca_${tipo}`);
-      // Una corrección de un elemento de fábrica lo tapa (queda solo la versión corregida).
+      const subidas = [...await leer(`biblioteca_${tipo}`), ...await leerLegado(st.opts, 'biblioteca_')];
+      // Una corrección de un elemento de fábrica (o de una colección vieja) lo tapa: queda solo la versión corregida.
       const tapados = new Set(subidas.map(e => e.reemplaza).filter(Boolean));
-      st.oficial = [...base.filter(b => !tapados.has(b.id)), ...subidas].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-      st.propuestas = esDueno() ? await leer(`propuestas_${tipo}`).catch(() => []) : [];
+      st.oficial = [...base, ...subidas].filter(e => !tapados.has(e.id)).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      st.propuestas = esDueno() ? [...await leer(`propuestas_${tipo}`).catch(() => []), ...await leerLegado(st.opts, 'propuestas_')] : [];
     }catch(err){
       if(!base.length) throw err;
       console.error('Biblioteca:', err);
@@ -340,11 +352,11 @@ const Biblioteca = (() => {
   async function accionFila(e){
     const b = e.target.closest('[data-bibacc]'); if(!b) return;
     const st = estado[actual];
-    const coleccion = (st.vista === 'propuestas' ? 'propuestas_' : 'biblioteca_') + actual;
     const tipoAct = actual;
     const lista = listaVista(st);
     const ent = lista.find(x => x.id === b.dataset.id);
     if(!ent) return;
+    const coleccion = ent.col || ((st.vista === 'propuestas' ? 'propuestas_' : 'biblioteca_') + actual);
     const acc = b.dataset.bibacc;
     try{
       if(acc === 'ver'){
@@ -449,8 +461,9 @@ const Biblioteca = (() => {
     const q = id => document.getElementById(id);
     const dueno = esDueno();
     const datosDe = m => { const d = opts.datosPara ? opts.datosPara(m) : opts.datos; return typeof Plantillas !== 'undefined' ? Plantillas.limpiar(tipo, d) : d; };
-    const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos}};
-    if(!st.opts) st.opts = {base: opts.base, grupos: opts.grupos};
+    const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos, legado: opts.legado}};
+    if(!st.opts) st.opts = {base: opts.base, grupos: opts.grupos, legado: opts.legado};
+    if(opts.legado && !st.opts.legado){ st.opts.legado = opts.legado; st.oficial = null; }
     // El elemento del que salió (si todavía existe en la lista cargada), para ofrecer "es una corrección".
     const origenEnt = () => opts.basadoEn && (st.oficial || []).find(e => e.id === opts.basadoEn.id || (e.reemplaza && e.reemplaza === opts.basadoEn.id));
     let modo = opts.basadoEn ? '' : 'nuevo';   // '' = todavía no eligió; 'correccion' | 'nuevo'
@@ -519,9 +532,9 @@ const Biblioteca = (() => {
       try{
         const o = modo === 'correccion' ? origenEnt() : null;
         const idOrigen = opts.basadoEn && opts.basadoEn.id;
-        if(modo === 'correccion' && !(o && !o.base) && !String(idOrigen || '').startsWith('base-'))
+        if(modo === 'correccion' && !o && !String(idOrigen || '').startsWith('base-'))
           throw Object.assign(new Error('ya no existe'), {code: 'no-existe'});
-        if(modo === 'correccion' && o && !o.base){
+        if(modo === 'correccion' && o && !o.base && !o.legado){
           // Corrección de algo ya subido: misma entrada, versión + 1, vuelve a "sin auditar" (salvo que corrija el dueño).
           const ref = col.doc(o.id);
           await fbDb.runTransaction(async tx => {
@@ -533,8 +546,8 @@ const Biblioteca = (() => {
           });
           msg = `"${nombre}" corregido para todos`;
         }else{
-          // Algo nuevo, o la corrección de uno de fábrica (lo tapa con `reemplaza`).
-          const reemplaza = modo === 'correccion' ? String(idOrigen) : '';
+          // Algo nuevo, o la corrección de uno de fábrica o de una colección vieja (lo tapa con `reemplaza`).
+          const reemplaza = modo === 'correccion' ? String(o ? o.id : idOrigen) : '';
           const ref = await col.add({...comun, autorUid: fbUsuario.uid, autorNombre: quien, creado: ts,
             auditado: dueno, version: reemplaza ? 2 : 1, reemplaza});
           subido = {id: ref.id, version: reemplaza ? 2 : 1, modo};

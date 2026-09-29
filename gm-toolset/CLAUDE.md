@@ -345,3 +345,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   y `vtt-hexgrid/mapa.html` — ver `../comun/CLAUDE.md` y `../vtt-hexgrid/CLAUDE.md`.
 
 - **El Tablero solo muestra lo que está en el mapa publicado** (2026-09-22, a pedido del dueño): antes listaba TODAS las fichas de la partida y TODOS los creeps abiertos en gm-tools, tuvieran o no token puesto en algún mapa. Ahora, mientras el Tablero está abierto, además de escuchar `fichas` escucha `campanas/{id}/mapa/activo` (`tableroEscucharMapaPublicado`) y los tokens de ESE mapa (`tableroColeccionTokensDe`, mismo esquema de colecciones que `vtt-hexgrid/mapa.html`: `tokens` para el mapa principal, `mapas/{id}/tokens` para uno guardado) — `tableroTokensMapa`, un `Set` de `fichaId`s. `renderTablero()` filtra `tableroDatos.fichas` y `tableroCreepsLocales()` contra ese set antes de armar las tarjetas. Como esto lo ve solo el GM, no hace falta filtrar oculto ni sigilo (eso sí importa en la versión del mapa, ver `vtt-hexgrid/CLAUDE.md`, que además agrega el mismo Tablero ahí para que también lo puedan abrir los jugadores).
+
+- **Subida unificada: habilidades de creep y creeps** (2026-09-29, paso 3 de `../docs/plan-subida-unificada.md`): "+
+  Habilidad" de un creep abre la biblioteca de tipo `skills` (la misma de las habilidades de jugador, P122) con
+  `legado: LEGADO_HABS` (lo viejo de `biblioteca_habs_creep`), cada fila marcada 🐾 Creep · cooldown / 🧙 Jugador · SP
+  (`PARA_TXT`, `paraHabHtml`, `habDeBiblioteca(sc, datos, meta)`); ⬆ Subir en la ventana "Ver" de una habilidad del
+  creep (`#verhab-subir` → `proponerHabilidadABiblioteca`, corrección / nuevo). Los creeps guardan `bibOrigen` y la
+  tarjeta muestra 🔔 si el original se corrigió (`creepsSubidos`, `versionNuevaDeCreep`, `abrirVersionNuevaCreep`,
+  `actualizarCreepDesdeBib`: conserva vida, estados, grupo, imagen y color).

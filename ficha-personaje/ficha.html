@@ -2067,8 +2067,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929b"></script>
-<script src="../comun/biblioteca.js?v=20260929b"></script>
+<script src="../comun/plantillas.js?v=20260929c"></script>
+<script src="../comun/biblioteca.js?v=20260929c"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -5934,7 +5934,7 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}${i.para === 'creep' ? ' <span class="tag cost" title="Habilidad pensada para creeps: paga con cooldown, no con SP. En la ficha no hay cooldown: revisale el costo.">🐾 de creep</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button><button class="mini" data-subirhab="${i.id}" title="Subir a la biblioteca con toda su configuración: queda disponible para todos al instante">⬆</button></div>
@@ -9593,10 +9593,13 @@ let poolFiltroFuncion = '', poolFiltroTipoDano = '';
    cualquiera a la biblioteca (`biblioteca_skills`, comun/biblioteca.js), al instante. Una corrección de una de fábrica
    la reemplaza en la lista (conserva su id, así "Ya la tenés" sigue andando); una subida nueva aparece en su clase
    (`datos.clase`) o en el pool custom. Solo las `para: 'jugador'` (P122: las de creep pagan con cooldown, no SP). */
-let skillsSubidas = [];
+let skillsSubidas = [], skillsDeCreep = [];
 async function cargarSkillsSubidas(){
   if(typeof Biblioteca === 'undefined' || !Biblioteca.lista) return;
-  skillsSubidas = (await Biblioteca.lista('skills')).filter(e => e.datos && (e.datos.para || 'jugador') === 'jugador');
+  const todas = (await Biblioteca.lista('skills')).filter(e => e.datos);
+  skillsSubidas = todas.filter(e => (e.datos.para || 'jugador') === 'jugador');
+  // Las 🐾 de creep (pagan con cooldown, P122/P125) se ofrecen aparte, con el aviso bien visible (🐾 De creep).
+  skillsDeCreep = todas.filter(e => e.datos.para === 'creep');
 }
 const claseDeSubida = e => { const c = e.datos.clase; return c && CLASES_SKILLS.some(x => x.id === c) ? c : '_custom'; };
 // Una entrada subida, en la forma de una skill del pool; `_bib` = de dónde salió (para Agregar y el aviso de versión).
@@ -9605,6 +9608,7 @@ function skillDeEntrada(e, idPool){
     _bib: {id: e.id, version: e.version || 1, auditado: e.auditado, autor: e.editorNombre || e.autorNombre || '', subida: true}};
 }
 function habsDelPool(claseId){
+  if(claseId === '_creep') return skillsDeCreep.map(e => skillDeEntrada(e, 'bib-' + e.id));
   const esCustom = claseId === '_custom';
   const clase = esCustom ? null : CLASES_SKILLS.find(c => c.id === claseId);
   const fabrica = esCustom ? (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []) : (clase ? clase.habilidades : []);
@@ -9626,7 +9630,8 @@ function origenDeHab(it){
 function versionNuevaDeHab(it){
   const o = origenDeHab(it);
   if(!o) return null;
-  const e = String(o.id).startsWith('base-') ? skillsSubidas.find(x => x.reemplaza === o.id) : skillsSubidas.find(x => x.id === o.id);
+  const todas = [...skillsSubidas, ...skillsDeCreep];
+  const e = String(o.id).startsWith('base-') ? todas.find(x => x.reemplaza === o.id) : todas.find(x => x.id === o.id);
   if(!e || (e.version || 1) <= (o.version || 1)) return null;
   if(it.bibIgnorada === e.id + ':' + (e.version || 1)) return null;   // "Dejar la mía" para esta versión
   return e;
@@ -9644,11 +9649,14 @@ function subirHabilidad(it){
   };
   Biblioteca.guardar({tipo: 'skills', nombre: it.nombre, nivel: 0,
     basadoEn: o ? {id: o.id, nombre: it.nombre} : null,
-    datosPara: modo => { const d = Plantillas.habilidad(it); delete d.id; return {...d, para: 'jugador', clase: modo === 'correccion' ? claseOrigen() : '_custom'}; },
+    datosPara: modo => {
+      if(it.para === 'creep' && modo === 'correccion'){ const d = structuredClone(it); ['id', 'job', 'jobCosto', 'origen', 'imagen', 'habClaseId', 'habClase', 'usadaEsteTurno'].forEach(k => delete d[k]); return {...d, para: 'creep'}; }
+      const d = Plantillas.habilidad(it); delete d.id; return {...d, para: 'jugador', clase: modo === 'correccion' ? claseOrigen() : '_custom'};
+    },
     alSubir: r => {
       it.bibOrigen = {tipo: 'skills', id: r.id, version: r.version};
       delete it.bibIgnorada;
-      if(r.modo === 'nuevo'){ it.habClaseId = 'bib-' + r.id; it.habClase = 'Pool custom'; }
+      if(r.modo === 'nuevo'){ it.habClaseId = 'bib-' + r.id; it.habClase = 'Pool custom'; delete it.para; }
       refresh();
       cargarSkillsSubidas().then(() => renderList('habilidades')).catch(() => {});
     }});
@@ -9659,7 +9667,7 @@ function actualizarHabDesdeBib(it, e){
   Plantillas.HAB.forEach(k => delete it[k]);
   const {para, clase, id, ...d} = structuredClone(e.datos);
   Object.assign(it, d, guardar, {costo: d.costo || '', nitrosCosto: d.nitrosCosto ?? IT2.nitrosHabilidad, automatizada: d.automatizada !== false,
-    duelo: d.duelo || null, bibOrigen: {tipo: 'skills', id: e.id, version: e.version || 1}});
+    duelo: d.duelo || null, bibOrigen: {tipo: 'skills', id: e.id, version: e.version || 1}, ...(para === 'creep' ? {para: 'creep'} : {})});
   delete it.bibIgnorada;
 }
 function abrirVersionNuevaHab(it){
@@ -9701,18 +9709,21 @@ function abrirHabClase(claseId, yaLeido){
   // Lo subido se relee cada vez que se abre (y se redibuja al llegar): lo que subió otro aparece sin recargar.
   habClaseVista = claseId;
   if(!yaLeido) cargarSkillsSubidas().then(() => { if($('#scrim-hab-clase').classList.contains('open') && habClaseVista === claseId) abrirHabClase(claseId, true); }).catch(() => {});
-  const esCustomPool = claseId === '_custom';
+  const deCreep = claseId === '_creep';
+  const esCustomPool = claseId === '_custom' || deCreep;
   const clase = esCustomPool ? null : CLASES_SKILLS.find(c => c.id === claseId);
   $('#scrim-hab-clase').classList.add('open');
-  if(!esCustomPool){ poolFiltroFuncion = ''; poolFiltroTipoDano = ''; }   // filtros del pool: se resetean al salir de él
+  if(claseId !== '_custom'){ poolFiltroFuncion = ''; poolFiltroTipoDano = ''; }   // filtros del pool: se resetean al salir de él
   if(!clase && !esCustomPool){
     $('#hab-clase-titulo').textContent = 'Nueva habilidad';
     const pool = habsDelPool('_custom');
+    const deCreep = habsDelPool('_creep');
     $('#hab-clase-body').innerHTML = `
       <div class="hint" style="margin-bottom:10px">Habilidad de clase = elegís una ya armada y queda cargada con toda su configuración. Custom = la armás vos paso a paso.</div>
       <div class="opcion-fila" style="margin-bottom:14px">
         <button type="button" class="opcion-btn" data-habclase-custom="1">Habilidad custom<br><small>2 de Job</small></button>
         <button type="button" class="opcion-btn" data-habclase-clase="_custom" ${pool.length ? '' : 'disabled'}>🧩 Pool custom<br><small>${pool.length ? pool.length + ' cargada' + (pool.length === 1 ? '' : 's') + ' · 2 de Job' : 'sin cargar'}</small></button>
+        <button type="button" class="opcion-btn" data-habclase-clase="_creep" ${deCreep.length ? '' : 'disabled'} title="Habilidades pensadas para creeps: pagan con cooldown, no con SP">🐾 De creep<br><small>${deCreep.length ? deCreep.length + ' · 2 de Job · usan cooldown' : 'ninguna subida'}</small></button>
       </div>
       <div class="cat-grouphead" style="margin-top:0"><span>Habilidad de clase</span></div>
       <div class="hint" style="margin:6px 0">Cualquier habilidad de clase cuesta 1 de Job${S.meta.clase ? ` (tu clase: <b>${esc(S.meta.clase)}</b>)` : ''}.</div>
@@ -9720,13 +9731,14 @@ function abrirHabClase(claseId, yaLeido){
     return;
   }
   const listaCompleta = habsDelPool(claseId);
-  const lista = esCustomPool ? listaCompleta.filter(h => (!poolFiltroFuncion || (h.etiquetas || []).includes(poolFiltroFuncion)) && (!poolFiltroTipoDano || (h.etiquetas || []).includes(poolFiltroTipoDano))) : listaCompleta;
+  const lista = claseId === '_custom' ? listaCompleta.filter(h => (!poolFiltroFuncion || (h.etiquetas || []).includes(poolFiltroFuncion)) && (!poolFiltroTipoDano || (h.etiquetas || []).includes(poolFiltroTipoDano))) : listaCompleta;
   const costo = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
-  $('#hab-clase-titulo').textContent = esCustomPool ? '🧩 Pool custom' : `Habilidades de ${clase.nombre}`;
+  $('#hab-clase-titulo').textContent = deCreep ? '🐾 Habilidades de creep' : esCustomPool ? '🧩 Pool custom' : `Habilidades de ${clase.nombre}`;
   $('#hab-clase-body').innerHTML = `
     <button type="button" class="btn ghost" data-habclase-volver="1" style="margin-bottom:10px">← Volver</button>
-    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>${esCustomPool ? ' — pool abierto de cualquiera, sin auditar del todo por la mesa' : ''}. Te quedan ${fmt(jobBudget().resto)}.</div>
-    ${esCustomPool ? `<div class="opcion-fila" style="margin-bottom:10px">
+    ${deCreep ? `<div class="hint" style="margin-bottom:8px;color:#e0a040"><b>🐾 Creep · cooldown</b> — estas habilidades se armaron para creeps: pagan con <b>cooldown</b>, no con SP. En tu ficha no hay cooldown: si agregás una, ponele un costo en SP (✎ Editar).</div>` : ''}
+    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>${claseId === '_custom' ? ' — pool abierto de cualquiera, sin auditar del todo por la mesa' : ''}. Te quedan ${fmt(jobBudget().resto)}.</div>
+    ${claseId === '_custom' ? `<div class="opcion-fila" style="margin-bottom:10px">
       <select id="pool-filtro-funcion" style="flex:1;min-width:140px">${'<option value="">Cualquier función</option>'}${FUNCION_TAGS.map(t => `<option value="${esc(t)}"${poolFiltroFuncion === t ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>
       <select id="pool-filtro-tipodano" style="flex:1;min-width:140px">${'<option value="">Cualquier tipo de daño</option>'}${TIPODANO_TAGS.map(t => `<option value="${esc(t)}"${poolFiltroTipoDano === t ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>
     </div>` : ''}
@@ -9735,20 +9747,21 @@ function abrirHabClase(claseId, yaLeido){
       const costoTxt = costoHabilidadTxt({...h, automatizada: h.automatizada !== false});
       return `<div class="habs-grid-item">
         <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(h.nombre)}</b>
-        <button type="button" class="mini" data-habclase-agregar="${esCustomPool ? '_custom' : clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
+        <button type="button" class="mini" data-habclase-agregar="${esCustomPool ? claseId : clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
         ${h._bib && h._bib.subida ? `<div class="hint" style="margin-top:2px">${h._bib.auditado ? '' : '<b style="color:#e0a040" title="La subió alguien del grupo y todavía no la revisó el dueño. Se puede usar igual.">🔶 sin auditar</b> · '}${h._bib.version > 1 ? `v${fmt(h._bib.version)} · ` : ''}subida por ${esc(h._bib.autor || 'alguien')}</div>` : ''}
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}
         <div class="hint" style="margin-top:4px">${esc(h.detalle)}</div>
       </div>`;
     }).join('') || `<div class="hint">${esCustomPool && listaCompleta.length ? 'Ninguna con ese filtro.' : 'Todavía no hay ninguna acá.'}</div>`}</div>`;
-  if(esCustomPool){
+  if(claseId === '_custom'){
     $('#pool-filtro-funcion').onchange = e => { poolFiltroFuncion = e.target.value; abrirHabClase('_custom', true); };
     $('#pool-filtro-tipodano').onchange = e => { poolFiltroTipoDano = e.target.value; abrirHabClase('_custom', true); };
   }
 }
 function agregarHabClase(claseId, habId){
-  const esCustomPool = claseId === '_custom';
+  const deCreep = claseId === '_creep';
+  const esCustomPool = claseId === '_custom' || deCreep;
   const clase = esCustomPool ? null : CLASES_SKILLS.find(c => c.id === claseId);
   const base = habsDelPool(claseId).find(h => h.id === habId);
   if(!base) return;
@@ -9762,14 +9775,15 @@ function agregarHabClase(claseId, habId){
     ...copia,
     id: uid(), costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
-    habClaseId: base.id, habClase: esCustomPool ? 'Pool custom' : clase.nombre,
+    habClaseId: base.id, habClase: deCreep ? 'De creep' : esCustomPool ? 'Pool custom' : clase.nombre,
+    ...(para === 'creep' ? {para: 'creep'} : {}),   // queda la marca 🐾 a la vista en la ficha
     ...(_bib ? {bibOrigen: {tipo: 'skills', id: _bib.id, version: _bib.version}} : {}),
     ...(_bib && _bib.subida ? {duelo: copia.duelo || null} : {}),
   });
   $('#scrim-hab-clase').classList.remove('open');
   renderList('habilidades');
   refresh();
-  toast(`${base.nombre} agregada (${job} de Job)`);
+  toast(deCreep ? `🐾 ${base.nombre} agregada (${job} de Job) — es de creep: ponele un costo en SP` : `${base.nombre} agregada (${job} de Job)`);
 }
 $('#hab-clase-x').onclick = () => $('#scrim-hab-clase').classList.remove('open');
 $('#scrim-hab-clase').addEventListener('mousedown', e => { if(e.target.id === 'scrim-hab-clase') $('#scrim-hab-clase').classList.remove('open'); });

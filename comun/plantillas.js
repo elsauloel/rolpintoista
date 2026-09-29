@@ -58,7 +58,7 @@ const Plantillas = (() => {
     out.nitros = null;
     out.ataquesTurno = 0;
     out.estados = (out.estados || []).filter(es => es && es.permanente);
-    out.habilidades = (out.habilidades || []).map(habCreep);
+    out.habilidades = (out.habilidades || []).map(h => { const x = habCreep(h); delete x.bibOrigen; delete x.bibIgnorada; return x; });
     return out;
   }
 
@@ -113,12 +113,15 @@ const Plantillas = (() => {
     if(!datos || typeof datos !== 'object') return datos;
     // habs_creep viaja envuelta: {habilidad: {...}} (así lo guarda gm-tools desde siempre).
     if(tipo === 'habs_creep' && datos.habilidad) return {...clon(datos), habilidad: sinOrigen(habCreep(datos.habilidad))};
+    // Habilidad de creep dentro del tipo único de habilidades (P122): se limpia como de creep (cooldown, estado sobre el
+    // objetivo…), no con la lista de la de jugador.
+    if(tipo === 'skills' && datos.para === 'creep') return sinOrigen({...habCreep(datos), para: 'creep'});
     const f = POR_TIPO[tipo];
     return sinOrigen(f ? f(datos) : clon(datos));
   }
   // `bibOrigen` = {tipo, id, version}: la marca que lleva una copia bajada de la biblioteca, para avisar "hay una
   // versión nueva". Es de la copia, no del elemento: no se sube.
-  function sinOrigen(o){ if(o && typeof o === 'object') delete o.bibOrigen; return o; }
+  function sinOrigen(o){ if(o && typeof o === 'object'){ delete o.bibOrigen; delete o.bibIgnorada; } return o; }
 
   return {limpiar, habilidad, habCreep, creep, pasiva, trampa, estado, item, HAB};
 })();

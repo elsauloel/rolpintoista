@@ -163,7 +163,7 @@ const Biblioteca = (() => {
         </div>
       </div>
     </div>
-    <div class="scrim" id="scrim-biblioteca-guardar" style="z-index:95">
+    <div class="scrim" id="scrim-biblioteca-guardar" style="z-index:99700">
       <div class="modal" style="max-width:480px">
         <header><h3 id="bibg-titulo">⬆ Subir a la biblioteca</h3><button class="iconbtn" id="bibg-x">Cerrar</button></header>
         <div class="body" style="display:flex;flex-direction:column;gap:10px">
@@ -627,7 +627,7 @@ const Biblioteca = (() => {
   function avisoVersion(opts){
     const e = opts.entrada;
     let fondo = document.getElementById('scrim-bib-version');
-    if(!fondo){ fondo = document.createElement('div'); fondo.className = 'scrim'; fondo.id = 'scrim-bib-version'; fondo.style.zIndex = '97'; document.body.appendChild(fondo); }
+    if(!fondo){ fondo = document.createElement('div'); fondo.className = 'scrim'; fondo.id = 'scrim-bib-version'; fondo.style.zIndex = '99700'; document.body.appendChild(fondo); }
     const quien = e.editorNombre || e.autorNombre;
     const dejar = opts.dejarTxt || 'Dejar la mía';
     fondo.innerHTML = `<div class="modal" style="max-width:480px">

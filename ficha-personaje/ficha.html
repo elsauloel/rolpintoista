@@ -2026,7 +2026,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <footer>
       <div style="display:flex;gap:9px">
         <button class="btn del" id="modal-del">Eliminar</button>
-        <button class="btn ghost" id="modal-catalogo" style="display:none" title="Publica este ítem en el catálogo del fabricante, para que cualquiera lo pueda comprar">📦 Agregar al catálogo</button>
+        <button class="btn ghost" id="modal-catalogo" style="display:none" title="Sube este ítem al catálogo compartido: queda disponible al instante para que cualquiera lo compre (si salió de un ítem del catálogo, podés elegir que sea una corrección)">⬆ Subir al catálogo</button>
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn ghost" id="modal-cancel">Cancelar</button>
@@ -2055,21 +2055,22 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
-<script src="../comun/tokens-auto.js?v=20260929f"></script>
+<script src="../comun/tokens-auto.js?v=20260929h"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
-<script src="../comun/asistente-trampa.js?v=20260929f"></script>
+<script src="../comun/asistente-trampa.js?v=20260929h"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
 <script src="../comun/duelo.js?v=20260927f"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/catalogo.js?v=20260929a"></script>
+<script src="../comun/items-subidos.js?v=20260929a"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929f"></script>
-<script src="../comun/biblioteca.js?v=20260929f"></script>
+<script src="../comun/plantillas.js?v=20260929h"></script>
+<script src="../comun/biblioteca.js?v=20260929h"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -6575,7 +6576,7 @@ function aplicarFicha(data){
         const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
         const frescoIds = new Set(fresh.catalogo.map(i => i.id));
         const soloLocal = propio.filter(item => !frescoIds.has(item.id));
-        next.catalogo = [...structuredClone(fresh.catalogo), ...soloLocal];
+        next.catalogo = ItemsSubidos.mezclar([...structuredClone(fresh.catalogo), ...soloLocal.filter(i => !i._bib)], itemsSubidos, DEFAULT.catalogo);
       }
       // Migración: fichas viejas guardaban equipo y mochila como listas separadas.
       if(!(Array.isArray(data.inventario) && data.inventario.length) && (Array.isArray(data.equipo) || Array.isArray(data.mochila))){
@@ -7336,7 +7337,7 @@ function catalogoRowHtml(item){
     ${thumb(item)}
     <div class="cat-info">
       <div class="cat-card-titulo">
-        <div class="cat-nombre">${esc(item.nombre)}</div>
+        <div class="cat-nombre">${esc(item.nombre)}${item._bib ? ` <span class="hint" style="font-weight:600;${item._bib.auditado ? '' : 'color:#e0a040'}" title="Lo subió alguien del grupo${item._bib.auditado ? '' : ' y todavía no lo revisó el dueño (se puede usar igual)'}">${esc(ItemsSubidos.etiqueta(item))}</span>` : ''}</div>
         ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
       </div>
       <div class="cat-meta">${precioTiendaHtml(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
@@ -8996,7 +8997,7 @@ function openEditor(key, id, equipadoPreset, opciones){
   $("#modal-save").style.display = "";
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
-  $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon') ? 'block' : 'none';
+  $('#modal-catalogo').style.display = (key === 'inventario' || key === 'cinturon' || key === 'catalogo') ? 'block' : 'none';
   $('#modal-activar').style.display = key === 'efectos' ? '' : 'none';
   drawEditor();
   $('#scrim').classList.add('open');
@@ -9420,7 +9421,7 @@ function abrirAsistenteItem(key, id, op){
     conMano: enInventario,
     textoGuardar: original ? 'Guardar' : 'Crear',
     botones: [
-      ...(enInventario ? [{texto: '📦 Agregar al catálogo', accion: (d, boton) => publicarEnCatalogoDesdeFicha({...base, ...d}, boton)}] : []),
+      ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirItemAlCatalogo({...base, ...d}, 'inventario')}] : []),
       ...(original ? [{texto: 'Eliminar', accion: () => {
         if(!confirm(`¿Eliminar "${original.nombre}"? No se puede deshacer.`)) return;
         S[key] = S[key].filter(x => x.id !== id);
@@ -9780,40 +9781,34 @@ function itemComoEntradaDeCatalogo(draft){
   };
 }
 
-async function agregarAlCatalogoDelFabricante(){
-  await publicarEnCatalogoDesdeFicha(editing.draft, $('#modal-catalogo'));
+/* ⬆ Subir al catálogo (paso 5 de docs/plan-subida-unificada.md, P124): el ítem va a la biblioteca compartida de Firebase
+   (tipo `items`), disponible al instante para todos, 🔶 sin auditar hasta que lo revise el dueño. Antes escribía
+   datos/catalogo.json por GitHub (con token) y no llegaba a nadie hasta correr un script. Si el ítem salió del catálogo
+   (mismo id, o mismo nombre), se puede elegir que sea una CORRECCIÓN de ese ítem: lo reemplaza para todos. */
+function agregarAlCatalogoDelFabricante(){
+  if(editing) subirItemAlCatalogo(editing.draft, editing.key);
 }
-
-async function publicarEnCatalogoDesdeFicha(draft, btn){
-  if(!draft.nombre.trim()){ toast('Poné un nombre antes de agregarlo al catálogo'); return; }
-  if(!draft.tipoItem){ toast('Elegí una categoría antes de agregarlo al catálogo'); return; }
-  const aviso = `Esto publica "${draft.nombre}" en el catálogo del fabricante — va a quedar disponible para que ` +
-    `cualquier jugador lo compre desde cualquier ficha (con tier "A definir" hasta que alguien le asigne uno real ` +
-    `desde el editor de catálogo). No borra ni modifica tu ítem acá, solo agrega una copia al catálogo compartido.\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
-  const token = await ghToken(false);
-  if(!token){ toast('Sin token no se puede publicar en el catálogo'); return; }
-  btn.disabled = true;
-  toast('Publicando en el catálogo…');
-  try{
-    const actual = (await ghLeerJson(ARCHIVO_CATALOGO).catch(() => null)) || [];
-    const nuevo = itemComoEntradaDeCatalogo(draft);
-    actual.push(nuevo);
-    await ghSubir(ARCHIVO_CATALOGO, await aBase64(JSON.stringify(actual, null, 2)), token, `Catálogo: agregar "${nuevo.nombre}" (desde la ficha)`);
-    toast(`"${nuevo.nombre}" publicado en el catálogo ✓ — falta correr importar_json.py para que llegue a las 3 herramientas`);
-  }catch(err){
-    if(err && err.auth){
-      localStorage.removeItem('gh-token');
-      toast('El token no sirve o venció — tocá de nuevo y pegá uno nuevo');
-    }else{
-      console.error('Error publicando en el catálogo:', err);
-      toast('No se pudo publicar — revisá la consola');
-    }
-  }finally{
-    btn.disabled = false;
-  }
+// `key` = 'catalogo' si es un ítem del catálogo (se sube tal cual); si no, es un ítem de un personaje (mochila, cinturón).
+function subirItemAlCatalogo(draft, key){
+  if(!String(draft.nombre || '').trim()){ toast('Poné un nombre antes de subirlo al catálogo'); return; }
+  if(!draft.tipoItem){ toast('Elegí una categoría antes de subirlo al catálogo'); return; }
+  const datos = key === 'catalogo' ? structuredClone(draft) : itemComoEntradaDeCatalogo(draft);
+  if(key !== 'catalogo'){ const base = (S.catalogo || []).find(c => c.nombre === draft.nombre); if(base && base.tier) datos.tier = base.tier; }
+  Biblioteca.guardar({tipo: 'items', datos, nombre: datos.nombre, nivel: 0, basadoEn: ItemsSubidos.basadoEn(draft, S.catalogo),
+    alSubir: () => cargarItemsSubidos()});
 }
 $('#modal-catalogo').onclick = agregarAlCatalogoDelFabricante;
+
+// Lo subido por el grupo, sumado al catálogo de esta ficha (comun/items-subidos.js). Se lee al entrar y después de subir.
+let itemsSubidos = [];
+function mezclarItemsSubidos(){
+  if(!Array.isArray(S.catalogo)) return;
+  S.catalogo = ItemsSubidos.mezclar(S.catalogo, itemsSubidos, DEFAULT.catalogo);
+  if(document.getElementById('scrim-catalogo') && $('#scrim-catalogo').classList.contains('open')) renderCatalogoModal();
+}
+function cargarItemsSubidos(){
+  return ItemsSubidos.cargar().then(l => { itemsSubidos = l; mezclarItemsSubidos(); });
+}
 
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;
@@ -11257,7 +11252,7 @@ function fichaPartesActuales(){
   res.otros = fichaSerializar(otros);
   // Del catálogo solo viaja lo que no está en el catálogo compartido
   // (ítems agregados a mano en esta ficha), igual que en aplicarFicha().
-  res.catalogo = fichaSerializar({catalogo: (S.catalogo || []).filter(i => !CATALOGO_IDS.has(i.id))});
+  res.catalogo = fichaSerializar({catalogo: (S.catalogo || []).filter(i => !CATALOGO_IDS.has(i.id) && !i._bib)});
   res.retrato = JSON.stringify({imagen: S.meta.imagen || '', miniatura: S.meta.miniatura || ''});
   res.imgInvocaciones = JSON.stringify(fichaImagenesInvocaciones());
   return res;
@@ -11293,7 +11288,7 @@ function fichaAplicarParte(parte, datos){
   if(parte === 'imgInvocaciones'){ fichaPonerImagenesInvocaciones(datos.imgInvocaciones); return; }
   if(parte === 'catalogo'){
     const propios = Array.isArray(datos.catalogo) ? datos.catalogo : [];
-    S.catalogo = (S.catalogo || []).filter(i => CATALOGO_IDS.has(i.id)).concat(propios);
+    S.catalogo = ItemsSubidos.mezclar((S.catalogo || []).filter(i => CATALOGO_IDS.has(i.id)).concat(propios.filter(i => !i._bib)), itemsSubidos, DEFAULT.catalogo);
     return;
   }
   if(datos.meta){ datos.meta.imagen = S.meta.imagen; datos.meta.miniatura = S.meta.miniatura; }
@@ -12198,6 +12193,7 @@ async function fbAlEntrar(){
   mesaComunEscuchar();
   cargarSkillsSubidas().then(() => renderList('habilidades')).catch(() => {});   // avisos de 🔔 versión nueva
   cargarPasivasSubidas();
+  cargarItemsSubidos();   // ítems que subió el grupo (catálogo compartido, paso 5)
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

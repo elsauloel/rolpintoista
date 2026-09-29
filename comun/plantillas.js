@@ -134,7 +134,7 @@ const Plantillas = (() => {
   /* ---- Ítem ---- la forma del catálogo, sin imagen ni lo de quien lo lleva. */
   function item(it){
     const out = clon(it);
-    ['id', 'imagen', 'equipado', 'cargaActual'].forEach(k => delete out[k]);   // se revisa en el paso 5 (ítems)
+    ['id', 'imagen', 'equipado', 'cargaActual', '_bib'].forEach(k => delete out[k]);
     return out;
   }
 

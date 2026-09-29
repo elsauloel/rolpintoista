@@ -749,3 +749,6 @@ versión parecida en más de una, es candidato a juntar.
   en `ent.col` para auditar/borrar; corregir una entrada vieja crea una nueva con `reemplaza`. Lo usa gm-tools para las
   habilidades de creep (`biblioteca_habs_creep` → `biblioteca_skills`). `Plantillas.limpiar('skills', {para:'creep'})`
   limpia como habilidad de creep.
+- **`biblioteca.js`, cartel único de versión nueva** (2026-09-29, paso 4): `Biblioteca.versionNueva(subidas, origen,
+  ignorada)` (¿hay una versión más nueva que la de la copia?) y `Biblioteca.avisoVersion(opts)` (el cartel "🔔 hay una
+  versión nueva" con Actualizar / Dejar la mía / Ahora no). Todas las herramientas lo usan en vez de un cartel propio.

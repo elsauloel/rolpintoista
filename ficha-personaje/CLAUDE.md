@@ -526,3 +526,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `skillsSubidas`, `cargarSkillsSubidas`). Cada copia guarda `bibOrigen` y, si la original se corrige, aparece
   **🔔 versión nueva** (`versionNuevaDeHab`/`abrirVersionNuevaHab`: Actualizar / Dejar la mía (`bibIgnorada`) / Ahora no).
   Reemplaza al 📤 retirado.
+- **Pasivas en la subida unificada** (2026-09-29, paso 4): "📚 Proponer" pasó a **⬆ Subir** (corrección / nueva);
+  las pasivas guardan `bibOrigen` y muestran 🔔 versión nueva si el original se corrige (`origenDePasiva`,
+  `versionNuevaDePasiva`, `abrirVersionNuevaPasiva`). El 🔔 de habilidades usa ahora el cartel compartido
+  (`Biblioteca.avisoVersion`).

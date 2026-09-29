@@ -1276,8 +1276,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/sesion.js"></script>
-<script src="../comun/plantillas.js?v=20260929c"></script>
-<script src="../comun/biblioteca.js?v=20260929c"></script>
+<script src="../comun/plantillas.js?v=20260929d"></script>
+<script src="../comun/biblioteca.js?v=20260929d"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
@@ -2423,14 +2423,7 @@ function cargarCreepsSubidos(){
   if(typeof Biblioteca === 'undefined' || !Biblioteca.lista) return Promise.resolve();
   return Biblioteca.lista('creeps').then(l => { creepsSubidos = l; renderAll(); }).catch(() => {});
 }
-function versionNuevaDeCreep(sc){
-  const o = sc.bibOrigen;
-  if(!o || !o.id) return null;
-  const e = String(o.id).startsWith('base-') ? creepsSubidos.find(x => x.reemplaza === o.id) : creepsSubidos.find(x => x.id === o.id);
-  if(!e || (e.version || 1) <= (o.version || 1)) return null;
-  if(sc.bibIgnorada === e.id + ':' + (e.version || 1)) return null;
-  return e;
-}
+const versionNuevaDeCreep = sc => typeof Biblioteca !== 'undefined' && Biblioteca.versionNueva ? Biblioteca.versionNueva(creepsSubidos, sc.bibOrigen, sc.bibIgnorada) : null;
 function actualizarCreepDesdeBib(sc, e){
   const d = Plantillas.creep(e.datos);
   const combate = {id: sc.id, imagen: sc.imagen, grupo: sc.grupo, color: sc.color, estados: sc.estados, hp: sc.hp, nitros: sc.nitros,
@@ -2445,30 +2438,10 @@ function actualizarCreepDesdeBib(sc, e){
 function abrirVersionNuevaCreep(sc){
   const e = versionNuevaDeCreep(sc);
   if(!e) return;
-  let fondo = document.getElementById('scrim-creepnuevo');
-  if(!fondo){ fondo = document.createElement('div'); fondo.className = 'scrim'; fondo.id = 'scrim-creepnuevo'; fondo.style.zIndex = '96'; document.body.appendChild(fondo); }
-  const quien = e.editorNombre || e.autorNombre;
-  fondo.innerHTML = `<div class="modal" style="max-width:480px">
-    <header><h3>🔔 ${esc(sc.nombre)}: hay una versión nueva</h3></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:8px">
-      <div>El creep de la biblioteca del que salió este se corrigió${quien ? ` (por <b>${esc(quien)}</b>)` : ''} — versión ${fmt(e.version || 1)}${e.auditado ? '' : ', 🔶 sin auditar todavía'}.</div>
-      <div class="hint"><b>Actualizar</b> cambia sus atributos, arma, equipo y habilidades por los nuevos; se quedan su vida (con el tope del máximo nuevo), sus estados, su grupo y su imagen. <b>Dejar el mío</b> no vuelve a avisar de esta versión.</div>
-    </div>
-    <footer style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-      <button type="button" class="btn ghost" data-cn="despues">Ahora no</button>
-      <button type="button" class="btn" data-cn="mio">Dejar el mío</button>
-      <button type="button" class="btn primary" data-cn="actualizar">Actualizar</button>
-    </footer></div>`;
-  fondo.classList.add('open');
-  fondo.onclick = ev => {
-    const b = ev.target.closest('[data-cn]');
-    if(!b && ev.target !== fondo) return;
-    fondo.classList.remove('open');
-    if(!b || b.dataset.cn === 'despues') return;
-    if(b.dataset.cn === 'mio') sc.bibIgnorada = e.id + ':' + (e.version || 1);
-    else{ actualizarCreepDesdeBib(sc, e); toast(`${sc.nombre} actualizado a la versión ${fmt(e.version || 1)}`); }
-    renderAll();
-  };
+  Biblioteca.avisoVersion({nombre: sc.nombre, entrada: e, que: 'El creep', dejarTxt: 'Dejar el mío',
+    actualizarTxt: 'cambia sus atributos, arma, equipo y habilidades por los nuevos; se quedan su vida (con el tope del máximo nuevo), sus estados, su grupo y su imagen.',
+    alActualizar: () => { actualizarCreepDesdeBib(sc, e); toast(`${sc.nombre} actualizado a la versión ${fmt(e.version || 1)}`); renderAll(); },
+    alDejar: () => { sc.bibIgnorada = e.id + ':' + (e.version || 1); renderAll(); }});
 }
 
 function agregarCreepDeBiblioteca(datos, meta){

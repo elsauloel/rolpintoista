@@ -218,6 +218,26 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
   creep ya guardan `bibOrigen`, así que se puede sumar). Anotado en `docs/pendientes.md`.
 - Verificado con la base de datos simulada en copias de GM Tools y de la ficha; no probado contra Firebase real.
 
+## Paso 4: cómo quedó (2026-09-29)
+
+- **Cartel compartido de versión nueva**: `Biblioteca.versionNueva(subidas, origen, ignorada)` y
+  `Biblioteca.avisoVersion({nombre, entrada, que, actualizarTxt, dejarTxt, alActualizar, alDejar})` en
+  `comun/biblioteca.js`. Lo usan las habilidades (ficha), los creeps (gm-tools), las pasivas (ficha) y las trampas
+  guardadas (mapa) — antes cada herramienta tenía su propio cartel. El `meta` de `alElegir` suma `reemplaza`.
+- **Pasivas (ficha)**: "📚 Proponer" pasó a **⬆ Subir** (`proponerPasiva`, con `basadoEn` → corrección / nueva). Las
+  agregadas guardan `bibOrigen` (las de fábrica de antes salen de `base-<poolId>`, versión 1). La corrección de una de
+  fábrica se acumula con ella (misma clave de compras). Si el original se corrige, la fila muestra **🔔 versión nueva**
+  (Actualizar cambia nombre, descripción, Job y bonos; las compras quedan). `pasivasSubidas`/`cargarPasivasSubidas`.
+- **Trampas (mapa)**: "Guardar como recurrente" ahora guarda también el **teleport** y **"deja una zona al
+  dispararse"** (turnos, cada paso, Mantenimiento, resistencia), y `cargarTrampaEnPanel` los vuelve a cargar — el
+  pendiente de "Trampas persistentes" que no se recordaba. Cada trampa guardada tiene **⬆** (antes 📤, con corrección /
+  nueva) y, si la del catálogo de la que salió se corrigió, **🔔** (`trampasSubidas`, `versionNuevaDeTrampa`,
+  `elemTrampaBibOrigen`). `Plantillas.trampa` suma `teleport`.
+- Las trampas preconstruidas que se eligen desde el editor de habilidades (ficha y gm-tools) no cambiaron: leen el
+  mismo catálogo, que ahora muestra lo subido al instante.
+- P123 (una sola forma de trampa para el mapa y para las habilidades) sigue abierta: este paso no la necesitaba.
+- Verificado con la base de datos simulada en copias de la ficha, GM Tools y el mapa; no probado contra Firebase real.
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -231,6 +251,6 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
 | 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | ✅ 2026-09-29 (el mecanismo; el aviso en cada herramienta va en su paso) — ver "Paso 1: cómo quedó" · **falta pegar las reglas de Firestore** |
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | ✅ 2026-09-29 — ver "Paso 2: cómo quedó" |
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | ✅ 2026-09-29 — ver "Paso 3: cómo quedó" |
-| 4 | Pasivas y trampas | Pendiente |
+| 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (P123, unificar las dos formas de trampa, sigue abierta) |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | Pendiente |
 | 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | Pendiente |

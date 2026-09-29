@@ -363,7 +363,7 @@ const Biblioteca = (() => {
         st.opts.alVer(structuredClone(ent.datos), ent);
       }else if(acc === 'agregar'){
         // meta: de dónde salió la copia, para el aviso de "hay una versión nueva" (la herramienta la guarda en bibOrigen).
-        st.opts.alElegir(structuredClone(ent.datos), {tipo: tipoAct, id: ent.id, version: ent.version || 1});
+        st.opts.alElegir(structuredClone(ent.datos), {tipo: tipoAct, id: ent.id, version: ent.version || 1, reemplaza: ent.reemplaza || ''});
         document.getElementById('scrim-biblioteca').classList.remove('open');
       }else if(acc === 'rechazar'){
         if(!confirm(`¿Rechazar la propuesta "${ent.nombre}"? Se borra.`)) return;
@@ -606,5 +606,52 @@ const Biblioteca = (() => {
     return e ? {id: e.id, nombre: e.nombre, version: e.version || 1, auditado: e.auditado, datos: structuredClone(e.datos)} : null;
   }
 
-  return {abrir, guardar, entrada, lista, esDueno};
+  /**
+   * Busca, en una lista de `lista(tipo)`, la versión actual del elemento del que salió una copia (`origen = {id,
+   * version}`, lo que la copia guarda en `bibOrigen`). Devuelve la entrada si es MÁS NUEVA que la de la copia y la
+   * copia no dijo "Dejar la mía" para esa versión (`ignorada = 'id:version'`); si no, null.
+   */
+  function versionNueva(subidas, origen, ignorada){
+    if(!origen || !origen.id) return null;
+    const e = String(origen.id).startsWith('base-') ? (subidas || []).find(x => x.reemplaza === origen.id) : (subidas || []).find(x => x.id === origen.id);
+    if(!e || (e.version || 1) <= (origen.version || 1)) return null;
+    if(ignorada === e.id + ':' + (e.version || 1)) return null;
+    return e;
+  }
+
+  /**
+   * El cartel "🔔 hay una versión nueva" (decisión 3 del plan de subida unificada): el mismo para habilidades, creeps,
+   * pasivas y trampas. opts: {nombre, entrada, que ('La habilidad'…), actualizarTxt (qué cambia y qué se queda),
+   * dejarTxt ('Dejar la mía'), alActualizar(), alDejar()}. "Ahora no" no hace nada (vuelve a avisar la próxima vez).
+   */
+  function avisoVersion(opts){
+    const e = opts.entrada;
+    let fondo = document.getElementById('scrim-bib-version');
+    if(!fondo){ fondo = document.createElement('div'); fondo.className = 'scrim'; fondo.id = 'scrim-bib-version'; fondo.style.zIndex = '97'; document.body.appendChild(fondo); }
+    const quien = e.editorNombre || e.autorNombre;
+    const dejar = opts.dejarTxt || 'Dejar la mía';
+    fondo.innerHTML = `<div class="modal" style="max-width:480px">
+      <header><h3>🔔 ${esc(opts.nombre || e.nombre)}: hay una versión nueva</h3></header>
+      <div class="body" style="display:flex;flex-direction:column;gap:8px">
+        <div>${esc(opts.que || 'El elemento')}: el original de la biblioteca se corrigió${quien ? ` (por <b>${esc(quien)}</b>)` : ''} y ahora va por la versión ${esc(e.version || 1)}${e.auditado ? '' : ' (🔶 sin auditar todavía)'}.</div>
+        ${(e.datos && e.datos.detalle) || e.descripcion ? `<div class="hint">${esc((e.datos && e.datos.detalle) || e.descripcion)}</div>` : ''}
+        <div class="hint"><b>Actualizar</b> ${esc(opts.actualizarTxt || 'reemplaza lo tuyo por la versión nueva.')} <b>${esc(dejar)}</b> no vuelve a avisar de esta versión.</div>
+      </div>
+      <footer style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <button type="button" class="btn ghost" data-bv="despues">Ahora no</button>
+        <button type="button" class="btn" data-bv="dejar">${esc(dejar)}</button>
+        <button type="button" class="btn primary" data-bv="actualizar">Actualizar</button>
+      </footer></div>`;
+    fondo.classList.add('open');
+    fondo.onclick = ev => {
+      const b = ev.target.closest('[data-bv]');
+      if(!b && ev.target !== fondo) return;
+      fondo.classList.remove('open');
+      if(!b || b.dataset.bv === 'despues') return;
+      if(b.dataset.bv === 'dejar'){ if(opts.alDejar) opts.alDejar(); }
+      else if(opts.alActualizar) opts.alActualizar();
+    };
+  }
+
+  return {abrir, guardar, entrada, lista, versionNueva, avisoVersion, esDueno};
 })();

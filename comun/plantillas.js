@@ -72,7 +72,7 @@ const Plantillas = (() => {
   }
 
   /* ---- Trampa del mapa ("Trampas guardadas") ---- con la zona que deja al dispararse, si la tiene. */
-  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos',
+  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'teleport',
     'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor'];
   function trampa(t){
     const out = {};

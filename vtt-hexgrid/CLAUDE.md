@@ -1088,3 +1088,9 @@ hexágono con otro sin importar bando. Todavía no está construido.
   Trampas / Zonas con efectos persistentes en vez de entrar directo a un modo; Zonas abre un asistente paso a
   paso nuevo (`comun/asistente-zona.js`). Detalle grande en `comun/CLAUDE.md` (comparte motor y datos con la
   Etapa 1 del mismo día). 🔥 Terreno incendiado ya no se crea desde acá — lo reemplaza una zona sin estado.
+
+- **Trampas guardadas en la subida unificada** (2026-09-29, paso 4 de `../docs/plan-subida-unificada.md`): "Guardar como
+  recurrente" guarda también el teleport y "deja una zona al dispararse" (y `cargarTrampaEnPanel` los recupera — antes se
+  perdían). Cada trampa guardada tiene **⬆** (subir al catálogo compartido: al instante para todos, corrección / nueva
+  si salió del catálogo) y **🔔** si la del catálogo de la que salió se corrigió (`elemTrampaBibOrigen`,
+  `trampasSubidas`, `versionNuevaDeTrampa`, cartel `Biblioteca.avisoVersion`).

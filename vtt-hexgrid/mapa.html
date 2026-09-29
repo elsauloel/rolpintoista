@@ -929,8 +929,8 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/tiradas.js"></script>
 <script src="../comun/mesa.js"></script>
 <script src="../comun/recorte-imagen.js"></script>
-<script src="../comun/plantillas.js?v=20260929c"></script>
-<script src="../comun/biblioteca.js?v=20260929c"></script>
+<script src="../comun/plantillas.js?v=20260929d"></script>
+<script src="../comun/biblioteca.js?v=20260929d"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
@@ -1200,6 +1200,7 @@ let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport:
 // siendo a mano); acá sí es automática, con una dificultad fija (no hay quien tire, como en el asistente de zonas).
 let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant = true, elemTrampaZonaCadaPaso = false;
 let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
+let elemTrampaBibOrigen = null;   // de qué trampa de la biblioteca salió la que se está armando (para ⬆ Subir y el aviso 🔔)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
@@ -1951,7 +1952,7 @@ async function sigiloAviso(origen, formula){
 // Lista de trampas guardadas en el panel de creación: tocar el nombre la carga, ✕ la borra.
 function trampasGuardadasHtml(){
   if(!trampasGuardadas.length) return `<label class="etiqueta">Trampas</label><button type="button" class="btn chico" id="trampas-catalogo" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button>`;
-  return `<label class="etiqueta">Trampas guardadas</label><button type="button" class="btn chico" id="trampas-catalogo" style="margin-bottom:4px" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button><div class="trampas-guardadas">${trampasGuardadas.map((g, i) => `<div class="tg-fila"><button type="button" class="btn chico tg-usar" data-tg-usar="${i}" title="${esc(g.detalle || '')}">${esc(g.nombre)}${g.amiga ? ' · 🔥' : ''}</button><button type="button" class="btn chico" data-tg-proponer="${i}" title="Proponerla al catálogo de trampas para que el dueño la evalúe">📤</button><button type="button" class="btn chico peligro" data-tg-borrar="${i}" title="Borrar de las guardadas">✕</button></div>`).join('')}</div>`;
+  return `<label class="etiqueta">Trampas guardadas</label><button type="button" class="btn chico" id="trampas-catalogo" style="margin-bottom:4px" title="Elegir una trampa del catálogo">📚 Catálogo de trampas</button><div class="trampas-guardadas">${trampasGuardadas.map((g, i) => `<div class="tg-fila"><button type="button" class="btn chico tg-usar" data-tg-usar="${i}" title="${esc(g.detalle || '')}">${esc(g.nombre)}${g.amiga ? ' · 🔥' : ''}</button>${versionNuevaDeTrampa(g) ? `<button type="button" class="btn chico" data-tg-version="${i}" title="Alguien corrigió la trampa del catálogo de la que salió esta: ver y decidir si actualizarla">🔔</button>` : ''}<button type="button" class="btn chico" data-tg-proponer="${i}" title="Subirla al catálogo compartido de trampas: queda disponible para todos al instante">⬆</button><button type="button" class="btn chico peligro" data-tg-borrar="${i}" title="Borrar de las guardadas">✕</button></div>`).join('')}</div>`;
 }
 // Estado automático de una trampa (2026-09-24): los debuffs de EstadosAplicar con duración (Escarcha, Pajaritos, Rengo, Stun…).
 // Al pisarla se aplica solo a quien la activa (y a los de adentro si es de área), con los turnos que se elijan al colocarla.
@@ -2148,8 +2149,15 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
   });
 }
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
-function cargarTrampaEnPanel(g){
+function cargarTrampaEnPanel(g, meta){
   if(!g) return;
+  elemTrampaBibOrigen = g.bibOrigen || (meta && meta.id ? {tipo: 'trampas', id: meta.id, version: meta.version || 1} : null);
+  // "Deja una zona al dispararse" (trampas persistentes): antes no se guardaba en las recurrentes.
+  elemTrampaDejaZona = !!g.dejaZona;
+  if(g.dejaZona){
+    elemTrampaZonaTurnos = Math.max(1, Math.round(num(g.zonaTurnos)) || 3); elemTrampaZonaEnMant = g.zonaEnMantenimiento !== false;
+    elemTrampaZonaCadaPaso = !!g.zonaCadaPaso; elemTrampaZonaResistStat = g.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(g.zonaResistValor)) || 12;
+  }
   elemTrampaTeleport = !!g.teleport; if(!g.teleport) elemTrampaDestino = '';
   elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef; elemTrampaEstado = g.estado || ''; elemTrampaEstadoTurnos = Math.max(0, Math.round(num(g.estadoTurnos)) || 0);
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
@@ -2167,7 +2175,7 @@ function abrirCatalogoTrampas(){
     tipo: 'trampas', titulo: 'Catálogo de trampas',
     base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
     textoCrearDeCero: '+ Crear una trampa custom (paso a paso)',
-    alCrearDeCero: () => { elemTrampa = true; abrirAsistenteTrampaPanel(); },
+    alCrearDeCero: () => { elemTrampa = true; elemTrampaBibOrigen = null; abrirAsistenteTrampaPanel(); },
     alElegir: cargarTrampaEnPanel,
     subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [
@@ -2177,6 +2185,17 @@ function abrirCatalogoTrampas(){
       {nombre: 'Alcance', tags: ['área']},
     ],
   });
+}
+// Lo subido al catálogo de trampas, para el aviso 🔔 de las trampas guardadas (se lee al abrir el panel de trampas).
+let trampasSubidas = null;
+function cargarTrampasSubidas(){
+  if(typeof Biblioteca === 'undefined' || !Biblioteca.lista) return;
+  trampasSubidas = trampasSubidas || [];
+  Biblioteca.lista('trampas').then(l => { trampasSubidas = l; renderHerramientaFlotante(); }).catch(() => {});
+}
+function versionNuevaDeTrampa(g){
+  if(trampasSubidas === null) cargarTrampasSubidas();
+  return typeof Biblioteca !== 'undefined' && Biblioteca.versionNueva ? Biblioteca.versionNueva(trampasSubidas || [], g.bibOrigen, g.bibIgnorada) : null;
 }
 function guardarTrampaRecurrente(g){
   const i = trampasGuardadas.findIndex(x => x.nombre === g.nombre);
@@ -10083,7 +10102,11 @@ $('#herramienta-flotante').addEventListener('click', e => {
     const nombre = elemTrampaNombre.trim();
     if(!nombre){ toast('Ponele un nombre a la trampa para guardarla'); return; }
     const g = {nombre: nombre.slice(0, 40), detalle: elemTrampaDetalle.trim().slice(0, 200), amiga: elemTrampaAmiga,
-      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos};
+      tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa, dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos,
+      ...(elemTrampaTeleport ? {teleport: true} : {}),
+      ...(elemTrampaDejaZona ? {dejaZona: true, zonaTurnos: elemTrampaZonaTurnos, zonaEnMantenimiento: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso,
+        zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor} : {}),
+      ...(elemTrampaBibOrigen ? {bibOrigen: elemTrampaBibOrigen} : {})};
     guardarTrampaRecurrente(g);
     toast(`Trampa "${g.nombre}" guardada`);
     return;
@@ -10092,7 +10115,20 @@ $('#herramienta-flotante').addEventListener('click', e => {
   const tgProponer = e.target.closest('[data-tg-proponer]');
   if(tgProponer){
     const g = trampasGuardadas[num(tgProponer.dataset.tgProponer)];
-    if(g) Biblioteca.guardar({tipo: 'trampas', datos: g, nombre: g.nombre, nivel: 0});
+    // ⬆ Subir (subida unificada, paso 4): disponible para todos al instante; si salió del catálogo, corrección o nueva.
+    if(g) Biblioteca.guardar({tipo: 'trampas', datos: g, nombre: g.nombre, nivel: 0, base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
+      basadoEn: g.bibOrigen && g.bibOrigen.id ? {id: g.bibOrigen.id, nombre: g.nombre} : null,
+      alSubir: r => { g.bibOrigen = {tipo: 'trampas', id: r.id, version: r.version}; delete g.bibIgnorada; guardarTrampasGuardadas(); cargarTrampasSubidas(); }});
+    return;
+  }
+  const tgVersion = e.target.closest('[data-tg-version]');
+  if(tgVersion){
+    const g = trampasGuardadas[num(tgVersion.dataset.tgVersion)];
+    const ent = g && versionNuevaDeTrampa(g);
+    if(ent) Biblioteca.avisoVersion({nombre: g.nombre, entrada: ent, que: 'La trampa',
+      actualizarTxt: 'reemplaza tu trampa guardada (daño, estado, forma…) por la nueva.',
+      alActualizar: () => { const i = trampasGuardadas.indexOf(g); if(i >= 0) trampasGuardadas[i] = {...structuredClone(ent.datos), bibOrigen: {tipo: 'trampas', id: ent.id, version: ent.version || 1}}; guardarTrampasGuardadas(); renderHerramientaFlotante(); toast(`Trampa "${g.nombre}" actualizada`); },
+      alDejar: () => { g.bibIgnorada = ent.id + ':' + (ent.version || 1); guardarTrampasGuardadas(); renderHerramientaFlotante(); }});
     return;
   }
   const tgUsar = e.target.closest('[data-tg-usar]');

@@ -2067,8 +2067,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929c"></script>
-<script src="../comun/biblioteca.js?v=20260929c"></script>
+<script src="../comun/plantillas.js?v=20260929d"></script>
+<script src="../comun/biblioteca.js?v=20260929d"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
 /* =========================================================
@@ -5949,9 +5949,9 @@ const LISTS = {
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}</div><div class="idesc">${esc(i.detalle)}</div>
+        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}${versionNuevaDePasiva(i) ? ` <button type="button" class="mini" data-versionpasiva="${i.id}" title="Alguien corrigió la pasiva de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div><div class="idesc">${esc(i.detalle)}</div>
         <div class="imeta">${modTags(i.mods)}</div></div>
-        <div class="rowbtns"><button class="mini" data-proponerpasiva="${i.id}" title="Mandar esta pasiva al catálogo para que el dueño la revise">📚 Proponer</button><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
+        <div class="rowbtns"><button class="mini" data-proponerpasiva="${i.id}" title="Subir esta pasiva a la biblioteca compartida: queda disponible para todos al instante">⬆ Subir</button><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
       </div></div>`
   },
   sociales:{
@@ -7220,6 +7220,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.usarinv){ abrirBotoneraInv(b.dataset.usarinv); return; }
   if(b.dataset.editararmainv){ abrirEditorArmaInv(b.dataset.editararmainv); return; }
   if(b.dataset.proponerpasiva){ proponerPasiva(b.dataset.proponerpasiva); return; }
+  if(b.dataset.versionpasiva){ const p = S.pasivas.find(x => x.id === b.dataset.versionpasiva); if(p) abrirVersionNuevaPasiva(p); return; }
   if(b.dataset.additeminv){ abrirItemNuevoInv(b.dataset.additeminv); return; }
   if(b.dataset.quitarequipoinv){
     const [invId, equipoId] = b.dataset.quitarequipoinv.split(':');
@@ -9630,11 +9631,7 @@ function origenDeHab(it){
 function versionNuevaDeHab(it){
   const o = origenDeHab(it);
   if(!o) return null;
-  const todas = [...skillsSubidas, ...skillsDeCreep];
-  const e = String(o.id).startsWith('base-') ? todas.find(x => x.reemplaza === o.id) : todas.find(x => x.id === o.id);
-  if(!e || (e.version || 1) <= (o.version || 1)) return null;
-  if(it.bibIgnorada === e.id + ':' + (e.version || 1)) return null;   // "Dejar la mía" para esta versión
-  return e;
+  return typeof Biblioteca !== 'undefined' && Biblioteca.versionNueva ? Biblioteca.versionNueva([...skillsSubidas, ...skillsDeCreep], o, it.bibIgnorada) : null;
 }
 // ⬆ Subir: la habilidad del personaje, con toda su configuración, a la biblioteca (comun/biblioteca.js). Si salió de
 // otra, pregunta si es una corrección (queda en la clase del original) o algo nuevo (va al pool custom).
@@ -9673,32 +9670,10 @@ function actualizarHabDesdeBib(it, e){
 function abrirVersionNuevaHab(it){
   const e = versionNuevaDeHab(it);
   if(!e) return;
-  let sc = document.getElementById('scrim-habnueva');
-  if(!sc){ sc = document.createElement('div'); sc.className = 'scrim'; sc.id = 'scrim-habnueva'; sc.style.zIndex = '96'; document.body.appendChild(sc); }
-  const quien = e.editorNombre || e.autorNombre;
-  sc.innerHTML = `<div class="modal" style="max-width:480px">
-    <header><h3>🔔 ${esc(it.nombre)}: hay una versión nueva</h3></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:8px">
-      <div>La habilidad de la que salió la tuya se corrigió${quien ? ` (por <b>${esc(quien)}</b>)` : ''} — versión ${fmt(e.version || 1)}${e.auditado ? '' : ', 🔶 sin auditar todavía'}.</div>
-      <div class="hint">${esc(e.datos.detalle || '')}</div>
-      <div class="hint"><b>Actualizar</b> reemplaza la configuración de tu habilidad (costo, tirada, Ejecución…) por la nueva; tu Job y tu imagen quedan. <b>Dejar la mía</b> no te vuelve a avisar de esta versión.</div>
-    </div>
-    <footer style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-      <button type="button" class="btn ghost" data-hn="despues">Ahora no</button>
-      <button type="button" class="btn" data-hn="mia">Dejar la mía</button>
-      <button type="button" class="btn primary" data-hn="actualizar">Actualizar</button>
-    </footer></div>`;
-  sc.classList.add('open');
-  sc.onclick = ev => {
-    const b = ev.target.closest('[data-hn]');
-    if(!b && ev.target !== sc) return;
-    sc.classList.remove('open');
-    if(!b || b.dataset.hn === 'despues') return;
-    if(b.dataset.hn === 'mia') it.bibIgnorada = e.id + ':' + (e.version || 1);
-    else{ actualizarHabDesdeBib(it, e); toast(`${it.nombre} actualizada a la versión ${fmt(e.version || 1)}`); }
-    renderList('habilidades');
-    refresh();
-  };
+  Biblioteca.avisoVersion({nombre: it.nombre, entrada: e, que: 'La habilidad',
+    actualizarTxt: 'reemplaza la configuración de tu habilidad (costo, tirada, Ejecución…) por la nueva; tu Job y tu imagen quedan.',
+    alActualizar: () => { actualizarHabDesdeBib(it, e); toast(`${it.nombre} actualizada a la versión ${fmt(e.version || 1)}`); renderList('habilidades'); refresh(); },
+    alDejar: () => { it.bibIgnorada = e.id + ':' + (e.version || 1); renderList('habilidades'); refresh(); }});
 }
 // '_custom' es un id de pseudo-clase (no está en CLASES_SKILLS) para el pool SKILLS_CUSTOM (2026-09-29, pedido del
 // dueño): mismo menú y mismo mecanismo de "Agregar" que una clase real, pero cuesta 2 de Job (HAB_JOB_CUSTOM, lo
@@ -9804,7 +9779,39 @@ const pasivaCompras = x => Math.max(1, Math.floor(num(x && x.compras)) || 1);
 const PASIVA_TOPE = () => Math.max(1, Math.floor(Math.max(1, num(S.meta.nivel) || 1) / 2));
 const claveDePasiva = d => d.poolId || ('p-' + normClase(d.nombre));
 
+/* Subida unificada (paso 4 de docs/plan-subida-unificada.md): una pasiva agregada desde la biblioteca guarda de dónde
+   salió (`bibOrigen`); ⬆ Subir pregunta si es una corrección o una nueva, y si el original se corrige la fila muestra
+   🔔 (cartel compartido `Biblioteca.avisoVersion`). */
+let pasivasSubidas = [];
+function cargarPasivasSubidas(){
+  if(typeof Biblioteca === 'undefined' || !Biblioteca.lista) return Promise.resolve();
+  return Biblioteca.lista('pasivas').then(l => { pasivasSubidas = l; renderList('pasivas'); }).catch(() => {});
+}
+// Las pasivas de fábrica que se agregaron antes de esto no tienen `bibOrigen`: salen de la de fábrica (poolId), versión 1.
+function origenDePasiva(p){
+  if(p.bibOrigen && p.bibOrigen.id) return p.bibOrigen;
+  if(p.poolId && typeof PASIVAS_BASE !== 'undefined' && PASIVAS_BASE.some(b => b.poolId === p.poolId)) return {tipo: 'pasivas', id: 'base-' + p.poolId, version: 1};
+  return null;
+}
+const versionNuevaDePasiva = p => typeof Biblioteca !== 'undefined' && Biblioteca.versionNueva ? Biblioteca.versionNueva(pasivasSubidas, origenDePasiva(p), p.bibIgnorada) : null;
+function abrirVersionNuevaPasiva(p){
+  const e = versionNuevaDePasiva(p);
+  if(!e) return;
+  Biblioteca.avisoVersion({nombre: p.nombre, entrada: e, que: 'La pasiva',
+    actualizarTxt: 'cambia su nombre, descripción, costo en Job y bonos por los nuevos; las veces que la compraste quedan.',
+    alActualizar: () => {
+      const d = e.datos;
+      Object.assign(p, {nombre: d.nombre || p.nombre, detalle: d.detalle || '', jobCosto: Math.max(0, num(d.jobCosto) || 1),
+        mods: (d.mods || []).map(m => ({...m})), regenHp: num(d.regenHp) || 0, bibOrigen: {tipo: 'pasivas', id: e.id, version: e.version || 1}});
+      delete p.bibIgnorada;
+      toast(`${p.nombre} actualizada a la versión ${fmt(e.version || 1)}`);
+      renderList('pasivas'); refresh();
+    },
+    alDejar: () => { p.bibIgnorada = e.id + ':' + (e.version || 1); renderList('pasivas'); refresh(); }});
+}
+
 function abrirPasivaNueva(){
+  cargarPasivasSubidas();
   Biblioteca.abrir({
     tipo: 'pasivas', titulo: 'Pasiva nueva',
     base: PASIVAS_BASE,
@@ -9815,8 +9822,9 @@ function abrirPasivaNueva(){
   });
 }
 
-function agregarPasivaDeCatalogo(datos){
-  const clave = claveDePasiva(datos);
+function agregarPasivaDeCatalogo(datos, meta){
+  // La corrección de una de fábrica se acumula con la de fábrica (misma clave), no como otra pasiva distinta.
+  const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
   const costo = Math.max(0, num(datos.jobCosto) || 1);
   const tope = PASIVA_TOPE();
   const ya = S.pasivas.find(p => (p.poolId || claveDePasiva(p)) === clave);
@@ -9829,6 +9837,7 @@ function agregarPasivaDeCatalogo(datos){
       ...structuredClone(datos), id: uid(), poolId: clave, compras: 1,
       mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0,
       job: true, jobCosto: costo, origen: '', imagen: '',
+      ...(meta && meta.id ? {bibOrigen: {tipo: 'pasivas', id: meta.id, version: meta.version || 1}} : {}),
     });
     toast(`${datos.nombre} agregada (${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
   }
@@ -9836,13 +9845,16 @@ function agregarPasivaDeCatalogo(datos){
   refresh();
 }
 
-// Manda una pasiva propia al catálogo (propuesta; el dueño la audita).
+// ⬆ Sube una pasiva a la biblioteca compartida: disponible para todos al instante (el dueño la audita después).
 function proponerPasiva(id){
   const p = S.pasivas.find(x => x.id === id);
   if(!p) return;
   const datos = {nombre: p.nombre, detalle: p.detalle || '', jobCosto: Math.max(1, num(p.jobCosto) || 1),
     mods: (p.mods || []).map(m => ({stat: m.stat, val: num(m.val)})), regenHp: num(p.regenHp) || 0};
-  Biblioteca.guardar({tipo: 'pasivas', datos, nombre: p.nombre, nivel: datos.jobCosto});
+  const o = origenDePasiva(p);
+  Biblioteca.guardar({tipo: 'pasivas', datos, nombre: p.nombre, nivel: datos.jobCosto, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
+    basadoEn: o ? {id: o.id, nombre: p.nombre} : null,
+    alSubir: r => { p.bibOrigen = {tipo: 'pasivas', id: r.id, version: r.version}; delete p.bibIgnorada; refresh(); cargarPasivasSubidas(); }});
 }
 
 function openEditor(key, id, equipadoPreset, opciones){
@@ -13084,6 +13096,7 @@ async function fbAlEntrar(){
   botinLootEscuchar();
   mesaComunEscuchar();
   cargarSkillsSubidas().then(() => renderList('habilidades')).catch(() => {});   // avisos de 🔔 versión nueva
+  cargarPasivasSubidas();
   let id = location.hash.slice(1);
   if(!id){ try{ id = localStorage.getItem('ficha-actual-' + FB_CAMPANA) || ''; }catch(e){} }
   if(id && await fichaAbrir(id)) return;

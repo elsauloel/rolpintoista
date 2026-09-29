@@ -625,3 +625,19 @@ versión parecida en más de una, es candidato a juntar.
      (no solo el GM) tenga el mapa abierto para que su propio buff se aplique solo.
   **No verificado en vivo con Firebase real** (solo por trazado de código + sintaxis: no hay forma de simular
   un duelo completo con Firestore real sin credenciales) — pedido al dueño reprobar en su partida.
+
+- **Bug real encontrado: `#ct-fondo` (¿Es tu turno?) quedaba invisible dentro de la Botonera del mapa
+  (2026-09-29, siguiendo el mismo reporte de Blindaje "no pasa nada" — el dueño confirmó que Shockwave SÍ
+  funciona embebido, lo que descartó las dos causas de arriba como explicación completa)**. `ficha-personaje/ficha.html`
+  tiene una regla CSS que en modo Botonera (`?modo=botonera`, la ficha corre en un iframe dentro del mapa) oculta
+  TODO hijo directo de `<body>` salvo una lista puntual de excepciones (`:not(.scrim):not(.toast):not(#ep-fondo)…`)
+  — pensada para que solo se vea la Botonera y sus ventanitas, con fondo transparente. Al sumar
+  `comun/confirmar-turno.js` (el cartelito "¿Es tu turno?" del paso Costo, `turnoAjenoSp`) se cargó el script pero
+  se olvidó agregar su `#ct-fondo` a esa lista — así que una habilidad con "el costo en SP es distinto si no es tu
+  turno" tildado, ejecutada desde la Botonera del mapa, queda **esperando un clic en un cartelito invisible**: sin
+  ningún error, sin ningún toast, "no pasa nada" para quien la usa (el `await ConfirmarTurno.pedir(...)` de
+  `ejecutarHabilidad` nunca se resuelve). Arreglado sumando `:not(#ct-fondo)` a la regla de `ficha-personaje/ficha.html`
+  (línea de `html.modo-botonera body > :not(...)`). Verificado con una prueba de CSS aislada (no con Firebase real):
+  con el fix, `#ct-fondo` computa `display:block`; sin él, `display:none`. **Pedido al dueño**: confirmar si
+  Blindaje tenía tildado ese checkbox (parece la explicación más probable dado que no daba ningún error) y reprobar
+  ejecutándolo desde la Botonera del mapa.

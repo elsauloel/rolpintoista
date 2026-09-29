@@ -87,6 +87,7 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
     </select>
     <select id="f-funcion"><option value="">Cualquier función</option></select>
     <select id="f-tipodano"><option value="">Cualquier tipo de daño</option></select>
+    <select id="f-mecanica"><option value="">Cualquier mecánica</option></select>
     <span class="cont" id="cont"></span>
   </div>
   <div class="barra" style="margin-top:6px">
@@ -148,6 +149,11 @@ const NOMBRES_CLASE = {warrior: 'Warrior', asalto: 'Asalto', tanque: 'Tanque', m
 // grupo solo para mostrarlas y filtrarlas, no por el dato en sí.
 const FUNCION_TAGS = ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área'];
 const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'físico'];
+// Mecánicas especiales (2026-09-29, pedido del dueño): marca una skill que usa un andamiaje puntual del duelo,
+// más allá de la función/el tipo de daño de arriba — por ahora una sola, "Critical Matters" (comun/duelo.js,
+// comun/asistente-duelo-hab.js: un efecto que solo pasa si el golpe sale crítico, ver Lisiar). Lista abierta
+// para sumar otras mecánicas puntuales el día que aparezcan, sin tocar el resto de la clasificación.
+const MECANICA_TAGS = ['critical matters'];
 
 let datos = null;   // {clases: [...], custom: [...]}  — clon editable de CLASES_SKILLS/SKILLS_CUSTOM
 let editando = null;   // referencia directa al objeto skill que muestra el editor ahora mismo
@@ -186,6 +192,7 @@ function cargar(){
   $('#f-clase').insertAdjacentHTML('beforeend', datos.clases.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}</option>`).join('') + '<option value="_custom">Pool custom (fuera de clase)</option>');
   $('#f-funcion').insertAdjacentHTML('beforeend', FUNCION_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
   $('#f-tipodano').insertAdjacentHTML('beforeend', TIPODANO_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
+  $('#f-mecanica').insertAdjacentHTML('beforeend', MECANICA_TAGS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
   const local = leerLocal();
   if(local){
     $('#banner-borrador').innerHTML = `<div class="banner">📝 Hay un borrador sin publicar en este navegador (${new Date(local.actualizado).toLocaleString('es-AR')}).
@@ -233,10 +240,10 @@ function pasaFiltroEstado(h, fe){
   return true;
 }
 function dibujar(){
-  const q = $('#buscar').value.trim(), fc = $('#f-clase').value, fe = $('#f-estado').value, ff = $('#f-funcion').value, ft = $('#f-tipodano').value;
-  const pasaTags = h => (!ff || (h.etiquetas || []).includes(ff)) && (!ft || (h.etiquetas || []).includes(ft));
+  const q = $('#buscar').value.trim(), fc = $('#f-clase').value, fe = $('#f-estado').value, ff = $('#f-funcion').value, ft = $('#f-tipodano').value, fm = $('#f-mecanica').value;
+  const pasaTags = h => (!ff || (h.etiquetas || []).includes(ff)) && (!ft || (h.etiquetas || []).includes(ft)) && (!fm || (h.etiquetas || []).includes(fm));
   let html = '', total = 0, auditadasN = 0;
-  const hayFiltro = q || fe || ff || ft;
+  const hayFiltro = q || fe || ff || ft || fm;
   const clasesAMostrar = fc && fc !== '_custom' ? datos.clases.filter(c => c.id === fc) : (fc === '_custom' ? [] : datos.clases);
   clasesAMostrar.forEach(c => {
     const lista = buscar(c.habilidades, q).filter(h => pasaFiltroEstado(h, fe) && pasaTags(h));
@@ -255,7 +262,7 @@ function dibujar(){
   $('#lista').innerHTML = html;
   $('#cont').innerHTML = `<b>${total}</b> skills · ${auditadasN} auditadas`;
 }
-['#buscar', '#f-clase', '#f-estado', '#f-funcion', '#f-tipodano'].forEach(s => $(s).addEventListener('input', dibujar));
+['#buscar', '#f-clase', '#f-estado', '#f-funcion', '#f-tipodano', '#f-mecanica'].forEach(s => $(s).addEventListener('input', dibujar));
 
 function listaDe(contexto){ return contexto === '_custom' ? datos.custom : (datos.clases.find(c => c.id === contexto) || {habilidades: []}).habilidades; }
 function skillDe(contexto, id){ return (listaDe(contexto) || []).find(h => h.id === id); }
@@ -323,6 +330,7 @@ function renderEditor(h){
     <div class="seccion"><h3>Clasificación (para filtrar el pool)</h3>
       <div class="campo"><label>Función</label><div class="tagpick" id="tags-funcion">${FUNCION_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
       <div class="campo"><label>Tipo de daño (si hace daño)</label><div class="tagpick" id="tags-tipodano">${TIPODANO_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
+      <div class="campo"><label>Mecánicas especiales</label><div class="tagpick" id="tags-mecanica">${MECANICA_TAGS.map(t => `<button type="button" data-tag="${esc(t)}" class="${(h.etiquetas || []).includes(t) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div></div>
       <div class="nota">Se pueden marcar varias. Es solo para navegar y filtrar el pool — no cambia nada de cómo juega la skill.</div>
     </div>
 

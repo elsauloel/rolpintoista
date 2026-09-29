@@ -81,6 +81,12 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
   `h.etiquetas` (un array de strings), separadas solo para mostrarlas y filtrarlas. La cabecera suma dos
   `<select>` (Función / Tipo de daño) que filtran la lista junto con los de siempre. **El mismo filtro aparece
   en la ficha**, al abrir "+ Habilidad → 🧩 Pool custom" — ver `ficha-personaje/CLAUDE.md`.
+  **Tercer grupo, "Mecánicas especiales"** (mismo día, pedido del dueño): `MECANICA_TAGS` (lista abierta, hoy
+  solo `'critical matters'` — ver `comun/CLAUDE.md`, "⚡ Critical Matters") marca una skill que usa un andamiaje
+  puntual del duelo, más allá de la función o el tipo de daño; mismo mecanismo de chips + `h.etiquetas` +
+  `<select id="f-mecanica">` que los otros dos grupos, sin tocar nada de la clasificación existente. Es manual
+  (no se autodetecta de `duelo.critico`, a propósito — mismo criterio "avisa, no impone" del resto de la
+  clasificación): hay que tildarla a mano al auditar la skill.
 
 ## Dependencias con otras carpetas
 

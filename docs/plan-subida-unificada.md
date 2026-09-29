@@ -149,6 +149,30 @@ etiquetas, descripcion, nivel, json, autorUid, autorNombre, creado`) y le suma:
 choca con la decisión 1 (disponible al instante para los cuatro). Hay que cambiar las reglas de Firestore (y
 pegarlas en la consola).
 
+## Paso 1: cómo quedó (2026-09-29)
+
+- **`comun/plantillas.js`** (`Plantillas.limpiar(tipo, datos)`): las plantillas de arriba, en código. La usa la
+  Biblioteca al subir y `datos/auditoria-skills.html` al guardar skills (antes tenía su propia copia).
+- **`comun/biblioteca.js`**, el "Subir" (`Biblioteca.guardar`, botón ⬆ Subir): va directo a `biblioteca_<tipo>`,
+  disponible al instante; si no sube el dueño, con `auditado: false`. Con `opts.basadoEn = {id}` pregunta con dos
+  botones **"✎ Una corrección de «X»"** (misma entrada, versión + 1, vuelve a sin auditar; si X es de fábrica, una
+  entrada nueva con `reemplaza` que lo tapa) o **"＋ Algo nuevo"**. Si las reglas nuevas no están publicadas, cae
+  al camino viejo (propuesta) y lo avisa.
+- El "Bajar" (`Biblioteca.abrir`): relee cada vez que se abre (lo que subió otro aparece sin recargar), marca
+  **🔶 sin auditar** y **vN**, pestaña **🔶 Sin auditar (N)** para todos; el dueño tiene **✅ Auditado**. Borrar: el
+  dueño, o el autor mientras siga sin auditar. `alElegir(datos, meta)` recibe `meta = {tipo, id, version}`.
+- Para el aviso de versión nueva: la copia guarda `bibOrigen = meta` (lo cablea cada herramienta en su paso) y
+  compara con `Biblioteca.entrada(tipo, id)` → `{id, nombre, version, auditado, datos}` (encuentra también la
+  corrección de uno de fábrica).
+- Reglas (`firebase/firestore.rules`, `match /{bib}/{id}`): crear lo propio sin auditar; corregir cualquiera
+  (autor y fecha fijos, versión + 1, sin auditar, editor = quien corrige); el dueño todo. Anotado en "Antes de
+  abrirlo al público" de `plan-sistema-nuevo.md`.
+- **Todavía no cableado** en cada herramienta (pasos 2 a 5): pasarle `basadoEn` al subir, guardar `bibOrigen` al
+  bajar y mostrar el aviso. Mientras tanto, los botones de siempre ("📚 Biblioteca" de un creep o una habilidad de
+  creep, proponer pasiva, proponer trampa) ya suben por el camino nuevo, como "algo nuevo".
+- Verificado con una base de datos simulada (subir, bajar, corregir lo subido y lo de fábrica, auditar, borrar,
+  reglas viejas → propuesta); **no probado contra Firebase real**.
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -159,7 +183,7 @@ pegarlas en la consola).
 | 0c | `datos/auditoria-skills.html` guarda con la plantilla y el mismo formato (ida y vuelta idéntica), y avisa si el archivo cambió desde que se abrió; sale "🔍 A auditar" (dependía del 📤) | ✅ 2026-09-29 |
 | 0d | Juntar las tres copias de los presets de estados en un solo archivo de `comun/`: `comun/estados-presets.js` (ficha, gm-tools, mapa y auditoría de skills leen de ahí; se reconciliaron Sangrado, Afortunado, textos viejos y Barrera) | ✅ 2026-09-29 |
 | 0e | Plantillas del resto de los elementos (este documento) + el "sobre" común; preguntas P122–P124 | ✅ 2026-09-29 |
-| 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | Pendiente |
+| 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | ✅ 2026-09-29 (el mecanismo; el aviso en cada herramienta va en su paso) — ver "Paso 1: cómo quedó" · **falta pegar las reglas de Firestore** |
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | Pendiente |
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | Pendiente |
 | 4 | Pasivas y trampas | Pendiente |

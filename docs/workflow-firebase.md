@@ -155,6 +155,13 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   mesa para ajustarlas o las rechaza. Lo maneja `comun/biblioteca.js`;
   "+ Creep" de gm-tools abre la ventana (crear de cero o elegir, con buscador
   y etiquetas que se combinan). Que solo los GM la vean es visual.
+  **Desde el 2026-09-29 (subida unificada, `docs/plan-subida-unificada.md` paso 1)**: lo que sube cualquier cuenta
+  confirmada va **directo** a `biblioteca_<tipo>` con `auditado: false` (disponible al instante para todos; el dueño
+  lo marca auditado), y cualquiera puede corregir una entrada (`version` + 1, `editorUid`/`editorNombre`/`actualizado`,
+  vuelve a sin auditar). Una corrección de un elemento de fábrica (`base-…`) es una entrada nueva con `reemplaza`.
+  Campos nuevos opcionales: `auditado, version, reemplaza, editorUid, editorNombre, actualizado` (sin `auditado` =
+  auditado). Tipos nuevos en las reglas: `estados` e `items`. `propuestas_*` queda para lo mandado con el camino
+  viejo y como respaldo si las reglas nuevas no están publicadas. **Reglas nuevas: hay que pegarlas.**
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, resumen: {hpPct,
   muerto, estados[]}, miniatura, firma, actualizado}`. De la vida solo se
   publica el porcentaje (`hpPct`, 0–100): los jugadores ven la barra sin

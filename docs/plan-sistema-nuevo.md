@@ -252,6 +252,7 @@ decisión relajada nueva se agrega acá al tomarla).
 | Lo que cada uno escribe en su ficha (vida, SP, No2, stats) no se valida | Validar en el servidor lo que afecta a los demás |
 | **Sigilo** (en diseño): el bando contrario no ve el token, pero el resto de la info (ficha, tiradas) queda a decidir | Revisar que ningún dato filtre la posición o las acciones del que está en sigilo |
 | **Ocultar tokens** (GM, ya en el mapa): un jugador que mire la base de datos directamente podría ver igual el token oculto — el filtro es del lado del cliente, no de las reglas | Mover los tokens ocultos a una subcolección que solo lea el GM |
+| **Biblioteca (subida unificada, 2026-09-29)**: cualquier cuenta confirmada sube a la biblioteca compartida y puede **corregir** cualquier entrada (queda sin auditar, con versión +1 y quién la corrigió) — confianza entre los cuatro | Que corregir lo ajeno pase por una propuesta que apruebe el autor o el dueño; tope de subidas por cuenta |
 | **Orden de turnos**: cualquier miembro puede reescribir el `orden` entero de `mapa/iniciativa` (no solo el valor de su propia fila) — las reglas no pueden revisar un elemento suelto de una lista | Partir `orden` en un documento por token, para que las reglas sí puedan limitar cada uno a su dueño |
 
 ## Pendientes chicos

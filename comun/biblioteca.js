@@ -7,11 +7,27 @@
    - biblioteca_<tipo>/{id}  → la oficial. La lee cualquier cuenta
      confirmada; solo el dueño del proyecto (BIBLIOTECA_DUENO_EMAIL)
      escribe.
-   - propuestas_<tipo>/{id}  → lo que manda cualquier GM con "Guardar en
-     la biblioteca". Solo la ven su autor y el dueño, que las audita y las
-     pasa a la oficial (o las rechaza).
+   - propuestas_<tipo>/{id}  → el camino VIEJO (hasta 2026-09-29): lo que
+     mandaba un no-dueño quedaba ahí hasta que el dueño lo aprobaba. Se sigue
+     mostrando al dueño mientras quede algo, y es el respaldo si las reglas
+     nuevas todavía no están publicadas.
    Cada entrada: {nombre, etiquetas[], descripcion, nivel, json,
-   autorUid, autorNombre, creado}. `json` es el creep/skill como texto.
+   autorUid, autorNombre, creado} + (desde 2026-09-29) {auditado, version,
+   reemplaza, editorUid, editorNombre, actualizado}. `json` es el elemento
+   como texto, ya limpio con su plantilla (comun/plantillas.js).
+
+   SUBIDA UNIFICADA (paso 1 de docs/plan-subida-unificada.md, 2026-09-29):
+   - Lo que sube cualquiera va DIRECTO a biblioteca_<tipo>, disponible al
+     instante para todos, con `auditado: false` (🔶 sin auditar). Lo que sube
+     el dueño entra auditado. Solo el dueño marca ✅ auditado.
+   - Al subir algo que salió de otro elemento (`opts.basadoEn`), se pregunta
+     si es una CORRECCIÓN de ese elemento (lo reemplaza: misma entrada,
+     `version` + 1, vuelve a "sin auditar") o algo NUEVO. Corregir uno de
+     fábrica (entrada `base-…` del código) crea una entrada con
+     `reemplaza: 'base-…'` que lo tapa en la lista.
+   - Al bajar, `alElegir(datos, meta)` recibe `meta = {tipo, id, version}`
+     para que la copia guarde `bibOrigen` y la herramienta pueda avisar
+     "hay una versión nueva" (`Biblioteca.entrada(tipo, id)`).
 
    Usa las globales de sesion.js (fbDb, fbUsuario, fbMiembro) y las clases
    .scrim/.modal/.btn/.iconbtn/.f de la herramienta donde se cargue.
@@ -53,7 +69,10 @@ const Biblioteca = (() => {
     let datos = null;
     try{ datos = JSON.parse(d.json || ''); }catch(e){ datos = null; }
     return {id: fila.id, nombre: d.nombre || '', etiquetas: Array.isArray(d.etiquetas) ? d.etiquetas : [],
-      descripcion: d.descripcion || '', nivel: d.nivel, autorUid: d.autorUid, autorNombre: d.autorNombre || '', datos};
+      descripcion: d.descripcion || '', nivel: d.nivel, autorUid: d.autorUid, autorNombre: d.autorNombre || '', datos,
+      // Lo de antes de la subida unificada ya había pasado por el dueño: cuenta como auditado.
+      auditado: d.auditado !== false, version: Number(d.version) || 1, reemplaza: d.reemplaza || '',
+      editorNombre: d.editorNombre || ''};
   }
 
   async function leer(coleccion){
@@ -65,7 +84,8 @@ const Biblioteca = (() => {
   // Entradas incluidas en el código (opts.base): siempre están, aun sin Firebase.
   function entradasBase(opts){
     return (opts.base || []).map(b => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
-      descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true}));
+      descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true,
+      auditado: true, version: 1, reemplaza: ''}));
   }
 
   async function cargar(tipo, forzar){
@@ -74,8 +94,11 @@ const Biblioteca = (() => {
     const base = entradasBase(st.opts);
     if(!hayMesa()){ st.oficial = base; st.propuestas = []; return; }
     try{
-      st.oficial = [...base, ...await leer(`biblioteca_${tipo}`)];
-      st.propuestas = esDueno() ? await leer(`propuestas_${tipo}`) : [];
+      const subidas = await leer(`biblioteca_${tipo}`);
+      // Una corrección de un elemento de fábrica lo tapa (queda solo la versión corregida).
+      const tapados = new Set(subidas.map(e => e.reemplaza).filter(Boolean));
+      st.oficial = [...base.filter(b => !tapados.has(b.id)), ...subidas].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      st.propuestas = esDueno() ? await leer(`propuestas_${tipo}`).catch(() => []) : [];
     }catch(err){
       if(!base.length) throw err;
       console.error('Biblioteca:', err);
@@ -107,6 +130,10 @@ const Biblioteca = (() => {
       .bib-pop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:5;min-width:220px;max-width:340px;background:var(--panel,#1a1418);border:1px solid var(--copper,#c98545);border-radius:8px;padding:10px;box-shadow:0 10px 26px rgba(0,0,0,.6);max-height:240px;overflow:auto}
       .bib-grupo.abierto .bib-pop{display:block}
       .bib-activos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;width:100%}
+      .bib-sinaud{font-size:11px;font-weight:600;color:#e0a040;margin-left:6px;white-space:nowrap}
+      .bib-ver{font-size:11px;opacity:.7;margin-left:6px}
+      .bib-cual{display:flex;flex-direction:column;gap:6px}
+      .bib-cual button{text-align:left;white-space:normal}
     `;
     document.head.appendChild(estilos);
     const cont = document.createElement('div');
@@ -126,9 +153,10 @@ const Biblioteca = (() => {
     </div>
     <div class="scrim" id="scrim-biblioteca-guardar" style="z-index:95">
       <div class="modal" style="max-width:480px">
-        <header><h3 id="bibg-titulo">Guardar en la biblioteca</h3><button class="iconbtn" id="bibg-x">Cerrar</button></header>
+        <header><h3 id="bibg-titulo">⬆ Subir a la biblioteca</h3><button class="iconbtn" id="bibg-x">Cerrar</button></header>
         <div class="body" style="display:flex;flex-direction:column;gap:10px">
           <div class="hint" id="bibg-aviso"></div>
+          <div id="bibg-cual"></div>
           <div class="f"><label>Nombre</label><input id="bibg-nombre" maxlength="60"></div>
           <div class="f"><label>Etiquetas</label>
             <div class="bib-grupos" id="bibg-tags" style="margin-bottom:6px"></div>
@@ -137,7 +165,7 @@ const Biblioteca = (() => {
         </div>
         <footer>
           <button class="btn ghost" id="bibg-cancel">Cancelar</button>
-          <button class="btn primary" id="bibg-ok">Guardar</button>
+          <button class="btn primary" id="bibg-ok">⬆ Subir</button>
         </footer>
       </div>
     </div>`;
@@ -221,15 +249,20 @@ const Biblioteca = (() => {
   let actual = null;
 
   function listaVista(st){
-    return st.vista === 'propuestas' ? st.propuestas : st.oficial;
+    if(st.vista === 'propuestas') return st.propuestas;
+    if(st.vista === 'sinauditar') return st.oficial.filter(e => !e.auditado);
+    return st.oficial;
   }
 
   function pintar(){
     const st = estado[actual];
     const q = id => document.getElementById(id);
-    q('bib-tabs').innerHTML = esDueno()
-      ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Oficial (${st.oficial.length})</button>
-         <button class="btn ${st.vista === 'propuestas' ? 'primary' : ''}" data-bibvista="propuestas">Propuestas (${st.propuestas.length})</button>`
+    const sinAud = st.oficial.filter(e => !e.auditado).length;
+    // Pestañas: todo / lo que falta auditar (la ven todos) / las propuestas del camino viejo (solo el dueño, si quedan).
+    q('bib-tabs').innerHTML = (sinAud || (esDueno() && st.propuestas.length))
+      ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Todo (${st.oficial.length})</button>
+         ${sinAud ? `<button class="btn ${st.vista === 'sinauditar' ? 'primary' : ''}" data-bibvista="sinauditar">🔶 Sin auditar (${sinAud})</button>` : ''}
+         ${esDueno() && st.propuestas.length ? `<button class="btn ${st.vista === 'propuestas' ? 'primary' : ''}" data-bibvista="propuestas">Propuestas viejas (${st.propuestas.length})</button>` : ''}`
       : '';
     pintarChips();
     pintarLista();
@@ -286,8 +319,10 @@ const Biblioteca = (() => {
     document.getElementById('bib-lista').innerHTML = f.length ? f.map(e => `
       <div class="bib-fila">
         <div class="info">
-          <div class="tit">${esc(e.nombre)}${st.opts.subtitulo ? esc(st.opts.subtitulo(e)) : (e.nivel !== undefined && e.nivel !== null ? ` · Lv ${esc(e.nivel)}` : '')}</div>
-          <div class="tags">${e.etiquetas.map(esc).join(' · ') || 'sin etiquetas'}${propuestas ? ` · de ${esc(e.autorNombre)}` : ''}</div>
+          <div class="tit">${esc(e.nombre)}${st.opts.subtitulo ? esc(st.opts.subtitulo(e)) : (e.nivel !== undefined && e.nivel !== null ? ` · Lv ${esc(e.nivel)}` : '')}
+            ${!propuestas && !e.auditado ? '<span class="bib-sinaud" title="Lo subió alguien del grupo y todavía no lo revisó el dueño. Se puede usar igual.">🔶 sin auditar</span>' : ''}
+            ${e.version > 1 ? `<span class="bib-ver" title="Veces que se corrigió">v${esc(e.version)}</span>` : ''}</div>
+          <div class="tags">${e.etiquetas.map(esc).join(' · ') || 'sin etiquetas'}${(propuestas || !e.base) && e.autorNombre ? ` · de ${esc(e.autorNombre)}` : ''}${e.editorNombre ? ` · corregido por ${esc(e.editorNombre)}` : ''}</div>
           ${e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : ''}
         </div>
         <div class="acc">
@@ -295,8 +330,9 @@ const Biblioteca = (() => {
           ${st.opts.alVer ? `<button class="btn" data-bibacc="ver" data-id="${esc(e.id)}">👁 Ver</button>` : ''}
           ${esDueno() && propuestas ? `<button class="btn" data-bibacc="aprobar" data-id="${esc(e.id)}">Aprobar</button>
             <button class="btn ghost" data-bibacc="rechazar" data-id="${esc(e.id)}">Rechazar</button>` : ''}
-          ${esDueno() && !propuestas && !e.base ? `<button class="btn" data-bibacc="etiquetas" data-id="${esc(e.id)}">✎ Etiquetas</button>
-            <button class="btn ghost" data-bibacc="borrar" data-id="${esc(e.id)}">Borrar</button>` : ''}
+          ${esDueno() && !propuestas && !e.base && !e.auditado ? `<button class="btn" data-bibacc="auditar" data-id="${esc(e.id)}">✅ Auditado</button>` : ''}
+          ${esDueno() && !propuestas && !e.base ? `<button class="btn" data-bibacc="etiquetas" data-id="${esc(e.id)}">✎ Etiquetas</button>` : ''}
+          ${!propuestas && !e.base && (esDueno() || (!e.auditado && fbUsuario && e.autorUid === fbUsuario.uid)) ? `<button class="btn ghost" data-bibacc="borrar" data-id="${esc(e.id)}">Borrar</button>` : ''}
         </div>
       </div>`).join('') : '<div class="hint">No hay nada con ese filtro.</div>';
   }
@@ -305,6 +341,7 @@ const Biblioteca = (() => {
     const b = e.target.closest('[data-bibacc]'); if(!b) return;
     const st = estado[actual];
     const coleccion = (st.vista === 'propuestas' ? 'propuestas_' : 'biblioteca_') + actual;
+    const tipoAct = actual;
     const lista = listaVista(st);
     const ent = lista.find(x => x.id === b.dataset.id);
     if(!ent) return;
@@ -313,7 +350,8 @@ const Biblioteca = (() => {
       if(acc === 'ver'){
         st.opts.alVer(structuredClone(ent.datos), ent);
       }else if(acc === 'agregar'){
-        st.opts.alElegir(structuredClone(ent.datos));
+        // meta: de dónde salió la copia, para el aviso de "hay una versión nueva" (la herramienta la guarda en bibOrigen).
+        st.opts.alElegir(structuredClone(ent.datos), {tipo: tipoAct, id: ent.id, version: ent.version || 1});
         document.getElementById('scrim-biblioteca').classList.remove('open');
       }else if(acc === 'rechazar'){
         if(!confirm(`¿Rechazar la propuesta "${ent.nombre}"? Se borra.`)) return;
@@ -321,9 +359,14 @@ const Biblioteca = (() => {
         st.propuestas = lista.filter(x => x !== ent);
         pintar();
       }else if(acc === 'borrar'){
-        if(!confirm(`¿Borrar "${ent.nombre}" de la biblioteca oficial? No se puede deshacer.`)) return;
+        if(!confirm(`¿Borrar "${ent.nombre}" de la biblioteca? No se puede deshacer.`)) return;
         await fbDb.collection(coleccion).doc(ent.id).delete();
-        st.oficial = lista.filter(x => x !== ent);
+        await cargar(tipoAct, true);   // relee: si era la corrección de uno de fábrica, el original vuelve a aparecer
+        pintar();
+      }else if(acc === 'auditar'){
+        await fbDb.collection(coleccion).doc(ent.id).update({auditado: true});
+        ent.auditado = true;
+        aviso(`"${ent.nombre}" quedó auditado`);
         pintar();
       }else if(acc === 'etiquetas'){
         const txt = prompt('Etiquetas (separadas por coma):', ent.etiquetas.join(', '));
@@ -337,7 +380,7 @@ const Biblioteca = (() => {
         batch.set(fbDb.collection(`biblioteca_${actual}`).doc(ent.id), {
           nombre: ent.nombre, etiquetas: ent.etiquetas, descripcion: ent.descripcion, nivel: ent.nivel ?? 0,
           json: JSON.stringify(ent.datos), autorUid: ent.autorUid, autorNombre: ent.autorNombre, creado: ts,
-        });
+        });   // sin `auditado`: cuenta como auditado (y así anda también con las reglas viejas)
         batch.delete(fbDb.collection(coleccion).doc(ent.id));
         await batch.commit();
         st.propuestas = lista.filter(x => x !== ent);
@@ -378,7 +421,7 @@ const Biblioteca = (() => {
     q('scrim-biblioteca').classList.add('open');
     q('bib-lista').innerHTML = '<div class="hint">Cargando…</div>';
     try{
-      await cargar(tipo, false);
+      await cargar(tipo, true);   // siempre relee: lo que subió otro aparece sin recargar la página
       pintar();
     }catch(err){
       console.error('Biblioteca:', err);
@@ -387,9 +430,13 @@ const Biblioteca = (() => {
   }
 
   /**
-   * Guarda algo en la biblioteca. opts: {tipo, datos, nombre, nivel?}.
-   * El dueño guarda directo en la oficial; cualquier otro GM manda una
-   * propuesta para que el dueño la revise.
+   * Sube algo a la biblioteca (el "Subir" único, paso 1 de la subida unificada).
+   * opts: {tipo, datos, nombre, nivel?, grupos?, base?, basadoEn?}.
+   * - `datos` se limpia con su plantilla (comun/plantillas.js) antes de subir.
+   * - Queda disponible al instante para todos; si no lo sube el dueño, marcado "sin auditar".
+   * - `basadoEn = {id, nombre?}`: el elemento de la biblioteca del que salió (id de Firebase o `base-…` de fábrica).
+   *   Si viene, se pregunta si es una corrección de ese elemento o algo nuevo.
+   * - Si las reglas nuevas de Firestore todavía no están publicadas, cae al camino viejo (propuesta).
    */
   function guardar(opts){
     if(!hayMesa()){ aviso('Entrá primero a una partida para usar la biblioteca.'); return; }
@@ -397,14 +444,44 @@ const Biblioteca = (() => {
     const tipo = opts.tipo;
     const q = id => document.getElementById(id);
     const dueno = esDueno();
-    q('bibg-aviso').textContent = dueno
-      ? 'Se guarda directo en la biblioteca oficial.'
-      : 'Se manda como propuesta: el dueño la revisa y, si la aprueba, pasa a la biblioteca oficial.';
+    const datos = typeof Plantillas !== 'undefined' ? Plantillas.limpiar(tipo, opts.datos) : opts.datos;
+    const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos}};
+    if(!st.opts) st.opts = {base: opts.base, grupos: opts.grupos};
+    // El elemento del que salió (si todavía existe en la lista cargada), para ofrecer "es una corrección".
+    const origenEnt = () => opts.basadoEn && (st.oficial || []).find(e => e.id === opts.basadoEn.id || (e.reemplaza && e.reemplaza === opts.basadoEn.id));
+    let modo = opts.basadoEn ? '' : 'nuevo';   // '' = todavía no eligió; 'correccion' | 'nuevo'
+    const pintarCual = () => {
+      const b = opts.basadoEn;
+      if(!b){ q('bibg-cual').innerHTML = ''; return; }
+      const nom = (origenEnt() || {}).nombre || b.nombre || 'el original';
+      q('bibg-cual').innerHTML = `<div class="f"><label>¿Qué estás subiendo?</label><div class="bib-cual">
+        <button type="button" class="btn${modo === 'correccion' ? ' primary' : ''}" data-bibgcual="correccion">✎ Una corrección de «${esc(nom)}» — la reemplaza para todos (quien ya lo tenga ve el aviso de versión nueva)</button>
+        <button type="button" class="btn${modo === 'nuevo' ? ' primary' : ''}" data-bibgcual="nuevo">＋ Algo nuevo — «${esc(nom)}» queda como está y esto se suma aparte</button>
+      </div></div>`;
+    };
+    const avisoTxt = () => (modo === 'correccion'
+      ? 'Reemplaza al original para todos, al instante.'
+      : 'Queda disponible para todos al instante.')
+      + (dueno ? ' Como sos el dueño, entra ya auditado.' : ' Queda marcado 🔶 sin auditar hasta que lo revise el dueño.');
+    q('bibg-aviso').textContent = avisoTxt();
     q('bibg-nombre').value = opts.nombre || '';
     q('bibg-etiquetas').value = '';
     q('bibg-desc').value = '';
+    q('bibg-cual').onclick = e => {
+      const b = e.target.closest('[data-bibgcual]'); if(!b) return;
+      modo = b.dataset.bibgcual;
+      // Una corrección arranca con las etiquetas y la descripción del original (si no se escribió nada todavía).
+      const o = origenEnt();
+      if(modo === 'correccion' && o){
+        if(!q('bibg-etiquetas').value.trim()) q('bibg-etiquetas').value = o.etiquetas.join(', ');
+        if(!q('bibg-desc').value.trim()) q('bibg-desc').value = o.descripcion || '';
+        pintarTagsGuardar();
+      }
+      q('bibg-aviso').textContent = avisoTxt();
+      pintarCual();
+    };
+    pintarCual();
     // Etiquetas para elegir: primero las conocidas de entrada; después se suman las que ya usa la biblioteca (si se puede leer).
-    const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos}};
     const defGrupos = opts.grupos || (st.opts && st.opts.grupos) || null;
     const conocidas = new Set(SUGERENCIAS[tipo] || []);
     (defGrupos || []).forEach(g => g.tags.forEach(t => conocidas.add(t)));
@@ -415,34 +492,86 @@ const Biblioteca = (() => {
       [...(st.oficial || []), ...(st.propuestas || [])].forEach(e => e.etiquetas.forEach(t => conocidas.add(t)));
       tagsGuardar.grupos = armarGruposTags(defGrupos, conocidas);
       pintarTagsGuardar();
+      pintarCual();
     }).catch(() => {});
     q('scrim-biblioteca-guardar').classList.add('open');
     q('bibg-ok').onclick = async () => {
       const nombre = q('bibg-nombre').value.trim().slice(0, 60);
       if(!nombre){ aviso('Ponele un nombre.'); return; }
-      const json = JSON.stringify(opts.datos);
+      if(!modo){ aviso('Elegí si es una corrección o algo nuevo.'); return; }
+      const json = JSON.stringify(datos);
       if(json.length > 200000){ aviso('Es demasiado grande para la biblioteca.'); return; }
-      const coleccion = (dueno ? 'biblioteca_' : 'propuestas_') + tipo;
+      const comun = {
+        nombre, etiquetas: limpiarEtiquetas(q('bibg-etiquetas').value),
+        descripcion: q('bibg-desc').value.trim().slice(0, 300),
+        nivel: Math.max(0, Math.round(Number(opts.nivel ?? (modo === 'correccion' && origenEnt() ? origenEnt().nivel : 0)) || 0)), json,
+      };
+      const quien = String((fbMiembro && fbMiembro.nombre) || fbUsuario.displayName || '').slice(0, 40);
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+      const col = fbDb.collection(`biblioteca_${tipo}`);
       q('bibg-ok').disabled = true;
+      let msg = '';
       try{
-        await fbDb.collection(coleccion).add({
-          nombre, etiquetas: limpiarEtiquetas(q('bibg-etiquetas').value),
-          descripcion: q('bibg-desc').value.trim().slice(0, 300),
-          nivel: Math.max(0, Math.round(Number(opts.nivel) || 0)),
-          json, autorUid: fbUsuario.uid, autorNombre: String((fbMiembro && fbMiembro.nombre) || '').slice(0, 40),
-          creado: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-        if(estado[tipo]) estado[tipo].oficial = null;  // la próxima vez se vuelve a leer
-        q('scrim-biblioteca-guardar').classList.remove('open');
-        aviso(dueno ? `"${nombre}" guardado en la biblioteca` : `"${nombre}" mandado como propuesta`);
+        const o = modo === 'correccion' ? origenEnt() : null;
+        const idOrigen = opts.basadoEn && opts.basadoEn.id;
+        if(modo === 'correccion' && !(o && !o.base) && !String(idOrigen || '').startsWith('base-'))
+          throw Object.assign(new Error('ya no existe'), {code: 'no-existe'});
+        if(modo === 'correccion' && o && !o.base){
+          // Corrección de algo ya subido: misma entrada, versión + 1, vuelve a "sin auditar" (salvo que corrija el dueño).
+          const ref = col.doc(o.id);
+          await fbDb.runTransaction(async tx => {
+            const doc = await tx.get(ref);
+            if(!doc.exists) throw Object.assign(new Error('ya no existe'), {code: 'no-existe'});
+            tx.update(ref, {...comun, auditado: dueno, version: (Number(doc.data().version) || 1) + 1,
+              editorUid: fbUsuario.uid, editorNombre: quien, actualizado: ts});
+          });
+          msg = `"${nombre}" corregido para todos`;
+        }else{
+          // Algo nuevo, o la corrección de uno de fábrica (lo tapa con `reemplaza`).
+          const reemplaza = modo === 'correccion' ? String(idOrigen) : '';
+          await col.add({...comun, autorUid: fbUsuario.uid, autorNombre: quien, creado: ts,
+            auditado: dueno, version: reemplaza ? 2 : 1, reemplaza});
+          msg = reemplaza ? `"${nombre}" reemplaza al original para todos` : `"${nombre}" subido: ya lo pueden usar todos`;
+        }
       }catch(err){
-        console.error('Biblioteca:', err);
-        aviso(err.code === 'permission-denied' ? 'La biblioteca no te dejó guardar (¿reglas de Firestore sin publicar?).' : 'No se pudo guardar (mirá la consola).');
-      }finally{
-        q('bibg-ok').disabled = false;
+        if(err && err.code === 'no-existe'){ aviso('El original ya no está en la biblioteca: subilo como algo nuevo.'); q('bibg-ok').disabled = false; return; }
+        if(!(err && err.code === 'permission-denied')){
+          console.error('Biblioteca:', err);
+          aviso('No se pudo subir (mirá la consola).');
+          q('bibg-ok').disabled = false;
+          return;
+        }
+        // Reglas viejas todavía publicadas: el camino de antes (el dueño directo a la oficial, el resto como propuesta).
+        try{
+          await fbDb.collection((dueno ? 'biblioteca_' : 'propuestas_') + tipo).add({...comun, autorUid: fbUsuario.uid, autorNombre: quien, creado: ts});
+          msg = dueno ? `"${nombre}" guardado (reglas viejas: publicá las nuevas de Firestore)`
+            : `"${nombre}" mandado como propuesta (el dueño tiene que publicar las reglas nuevas para que se vea al instante)`;
+        }catch(err2){
+          console.error('Biblioteca:', err2);
+          aviso('La biblioteca no te dejó guardar (¿reglas de Firestore sin publicar?).');
+          q('bibg-ok').disabled = false;
+          return;
+        }
       }
+      q('bibg-ok').disabled = false;
+      st.oficial = null;   // la próxima vez se vuelve a leer
+      q('scrim-biblioteca-guardar').classList.remove('open');
+      aviso(msg);
     };
   }
 
-  return {abrir, guardar, esDueno};
+  /**
+   * La entrada actual de la biblioteca con ese id (o la que reemplaza a ese elemento de fábrica), para el aviso de
+   * "hay una versión nueva": {id, nombre, version, auditado, datos} o null. `forzar` vuelve a leer de Firebase.
+   */
+  async function entrada(tipo, id, forzar){
+    estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {}};
+    if(!estado[tipo].opts) estado[tipo].opts = {};
+    try{ await cargar(tipo, !!forzar); }catch(e){ return null; }
+    const lista = estado[tipo].oficial || [];
+    const e = lista.find(x => x.id === id) || lista.find(x => x.reemplaza && x.reemplaza === id);
+    return e ? {id: e.id, nombre: e.nombre, version: e.version || 1, auditado: e.auditado, datos: structuredClone(e.datos)} : null;
+  }
+
+  return {abrir, guardar, entrada, esDueno};
 })();

@@ -117,6 +117,7 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 </div>
 
 <script src="../comun/skills-clase.js"></script>
+<script src="../comun/plantillas.js?v=20260929a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
@@ -155,28 +156,9 @@ const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'físico'];
 // para sumar otras mecánicas puntuales el día que aparezcan, sin tocar el resto de la clasificación.
 const MECANICA_TAGS = ['critical matters'];
 
-/* Plantilla de una habilidad (docs/plan-subida-unificada.md): lo único que se guarda en comun/skills-clase.js,
-   en ese orden. Lo vacío se omite (salvo id/nombre/detalle/nitrosCosto: nitrosCosto ausente vale 1 al cargarla
-   en la ficha, no 0); los efecto* solo si hay efectoNombre. */
-const PLANTILLA_HAB = ['id', 'nombre', 'detalle', 'automatizada', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp',
-  'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
-  'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
-  'zonaMapa', 'zonaRadio', 'portalMapa', 'trampaColocar', 'duelo'];
-const HAB_SIEMPRE = new Set(['id', 'nombre', 'detalle', 'nitrosCosto']);
-const esVacio = v => v === null || v === undefined || v === false || v === '' || v === 0
-  || (Array.isArray(v) && !v.length) || (typeof v === 'object' && v && !Array.isArray(v) && !Object.keys(v).length);
-function limpiarHab(h){
-  const out = {}, conEfecto = !!String(h.efectoNombre || '').trim();
-  PLANTILLA_HAB.forEach(k => {
-    if(!(k in h)) return;
-    const v = h[k];
-    if(HAB_SIEMPRE.has(k)){ out[k] = v; return; }
-    if(k === 'automatizada'){ if(v === false) out[k] = false; return; }
-    if(k.startsWith('efecto')){ if(conEfecto && v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && !v.length)) out[k] = v; return; }
-    if(!esVacio(v)) out[k] = v;
-  });
-  return out;
-}
+// Plantilla de una habilidad: la compartida de comun/plantillas.js (la misma que usa la biblioteca al subir). Lo
+// único que se guarda en comun/skills-clase.js, en ese orden.
+const limpiarHab = h => Plantillas.habilidad(h);
 // Formato del archivo: una habilidad por renglón; las sin auditar que son solo título + descripción, con skillSA(…).
 const SIN_AUDITAR = '(Sin auditar) ';
 function lineaHab(claseId, h){

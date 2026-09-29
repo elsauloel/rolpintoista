@@ -763,8 +763,19 @@ service cloud.firestore {
     function esDuenoProyecto() {
       return verificado() && request.auth.token.email == 'rolpintoista@gmail.com';
     }
+    // Subida unificada (2026-09-29, docs/plan-subida-unificada.md paso 1): lo que sube CUALQUIER cuenta confirmada va
+    // directo a `biblioteca_<tipo>` (disponible al instante para todos) con `auditado: false`; solo el dueño lo pasa a
+    // `true`. Cualquiera puede CORREGIR una entrada (creación colectiva): la versión sube 1, vuelve a "sin auditar" y
+    // queda anotado quién la corrigió; no puede cambiar el autor ni la fecha de creación. Borrar: el dueño, o el autor
+    // mientras siga sin auditar. `propuestas_<tipo>` queda para lo que se mandó con el camino viejo.
     function entradaBiblioteca(d) {
-      return d.keys().hasOnly(['nombre', 'etiquetas', 'descripcion', 'nivel', 'json', 'autorUid', 'autorNombre', 'creado'])
+      return d.keys().hasOnly(['nombre', 'etiquetas', 'descripcion', 'nivel', 'json', 'autorUid', 'autorNombre', 'creado',
+          'auditado', 'version', 'reemplaza', 'editorUid', 'editorNombre', 'actualizado'])
+        && d.get('auditado', true) is bool
+        && d.get('version', 1) is int && d.get('version', 1) >= 1 && d.get('version', 1) <= 100000
+        && d.get('reemplaza', '') is string && d.get('reemplaza', '').size() <= 80
+        && d.get('editorUid', '') is string
+        && d.get('editorNombre', '') is string && d.get('editorNombre', '').size() <= 40
         && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 60
         && d.etiquetas is list && d.etiquetas.size() <= 12
         && d.descripcion is string && d.descripcion.size() <= 300
@@ -774,20 +785,40 @@ service cloud.firestore {
         && d.autorNombre is string && d.autorNombre.size() <= 40;
     }
     match /{bib}/{id} {
-      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep'];
-      allow create, update: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep']
-        && entradaBiblioteca(request.resource.data);
-      allow delete: if esDuenoProyecto() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep'];
+      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items'];
+      allow create: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && entradaBiblioteca(request.resource.data)
+        && (esDuenoProyecto()
+          || (verificado()
+            && request.resource.data.autorUid == request.auth.uid
+            && request.resource.data.creado == request.time
+            && request.resource.data.auditado == false
+            && request.resource.data.version in [1, 2]));
+      allow update: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && entradaBiblioteca(request.resource.data)
+        && (esDuenoProyecto()
+          || (verificado()
+            && request.resource.data.auditado == false
+            && request.resource.data.version == resource.data.get('version', 1) + 1
+            && request.resource.data.autorUid == resource.data.autorUid
+            && request.resource.data.autorNombre == resource.data.autorNombre
+            && request.resource.data.creado == resource.data.creado
+            && request.resource.data.get('reemplaza', '') == resource.data.get('reemplaza', '')
+            && request.resource.data.editorUid == request.auth.uid
+            && request.resource.data.actualizado == request.time));
+      allow delete: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && (esDuenoProyecto()
+          || (verificado() && resource.data.autorUid == request.auth.uid && resource.data.get('auditado', true) == false));
     }
     match /{prop}/{id} {
-      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
+      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
         && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
-      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
+      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
         && entradaBiblioteca(request.resource.data)
         && request.resource.data.autorUid == request.auth.uid
         && request.resource.data.creado == request.time;
       allow update: if false;
-      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep']
+      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
         && (esDuenoProyecto() || (verificado() && resource.data.autorUid == request.auth.uid));
     }
 

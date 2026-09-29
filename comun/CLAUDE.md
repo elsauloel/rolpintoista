@@ -732,3 +732,12 @@ versión parecida en más de una, es candidato a juntar.
   tenía 2; igual se pregunta al activarlo); los textos viejos de Inmovilizado y Rengo en gm-tools (hablaban de Movimiento);
   **Barrera**, que faltaba en gm-tools; y los textos, en tercera persona para que sirvan a personajes y creeps.
 
+- **`plantillas.js`** (`Plantillas`, 2026-09-29, paso 1 de `../docs/plan-subida-unificada.md`) — qué datos viajan al
+  subir cada tipo de elemento: `Plantillas.limpiar(tipo, datos)` para `skills`, `habs_creep`, `creeps`, `pasivas`,
+  `trampas`, `estados`, `items` (copia limpia, no toca el original; saca también `bibOrigen`). Se carga antes que
+  `biblioteca.js` (ficha, gm-tools, mapa) y en `datos/auditoria-skills.html`, que usa `Plantillas.habilidad` para
+  escribir `skills-clase.js`.
+- **`biblioteca.js`, subida unificada** (2026-09-29): lo que sube cualquiera queda al instante en la biblioteca, con
+  🔶 sin auditar hasta que el dueño lo marca ✅; "¿corrección de X o algo nuevo?" con `opts.basadoEn`; `alElegir(datos,
+  meta)` con `{tipo, id, version}`; `Biblioteca.entrada(tipo, id)` para el aviso de versión nueva. Detalle en el
+  comentario de cabecera y en `../docs/plan-subida-unificada.md` ("Paso 1: cómo quedó"). Reglas nuevas: hay que pegarlas.

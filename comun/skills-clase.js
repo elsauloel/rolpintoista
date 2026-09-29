@@ -169,6 +169,11 @@ const CLASES_SKILLS = [
    datos/auditoria-skills.html). Mismo formato que una habilidad de CLASES_SKILLS (mismos
    campos, ver el comentario de arriba); no está atada a ninguna clase — pensada para
    habilidades que cualquiera pueda tomar, o para probar una idea antes de decidir si
-   entra en el pool de una clase. La ficha todavía no la ofrece en "+ Habilidad" (falta
-   sumarla ahí si se quiere que los jugadores la vean — ver docs/pendientes.md). */
+   entra en el pool de una clase. La ficha la ofrece en "+ Habilidad → 🧩 Pool custom"
+   (ficha-personaje/ficha.html, abrirHabClase/agregarHabClase con claseId '_custom'),
+   a 2 de Job (el mismo costo que armar una habilidad custom de cero — HAB_JOB_CUSTOM,
+   no el 1 de Job de una habilidad ya cerrada de una clase). Una entrada puede llegar
+   acá a mano (editando esta lista o desde datos/auditoria-skills.html) o publicada por
+   un jugador con el botón 📤 de una habilidad custom en su ficha (marcada `auditar:
+   true` hasta que el dueño la revise — ver ficha-personaje/CLAUDE.md). */
 const SKILLS_CUSTOM = [];

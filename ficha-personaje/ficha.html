@@ -9640,49 +9640,61 @@ function esMiClase(clase){
   const mia = normClase(S.meta.clase);
   return !!mia && (mia === normClase(clase.nombre) || mia === clase.id);
 }
+// '_custom' es un id de pseudo-clase (no está en CLASES_SKILLS) para el pool SKILLS_CUSTOM (2026-09-29, pedido del
+// dueño): mismo menú y mismo mecanismo de "Agregar" que una clase real, pero cuesta 2 de Job (HAB_JOB_CUSTOM, lo
+// mismo que armar una habilidad custom de cero) en vez de 1 — es una skill sin auditar del todo por la mesa, no
+// una ya cerrada de una clase.
 function abrirHabClase(claseId){
-  const clase = CLASES_SKILLS.find(c => c.id === claseId);
+  const esCustomPool = claseId === '_custom';
+  const clase = esCustomPool ? null : CLASES_SKILLS.find(c => c.id === claseId);
   $('#scrim-hab-clase').classList.add('open');
-  if(!clase){
+  if(!clase && !esCustomPool){
     $('#hab-clase-titulo').textContent = 'Nueva habilidad';
+    const pool = typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [];
     $('#hab-clase-body').innerHTML = `
       <div class="hint" style="margin-bottom:10px">Habilidad de clase = elegís una ya armada y queda cargada con toda su configuración. Custom = la armás vos paso a paso.</div>
       <div class="opcion-fila" style="margin-bottom:14px">
         <button type="button" class="opcion-btn" data-habclase-custom="1">Habilidad custom<br><small>2 de Job</small></button>
+        <button type="button" class="opcion-btn" data-habclase-clase="_custom" ${pool.length ? '' : 'disabled'}>🧩 Pool custom<br><small>${pool.length ? pool.length + ' cargada' + (pool.length === 1 ? '' : 's') + ' · 2 de Job' : 'sin cargar'}</small></button>
       </div>
       <div class="cat-grouphead" style="margin-top:0"><span>Habilidad de clase</span></div>
       <div class="hint" style="margin:6px 0">Cualquier habilidad de clase cuesta 1 de Job${S.meta.clase ? ` (tu clase: <b>${esc(S.meta.clase)}</b>)` : ''}.</div>
       <div class="opcion-fila">${CLASES_SKILLS.map(c => `<button type="button" class="opcion-btn" data-habclase-clase="${c.id}" ${c.habilidades.length ? '' : 'disabled'}>${esc(c.nombre)}${esMiClase(c) ? ' ★' : ''}<br><small>${c.habilidades.length ? c.habilidades.length + ' cargada' + (c.habilidades.length === 1 ? '' : 's') : 'sin cargar'}</small></button>`).join('')}</div>`;
     return;
   }
-  const costo = HAB_JOB_CLASE;
-  $('#hab-clase-titulo').textContent = `Habilidades de ${clase.nombre}`;
+  const lista = esCustomPool ? (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []) : clase.habilidades;
+  const costo = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
+  $('#hab-clase-titulo').textContent = esCustomPool ? '🧩 Pool custom' : `Habilidades de ${clase.nombre}`;
   $('#hab-clase-body').innerHTML = `
     <button type="button" class="btn ghost" data-habclase-volver="1" style="margin-bottom:10px">← Volver</button>
-    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>. Te quedan ${fmt(jobBudget().resto)}.</div>
-    <div class="habs-grid" style="grid-template-columns:1fr">${clase.habilidades.map(h => {
+    <div class="hint" style="margin-bottom:8px">Cada una cuesta <b>${costo} de Job</b>${esCustomPool ? ' — pool abierto de cualquiera, sin auditar del todo por la mesa' : ''}. Te quedan ${fmt(jobBudget().resto)}.</div>
+    <div class="habs-grid" style="grid-template-columns:1fr">${lista.map(h => {
       const ya = S.habilidades.some(x => claveHabClase(x) === h.id);
       const costoTxt = costoHabilidadTxt({...h, automatizada: h.automatizada !== false});
       return `<div class="habs-grid-item">
         <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(h.nombre)}</b>
-        <button type="button" class="mini" data-habclase-agregar="${clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
+        <button type="button" class="mini" data-habclase-agregar="${esCustomPool ? '_custom' : clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         <div class="hint" style="margin-top:4px">${esc(h.detalle)}</div>
       </div>`;
-    }).join('')}</div>`;
+    }).join('') || '<div class="hint">Todavía no hay ninguna acá.</div>'}</div>`;
 }
 function agregarHabClase(claseId, habId){
-  const clase = CLASES_SKILLS.find(c => c.id === claseId);
-  const base = clase && clase.habilidades.find(h => h.id === habId);
+  const esCustomPool = claseId === '_custom';
+  const clase = esCustomPool ? null : CLASES_SKILLS.find(c => c.id === claseId);
+  const base = esCustomPool ? (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []).find(h => h.id === habId) : (clase && clase.habilidades.find(h => h.id === habId));
   if(!base) return;
   if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
-  const job = HAB_JOB_CLASE;
-  // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar…).
+  const job = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
+  // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar…). `auditar` es un dato del pool (si
+  // todavía no la revisó el dueño), no del personaje: no tiene sentido que viaje a la ficha.
+  const copiaBase = structuredClone(base);
+  delete copiaBase.auditar;
   S.habilidades.push({
-    ...structuredClone(base),
+    ...copiaBase,
     id: uid(), costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
-    habClaseId: base.id, habClase: clase.nombre,
+    habClaseId: base.id, habClase: esCustomPool ? 'Pool custom' : clase.nombre,
   });
   $('#scrim-hab-clase').classList.remove('open');
   renderList('habilidades');

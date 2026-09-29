@@ -365,6 +365,19 @@ archivo por texto, no por JSON (`ghLeerTexto`, nuevo — `ghLeerJson` no sirve p
 `const SKILLS_CUSTOM = ` en adelante: si `CLASES_SKILLS` cambió mientras tanto (por ejemplo alguien guardó desde
 la auditoría), esa parte del archivo no se pisa.
 
+**"+ Habilidad" ya ofrece el pool custom** (2026-09-29, pedido del dueño, cierra el círculo de lo de arriba):
+`abrirHabClase()` (sin argumento, el menú de siempre) suma un tercer botón **🧩 Pool custom** junto a "Habilidad
+custom" y la grilla de clases — deshabilitado con "sin cargar" mientras `SKILLS_CUSTOM` esté vacío. Es un
+pseudo-`claseId` (`'_custom'`, no está en `CLASES_SKILLS`) que `abrirHabClase(claseId)`/`agregarHabClase(claseId,
+habId)` reconocen antes de buscar en `CLASES_SKILLS`, así que reusan la misma grilla, el mismo botón "Agregar" y
+la misma detección de "Ya la tenés" (`claveHabClase`, por `habClaseId`) que las habilidades de clase — **la única
+diferencia real es el costo**: **2 de Job** (`HAB_JOB_CUSTOM`, la misma constante que ya usaba "Habilidad custom"
+para armar una de cero — coherente: del pool sin auditar del todo por la mesa cuesta lo mismo que crear la tuya)
+en vez de 1 (`HAB_JOB_CLASE`). Al agregarla, `agregarHabClase` borra el campo `auditar` de la copia que llega al
+personaje (es dato del pool — si el dueño todavía no la revisó —, no algo que tenga sentido que cargue la ficha
+de un jugador) y con `habClaseId` puesto, el botón 📤 de arriba ya no aparece para ella (tiene sentido: ya está
+"en el sistema", republicarla sería redundante).
+
 - **Nueva disposición** (2026-09-19): bajo la cabecera va **Atributos a todo el
   ancho** (los cinco en horizontal, `#attrs` en grilla; el cuadro de **Campo de
   visión** quedó ahí abajo) y después **dos columnas**: Mochila, Cinturón y

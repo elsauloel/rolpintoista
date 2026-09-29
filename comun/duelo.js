@@ -463,11 +463,18 @@ const Duelo = (() => {
     }
     return d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
   };
-  // Las opciones de defensa de una habilidad: lo que el objetivo puede tirar contra ella (por ahora un botón por cada stat de `contra`).
+  // Las opciones de defensa de una habilidad: lo que el objetivo puede tirar contra ella (un botón por cada stat de `contra`).
+  // Parry (2026-09-29, pedido del dueño: "cajas individuales, ante el posible caso de algún skill que no se pueda
+  // parriar") sale como una caja más, PERO respeta la misma regla que un ataque normal — sin arma ni escudo
+  // equipado no hay Parry (P121): si el objetivo no puede parriar ahora, esa caja no se ofrece, aunque la
+  // habilidad la tenga marcada. `hk.puedeParry(d)` es opcional (compatibilidad hacia atrás: sin el hook, se ofrece
+  // igual — hoy solo lo define ficha.html/gm-tools.html).
   function opcionesHab(d, h){
     const hk = h || hooks();
-    return ((d.hab && d.hab.contra) || []).map(c => ({modo: c.modo, itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
-      info: hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}`] : []}));
+    return ((d.hab && d.hab.contra) || [])
+      .filter(c => c.stat !== 'parry' || !hk || !hk.puedeParry || hk.puedeParry(d))
+      .map(c => ({modo: c.modo, itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
+        info: hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}`] : []}));
   }
   // Pasa a lo que sigue cuando quien usa la habilidad ganó la contienda (o no había): daño, efectos o fin.
   function entrarHab(m){

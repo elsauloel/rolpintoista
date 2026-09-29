@@ -8583,6 +8583,12 @@ window.DUELO_HOOKS = {
     const v = habStatCreep(sc, stat), f = formulaParaValor(v);
     return f ? f.formula : fmt(num(v));
   },
+  // ¿El creep objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, misma regla que un ataque
+  // normal, P121: sin arma no hay Parry.)
+  puedeParry: d => {
+    const sc = S.creeps.find(c => c.id === d.defensor.ref);
+    return !!(sc && sc.armaNombre);
+  },
   // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
   opcionesDefensa: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);

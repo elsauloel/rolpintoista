@@ -640,4 +640,30 @@ versión parecida en más de una, es candidato a juntar.
   (línea de `html.modo-botonera body > :not(...)`). Verificado con una prueba de CSS aislada (no con Firebase real):
   con el fix, `#ct-fondo` computa `display:block`; sin él, `display:none`. **Pedido al dueño**: confirmar si
   Blindaje tenía tildado ese checkbox (parece la explicación más probable dado que no daba ningún error) y reprobar
-  ejecutándolo desde la Botonera del mapa.
+  ejecutándolo desde la Botonera del mapa. **Confirmado por el dueño: arregló el problema.**
+
+- **Parry como caja individual en «¿Con qué se resiste el objetivo?» (2026-09-29, pedido del dueño)**: el paso
+  Resistencia del 🎯/✨ (`comun/asistente-duelo-hab.js`, `CONTRA`) tenía Evasión y varios stats pasivos, pero no
+  Parry — el dueño pidió que apareciera como una caja más (no mezclada con el texto de Evasión), "ante el posible
+  caso de algún skill que no se pueda parriar" (o sea: que sea el diseño de CADA habilidad, tildando o no la
+  caja, el que decida si se puede parriar — no una regla fija del sistema). Se sumó `['parry', 'Parry (bloquear
+  con un arma o escudo — solo si el objetivo tiene uno equipado)']` a `CONTRA`; al marcarla aparece un aviso
+  (re-renderiza sola al tocar esa caja puntual, algo que las demás cajas de esta lista no hacían — no hacía falta
+  antes porque no dependían de ningún otro texto en pantalla) explicando que igual no se ofrece si el objetivo no
+  tiene arma ni escudo equipado.
+  - **Por qué no hacía falta más código en el motor**: para una habilidad dirigida (`d.hab`), la tirada de cada
+    stat de `contra` (Evasión, Res.Esp, Parry, lo que sea) ya se resuelve genéricamente por `DUELO_HOOKS.habTirar`
+    (busca el stat en `d.hab.contra` por `modo` y tira `compute().final[stat]`/`creepStatValor(sc, stat)`, ver
+    `comun/duelo.js` línea ~1671) — el hook `defender` (con su lógica hardcodeada de Evasión/Parry de un ataque
+    normal) **nunca se llama** para un duelo de habilidad, solo para uno de arma. Así que Parry como stat de
+    `contra` ya "andaba" en el sentido de tirar el número correcto; lo único que faltaba era la opción en la
+    lista y la regla de "sin arma no hay Parry".
+  - **La regla "sin arma ni escudo no se puede parriar" (P121) se respeta con un hook nuevo, opcional**:
+    `comun/duelo.js`'s `opcionesHab(d, h)` (arma una caja por cada stat de `contra` para que el objetivo elija
+    a ciegas) ahora filtra la caja de Parry si `h.puedeParry` existe y devuelve `false` — sin el hook (compatibilidad
+    hacia atrás), se sigue ofreciendo igual. `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html` suman
+    `puedeParry: d => …` a `DUELO_HOOKS`, reusando `armasYEscudosParaParry()`/`sc.armaNombre`/`inv.armaNombre` —
+    los mismos criterios que ya usa `opcionesDefensa` para un ataque normal.
+  - **No verificado en vivo con Firebase real** (el checkbox y el aviso sí, con una prueba aislada del asistente
+    en el navegador — ver el bug de arriba para la técnica) — el flujo completo (crear una habilidad con Parry
+    marcado, ejecutarla contra alguien con y sin arma) queda para probar en mesa.

@@ -10967,6 +10967,12 @@ window.DUELO_HOOKS = {
     const f = formulaParaValor(num(v));
     return f ? f.formula : fmt(num(v));
   },
+  // ¿El objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, la caja "Parry" del paso Resistencia
+  // del 🎯/✨ — misma regla que un ataque normal, P121: sin arma ni escudo equipado, no hay Parry.)
+  puedeParry: d => {
+    const inv = dueloInvDe(d.defensor);
+    return inv ? !!inv.armaNombre : armasYEscudosParaParry().length > 0;
+  },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
     // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.

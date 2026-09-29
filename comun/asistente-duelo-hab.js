@@ -64,7 +64,7 @@
    `comun/confirmar-turno.js`) es quien pregunta «¿es tu turno?» y cobra el SP que corresponda, antes de nada más. */
 const AsistenteDueloHab = (() => {
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
-  const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
+  const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['parry', 'Parry (bloquear con un arma o escudo — solo si el objetivo tiene uno equipado)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const BONOS_LABEL = Object.fromEntries(BONOS);
@@ -305,6 +305,7 @@ const AsistenteDueloHab = (() => {
       }
       if(esArea || st.contraModo === 'stats'){
         h += `<div class="adh-check-list">${CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
+        if(!esArea && st.contra.has('parry')) h += `<p class="nota" style="margin-top:6px">Parry sale como una caja más para elegir, junto a lo demás que hayas marcado — pero solo se ofrece si el objetivo tiene un arma o escudo equipado (misma regla que un ataque normal): sin eso, esa caja no aparece, aunque la hayas marcado acá.</p>`;
       }else if(st.contraModo === 'otro'){
         h += `<input type="text" style="margin-top:8px;width:100%;box-sizing:border-box" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}">
           <p class="nota" style="margin-top:6px">La habilidad tira igual (paso anterior), pero nadie automatiza lo que la resiste: el cuadro se abre directo en los efectos, con este texto como recordatorio.</p>`;
@@ -471,7 +472,10 @@ const AsistenteDueloHab = (() => {
       q('[data-zonaestado]', e => { st.zonaEstadoNombre = e.target.value; dibujar(); });
       q('[data-zonaestadoturnos]', e => { st.zonaEstadoTurnos = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-zonaestadostacks]', e => { st.zonaEstadoStacks = Math.max(0, Math.round(Number(e.target.value) || 0)); });
-      f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => { c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra); });
+      f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => {
+        c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra);
+        if(c.dataset.contra === 'parry') dibujar();   // el aviso de abajo depende de si Parry está marcado
+      });
       f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
       f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value === 'si'; dibujar(); });

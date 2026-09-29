@@ -1466,13 +1466,15 @@ const Duelo = (() => {
     let cierre = '';
     if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
     else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano' || d.fase === 'efectos')) cierre = veredictoHtml(d, nuevaClave('resultado'));
-    else if(d.estado === 'cancelado') cierre = '<div class="duelo-veredicto fallo"><div class="chico">Duelo cancelado</div></div>';
-    // Fin del duelo: cuando ya no queda ninguna reacción, un cartel claro y un botón para terminarlo.
+    else if(d.estado === 'cancelado') cierre = `<div class="duelo-veredicto fallo"><div class="chico">${d.hab ? 'Cancelado' : 'Duelo cancelado'}</div></div>`;
+    // Fin: cuando ya no queda ninguna reacción, un cartel claro y un botón para cerrarlo. «Duelo» es solo para el
+    // combate cuerpo a cuerpo de siempre (PdG contra Evasión) — una habilidad (d.hab) usa un texto genérico, para
+    // no llamarle "duelo" a un buff sobre uno mismo o un aliado (2026-09-29, pedido del dueño).
     const nuevoFin = d.estado === 'resuelto' && !revelado[d.id + ':fin'];
     if(d.estado === 'resuelto') revelado[d.id + ':fin'] = true;
     const finHtml = d.estado === 'resuelto'
-      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 FIN DEL DUELO</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>Terminar duelo</button></div>`
-      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 DUELO CANCELADO</div><button type="button" data-fin-duelo>Terminar duelo</button></div>` : '';
+      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button></div>`
+      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
@@ -1501,7 +1503,7 @@ const Duelo = (() => {
         ${cierre}
         ${finHtml}
         <div class="duelo-pie">
-          ${puedoCancelar ? '<button type="button" class="sec" data-cancelarduelo>Cancelar duelo</button>' : ''}
+          ${puedoCancelar ? `<button type="button" class="sec" data-cancelarduelo>Cancelar${d.hab ? '' : ' duelo'}</button>` : ''}
           <button type="button" class="sec" data-min2>Minimizar</button>
           <button type="button" class="sec" data-x2>Cerrar</button>
         </div>

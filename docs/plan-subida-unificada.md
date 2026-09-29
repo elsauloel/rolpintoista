@@ -262,6 +262,27 @@ los HTML) se retira.
 - **Queda para después**: el aviso 🔔 "versión nueva" en los ítems que ya están en una mochila (hoy una corrección
   cambia el catálogo, no las copias ya compradas).
 
+## Paso 6: cómo quedó (2026-09-29)
+
+- **`datos/auditoria.html`** ("🔍 Auditoría de lo subido", también en el menú ☰): entra con la cuenta, sin elegir partida
+  (como Herramientas de diseño). Lista todo lo que subió el grupo, de todos los tipos (habilidades de jugador y de creep,
+  las de creep de antes, creeps, pasivas, trampas, ítems), con filtros por tipo, "solo 🔶 sin auditar" y buscador. Cada
+  entrada: **👁 Ver** (la configuración entera), **⚖ Comparar** con el original que corrige (el de fábrica —de los archivos
+  de `comun/`— o una entrada vieja: tabla campo por campo, las dos pasadas por su plantilla para no ver ruido) y, solo el
+  dueño, **✎ Editar** (el JSON completo; al guardar queda como corrección suya, versión + 1, ya auditada), **✅ Auditado** y
+  **🗑 Descartar** (también el autor, mientras siga sin auditar — lo mismo que dejan las reglas). Abajo, para el dueño, las
+  **propuestas del camino viejo** con Aprobar / Rechazar.
+- `comun/biblioteca.js` suma para esto `auditar`, `descartar`, `corregirComoDueno`, `propuestasViejas`,
+  `aprobarPropuesta`, `rechazarPropuesta`, y la fecha de cada entrada (`fecha`).
+- La ventana de la Biblioteca de cada herramienta sigue teniendo su pestaña "🔶 Sin auditar" y su ✅: la pantalla nueva es
+  para revisar todo junto, no la reemplaza.
+- Verificado: con la biblioteca real (solo lectura: se ve lo subido y la comparación) y, para lo que escribe, con una base
+  de datos simulada adentro de la página (editar, auditar, descartar, aprobar y rechazar; un amigo ve solo Ver/Comparar y
+  Descartar en lo suyo sin auditar).
+
+**Con esto el plan de subida unificada queda completo** (pasos 0 a 6). Queda chico, anotado en `docs/pendientes.md`: el
+🔔 por habilidad dentro de un creep y el 🔔 de ítems ya comprados.
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -277,4 +298,4 @@ los HTML) se retira.
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | ✅ 2026-09-29 — ver "Paso 3: cómo quedó" |
 | 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (incluye P123: una sola forma de trampa) |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | ✅ 2026-09-29 — ver "Paso 5: cómo quedó" |
-| 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | Pendiente |
+| 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | ✅ 2026-09-29 — `datos/auditoria.html`, ver "Paso 6: cómo quedó" |

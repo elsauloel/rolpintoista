@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auditoría de lo subido — Rol Pintoísta</title>
+<link rel="icon" type="image/svg+xml" href="../comun/icono.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --ambar:#E0A040; --r:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ink);color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.45;min-height:100vh;padding-bottom:40px}
+a{color:var(--brass)}
+input,select,textarea,button{font-family:inherit;color:inherit;font-size:14px}
+input[type=text],select,textarea{background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);color:var(--paper);padding:8px 10px}
+textarea{width:100%;font-family:"Space Mono",monospace;font-size:12.5px;min-height:260px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--copper);outline-offset:1px}
+button{cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--paper);border-radius:var(--r);padding:7px 12px;font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08}
+.btn.ok{background:var(--bottle);border-color:var(--bottle)}
+.btn.peligro{border-color:var(--danger);color:#F0A49E}
+.btn.on{border-color:var(--brass);color:var(--brass)}
+.btn[disabled]{opacity:.45;cursor:default}
+header{position:sticky;top:0;z-index:5;padding:14px 16px 12px 60px;background:rgba(15,12,14,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+header .cab{display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;margin:0;flex:1}
+header .quien{font-size:12px;color:var(--muted)}
+main{max-width:1000px;margin:0 auto;padding:14px 16px 0}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.filtros .tipos{display:flex;flex-wrap:wrap;gap:6px}
+.filtros label{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.filtros input[type=text]{flex:1;min-width:200px}
+.hint{font-size:12.5px;color:var(--muted)}
+.fila{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:10px 12px;margin-bottom:8px}
+.fila.sin{border-left:4px solid var(--ambar)}
+.fila .cab{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.fila .info{flex:1 1 380px;min-width:0}
+.fila .tit{font-weight:700;font-size:15.5px}
+.fila .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.fila .acc{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;border:1px solid var(--line)}
+.badge.sin{color:var(--ambar);border-color:var(--ambar)}
+.badge.ok{color:var(--absenta);border-color:var(--bottle)}
+.badge.tipo{color:var(--muted)}
+.detalle{margin-top:10px;border-top:1px dashed var(--line-soft);padding-top:10px}
+.kv{display:grid;grid-template-columns:190px 1fr;gap:4px 12px;font-size:13px}
+.kv .k{color:var(--muted);font-family:"Space Mono",monospace;font-size:12px;overflow-wrap:anywhere}
+.kv .v{overflow-wrap:anywhere}
+pre{margin:0;white-space:pre-wrap;font-family:"Space Mono",monospace;font-size:12px;color:#D8CCBA}
+table.dif{width:100%;border-collapse:collapse;font-size:12.5px}
+table.dif th,table.dif td{border:1px solid var(--line-soft);padding:5px 7px;vertical-align:top;text-align:left}
+table.dif th{color:var(--muted);font-weight:600;background:var(--panel2)}
+table.dif td.k{font-family:"Space Mono",monospace;color:var(--brass);white-space:nowrap}
+table.dif td.antes{color:#F0A49E}
+table.dif td.ahora{color:#BFE08A}
+.seccion{margin:22px 0 8px;font-size:14px;font-weight:700;color:var(--brass);text-transform:uppercase;letter-spacing:.06em}
+#login-box{max-width:380px;margin:16vh auto 0;padding:0 20px;text-align:center}
+#login-error{color:#F0A49E;min-height:1.4em;font-size:13px;margin-top:8px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--copper);border-radius:var(--r);padding:10px 16px;display:none;z-index:100;max-width:90vw}
+#toast.on{display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="cab">
+    <h1>🔍 Auditoría de lo subido</h1>
+    <span class="quien" id="quien"></span>
+    <button class="btn" id="btn-recargar" hidden title="Volver a leer todo de la biblioteca">⟳ Actualizar</button>
+    <button class="btn" id="btn-salir" hidden>Salir</button>
+  </div>
+</header>
+
+<div id="login-box" hidden>
+  <p>Entrá con tu cuenta para ver lo que subió el grupo.</p>
+  <button class="btn primary" id="btn-google">Entrar con Google</button>
+  <div id="login-error"></div>
+</div>
+
+<main id="main" hidden>
+  <p class="hint" style="margin-top:0">Todo lo que subió el grupo a la biblioteca compartida —habilidades, creeps, pasivas, trampas e ítems—, disponible
+    para todos desde que se subió. Acá se revisa: <b>👁 Ver</b> la configuración, <b>⚖ Comparar</b> con el original que corrige,
+    y (solo el dueño) <b>✎ Editar</b>, <b>✅ Auditado</b> o <b>🗑 Descartar</b>. Ver <code>docs/plan-subida-unificada.md</code> (paso 6).</p>
+  <div class="filtros">
+    <div class="tipos" id="tipos"></div>
+    <label><input type="checkbox" id="chk-sin" checked> Solo 🔶 sin auditar</label>
+    <input type="text" id="buscar" placeholder="Buscar por nombre, autor o descripción…">
+  </div>
+  <div class="hint" id="cuenta"></div>
+  <div id="lista"></div>
+  <div id="viejas"></div>
+</main>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/sesion.js"></script>
+<script src="../comun/menu-sitio.js"></script>
+<script src="../comun/plantillas.js?v=20260929i"></script>
+<script src="../comun/biblioteca.js?v=20260929i"></script>
+<script src="../comun/catalogo.js?v=20260929b"></script>
+<script src="../comun/skills-clase.js"></script>
+<script src="../comun/pasivas.js"></script>
+<script src="../comun/creeps-base.js?v=20260927a"></script>
+<script src="../comun/skills-creep-base.js?v=20260927a"></script>
+<script src="../comun/trampas-base.js"></script>
+<script>
+/* =========================================================
+   AUDITORÍA DE LO SUBIDO — la pantalla única del paso 6 de docs/plan-subida-unificada.md (2026-09-29).
+   Lee de la biblioteca compartida (comun/biblioteca.js) todo lo que subió el grupo, de todos los tipos, y deja verlo,
+   compararlo con el original que corrige (el de fábrica, de los archivos de comun/, o una entrada vieja) y —solo el dueño
+   (BIBLIOTECA_DUENO_EMAIL)— editarlo, marcarlo auditado o descartarlo. El autor también puede descartar lo suyo mientras
+   siga sin auditar (lo mismo que dejan las reglas de Firestore). Entra con la cuenta, sin elegir partida, como
+   preguntas-diseno/preguntas.html. Las propuestas del camino viejo (propuestas_<tipo>) se muestran al dueño aparte.
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+let toastT = null;
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200); }
+
+const TIPOS = [
+  {id: 'skills', nombre: 'Habilidades', icono: '✨'},
+  {id: 'habs_creep', nombre: 'Habilidades de creep (de antes)', icono: '🐾'},
+  {id: 'creeps', nombre: 'Creeps', icono: '👹'},
+  {id: 'pasivas', nombre: 'Pasivas', icono: '🧬'},
+  {id: 'trampas', nombre: 'Trampas', icono: '🪤'},
+  {id: 'items', nombre: 'Ítems', icono: '🎒'},
+];
+const TIPO = Object.fromEntries(TIPOS.map(t => [t.id, t]));
+const st = {tipo: '', soloSin: true, texto: '', entradas: [], viejas: [], abierto: {}, borrador: {}};
+
+/* ---------- Los originales de fábrica (para comparar) ---------- */
+let basesCache = null;
+function bases(){
+  if(basesCache) return basesCache;
+  const m = {skills: new Map(), habs_creep: new Map(), creeps: new Map(), pasivas: new Map(), trampas: new Map(), items: new Map()};
+  const put = (tipo, id, datos, nombre) => m[tipo].set('base-' + id, {datos, nombre});
+  (typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []).forEach(c => c.habilidades.forEach(h => put('skills', h.id, h, `${h.nombre} (${c.nombre})`)));
+  (typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : []).forEach(h => put('skills', h.id, h, `${h.nombre} (pool custom)`));
+  (typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : []).forEach(b => {
+    let d = b.datos || b;
+    try{ if(d.sp && typeof armarHabilidadDeCreep === 'function') d = {...armarHabilidadDeCreep(d, 1), para: 'creep'}; }catch(e){}
+    put('skills', b.poolId, d, `${b.nombre} (creep de fábrica, calculada a nivel 1)`);
+  });
+  (typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : []).forEach(b => put('creeps', b.poolId, b.datos || b, b.nombre));
+  (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).forEach(b => put('pasivas', b.poolId, b, b.nombre));
+  (typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : []).forEach(b => put('trampas', b.poolId, b.datos || b, b.nombre));
+  (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE : []).forEach(it => put('items', it.id, it, it.nombre));
+  return (basesCache = m);
+}
+// El original que corrige una entrada: uno de fábrica (`base-…`) o una entrada vieja (habilidad de creep de antes).
+function originalDe(e){
+  if(!e.reemplaza) return null;
+  const b = (bases()[e.tipo] || new Map()).get(e.reemplaza);
+  if(b) return {...b, deFabrica: true};
+  const vieja = st.entradas.find(x => x.id === e.reemplaza);
+  if(vieja) return {datos: vieja.tipo === 'habs_creep' && vieja.datos.habilidad ? {...vieja.datos.habilidad, para: 'creep'} : vieja.datos, nombre: vieja.nombre + ' (entrada vieja)', deFabrica: false};
+  return null;
+}
+
+/* ---------- Carga ---------- */
+async function cargar(){
+  $('#lista').innerHTML = '<div class="hint">Cargando…</div>';
+  const todas = [];
+  for(const t of TIPOS){
+    const l = await Biblioteca.lista(t.id);
+    l.forEach(e => todas.push({...e, tipo: t.id}));
+  }
+  // Una entrada vieja que ya tiene su corrección en el tipo nuevo no se lista (la corrección la muestra al comparar).
+  const tapadas = new Set(todas.map(e => e.reemplaza).filter(Boolean));
+  st.entradas = todas.filter(e => !tapadas.has(e.id));
+  st.viejas = [];
+  if(Biblioteca.esDueno()) for(const t of TIPOS){ (await Biblioteca.propuestasViejas(t.id)).forEach(e => st.viejas.push({...e, tipo: t.id})); }
+  render();
+}
+
+/* ---------- Dibujo ---------- */
+const fechaTxt = ms => ms ? new Date(ms).toLocaleString('es-AR', {dateStyle: 'short', timeStyle: 'short'}) : '';
+const corto = v => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s === undefined ? '—' : s; };
+function valorHtml(v){
+  if(v === null || v === undefined || v === '') return '<span class="hint">—</span>';
+  if(typeof v === 'object') return `<pre>${esc(JSON.stringify(v, null, 2))}</pre>`;
+  return esc(String(v));
+}
+function verHtml(e){
+  const d = e.datos || {};
+  const claves = Object.keys(d).filter(k => !['imagen', '_bib'].includes(k));
+  return `<div class="kv">${claves.map(k => `<div class="k">${esc(k)}</div><div class="v">${valorHtml(d[k])}</div>`).join('')}</div>`;
+}
+// Diferencias campo por campo entre el original y la versión subida (las dos pasadas por su plantilla, para no ver ruido).
+function diferencias(e, o){
+  const L = x => { try{ return Plantillas.limpiar(e.tipo, structuredClone(x)); }catch(err){ return x; } };
+  const a = L(o.datos) || {}, b = L(e.datos) || {};
+  const ignorar = new Set(['id', 'imagen', '_bib', 'bibOrigen', 'cdActual']);
+  return [...new Set([...Object.keys(a), ...Object.keys(b)])].filter(k => !ignorar.has(k))
+    .filter(k => JSON.stringify(a[k]) !== JSON.stringify(b[k])).map(k => ({k, antes: a[k], ahora: b[k]}));
+}
+function compararHtml(e){
+  const o = originalDe(e);
+  if(!o) return `<div class="hint">${e.reemplaza ? 'No encontré el original que corrige (puede haber cambiado de nombre o haberse borrado).' : 'Es algo nuevo: no corrige a ningún original. Usá 👁 Ver para revisarlo entero.'}</div>`;
+  const dif = diferencias(e, o);
+  return `<div class="hint" style="margin-bottom:6px">Corrige a <b>${esc(o.nombre)}</b>${o.deFabrica ? ' (de fábrica)' : ''}. ${dif.length ? `${dif.length} campo${dif.length === 1 ? '' : 's'} distinto${dif.length === 1 ? '' : 's'}:` : 'No cambia nada respecto del original.'}</div>
+    ${dif.length ? `<table class="dif"><tr><th>Campo</th><th>Original</th><th>Subido</th></tr>${dif.map(x => `<tr><td class="k">${esc(x.k)}</td><td class="antes">${valorHtml(x.antes)}</td><td class="ahora">${valorHtml(x.ahora)}</td></tr>`).join('')}</table>` : ''}`;
+}
+function editarHtml(e){
+  const txt = st.borrador[e.id] ?? JSON.stringify(e.datos, null, 2);
+  return `<div class="hint" style="margin-bottom:6px">La configuración completa en texto (JSON). Al guardar, queda como una corrección tuya (versión ${e.version + 1}), ya auditada.</div>
+    <textarea data-borrador="${esc(e.id)}">${esc(txt)}</textarea>
+    <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px">
+      <button class="btn" data-acc="cancelar-edicion" data-id="${esc(e.id)}">Cancelar</button>
+      <button class="btn primary" data-acc="guardar-edicion" data-id="${esc(e.id)}">💾 Guardar corrección</button></div>`;
+}
+function filaHtml(e){
+  const dueno = Biblioteca.esDueno();
+  const mio = fbUsuario && e.autorUid === fbUsuario.uid;
+  const t = TIPO[e.tipo];
+  const abierto = st.abierto[e.id];
+  const para = e.tipo === 'skills' ? (e.datos && e.datos.para === 'creep' ? ' · 🐾 Creep · cooldown' : ' · 🧙 Jugador · SP') : '';
+  const o = e.reemplaza ? originalDe(e) : null;
+  return `<div class="fila${e.auditado ? '' : ' sin'}">
+    <div class="cab">
+      <div class="info">
+        <div class="tit">${esc(e.nombre)}<span class="badge tipo">${t.icono} ${esc(t.nombre)}${esc(para)}</span>${e.auditado ? '<span class="badge ok">✅ auditado</span>' : '<span class="badge sin">🔶 sin auditar</span>'}${e.version > 1 ? `<span class="badge tipo">v${e.version}</span>` : ''}</div>
+        <div class="meta">de ${esc(e.autorNombre || 'alguien')}${e.editorNombre ? ` · corregido por ${esc(e.editorNombre)}` : ''}${e.fecha ? ` · ${esc(fechaTxt(e.fecha))}` : ''}${e.reemplaza ? ` · corrige a ${esc(o ? o.nombre : e.reemplaza)}` : ' · nuevo'}</div>
+        ${e.descripcion ? `<div class="meta" style="color:var(--paper)">${esc(e.descripcion)}</div>` : ''}
+      </div>
+      <div class="acc">
+        <button class="btn${abierto === 'ver' ? ' on' : ''}" data-acc="ver" data-id="${esc(e.id)}">👁 Ver</button>
+        <button class="btn${abierto === 'comparar' ? ' on' : ''}" data-acc="comparar" data-id="${esc(e.id)}" ${e.reemplaza ? '' : 'title="Es algo nuevo: no corrige a ningún original"'}>⚖ Comparar</button>
+        ${dueno ? `<button class="btn${abierto === 'editar' ? ' on' : ''}" data-acc="editar" data-id="${esc(e.id)}">✎ Editar</button>` : ''}
+        ${dueno && !e.auditado ? `<button class="btn ok" data-acc="auditar" data-id="${esc(e.id)}">✅ Auditado</button>` : ''}
+        ${dueno || (mio && !e.auditado) ? `<button class="btn peligro" data-acc="descartar" data-id="${esc(e.id)}">🗑 Descartar</button>` : ''}
+      </div>
+    </div>
+    ${abierto ? `<div class="detalle">${abierto === 'ver' ? verHtml(e) : abierto === 'comparar' ? compararHtml(e) : editarHtml(e)}</div>` : ''}
+  </div>`;
+}
+function visibles(){
+  const q = st.texto.toLowerCase();
+  return st.entradas
+    .filter(e => !st.tipo || e.tipo === st.tipo)
+    .filter(e => !st.soloSin || !e.auditado)
+    .filter(e => !q || [e.nombre, e.autorNombre, e.editorNombre, e.descripcion, e.datos && e.datos.detalle].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => (a.auditado - b.auditado) || (b.fecha - a.fecha) || a.nombre.localeCompare(b.nombre, 'es'));
+}
+function render(){
+  const cuenta = t => st.entradas.filter(e => (!t || e.tipo === t) && !e.auditado).length;
+  $('#tipos').innerHTML = [{id: '', nombre: 'Todo', icono: ''}, ...TIPOS].map(t => {
+    const n = cuenta(t.id), total = st.entradas.filter(e => !t.id || e.tipo === t.id).length;
+    if(t.id && !total) return '';
+    return `<button class="btn${st.tipo === t.id ? ' on' : ''}" data-tipo="${t.id}">${t.icono} ${esc(t.nombre)} <span class="hint">${n ? `🔶${n} · ` : ''}${total}</span></button>`;
+  }).join('');
+  const l = visibles();
+  $('#cuenta').textContent = `${l.length} de ${st.entradas.length} · ${st.entradas.filter(e => !e.auditado).length} sin auditar en total`;
+  $('#lista').innerHTML = l.map(filaHtml).join('') || `<div class="hint" style="padding:10px 0">${st.entradas.length ? (st.soloSin ? '🎉 No hay nada sin auditar con ese filtro.' : 'Nada con ese filtro.') : 'Todavía nadie subió nada a la biblioteca.'}</div>`;
+  $('#viejas').innerHTML = st.viejas.length ? `<div class="seccion">Propuestas del camino viejo (${st.viejas.length})</div>
+    <div class="hint" style="margin-bottom:8px">Lo que se mandó como propuesta antes de la subida unificada (o sin las reglas nuevas de Firestore publicadas). Aprobar lo pasa a la biblioteca como auditado; Rechazar lo borra.</div>
+    ${st.viejas.map(e => `<div class="fila"><div class="cab"><div class="info"><div class="tit">${esc(e.nombre)}<span class="badge tipo">${TIPO[e.tipo].icono} ${esc(TIPO[e.tipo].nombre)}</span></div>
+      <div class="meta">de ${esc(e.autorNombre || 'alguien')}${e.fecha ? ` · ${esc(fechaTxt(e.fecha))}` : ''}</div></div>
+      <div class="acc"><button class="btn${st.abierto['v-' + e.id] ? ' on' : ''}" data-acc="ver-vieja" data-id="${esc(e.id)}">👁 Ver</button>
+        <button class="btn ok" data-acc="aprobar" data-id="${esc(e.id)}">Aprobar</button><button class="btn peligro" data-acc="rechazar" data-id="${esc(e.id)}">Rechazar</button></div></div>
+      ${st.abierto['v-' + e.id] ? `<div class="detalle">${verHtml(e)}</div>` : ''}</div>`).join('')}` : '';
+}
+
+/* ---------- Acciones ---------- */
+document.addEventListener('input', ev => { const t = ev.target; if(t.dataset && t.dataset.borrador) st.borrador[t.dataset.borrador] = t.value; });
+$('#buscar').addEventListener('input', ev => { st.texto = ev.target.value.trim(); render(); });
+$('#chk-sin').addEventListener('change', ev => { st.soloSin = ev.target.checked; render(); });
+$('#tipos').addEventListener('click', ev => { const b = ev.target.closest('[data-tipo]'); if(!b) return; st.tipo = b.dataset.tipo; render(); });
+document.addEventListener('click', async ev => {
+  const b = ev.target.closest('[data-acc]'); if(!b) return;
+  const acc = b.dataset.acc, id = b.dataset.id;
+  const e = st.entradas.find(x => x.id === id), v = st.viejas.find(x => x.id === id);
+  const alternar = modo => { st.abierto[id] = st.abierto[id] === modo ? null : modo; render(); };
+  try{
+    if(acc === 'ver' || acc === 'comparar') return alternar(acc);
+    if(acc === 'editar'){ st.borrador[id] = JSON.stringify(e.datos, null, 2); return alternar('editar'); }
+    if(acc === 'cancelar-edicion'){ delete st.borrador[id]; st.abierto[id] = null; return render(); }
+    if(acc === 'ver-vieja'){ st.abierto['v-' + id] = !st.abierto['v-' + id]; return render(); }
+    if(acc === 'guardar-edicion'){
+      let datos;
+      try{ datos = JSON.parse(st.borrador[id] ?? ''); }catch(err){ toast('El texto no es un JSON válido: revisá comas, comillas y llaves'); return; }
+      await Biblioteca.corregirComoDueno(e.tipo, e.id, datos);
+      delete st.borrador[id]; st.abierto[id] = null;
+      toast(`"${e.nombre}" corregido y auditado`);
+      return cargar();
+    }
+    if(acc === 'auditar'){ await Biblioteca.auditar(e.tipo, e.id); e.auditado = true; toast(`"${e.nombre}" quedó auditado`); return render(); }
+    if(acc === 'descartar'){
+      if(!confirm(`¿Descartar "${e.nombre}"? Se borra de la biblioteca para todos (las copias que ya estén en fichas o creeps no se tocan). No se puede deshacer.`)) return;
+      await Biblioteca.descartar(e.tipo, e.id); toast(`"${e.nombre}" descartado`); return cargar();
+    }
+    if(acc === 'aprobar'){ await Biblioteca.aprobarPropuesta(v.tipo, v); toast(`"${v.nombre}" pasó a la biblioteca`); return cargar(); }
+    if(acc === 'rechazar'){
+      if(!confirm(`¿Rechazar la propuesta "${v.nombre}"? Se borra.`)) return;
+      await Biblioteca.rechazarPropuesta(v.tipo, v.id); toast(`Propuesta "${v.nombre}" rechazada`); return cargar();
+    }
+  }catch(err){
+    console.error('Auditoría:', err);
+    toast(err && err.code === 'permission-denied' ? 'La biblioteca no te dejó (¿reglas nuevas de Firestore sin publicar, o no sos el dueño?).' : 'No se pudo: ' + (err.message || err));
+  }
+});
+$('#btn-recargar').onclick = () => cargar();
+$('#btn-salir').onclick = () => firebase.auth().signOut();
+$('#btn-google').onclick = async () => {
+  $('#login-error').textContent = '';
+  const prov = new firebase.auth.GoogleAuthProvider();
+  prov.setCustomParameters({prompt: 'select_account'});
+  try{ await firebase.auth().signInWithPopup(prov); }
+  catch(err){
+    if(err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment'){ await firebase.auth().signInWithRedirect(prov); return; }
+    if(err.code !== 'auth/cancelled-popup-request') $('#login-error').textContent = 'No se pudo entrar: ' + (err.message || err.code || '');
+  }
+};
+
+/* ---------- Arranque: entra con la cuenta, sin elegir partida ---------- */
+(function iniciar(){
+  if(!fbIniciar()){ $('#login-box').hidden = false; $('#login-error').textContent = 'Sin conexión con Firebase.'; return; }
+  let cargado = false;
+  firebase.auth().onAuthStateChanged(u => {
+    fbUsuario = u || null;
+    const ok = fbCuentaConfirmada(u);
+    $('#login-box').hidden = ok; $('#main').hidden = !ok;
+    $('#btn-salir').hidden = !ok; $('#btn-recargar').hidden = !ok;
+    $('#quien').textContent = ok ? (u.displayName || u.email || '') + (Biblioteca.esDueno() ? ' · dueño' : '') : '';
+    if(ok && !cargado){ cargado = true; cargar(); }
+  });
+})();
+</script>
+</body>
+</html>

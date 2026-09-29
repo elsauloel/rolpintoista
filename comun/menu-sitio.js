@@ -150,6 +150,7 @@ async function menuDibujar(){
     if(typeof GuiaDiseno !== 'undefined') h += '<button type="button" class="ms-item" id="menu-sitio-guia"><span class="ms-ico">📐</span><span>Guía de diseño</span></button>';
     h += menuLink(menuUrl('manual-usuario/manual.html', enPartida ? FB_CAMPANA : ''), '📖', 'Manual');
     h += menuLink(menuUrl('preguntas-diseno/preguntas.html', ''), '🛠', 'Herramientas de diseño');
+    h += menuLink(menuUrl('datos/auditoria.html', ''), '🔍', 'Auditoría de lo subido');
     h += menuLink(menuUrl('datos/auditoria-armas.html', ''), '🗡', 'Auditoría de armas');
     h += menuLink(menuUrl('datos/auditoria-defensa.html', ''), '🛡', 'Auditoría de defensa');
     h += menuLink(menuUrl('datos/auditoria-creeps.html', ''), '👹', 'Auditoría de creeps');

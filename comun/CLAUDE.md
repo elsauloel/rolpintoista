@@ -775,3 +775,7 @@ versión parecida en más de una, es candidato a juntar.
   entra como `usr-<id>`; cada uno lleva `_bib` con de dónde salió), `cargar()`, `basadoEn(item, catalogo)` (para
   "¿corrección o algo nuevo?" al subir) y `etiqueta(item)` ("🔶 sin auditar · subido por X"). Lo usan ficha, gm-tools y el
   generador de tiendas; el botón de todos es **⬆ Subir al catálogo** (`Biblioteca.guardar({tipo: 'items'})`).
+- **`biblioteca.js`, operaciones para la auditoría** (2026-09-29, paso 6): `auditar(tipo, id, col?)`,
+  `descartar(tipo, id, col?)`, `corregirComoDueno(tipo, id, datos, col?)` (versión + 1, queda auditada),
+  `propuestasViejas(tipo)`, `aprobarPropuesta(tipo, ent)`, `rechazarPropuesta(tipo, id)`, y `fecha` en cada entrada. Las usa
+  `datos/auditoria.html`. El menú ☰ (`menu-sitio.js`) suma el link "🔍 Auditoría de lo subido".

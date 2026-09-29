@@ -128,3 +128,6 @@
 - [ ] **🔔 versión nueva por habilidad dentro de un creep** (2026-09-29, paso 3 de `docs/plan-subida-unificada.md`): hoy
   el aviso de versión nueva es por creep entero; las habilidades de un creep ya guardan `bibOrigen`, falta mostrar el 🔔
   en su fila y el cartel de Actualizar (mismo patrón que `abrirVersionNuevaHab` de la ficha).
+- [ ] **🔔 versión nueva en ítems ya comprados** (2026-09-29, paso 5 de `docs/plan-subida-unificada.md`): una corrección de
+  un ítem del catálogo cambia el catálogo, pero no las copias que ya están en una mochila. Falta guardar de dónde salió
+  cada ítem al comprarlo (`bibOrigen`) y mostrar el aviso (cartel `Biblioteca.avisoVersion`).

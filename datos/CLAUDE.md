@@ -90,3 +90,9 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
 - `ficha-personaje/`, `gm-toolset/` — todos leen y escriben algo de acá
   vía la API de contenidos de GitHub (no filesystem directo).
 - **Nombres propios del equipo de los humanos** (2026-09-20): ver `gm-toolset/CLAUDE.md`; el catálogo pasó a 665 ítems (54 clones con nombre inspirado en el creep).
+- **`auditoria.html`** (2026-09-29, paso 6 de `../docs/plan-subida-unificada.md`) — **la pantalla única de auditoría de lo
+  subido** ("🔍 Auditoría de lo subido", en el menú ☰): todo lo que el grupo subió a la biblioteca compartida (habilidades,
+  creeps, pasivas, trampas, ítems), con 👁 Ver, ⚖ Comparar con el original que corrige y, para el dueño, ✎ Editar (JSON),
+  ✅ Auditado y 🗑 Descartar; más las propuestas del camino viejo (Aprobar / Rechazar). Entra con la cuenta, sin partida.
+  A diferencia de `auditoria-armas/defensa/creeps.html` (decisiones sobre el catálogo de fábrica) y `auditoria-skills.html`
+  (edita `comun/skills-clase.js`), esta trabaja sobre lo subido en Firebase.

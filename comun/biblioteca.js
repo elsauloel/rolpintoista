@@ -64,6 +64,8 @@ const Biblioteca = (() => {
     return [...vistas].slice(0, 12);
   }
 
+  const ms = t => (t && typeof t.toMillis === 'function') ? t.toMillis() : 0;
+
   function armarEntrada(fila){
     const d = fila.data();
     let datos = null;
@@ -72,7 +74,8 @@ const Biblioteca = (() => {
       descripcion: d.descripcion || '', nivel: d.nivel, autorUid: d.autorUid, autorNombre: d.autorNombre || '', datos,
       // Lo de antes de la subida unificada ya había pasado por el dueño: cuenta como auditado.
       auditado: d.auditado !== false, version: Number(d.version) || 1, reemplaza: d.reemplaza || '',
-      editorNombre: d.editorNombre || ''};
+      editorNombre: d.editorNombre || '',
+      fecha: ms(d.actualizado) || ms(d.creado) || 0};
   }
 
   async function leer(coleccion){
@@ -653,5 +656,38 @@ const Biblioteca = (() => {
     };
   }
 
-  return {abrir, guardar, entrada, lista, versionNueva, avisoVersion, esDueno};
+  /* ---------- Para la pantalla única de auditoría (datos/auditoria.html, paso 6) ----------
+     `col` = la colección de la entrada si no es la de siempre (las viejas de biblioteca_habs_creep traen `ent.col`). */
+  const colDe = (tipo, col) => fbDb.collection(col || `biblioteca_${tipo}`);
+  async function auditar(tipo, id, col){ await colDe(tipo, col).doc(id).update({auditado: true}); }
+  async function descartar(tipo, id, col){ await colDe(tipo, col).doc(id).delete(); }
+  // El dueño corrige una entrada desde la auditoría: misma entrada, versión + 1, queda auditada.
+  async function corregirComoDueno(tipo, id, datos, col){
+    const limpio = typeof Plantillas !== 'undefined' ? Plantillas.limpiar(tipo, datos) : datos;
+    const json = JSON.stringify(limpio);
+    if(json.length > 200000) throw new Error('Es demasiado grande para la biblioteca.');
+    const ref = colDe(tipo, col).doc(id);
+    const quien = String((fbMiembro && fbMiembro.nombre) || (fbUsuario && fbUsuario.displayName) || '').slice(0, 40);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) throw new Error('Esa entrada ya no existe.');
+      tx.update(ref, {json, auditado: true, version: (Number(doc.data().version) || 1) + 1,
+        editorUid: fbUsuario.uid, editorNombre: quien, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    });
+  }
+  // Las propuestas del camino viejo (propuestas_<tipo>), que solo ve el dueño.
+  async function propuestasViejas(tipo){ return esDueno() ? leer(`propuestas_${tipo}`).catch(() => []) : []; }
+  async function aprobarPropuesta(tipo, ent){
+    const batch = fbDb.batch();
+    batch.set(fbDb.collection(`biblioteca_${tipo}`).doc(ent.id), {
+      nombre: ent.nombre, etiquetas: ent.etiquetas, descripcion: ent.descripcion, nivel: ent.nivel ?? 0,
+      json: JSON.stringify(ent.datos), autorUid: ent.autorUid, autorNombre: ent.autorNombre, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    batch.delete(fbDb.collection(`propuestas_${tipo}`).doc(ent.id));
+    await batch.commit();
+  }
+  async function rechazarPropuesta(tipo, id){ await fbDb.collection(`propuestas_${tipo}`).doc(id).delete(); }
+
+  return {abrir, guardar, entrada, lista, versionNueva, avisoVersion, esDueno,
+    auditar, descartar, corregirComoDueno, propuestasViejas, aprobarPropuesta, rechazarPropuesta};
 })();

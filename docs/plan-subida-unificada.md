@@ -34,7 +34,7 @@ para todos. Quien lo baje recibe **exactamente lo mismo**. Después hay una audi
 | Habilidades de clase / pool custom | `comun/skills-clase.js` (código, GitHub) | 📤 de la ficha escribiendo directo en GitHub, con token (hecho y **retirado** el 2026-09-29) | Sí, pero con campos basura, duplicados y caché |
 | Habilidades de creep, creeps, pasivas, trampas | Firebase, Biblioteca | "Guardar en la biblioteca" → propuesta → el dueño aprueba | Sí |
 | Ítems | `datos/catalogo.json` en la rama `main` | "📦 Agregar al catálogo", con token | No llega a las herramientas hasta correr `importar_json.py` |
-| Presets de estados | Copiados en `ficha.html` (`EFECTOS_PRESET`), `gm-tools.html` (`ESTADOS_PRESET_GM`) y `comun/estados-aplicar.js` | No se suben | — |
+| Presets de estados | Copiados en `ficha.html` (`EFECTOS_PRESET`), `gm-tools.html` (`ESTADOS_PRESET_GM`) y `comun/estados-aplicar.js` (juntados en `comun/estados-presets.js` el 2026-09-29) | No se suben | — |
 
 Problemas encontrados:
 - **Tres maneras distintas de "subir"**, una por tipo de elemento.
@@ -70,7 +70,7 @@ turno ni campos de otros tipos de elemento. Implementado hoy en `limpiarHab` de 
 | 0a | Retirar el 📤 que escribía directo en GitHub (camino paralelo) | ✅ 2026-09-29 |
 | 0b | Limpiar `comun/skills-clase.js`: una habilidad por renglón, sin campos basura; Lisiar consolidada en Asalto (la versión con Critical Matters bien armado); pool custom vacío | ✅ 2026-09-29 |
 | 0c | `datos/auditoria-skills.html` guarda con la plantilla y el mismo formato (ida y vuelta idéntica), y avisa si el archivo cambió desde que se abrió; sale "🔍 A auditar" (dependía del 📤) | ✅ 2026-09-29 |
-| 0d | Juntar las tres copias de los presets de estados en un solo archivo de `comun/` | Pendiente |
+| 0d | Juntar las tres copias de los presets de estados en un solo archivo de `comun/`: `comun/estados-presets.js` (ficha, gm-tools, mapa y auditoría de skills leen de ahí; se reconciliaron Sangrado, Afortunado, textos viejos y Barrera) | ✅ 2026-09-29 |
 | 0e | Plantillas del resto de los elementos (este documento) | Pendiente |
 | 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | Pendiente |
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | Pendiente |

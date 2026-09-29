@@ -1,0 +1,102 @@
+/* =========================================================
+   PRESETS DE ESTADOS ALTERADOS (compartido: ficha, gm-tools, mapa, auditoría de skills)
+   La lista ÚNICA de estados estándar del juego (Veneno, Sangrado, Stun, Escudo especial…). Antes vivía copiada tres
+   veces —`EFECTOS_PRESET` en ficha.html, `ESTADOS_PRESET_GM` en gm-tools.html y `DEBUFFS`/`BUFFS` en
+   estados-aplicar.js— y las copias se habían ido separando (Sangrado, Afortunado, textos viejos de Inmovilizado y
+   Rengo, Barrera que faltaba en gm-tools). Se juntaron el 2026-09-29 (paso 0d de `docs/plan-subida-unificada.md`).
+   Para cambiar un preset o sumar uno nuevo, se toca SOLO acá.
+
+   Forma: la de un creep (`hpTurno`, `stacksTurno`). Cada herramienta la pide adaptada a lo suyo:
+   - `estadosPresetFicha()`  → ficha.html (`hpturno`, `stacksturno`; Armadura rota lleva su −1 Defensa como mod,
+     que es como la ficha la cuenta: mods × stacks).
+   - `estadosPresetCreep()`  → gm-tools.html y `EstadosAplicar` (con `stacks: 1, hpTurno: 0` por defecto; Armadura
+     rota sin mod, porque los creeps la cuentan aparte, por acumulación).
+   Los textos van en tercera persona para que sirvan igual a un personaje que a un creep.
+   Las cantidades son el punto de partida: al activar un preset, `estado-preguntas.js` pregunta HP, escudo, stacks,
+   bonos y turnos, así que acá lo que importa es QUÉ hace cada estado (sus marcas), no tanto sus números.
+   ========================================================= */
+const ESTADOS_PRESET = [
+  {nombre:'Veneno', polaridad:'debuff', stacks:4, turnos:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
+    detalle:'Pierde HP por stack cada turno. Se agota junto con los stacks.'},
+  {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpTurno:5, stacksTurno:0,
+    detalle:'Cura HP cada turno.'},
+  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true, esCC:true,
+    detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
+  // PLACEHOLDER (Iteración 2): Exhausto, Stun, Hypeado, Inmovilizado y Rengo
+  // pasaron de Acciones/Movimiento a Nitros 1 a 1, sin recalibrar. Cansado ya
+  // se recalibró (2026-09-21, P28): pierde un tercio de sus No2 máximos.
+  {nombre:'Cansado', polaridad:'debuff', turnos:3, cansado:true,
+    detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
+  {nombre:'Exhausto', polaridad:'debuff', turnos:3, exhausto:true, esCC:true,
+    detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
+  {nombre:'Stun', polaridad:'debuff', turnos:2, forzarNitros:0, esCC:true,
+    detalle:'Sin No2 mientras dura (contá un turno de más para que lo agarre de verdad en su próximo turno, aunque el Mantenimiento pase antes de que actúe). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
+  {nombre:'Hypeado', polaridad:'buff', turnos:3, hypeado:true,
+    detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
+  {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true,
+    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
+  {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
+    detalle:'Hace daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente.'},
+  // Sangrado (2026-09-22): N de daño = N stacks de 1 HP, así cada reaplicación suma +1 al daño por turno.
+  {nombre:'Sangrado', polaridad:'debuff', stacks:2, turnos:0, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
+    detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
+  {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true, esCC:true,
+    detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
+  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true, esCC:true,
+    detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
+  {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
+    detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
+  {nombre:'Miedo', polaridad:'debuff', turnos:2, esCC:true, mods:[{stat:'pdg', val:-2}, {stat:'dmg', val:-2}],
+    detalle:'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
+  {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,
+    detalle:'Provocado (Taunt): mientras dure, si ataca, tiene que elegir como objetivo a quien lo provocó, si puede llegar a él (✋ a mano: lo respeta el jugador o el GM). No le impide usar habilidades que no sean atacar. Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
+  {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
+    detalle:'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
+  {nombre:'Parálisis', polaridad:'debuff', turnos:2, paralisis:true, esCC:true,
+    detalle:'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
+  {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, mods:[{stat:'crit', val:1}],
+    detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:1}],
+    detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
+    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
+  {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
+    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
+  {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
+    detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
+  {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
+    detalle:'✋ A mano: mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño CRUDO del golpe (antes de Defensa y escudos), redondeado hacia arriba, como daño directo (ignora Defensa). El GM o la mesa lo aplican; el estado solo recuerda que está activo y cuántos turnos dura.'},
+  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, escudoMagico:10,
+    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
+  {nombre:'Barrera', polaridad:'buff', turnos:1, escudoMagico:8,
+    detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
+  {nombre:'Excedente de vida', polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
+    detalle:'HP extra por encima de su máximo (por ejemplo, lo que drena de más). Es un valor neto: sin tope y sin recarga; absorbe el daño antes que la vida y se sube o baja a mano desde el chip. Por defecto no vence por turnos, pero se le pueden poner turnos.'},
+  {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
+    detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
+  {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
+    detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, coagulacionExtrema:true,
+    detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
+    detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},
+  {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
+    detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
+];
+
+// La lista en la forma de la ficha: `hpturno`/`stacksturno`, y Armadura rota con su −1 Defensa como mod.
+function estadosPresetFicha(){
+  return ESTADOS_PRESET.map(p => {
+    const {hpTurno, stacksTurno, ...resto} = structuredClone(p);
+    const f = {...resto};
+    if(hpTurno !== undefined) f.hpturno = hpTurno;
+    if(stacksTurno !== undefined) f.stacksturno = stacksTurno;
+    if(f.armaduraRota && !(f.mods || []).some(m => m.stat === 'def')) f.mods = [...(f.mods || []), {stat:'def', val:-1}];
+    return f;
+  });
+}
+
+// La lista en la forma de un creep (gm-tools, EstadosAplicar): con los valores por defecto que espera un estado de creep.
+function estadosPresetCreep(){
+  return ESTADOS_PRESET.map(p => ({stacks: 1, hpTurno: 0, ...structuredClone(p)}));
+}

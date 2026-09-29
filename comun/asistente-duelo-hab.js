@@ -541,7 +541,7 @@ const AsistenteDueloHab = (() => {
         // Al elegir un preset con escudo (Escudo especial/Barrera) y no haber tocado nada todavía, precarga sus
         // valores de siempre — se pueden cambiar igual, es solo para no arrancar de cero (2026-09-28).
         const preset = BUFF_PRESETS.find(p => p.nombre === ef.nombre);
-        if(preset && !ef.escudo && !ef.stat){ ef.escudo = preset.escudoMagico; ef.turnos = preset.turnos; dibujar(); }
+        if(preset && preset.escudoMagico && !ef.escudo && !ef.stat){ ef.escudo = preset.escudoMagico; ef.turnos = preset.turnos; dibujar(); }
       });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efStat); arr[idx].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efVal); arr[idx].val = Number(i.value) || 0; });
@@ -636,8 +636,8 @@ const AsistenteDueloHab = (() => {
         cfg.alGuardar({duelo: out, costo: costoResultado()});
       };
     }
-    // Nombres de estados que conoce el juego (debuffs Y buffs con escudo automáticos, 2026-09-28); se puede
-    // escribir otro a mano si no hay lista.
+    // Nombres de estados que conoce el juego (debuffs y buffs de `comun/estados-presets.js`, vía EstadosAplicar);
+    // se puede escribir otro a mano si no hay lista.
     const BUFF_PRESETS = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.BUFFS) || [];
     function nombresEstado(){
       const debuffs = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.map(p => p.nombre) : [];

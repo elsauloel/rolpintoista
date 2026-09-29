@@ -1277,7 +1277,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/sesion.js"></script>
 <script src="../comun/biblioteca.js"></script>
 <script src="../comun/tokens-auto.js?v=3"></script>
-<script src="../comun/estados-aplicar.js"></script>
+<script src="../comun/estados-presets.js?v=20260929a"></script>
+<script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
 <script src="../comun/skills-creep-base.js?v=20260927a"></script>
 <script src="../comun/armas-naturales-base.js"></script>
@@ -1292,12 +1293,12 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/tiradas.js"></script>
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
-<script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/estado-preguntas.js?v=20260929a"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js"></script>
-<script src="../comun/asistente-duelo-hab.js?v=20260927d"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js"></script>
 <script src="../comun/duelo.js?v=20260927f"></script>
@@ -3931,68 +3932,9 @@ function habsMiniHtml(sc){
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
 const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
-const ESTADOS_PRESET_GM = [
-  {nombre:'Veneno', polaridad:'debuff', turnos:4, stacks:4, hpTurno:-1, stacksTurno:-1, esVeneno:true,
-    detalle:'Pierde HP por stack cada turno.'},
-  {nombre:'Regeneración', polaridad:'buff', turnos:3, stacks:1, hpTurno:5,
-    detalle:'Cura HP cada turno.'},
-  {nombre:'Pajaritos', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, mitadPdgEva:true, esCC:true,
-    detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Cansado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, cansado:true,
-    detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
-  {nombre:'Exhausto', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, esCC:true, exhausto:true,
-    detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, forzarNitros:0,
-    detalle:'Sin No2 mientras dura (contá un turno de más para que te agarre de verdad en su próximo turno, aunque el Mantenimiento pase antes de que actúe). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
-  {nombre:'Hypeado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, hypeado:true,
-    detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
-  {nombre:'Armadura rota', polaridad:'debuff', permanente:true, stacks:1, hpTurno:0, armaduraRota:true,
-    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
-  {nombre:'Veneno severo', polaridad:'debuff', turnos:0, stacks:1, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
-    detalle:'Hace daño el primer turno. Con cada mantenimiento aumenta 1 el daño para el turno siguiente.'},
-  {nombre:'Sangrado', polaridad:'debuff', turnos:0, stacks:2, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
-    detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
-  {nombre:'Lisiado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, lisiado:true, esCC:true,
-    detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, inmovilizado:true, esCC:true,
-    detalle:'El Movimiento queda en 0 mientras dure.'},
-  {nombre:'Rengo', polaridad:'debuff', turnos:3, stacks:1, hpTurno:0, rengo:true, esCC:true,
-    detalle:'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
-  {nombre:'Miedo', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true, mods:[{stat:'pdg', val:-2}, {stat:'dmg', val:-2}],
-    detalle:'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
-  {nombre:'Provocado', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esCC:true,
-    detalle:'Provocado (Taunt): mientras dure, si ataca, tiene que elegir como objetivo a quien lo provocó, si puede llegar a él (✋ a mano: lo respeta el jugador o el GM). No le impide usar habilidades que no sean atacar. Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
-  {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
-    detalle:'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
-  {nombre:'Parálisis', polaridad:'debuff', turnos:2, stacks:1, hpTurno:0, paralisis:true, esCC:true,
-    detalle:'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
-  {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'crit', val:1}],
-    detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
-  {nombre:'Crítico potente', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, mods:[{stat:'critpot', val:1}],
-    detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
-  {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, stacks:1, hpTurno:0, sentado:true, esCC:true,
-    detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de sus Acciones).'},
-  {nombre:'Invulnerable', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, invulnerable:true,
-    detalle:'No recibe daño de ninguna fuente y no se le puede aplicar ningún debuff.'},
-  {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, inmunidadCC:true,
-    detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
-  {nombre:'Espinas', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, espinas:true,
-    detalle:'✋ A mano: mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño CRUDO del golpe (antes de Defensa y escudos), redondeado hacia arriba, como daño directo (ignora Defensa). El GM o la mesa lo aplican; el estado solo recuerda que está activo y cuántos turnos dura.'},
-  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, stacks:1, hpTurno:0, escudoMagico:10,
-    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño de cualquier fuente —incluso true damage— antes de que le toquen el HP, y se recarga entera en cada Mantenimiento mientras el estado siga activo.'},
-  {nombre:'Excedente de vida', polaridad:'buff', permanente:true, turnos:0, stacks:1, hpTurno:0, escudoMagico:5, excedenteVida:true,
-    detalle:'HP extra por encima de su máximo (por ejemplo, lo que drena de más). Es un valor neto: sin tope y sin recarga; absorbe el daño antes que su vida y se sube o baja a mano desde el chip. Por defecto no vence por turnos, pero se le pueden poner turnos.'},
-  {nombre:'Afortunado', polaridad:'buff', turnos:2, stacks:1, hpTurno:0, afortunado:true,
-    detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
-  {nombre:'Sangre pura', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, sangrePura:true,
-    detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
-  {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, coagulacionExtrema:true,
-    detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
-  {nombre:'Blindado', polaridad:'buff', turnos:3, stacks:1, hpTurno:0, blindado:true,
-    detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},
-  {nombre:'Sigilo', polaridad:'buff', permanente:true, stacks:1, hpTurno:0,
-    detalle:'Oculto: los jugadores no lo ven en el mapa. Se rompe si entra en el cono de detección de un personaje o si hace una acción hostil. Cada paso dentro de la zona de alerta de un personaje pide una tirada de detección.'},
-];
+// Presets estándar de estados: la lista vive en comun/estados-presets.js (una sola
+// para ficha, gm-tools y mapa); acá se pide en la forma de un creep.
+const ESTADOS_PRESET_GM = estadosPresetCreep();
 
 const POLARIDAD_ESTADO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
 function optgroupsEstadosPresetHtml(){

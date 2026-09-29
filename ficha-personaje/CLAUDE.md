@@ -186,8 +186,9 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   `tirarDanoDeArma` los dispara después del daño. Sin tiradas, va directo
   a la Mesa una línea resaltada (`desde: 'efecto'`); con porcentaje, abre el
   pop-up para tirar (50% = 1d2, 25% = 1d4…) y publica al cerrarlo.
-- **Estados alterados**: `EFECTOS_PRESET` define los presets (Veneno,
-  Lisiado, Invulnerable, etc.) con sus tags de inmunidad (`esCC`,
+- **Estados alterados**: `EFECTOS_PRESET` son los presets (Veneno,
+  Lisiado, Invulnerable, etc.) — desde el 2026-09-29 salen de la lista única
+  `comun/estados-presets.js` (`estadosPresetFicha()`), no se editan acá — con sus tags de inmunidad (`esCC`,
   `esVeneno`, `esSangrado`). Ya no hay "Daño entrante": el HP se edita a
   mano (número o +N/-N), así que Invulnerable, Blindado, Escudo mágico y
   Espinas frente a golpes quedan como recordatorio manual (en el
@@ -290,8 +291,9 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   vive acá, está en Firebase (ver
   [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)).
 - `gm-toolset/gm-tools.html` — mismo formato de tarjeta de estado/efecto,
-  pero cada uno con su propia lista de presets (`EFECTOS_PRESET` acá,
-  `ESTADOS_PRESET_GM` en gm-tools) — duplicado a propósito, no importado.
+  y la misma lista de presets de estados (`comun/estados-presets.js`: acá
+  `EFECTOS_PRESET`, en gm-tools `ESTADOS_PRESET_GM`, cada uno con sus nombres de
+  campo; hasta el 2026-09-29 eran dos copias separadas).
 - `vtt-hexgrid/mapa.html` — el menú ☰ (`comun/menu-sitio.js`) es la
   navegación principal entre partida, mapa y fichas; el mapa además carga
   la ficha adentro en un iframe (`?modo=botonera`) para la Botonera de

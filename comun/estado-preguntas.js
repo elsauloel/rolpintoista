@@ -31,7 +31,8 @@ const EstadoPreguntas = (() => {
     // `excedenteTope`, nada lo hace cumplir solo.
     if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,
       sinLimiteTexto: 'Sin tope (se puede acumular lo que sea)', texto: '¿Tiene un tope máximo de excedente?'});
-    if(num(p.stacks) > 1) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
+    // Sangrado no: sus stacks SON el daño (N de daño = N stacks de 1 HP), ya salen de la pregunta de HP.
+    if(num(p.stacks) > 1 && !p.esSangrado) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir
       (p.mods || []).forEach((m, i) => {
         if(!m || !m.stat) return;

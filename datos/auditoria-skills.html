@@ -117,7 +117,9 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 </div>
 
 <script src="../comun/skills-clase.js"></script>
-<script src="../comun/asistente-duelo-hab.js"></script>
+<script src="../comun/estados-presets.js?v=20260929a"></script>
+<script src="../comun/estados-aplicar.js?v=20260929a"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
 <script>
 window.esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 const esc = window.esc;
@@ -489,8 +491,8 @@ function abrirEjecucion(h){
     costoVariable: spVariableTxt(h.costo) ? 'sp' : (spVariableTxt(h.nitrosCosto) && !nitrosAtaqueTxt(h.nitrosCosto)) ? 'nitros' : '',
     costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto, hpCosto: h.hpCosto, turnoAjenoSp: h.turnoAjenoSp},
     // Sin elegirEstado a propósito (2026-09-29, decidido con el dueño): el paso Efectos queda en modo manual,
-    // sin el selector real de presets (EFECTOS_PRESET vive copiado en ficha.html/gm-tools.html, no en comun/
-    // todavía) — si hace falta más adelante, se extrae y se suma acá también.
+    // sin la grilla del selector real (esa ventana vive en ficha.html/gm-tools.html). Los nombres de los estados
+    // sí salen de la lista única (comun/estados-presets.js, vía EstadosAplicar), para la lista de sugerencias.
     alGuardar: r => {
       if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; h.hpCosto = r.costo.hpCosto; h.turnoAjenoSp = r.costo.turnoAjenoSp || ''; }
       else delete h.duelo;

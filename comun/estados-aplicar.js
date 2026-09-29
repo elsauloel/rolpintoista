@@ -6,43 +6,22 @@
    - `aplicarACreep(sc, spec)`: lo pone en un creep (respeta Invulnerable, Inmunidad a CC, Sangre pura…).
    - `encolarPj({fichaId, duenoUid, spec, origen})`: para un personaje NO se escribe en su ficha desde afuera: se deja un
      aviso en campanas/<id>/estados y la ficha del dueño lo aplica sola, una vez (mismo mecanismo que las recompensas).
-   spec = {nombre, turnos?, mods?: [{stat, val}], hp?, detalle?, polaridad?}. Si el nombre es el de un preset
-   (Veneno, Sangrado, Stun, Exhausto, Cansado, Lisiado, Inmovilizado, Rengo, Pajaritos, Armadura rota, Veneno severo)
-   se usa ese preset con sus marcas; si no, es un estado propio con lo que traiga la spec.
+   spec = {nombre, turnos?, mods?: [{stat, val}], hp?, detalle?, polaridad?}. Si el nombre es el de un preset de
+   `comun/estados-presets.js` (Veneno, Sangrado, Stun, Escudo especial…) se usa ese preset con sus marcas; si no, es
+   un estado propio con lo que traiga la spec.
    Aplicar sobre el rival sigue pasando por una decisión del GM (elegir a quién le pegó) o por una trampa que alguien pisó.
    ========================================================= */
 const EstadosAplicar = (() => {
   const id = () => Math.random().toString(36).slice(2, 9);
-  // Los debuffs de ESTADOS_PRESET_GM (gm-tools), en la forma de un creep.
-  const DEBUFFS = [
-    {nombre: 'Veneno', polaridad: 'debuff', turnos: 4, stacks: 4, hpTurno: -1, stacksTurno: -1, esVeneno: true, detalle: 'Pierde 1 HP por stack cada turno.'},
-    {nombre: 'Pajaritos', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, mitadPdgEva: true, esCC: true, detalle: 'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Cansado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, cansado: true, detalle: 'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
-    {nombre: 'Exhausto', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, esCC: true, exhausto: true, detalle: 'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
-    {nombre: 'Stun', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, forzarNitros: 0, detalle: 'Sin No2 durante 2 turnos (dura dos para que te agarre de verdad en tu próximo turno, aunque el Mantenimiento pase antes de que actúes). Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
-    {nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: 1, hpTurno: 0, armaduraRota: true, detalle: '−1 Defensa por cada acumulación (×N). Permanente y acumulable.'},
-    {nombre: 'Veneno severo', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: -1, stacksTurno: 1, permanente: true, esVeneno: true, detalle: 'Hace 1 de daño el primer turno y 1 más con cada mantenimiento. No caduca.'},
-    {nombre: 'Sangrado', polaridad: 'debuff', turnos: 0, stacks: 2, hpTurno: -1, stacksTurno: 0, permanente: true, esSangrado: true, detalle: 'Pierde 2 HP por turno. Permanente hasta curarse. Si se repite, suma +1 al daño por turno.'},
-    {nombre: 'Lisiado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, lisiado: true, esCC: true, detalle: 'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Inmovilizado', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, inmovilizado: true, esCC: true, detalle: 'El Movimiento queda en 0 mientras dure.'},
-    {nombre: 'Rengo', polaridad: 'debuff', turnos: 3, stacks: 1, hpTurno: 0, rengo: true, esCC: true, detalle: 'El Movimiento queda a la mitad (redondeado hacia abajo) mientras dure.'},
-    {nombre: 'Provocado', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, detalle: 'Provocado (Taunt): mientras dure, si ataca, tiene que elegir como objetivo a quien lo provocó, si puede llegar a él (✋ a mano: lo respeta el jugador o el GM). No le impide usar habilidades que no sean atacar. Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
-    {nombre: 'Miedo', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esCC: true, mods: [{stat: 'pdg', val: -2}, {stat: 'dmg', val: -2}], detalle: 'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
-    {nombre: 'Escarcha', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, esEscarcha: true, mods: [{stat: 'nitros', val: -1}], detalle: 'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
-    {nombre: 'Parálisis', polaridad: 'debuff', turnos: 2, stacks: 1, hpTurno: 0, paralisis: true, esCC: true, detalle: 'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
-    {nombre: 'Sentado', polaridad: 'debuff', turnos: 0, stacks: 1, hpTurno: 0, permanente: true, sentado: true, esCC: true, detalle: 'Su Evasión se parte a la mitad, no puede atacar y no puede hacer dodge roll. No vence solo: levantarse cuesta 1 No2.'},
-  ];
-
-  // Buffs con escudo especial (2026-09-28, pedido del dueño): los mismos presets de EFECTOS_PRESET (ficha.html)
-  // y ESTADOS_PRESET_GM (gm-tools.html), acá en la forma de un creep, para que una habilidad que da un escudo
-  // sobre uno mismo o un aliado (Blindaje…) los pueda usar desde el paso «Efectos» del 🎯, igual que ya hacía
-  // un debuff sobre un rival. `escudoMagico` es el mismo campo que ya entiende el resto del juego (HUD del mapa,
-  // chip de la ficha): una barra secundaria que absorbe daño antes que el HP real.
-  const BUFFS = [
-    {nombre: 'Escudo especial', polaridad: 'buff', turnos: 3, stacks: 1, hpTurno: 0, escudoMagico: 10, detalle: 'Escudo especial: absorbe daño antes que el HP real, hasta agotarse.'},
-    {nombre: 'Barrera', polaridad: 'buff', turnos: 1, stacks: 1, hpTurno: 0, escudoMagico: 8, detalle: 'Barrera: absorbe daño antes que el HP real, dura poco.'},
-  ];
-  const presetPorNombre = nombre => DEBUFFS.find(p => p.nombre === nombre) || BUFFS.find(p => p.nombre === nombre);
+  // Los presets salen de la lista única de `comun/estados-presets.js` (se carga antes que este archivo), en la forma
+  // de un creep. DEBUFFS son los que se le ponen a un rival (habilidades de creep, trampas, zonas); BUFFS, los que se da
+  // uno mismo o a un aliado desde el paso «Efectos» de la Ejecución (Escudo especial, Barrera, Invulnerable…).
+  // `escudoMagico` es el mismo campo que entiende el resto del juego (HUD del mapa, chip de la ficha): una barra
+  // secundaria que absorbe daño antes que el HP real.
+  const TODOS = typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : [];
+  const DEBUFFS = TODOS.filter(p => p.polaridad === 'debuff');
+  const BUFFS = TODOS.filter(p => p.polaridad === 'buff');
+  const presetPorNombre = nombre => TODOS.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
 
   function limpiarSpec(spec){
     const s = spec || {};

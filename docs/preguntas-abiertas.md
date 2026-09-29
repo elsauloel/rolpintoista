@@ -512,13 +512,20 @@ resuelven a mano, como el resto de los avisos).
 
 - ⏸ **P120. Reglas de arma de rango, pendientes — 2026-09-27 (auditando la clase Shooter).** Al llegar a la clase **Shooter** en `docs/clases-borrador.md`, la mayoría de sus 10 skills piden mecánicas que todavía no existen en el juego: **cooldown de arma para personajes** (Acelerado — hoy el cooldown solo existe en las habilidades de creep), **reaccionar a un ataque entrante con un disparo propio** (Parry a distancia), **un ataque normal (no hechizo de área) que pegue a más de un objetivo** (Proyectil perforante, Disparo múltiple — el sistema de área en cascada de `comun/duelo.js` hoy es solo para habilidades tipo hechizo), **una marca sobre el objetivo que da bono mientras lo ataques** (Marcar — `efectoMods` de hoy siempre es sobre quien lo tiene, no "bono contra X"), y **línea de tiro esquivando obstáculos** (Tiro con comba). El dueño decidió **dejar Shooter en pausa entera hasta definir las reglas generales de arma de rango** (el módulo "Reglas del tiro" al pie de `clases-borrador.md`, hoy solo la fórmula vieja del PDF con 1d20 y distancia máxima = DES, sin uso real en el juego) — de ahí probablemente salgan resueltas varias de estas mecánicas de una. **Solo 2 de las 10 cerraban limpio con lo que ya existe** (Enfocado con `duelo:{modo:'arma', arma:{fijo:2}}`; Headshot igual salvo la salvedad "falla si no es crítico", que no se puede automatizar) y una a medias con precedente (Apuntar, como Cañón Vasco: cobra No2/SP variable pero el bono en sí queda a mano) — no se cargó ninguna todavía, para no auditarlas a medias antes de la base. Se sigue con **Support** mientras tanto.
 
-- ⬜ **P122. ¿Habilidades de jugador y de creep deberían ser un solo tipo de elemento? — 2026-09-29 (paso 0e de
-  `docs/plan-subida-unificada.md`).** Al escribir las plantillas quedó a la vista que son casi iguales: comparten
+- ✅ **P122. ¿Habilidades de jugador y de creep deberían ser un solo tipo de elemento? — 2026-09-29 (paso 0e de
+  `docs/plan-subida-unificada.md`), decidida el mismo día.** Al escribir las plantillas quedó a la vista que son casi iguales: comparten
   nombre, descripción, costos, tirada, efecto propio, trampa y la Ejecución completa; el creep suma cooldown,
   "habilidad lenta" y el estado que deja al golpear, y el jugador suma HP de costo, zona/portal y etiquetas.
-  **Propuesta**: una sola plantilla de "habilidad" con todos los campos (los que no aplican quedan vacíos), así
-  una habilidad subida desde la ficha se puede usar en un creep y al revés, y hay una sola pantalla de auditoría
-  para las dos. **Alternativa**: dos tipos separados (como hoy), más simple de armar. Se decide antes del paso 2.
+  **Decidido (dueño): sí, un solo tipo, con una condición** — mientras los creeps paguen con cooldown y los
+  jugadores con SP (ver P125), **cada habilidad tiene que dejar bien claro y a la vista para quién es y con qué se
+  paga**: marca `para: 'jugador' | 'creep'` en la habilidad, y en la lista, el detalle y al agregarla una etiqueta
+  visible (🧙 Jugador · SP / 🐾 Creep · cooldown). Usar una de creep en un personaje (o al revés) se avisa, no se
+  bloquea (esencia sandbox).
+
+- ⬜ **P125. ¿Los creeps pasan a pagar sus habilidades con SP, como los jugadores? — 2026-09-29.** Hoy los creeps
+  usan cooldown como costo para simplificar el trabajo del GM; el dueño lo está evaluando a nivel diseño del juego.
+  Si se unifica (todos con SP), la marca `para` de P122 deja de separar recursos y una habilidad sirve igual para los
+  dos. Mientras tanto, la distinción tiene que quedar visible.
 
 - ⬜ **P123. ¿Una sola forma de trampa? — 2026-09-29 (paso 0e).** Hoy hay dos: la del mapa ("Trampas guardadas":
   forma, color, daño, estado, zona que deja) y la que coloca una habilidad (`trampaColocar`: radio, cantidad, daño,

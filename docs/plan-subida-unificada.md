@@ -173,6 +173,28 @@ pegarlas en la consola).
 - Verificado con una base de datos simulada (subir, bajar, corregir lo subido y lo de fábrica, auditar, borrar,
   reglas viejas → propuesta); **no probado contra Firebase real**.
 
+## Paso 2: cómo quedó (2026-09-29)
+
+Decisión previa (P122): **un solo tipo "habilidad"** (colección `biblioteca_skills`), con la marca `para: 'jugador' |
+'creep'` bien visible mientras paguen con recursos distintos (SP / cooldown, ver P125). En este paso solo hay de jugador;
+la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cuando entran las de creep.
+
+- **Ficha, ⬆ en cada habilidad** (`subirHabilidad`): sube la plantilla (`Plantillas.habilidad`, sin el id del personaje)
+  con `para: 'jugador'` y `clase`. Si salió de otra (`bibOrigen`, o `habClaseId` de fábrica) pregunta corrección / nuevo:
+  una **corrección** queda en la clase del original y lo reemplaza para todos; **algo nuevo** va al pool custom. Después
+  de subir, la copia de quien subió apunta a la entrada nueva (no se avisa a sí mismo).
+- **"+ Habilidad"** (`habsDelPool`): fábrica + lo subido, releído al abrir. La corrección de una de fábrica ocupa su
+  lugar (misma id, "Ya la tenés" sigue andando); lo nuevo aparece en su clase o en 🧩 Pool custom (ids `bib-<doc>`).
+  Lo subido muestra "🔶 sin auditar · vN · subida por X". Agregar guarda `bibOrigen = {tipo, id, version}`.
+- **🔔 versión nueva** (`versionNuevaDeHab`, `abrirVersionNuevaHab`): al lado del nombre de la habilidad, si la de la
+  biblioteca de la que salió tiene una versión mayor. Las agregadas antes de esto salen de la de fábrica, versión 1.
+  Cartel con **Actualizar** (pisa la configuración, conserva Job/imagen/id), **Dejar la mía** (no avisa más de ESA
+  versión; una corrección posterior vuelve a avisar) y **Ahora no**.
+- Límite conocido: un cambio hecho **en el archivo de fábrica** (`comun/skills-clase.js`, desde la auditoría de skills)
+  no sube versión, así que no dispara el aviso — solo lo subido a la biblioteca lo hace.
+- Verificado en una copia de la ficha con la base de datos simulada (agregar, corregir, actualizar, dejar la mía,
+  segunda corrección que vuelve a avisar, subir una creada de cero); no probado contra Firebase real.
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -184,7 +206,7 @@ pegarlas en la consola).
 | 0d | Juntar las tres copias de los presets de estados en un solo archivo de `comun/`: `comun/estados-presets.js` (ficha, gm-tools, mapa y auditoría de skills leen de ahí; se reconciliaron Sangrado, Afortunado, textos viejos y Barrera) | ✅ 2026-09-29 |
 | 0e | Plantillas del resto de los elementos (este documento) + el "sobre" común; preguntas P122–P124 | ✅ 2026-09-29 |
 | 1 | **Mecanismo único**: extender la Biblioteca — un "Subir" y un "Bajar" genéricos por tipo, con la plantilla de cada tipo; lo subido disponible al instante, marcado "sin auditar"; aviso de versión nueva en las copias | ✅ 2026-09-29 (el mecanismo; el aviso en cada herramienta va en su paso) — ver "Paso 1: cómo quedó" · **falta pegar las reglas de Firestore** |
-| 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | Pendiente |
+| 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | ✅ 2026-09-29 — ver "Paso 2: cómo quedó" |
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | Pendiente |
 | 4 | Pasivas y trampas | Pendiente |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | Pendiente |

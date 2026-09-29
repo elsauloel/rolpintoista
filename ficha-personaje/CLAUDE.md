@@ -518,3 +518,11 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   tiradas ni en el `DUELO_HOOKS.opcionesDefensa` de cada archivo — mismo criterio (nombre de arma vacío = sin
   arma). Un arma natural (garras, colmillos…) puesta en `armaNombre` sigue contando como arma, así que un creep
   con arma natural no pierde Parry.
+
+- **Subida unificada de habilidades** (2026-09-29, paso 2 de `../docs/plan-subida-unificada.md`): cada habilidad tiene
+  **⬆** (`subirHabilidad`) que la sube con toda su configuración a la biblioteca compartida (`comun/biblioteca.js`,
+  tipo `skills`, `para: 'jugador'`), preguntando si es una corrección de la original o algo nuevo. "+ Habilidad" arma
+  cada clase y el 🧩 Pool custom con `habsDelPool` (fábrica de `comun/skills-clase.js` + lo subido, releído al abrir;
+  `skillsSubidas`, `cargarSkillsSubidas`). Cada copia guarda `bibOrigen` y, si la original se corrige, aparece
+  **🔔 versión nueva** (`versionNuevaDeHab`/`abrirVersionNuevaHab`: Actualizar / Dejar la mía (`bibIgnorada`) / Ahora no).
+  Reemplaza al 📤 retirado.

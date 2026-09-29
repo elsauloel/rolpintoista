@@ -436,6 +436,10 @@ const Biblioteca = (() => {
    * - Queda disponible al instante para todos; si no lo sube el dueño, marcado "sin auditar".
    * - `basadoEn = {id, nombre?}`: el elemento de la biblioteca del que salió (id de Firebase o `base-…` de fábrica).
    *   Si viene, se pregunta si es una corrección de ese elemento o algo nuevo.
+   * - `datosPara(modo)` (opcional, en lugar de `datos`): arma los datos según lo que se eligió ('correccion' | 'nuevo');
+   *   la ficha lo usa para que una corrección quede en la clase del original y algo nuevo vaya al pool custom.
+   * - `alSubir({id, version, modo})` (opcional): se llama al terminar bien, con la entrada que quedó (no con el
+   *   camino viejo), para que la copia de quien subió apunte a esa versión y no se avise a sí mismo.
    * - Si las reglas nuevas de Firestore todavía no están publicadas, cae al camino viejo (propuesta).
    */
   function guardar(opts){
@@ -444,7 +448,7 @@ const Biblioteca = (() => {
     const tipo = opts.tipo;
     const q = id => document.getElementById(id);
     const dueno = esDueno();
-    const datos = typeof Plantillas !== 'undefined' ? Plantillas.limpiar(tipo, opts.datos) : opts.datos;
+    const datosDe = m => { const d = opts.datosPara ? opts.datosPara(m) : opts.datos; return typeof Plantillas !== 'undefined' ? Plantillas.limpiar(tipo, d) : d; };
     const st = estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {base: opts.base, grupos: opts.grupos}};
     if(!st.opts) st.opts = {base: opts.base, grupos: opts.grupos};
     // El elemento del que salió (si todavía existe en la lista cargada), para ofrecer "es una corrección".
@@ -499,7 +503,8 @@ const Biblioteca = (() => {
       const nombre = q('bibg-nombre').value.trim().slice(0, 60);
       if(!nombre){ aviso('Ponele un nombre.'); return; }
       if(!modo){ aviso('Elegí si es una corrección o algo nuevo.'); return; }
-      const json = JSON.stringify(datos);
+      await cargar(tipo, false).catch(() => {});   // para encontrar el original aunque se haya tocado Subir enseguida
+      const json = JSON.stringify(datosDe(modo));
       if(json.length > 200000){ aviso('Es demasiado grande para la biblioteca.'); return; }
       const comun = {
         nombre, etiquetas: limpiarEtiquetas(q('bibg-etiquetas').value),
@@ -510,7 +515,7 @@ const Biblioteca = (() => {
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       const col = fbDb.collection(`biblioteca_${tipo}`);
       q('bibg-ok').disabled = true;
-      let msg = '';
+      let msg = '', subido = null;
       try{
         const o = modo === 'correccion' ? origenEnt() : null;
         const idOrigen = opts.basadoEn && opts.basadoEn.id;
@@ -522,15 +527,17 @@ const Biblioteca = (() => {
           await fbDb.runTransaction(async tx => {
             const doc = await tx.get(ref);
             if(!doc.exists) throw Object.assign(new Error('ya no existe'), {code: 'no-existe'});
-            tx.update(ref, {...comun, auditado: dueno, version: (Number(doc.data().version) || 1) + 1,
-              editorUid: fbUsuario.uid, editorNombre: quien, actualizado: ts});
+            const version = (Number(doc.data().version) || 1) + 1;
+            tx.update(ref, {...comun, auditado: dueno, version, editorUid: fbUsuario.uid, editorNombre: quien, actualizado: ts});
+            subido = {id: o.id, version, modo};
           });
           msg = `"${nombre}" corregido para todos`;
         }else{
           // Algo nuevo, o la corrección de uno de fábrica (lo tapa con `reemplaza`).
           const reemplaza = modo === 'correccion' ? String(idOrigen) : '';
-          await col.add({...comun, autorUid: fbUsuario.uid, autorNombre: quien, creado: ts,
+          const ref = await col.add({...comun, autorUid: fbUsuario.uid, autorNombre: quien, creado: ts,
             auditado: dueno, version: reemplaza ? 2 : 1, reemplaza});
+          subido = {id: ref.id, version: reemplaza ? 2 : 1, modo};
           msg = reemplaza ? `"${nombre}" reemplaza al original para todos` : `"${nombre}" subido: ya lo pueden usar todos`;
         }
       }catch(err){
@@ -557,7 +564,20 @@ const Biblioteca = (() => {
       st.oficial = null;   // la próxima vez se vuelve a leer
       q('scrim-biblioteca-guardar').classList.remove('open');
       aviso(msg);
+      if(subido && opts.alSubir) try{ opts.alSubir(subido); }catch(e){ console.error('Biblioteca:', e); }
     };
+  }
+
+  /**
+   * Lo subido de un tipo (sin lo de fábrica), leído de nuevo de Firebase, para herramientas que muestran la
+   * biblioteca con su propia pantalla (la ficha con "+ Habilidad"). Cada entrada: {id, nombre, etiquetas,
+   * descripcion, nivel, autorNombre, editorNombre, auditado, version, reemplaza, datos}. [] si no se puede leer.
+   */
+  async function lista(tipo){
+    estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: '', opts: {}};
+    if(!estado[tipo].opts) estado[tipo].opts = {};
+    try{ await cargar(tipo, true); }catch(e){ console.error('Biblioteca:', e); return []; }
+    return (estado[tipo].oficial || []).filter(e => !e.base).map(e => ({...e, datos: structuredClone(e.datos)}));
   }
 
   /**
@@ -573,5 +593,5 @@ const Biblioteca = (() => {
     return e ? {id: e.id, nombre: e.nombre, version: e.version || 1, auditado: e.auditado, datos: structuredClone(e.datos)} : null;
   }
 
-  return {abrir, guardar, entrada, esDueno};
+  return {abrir, guardar, entrada, lista, esDueno};
 })();

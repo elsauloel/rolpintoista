@@ -741,3 +741,6 @@ versión parecida en más de una, es candidato a juntar.
   🔶 sin auditar hasta que el dueño lo marca ✅; "¿corrección de X o algo nuevo?" con `opts.basadoEn`; `alElegir(datos,
   meta)` con `{tipo, id, version}`; `Biblioteca.entrada(tipo, id)` para el aviso de versión nueva. Detalle en el
   comentario de cabecera y en `../docs/plan-subida-unificada.md` ("Paso 1: cómo quedó"). Reglas nuevas: hay que pegarlas.
+- **`biblioteca.js`, para herramientas con pantalla propia** (2026-09-29, paso 2): `Biblioteca.lista(tipo)` devuelve lo
+  subido (sin lo de fábrica) sin abrir la ventana; `guardar` acepta `datosPara(modo)` (datos distintos si es corrección
+  o algo nuevo) y `alSubir({id, version, modo})` (la entrada que quedó). La ficha los usa para las habilidades.

@@ -10744,7 +10744,7 @@ function armasYEscudosParaParry(){
 
 function costoParryTxt(){
   const armas = armasYEscudosParaParry();
-  if(!armas.length) return `${fmt(costoParryNitros(null))} No2 (sin arma ni escudo)`;
+  if(!armas.length) return 'no podés parriar sin un arma o escudo equipado';
   return armas.map(a => `${a.item.nombre}: ${fmt(costoParryNitros(a.item))} No2`).join(' · ');
 }
 
@@ -10965,8 +10965,9 @@ window.DUELO_HOOKS = {
       ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: num(S.nitros) < 1 ? 'no te alcanzan los No2' : '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`]},
          {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)} −${fmt(sobre)}`, 'no gastás No2']}]
       : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`]}];
+    // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28) — antes había una opción
+    // "Parry (sin arma ni escudo)" gratis; se sacó, no se ofrece nada si `armas` viene vacío.
     const armas = armasYEscudosParaParry();
-    if(!armas.length) ops.push({modo: 'parry', itemId: '', itemNombre: '', etiqueta: '🗡 Parry (sin arma ni escudo)', costo: costoParryNitros(null), motivoNo: '', info: [`Parry 🎲 ${fx(statParaArma('parry', null), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorConArma(null))}`]});
     armas.forEach(a => {
       const c = costoParryNitros(a.item);
       ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo: c, motivoNo: c > num(S.nitros) ? 'no te alcanzan los No2' : '',
@@ -11038,6 +11039,7 @@ function elegirArmaDefensa(tipo){
     parryArmaPendiente = null;   // el arma ya no está equipada: se elige de nuevo
   }
   const armas = tipo === 'parry' ? armasYEscudosParaParry() : armasEquipadasConDano();
+  if(tipo === 'parry' && !armas.length){ toast('No podés parriar sin un arma o escudo equipado'); return; }
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : tipo === 'fuerza' ? fuerzaGolpeConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =

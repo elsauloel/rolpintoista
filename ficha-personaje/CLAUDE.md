@@ -464,3 +464,17 @@ sea o no de su clase; cambio 2026-09-19), y `habClaseId` para no repetirla.
   que cualquier stat — sin ventanas nuevas ni cambios al flujo de Ejecutar.
 
 - **El Crítico frecuente/potente de un arma vale solo para esa arma** (2026-09-28, regla del dueño): con dos armas equipadas, lo que da una no mejora las tiradas de la otra (los anillos, pasivas y estados sí valen para las dos). El duelo ya lo hacía (`statsCritico` → `statParaArma`); se corrigió además la Calculadora de crítico (`criticoDatosIniciales`) y lo que la ficha publica al mapa (`resumen.crit`/`critpot`), que sumaban el de ambas armas: ahora usan `statParaArma` con la misma arma de `armaTipo`. El número "Crít.Frec." de la tarjeta de stats sigue siendo el total de la ficha (no es de un arma puntual).
+
+- **Sin arma ni escudo no se puede parriar (2026-09-28, regla del dueño, reportado con una captura del duelo en
+  vivo — reemplaza la opción gratis "Parry (sin arma ni escudo)" que existía desde el 2026-09-24, ver la nota de
+  arriba "Parry cuesta el Peso entero")**: `DUELO_HOOKS.opcionesDefensa` ya no ofrece Parry en el menú "Elegí
+  cómo te defendés" si `armasYEscudosParaParry()` viene vacío (antes agregaba una opción a costo 0). El botón
+  🎲 Parry de la Botonera (`elegirArmaDefensa('parry')`) tampoco lo ejecuta más en ese caso — avisa con un toast
+  ("No podés parriar sin un arma o escudo equipado") en vez de llamar a `parryConArma(null)`; `costoParryTxt()`
+  (el texto del tooltip del botón) dice lo mismo en vez de mostrar un costo que ya no aplica. La fórmula de
+  costo (`costoParryNitros`, Peso del arma, 0 sin nada) no cambió — lo que cambió es que ahora, sin arma ni
+  escudo, no hay ninguna opción de Parry para elegir, ni desde el duelo ni desde el botón suelto.
+  **Sin tocar todavía**: las invocaciones (siguen ofreciendo Parry siempre, `inv.armaNombre || 'su arma'`) y los
+  creeps de gm-tools (`DUELO_HOOKS.opcionesDefensa` en gm-tools.html, mismo `sc.armaNombre || 'su arma'`) — no
+  se sabe si esos dos casos deberían seguir la misma regla o si un creep/invocación sin arma puede considerarse
+  "a mano limpia" a propósito; es una pregunta de diseño nueva, no una omisión.

@@ -15,25 +15,17 @@ GitHub hardcodeadas como strings (`datos/personajes/...`,
 
 ## Contenido
 
-- **`catalogo.json`** — el catálogo de ítems, fuente única. Se edita con
-  `catalogo-editor.html` (acá mismo), con `assets/catalogo.xlsx`, o desde
-  el botón "📦 Agregar al catálogo" que tienen `ficha-personaje/ficha.html`
-  (editor de ítems de Mochila/Equipo/Cinturón) y `gm-toolset/gm-tools.html`
-  (modal de Ítem custom) — un jugador o el GM pueden publicar ahí mismo,
-  con confirmación, un ítem que crearon en la mesa. Los tres caminos
-  conviven y convergen acá vía `herramientas/importar_json.py` /
-  `herramientas/importar.py`. Ver `herramientas/LEEME.md` para el flujo
-  completo — **nunca se edita este archivo a mano ni se edita el catálogo
-  embebido en los HTML de juego directamente**, siempre por ese pipeline.
+- **El catálogo de ítems ya no vive acá** (2026-09-29, paso 5 de `../docs/plan-subida-unificada.md`): la copia de
+  fábrica es **`comun/catalogo.js`** (la única; ficha, GM Tools y la tienda la cargan directo) y lo que suben jugadores y
+  GM con **⬆ Subir al catálogo** vive en Firebase (`biblioteca_items`). Se retiraron `catalogo.json`, el Excel
+  (`assets/catalogo.xlsx`) y los importadores de Python (quedan en el historial del repositorio).
 - **Auditoría 2026-09-20** (ver P88 en `docs/preguntas-abiertas.md`): la resistencia a crítico
   de las defensas se limitó por tier (Tipo 4 y 6 en Común; Tipo 10 y 12 solo
   en Excepcional/Legendario y de a 1) y el catálogo pasó a 611 ítems.
-- **`catalogo-editor.html`** — la herramienta de edición: listado
-  filtrable, alta/edición/borrado de ítems, mismo patrón de Guardar/Cargar
-  archivo/Subir datos/Token que el resto de las herramientas de la
-  campaña. Después de editar, hay que correr `importar_json.py` para que
-  los cambios lleguen a `ficha.html`/`gm-tools.html`/`vendor-generator.html`
-  — el editor no lo hace solo (es HTML puro, no puede ejecutar Python).
+- **`catalogo-editor.html`** — el editor del catálogo de FÁBRICA: listado filtrable, alta/edición/borrado de ítems.
+  Arranca con la copia del sitio y trae la última de GitHub; **💾 Guardar en el proyecto** reescribe `comun/catalogo.js`
+  en la rama `nueva-version` (token de GitHub, el mismo de las otras herramientas), un ítem por renglón, y avisa si el
+  archivo cambió desde que se trajo. Llega solo a las herramientas en 1–2 minutos. **⬇ Respaldo** baja una copia JSON.
   Todo lo que no es consumible (nuevo o existente) se edita con el
   asistente paso a paso compartido `comun/asistente-item.js`
   (`abrirAsistente`); su resumen deja pasar al formulario completo. Los

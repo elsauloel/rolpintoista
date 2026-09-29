@@ -12,7 +12,7 @@ Tope por pieza según tier (ver TOPE). Las armaduras blandas solo dan Tipo 4.
 Uso:
   python herramientas/reajuste_defensa.py auditoria   # escribe datos/auditoria-defensa-datos.json (actuales reajustados + nuevos)
   python herramientas/reajuste_defensa.py resumen     # máximo equipable por Tipo, antes y después
-No toca datos/catalogo.json: los cambios se aplican después de que el dueño audite.
+No toca el catálogo (comun/catalogo.js): los cambios se aplican después de que el dueño audite.
 """
 import json, pathlib, sys, collections
 
@@ -138,7 +138,8 @@ def reajustar(item):
 
 
 def cargar():
-    c = json.load(open(RAIZ / 'datos' / 'catalogo.json', encoding='utf-8'))
+    from catalogo_comun import leer_catalogo
+    c = leer_catalogo()
     c = c['items'] if isinstance(c, dict) and 'items' in c else c
     return [i for i in c if i['tipoItem'] in SLOT_DE and not str(i.get('id', '')).startswith('nuevo-')]
 

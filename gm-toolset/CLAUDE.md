@@ -190,15 +190,15 @@ hay trabajo reciente o en curso de otra conversación (ver
 
 ## Formato de datos
 
-- **Consumen** el catálogo (`CATALOGO_EQUIPO` en gm-tools.html, sin
-  consumibles no equipables; `CATALOGO` en vendor-generator.html, sin
-  imágenes) — se sincroniza desde `datos/catalogo.json`, **no se edita a
-  mano acá**. Ver [`datos/CLAUDE.md`](../datos/CLAUDE.md).
-- **gm-tools.html produce, opcionalmente**: el modal de Ítem custom tiene
-  un botón "📦 Agregar al catálogo" (`agregarItemCustomAlCatalogo()`) que
-  arma la entrada de catálogo directo desde el formulario (funciona con o
-  sin creep elegido) y la sube a `datos/catalogo.json`, con confirmación
-  explícita. No corre `importar_json.py` sola.
+- **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`
+  (antes copiado adentro de cada archivo): gm-tools arma `CATALOGO_EQUIPO` con
+  `itemParaCreep` (la Defensa aparte, sin id) y vendor-generator usa
+  `CATALOGO = structuredClone(CATALOGO_BASE)`; los dos le suman al entrar lo
+  que subió el grupo (`cargarItemsSubidosGM`, `cargarItemsSubidosTienda`,
+  `comun/items-subidos.js`).
+- **gm-tools.html produce, opcionalmente**: "✎ Ítem custom" tiene **⬆ Subir al
+  catálogo** (`publicarEnCatalogoGM` → `Biblioteca.guardar({tipo: 'items'})`,
+  disponible al instante; corrección si tiene el nombre de uno del catálogo).
 - **gm-tools.html** produce/consume `datos/creeps-publico.json` y lee
   `datos/tablero/*.json`.
 - **vendor-generator.html** produce `campanas/{id}/tienda/publicada` en

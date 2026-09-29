@@ -240,6 +240,28 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
   Ver `comun/CLAUDE.md`, "Una sola forma de trampa".
 - Verificado con la base de datos simulada en copias de la ficha, GM Tools y el mapa; no probado contra Firebase real.
 
+## Paso 5: cómo quedó (2026-09-29)
+
+Decidido con el dueño (P124 y simplificación): los ítems que sube el grupo viven en Firebase como todo lo demás, y el
+circuito viejo del catálogo (Excel + `datos/catalogo.json` en la rama `main` + scripts que copiaban el catálogo adentro de
+los HTML) se retira.
+
+- **5a — una sola copia de fábrica**: `comun/catalogo.js` (`CATALOGO_BASE`, 889 ítems). Verificado que la ficha, GM Tools
+  (`itemParaCreep`) y el generador de tiendas reciben exactamente lo mismo que antes. La ficha pasó de 1,19 MB a 0,70 MB y
+  el generador de tiendas de 580 KB a 94 KB.
+- **5b — ⬆ Subir al catálogo** (ficha: asistente de un ítem de la mochila y editor de un ítem del catálogo; GM Tools: Ítem
+  custom) → `Biblioteca.guardar({tipo: 'items'})`, al instante, con corrección / nuevo. `comun/items-subidos.js` suma lo
+  subido en las tres herramientas (corrección = mismo id que el de fábrica; nuevo = `usr-<id>`). La ficha no guarda lo
+  subido como propio del personaje.
+- **5c — el editor de catálogo** (`datos/catalogo-editor.html`) lee y escribe `comun/catalogo.js` en `nueva-version`
+  (💾 Guardar en el proyecto), con aviso si el archivo cambió desde que se trajo; ida y vuelta idéntica.
+- **5d — se retiraron** el Excel, `datos/catalogo.json`, `importar.py`, `importar_json.py`, `leer_excel.py`,
+  `generar_excel.py`, `analizar_catalogo.py`, `catalogo_items.json` (quedan en el historial). Los scripts de diseño
+  (calculadora de armas, reajuste de defensa, equipo de creeps, publicar ítems del rework, detectar efectos) leen y
+  escriben `comun/catalogo.js` con `herramientas/catalogo_comun.py`.
+- **Queda para después**: el aviso 🔔 "versión nueva" en los ítems que ya están en una mochila (hoy una corrección
+  cambia el catálogo, no las copias ya compradas).
+
 ## Pasos
 
 | # | Paso | Estado |
@@ -254,5 +276,5 @@ la etiqueta visible 🧙/🐾 y el aviso al mezclarlas se suman en el paso 3, cu
 | 2 | Habilidades de jugador sobre ese mecanismo (botón Subir en la ficha, "+ Habilidad" lee base + lo subido) | ✅ 2026-09-29 — ver "Paso 2: cómo quedó" |
 | 3 | Habilidades de creep y creeps (ya usan la Biblioteca: alinearlos a la plantilla y al "al instante") | ✅ 2026-09-29 — ver "Paso 3: cómo quedó" |
 | 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (incluye P123: una sola forma de trampa) |
-| 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | Pendiente |
+| 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | ✅ 2026-09-29 — ver "Paso 5: cómo quedó" |
 | 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | Pendiente |

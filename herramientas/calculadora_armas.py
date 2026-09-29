@@ -24,7 +24,8 @@ Uso:
 import json, math, sys, pathlib, collections
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
-CATALOGO = RAIZ / 'datos' / 'catalogo.json'
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from catalogo_comun import leer_catalogo   # el catálogo de fábrica: comun/catalogo.js (desde 2026-09-29)
 
 # ---------------------------------------------------------------- tasas (a ajustar)
 K_EFECTO = 1.0            # PC por punto de peso de efecto al 100 %
@@ -165,7 +166,7 @@ def precio(pc, tier_asignado=None):
 
 
 def cargar():
-    d = json.load(open(CATALOGO, encoding='utf-8'))
+    d = leer_catalogo()
     return [i for i in d if i.get('tipoItem') in ('arma_1m', 'arma_2m') and not str(i.get('id', '')).startswith('nuevo-')]   # los 'nuevo-' vienen de armas-nuevas.json (ya publicados o no)
 
 

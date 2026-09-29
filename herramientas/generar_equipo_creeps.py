@@ -10,15 +10,16 @@ Pedidos del dueño (2026-09-26):
   - DEFENSA: la de un HUMANO es siempre la de su equipo; un HUMANOIDE puede tener defensa propia (natural) y además equipo; todo lo que NO es humano tiene defensa NATURAL.
     Los valores por nivel son parecidos entre creeps; el rol tanque juega con mucha defensa. Objetivo T por nivel [1, 2,5, 4, 6, 8] × factor del rol
     (tanque 1,7 · melee 1,1 · asalto 0,8 · rango 0,8 · apoyo 0,8 · debuffer 0,7 · mágico 0,6); el jefe suma 2.
-Las piezas salen del catálogo (datos/catalogo.json); este script vuelca una tabla compacta y la lógica entre los marcadores
+Las piezas salen del catálogo de fábrica (comun/catalogo.js); este script vuelca una tabla compacta y la lógica entre los marcadores
 /*EQUIPO_CREEP:INICIO*/ y /*EQUIPO_CREEP:FIN*/ de comun/creeps-base.js. Volver a correrlo cuando cambie el catálogo.
 
 Uso: python herramientas/generar_equipo_creeps.py
 """
-import json, pathlib, collections
+import json, pathlib, collections, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from catalogo_comun import leer_catalogo
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
-CAT = RAIZ / 'datos' / 'catalogo.json'
 DEST = RAIZ / 'comun' / 'creeps-base.js'
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional']
 SLOTS = {'cabeza': 'cabeza', 'armadura_blanda': 'torso', 'armadura_rigida': 'torso', 'manos': 'manos', 'piernas': 'piernas', 'pies': 'pies', 'escudo_1m': 'escudo'}
@@ -158,7 +159,7 @@ JS = r"""/*EQUIPO_CREEP:INICIO*/
 
 
 def main():
-    cat = json.load(open(CAT, encoding='utf-8'))
+    cat = leer_catalogo()
     grupos = collections.defaultdict(list)
     for it in cat:
         ti = it['tipoItem']

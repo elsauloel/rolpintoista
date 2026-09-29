@@ -5,13 +5,14 @@ No es exhaustivo: para el detalle completo de un campo, la fuente de verdad
 siempre es el código (`SCHEMA`/`DEFAULT` en `ficha-personaje/ficha.html`,
 `nuevoCreep()` en `gm-toolset/gm-tools.html`).
 
-## Ítem de catálogo — `datos/catalogo.json`
+## Ítem de catálogo — `comun/catalogo.js`
 
-El formato central: lo produce `datos/catalogo-editor.html` o
-`assets/catalogo.xlsx`, y de ahí lo consumen (con distinto recorte cada
-una) `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html` y
-`gm-toolset/vendor-generator.html`. Ver [`herramientas/catalogo_comun.py`](../herramientas/catalogo_comun.py)
-para la lógica de corrección/escritura.
+El catálogo de fábrica (`CATALOGO_BASE`, un ítem por renglón, desde 2026-09-29; antes `datos/catalogo.json` + Excel +
+copias adentro de los HTML). Lo escribe `datos/catalogo-editor.html` (o una conversación, con
+[`herramientas/catalogo_comun.py`](../herramientas/catalogo_comun.py)) y lo cargan la ficha, GM Tools (que arma su forma
+con `itemParaCreep`) y el generador de tiendas. Lo que suben jugadores y GM vive en Firebase (`biblioteca_items`) con la
+misma forma y se suma con `comun/items-subidos.js` (id `usr-<id>`, o el id del de fábrica si es una corrección). Campos
+que usan las herramientas (los que no aplican se omiten):
 
 ```jsonc
 {

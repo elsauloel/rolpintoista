@@ -91,16 +91,20 @@ lo que el grupo usa.
   estructura completa y [`firebase/firestore.rules`](firebase/firestore.rules)
   para los permisos (hay que pegarlos a mano en la consola cada vez que
   cambian).
-- **El catálogo de ítems es la excepción**: sigue viviendo en
-  `datos/catalogo.json` y sincronizándose por **GitHub** (API de
-  contenidos, con un token personal en `localStorage`, nunca en el repo),
-  siempre contra la rama **`main`** — es infraestructura compartida entre
-  campañas, no estado de una partida puntual. Ver
-  [`docs/workflow-github.md`](docs/workflow-github.md) y
-  [`datos/CLAUDE.md`](datos/CLAUDE.md).
-- **Python** (`herramientas/`) mantiene ese catálogo sincronizado entre
-  Excel, el editor HTML y las herramientas de juego. No es parte del
-  runtime de ninguna herramienta.
+- **Catálogo de ítems** (desde 2026-09-29, paso 5 de
+  [`docs/plan-subida-unificada.md`](docs/plan-subida-unificada.md)): una
+  sola copia de fábrica, **`comun/catalogo.js`** (`CATALOGO_BASE`, un ítem
+  por renglón), que cargan la ficha, GM Tools, el generador de tiendas y el
+  editor (`datos/catalogo-editor.html`, que la escribe directo en
+  `nueva-version`). Lo que suben jugadores y GM desde el juego (⬆ Subir al
+  catálogo) vive en Firebase (`biblioteca_items`) y cada herramienta lo suma
+  (`comun/items-subidos.js`). Se retiraron el Excel, `datos/catalogo.json`,
+  la rama `main` para el catálogo y los scripts que lo copiaban adentro de
+  los HTML. Ver [`datos/CLAUDE.md`](datos/CLAUDE.md).
+- **Python** (`herramientas/`): scripts de diseño que leen y escriben
+  `comun/catalogo.js` (`herramientas/catalogo_comun.py`): calculadora de
+  armas, equipo de los creeps, reajuste de defensa, publicar ítems del
+  rework. No son parte del runtime de ninguna herramienta.
 - **`gestor.html`** (raíz) actualiza el *código* de las herramientas desde
   GitHub — nunca datos de partida — usando la File System Access API
   sobre la carpeta que elige el usuario, y apunta a la rama `main`. La
@@ -121,11 +125,10 @@ lo que el grupo usa.
   español, `camelCase` para variables/funciones (`aplicarFicha`,
   `renderBotonera`, `mesaPublicar`). Los nombres de conceptos del juego
   (PdG, Bloqueo, Res.Mt, No2) se usan tal cual, sin traducir a inglés.
-- IDs de ítems de catálogo: `cat-<slug>` para los originales, `new-<slug>`
-  para los agregados por el importador cuando no traían id.
-- Rutas de sincronización con GitHub del catálogo (los strings que ven
-  `ghSubir`/`ghLeerJson`) son siempre relativas a la raíz del repo, no al
-  archivo HTML que las usa.
+- IDs de ítems de catálogo: `cat-<slug>` / `new-<slug>` / `nuevo-<slug>` /
+  `ia-<slug>` para los de fábrica (quedaron de distintas tandas), y
+  `usr-<id>` para los que se suben desde el juego (una corrección de uno de
+  fábrica conserva su id).
 
 ## Qué hay en cada carpeta
 
@@ -135,10 +138,10 @@ lo que el grupo usa.
 | [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas, en vivo con Firebase | En desarrollo activo |
 | [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa de hexágonos en vivo con tokens (`mapa.html`, Firebase) | En desarrollo activo |
 | [`comun/`](comun/CLAUDE.md) | Código JS compartido entre las herramientas (sesión, menú, Mesa, dados, lupa, asistente de ítems…) | En uso activo |
-| [`datos/`](datos/CLAUDE.md) | Catálogo de ítems (`catalogo.json`, sincronizado por GitHub contra `main`) + su editor | En uso activo |
+| [`datos/`](datos/CLAUDE.md) | Editor del catálogo de ítems (el catálogo vive en `comun/catalogo.js`), herramientas de auditoría, esquema | En uso activo |
 | [`manual-usuario/`](manual-usuario/CLAUDE.md) | El manual, navegable como un vault de Obsidian (buscador, enlaces, backlinks, mapa, pendientes); fuente en `notas/*.md` | Primera versión completa (2026-09-20), con preguntas abiertas para completar |
 | [`docs/`](docs/CLAUDE.md) | Plan del sistema nuevo, workflow de Firebase/GitHub, preguntas de diseño abiertas | Con contenido activo |
-| `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Ver `herramientas/LEEME.md` |
+| `herramientas/` | Scripts Python de diseño que leen/escriben `comun/catalogo.js` (y el compilador del manual) | Ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |
 | `firebase/` | `firestore.rules`, la copia versionada de los permisos | En uso activo |
 | [`preguntas-diseno/`](preguntas-diseno/CLAUDE.md) | "🛠 Herramientas de diseño": log compartido con tres pestañas — Preguntas, A desarrollar (propuestas + resumen de lo incorporado) y Falta testear —, pensado para el celular (excepción a "solo compu") | En uso activo |
@@ -184,8 +187,9 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
 - **El catálogo va sin imágenes mientras dura el desarrollo** (decidido
   2026-09-17): no cargar imágenes de ítems ni volver a ponerlas. La
   función de cargar imagen sigue en las herramientas, a propósito. Para
-  tocar el catálogo está `datos/catalogo.json` + `datos/catalogo-editor.html`
-  — nunca a mano.
+  tocar el catálogo de fábrica está `datos/catalogo-editor.html` (o una
+  conversación editando `comun/catalogo.js`); desde el juego, ⬆ Subir al
+  catálogo.
 - **Solo compu, no celular** (decidido 2026-09-17): no adaptar ni probar
   nada para pantallas de celular salvo que se pida explícitamente — ver
   [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md).

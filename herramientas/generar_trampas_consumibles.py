@@ -8,7 +8,7 @@ Potencia p = 1 (menor, radio 1) · 2 (común, radio 2) · 3 (mayor, radio 3). La
   - daño: el de la trampa base en la potencia 2; ±1 dado en las potencias 1 y 3;
   - dificultades y duraciones: ±2 según la potencia (a mano, van en el texto);
   - precio: (10 + 12 × nivel) × [0,7 · 1 · 1,5], redondeado a 5.
-Uso: python herramientas/generar_trampas_consumibles.py   (después, publicar_nuevos.py e importar_json.py)
+Uso: python herramientas/generar_trampas_consumibles.py   (después, publicar_nuevos.py)
 """
 import json, re, pathlib, math
 

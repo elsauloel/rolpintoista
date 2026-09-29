@@ -38,7 +38,7 @@ def grupos(pares):
 
 
 def main():
-    cat = json.load(open(C.CATALOGO, encoding='utf-8'))
+    cat = C.leer_catalogo()
     cat = cat['items'] if isinstance(cat, dict) and 'items' in cat else cat
     informe = {
         'armas': grupos([(firma_arma(C.reajustar(a)[0]), a['nombre']) for a in C.cargar()] + [(firma_arma(a), a['nombre'] + ' [nuevo]') for a in C.cargar_nuevas()]),

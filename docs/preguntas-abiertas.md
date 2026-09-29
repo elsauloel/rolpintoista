@@ -535,7 +535,7 @@ resuelven a mano, como el resto de los avisos).
   deja al dispararse, cuánto dura) **salvo el teleport** (su destino se marca con un clic en el mapa) y la forma libre
   (se pinta a mano). Una trampa del catálogo elegida desde una habilidad conserva su estado, su color y su zona.
 
-- ⬜ **P124. Ítems subidos por jugadores: ¿viven en Firebase o van al catálogo de GitHub? — 2026-09-29 (paso 0e).**
+- ✅ **P124. Ítems subidos por jugadores: ¿viven en Firebase o van al catálogo de GitHub? — 2026-09-29 (paso 0e), decidida el mismo día: en Firebase; y además se simplificó todo el circuito del catálogo (ver `docs/plan-subida-unificada.md`, paso 5).**
   La decisión 4 del plan dice "lo subido vive en Firebase"; el catálogo de ítems hoy vive en `datos/catalogo.json`
   (rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML). **Propuesta**: los ítems subidos
   viven en Firebase igual que el resto (disponibles al instante, sin token), con id `usr-<slug>`; el catálogo de

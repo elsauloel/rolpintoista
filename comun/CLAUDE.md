@@ -765,3 +765,13 @@ versión parecida en más de una, es candidato a juntar.
   `resumenTexto(t)`, que usan la ficha y gm-tools (gm-tools guarda la trampa en edición en `hcTrampa`; los campos
   `#hc-trampa-*` quedaron sin uso). (Una primera versión de este cambio tomó `tamano` como "radio + 1" y achicaba las
   trampas consumibles —"flor de radio 2 (19 casillas)" salía de 7—; se corrigió el mismo día: `tamano` ES el radio.)
+- **`catalogo.js`** (`CATALOGO_BASE`, 2026-09-29, paso 5 de `../docs/plan-subida-unificada.md`) — **el catálogo de ítems
+  de fábrica**, la única copia: la cargan la ficha (`DEFAULT.catalogo`), GM Tools (`CATALOGO_EQUIPO` vía `itemParaCreep`),
+  el generador de tiendas (`CATALOGO`) y `datos/catalogo-editor.html`, que lo escribe directo en `nueva-version` (un ítem
+  por renglón, JSON compacto, conserva la cabecera). Reemplaza a las tres copias que había adentro de esos HTML, a
+  `datos/catalogo.json` y al Excel + scripts de Python (retirados). Formato: `../datos/esquema.md`.
+- **`items-subidos.js`** (`ItemsSubidos`, 2026-09-29, P124) — suma al catálogo de fábrica lo que subió el grupo
+  (`biblioteca_items`): `mezclar(lista, subidas, base)` (una corrección reemplaza al de fábrica con el mismo id; lo nuevo
+  entra como `usr-<id>`; cada uno lleva `_bib` con de dónde salió), `cargar()`, `basadoEn(item, catalogo)` (para
+  "¿corrección o algo nuevo?" al subir) y `etiqueta(item)` ("🔶 sin auditar · subido por X"). Lo usan ficha, gm-tools y el
+  generador de tiendas; el botón de todos es **⬆ Subir al catálogo** (`Biblioteca.guardar({tipo: 'items'})`).

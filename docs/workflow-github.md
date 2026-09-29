@@ -1,5 +1,12 @@
 # Workflow de GitHub / Gestor
 
+> **Casi todo esto es historia (2026-09-29).** Los datos de partida van por Firebase desde el sistema nuevo, y el catálogo
+> de ítems dejó de sincronizarse por GitHub: la copia de fábrica es `comun/catalogo.js` y lo que suben jugadores y GM vive
+> en Firebase (`docs/plan-subida-unificada.md`, paso 5). Lo que sigue usando la API de GitHub con token es solo lo del
+> dueño que escribe archivos de fábrica en la rama `nueva-version` (`datos/catalogo-editor.html` → `comun/catalogo.js`,
+> `datos/auditoria-skills.html` → `comun/skills-clase.js`) y `gestor.html`. El patrón de token de abajo sigue valiendo para
+> esas herramientas.
+
 Cómo se mantienen sincronizadas las herramientas entre sí y con el repo,
 sin backend y sin que nadie tenga que usar `git` a mano durante una
 sesión de juego.

@@ -28,10 +28,13 @@ su casa:
   `nueva-version`). **La plataforma vieja (sync de datos de partida por
   GitHub) ya no se usa ni hace falta preservarla**: no quedan botones ni
   código de "Traer última versión"/Subir/Bajar datos para personajes,
-  tablero, tienda o creeps — todo eso es Firebase. Lo único que sigue por
-  GitHub es el catálogo de ítems (compartido entre campañas, siempre
-  contra `main`) y `gestor.html` (actualiza el *código* de las
-  herramientas, no datos).
+  tablero, tienda o creeps — todo eso es Firebase. Desde 2026-09-29 el
+  catálogo de ítems tampoco va por la rama `main`: la copia de fábrica es
+  `comun/catalogo.js` (código del sitio) y lo que sube el grupo vive en
+  Firebase (ver `docs/plan-subida-unificada.md`, paso 5). Por GitHub (con
+  token) solo escriben las herramientas del dueño que editan archivos de
+  fábrica (`datos/catalogo-editor.html`, `datos/auditoria-skills.html`) y
+  `gestor.html` (actualiza el *código* de las herramientas, no datos).
 - Sin backend propio ni build step: cada herramienta sigue siendo un
   `.html` que se abre con doble clic. Firebase (proyecto `rol-pintoista`,
   plan Spark gratis, sin tarjeta) es el backend en vivo.
@@ -107,8 +110,8 @@ su casa:
   "Traer última versión" nunca se abría en `nueva-version`, así que se
   sacó entero de la ficha y gm-tools, junto con las funciones que solo
   servían para eso. `gestor.html` sigue existiendo para actualizar el
-  *código* de las herramientas desde `main`, y el catálogo sigue
-  publicándose por GitHub (ver `docs/workflow-github.md`) — eso no cambia.
+  *código* de las herramientas desde `main` (el catálogo ya no: ver
+  arriba).
   "Guardar ficha"/"Cargar archivo" local se conserva como respaldo.
 
 ## Pasos

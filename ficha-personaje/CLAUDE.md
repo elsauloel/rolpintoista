@@ -219,17 +219,20 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
 
 ## Formato de datos
 
-- **Consume**: el catálogo de ítems, embebido como `S.catalogo` (con
-  imágenes) — se sincroniza desde `datos/catalogo.json` corriendo
-  `herramientas/importar_json.py` (o `importar.py` si se editó el Excel).
-  **No se edita a mano acá** — ver [`datos/CLAUDE.md`](../datos/CLAUDE.md).
-- **Produce, opcionalmente**: el editor de ítems de Mochila/Equipo/Cinturón
-  tiene un botón "📦 Agregar al catálogo" (`agregarAlCatalogoDelFabricante()`)
-  que convierte el ítem del jugador en una entrada de catálogo (descarta
-  campos de instancia como `equipado`/`cargaActual`, le pone tier "Común"
-  por default) y la sube directo a `datos/catalogo.json`, con confirmación
-  explícita antes de publicar. No corre `importar_json.py` sola — eso
-  sigue siendo un paso aparte.
+- **Consume** (desde 2026-09-29): el catálogo de fábrica `comun/catalogo.js`
+  (`DEFAULT.catalogo = structuredClone(CATALOGO_BASE)`; antes estaba copiado
+  adentro de este archivo) **más lo que subió el grupo** (`itemsSubidos`,
+  `cargarItemsSubidos`/`mezclarItemsSubidos`, `comun/items-subidos.js`): una
+  corrección reemplaza al ítem de fábrica con el mismo id, lo nuevo entra como
+  `usr-<id>`; la fila del catálogo muestra "🔶 sin auditar · subido por X". De
+  `S.catalogo` solo se guardan los ítems propios de la ficha (ni los de fábrica
+  ni los subidos, que llevan `_bib`).
+- **Produce, opcionalmente**: **⬆ Subir al catálogo** (antes "📦 Agregar al
+  catálogo", que escribía `datos/catalogo.json` por GitHub): en el asistente de
+  un ítem de la mochila y en el editor de un ítem del catálogo
+  (`subirItemAlCatalogo`) → `Biblioteca.guardar({tipo: 'items'})`, disponible al
+  instante; si el ítem salió del catálogo (mismo id o nombre) se puede subir
+  como corrección.
 - **En vivo con Firebase** (rama `nueva-version`, bloque "FICHA EN VIVO"
   al final del script): el personaje abierto se guarda solo en
   `campanas/{id}/fichas/{fichaId}` por partes (ver

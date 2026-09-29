@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Publica en el catálogo (datos/catalogo.json) los ítems del rework que están en archivos aparte:
+"""Publica en el catálogo de fábrica (comun/catalogo.js) los ítems del rework que están en archivos aparte:
   datos/armas-nuevas.json, datos/defensa-nuevos.json, datos/consumibles-nuevos.json
 Es idempotente: primero saca del catálogo todo id que empiece con "nuevo-" y vuelve a ponerlo con los datos de hoy.
-No toca ningún otro ítem. Después hay que correr `python herramientas/importar_json.py` para regenerar los tres HTML.
+No toca ningún otro ítem. Las herramientas leen comun/catalogo.js directamente: no hace falta ningún paso más.
 
 Uso: python herramientas/publicar_nuevos.py
 """
@@ -12,7 +12,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import calculadora_armas as C
 
 RAIZ = C.RAIZ
-CATALOGO = RAIZ / 'datos' / 'catalogo.json'
+from catalogo_comun import leer_catalogo, guardar_catalogo, normalizar_item
 STAT = {'rng': 'Alcance', 'pdg': 'PdG', 'parry': 'Parry', 'bloqueo': 'Bloqueo', 'crit': 'Crít. frecuente', 'critpot': 'Crít. potente', 'pdgcontra': 'PdG en contraataque', 'pdgopor': 'PdG en oportunidad', 'ini': 'Iniciativa', 'dmg': 'Dmg'}
 EXTRAS = ('tanda', 'categoria', 'categoriaVisibilidad', 'revelaOculto', 'percepcionAumentada')   # campos de trabajo que no van al catálogo
 
@@ -60,7 +60,7 @@ def cargar_json(nombre):
 
 
 def main():
-    cat = json.load(open(CATALOGO, encoding='utf-8'))
+    cat = leer_catalogo()
     antes = len(cat)
     cat = [i for i in cat if not str(i.get('id', '')).startswith('nuevo-')]
     quitados = antes - len(cat)
@@ -68,8 +68,8 @@ def main():
     nombres = {i['nombre'].strip().lower() for i in cat}
     choques = [n['nombre'] for n in nuevos if n['nombre'].strip().lower() in nombres]
     assert not choques, 'nombres que ya existen en el catálogo: %s' % choques
-    cat += nuevos
-    json.dump(cat, open(CATALOGO, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=2)
+    cat += [normalizar_item(n) for n in nuevos]
+    guardar_catalogo(cat)
     print('catálogo: %d ítems (quitados %d "nuevo-" viejos, agregados %d)' % (len(cat), quitados, len(nuevos)))
 
 

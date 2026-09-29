@@ -116,10 +116,10 @@ la misma forma:
 }
 ```
 
-Los presets (`EFECTOS_PRESET` en ficha.html, `ESTADOS_PRESET_GM` en
-gm-tools.html) están duplicados a mano entre los dos archivos — no hay
-sincronización automática entre ellos todavía. Si agregás un estado nuevo,
-sumalo en los dos lados.
+Los presets estándar viven en una sola lista, `comun/estados-presets.js`
+(desde el 2026-09-29): la ficha la usa como `EFECTOS_PRESET` (campos
+`hpturno`/`stacksturno`) y gm-tools como `ESTADOS_PRESET_GM` (forma de creep,
+`hpTurno`/`stacksTurno`). Un estado nuevo se suma solo ahí.
 
 ## Tarjeta de tablero — lo que arma cada uno para el panel de combate
 

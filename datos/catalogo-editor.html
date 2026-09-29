@@ -150,16 +150,17 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     <button class="iconbtn" id="btn-traer">⬇ Traer última versión</button>
     <button class="iconbtn" id="btn-cargar-archivo">Cargar archivo…</button>
     <input type="file" id="input-archivo" accept="application/json" style="display:none">
-    <button class="iconbtn" id="btn-guardar">Guardar</button>
-    <button class="btn" id="btn-subir">Subir datos</button>
+    <button class="iconbtn" id="btn-guardar" title="Bajar una copia de respaldo (catalogo.json) a esta compu">⬇ Respaldo</button>
+    <button class="btn" id="btn-subir" title="Escribe el catálogo de fábrica (comun/catalogo.js) en el sitio: llega solo a la ficha, GM Tools y la tienda">💾 Guardar en el proyecto</button>
     <button class="btn primary" id="btn-nuevo">+ Nuevo ítem</button>
     <button class="iconbtn" id="btn-token">Token</button>
   </div>
 </header>
 
 <div class="aviso-sync">
-  Esto edita <b>datos/catalogo.json</b> únicamente. Para que los cambios aparezcan en la ficha, en gm-tools y en
-  el vendedor hace falta correr <code>herramientas/importar_json.py</code> después (pedíselo a Claude, o corrélo vos).
+  Esto edita el <b>catálogo de fábrica</b> (<code>comun/catalogo.js</code>, rama <code>nueva-version</code>): al tocar
+  <b>💾 Guardar en el proyecto</b>, los cambios llegan solos a la ficha, GM Tools y la tienda en 1–2 minutos (lo que
+  tarda en publicarse el sitio). Lo que suben los jugadores y el GM desde el juego está en la biblioteca de Firebase.
 </div>
 
 <div class="barra">
@@ -205,19 +206,37 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/asistente-item.js"></script>
+<script src="../comun/catalogo.js?v=20260929b"></script>
 <script>
 /* =========================================================
-   Editor de catálogo — HTML standalone, sin dependencias.
-   Fuente y destino: datos/catalogo.json (un array de ítems). No toca
-   ficha.html/gm-tools.html/vendor-generator.html directamente — eso lo
-   hace herramientas/importar_json.py, aparte. Mismo patrón de
-   guardado/carga JSON y sincronización con GitHub que el resto de las
-   herramientas (mismo token de localStorage).
+   Editor de catálogo — edita el catálogo de FÁBRICA: comun/catalogo.js (CATALOGO_BASE), la única copia que usan la ficha,
+   GM Tools y el generador de tiendas (paso 5 de docs/plan-subida-unificada.md, 2026-09-29). Antes editaba
+   datos/catalogo.json en la rama main y había que correr herramientas/importar_json.py: ese circuito (y el Excel) se retiró.
+   - Arranca con la copia que trae el sitio (el <script> de comun/catalogo.js) y enseguida trae la última de GitHub.
+   - "💾 Guardar en el proyecto" reescribe comun/catalogo.js en la rama nueva-version (token de GitHub en localStorage, el
+     mismo de las otras herramientas): conserva la cabecera y escribe un ítem por renglón. Si el archivo cambió desde que se
+     trajo (otra persona u otra conversación guardó), avisa antes de pisarlo.
+   - Lo que suben los jugadores y el GM está en la biblioteca de Firebase (comun/biblioteca.js, tipo items); pasarlo a
+     fábrica es editarlo acá (o que lo haga una conversación).
    ========================================================= */
 
 const GH_REPO = 'elsauloel/rolpintoista';
-const GH_BRANCH = 'main';
-const ARCHIVO_CATALOGO = 'datos/catalogo.json';
+const GH_BRANCH = 'nueva-version';
+const ARCHIVO_CATALOGO = 'comun/catalogo.js';
+let textoRemoto = null;   // el archivo tal como estaba al traerlo (para avisar si alguien lo cambió antes de guardar)
+// comun/catalogo.js → lista de ítems (un JSON por renglón entre "const CATALOGO_BASE = [" y "];").
+function leerCatalogoJs(texto){
+  const i = texto.indexOf('[', texto.indexOf('const CATALOGO_BASE'));
+  const j = texto.lastIndexOf('];');
+  if(i < 0 || j < i) throw new Error('No encontré CATALOGO_BASE en comun/catalogo.js');
+  return JSON.parse(texto.slice(i, j + 1).replace(/,\s*\]$/, ']'));
+}
+// Lista de ítems → comun/catalogo.js, conservando la cabecera del archivo actual.
+function escribirCatalogoJs(items, textoBase){
+  const cab = textoBase && textoBase.includes('const CATALOGO_BASE') ? textoBase.slice(0, textoBase.indexOf('const CATALOGO_BASE')) : '';
+  const limpio = it => { const c = {...it}; delete c._bib; if(c.imagen === undefined) c.imagen = ''; return c; };
+  return cab + 'const CATALOGO_BASE = [\n' + items.map(it => '  ' + JSON.stringify(limpio(it)) + ',\n').join('') + '];\n';
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -762,7 +781,7 @@ $('#btn-guardar').onclick = () => {
   a.download = 'catalogo.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('Descargado: catalogo.json');
+  toast('Descargado: catalogo.json (respaldo)');
 };
 
 $('#btn-cargar-archivo').onclick = () => $('#input-archivo').click();
@@ -857,22 +876,22 @@ async function ghSubir(ruta, texto, token, mensaje){
   if(!resp.ok) throw new Error(`GitHub respondió ${resp.status} subiendo ${ruta}: ${await resp.text()}`);
 }
 
+async function leerRemoto(){
+  const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_CATALOGO}?ref=${GH_BRANCH}`;
+  const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
+  if(resp.status === 404) return {falta: true};
+  if(resp.status === 429 || resp.status === 403) return {limite: true};
+  if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+  return {texto: await resp.text()};
+}
 async function traerUltimaVersion(silencioso){
   if(!silencioso) estado('Buscando la última versión…');
   try{
-    const url = `https://api.github.com/repos/${GH_REPO}/contents/${ARCHIVO_CATALOGO}?ref=${GH_BRANCH}`;
-    const resp = await fetch(url, {headers: ghCabeceras('application/vnd.github.raw+json'), cache: 'no-store'});
-    if(resp.status === 404){
-      if(!silencioso) estado('Todavía no hay catalogo.json publicado en GitHub.', 'err');
-      return;
-    }
-    if(resp.status === 429 || resp.status === 403){
-      if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err');
-      return;
-    }
-    if(!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
-    const datos = await resp.json();
-    aplicarDatos(datos, 'Última versión traída de GitHub ✓');
+    const r = await leerRemoto();
+    if(r.falta){ if(!silencioso) estado('No encontré comun/catalogo.js en GitHub.', 'err'); return; }
+    if(r.limite){ if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err'); return; }
+    textoRemoto = r.texto;
+    aplicarDatos(leerCatalogoJs(r.texto), 'Última versión traída de GitHub ✓');
   }catch(err){
     console.error('Error trayendo el catálogo:', err);
     estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
@@ -885,10 +904,19 @@ $('#btn-subir').onclick = async () => {
   const token = await ghToken(false);
   if(!token){ toast('Sin token no se puede subir'); return; }
   btn.disabled = true;
-  toast('Subiendo a GitHub…');
+  toast('Guardando en el proyecto…');
   try{
-    await ghSubir(ARCHIVO_CATALOGO, JSON.stringify(CATALOGO, null, 2), token, 'Actualizar catálogo');
-    toast('Catálogo publicado en GitHub ✓ — corré importar_json.py para que llegue a las 3 herramientas');
+    const r = await leerRemoto();
+    const actual = r.texto || null;
+    // Alguien (otra persona u otra conversación) lo cambió desde que se trajo: se avisa antes de pisarlo.
+    if(textoRemoto !== null && actual !== null && actual.replace(/\r\n/g, '\n') !== textoRemoto.replace(/\r\n/g, '\n')
+      && !confirm('comun/catalogo.js cambió en GitHub desde que lo abriste (lo guardó otra persona u otra conversación).\n\nSi guardás ahora, se pisan esos cambios con lo que tenés acá. ¿Guardar igual?\n\n(Cancelar y tocar "⬇ Traer última versión" trae lo nuevo, pero pierde lo que editaste acá sin guardar.)')){
+      return;
+    }
+    const texto = escribirCatalogoJs(CATALOGO, actual || textoRemoto);
+    await ghSubir(ARCHIVO_CATALOGO, texto, token, `Catálogo de fábrica: ${CATALOGO.length} ítems (desde el editor)`);
+    textoRemoto = texto;
+    toast('Catálogo de fábrica guardado ✓ — llega a la ficha, GM Tools y la tienda en 1–2 minutos');
   }catch(err){
     if(err && err.auth){
       localStorage.removeItem('gh-token');
@@ -908,7 +936,9 @@ $('#btn-token').onclick = async () => {
 
 /* ---------- Arranque ---------- */
 poblarFiltros();
-renderLista();
+// Primero la copia que trae el sitio (se ve al instante, sin GitHub); después la última de GitHub.
+if(typeof CATALOGO_BASE !== 'undefined') aplicarDatos(structuredClone(CATALOGO_BASE), 'Copia de fábrica del sitio');
+else renderLista();
 traerUltimaVersion(true);
 </script>
 </body>

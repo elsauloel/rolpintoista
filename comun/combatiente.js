@@ -318,7 +318,115 @@ const Combatiente = (() => {
     return false;
   }
 
+  /* ---------- Usar una habilidad (paso 3, 2026-09-30) ----------
+     Lo mismo para personaje, invocación y creep: en qué modo se ejecuta, qué cuesta, si se puede usar ahora, hasta dónde
+     llega y lo que el cuadro del duelo necesita (la ✨ Ejecución). Cada herramienta pone lo suyo: de dónde salen los stats
+     del que la usa, las etiquetas y la X del costo variable (solo los personajes la tienen). */
+  const MODOS_HAB = ['manual', 'semi', 'auto'];
+  const nf = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };   // como num() de las herramientas: '2 No2' = 2
+  // 📣 manual / 💰 semi / ✨ auto. `duelo`: la Ejecución que tiene armada (la propia o la de su plantilla); las viejas sin
+  // `modo` lo deducen: automatizada === false → manual, con Ejecución → auto, el resto → semi. null = nueva, sin elegir.
+  function modoHab(h, duelo){
+    if(!h) return 'semi';
+    if(h.modo === null) return null;
+    if(MODOS_HAB.includes(h.modo)) return h.modo;
+    if(h.automatizada === false) return 'manual';
+    return duelo ? 'auto' : 'semi';
+  }
+  // Qué arma la Ejecución: 'arma' (ataque con arreglos), 'flash' (reacción), 'zona' (persistente) o 'dirigida'.
+  function tipoEjecucion(c){
+    if(!c || typeof c !== 'object') return '';
+    if(c.modo === 'arma' || c.modo === 'flash') return c.modo;
+    return c.objetivo === 'zona' ? 'zona' : 'dirigida';
+  }
+  // Cambia la «X» del costo variable por el número elegido, en una fórmula («1dX», «X+2») o en un texto libre.
+  // \bx\b sola no alcanza: en «1dX» la X queda pegada a la «d»; por eso la segunda pasada para «dX»/«Xd».
+  function sustituirX(formula, X){
+    const s = String(Math.max(0, Math.round(nf(X))));
+    return String(formula || '').replace(/\bx\b/gi, s).replace(/dx/gi, 'd' + s).replace(/xd/gi, s + 'd');
+  }
+  const esCostoAtaque = h => String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE';
+  const esCostoX = v => /x/i.test(String(v ?? ''));
+  // No2 de una habilidad: "ATAQUE" = lo que cuesta un ataque con su arma (y cuenta como ese ataque), X = se elige al
+  // usarla (acá 0), sin cargar (undefined/null) = el costo por defecto de quien la usa.
+  function costoNitrosHab(h, costoAtaque, porDefecto){
+    if(esCostoAtaque(h)) return nf(typeof costoAtaque === 'function' ? costoAtaque() : costoAtaque);
+    if(esCostoX(h && h.nitrosCosto)) return 0;
+    return nf((h && h.nitrosCosto) ?? porDefecto);
+  }
+  // ¿Se puede usar ahora? '' = sí; si no, el motivo. Se cobra lo que la habilidad tenga cargado, sea de quien sea (P133):
+  // cooldown, No2 y vida (tiene que sobrar vida después de pagarla). Una 📣 manual no cobra nada.
+  function bloqueoHab(h, o){
+    o = o || {};
+    if(o.modo === 'manual') return '';
+    if(nf(h && h.cdActual) > 0) return `Cooldown · ${nf(h.cdActual)} turno(s)`;
+    if(o.nitros !== undefined && nf(o.nitros) < nf(o.costo)) return 'Sin No2';
+    if(o.hp !== undefined && nf(h && h.hpCosto) > 0 && nf(o.hp) <= nf(h.hpCosto)) return 'Sin vida';
+    return '';
+  }
+  // Hasta dónde llega (casilleros; 0 = sin límite, no resalta). `stat(id)` da el Rango ('rng') o el Rango de casteo
+  // ('rangocasteo') de quien la usa. En automático, los hechizos (PdG.Mg) usan el Rango de casteo y el resto no resalta.
+  function alcanceHab(c, statTira, stat){
+    const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
+    const v = id => { const x = Number(stat ? stat(id) : 0); return Number.isFinite(x) ? Math.max(0, Math.round(x)) : 0; };
+    if(modo === 'casteo') return v('rangocasteo');
+    if(modo === 'rango') return v('rng');
+    if(modo === 'adyacente') return 1;
+    if(modo === 'ilimitado') return 0;
+    if(modo === 'fijo') return Math.max(0, Math.round(nf(c.alcanceN)));
+    return statTira === 'pdgmg' ? v('rangocasteo') : 0;
+  }
+  // Un efecto de la Ejecución, en la forma que usa el cuadro del duelo (y el estado que pone, `spec`).
+  function efectoDeEjecucion(e){
+    return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1,
+      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
+        polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo},
+      cura: nf(e.cura), detalle: e.detalle || ''};
+  }
+  /* Lo que el cuadro del duelo necesita para una habilidad dirigida ✨ (y las de área, onda y zona), o null si la
+     Ejecución es un ataque con arma o un Flash. `h` la habilidad, `c` su Ejecución. `o.stat(id)`: stats de quien la usa
+     (para el alcance); `o.etq(id)`: nombre de un stat; `o.X`: la X elegida al pagar el costo variable — sin `o.X` no se
+     toca ninguna «X» de los textos. La tirada personalizada, el daño que escala con X y los textos a mano valen igual
+     para los tres (antes el creep los perdía). */
+  function habEjecucion(h, c, o){
+    if(tipoEjecucion(c) === '' || c.modo === 'arma' || c.modo === 'flash') return null;
+    o = o || {};
+    const etq = o.etq || (s => s), conX = o.X !== undefined && o.X !== null, X = nf(o.X);
+    const sx = t => conX ? sustituirX(t, X) : t;
+    const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+    const tipo = c.tipoDano || 'arcano';
+    const base = String(h.tiradaExtra || '').trim();
+    const extra = conX && c.danoFijoPorX ? nf(c.danoFijoPorX) * X : 0;
+    const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
+    return {
+      nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
+      alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceHab(c, stat, o.stat),
+      tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(h.tiradaBono)} : null),
+      contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
+      dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
+      efectos: (c.efectos || []).map(efectoDeEjecucion),
+      ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
+      ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
+      ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
+      ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
+    };
+  }
+  // Solo sobre uno mismo y sin nada que tirar ni resistir (Blindaje y parecidos): se aplica directo, sin abrir el cuadro.
+  const sobreSiSinTiradas = hab => !!(hab && hab.objetivo === 'uno mismo' && !hab.tira && !hab.dano && !(hab.contra || []).length);
+  // Por qué una ✨ se ejecuta como 💰 en quien todavía no tiene esa parte (P134: invocaciones y creeps sin ataque con
+  // arma ni Flash; invocaciones sin zona). '' = se puede.
+  function ejecucionNoDisponible(c, quien){
+    const t = tipoEjecucion(c);
+    if(!t) return 'todavía no tiene armada la ejecución paso a paso (✨)';
+    if(quien === 'pj') return '';
+    if(t === 'arma') return 'el «ataque con arma, con arreglos» todavía no anda para ' + (quien === 'inv' ? 'invocaciones' : 'creeps');
+    if(t === 'flash') return 'la «reacción Flash» todavía no anda para ' + (quien === 'inv' ? 'invocaciones' : 'creeps');
+    if(t === 'zona' && quien === 'inv') return 'la zona persistente todavía no anda para invocaciones';
+    return '';
+  }
+
   return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
-    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad};
+    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
+    modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible};
 })();

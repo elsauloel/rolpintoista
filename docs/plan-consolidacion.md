@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1 y 2** (2026-09-30). Siguiente: paso 3 (ejecución de habilidades). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1 y 2** (2026-09-30). En curso: paso 3 (ejecución de habilidades), tanda 1 hecha. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -132,7 +132,19 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
 - **Se gana**: un estado nuevo o una regla de turno nueva se escribe una vez.
 - **Riesgo**: medio (el Mantenimiento toca todo); probar con una partida de prueba varios turnos seguidos.
 
-### Paso 3 — Ejecución de habilidades única
+### Paso 3 — Ejecución de habilidades única — en curso (2026-09-30)
+- **Cómo va — tanda 1 ✅** (2026-09-30): **usar una habilidad** en `comun/combatiente.js`: el modo (`modoHab`), el costo en
+  No2 (`costoNitrosHab`: número, "ATAQUE", X), si se puede usar ahora (`bloqueoHab`: cooldown, No2 y vida), el alcance
+  (`alcanceHab`), lo que el cuadro del duelo necesita de la ✨ Ejecución (`habEjecucion`, con `efectoDeEjecucion` y
+  `sustituirX`) y el atajo "solo sobre sí y sin tiradas" (`sobreSiSinTiradas`). Lo usan el personaje, la invocación y el
+  creep (antes, tres copias de cada una). Comparado contra las versiones viejas: personaje 3013 casos e invocación 2596, igual;
+  en el creep solo cambia lo buscado. Decisiones: **P133** (se cobra lo que la habilidad tenga, sea de quien sea: creeps e
+  invocaciones ahora pueden costar vida y curar) y **P134** (ataque con arma, Flash y zona de invocación: se avisa y va como
+  semiautomática; sumarlos queda en pendientes). Corregido de paso: el creep perdía la tirada personalizada y los textos "a
+  mano" de su Ejecución (y su duelo no sabía tirar una fórmula); los estados que una invocación se pone a sí misma no
+  revisaban inmunidades y se duplicaban en vez de renovarse; una ✨ de creep sin la Ejecución armada no avisaba. Pruebas: 92.
+- **Falta — tanda 2**: trampas y zonas (hoy la ficha y GM Tools tienen cada una su `colocarTrampaDeHab` y su
+  `colocarZona…`), y lo que se pone uno mismo con el estado del sistema anterior (`aplicarEfectoDeConsumo`).
 - **Qué**: cobrar el costo, los tres modos (📣 manual, 💰 semi, ✨ auto), lo del sistema anterior mientras dure, trampas y
   zonas: una sola implementación que usan personaje, invocación y creep.
 - **Se gana**: se terminan las tres versiones; las invocaciones reciben lo que hoy les falta (zonas, ataque con arma desde

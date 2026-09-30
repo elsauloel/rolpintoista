@@ -825,6 +825,14 @@ versión parecida en más de una, es candidato a juntar.
   herramienta recuerda el Parry que espera su Bloqueo (`parryArmaPendiente` en la ficha, `parryPendienteInv`,
   `parryPendienteCreep`); el botón de Bloqueo se ve siempre, apagado, mostrando lo que tiraría, para decidir entre Parry y
   Evasión.
+  **Usar una habilidad** (paso 3, 2026-09-30): `modoHab(h, duelo)` (📣/💰/✨; `duelo` = la Ejecución que tenga armada),
+  `costoNitrosHab(h, costoAtaque, porDefecto)`, `bloqueoHab(h, {modo, nitros, costo, hp})` (cooldown, No2 y vida — P133: se
+  cobra lo que la habilidad tenga, sea de quien sea), `alcanceHab(c, statTira, stat)`, `habEjecucion(h, c, {stat, etq, X})`
+  (lo que el cuadro del duelo necesita: tirada o fórmula propia, resistencias, daño, efectos, radio, textos a mano; sin `X`
+  no se toca ninguna «X»), `efectoDeEjecucion(e)`, `sustituirX`, `sobreSiSinTiradas(hab)` (el atajo de Blindaje) y
+  `ejecucionNoDisponible(c, 'pj'|'inv'|'creep')` (P134: ataque con arma y Flash todavía solo en personajes, zona no en
+  invocaciones → aviso y 💰). Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
+  de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
   3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,

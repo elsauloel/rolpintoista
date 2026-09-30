@@ -288,6 +288,47 @@ prueba('stacks por turno: bajan y en 0 se termina', () => {
 });
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
+/* ---------- Usar una habilidad (paso 3) ---------- */
+grupo('Usar una habilidad (paso 3)');
+prueba('modo: el elegido manda; las viejas lo deducen; null = nueva sin elegir', () => igual(
+  [Combatiente.modoHab({modo: 'manual'}, {}), Combatiente.modoHab({automatizada: false}), Combatiente.modoHab({}, {objetivo: 'enemigo'}), Combatiente.modoHab({}), Combatiente.modoHab({modo: null})],
+  ['manual', 'manual', 'auto', 'semi', null]));
+prueba('No2: número, "ATAQUE" (lo de un ataque), X (se elige después), sin cargar = por defecto', () => igual(
+  [Combatiente.costoNitrosHab({nitrosCosto: 2}, 9, 1), Combatiente.costoNitrosHab({nitrosCosto: 'ATAQUE'}, () => 4, 1), Combatiente.costoNitrosHab({nitrosCosto: 'X'}, 9, 1), Combatiente.costoNitrosHab({}, 9, 1), Combatiente.costoNitrosHab({nitrosCosto: 0}, 9, 1)],
+  [2, 4, 0, 1, 0]));
+prueba('¿se puede usar? cooldown, No2 y vida (tiene que sobrar); manual nunca se frena (P133)', () => igual(
+  [Combatiente.bloqueoHab({cdActual: 2}, {nitros: 9, costo: 1}), Combatiente.bloqueoHab({}, {nitros: 1, costo: 2}), Combatiente.bloqueoHab({hpCosto: 5}, {nitros: 9, costo: 1, hp: 5}),
+   Combatiente.bloqueoHab({hpCosto: 5}, {nitros: 9, costo: 1, hp: 6}), Combatiente.bloqueoHab({cdActual: 2}, {modo: 'manual'})],
+  ['Cooldown · 2 turno(s)', 'Sin No2', 'Sin vida', '', '']));
+prueba('alcance: casteo, rango, adyacente, fijo; en automático los hechizos usan el Rango de casteo', () => {
+  const st = s => ({rangocasteo: 4.4, rng: 6}[s]);
+  igual([Combatiente.alcanceHab({alcance: 'casteo'}, '', st), Combatiente.alcanceHab({alcance: 'rango'}, '', st), Combatiente.alcanceHab({alcance: 'adyacente'}, '', st),
+    Combatiente.alcanceHab({alcance: 'fijo', alcanceN: 3}, '', st), Combatiente.alcanceHab({}, 'pdgmg', st), Combatiente.alcanceHab({}, 'pdg', st)], [4, 6, 1, 3, 4, 0]);
+});
+prueba('X: se cambia en fórmulas («1dX», «X+2») y textos, sin tocar otras palabras', () => igual(
+  [Combatiente.sustituirX('1dX+X', 3), Combatiente.sustituirX('Xd6', 2), Combatiente.sustituirX('excedente de X', 4)], ['1d3+3', '2d6', 'excedente de 4']));
+prueba('la Ejecución: tirada personalizada, daño por X y textos a mano, igual para los tres', () => {
+  const h = {nombre: 'Drenar', tiradaExtra: '1d6'}, c = {objetivo: 'enemigo', tiraFormula: 'Xd4', tiraEtiqueta: 'Drenaje', contra: ['resmt'], dano: true, danoFijoPorX: 2, efectoLibre: 'Drenás X', efectosNota: 'Nota'};
+  const conX = Combatiente.habEjecucion(h, c, {X: 3, etq: s => s.toUpperCase()}), sinX = Combatiente.habEjecucion(h, c, {});
+  igual([conX.tira, conX.dano.formula, conX.efectoLibre, conX.contra[0].etq, sinX.tira.formula, sinX.dano.formula, sinX.efectoLibre, sinX.efectosNota],
+    [{formula: '3d4', etq: 'Drenaje'}, '1d6+6', 'Drenás 3', 'RESMT', 'Xd4', '1d6', 'Drenás X', 'Nota']);
+});
+prueba('la Ejecución: efectos (estado, bono, escudo, cura); ataque con arma y Flash no son dirigidas', () => {
+  const r = Combatiente.habEjecucion({nombre: 'Blindaje'}, {objetivo: 'uno mismo', efectos: [{nombre: 'Escudo especial', escudo: 8, turnos: 1}, {nombre: 'Furia', stat: 'pdg', val: 2}, {cura: 5}]});
+  igual([r.alcance, r.tira, r.efectos[0].spec.escudoMagico, r.efectos[0].spec.polaridad, r.efectos[1].spec.mods, r.efectos[2].nombre, r.efectos[2].spec, r.efectos[2].cura,
+    Combatiente.habEjecucion({}, {modo: 'arma'}), Combatiente.habEjecucion({}, {modo: 'flash'}), Combatiente.habEjecucion({}, null)],
+    [0, null, 8, 'buff', [{stat: 'pdg', val: 2}], 'Curación', null, 5, null, null, null]);
+});
+prueba('solo sobre sí y sin tiradas (Blindaje) se aplica directo; con tirada o resistencia, no', () => {
+  const E1 = c => Combatiente.sobreSiSinTiradas(Combatiente.habEjecucion({nombre: 'h', tiradaExtra: '1d4'}, c));
+  igual([E1({objetivo: 'uno mismo', efectos: [{cura: 2}]}), E1({objetivo: 'uno mismo', tira: 'pdgmg'}), E1({objetivo: 'uno mismo', tiraFormula: '1d4'}), E1({objetivo: 'uno mismo', contra: ['eva']}), E1({objetivo: 'enemigo'})],
+    [true, false, false, false, false]);
+});
+prueba('lo que todavía no anda en creeps e invocaciones se avisa (P134)', () => igual(
+  [Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'pj'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'creep') !== '', Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'inv') !== '',
+   Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'creep'), Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'inv') !== '', Combatiente.ejecucionNoDisponible(null, 'pj') !== ''],
+  ['', true, true, '', true, true]));
+
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');
 prueba('un ítem sube sin id, imagen ni "equipado"', () => igual(Plantillas.limpiar('items', {id: 'x', imagen: 'a', equipado: true, nombre: 'N'}), {nombre: 'N'}));

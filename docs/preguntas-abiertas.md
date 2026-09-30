@@ -580,3 +580,14 @@ resuelven a mano, como el resto de los avisos).
   encontrada en el paso 2 de la consolidación: lo que llegaba a un creep desde una habilidad o trampa ya renovaba, pero el
   "+ Estado" a mano (personaje, invocación, creep), el formulario completo y lo que le llegaba al personaje dejaban dos iguales.
   Los estados que da un ítem equipado no se renuevan (el de a mano va aparte). Regla en `Combatiente.agregarEstado`.
+- ✅ **P133. Qué se cobra al usar una habilidad — 2026-09-30, resuelta: LO QUE LA HABILIDAD TENGA CARGADO, SEA DE QUIEN SEA**
+  (dueño). Antes cada uno pagaba distinto: el personaje SP + No2 + vida (y algunas curaban), el creep No2 + cooldown (y cura),
+  la invocación No2 + cooldown, sin vida ni cura. Ahora creeps e invocaciones también pueden costar vida (campo "Vida (HP) que
+  cuesta" en su editor y en el paso Costo de la ✨ Ejecución, que antes se mostraba y no se guardaba) y curar; hace falta que
+  sobre vida después de pagar ("Sin vida"). El SP sigue siendo solo del personaje; el cooldown, de creeps e invocaciones.
+  Regla en `Combatiente.bloqueoHab` / `costoNitrosHab` (paso 3 de la consolidación).
+- ✅ **P134. Ataque con arma, Flash y zona en creeps e invocaciones — 2026-09-30, resuelta: SE AVISA AHORA, SE SUMA DESPUÉS**
+  (dueño). La ✨ Ejecución deja elegir "Ataque con mi arma, con arreglos" y "⚡ Reacción Flash", pero solo andaban en
+  personajes: en un creep armaban un cuadro de habilidad que no correspondía y en una invocación (igual que la zona) se
+  ejecutaban como semiautomáticas sin decir nada. Ahora se avisa ("todavía no anda para creeps/invocaciones: se ejecutó como
+  semiautomática", `Combatiente.ejecucionNoDisponible`) y sumarlos queda en `pendientes.md` para una tanda propia.

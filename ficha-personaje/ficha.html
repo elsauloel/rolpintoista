@@ -1842,7 +1842,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <div class="inv-row3">
           <div class="inv-minif" id="hi-acciones-caja"><label>No2 que gasta</label><input type="number" id="hi-acciones" min="0" value="1" data-hi-enter="1"></div>
           <div class="inv-minif"><label>Cooldown (turnos)</label><input type="number" id="hi-cd" min="0" value="0" data-hi-enter="1"></div>
-          <div></div>
+          <div class="inv-minif"><label>Vida (HP) que cuesta</label><input type="number" id="hi-hpcosto" min="0" value="0" data-hi-enter="1"></div>
         </div>
         <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera).</div>
       </div>
@@ -2075,7 +2075,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930i"></script>
+<script src="../comun/combatiente.js?v=20260930j"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -2839,15 +2839,10 @@ async function estadosRevisar(){
 }
 // Un preset se encuentra por su nombre o por un nombre viejo (alias): "Escudo especial" pasó a llamarse "Escudo especial" (2026-09-24).
 const presetPorNombre = (lista, nombre) => lista.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
-function aplicarEstadoRecibido(spec, origen){
-  // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
-  if(spec.nombre === 'Desgaste'){
-    const it = S.inventario.find(x => x.id === spec.item);
-    if(it && durableItem(it)){ desgastarItem(it, 1); renderList('equipo'); renderList('mochila'); refresh(); }
-    else toast(`Desgaste: no encuentro ese ítem en tu inventario`);
-    return;
-  }
-  if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(Math.max(1, num(spec.stacks) || 1)); return; }
+// Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
+// el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
+// Lo usan lo que le llega al personaje y lo que una invocación se pone a sí misma.
+function estadoDeSpec(spec){
   const preset = presetPorNombre(EFECTOS_PRESET, spec.nombre);
   let draft;
   if(preset){
@@ -2861,11 +2856,23 @@ function aplicarEstadoRecibido(spec, origen){
     const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${STAT_LABEL[m.stat] || m.stat}`);
     if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
     if(spec.escudoMagico) txt.push(`escudo de ${num(spec.escudoMagico)}`);
-    draft = {id: uid(), nombre: spec.nombre, polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
+    draft = {id: uid(), nombre: spec.nombre || 'Efecto', polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
       permanente: false, detalle: spec.detalle || txt.join(', '), mods, ...(num(spec.escudoMagico) ? {escudoMagico: num(spec.escudoMagico)} : {})};
   }
   draft.activo = true;
   if(!draft.polaridad) draft.polaridad = 'debuff';
+  return draft;
+}
+function aplicarEstadoRecibido(spec, origen){
+  // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
+  if(spec.nombre === 'Desgaste'){
+    const it = S.inventario.find(x => x.id === spec.item);
+    if(it && durableItem(it)){ desgastarItem(it, 1); renderList('equipo'); renderList('mochila'); refresh(); }
+    else toast(`Desgaste: no encuentro ese ítem en tu inventario`);
+    return;
+  }
+  if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(Math.max(1, num(spec.stacks) || 1)); return; }
+  const draft = estadoDeSpec(spec);
   const quien = origen ? `${origen}: ` : '';
   // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
   const r = Combatiente.agregarEstado(S.efectos, draft);
@@ -3502,10 +3509,7 @@ function xDeHab(it, xSp, xNitros){ return spVariable(it) ? num(xSp) : nitrosVari
 // la tocaba — la fórmula quedaba con una X literal y tirarDados fallaba en silencio (bug real, 2026-09-28).
 // Por eso hay una segunda pasada para «dX»/«Xd» (dado de X caras / X dados), sin tocar el resto del texto
 // libre (una palabra como "excedente" no tiene "dx"/"xd" pegados, así que no se toca).
-function sustituirX(formula, X){
-  const n = String(Math.max(0, Math.round(num(X))));
-  return String(formula || '').replace(/\bx\b/gi, n).replace(/dx/gi, 'd' + n).replace(/xd/gi, n + 'd');
-}
+function sustituirX(formula, X){ return Combatiente.sustituirX(formula, X); }   // comun/combatiente.js
 // Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje, sin esperar al GM (2026-09-29,
 // bug real reportado con Blindaje: un buff sobre uno mismo se quedaba en «Aplicando…» para siempre si el GM no
 // tenía el mapa abierto y conectado — antes SOLO el mapa del GM podía aplicar un efecto, comun/duelo.js
@@ -3592,47 +3596,18 @@ function alcanceDeArma(arma){
   return 1 + Math.max(0, Math.round(bono));
 }
 // Alcance de una habilidad según lo que configuró el 🎯: 'casteo' (Rango de casteo), 'rango' (Rango), 'adyacente' (1), un número, o sin límite (0 = no resalta).
-function alcanceDeHab(c, statTira){
-  const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
-  const rc = () => { const v = compute().final.rangocasteo; return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v)); };
-  const rg = () => { const v = compute().final.rng; return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v)); };
-  if(modo === 'casteo') return rc();
-  if(modo === 'rango') return rg();
-  if(modo === 'adyacente') return 1;
-  if(modo === 'ilimitado') return 0;
-  if(modo === 'fijo') return Math.max(0, Math.round(num(c.alcanceN)));
-  return statTira === 'pdgmg' ? rc() : 0;   // auto: los hechizos usan el Rango de casteo; el resto no resalta
-}
+// Hasta dónde llega: la regla común (comun/combatiente.js), con el Rango y el Rango de casteo del personaje.
+function alcanceDeHab(c, statTira){ return Combatiente.alcanceHab(c, statTira, s => compute().final[s]); }
 function habDueloDe(it, xSp, xNitros){
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   return habDueloDatos(it, xSp, xNitros);
 }
 // Lo mismo que habDueloDe pero sin pedir que el duelo esté conectado (lo usa el atajo de «solo sobre vos, sin tiradas»).
+// La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion), la misma de invocaciones y
+// creeps. La X ya se eligió al pagar el costo variable (confirmarCostoVariable): daño por X, tirada personalizada y
+// textos a mano llegan con la X ya sustituida.
 function habDueloDatos(it, xSp, xNitros){
-  const c = dueloDe(it);
-  if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash') return null;
-  const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
-  const tipo = c.tipoDano || 'arcano';
-  const base = String(it.tiradaExtra || '').trim();
-  // Daño que escala con X (P119, 2026-09-27): la X ya se eligió al pagar el costo variable (confirmarCostoVariable),
-  // acá solo se arma la fórmula final sumando danoFijoPorX * X — mismo momento que ataqueDeHabArma arma sus mods por X.
-  const X = spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0;
-  const extra = c.danoFijoPorX ? num(c.danoFijoPorX) * X : 0;
-  const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
-  // Tirada personalizada (2026-09-27, pedido del dueño): la fórmula ya se resuelve ACÁ (con la X ya sustituida,
-  // igual que danoFijoPorX) — el duelo/DUELO_HOOKS.habTirar solo la tira, sin saber nada de X.
-  const tira = c.tiraFormula ? {formula: sustituirX(c.tiraFormula, X), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(it.tiradaBono)} : null);
-  return {
-    nombre: it.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceDeHab(c, stat),
-    tira,
-    contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
-    dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
-    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo}, cura: num(e.cura), detalle: e.detalle || ''})),
-    ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
-    ...(c.efectoLibre ? {efectoLibre: sustituirX(c.efectoLibre, X)} : {}),
-    ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
-    ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
-  };
+  return Combatiente.habEjecucion(it, dueloDe(it), {stat: s => compute().final[s], etq: s => STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros)});
 }
 // Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
 function resumenEjecucionHab(c){
@@ -3665,7 +3640,7 @@ function abrirEjecucionHab(it, alTerminar){
 // ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia
 // en la Mesa con lo que pasó. Devuelve false si no es ese caso (entonces sigue el cuadro de siempre).
 function aplicarHabSobreMiDirecto(it, h){
-  if(!h || h.objetivo !== 'uno mismo' || h.tira || h.dano || (h.contra || []).length || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura) return false;
+  if(!Combatiente.sobreSiSinTiradas(h) || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura) return false;
   const d = {defensor: {tipo: 'pj', ref: fichaVivo && fichaVivo.id}, atacante: {nombre: (S.meta && S.meta.nombre) || 'Personaje'}};
   const hechos = (h.efectos || []).map(ef => { const r = dueloAplicarEfectoPropio(d, ef); return r && !r.manual && r.nota ? r.nota : `${ef.nombre || 'Efecto'}: a mano`; });
   const texto = [it.detalle || it.efectoDetalle || '', hechos.length ? '→ ' + hechos.join(' · ') : '', h.efectoLibre || '', h.efectosNota || ''].filter(Boolean).join(' ');
@@ -4111,21 +4086,14 @@ function defensaInv(inv){
 }
 function bloqueoValorInv(inv){ const d = defensaInv(inv); return invStatValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
 function costoAtaqueInv(inv){ return Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno); }   // regla común (comun/combatiente.js)
-function costoNitrosHabInv(inv, h){
-  if(habInvAtaque(h)) return costoAtaqueInv(inv);
-  return num(h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
-}
+function costoNitrosHabInv(inv, h){ return Combatiente.costoNitrosHab(h, () => costoAtaqueInv(inv), IT2_INV.nitrosHabilidad); }
 function costoHabInvTxt(inv, h){
   const n = costoNitrosHabInv(inv, h);
   if(habInvAtaque(h)) return `${fmt(n)} No2 (como un ataque)`;
   return n ? `${fmt(n)} No2` : 'sin costo';
 }
-function bloqueoHabInv(inv, h){
-  if(modoHab(h) === 'manual') return '';   // manual: no cobra nada
-  if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
-  if(num(inv.nitros) < costoNitrosHabInv(inv, h)) return 'Sin No2';
-  return '';
-}
+// ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
+function bloqueoHabInv(inv, h){ return Combatiente.bloqueoHab(h, {modo: modoHab(h), nitros: inv.nitros, costo: costoNitrosHabInv(inv, h), hp: inv.hp}); }
 function invDanoTxt(inv, extra){
   const dados = Math.max(1, num(inv.armaPeso)||1) + Math.max(0, num(inv.armaAmplificado));
   const tipo = num(inv.armaTipo)||8;
@@ -4669,48 +4637,29 @@ const botonSegundaHabInv = (inv, h) => (h.tiradaStat && (h.tiradaExtra||'').trim
   ? `<button type="button" class="mini" data-danohabinv="${inv.id}:${h.id}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
 // Tres modos (2026-09-30): 📣 manual solo anuncia; 💰 semi cobra No2 y cooldown y tira la primera; ✨ auto abre la Ejecución
 // paso a paso a nombre de la invocación (ref `fichaId~invId`, como su ataque), o aplica directo si es solo sobre ella y sin tiradas.
-function alcanceDeHabInv(inv, c, statTira){
-  const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
-  const v = s => Math.max(0, Math.round(num(invStatValor(inv, s))));
-  if(modo === 'casteo') return v('rangocasteo');
-  if(modo === 'rango') return v('rng');
-  if(modo === 'adyacente') return 1;
-  if(modo === 'ilimitado') return 0;
-  if(modo === 'fijo') return Math.max(0, Math.round(num(c.alcanceN)));
-  return statTira === 'pdgmg' ? v('rangocasteo') : 0;
-}
+function alcanceDeHabInv(inv, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => invStatValor(inv, s)); }   // comun/combatiente.js
+// La Ejecución de una invocación: la misma regla que el personaje y el creep (comun/combatiente.js, habEjecucion). Las
+// invocaciones no tienen costo variable, así que ninguna «X» se toca.
 function habDueloInv(inv, h){
-  const c = h && h.duelo;
-  if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash' || c.objetivo === 'zona') return null;
-  const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
-  const tipo = c.tipoDano || 'arcano';
-  const formula = String(h.tiradaExtra || '').trim();
-  return {
-    nombre: h.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceDeHabInv(inv, c, stat),
-    tira: c.tiraFormula ? {formula: c.tiraFormula, etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(h.tiradaBono)} : null),
-    contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
-    dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
-    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo}, cura: num(e.cura), detalle: e.detalle || ''})),
-    ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
-    ...(c.efectoLibre ? {efectoLibre: c.efectoLibre} : {}),
-    ...(c.efectosNota ? {efectosNota: c.efectosNota} : {}),
-    ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
-  };
+  return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => invStatValor(inv, s), etq: s => STAT_LABEL[s] || s});
 }
-// Un efecto del cuadro de Ejecución sobre la propia invocación: el preset con ese nombre (con lo que traiga la habilidad encima) o un estado propio.
-function aplicarSpecAInv(inv, e){
-  if(e.cura){ inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + num(e.cura)); return `+${fmt(num(e.cura))} HP`; }
-  const base = EFECTOS_PRESET.find(p => p.nombre === e.nombre);
-  const d = {...(base ? structuredClone(base) : {polaridad: e.escudo ? 'buff' : 'otro'}), id: uid(), nombre: e.nombre || 'Efecto', activo: true};
-  if(e.turnos !== undefined && e.turnos !== null && e.turnos !== ''){ d.turnos = Math.max(0, num(e.turnos)); if(d.turnos) d.permanente = false; }
-  if(e.stat) d.mods = [{stat: e.stat, val: num(e.val)}]; else if(Array.isArray(e.mods) && e.mods.length) d.mods = structuredClone(e.mods);
-  if(e.hp) d.hpturno = num(e.hp);
-  if(e.stacks) d.stacks = Math.max(1, num(e.stacks));
-  if(e.escudo){ d.escudoMagico = num(e.escudo); d.escudoMagicoActual = num(e.escudo); }
+// Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación: comun/combatiente.js,
+// agregarEstado — antes se sumaba directo y duplicaba). Devuelve el texto para la Mesa.
+function ponerEstadoEnInv(inv, d){
   inv.estados = inv.estados || [];
-  inv.estados.push(d);
-  if(modsAfectanHpInv(d.mods || [])) actualizarHpMaxPorConInv(inv);
-  return `${d.nombre}${d.turnos ? ` (${fmt(d.turnos)} turno${d.turnos === 1 ? '' : 's'})` : ''}${d.escudoMagico ? `, 🛡${fmt(d.escudoMagico)}` : ''}`;
+  const r = Combatiente.agregarEstado(inv.estados, d);
+  if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
+  if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
+  const e = r.estado;
+  if(modsAfectanHpInv(e.mods || [])) actualizarHpMaxPorConInv(inv);
+  if(r.que === 'acumulado') return `${e.nombre} ×${fmt(num(e.stacks))}`;
+  return `${e.nombre}${r.que === 'renovado' ? ' renovado' : ''}${e.permanente ? ' (no vence)' : e.turnos ? ` (${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}${e.escudoMagico ? `, 🛡${fmt(e.escudoMagico)}` : ''}`;
+}
+// Un efecto del cuadro de Ejecución sobre la propia invocación: cura, o el estado armado igual que uno recibido (el preset
+// con lo que traiga la habilidad encima, o uno propio).
+function aplicarSpecAInv(inv, ef){
+  if(ef.cura){ inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
+  return ponerEstadoEnInv(inv, estadoDeSpec(ef.spec || {nombre: ef.nombre}));
 }
 function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
@@ -4720,31 +4669,31 @@ function invEjecutarHab(invId, habId){
   if(modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
   const bloqueo = bloqueoHabInv(inv, h);
   if(bloqueo){ toast(`${inv.nombre}: ${h.nombre||'Habilidad'} — ${bloqueo}`); return; }
-  const costo = costoNitrosHabInv(inv, h);
+  // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y si trae una cura del sistema anterior, cura.
+  const costo = costoNitrosHabInv(inv, h), costoHp = num(h.hpCosto), curaHp = num(h.curaHp);
   inv.nitros = num(inv.nitros) - costo;
   if(habInvAtaque(h)) inv.ataquesTurno = num(inv.ataquesTurno) + 1;
   if(num(h.cd) > 0) h.cdActual = num(h.cd);
+  if(costoHp > 0) inv.hp = num(inv.hp) - costoHp;
+  if(curaHp > 0) inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + curaHp);
   let efectoTxt = '';
   if((h.efectoNombre||'').trim()){
-    const datos = {
-      id: uid(), nombre: h.efectoNombre.trim(), detalle: h.efectoDetalle||'', turnos: Math.max(0,num(h.efectoTurnos)||0),
+    const nombre = h.efectoNombre.trim();
+    // Estado al ejecutar (sistema anterior): con las marcas de su preset, si tiene uno, para que valgan las inmunidades.
+    efectoTxt = ponerEstadoEnInv(inv, {...flagsDePreset(nombre), id: uid(), nombre, detalle: h.efectoDetalle||'', turnos: Math.max(0,num(h.efectoTurnos)||0),
       hpturno: num(h.efectoHpTurno)||0, permanente: !!h.efectoPermanente, activo: true, stacks:1, stacksturno:0,
-      polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[]),
-    };
-    inv.estados = inv.estados || [];
-    inv.estados.push(datos);
-    if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
-    efectoTxt = `${datos.nombre}${datos.permanente?' (no vence)':datos.turnos?` (${fmt(datos.turnos)} turnos)`:''}`;
+      polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[])});
   }
-  let hDuelo = null, aplicadoDirecto = '';
+  let hDuelo = null, aplicadoDirecto = '', falta = '';
   if(modo === 'auto'){
-    const c = h.duelo;
-    const stat = c ? (c.tira !== undefined ? c.tira : (h.tiradaStat || '')) : '';
-    if(c && typeof c === 'object' && c.objetivo === 'uno mismo' && !stat && !c.tiraFormula && !c.dano && !(c.contra || []).length && c.modo !== 'arma' && c.modo !== 'flash'){
-      aplicadoDirecto = (c.efectos || []).map(e => aplicarSpecAInv(inv, e)).join(' · ');
-      mesaPublicarHabilidadInv(inv, h.nombre, `${h.detalle || ''}${aplicadoDirecto ? ' → ' + aplicadoDirecto : ''}`);
-    }else if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM) hDuelo = habDueloInv(inv, h);
-    if(!c) toast(`${h.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`);
+    // Lo que todavía no anda para invocaciones (ataque con arma, Flash, zona — P134) se avisa y va como 💰.
+    falta = Combatiente.ejecucionNoDisponible(h.duelo, 'inv');
+    const hab = falta ? null : habDueloInv(inv, h);
+    if(falta){ /* se avisa al final, junto con lo que se cobró */ }
+    else if(Combatiente.sobreSiSinTiradas(hab)){
+      aplicadoDirecto = hab.efectos.map(ef => aplicarSpecAInv(inv, ef)).join(' · ');
+      mesaPublicarHabilidadInv(inv, h.nombre, [h.detalle || '', aplicadoDirecto ? '→ ' + aplicadoDirecto : '', hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' '));
+    }else if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM) hDuelo = hab;
   }
   if(hDuelo){
     mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
@@ -4755,6 +4704,9 @@ function invEjecutarHab(invId, habId){
   }
   renderInvocaciones();
   const partes = ['ejecutada', costo?`-${fmt(costo)} No2`:'sin costo de Nitros'];
+  if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+  if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
+  if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
   if(aplicadoDirecto) partes.push(aplicadoDirecto);
   if(efectoTxt) partes.push(efectoTxt);
   toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
@@ -4822,13 +4774,14 @@ function hiEjecucionRender(){
 function hiAbrirEjecucion(){
   const e = editingHabInv;
   AsistenteDueloHab.abrir({nombre: $('#hi-nombre').value.trim() || 'Habilidad', inicial: e.duelo || null, siempreActivo: true, tieneFormula: !!$('#hi-tirada').value.trim(),
-    costoInicial: {sp: '', nitrosCosto: $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hi-acciones').value)}, elegirEstado: elegirEstadoDuelo,
+    costoInicial: {sp: '', nitrosCosto: $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hi-acciones').value), hpCosto: num($('#hi-hpcosto').value)}, elegirEstado: elegirEstadoDuelo,
     alGuardar: r => {
       if(editingHabInv !== e) return;
       if(r){
         e.duelo = r.duelo;
         if(r.costo.nitrosCosto === 'ATAQUE') $('#hi-nitros-modo').value = 'ataque';
         else{ $('#hi-nitros-modo').value = 'num'; $('#hi-acciones').value = Math.max(0, num(r.costo.nitrosCosto)); }
+        $('#hi-hpcosto').value = Math.max(0, num(r.costo.hpCosto));
         hiAplicarModoNitros();
       }else{ e.duelo = null; e.modo = 'semi'; }
       hiMostrarPaso(e.paso);
@@ -4897,6 +4850,7 @@ function hiResumenHtml(){
     ${editingHabInv.modo === 'auto' ? fila('Paso a paso', editingHabInv.duelo ? resumenEjecucionHab(editingHabInv.duelo) : 'sin configurar') : ''}
     ${fila('No2', $('#hi-nitros-modo').value === 'ataque' ? 'como un ataque' : fmt(Math.max(0, num($('#hi-acciones').value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd===1?'':'s'}` : 'sin cooldown')}
+    ${num($('#hi-hpcosto').value) > 0 ? fila('Vida', `${fmt(num($('#hi-hpcosto').value))} HP`) : ''}
     ${fila('Al ejecutar', STAT_LABEL[$('#hi-tirada-stat').value] || $('#hi-tirada').value.trim() || 'no tira')}
     ${fila('Efecto', $('#hi-tirada-stat').value && $('#hi-tirada').value.trim() ? $('#hi-tirada').value.trim() + ' (botón 🎲)' : 'sin tirada de efecto')}
     ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
@@ -4914,6 +4868,7 @@ function abrirEditorHabInv(invId, habId){
   $('#hi-acciones').value = habInvAtaque(h) ? IT2_INV.nitrosHabilidad : (h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
   editingHabInvPdgAuto = false;
   $('#hi-cd').value = h.cd || 0;
+  $('#hi-hpcosto').value = h.hpCosto || 0;
   $('#hi-detalle').value = h.detalle || '';
   $('#hi-tirada').value = h.tiradaExtra || '';
   $('#hi-tirada-stat').innerHTML = hiOpcionesStat(h.tiradaStat || '');
@@ -4944,6 +4899,8 @@ function guardarEditorHabInv(){
   h.nombre = $('#hi-nombre').value.trim() || 'Sin nombre';
   h.nitrosCosto = $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : Math.max(0, num($('#hi-acciones').value) || 0);
   h.cd = Math.max(0, num($('#hi-cd').value) || 0);
+  const hpCostoInv = Math.max(0, num($('#hi-hpcosto').value) || 0);
+  if(hpCostoInv) h.hpCosto = hpCostoInv; else delete h.hpCosto;
   h.detalle = $('#hi-detalle').value;
   h.tiradaExtra = $('#hi-tirada').value.trim();
   h.tiradaStat = $('#hi-tirada-stat').value;
@@ -9121,13 +9078,7 @@ const MODOS_HAB = {
   semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra el costo y tira la tirada inicial'},
   auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso'},
 };
-function modoHab(h){
-  if(!h) return 'semi';
-  if(h.modo === null) return null;   // habilidad nueva: todavía no eligió
-  if(MODOS_HAB[h.modo]) return h.modo;
-  if(h.automatizada === false) return 'manual';
-  return dueloDe(h) ? 'auto' : 'semi';
-}
+function modoHab(h){ return Combatiente.modoHab(h, h && dueloDe(h)); }   // la regla común (comun/combatiente.js); null = nueva, sin elegir
 const habAutomatizada = h => modoHab(h) !== 'manual';
 // Lo del sistema anterior que tiene cargado la habilidad (se sigue aplicando en semi y auto hasta adaptarla).
 function habLegado(h){
@@ -10020,9 +9971,7 @@ function habCostoVariable(h){ return spVariable(h) || nitrosVariable(h); }
 
 // Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
 function costoNitrosHab(h, arma){
-  if(nitrosAtaque(h)) return arma === undefined ? costoAtaqueMinimo() : costoAtaqueNitros(arma);
-  if(nitrosVariable(h)) return 0;
-  return num(h.nitrosCosto ?? IT2.nitrosHabilidad);
+  return Combatiente.costoNitrosHab(h, () => arma === undefined ? costoAtaqueMinimo() : costoAtaqueNitros(arma), IT2.nitrosHabilidad);
 }
 
 /* ---------- Moverse: los Nitros se gastan desde el mapa (arrastrando el token);

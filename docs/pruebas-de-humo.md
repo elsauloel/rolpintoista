@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 83 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 92 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -74,5 +74,6 @@
 | 2026-09-30 | 🎮 Tomar el control en mesa ("Claude · pruebas", Clementino): estado recibido, pase de turno, Botonera en el mapa, mover con No2, defensa en un duelo, devolver | ✔ | Todo restaurado al terminar. |
 | 2026-09-30 | Paso 2 en mesa ("Claude · pruebas", sitio publicado): Goblin con Veneno ×2, Regeneración +3 y Escudo gastado, 3 Mantenimientos seguidos | ✔ | Vida 20 → 21 → 23 → 26; Veneno se terminó al llegar a 0 stacks; Regeneración venció; escudo recargado. Todo restaurado. |
 | 2026-09-30 | Tanda 3: costo de atacar y No2 máximo en ficha, invocación y GM Tools (copias sin sesión) | ✔ 72/72 | "Forzar Nitros a 20" con Agilidad 9 ya no sube el máximo (P130). |
+| 2026-09-30 | Paso 3, tanda 1 (usar una habilidad): creep (✨ sobre sí con costo en vida, cooldown, "Sin vida", ataque con arma y sin Ejecución → avisan, tirada personalizada en el duelo, editor), invocación (escudo que se renueva, Invulnerable frena un Stun, Veneno ×2, zona → avisa, cura, editor) y personaje (copias sin sesión) | ✔ 92/92 | Comparado contra las funciones viejas sobre las habilidades de clase + 3000 al azar: igual (creep: solo lo buscado). |
 | 2026-09-30 | Bloqueo solo tras un Parry: personaje (arma + escudo), invocación y creep (copias sin sesión) | ✔ 66/66 | Antes del Parry: apagado con «Espada 1d4 · Escudo 1d6»; tras el Parry: se tira con ese; un segundo Bloqueo no. |
 | 2026-09-30 | Parry y Bloqueo solo con arma o escudo: personaje (sin nada / con escudo), invocación (natural / con arma), creeps (sin arma, espada, garras, garras + escudo) | ✔ 66/66 | Sin opción → aviso y no cobra ni tira. |

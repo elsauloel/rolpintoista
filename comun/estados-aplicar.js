@@ -47,12 +47,8 @@ const EstadosAplicar = (() => {
     // Sin preset (nombre propio) pero con un escudo puesto a mano: es un buff, no el debuff de siempre por
     // defecto (2026-09-28) — un «Blindaje improvisado» con escudoMagico:6 no debería quedar marcado en contra.
     const base = p ? structuredClone(p) : {nombre: s.nombre, polaridad: s.polaridad || (s.escudoMagico ? 'buff' : 'debuff'), turnos: 0, stacks: 1, hpTurno: 0, detalle: ''};
-    if(s.turnos !== undefined) base.turnos = s.turnos;
-    if(s.mods) base.mods = structuredClone(s.mods);
-    if(s.hp) base.hpTurno = s.hp;
-    if(s.stacks && p && p.esVeneno && !p.permanente){ base.stacks = s.stacks; base.turnos = s.stacks; }   // Veneno de N stacks: dura N turnos
-    if(s.escudoMagico !== undefined) base.escudoMagico = s.escudoMagico;   // un valor a mano manda sobre el del preset
-    if(s.detalle) base.detalle = s.detalle;
+    // Los números que manda la habilidad pisan los del preset (comun/combatiente.js, la misma regla que la ficha).
+    Combatiente.ajustarPreset(base, s, 'hpTurno');
     if(!p && !s.detalle){
       const partes = (base.mods || []).map(m => `${m.val > 0 ? '+' : ''}${m.val} ${m.stat}`);
       if(base.hpTurno) partes.push(`${base.hpTurno > 0 ? '+' : ''}${base.hpTurno} HP por turno`);

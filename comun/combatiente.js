@@ -82,6 +82,23 @@ const Combatiente = (() => {
     return ya;
   }
 
+  /* ---------- Un preset con los números que manda la habilidad ----------
+     Cuando una habilidad, trampa o zona aplica un estado estándar (Veneno, Sangrado…) con sus propios números, esos números
+     mandan sobre los del preset: turnos, bonos, daño/cura por turno, escudo, detalle y, en el Veneno (no el severo), los
+     stacks (que son también sus turnos). `base` es la copia del preset (se modifica y se devuelve); `campoHp` es el nombre
+     del daño por turno en esa herramienta ('hpTurno' en creeps, 'hpturno' en la ficha). Antes (hasta el 2026-09-30) la
+     ficha solo respetaba turnos y escudo: un Veneno ×3 de la Nube tóxica le llegaba ×4 a un personaje. */
+  function ajustarPreset(base, spec, campoHp){
+    const s = spec || {};
+    if(s.turnos !== undefined && s.turnos !== null) base.turnos = n(s.turnos);
+    if(Array.isArray(s.mods) && s.mods.length) base.mods = s.mods.map(m => ({stat: m.stat, val: n(m.val)}));
+    if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
+    if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
+    if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
+    if(s.detalle) base.detalle = s.detalle;
+    return base;
+  }
+
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
      'Coagulación extrema', 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
@@ -96,5 +113,5 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, escudoParsear, acumularVeneno, acumularSangrado, inmunidad};
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

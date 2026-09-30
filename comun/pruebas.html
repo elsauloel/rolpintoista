@@ -173,6 +173,17 @@ prueba('estados-aplicar usa el motor: Sangrado en un creep suma de a 1', () => {
   const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Sangrado'});
   igual([r.ok, sc.estados.length, sc.estados[0].stacks], [true, 1, 3]);
 });
+prueba('los números de la habilidad pisan los del preset (Veneno ×3 dura 3; bonos; daño por turno)', () => {
+  const v = Combatiente.ajustarPreset({nombre: 'Veneno', esVeneno: true, stacks: 4, turnos: 4}, {stacks: 3}, 'hpturno');
+  const sev = Combatiente.ajustarPreset({nombre: 'Veneno severo', esVeneno: true, permanente: true, stacks: 1}, {stacks: 3});
+  const b = Combatiente.ajustarPreset({nombre: 'X', mods: [{stat: 'pdg', val: -1}]}, {mods: [{stat: 'pdg', val: -3}], hp: -2, turnos: 2}, 'hpturno');
+  igual([v.stacks, v.turnos, sev.stacks, b.mods[0].val, b.hpturno, b.turnos], [3, 3, 1, -3, -2, 2]);
+});
+prueba('creep y personaje reciben el mismo Veneno ×3', () => {
+  const creep = EstadosAplicar.componer({nombre: 'Veneno', stacks: 3});
+  const pj = Combatiente.ajustarPreset(structuredClone(ESTADOS_PRESET.find(p => p.nombre === 'Veneno')), {stacks: 3}, 'hpturno');
+  igual([creep.stacks, creep.turnos, pj.stacks, pj.turnos], [3, 3, 3, 3]);
+});
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

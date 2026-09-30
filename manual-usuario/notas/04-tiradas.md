@@ -101,6 +101,8 @@ Después de que el atacante tira su [[Atacar|PdG]] y el defensor su [[Evasión]]
 | 17 o más | **triple daño** (×3) |
 | 20 | **cuádruple daño** (×4) |
 
+**Supercrítico:** si entre los d20 del crítico salen **dos o más 20 naturales**, los multiplicadores **se suman**: cada 20 vale ×4, así que dos 20 dan **×8**, tres dan ×12. Cuentan solo los 20 que salen en el dado: no lo cambian los umbrales, el Crítico potente ni ningún modificador. (Un solo 20 sigue siendo cuádruple daño.)
+
 Algunas habilidades tienen un efecto distinto si el golpe es crítico (en la descripción figura como *"Critical Matters"*).
 
 ## Cómo se mejora el crítico

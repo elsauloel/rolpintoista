@@ -572,14 +572,17 @@ const Duelo = (() => {
       if(m.estado !== 'esperando' || m.fase !== 'critico' || !m.crit || m.crit.d20) return;
       const n = Math.max(1, _num(m.crit.dados));
       const rolls = Array.from({length: n}, () => 1 + Math.floor(Math.random() * 20));
-      const mejor = Math.max(...rolls);
-      const mult = Critico.multiplicador(mejor, m.crit.potente);
-      m.crit = {...m.crit, d20: rolls, mejor, mult};
+      // Supercrítico (2026-09-30): dos o más 20 naturales suman sus ×4 (Critico.resultadoD20).
+      const res = Critico.resultadoD20 ? Critico.resultadoD20(rolls, m.crit.potente) : {mejor: Math.max(...rolls), mult: Critico.multiplicador(Math.max(...rolls), m.crit.potente)};
+      const mejor = res.mejor, mult = res.mult;
+      m.crit = {...m.crit, d20: rolls, mejor, mult, ...(res.supercritico ? {supercritico: res.veintes} : {})};
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
       publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor, destacar: 'max'}};
-      anuncio = `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
+      anuncio = res.supercritico
+        ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
+        : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
     anunciarMesa(anuncio);
@@ -1214,7 +1217,7 @@ const Duelo = (() => {
     else if(d.hab && d.resultado === 'fallo') caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 SE RESISTIÓ</div><div class="chico">${_esc(d.defensor.nombre)} resistió ${_esc(d.hab.nombre)} (${_esc(etqContra(d))})</div>${mot}</div>`;
     else if(d.resultado === 'pego' && d.crit && d.crit.critico){
       const porParry = d.defensa && d.defensa.modo === 'parry';
-      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">¡CRÍTICO!</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult]}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
+      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">${d.crit.supercritico ? '¡SUPERCRÍTICO!' : '¡CRÍTICO!'}</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult] || `${d.crit.supercritico} VEINTES NATURALES`}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
     }else if(d.resultado === 'pego'){
       const porParry = d.defensa && d.defensa.modo === 'parry';
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
@@ -1441,10 +1444,12 @@ const Duelo = (() => {
       // Los d20 como fichas: el más alto destaca con ondas concéntricas.
       const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
       const iMejor = c.d20.indexOf(c.mejor);
-      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${i === iMejor ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
-      cuerpo = titulo('si', `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
+      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${(c.supercritico ? x === 20 : i === iMejor) ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
+      cuerpo = titulo('si', c.supercritico ? `🌟 ¡SUPERCRÍTICO! ×${_fmt(c.mult)} · ${_fmt(c.supercritico)} VEINTES NATURALES` : `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
         + fichas
-        + explica([`d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
+        + explica([c.supercritico
+            ? `d20: salieron ${_fmt(c.supercritico)} veintes naturales. Supercrítico: cada 20 vale ×4 y se suman (${Array(c.supercritico).fill('×4').join(' + ')} = ×${_fmt(c.mult)}), sin importar umbrales ni modificadores.`
+            : `d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
         + viz
         + tablaCriticoHtml(c, d, c.mejor);
     }

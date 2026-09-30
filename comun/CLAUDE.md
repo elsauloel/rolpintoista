@@ -787,3 +787,8 @@ versión parecida en más de una, es candidato a juntar.
   copia no trae (rareza, precio, narrativa) se completa del ítem del catálogo. `EditarItem.subir(item, {catalogo})` sube
   directo (lo usa el ⬆ del editor del arma de un creep). En la ficha, los ítems propios editables siguen con su "Editar"
   de siempre; el de "Editar y subir" aparece para el catálogo/tienda/botín y en fichas de solo lectura.
+- **Supercrítico** (2026-09-30, regla del dueño): `Critico.resultadoD20(rolls, potente)` → `{mejor, mult, veintes,
+  supercritico}`: con dos o más 20 NATURALES en los d20 del crítico, cada 20 vale ×4 y se suman (dos = ×8, tres = ×12),
+  sin importar umbrales ni Crítico potente; si no, el mejor d20 como siempre. `Critico.nombreMult(mult)`. Lo usan la
+  calculadora de crítico y el duelo (`tirarCritico` guarda `crit.supercritico` = cuántos 20; el cuadro muestra
+  «¡SUPERCRÍTICO!», resalta todos los 20 y explica la suma). No hace falta regla nueva de Firestore (va dentro de `crit`).

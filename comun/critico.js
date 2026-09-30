@@ -34,6 +34,19 @@ const Critico = (() => {
     return d >= u.cuadruple ? 4 : d >= u.triple ? 3 : d >= u.doble ? 2 : 1;
   }
 
+  // Resultado de los d20 del crítico. SUPERCRÍTICO (regla del dueño, 2026-09-30): con DOS O MÁS 20 NATURALES los
+  // multiplicadores se suman — cada 20 vale ×4 (el cuádruple): dos 20 = ×8, tres = ×12. No lo cambian los umbrales ni el
+  // Crítico potente ni ningún modificador: cuentan solo los 20 que salen en el dado. Con uno o ninguno, vale el mejor d20.
+  function resultadoD20(rolls, potente){
+    const lista = (rolls || []).map(num);
+    const mejor = lista.length ? Math.max(...lista) : 0;
+    const veintes = lista.filter(x => x === 20).length;
+    if(veintes >= 2) return {mejor, mult: 4 * veintes, veintes, supercritico: true};
+    return {mejor, mult: multiplicador(mejor, potente), veintes, supercritico: false};
+  }
+  // Nombre del multiplicador para mostrar ("doble daño"…; más de ×4 solo puede ser un supercrítico).
+  const nombreMult = mult => NOMBRE_MULT[mult] || `SUPERCRÍTICO (${mult / 4} veintes naturales)`;
+
   // ¿Hay crítico? Devuelve el rango efectivo, la diferencia, el nivel N y cuántos d20 se tiran (N − resistencia).
   function evaluar({pdg, eva, tipo, frecuente = 0, potente = 0, resistencia = 0}){
     const r = rango(tipo, frecuente), diff = num(pdg) - num(eva);
@@ -183,8 +196,8 @@ const Critico = (() => {
         else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango.`;
         else if(!e.critico) r = `Nivel del crítico ${e.nivel} − resistencia ${num(v.resistencia)}: la Resistencia a crítico del defensor <b>anula el crítico</b>.`;
         else{
-          r = `Nivel del crítico: <b>${e.nivel}</b>${num(v.resistencia) > 0 ? ` − resistencia ${num(v.resistencia)} = <b>${e.dados}</b>` : ''}.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor. Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
-          if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → mejor <b>${tirada.mejor}</b> → <b>${NOMBRE_MULT[tirada.mult]}</b> (×${tirada.mult})`;
+          r = `Nivel del crítico: <b>${e.nivel}</b>${num(v.resistencia) > 0 ? ` − resistencia ${num(v.resistencia)} = <b>${e.dados}</b>` : ''}.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
+          if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → ${tirada.supercritico ? `<b>¡${tirada.mult / 4} veintes naturales!</b>` : `mejor <b>${tirada.mejor}</b>`} → <b>${nombreMult(tirada.mult)}</b> (×${tirada.mult})`;
           else r += `<div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar ${e.dados}d20</button></div>`;
         }
         return `<div class="cr-preg">¿Hay crítico?</div><div class="cr-res${e.critico ? ' si' : ''}">${cab}<br>${r}</div>`;
@@ -241,8 +254,8 @@ const Critico = (() => {
       const e = ev();
       if(!e.critico) return;
       const rolls = Array.from({length: e.dados}, () => 1 + Math.floor(Math.random() * 20));
-      const mejor = Math.max(...rolls);
-      tirada = {rolls, mejor, mult: multiplicador(mejor, v.potente), dados: e.dados};
+      const res = resultadoD20(rolls, v.potente);
+      tirada = {rolls, mejor: res.mejor, mult: res.mult, supercritico: res.supercritico, dados: e.dados};
       error = '';
       dibujar();
     }
@@ -253,7 +266,7 @@ const Critico = (() => {
       const partes = [`PdG ${num(v.pdg)} − Evasión ${num(v.eva)} = ${e.diferencia} (rango ${e.rango})`];
       if(!e.critico) partes.push('la Resistencia a crítico lo anula');
       else if(t){
-        partes.push(`${NOMBRE_MULT[t.mult]} (×${t.mult})`);
+        partes.push(`${nombreMult(t.mult)} (×${t.mult})`);
         if(v.dano !== '') partes.push(`daño ${num(v.dano)} × ${t.mult} = ${num(v.dano) * t.mult}, ignora la Defensa`);
       }else{ if(typeof toast === 'function') toast('Primero tirá los d20'); return; }
       try{ if(typeof mesaTextoPendiente !== 'undefined') mesaTextoPendiente = partes.join(' · ').slice(0, 300); }catch(err){}
@@ -299,5 +312,5 @@ const Critico = (() => {
     reubicar();
   }
 
-  return {abrir, rango, umbrales, multiplicador, evaluar, resolverDano, TIPOS};
+  return {abrir, rango, umbrales, multiplicador, resultadoD20, nombreMult, evaluar, resolverDano, TIPOS};
 })();

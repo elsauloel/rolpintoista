@@ -83,6 +83,7 @@ El dueño va dando herramientas de diseño para que, cuando pida un catálogo, s
 
 - **Anillos:** mágicos, uno por mano (2 slots). Más libertad de efectos, pero más escasos y caros. Los preceptos de esta guía son la base de un futuro **rework del catálogo**.
 
+- **Supercrítico (regla del dueño, 2026-09-30):** si en los d20 del crítico salen **dos o más 20 naturales**, los multiplicadores se suman (cada 20 = ×4: dos 20 = ×8, tres = ×12). No lo afectan los umbrales, el Crítico potente ni los modificadores: solo 20 naturales. Automatizado en el duelo y en la calculadora de crítico (`Critico.resultadoD20`, `comun/critico.js`).
 - **Dos formas de mejorar el crítico (P115, cerrada):** **Crítico frecuente** (baja el rango del crítico: Tipo 4 pasa a 3; mínimo 2; también cambia el nivel de doble crítico) y **Crítico potente** (baja los umbrales del d20: doble daño con 6+, triple 16+, cuádruple 19+; se pueden afinar por separado). Vocabulario: **doble crítico** = diferencia doble (2d20); **doble / triple / cuádruple daño** = el multiplicador del d20.
 
 ## Propuesta de skills de crítico (para que el dueño las audite; costos provisorios)

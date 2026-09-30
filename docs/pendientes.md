@@ -25,7 +25,7 @@
 - [ ] **Protección de jefe** (inmune a Stun, +1 Res.Esp).
 - [ ] Botón **🗺 Mapas** del GM (se arregló una posible falla de caché: confirmar que abre; si no, mandar el error de la consola).
 - [ ] Al borrar un creep, la pregunta de borrar sus tokens en todos los mapas.
-- [ ] **🎮 Tomar el control** (2026-09-30): cuando el dueño cree un personaje con otra cuenta en "Claude · pruebas", probar con la cuenta del GM: Tomar el control → Botonera desde el mapa, moverlo pagando No2, atacar y ser atacado (duelo), ⟳ Mantenimiento, estado recibido de un creep → Devolver el control; y desde la otra cuenta, ver el cartel de solo lectura y los avisos de la Mesa.
+- [x] **🎮 Tomar el control** (2026-09-30): probado en "Claude · pruebas" con Clementino (personaje del dueño con otra cuenta) desde la cuenta del GM: tomar el control (marca, cartel, Mesa), estado recibido (Veneno ×2, el aviso se borra), pase de turno (25 → 23, reporte en la Mesa), Botonera desde el mapa, mover pagando No2 (12 → 11), ser atacado por un creep (el GM elige la defensa y tira la Evasión) y devolver el control. Todo restaurado. Falta mirarlo desde la cuenta del jugador (el cartel de solo lectura en su pantalla).
 - [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.
 
 ## 3. Documentación

@@ -2082,7 +2082,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930b"></script>
+<script src="../comun/duelo.js?v=20260930c"></script>
 <script src="../comun/asistente-item.js?v=20260930b"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
@@ -2730,7 +2730,9 @@ function mostrarSubidaNivel(nivel){
 let recompensasPendientes = [], recompensasAplicando = false;
 function recompensasEscuchar(){
   if(!fbUsuario) return;
-  fbDb.collection(fbRutaCampana('recompensas')).where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false).onSnapshot(snap => {
+  // El GM escucha todas las pendientes: si toma el control de un personaje, le toca aplicarle las suyas (🎮, 2026-09-30).
+  const col = fbDb.collection(fbRutaCampana('recompensas'));
+  (fbMiembro && fbMiembro.gm ? col.where('aplicada', '==', false) : col.where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false)).onSnapshot(snap => {
     recompensasPendientes = snap.docs;
     recompensasRevisar();
   }, err => console.error('Error escuchando las recompensas:', err));
@@ -2769,7 +2771,8 @@ async function recompensasRevisar(){
       const tomada = await fbDb.runTransaction(async tx => {
         const x = await tx.get(d.ref);
         if(!x.exists || x.data().aplicada) return false;
-        tx.update(d.ref, {aplicada: true});
+        // El GM con el control no puede marcarla como aplicada (las reglas se lo dejan al dueño), pero sí borrarla: mismo efecto.
+        if(fichaControloYo(f)) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});
         return true;
       });
       if(!tomada || fichaVivo !== f) continue;
@@ -2801,7 +2804,9 @@ async function recompensasRevisar(){
 let estadosPendientes = [], estadosAplicando = false;
 function estadosEscuchar(){
   if(!fbUsuario) return;
-  fbDb.collection(fbRutaCampana('estados')).where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false).onSnapshot(snap => {
+  // El GM escucha todos los pendientes: si toma el control de un personaje, le toca aplicarle los suyos (🎮, 2026-09-30).
+  const col = fbDb.collection(fbRutaCampana('estados'));
+  (fbMiembro && fbMiembro.gm ? col.where('aplicada', '==', false) : col.where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false)).onSnapshot(snap => {
     estadosPendientes = snap.docs;
     estadosRevisar();
   }, err => console.error('Error escuchando los estados recibidos:', err));
@@ -2817,7 +2822,7 @@ async function estadosRevisar(){
       const tomada = await fbDb.runTransaction(async tx => {
         const x = await tx.get(d.ref);
         if(!x.exists || x.data().aplicada) return false;
-        tx.update(d.ref, {aplicada: true});
+        if(fichaControloYo(f)) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});   // 🎮 el GM lo borra en vez de marcarlo
         return true;
       });
       if(!tomada || fichaVivo !== f) continue;
@@ -10240,6 +10245,8 @@ window.DUELO_HOOKS = {
     if(!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)) return false;
     return lado.ref === fichaVivo.id || !!dueloInvDe(lado);
   },
+  // 🎮 Si el GM tiene el control de este personaje, su lado del duelo lo maneja el GM (comun/duelo.js, esMio).
+  controlDe: lado => (lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.control && String(lado.ref || '').split('~')[0] === fichaVivo.id) ? fichaVivo.control.uid : '',
   // El ataque de siempre (paga los No2 y tira el PdG).
   atacar: d => {
     const inv = dueloInvDe(d.atacante);
@@ -11459,6 +11466,8 @@ function fichaResumen(){
     costoMover: IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado') ? 0 : costoMoverCasillero(),
     muerto: !!(S.muerto && S.muerto.activo),
     muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
+    // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).
+    ...(fichaVivo && fichaVivo.control && fichaVivo.control.uid ? {control: fichaVivo.control.uid} : {}),
     estados: estadosTodos()
       .filter(e => e && e.activo !== false && e.nombre)
       .slice(0, 30)
@@ -11588,6 +11597,10 @@ function fichaIdentidadRender(){
 // El GM también la mira, pero puede pasar a editarla (para ayudar a un jugador
 // nuevo a configurar habilidades, automatizarlas, etc.): f.editaGM.
 function fichaSoloLecturaPara(duenoUid, f){
+  // 🎮 Control del GM (2026-09-30, pedido del dueño): mientras el GM tiene el control, él la usa como si fuera el dueño y
+  // todos los demás —el dueño incluido— la ven en solo lectura, hasta que la devuelve.
+  const ctl = f && f.control && f.control.uid;
+  if(ctl) return ctl !== fbUsuario.uid;
   // Tu propio personaje nunca arranca en solo lectura, seas GM o no (2026-09-29, bug real: un GM que también
   // juega con su propio PJ —"múltiples cuentas, mismo dueño" no aplica acá, es la MISMA cuenta con los dos roles—
   // lo abría en solo lectura por defecto, como si fuera de otro jugador, y las habilidades con duelo (que
@@ -11596,6 +11609,69 @@ function fichaSoloLecturaPara(duenoUid, f){
   if(duenoUid === fbUsuario.uid) return false;
   if(fbMiembro.gm) return !(f && f.editaGM);
   return true;
+}
+
+/* ---------- 🎮 Tomar / devolver el control (2026-09-30, pedido del dueño) ----------
+   Distinto de "✎ Editar como GM" (que es para configurar): con el control, el GM USA el personaje como si fuera su dueño —
+   Botonera, duelos, habilidades, token en el mapa pagando No2, botín, estados que le llegan y Mantenimiento—. El dueño
+   queda en solo lectura con un cartel hasta que se lo devuelve, y la Mesa avisa las dos cosas. No pide permiso al jugador
+   (juego entre amigos: anotado en "Antes de abrirlo al público"). La marca vive en la parte `control` de la ficha
+   ({uid, nombre, desde}; "null" = la tiene su dueño) y, para el mapa, en `resumen.control` (el uid del GM). */
+const fichaControloYo = f => !!(f && f.control && fbUsuario && f.control.uid === fbUsuario.uid);
+function fichaAvisarMesaControl(texto){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: fichaNombre(),
+    origen: texto.slice(0, 80), formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo avisar en la Mesa:', err));
+}
+async function fichaTomarControl(){
+  const f = fichaVivo;
+  if(!f || !fbMiembro.gm || !f.cargada || fichaControloYo(f)) return;
+  if(!confirm(`¿Tomar el control de ${fichaNombre()}?\n\nLo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`)) return;
+  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
+  const control = {uid: fbUsuario.uid, nombre: fbMiembro.nombre || 'GM', desde: Date.now()};
+  try{
+    await base.collection('partes').doc('control').set({json: JSON.stringify(control), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await base.update({'resumen.control': fbUsuario.uid});
+  }catch(err){ console.error('No se pudo tomar el control:', err); toast('No se pudo tomar el control — revisá la consola'); return; }
+  f.editaGM = false;
+  fichaControlCambio(f, control, true);
+  fichaAvisarMesaControl(`🎮 El GM (${control.nombre}) tomó el control de ${fichaNombre()}`);
+}
+async function fichaDevolverControl(){
+  const f = fichaVivo;
+  if(!f || !fichaControloYo(f)) return;
+  await fichaGuardarTick(true);   // sube lo último antes de soltarlo
+  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
+  try{
+    await base.collection('partes').doc('control').set({json: 'null', actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await base.update({'resumen.control': firebase.firestore.FieldValue.delete()});
+  }catch(err){ console.error('No se pudo devolver el control:', err); toast('No se pudo devolver el control — revisá la consola'); return; }
+  fichaAvisarMesaControl(`↩ El GM devolvió el control de ${fichaNombre()} a su jugador`);
+  fichaControlCambio(f, null, true);
+}
+// Llega (o cambia) la marca de control: recalcula quién puede editar y avisa. `avisar` = false en la carga inicial.
+function fichaControlCambio(f, control, avisar){
+  const antes = f.soloLectura;
+  f.control = control && control.uid ? control : null;
+  if(f.control) f.editaGM = false;
+  const ahora = fichaSoloLecturaPara(f.duenoUid, f);
+  // Al dueño que queda en solo lectura: primero sube lo que tenía sin guardar (fichaGuardarTick mira soloLectura al empezar).
+  if(!antes && ahora && fichaHayPendiente()) fichaGuardarTick(true);
+  f.soloLectura = ahora;
+  if(avisar && antes !== ahora){
+    const mio = f.duenoUid === fbUsuario.uid;
+    if(f.control && mio) toast(`🎮 El GM (${f.control.nombre}) tomó el control de tu personaje: queda en solo lectura hasta que te lo devuelva`);
+    else if(!f.control && mio) toast('↩ El GM te devolvió el control de tu personaje');
+    else if(fichaControloYo(f)) toast(`🎮 Tenés el control de ${fichaNombre()}: lo usás como si fueras su jugador`);
+    else if(!f.control) toast('Devolviste el control: la ficha vuelve a solo lectura');
+  }
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+  if(!f.soloLectura){ mantenimientoRevisar(); recompensasRevisar(); estadosRevisar(); }
+  renderBotoneraSiAbierta();
 }
 
 async function fichaAlternarEdicionGM(){
@@ -11630,7 +11706,8 @@ async function fichaMostrarLectura(){
   let cartel = $('#ficha-lectura');
   const f = fichaVivo;
   const editaGM = !!(f && f.editaGM && fbMiembro.gm);
-  if(!f || (!f.soloLectura && !editaGM)){
+  const controlo = fichaControloYo(f);
+  if(!f || (!f.soloLectura && !editaGM && !controlo)){
     if(cartel) cartel.remove();
     fichaIdentidadUsuario = '';
     fichaIdentidadRender();
@@ -11641,17 +11718,31 @@ async function fichaMostrarLectura(){
     cartel.id = 'ficha-lectura';
     document.body.appendChild(cartel);
   }
-  cartel.classList.toggle('editando-gm', editaGM);
+  cartel.classList.toggle('editando-gm', editaGM || controlo);
+  const boton = (texto, accion, titulo) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'mini'; b.textContent = texto; b.onclick = accion;
+    if(titulo) b.title = titulo;
+    cartel.appendChild(b);
+  };
   const armar = dueno => {
+    const deQuien = dueno ? ' de ' + dueno : '';
+    const mio = f.duenoUid === fbUsuario.uid;
+    if(controlo){
+      cartel.textContent = `🎮 Tenés el control del personaje${deQuien}: lo usás como si fueras su jugador (Botonera, duelos, token, Mantenimiento). Su jugador lo ve en solo lectura.`;
+      boton('↩ Devolver el control', fichaDevolverControl, 'Se lo devolvés a su jugador; la Mesa avisa');
+      return;
+    }
+    if(f.control && mio){
+      cartel.textContent = `🎮 El GM (${f.control.nombre}) tiene el control de tu personaje: lo ves en solo lectura hasta que te lo devuelva.`;
+      return;
+    }
     cartel.textContent = editaGM
-      ? `Editando como GM el personaje${dueno ? ' de ' + dueno : ''}: lo que cambies se guarda en su ficha.`
-      : `Solo lectura: ${dueno ? 'personaje de ' + dueno : 'este personaje no es tuyo'}. Los cambios que hagas acá no se guardan.`;
+      ? `Editando como GM el personaje${deQuien}: lo que cambies se guarda en su ficha.`
+      : `Solo lectura: ${dueno ? 'personaje de ' + dueno : 'este personaje no es tuyo'}${f.control ? ` (lo controla el GM, ${f.control.nombre})` : ''}. Los cambios que hagas acá no se guardan.`;
     if(fbMiembro.gm){
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'mini';
-      b.textContent = editaGM ? 'Volver a solo lectura' : '✎ Editar como GM';
-      b.onclick = fichaAlternarEdicionGM;
-      cartel.appendChild(b);
+      boton(editaGM ? 'Volver a solo lectura' : '✎ Editar como GM', fichaAlternarEdicionGM, 'Para configurar la ficha (habilidades, equipo…); no la juega');
+      if(!f.control) boton('🎮 Tomar el control', fichaTomarControl, 'Usarlo como si fueras su jugador, hasta devolvérselo');
     }
   };
   armar('');
@@ -11659,7 +11750,7 @@ async function fichaMostrarLectura(){
   fichaIdentidadRender();
   try{
     const m = await fbDb.doc(fbRutaCampana(`miembros/${f.duenoUid}`)).get();
-    if(m.exists && fichaVivo === f && (f.soloLectura || f.editaGM)){
+    if(m.exists && fichaVivo === f && (f.soloLectura || f.editaGM || fichaControloYo(f))){
       armar(m.data().nombre);
       fichaIdentidadUsuario = m.data().nombre;
       fichaIdentidadRender();
@@ -11770,6 +11861,7 @@ function fichaNuevoEstado(id, duenoUid, cargada){
   return {
     id, duenoUid,
     editaGM: false,   // el GM puede pasar a editar (fichaAlternarEdicionGM)
+    control: null,    // {uid, nombre, desde}: quien tiene el control del personaje (el GM, con "🎮 Tomar el control"); null = su dueño
     soloLectura: fichaSoloLecturaPara(duenoUid, null),
     cargada,
     ultimo: {}, sucias: {}, enviando: {},
@@ -11814,6 +11906,8 @@ function fichaEscuchar(f){
         let imgInvocaciones = {};
         snap.docs.forEach(d => {
           const json = String(d.data().json || '');
+          // La marca de control del GM no es un dato del personaje: va aparte (fichaControlCambio).
+          if(d.id === 'control'){ let c = null; try{ c = JSON.parse(json); }catch(e){} f.control = c && c.uid ? c : null; return; }
           f.ultimo[d.id] = json;
           const leido = fichaLeerParte(d.id, json);
           if(d.id === 'retrato'){ retrato = leido.retrato; retratoMiniatura = leido.retratoMiniatura; }
@@ -11823,6 +11917,7 @@ function fichaEscuchar(f){
         if(!datos.meta) datos.meta = {};
         datos.meta.imagen = retrato;
         datos.meta.miniatura = retratoMiniatura;
+        f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
         aplicarFicha(datos);
         fichaPonerImagenesInvocaciones(imgInvocaciones);
         renderInvocaciones();
@@ -11839,6 +11934,14 @@ function fichaEscuchar(f){
       }
       let cambio = false;
       snap.docChanges().forEach(ch => {
+        if(ch.doc.id === 'control'){
+          if(ch.doc.metadata.hasPendingWrites) return;   // lo escribió esta misma pantalla: ya se aplicó
+          let c = null;
+          if(ch.type !== 'removed'){ try{ c = JSON.parse(String(ch.doc.data().json || 'null')); }catch(e){} }
+          const nuevo = c && c.uid ? c : null;
+          if((nuevo && nuevo.uid) !== (f.control && f.control.uid)) fichaControlCambio(f, nuevo, true);
+          return;
+        }
         if(ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
         const json = String(ch.doc.data().json || '');
         if(json === f.ultimo[ch.doc.id] || json === f.enviando[ch.doc.id]) return;

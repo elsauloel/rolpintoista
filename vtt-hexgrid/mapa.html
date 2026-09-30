@@ -941,7 +941,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-zona.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930b"></script>
+<script src="../comun/duelo.js?v=20260930c"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -2892,6 +2892,8 @@ function escucharMantenimiento(){
     const base = '../';
     if(soyGM){
       mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
+      // 🎮 Los personajes que el GM controla: les pasa el turno él (su dueño los tiene en solo lectura).
+      fichasPub.forEach((f, id) => { if(controloFicha(id)) mantenimientoEncolar(`${base}ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento#${encodeURIComponent(id)}`); });
     }else{
       fichasPub.forEach((f, id) => {
         if(f.duenoUid === fbUsuario.uid) mantenimientoEncolar(`${base}ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento#${encodeURIComponent(id)}`);
@@ -3449,9 +3451,16 @@ function costoMoverCreep(t){
   return {porCasillero, disponibles: num(sc.nitros)};
 }
 
+// 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su
+// dueño — lo mueve pagando No2, abre su Botonera, le cambia la vida y le pasa el turno.
+function controloFicha(fichaId){
+  if(!soyGM || !fichaId || !fbUsuario) return false;
+  const f = fichasPub.get(String(fichaId).split(SEP_INVOCACION)[0]);
+  return !!(f && f.resumen && f.resumen.control === fbUsuario.uid);
+}
 function puedoMover(t){
   if(!t || !fbUsuario) return false;
-  return t.tipo === 'creep' ? soyGM : t.duenoUid === fbUsuario.uid;
+  return t.tipo === 'creep' ? soyGM : (t.duenoUid === fbUsuario.uid || controloFicha(t.fichaId));
 }
 function puedoMoverLibre(t){
   if(!t || !fbUsuario) return false;
@@ -7450,7 +7459,7 @@ function puedoCambiarVida(t){
   if(!t || !t.fichaId || !fbUsuario) return false;
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
-  return !!v && !soyGM && v.duenoUid === fbUsuario.uid;
+  return !!v && ((!soyGM && v.duenoUid === fbUsuario.uid) || controloFicha(t.fichaId));
 }
 // Estados alterados (agregar, sacar, cambiar turnos, editar): el dueño en su personaje y el GM en TODOS (2026-09-24, pedido
 // del dueño); los creeps, el GM. La vida de un personaje sigue siendo solo de su dueño.
@@ -8000,7 +8009,7 @@ function hudHtml(t){
   const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   // Una invocación la maneja el mismo dueño que su personaje: mismo ⚡
   // (Botonera propia) que un PJ, ya no queda afuera.
-  const propio = fichaDeToken && !soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid;
+  const propio = fichaDeToken && ((!soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid) || controloFicha(fichaDeToken));
   const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
 
   // Con 🦶 Mover libre prendido el HUD se limpia: solo queda el pie, en rojo, para que
@@ -9075,7 +9084,7 @@ function botoneraDeToken(t){
   if(!t || !t.fichaId || !fbUsuario) return null;
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId) ? {creep: t.fichaId} : null;
   const v = vinculo(t);
-  if(soyGM || !v || v.duenoUid !== fbUsuario.uid) return null;
+  if(!v || (!controloFicha(t.fichaId) && (soyGM || v.duenoUid !== fbUsuario.uid))) return null;
   const [ficha, inv] = t.fichaId.split(SEP_INVOCACION);
   return {ficha, inv: inv || ''};
 }
@@ -10709,7 +10718,11 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  Duelo.escuchar({relay: dueloRelayMapa, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina});
+  Duelo.escuchar({relay: dueloRelayMapa, controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+    if(!lado || lado.tipo !== 'pj') return '';
+    const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
+    return (f && f.resumen && f.resumen.control) || '';
+  }, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina});
   escucharAreas();   // hechizos de área (Paso 4/7 del casteo): el círculo compartido y, el GM, la cascada
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.

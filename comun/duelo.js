@@ -984,7 +984,10 @@ const Duelo = (() => {
     dibujarChips();
   }
 
-  const esMio = lado => !!lado && lado.uid === yo();
+  // 🎮 Si el GM tomó el control de un personaje (2026-09-30), su lado lo maneja quien lo controla, no su dueño. Lo avisa la
+  // página: el mapa con cfg.controlDe(lado), la ficha suelta con el hook controlDe(lado) → uid de quien lo controla, o ''.
+  const controlDe = lado => (cfgEscuchar.controlDe && cfgEscuchar.controlDe(lado)) || (hooks() && hooks().controlDe && hooks().controlDe(lado)) || '';
+  const esMio = lado => { if(!lado) return false; const c = controlDe(lado); return c ? c === yo() : lado.uid === yo(); };
   // ¿Puede esta pestaña tirar por ese lado con su propio código (o pidiéndolo al iframe)?
   const puedoTirarYo = lado => esMio(lado) && !!(cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(lado)));
   const puedoAMano = lado => soyGM() || esMio(lado);

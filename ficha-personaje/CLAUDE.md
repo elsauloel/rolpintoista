@@ -338,6 +338,18 @@ que guarda cada parte (igual que con dos ventanas del mismo jugador).
   ahí el dueño probablemente estaba con otra sesión/cuenta (jugador, no GM) —
   ver `multiples-cuentas-mismo-dueno` en la memoria del asistente.
 
+**🎮 Tomar / devolver el control (2026-09-30, pedido del dueño)** — distinto de "✎ Editar como GM" (que es para *configurar*):
+con el control, el GM **usa** el personaje como si fuera su dueño — Botonera, duelos y habilidades (también cuando lo atacan:
+`comun/duelo.js` pregunta `controlDe(lado)`), token en el mapa pagando No2, vida desde el HUD, botín, estados y recompensas
+que le llegan (el GM los aplica y **borra** el aviso, porque las reglas solo dejan al dueño marcarlo como aplicado) y el
+Mantenimiento (el mapa del GM le encola la ficha). El dueño la ve en solo lectura con un cartel ("El GM tiene el control…")
+y la Mesa avisa al tomar y al devolver. No pide permiso (anotado en "Antes de abrirlo al público"). La marca vive en la parte
+`fichas/{id}/partes/control` (`{uid, nombre, desde}`; `"null"` = la tiene su dueño; se lee aparte, no es un dato del
+personaje) y, para el mapa, en `resumen.control` (uid del GM, `controloFicha()` en el mapa). Funciones:
+`fichaTomarControl`, `fichaDevolverControl`, `fichaControlCambio`, `fichaControloYo`; `fichaSoloLecturaPara` la mira
+primero. No hicieron falta reglas nuevas: el GM ya podía escribir fichas y partes y mover tokens de personajes
+(col/fila/ruta/rotación). Sirve también para probar el lado jugador con una sola cuenta de GM.
+
 **Título de la pestaña** (2026-09-19): "Ficha — <personaje> · <partida>" con un
 personaje abierto, y "Ficha de personaje — <partida>" sin ninguno
 (`fichaIdentidadRender`, que se llama al abrir, soltar y renombrar).

@@ -395,9 +395,7 @@ const Combatiente = (() => {
     const sx = t => conX ? sustituirX(t, X) : t;
     const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
     const tipo = c.tipoDano || 'arcano';
-    const base = String(h.tiradaExtra || '').trim();
-    const extra = conX && c.danoFijoPorX ? nf(c.danoFijoPorX) * X : 0;
-    const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
+    const formula = formulaDanoHab(h, c, o.X);
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
       alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceHab(c, stat, o.stat),
@@ -410,6 +408,28 @@ const Combatiente = (() => {
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
     };
+  }
+  // La fórmula de daño de la Ejecución: la de la habilidad («tiradaExtra») más danoFijoPorX × X (P119); sin X, tal cual.
+  function formulaDanoHab(h, c, X){
+    const base = String((h && h.tiradaExtra) || '').trim();
+    const extra = X !== undefined && X !== null && c && c.danoFijoPorX ? nf(c.danoFijoPorX) * nf(X) : 0;
+    return base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
+  }
+  /* Lo que el mapa necesita para dejar puesta la zona persistente de una habilidad (el mensaje 'zona-persistente-habilidad',
+     igual para personaje y creep). `o.fichaId` y `o.tipo` ('pj'|'creep'): quién la usa; `o.X`: el costo variable;
+     `o.resistValor`: la tirada de «tira», hecha UNA vez y reusada contra cada uno que entra o sigue adentro. */
+  function zonaDeHab(h, c, o){
+    o = o || {};
+    return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
+      radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
+      zonaEstado: c.zonaEstado || null, zonaDano: c.dano ? formulaDanoHab(h, c, o.X) : '',
+      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor};
+  }
+  // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
+  function trampaDeHab(h){
+    const t = h && h.trampaColocar;
+    return t ? {...t, nombre: String(t.nombre || '').trim() || h.nombre} : null;
   }
   // Solo sobre uno mismo y sin nada que tirar ni resistir (Blindaje y parecidos): se aplica directo, sin abrir el cuadro.
   const sobreSiSinTiradas = hab => !!(hab && hab.objetivo === 'uno mismo' && !hab.tira && !hab.dano && !(hab.contra || []).length);
@@ -428,5 +448,6 @@ const Combatiente = (() => {
   return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
-    modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible};
+    modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
+    formulaDanoHab, zonaDeHab, trampaDeHab};
 })();

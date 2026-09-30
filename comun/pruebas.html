@@ -324,6 +324,15 @@ prueba('solo sobre sí y sin tiradas (Blindaje) se aplica directo; con tirada o 
   igual([E1({objetivo: 'uno mismo', efectos: [{cura: 2}]}), E1({objetivo: 'uno mismo', tira: 'pdgmg'}), E1({objetivo: 'uno mismo', tiraFormula: '1d4'}), E1({objetivo: 'uno mismo', contra: ['eva']}), E1({objetivo: 'enemigo'})],
     [true, false, false, false, false]);
 });
+prueba('zona persistente: el mismo mensaje al mapa para personaje y creep (daño con X, resistencia, turnos)', () => {
+  const h = {nombre: 'Pantano', tiradaExtra: '1d4'}, c = {objetivo: 'zona', radio: 2, zonaTurnos: 0, dano: true, tipoDano: 'fisico', danoFijoPorX: 1, contra: ['eva', 'parry'], zonaEstado: {nombre: 'Rengo'}};
+  const pj = Combatiente.zonaDeHab(h, c, {fichaId: 'f1', tipo: 'pj', X: 2, resistValor: 7}), cr = Combatiente.zonaDeHab(h, c, {fichaId: 'c1', tipo: 'creep'});
+  igual([pj.tipo, pj.casteadorTipo, pj.radio, pj.zonaTurnos, pj.zonaDano, pj.zonaIgnoraDef, pj.resistStat, pj.resistValor, pj.zonaEstado.nombre, cr.zonaDano, cr.resistValor, cr.casteadorTipo],
+    ['zona-persistente-habilidad', 'pj', 2, 3, '1d4+2', false, 'eva', 7, 'Rengo', '1d4', null, 'creep']);
+});
+prueba('trampa de una habilidad: sin nombre propio lleva el de la habilidad', () => igual(
+  [Combatiente.trampaDeHab({nombre: 'Raíces', trampaColocar: {nombre: '  ', dano: '1d6', radio: 1}}), Combatiente.trampaDeHab({nombre: 'X', trampaColocar: {nombre: 'Cepo'}}).nombre, Combatiente.trampaDeHab({nombre: 'Y'})],
+  [{nombre: 'Raíces', dano: '1d6', radio: 1}, 'Cepo', null]));
 prueba('lo que todavía no anda en creeps e invocaciones se avisa (P134)', () => igual(
   [Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'pj'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'creep') !== '', Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'inv') !== '',
    Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'creep'), Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'inv') !== '', Combatiente.ejecucionNoDisponible(null, 'pj') !== ''],

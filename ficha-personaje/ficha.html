@@ -2075,7 +2075,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930j"></script>
+<script src="../comun/combatiente.js?v=20260930k"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -3418,22 +3418,13 @@ function aplicarEfectoDeConsumo(it){
   // Cantidades propias de la habilidad/ítem (las que se eligieron en el asistente de estados): mandan sobre las del preset.
   const escudo = num(src.efectoEscudo), stacks = Math.max(1, num(src.efectoStacks) || 1);
   if(escudo > 0) categorias.escudoMagico = escudo;
-  let ef = S.efectos.find(e => e.nombre === nombre);
-  if(ef){
-    ef.turnos = turnos;
-    ef.hpturno = hpturno;
-    ef.activo = true;
-    ef.permanente = permanente;
-    ef.mods = mods;
-    if(stacks > 1) ef.stacks = stacks;
-    if(detalle) ef.detalle = detalle;
-    Object.assign(ef, categorias);
-    if(num(ef.escudoMagico) > 0) ef.escudoMagicoActual = num(ef.escudoMagico);   // reaplicar recarga el escudo entero
-  }else{
-    ef = {id:uid(), nombre, imagen:'', turnos, stacks, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
-    S.efectos.push(ef);
-  }
-  return ef;
+  // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades, Veneno y Sangrado que se acumulan y, si ya
+  // tiene uno igual (no el de un ítem equipado), se renueva (P132). Reaplicar recarga el escudo entero.
+  const nuevo = {id:uid(), nombre, imagen:'', turnos, stacks, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
+  if(num(nuevo.escudoMagico) > 0) nuevo.escudoMagicoActual = num(nuevo.escudoMagico);
+  const r = Combatiente.agregarEstado(S.efectos, nuevo);
+  if(!r.ok){ toast(`Inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`); return null; }
+  return r.estado;
 }
 
 // Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y
@@ -3575,17 +3566,9 @@ function colocarZonaDeHab(it, xSp, xNitros){
       registrarTirada(`${it.nombre} · ${STAT_LABEL[stat] || stat}`, r);
     }
   }
-  const X = spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0;
-  const base = String(it.tiradaExtra || '').trim();
-  const extra = c.danoFijoPorX ? num(c.danoFijoPorX) * X : 0;
-  const formula = base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
   try{
-    window.parent.postMessage({tipo: 'zona-persistente-habilidad', fichaId: fichaVivo.id, casteadorTipo: 'pj', nombre: it.nombre,
-      radio: Math.max(1, num(c.radio) || 1), zonaTurnos: Math.max(1, num(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
-      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && formula ? formula : '',
-      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
-      resistStat: (c.contra && c.contra[0]) || '', resistValor,
-    }, location.origin);
+    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
+    window.parent.postMessage(Combatiente.zonaDeHab(it, c, {fichaId: fichaVivo.id, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor}), location.origin);
     return true;
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
@@ -9380,13 +9363,13 @@ async function colocarTrampaDeHab(h){
   // queda al lado del token como siempre.
   if(modoHab(h) === 'auto' && window.parent !== window){
     mesaPublicarHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
-    try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: {...t, nombre: String(t.nombre || '').trim() || h.nombre}}, location.origin); }
+    try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}, location.origin); }
     catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
     return;
   }
   try{
     const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
-    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', trampa: {...t, nombre: String(t.nombre || '').trim() || h.nombre, dano}});
+    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h), dano}});
     if(r.colocadas) toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
     else toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
   }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }

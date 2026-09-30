@@ -831,7 +831,8 @@ versión parecida en más de una, es candidato a juntar.
   (lo que el cuadro del duelo necesita: tirada o fórmula propia, resistencias, daño, efectos, radio, textos a mano; sin `X`
   no se toca ninguna «X»), `efectoDeEjecucion(e)`, `sustituirX`, `sobreSiSinTiradas(hab)` (el atajo de Blindaje) y
   `ejecucionNoDisponible(c, 'pj'|'inv'|'creep')` (P134: ataque con arma y Flash todavía solo en personajes, zona no en
-  invocaciones → aviso y 💰). Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
+  invocaciones → aviso y 💰), `zonaDeHab(h, c, {fichaId, tipo, X, resistValor})` (el mensaje 'zona-persistente-habilidad'
+  al mapa), `formulaDanoHab(h, c, X)` y `trampaDeHab(h)` (la trampa lista para el mapa). Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
   de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
@@ -843,6 +844,6 @@ versión parecida en más de una, es candidato a juntar.
   el concepto (textos en `AYUDA`, siguen las notas Parry/Bloqueo/Evasión del manual: si cambia una regla, cambiar los dos).
   Tocarlo no dispara el botón. Está en la Botonera del personaje, la de las invocaciones, las Acciones de los creeps y en
   "Elegí cómo te defendés" / "Tirar Bloqueo" del duelo (el mapa ahora también carga este archivo). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
-  y el mapa conservan los nombres de siempre como atajos de una línea (`estaBloqueadoElDebuffCreep` → `inmunidad`, etc.);
+  y el mapa conservan los nombres de siempre como atajos de una línea (`escudoParsear`, `mitadesDeTirada`, etc.);
   `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
   gm-tools, mapa y `datos/auditoria-skills.html`.

@@ -1296,7 +1296,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930j"></script>
+<script src="../comun/combatiente.js?v=20260930k"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -3240,9 +3240,6 @@ function textoEstadoAgregado(r, campoHp){
   return r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
 }
 
-// Veneno suma sus stacks enteros (comun/combatiente.js); lo usa el estado que se pone el creep con una habilidad.
-// Devuelve el estado que ya estaba (null si no había).
-function acumularVenenoCreep(sc, nuevo){ return Combatiente.acumularVeneno(sc.estados, nuevo); }
 
 function aplicarPresetEstadoCreep(valor){
   if(presetsCreepDestino === 'duelo'){
@@ -3269,8 +3266,8 @@ const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
 // Crea o refresca un estado del creep a partir de una habilidad con un
 // efecto configurado (preset o a mano) — igual variedad que en ficha.html:
 // nombre, turnos, stacks, HP por turno, detalle y modificadores de atributo.
-// Invulnerable, Inmunidad a CC, Sangre pura, Coagulación extrema y la protección de jefe contra Stun (comun/combatiente.js).
-function estaBloqueadoElDebuffCreep(sc, objEfecto){ return !!Combatiente.inmunidad(sc.estados, objEfecto, {jefe: sc.jefe}); }
+// (Inmunidades — Invulnerable, Inmunidad a CC, Sangre pura, Coagulación extrema, jefe contra Stun — y acumular Veneno:
+// Combatiente.agregarEstado, comun/combatiente.js.)
 
 function aplicarEfectoDeConsumoCreep(sc, h){
   const nombre = (h.efectoNombre || '').trim();
@@ -3282,35 +3279,24 @@ function aplicarEfectoDeConsumoCreep(sc, h){
   const stacks = Math.max(1, num(h.efectoStacks) || 1);
   const hpTurno = num(h.efectoHpTurno);
   const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
-  if(estaBloqueadoElDebuffCreep(sc, {nombre, polaridad, esCC: preset && preset.esCC, esVeneno: preset && preset.esVeneno, esSangrado: preset && preset.esSangrado})){
-    toast(`${sc.nombre}: inmune ahora mismo — ${nombre} no hizo efecto`);
-    return null;
-  }
   const detalle = h.efectoDetalle || '';
   const mods = structuredClone(h.efectoMods || []);
   // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
   const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
     stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
   if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
-  let es = sc.estados.find(x => x.nombre === nombre);
-  const excPrevio = es ? num(es.escudoMagicoActual ?? es.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
-  if(es && preset && preset.esVeneno){
-    // Veneno se acumula (y el severo no): ver acumularVenenoCreep.
-    return acumularVenenoCreep(sc, {nombre, esVeneno: true, permanente: !!preset.permanente, stacks});
-  }
-  if(es){
-    es.turnos = turnos; es.stacks = stacks; es.hpTurno = hpTurno;
-    es.polaridad = polaridad; es.detalle = detalle; es.mods = mods;
-    Object.assign(es, categorias);
-  }else{
-    es = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
-    sc.estados.push(es);
-  }
+  const previo = sc.estados.find(x => x.nombre === nombre);
+  const excPrevio = previo ? num(previo.escudoMagicoActual ?? previo.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
+  const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
   if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
     const suma = num(h.efectoEscudo), total = (preset && preset.excedenteVida) ? excPrevio + suma : suma;
-    es.escudoMagico = total; es.escudoMagicoActual = total;
+    nuevo.escudoMagico = total; nuevo.escudoMagicoActual = total;
   }
-  return es;
+  // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula (el
+  // severo no) y, si ya tiene uno igual, se renueva (P132).
+  const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
+  if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`); return null; }
+  return r.estado;
 }
 
 // Tirada de una habilidad del creep: el stat vinculado (con su valor del
@@ -3361,14 +3347,9 @@ function colocarZonaDeHabCreep(sc, h){
       registrarTirada(`${sc.nombre} · ${h.nombre} · ${habEtqCreep(stat)}`, r);
     }
   }
-  const formula = String(h.tiradaExtra || '').trim();
   try{
-    window.parent.postMessage({tipo: 'zona-persistente-habilidad', fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre,
-      radio: Math.max(1, num(c.radio) || 1), zonaTurnos: Math.max(1, num(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
-      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && formula ? formula : '',
-      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
-      resistStat: (c.contra && c.contra[0]) || '', resistValor,
-    }, location.origin);
+    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
+    window.parent.postMessage(Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor}), location.origin);
     return true;
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
@@ -6697,7 +6678,7 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 // trampaDeHabilidad en el mapa). Devuelve false si no hay mapa (entonces se coloca sola al lado del token, como siempre).
 function pedirTrampaAlMapaCreep(sc, h){
   if(window.parent === window) return false;
-  try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: {...h.trampaColocar, nombre: h.trampaColocar.nombre || h.nombre}}, location.origin); return true; }
+  try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}, location.origin); return true; }
   catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); return false; }
 }
 // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo (como Blindaje en la ficha).
@@ -6716,9 +6697,8 @@ function aplicarHabCreepSobreSi(sc, h){
   return {hechos, nota: [hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' ')};
 }
 async function colocarTrampaDeHab(sc, h){
-  const t = h.trampaColocar;
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: {...t, nombre: t.nombre || h.nombre}});   // forma única (P123)
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h)});   // forma única (P123)
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');

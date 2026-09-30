@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1 y 2** (2026-09-30). En curso: paso 3 (ejecución de habilidades), tanda 1 hecha. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1, 2 y 3** (2026-09-30). Siguiente: paso 4 (la Botonera y las Acciones como piezas compartidas). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -132,7 +132,7 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
 - **Se gana**: un estado nuevo o una regla de turno nueva se escribe una vez.
 - **Riesgo**: medio (el Mantenimiento toca todo); probar con una partida de prueba varios turnos seguidos.
 
-### Paso 3 — Ejecución de habilidades única — en curso (2026-09-30)
+### Paso 3 — Ejecución de habilidades única — ✅ 2026-09-30
 - **Cómo va — tanda 1 ✅** (2026-09-30): **usar una habilidad** en `comun/combatiente.js`: el modo (`modoHab`), el costo en
   No2 (`costoNitrosHab`: número, "ATAQUE", X), si se puede usar ahora (`bloqueoHab`: cooldown, No2 y vida), el alcance
   (`alcanceHab`), lo que el cuadro del duelo necesita de la ✨ Ejecución (`habEjecucion`, con `efectoDeEjecucion` y
@@ -143,8 +143,14 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   semiautomática; sumarlos queda en pendientes). Corregido de paso: el creep perdía la tirada personalizada y los textos "a
   mano" de su Ejecución (y su duelo no sabía tirar una fórmula); los estados que una invocación se pone a sí misma no
   revisaban inmunidades y se duplicaban en vez de renovarse; una ✨ de creep sin la Ejecución armada no avisaba. Pruebas: 92.
-- **Falta — tanda 2**: trampas y zonas (hoy la ficha y GM Tools tienen cada una su `colocarTrampaDeHab` y su
-  `colocarZona…`), y lo que se pone uno mismo con el estado del sistema anterior (`aplicarEfectoDeConsumo`).
+- **Tanda 2 ✅** (2026-09-30): **zonas y trampas** — el mensaje que recibe el mapa para dejar una zona persistente
+  (`zonaDeHab`, con `formulaDanoHab`) y la trampa de una habilidad (`trampaDeHab`) salen del motor, iguales para personaje y
+  creep (cada uno sigue decidiendo lo suyo: el personaje la anuncia sin la ubicación, el creep en secreto). **El estado que uno
+  se pone con el sistema anterior** (habilidades y consumibles: `aplicarEfectoDeConsumo` en la ficha,
+  `aplicarEfectoDeConsumoCreep`) pasa por `agregarEstado`: inmunidades, Veneno que se acumula y renovar uno igual, como todo
+  lo demás (el personaje renovaba también el de un ítem equipado y no acumulaba Veneno; el Excedente de vida del creep se
+  sigue sumando). Pruebas: 94. **El paso 3 queda cerrado**; lo que falta para creeps e invocaciones (ataque con arma, Flash,
+  zona y trampas de invocación) quedó en `pendientes.md` (P134).
 - **Qué**: cobrar el costo, los tres modos (📣 manual, 💰 semi, ✨ auto), lo del sistema anterior mientras dure, trampas y
   zonas: una sola implementación que usan personaje, invocación y creep.
 - **Se gana**: se terminan las tres versiones; las invocaciones reciben lo que hoy les falta (zonas, ataque con arma desde

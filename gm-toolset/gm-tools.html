@@ -1308,9 +1308,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/critico.js"></script>
 <script src="../comun/duelo.js?v=20260927f"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
-<script src="../comun/items-subidos.js?v=20260929a"></script>
+<script src="../comun/items-subidos.js?v=20260930a"></script>
 <script src="../comun/asistente-item.js"></script>
-<script src="../comun/editar-item.js?v=20260929a"></script>
+<script src="../comun/editar-item.js?v=20260930a"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
@@ -5876,7 +5876,7 @@ function plantillaArmaCreep(sc){
     detalle: sc.armaDetalle || '', descripcionNarrativa: `Arma de ${nombreLimpioCreep(sc)}.`, consumible: false, estimado: true};
 }
 function plantillaEquipoCreep(it, nivel){
-  const c = CATALOGO_EQUIPO.find(i => i.nombre === it.nombre && i.tipoItem === it.tipoItem);
+  const c = CATALOGO_EQUIPO.find(i => sinAviso(i.nombre) === sinAviso(it.nombre) && i.tipoItem === it.tipoItem);
   if(c) return {...plantillaDeCatalogo(c), estimado: false};
   const mods = [...(it.mods || [])];
   if(num(it.def)) mods.unshift({stat: 'def', val: num(it.def)});

@@ -9,6 +9,10 @@
    Cada ítem sumado lleva `_bib = {id, version, auditado, autor}` (de dónde salió) para mostrar 🔶 sin auditar y para no
    guardarlo adentro de la ficha como si fuera propio.
    ========================================================= */
+// El nombre sin la marca ⚠️ que lleva un ítem de fábrica con una observación de la auditoría (docs/auditoria-catalogo-2026-09.md):
+// las búsquedas por nombre (una copia en una mochila o en un creep contra el catálogo) la ignoran.
+function sinAviso(s){ return String(s ?? '').replace(/^⚠️\s*/, ''); }
+
 const ItemsSubidos = (() => {
   const clon = v => structuredClone(v);
 
@@ -46,7 +50,7 @@ const ItemsSubidos = (() => {
     if(item._bib && item._bib.id) return {id: item._bib.id, nombre: item.nombre};
     const cat = catalogo || [];
     const porId = item.id && cat.find(c => c.id === item.id);
-    const c = porId || cat.find(c => c.nombre === item.nombre);
+    const c = porId || cat.find(c => sinAviso(c.nombre) === sinAviso(item.nombre));
     if(!c) return null;
     if(c._bib && c._bib.id) return {id: c._bib.id, nombre: c.nombre};
     const esFabrica = typeof CATALOGO_BASE !== 'undefined' && CATALOGO_BASE.some(b => b.id === c.id);

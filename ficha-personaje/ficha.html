@@ -2066,8 +2066,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/duelo.js?v=20260927f"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
-<script src="../comun/items-subidos.js?v=20260929a"></script>
-<script src="../comun/editar-item.js?v=20260929a"></script>
+<script src="../comun/items-subidos.js?v=20260930a"></script>
+<script src="../comun/editar-item.js?v=20260930a"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
 <script src="../comun/plantillas.js?v=20260929i"></script>
@@ -3346,7 +3346,7 @@ function configEfectoDe(it){
   // los ítems que la gente ya tenía en la mochila tienen que verlo también.
   // Solo se usa lo propio del ítem si no hay match en el catálogo (algo
   // 100% custom, nunca publicado).
-  const base = (S.catalogo || []).find(c => c.nombre === it.nombre);
+  const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(it.nombre));
   if(base && (base.efectoNombre || '').trim()) return base;
   return it;
 }
@@ -5722,7 +5722,7 @@ function renderAll(){
 // Igual que configEfectoDe: el catálogo es la referencia fresca, gana
 // sobre lo que haya quedado copiado en el ítem al comprarlo/agregarlo.
 function configEquipoEstadoDe(it){
-  const base = (S.catalogo || []).find(c => c.nombre === it.nombre);
+  const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(it.nombre));
   if(base && (base.equipoEstadoNombre || '').trim()) return base;
   return it;
 }
@@ -7184,7 +7184,7 @@ let viewing = null;
 function narrativaDe(it){
   const propia = (it.descripcionNarrativa || '').trim();
   if(propia) return propia;
-  const base = (S.catalogo || []).find(c => c.nombre === it.nombre);
+  const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(it.nombre));
   return base ? (base.descripcionNarrativa || '').trim() : '';
 }
 
@@ -9809,7 +9809,7 @@ function subirItemAlCatalogo(draft, key){
   if(!String(draft.nombre || '').trim()){ toast('Poné un nombre antes de subirlo al catálogo'); return; }
   if(!draft.tipoItem){ toast('Elegí una categoría antes de subirlo al catálogo'); return; }
   const datos = key === 'catalogo' ? structuredClone(draft) : itemComoEntradaDeCatalogo(draft);
-  if(key !== 'catalogo'){ const base = (S.catalogo || []).find(c => c.nombre === draft.nombre); if(base && base.tier) datos.tier = base.tier; }
+  if(key !== 'catalogo'){ const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(draft.nombre)); if(base && base.tier) datos.tier = base.tier; }
   Biblioteca.guardar({tipo: 'items', datos, nombre: datos.nombre, nivel: 0, basadoEn: ItemsSubidos.basadoEn(draft, S.catalogo),
     alSubir: () => cargarItemsSubidos()});
 }

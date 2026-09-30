@@ -42,7 +42,8 @@ const EditarItem = (() => {
   };
   function delCatalogo(item, catalogo){
     const cat = catalogo || [];
-    return (item.id && cat.find(c => c.id === item.id)) || cat.find(c => c.nombre === item.nombre) || null;
+    const nom = typeof sinAviso === 'function' ? sinAviso : (s => s);
+    return (item.id && cat.find(c => c.id === item.id)) || cat.find(c => nom(c.nombre) === nom(item.nombre)) || null;
   }
 
   // La copia, con lo que no trae (rareza, precio, narrativa… en el arma de un creep) sacado del ítem del catálogo del que sale.

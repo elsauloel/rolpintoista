@@ -14,7 +14,7 @@ Uso:
   python herramientas/reajuste_defensa.py resumen     # máximo equipable por Tipo, antes y después
 No toca el catálogo (comun/catalogo.js): los cambios se aplican después de que el dueño audite.
 """
-import json, pathlib, sys, collections
+import json, pathlib, sys, collections, re
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 T_CRIT = {'tipo1': 4, 'tipo2': 6, 'tipo3': 8, 'tipo4': 10, 'tipo5': 12}
@@ -105,7 +105,7 @@ def reajustar(item):
     it = json.loads(json.dumps(item))
     tier = tier_norm(it.get('tier'))
     cambios, avisos, mods = [], [], []
-    for stat, v in VARIACIONES.get(it.get('nombre'), []):   # variación para que no sea idéntica a otra pieza
+    for stat, v in VARIACIONES.get(re.sub(r'^⚠️\s*', '', it.get('nombre') or ''), []):   # variación para que no sea idéntica a otra pieza
         it['mods'] = list(it.get('mods') or [])
         for m in it['mods']:
             if m['stat'] == stat:

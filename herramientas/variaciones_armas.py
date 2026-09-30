@@ -5,7 +5,7 @@ Si dos armas del catálogo tienen exactamente los mismos números y efectos, una
 (un bono +1 o un efecto de 25 %). Clave: nombre del arma. Valor: lista de ('bono', stat, val) o ('efecto', nombre, porcentaje, detalle[, stacks]).
 `variar(arma)` devuelve (arma_con_variacion, texto_del_cambio) o (arma, None) si no hay variación para ella.
 """
-import copy
+import copy, re
 
 PROB = {100: (1, 1), 50: (2, 1), 33: (6, 2), 25: (4, 1)}
 S = 'Sangrado'
@@ -68,7 +68,7 @@ VARIACIONES = {
 
 def variar(arma):
     """Devuelve (copia con la variación, texto) o (arma, None)."""
-    v = VARIACIONES.get(arma.get('nombre'))
+    v = VARIACIONES.get(re.sub(r'^⚠️\s*', '', arma.get('nombre') or ''))
     if not v:
         return arma, None
     a = copy.deepcopy(arma)

@@ -40,6 +40,13 @@ armas y defensa no tienen decisiones guardadas).
   - El tope por tier (`herramientas/reajuste_defensa.py`) pasa a permitir +1 de Tipo 8 y 10 en Común y Buena Calidad,
     con la aclaración de que son **pocas piezas elegidas a mano**. Precios sin tocar (a revisar con el motor de valor).
 
+- **2026-09-30 · Cascos sin Tipo 8:** dueño: quitárselo a los cascos de Buena Calidad (el Tipo 8 va en torso rígido y
+  escudos). Hecho en 7 cascos (texto incluido).
+- **2026-09-30 · Auditoría a fondo y marca ⚠️:** reporte completo en [`auditoria-catalogo-reporte.md`](auditoria-catalogo-reporte.md).
+  Pedido del dueño: los ítems que ameritan atención llevan **⚠️ adelante del nombre** para reconocerlos en las tiendas
+  (88). Se saca al corregir cada uno. Las búsquedas por nombre (ficha, GM Tools, `comun/items-subidos.js`,
+  `comun/editar-item.js`, scripts de variaciones) ignoran el ⚠️ (`sinAviso`).
+
 ## Preguntas abiertas
 1. Tope de crítico por tier: ¿cuenta el potente igual que el frecuente, o es solo para el frecuente?
 2. Rango de arcos y pistolas (+4 a +8): ¿es su alcance base, fuera del máximo de +3 por stat?

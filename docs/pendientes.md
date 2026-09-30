@@ -36,8 +36,8 @@
 - [ ] **Ataque con arma y Flash desde una habilidad en invocaciones; zona persistente y trampas en invocaciones** (P134,
   2026-09-30): hoy avisan y se ejecutan como semiautomáticas. (Los creeps ya los tienen desde el 2026-09-30: `ataqueDeHabCreep`
   y los ganchos `flashOpciones`/`flashUsar` de GM Tools, P135.)
-- [ ] **Probar en mesa el ataque con arreglos y el Flash de un creep** (2026-09-30): probado en copias sin sesión; falta un duelo
-  real en el mapa ("Claude · pruebas", GM contra Clementino con 🎮 Tomar el control).
+- [x] **Probar en mesa el ataque con arreglos y el Flash de un creep** (2026-09-30): ✔ en "Claude · pruebas" (ver
+  `pruebas-de-humo.md`); encontró y se corrigieron dos fallas de carteles tapados en el mapa.
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).

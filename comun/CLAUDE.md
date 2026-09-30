@@ -843,6 +843,15 @@ versión parecida en más de una, es candidato a juntar.
   dentro del mapa el cartel (`#ct-fondo`) cuenta como ventana abierta para que se muestre la página que lo abrió. En la ficha,
   `pagarFlash`/`usarFlashFueraDelDuelo`; en GM Tools, `pagarFlashCreep`/`usarFlashFueraDelDueloCreep`. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
   de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
+- **`embebido.js`** (`Embebido`, 2026-09-30, paso 4 etapa 1, `../docs/plan-paso4.md`) — **una herramienta dentro del mapa**
+  (la ficha con `?modo=botonera`, GM Tools con `?modo=acciones|finalizar|botin`). `Embebido.iniciar({clase, pagina,
+  noCuenta})`: esconde SOLO la página de la herramienta (`pagina`) y las piezas comunes que el mapa ya muestra (`COMUNES`:
+  Mesa flotante, menú ☰, historial, cuadro del duelo, dados 3D); **cualquier otra ventana o cartel se ve** (antes era al revés:
+  una lista fija de ventanas permitidas, y cada cartel nuevo desaparecía). Mira la página y le avisa al mapa solo en los
+  cambios: `embebido-abierto` (el mapa muestra la capa del marco, encima del duelo si hay uno a la vista) y `embebido-cerrado`
+  (la saca, para que el marco transparente no tape el mapa). `noCuenta`: lo que se ve pero no es una ventana (la Polilla
+  mística). **Un cartel nuevo no necesita registrarse en ningún lado**; una parte nueva de la PÁGINA que se agregue al
+  `<body>` sí va en `pagina` (si no, se vería dentro del mapa y dejaría la capa abierta).
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
   3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,

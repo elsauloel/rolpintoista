@@ -797,15 +797,15 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
 .modo-hab-btn span{font-size:12.5px;color:var(--muted);font-weight:400}
 .modo-hab-btn.activa span{color:inherit}
 </style>
-<style>
-/* Modo acciones (?modo=acciones&creep=<id>): gm-tools se abre adentro del
-   mapa y muestra solo la ventana de Acciones del creep (y las que se abren
-   desde ahí), con fondo transparente. */
-html.modo-acciones, html.modo-acciones body{background:transparent!important;min-height:0}
-html.modo-acciones body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#at-fondo):not(#adh-fondo):not(#ct-fondo){display:none!important}   /* #ct-fondo: «¿es su turno?» del Flash */
-</style>
+<script src="../comun/embebido.js?v=20260930a"></script>
 <script>
-if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.search).get('modo'))) document.documentElement.classList.add('modo-acciones');   // finalizar y botín: el mapa los abre igual que las Acciones
+/* Modo acciones (?modo=acciones&creep=<id>; finalizar y botín se abren igual): gm-tools se abre adentro del mapa y muestra solo
+   la ventana de Acciones del creep y las que se abren desde ahí, con fondo transparente. Desde el paso 4 (2026-09-30) lo
+   resuelve comun/embebido.js: se esconde solo la página y las piezas comunes; cualquier ventana o cartel se ve. */
+if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.search).get('modo'))){
+  document.documentElement.classList.add('modo-acciones');
+  Embebido.iniciar({clase: 'modo-acciones', pagina: ['.wrap']});
+}
 </script>
 </head>
 <body>

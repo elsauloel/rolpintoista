@@ -1213,14 +1213,19 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .modo-hab-btn.activa span{color:inherit}
 </style>
 <style>
-/* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
-   muestra solo la Botonera y sus ventanitas, con fondo transparente. */
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
-html.modo-botonera, html.modo-botonera body{background:transparent!important;min-height:0}
-html.modo-botonera body > :not(.scrim):not(.toast):not(#lupa-pop):not(#ep-fondo):not(#ae-fondo):not(#adh-fondo):not(#ct-fondo):not(.ei-scrim):not(#grilla-dados):not(#polilla-flotante){display:none!important}
 </style>
+<script src="../comun/embebido.js?v=20260930a"></script>
 <script>
-if(new URLSearchParams(location.search).get('modo') === 'botonera') document.documentElement.classList.add('modo-botonera');
+/* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y muestra solo la Botonera y sus ventanitas, con fondo
+   transparente. Desde el paso 4 (2026-09-30) lo resuelve comun/embebido.js: se esconde solo la página (lo de abajo) y las
+   piezas comunes que el mapa ya muestra; cualquier ventana o cartel se ve, y el mapa se entera solo cuando algo se abre. */
+if(new URLSearchParams(location.search).get('modo') === 'botonera'){
+  document.documentElement.classList.add('modo-botonera');
+  // #ficha-lectura: el cartel de solo lectura / control del GM (lo muestra el mapa a su manera). La Polilla mística se ve,
+  // pero es un botón que dura mientras dura el estado: no es una ventana abierta.
+  Embebido.iniciar({clase: 'modo-botonera', pagina: ['.wrap', '#dock-izq', '#overlay-muerte', '#ficha-lectura'], noCuenta: ['#polilla-flotante']});
+}
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
 </head>

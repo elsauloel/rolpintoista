@@ -9459,9 +9459,13 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar
   if(e.data.tipo === 'duelo-opciones-res') Duelo.recibirOpciones(e.data.id, e.data.opciones);   // las opciones de defensa que calculó la ficha del defensor
-  if(e.data.tipo === 'duelo-ui-visible'){   // la ficha tirando para un duelo necesita mostrar un cartelito (Nitros, sobrepeso…)
+  // La ficha o GM Tools (en el marco) abrió o cerró algo: comun/embebido.js lo avisa solo (paso 4, 2026-09-30). Abierto: se
+  // muestra la capa, encima del duelo; cerrado: se saca, para que el marco transparente no tape el mapa.
+  if(e.data.tipo === 'embebido-cerrado'){ cerrarBotonera(); return; }
+  if(e.data.tipo === 'duelo-ui-visible' || e.data.tipo === 'embebido-abierto'){   // un cartelito (Nitros, sobrepeso, Flash…) o una ventana
     $('#botonera-capa').hidden = false;
-    $('#botonera-capa').classList.add('sobre-duelo');   // encima del cuadro del duelo mientras dure el cartel
+    const duelo = document.getElementById('duelo-fondo');   // encima del cuadro del duelo, solo si hay uno a la vista
+    if(e.data.tipo === 'duelo-ui-visible' || (duelo && getComputedStyle(duelo).display !== 'none')) $('#botonera-capa').classList.add('sobre-duelo');
     ubicarBotoneraCapa();
     enfocarBotonera();
   }

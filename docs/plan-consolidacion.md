@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1, 2 y 3** (2026-09-30). Siguiente: paso 4 (la Botonera y las Acciones como piezas compartidas). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1, 2 y 3** (2026-09-30). En curso: paso 4, por etapas (plan en [`plan-paso4.md`](plan-paso4.md)). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -162,7 +162,11 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   una habilidad, Flash).
 - **Riesgo**: medio.
 
-### Paso 4 — La Botonera y las Acciones como piezas compartidas
+### Paso 4 — La Botonera y las Acciones como piezas compartidas — en curso, por etapas (2026-09-30)
+- **Cómo va**: el dueño eligió hacerlo **por etapas** (plan detallado en [`plan-paso4.md`](plan-paso4.md)): 1) arreglar de raíz
+  cómo viven la ficha y GM Tools dentro del mapa (`comun/embebido.js`: se esconde la página, cualquier cartel se ve y avisa
+  solo); 2) el paso 5 (partir los archivos); 3) que el mapa dibuje la Botonera y las Acciones; al final, zonas y trampas de
+  las invocaciones.
 - **Qué**: que el mapa **dibuje él mismo** la Botonera del personaje y las Acciones del creep (usando el motor), en vez de
   meter la ficha o GM Tools enteras adentro. Menos puertas y menos mensajes.
 - **Se gana**: se van los bugs de "invisible dentro del mapa", el mapa carga más rápido, un clic hace lo que dice.

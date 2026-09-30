@@ -1291,7 +1291,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930g"></script>
+<script src="../comun/combatiente.js?v=20260930h"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -5671,56 +5671,20 @@ function mantenimiento(){
     sc.ataquesTurno = 0;
     // Reporte para el 📜 Historial del GM (2026-09-24): qué le pasó a este creep en el pase de turno, con el antes y el después.
     const rep = [];
-    const terminoPorTurnos = new Set();
     sc.habilidades.forEach(h => {
       if(num(h.cdActual) > 0){
         h.cdActual = Math.max(0, num(h.cdActual) - 1);
         enCooldown++;
       }
     });
-    const activosMant = sc.estados.filter(e => e.activo !== false);
-    const esInvulnerableMant = activosMant.some(e => e.invulnerable);
-    const inmuneVenenoMant = activosMant.some(e => e.sangrePura);
-    const inmuneSangradoMant = activosMant.some(e => e.coagulacionExtrema);
-    sc.estados.forEach(es => {
-      if(es.activo === false) return; // inactivo: no aplica HP/turno ni cuenta turnos ni stacks
-      // Escudo especial funciona como una barra de HP secundaria: se recarga
-      // entera cada Mantenimiento mientras el estado siga activo. (El Excedente de vida NO: valor neto, sin tope ni recarga.)
-      if(num(es.escudoMagico) > 0 && !es.excedenteVida){
-        const previo = num(es.escudoMagicoActual ?? es.escudoMagico);
-        if(previo < num(es.escudoMagico)) rep.push(`${es.nombre}: escudo especial ${fmt(previo)} → ${fmt(num(es.escudoMagico))}`);
-        es.escudoMagicoActual = num(es.escudoMagico);
-      }
-      const stacks = Math.max(1, num(es.stacks) || 1);
-      let cambio = num(es.hpTurno) * stacks;
-      if(cambio < 0 && (esInvulnerableMant || (es.esVeneno && inmuneVenenoMant) || (es.esSangrado && inmuneSangradoMant))){
-        rep.push(`${es.nombre}: no le hizo efecto (inmunidad)`);
-        cambio = 0;
-      }
-      if(cambio){
-        sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + cambio));
-        hpAplicado++;
-        rep.push(`${es.nombre}: ${cambio > 0 ? '+' : '−'}${fmt(Math.abs(cambio))} HP${stacks > 1 ? ` (${fmt(stacks)} stacks)` : ''}`);
-      }
-      const ds = num(es.stacksTurno);
-      if(ds){
-        es.stacks = Math.max(0, stacks + ds);
-        rep.push(`${es.nombre}: stacks ${fmt(stacks)} → ${fmt(es.stacks)}`);
-      }
-      if(!es.permanente && num(es.turnos) > 0){
-        const turnosAntes = num(es.turnos);
-        es.turnos = Math.max(0, turnosAntes - 1);
-        rep.push(es.turnos > 0 ? `${es.nombre}: ${fmt(turnosAntes)} → ${fmt(es.turnos)} turno${es.turnos === 1 ? '' : 's'}` : `${es.nombre}: ${fmt(turnosAntes)} → 0 turnos, se terminó`);
-        if(es.turnos === 0) terminoPorTurnos.add(es.id);
-      }
-    });
-    const antes = sc.estados.length;
-    const sigue = es => es.activo === false || (es.permanente ? num(es.stacks) !== 0 : (es.turnos > 0 && num(es.stacks) !== 0));
-    const vencenConHp = sc.estados.some(es => !sigue(es) && modsAfectanHp(es.mods));
-    sc.estados.filter(es => !sigue(es) && es.activo !== false && !terminoPorTurnos.has(es.id)).forEach(es => rep.push(`${es.nombre}: se terminó`));
-    sc.estados = sc.estados.filter(sigue);
-    if(vencenConHp) actualizarHpMaxPorCon(sc);
-    vencidos += antes - sc.estados.length;
+    // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js).
+    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
+    if(turnoEst.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + turnoEst.hp)); }
+    hpAplicado += turnoEst.eventos.filter(ev => ev.tipo === 'hp').length;
+    rep.push(...Combatiente.reporteTurno(turnoEst.eventos));
+    sc.estados = turnoEst.quedan;
+    if(turnoEst.terminados.some(es => modsAfectanHp(es.mods))) actualizarHpMaxPorCon(sc);
+    vencidos += turnoEst.terminados.length;
     // Se recargan después de los estados: un Stun que venció ya no los topea.
     sc.nitros = creepNitrosMax(sc);
     if(rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(sc.nombre, rep);

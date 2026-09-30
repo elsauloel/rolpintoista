@@ -571,3 +571,7 @@ resuelven a mano, como el resto de los avisos).
   puede bajar el máximo de No2, nunca subirlo (para subir están Hypeado o un bono a Nitros). Diferencia encontrada al unificar
   (paso 1 de la consolidación): creeps e invocaciones ya lo tomaban como tope; el personaje lo tomaba como "fijar" y un estado
   armado a mano con N más alto le subía el máximo. Ahora los tres usan `Combatiente.nitrosMax`.
+- ✅ **P131. Un estado sin turnos y sin marcar "permanente" (dato a medio cargar) — 2026-09-30, resuelta: hace su efecto una vez y se
+  va en el próximo pase de turno** (dueño). Diferencia encontrada en el paso 2 de la consolidación: el personaje lo dejaba para
+  siempre (como permanente) y el creep lo borraba. Ningún estado de fábrica ni de ítems equipados cae en este caso; solo uno
+  armado a mano sin turnos. Regla en `Combatiente.pasarTurnoEstados`. De paso: un estado con 0 stacks se termina en los tres.

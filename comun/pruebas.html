@@ -235,6 +235,33 @@ prueba('No2 máximo: Cansado 2/3, Hypeado +1/3, Exhausto 1/3, Stun 0', () => igu
   Combatiente.nitrosMax(9, [E({exhausto: true})]), Combatiente.nitrosMax(9, [E({forzarNitros: 0})]), Combatiente.nitrosMax(9, [E({cansado: true}), E({hypeado: true})]),
 ], [9, 6, 12, 3, 0, 9]));
 prueba('"Forzar Nitros máx." es un tope: nunca sube el máximo (dueño, 2026-09-30)', () => igual(Combatiente.nitrosMax(6, [E({forzarNitros: 10})]), 6));
+grupo('Pase de turno (paso 2)');
+const campF = {hp: 'hpturno', stacks: 'stacksturno'};
+prueba('Veneno ×3 de 1: −3 de vida y un turno menos', () => {
+  const r = Combatiente.pasarTurnoEstados([E({nombre: 'Veneno', esVeneno: true, hpturno: -1, stacks: 3, turnos: 3})], campF);
+  igual([r.hp, r.quedan[0].turnos, Combatiente.reporteTurno(r.eventos)], [-3, 2, ['Veneno: −3 HP (3 stacks)', 'Veneno: 3 → 2 turnos']]);
+});
+prueba('Invulnerable, Sangre pura y Coagulación frenan el daño por turno (no la cura)', () => {
+  const r = Combatiente.pasarTurnoEstados([E({nombre: 'Veneno', esVeneno: true, hpturno: -2, turnos: 2}), E({nombre: 'Sangre pura', sangrePura: true, permanente: true}), E({nombre: 'Regeneración', hpturno: 2, turnos: 2})], campF);
+  igual(r.hp, 2);
+});
+prueba('el escudo especial se recarga; el Excedente de vida no', () => {
+  const es = [E({nombre: 'Escudo especial', escudoMagico: 8, escudoMagicoActual: 3, turnos: 2}), E({nombre: 'Excedente', escudoMagico: 5, escudoMagicoActual: 1, excedenteVida: true, permanente: true})];
+  Combatiente.pasarTurnoEstados(es, campF);
+  igual([es[0].escudoMagicoActual, es[1].escudoMagicoActual], [8, 1]);
+});
+prueba('vence al llegar a 0 turnos; el permanente sigue; el pausado no hace nada', () => {
+  const r = Combatiente.pasarTurnoEstados([E({nombre: 'A', turnos: 1}), E({nombre: 'B', permanente: true}), {nombre: 'C', activo: false, turnos: 1, hpturno: -5}], campF);
+  igual([r.quedan.map(e => e.nombre), r.hp], [['B', 'C'], 0]);
+});
+prueba('sin turnos y sin "permanente": hace su efecto una vez y se va (dueño, 2026-09-30)', () => {
+  const r = Combatiente.pasarTurnoEstados([E({nombre: 'Improvisado', hpturno: -2, turnos: 0})], campF);
+  igual([r.hp, r.quedan.length], [-2, 0]);
+});
+prueba('stacks por turno: bajan y en 0 se termina', () => {
+  const r = Combatiente.pasarTurnoEstados([E({nombre: 'Llamas', hpTurno: -1, stacks: 1, stacksTurno: -1, permanente: true})], {hp: 'hpTurno', stacks: 'stacksTurno'});
+  igual([r.hp, r.quedan.length], [-1, 0]);
+});
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

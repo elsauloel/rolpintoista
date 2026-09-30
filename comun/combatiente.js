@@ -79,6 +79,68 @@ const Combatiente = (() => {
     if(conVentaja){ const af = activos(estados).find(e => e.afortunado); if(af) out.push({n: af.nombre, p: 'buff'}); }
     return out;
   }
+  /* ---------- Pase de turno de los estados (paso 2, 2026-09-30) ----------
+     Lo que le hacen los estados a quien los tiene en cada Mantenimiento — igual para personaje, invocación y creep:
+       · Escudo especial: se recarga entero (el Excedente de vida no: es un valor neto).
+       · Daño o cura por turno × stacks. El daño no hace efecto con Invulnerable, ni el de Veneno con Sangre pura, ni el de
+         Sangrado con Coagulación extrema.
+       · Stacks por turno (suben o bajan); en 0 stacks, el estado se termina.
+       · Turnos: se descuenta 1; en 0 se termina. Uno que no es permanente y no tiene turnos (dato a medio cargar) hace su
+         efecto este turno y se va (dueño, 2026-09-30; antes el personaje lo dejaba para siempre y el creep lo borraba).
+     Los estados pausados (activo === false) no hacen nada ni vencen. Modifica los estados y devuelve {hp, quedan,
+     terminados, eventos}: `hp` es cuánto cambia la vida (lo aplica cada herramienta, con su tope y su muerte), `quedan` la
+     lista sin los que se terminaron. `campos` = nombres del daño por turno y de los stacks por turno en esa herramienta
+     ({hp:'hpturno', stacks:'stacksturno'} en la ficha; {hp:'hpTurno', stacks:'stacksTurno'} en los creeps). */
+  function pasarTurnoEstados(estados, campos){
+    const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
+    const act = activos(lista);
+    const invulnerable = act.some(e => e.invulnerable), sangrePura = act.some(e => e.sangrePura), coagulacion = act.some(e => e.coagulacionExtrema);
+    const eventos = [], fin = new Set();
+    let hp = 0;
+    lista.forEach(e => {
+      if(!e || e.activo === false) return;
+      if(n(e.escudoMagico) > 0 && !e.excedenteVida){
+        const antes = n(e.escudoMagicoActual ?? e.escudoMagico);
+        if(antes < n(e.escudoMagico)) eventos.push({tipo: 'escudo', nombre: e.nombre, de: antes, a: n(e.escudoMagico)});
+        e.escudoMagicoActual = n(e.escudoMagico);
+      }
+      const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
+      const stacks = Math.max(1, n(e.stacks) || 1);
+      let d = n(e[c.hp]) * stacks;
+      if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
+      if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks}); }
+      const ds = n(e[c.stacks]);
+      if(ds){
+        e.stacks = Math.max(0, stacks + ds);
+        eventos.push({tipo: 'stacks', nombre: e.nombre, de: stacks, a: e.stacks});
+        if(e.stacks === 0){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      }else if(hayStacks && n(e.stacks) === 0 && !fin.has(e)){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      if(!e.permanente){
+        const antes = n(e.turnos);
+        if(antes > 0){
+          e.turnos = antes - 1;
+          if(e.turnos === 0){ if(!fin.has(e)){ fin.add(e); eventos.push({tipo: 'vence', nombre: e.nombre, de: antes}); } }
+          else eventos.push({tipo: 'turnos', nombre: e.nombre, de: antes, a: e.turnos});
+        }else if(!fin.has(e)){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      }
+    });
+    return {hp, quedan: lista.filter(e => !fin.has(e)), terminados: lista.filter(e => fin.has(e)), eventos};
+  }
+  // El reporte en texto llano (Mesa del personaje, 📜 Historial del GM), un renglón por cosa que pasó.
+  const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
+  function reporteTurno(eventos){
+    return (eventos || []).map(ev => {
+      if(ev.tipo === 'escudo') return `${ev.nombre}: escudo especial ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
+      if(ev.tipo === 'inmune') return `${ev.nombre}: no le hizo efecto (inmunidad)`;
+      if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
+      if(ev.tipo === 'stacks') return `${ev.nombre}: stacks ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
+      if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
+      if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;
+      if(ev.tipo === 'fin') return `${ev.nombre}: se terminó`;
+      return '';
+    }).filter(Boolean);
+  }
+
   /* ---------- Máximo de No2 con los estados (tanda 3, 2026-09-30) ----------
      `natural` = Agilidad efectiva + bonos a Nitros (cada herramienta lo arma con lo suyo). Cansado lo deja en 2/3 del natural
      (para abajo); Hypeado suma un tercio del natural (para arriba); "Forzar Nitros máx." (Stun = 0, estados propios) y
@@ -218,7 +280,7 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

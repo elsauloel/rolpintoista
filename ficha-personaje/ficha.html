@@ -2074,7 +2074,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930g"></script>
+<script src="../comun/combatiente.js?v=20260930h"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -10967,11 +10967,9 @@ function mantenimiento(){
   const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
   const log = [];
   let hpDelta = 0;
-  const vencidos = [];
   // Reporte para la Mesa (2026-09-24): lo que le pasó a este personaje en el pase de turno, en texto llano y con el antes y el
   // después, para que todos vean si el veneno bajó, si la regeneración curó, etc. Se publica al final (mesaPublicarReporte).
   const rep = [];
-  const terminados = new Set();
   const hpAntes = num(S.hp);
 
   // SP Regen: AL PRINCIPIO del Mantenimiento (2026-09-24), con los números de antes de que venza o cambie ningún estado.
@@ -10984,59 +10982,11 @@ function mantenimiento(){
     rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
   }
 
-  const efectosActivosMant = S.efectos.filter(e => e.activo !== false);
-  const esInvulnerable = efectosActivosMant.some(e => e.invulnerable);
-  const inmuneVenenoMant = efectosActivosMant.some(e => e.sangrePura);
-  const inmuneSangradoMant = efectosActivosMant.some(e => e.coagulacionExtrema);
-
-  S.efectos.forEach(e => {
-    if(e.activo === false) return;
-    const stacks = Math.max(1, num(e.stacks) || 1);
-
-    // Escudo especial funciona como una barra de HP secundaria: se recarga
-    // entera cada Mantenimiento mientras el estado siga activo. (El Excedente de vida NO: es un valor neto, sin tope ni recarga.)
-    if(num(e.escudoMagico) > 0 && !e.excedenteVida){
-      const actual = num(e.escudoMagicoActual ?? e.escudoMagico);
-      if(actual < num(e.escudoMagico)){
-        log.push(`<b>${esc(e.nombre)}</b> escudo recargado a ${fmt(num(e.escudoMagico))}`);
-        rep.push(`${e.nombre}: escudo especial ${fmt(actual)} → ${fmt(num(e.escudoMagico))}`);
-      }
-      e.escudoMagicoActual = num(e.escudoMagico);
-    }
-
-    let hp = num(e.hpturno) * stacks;
-    if(hp < 0 && (esInvulnerable || (e.esVeneno && inmuneVenenoMant) || (e.esSangrado && inmuneSangradoMant))){
-      log.push(`<b>${esc(e.nombre)}</b> <span class="heal">bloqueado por inmunidad</span>`);
-      rep.push(`${e.nombre}: no le hizo efecto (inmunidad)`);
-      hp = 0;
-    }
-    if(hp){
-      hpDelta += hp;
-      log.push(`<b>${esc(e.nombre)}</b> <span class="${hp<0?'dmg':'heal'}">${hp>0?'+':''}${fmt(hp)} HP</span>`);
-      rep.push(`${e.nombre}: ${hp > 0 ? '+' : '−'}${fmt(Math.abs(hp))} HP${stacks > 1 ? ` (${fmt(stacks)} stacks)` : ''}`);
-    }
-
-    const ds = num(e.stacksturno);
-    if(ds){
-      e.stacks = Math.max(0, stacks + ds);
-      log.push(`<b>${esc(e.nombre)}</b> stacks ${fmt(stacks)} &rarr; ${fmt(e.stacks)}`);
-      rep.push(`${e.nombre}: stacks ${fmt(stacks)} → ${fmt(e.stacks)}`);
-      if(e.stacks === 0){ vencidos.push(e.id); terminados.add(e.id); rep.push(`${e.nombre}: se terminó`); }
-    }
-
-    if(!e.permanente && num(e.turnos) > 0){
-      const turnosAntes = num(e.turnos);
-      e.turnos = turnosAntes - 1;
-      if(e.turnos === 0){
-        if(!terminados.has(e.id)) rep.push(`${e.nombre}: ${fmt(turnosAntes)} → 0 turnos, se terminó`);
-        terminados.add(e.id);
-        vencidos.push(e.id);
-      }else{
-        log.push(`<b>${esc(e.nombre)}</b> quedan ${fmt(e.turnos)}`);
-        rep.push(`${e.nombre}: ${fmt(turnosAntes)} → ${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'}`);
-      }
-    }
-  });
+  // Lo que hacen los estados en el pase de turno (escudo, daño/cura con inmunidades, stacks, turnos): regla común de
+  // personajes, invocaciones y creeps (comun/combatiente.js). La vida se aplica más abajo, con fijarHp (tope, Ankh, muerte).
+  const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno'});
+  hpDelta += turnoEst.hp;
+  Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
 
   // Pasivas de regeneración: recuperan HP en cada Mantenimiento (por compra).
   S.pasivas.forEach(p => {
@@ -11069,10 +11019,10 @@ function mantenimiento(){
     renderOverlayMuerte();
   }
 
-  if(vencidos.length){
-    S.efectos.filter(e => vencidos.includes(e.id))
-      .forEach(e => { log.push(`<span class="gone">${esc(e.nombre)} se termin&oacute;</span>`); if(!terminados.has(e.id)) rep.push(`${e.nombre}: se terminó`); });
-    S.efectos = S.efectos.filter(e => !vencidos.includes(e.id));
+  // Los estados que se terminaron se sacan por identidad (fijarHp pudo tocar la lista, por ejemplo el Ankh).
+  if(turnoEst.terminados.length){
+    const fin = new Set(turnoEst.terminados);
+    S.efectos = S.efectos.filter(e => !fin.has(e));
   }
 
   S.turno = (S.turno || 1) + 1;
@@ -11092,22 +11042,11 @@ function mantenimiento(){
     inv.nitros = invNitrosMax(inv);
     inv.ataquesTurno = 0;
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
-    // Estados alterados de la invocación: mismo criterio que los del
-    // propio personaje (HP por turno, stacks, turnos que vencen).
-    const vencidosInv = [];
-    inv.estados.forEach(e => {
-      if(e.activo === false) return;
-      const stacks = Math.max(1, num(e.stacks) || 1);
-      const hp = num(e.hpturno) * stacks;
-      if(hp) inv.hp = num(inv.hp) + hp;
-      const ds = num(e.stacksturno);
-      if(ds){ e.stacks = Math.max(0, stacks + ds); if(e.stacks === 0) vencidosInv.push(e.id); }
-      if(!e.permanente && num(e.turnos) > 0){
-        e.turnos = num(e.turnos) - 1;
-        if(e.turnos === 0) vencidosInv.push(e.id);
-      }
-    });
-    if(vencidosInv.length) inv.estados = inv.estados.filter(e => !vencidosInv.includes(e.id));
+    // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js). Hasta el
+    // 2026-09-30 era una copia recortada: no respetaba inmunidades, no recargaba el escudo y la vida no tenía tope.
+    const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno'});
+    if(turnoInv.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + turnoInv.hp));
+    inv.estados = turnoInv.quedan;
     if(num(inv.cooldown) > 0){
       inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
       if(inv.cooldownActual === 0){

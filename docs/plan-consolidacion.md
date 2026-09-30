@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0 y 1** (2026-09-30). Siguiente: paso 2 (estados y Mantenimiento). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0 y 1** (2026-09-30). En curso: paso 2 (estados y Mantenimiento; tanda 1 hecha). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -108,7 +108,19 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
     herramienta se los pasa. Lo que sigue repetido de verdad son el **Mantenimiento** (paso 2) y la **ejecución de
     habilidades** con su costo en No2/SP (paso 3). **El paso 1 queda cerrado.**
 
-### Paso 2 — Estados y Mantenimiento únicos
+### Paso 2 — Estados y Mantenimiento únicos — en curso (2026-09-30)
+- **Cómo va — tanda 1 ✅**: **el pase de turno de los estados** (`Combatiente.pasarTurnoEstados` + `reporteTurno`): escudo
+  que se recarga, daño/cura por turno × stacks con inmunidades, stacks por turno, turnos que vencen y el reporte (Mesa del
+  personaje, 📜 Historial del GM). Lo usan el personaje, las invocaciones y los creeps; lo propio de cada uno queda en su
+  herramienta (SP Regen, pasivas y cuenta de muerte del personaje; cooldowns de creeps e invocaciones; cómo se aplica la vida:
+  `fijarHp` en la ficha, tope 0–máximo en creeps e invocaciones). Comparado con las versiones viejas en 4000 casos: igual.
+  Diferencias corregidas: **las invocaciones** tenían una copia recortada (no respetaban inmunidades, no recargaban el escudo,
+  la vida no tenía tope); **un estado sin turnos ni "permanente"** ahora hace su efecto una vez y se va (**P131**, antes el
+  personaje lo dejaba para siempre y el creep lo borraba); **0 stacks = se terminó** en los tres; en los creeps la vida del
+  turno se suma toda junta antes del tope (antes, estado por estado: una cura y un daño en el mismo turno podían dar distinto
+  según el orden). Pruebas: 78.
+- **Tanda 2 (siguiente)**: probarlo en "Claude · pruebas" varios turnos seguidos; después, aplicar/quitar estados (lo que
+  todavía está repetido entre el "+ Estado" de la ficha, el de los creeps y `EstadosAplicar`).
 - **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los
   tres tipos de combatiente. Hoy `mantenimiento` existe en tres versiones.
 - **Se gana**: un estado nuevo o una regla de turno nueva se escribe una vez.

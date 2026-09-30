@@ -20,6 +20,10 @@
 > (en curso desde 2026-09-29): un solo mecanismo para todo tipo de elemento, con la configuración completa
 > incluida la automatización, partiendo de la Biblioteca de Firebase. No armar otro camino en paralelo.
 >
+> **Plan de consolidación (propuesta, sin empezar) → [`docs/plan-consolidacion.md`](docs/plan-consolidacion.md)**: un solo
+> motor de reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas. Se lleva adelante
+> cuando el dueño lo decida; mientras tanto, al tocar código repetido entre herramientas, tenerlo en cuenta.
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

@@ -14,6 +14,8 @@ de diseño sin decidir (regla general: toda pregunta abierta se anota ahí).
 [`rework-armas.md`](rework-armas.md) es la hoja de trabajo del rework de armas (preguntas en orden con propuestas y respuestas). [`rework-armas-revision.md`](rework-armas-revision.md) es la hoja para marcar qué armas del catálogo actual se conservan, reajustan o descartan (P11). [`hoja-de-ruta-rework-catalogo.md`](hoja-de-ruta-rework-catalogo.md) es la hoja de ruta del rework del catálogo (fases, lo decidido y lo pendiente). [`guia-de-diseno.md`](guia-de-diseno.md) es la guía de campos de juego y mecánicas por familia de arma / elemento (borrador vivo, para diseñar skills y equipos). [`herramientas-de-diseno.md`](herramientas-de-diseno.md) lista los tipos de efecto y conceptos a tener a mano para el rework de skills y equipos (niebla y visibilidad, efectos sobre la iniciativa, "equipo" incluye armas).
 [`plan-sistema-nuevo.md`](plan-sistema-nuevo.md) tiene las decisiones y el estado del
 sistema nuevo; [`workflow-firebase.md`](workflow-firebase.md), cómo está armado Firebase.
+[`plan-consolidacion.md`](plan-consolidacion.md) (2026-09-30, propuesta sin empezar): pasar a un solo motor de
+reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas — por pasos, cuando el dueño lo decida.
 
 Con contenido básico: [`workflow-github.md`](workflow-github.md) documenta
 el patrón de sincronización (token, `gestor.html`, API de contenidos) que

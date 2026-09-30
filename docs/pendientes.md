@@ -131,3 +131,4 @@
 - [ ] **🔔 versión nueva en ítems ya comprados** (2026-09-29, paso 5 de `docs/plan-subida-unificada.md`): una corrección de
   un ítem del catálogo cambia el catálogo, pero no las copias que ya están en una mochila. Falta guardar de dónde salió
   cada ítem al comprarlo (`bibOrigen`) y mostrar el aviso (cartel `Biblioteca.avisoVersion`).
+- [ ] **Plan de consolidación** (2026-09-30, propuesta del asistente a pedido del dueño): un solo motor de reglas (personaje, invocación y creep) y la ficha, GM Tools y el mapa como ventanas; pasos 0 a 6 en `docs/plan-consolidacion.md`. **Sin empezar**: el dueño decide cuándo.

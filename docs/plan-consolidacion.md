@@ -1,0 +1,108 @@
+# Plan de consolidación: un solo motor, varias ventanas
+
+> **Estado: propuesta, sin empezar** (escrita el 2026-09-30 a pedido del dueño). Se lleva adelante cuando el dueño tenga el
+> tiempo y lo considere criterioso — no antes. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
+> [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
+
+## Por qué
+
+El proyecto creció por descubrimiento: primero la ficha, después el mapa, después GM Tools, la tienda, el duelo… Cada pieza
+nació como una página propia y se fue conectando con las demás. Lo esencial está bien resuelto — **Firebase es la única fuente
+de verdad** y todas las páginas leen y escriben ahí en vivo; `comun/` (38 archivos) ya junta mucho de lo compartido —, pero el
+crecimiento por partes dejó tres costos que se sienten cada vez que se toca algo:
+
+1. **La misma regla escrita varias veces.** Un personaje, una invocación y un creep son lo mismo en el fondo (un combatiente:
+   stats, estados, No2, HP, habilidades), pero cada uno tiene su propio código. Hoy están repetidas, entre otras:
+   `mantenimiento` (ficha, GM Tools y mapa), `escudoParsear` (las tres), `tirarValorStat`, `mitadesDeTirada`,
+   `acumularVeneno`/`acumularSangrado`, `estaBloqueadoElDebuff`, `costoParry`, `bloqueoValor` (ficha y GM Tools), y la
+   ejecución de habilidades en tres versiones (personaje, invocación, creep). Los tres modos de ejecución (2026-09-30) hubo que
+   escribirlos tres veces. Cada copia puede quedar distinta de las otras sin que nadie lo note.
+2. **Las "puertas" entre páginas son frágiles.** El mapa mete adentro la ficha (`?modo=botonera`, `?modo=mantenimiento`) y
+   GM Tools (`?modo=acciones`, `finalizar`, `botin`) y se hablan con mensajes (unos 30 tipos distintos entre las tres). De
+   ahí salieron algunos de los bugs más raros: el cartel "¿Es tu turno?" invisible dentro del mapa (la ficha escondía lo que
+   no conocía), clics que no llegan, ventanas que se tapan.
+3. **Archivos gigantes.** `ficha.html` ~12.700 renglones, `mapa.html` ~10.700, `gm-tools.html` ~8.000. Cuanto más grande,
+   más cuesta cambiar algo sin romper otra cosa y más fácil es que dos conversaciones se pisen.
+
+## La idea: un motor de reglas, varias ventanas
+
+Lo que más rinde **no es juntar todo en una sola página**, sino tener **un solo motor de reglas**: un lugar que sepa qué es un
+combatiente y qué significa cobrar un costo, tirar, aplicar un estado, pasar el turno o ejecutar una habilidad. La ficha, GM
+Tools y el mapa pasan a ser **ventanas** que miran y usan ese motor. Una regla nueva se escribe una vez y vale para todos.
+
+Juntar todo en una sola pantalla (la ficha y GM Tools como paneles del mapa) es un paso aparte y opcional; con el motor común
+hecho, sería un cambio chico. Sin él, sería una casa más grande con los mismos problemas adentro.
+
+## Lo que NO cambia
+
+- **Los datos**: la estructura de Firebase, las fichas, los creeps, los mapas y las partidas en curso siguen igual. Nada de
+  esto obliga a migrar datos de jugadores (si algún paso lo necesitara, se convierte solo al abrir, como siempre).
+- **Sin "build step"**: todo sigue siendo HTML y JS que se abre directo y se publica solo en GitHub Pages.
+- **Las reglas del juego**: esto reordena cómo está escrito el código, no qué hace. Si en el camino aparece una diferencia
+  entre copias (una regla que en la ficha hace una cosa y en GM Tools otra), se le pregunta al dueño cuál vale.
+
+## Los pasos
+
+Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden espaciar semanas entre uno y otro.
+
+### Paso 0 — Red de seguridad (antes de tocar nada)
+- **Qué**: una lista de pruebas de humo por herramienta (qué tocar y qué tiene que pasar: atacar, defenderse, ejecutar una
+  habilidad de cada modo, pasar el turno, comprar, colocar una trampa…) y, si conviene, una página de pruebas
+  (`comun/pruebas.html`) que carga el motor y verifica resultados solos (ej.: "Sangrado 2 stacks + otro → 3").
+  Usar la partida **"Claude · pruebas"** (creeps y mapas ya armados) y **"Test"** para fichas de jugador.
+- **Se gana**: poder mover código con la tranquilidad de detectar enseguida si algo se rompió.
+- **Riesgo**: ninguno (no toca el juego).
+
+### Paso 1 — El combatiente único (`comun/combatiente.js`)
+- **Qué**: una sola forma de leer y escribir a "alguien que pelea", con tres adaptadores (personaje, invocación, creep):
+  valor de un stat con sus modificadores, estados activos, No2, HP, escudo. Y mover ahí primero las funciones **puras**
+  repetidas (`mitadesDeTirada`, `escudoParsear`, `acumularVeneno`/`Sangrado`, `bloqueoValor`, `costoParry`,
+  `estaBloqueadoElDebuff`…), una por una, comparando que den lo mismo que antes.
+- **Se gana**: el cimiento de todo lo demás; cada función movida deja de poder divergir.
+- **Riesgo**: bajo, si se mueve de a una y con el paso 0.
+
+### Paso 2 — Estados y Mantenimiento únicos
+- **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los
+  tres tipos de combatiente. Hoy `mantenimiento` existe en tres versiones.
+- **Se gana**: un estado nuevo o una regla de turno nueva se escribe una vez.
+- **Riesgo**: medio (el Mantenimiento toca todo); probar con una partida de prueba varios turnos seguidos.
+
+### Paso 3 — Ejecución de habilidades única
+- **Qué**: cobrar el costo, los tres modos (📣 manual, 💰 semi, ✨ auto), lo del sistema anterior mientras dure, trampas y
+  zonas: una sola implementación que usan personaje, invocación y creep.
+- **Se gana**: se terminan las tres versiones; las invocaciones reciben lo que hoy les falta (zonas, ataque con arma desde
+  una habilidad, Flash).
+- **Riesgo**: medio.
+
+### Paso 4 — La Botonera y las Acciones como piezas compartidas
+- **Qué**: que el mapa **dibuje él mismo** la Botonera del personaje y las Acciones del creep (usando el motor), en vez de
+  meter la ficha o GM Tools enteras adentro. Menos puertas y menos mensajes.
+- **Se gana**: se van los bugs de "invisible dentro del mapa", el mapa carga más rápido, un clic hace lo que dice.
+- **Riesgo**: medio-alto (es lo que más se usa en mesa). Conviene hacerlo en una **rama aparte** (no en `nueva-version`,
+  que se publica sola) y juntarlo cuando esté probado en "Claude · pruebas" y "Test".
+
+### Paso 5 — Partir los archivos gigantes
+- **Qué**: separar cada herramienta en piezas con nombre (`comun/…`: inventario, habilidades, invocaciones, niebla, tokens,
+  tienda…), cada una más chica y con una sola responsabilidad.
+- **Se gana**: cambios más seguros, menos choques entre conversaciones, más fácil de entender.
+- **Riesgo**: bajo por pieza, pero es mucho trabajo; se puede hacer de a una cuando se toque cada parte.
+
+### Paso 6 (opcional) — Una sola pantalla
+- **Qué**: la ficha y GM Tools como paneles que se abren al lado del mapa (con la opción de abrirlas aparte), como pide "A
+  desarrollar" n.º 51.
+- **Se gana**: la experiencia de "todo en un lugar".
+- **Riesgo**: con los pasos 1–4 hechos, bajo; sin ellos, alto (no conviene hacerlo primero).
+
+## Cómo trabajarlo
+- **De a un paso**, cada uno con su propio plan detallado antes de empezar (como `plan-subida-unificada.md`), preguntas de
+  diseño primero y código después.
+- **Nada a medias en el sitio público**: los pasos 1–3 y 5 se pueden subir de a poco (cada función movida, probada); el 4 y
+  el 6, en una rama aparte hasta que estén probados.
+- **Aprovechar el envión**: cuando haya que tocar una parte por otro motivo (una regla nueva, un bug), ese es el mejor
+  momento para mover esa parte al motor común.
+
+## Para decidir antes de empezar
+1. ¿Arrancamos por el paso 0 + 1 (bajo riesgo, mucho beneficio) y vemos?
+2. ¿Una ventana de tiempo sin partidas (o con partidas de prueba) para el paso 4?
+3. ¿El paso 6 (una sola pantalla) es un objetivo, o alcanza con que las piezas estén bien conectadas?
